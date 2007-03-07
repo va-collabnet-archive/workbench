@@ -1,0 +1,30 @@
+package org.dwfa.maven;
+
+public class OutputSpec {
+	private InputFileSpec[] inputSpecs;
+	private I_TransformAndWrite[] writers;
+	
+
+	
+	public String toString() {
+		StringBuffer b = new StringBuffer();
+		b.append("\nWriters: \n");
+		for (I_TransformAndWrite w: writers) {
+			b.append(w);
+		}
+		return b.toString();
+	}
+	public InputFileSpec[] getInputSpecs() {
+		return inputSpecs;
+	}
+	public void setInputSpecs(InputFileSpec[] inputSpecs) {
+		this.inputSpecs = inputSpecs;
+	}
+	public I_TransformAndWrite[] getWriters() {
+		return writers;
+	}
+	public void setWriters(I_TransformAndWrite[] writers) {
+		this.writers = writers;
+	}
+	
+}
