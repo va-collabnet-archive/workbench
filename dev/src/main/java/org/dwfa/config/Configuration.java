@@ -1,0 +1,94 @@
+package org.dwfa.config;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+public class Configuration {
+	List<ServiceConfigOption> options;
+	boolean rmiSecure = false;
+	
+	
+    public Configuration(List<ServiceConfigOption> options, boolean rmiSecure) {
+		super();
+		this.options = options;
+		this.rmiSecure = rmiSecure;
+	}
+    public Configuration(ServiceConfigOption[] options, boolean rmiSecure) {
+    	this(Arrays.asList(options), rmiSecure);
+    }
+
+	public void writeToFile(String fileName) throws IOException {
+    	writeToFile(new File(fileName));
+    }
+
+    /**
+     * @param file
+     */
+    public void writeToFile(File file) throws IOException {
+        file.getParentFile().mkdirs();
+        FileWriter fw = new FileWriter(file);
+        fw.write(this.generateConfigString());
+        fw.close();
+    }
+
+    public String generateConfigString() {
+        StringBuffer buff = new StringBuffer();
+        buff.append("import com.sun.jini.start.NonActivatableServiceDescriptor;\n");
+        buff.append("import com.sun.jini.start.ServiceDescriptor;\n");
+        buff.append("import com.sun.jini.config.ConfigUtil;\n");
+        buff.append("import net.jini.url.httpmd.HttpmdUtil;\n\n");
+        buff.append("import org.dwfa.jini.VHelp;\n\n");
+    
+        buff.append("com.sun.jini.start {\n");
+    
+        buff.append("   private static host = ConfigUtil.getHostAddress();\n");
+        buff.append('\n');
+        buff.append("   private static jskCodebase = ConfigUtil.concat(new String[] { \"http://\", host, \":8081/\", VHelp.addDlVersion(\"jsk-dl\")});\n");
+        buff.append("   private static jskMdURL = ConfigUtil.concat(new String[] { \"httpmd://\", host, \":8081/\",  VHelp.addDlVersion(\"jsk-dl\"), \";sha=0\"});\n");
+        buff.append("   private static jskCodebaseMd = HttpmdUtil.computeDigestCodebase(\"lib-dl\", jskMdURL);\n\n");
+        for (ServiceConfigOption option: options) {
+            if (option.isEnabled()) {
+             	   String[] setupStrings = option.getSetupStrings(rmiSecure);
+            	   for (int j = 0; j < setupStrings.length; j++) {
+                       buff.append("   ");
+                       buff.append(setupStrings[j]);
+                       buff.append("\n");
+            	   }
+                buff.append("\n");
+            }
+        }
+    
+        
+        buff.append("   static serviceDescriptors = new ServiceDescriptor[] {\n");
+        for (int i = 0; i < options.size(); i++) {
+            if (options.get(i).isEnabled()) {
+                buff.append("     ");
+                buff.append(options.get(i).getNonActivatableServiceDescriptor());
+                if (i < options.size() - 1) {
+                    buff.append(",");
+                }
+                buff.append("\n");
+            }
+        }
+    
+        buff.append("   };\n");
+        buff.append("}\n");
+        return buff.toString();   
+    }
+
+	public boolean isRmiSecure() {
+		return rmiSecure;
+	}
+
+	public void setRmiSecure(boolean rmiSecure) {
+		this.rmiSecure = rmiSecure;
+	}
+
+	public List<ServiceConfigOption> getOptions() {
+		return options;
+	}
+
+}

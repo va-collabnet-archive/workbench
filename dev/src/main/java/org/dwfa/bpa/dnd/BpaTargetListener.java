@@ -1,0 +1,237 @@
+/*
+ * Created on Mar 19, 2005
+ *
+ * Copyright 2005 by Informatics, Inc. 
+ */
+package org.dwfa.bpa.dnd;
+
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.dwfa.bpa.data.DataContainer;
+
+public class BpaTargetListener implements DropTargetListener {
+
+    private static Logger logger = Logger.getLogger("org.dwfa.bpa.dnd");
+    
+    private I_DoDragAndDrop targetComponent;
+
+    private String prefix;
+    
+    private boolean dropHighlight = false;
+    
+    private Class acceptableClass = Object.class;
+
+    /**
+     * @param targetComponent
+     * @param prefix
+     * @param label
+     *            TODO
+     * @throws ClassNotFoundException
+     */    
+    public BpaTargetListener(I_DoDragAndDrop targetComponent,
+            String prefix, Class acceptableClass) throws ClassNotFoundException {
+        super();
+        this.targetComponent = targetComponent;
+        this.prefix = prefix;
+        this.acceptableClass = acceptableClass;
+    }
+
+    /**
+     * @see java.awt.dnd.DropTargetListener#dragEnter(java.awt.dnd.DropTargetDragEvent)
+     */
+    public void dragEnter(DropTargetDragEvent ev) {
+        if (this.isDragOk(ev)) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Target " + this.prefix + " dragEnter targetComponent"
+                        + ev);
+            }
+            this.targetComponent.highlightForDrop(true);
+            this.dropHighlight = true;
+            ev.acceptDrag(this.targetComponent.getAcceptableActions());
+        }
+
+    }
+
+    /**
+     * @see java.awt.dnd.DropTargetListener#dragOver(java.awt.dnd.DropTargetDragEvent)
+     */
+    public void dragOver(DropTargetDragEvent ev) {
+        if (this.isDragOk(ev)) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Target " + this.prefix + " dragOver targetComponent"
+                        + ev);
+            }
+            ev.acceptDrag(this.targetComponent.getAcceptableActions());
+        }
+
+    }
+
+    /**
+     * @see java.awt.dnd.DropTargetListener#dropActionChanged(java.awt.dnd.DropTargetDragEvent)
+     */
+    public void dropActionChanged(DropTargetDragEvent ev) {
+        if (this.isDragOk(ev)) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Target " + this.prefix + " dropActionChanged targetComponent"
+                        + ev);
+            }
+            ev.acceptDrag(this.targetComponent.getAcceptableActions());
+        }
+
+    }
+
+    /**
+     * @see java.awt.dnd.DropTargetListener#dragExit(java.awt.dnd.DropTargetEvent)
+     */
+    public void dragExit(DropTargetEvent ev) {
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Target " + this.prefix + " dragExit targetComponent"
+                    + ev);
+        }
+        if (this.dropHighlight) {
+            this.targetComponent.highlightForDrop(false);
+            this.dropHighlight = false;
+        }
+    }
+
+    /**
+     * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
+     */
+    public void drop(DropTargetDropEvent ev) {
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Target " + this.prefix + " drop targetComponent"
+                    + ev);
+        }
+        this.targetComponent.getJComponent().requestFocus();
+        if (this.dropHighlight) {
+            this.targetComponent.highlightForDrop(false);
+            this.dropHighlight = false;
+
+            DataFlavor chosen = null;
+            Iterator<DataFlavor> localFlavorItr = this.targetComponent.getLocalFlavors().iterator();
+            while (localFlavorItr.hasNext()) {
+                DataFlavor flavor = localFlavorItr.next();
+                if (ev.isDataFlavorSupported(flavor)) {
+                 chosen = flavor;
+                 break;
+                }
+            }
+            if (chosen == null) {
+                Iterator<DataFlavor> serialFlavorItr = this.targetComponent.getLocalFlavors().iterator();
+                while (serialFlavorItr.hasNext()) {
+                    DataFlavor flavor = serialFlavorItr.next();
+                    if (ev.isDataFlavorSupported(flavor)) {
+                     chosen = flavor;
+                     break;
+                    }
+                }
+            }
+            // the actions that the sourceId has specified with
+            // DragGestureRecognizer
+            int sa = ev.getSourceActions();
+            if ((sa & this.targetComponent.getAcceptableActions()) == 0) {
+                 //System.out.println(" reject drop");
+                ev.rejectDrop();
+                ev.dropComplete(true);
+                return;
+            }
+            Object data = null;
+            try {
+                 //System.out.println(" accept drop");
+                ev.acceptDrop(this.targetComponent.getAcceptableActions());
+                data = ev.getTransferable().getTransferData(chosen);
+                if (data == null) {
+                    ev.rejectDrop();
+                    ev.dropComplete(true);
+                    throw new NullPointerException();
+                }
+                
+                //Add drop handler here...
+                this.targetComponent.setDroppedObject(data, ev);
+                
+                ev.dropComplete(true);       
+            } catch (Throwable t) {
+                t.printStackTrace();
+                ev.dropComplete(true);
+                //showBorder(false);
+                return;
+            }
+
+        } else {
+             System.out.println(prefix + " reject drop");
+            ev.rejectDrop();
+            ev.dropComplete(true);
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+	private boolean isDragOk(DropTargetDragEvent ev) {
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Target " + this.prefix + " isDragOk targetComponent"
+                    + ev);
+        }
+        if (this.targetComponent.isDragging()) {
+         return false;   
+        }
+
+        
+        
+        DataFlavor chosen = null;
+        Iterator<DataFlavor> localFlavorItr = this.targetComponent.getLocalFlavors().iterator();
+        while (localFlavorItr.hasNext()) {
+            DataFlavor flavor = localFlavorItr.next();
+            if (ev.isDataFlavorSupported(flavor)) {
+             chosen = flavor;
+             break;
+            }
+        }
+        if (chosen == null) {
+            Iterator<DataFlavor> serialFlavorItr = this.targetComponent.getLocalFlavors().iterator();
+            while (serialFlavorItr.hasNext()) {
+                DataFlavor flavor = serialFlavorItr.next();
+                if (ev.isDataFlavorSupported(flavor)) {
+                 chosen = flavor;
+                 break;
+                }
+            }
+        }
+        if (chosen == null) {
+         return false;   
+        }
+        // the actions specified when the sourceId
+        // created the DragGestureRecognizer
+        int sa = ev.getSourceActions();
+
+        // we're saying that these actions are necessary      
+        if ((sa & this.targetComponent.getAcceptableActions()) == 0) {
+            return false;
+        }
+        
+        try {
+            Object t = ev.getTransferable().getTransferData(chosen);
+            if (DataContainer.class.isAssignableFrom(t.getClass())) {
+                DataContainer dc = (DataContainer) t;
+                boolean acceptableSubclass = acceptableClass.isAssignableFrom(dc.getElementClass());
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Acceptable: " + acceptableSubclass + " acceptableClass " + this.acceptableClass + " elementClass"
+                            + dc.getElementClass());
+                }
+                if (acceptableSubclass == false) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, e.getMessage(), e);
+            return false;
+        }
+        return true;
+    }
+}
