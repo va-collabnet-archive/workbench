@@ -145,6 +145,9 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	}
 
 	public static LocalFixedConcept get(Collection<UUID> uids) throws NoMappingException {
+		if (LocalFixedTerminology.getStore() == null) {
+			throw new NoMappingException("LocalFixedTerminology has not been initialized.");
+		}
 		for (UUID id : uids) {
 			int nid;
 			try {
