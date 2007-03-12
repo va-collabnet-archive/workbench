@@ -57,30 +57,31 @@ public class QueueTypeEditor extends PropertyEditorSupport
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
-    	
-    	if (value != null) {
-    		if (value.equals(getValue())) {
-    			//nothing to do...
-    		} else {
-        	   	super.setValue(value);
-        	   	TermEntry entry = (TermEntry) value;
-                 try {
-					this.editor.setConcept(entry.getLocalConcept());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
+    	if (value == getValue()) {
+    		// nothing to do...
+    	} else if (value != null && value.equals(getValue())) {
+    		// nothing to do...
     	} else {
-    	   	super.setValue(value);
-    	   	try {
-				editor.setConcept(null);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    	   	if (value != null) {
+        		if (value.equals(getValue())) {
+        			//nothing to do...
+        		} else {
+            	   	super.setValue(value);
+            	   	TermEntry entry = (TermEntry) value;
+                     try {
+    					this.editor.setConcept(entry.getLocalConcept());
+    				} catch (Exception e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+        		}
+        	} else {
+        	   	super.setValue(value);
+    			editor.setNull();
+        	}
+   		
     	}
-     }
+      }
 
     /**
      * @see java.beans.PropertyEditor#isPaintable()
@@ -145,8 +146,12 @@ public class QueueTypeEditor extends PropertyEditorSupport
 	public void propertyChange(PropertyChangeEvent evt) {
         I_ConceptualizeLocally c = editor.getConcept();
         try {
-			TermEntry entry = new TermEntry(c.getUids());
-			setValue(entry);
+        	if (c != null) {
+    			TermEntry entry = new TermEntry(c.getUids());
+    			setValue(entry);
+        	} else {
+    			setValue(null);
+        	}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

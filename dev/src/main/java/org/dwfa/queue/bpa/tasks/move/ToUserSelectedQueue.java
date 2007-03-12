@@ -7,6 +7,7 @@ package org.dwfa.queue.bpa.tasks.move;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
@@ -14,6 +15,7 @@ import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceTemplate;
+import net.jini.core.transaction.Transaction;
 import net.jini.lookup.ServiceItemFilter;
 
 import org.dwfa.bpa.process.Condition;
@@ -86,10 +88,12 @@ public class ToUserSelectedQueue extends AbstractTask {
             Entry[] attrSetTemplates;
             if (this.queueType == null) {
                 attrSetTemplates = null;
+                getLogger().info("Setting queue type to null.");
             } else {
                 attrSetTemplates = new Entry[] { this.queueType };
+                getLogger().info("Setting queue type to: " + Arrays.asList(attrSetTemplates));
             }
-            ServiceTemplate template = new ServiceTemplate(serviceID,
+           ServiceTemplate template = new ServiceTemplate(serviceID,
                     serviceTypes,
                     attrSetTemplates);
         
@@ -140,7 +144,11 @@ public class ToUserSelectedQueue extends AbstractTask {
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            q.write(process, worker.getActiveTransaction());
+            getLogger().info("Starting complete, getting transaction.");
+            Transaction t = worker.getActiveTransaction();
+            getLogger().info("Got transaction: " + t);
+            q.write(process, t);
+            getLogger().info("Written to queue.");
         } catch (Exception e) {
             throw new TaskFailedException(e);
         } 
