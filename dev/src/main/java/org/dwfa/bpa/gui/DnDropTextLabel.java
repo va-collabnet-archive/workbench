@@ -52,8 +52,6 @@ import org.dwfa.bpa.dnd.BpaGestureListener;
 import org.dwfa.bpa.dnd.BpaTargetListener;
 import org.dwfa.bpa.dnd.I_DoDragAndDrop;
 
-import com.sun.java.swing.SwingUtilities2;
-
 public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionListener {
 
     static class TransferAction extends AbstractAction implements UIResource {
@@ -113,24 +111,8 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          * Returns the clipboard to use for cut/copy/paste.
          */
         private Clipboard getClipboard(JComponent c) {
-            if (SwingUtilities2.canAccessSystemClipboard()) {
-                return c.getToolkit().getSystemClipboard();
-            }
-            Clipboard clipboard = (Clipboard) sun.awt.AppContext
-                    .getAppContext().get(SandboxClipboardKey);
-            if (clipboard == null) {
-                clipboard = new Clipboard("Sandboxed Component Clipboard");
-                sun.awt.AppContext.getAppContext().put(SandboxClipboardKey,
-                        clipboard);
-            }
-            return clipboard;
+        	return Toolkit.getDefaultToolkit().getSystemClipboard();
         }
-
-        /**
-         * Key used in app context to lookup Clipboard to use if access to
-         * System clipboard is denied.
-         */
-        private static Object SandboxClipboardKey = new Object();
 
     }
     
