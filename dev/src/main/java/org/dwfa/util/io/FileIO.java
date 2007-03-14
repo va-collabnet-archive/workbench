@@ -248,7 +248,7 @@ public class FileIO {
 		while (slashDotIndex >= 0) {
 			String part1 = s.substring(0, slashDotIndex);
 			//System.out.println("part1a " + part1);
-			part1 = part1.substring(0, part1.lastIndexOf('/'));
+			part1 = part1.substring(0, part1.lastIndexOf(File.separator));
 			//System.out.println("part1b " + part1);
 			String part2 = s.substring(slashDotIndex + 3);
 			//System.out.println("part2 " + part2);
@@ -267,23 +267,30 @@ public class FileIO {
 			p = p.getParentFile();
 		}
 		//Try regular expression matching...
+
 		//System.out.println("Regex: " + normalizeFileString(inputFile));
 		Pattern pattern = Pattern.compile(normalizeFileString(inputFile));
-		return matchPattern(p, pattern);
+
+		File f = matchPattern(p, pattern);
+		return f;
 	}
 
 	private static String normalizeFileString(File f) {
 		//return f.getAbsolutePath().replace("/", " ").replace("-", " ");
-		return f.getAbsolutePath();
+		String path = f.getAbsolutePath();
+		path = path.replace("[\\", "[@");
+		path = path.replace('\\', '/');
+		path = path.replace("[@", "[\\");
+		return path;
 	}
 
 	private static File matchPattern(File p, Pattern pattern) {
 		for (File f: p.listFiles()) {
+			//System.out.println("Current file: " + f.toString());
 			//System.out.println("Testing: " + f.getAbsolutePath());
 			//System.out.println("Testing normal: " + normalizeFileString(f));
 			Matcher m = pattern.matcher(normalizeFileString(f));
 			if (m.matches()) {
-				//System.out.println("Matched: " + f.getAbsolutePath());
 				return f;
 			}
 			if (f.isDirectory()) {
