@@ -106,9 +106,7 @@ public class Transform extends AbstractMojo {
 							tw.addTransform(t);
 						}
 					}
-
 					File inputFile = normalize(spec);
-					
 					FileInputStream fs = new FileInputStream(inputFile);
 					InputStreamReader isr = new InputStreamReader(fs, spec
 							.getInputEncoding());
@@ -234,8 +232,8 @@ public class Transform extends AbstractMojo {
 
 	private File normalize(InputFileSpec spec) {
 		String s = spec.getInputFile();
-		return FileIO.normalizeFileStr(s);
-		
+		File f = FileIO.normalizeFileStr(s);
+		return f;
 	}
 
 	

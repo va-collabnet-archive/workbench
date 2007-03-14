@@ -36,7 +36,7 @@ public class WordsInLists extends ProcessWords {
 		}
 		for (Object root: sourceRoots) {
 			String rootStr = (String) root;
-			int loc = rootStr.indexOf("src/main/");
+			int loc = rootStr.indexOf("src" + File.separator + "main" + File.separator);
 			rootStr = rootStr.substring(0, loc);
 			System.out.println(" rootStr: " + rootStr);
 			

@@ -78,6 +78,8 @@ public class Derby extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.out.println("sourceRoots: " + sourceRoots);
 		System.out.println("sourceDirectory: " + sourceDirectory);
+		
+		System.out.println("outputDirectory: " + outputDirectory);
 		System.out.println("outputDirectory: " + outputDirectory);
 		try {
 			
@@ -88,11 +90,12 @@ public class Derby extends AbstractMojo {
 				public boolean accept(File f) {
 					return f.getName().endsWith(".sql");
 				}})) {
-				RegexReplace replacer = new RegexReplace("\\$\\{project.build.directory\\}", outputDirectory.getCanonicalPath());
+				RegexReplace replacer = new RegexReplace("\\$\\{project.build.directory\\}", outputDirectory.getCanonicalPath().replace('\\', '/'));
 				getLog().info("Transforming: " + f.getName());
 				Reader is = new FileReader(f);
 				String input = FileIO.readerToString(is);
 				String sqlScript = replacer.execute(input);
+				sqlScript = sqlScript.replace('/', File.separatorChar);
 				FileIO.copyFile(new StringInputStream(sqlScript), new FileOutputStream(new File(sqlTargetDir, f.getName())), true);
 				
 			}
