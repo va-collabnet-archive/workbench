@@ -84,18 +84,20 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
-		List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
-		for (Dependency d: dependencies) {
-			if (d.getScope().equals("provided")) {
-				//don't add
-			} else {
-				dependencyWithoutProvided.add(d);
-			}
-		}
+    	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
+    	for (Dependency d: dependencies) {
+    		if (d.getScope().equals("provided")) {
+    			//don't add
+    		} else {
+    			dependencyWithoutProvided.add(d);
+    		}
+    	}
+		
 		try {
 			rootDir = new File(this.outputDirectory, targetSubDir);
-			URLClassLoader libLoader = MojoUtil.getProjectClassLoader(
-					dependencyWithoutProvided, localRepository, outputDirectory
+			URLClassLoader libLoader = 
+				MojoUtil.getProjectClassLoaderWithoutProvided(
+						dependencies, localRepository, outputDirectory
 							+ "/classes/");
 			Class beanListClass = libLoader.loadClass(BeanList.class.getName());
 			for (Dependency d : dependencyWithoutProvided) {

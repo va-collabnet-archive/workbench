@@ -84,4 +84,19 @@ public class MojoUtil {
         return new URLClassLoader(libs.toArray(new URL[libs.size()]));
     }
     
+    public static URLClassLoader getProjectClassLoaderWithoutProvided(
+    		List<Dependency> dependencies, String localRepository, 
+    		String classesDir) throws IOException {
+    	
+    	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
+    	for (Dependency d: dependencies) {
+    		if (d.getScope().equals("provided")) {
+    			//don't add
+    		} else {
+    			dependencyWithoutProvided.add(d);
+    		}
+    	}
+		return getProjectClassLoader(dependencyWithoutProvided, localRepository,
+				classesDir);
+    }
 }

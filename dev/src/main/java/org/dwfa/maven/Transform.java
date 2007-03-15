@@ -232,7 +232,9 @@ public class Transform extends AbstractMojo {
 
 	private File normalize(InputFileSpec spec) {
 		String s = spec.getInputFile();
+		System.out.println(">>>> Input File: " + s);
 		File f = FileIO.normalizeFileStr(s);
+		System.out.println(">>>> Normalised file string: " + f.toString());
 		return f;
 	}
 
