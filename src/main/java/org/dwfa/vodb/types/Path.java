@@ -156,7 +156,7 @@ public class Path implements I_Transact, Serializable {
 				fileStr = args[0];
 			}
 			VodbEnv vodb = new VodbEnv();
-			vodb.setup(new File(fileStr), false);
+			vodb.setup(new File(fileStr), false, 600000000L);
 			
 			writeBasePaths(vodb);
 			vodb.sync();

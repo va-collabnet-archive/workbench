@@ -17,7 +17,7 @@ public class LoadSourcesFromJars {
 		ProcessConstantsBerkeley loadConstants = null;
 		timer = new Stopwatch();
 		timer.start();
-		AceConfig.vodb.setup(new File(args[0]), false);
+		AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
 		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
 		System.out.println("Starting to process AceAuxillary: " + Arrays.asList(args));
 		loadConstants.execute(new JarFile(args[1]));

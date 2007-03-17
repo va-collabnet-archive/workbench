@@ -3,6 +3,7 @@
  */
 package org.dwfa.ace.dnd;
 
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -17,8 +18,6 @@ import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
 import org.dwfa.ace.AceLog;
-
-import com.sun.java.swing.SwingUtilities2;
 
 public class AceTransferAction extends AbstractAction implements UIResource {
 
@@ -77,23 +76,8 @@ public class AceTransferAction extends AbstractAction implements UIResource {
      * Returns the clipboard to use for cut/copy/paste.
      */
     private Clipboard getClipboard(JComponent c) {
-        if (SwingUtilities2.canAccessSystemClipboard()) {
-            return c.getToolkit().getSystemClipboard();
-        }
-        Clipboard clipboard = (Clipboard) sun.awt.AppContext
-                .getAppContext().get(SandboxClipboardKey);
-        if (clipboard == null) {
-            clipboard = new Clipboard("Sandboxed Component Clipboard");
-            sun.awt.AppContext.getAppContext().put(SandboxClipboardKey,
-                    clipboard);
-        }
-        return clipboard;
+        return Toolkit.getDefaultToolkit().getSystemClipboard();
     }
 
-    /**
-     * Key used in app context to lookup Clipboard to use if access to
-     * System clipboard is denied.
-     */
-    private static Object SandboxClipboardKey = new Object();
 
 }

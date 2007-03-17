@@ -5,8 +5,11 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
+import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescTuple;
+
+import com.sleepycat.je.DatabaseException;
 
 public class DescriptionTransferable implements Transferable {
 
@@ -29,6 +32,24 @@ public class DescriptionTransferable implements Transferable {
 			return tuple.getDescVersioned();
 		} else if (flavor.equals(TerminologyTransferHandler.thinDescTupleFlavor)) {
 			return tuple;
+		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
+			try {
+				return ConceptBean.get(tuple.getConceptId()).getConcept().getLocalFixedConcept();
+			} catch (DatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
+			try {
+				return ConceptBean.get(tuple.getConceptId()).getConcept().getLocalFixedConcept();
+			} catch (DatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
+			return tuple.getDescVersioned().toLocalFixedDesc();
+		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
+			return tuple.getDescVersioned().toLocalFixedDesc();
 		} else if (flavor.equals(DataFlavor.stringFlavor)) {
 			return tuple.getText();
 		}

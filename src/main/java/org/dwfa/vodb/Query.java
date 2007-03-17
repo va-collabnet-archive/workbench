@@ -31,7 +31,7 @@ public class Query {
 			ThinDescVersionedBinding descBinder = new ThinDescVersionedBinding();
 			ConceptIdKeyForDescCreator descForConceptKeyCreator = 
 				new ConceptIdKeyForDescCreator(descBinder);
-			vodb.setup(new File("berkeley-db"), true);
+			vodb.setup(new File("berkeley-db"), true, 600000000L);
 			System.out.println("Setup env.");
 			printElapsedTime();
 			doQuery(vodb, descBinder, "SNOMED CT Concept");

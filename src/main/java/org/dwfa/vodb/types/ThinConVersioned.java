@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.IntSet;
+import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.impl.LocalFixedConcept;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 public class ThinConVersioned {
@@ -196,6 +198,10 @@ public class ThinConVersioned {
 		for (ThinConPart p : uncommittedParts) {
 			returnImages.add(new ThinConTuple(this, p));
 		}
+	}
+
+	public I_ConceptualizeLocally getLocalFixedConcept() {
+		return LocalFixedConcept.get(conId, versions.get(versions.size() -1).isDefined());
 	}
 
 }

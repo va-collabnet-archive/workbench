@@ -8,6 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dwfa.ace.IntSet;
+import org.dwfa.tapi.I_DescribeConceptLocally;
+import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 public class ThinDescVersioned {
@@ -267,6 +269,13 @@ public class ThinDescVersioned {
 	@Override
 	public int hashCode() {
 		return descId;
+	}
+
+	public I_DescribeConceptLocally toLocalFixedDesc() {
+		ThinDescPart part = versions.get(versions.size()-1);
+		return new LocalFixedDesc(descId, part.getStatusId(), conceptId,
+				part.getInitialCaseSignificant(), part.getTypeId(), part.getText(),
+				part.getLang());
 	}
 
 }

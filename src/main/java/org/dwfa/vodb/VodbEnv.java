@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.IntSet;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.search.I_TrackContinuation;
@@ -22,6 +23,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.BranchTimeBinder;
 import org.dwfa.vodb.bind.PathBinder;
 import org.dwfa.vodb.bind.ThinConVersionedBinding;
@@ -141,12 +143,17 @@ public class VodbEnv {
 	 * @todo find out of all secondary databases have to be opened when the
 	 * primary is opened? How do they get updated, etc?
 	 */
-	public void setup(File envHome, boolean readOnly) throws DatabaseException {
+	public void setup(File envHome, boolean readOnly, Long cacheSize) throws DatabaseException {
+		AceLog.info("Setting up db: " + envHome);
 		this.readOnly = readOnly;
+		LocalFixedTerminology.setStore(new VodbFixedServer(this));
 		envHome.mkdirs();
 
 		EnvironmentConfig envConfig = new EnvironmentConfig();
-		envConfig.setCacheSize(600000000);
+		if (cacheSize != null) {
+			envConfig.setCacheSize(cacheSize);
+			AceLog.info("Setting cache size to: " + cacheSize);
+		}
 
 		envConfig.setReadOnly(readOnly);
 		envConfig.setAllowCreate(!readOnly);
@@ -199,8 +206,8 @@ public class VodbEnv {
 		DatabaseConfig pathDbConfig = makeConfig(readOnly);
 		pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
 
-		System.out.println("Cache percent: " + envConfig.getCachePercent());
-		System.out.println("Cache size: " + envConfig.getCacheSize());
+		AceLog.info("Cache percent: " + envConfig.getCachePercent());
+		AceLog.info("Cache size: " + envConfig.getCacheSize());
 
 	}
 
@@ -1298,7 +1305,7 @@ public class VodbEnv {
 				}
 				idCursor.close();
 				ThinIdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
-				// System.out.println("Last id: " + lastId + " NewId: " +
+				// AceLog.info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
 				for (UUID uid : uids) {
@@ -1342,7 +1349,7 @@ public class VodbEnv {
 				}
 				idCursor.close();
 				ThinIdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
-				// System.out.println("Last id: " + lastId + " NewId: " +
+				// AceLog.info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
 				for (Path p : idPaths) {

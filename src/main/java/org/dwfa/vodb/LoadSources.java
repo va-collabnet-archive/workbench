@@ -17,7 +17,7 @@ public class LoadSources {
 		try {
 			timer = new Stopwatch();
 			timer.start();
-			AceConfig.vodb.setup(new File(args[0]), false);
+			AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
 			loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
 			System.out.println("Starting to process AceAuxillary.");
 			loadConstants.execute(new File(args[1]));

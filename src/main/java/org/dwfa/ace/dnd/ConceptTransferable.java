@@ -7,8 +7,14 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.logging.Level;
 
+import org.dwfa.ace.AceLog;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.I_GetConceptData;
+
+import com.sleepycat.je.DatabaseException;
 
 public class ConceptTransferable implements Transferable {
 
@@ -29,6 +35,8 @@ public class ConceptTransferable implements Transferable {
 			throw new RuntimeException(e);
 		}
 		supportedFlavors = new DataFlavor[] { conceptBeanFlavor,
+				FixedTerminologyTransferable.universalFixedConceptFlavor,
+				FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
 				DataFlavor.stringFlavor };
 	}
 
@@ -39,6 +47,22 @@ public class ConceptTransferable implements Transferable {
 		}
 		if (flavor.equals(conceptBeanFlavor)) {
 			return conceptTransferable;
+		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
+			try {
+				return conceptTransferable.getConcept().getLocalFixedConcept().universalize();
+			} catch (DatabaseException e) {
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			} catch (TerminologyException e) {
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
+		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
+			try {
+				return conceptTransferable.getConcept().getLocalFixedConcept().universalize();
+			} catch (DatabaseException e) {
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			} catch (TerminologyException e) {
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
 		} else if (flavor.equals(DataFlavor.stringFlavor)) {
 			return conceptTransferable.toString();
 		}

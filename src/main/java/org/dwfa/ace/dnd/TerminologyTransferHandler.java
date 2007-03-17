@@ -8,6 +8,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -37,6 +38,7 @@ import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.ThinDescTuple;
@@ -81,10 +83,12 @@ public class TerminologyTransferHandler extends TransferHandler {
 				thinDescTupleFlavor = new DataFlavor(
 						TerminologyTransferHandler.thinDescTupleType);
 				supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor,
-						thinDescTupleFlavor, conceptBeanFlavor,
-						DataFlavor.stringFlavor };
-				supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor,
-						thinDescTupleFlavor, conceptBeanFlavor,
+						thinDescTupleFlavor, 
+						conceptBeanFlavor,
+						FixedTerminologyTransferable.universalFixedConceptFlavor,
+						FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
+						FixedTerminologyTransferable.universalFixedDescFlavor,
+						FixedTerminologyTransferable.universalFixedDescInterfaceFlavor,
 						DataFlavor.stringFlavor };
 			} catch (ClassNotFoundException e) {
 				// should never happen.
@@ -95,6 +99,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	protected Transferable createTransferable(JComponent c) {
+		if (AceLog.isLoggable(Level.FINE)) {
+			AceLog.fine("Creating a transferable for: " + c);
+		}
 		if (JTree.class.isAssignableFrom(c.getClass())) {
 			JTree tree = (JTree) c;
 			Object obj = tree.getLastSelectedPathComponent();
@@ -205,6 +212,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	protected void exportDone(JComponent source, Transferable data, int action) {
+		if (AceLog.isLoggable(Level.FINE)) {
+			AceLog.fine("export done: " + source);
+		}
 		super.exportDone(source, data, action);
 		if (action == MOVE) {
 			if (TerminologyList.class.isAssignableFrom(source.getClass())) {
@@ -224,10 +234,16 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	public boolean importData(JComponent comp, Transferable t) {
+		if (AceLog.isLoggable(Level.FINE)) {
+			AceLog.fine("import: " + comp);
+		}
 		if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
 			I_ContainTermComponent ictc = (I_ContainTermComponent) comp;
 			try {
 				Object obj = t.getTransferData(conceptBeanFlavor);
+				if (AceLog.isLoggable(Level.FINE)) {
+					AceLog.fine("Transfer data for conceptBeanFlavor is: " + obj);
+				}
 				ConceptBean cb;
 				if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
 					ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
@@ -238,9 +254,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 				ictc.setTermComponent(cb);
 				return true;
 			} catch (UnsupportedFlavorException e) {
-				e.printStackTrace();
+				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		}
 		if (TerminologyList.class.isAssignableFrom(comp.getClass())) {
@@ -258,9 +274,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 				model.addElement(cb);
 				return true;
 			} catch (UnsupportedFlavorException e) {
-				e.printStackTrace();
+				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		}
 
@@ -296,9 +312,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 				db.doDrop(obj);
 				AceLog.info("Dropped on DropButton: " + obj);
 			} catch (UnsupportedFlavorException e) {
-				e.printStackTrace();
+				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 			return true;
 		}
@@ -310,11 +326,11 @@ public class TerminologyTransferHandler extends TransferHandler {
 						.getTransferData(conceptBeanFlavor);
 				new ExpandPathToNodeStateListener(tree, config, obj);
 			} catch (UnsupportedFlavorException e) {
-				e.printStackTrace();
+				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (DatabaseException e) {
-				e.printStackTrace();
+				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 			return true;
 		}
@@ -331,23 +347,29 @@ public class TerminologyTransferHandler extends TransferHandler {
 				}
 			}
 		} catch (NoSuchMethodException e) {
+			if (AceLog.isLoggable(Level.FINE)) {
+				AceLog.fine("Can't paste: " + e.toString());
+			}
 			// Nothing to do
 		} catch (UnsupportedFlavorException e) {
-			e.printStackTrace();
+			AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		return false;
 	}
 
 	@Override
 	public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+		if (AceLog.isLoggable(Level.FINE)) {
+			AceLog.fine("Can import: " + comp);
+		}
 		if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
 			for (DataFlavor f : transferFlavors) {
 				if (f.equals(conceptBeanFlavor)) {
@@ -385,17 +407,25 @@ public class TerminologyTransferHandler extends TransferHandler {
 				}
 			}
 		} catch (NoSuchMethodException e) {
-			// Nothing to do
+			if (AceLog.isLoggable(Level.FINE)) {
+				AceLog.fine("Can't paste: " + e.toString());
+			}
 		}
 		return false;
 	}
 
 	@Override
 	public int getSourceActions(JComponent c) {
+		if (AceLog.isLoggable(Level.FINE)) {
+			AceLog.fine("getSourceActions ");
+		}
 		return COPY_OR_MOVE;
 	}
 
 	public static DataFlavor[] getSupportedFlavors() {
+		if (AceLog.isLoggable(Level.FINE)) {
+			AceLog.fine("getSupportedFlavors ");
+		}
 		return supportedFlavors;
 	}
 
