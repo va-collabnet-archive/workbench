@@ -3,29 +3,26 @@ package org.dwfa.ace.config;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.text.ParseException;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.AceLog;
-import org.dwfa.tapi.TerminologyException;
 
-import com.sleepycat.je.DatabaseException;
 import com.sun.jini.start.LifeCycle;
 
 public class AceRunner {
 
+	@SuppressWarnings("unused")
 	private String[] args;
 
+	@SuppressWarnings("unused")
 	private LifeCycle lc;
 
 	protected Configuration config;
