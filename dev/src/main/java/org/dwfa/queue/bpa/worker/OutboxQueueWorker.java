@@ -57,7 +57,7 @@ import org.dwfa.queue.I_GetWorkFromQueue;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 		Runnable {
@@ -75,40 +75,46 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 	private I_SelectProcesses selector;
 
 	private Properties props;
-    
-    private boolean noSmtp = true; 
+
+	private boolean noSmtp = true;
 
 	/**
 	 * @param config
 	 * @param id
 	 * @param desc
 	 * @throws ConfigurationException
-	 * @throws LoginException 
-	 * @throws IOException 
+	 * @throws LoginException
+	 * @throws IOException
 	 */
 	public OutboxQueueWorker(Configuration config, UUID id, String desc,
-			I_SelectProcesses selector) 
-		throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
+			I_SelectProcesses selector) throws ConfigurationException,
+			LoginException, IOException, PrivilegedActionException {
 		super(config, id, desc);
 		this.selector = selector;
 		props = new Properties();
 		String mailHost;
-        try {
-            mailHost = (String) this.config.getEntry(this.getClass()
-            		.getName(), "mailHost", String.class);
-            props.put("mail.host", mailHost);
-            this.noSmtp = false;
-       } catch (ConfigurationException e) {
-            this.getLogger().info("No mailhost specified. SMTP sending will be turned off. ");
-        }
-		//      add handlers for main MIME types
+		try {
+			mailHost = (String) this.config.getEntry(this.getClass().getName(),
+					"mailHost", String.class);
+			props.put("mail.host", mailHost);
+			this.noSmtp = false;
+		} catch (ConfigurationException e) {
+			this.getLogger().info(
+					"No mailhost specified. SMTP sending will be turned off. ");
+		}
+		// add handlers for main MIME types
 		MailcapCommandMap mc = (MailcapCommandMap) CommandMap
 				.getDefaultCommandMap();
-		mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
-		mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
-		mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
-		mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
-		mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
+		mc
+				.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+		mc
+				.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+		mc
+				.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+		mc
+				.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+		mc
+				.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
 		mc.addMailcap(PROCESS_ATTACHMENT_TYPE
 				+ ";; x-java-content-handler=com.sun.mail.handlers.text_plain");
 		CommandMap.setDefaultCommandMap(mc);
@@ -152,38 +158,46 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 		Transaction t;
 		while (true) {
 			try {
-                BusinessProcess.validateAddress(this.queue.getNodeInboxAddress(), null);
+				BusinessProcess.validateAddress(this.queue
+						.getNodeInboxAddress(), null);
 				while (true) {
 					logger.fine(this.getWorkerDesc() + " starting outbox run");
 					t = this.getActiveTransaction();
 					I_EncodeBusinessProcess process = this.queue.take(selector,
 							t);
-
 					logger.info(this.getWorkerDesc() + " found process: "
 							+ process);
-                    
-                    try {
-                        BusinessProcess.validateAddress(process.getOriginator(), process.getProcessID());
-                    } catch (TaskFailedException ex) {
-                        logger
-                        .info(this.getWorkerDesc()
-                                + " found missing or malformed origin for process: "
-                                + process
-                                + " setting origin to queue's node inbox address");
-                        process.setOriginator(this.queue.getNodeInboxAddress());
-                        
-                    }
+					try {
+						BusinessProcess
+								.validateAddress(process.getOriginator(),
+										process.getProcessID());
+					} catch (TaskFailedException ex) {
+						logger
+								.info(this.getWorkerDesc()
+										+ " found missing or malformed origin for process: "
+										+ process
+										+ " setting origin to queue's node inbox address");
+						process.setOriginator(this.queue.getNodeInboxAddress());
 
-					if (jiniDelivery(process, t)) {
-						this.commitTransactionIfActive();
-					} else if (smtpDelivery(process, t)) {
-						this.commitTransactionIfActive();
-					} else {
+					}
+
+					try {
+						if (jiniDelivery(process, t)) {
+							this.commitTransactionIfActive();
+						} else if (smtpDelivery(process, t)) {
+							this.commitTransactionIfActive();
+						} else {
+							this.discardActiveTransaction();
+							logger.info("Worker: " + this.getWorkerDesc()
+									+ " (" + this.getId()
+									+ ") cannot deliver process to: "
+									+ process.getDestination());
+						}
+					} catch (TaskFailedException ex) {
+						logger.severe(this.getWorkerDesc()
+								+ " cannot deliver process " + process.getId()
+								+ " to: " + process.getDestination());
 						this.discardActiveTransaction();
-						logger.info("Worker: " + this.getWorkerDesc() + " ("
-								+ this.getId()
-								+ ") cannot deliver process to: "
-								+ process.getDestination());
 					}
 				}
 			} catch (NoMatchingEntryException ex) {
@@ -215,9 +229,9 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 	 * @return
 	 */
 	private boolean smtpDelivery(I_EncodeBusinessProcess process, Transaction t) {
-        if (noSmtp) {
-            return false;
-        }
+		if (noSmtp) {
+			return false;
+		}
 		try {
 			logger.info(this.getWorkerDesc() + " trying SMTP delivery. ");
 			process.validateAddresses();
@@ -225,15 +239,15 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 			Message msg = new MimeMessage(mailConnection);
 			Address from = new InternetAddress(process.getOriginator());
 			msg.setFrom(from);
-			//TODO make this more robust by only looking for splits
-			// outside of quotes. 
+			// TODO make this more robust by only looking for splits
+			// outside of quotes.
 			String[] destinations = process.getDestination().split("[,]");
 			Address[] toAddresses = new Address[destinations.length];
 			for (int i = 0; i < destinations.length; i++) {
 				toAddresses[i] = new InternetAddress(destinations[i]);
 			}
 			msg.setRecipients(Message.RecipientType.TO, toAddresses);
-			
+
 			msg.setSubject(process.getProcessID().toString());
 			msg.addHeader("X-Priority", process.getPriority()
 					.getXPriorityValue());
@@ -323,10 +337,13 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 	 * @throws InterruptedException
 	 * @throws RemoteException
 	 * @throws IOException
-	 * @throws ConfigurationException 
-	 * @throws PrivilegedActionException 
+	 * @throws ConfigurationException
+	 * @throws PrivilegedActionException
 	 */
-	protected ServiceItem jinilookup(ServiceTemplate tmpl, ServiceItemFilter filter) throws InterruptedException, RemoteException, IOException, PrivilegedActionException, ConfigurationException {
+	protected ServiceItem jinilookup(ServiceTemplate tmpl,
+			ServiceItemFilter filter) throws InterruptedException,
+			RemoteException, IOException, PrivilegedActionException,
+			ConfigurationException {
 		ServiceItem item = lookup(tmpl, filter, 1000 * 10);
 		return item;
 	}
@@ -350,8 +367,8 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 	 * @see org.dwfa.bpa.process.I_Work#createWorkspace(net.jini.id.UUID,
 	 *      java.lang.String, org.dwfa.bpa.gui.TerminologyConfiguration)
 	 */
-	public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir) throws WorkspaceActiveException,
-			Exception {
+	public I_Workspace createWorkspace(UUID workspaceId, String name,
+			File menuDir) throws WorkspaceActiveException, Exception {
 		throw new UnsupportedOperationException();
 	}
 
@@ -397,22 +414,29 @@ public class OutboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 	 * @see org.dwfa.bpa.process.I_Work#createHeadlessWorkspace(net.jini.id.UUID,
 	 *      org.dwfa.bpa.gui.TerminologyConfiguration)
 	 */
-	public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException,
-			HeadlessException {
+	public I_Workspace createHeadlessWorkspace(UUID workspace_id)
+			throws WorkspaceActiveException, HeadlessException {
 		throw new UnsupportedOperationException();
 	}
 
-    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir) throws WorkspaceActiveException, Exception {
-        throw new UnsupportedOperationException();
-    }
-	public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException, ClassNotFoundException {
-        throw new UnsupportedOperationException();
+	public I_Workspace createWorkspace(UUID arg0, String arg1,
+			I_ManageUserTransactions arg2, File menuDir)
+			throws WorkspaceActiveException, Exception {
+		throw new UnsupportedOperationException();
 	}
 
-	public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
-        throw new UnsupportedOperationException();
+	public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2,
+			FilenameFilter arg3) throws IOException, ClassNotFoundException {
+		throw new UnsupportedOperationException();
 	}
-	public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException {
+
+	public void writeObjToFilesystem(Frame arg0, String arg1, String arg2,
+			String arg3, Object arg4) throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public I_Work getTransactionIndependentClone() throws LoginException,
+			ConfigurationException, IOException, PrivilegedActionException {
 		throw new UnsupportedOperationException();
 	}
 
