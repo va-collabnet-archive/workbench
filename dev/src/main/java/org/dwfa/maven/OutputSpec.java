@@ -3,8 +3,7 @@ package org.dwfa.maven;
 public class OutputSpec {
 	private InputFileSpec[] inputSpecs;
 	private I_TransformAndWrite[] writers;
-	
-
+	private I_ReadAndTransform[] constantSpecs;
 	
 	public String toString() {
 		StringBuffer b = new StringBuffer();
@@ -25,6 +24,12 @@ public class OutputSpec {
 	}
 	public void setWriters(I_TransformAndWrite[] writers) {
 		this.writers = writers;
+	}
+	public I_ReadAndTransform[] getConstantSpecs() {
+		return constantSpecs;
+	}
+	public void setConstantSpecs(I_ReadAndTransform[] constantSpecs) {
+		this.constantSpecs = constantSpecs;
 	}
 	
 }

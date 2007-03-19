@@ -98,6 +98,12 @@ public class Transform extends AbstractMojo {
 					BufferedWriter bw = new BufferedWriter(osw);
 					tw.init(bw, this);
 				}
+				for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
+					constantTransform.setup(this);
+					for (I_TransformAndWrite tw: outSpec.getWriters()) {
+						tw.addTransform(constantTransform);
+					}
+				}
 				for (InputFileSpec spec : outSpec.getInputSpecs()) {
 					getLog().info("Now processing file spec:\n\n" + spec);
 					for (I_ReadAndTransform t : spec.getColumnSpecs()) {
