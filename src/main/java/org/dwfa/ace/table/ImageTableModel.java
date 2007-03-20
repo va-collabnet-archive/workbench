@@ -14,8 +14,9 @@ import javax.swing.ImageIcon;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
+import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
-import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -243,7 +244,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	}
 	private IMAGE_FIELD[] columns;
 	private SmallProgressPanel progress = new SmallProgressPanel();
-	private ConceptPanel parentPanel;
+	private I_HostConceptPlugins host;
 	private List<ThinImageTuple> allTuples;
 	private List<ThinImageVersioned> allImages;
 
@@ -255,12 +256,12 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	private ConceptBean tableConcept;
 
 	public ImageTableModel(
-			ConceptPanel parentPanel, 
+			I_HostConceptPlugins host, 
 			IMAGE_FIELD[] columns, boolean showHistory) {
 		super();
 		this.columns = columns;
-		this.parentPanel = parentPanel;
-		this.parentPanel.addTermChangeListener(this);
+		this.host = host;
+		this.host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 		this.showHistory = showHistory;
 	}
 
@@ -378,7 +379,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple desc = cb.getDescTuple(parentPanel.getConfig().getTableDescPreferenceList(), parentPanel.getConfig());
+		ThinDescTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
@@ -414,6 +415,20 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		return columns;
 	}
 
+	public void setColumns(IMAGE_FIELD[] columns) {
+		if (this.columns.length != columns.length) {
+			this.columns = columns;
+			fireTableStructureChanged();
+			return;
+		}
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(this.columns[i]) == false) {
+				this.columns = columns;
+				fireTableStructureChanged();
+				return;
+			}
+		}
+	}
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		try {

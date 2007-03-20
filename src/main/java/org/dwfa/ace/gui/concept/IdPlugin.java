@@ -33,6 +33,11 @@ import com.sleepycat.je.DatabaseException;
 
 public class IdPlugin extends AbstractPlugin {
 
+	public IdPlugin() {
+		super(false);
+	}
+
+
 	private IdTableModel idTableModel;
 	private JPanel idPanel;
 	private I_HostConceptPlugins host;
@@ -43,10 +48,6 @@ public class IdPlugin extends AbstractPlugin {
 		return new ImageIcon(ACE.class.getResource("/24x24/plain/id_card.png"));
 	}
 
-	@Override
-	protected boolean isSelectedByDefault() {
-		return false;
-	}
 
 	@Override
 	public void update() throws DatabaseException {

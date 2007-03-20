@@ -9,6 +9,10 @@ import org.dwfa.vodb.types.ConceptBean;
 import com.sleepycat.je.DatabaseException;
 
 public class ConflictPlugin extends AbstractPlugin {
+	public ConflictPlugin() {
+		super(false);
+	}
+
 	private ConflictPanel conflictPanel;
 	private I_HostConceptPlugins host;
 
@@ -25,11 +29,6 @@ public class ConflictPlugin extends AbstractPlugin {
 	protected ImageIcon getImageIcon() {
 		return new ImageIcon(ACE.class
 				.getResource("/24x24/plain/transform.png"));
-	}
-
-	@Override
-	protected boolean isSelectedByDefault() {
-		return false;
 	}
 
 	@Override

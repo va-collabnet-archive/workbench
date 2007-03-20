@@ -36,6 +36,11 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 	private JToggleButton toggleButton;
 	private Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
 
+	public AbstractPlugin(boolean selectedByDefault) {
+		super();
+		this.selectedByDefault = selectedByDefault;
+	}
+
 	public void propertyChange(PropertyChangeEvent evt) {
 		try {
 			update();
@@ -65,13 +70,13 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 	public final JToggleButton getToggleButton() {
 		if (toggleButton == null) {
 			toggleButton = new JToggleButton(getImageIcon());
-			toggleButton.setSelected(isSelectedByDefault());
+			toggleButton.setSelected(selectedByDefault);
 			toggleButton.addActionListener(new ToggleActionListener());
 		}
 		return toggleButton;
 	}
 	
-	protected abstract boolean isSelectedByDefault();
-
 	protected abstract ImageIcon getImageIcon();
+	boolean selectedByDefault;
+	
 }

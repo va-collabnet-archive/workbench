@@ -24,6 +24,10 @@ import org.dwfa.bpa.util.TableSorter;
 
 public abstract class RelPlugin extends AbstractPlugin {
 
+	public RelPlugin(boolean selectedByDefault) {
+		super(selectedByDefault);
+	}
+
 	private JTableWithDragImage relTable;
 
 	protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText,

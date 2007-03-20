@@ -52,22 +52,17 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddConceptPart;
 import org.dwfa.ace.edit.AddDescription;
-import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.table.ConceptTableModel;
 import org.dwfa.ace.table.ConceptTableRenderer;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsForConceptTableModel;
 import org.dwfa.ace.table.I_CellTextWithTuple;
-import org.dwfa.ace.table.ImageTableModel;
-import org.dwfa.ace.table.ImageTableRenderer;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
-import org.dwfa.ace.table.ImageTableModel.IMAGE_FIELD;
-import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.bpa.util.TableSorter;
@@ -84,38 +79,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public enum LINK_TYPE {
 		UNLINKED, SEARCH_LINK, TREE_LINK
 	};
-
-	private class ToggleImageChangeActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-			if (toggle.isSelected()) {
-				imageTableModel = new ImageTableModel(ConceptPanel.this,
-						getImageColumns(), historyButton.isSelected());
-			} else {
-				for (TableModelListener l : imageTableModel
-						.getTableModelListeners()) {
-					imageTableModel.removeTableModelListener(l);
-				}
-				removeTermChangeListener(imageTableModel);
-			}
-			try {
-				contentScroller.setViewportView(getContentPane());
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						PropertyChangeEvent pce = new PropertyChangeEvent(
-								ConceptPanel.this, "termComponent", null, label
-										.getTermComponent());
-						imageTableModel.propertyChange(pce);
-						imageTableModel.fireTableDataChanged();
-					}
-				});
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-
-	}
 
 	private class ShowPluginComponentActionListener implements ActionListener {
 
@@ -167,14 +130,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			descTableModel = new DescriptionsForConceptTableModel(
 					getDescColumns(), ConceptPanel.this);
 
-			for (TableModelListener l : imageTableModel
-					.getTableModelListeners()) {
-				imageTableModel.removeTableModelListener(l);
-			}
-			removeTermChangeListener(imageTableModel);
-			imageTableModel = new ImageTableModel(ConceptPanel.this,
-					getImageColumns(), historyButton.isSelected());
-
 
 			try {
 				contentScroller.setViewportView(getContentPane());
@@ -185,8 +140,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				conceptTableModel.propertyChange(pce);
 				descTableModel.propertyChange(pce);
 				descTableModel.fireTableDataChanged();
-				imageTableModel.propertyChange(pce);
-				imageTableModel.fireTableDataChanged();
 			} catch (DatabaseException e1) {
 				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
@@ -275,11 +228,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	private DescriptionsForConceptTableModel descTableModel;
 
-	private ImageTableModel imageTableModel;
-
 	private ConceptTableModel conceptTableModel;
-
-	private JToggleButton imageButton;
 
 	private JToggleButton usePrefButton;
 
@@ -301,12 +250,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			.getResource("/16x16/plain/text_tree.png"));
 	
 	private ConflictPlugin conflictPlugin = new ConflictPlugin();
-	private SrcRelPlugin srcRelPlugin = new SrcRelPlugin();
+	private AbstractPlugin srcRelPlugin = new SrcRelPlugin();
 	private DestRelPlugin destRelPlugin = new DestRelPlugin();
 	private IdPlugin idPlugin = new IdPlugin();
+	private ImagePlugin imagePlugin = new ImagePlugin();
 	
 	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
-			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, srcRelPlugin, destRelPlugin, conflictPlugin }));
+			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, srcRelPlugin, destRelPlugin, imagePlugin, conflictPlugin }));
 
 	public ImageIcon tabIcon;
 
@@ -492,90 +442,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		conceptTableModel = new ConceptTableModel(getConceptColumns(), this);
 		descTableModel = new DescriptionsForConceptTableModel(getDescColumns(),
 				this);
-		imageTableModel = new ImageTableModel(ConceptPanel.this,
-				getImageColumns(), historyButton.isSelected());
 
 		contentScroller = new JScrollPane(getContentPane());
 		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
 		add(contentScroller, c);
 		setBorder(BorderFactory.createRaisedBevelBorder());
 		label.addPropertyChangeListener("termComponent", labelListener);
-	}
-
-	public JComponent getToggleBar() {
-		JPanel toggleBar = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-
-		conceptButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/bullet_triangle_blue.png")));
-		conceptButton.setSelected(true);
-		conceptButton
-				.addActionListener(new ToggleConceptChangeActionListener());
-		toggleBar.add(conceptButton, c);
-		c.gridx++;
-		descButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/paragraph.png")));
-		descButton.setSelected(true);
-		descButton.addActionListener(new ToggleDescChangeActionListener());
-		toggleBar.add(descButton, c);
-		c.gridx++;
-
-		lineageButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/nav_up_right_green.png")));
-		lineageButton.setSelected(true);
-		lineageButton
-				.addActionListener(new ToggleLineageChangeActionListener());
-		toggleBar.add(lineageButton, c);
-		c.gridx++;
-
-		imageButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/photo_scenery.png")));
-		imageButton.setSelected(true);
-		imageButton.addActionListener(new ToggleImageChangeActionListener());
-		toggleBar.add(imageButton, c);
-		c.gridx++;
-		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
-		for (I_PluginToConceptPanel plugin: plugins) {
-			for (JComponent component: plugin.getToggleBarComponents()) {
-				toggleBar.add(component, c);
-				c.gridx++;
-			}
-			plugin.addShowComponentListener(l);
-		}
-		inferredButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/yinyang.png")));
-		inferredButton.setSelected(false);
-		inferredButton
-				.setToolTipText("<html>Yin and yang can also be seen as a process of <br>"
-						+ "transformation which describes the changes between<br>"
-						+ " the phases of a cycle. For example, cold water (yin) <br>"
-						+ "can be boiled and eventually turn into steam (yang).<p> <p>"
-						+ "Stated forms (yin) can be classified and turned into<br>"
-						+ "inferred forms (yang).");
-		toggleBar.add(inferredButton, c);
-		c.gridx++;
-		usePrefButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/component_preferences.png")));
-		usePrefButton.setSelected(false);
-		historyChangeActionListener = new ToggleHistoryChangeActionListener();
-		usePrefButton.addActionListener(historyChangeActionListener);
-		toggleBar.add(usePrefButton, c);
-		c.gridx++;
-		historyButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/history.png")));
-		historyButton.setSelected(false);
-		historyButton.addActionListener(historyChangeActionListener);
-		toggleBar.add(historyButton, c);
-		c.gridy++;
-		c.gridx++;
-		c.weightx = 1.0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		toggleBar.add(new JPanel(), c);
-		return toggleBar;
 	}
 
 	public JComponent getContentPane() throws DatabaseException {
@@ -596,10 +468,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 		if (lineageButton.isSelected()) {
 			content.add(getLineagePanel(), c);
-			c.gridy++;
-		}
-		if (imageButton.isSelected()) {
-			content.add(getImagePanel(), c);
 			c.gridy++;
 		}
 		for (I_PluginToConceptPanel plugin: plugins) {
@@ -766,6 +634,76 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return lineage;
 	}
 
+	public JComponent getToggleBar() {
+		JPanel toggleBar = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.WEST;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+	
+		conceptButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/24x24/plain/bullet_triangle_blue.png")));
+		conceptButton.setSelected(true);
+		conceptButton
+				.addActionListener(new ToggleConceptChangeActionListener());
+		toggleBar.add(conceptButton, c);
+		c.gridx++;
+		descButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/24x24/plain/paragraph.png")));
+		descButton.setSelected(true);
+		descButton.addActionListener(new ToggleDescChangeActionListener());
+		toggleBar.add(descButton, c);
+		c.gridx++;
+	
+		lineageButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/24x24/plain/nav_up_right_green.png")));
+		lineageButton.setSelected(true);
+		lineageButton
+				.addActionListener(new ToggleLineageChangeActionListener());
+		toggleBar.add(lineageButton, c);
+		c.gridx++;
+	
+		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
+		for (I_PluginToConceptPanel plugin: plugins) {
+			for (JComponent component: plugin.getToggleBarComponents()) {
+				toggleBar.add(component, c);
+				c.gridx++;
+			}
+			plugin.addShowComponentListener(l);
+		}
+		inferredButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/24x24/plain/yinyang.png")));
+		inferredButton.setSelected(false);
+		inferredButton
+				.setToolTipText("<html>Yin and yang can also be seen as a process of <br>"
+						+ "transformation which describes the changes between<br>"
+						+ " the phases of a cycle. For example, cold water (yin) <br>"
+						+ "can be boiled and eventually turn into steam (yang).<p> <p>"
+						+ "Stated forms (yin) can be classified and turned into<br>"
+						+ "inferred forms (yang).");
+		toggleBar.add(inferredButton, c);
+		c.gridx++;
+		usePrefButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/24x24/plain/component_preferences.png")));
+		usePrefButton.setSelected(false);
+		historyChangeActionListener = new ToggleHistoryChangeActionListener();
+		usePrefButton.addActionListener(historyChangeActionListener);
+		toggleBar.add(usePrefButton, c);
+		c.gridx++;
+		historyButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/24x24/plain/history.png")));
+		historyButton.setSelected(false);
+		historyButton.addActionListener(historyChangeActionListener);
+		toggleBar.add(historyButton, c);
+		c.gridy++;
+		c.gridx++;
+		c.weightx = 1.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		toggleBar.add(new JPanel(), c);
+		return toggleBar;
+	}
+
 	public I_AmTermComponent getTermComponent() {
 		return label.getTermComponent();
 	}
@@ -811,81 +749,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			}
 			conceptTabs.setIconAt(index, tabIcon);
 		}
-	}
-
-	private JPanel getImagePanel() {
-		JPanel imagePanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.gridwidth = 2;
-		JLabel imageLabel = new JLabel("Images:");
-		imageLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
-		imagePanel.add(imageLabel, c);
-
-		SmallProgressPanel imageProgress = new SmallProgressPanel();
-		imageProgress.setVisible(false);
-		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx++;
-		imagePanel.add(imageProgress, c);
-		imageTableModel.setProgress(imageProgress);
-
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		imagePanel.add(rowAddAfter, c);
-		rowAddAfter.addActionListener(new AddImage(this, getConfig()));
-		c.gridheight = 1;
-		c.gridx++;
-		TableSorter sortingTable = new TableSorter(imageTableModel);
-		JTable imageTable = new JTableWithDragImage(sortingTable);
-		imageTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sortingTable.setTableHeader(imageTable.getTableHeader());
-
-		IMAGE_FIELD[] columnEnums = imageTableModel.getColumnEnums();
-		for (int i = 0; i < imageTable.getColumnCount(); i++) {
-			TableColumn column = imageTable.getColumnModel().getColumn(i);
-			IMAGE_FIELD columnDesc = columnEnums[i];
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
-			column.setIdentifier(columnDesc);
-		}
-
-		// Set up tool tips for column headers.
-		sortingTable
-				.getTableHeader()
-				.setToolTipText(
-						"Click to specify sorting; Control-Click to specify secondary sorting");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		imagePanel.add(imageTable.getTableHeader(), c);
-		c.gridy++;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridheight = 6;
-
-		imageTable.setDefaultRenderer(String.class, new ImageTableRenderer());
-		imageTable.setDefaultRenderer(ImageWithImageTuple.class,
-				new ImageTableRenderer());
-		imagePanel.add(imageTable, c);
-		imagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
-
-		c.gridheight = 1;
-		c.gridx = 0;
-		return imagePanel;
 	}
 
 	private JPanel getConceptPanel() {
@@ -1141,19 +1004,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			fields.add(DESC_FIELD.BRANCH);
 		}
 		return fields.toArray(new DESC_FIELD[fields.size()]);
-	}
-
-	private IMAGE_FIELD[] getImageColumns() {
-		List<IMAGE_FIELD> fields = new ArrayList<IMAGE_FIELD>();
-		fields.add(IMAGE_FIELD.IMAGE);
-		fields.add(IMAGE_FIELD.TYPE);
-		fields.add(IMAGE_FIELD.DESC);
-		fields.add(IMAGE_FIELD.STATUS);
-		if (historyButton.isSelected()) {
-			fields.add(IMAGE_FIELD.VERSION);
-			fields.add(IMAGE_FIELD.BRANCH);
-		}
-		return fields.toArray(new IMAGE_FIELD[fields.size()]);
 	}
 
 	public boolean getUsePrefs() {

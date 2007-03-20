@@ -16,6 +16,10 @@ import com.sleepycat.je.DatabaseException;
 
 public class DestRelPlugin extends RelPlugin {
 
+	public DestRelPlugin() {
+		super(false);
+	}
+
 	private JPanel pluginPanel;
 	private DestRelTableModel destRelTableModel;
 	I_HostConceptPlugins host;
@@ -50,24 +54,22 @@ public class DestRelPlugin extends RelPlugin {
 	protected ImageIcon getImageIcon() {
 		return new ImageIcon(ACE.class.getResource("/24x24/plain/invert_node.png"));
 	}
-	@Override
-	protected boolean isSelectedByDefault() {
-		return true;
-	}
 
 	@Override
 	public void update() throws DatabaseException {
-		PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-		REL_FIELD[] columnEnums = getDestRelColumns(host.getShowHistory());
-		destRelTableModel.setColumns(getDestRelColumns(host.getShowHistory()));
-		for (int i = 0; i < destRelTableModel.getColumnCount(); i++) {
-			TableColumn column = getRelTable().getColumnModel().getColumn(i);
-			REL_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
+		if (host != null) {
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			REL_FIELD[] columnEnums = getDestRelColumns(host.getShowHistory());
+			destRelTableModel.setColumns(getDestRelColumns(host.getShowHistory()));
+			for (int i = 0; i < destRelTableModel.getColumnCount(); i++) {
+				TableColumn column = getRelTable().getColumnModel().getColumn(i);
+				REL_FIELD columnDesc = columnEnums[i];
+				column.setIdentifier(columnDesc);
+				column.setPreferredWidth(columnDesc.getPref());
+				column.setMaxWidth(columnDesc.getMax());
+				column.setMinWidth(columnDesc.getMin());
+			}
+			destRelTableModel.propertyChange(evt);
 		}
-		destRelTableModel.propertyChange(evt);
 	}
 }

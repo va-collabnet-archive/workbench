@@ -16,6 +16,9 @@ import com.sleepycat.je.DatabaseException;
 
 public class SrcRelPlugin extends RelPlugin {
 
+	public SrcRelPlugin() {
+		super(true);
+	}
 	private JPanel pluginPanel;
 	private SrcRelTableModel srcRelTableModel;
 	I_HostConceptPlugins host;
@@ -50,11 +53,6 @@ public class SrcRelPlugin extends RelPlugin {
 	protected ImageIcon getImageIcon() {
 		return new ImageIcon(ACE.class.getResource("/24x24/plain/node.png"));
 	}
-	@Override
-	protected boolean isSelectedByDefault() {
-		return true;
-	}
-
 	@Override
 	public void update() throws DatabaseException {
 		PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
