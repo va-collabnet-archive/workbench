@@ -59,8 +59,6 @@ import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsForConceptTableModel;
 import org.dwfa.ace.table.I_CellTextWithTuple;
-import org.dwfa.ace.table.IdTableModel;
-import org.dwfa.ace.table.IdTableRenderer;
 import org.dwfa.ace.table.ImageTableModel;
 import org.dwfa.ace.table.ImageTableRenderer;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -68,8 +66,6 @@ import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
-import org.dwfa.ace.table.IdTableModel.ID_FIELD;
-import org.dwfa.ace.table.IdTableModel.StringWithIdTuple;
 import org.dwfa.ace.table.ImageTableModel.IMAGE_FIELD;
 import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
 import org.dwfa.ace.tree.JTreeWithDragImage;
@@ -179,11 +175,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			imageTableModel = new ImageTableModel(ConceptPanel.this,
 					getImageColumns(), historyButton.isSelected());
 
-			for (TableModelListener l : idTableModel.getTableModelListeners()) {
-				idTableModel.removeTableModelListener(l);
-			}
-			removeTermChangeListener(idTableModel);
-			idTableModel = new IdTableModel(getIdColumns(), ConceptPanel.this);
 
 			try {
 				contentScroller.setViewportView(getContentPane());
@@ -196,47 +187,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				descTableModel.fireTableDataChanged();
 				imageTableModel.propertyChange(pce);
 				imageTableModel.fireTableDataChanged();
-				idTableModel.propertyChange(pce);
-				idTableModel.fireTableDataChanged();
 			} catch (DatabaseException e1) {
 				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 	}
 
-	public IdTableModel idTableModel;
-
-	private class ToggleIdChangeActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-			if (toggle.isSelected()) {
-				idTableModel = new IdTableModel(getIdColumns(),
-						ConceptPanel.this);
-			} else {
-				for (TableModelListener l : idTableModel
-						.getTableModelListeners()) {
-					idTableModel.removeTableModelListener(l);
-				}
-				removeTermChangeListener(idTableModel);
-			}
-			try {
-				contentScroller.setViewportView(getContentPane());
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						PropertyChangeEvent pce = new PropertyChangeEvent(
-								ConceptPanel.this, "termComponent", null, label
-										.getTermComponent());
-						idTableModel.propertyChange(pce);
-						idTableModel.fireTableDataChanged();
-					}
-				});
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-
-	}
 
 	private class ToggleConceptChangeActionListener implements ActionListener {
 
@@ -347,17 +303,16 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private ConflictPlugin conflictPlugin = new ConflictPlugin();
 	private SrcRelPlugin srcRelPlugin = new SrcRelPlugin();
 	private DestRelPlugin destRelPlugin = new DestRelPlugin();
+	private IdPlugin idPlugin = new IdPlugin();
 	
 	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
-			Arrays.asList(new I_PluginToConceptPanel[] { srcRelPlugin, destRelPlugin, conflictPlugin }));
+			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, srcRelPlugin, destRelPlugin, conflictPlugin }));
 
 	public ImageIcon tabIcon;
 
 	private JTabbedPane conceptTabs;
 
 	private JToggleButton inferredButton;
-
-	private JToggleButton idButton;
 
 	private ToggleHistoryChangeActionListener historyChangeActionListener;
 
@@ -539,7 +494,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				this);
 		imageTableModel = new ImageTableModel(ConceptPanel.this,
 				getImageColumns(), historyButton.isSelected());
-		idTableModel = new IdTableModel(getIdColumns(), this);
 
 		contentScroller = new JScrollPane(getContentPane());
 		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
@@ -555,12 +509,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.NONE;
-		idButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/id_card.png")));
-		idButton.setSelected(false);
-		idButton.addActionListener(new ToggleIdChangeActionListener());
-		toggleBar.add(idButton, c);
-		c.gridx++;
+
 		conceptButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/bullet_triangle_blue.png")));
 		conceptButton.setSelected(true);
@@ -637,10 +586,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		if (idButton.isSelected()) {
-			content.add(getIdPanel(), c);
-			c.gridy++;
-		}
 		if (conceptButton.isSelected()) {
 			content.add(getConceptPanel(), c);
 			c.gridy++;
@@ -1048,114 +993,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return conceptPanel;
 	}
 
-	private JPanel getIdPanel() {
-		JPanel idPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.gridwidth = 2;
-		JLabel idLabel = new JLabel("Id:");
-		idLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
-		idPanel.add(idLabel, c);
-
-		SmallProgressPanel idProgress = new SmallProgressPanel();
-		idProgress.setVisible(false);
-		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx++;
-		idPanel.add(idProgress, c);
-		idTableModel.setProgress(idProgress);
-
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		idPanel.add(rowAddAfter, c);
-		// rowAddAfter.addActionListener(new AddConceptPart(this));
-		c.gridheight = 1;
-		c.gridx++;
-		TableSorter sortingTable = new TableSorter(idTableModel);
-		JTable idTable = new JTableWithDragImage(sortingTable);
-		idTable.addMouseListener(idTableModel.makePopupListener(idTable,
-				getConfig()));
-
-		idTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sortingTable.setTableHeader(idTable.getTableHeader());
-
-		ID_FIELD[] columnEnums = idTableModel.getColumnEnums();
-		for (int i = 0; i < idTable.getColumnCount(); i++) {
-			TableColumn column = idTable.getColumnModel().getColumn(i);
-			ID_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
-		}
-
-		// Set up tool tips for column headers.
-		sortingTable
-				.getTableHeader()
-				.setToolTipText(
-						"Click to specify sorting; Control-Click to specify secondary sorting");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		idPanel.add(idTable.getTableHeader(), c);
-		c.gridy++;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridheight = 6;
-
-		IdTableRenderer renderer = new IdTableRenderer();
-
-		idTable.setDefaultRenderer(StringWithIdTuple.class, renderer);
-		idTable.setDefaultRenderer(Number.class, renderer);
-		idTable.setDefaultRenderer(String.class, renderer);
-		JComboBox comboBox = new JComboBox() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setSelectedItem(Object anObject) {
-				Boolean value = null;
-				if (Boolean.class.isAssignableFrom(anObject.getClass())) {
-					value = (Boolean) anObject;
-				} else if (StringWithConceptTuple.class
-						.isAssignableFrom(anObject.getClass())) {
-					I_CellTextWithTuple swt = (I_CellTextWithTuple) anObject;
-					value = Boolean.parseBoolean(swt.getCellText());
-				}
-				super.setSelectedItem(value);
-			}
-		};
-		comboBox.addItem(new Boolean(true));
-		comboBox.addItem(new Boolean(false));
-		idTable
-				.setDefaultEditor(Boolean.class,
-						new DefaultCellEditor(comboBox));
-
-		idTable.getColumn(ID_FIELD.STATUS).setCellEditor(
-				new IdTableModel.IdStatusFieldEditor(ace.getAceFrameConfig()));
-
-		idTable.setDefaultRenderer(String.class, renderer);
-		idPanel.add(idTable, c);
-		idPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
-		c.gridheight = 1;
-		c.gridx = 0;
-		return idPanel;
-	}
-
 	private JPanel getDescPanel() {
 		JPanel descPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -1290,17 +1127,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			fields.add(CONCEPT_FIELD.BRANCH);
 		}
 		return fields.toArray(new CONCEPT_FIELD[fields.size()]);
-	}
-
-	private ID_FIELD[] getIdColumns() {
-		List<ID_FIELD> fields = new ArrayList<ID_FIELD>();
-		fields.add(ID_FIELD.EXT_ID);
-		fields.add(ID_FIELD.STATUS);
-		if (historyButton.isSelected()) {
-			fields.add(ID_FIELD.VERSION);
-			fields.add(ID_FIELD.BRANCH);
-		}
-		return fields.toArray(new ID_FIELD[fields.size()]);
 	}
 
 	private DESC_FIELD[] getDescColumns() {

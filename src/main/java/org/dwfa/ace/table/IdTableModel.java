@@ -20,10 +20,11 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -247,13 +248,27 @@ public class IdTableModel extends AbstractTableModel implements
 
 	private SmallProgressPanel progress = new SmallProgressPanel();
 
-	private ConceptPanel parentPanel;
+	private I_HostConceptPlugins host;
 
-	public IdTableModel(ID_FIELD[] columns, ConceptPanel parentPanel) {
+	public IdTableModel(ID_FIELD[] columns, I_HostConceptPlugins host) {
 		super();
-		this.parentPanel = parentPanel;
-		this.parentPanel.addTermChangeListener(this);
+		this.host = host;
+		host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 		this.columns = columns;
+	}
+	public void setColumns(ID_FIELD[] columns) {
+		if (this.columns.length != columns.length) {
+			this.columns = columns;
+			fireTableStructureChanged();
+			return;
+		}
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(this.columns[i]) == false) {
+				this.columns = columns;
+				fireTableStructureChanged();
+				return;
+			}
+		}
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -279,7 +294,7 @@ public class IdTableModel extends AbstractTableModel implements
 		return columns.length;
 	}
 	private ThinIdTuple getIdTuple(int rowIndex) throws DatabaseException {
-		I_GetConceptData cb = (I_GetConceptData) parentPanel.getTermComponent();
+		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
 		}
@@ -305,7 +320,7 @@ public class IdTableModel extends AbstractTableModel implements
 	}
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple statusDesc = cb.getDescTuple(parentPanel.getConfig().getTableDescPreferenceList(), parentPanel.getConfig());
+		ThinDescTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		String text = statusDesc.getText();
 		return text;
 	}
