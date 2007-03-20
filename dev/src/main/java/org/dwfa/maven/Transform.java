@@ -85,7 +85,7 @@ public class Transform extends AbstractMojo {
 	
 	private Map sourceToUuidMapMap = new HashMap();
 	private Map uuidToSourceMapMap = new HashMap();
-
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.out.println("sourceRoots: " + sourceRoots);
 		try {
@@ -98,10 +98,13 @@ public class Transform extends AbstractMojo {
 					BufferedWriter bw = new BufferedWriter(osw);
 					tw.init(bw, this);
 				}
-				for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
-					constantTransform.setup(this);
-					for (I_TransformAndWrite tw: outSpec.getWriters()) {
-						tw.addTransform(constantTransform);
+				if(outSpec.getConstantSpecs() != null) {
+					for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
+						constantTransform.setup(this);
+						constantTransform.transform("test");
+						for (I_TransformAndWrite tw: outSpec.getWriters()) {
+							tw.addTransform(constantTransform);
+						}
 					}
 				}
 				for (InputFileSpec spec : outSpec.getInputSpecs()) {
@@ -144,10 +147,12 @@ public class Transform extends AbstractMojo {
 							// CR or LF
 							tokenType = st.nextToken();
 						}
+
+
 						for (I_TransformAndWrite tw: outSpec.getWriters()) {
 							tw.processRec();
 						}
-						
+
 						
 						switch (tokenType) {
 						case '\r': // is CR
@@ -170,6 +175,8 @@ public class Transform extends AbstractMojo {
 					tw.close();
 				}
 			}
+
+				
 
 			if (uuidToNativeMap != null) {
 				getLog().info("ID map is not null.");
@@ -238,13 +245,9 @@ public class Transform extends AbstractMojo {
 
 	private File normalize(InputFileSpec spec) {
 		String s = spec.getInputFile();
-		System.out.println(">>>> Input File: " + s);
 		File f = FileIO.normalizeFileStr(s);
-		System.out.println(">>>> Normalised file string: " + f.toString());
 		return f;
 	}
-
-	
 
 	public Map getUuidToNativeMap() {
 		if (uuidToNativeMap == null) {
