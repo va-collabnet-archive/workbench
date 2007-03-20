@@ -64,12 +64,14 @@ public class InputFileSpec {
 		b.append(inputEncoding);
 		b.append("\nTransforms: \n");
 		int col = 1;
-		for (I_ReadAndTransform t: columnSpecs) {
-			b.append("  ");
-			b.append(col++);
-			b.append(". ");
-			b.append(t);
-			b.append("\n");
+		if(columnSpecs != null) {
+			for (I_ReadAndTransform t: columnSpecs) {
+				b.append("  ");
+				b.append(col++);
+				b.append(". ");
+				b.append(t);
+				b.append("\n");
+			}
 		}
 		return b.toString();
 	}
