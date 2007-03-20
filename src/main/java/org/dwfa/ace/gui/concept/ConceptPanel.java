@@ -44,7 +44,6 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
-import org.dwfa.ace.DropButton;
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.TermComponentLabel;
@@ -59,16 +58,12 @@ import org.dwfa.ace.table.ConceptTableRenderer;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsForConceptTableModel;
-import org.dwfa.ace.table.DestRelTableModel;
 import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.IdTableModel;
 import org.dwfa.ace.table.IdTableRenderer;
 import org.dwfa.ace.table.ImageTableModel;
 import org.dwfa.ace.table.ImageTableRenderer;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.RelTableModel;
-import org.dwfa.ace.table.RelationshipTableRenderer;
-import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
@@ -77,7 +72,6 @@ import org.dwfa.ace.table.IdTableModel.ID_FIELD;
 import org.dwfa.ace.table.IdTableModel.StringWithIdTuple;
 import org.dwfa.ace.table.ImageTableModel.IMAGE_FIELD;
 import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
-import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.bpa.util.TableSorter;
@@ -177,20 +171,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			descTableModel = new DescriptionsForConceptTableModel(
 					getDescColumns(), ConceptPanel.this);
 
-			for (TableModelListener l : srcRelTableModel
-					.getTableModelListeners()) {
-				srcRelTableModel.removeTableModelListener(l);
-			}
-			removeTermChangeListener(srcRelTableModel);
-			srcRelTableModel = new SrcRelTableModel(ConceptPanel.this,
-					getSrcRelColumns());
-			for (TableModelListener l : destRelTableModel
-					.getTableModelListeners()) {
-				destRelTableModel.removeTableModelListener(l);
-			}
-			removeTermChangeListener(destRelTableModel);
-			destRelTableModel = new DestRelTableModel(ConceptPanel.this,
-					getDestRelColumns());
 			for (TableModelListener l : imageTableModel
 					.getTableModelListeners()) {
 				imageTableModel.removeTableModelListener(l);
@@ -212,12 +192,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 								.getTermComponent());
 				conceptTableModel.fireTableDataChanged();
 				conceptTableModel.propertyChange(pce);
-				destRelTableModel.fireTableDataChanged();
-				destRelTableModel.propertyChange(pce);
-				srcRelTableModel.fireTableDataChanged();
-				srcRelTableModel.propertyChange(pce);
-				destRelTableModel.fireTableDataChanged();
-				destRelTableModel.propertyChange(pce);
 				descTableModel.propertyChange(pce);
 				descTableModel.fireTableDataChanged();
 				imageTableModel.propertyChange(pce);
@@ -329,72 +303,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	}
 
-	private class ToggleSrcRelChangeActionListener implements ActionListener {
 
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-			if (toggle.isSelected()) {
-				srcRelTableModel = new SrcRelTableModel(ConceptPanel.this,
-						getSrcRelColumns());
-			} else {
-				for (TableModelListener l : srcRelTableModel
-						.getTableModelListeners()) {
-					srcRelTableModel.removeTableModelListener(l);
-				}
-				removeTermChangeListener(srcRelTableModel);
-			}
-			try {
-				contentScroller.setViewportView(getContentPane());
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						PropertyChangeEvent pce = new PropertyChangeEvent(
-								ConceptPanel.this, "termComponent", null, label
-										.getTermComponent());
-						srcRelTableModel.propertyChange(pce);
-						srcRelTableModel.fireTableDataChanged();
-					}
-
-				});
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-
-	}
-
-	private class ToggleDestRelChangeActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-			if (toggle.isSelected()) {
-				destRelTableModel = new DestRelTableModel(ConceptPanel.this,
-						getDestRelColumns());
-			} else {
-				for (TableModelListener l : destRelTableModel
-						.getTableModelListeners()) {
-					destRelTableModel.removeTableModelListener(l);
-				}
-				removeTermChangeListener(destRelTableModel);
-			}
-			try {
-				contentScroller.setViewportView(getContentPane());
-				SwingUtilities.invokeLater(new Runnable() {
-
-					public void run() {
-						PropertyChangeEvent pce = new PropertyChangeEvent(
-								ConceptPanel.this, "termComponent", null, label
-										.getTermComponent());
-						destRelTableModel.propertyChange(pce);
-						destRelTableModel.fireTableDataChanged();
-					}
-
-				});
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-
-	}
 
 	TermComponentLabel label;
 
@@ -402,21 +311,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	private JToggleButton descButton;
 
-	private JToggleButton srcRelButton;
-
 	private JToggleButton lineageButton;
-
-	private JToggleButton destRelButton;
 
 	private JToggleButton historyButton;
 
 	private JScrollPane contentScroller;
 
 	private DescriptionsForConceptTableModel descTableModel;
-
-	private DestRelTableModel destRelTableModel;
-
-	private SrcRelTableModel srcRelTableModel;
 
 	private ImageTableModel imageTableModel;
 
@@ -636,8 +537,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		conceptTableModel = new ConceptTableModel(getConceptColumns(), this);
 		descTableModel = new DescriptionsForConceptTableModel(getDescColumns(),
 				this);
-		destRelTableModel = new DestRelTableModel(this, getDestRelColumns());
-		srcRelTableModel = new SrcRelTableModel(this, getSrcRelColumns());
 		imageTableModel = new ImageTableModel(ConceptPanel.this,
 				getImageColumns(), historyButton.isSelected());
 		idTableModel = new IdTableModel(getIdColumns(), this);
@@ -676,13 +575,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		toggleBar.add(descButton, c);
 		c.gridx++;
 
-		srcRelButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/node.png")));
-		srcRelButton.setSelected(true);
-		srcRelButton.addActionListener(new ToggleSrcRelChangeActionListener());
-		toggleBar.add(srcRelButton, c);
-		c.gridx++;
-
 		lineageButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/nav_up_right_green.png")));
 		lineageButton.setSelected(true);
@@ -691,13 +583,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		toggleBar.add(lineageButton, c);
 		c.gridx++;
 
-		destRelButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/invert_node.png")));
-		destRelButton.setSelected(true);
-		destRelButton
-				.addActionListener(new ToggleDestRelChangeActionListener());
-		toggleBar.add(destRelButton, c);
-		c.gridx++;
 		imageButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/photo_scenery.png")));
 		imageButton.setSelected(true);
@@ -764,16 +649,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			content.add(getDescPanel(), c);
 			c.gridy++;
 		}
-		if (srcRelButton.isSelected()) {
-			content.add(getSrcRelPanel(), c);
-			c.gridy++;
-		}
 		if (lineageButton.isSelected()) {
 			content.add(getLineagePanel(), c);
-			c.gridy++;
-		}
-		if (destRelButton.isSelected()) {
-			content.add(getDestRelPanel(), c);
 			c.gridy++;
 		}
 		if (imageButton.isSelected()) {
@@ -1395,108 +1272,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return descPanel;
 	}
 
-	private JPanel getSrcRelPanel() {
-		return getRelPanel(srcRelTableModel, "Source relationships:", true);
-	}
-
-	private JPanel getDestRelPanel() {
-		return getRelPanel(destRelTableModel, "Destination relationships:",
-				false);
-	}
-
-	private JPanel getRelPanel(RelTableModel model, String labelText,
-			boolean enableEdit) {
-		JPanel relPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		JLabel srcRelLabel = new JLabel(labelText);
-		srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 2;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		relPanel.add(srcRelLabel, c);
-
-		SmallProgressPanel progress = new SmallProgressPanel();
-		progress.setVisible(false);
-		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx++;
-		relPanel.add(progress, c);
-		model.setProgress(progress);
-
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-
-		c.gridwidth = 1;
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridheight = 2;
-		DropButton rowAddAfter = new DropButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")), model);
-		relPanel.add(rowAddAfter, c);
-		rowAddAfter.setEnabled(enableEdit);
-		if (enableEdit) {
-			rowAddAfter.setTransferHandler(new TerminologyTransferHandler());
-			// rowAddAfter.setDragEnabled(true);
-		}
-		c.gridheight = 1;
-		c.gridx++;
-		c.gridwidth = 1;
-
-		TableSorter relSortingTable = new TableSorter(model);
-		JTable relTable = new JTableWithDragImage(relSortingTable);
-		relTable.setDragEnabled(true);
-		relTable.setTransferHandler(new TerminologyTransferHandler());
-		relTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		relSortingTable.setTableHeader(relTable.getTableHeader());
-		relSortingTable
-				.getTableHeader()
-				.setToolTipText(
-						"Click to specify sorting; Control-Click to specify secondary sorting");
-		REL_FIELD[] columnEnums = model.getColumnEnums();
-		for (int i = 0; i < relTable.getColumnCount(); i++) {
-			TableColumn column = relTable.getColumnModel().getColumn(i);
-			REL_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
-		}
-
-		relTable.getColumn(REL_FIELD.REL_TYPE).setCellEditor(
-				new RelTableModel.RelTypeFieldEditor(ace.getAceFrameConfig()));
-		relTable.getColumn(REL_FIELD.CHARACTERISTIC).setCellEditor(
-				new RelTableModel.RelCharactisticFieldEditor(ace
-						.getAceFrameConfig()));
-		relTable.getColumn(REL_FIELD.REFINABILITY).setCellEditor(
-				new RelTableModel.RelRefinabilityFieldEditor(ace
-						.getAceFrameConfig()));
-		relTable.getColumn(REL_FIELD.STATUS)
-				.setCellEditor(
-						new RelTableModel.RelStatusFieldEditor(ace
-								.getAceFrameConfig()));
-		relTable.addMouseListener(model
-				.makePopupListener(relTable, getConfig()));
-		// Set up tool tips for column headers.
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		relPanel.add(relTable.getTableHeader(), c);
-		c.gridy++;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 0.0;
-		c.gridheight = 5;
-		relTable.setDefaultRenderer(String.class,
-				new RelationshipTableRenderer());
-		relPanel.add(relTable, c);
-		relPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
-		return relPanel;
-	}
 
 	public void addTermChangeListener(PropertyChangeListener l) {
 		addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
@@ -1504,35 +1279,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public void removeTermChangeListener(PropertyChangeListener l) {
 		removePropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
-	}
-
-	private REL_FIELD[] getDestRelColumns() {
-		List<REL_FIELD> fields = new ArrayList<REL_FIELD>();
-		fields.add(REL_FIELD.SOURCE_ID);
-		fields.add(REL_FIELD.REL_TYPE);
-		fields.add(REL_FIELD.CHARACTERISTIC);
-		fields.add(REL_FIELD.REFINABILITY);
-		fields.add(REL_FIELD.STATUS);
-		if (historyButton.isSelected()) {
-			fields.add(REL_FIELD.VERSION);
-			fields.add(REL_FIELD.BRANCH);
-		}
-		return fields.toArray(new REL_FIELD[fields.size()]);
-	}
-
-	private REL_FIELD[] getSrcRelColumns() {
-		List<REL_FIELD> fields = new ArrayList<REL_FIELD>();
-		fields.add(REL_FIELD.REL_TYPE);
-		fields.add(REL_FIELD.DEST_ID);
-		fields.add(REL_FIELD.CHARACTERISTIC);
-		fields.add(REL_FIELD.REFINABILITY);
-		fields.add(REL_FIELD.GROUP);
-		fields.add(REL_FIELD.STATUS);
-		if (historyButton.isSelected()) {
-			fields.add(REL_FIELD.VERSION);
-			fields.add(REL_FIELD.BRANCH);
-		}
-		return fields.toArray(new REL_FIELD[fields.size()]);
 	}
 
 	private CONCEPT_FIELD[] getConceptColumns() {
