@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.dwfa.ace.ConceptPanel;
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinRelTuple;
@@ -15,8 +16,8 @@ import com.sleepycat.je.DatabaseException;
 
 public class DestRelTableModel extends RelTableModel {
 
-	public DestRelTableModel(ConceptPanel parentPanel, REL_FIELD[] columns, boolean showHistory) {
-		super(parentPanel, columns, showHistory);
+	public DestRelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns) {
+		super(host, columns);
 	}
 
 	/**
@@ -27,12 +28,12 @@ public class DestRelTableModel extends RelTableModel {
 	@Override
 	public List<ThinRelTuple> getRels(I_GetConceptData cb, boolean usePrefs, boolean showHistory) throws DatabaseException {
 		List<ThinRelTuple> selectedTuples = new ArrayList<ThinRelTuple>();
-		IntSet allowedStatus = parentPanel.getConfig().getAllowedStatus();
+		IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		IntSet allowedTypes = null;
 		Set<Position> positions = null;
 		if (usePrefs) {
-			allowedTypes = parentPanel.getConfig().getDestRelTypes();
-			positions = parentPanel.getConfig().getViewPositionSet();
+			allowedTypes = host.getConfig().getDestRelTypes();
+			positions = host.getConfig().getViewPositionSet();
 		}
 		if (showHistory) {
 			positions = null;
@@ -44,7 +45,7 @@ public class DestRelTableModel extends RelTableModel {
 		
 		return selectedTuples;
 	}
-
+	
 	public void doDrop(I_GetConceptData obj) {
 		throw new UnsupportedOperationException();
 	}

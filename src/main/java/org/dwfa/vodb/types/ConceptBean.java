@@ -25,9 +25,9 @@ import javax.swing.JPanel;
 import org.dwfa.ace.IntList;
 import org.dwfa.ace.IntSet;
 import org.dwfa.ace.TermLabelMaker;
-import org.dwfa.ace.ConflictPanel.ConflictColors;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.gui.concept.ConflictPanel.ConflictColors;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;

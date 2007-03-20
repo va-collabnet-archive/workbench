@@ -20,10 +20,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.ConceptPanel;
 import org.dwfa.ace.IntSet;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.types.ConceptBean;
@@ -193,7 +193,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		IntSet allowedStatus = parentPanel.getConfig().getAllowedStatus();
 		IntSet allowedTypes = null;
 		Set<Position> positions = null;
-		if (parentPanel.usePrefs()) {
+		if (parentPanel.getUsePrefs()) {
 			allowedTypes = parentPanel.getConfig().getDescTypes();
 			positions = parentPanel.getConfig().getViewPositionSet();
 		}

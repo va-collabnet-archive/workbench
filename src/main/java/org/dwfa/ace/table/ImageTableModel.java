@@ -14,8 +14,8 @@ import javax.swing.ImageIcon;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
-import org.dwfa.ace.ConceptPanel;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;

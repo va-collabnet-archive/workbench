@@ -1,6 +1,7 @@
-package org.dwfa.ace;
+package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -21,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Position;
@@ -78,13 +82,11 @@ public class ConflictPanel extends JPanel implements ActionListener {
 	private JCheckBox longForm = new JCheckBox("long form");
 	private ConceptBean cb;
 	private AceFrameConfig config;
-	private ConceptPanel conceptPanel;
 	
 
 
-	public ConflictPanel(ConceptPanel conceptPanel) {
+	public ConflictPanel() {
 		super();
-		this.conceptPanel = conceptPanel;
 		initWithGridBagLayout();
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3), 
 				BorderFactory.createLineBorder(Color.GRAY)));
@@ -181,18 +183,16 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			versionPanel.add(new JPanel(), c);
 		}
 	}
-	private void tickle(JPanel p) {
-		Dimension d = p.getSize();
-		p.setSize(d.width + 1, d.height + 1);
-		p.setSize(d);
-	}
 	public void actionPerformed(ActionEvent e) {
 		try {
 			setConcept(cb, config);
-			tickle(conceptPanel);
+			Component parent = this.getParent();
+			while (parent != null) {
+				parent.invalidate();
+				parent = this.getParent();
+			}
 		} catch (DatabaseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			AceLog.alertAndLog(this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 		}
 	}	
 }

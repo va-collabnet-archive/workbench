@@ -1,5 +1,6 @@
 package org.dwfa.ace;
 
+import java.awt.Component;
 import java.util.ResourceBundle;
 import java.util.logging.Filter;
 import java.util.logging.Handler;
@@ -7,11 +8,39 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
 public class AceLog {
 
 	private static Logger logger = Logger.getLogger(AceLog.class
 			.getName());
 
+	public static void alertAndLog(Level level, String message, Throwable ex) {
+		alertAndLog(null, level, message, ex);
+	}
+	public static void alertAndLog(Component parent, Level level, String message, Throwable ex) {
+		if (level.intValue() <= Level.INFO.intValue()) {
+			JOptionPane.showMessageDialog(parent,
+					message,
+				    "Information has been logged",
+				    JOptionPane.INFORMATION_MESSAGE);
+		} else if (level.intValue() <= Level.WARNING.intValue()) {
+			JOptionPane.showMessageDialog(parent,
+					message,
+				    "A warning has been logged",
+				    JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(parent,
+					message);
+		} else {
+			JOptionPane.showMessageDialog(parent,
+					message,
+				    "An error has been logged",
+				    JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(parent,
+					message);
+		} 
+		logger.log(level, message, ex);
+	}
 	public static void addHandler(Handler arg0) throws SecurityException {
 		logger.addHandler(arg0);
 	}

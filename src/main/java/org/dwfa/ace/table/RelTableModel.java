@@ -23,12 +23,13 @@ import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.ConceptPanel;
+import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.I_DoConceptDrop;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -45,7 +46,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		PropertyChangeListener, I_DoConceptDrop {
 	private List<ThinRelTuple> allTuples;
 
-	protected ConceptPanel parentPanel;
+	//protected ConceptPanel parentPanel;
 
 	protected I_GetConceptData tableBean = null;
 
@@ -177,8 +178,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			if (cb == null) {
 				return 0;
 			}
-			List<ThinRelTuple> rels = getRels(cb, parentPanel.usePrefs(),
-					showHistory);
+			List<ThinRelTuple> rels = getRels(cb, host.getUsePrefs(),
+					getShowHistory());
 			for (ThinRelTuple r : rels) {
 				if (stopWork) {
 					return -1;
@@ -280,15 +281,13 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 	private REL_FIELD[] columns;
 
-	private boolean showHistory;
+	protected I_HostConceptPlugins host;
 
-	public RelTableModel(ConceptPanel parentPanel, REL_FIELD[] columns,
-			boolean showHistory) {
+	public RelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns) {
 		super();
 		this.columns = columns;
-		this.parentPanel = parentPanel;
-		this.parentPanel.addPropertyChangeListener("termComponent", this);
-		this.showHistory = showHistory;
+		this.host = host;
+		this.host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 	}
 
 	public int getColumnCount() {
@@ -300,7 +299,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			return 0;
 		}
 		try {
-			allTuples = getRels(tableBean, parentPanel.usePrefs(), showHistory);
+			allTuples = getRels(tableBean, host.getUsePrefs(), getShowHistory());
 			return allTuples.size();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -312,7 +311,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			boolean usePrefs, boolean showHistory) throws DatabaseException;
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		I_GetConceptData cb = (I_GetConceptData) parentPanel.getTermComponent();
+		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
 		}
@@ -388,12 +387,12 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	}
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = referencedConcepts.get(id);
-		ThinDescTuple desc = cb.getDescTuple(parentPanel.getConfig().getTableDescPreferenceList(), parentPanel.getConfig());
+		ThinDescTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
 		cb = referencedConcepts.get(id);
-		desc = cb.getDescTuple(parentPanel.getConfig().getTableDescPreferenceList(), parentPanel.getConfig());
+		desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		return "null pref desc: " + cb.getInitialText();
 	}
 
@@ -771,6 +770,29 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				}
 			}
 		}
+	}
+
+	public REL_FIELD[] getColumns() {
+		return columns;
+	}
+
+	public void setColumns(REL_FIELD[] columns) {
+		if (this.columns.length != columns.length) {
+			this.columns = columns;
+			fireTableStructureChanged();
+			return;
+		}
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(this.columns[i]) == false) {
+				this.columns = columns;
+				fireTableStructureChanged();
+				return;
+			}
+		}
+	}
+
+	public boolean getShowHistory() {
+		return host.getShowHistory();
 	}
 
 }

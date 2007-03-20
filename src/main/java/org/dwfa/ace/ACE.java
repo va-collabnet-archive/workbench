@@ -53,7 +53,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.dwfa.ace.ConceptPanel.LINK_TYPE;
 import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportBaselineJar;
@@ -66,6 +65,8 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.search.SearchPanel;

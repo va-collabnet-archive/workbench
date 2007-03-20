@@ -1,4 +1,4 @@
-package org.dwfa.ace;
+package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -42,6 +42,13 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.DropButton;
+import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.TermComponentSelectionListener;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddConceptPart;
@@ -81,7 +88,7 @@ import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
-public class ConceptPanel extends JPanel implements I_ContainTermComponent,
+public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		PropertyChangeListener {
 
 	public enum LINK_TYPE {
@@ -114,14 +121,13 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 					}
 				});
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 
 	}
 
-	private class ToggleConflictChangeActionListener implements ActionListener {
+	private class ShowPluginComponentActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -129,8 +135,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 					try {
 						contentScroller.setViewportView(getContentPane());
 					} catch (DatabaseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e.getLocalizedMessage(), e);
 					}
 				}
 			});
@@ -145,8 +150,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 					try {
 						contentScroller.setViewportView(getContentPane());
 					} catch (DatabaseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e.getLocalizedMessage(), e);
 					}
 				}
 			});
@@ -157,7 +161,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 	private class ToggleHistoryChangeActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-
+			firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(), historyButton.isSelected());
 			for (TableModelListener l : conceptTableModel
 					.getTableModelListeners()) {
 				conceptTableModel.removeTableModelListener(l);
@@ -179,14 +183,14 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 			}
 			removeTermChangeListener(srcRelTableModel);
 			srcRelTableModel = new SrcRelTableModel(ConceptPanel.this,
-					getSrcRelColumns(), historyButton.isSelected());
+					getSrcRelColumns());
 			for (TableModelListener l : destRelTableModel
 					.getTableModelListeners()) {
 				destRelTableModel.removeTableModelListener(l);
 			}
 			removeTermChangeListener(destRelTableModel);
 			destRelTableModel = new DestRelTableModel(ConceptPanel.this,
-					getDestRelColumns(), historyButton.isSelected());
+					getDestRelColumns());
 			for (TableModelListener l : imageTableModel
 					.getTableModelListeners()) {
 				imageTableModel.removeTableModelListener(l);
@@ -220,13 +224,8 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 				imageTableModel.fireTableDataChanged();
 				idTableModel.propertyChange(pce);
 				idTableModel.fireTableDataChanged();
-				if (conflictPanel != null) {
-					conflictPanel.setConcept((ConceptBean) label
-							.getTermComponent(), ace.getAceFrameConfig());
-				}
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 	}
@@ -259,8 +258,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 					}
 				});
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 
@@ -292,8 +290,8 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 					}
 				});
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE,
+						"Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 
@@ -325,8 +323,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 					}
 				});
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 
@@ -338,7 +335,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 			JToggleButton toggle = (JToggleButton) e.getSource();
 			if (toggle.isSelected()) {
 				srcRelTableModel = new SrcRelTableModel(ConceptPanel.this,
-						getSrcRelColumns(), historyButton.isSelected());
+						getSrcRelColumns());
 			} else {
 				for (TableModelListener l : srcRelTableModel
 						.getTableModelListeners()) {
@@ -359,8 +356,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 
 				});
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 
@@ -372,7 +368,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 			JToggleButton toggle = (JToggleButton) e.getSource();
 			if (toggle.isSelected()) {
 				destRelTableModel = new DestRelTableModel(ConceptPanel.this,
-						getDestRelColumns(), historyButton.isSelected());
+						getDestRelColumns());
 			} else {
 				for (TableModelListener l : destRelTableModel
 						.getTableModelListeners()) {
@@ -394,8 +390,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 
 				});
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
 
@@ -447,10 +442,15 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 
 	public static ImageIcon SMALL_TREE_LINK_ICON = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/text_tree.png"));
+	
+	private ConflictPlugin conflictPlugin = new ConflictPlugin();
+	private SrcRelPlugin srcRelPlugin = new SrcRelPlugin();
+	private DestRelPlugin destRelPlugin = new DestRelPlugin();
+	
+	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
+			Arrays.asList(new I_PluginToConceptPanel[] { srcRelPlugin, destRelPlugin, conflictPlugin }));
 
 	public ImageIcon tabIcon;
-
-	private JToggleButton conflictButton;
 
 	private JTabbedPane conceptTabs;
 
@@ -462,8 +462,6 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 
 	private JToggleButton conceptButton;
 
-	private ConflictPanel conflictPanel;
-
 	private JTreeWithDragImage lineageTree;
 
 	private LineageTreeCellRenderer lineageRenderer;
@@ -473,9 +471,6 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 		public void propertyChange(PropertyChangeEvent evt) {
 			updateTab(label.getTermComponent());
 			try {
-				conflictPanel.setConcept(
-						(ConceptBean) label.getTermComponent(), ace
-								.getAceFrameConfig());
 				updateLineageModel();
 			} catch (DatabaseException e) {
 				e.printStackTrace();
@@ -641,10 +636,8 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 		conceptTableModel = new ConceptTableModel(getConceptColumns(), this);
 		descTableModel = new DescriptionsForConceptTableModel(getDescColumns(),
 				this);
-		destRelTableModel = new DestRelTableModel(this, getDestRelColumns(),
-				historyButton.isSelected());
-		srcRelTableModel = new SrcRelTableModel(this, getSrcRelColumns(),
-				historyButton.isSelected());
+		destRelTableModel = new DestRelTableModel(this, getDestRelColumns());
+		srcRelTableModel = new SrcRelTableModel(this, getSrcRelColumns());
 		imageTableModel = new ImageTableModel(ConceptPanel.this,
 				getImageColumns(), historyButton.isSelected());
 		idTableModel = new IdTableModel(getIdColumns(), this);
@@ -653,7 +646,6 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
 		add(contentScroller, c);
 		setBorder(BorderFactory.createRaisedBevelBorder());
-		conflictPanel = new ConflictPanel(this);
 		label.addPropertyChangeListener("termComponent", labelListener);
 	}
 
@@ -712,13 +704,14 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 		imageButton.addActionListener(new ToggleImageChangeActionListener());
 		toggleBar.add(imageButton, c);
 		c.gridx++;
-		conflictButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/transform.png")));
-		conflictButton.setSelected(false);
-		conflictButton
-				.addActionListener(new ToggleConflictChangeActionListener());
-		toggleBar.add(conflictButton, c);
-		c.gridx++;
+		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
+		for (I_PluginToConceptPanel plugin: plugins) {
+			for (JComponent component: plugin.getToggleBarComponents()) {
+				toggleBar.add(component, c);
+				c.gridx++;
+			}
+			plugin.addShowComponentListener(l);
+		}
 		inferredButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/yinyang.png")));
 		inferredButton.setSelected(false);
@@ -787,9 +780,11 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 			content.add(getImagePanel(), c);
 			c.gridy++;
 		}
-		if (conflictButton.isSelected()) {
-			content.add(getConflictPanel(), c);
-			c.gridy++;
+		for (I_PluginToConceptPanel plugin: plugins) {
+			if (plugin.showComponent()) {
+				content.add(plugin.getComponent(this), c);
+				c.gridy++;
+			}
 		}
 		c.weightx = 1.0;
 		c.weighty = 1.0;
@@ -994,12 +989,6 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 			}
 			conceptTabs.setIconAt(index, tabIcon);
 		}
-	}
-
-	private JPanel getConflictPanel() throws DatabaseException {
-		conflictPanel.setConcept((ConceptBean) label.getTermComponent(), ace
-				.getAceFrameConfig());
-		return conflictPanel;
 	}
 
 	private JPanel getImagePanel() {
@@ -1510,11 +1499,11 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 	}
 
 	public void addTermChangeListener(PropertyChangeListener l) {
-		addPropertyChangeListener("termComponent", l);
+		addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
 	}
 
 	public void removeTermChangeListener(PropertyChangeListener l) {
-		removePropertyChangeListener("termComponent", l);
+		removePropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
 	}
 
 	private REL_FIELD[] getDestRelColumns() {
@@ -1595,7 +1584,7 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 		return fields.toArray(new IMAGE_FIELD[fields.size()]);
 	}
 
-	public boolean usePrefs() {
+	public boolean getUsePrefs() {
 		return usePrefButton.isSelected();
 	}
 
@@ -1625,14 +1614,16 @@ public class ConceptPanel extends JPanel implements I_ContainTermComponent,
 			break;
 		case UNLINKED:
 			break;
-
 		}
-
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("viewPosition")) {
 			historyChangeActionListener.actionPerformed(null);
 		}
+	}
+
+	public boolean getShowHistory() {
+		return historyButton.isSelected();
 	}
 }
