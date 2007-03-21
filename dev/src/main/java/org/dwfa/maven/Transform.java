@@ -151,20 +151,26 @@ public class Transform extends AbstractMojo {
 					int rowCount = 0;
 					while (tokenType != StreamTokenizer.TT_EOF) {
 						int currentColumn = 0;
-						while (tokenType != '\r' && tokenType != '\n') {
-							if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+						while (tokenType != '\r' && tokenType != '\n' && tokenType != StreamTokenizer.TT_EOF) {
+							/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
 								getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
-							}
+								getLog().info("Current row:" + rowCount);
+							}*/
 							
+							if(columnTransformerMap.get((Integer) currentColumn) == null) {
+								System.out.println("Current col:" + currentColumn);
+								System.out.println("Current row: " + rowCount);
+								System.out.println("Token: " + tokenType);
+							}
 							for (Object tObj: (Set) columnTransformerMap.get((Integer) currentColumn)) {
 								I_ReadAndTransform t = (I_ReadAndTransform) tObj;
-								if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+								/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
 									getLog().info("Transform for column: " + currentColumn + " is: " + t);
-								}
+								}*/
 								String result = t.transform(st.sval);
-								if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+								/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
 									getLog().info("Transform: " + t + " result: " + result);
-								}
+								}*/
 							}
 							// CR or LF
 							tokenType = st.nextToken();
@@ -178,15 +184,17 @@ public class Transform extends AbstractMojo {
 
 						
 						switch (tokenType) {
-						case '\r': // is CR
-							// LF
-							tokenType = st.nextToken();
-							break;
-						case '\n':  //LF
-							break;
-						default:
-							throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
-						}
+							case '\r': // is CR
+								// LF
+								tokenType = st.nextToken();
+								break;
+							case '\n':  //LF
+								break;
+							case StreamTokenizer.TT_EOF: // End of file
+								break;
+							default:
+								throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
+						} 
 						rowCount++;
 						// Beginning of loop
 						tokenType = st.nextToken();
