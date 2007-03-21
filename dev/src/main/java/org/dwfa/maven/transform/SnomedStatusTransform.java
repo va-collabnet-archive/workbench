@@ -11,7 +11,7 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 public class SnomedStatusTransform extends AbstractTransform implements I_ReadAndTransform {
 
 	private Map uuidToNativeMap;
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();
 	}
 

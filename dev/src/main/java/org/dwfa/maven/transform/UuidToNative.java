@@ -12,7 +12,7 @@ public class UuidToNative extends AbstractTransform implements
 	private Map uuidToNativeMap;
 	private Map nativeToUuidMap;
 
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();
 		nativeToUuidMap = transformer.getNativeToUuidMap();
 	}

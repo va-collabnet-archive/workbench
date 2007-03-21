@@ -19,7 +19,7 @@ public class Type4UuidAndNativeTransform extends AbstractTransform implements I_
 	private Map sourceToUuidMap;
 	private Map uuidToSourceMap;
 	
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();
 		nativeToUuidMap = transformer.getNativeToUuidMap();
 		sourceToUuidMap = transformer.getSourceToUuidMap(source);

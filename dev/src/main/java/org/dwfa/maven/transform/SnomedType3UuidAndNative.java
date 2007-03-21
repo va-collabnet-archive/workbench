@@ -14,7 +14,7 @@ public class SnomedType3UuidAndNative extends AbstractTransform implements I_Rea
 	private Map sourceToUuidMap;
 	private Map uuidToSourceMap;
 	
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();
 		nativeToUuidMap = transformer.getNativeToUuidMap();
 		sourceToUuidMap = transformer.getSourceToUuidMap("snomed");

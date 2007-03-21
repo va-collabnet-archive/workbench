@@ -6,4 +6,6 @@ public interface I_ReadAndTransform {
 	public String getLastTransform();
 	public String getName();
 	public void setName(String name);
+	public void setColumnId(int id);
+	public int getColumnId();
 }

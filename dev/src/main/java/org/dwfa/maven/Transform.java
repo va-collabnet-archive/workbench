@@ -13,13 +13,13 @@ import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -86,6 +86,14 @@ public class Transform extends AbstractMojo {
 	private Map sourceToUuidMapMap = new HashMap();
 	private Map uuidToSourceMapMap = new HashMap();
 	
+	
+	private int nextColumnId = 0;
+	public int getNextColumnId() {
+		int id = nextColumnId;
+		nextColumnId++;
+		return id;
+	}
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.out.println("sourceRoots: " + sourceRoots);
 		try {
@@ -108,9 +116,19 @@ public class Transform extends AbstractMojo {
 					}
 				}
 				for (InputFileSpec spec : outSpec.getInputSpecs()) {
+					nextColumnId = 0;
+					Map columnTransformerMap = new HashMap();
 					getLog().info("Now processing file spec:\n\n" + spec);
+					
 					for (I_ReadAndTransform t : spec.getColumnSpecs()) {
 						t.setup(this);
+						Set transformerSet = (Set) columnTransformerMap.get((Integer) t.getColumnId());
+						if (transformerSet == null) {
+							transformerSet = new HashSet();
+							columnTransformerMap.put((Integer) t.getColumnId(), transformerSet);
+						}
+						transformerSet.add(t);
+
 						for (I_TransformAndWrite tw: outSpec.getWriters()) {
 							tw.addTransform(t);
 						}
@@ -132,20 +150,25 @@ public class Transform extends AbstractMojo {
 					int tokenType = st.nextToken();
 					int rowCount = 0;
 					while (tokenType != StreamTokenizer.TT_EOF) {
-						for (I_ReadAndTransform t : spec.getColumnSpecs()) {
-							switch (tokenType) {
-							case '\r': // is CR
-								throw new Exception("There are more transformers than columns. ('\\r' encountered)");
-							case '\n':  //LF
-								throw new Exception("There are more transformers than columns. ('\\n' encountered)");
-							default:
-							}
-							String result = t.transform(st.sval);
+						int currentColumn = 0;
+						while (tokenType != '\r' && tokenType != '\n') {
 							if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-								getLog().info("Transform: " + t + " result: " + result);
+								getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
+							}
+							
+							for (Object tObj: (Set) columnTransformerMap.get((Integer) currentColumn)) {
+								I_ReadAndTransform t = (I_ReadAndTransform) tObj;
+								if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+									getLog().info("Transform for column: " + currentColumn + " is: " + t);
+								}
+								String result = t.transform(st.sval);
+								if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+									getLog().info("Transform: " + t + " result: " + result);
+								}
 							}
 							// CR or LF
 							tokenType = st.nextToken();
+							currentColumn++;
 						}
 
 

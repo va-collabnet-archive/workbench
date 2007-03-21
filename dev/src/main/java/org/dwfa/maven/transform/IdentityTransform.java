@@ -5,7 +5,7 @@ import org.dwfa.maven.Transform;
 
 public class IdentityTransform extends AbstractTransform implements I_ReadAndTransform {
 
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 		// Nothing to setup
 	}
 

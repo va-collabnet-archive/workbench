@@ -5,7 +5,7 @@ import org.dwfa.maven.Transform;
 
 public class NullTransform extends AbstractTransform implements I_ReadAndTransform {
 
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 	}
 
 	public String transform(String input) throws Exception {

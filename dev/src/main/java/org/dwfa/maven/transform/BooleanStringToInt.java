@@ -6,7 +6,7 @@ import org.dwfa.maven.Transform;
 public class BooleanStringToInt extends AbstractTransform implements
 		I_ReadAndTransform {
 
-	public void setup(Transform transformer) {
+	public void setupImpl(Transform transformer) {
 		// Nothing to do...
 	}
 
