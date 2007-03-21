@@ -6,8 +6,8 @@ public class InputFileSpec {
 	private Character inputColumnDelimiter = '\t';
 	private Character inputCharacterDelimiter = '"';
  	private String inputEncoding = "UTF-8";
-	private int debugRowStart = 1;
-	private int debugRowEnd = 1;
+	private int debugRowStart = 0;
+	private int debugRowEnd = 0;
 	
 	private I_ReadAndTransform[] columnSpecs;
 	
