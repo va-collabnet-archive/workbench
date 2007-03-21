@@ -86,8 +86,13 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 		if (exportOnlyActive == false) {
 			writeRec();
 		} else {
-			if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
-				writeRec();
+			if(statusTransform != null) {
+				if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
+					writeRec();
+				}
+				else {
+					writeRec();
+				}
 			}
 		}
 	}
