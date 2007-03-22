@@ -29,7 +29,7 @@ import org.dwfa.util.io.FileIO;
 
 /**
  * Goal which transforms source files and puts them in generated resources.
- * 
+ *
  * @goal transform
  * @phase generate-resources
  */
@@ -42,16 +42,16 @@ public class Transform extends AbstractMojo {
 	 */
 	private OutputSpec[] outputSpecs;
 
-	
+
 	/**
 	 * @parameter
 	 * @required
 	 */
 	private String idFileLoc;
-	
+
 	/**
 	 * @parameter
-	 * 
+	 *
 	 */
 	private boolean appendIdFiles = false;
 
@@ -67,7 +67,7 @@ public class Transform extends AbstractMojo {
 	 * @parameter
 	 */
 	private Character outputCharacterDelimiter = '"';
-	
+
 	/**
 	* List of source roots containing non-test code.
 	* @parameter default-value="${project.compileSourceRoots}"
@@ -75,25 +75,25 @@ public class Transform extends AbstractMojo {
 	* @readonly
 	*/
 	private List sourceRoots;
-	
+
 	private boolean includeHeader = false;
 
 
 	private Map uuidToNativeMap;
 
 	private Map nativeToUuidMap;
-	
+
 	private Map sourceToUuidMapMap = new HashMap();
 	private Map uuidToSourceMapMap = new HashMap();
-	
-	
+
+
 	private int nextColumnId = 0;
 	public int getNextColumnId() {
 		int id = nextColumnId;
 		nextColumnId++;
 		return id;
 	}
-	
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.out.println("sourceRoots: " + sourceRoots);
 		try {
@@ -119,7 +119,7 @@ public class Transform extends AbstractMojo {
 					nextColumnId = 0;
 					Map columnTransformerMap = new HashMap();
 					getLog().info("Now processing file spec:\n\n" + spec);
-					
+
 					for (I_ReadAndTransform t : spec.getColumnSpecs()) {
 						t.setup(this);
 						Set transformerSet = (Set) columnTransformerMap.get((Integer) t.getColumnId());
@@ -156,7 +156,7 @@ public class Transform extends AbstractMojo {
 								getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
 								getLog().info("Current row:" + rowCount);
 							}*/
-							
+
 							if(columnTransformerMap.get((Integer) currentColumn) == null) {
 								System.out.println("Current col:" + currentColumn);
 								System.out.println("Current row: " + rowCount);
@@ -182,7 +182,7 @@ public class Transform extends AbstractMojo {
 							tw.processRec();
 						}
 
-						
+
 						switch (tokenType) {
 							case '\r': // is CR
 								// LF
@@ -194,7 +194,7 @@ public class Transform extends AbstractMojo {
 								break;
 							default:
 								throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
-						} 
+						}
 						rowCount++;
 						// Beginning of loop
 						tokenType = st.nextToken();
@@ -207,14 +207,14 @@ public class Transform extends AbstractMojo {
 				}
 			}
 
-				
+
 
 			if (uuidToNativeMap != null) {
 				getLog().info("ID map is not null.");
 				// write out id map...
 				File outputFileLoc = new File(idFileLoc);
 				outputFileLoc.getParentFile().mkdirs();
-				
+
 				FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, "uuidToNative.txt"), appendIdFiles);
 				OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
 				BufferedWriter bw = new BufferedWriter(osw);
@@ -231,17 +231,17 @@ public class Transform extends AbstractMojo {
 					bw.append(entry.getValue().toString());
 					bw.append("\n");
 				}
-				
+
 				bw.close();
 			}
-			
-			
+
+
 			for (Iterator keyItr = sourceToUuidMapMap.keySet().iterator(); keyItr.hasNext();) {
 				String key = (String) keyItr.next();
-				
+
 				File outputFileLoc = new File(idFileLoc);
 				outputFileLoc.getParentFile().mkdirs();
-				
+
 				FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, key + "ToUuid.txt"), appendIdFiles);
 				OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
 				BufferedWriter bw = new BufferedWriter(osw);
@@ -251,7 +251,7 @@ public class Transform extends AbstractMojo {
 					bw.append("UUID");
 					bw.append("\n");
 				}
-				
+
 				Map idMap = (Map) sourceToUuidMapMap.get(key);
 				for (Iterator i = idMap.entrySet().iterator(); i.hasNext();) {
 					Map.Entry entry = (Entry) i.next();
@@ -262,7 +262,7 @@ public class Transform extends AbstractMojo {
 				}
 				bw.close();
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		} catch (UnsupportedEncodingException e) {
@@ -345,6 +345,20 @@ public class Transform extends AbstractMojo {
 
 	public List getSourceRoots() {
 		return sourceRoots;
+	}
+
+	public void setMavenParameters(OutputSpec[] outputSpecs,
+			String idFileLoc, boolean appendIdFiles,
+			String idEncoding, Character outputColumnDelimiter,
+			Character outputCharacterDelimiter,
+			List sourceRoots) {
+		this.outputSpecs = outputSpecs;
+		this.idFileLoc = idFileLoc;
+		this.appendIdFiles = appendIdFiles;
+		this.idEncoding = idEncoding;
+		this.outputCharacterDelimiter = outputCharacterDelimiter;
+		this.outputColumnDelimiter = outputColumnDelimiter;
+		this.sourceRoots = sourceRoots;
 	}
 
 }
