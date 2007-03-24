@@ -76,6 +76,20 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		this.columns = columns;
 		this.config = config;
 	}
+	public final void setColumns(DESC_FIELD[] columns) {
+		if (this.columns.length != columns.length) {
+			this.columns = columns;
+			fireTableStructureChanged();
+			return;
+		}
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(this.columns[i]) == false) {
+				this.columns = columns;
+				fireTableStructureChanged();
+				return;
+			}
+		}
+	}
 
 	public int getColumnCount() {
 		return columns.length;

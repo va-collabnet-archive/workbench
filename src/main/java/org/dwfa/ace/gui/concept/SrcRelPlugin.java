@@ -55,17 +55,19 @@ public class SrcRelPlugin extends RelPlugin {
 	}
 	@Override
 	public void update() throws DatabaseException {
-		PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-		REL_FIELD[] columnEnums = getSrcRelColumns(host.getShowHistory());
-		srcRelTableModel.setColumns(getSrcRelColumns(host.getShowHistory()));
-		for (int i = 0; i < srcRelTableModel.getColumnCount(); i++) {
-			TableColumn column = getRelTable().getColumnModel().getColumn(i);
-			REL_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
+		if (host != null) {
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			REL_FIELD[] columnEnums = getSrcRelColumns(host.getShowHistory());
+			srcRelTableModel.setColumns(getSrcRelColumns(host.getShowHistory()));
+			for (int i = 0; i < srcRelTableModel.getColumnCount(); i++) {
+				TableColumn column = getRelTable().getColumnModel().getColumn(i);
+				REL_FIELD columnDesc = columnEnums[i];
+				column.setIdentifier(columnDesc);
+				column.setPreferredWidth(columnDesc.getPref());
+				column.setMaxWidth(columnDesc.getMax());
+				column.setMinWidth(columnDesc.getMin());
+			}
+			srcRelTableModel.propertyChange(evt);			
 		}
-		srcRelTableModel.propertyChange(evt);
 	}
 }

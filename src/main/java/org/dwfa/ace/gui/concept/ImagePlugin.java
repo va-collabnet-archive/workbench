@@ -68,6 +68,7 @@ public class ImagePlugin extends AbstractPlugin {
 			imageTableModel = new ImageTableModel(host,
 					getImageColumns(host), host.getShowHistory());
 			imagePanel = getImagePanel(host);
+			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 		}
 		return imagePanel;
 	}

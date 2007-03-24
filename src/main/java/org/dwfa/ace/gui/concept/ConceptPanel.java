@@ -51,18 +51,12 @@ import org.dwfa.ace.TermComponentSelectionListener;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddConceptPart;
-import org.dwfa.ace.edit.AddDescription;
 import org.dwfa.ace.table.ConceptTableModel;
 import org.dwfa.ace.table.ConceptTableRenderer;
-import org.dwfa.ace.table.DescriptionTableModel;
-import org.dwfa.ace.table.DescriptionTableRenderer;
-import org.dwfa.ace.table.DescriptionsForConceptTableModel;
 import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
-import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
-import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.bpa.util.TableSorter;
@@ -123,14 +117,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			conceptTableModel = new ConceptTableModel(getConceptColumns(),
 					ConceptPanel.this);
 
-			for (TableModelListener l : descTableModel.getTableModelListeners()) {
-				descTableModel.removeTableModelListener(l);
-			}
-			removeTermChangeListener(descTableModel);
-			descTableModel = new DescriptionsForConceptTableModel(
-					getDescColumns(), ConceptPanel.this);
-
-
 			try {
 				contentScroller.setViewportView(getContentPane());
 				PropertyChangeEvent pce = new PropertyChangeEvent(
@@ -138,8 +124,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 								.getTermComponent());
 				conceptTableModel.fireTableDataChanged();
 				conceptTableModel.propertyChange(pce);
-				descTableModel.propertyChange(pce);
-				descTableModel.fireTableDataChanged();
 			} catch (DatabaseException e1) {
 				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
@@ -180,53 +164,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	}
 
-	private class ToggleDescChangeActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-			if (toggle.isSelected()) {
-				descTableModel = new DescriptionsForConceptTableModel(
-						getDescColumns(), ConceptPanel.this);
-			} else {
-				for (TableModelListener l : descTableModel
-						.getTableModelListeners()) {
-					descTableModel.removeTableModelListener(l);
-				}
-				removeTermChangeListener(descTableModel);
-			}
-			try {
-				contentScroller.setViewportView(getContentPane());
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						PropertyChangeEvent pce = new PropertyChangeEvent(
-								ConceptPanel.this, "termComponent", null, label
-										.getTermComponent());
-						descTableModel.propertyChange(pce);
-						descTableModel.fireTableDataChanged();
-					}
-				});
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-
-	}
-
-
-
 	TermComponentLabel label;
 
 	PropertyChangeListener labelListener = new LabelListener();
-
-	private JToggleButton descButton;
 
 	private JToggleButton lineageButton;
 
 	private JToggleButton historyButton;
 
 	private JScrollPane contentScroller;
-
-	private DescriptionsForConceptTableModel descTableModel;
 
 	private ConceptTableModel conceptTableModel;
 
@@ -254,9 +200,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private DestRelPlugin destRelPlugin = new DestRelPlugin();
 	private IdPlugin idPlugin = new IdPlugin();
 	private ImagePlugin imagePlugin = new ImagePlugin();
+	private DescriptionPlugin descPlugin = new DescriptionPlugin();
 	
 	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
-			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, srcRelPlugin, destRelPlugin, imagePlugin, conflictPlugin }));
+			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, descPlugin, srcRelPlugin, destRelPlugin, imagePlugin, conflictPlugin }));
 
 	public ImageIcon tabIcon;
 
@@ -440,8 +387,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridy++;
 
 		conceptTableModel = new ConceptTableModel(getConceptColumns(), this);
-		descTableModel = new DescriptionsForConceptTableModel(getDescColumns(),
-				this);
 
 		contentScroller = new JScrollPane(getContentPane());
 		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
@@ -462,10 +407,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			content.add(getConceptPanel(), c);
 			c.gridy++;
 		}
-		if (descButton.isSelected()) {
-			content.add(getDescPanel(), c);
-			c.gridy++;
-		}
+
 		if (lineageButton.isSelected()) {
 			content.add(getLineagePanel(), c);
 			c.gridy++;
@@ -648,12 +590,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		conceptButton
 				.addActionListener(new ToggleConceptChangeActionListener());
 		toggleBar.add(conceptButton, c);
-		c.gridx++;
-		descButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/paragraph.png")));
-		descButton.setSelected(true);
-		descButton.addActionListener(new ToggleDescChangeActionListener());
-		toggleBar.add(descButton, c);
 		c.gridx++;
 	
 		lineageButton = new JToggleButton(new ImageIcon(ACE.class
@@ -856,122 +792,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return conceptPanel;
 	}
 
-	private JPanel getDescPanel() {
-		JPanel descPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.gridwidth = 2;
-		JLabel descLabel = new JLabel("Descriptions:");
-		descLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
-		descPanel.add(descLabel, c);
-
-		SmallProgressPanel descProgress = new SmallProgressPanel();
-		descProgress.setVisible(false);
-		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx++;
-		descPanel.add(descProgress, c);
-		descTableModel.setProgress(descProgress);
-
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		descPanel.add(rowAddAfter, c);
-		rowAddAfter.addActionListener(new AddDescription(this, getConfig()));
-
-		c.gridheight = 1;
-		c.gridx++;
-		TableSorter sortingTable = new TableSorter(descTableModel);
-		JTable descTable = new JTableWithDragImage(sortingTable);
-		descTable.setDragEnabled(true);
-		descTable.setTransferHandler(new TerminologyTransferHandler());
-		descTable.addMouseListener(descTableModel.makePopupListener(descTable,
-				getConfig()));
-		descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sortingTable.setTableHeader(descTable.getTableHeader());
-
-		DESC_FIELD[] columnEnums = descTableModel.getColumnEnums();
-
-		for (int i = 0; i < descTable.getColumnCount(); i++) {
-			TableColumn column = descTable.getColumnModel().getColumn(i);
-			DESC_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
-		}
-
-		// Set up tool tips for column headers.
-		sortingTable
-				.getTableHeader()
-				.setToolTipText(
-						"Click to specify sorting; Control-Click to specify secondary sorting");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		descPanel.add(descTable.getTableHeader(), c);
-		c.gridy++;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridheight = 6;
-
-		DescriptionTableRenderer renderer = new DescriptionTableRenderer();
-		descTable.setDefaultRenderer(Boolean.class, renderer);
-		JComboBox comboBox = new JComboBox() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setSelectedItem(Object anObject) {
-				Boolean value = null;
-				if (Boolean.class.isAssignableFrom(anObject.getClass())) {
-					value = (Boolean) anObject;
-				} else if (StringWithDescTuple.class.isAssignableFrom(anObject
-						.getClass())) {
-					StringWithDescTuple swt = (StringWithDescTuple) anObject;
-					value = Boolean.parseBoolean(swt.getCellText());
-				}
-				super.setSelectedItem(value);
-			}
-		};
-		comboBox.addItem(new Boolean(true));
-		comboBox.addItem(new Boolean(false));
-		descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
-				comboBox));
-
-		descTable.setDefaultEditor(StringWithDescTuple.class,
-				new DescriptionTableModel.DescTextFieldEditor());
-		descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
-		descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
-				new DescriptionTableModel.DescTypeFieldEditor(ace
-						.getAceFrameConfig()));
-		descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
-				new DescriptionTableModel.DescStatusFieldEditor(ace
-						.getAceFrameConfig()));
-
-		descTable.setDefaultRenderer(Number.class, renderer);
-		descTable.setDefaultRenderer(String.class, renderer);
-		descPanel.add(descTable, c);
-		descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
-
-		c.gridheight = 1;
-		c.gridx = 0;
-		return descPanel;
-	}
-
 
 	public void addTermChangeListener(PropertyChangeListener l) {
 		addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
@@ -990,20 +810,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			fields.add(CONCEPT_FIELD.BRANCH);
 		}
 		return fields.toArray(new CONCEPT_FIELD[fields.size()]);
-	}
-
-	private DESC_FIELD[] getDescColumns() {
-		List<DESC_FIELD> fields = new ArrayList<DESC_FIELD>();
-		fields.add(DESC_FIELD.TEXT);
-		fields.add(DESC_FIELD.TYPE);
-		fields.add(DESC_FIELD.CASE_FIXED);
-		fields.add(DESC_FIELD.LANG);
-		fields.add(DESC_FIELD.STATUS);
-		if (historyButton.isSelected()) {
-			fields.add(DESC_FIELD.VERSION);
-			fields.add(DESC_FIELD.BRANCH);
-		}
-		return fields.toArray(new DESC_FIELD[fields.size()]);
 	}
 
 	public boolean getUsePrefs() {

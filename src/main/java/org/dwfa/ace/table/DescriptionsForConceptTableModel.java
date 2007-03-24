@@ -20,10 +20,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.IntSet;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.types.ConceptBean;
@@ -180,28 +181,28 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 
 	private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 
-	private ConceptPanel parentPanel;
+	private I_HostConceptPlugins host;
 	
 	public DescriptionsForConceptTableModel(DESC_FIELD[] columns,
-			ConceptPanel parentPanel) {
-		super(columns, parentPanel.getConfig());
-		this.parentPanel = parentPanel;
-		this.parentPanel.addTermChangeListener(this);
+			I_HostConceptPlugins host) {
+		super(columns, host.getConfig());
+		this.host = host;
+		host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 	}
 	public List<ThinDescTuple> getDescriptions() throws DatabaseException {
 		List<ThinDescTuple> selectedTuples = new ArrayList<ThinDescTuple>();
-		IntSet allowedStatus = parentPanel.getConfig().getAllowedStatus();
+		IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		IntSet allowedTypes = null;
 		Set<Position> positions = null;
-		if (parentPanel.getUsePrefs()) {
-			allowedTypes = parentPanel.getConfig().getDescTypes();
-			positions = parentPanel.getConfig().getViewPositionSet();
+		if (host.getUsePrefs()) {
+			allowedTypes = host.getConfig().getDescTypes();
+			positions = host.getConfig().getViewPositionSet();
 		}
-		if (parentPanel.showHistory()) {
+		if (host.getShowHistory()) {
 			positions = null;
 			allowedStatus = null;
 		}
-		I_GetConceptData cb = (I_GetConceptData) parentPanel.getTermComponent();
+		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return selectedTuples;
 		}
@@ -218,7 +219,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			throws DatabaseException {
 		
 		
-		I_GetConceptData cb = (I_GetConceptData) parentPanel.getTermComponent();
+		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
 		}
@@ -229,7 +230,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 	}
 
 	public int getRowCount() {
-		I_GetConceptData cb = (I_GetConceptData) parentPanel.getTermComponent();
+		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return 0;
 		}

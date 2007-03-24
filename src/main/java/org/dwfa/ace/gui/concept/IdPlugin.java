@@ -71,6 +71,7 @@ public class IdPlugin extends AbstractPlugin {
 		if (idPanel == null) {
 			this.host = host;
 			idPanel = getIdPanel(host);
+			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 		}
 		return idPanel;
 	}
