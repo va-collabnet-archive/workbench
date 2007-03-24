@@ -1,6 +1,5 @@
 package org.dwfa.ace.gui.concept;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,41 +15,25 @@ import java.util.logging.Level;
 
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_ContainTermComponent;
-import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.TermComponentSelectionListener;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.edit.AddConceptPart;
-import org.dwfa.ace.table.ConceptTableModel;
-import org.dwfa.ace.table.ConceptTableRenderer;
-import org.dwfa.ace.table.I_CellTextWithTuple;
-import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
-import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
-import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_AmTermComponent;
 import org.dwfa.vodb.types.ThinDescTuple;
@@ -96,59 +79,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		public void actionPerformed(ActionEvent e) {
 			firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY,
 					!historyButton.isSelected(), historyButton.isSelected());
-			for (TableModelListener l : conceptTableModel
-					.getTableModelListeners()) {
-				conceptTableModel.removeTableModelListener(l);
-			}
-			removeTermChangeListener(conceptTableModel);
-			conceptTableModel = new ConceptTableModel(getConceptColumns(),
-					ConceptPanel.this);
-
 			try {
 				contentScroller.setViewportView(getContentPane());
-				PropertyChangeEvent pce = new PropertyChangeEvent(
-						ConceptPanel.this, "termComponent", null, label
-								.getTermComponent());
-				conceptTableModel.fireTableDataChanged();
-				conceptTableModel.propertyChange(pce);
 			} catch (DatabaseException e1) {
 				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE,
 						"Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
-	}
-
-	private class ToggleConceptChangeActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-			if (toggle.isSelected()) {
-				conceptTableModel = new ConceptTableModel(getConceptColumns(),
-						ConceptPanel.this);
-			} else {
-				for (TableModelListener l : conceptTableModel
-						.getTableModelListeners()) {
-					conceptTableModel.removeTableModelListener(l);
-				}
-				removeTermChangeListener(conceptTableModel);
-			}
-			try {
-				contentScroller.setViewportView(getContentPane());
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						PropertyChangeEvent pce = new PropertyChangeEvent(
-								ConceptPanel.this, "termComponent", null, label
-										.getTermComponent());
-						conceptTableModel.propertyChange(pce);
-						conceptTableModel.fireTableDataChanged();
-					}
-				});
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE,
-						"Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-
 	}
 
 	TermComponentLabel label;
@@ -156,8 +93,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private JToggleButton historyButton;
 
 	private JScrollPane contentScroller;
-
-	private ConceptTableModel conceptTableModel;
 
 	private JToggleButton usePrefButton;
 
@@ -191,10 +126,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private DescriptionPlugin descPlugin = new DescriptionPlugin();
 
 	private LineagePlugin lineagePlugin = new LineagePlugin();
+	
+	ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
 
 	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
-			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, descPlugin,
-					srcRelPlugin, destRelPlugin, lineagePlugin, imagePlugin,
+			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, conceptAttributePlugin,
+					descPlugin, srcRelPlugin, destRelPlugin, 
+					lineagePlugin, imagePlugin,
 					conflictPlugin }));
 
 	public ImageIcon tabIcon;
@@ -204,8 +142,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private JToggleButton inferredButton;
 
 	private ToggleHistoryChangeActionListener historyChangeActionListener;
-
-	private JToggleButton conceptButton;
 
 	private PropertyChangeListener labelListener = new LabelListener();
 
@@ -361,8 +297,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.weighty = 1.0;
 		c.gridy++;
 
-		conceptTableModel = new ConceptTableModel(getConceptColumns(), this);
-
 		contentScroller = new JScrollPane(getContentPane());
 		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
 		add(contentScroller, c);
@@ -378,10 +312,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		if (conceptButton.isSelected()) {
-			content.add(getConceptPanel(), c);
-			c.gridy++;
-		}
 
 		for (I_PluginToConceptPanel plugin : plugins) {
 			if (plugin.showComponent()) {
@@ -404,14 +334,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.NONE;
-
-		conceptButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/bullet_triangle_blue.png")));
-		conceptButton.setSelected(true);
-		conceptButton
-				.addActionListener(new ToggleConceptChangeActionListener());
-		toggleBar.add(conceptButton, c);
-		c.gridx++;
 
 		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
 		for (I_PluginToConceptPanel plugin : plugins) {
@@ -500,128 +422,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 	}
 
-	private JPanel getConceptPanel() {
-		JPanel conceptPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.gridwidth = 2;
-		JLabel conceptLabel = new JLabel("Concept:");
-		conceptLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
-		conceptPanel.add(conceptLabel, c);
-
-		SmallProgressPanel concProgress = new SmallProgressPanel();
-		concProgress.setVisible(false);
-		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx++;
-		conceptPanel.add(concProgress, c);
-		conceptTableModel.setProgress(concProgress);
-
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		conceptPanel.add(rowAddAfter, c);
-		rowAddAfter.addActionListener(new AddConceptPart(this, getConfig()));
-		c.gridheight = 1;
-		c.gridx++;
-		TableSorter sortingTable = new TableSorter(conceptTableModel);
-		JTable conceptTable = new JTableWithDragImage(sortingTable);
-		conceptTable.addMouseListener(conceptTableModel.makePopupListener(
-				conceptTable, getConfig()));
-
-		conceptTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sortingTable.setTableHeader(conceptTable.getTableHeader());
-
-		CONCEPT_FIELD[] columnEnums = conceptTableModel.getColumnEnums();
-		for (int i = 0; i < conceptTable.getColumnCount(); i++) {
-			TableColumn column = conceptTable.getColumnModel().getColumn(i);
-			CONCEPT_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
-		}
-
-		// Set up tool tips for column headers.
-		sortingTable
-				.getTableHeader()
-				.setToolTipText(
-						"Click to specify sorting; Control-Click to specify secondary sorting");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		conceptPanel.add(conceptTable.getTableHeader(), c);
-		c.gridy++;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridheight = 6;
-
-		ConceptTableRenderer renderer = new ConceptTableRenderer();
-		conceptTable.setDefaultRenderer(StringWithConceptTuple.class, renderer);
-		JComboBox comboBox = new JComboBox() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setSelectedItem(Object anObject) {
-				Boolean value = null;
-				if (Boolean.class.isAssignableFrom(anObject.getClass())) {
-					value = (Boolean) anObject;
-				} else if (StringWithConceptTuple.class
-						.isAssignableFrom(anObject.getClass())) {
-					I_CellTextWithTuple swt = (I_CellTextWithTuple) anObject;
-					value = Boolean.parseBoolean(swt.getCellText());
-				}
-				super.setSelectedItem(value);
-			}
-		};
-		comboBox.addItem(new Boolean(true));
-		comboBox.addItem(new Boolean(false));
-		conceptTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
-				comboBox));
-
-		conceptTable.getColumn(CONCEPT_FIELD.STATUS).setCellEditor(
-				new ConceptTableModel.ConceptStatusFieldEditor(ace
-						.getAceFrameConfig()));
-
-		conceptTable.setDefaultRenderer(String.class, renderer);
-		conceptPanel.add(conceptTable, c);
-		conceptPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
-		c.gridheight = 1;
-		c.gridx = 0;
-		return conceptPanel;
-	}
-
 	public void addTermChangeListener(PropertyChangeListener l) {
 		addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
 	}
 
 	public void removeTermChangeListener(PropertyChangeListener l) {
 		removePropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
-	}
-
-	private CONCEPT_FIELD[] getConceptColumns() {
-		List<CONCEPT_FIELD> fields = new ArrayList<CONCEPT_FIELD>();
-		fields.add(CONCEPT_FIELD.DEFINED);
-		fields.add(CONCEPT_FIELD.STATUS);
-		if (historyButton.isSelected()) {
-			fields.add(CONCEPT_FIELD.VERSION);
-			fields.add(CONCEPT_FIELD.BRANCH);
-		}
-		return fields.toArray(new CONCEPT_FIELD[fields.size()]);
 	}
 
 	public boolean getUsePrefs() {

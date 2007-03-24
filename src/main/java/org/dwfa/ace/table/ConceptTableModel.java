@@ -20,10 +20,11 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -237,13 +238,28 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 	private SmallProgressPanel progress;
 
-	private ConceptPanel parentPanel;
+	private I_HostConceptPlugins host;
 
-	public ConceptTableModel(CONCEPT_FIELD[] columns, ConceptPanel parentPanel) {
+	public ConceptTableModel(CONCEPT_FIELD[] columns, I_HostConceptPlugins host) {
 		super();
 		this.columns = columns;
-		this.parentPanel = parentPanel;
-		this.parentPanel.addTermChangeListener(this);
+		this.host = host;
+		host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
+	}
+
+	public void setColumns(CONCEPT_FIELD[] columns) {
+		if (this.columns.length != columns.length) {
+			this.columns = columns;
+			fireTableStructureChanged();
+			return;
+		}
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(this.columns[i]) == false) {
+				this.columns = columns;
+				fireTableStructureChanged();
+				return;
+			}
+		}
 	}
 
 	public int getColumnCount() {
@@ -295,17 +311,17 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple desc = cb.getDescTuple(parentPanel.getConfig().getTableDescPreferenceList(), parentPanel.getConfig());
+		ThinDescTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
 		cb = getReferencedConcepts().get(id);
-		desc = cb.getDescTuple(parentPanel.getConfig().getTableDescPreferenceList(), parentPanel.getConfig());
+		desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		return "null pref desc: " + cb.getInitialText();
 	}
 
 	private ThinConTuple getConceptTuple(int rowIndex) throws DatabaseException {
-		I_GetConceptData cb = (I_GetConceptData) parentPanel.getTermComponent();
+		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
 		}
