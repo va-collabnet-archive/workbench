@@ -113,6 +113,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		AceConfig.vodb.addTimeBranchValues(values);
 		AceConfig.vodb.sync();
 		uncommitted.clear();
+		for (AceFrameConfig frameConfig: getAceConfig().aceFrames) {
+			frameConfig.fireCommit();
+		}
 	}
 
 	public static void abort() throws DatabaseException {
@@ -364,7 +367,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private JPanel treeProgress;
 
-	private AceConfig aceConfig;
+	private static AceConfig aceConfig;
 
 	private JMenu fileMenu = new JMenu("File");
 
@@ -405,10 +408,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		super(new GridBagLayout());
 	}
 
-	public void setup(AceFrameConfig aceFrameConfig, AceConfig aceConfig) throws DatabaseException {
+	public void setup(AceFrameConfig aceFrameConfig) throws DatabaseException {
 		this.aceFrameConfig = aceFrameConfig;
 		this.aceFrameConfig.addPropertyChangeListener(this);
-		this.aceConfig = aceConfig;
 		searchPanel = new SearchPanel(aceFrameConfig);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -868,9 +870,16 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	protected void treeValueChanged(TreeSelectionEvent evt) {
-		Object node = evt.getPath().getLastPathComponent();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
 		String s = evt.isAddedPath() ? "Selected " + node : "";
 		statusLabel.setText(s);
+		if (node != null) {
+			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
+			.getUserObject();
+			aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
+		} else {
+			aceFrameConfig.setHierarchySelection(null);
+		}
 	}
 
 	protected void treeTreeCollapsed(TreeExpansionEvent evt) {
@@ -1121,6 +1130,18 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public JMenu getFileMenu() {
 		return fileMenu;
+	}
+
+	public static AceConfig getAceConfig() {
+		return aceConfig;
+	}
+
+	public static void setAceConfig(AceConfig aceConfig) {
+		if (ACE.aceConfig == null) {
+			ACE.aceConfig = aceConfig;			
+		} else {
+			throw new UnsupportedOperationException("Ace.aceConfig is already set");
+		}
 	}
 
 }

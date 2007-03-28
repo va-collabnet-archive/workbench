@@ -466,10 +466,23 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("viewPosition")) {
 			historyChangeActionListener.actionPerformed(null);
+		} else if (evt.getPropertyName().equals("commit")) {
+			this.firePropertyChange("commit", null, null);
 		}
 	}
 
 	public boolean getShowHistory() {
 		return historyButton.isSelected();
+	}
+
+	public VIEW_TYPE getViewType() {
+		if (inferredButton.isSelected()) {
+			return VIEW_TYPE.INFERRED;
+		}
+		return VIEW_TYPE.STATED;
+	}
+
+	public ConceptBean getHierarchySelection() {
+		return ace.getAceFrameConfig().getHierarchySelection();
 	}
 }

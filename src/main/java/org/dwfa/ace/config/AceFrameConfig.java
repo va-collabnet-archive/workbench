@@ -26,7 +26,7 @@ public class AceFrameConfig implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 11;
+    private static final int dataVersion = 12;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -67,7 +67,9 @@ public class AceFrameConfig implements Serializable {
     private IntList longLabelDescPreferenceList = new IntList();
 	private int termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    private ConceptBean hierarchySelection;
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(active);
         out.writeObject(frameName);
@@ -108,6 +110,17 @@ public class AceFrameConfig implements Serializable {
 		IntList.writeIntList(out, shortLabelDescPreferenceList);
 		IntList.writeIntList(out, longLabelDescPreferenceList);
 		out.writeInt(termTreeDividerLoc);
+		try {
+			if (hierarchySelection != null) {
+				out.writeObject(AceConfig.vodb.nativeToUuid(hierarchySelection.getConceptId()));				
+			} else {
+				out.writeObject(null);				
+			}
+		} catch (DatabaseException e) {
+			IOException newEx = new IOException();
+			newEx.initCause(e);
+			throw newEx;
+		}
 
     }
 
@@ -208,6 +221,18 @@ public class AceFrameConfig implements Serializable {
             } else {
             	termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
             }
+            if (objDataVersion >= 12) {
+            	try {
+            		List<UUID> uuidList = (List<UUID>) in.readObject();
+            		if (uuidList != null) {
+                		hierarchySelection = ConceptBean.get(AceConfig.vodb.uuidToNative(uuidList));
+            		}
+				} catch (Exception e) {
+					IOException newEx = new IOException();
+					newEx.initCause(e);
+					throw newEx;
+				}
+            } 
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -344,6 +369,10 @@ public class AceFrameConfig implements Serializable {
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		changeSupport.addPropertyChangeListener(listener);
+	}
+	
+	public void fireCommit() {
+		changeSupport.firePropertyChange("commit", null, null);
 	}
 
 
@@ -520,6 +549,18 @@ public class AceFrameConfig implements Serializable {
 
 	public void setTreeTermDividerLoc(int termTreeDividerLoc) {
 		this.termTreeDividerLoc = termTreeDividerLoc;
+	}
+
+
+	public ConceptBean getHierarchySelection() {
+		return hierarchySelection;
+	}
+
+
+	public void setHierarchySelection(ConceptBean hierarchySelection) {
+		Object old = this.hierarchySelection;
+		this.hierarchySelection = hierarchySelection;
+		this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
 	}
 
 }

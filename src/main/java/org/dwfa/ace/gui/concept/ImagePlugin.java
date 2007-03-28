@@ -69,6 +69,7 @@ public class ImagePlugin extends AbstractPlugin {
 					getImageColumns(host), host.getShowHistory());
 			imagePanel = getImagePanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener("commit", this);
 		}
 		return imagePanel;
 	}

@@ -72,6 +72,7 @@ public class IdPlugin extends AbstractPlugin {
 			this.host = host;
 			idPanel = getIdPanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener("commit", this);
 		}
 		return idPanel;
 	}

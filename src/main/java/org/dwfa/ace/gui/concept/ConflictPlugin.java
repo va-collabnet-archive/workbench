@@ -21,6 +21,7 @@ public class ConflictPlugin extends AbstractPlugin {
 			this.host = host;
 			conflictPanel = new ConflictPanel();
 			host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
+			host.addPropertyChangeListener("commit", this);
 		}
 		return conflictPanel;
 	}

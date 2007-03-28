@@ -861,4 +861,87 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		return null;
 	}
+
+	public boolean isUncommitted() throws DatabaseException {
+		// handle the parts first...
+		if (images != null) {
+			for (ThinImageVersioned image : images) {
+				for (ThinImagePart p : image.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		if (concept != null) {
+			for (ThinConPart p : concept.getVersions()) {
+				if (p.getVersion() == Integer.MAX_VALUE) {
+					return true;
+				}
+			}
+		}
+		if (descriptions != null) {
+			for (ThinDescVersioned desc : descriptions) {
+				for (ThinDescPart p : desc.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		if (sourceRels != null) {
+			for (ThinRelVersioned rel : sourceRels) {
+				for (ThinRelPart p : rel.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		if (uncommittedImages != null) {
+			for (ThinImageVersioned image : uncommittedImages) {
+				for (ThinImagePart p : image.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		if (uncommittedConcept != null) {
+			for (ThinConPart p : uncommittedConcept.getVersions()) {
+				if (p.getVersion() == Integer.MAX_VALUE) {
+					return true;
+				}
+			}
+		}
+		if (uncommittedDescriptions != null) {
+			for (ThinDescVersioned desc : uncommittedDescriptions) {
+				for (ThinDescPart p : desc.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		if (uncommittedSourceRels != null) {
+			for (ThinRelVersioned rel : uncommittedSourceRels) {
+				for (ThinRelPart p : rel.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		if (uncommittedIds != null) {
+			for (int id : uncommittedIds.getSetValues()) {
+				ThinIdVersioned idv = AceConfig.vodb.getId(id);
+				for (ThinIdPart p : idv.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 }

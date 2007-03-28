@@ -15,9 +15,9 @@ public class AceFrame extends ComponentFrame {
 
 	private ACE cdePanel;
 
-	public AceFrame(String[] args, LifeCycle lc, AceConfig config, AceFrameConfig frameConfig) throws Exception {
+	public AceFrame(String[] args, LifeCycle lc, AceFrameConfig frameConfig) throws Exception {
 		super(args, lc);
-		getCdePanel().setup(frameConfig, config);
+		getCdePanel().setup(frameConfig);
 		setName(frameConfig.getFrameName());
 		setContentPane(cdePanel);
 		setBounds(frameConfig.getBounds());

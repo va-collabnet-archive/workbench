@@ -247,7 +247,7 @@ public class ImportBaselineJarReader implements ActionListener {
 								ACE cdePanel;
 								try {
 									cdePanel = new ACE();
-									cdePanel.setup(ace, config);
+									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);
 									cdeFrame.setJMenuBar(cdePanel.createMenuBar());

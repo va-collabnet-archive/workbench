@@ -50,7 +50,6 @@ public class DescriptionPlugin extends AbstractPlugin {
 
 	@Override
 	public void update() throws DatabaseException {
-		System.out.println("Description plugin update...");
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			DESC_FIELD[] columnEnums = getDescColumns(host);
@@ -72,6 +71,7 @@ public class DescriptionPlugin extends AbstractPlugin {
 			this.host = host;
 			descPanel = getDescPanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener("commit", this);
 		}
 		return descPanel;
 	}

@@ -10,6 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ThinRelTuple;
 
@@ -89,7 +90,7 @@ public class TreeMouseListener implements MouseListener {
 					if (t.getC2Id() == parentBean
 							.getConceptId() && treeBean
 							.getParentDepth() == 0) {
-						System.out.println(" parent depth: " + treeBean
+						AceLog.info(" parent depth: " + treeBean
 						.getParentDepth());
 						continue;
 					}
@@ -109,8 +110,7 @@ public class TreeMouseListener implements MouseListener {
 						newNodeIndices);
 
 			} catch (DatabaseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AceLog.alertAndLogException(e1);
 			}
 		} else { // remove nodes
 			removeAllExtraParents(model, treeBean, parentNode);

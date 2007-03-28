@@ -17,6 +17,7 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -82,6 +83,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 	private JCheckBox longForm = new JCheckBox("long form");
 	private ConceptBean cb;
 	private AceFrameConfig config;
+	private JButton resolve;
 	
 
 
@@ -108,6 +110,8 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		label.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
 		add(label, c);
 		c.gridx++;
+		resolve = new JButton("implement");
+		add(resolve, c);
 		c.gridx++;
 		add(longForm, c);
 		c.gridx++;
@@ -120,7 +124,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		
 		commonPanel = new JPanel(new GridLayout(0,1));
 		commonPanel.setName("commonPanel");
-		commonPanel.setBorder(BorderFactory.createTitledBorder("Common: "));
+		commonPanel.setBorder(BorderFactory.createTitledBorder("Resolution: "));
 		add(commonPanel, c);
 		c.gridx = c.gridx + c.gridwidth;
 		differencePanel = new JPanel(new GridLayout(0,1));

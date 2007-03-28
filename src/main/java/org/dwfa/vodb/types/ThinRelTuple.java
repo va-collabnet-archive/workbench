@@ -79,5 +79,8 @@ public class ThinRelTuple {
 		}
 		return hash;
 	}
+	public ThinRelVersioned getFixedPart() {
+		return fixedPart;
+	}
 
 }

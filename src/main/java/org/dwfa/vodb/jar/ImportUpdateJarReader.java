@@ -23,12 +23,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -285,7 +287,7 @@ public class ImportUpdateJarReader implements ActionListener {
 								ACE cdePanel;
 								try {
 									cdePanel = new ACE();
-									cdePanel.setup(ace, config);
+									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);
 									cdeFrame.setJMenuBar(cdePanel.createMenuBar());
@@ -293,8 +295,7 @@ public class ImportUpdateJarReader implements ActionListener {
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);
 								} catch (DatabaseException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									AceLog.alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
 								}
 							}
 						}

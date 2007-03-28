@@ -64,6 +64,7 @@ public class LineagePlugin extends AbstractPlugin {
 			try {
 				lineagePanel = getLineagePanel(host);
 				host.addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, this);
+				host.addPropertyChangeListener("commit", this);
 			} catch (DatabaseException e) {
 				AceLog.alertAndLog(null, Level.SEVERE, "Database Exception: " + e.getLocalizedMessage(), e);
 			}

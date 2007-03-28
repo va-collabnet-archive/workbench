@@ -15,6 +15,12 @@ public class AceLog {
 	private static Logger logger = Logger.getLogger(AceLog.class
 			.getName());
 
+	public static void alertAndLogException(Component parent, Throwable ex) {
+		alertAndLog(parent, Level.SEVERE, ex.getLocalizedMessage(), ex);
+	}
+	public static void alertAndLogException(Throwable ex) {
+		alertAndLog(null, Level.SEVERE, ex.getLocalizedMessage(), ex);
+	}
 	public static void alertAndLog(Level level, String message, Throwable ex) {
 		alertAndLog(null, level, message, ex);
 	}

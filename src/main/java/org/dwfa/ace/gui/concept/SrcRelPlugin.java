@@ -29,6 +29,7 @@ public class SrcRelPlugin extends RelPlugin {
 					getSrcRelColumns(host.getShowHistory()));
 			pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener("commit", this);
 			this.host = host;
 		}
 		return pluginPanel;

@@ -41,6 +41,9 @@ public class SrcRelTableModel extends RelTableModel {
 		for (ThinRelVersioned rel: cb.getSourceRels()) {
 			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
 		}
+		for (ThinRelVersioned rel: cb.getUncommittedSourceRels()) {
+			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
+		}
 		
 		return selectedTuples;
 	}

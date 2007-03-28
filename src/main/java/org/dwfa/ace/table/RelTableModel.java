@@ -415,9 +415,17 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		case SOURCE_ID:
 			return false;
 		case REL_TYPE:
-			return true;
+			if (rel.getFixedPart().getTuples().size() == 1) {
+				return true;
+			} else {
+				return false;
+			}
 		case DEST_ID:
-			return false;
+			if (rel.getFixedPart().getTuples().size() == 1) {
+				return true;
+			} else {
+				return false;
+			}
 		case GROUP:
 			return true;
 		case REFINABILITY:
@@ -448,6 +456,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			referencedConcepts.put(typeId, ConceptBean.get(typeId));
 			break;
 		case DEST_ID:
+			Integer destId = (Integer) value;
+			rel.getFixedPart().setC2Id(destId);
+			referencedConcepts.put(destId, ConceptBean.get(destId));
 			break;
 		case GROUP:
 			if (String.class.isAssignableFrom(value.getClass())) {
@@ -483,7 +494,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	}
 
 	public Class<?> getColumnClass(int c) {
-		return String.class;
+		return StringWithRelTuple.class;
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {

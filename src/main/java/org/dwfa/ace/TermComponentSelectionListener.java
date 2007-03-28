@@ -1,10 +1,17 @@
 package org.dwfa.ace;
 
+import java.awt.Component;
+import java.util.logging.Level;
+
+import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
+import org.dwfa.vodb.types.ConceptBean;
+
+import com.sleepycat.je.DatabaseException;
 
 public class TermComponentSelectionListener implements TreeSelectionListener {
 
@@ -16,12 +23,36 @@ public class TermComponentSelectionListener implements TreeSelectionListener {
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
+		try {
+			ConceptBean currentBean = (ConceptBean) linkedComponent
+					.getTermComponent();
+			if (currentBean != null) {
+				if (currentBean.isUncommitted()) {
+					int option = JOptionPane.showConfirmDialog((Component) linkedComponent, 
+							"This view contains an uncommited concept. If you continue, the " +
+							"focused concept will change...", 
+							"Uncommitted component", 
+							JOptionPane.OK_CANCEL_OPTION);
+					if (JOptionPane.OK_OPTION == option) {
+						setLinkedComponent(e);
+					}
+				} else {
+					setLinkedComponent(e);
+				}
+			} else {
+				setLinkedComponent(e);
+			}
+		} catch (DatabaseException e1) {
+			AceLog.alertAndLog(Level.SEVERE, e1.getLocalizedMessage(), e1);
+		}
+	}
+
+	private void setLinkedComponent(TreeSelectionEvent e) {
 		Object obj = e.getPath().getLastPathComponent();
 		I_GetConceptDataForTree cb;
 
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj;
 		cb = (I_GetConceptDataForTree) node.getUserObject();
-		System.out.println("Selected: " + cb + " nativeId: " + cb.getConceptId());
 		linkedComponent.setTermComponent(cb.getCoreBean());
 	}
 

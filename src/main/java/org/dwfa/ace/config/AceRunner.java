@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 
 import com.sun.jini.start.LifeCycle;
@@ -61,9 +62,10 @@ public class AceRunner {
 			setupDatabase(aceConfig);
 			AceConfig.setupAceConfig(aceConfig, aceConfigFile, cacheSize);
 		}
+		ACE.setAceConfig(aceConfig);
 		for (AceFrameConfig ace: aceConfig.aceFrames) {
 			if (ace.isActive()) {
-				AceFrame af = new AceFrame(args, lc, aceConfig, ace);
+				AceFrame af = new AceFrame(args, lc, ace);
 				af.setVisible(true);
 			}
 		}

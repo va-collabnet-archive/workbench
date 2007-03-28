@@ -15,10 +15,12 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.edit.AddRelationship;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelTableModel;
 import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
+import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.bpa.util.TableSorter;
 
 
@@ -64,6 +66,7 @@ public abstract class RelPlugin extends AbstractPlugin {
 				.getResource("/24x24/plain/row_add_after.png")), model);
 		relPanel.add(rowAddAfter, c);
 		rowAddAfter.setEnabled(enableEdit);
+		rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
 		if (enableEdit) {
 			rowAddAfter.setTransferHandler(new TerminologyTransferHandler());
 			// rowAddAfter.setDragEnabled(true);
@@ -112,7 +115,7 @@ public abstract class RelPlugin extends AbstractPlugin {
 		c.weightx = 1.0;
 		c.weighty = 0.0;
 		c.gridheight = 5;
-		relTable.setDefaultRenderer(String.class,
+		relTable.setDefaultRenderer(StringWithRelTuple.class,
 				new RelationshipTableRenderer());
 		relPanel.add(relTable, c);
 		relPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory

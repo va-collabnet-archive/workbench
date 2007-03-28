@@ -30,6 +30,7 @@ public class DestRelPlugin extends RelPlugin {
 					getDestRelColumns(host.getShowHistory()));
 			pluginPanel = getRelPanel(host, destRelTableModel, "Destination relationships:", true);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener("commit", this);
 			this.host = host;
 		}
 		return pluginPanel;

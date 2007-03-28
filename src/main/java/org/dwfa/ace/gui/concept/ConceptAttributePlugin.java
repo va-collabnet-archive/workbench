@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
@@ -10,7 +11,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -20,7 +20,6 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
-import org.dwfa.ace.edit.AddConceptPart;
 import org.dwfa.ace.table.ConceptTableModel;
 import org.dwfa.ace.table.ConceptTableRenderer;
 import org.dwfa.ace.table.I_CellTextWithTuple;
@@ -69,6 +68,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		if (conceptAttributes == null) {
 			conceptAttributes = getConceptPanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener("commit", this);
 			this.host = host;
 		}
 		return conceptAttributes;
@@ -112,10 +112,16 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		conceptPanel.add(rowAddAfter, c);
-		rowAddAfter.addActionListener(new AddConceptPart(host, host.getConfig()));
+		//JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
+		//		.getResource("/24x24/plain/row_add_after.png")));
+		//conceptPanel.add(rowAddAfter, c);
+		//rowAddAfter.addActionListener(new AddConceptPart(host, host.getConfig()));
+		JPanel filler = new JPanel();
+		filler.setMaximumSize(new Dimension(40, 32));
+		filler.setMinimumSize(new Dimension(40, 32));
+		filler.setPreferredSize(new Dimension(40, 32));
+		conceptPanel.add(filler, c);
+
 		c.gridheight = 1;
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(conceptTableModel);
@@ -173,13 +179,14 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		};
 		comboBox.addItem(new Boolean(true));
 		comboBox.addItem(new Boolean(false));
-		conceptTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
+		conceptTable.getColumn(CONCEPT_FIELD.DEFINED).setCellEditor(new DefaultCellEditor(
 				comboBox));
 
 		conceptTable.getColumn(CONCEPT_FIELD.STATUS).setCellEditor(
 				new ConceptTableModel.ConceptStatusFieldEditor(host.getConfig()));
 
 		conceptTable.setDefaultRenderer(String.class, renderer);
+		conceptTable.setDefaultRenderer(Boolean.class, renderer);
 		conceptPanel.add(conceptTable, c);
 		conceptPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory

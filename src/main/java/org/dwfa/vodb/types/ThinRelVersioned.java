@@ -293,4 +293,9 @@ public class ThinRelVersioned {
 		return tpSet;
 	}
 
+	public void setC2Id(int destId) {
+		componentTwoId = destId;
+		
+	}
+
 }

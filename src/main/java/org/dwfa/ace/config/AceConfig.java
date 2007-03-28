@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.IntSet;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -179,9 +180,10 @@ public class AceConfig implements Serializable {
 			}
 			new LogViewerFrame(new String[] { logConfigFile.getCanonicalPath() }, null);
 
+			ACE.setAceConfig(config);
 			for (AceFrameConfig ace: config.aceFrames) {
 				if (ace.isActive()) {
-					AceFrame af = new AceFrame(null, null, config, ace);
+					AceFrame af = new AceFrame(null, null, ace);
 					af.setVisible(true);
 				}
 			}
