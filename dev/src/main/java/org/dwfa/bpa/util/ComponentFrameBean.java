@@ -419,22 +419,22 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         }
     }
     public void windowClosed(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowClosed()");		
+		//System.out.println("ComponentFrameBean: windowClosed()");		
     }
     public void windowIconified(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowIconified()");		
+		//System.out.println("ComponentFrameBean: windowIconified()");		
     }
     public void windowDeiconified(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowDeiconified()");		
+		//System.out.println("ComponentFrameBean: windowDeiconified()");		
     }
     public void windowActivated(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowActivated()");		
+		//System.out.println("ComponentFrameBean: windowActivated()");		
     }
     public void windowDeactivated(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowDeactivated()");		
+		//System.out.println("ComponentFrameBean: windowDeactivated()");		
     }
 	public void openApplication() {
-		System.out.println("ComponentFrameBean: openApplication()");		
+		//System.out.println("ComponentFrameBean: openApplication()");		
 	}
 	public void openFile() {
 		throw new UnsupportedOperationException();		
@@ -443,6 +443,6 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
 		throw new UnsupportedOperationException();		
 	}
 	public void reOpenApplication() {
-		System.out.println("ComponentFrameBean: reOpenApplication()");		
+		//System.out.println("ComponentFrameBean: reOpenApplication()");		
 	}
 }
