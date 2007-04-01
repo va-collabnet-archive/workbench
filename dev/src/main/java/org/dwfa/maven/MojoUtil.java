@@ -11,11 +11,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 
 public class MojoUtil {
 
@@ -99,4 +101,20 @@ public class MojoUtil {
 		return getProjectClassLoader(dependencyWithoutProvided, localRepository,
 				classesDir);
     }
+    
+	public static boolean allowedGoal(Log log, List sessionGoals, String[] allowedGoals) {
+		boolean allowedGoal = false;
+		for (String goal: allowedGoals) {
+			if (sessionGoals.contains(goal)) {
+				allowedGoal = true;
+				break;
+			}
+		}
+		if (allowedGoal == false) {
+			log.info("Skipping execution since session goals: " + sessionGoals + 
+					" do not contain one of the following allowed goals: " + Arrays.asList(allowedGoals));
+		}
+		return allowedGoal;
+	}
+
 }
