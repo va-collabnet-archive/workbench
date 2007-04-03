@@ -288,4 +288,8 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
     public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException;
     public I_KeepTime getTimer();
     public void setTimer(I_KeepTime timer);
+    
+    public void writeAttachment(String key, Object value);
+    public Object readAttachement(String key);
+    public Object takeAttachment(String key);
 }

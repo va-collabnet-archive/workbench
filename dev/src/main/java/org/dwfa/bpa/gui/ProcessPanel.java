@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -62,6 +63,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.NoMappingException;
 
 /**
  * @author kec
@@ -124,8 +126,11 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
             f.setFilenameFilter(new FilenameFilter() {
 
                 public boolean accept(File dir, String name) {
-
-                    return name.endsWith(".bean") || name.endsWith(".xml");
+                    return name.endsWith(".bean") || name.endsWith(".xml") ||
+                   	name.toLowerCase().endsWith(".png") ||
+                   	name.toLowerCase().endsWith(".jpg") ||
+                   	name.toLowerCase().endsWith(".jpeg") ||
+                   	name.toLowerCase().endsWith(".gif");
                 }
             });
             f.setVisible(true); // Display dialog and wait for response
@@ -133,7 +138,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                 if (f.getFile() != null) {
                     File processFile = new File(f.getDirectory(), f.getFile());
                     String attachmentName;
-                    if (f.getFile().endsWith(".xml")) {
+                    if (f.getFile().toLowerCase().endsWith(".xml")) {
                         XMLDecoder d = new XMLDecoder(new BufferedInputStream(
                                 new FileInputStream(processFile)));
                         Object obj = d.readObject();
@@ -143,7 +148,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                                 attachmentName.length() - 4);
                         addAttachment(obj, attachmentName);
                         layoutComponents();
-                    } else {
+                    } else if (f.getFile().toLowerCase().endsWith(".bean")) {
                         FileInputStream fis = new FileInputStream(processFile);
                         BufferedInputStream bis = new BufferedInputStream(fis);
                         ObjectInputStream ois = new ObjectInputStream(bis);
@@ -159,6 +164,22 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                         addAttachment(obj, attachmentName);
                         layoutComponents();
 
+                    } else {
+                    	// Handle a graphic image...
+                        FileInputStream fis = new FileInputStream(processFile);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        byte[] bytes = new byte[bis.available()];
+                        int bytesToRead = bytes.length;
+                        int bytesRead = 0;
+                        while (bytesToRead != 0) {
+                            int read = bis.read(bytes, bytesRead, bytesToRead);
+                            bytesRead = bytesRead + read;
+                            bytesToRead = bytesToRead - read;
+                        }
+                        bis.close();
+                        attachmentName = f.getFile();
+                         addAttachment(bytes, attachmentName);
+                        layoutComponents();
                     }
                 }
                 f.dispose(); // Get rid of the dialog box
@@ -296,6 +317,11 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                     new FrameWithOpenFramesListener("Attached Process: "
                             + process.getName(), "Attachment", new JScrollPane(
                             panel));
+                } else if (byte[].class.isAssignableFrom(object.getClass())) {
+                	byte[] imageBytes = (byte[]) object;
+                     new FrameWithOpenFramesListener("Attached Image: "
+                            + process.getName(), "Attachment", new JLabel(new ImageIcon(imageBytes)));
+               	
                 } else {
                     JEditorPane textPane = new JEditorPane();
                     textPane.setContentType("text/html");

@@ -22,6 +22,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -73,6 +74,19 @@ import org.dwfa.jini.JiniManager;
  */
 public abstract class Worker implements I_Work {
 
+	public Object readAttachement(String key) {
+		return attachments.get(key);
+	}
+
+	public Object takeAttachment(String key) {
+		return attachments.remove(key);
+	}
+
+	public void writeAttachment(String key, Object value) {
+		attachments.put(key, value);
+		
+	}
+
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss.SSS");
 
@@ -92,6 +106,8 @@ public abstract class Worker implements I_Work {
 	public Logger getLogger() {
 		return logger;
 	}
+	
+	private HashMap<String, Object> attachments = new HashMap<String, Object>();
 
 	protected Configuration config;
 
