@@ -1,9 +1,10 @@
 package org.dwfa.vodb.types;
 
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 
-public class ThinDescPart {
+public class ThinDescPart implements I_DescriptionPart {
 	private int pathId;
 	private int version;
 	private int statusId;
@@ -12,54 +13,99 @@ public class ThinDescPart {
 	private int typeId; 
 	private String lang;
 	
-	public boolean hasNewData(ThinDescPart another) {
-		return ((this.pathId != another.pathId) ||
-				(this.statusId != another.statusId) ||
-				((this.text.equals(another.text) == false) ||
-				(this.initialCaseSignificant != another.initialCaseSignificant) ||
-				(this.typeId != another.typeId) ||
-				((this.lang.equals(another.lang) == false))));
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#hasNewData(org.dwfa.vodb.types.ThinDescPart)
+	 */
+	public boolean hasNewData(I_DescriptionPart another) {
+		return ((this.pathId != another.getPathId()) ||
+				(this.statusId != another.getStatusId()) ||
+				((this.text.equals(another.getText()) == false) ||
+				(this.initialCaseSignificant != another.getInitialCaseSignificant()) ||
+				(this.typeId != another.getTypeId()) ||
+				((this.lang.equals(another.getLang()) == false))));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getPathId()
+	 */
 	public int getPathId() {
 		return pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setPathId(int)
+	 */
 	public void setPathId(int pathId) {
 		this.pathId = pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getInitialCaseSignificant()
+	 */
 	public boolean getInitialCaseSignificant() {
 		return initialCaseSignificant;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setInitialCaseSignificant(boolean)
+	 */
 	public void setInitialCaseSignificant(boolean capStatus) {
 		this.initialCaseSignificant = capStatus;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getLang()
+	 */
 	public String getLang() {
 		return lang;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setLang(java.lang.String)
+	 */
 	public void setLang(String lang) {
 		this.lang = lang;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getStatusId()
+	 */
 	public int getStatusId() {
 		return statusId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setStatusId(int)
+	 */
 	public void setStatusId(int status) {
 		this.statusId = status;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getText()
+	 */
 	public String getText() {
 		return text;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setText(java.lang.String)
+	 */
 	public void setText(String text) {
 		this.text = text;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getTypeId()
+	 */
 	public int getTypeId() {
 		return typeId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setTypeId(int)
+	 */
 	public void setTypeId(int typeInt) {
 		this.typeId = typeInt;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getVersion()
+	 */
 	public int getVersion() {
 		return version;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setVersion(int)
+	 */
 	public void setVersion(int version) {
 		this.version = version;
 	}
@@ -83,6 +129,9 @@ public class ThinDescPart {
 		return buff.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
+	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		pathId = jarToDbNativeMap.get(pathId);
 		statusId = jarToDbNativeMap.get(statusId);
@@ -113,6 +162,9 @@ public class ThinDescPart {
 		});
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#duplicate()
+	 */
 	public ThinDescPart duplicate() {
 		ThinDescPart newPart = new ThinDescPart();
 		newPart.pathId = pathId;

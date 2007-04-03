@@ -8,17 +8,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -33,15 +42,34 @@ import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.TermComponentSelectionListener;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_AmTermComponent;
-import org.dwfa.vodb.types.ThinDescTuple;
+import org.dwfa.vodb.types.I_Transact;
+import org.dwfa.vodb.types.Path;
+import org.dwfa.vodb.types.ThinConPart;
+import org.dwfa.vodb.types.ThinConVersioned;
+import org.dwfa.vodb.types.ThinDescPart;
+import org.dwfa.vodb.types.ThinDescVersioned;
+import org.dwfa.vodb.types.ThinRelPart;
+import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
-		PropertyChangeListener {
+		I_TermFactory, PropertyChangeListener {
 
 	public enum LINK_TYPE {
 		UNLINKED, SEARCH_LINK, TREE_LINK
@@ -56,6 +84,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 
 	}
+
 	private class ShowPluginComponentActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -88,7 +117,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 	}
 
-	TermComponentLabel label;
+	private TermComponentLabel label;
 
 	private JToggleButton historyButton;
 
@@ -126,14 +155,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private DescriptionPlugin descPlugin = new DescriptionPlugin();
 
 	private LineagePlugin lineagePlugin = new LineagePlugin();
-	
+
 	ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
 
 	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
-			Arrays.asList(new I_PluginToConceptPanel[] { idPlugin, conceptAttributePlugin,
-					descPlugin, srcRelPlugin, destRelPlugin, 
-					lineagePlugin, imagePlugin,
-					conflictPlugin }));
+			Arrays
+					.asList(new I_PluginToConceptPanel[] { idPlugin,
+							conceptAttributePlugin, descPlugin, srcRelPlugin,
+							destRelPlugin, lineagePlugin, imagePlugin,
+							conflictPlugin }));
 
 	public ImageIcon tabIcon;
 
@@ -256,12 +286,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link) throws DatabaseException {
+	public ConceptPanel(ACE ace, LINK_TYPE link) throws DatabaseException,
+			IOException, ClassNotFoundException {
 		this(ace, link, null);
 	}
 
 	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs)
-			throws DatabaseException {
+			throws DatabaseException, IOException, ClassNotFoundException {
 		super(new GridBagLayout());
 		this.ace = ace;
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
@@ -301,7 +332,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
 		add(contentScroller, c);
 		setBorder(BorderFactory.createRaisedBevelBorder());
-		label.addPropertyChangeListener("termComponent", labelListener );
+		label.addPropertyChangeListener("termComponent", labelListener);
 	}
 
 	public JComponent getContentPane() throws DatabaseException {
@@ -326,8 +357,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return content;
 	}
 
-
-	public JComponent getToggleBar() {
+	public JComponent getToggleBar() throws IOException, ClassNotFoundException {
 		JPanel toggleBar = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -367,12 +397,82 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		historyButton.setSelected(false);
 		historyButton.addActionListener(historyChangeActionListener);
 		toggleBar.add(historyButton, c);
-		c.gridy++;
 		c.gridx++;
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		toggleBar.add(new JPanel(), c);
+
+		File componentPluginDir = new File("plugins" + File.separator
+				+ "component");
+		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+			public boolean accept(File arg0, String fileName) {
+				return fileName.toLowerCase().endsWith(".bp");
+			}
+
+		});
+		if (plugins != null) {
+			c.weightx = 0.0;
+			c.weightx = 0.0;
+			c.fill = GridBagConstraints.NONE;
+			for (File f : plugins) {
+				FileInputStream fis = new FileInputStream(f);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+				ObjectInputStream ois = new ObjectInputStream(bis);
+				BusinessProcess bp = (BusinessProcess) ois.readObject();
+				ois.close();
+				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
+				if (iconBytes != null) {
+					ImageIcon icon = new ImageIcon(iconBytes);
+					JButton pluginButton = new JButton(icon);
+					pluginButton.setToolTipText(bp.getSubject());
+					pluginButton.addActionListener(new PluginListener(f));
+					c.gridx++;
+					toggleBar.add(pluginButton, c);
+				}
+			}
+		}
+
 		return toggleBar;
+	}
+
+	private class PluginListener implements ActionListener {
+		File pluginProcessFile;
+
+		private PluginListener(File pluginProcessFile) {
+			super();
+			this.pluginProcessFile = pluginProcessFile;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+				FileInputStream fis = new FileInputStream(pluginProcessFile);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+				ObjectInputStream ois = new ObjectInputStream(bis);
+				BusinessProcess bp = (BusinessProcess) ois.readObject();
+				ois.close();
+				getConfig().setStatusMessage("Executing: " + bp.getName());
+				MasterWorker worker = getConfig().getWorker();
+				// Set concept bean
+				// Set config
+
+				worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
+						getConfig());
+				worker.writeAttachment(
+						AttachmentKeys.I_GET_CONCEPT_DATA.name(), label
+								.getTermComponent());
+				worker.writeAttachment(AttachmentKeys.I_TERM_FACTORY.name(),
+						ConceptPanel.this);
+				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
+						.name(), ConceptPanel.this);
+				worker.execute(bp);
+				getConfig().setStatusMessage(
+						"Execution of " + bp.getName() + " complete.");
+			} catch (Exception e1) {
+				getConfig().setStatusMessage("Exception during execution.");
+				AceLog.alertAndLogException(e1);
+			}
+		}
+
 	}
 
 	public I_AmTermComponent getTermComponent() {
@@ -397,7 +497,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				ConceptBean cb = (ConceptBean) termComponent;
 				String desc;
 				try {
-					ThinDescTuple tdt = cb.getDescTuple(getConfig()
+					I_DescriptionTuple tdt = cb.getDescTuple(getConfig()
 							.getShortLabelDescPreferenceList(), getConfig());
 					if (tdt != null) {
 						desc = tdt.getText();
@@ -484,5 +584,151 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public ConceptBean getHierarchySelection() {
 		return ace.getAceFrameConfig().getHierarchySelection();
+	}
+
+	public I_GetConceptData newConcept(UUID newConceptId, boolean defined)
+			throws TerminologyException, IOException {
+		canEdit();
+		ConceptBean newBean = ConceptBean.get(newConceptId);
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
+				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
+				getConfig().getEditingPathSet().size());
+		for (Path p : getConfig().getEditingPathSet()) {
+			ThinConPart attributePart = new ThinConPart();
+			attributePart.setVersion(Integer.MAX_VALUE);
+			attributePart.setDefined(defined);
+			attributePart.setPathId(p.getConceptId());
+			attributePart.setConceptStatus(status);
+			conceptAttributes.addVersion(attributePart);
+		}
+		newBean.setUncommittedConceptAttributes(conceptAttributes);
+		newBean.getUncommittedIds().add(nid);
+		ACE.addUncommitted(newBean);
+		return newBean;
+	}
+
+	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
+			I_GetConceptData concept, String lang, String text,
+			I_ConceptualizeLocally descType) throws TerminologyException,
+			IOException {
+		canEdit();
+		ACE.addUncommitted((I_Transact) concept);
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		int descId = AceConfig.vodb.uuidToNativeWithGeneration(
+				newDescriptionId, idSource, getConfig().getEditingPathSet(),
+				Integer.MAX_VALUE);
+		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
+				.getConceptId(), getConfig().getEditingPathSet().size());
+		ThinDescPart descPart = new ThinDescPart();
+		desc.addVersion(descPart);
+		boolean capStatus = false;
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int typeId = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
+						.getUids());
+		for (Path p : getConfig().getEditingPathSet()) {
+			descPart.setVersion(Integer.MAX_VALUE);
+			descPart.setPathId(p.getConceptId());
+			descPart.setInitialCaseSignificant(capStatus);
+			descPart.setLang(lang);
+			descPart.setStatusId(status);
+			descPart.setText(text);
+			descPart.setTypeId(typeId);
+		}
+		concept.getUncommittedDescriptions().add(desc);
+		concept.getUncommittedIds().add(descId);
+		return desc;
+	}
+
+	public I_RelVersioned newRelationship(UUID newRelUid,
+			I_GetConceptData concept) throws TerminologyException, IOException {
+		canEdit();
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
+				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
+				.getConceptId(), getConfig().getHierarchySelection()
+				.getConceptId(), 1);
+		ThinRelPart relPart = new ThinRelPart();
+		rel.addVersion(relPart);
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		for (Path p : getConfig().getEditingPathSet()) {
+			relPart.setVersion(Integer.MAX_VALUE);
+			relPart.setPathId(p.getConceptId());
+			relPart.setStatusId(status);
+			relPart.setRelTypeId(getConfig().getDefaultRelationshipType()
+					.getConceptId());
+			relPart.setCharacteristicId(getConfig()
+					.getDefaultRelationshipCharacteristic().getConceptId());
+			relPart.setRefinabilityId(getConfig()
+					.getDefaultRelationshipRefinability().getConceptId());
+			relPart.setGroup(0);
+		}
+		concept.getUncommittedSourceRels().add(rel);
+		concept.getUncommittedIds().add(relId);
+		ACE.addUncommitted((I_Transact) concept);
+		return rel;
+
+	}
+
+	public I_RelVersioned newRelationship(UUID newRelUid,
+			I_GetConceptData concept, 
+			I_ConceptualizeLocally relType,
+			I_ConceptualizeLocally relDestination,
+			I_ConceptualizeLocally relCharacteristic,
+			I_ConceptualizeLocally relRefinability, int relGroup)
+			throws TerminologyException, IOException {
+		canEdit();
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		
+		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
+				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+		
+		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
+				.getConceptId(), relDestination.getNid(), getConfig().getEditingPathSet().size());
+		
+		ThinRelPart relPart = new ThinRelPart();
+		
+		rel.addVersion(relPart);
+		
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		
+		for (Path p : getConfig().getEditingPathSet()) {
+			relPart.setVersion(Integer.MAX_VALUE);
+			relPart.setPathId(p.getConceptId());
+			relPart.setStatusId(status);
+			relPart.setRelTypeId(relType.getNid());
+			relPart.setCharacteristicId(relCharacteristic.getNid());
+			relPart.setRefinabilityId(relRefinability.getNid());
+			relPart.setGroup(relGroup);
+		}
+		concept.getUncommittedSourceRels().add(rel);
+		concept.getUncommittedIds().add(relId);
+		ACE.addUncommitted((I_Transact) concept);
+		return rel;
+
+	}
+
+	private void canEdit() throws TerminologyException {
+		if (getConfig().getEditingPathSet().size() == 0) {
+			JOptionPane.showMessageDialog(this,
+					"You must select an editing path before editing...");
+			throw new TerminologyException("No editing path selected.");
+		}
 	}
 }

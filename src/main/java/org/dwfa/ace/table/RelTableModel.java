@@ -27,6 +27,10 @@ import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.I_DoConceptDrop;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
@@ -34,17 +38,13 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinRelPart;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
 public abstract class RelTableModel extends AbstractTableModel implements
 		PropertyChangeListener, I_DoConceptDrop {
-	private List<ThinRelTuple> allTuples;
+	private List<I_RelTuple> allTuples;
 
 	//protected ConceptPanel parentPanel;
 
@@ -178,9 +178,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			if (cb == null) {
 				return 0;
 			}
-			List<ThinRelTuple> rels = getRels(cb, host.getUsePrefs(),
+			List<I_RelTuple> rels = getRels(cb, host.getUsePrefs(),
 					getShowHistory());
-			for (ThinRelTuple r : rels) {
+			for (I_RelTuple r : rels) {
 				if (stopWork) {
 					return -1;
 				}
@@ -307,7 +307,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		return 0;
 	}
 
-	public abstract List<ThinRelTuple> getRels(I_GetConceptData cb,
+	public abstract List<I_RelTuple> getRels(I_GetConceptData cb,
 			boolean usePrefs, boolean showHistory) throws DatabaseException;
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -317,7 +317,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		}
 		REL_FIELD field = columns[columnIndex];
 		try {
-			ThinRelTuple rel;
+			I_RelTuple rel;
 			if (rowIndex >= allTuples.size()) {
 				return null;
 			}
@@ -387,7 +387,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	}
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = referencedConcepts.get(id);
-		ThinDescTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
@@ -404,7 +404,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		if (row >= allTuples.size()) {
 			return false;
 		}
-		ThinRelTuple rel = allTuples.get(row);
+		I_RelTuple rel = allTuples.get(row);
 		if (rel.getVersion() != Integer.MAX_VALUE) {
 			return false;
 		}
@@ -443,7 +443,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	}
 
 	public void setValueAt(Object value, int row, int col) {
-		ThinRelTuple rel = allTuples.get(row);
+		I_RelTuple rel = allTuples.get(row);
 		REL_FIELD field = columns[col];
 		switch (field) {
 		case REL_ID:
@@ -527,9 +527,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	public static class StringWithRelTuple implements Comparable, I_CellTextWithTuple {
 		String cellText;
 
-		ThinRelTuple tuple;
+		I_RelTuple tuple;
 
-		public StringWithRelTuple(String cellText, ThinRelTuple tuple) {
+		public StringWithRelTuple(String cellText, I_RelTuple tuple) {
 			super();
 			this.cellText = cellText;
 			this.tuple = tuple;
@@ -539,7 +539,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			return cellText;
 		}
 
-		public ThinRelTuple getTuple() {
+		public I_RelTuple getTuple() {
 			return tuple;
 		}
 
@@ -657,7 +657,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					ConceptBean destBean = ConceptBean.get(selectedObject
 							.getTuple().getC2Id());
 					for (Path p : config.getEditingPathSet()) {
-						ThinRelPart newPart = selectedObject.getTuple()
+						I_RelPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);
@@ -693,7 +693,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					ConceptBean destBean = ConceptBean.get(selectedObject
 							.getTuple().getC2Id());
 					for (Path p : config.getEditingPathSet()) {
-						ThinRelPart newPart = selectedObject.getTuple()
+						I_RelPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);

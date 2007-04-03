@@ -2,7 +2,7 @@ package org.dwfa.ace;
 
 import java.util.Comparator;
 
-import org.dwfa.vodb.types.I_GetConceptData;
+import org.dwfa.ace.api.I_GetConceptData;
 
 import com.sleepycat.je.DatabaseException;
 

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinRelTuple;
-import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -25,8 +25,8 @@ public class SrcRelTableModel extends RelTableModel {
 	private static final long serialVersionUID = 1L;
 	
 	@Override
-	public List<ThinRelTuple> getRels(I_GetConceptData cb, boolean usePrefs, boolean showHistory) throws DatabaseException {
-		List<ThinRelTuple> selectedTuples = new ArrayList<ThinRelTuple>();
+	public List<I_RelTuple> getRels(I_GetConceptData cb, boolean usePrefs, boolean showHistory) throws DatabaseException {
+		List<I_RelTuple> selectedTuples = new ArrayList<I_RelTuple>();
 		IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		IntSet allowedTypes = null;
 		Set<Position> positions = null;
@@ -38,10 +38,10 @@ public class SrcRelTableModel extends RelTableModel {
 			positions = null;
 			allowedStatus = null;
 		}
-		for (ThinRelVersioned rel: cb.getSourceRels()) {
+		for (I_RelVersioned rel: cb.getSourceRels()) {
 			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
 		}
-		for (ThinRelVersioned rel: cb.getUncommittedSourceRels()) {
+		for (I_RelVersioned rel: cb.getUncommittedSourceRels()) {
 			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
 		}
 		

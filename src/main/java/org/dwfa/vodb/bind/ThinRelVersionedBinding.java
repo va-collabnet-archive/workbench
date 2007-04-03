@@ -1,5 +1,7 @@
 package org.dwfa.vodb.bind;
 
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
@@ -30,12 +32,12 @@ public class ThinRelVersionedBinding extends TupleBinding {
 	}
 
 	public void objectToEntry(Object obj, TupleOutput to) {
-		ThinRelVersioned versioned = (ThinRelVersioned) obj;
+		I_RelVersioned versioned = (I_RelVersioned) obj;
 		to.writeInt(versioned.getRelId());
 		to.writeInt(versioned.getC1Id());
 		to.writeInt(versioned.getC2Id());
 		to.writeInt(versioned.versionCount());
-		for (ThinRelPart rel: versioned.getVersions()) {
+		for (I_RelPart rel: versioned.getVersions()) {
 			to.writeInt(rel.getPathId());
 			to.writeInt(rel.getVersion());
 			to.writeInt(rel.getStatusId());

@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.IntList;
 import org.dwfa.ace.IntSet;
+import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
@@ -66,8 +67,11 @@ public class AceFrameConfig implements Serializable {
     private IntList shortLabelDescPreferenceList = new IntList();
     private IntList longLabelDescPreferenceList = new IntList();
 	private int termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
-
+	
     private ConceptBean hierarchySelection;
+    
+    private transient MasterWorker worker;
+    private transient String statusMessage;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -561,6 +565,30 @@ public class AceFrameConfig implements Serializable {
 		Object old = this.hierarchySelection;
 		this.hierarchySelection = hierarchySelection;
 		this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
+	}
+
+
+	public MasterWorker getWorker() {
+		return worker;
+	}
+
+
+	public void setWorker(MasterWorker worker) {
+		Object old = this.worker;
+		this.worker = worker;
+		this.changeSupport.firePropertyChange("worker", old, worker);
+	}
+
+
+	public String getStatusMessage() {
+		return statusMessage;
+	}
+
+
+	public void setStatusMessage(String statusMessage) {
+		Object old = this.statusMessage;
+		this.statusMessage = statusMessage;
+		this.changeSupport.firePropertyChange("statusMessage", old, statusMessage);
 	}
 
 }

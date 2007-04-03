@@ -9,6 +9,10 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.vodb.bind.ThinConVersionedBinding;
@@ -61,7 +65,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 			DatabaseEntry key = new DatabaseEntry(); 
 			intBinder.objectToEntry(newId, key);
 			DatabaseEntry value = new DatabaseEntry(); 
-			ThinIdVersioned idv = new ThinIdVersioned(newId, 1);
+			I_IdVersioned idv = new ThinIdVersioned(newId, 1);
 			ThinIdPart idPart = new ThinIdPart();
 			idPart.setIdStatus(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.CURRENT.getUids(), 
 					encodingSource, idPath, version));
@@ -97,7 +101,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		if (nativeIdClass.equals(Integer.class)) {
 			for (PrimordialId primId: PrimordialId.values()) {
 				for (UUID uid:  primId.getUids()) {
-					ThinIdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
+					I_IdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
 					ThinIdPart idPart = new ThinIdPart();
 					idPart.setIdStatus(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
 					idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
@@ -141,9 +145,9 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		intBinder.objectToEntry(map.getIntId((UUID) conceptKey, aceAuxPath, version), key);
 		DatabaseEntry value = new DatabaseEntry(); 
 		
-		ThinConVersioned vcon;
+		I_ConceptAttributeVersioned vcon;
 		if (vodb.getConceptDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vcon = (ThinConVersioned) conBinder.entryToObject(value);
+			 vcon = (I_ConceptAttributeVersioned) conBinder.entryToObject(value);
 		} else {
 			vcon = new ThinConVersioned(map.getIntId((UUID) conceptKey, aceAuxPath, version), 1);
 		}
@@ -172,9 +176,9 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		intBinder.objectToEntry(map.getIntId((UUID) descriptionId, aceAuxPath, version), key);
 		DatabaseEntry value = new DatabaseEntry(); 
 		
-		ThinDescVersioned vdesc;
+		I_DescriptionVersioned vdesc;
 		if (vodb.getDescDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vdesc = (ThinDescVersioned) descBinder.entryToObject(value);
+			 vdesc = (I_DescriptionVersioned) descBinder.entryToObject(value);
 		} else {
 			vdesc = new ThinDescVersioned(map.getIntId((UUID) descriptionId, aceAuxPath, version), 
 					map.getIntId((UUID) conceptId, aceAuxPath, ThinVersionHelper.convert(releaseDate.getTime())), 1);
@@ -204,9 +208,9 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		DatabaseEntry key = new DatabaseEntry(); 
 		intBinder.objectToEntry(map.getIntId((UUID) relID, aceAuxPath, version), key);
 		DatabaseEntry value = new DatabaseEntry(); 
-		ThinRelVersioned vrel;
+		I_RelVersioned vrel;
 		if (vodb.getRelDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vrel = (ThinRelVersioned) relBinder.entryToObject(value);
+			 vrel = (I_RelVersioned) relBinder.entryToObject(value);
 		} else {
 			vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version),
 					map.getIntId((UUID) conceptOneID, aceAuxPath, version),

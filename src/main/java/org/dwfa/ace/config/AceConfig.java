@@ -57,13 +57,15 @@ public class AceConfig implements Serializable {
     private static final int dataVersion = 3;
 	public static VodbEnv vodb = new VodbEnv();
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
+	private static String DEFAULT_ACE_CONFIG_FILE = "ace.config";
     
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     
     public List<AceFrameConfig> aceFrames = new ArrayList<AceFrameConfig>();
     private File dbFolder = new File("../test/berkeley-db");
-    private String loggerConfigFile  = DEFAULT_LOGGER_CONFIG_FILE;
+    private String loggerRiverConfigFile  = DEFAULT_LOGGER_CONFIG_FILE;
+    private String aceRiverConfigFile  = DEFAULT_ACE_CONFIG_FILE;
     private boolean readOnly = false;
     private Long cacheSize = null;
 
@@ -87,7 +89,7 @@ public class AceConfig implements Serializable {
         out.writeBoolean(readOnly);
         out.writeObject(cacheSize);
         out.writeObject(aceFrames);
-        out.writeObject(loggerConfigFile);
+        out.writeObject(loggerRiverConfigFile);
     }
 
     @SuppressWarnings("unchecked")
@@ -116,9 +118,9 @@ public class AceConfig implements Serializable {
             	aceFrames = (List<AceFrameConfig>) in.readObject();
         	}
         	if (objDataVersion >= 2) {
-        		loggerConfigFile = (String) in.readObject();
+        		loggerRiverConfigFile = (String) in.readObject();
         	} else {
-        		loggerConfigFile = DEFAULT_LOGGER_CONFIG_FILE;
+        		loggerRiverConfigFile = DEFAULT_LOGGER_CONFIG_FILE;
         	}
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -160,7 +162,6 @@ public class AceConfig implements Serializable {
 					return;
 				}
 			}
-
 			File configFile = new File(fileStr);
 			if (configFile.exists() == false) {
 				setupAceConfig(config, configFile, 600000000L);
@@ -169,7 +170,7 @@ public class AceConfig implements Serializable {
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				config = (AceConfig) ois.readObject();
 			}
-			File logConfigFile = new File(configFile.getParent(), config.loggerConfigFile);
+			File logConfigFile = new File(configFile.getParent(), config.loggerRiverConfigFile);
 			if (logConfigFile.exists() == false) {
 	            URL logConfigUrl = AceConfig.class.getResource("/org/dwfa/resources/core/config/logViewer.config");
 	            AceLog.info("Config file does not exist... " + logConfigUrl);
@@ -180,20 +181,27 @@ public class AceConfig implements Serializable {
 			}
 			new LogViewerFrame(new String[] { logConfigFile.getCanonicalPath() }, null);
 
-			ACE.setAceConfig(config);
-			for (AceFrameConfig ace: config.aceFrames) {
-				if (ace.isActive()) {
-					AceFrame af = new AceFrame(null, null, ace);
-					af.setVisible(true);
-				}
+			File aceRiverConfigFile = new File(configFile.getParent(), config.getAceRiverConfigFile());
+			if (aceRiverConfigFile.exists() == false) {
+	            URL configUrl = AceConfig.class.getResource("/org/dwfa/ace/config/ace.config");
+	            AceLog.info("Config file does not exist... " + configUrl);
+				InputStream is = configUrl.openStream();
+				FileOutputStream fos = new FileOutputStream(aceRiverConfigFile);
+				FileIO.copyFile(is, fos, true);
+				is.close();
 			}
 			
 			
-			
+			ACE.setAceConfig(config);
+			for (AceFrameConfig ace: config.aceFrames) {
+				if (ace.isActive()) {
+					AceFrame af = new AceFrame(new String[] { aceRiverConfigFile.getAbsolutePath() }, null, ace);
+					af.setVisible(true);
+				}
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.alertAndLogException(e);
 		}
-
 	}
 	public static void setupAceConfig(AceConfig config, File configFile, Long cacheSize) throws DatabaseException, ParseException, TerminologyException, IOException, FileNotFoundException {
 		AceConfig.vodb.setup(config.dbFolder, config.readOnly, cacheSize);
@@ -395,11 +403,20 @@ public class AceConfig implements Serializable {
 			targetDir.setLastModified(srcJarFile.lastModified());
 		}
 	}
-	public String getLoggerConfigFile() {
-		return loggerConfigFile;
+	public String getLoggerRiverConfigFile() {
+		return loggerRiverConfigFile;
 	}
-	public void setLoggerConfigFile(String loggerConfigFile) {
-		this.loggerConfigFile = loggerConfigFile;
+	public void setLoggerRiverConfigFile(String loggerConfigFile) {
+		this.loggerRiverConfigFile = loggerConfigFile;
+	}
+	public String getAceRiverConfigFile() {
+		if (aceRiverConfigFile == null) {
+			aceRiverConfigFile = DEFAULT_ACE_CONFIG_FILE;
+		}
+		return aceRiverConfigFile;
+	}
+	public void setAceRiverConfigFile(String aceRiverConfigFile) {
+		this.aceRiverConfigFile = aceRiverConfigFile;
 	}
 
     

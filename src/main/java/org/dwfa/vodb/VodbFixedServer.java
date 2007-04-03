@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.I_ExtendLocally;
@@ -13,8 +15,6 @@ import org.dwfa.tapi.I_ManifestLocally;
 import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ThinConVersioned;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -92,7 +92,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 	public I_DescribeConceptLocally getDescription(int descriptionNid)
 			throws IOException, TerminologyException {
 		try {
-			ThinDescVersioned vDesc = server.getDescription(descriptionNid);
+			I_DescriptionVersioned vDesc = server.getDescription(descriptionNid);
 			return vDesc.toLocalFixedDesc();
 		} catch (DatabaseException e) {
 			throw new DbToIoException(e);
@@ -104,7 +104,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 			TerminologyException {
 		List<I_DescribeConceptLocally> descList = new ArrayList<I_DescribeConceptLocally>();
 		try {
-			for (ThinDescVersioned desc : server.getDescriptions(concept
+			for (I_DescriptionVersioned desc : server.getDescriptions(concept
 					.getNid())) {
 				descList.add(desc.toLocalFixedDesc());
 			}
@@ -117,7 +117,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 	public I_ConceptualizeLocally getConcept(int conceptNid)
 			throws IOException, TerminologyException {
 		try {
-			ThinConVersioned vCon = server.getConcept(conceptNid);
+			I_ConceptAttributeVersioned vCon = server.getConcept(conceptNid);
 			return vCon.getLocalFixedConcept();
 		} catch (DatabaseException e) {
 			throw new DbToIoException(e);

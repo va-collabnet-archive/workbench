@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
-import org.dwfa.vodb.types.I_GetConceptData;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -49,7 +49,7 @@ public class ConceptTransferable implements Transferable {
 			return conceptTransferable;
 		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
 			try {
-				return conceptTransferable.getConcept().getLocalFixedConcept().universalize();
+				return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
 			} catch (DatabaseException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (TerminologyException e) {
@@ -57,7 +57,7 @@ public class ConceptTransferable implements Transferable {
 			}
 		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
 			try {
-				return conceptTransferable.getConcept().getLocalFixedConcept().universalize();
+				return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
 			} catch (DatabaseException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (TerminologyException e) {

@@ -2,8 +2,8 @@ package org.dwfa.ace;
 
 import java.beans.PropertyChangeListener;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.vodb.types.I_AmTermComponent;
 
 public interface I_ContainTermComponent {
 	

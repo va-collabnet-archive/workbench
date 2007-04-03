@@ -2,6 +2,8 @@ package org.dwfa.vodb.bind;
 
 import java.util.ArrayList;
 
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.vodb.types.ThinImagePart;
 import org.dwfa.vodb.types.ThinImageVersioned;
 
@@ -20,7 +22,7 @@ public class ThinImageBinder extends TupleBinding {
 		int conceptId = ti.readInt();
 		int size = ti.readInt();
 		ThinImageVersioned versioned = new ThinImageVersioned(nativeId, image, 
-				new ArrayList<ThinImagePart>(size), format, conceptId);
+				new ArrayList<I_ImagePart>(size), format, conceptId);
 		for (int x = 0; x < size; x++) {
 			ThinImagePart part = new ThinImagePart();
 			part.setPathId(ti.readInt());
@@ -34,7 +36,7 @@ public class ThinImageBinder extends TupleBinding {
 	}
 
 	public void objectToEntry(Object obj, TupleOutput to) {
-		ThinImageVersioned versioned = (ThinImageVersioned) obj;
+		I_ImageVersioned versioned = (I_ImageVersioned) obj;
 		to.writeInt(versioned.getImageId());
 		byte[] image = versioned.getImage();
 		to.writeInt(image.length);
@@ -42,7 +44,7 @@ public class ThinImageBinder extends TupleBinding {
 		to.writeString(versioned.getFormat());
 		to.writeInt(versioned.getConceptId());
 		to.writeInt(versioned.getVersions().size());
-		for (ThinImagePart part: versioned.getVersions()) {
+		for (I_ImagePart part: versioned.getVersions()) {
 			to.writeInt(part.getPathId());
 			to.writeInt(part.getVersion());
 			to.writeInt(part.getStatusId());

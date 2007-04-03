@@ -2,10 +2,11 @@ package org.dwfa.vodb.types;
 
 import java.util.Arrays;
 
+import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 
-public class ThinRelPart {
+public class ThinRelPart implements I_RelPart {
 	
 	private int pathId;
 	private int version;
@@ -15,54 +16,99 @@ public class ThinRelPart {
 	private int refinabilityId;
 	private int group;
 	
-	public boolean hasNewData(ThinRelPart another) {
-		return ((this.pathId != another.pathId) ||
-				(this.statusId != another.statusId) ||
-				(this.relTypeId != another.relTypeId) ||
-				(this.characteristicId != another.characteristicId) ||
-				(this.refinabilityId != another.refinabilityId) ||
-				(this.group != another.group));
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#hasNewData(org.dwfa.vodb.types.ThinRelPart)
+	 */
+	public boolean hasNewData(I_RelPart another) {
+		return ((this.pathId != another.getPathId()) ||
+				(this.statusId != another.getStatusId()) ||
+				(this.relTypeId != another.getRelTypeId()) ||
+				(this.characteristicId != another.getCharacteristicId()) ||
+				(this.refinabilityId != another.getRefinabilityId()) ||
+				(this.group != another.getGroup()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getPathId()
+	 */
 	public int getPathId() {
 		return pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setPathId(int)
+	 */
 	public void setPathId(int pathId) {
 		this.pathId = pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getCharacteristicId()
+	 */
 	public int getCharacteristicId() {
 		return characteristicId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setCharacteristicId(int)
+	 */
 	public void setCharacteristicId(int characteristicId) {
 		this.characteristicId = characteristicId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getGroup()
+	 */
 	public int getGroup() {
 		return group;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setGroup(int)
+	 */
 	public void setGroup(int group) {
 		this.group = group;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getRefinabilityId()
+	 */
 	public int getRefinabilityId() {
 		return refinabilityId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setRefinabilityId(int)
+	 */
 	public void setRefinabilityId(int refinabilityId) {
 		this.refinabilityId = refinabilityId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getRelTypeId()
+	 */
 	public int getRelTypeId() {
 		return relTypeId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setRelTypeId(int)
+	 */
 	public void setRelTypeId(int relTypeId) {
 		this.relTypeId = relTypeId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getVersion()
+	 */
 	public int getVersion() {
 		return version;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setVersion(int)
+	 */
 	public void setVersion(int version) {
 		this.version = version;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#getStatusId()
+	 */
 	public int getStatusId() {
 		return statusId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#setStatusId(int)
+	 */
 	public void setStatusId(int statusId) {
 		this.statusId = statusId;
 	}
@@ -103,6 +149,9 @@ public class ThinRelPart {
 		return HashFunction.hashCode(getAsArray());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
+	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		pathId = jarToDbNativeMap.get(pathId);
 		statusId = jarToDbNativeMap.get(statusId);
@@ -111,6 +160,9 @@ public class ThinRelPart {
 		refinabilityId = jarToDbNativeMap.get(refinabilityId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_RelPart#duplicate()
+	 */
 	public ThinRelPart duplicate() {
 		ThinRelPart part = new ThinRelPart();
 		part.setCharacteristicId(characteristicId);

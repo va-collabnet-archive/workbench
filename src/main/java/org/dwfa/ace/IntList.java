@@ -16,9 +16,9 @@ import javax.swing.AbstractListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.I_GetConceptData;
 
 import com.sleepycat.je.DatabaseException;
 

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.vodb.bind.ThinDescVersionedBinding;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
@@ -65,7 +66,7 @@ public class Query {
 		while (descC.getNext(descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			descCount++;
 			int descKeyInt = (Integer) intBinder.entryToObject(descKey);
-			ThinDescVersioned vdesc = (ThinDescVersioned) descBinder.entryToObject(descValue);
+			I_DescriptionVersioned vdesc = (I_DescriptionVersioned) descBinder.entryToObject(descValue);
 			if (vdesc.matches(Pattern.compile(queryString))) {
 				matchCount++;
 				System.out.println("descKeyInt: " + descKeyInt);
@@ -134,7 +135,7 @@ public class Query {
 		while (descC.getNext(descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			descCount++;
 			
-			ThinDescVersioned descFromTextSearch = (ThinDescVersioned) descBinder.entryToObject(descValue);
+			I_DescriptionVersioned descFromTextSearch = (I_DescriptionVersioned) descBinder.entryToObject(descValue);
 			if (descFromTextSearch.matches(Pattern.compile(queryString))) {
 				matchCount++;
 				System.out.println("   ---------------------------------------");
@@ -166,7 +167,7 @@ public class Query {
 			    } 		
 				mySecCursor.close();
 				System.out.println("++++++++ Concept Query Result(s) ++++++++++");
-				for (ThinDescVersioned desc: matches) {
+				for (I_DescriptionVersioned desc: matches) {
 					System.out.println(desc);
 				}
 				System.out.println("+++++++++++++++++++++++++++++++++++++++++++");

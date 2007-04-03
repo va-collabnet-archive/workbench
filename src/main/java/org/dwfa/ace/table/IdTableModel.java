@@ -22,6 +22,11 @@ import javax.swing.table.AbstractTableModel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdTuple;
+import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
@@ -29,12 +34,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinIdPart;
-import org.dwfa.vodb.types.ThinIdTuple;
-import org.dwfa.vodb.types.ThinIdVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -48,9 +48,9 @@ public class IdTableModel extends AbstractTableModel implements
 	public static class StringWithIdTuple implements Comparable, I_CellTextWithTuple {
 		String cellText;
 
-		ThinIdTuple tuple;
+		I_IdTuple tuple;
 
-		public StringWithIdTuple(String cellText, ThinIdTuple tuple) {
+		public StringWithIdTuple(String cellText, I_IdTuple tuple) {
 			super();
 			this.cellText = cellText;
 			this.tuple = tuple;
@@ -60,7 +60,7 @@ public class IdTableModel extends AbstractTableModel implements
 			return cellText;
 		}
 
-		public ThinIdTuple getTuple() {
+		public I_IdTuple getTuple() {
 			return tuple;
 		}
 
@@ -73,7 +73,7 @@ public class IdTableModel extends AbstractTableModel implements
 			return cellText.compareTo(another.cellText);
 		}
 	}
-	private List<ThinIdTuple> allTuples;
+	private List<I_IdTuple> allTuples;
 
 	private TableChangedSwingWorker tableChangeWorker;
 
@@ -159,8 +159,8 @@ public class IdTableModel extends AbstractTableModel implements
 			if (cb == null) {
 				return 0;
 			}
-			ThinIdVersioned id = cb.getId();
-			for (ThinIdPart part : id.getVersions()) {
+			I_IdVersioned id = cb.getId();
+			for (I_IdPart part : id.getVersions()) {
 				conceptsToFetch.add(part.getIdStatus());
 				conceptsToFetch.add(part.getPathId());
 			}
@@ -293,7 +293,7 @@ public class IdTableModel extends AbstractTableModel implements
 	public int getColumnCount() {
 		return columns.length;
 	}
-	private ThinIdTuple getIdTuple(int rowIndex) throws DatabaseException {
+	private I_IdTuple getIdTuple(int rowIndex) throws DatabaseException {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
@@ -320,7 +320,7 @@ public class IdTableModel extends AbstractTableModel implements
 	}
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+		I_DescriptionTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		String text = statusDesc.getText();
 		return text;
 	}
@@ -330,7 +330,7 @@ public class IdTableModel extends AbstractTableModel implements
 			if (rowIndex >= getRowCount()) {
 				return null;
 			}
-			ThinIdTuple idTuple = getIdTuple(rowIndex);
+			I_IdTuple idTuple = getIdTuple(rowIndex);
 			if (idTuple == null) {
 				return null;
 			}
@@ -410,7 +410,7 @@ public class IdTableModel extends AbstractTableModel implements
 
 			public void actionPerformed(ActionEvent e) {
 				for (Path p : config.getEditingPathSet()) {
-					ThinIdPart newPart = selectedObject.getTuple()
+					I_IdPart newPart = selectedObject.getTuple()
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
@@ -432,7 +432,7 @@ public class IdTableModel extends AbstractTableModel implements
 			public void actionPerformed(ActionEvent e) {
 				try {
 					for (Path p : config.getEditingPathSet()) {
-						ThinIdPart newPart = selectedObject.getTuple()
+						I_IdPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);

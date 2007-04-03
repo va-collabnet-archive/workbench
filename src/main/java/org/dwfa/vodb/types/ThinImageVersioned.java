@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
-public class ThinImageVersioned {
+public class ThinImageVersioned implements I_ImageVersioned {
 	public ThinImageVersioned() {
 		super();
 	}
@@ -17,8 +20,8 @@ public class ThinImageVersioned {
 	private String format;
 	private byte[] image;
 	private int conceptId;
-	private List<ThinImagePart> versions;
-	public ThinImageVersioned(int nativeId, byte[] image, List<ThinImagePart> versions, String format, 
+	private List<I_ImagePart> versions;
+	public ThinImageVersioned(int nativeId, byte[] image, List<I_ImagePart> versions, String format, 
 			int conceptId) {
 		super();
 		this.imageId = nativeId;
@@ -27,22 +30,34 @@ public class ThinImageVersioned {
 		this.format = format;
 		this.conceptId = conceptId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getImage()
+	 */
 	public byte[] getImage() {
 		return image;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getImageId()
+	 */
 	public int getImageId() {
 		return imageId;
 	}
-	public List<ThinImagePart> getVersions() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getVersions()
+	 */
+	public List<I_ImagePart> getVersions() {
 		return versions;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#addVersion(org.dwfa.vodb.types.ThinImagePart)
+	 */
 	public boolean addVersion(ThinImagePart part) {
 		int index = versions.size() - 1;
 		if (index == -1) {
 			return versions.add(part);
 		} else if (index >= 0) {
-			ThinImagePart prevPart = versions.get(index);
+			I_ImagePart prevPart = versions.get(index);
 			if (prevPart.hasNewData(part)) {
 				if (prevPart.getTextDescription().equals(part.getTextDescription())) {
 					part.setTextDescription(prevPart.getTextDescription());
@@ -52,34 +67,52 @@ public class ThinImageVersioned {
 		}
 		return false;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getFormat()
+	 */
 	public String getFormat() {
 		return format;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptId()
+	 */
 	public int getConceptId() {
 		return conceptId;
 	}
-	public ThinImageTuple getLastTuple() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
+	 */
+	public I_ImageTuple getLastTuple() {
 		return new ThinImageTuple(this, versions.get(versions.size() -1));
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
+	 */
 	public Collection<ThinImageTuple> getTuples() {
 		List<ThinImageTuple> tuples = new ArrayList<ThinImageTuple>();
-		for (ThinImagePart p: getVersions()) {
+		for (I_ImagePart p: getVersions()) {
 			tuples.add(new ThinImageTuple(this, p));
 		}
 		return tuples;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
+	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		conceptId = jarToDbNativeMap.get(conceptId);
 		imageId = jarToDbNativeMap.get(imageId);
-		for (ThinImagePart p: versions) {
+		for (I_ImagePart p: versions) {
 			p.convertIds(jarToDbNativeMap);
 		}
 		
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#merge(org.dwfa.vodb.types.ThinImageVersioned)
+	 */
 	public boolean merge(ThinImageVersioned jarImage) {
-		HashSet<ThinImagePart> versionSet = new HashSet<ThinImagePart>(versions);
+		HashSet<I_ImagePart> versionSet = new HashSet<I_ImagePart>(versions);
 		boolean changed = false;
-		for (ThinImagePart jarPart: jarImage.versions) {
+		for (I_ImagePart jarPart: jarImage.versions) {
 			if (!versionSet.contains(jarPart)) {
 				changed = true;
 				versions.add(jarPart);
@@ -87,21 +120,27 @@ public class ThinImageVersioned {
 		}
 		return changed;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTimePathSet()
+	 */
 	public Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> tpSet = new HashSet<TimePathId>(); 
-		for (ThinImagePart p: versions) {
+		for (I_ImagePart p: versions) {
 			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
 		}
 		return tpSet;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List)
+	 */
 	public void addTuples(IntSet allowedStatus, IntSet allowedTypes,
 			Set<Position> positions, List<ThinImageTuple> returnImages) {
-		Set<ThinImagePart> uncommittedParts = new HashSet<ThinImagePart>();
+		Set<I_ImagePart> uncommittedParts = new HashSet<I_ImagePart>();
 		if (positions == null) {
-			List<ThinImagePart> addedParts = new ArrayList<ThinImagePart>();
-			Set<ThinImagePart> rejectedParts = new HashSet<ThinImagePart>();
-			for (ThinImagePart part : versions) {
+			List<I_ImagePart> addedParts = new ArrayList<I_ImagePart>();
+			Set<I_ImagePart> rejectedParts = new HashSet<I_ImagePart>();
+			for (I_ImagePart part : versions) {
 				if (part.getVersion() == Integer.MAX_VALUE) {
 					uncommittedParts.add(part);
 				} else {
@@ -118,9 +157,9 @@ public class ThinImageVersioned {
 					addedParts.add(part);
 				}
 			}
-			for (ThinImagePart part : addedParts) {
+			for (I_ImagePart part : addedParts) {
 				boolean addPart = true;
-				for (ThinImagePart reject : rejectedParts) {
+				for (I_ImagePart reject : rejectedParts) {
 					if ((part.getVersion() <= reject.getVersion())
 							&& (part.getPathId() == reject.getPathId())) {
 						addPart = false;
@@ -133,11 +172,11 @@ public class ThinImageVersioned {
 			}
 		} else {
 
-			Set<ThinImagePart> addedParts = new HashSet<ThinImagePart>();
+			Set<I_ImagePart> addedParts = new HashSet<I_ImagePart>();
 			for (Position position : positions) {
-				Set<ThinImagePart> rejectedParts = new HashSet<ThinImagePart>();
+				Set<I_ImagePart> rejectedParts = new HashSet<I_ImagePart>();
 				ThinImageTuple possible = null;
-				for (ThinImagePart part : versions) {
+				for (I_ImagePart part : versions) {
 					if (part.getVersion() == Integer.MAX_VALUE) {
 						uncommittedParts.add(part);
 						continue;
@@ -201,7 +240,7 @@ public class ThinImageVersioned {
 					Position possibleStatusPosition = new Position(possible
 							.getVersion(), possiblePath);
 					boolean addPart = true;
-					for (ThinImagePart reject : rejectedParts) {
+					for (I_ImagePart reject : rejectedParts) {
 						Position rejectedStatusPosition = new Position(reject
 								.getVersion(), position.getPath()
 								.getMatchingPath(reject.getPathId()));
@@ -219,7 +258,7 @@ public class ThinImageVersioned {
 				}
 			}
 		}
-		for (ThinImagePart p: uncommittedParts) {
+		for (I_ImagePart p: uncommittedParts) {
 			returnImages.add(new ThinImageTuple(this, p));
 		}
 	}

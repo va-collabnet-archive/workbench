@@ -9,17 +9,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.IntList;
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinConTuple;
-import org.dwfa.vodb.types.ThinConVersioned;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinIdVersioned;
-import org.dwfa.vodb.types.ThinImageVersioned;
-import org.dwfa.vodb.types.ThinRelTuple;
-import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -44,42 +44,42 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		this.secondaryParentNode = secondaryParentNode;
 	}
 
-	public ThinConVersioned getConcept() throws DatabaseException {
-		return bean.getConcept();
+	public I_ConceptAttributeVersioned getConceptAttributes() throws DatabaseException {
+		return bean.getConceptAttributes();
 	}
 
 	public int getConceptId() {
 		return bean.getConceptId();
 	}
 
-	public List<ThinConTuple> getConceptTuples(IntSet allowedStatus, Set<Position> positions) {
+	public List<I_ConceptAttributeTuple> getConceptTuples(IntSet allowedStatus, Set<Position> positions) throws DatabaseException {
 		return bean.getConceptTuples(allowedStatus, positions);
 	}
 
-	public List<ThinDescVersioned> getDescriptions() throws DatabaseException {
+	public List<I_DescriptionVersioned> getDescriptions() throws DatabaseException {
 		return bean.getDescriptions();
 	}
 
-	public List<ThinDescTuple> getDescriptionTuples(IntSet allowedStatus, IntSet allowedTypes, Set<Position> positions) throws DatabaseException {
+	public List<I_DescriptionTuple> getDescriptionTuples(IntSet allowedStatus, IntSet allowedTypes, Set<Position> positions) throws DatabaseException {
 		return bean.getDescriptionTuples(allowedStatus, allowedTypes, positions);
 	}
 
-	public List<ThinRelVersioned> getDestRels() throws DatabaseException {
+	public List<I_RelVersioned> getDestRels() throws DatabaseException {
 		if (parentDepth > 0) {
-			return new ArrayList<ThinRelVersioned>();
+			return new ArrayList<I_RelVersioned>();
 		}
 		return bean.getDestRels();
 	}
 
-	public List<ThinRelTuple> getDestRelTuples(IntSet allowedStatus, 
+	public List<I_RelTuple> getDestRelTuples(IntSet allowedStatus, 
 			IntSet allowedTypes, Set<Position> positions, boolean addUncommitted) throws DatabaseException {
 		if (parentDepth > 0) {
-			return new ArrayList<ThinRelTuple>();
+			return new ArrayList<I_RelTuple>();
 		}
 		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
 	}
 
-	public List<ThinImageVersioned> getImages() throws DatabaseException {
+	public List<I_ImageVersioned> getImages() throws DatabaseException {
 		return bean.getImages();
 	}
 
@@ -87,11 +87,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getInitialText();
 	}
 
-	public List<ThinRelVersioned> getSourceRels() throws DatabaseException {
+	public List<I_RelVersioned> getSourceRels() throws DatabaseException {
 		return bean.getSourceRels();
 	}
 
-	public List<ThinRelTuple> getSourceRelTuples(IntSet allowedStatus, 
+	public List<I_RelTuple> getSourceRelTuples(IntSet allowedStatus, 
 			IntSet allowedTypes, Set<Position> positions, boolean addUncommitted) throws DatabaseException {
 		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
 	}
@@ -100,7 +100,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getUids();
 	}
 
-	public List<ThinImageVersioned> getUncommittedImages() {
+	public List<I_ImageVersioned> getUncommittedImages() {
 		return bean.getUncommittedImages();
 	}
 
@@ -140,28 +140,32 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return extraParentNodes;
 	}
 
-	public ThinConVersioned getUncommittedConcept() {
-		return bean.getUncommittedConcept();
+	public I_ConceptAttributeVersioned getUncommittedConceptAttributes() {
+		return bean.getUncommittedConceptAttributes();
 	}
 
-	public List<ThinDescVersioned> getUncommittedDescriptions() {
+	public List<I_DescriptionVersioned> getUncommittedDescriptions() {
 		return bean.getUncommittedDescriptions();
 	}
 
-	public List<ThinRelVersioned> getUncommittedSourceRels() {
+	public List<I_RelVersioned> getUncommittedSourceRels() {
 		return bean.getUncommittedSourceRels();
 	}
 
-	public ThinIdVersioned getId() throws DatabaseException {
+	public I_IdVersioned getId() throws DatabaseException {
 		return bean.getId();
 	}
 
-	public ThinDescTuple getDescTuple(AceFrameConfig config) throws DatabaseException {
+	public I_DescriptionTuple getDescTuple(AceFrameConfig config) throws DatabaseException {
 		return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
 	}
 
-	public ThinDescTuple getDescTuple(IntList prefOrder, AceFrameConfig config) throws DatabaseException {
+	public I_DescriptionTuple getDescTuple(IntList prefOrder, AceFrameConfig config) throws DatabaseException {
 		return bean.getDescTuple(prefOrder, config);
+	}
+
+	public IntSet getUncommittedIds() {
+		return bean.getUncommittedIds();
 	}
 	
 	/*

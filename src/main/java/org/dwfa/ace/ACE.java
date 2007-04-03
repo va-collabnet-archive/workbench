@@ -16,6 +16,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ import org.dwfa.ace.actions.ImportChangesetJar;
 import org.dwfa.ace.actions.SaveEnvironment;
 import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
@@ -81,7 +83,6 @@ import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.svn.CheckoutPanel;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.I_Transact;
 import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.TimePathId;
@@ -161,6 +162,14 @@ public class ACE extends JPanel implements PropertyChangeListener {
 						ActionEvent.ACTION_PERFORMED, null));
 			}
 		}
+	}
+	
+	private class StatusChangeListener implements PropertyChangeListener {
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			statusLabel.setText((String) evt.getNewValue());
+		}
+		
 	}
 
 	private class ManageBottomPaneActionListener implements ActionListener {
@@ -393,7 +402,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			return new Point(topPanel.getLocation().x, topPanel.getLocation().y
 					+ topPanel.getHeight() + 1);
 		}
-
 	}
 
 	/**
@@ -408,7 +416,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		super(new GridBagLayout());
 	}
 
-	public void setup(AceFrameConfig aceFrameConfig) throws DatabaseException {
+	public void setup(AceFrameConfig aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
 		this.aceFrameConfig = aceFrameConfig;
 		this.aceFrameConfig.addPropertyChangeListener(this);
 		searchPanel = new SearchPanel(aceFrameConfig);
@@ -432,6 +440,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridy++;
 		c.gridwidth = 2;
 		add(getBottomPanel(), c);
+		aceFrameConfig.addPropertyChangeListener("statusMessage", new StatusChangeListener());
 	}
 	
 	
@@ -499,7 +508,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		menuBar.add(fileMenu);
 	}
 
-	private JComponent getContentPanel() throws DatabaseException {
+	private JComponent getContentPanel() throws DatabaseException, IOException, ClassNotFoundException {
 		termTree = getHierarchyPanel();
 		/*
 		 * String htmlLabel = "<html><img src='" +
@@ -872,7 +881,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	protected void treeValueChanged(TreeSelectionEvent evt) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
 		String s = evt.isAddedPath() ? "Selected " + node : "";
-		statusLabel.setText(s);
+		aceFrameConfig.setStatusMessage(s);
 		if (node != null) {
 			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
 			.getUserObject();
@@ -911,7 +920,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		model.nodeStructureChanged(node);
 		model.setAsksAllowsChildren(true);
 
-		statusLabel.setText("Collapsed " + node);
+		aceFrameConfig.setStatusMessage("Collapsed " + node);
 		return userObject;
 	}
 
@@ -974,7 +983,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					.getUserObject();
 			if (userObject != null) {
 				aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
-				statusLabel.setText("Expanding " + node + "...");
+				aceFrameConfig.setStatusMessage("Expanding " + node + "...");
 				ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker(
 						(DefaultTreeModel) tree.getModel(), tree,
 						node, new CompareConceptBeanInitialText(), this);

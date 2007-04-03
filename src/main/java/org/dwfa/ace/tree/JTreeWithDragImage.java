@@ -34,12 +34,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
-import org.dwfa.vodb.types.ThinDescTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -109,9 +109,9 @@ public class JTreeWithDragImage extends JTree {
 		public Image getDragImage(I_GetConceptData obj)
 				throws DatabaseException {
 
-			ThinDescTuple desc = obj.getDescTuple(config
+			I_DescriptionTuple desc = obj.getDescTuple(config
 					.getTreeDescPreferenceList(), config);
-			JLabel dragLabel = TermLabelMaker.newLabel(desc, false, false);
+			JLabel dragLabel = TermLabelMaker.newLabel(desc, false, false).getLabel();
 			dragLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 			Image dragImage = createImage(dragLabel.getWidth(), dragLabel
 					.getHeight());

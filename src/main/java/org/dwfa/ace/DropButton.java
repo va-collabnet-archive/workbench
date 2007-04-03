@@ -4,7 +4,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 
-import org.dwfa.vodb.types.I_GetConceptData;
+import org.dwfa.ace.api.I_GetConceptData;
 
 public class DropButton extends JButton implements I_DoConceptDrop {
 

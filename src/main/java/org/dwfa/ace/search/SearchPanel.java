@@ -31,6 +31,7 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -38,7 +39,6 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class SearchPanel extends JPanel {
@@ -56,7 +56,7 @@ public class SearchPanel extends JPanel {
 			} else {
 				int selectedRow = lsm.getMinSelectionIndex();
 				int modelRow = sortingTable.modelIndex(selectedRow);
-				ThinDescTuple tuple = model.getDescription(modelRow);
+				I_DescriptionTuple tuple = model.getDescription(modelRow);
 				ConceptBean cb = ConceptBean.get(tuple.getConceptId());
 				for (I_ContainTermComponent l: linkedComponents) {
 					l.setTermComponent(cb);

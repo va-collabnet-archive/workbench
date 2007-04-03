@@ -16,9 +16,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -84,7 +84,7 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
 						.getUserObject().getClass())) {
 					ConceptBean cb = (ConceptBean) node
 							.getUserObject();
-					ThinDescTuple tdt = cb.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
+					I_DescriptionTuple tdt = cb.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
 					if (tdt != null) {
 						setText(tdt.getText());
 					} else {

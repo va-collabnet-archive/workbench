@@ -23,11 +23,11 @@ import javax.swing.tree.DefaultTreeModel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -202,11 +202,11 @@ public class LineagePlugin extends AbstractPlugin {
 			throws DatabaseException {
 		List<List<ConceptBean>> lineage = new ArrayList<List<ConceptBean>>();
 
-		List<ThinRelTuple> sourceRelTuples = bean.getSourceRelTuples(host.getConfig().getAllowedStatus(), 
+		List<I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(host.getConfig().getAllowedStatus(), 
 				host.getConfig().getDestRelTypes(), 
 				host.getConfig().getViewPositionSet(), false);
 		if ((sourceRelTuples.size() > 0) && (depth < 40)) {
-			for (ThinRelTuple rel : sourceRelTuples) {
+			for (I_RelTuple rel : sourceRelTuples) {
 				ConceptBean parent = ConceptBean.get(rel.getC2Id());
 				List<List<ConceptBean>> parentLineage = getLineage(parent,
 						depth + 1);

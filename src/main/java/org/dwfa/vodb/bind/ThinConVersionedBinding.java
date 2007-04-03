@@ -1,5 +1,7 @@
 package org.dwfa.vodb.bind;
 
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 
@@ -25,10 +27,10 @@ public class ThinConVersionedBinding extends TupleBinding {
 	}
 
 	public void objectToEntry(Object obj, TupleOutput to) {
-		ThinConVersioned versioned = (ThinConVersioned) obj;
+		I_ConceptAttributeVersioned versioned = (I_ConceptAttributeVersioned) obj;
 		to.writeInt(versioned.getConId());
 		to.writeInt(versioned.versionCount());
-		for (ThinConPart con: versioned.getVersions()) {
+		for (I_ConceptAttributePart con: versioned.getVersions()) {
 			to.writeInt(con.getPathId());
 			to.writeInt(con.getVersion());
 			to.writeInt(con.getConceptStatus());

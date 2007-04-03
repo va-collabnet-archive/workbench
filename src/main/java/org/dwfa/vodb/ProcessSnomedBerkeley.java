@@ -13,6 +13,10 @@ import java.util.logging.Logger;
 import org.dwfa.ace.IntSet;
 import org.dwfa.ace.activity.I_ShowActivity;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMEDExtension;
@@ -73,7 +77,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			
 			//See if the UUID generated a duplicate...
 			//Check to be sure the UUID generated from nameUUID is unique. 
-			ThinIdVersioned dup = vodb.getId(snomedUid);
+			I_IdVersioned dup = vodb.getId(snomedUid);
 			if (dup != null) {
 				boolean error = true;
 				if (dup.getTuples().size() == 1) {
@@ -101,7 +105,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			DatabaseEntry key = new DatabaseEntry(); 
 			intBinder.objectToEntry(newId, key);
 			DatabaseEntry value = new DatabaseEntry(); 
-			ThinIdVersioned idv = new ThinIdVersioned(newId, 2);
+			I_IdVersioned idv = new ThinIdVersioned(newId, 2);
 			//add 
 			ThinIdPart idPart = new ThinIdPart();
 			idPart.setIdStatus(currentId);
@@ -172,7 +176,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		Arrays.sort(releases);
 		while (relC.getNext(relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			totalRels++;
-			ThinRelVersioned vrel = (ThinRelVersioned) relBinder.entryToObject(relValue);
+			I_RelVersioned vrel = (I_RelVersioned) relBinder.entryToObject(relValue);
 			if (relsToIgnore.contains(vrel.getRelId()) == false) {
 				boolean addRetired = vrel.addRetiredRec(releases,
 						vodb.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
@@ -246,9 +250,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		intBinder.objectToEntry(getIntId((Long) conceptKey, releaseDate), key);
 		DatabaseEntry value = new DatabaseEntry(); 
 		
-		ThinConVersioned vcon;
+		I_ConceptAttributeVersioned vcon;
 		if (vodb.getConceptDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vcon = (ThinConVersioned) conBinder.entryToObject(value);
+			 vcon = (I_ConceptAttributeVersioned) conBinder.entryToObject(value);
 		} else {
 			vcon = new ThinConVersioned(getIntId((Long) conceptKey, releaseDate), 1);
 		}
@@ -288,6 +292,26 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			Object status, Object conceptId, String text, boolean capStatus,
 			Object typeInt, String lang) throws Exception {
 		
+		
+		text = new String(text.getBytes(), "UTF-8");
+		if (text.getBytes()[0] < 0) {
+			System.out.println("********\n" + text + "\n length: " + text.length());
+			for (byte b: text.getBytes()) {
+				System.out.print((int)b);
+				System.out.print(' ');
+			}
+			System.out.println("\n\nUTF 8:");
+			for (byte b: text.getBytes("UTF-8")) {
+				System.out.print((int)b);
+				System.out.print(' ');
+			}
+			System.out.println("\n\nUTF 16:");
+			for (char c: text.toCharArray()) {
+				System.out.print(c);
+				System.out.print(' ');
+			}
+			System.out.println();
+		}
 		ThinDescPart desc = new ThinDescPart();
 		desc.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
 		desc.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
@@ -301,9 +325,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		intBinder.objectToEntry(getIntId((Long) descriptionId, releaseDate), key);
 		DatabaseEntry value = new DatabaseEntry(); 
 		
-		ThinDescVersioned vdesc;
+		I_DescriptionVersioned vdesc;
 		if (vodb.getDescDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vdesc = (ThinDescVersioned) descBinder.entryToObject(value);
+			 vdesc = (I_DescriptionVersioned) descBinder.entryToObject(value);
 		} else {
 			vdesc = new ThinDescVersioned(getIntId((Long) descriptionId, releaseDate), 
 					getIntId((Long) conceptId, releaseDate), 1);
@@ -331,9 +355,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		DatabaseEntry key = new DatabaseEntry(); 
 		intBinder.objectToEntry(getIntId((Long) relID, releaseDate), key);
 		DatabaseEntry value = new DatabaseEntry(); 
-		ThinRelVersioned vrel;
+		I_RelVersioned vrel;
 		if (vodb.getRelDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vrel = (ThinRelVersioned) relBinder.entryToObject(value);
+			 vrel = (I_RelVersioned) relBinder.entryToObject(value);
 		} else {
 			vrel = new ThinRelVersioned(getIntId((Long) relID, releaseDate),
 					getIntId((Long) conceptOneID, releaseDate),

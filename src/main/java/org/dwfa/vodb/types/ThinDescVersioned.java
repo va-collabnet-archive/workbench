@@ -8,54 +8,69 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
-public class ThinDescVersioned {
+public class ThinDescVersioned implements I_DescriptionVersioned {
 	private int descId;
 
 	private int conceptId;
 
-	private List<ThinDescPart> versions;
+	private List<I_DescriptionPart> versions;
 
 	public ThinDescVersioned(int descId, int conceptId, int count) {
 		super();
 		this.descId = descId;
 		this.conceptId = conceptId;
-		this.versions = new ArrayList<ThinDescPart>(count);
+		this.versions = new ArrayList<I_DescriptionPart>(count);
 	}
 
-	public boolean addVersion(ThinDescPart desc) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#addVersion(org.dwfa.vodb.types.I_DescriptionPart)
+	 */
+	public boolean addVersion(I_DescriptionPart newPart) {
 		int index = versions.size() - 1;
 		if (index == -1) {
-			return versions.add(desc);
+			return versions.add(newPart);
 		} else if (index >= 0) {
-			ThinDescPart prevDesc = versions.get(index);
-			if (prevDesc.hasNewData(desc)) {
-				if (prevDesc.getText().equals(desc.getText())) {
-					desc.setText(prevDesc.getText());
+			I_DescriptionPart prevDesc = versions.get(index);
+			if (prevDesc.hasNewData(newPart)) {
+				if (prevDesc.getText().equals(newPart.getText())) {
+					newPart.setText(prevDesc.getText());
 				}
-				if (prevDesc.getLang().equals(desc.getLang())) {
-					desc.setLang(prevDesc.getLang());
+				if (prevDesc.getLang().equals(newPart.getLang())) {
+					newPart.setLang(prevDesc.getLang());
 				}
-				return versions.add(desc);
+				return versions.add(newPart);
 			}
 		}
 		return false;
 	}
 
-	public List<ThinDescPart> getVersions() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
+	 */
+	public List<I_DescriptionPart> getVersions() {
 		return versions;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#versionCount()
+	 */
 	public int versionCount() {
 		return versions.size();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#matches(java.util.regex.Pattern)
+	 */
 	public boolean matches(Pattern p) {
 		String lastText = null;
-		for (ThinDescPart desc : versions) {
+		for (I_DescriptionPart desc : versions) {
 			if (desc.getText() != lastText) {
 				lastText = desc.getText();
 				Matcher m = p.matcher(lastText);
@@ -74,7 +89,7 @@ public class ThinDescVersioned {
 		buff.append("\n     ConceptId: ");
 		buff.append(conceptId);
 		buff.append("\n");
-		for (ThinDescPart desl : versions) {
+		for (I_DescriptionPart desl : versions) {
 			buff.append("     ");
 			buff.append(desl.toString());
 			buff.append("\n");
@@ -83,37 +98,55 @@ public class ThinDescVersioned {
 		return buff.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getConceptId()
+	 */
 	public int getConceptId() {
 		return conceptId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getDescId()
+	 */
 	public int getDescId() {
 		return descId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTuples()
+	 */
 	public List<ThinDescTuple> getTuples() {
 		List<ThinDescTuple> tuples = new ArrayList<ThinDescTuple>();
-		for (ThinDescPart p : getVersions()) {
+		for (I_DescriptionPart p : getVersions()) {
 			tuples.add(new ThinDescTuple(this, p));
 		}
 		return tuples;
 	}
 
-	public ThinDescTuple getFirstTuple() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getFirstTuple()
+	 */
+	public I_DescriptionTuple getFirstTuple() {
 		return new ThinDescTuple(this, versions.get(0));
 	}
 
-	public ThinDescTuple getLastTuple() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getLastTuple()
+	 */
+	public I_DescriptionTuple getLastTuple() {
 		return new ThinDescTuple(this, versions.get(versions.size() - 1));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List)
+	 */
 	public void addTuples(IntSet allowedStatus, IntSet allowedTypes,
-			Set<Position> positions, List<ThinDescTuple> returnRels) {
-		Set<ThinDescPart> uncommittedParts = new HashSet<ThinDescPart>();
+			Set<Position> positions, List<I_DescriptionTuple> matchingTuples) {
+		Set<I_DescriptionPart> uncommittedParts = new HashSet<I_DescriptionPart>();
 		if (positions == null) {
-			List<ThinDescPart> addedParts = new ArrayList<ThinDescPart>();
-			Set<ThinDescPart> rejectedParts = new HashSet<ThinDescPart>();
-			for (ThinDescPart part : versions) {
+			List<I_DescriptionPart> addedParts = new ArrayList<I_DescriptionPart>();
+			Set<I_DescriptionPart> rejectedParts = new HashSet<I_DescriptionPart>();
+			for (I_DescriptionPart part : versions) {
 				if (part.getVersion() == Integer.MAX_VALUE) {
 					uncommittedParts.add(part);
 				} else {
@@ -130,9 +163,9 @@ public class ThinDescVersioned {
 					addedParts.add(part);
 				}
 			}
-			for (ThinDescPart part : addedParts) {
+			for (I_DescriptionPart part : addedParts) {
 				boolean addPart = true;
-				for (ThinDescPart reject : rejectedParts) {
+				for (I_DescriptionPart reject : rejectedParts) {
 					if ((part.getVersion() <= reject.getVersion())
 							&& (part.getPathId() == reject.getPathId())) {
 						addPart = false;
@@ -140,15 +173,15 @@ public class ThinDescVersioned {
 					}
 				}
 				if (addPart) {
-					returnRels.add(new ThinDescTuple(this, part));
+					matchingTuples.add(new ThinDescTuple(this, part));
 				}
 			}
 		} else {
-			Set<ThinDescPart> addedParts = new HashSet<ThinDescPart>();
+			Set<I_DescriptionPart> addedParts = new HashSet<I_DescriptionPart>();
 			for (Position position : positions) {
-				Set<ThinDescPart> rejectedParts = new HashSet<ThinDescPart>();
+				Set<I_DescriptionPart> rejectedParts = new HashSet<I_DescriptionPart>();
 				ThinDescTuple possible = null;
-				for (ThinDescPart part : versions) {
+				for (I_DescriptionPart part : versions) {
 					if (part.getVersion() == Integer.MAX_VALUE) {
 						uncommittedParts.add(part);
 						continue;
@@ -162,8 +195,9 @@ public class ThinDescVersioned {
 									.getMatchingPath(possible.getPathId());
 							Position possibleStatusPosition = new Position(
 									possible.getVersion(), possiblePath);
-							if (rejectedStatusPosition
-									.isSubsequentOrEqualTo(possibleStatusPosition)) {
+							if (rejectedStatusPosition.path != null && 
+									rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
+									position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
 								possible = null;
 							}
 						}
@@ -209,40 +243,47 @@ public class ThinDescVersioned {
 					Position possibleStatusPosition = new Position(possible
 							.getVersion(), possiblePath);
 					boolean addPart = true;
-					for (ThinDescPart reject : rejectedParts) {
+					for (I_DescriptionPart reject : rejectedParts) {
 						Position rejectedStatusPosition = new Position(reject
 								.getVersion(), position.getPath()
 								.getMatchingPath(reject.getPathId()));
-						if (rejectedStatusPosition
-								.isSubsequentOrEqualTo(possibleStatusPosition)) {
+						if (rejectedStatusPosition.path != null && 
+								rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
+								position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
 							addPart = false;
 							continue;
 						}
 					}
 					if (addPart) {
-						returnRels.add(possible);
+						matchingTuples.add(possible);
 					}
 				}
 			}
 		}
-		for (ThinDescPart p: uncommittedParts) {
-			returnRels.add(new ThinDescTuple(this, p));
+		for (I_DescriptionPart p: uncommittedParts) {
+			matchingTuples.add(new ThinDescTuple(this, p));
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
+	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		conceptId = jarToDbNativeMap.get(conceptId);
 		descId = jarToDbNativeMap.get(descId);
-		for (ThinDescPart p : versions) {
+		for (I_DescriptionPart p : versions) {
 			p.convertIds(jarToDbNativeMap);
 		}
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#merge(org.dwfa.vodb.types.ThinDescVersioned)
+	 */
 	public boolean merge(ThinDescVersioned jarDesc) {
-		HashSet<ThinDescPart> versionSet = new HashSet<ThinDescPart>(versions);
+		HashSet<I_DescriptionPart> versionSet = new HashSet<I_DescriptionPart>(versions);
 		boolean changed = false;
-		for (ThinDescPart jarPart : jarDesc.versions) {
+		for (I_DescriptionPart jarPart : jarDesc.versions) {
 			if (!versionSet.contains(jarPart)) {
 				changed = true;
 				versions.add(jarPart);
@@ -252,9 +293,12 @@ public class ThinDescVersioned {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTimePathSet()
+	 */
 	public Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (ThinDescPart p : versions) {
+		for (I_DescriptionPart p : versions) {
 			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
 		}
 		return tpSet;
@@ -271,8 +315,11 @@ public class ThinDescVersioned {
 		return descId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#toLocalFixedDesc()
+	 */
 	public I_DescribeConceptLocally toLocalFixedDesc() {
-		ThinDescPart part = versions.get(versions.size()-1);
+		I_DescriptionPart part = versions.get(versions.size()-1);
 		return new LocalFixedDesc(descId, part.getStatusId(), conceptId,
 				part.getInitialCaseSignificant(), part.getTypeId(), part.getText(),
 				part.getLang());

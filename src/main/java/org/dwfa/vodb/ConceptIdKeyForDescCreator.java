@@ -1,7 +1,7 @@
 package org.dwfa.vodb;
 
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.vodb.bind.ThinDescVersionedBinding;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 import com.sleepycat.bind.EntryBinding;
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -70,7 +70,7 @@ public class ConceptIdKeyForDescCreator implements SecondaryKeyCreator {
             DatabaseEntry dataEntry,
             DatabaseEntry resultEntry)
 			throws DatabaseException {
-		ThinDescVersioned desc = (ThinDescVersioned) descBinding.entryToObject(dataEntry);
+		I_DescriptionVersioned desc = (I_DescriptionVersioned) descBinding.entryToObject(dataEntry);
 		int descId = (Integer) intBinder.entryToObject(keyEntry);
 		descAndConceptId.setConId(desc.getConceptId());
 		descAndConceptId.setDescId(descId);

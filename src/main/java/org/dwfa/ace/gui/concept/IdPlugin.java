@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
@@ -10,7 +11,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -117,17 +117,19 @@ public class IdPlugin extends AbstractPlugin {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		idPanel.add(rowAddAfter, c);
-		// rowAddAfter.addActionListener(new AddConceptPart(this));
+		JPanel filler = new JPanel();
+		filler.setMaximumSize(new Dimension(40, 32));
+		filler.setMinimumSize(new Dimension(40, 32));
+		filler.setPreferredSize(new Dimension(40, 32));
+		idPanel.add(filler, c);
 		c.gridheight = 1;
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(idTableModel);
 		idTable = new JTableWithDragImage(sortingTable);
+		/*
 		idTable.addMouseListener(idTableModel.makePopupListener(idTable,
 				host.getConfig()));
-
+		*/
 		idTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortingTable.setTableHeader(idTable.getTableHeader());
 

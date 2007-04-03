@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StreamTokenizer;
 import java.nio.charset.Charset;
@@ -103,13 +104,16 @@ public abstract class ProcessSnomed extends ProcessSources {
 			
 			cleanup(oldRelSet.getIntSet());
 	}
+	boolean processConcepts = true;
+	boolean processRels = true;
+	boolean processDescriptions = true;
 	
-	public void execute(JarFile constantJar) throws Exception {
+	public void execute(JarFile snomedJar) throws Exception {
 		MakeRelSet oldRelSet = new MakeRelSet();
 		iterateRelationships(oldRelSet);
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Enumeration<JarEntry> jarEnum = constantJar.entries();
+		Enumeration<JarEntry> jarEnum = snomedJar.entries();
 		while (jarEnum.hasMoreElements()) {
 			JarEntry je = jarEnum.nextElement();
 			if (je.getName().startsWith("org/snomed/") &&
@@ -118,23 +122,24 @@ public abstract class ProcessSnomed extends ProcessSources {
 				int endIndex = startIndex + "yyyy-MM-dd".length();
 				Date releaseDate = dateFormat.parse(je.getName().substring(startIndex, endIndex));
 				addReleaseDate(releaseDate);
-				getLog().info(je.getName());
-				if (je.getName().contains("concepts")) {
+				getLog().info(" processing: " + je.getName());
+				if (processConcepts && je.getName().contains("concepts")) {
 					InputStreamReader isr = new InputStreamReader(
-							constantJar.getInputStream(je), Charset.forName("UTF-8"));
+							snomedJar.getInputStream(je), Charset.forName("UTF-8"));
 					readConcepts(isr, releaseDate);
 					isr.close();
-				} else if (je.getName().contains("descriptions")) {
+				} else if (processDescriptions && je.getName().contains("descriptions")) {
+					InputStream is = snomedJar.getInputStream(je);
 					InputStreamReader isr = new InputStreamReader(
-							constantJar.getInputStream(je), Charset.forName("UTF-8"));
+							is, Charset.forName("UTF-8"));
 					readDescriptions(new InputStreamReader(
-							constantJar.getInputStream(je)), releaseDate);
+							snomedJar.getInputStream(je)), releaseDate);
 					isr.close();
-				} else if (je.getName().contains("relationships")) {
+				} else if (processRels && je.getName().contains("relationships")) {
 					InputStreamReader isr = new InputStreamReader(
-							constantJar.getInputStream(je), Charset.forName("UTF-8"));
+							snomedJar.getInputStream(je), Charset.forName("UTF-8"));
 					readRelationships(new InputStreamReader(
-							constantJar.getInputStream(je)), releaseDate);
+							snomedJar.getInputStream(je)), releaseDate);
 					isr.close();
 				}
 			}

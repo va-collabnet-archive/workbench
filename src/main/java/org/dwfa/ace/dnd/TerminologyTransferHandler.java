@@ -25,6 +25,9 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
@@ -40,10 +43,8 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.ThinDescTuple;
 import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -124,7 +125,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 				StringWithRelTuple swrt = (StringWithRelTuple) rtm.getValueAt(
 						termTable.getSelectedRow(), termTable
 								.getSelectedColumn());
-				ThinRelTuple rel = swrt.getTuple();
+				I_RelTuple rel = swrt.getTuple();
 				TableColumn column = termTable.getColumnModel().getColumn(
 						termTable.getSelectedColumn());
 				REL_FIELD columnDesc = (REL_FIELD) column.getIdentifier();
@@ -162,7 +163,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 					StringWithDescTuple swdt = (StringWithDescTuple) dtm
 							.getValueAt(termTable.getSelectedRow(), termTable
 									.getSelectedColumn());
-					ThinDescTuple desc = swdt.getTuple();
+					I_DescriptionTuple desc = swdt.getTuple();
 					TableColumn column = termTable.getColumnModel().getColumn(
 							termTable.getSelectedColumn());
 					DESC_FIELD columnDesc = (DESC_FIELD) column.getIdentifier();

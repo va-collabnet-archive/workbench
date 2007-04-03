@@ -28,12 +28,12 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_AmTermComponent;
-import org.dwfa.vodb.types.ThinDescTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -166,7 +166,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 			if (ConceptBean.class.isAssignableFrom(termComponent.getClass())) {
 				ConceptBean cb = (ConceptBean) termComponent;
 				try {
-					ThinDescTuple desc = cb.getDescTuple(config.getLongLabelDescPreferenceList(),  config);
+					I_DescriptionTuple desc = cb.getDescTuple(config.getLongLabelDescPreferenceList(),  config);
 					if (desc != null) {
 						this.setText(desc.getText());
 					} else {

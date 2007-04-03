@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -53,7 +55,7 @@ public class AddImage extends AddComponent {
 				size = size - read;
 				read = fis.read(image, read, size);
 			}
-			List<ThinImagePart> parts = new ArrayList<ThinImagePart>(1);
+			List<I_ImagePart> parts = new ArrayList<I_ImagePart>(1);
 			for (Path p : termContainer.getConfig().getEditingPathSet()) {
 				ThinImagePart imagePart = new ThinImagePart();
 				imagePart.setStatusId(AceConfig.vodb
@@ -107,10 +109,10 @@ public class AddImage extends AddComponent {
 		imagePart.setTextDescription("Semiotic Triangle with Circle");
 		imagePart.setTypeId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
 				.getUids()));
-		List<ThinImagePart> parts = new ArrayList<ThinImagePart>(1);
+		List<I_ImagePart> parts = new ArrayList<I_ImagePart>(1);
 		parts.add(imagePart);
 
-		ThinImageVersioned imageCore = new ThinImageVersioned(nativeImageId,
+		I_ImageVersioned imageCore = new ThinImageVersioned(nativeImageId,
 				image, parts, ".gif", nativeConceptId);
 		vodb.writeImage(imageCore);
 

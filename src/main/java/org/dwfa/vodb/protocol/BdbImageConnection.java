@@ -7,15 +7,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ThinImageVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
 public class BdbImageConnection extends URLConnection {
 
-	ThinImageVersioned image;
+	I_ImageVersioned image;
 	protected BdbImageConnection(URL url) {
 		super(url);
 	}

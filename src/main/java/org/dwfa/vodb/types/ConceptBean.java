@@ -1,9 +1,5 @@
 package org.dwfa.vodb.types;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,21 +9,29 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.dwfa.ace.IntList;
 import org.dwfa.ace.IntSet;
-import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.ConflictPanel.ConflictColors;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;
@@ -66,25 +70,25 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	private int conceptId;
 
-	private ThinIdVersioned id;
+	private I_IdVersioned id;
 
-	private ThinConVersioned concept;
+	private I_ConceptAttributeVersioned conceptAttributes;
 
-	private List<ThinDescVersioned> descriptions;
+	private List<I_DescriptionVersioned> descriptions;
 
-	private List<ThinRelVersioned> sourceRels;
+	private List<I_RelVersioned> sourceRels;
 
-	private List<ThinRelVersioned> destRels;
+	private List<I_RelVersioned> destRels;
 
-	private List<ThinImageVersioned> images;
+	private List<I_ImageVersioned> images;
 
-	private List<ThinImageVersioned> uncommittedImages;
+	private List<I_ImageVersioned> uncommittedImages;
 
-	private List<ThinRelVersioned> uncommittedSourceRels;
+	private List<I_RelVersioned> uncommittedSourceRels;
 
-	private List<ThinDescVersioned> uncommittedDescriptions;
+	private List<I_DescriptionVersioned> uncommittedDescriptions;
 
-	private ThinConVersioned uncommittedConcept;
+	private I_ConceptAttributeVersioned uncommittedConceptAttributes;
 
 	private IntSet uncommittedIds;
 
@@ -100,11 +104,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * 
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getConcept()
 	 */
-	public ThinConVersioned getConcept() throws DatabaseException {
-		if (concept == null) {
-			concept = AceConfig.vodb.getConcept(conceptId);
+	public I_ConceptAttributeVersioned getConceptAttributes() throws DatabaseException {
+		if (conceptAttributes == null) {
+			conceptAttributes = AceConfig.vodb.getConcept(conceptId);
 		}
-		return concept;
+		return conceptAttributes;
 	}
 
 	/*
@@ -122,9 +126,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet,
 	 *      java.util.Set)
 	 */
-	public List<ThinConTuple> getConceptTuples(IntSet allowedStatus,
-			Set<Position> positions) {
-		throw new UnsupportedOperationException();
+	public List<I_ConceptAttributeTuple> getConceptTuples(IntSet allowedStatus,
+			Set<Position> positions) throws DatabaseException {
+		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
+		getConceptAttributes().addTuples(allowedStatus, positions, returnTuples);
+		return returnTuples;
 	}
 
 	/*
@@ -133,11 +139,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptionTuples(org.dwfa.ace.IntSet,
 	 *      org.dwfa.ace.IntSet, java.util.Set)
 	 */
-	public List<ThinDescTuple> getDescriptionTuples(IntSet allowedStatus,
+	public List<I_DescriptionTuple> getDescriptionTuples(IntSet allowedStatus,
 			IntSet allowedTypes, Set<Position> positions)
 			throws DatabaseException {
-		List<ThinDescTuple> returnRels = new ArrayList<ThinDescTuple>();
-		for (ThinDescVersioned desc : getDescriptions()) {
+		List<I_DescriptionTuple> returnRels = new ArrayList<I_DescriptionTuple>();
+		for (I_DescriptionVersioned desc : getDescriptions()) {
 			desc.addTuples(allowedStatus, allowedTypes, positions, returnRels);
 		}
 		return returnRels;
@@ -149,11 +155,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRelTuples(org.dwfa.ace.IntSet,
 	 *      org.dwfa.ace.IntSet, java.util.Set)
 	 */
-	public List<ThinRelTuple> getSourceRelTuples(IntSet allowedStatus,
+	public List<I_RelTuple> getSourceRelTuples(IntSet allowedStatus,
 			IntSet allowedTypes, Set<Position> positions, boolean addUncommitted)
 			throws DatabaseException {
-		List<ThinRelTuple> returnRels = new ArrayList<ThinRelTuple>();
-		for (ThinRelVersioned rel : getSourceRels()) {
+		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+		for (I_RelVersioned rel : getSourceRels()) {
 			rel.addTuples(allowedStatus, allowedTypes, positions, returnRels,
 					addUncommitted);
 		}
@@ -166,11 +172,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getDestRelTuples(org.dwfa.ace.IntSet,
 	 *      org.dwfa.ace.IntSet, java.util.Set)
 	 */
-	public List<ThinRelTuple> getDestRelTuples(IntSet allowedStatus,
+	public List<I_RelTuple> getDestRelTuples(IntSet allowedStatus,
 			IntSet allowedTypes, Set<Position> positions, boolean addUncommitted)
 			throws DatabaseException {
-		List<ThinRelTuple> returnRels = new ArrayList<ThinRelTuple>();
-		for (ThinRelVersioned rel : getDestRels()) {
+		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+		for (I_RelVersioned rel : getDestRels()) {
 			/*
 			 * if ((conceptId == -2147444184) && (rel.getC1Id() == -2147326003)) {
 			 * System.out.println("getSourceRelTuples for SNOMED CT Concept"); }
@@ -186,7 +192,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * 
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptions()
 	 */
-	public List<ThinDescVersioned> getDescriptions() throws DatabaseException {
+	public List<I_DescriptionVersioned> getDescriptions() throws DatabaseException {
 		if (descriptions == null) {
 			descriptions = AceConfig.vodb.getDescriptions(conceptId);
 		}
@@ -198,7 +204,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * 
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getDestRels()
 	 */
-	public List<ThinRelVersioned> getDestRels() throws DatabaseException {
+	public List<I_RelVersioned> getDestRels() throws DatabaseException {
 		if (destRels == null) {
 			destRels = AceConfig.vodb.getDestRels(conceptId);
 		}
@@ -210,7 +216,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * 
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRels()
 	 */
-	public List<ThinRelVersioned> getSourceRels() throws DatabaseException {
+	public List<I_RelVersioned> getSourceRels() throws DatabaseException {
 		if (sourceRels == null) {
 			sourceRels = AceConfig.vodb.getSrcRels(conceptId);
 		}
@@ -235,10 +241,10 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 */
 	public String getInitialText() throws DatabaseException {
 		try {
-			List<ThinDescVersioned> localDesc = getDescriptions();
-			ThinDescVersioned tdv = localDesc.get(0);
-			List<ThinDescPart> versions = tdv.getVersions();
-			ThinDescPart first = versions.get(0);
+			List<I_DescriptionVersioned> localDesc = getDescriptions();
+			I_DescriptionVersioned tdv = localDesc.get(0);
+			List<I_DescriptionPart> versions = tdv.getVersions();
+			I_DescriptionPart first = versions.get(0);
 			return first.getText();
 		} catch (IndexOutOfBoundsException e) {
 			return "No desc for: " + conceptId;
@@ -290,9 +296,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			Set<Position> positions, boolean addUncommitted)
 			throws DatabaseException {
 		if (destRelTypes.getSetValues().length > 0) {
-			List<ThinRelTuple> returnRels = new ArrayList<ThinRelTuple>();
+			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 			if (destRels != null) {
-				for (ThinRelVersioned rel : destRels) {
+				for (I_RelVersioned rel : destRels) {
 					rel.addTuples(allowedStatus, destRelTypes, positions,
 							returnRels, addUncommitted);
 					if (returnRels.size() > 0) {
@@ -311,9 +317,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			IntSet sourceRelTypes, Set<Position> positions,
 			boolean addUncommitted) throws DatabaseException {
 		if (sourceRelTypes.getSetValues().length > 0) {
-			List<ThinRelTuple> returnRels = new ArrayList<ThinRelTuple>();
+			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 			if (sourceRels != null) {
-				for (ThinRelVersioned rel : sourceRels) {
+				for (I_RelVersioned rel : sourceRels) {
 					rel.addTuples(allowedStatus, sourceRelTypes, positions,
 							returnRels, addUncommitted);
 					if (returnRels.size() > 0) {
@@ -333,16 +339,16 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * 
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getImages()
 	 */
-	public List<ThinImageVersioned> getImages() throws DatabaseException {
+	public List<I_ImageVersioned> getImages() throws DatabaseException {
 		if (images == null) {
 			images = AceConfig.vodb.getImages(conceptId);
 		}
 		return images;
 	}
 
-	public List<ThinImageVersioned> getUncommittedImages() {
+	public List<I_ImageVersioned> getUncommittedImages() {
 		if (uncommittedImages == null) {
-			uncommittedImages = new ArrayList<ThinImageVersioned>();
+			uncommittedImages = new ArrayList<I_ImageVersioned>();
 		}
 		return uncommittedImages;
 	}
@@ -373,9 +379,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			throws DatabaseException {
 		// handle the parts first...
 		if (images != null) {
-			for (ThinImageVersioned image : images) {
+			for (I_ImageVersioned image : images) {
 				boolean changed = false;
-				for (ThinImagePart p : image.getVersions()) {
+				for (I_ImagePart p : image.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -387,8 +393,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			}
 		}
-		if (concept != null) {
-			for (ThinConPart p : concept.getVersions()) {
+		if (conceptAttributes != null) {
+			for (I_ConceptAttributePart p : conceptAttributes.getVersions()) {
 				boolean changed = false;
 				if (p.getVersion() == Integer.MAX_VALUE) {
 					p.setVersion(version);
@@ -396,14 +402,14 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					changed = true;
 				}
 				if (changed) {
-					AceConfig.vodb.writeConcept(concept);
+					AceConfig.vodb.writeConcept(conceptAttributes);
 				}
 			}
 		}
 		if (descriptions != null) {
-			for (ThinDescVersioned desc : descriptions) {
+			for (I_DescriptionVersioned desc : descriptions) {
 				boolean changed = false;
-				for (ThinDescPart p : desc.getVersions()) {
+				for (I_DescriptionPart p : desc.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -416,9 +422,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		}
 		if (sourceRels != null) {
-			for (ThinRelVersioned rel : sourceRels) {
+			for (I_RelVersioned rel : sourceRels) {
 				boolean changed = false;
-				for (ThinRelPart p : rel.getVersions()) {
+				for (I_RelPart p : rel.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -433,8 +439,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		destRels = null;
 
 		if (uncommittedImages != null) {
-			for (ThinImageVersioned image : uncommittedImages) {
-				for (ThinImagePart p : image.getVersions()) {
+			for (I_ImageVersioned image : uncommittedImages) {
+				for (I_ImagePart p : image.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -445,20 +451,20 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			uncommittedImages = null;
 			images = null;
 		}
-		if (uncommittedConcept != null) {
-			for (ThinConPart p : uncommittedConcept.getVersions()) {
+		if (uncommittedConceptAttributes != null) {
+			for (I_ConceptAttributePart p : uncommittedConceptAttributes.getVersions()) {
 				if (p.getVersion() == Integer.MAX_VALUE) {
 					p.setVersion(version);
 					values.add(new TimePathId(version, p.getPathId()));
 				}
 			}
-			AceConfig.vodb.writeConcept(uncommittedConcept);
-			uncommittedConcept = null;
-			concept = null;
+			AceConfig.vodb.writeConcept(uncommittedConceptAttributes);
+			uncommittedConceptAttributes = null;
+			conceptAttributes = null;
 		}
 		if (uncommittedDescriptions != null) {
-			for (ThinDescVersioned desc : uncommittedDescriptions) {
-				for (ThinDescPart p : desc.getVersions()) {
+			for (I_DescriptionVersioned desc : uncommittedDescriptions) {
+				for (I_DescriptionPart p : desc.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -470,8 +476,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			descriptions = null;
 		}
 		if (uncommittedSourceRels != null) {
-			for (ThinRelVersioned rel : uncommittedSourceRels) {
-				for (ThinRelPart p : rel.getVersions()) {
+			for (I_RelVersioned rel : uncommittedSourceRels) {
+				for (I_RelPart p : rel.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -484,8 +490,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		if (uncommittedIds != null) {
 			for (int id : uncommittedIds.getSetValues()) {
-				ThinIdVersioned idv = AceConfig.vodb.getId(id);
-				for (ThinIdPart p : idv.getVersions()) {
+				I_IdVersioned idv = AceConfig.vodb.getId(id);
+				for (I_IdPart p : idv.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
@@ -503,7 +509,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 */
 	public void abort() throws DatabaseException {
 		// remove uncommitted brand new components...
-		uncommittedConcept = null;
+		uncommittedConceptAttributes = null;
 		uncommittedDescriptions = null;
 		uncommittedSourceRels = null;
 		uncommittedImages = null;
@@ -511,10 +517,10 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (uncommittedIds != null) {
 			boolean delete = true;
 			for (int id : uncommittedIds.getSetValues()) {
-				ThinIdVersioned idv = AceConfig.vodb.getId(id);
-				for (ListIterator<ThinIdPart> itr = idv.getVersions()
+				I_IdVersioned idv = AceConfig.vodb.getId(id);
+				for (ListIterator<I_IdPart> itr = idv.getVersions()
 						.listIterator(); itr.hasNext();) {
-					ThinIdPart p = itr.next();
+					I_IdPart p = itr.next();
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						itr.remove();
 					} else {
@@ -531,48 +537,48 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 
 		// remove uncommitted parts...
-		for (ListIterator<ThinConPart> partItr = concept.getVersions()
+		for (ListIterator<I_ConceptAttributePart> partItr = conceptAttributes.getVersions()
 				.listIterator(); partItr.hasNext();) {
-			ThinConPart part = partItr.next();
+			I_ConceptAttributePart part = partItr.next();
 			if (part.getVersion() == Integer.MAX_VALUE) {
 				partItr.remove();
 			}
 		}
 
-		for (ThinDescVersioned desc : descriptions) {
-			for (ListIterator<ThinDescPart> partItr = desc.getVersions()
+		for (I_DescriptionVersioned desc : descriptions) {
+			for (ListIterator<I_DescriptionPart> partItr = desc.getVersions()
 					.listIterator(); partItr.hasNext();) {
-				ThinDescPart part = partItr.next();
+				I_DescriptionPart part = partItr.next();
 				if (part.getVersion() == Integer.MAX_VALUE) {
 					partItr.remove();
 				}
 			}
 		}
 
-		for (ThinRelVersioned srcRel : sourceRels) {
-			for (ListIterator<ThinRelPart> partItr = srcRel.getVersions()
+		for (I_RelVersioned srcRel : sourceRels) {
+			for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
 					.listIterator(); partItr.hasNext();) {
-				ThinRelPart part = partItr.next();
+				I_RelPart part = partItr.next();
 				if (part.getVersion() == Integer.MAX_VALUE) {
 					partItr.remove();
 				}
 			}
 		}
 
-		for (ThinRelVersioned srcRel : destRels) {
-			for (ListIterator<ThinRelPart> partItr = srcRel.getVersions()
+		for (I_RelVersioned srcRel : destRels) {
+			for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
 					.listIterator(); partItr.hasNext();) {
-				ThinRelPart part = partItr.next();
+				I_RelPart part = partItr.next();
 				if (part.getVersion() == Integer.MAX_VALUE) {
 					partItr.remove();
 				}
 			}
 		}
 
-		for (ThinImageVersioned img : images) {
-			for (ListIterator<ThinImagePart> partItr = img.getVersions()
+		for (I_ImageVersioned img : images) {
+			for (ListIterator<I_ImagePart> partItr = img.getVersions()
 					.listIterator(); partItr.hasNext();) {
-				ThinImagePart part = partItr.next();
+				I_ImagePart part = partItr.next();
 				if (part.getVersion() == Integer.MAX_VALUE) {
 					partItr.remove();
 				}
@@ -622,30 +628,30 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return beanList;
 	}
 
-	public ThinConVersioned getUncommittedConcept() {
-		return uncommittedConcept;
+	public I_ConceptAttributeVersioned getUncommittedConceptAttributes() {
+		return uncommittedConceptAttributes;
 	}
 
-	public void setUncommittedConcept(ThinConVersioned uncommittedConcept) {
-		this.uncommittedConcept = uncommittedConcept;
+	public void setUncommittedConceptAttributes(I_ConceptAttributeVersioned uncommittedConcept) {
+		this.uncommittedConceptAttributes = uncommittedConcept;
 	}
 
-	public List<ThinDescVersioned> getUncommittedDescriptions() {
+	public List<I_DescriptionVersioned> getUncommittedDescriptions() {
 		if (uncommittedDescriptions == null) {
-			uncommittedDescriptions = new ArrayList<ThinDescVersioned>();
+			uncommittedDescriptions = new ArrayList<I_DescriptionVersioned>();
 		}
 		return uncommittedDescriptions;
 	}
 
-	public List<ThinRelVersioned> getUncommittedSourceRels() {
+	public List<I_RelVersioned> getUncommittedSourceRels() {
 		if (uncommittedSourceRels == null) {
-			uncommittedSourceRels = new ArrayList<ThinRelVersioned>();
+			uncommittedSourceRels = new ArrayList<I_RelVersioned>();
 		}
 		return uncommittedSourceRels;
 	}
 
-	public ThinRelVersioned getSourceRel(int id) throws DatabaseException {
-		for (ThinRelVersioned r : getSourceRels()) {
+	public I_RelVersioned getSourceRel(int id) throws DatabaseException {
+		for (I_RelVersioned r : getSourceRels()) {
 			if (r.getRelId() == id) {
 				return r;
 			}
@@ -653,8 +659,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return null;
 	}
 
-	public ThinRelVersioned getDestRel(int id) throws DatabaseException {
-		for (ThinRelVersioned r : getDestRels()) {
+	public I_RelVersioned getDestRel(int id) throws DatabaseException {
+		for (I_RelVersioned r : getDestRels()) {
 			if (r.getRelId() == id) {
 				return r;
 			}
@@ -662,174 +668,69 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return null;
 	}
 
-	public List<JLabel> getCommonLabels(boolean showLongForm,
-			boolean showStatus, AceFrameConfig config) throws DatabaseException {
-		List<JLabel> labelList = new ArrayList<JLabel>();
-		Set<ThinDescTuple> commonDescTuples = getCommonDescTuples(config);
-
-		if (commonDescTuples != null) {
-			for (ThinDescTuple t : commonDescTuples) {
-				JLabel descLabel = TermLabelMaker.newLabel(t, showLongForm,
-						showStatus);
-				setBorder(descLabel, null);
-				labelList.add(descLabel);
-			}
-		}
-		Set<ThinRelTuple> commonRelTuples = getCommonRelTuples(config);
-		if (commonRelTuples != null) {
-			for (ThinRelTuple t : commonRelTuples) {
-				JLabel relLabel = TermLabelMaker.newLabel(t, showLongForm,
-						showStatus);
-				setBorder(relLabel, null);
-				labelList.add(relLabel);
-			}
-		}
-
-		return labelList;
-	}
-
-	private Set<ThinDescTuple> getCommonDescTuples(AceFrameConfig config)
+	public Set<I_DescriptionTuple> getCommonDescTuples(AceFrameConfig config)
 			throws DatabaseException {
-		Set<ThinDescTuple> commonTuples = null;
+		Set<I_DescriptionTuple> commonTuples = null;
 		for (Position p : config.getViewPositionSet()) {
 			Set<Position> positionSet = new HashSet<Position>();
 			positionSet.add(p);
-			List<ThinDescTuple> tuplesForPosition = getDescriptionTuples(config
+			List<I_DescriptionTuple> tuplesForPosition = getDescriptionTuples(config
 					.getAllowedStatus(), null, positionSet);
 			if (commonTuples == null) {
-				commonTuples = new HashSet<ThinDescTuple>();
+				commonTuples = new HashSet<I_DescriptionTuple>();
 				commonTuples.addAll(tuplesForPosition);
 			} else {
 				commonTuples.retainAll(tuplesForPosition);
 			}
 		}
 		if (commonTuples == null) {
-			commonTuples = new HashSet<ThinDescTuple>();
+			commonTuples = new HashSet<I_DescriptionTuple>();
 		}
 		return commonTuples;
 	}
 
-	private Set<ThinRelTuple> getCommonRelTuples(AceFrameConfig config)
+	public Set<I_RelTuple> getCommonRelTuples(AceFrameConfig config)
 			throws DatabaseException {
-		Set<ThinRelTuple> commonTuples = null;
+		Set<I_RelTuple> commonTuples = null;
 		for (Position p : config.getViewPositionSet()) {
 			Set<Position> positionSet = new HashSet<Position>();
 			positionSet.add(p);
-			List<ThinRelTuple> tuplesForPosition = getSourceRelTuples(config
+			List<I_RelTuple> tuplesForPosition = getSourceRelTuples(config
 					.getAllowedStatus(), null, positionSet, false);
 			if (commonTuples == null) {
-				commonTuples = new HashSet<ThinRelTuple>();
+				commonTuples = new HashSet<I_RelTuple>();
 				commonTuples.addAll(tuplesForPosition);
 			} else {
 				commonTuples.retainAll(tuplesForPosition);
 			}
 		}
 		if (commonTuples == null) {
-			commonTuples = new HashSet<ThinRelTuple>();
+			commonTuples = new HashSet<I_RelTuple>();
 		}
 		return commonTuples;
 	}
 
-	public Collection<JLabel> getConflictingLabels(boolean showLongForm,
-			boolean showStatus, AceFrameConfig config, ConflictColors colors,
-			Map<ThinDescTuple, Color> descColorMap,
-			Map<ThinRelTuple, Color> relColorMap) throws DatabaseException {
-		Set<ThinDescTuple> allDescTuples = new HashSet<ThinDescTuple>();
-		Set<ThinRelTuple> allRelTuples = new HashSet<ThinRelTuple>();
+	public Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(AceFrameConfig config) throws DatabaseException {
+		Set<I_ConceptAttributeTuple> commonTuples = null;
 		for (Position p : config.getViewPositionSet()) {
 			Set<Position> positionSet = new HashSet<Position>();
 			positionSet.add(p);
-			List<ThinDescTuple> descTuplesForPosition = getDescriptionTuples(
-					config.getAllowedStatus(), null, positionSet);
-			allDescTuples.addAll(descTuplesForPosition);
-			List<ThinRelTuple> relTuplesForPosition = getSourceRelTuples(config
-					.getAllowedStatus(), null, positionSet, false);
-			allRelTuples.addAll(relTuplesForPosition);
+			List<I_ConceptAttributeTuple> tuplesForPosition = getConceptTuples(config
+					.getAllowedStatus(), positionSet);
+			if (commonTuples == null) {
+				commonTuples = new HashSet<I_ConceptAttributeTuple>();
+				commonTuples.addAll(tuplesForPosition);
+			} else {
+				commonTuples.retainAll(tuplesForPosition);
+			}
 		}
-		Set<ThinDescTuple> commonDescTuples = getCommonDescTuples(config);
-		allDescTuples.removeAll(commonDescTuples);
-
-		Set<ThinRelTuple> commonRelTuples = getCommonRelTuples(config);
-		allRelTuples.removeAll(commonRelTuples);
-
-		Collection<JLabel> labelList = new ArrayList<JLabel>(allDescTuples
-				.size());
-
-		for (ThinDescTuple t : allDescTuples) {
-			JLabel descLabel = TermLabelMaker.newLabel(t, showLongForm,
-					showStatus);
-			Color conflictColor = colors.getColor();
-			descColorMap.put(t, conflictColor);
-			setBorder(descLabel, conflictColor);
-			labelList.add(descLabel);
+		if (commonTuples == null) {
+			commonTuples = new HashSet<I_ConceptAttributeTuple>();
 		}
-		for (ThinRelTuple t : allRelTuples) {
-			JLabel relLabel = TermLabelMaker.newLabel(t, showLongForm,
-					showStatus);
-			Color conflictColor = colors.getColor();
-			relColorMap.put(t, conflictColor);
-			setBorder(relLabel, conflictColor);
-			labelList.add(relLabel);
-		}
-
-		return labelList;
+		return commonTuples;
 	}
 
-	public JPanel getVersionView(Position p, AceFrameConfig config,
-			Map<ThinDescTuple, Color> desColorMap,
-			Map<ThinRelTuple, Color> relColorMap) throws DatabaseException {
-		JPanel versionView = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.gridx = 0;
-		c.gridy = 0;
-		Set<Position> posSet = new HashSet<Position>(1);
-		posSet.add(p);
-		List<ThinDescTuple> descList = getDescriptionTuples(config
-				.getAllowedStatus(), null, posSet);
-		for (ThinDescTuple t : descList) {
-			JLabel tLabel = TermLabelMaker.newLabel(t, false, false);
-			Color conflictColor = desColorMap.get(t);
-			setBorder(tLabel, conflictColor);
-			versionView.add(tLabel, c);
-			c.gridy++;
-		}
-		List<ThinRelTuple> relList = getSourceRelTuples(config
-				.getAllowedStatus(), null, posSet, false);
-		for (ThinRelTuple t : relList) {
-			JLabel tLabel = TermLabelMaker.newLabel(t, false, false);
-			Color conflictColor = relColorMap.get(t);
-			setBorder(tLabel, conflictColor);
-			versionView.add(tLabel, c);
-			c.gridy++;
-		}
-		c.weighty = 1.0;
-		versionView.add(new JPanel(), c);
-		versionView.setBorder(BorderFactory.createTitledBorder(p.toString()));
-		return versionView;
-	}
-
-	private void setBorder(JLabel tLabel, Color conflictColor) {
-		if (conflictColor == null) {
-			conflictColor = Color.white;
-		}
-		Dimension size = tLabel.getSize();
-		tLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createRaisedBevelBorder(), BorderFactory.createCompoundBorder(
-				BorderFactory.createMatteBorder(1, 5, 1, 5, conflictColor),
-				BorderFactory.createEmptyBorder(1, 3, 1, 3))));
-		size.width = size.width + 18;
-		size.height = size.height + 6;
-		tLabel.setSize(size);
-		tLabel.setPreferredSize(size);
-		tLabel.setMaximumSize(size);
-		tLabel.setMinimumSize(size);
-	}
-
-	public ThinIdVersioned getId() throws DatabaseException {
+	public I_IdVersioned getId() throws DatabaseException {
 		if (id == null) {
 			id = AceConfig.vodb.getId(conceptId);
 		}
@@ -843,16 +744,16 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return uncommittedIds;
 	}
 
-	public ThinDescTuple getDescTuple(IntList prefOrder, AceFrameConfig config)
+	public I_DescriptionTuple getDescTuple(IntList prefOrder, AceFrameConfig config)
 			throws DatabaseException {
-		Collection<ThinDescTuple> descriptions = getDescriptionTuples(config
+		Collection<I_DescriptionTuple> descriptions = getDescriptionTuples(config
 				.getAllowedStatus(), config.getDescTypes(), config
 				.getViewPositionSet());
 		if (prefOrder == null) {
 			return descriptions.iterator().next();
 		} else {
 			for (int typeId : prefOrder.getListValues()) {
-				for (ThinDescTuple d : descriptions) {
+				for (I_DescriptionTuple d : descriptions) {
 					if (d.getTypeId() == typeId) {
 						return d;
 					}
@@ -865,24 +766,24 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public boolean isUncommitted() throws DatabaseException {
 		// handle the parts first...
 		if (images != null) {
-			for (ThinImageVersioned image : images) {
-				for (ThinImagePart p : image.getVersions()) {
+			for (I_ImageVersioned image : images) {
+				for (I_ImagePart p : image.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
 				}
 			}
 		}
-		if (concept != null) {
-			for (ThinConPart p : concept.getVersions()) {
+		if (conceptAttributes != null) {
+			for (I_ConceptAttributePart p : conceptAttributes.getVersions()) {
 				if (p.getVersion() == Integer.MAX_VALUE) {
 					return true;
 				}
 			}
 		}
 		if (descriptions != null) {
-			for (ThinDescVersioned desc : descriptions) {
-				for (ThinDescPart p : desc.getVersions()) {
+			for (I_DescriptionVersioned desc : descriptions) {
+				for (I_DescriptionPart p : desc.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
@@ -890,8 +791,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		}
 		if (sourceRels != null) {
-			for (ThinRelVersioned rel : sourceRels) {
-				for (ThinRelPart p : rel.getVersions()) {
+			for (I_RelVersioned rel : sourceRels) {
+				for (I_RelPart p : rel.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
@@ -899,24 +800,24 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		}
 		if (uncommittedImages != null) {
-			for (ThinImageVersioned image : uncommittedImages) {
-				for (ThinImagePart p : image.getVersions()) {
+			for (I_ImageVersioned image : uncommittedImages) {
+				for (I_ImagePart p : image.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
 				}
 			}
 		}
-		if (uncommittedConcept != null) {
-			for (ThinConPart p : uncommittedConcept.getVersions()) {
+		if (uncommittedConceptAttributes != null) {
+			for (I_ConceptAttributePart p : uncommittedConceptAttributes.getVersions()) {
 				if (p.getVersion() == Integer.MAX_VALUE) {
 					return true;
 				}
 			}
 		}
 		if (uncommittedDescriptions != null) {
-			for (ThinDescVersioned desc : uncommittedDescriptions) {
-				for (ThinDescPart p : desc.getVersions()) {
+			for (I_DescriptionVersioned desc : uncommittedDescriptions) {
+				for (I_DescriptionPart p : desc.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
@@ -924,8 +825,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		}
 		if (uncommittedSourceRels != null) {
-			for (ThinRelVersioned rel : uncommittedSourceRels) {
-				for (ThinRelPart p : rel.getVersions()) {
+			for (I_RelVersioned rel : uncommittedSourceRels) {
+				for (I_RelPart p : rel.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
@@ -934,8 +835,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		if (uncommittedIds != null) {
 			for (int id : uncommittedIds.getSetValues()) {
-				ThinIdVersioned idv = AceConfig.vodb.getId(id);
-				for (ThinIdPart p : idv.getVersions()) {
+				I_IdVersioned idv = AceConfig.vodb.getId(id);
+				for (I_IdPart p : idv.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
 					}
@@ -944,4 +845,5 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		return false;
 	}
+
 }

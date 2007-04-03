@@ -1,47 +1,82 @@
 package org.dwfa.vodb.types;
 
-public class ThinIdPart {
+import org.dwfa.ace.api.I_IdPart;
+
+public class ThinIdPart implements I_IdPart {
 	private int pathId;
 	private int version;
 	private int idStatus;
 	private int source;
 	private Object sourceId;
 	
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#getPathId()
+	 */
 	public int getPathId() {
 		return pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#setPathId(int)
+	 */
 	public void setPathId(int pathId) {
 		this.pathId = pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#getIdStatus()
+	 */
 	public int getIdStatus() {
 		return idStatus;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#setIdStatus(int)
+	 */
 	public void setIdStatus(int idStatus) {
 		this.idStatus = idStatus;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#getSource()
+	 */
 	public int getSource() {
 		return source;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#setSource(int)
+	 */
 	public void setSource(int source) {
 		this.source = source;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#getSourceId()
+	 */
 	public Object getSourceId() {
 		return sourceId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#setSourceId(java.lang.Object)
+	 */
 	public void setSourceId(Object sourceId) {
 		this.sourceId = sourceId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#getVersion()
+	 */
 	public int getVersion() {
 		return version;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#setVersion(int)
+	 */
 	public void setVersion(int version) {
 		this.version = version;
 	}
-	public boolean hasNewData(ThinIdPart another) {
-		return ((this.pathId != another.pathId) ||
-				(this.idStatus != another.idStatus) ||
-				(this.source != another.source) ||
-				sourceId.equals(another.sourceId) == false);
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_IdPart#hasNewData(org.dwfa.vodb.types.ThinIdPart)
+	 */
+	public boolean hasNewData(I_IdPart another) {
+		return ((this.pathId != another.getPathId()) ||
+				(this.idStatus != another.getIdStatus()) ||
+				(this.source != another.getSource()) ||
+				sourceId.equals(another.getSourceId()) == false);
 	}
 	@Override
 	public String toString() {

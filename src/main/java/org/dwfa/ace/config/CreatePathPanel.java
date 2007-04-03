@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -125,14 +126,14 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	ConceptBean cb = ConceptBean.get(nativePathId);
         	
         	//Needs a concept record...
-        	ThinConVersioned con = new ThinConVersioned(nativePathId, 1);
+        	I_ConceptAttributeVersioned con = new ThinConVersioned(nativePathId, 1);
         	ThinConPart part = new ThinConPart();
         	part.setPathId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
         	part.setVersion(Integer.MAX_VALUE);
         	part.setConceptStatus(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
         	part.setDefined(false);
         	con.addVersion(part);
-        	cb.setUncommittedConcept(con);
+        	cb.setUncommittedConceptAttributes(con);
         	
         	//Needs a description record...
         	int nativeDescId = AceConfig.vodb.uuidToNativeWithGeneration(UUID.randomUUID(), idSource,

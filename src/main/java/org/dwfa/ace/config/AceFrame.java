@@ -8,6 +8,7 @@ import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.bpa.util.ComponentFrame;
+import org.dwfa.bpa.worker.MasterWorker;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -17,10 +18,14 @@ public class AceFrame extends ComponentFrame {
 
 	public AceFrame(String[] args, LifeCycle lc, AceFrameConfig frameConfig) throws Exception {
 		super(args, lc);
+
 		getCdePanel().setup(frameConfig);
 		setName(frameConfig.getFrameName());
 		setContentPane(cdePanel);
 		setBounds(frameConfig.getBounds());
+		
+		MasterWorker worker = new MasterWorker(config);
+		cdePanel.getAceFrameConfig().setWorker(worker);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package org.dwfa.vodb;
 
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.vodb.bind.ThinImageBinder;
-import org.dwfa.vodb.types.ThinImageVersioned;
 
 import com.sleepycat.bind.EntryBinding;
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -19,7 +19,7 @@ public class ConceptKeyForImageCreator implements SecondaryKeyCreator {
             DatabaseEntry dataEntry,
             DatabaseEntry resultEntry)
 			throws DatabaseException {
-		ThinImageVersioned image = (ThinImageVersioned) imageBinder.entryToObject(dataEntry);
+		I_ImageVersioned image = (I_ImageVersioned) imageBinder.entryToObject(dataEntry);
 		intBinder.objectToEntry(image.getConceptId(), resultEntry);
 		return true;
 	}

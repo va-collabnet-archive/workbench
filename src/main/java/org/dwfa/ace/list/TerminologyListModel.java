@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.swing.AbstractListModel;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 
 import com.sleepycat.je.DatabaseException;
 

@@ -1,19 +1,29 @@
 package org.dwfa.vodb.types;
 
+import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.vodb.jar.I_MapNativeToNative;
 
-public class ThinImagePart {
+public class ThinImagePart implements I_ImagePart {
 	private int pathId;
 	private int version;
 	private int statusId;
 	private String textDescription;
 	private int typeId;
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#getPathId()
+	 */
 	public int getPathId() {
 		return pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#getStatusId()
+	 */
 	public int getStatusId() {
 		return statusId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#getVersion()
+	 */
 	public int getVersion() {
 		return version;
 	}
@@ -29,34 +39,61 @@ public class ThinImagePart {
 	public ThinImagePart() {
 		
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#setPathId(int)
+	 */
 	public void setPathId(int pathId) {
 		this.pathId = pathId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#setStatusId(int)
+	 */
 	public void setStatusId(int status) {
 		this.statusId = status;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#setVersion(int)
+	 */
 	public void setVersion(int version) {
 		this.version = version;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#getTextDescription()
+	 */
 	public String getTextDescription() {
 		return textDescription;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#setTextDescription(java.lang.String)
+	 */
 	public void setTextDescription(String name) {
 		this.textDescription = name;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#getTypeId()
+	 */
 	public int getTypeId() {
 		return typeId;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#setTypeId(int)
+	 */
 	public void setTypeId(int type) {
 		this.typeId = type;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart)
+	 */
 	public boolean hasNewData(ThinImagePart another) {
 		return ((this.pathId != another.pathId) ||
 				(this.statusId != another.statusId) ||
 				((this.textDescription.equals(another.textDescription) == false) ||
 				(this.typeId != another.typeId)));
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
+	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		pathId = jarToDbNativeMap.get(pathId);
 		statusId = jarToDbNativeMap.get(statusId);

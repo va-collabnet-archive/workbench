@@ -22,25 +22,25 @@ import javax.swing.JTable;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinDescPart;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
 public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		implements PropertyChangeListener {
 
-	private List<ThinDescTuple> allTuples;
+	private List<I_DescriptionTuple> allTuples;
 
 	public class ReferencedConceptsSwingWorker extends
 			SwingWorker<Map<Integer, ConceptBean>> {
@@ -117,12 +117,12 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			if (cb == null) {
 				return 0;
 			}
-			List<ThinDescVersioned> descs = cb.getDescriptions();
-			for (ThinDescVersioned d : descs) {
+			List<I_DescriptionVersioned> descs = cb.getDescriptions();
+			for (I_DescriptionVersioned d : descs) {
 				if (stopWork) {
 					return -1;
 				}
-				for (ThinDescPart descVersion : d.getVersions()) {
+				for (I_DescriptionPart descVersion : d.getVersions()) {
 					conceptsToFetch.add(descVersion.getTypeId());
 					conceptsToFetch.add(descVersion.getStatusId());
 					conceptsToFetch.add(descVersion.getPathId());
@@ -189,8 +189,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		this.host = host;
 		host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 	}
-	public List<ThinDescTuple> getDescriptions() throws DatabaseException {
-		List<ThinDescTuple> selectedTuples = new ArrayList<ThinDescTuple>();
+	public List<I_DescriptionTuple> getDescriptions() throws DatabaseException {
+		List<I_DescriptionTuple> selectedTuples = new ArrayList<I_DescriptionTuple>();
 		IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		IntSet allowedTypes = null;
 		Set<Position> positions = null;
@@ -206,16 +206,16 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		if (cb == null) {
 			return selectedTuples;
 		}
-		for (ThinDescVersioned desc: cb.getDescriptions()) {
+		for (I_DescriptionVersioned desc: cb.getDescriptions()) {
 			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples);
 		}
-		for (ThinDescVersioned desc: cb.getUncommittedDescriptions()) {
+		for (I_DescriptionVersioned desc: cb.getUncommittedDescriptions()) {
 			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples);
 		}
 		return selectedTuples;
 	}
 
-	protected ThinDescTuple getDescription(int rowIndex)
+	protected I_DescriptionTuple getDescription(int rowIndex)
 			throws DatabaseException {
 		
 		
@@ -277,7 +277,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 
 			public void actionPerformed(ActionEvent e) {
 				for (Path p : config.getEditingPathSet()) {
-					ThinDescPart newPart = selectedObject.getTuple()
+					I_DescriptionPart newPart = selectedObject.getTuple()
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
@@ -299,7 +299,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			public void actionPerformed(ActionEvent e) {
 				try {
 					for (Path p : config.getEditingPathSet()) {
-						ThinDescPart newPart = selectedObject.getTuple()
+						I_DescriptionPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);

@@ -22,6 +22,11 @@ import javax.swing.table.AbstractTableModel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
@@ -29,12 +34,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.ThinConPart;
-import org.dwfa.vodb.types.ThinConTuple;
-import org.dwfa.vodb.types.ThinConVersioned;
-import org.dwfa.vodb.types.ThinDescTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -65,7 +65,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private List<ThinConTuple> allTuples;
+	private List<I_ConceptAttributeTuple> allTuples;
 
 	private TableChangedSwingWorker tableChangeWorker;
 
@@ -151,8 +151,8 @@ public class ConceptTableModel extends AbstractTableModel implements
 			if (cb == null) {
 				return 0;
 			}
-			ThinConVersioned concept = cb.getConcept();
-			for (ThinConPart conVersion : concept.getVersions()) {
+			I_ConceptAttributeVersioned concept = cb.getConceptAttributes();
+			for (I_ConceptAttributePart conVersion : concept.getVersions()) {
 				conceptsToFetch.add(conVersion.getConceptStatus());
 				conceptsToFetch.add(conVersion.getPathId());
 			}
@@ -271,7 +271,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			if (rowIndex >= getRowCount()) {
 				return null;
 			}
-			ThinConTuple conTuple = getConceptTuple(rowIndex);
+			I_ConceptAttributeTuple conTuple = getConceptTuple(rowIndex);
 			if (conTuple == null) {
 				return null;
 			}
@@ -311,7 +311,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
@@ -320,13 +320,13 @@ public class ConceptTableModel extends AbstractTableModel implements
 		return "null pref desc: " + cb.getInitialText();
 	}
 
-	private ThinConTuple getConceptTuple(int rowIndex) throws DatabaseException {
+	private I_ConceptAttributeTuple getConceptTuple(int rowIndex) throws DatabaseException {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
 		}
 		if (allTuples == null) {
-			allTuples = cb.getConcept().getTuples();
+			allTuples = cb.getConceptAttributes().getTuples();
 		}
 		return allTuples.get(rowIndex);
 	}
@@ -430,9 +430,9 @@ public class ConceptTableModel extends AbstractTableModel implements
 	public static class StringWithConceptTuple implements Comparable, I_CellTextWithTuple {
 		String cellText;
 
-		ThinConTuple tuple;
+		I_ConceptAttributeTuple tuple;
 
-		public StringWithConceptTuple(String cellText, ThinConTuple tuple) {
+		public StringWithConceptTuple(String cellText, I_ConceptAttributeTuple tuple) {
 			super();
 			this.cellText = cellText;
 			this.tuple = tuple;
@@ -448,7 +448,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 		/* (non-Javadoc)
 		 * @see org.dwfa.ace.table.I_CellTextWithTuple#getTuple()
 		 */
-		public ThinConTuple getTuple() {
+		public I_ConceptAttributeTuple getTuple() {
 			return tuple;
 		}
 
@@ -494,7 +494,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 			public void actionPerformed(ActionEvent e) {
 				for (Path p : config.getEditingPathSet()) {
-					ThinConPart newPart = selectedObject.getTuple()
+					I_ConceptAttributePart newPart = selectedObject.getTuple()
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
@@ -516,7 +516,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			public void actionPerformed(ActionEvent e) {
 				try {
 					for (Path p : config.getEditingPathSet()) {
-						ThinConPart newPart = selectedObject.getTuple()
+						I_ConceptAttributePart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);

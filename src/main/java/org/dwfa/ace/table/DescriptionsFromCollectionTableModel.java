@@ -9,9 +9,9 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class DescriptionsFromCollectionTableModel extends DescriptionTableModel {
@@ -26,7 +26,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	private List<ThinDescVersioned> descriptionList = new ArrayList<ThinDescVersioned>();
 	
 	@Override
-	public ThinDescTuple getDescription(int rowIndex) {
+	public I_DescriptionTuple getDescription(int rowIndex) {
 		return descriptionList.get(rowIndex).getLastTuple();
 	}
 

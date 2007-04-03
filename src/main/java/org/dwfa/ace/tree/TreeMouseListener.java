@@ -11,8 +11,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -75,7 +75,7 @@ public class TreeMouseListener implements MouseListener {
 				.getUserObject();
 		if (addNodes) {
 	        aceConfig.getParentExpandedNodes().add(treeBean.getConceptId());
-			List<ThinRelTuple> tuples;
+			List<I_RelTuple> tuples;
 			try {
 				tuples = treeBean.getSourceRelTuples(aceConfig
 						.getAllowedStatus(), aceConfig
@@ -84,7 +84,7 @@ public class TreeMouseListener implements MouseListener {
 				int[] newNodeIndices = new int[tuples.size()];
 				int index = 0;
 				int insertIndex = parentNode.getIndex(node);
-				for (ThinRelTuple t : tuples) {
+				for (I_RelTuple t : tuples) {
 					newNodeIndices[index++] = insertIndex;
 					
 					if (t.getC2Id() == parentBean

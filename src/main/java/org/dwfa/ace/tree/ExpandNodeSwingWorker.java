@@ -25,10 +25,10 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.IntSet;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.swing.SwingWorker;
-import org.dwfa.vodb.types.I_GetConceptData;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		ActionListener {
@@ -203,7 +203,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	private class MakeSrcChildWorkers implements Runnable {
 		public void run() {
-			for (ThinRelTuple r : destRels) {
+			for (I_RelTuple r : destRels) {
 				ACE.threadPool.execute(new AddChildWorker(r.getC1Id()));
 			}
 		}
@@ -212,7 +212,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	private class MakeDestChildWorkers implements Runnable {
 		public void run() {
-			for (ThinRelTuple r : srcRels) {
+			for (I_RelTuple r : srcRels) {
 				ACE.threadPool.execute(new AddChildWorker(r.getC2Id()));
 			}
 		}
@@ -233,9 +233,9 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	CountDownLatch completeLatch;
 
-	List<ThinRelTuple> destRels;
+	List<I_RelTuple> destRels;
 
-	List<ThinRelTuple> srcRels;
+	List<I_RelTuple> srcRels;
 
 	SortedSet<DefaultMutableTreeNode> sortedNodes;
 

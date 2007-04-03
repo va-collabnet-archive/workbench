@@ -15,9 +15,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -86,7 +86,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 					I_GetConceptDataForTree cb = (I_GetConceptDataForTree) node
 							.getUserObject();
 					Rectangle iconRect = getIconRect(cb.getParentDepth());
-					ThinDescTuple tdt = cb.getDescTuple(aceConfig);
+					I_DescriptionTuple tdt = cb.getDescTuple(aceConfig);
 					if (tdt != null) {
 						setText(cb.getDescTuple(aceConfig).getText());
 					} else {

@@ -21,9 +21,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -36,15 +42,9 @@ import org.dwfa.vodb.bind.ThinImageBinder;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
 import org.dwfa.vodb.bind.TimePathIdBinder;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.ThinConVersioned;
-import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinIdVersioned;
-import org.dwfa.vodb.types.ThinImageVersioned;
-import org.dwfa.vodb.types.ThinRelVersioned;
 import org.dwfa.vodb.types.TimePathId;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.je.DatabaseException;
 
 public class ImportBaselineJarReader implements ActionListener {
 
@@ -254,9 +254,8 @@ public class ImportBaselineJarReader implements ActionListener {
 
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);
-								} catch (DatabaseException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+								} catch (Exception e) {
+									AceLog.alertAndLogException(e);
 								}
 							}
 						}
@@ -290,7 +289,7 @@ public class ImportBaselineJarReader implements ActionListener {
 					read = dis.read(buffer, read, size);
 				}
 				TupleInput input = new TupleInput(buffer);
-				ThinIdVersioned jarId = binding.entryToObject(input);
+				I_IdVersioned jarId = binding.entryToObject(input);
 				AceConfig.vodb.writeId(jarId);
 				processed++;
 			} catch (Throwable e) {
@@ -319,7 +318,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				read = dis.read(buffer, read, size);
 			}
 			TupleInput input = new TupleInput(buffer);
-			ThinImageVersioned jarImage = binding.entryToObject(input);
+			I_ImageVersioned jarImage = binding.entryToObject(input);
 			AceConfig.vodb.writeImage(jarImage);
 			processed++;
 		}
@@ -343,7 +342,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				read = dis.read(buffer, read, size);
 			}
 			TupleInput input = new TupleInput(buffer);
-			ThinRelVersioned jarRel = binding.entryToObject(input);
+			I_RelVersioned jarRel = binding.entryToObject(input);
 			AceConfig.vodb.writeRel(jarRel);
 			processed++;
 		}
@@ -367,7 +366,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				read = dis.read(buffer, read, size);
 			}
 			TupleInput input = new TupleInput(buffer);
-			ThinDescVersioned jarDesc = binding.entryToObject(input);
+			I_DescriptionVersioned jarDesc = binding.entryToObject(input);
 			AceConfig.vodb.writeDescription(jarDesc);
 			processed++;
 		}
@@ -390,7 +389,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				read = dis.read(buffer, read, size);
 			}
 			TupleInput input = new TupleInput(buffer);
-			ThinConVersioned jarCon = binding.entryToObject(input);
+			I_ConceptAttributeVersioned jarCon = binding.entryToObject(input);
 			AceConfig.vodb.writeConcept(jarCon);
 			processed++;
 		}

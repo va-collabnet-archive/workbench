@@ -13,10 +13,10 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -96,7 +96,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	}
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple desc = cb.getDescTuple(config.getTableDescPreferenceList(), config);
+		I_DescriptionTuple desc = cb.getDescTuple(config.getTableDescPreferenceList(), config);
 		if (desc != null) {
 			return desc.getText();
 		}
@@ -108,7 +108,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			if (rowIndex >= getRowCount()) {
 				return null;
 			}
-			ThinDescTuple desc = getDescription(rowIndex);
+			I_DescriptionTuple desc = getDescription(rowIndex);
 			if (desc == null) {
 				return null;
 			}
@@ -163,7 +163,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		return null;
 	}
 
-	protected abstract ThinDescTuple getDescription(int rowIndex)
+	protected abstract I_DescriptionTuple getDescription(int rowIndex)
 			throws DatabaseException;
 
 	public String getColumnName(int col) {
@@ -183,7 +183,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 	public void setValueAt(Object value, int row, int col) {
 		try {
-			ThinDescTuple desc = getDescription(row);
+			I_DescriptionTuple desc = getDescription(row);
 			if (desc.getVersion() == Integer.MAX_VALUE) {
 				switch (columns[col]) {
 				case DESC_ID:
@@ -261,9 +261,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public static class StringWithDescTuple implements Comparable, I_CellTextWithTuple {
 		String cellText;
 
-		ThinDescTuple tuple;
+		I_DescriptionTuple tuple;
 
-		public StringWithDescTuple(String cellText, ThinDescTuple tuple) {
+		public StringWithDescTuple(String cellText, I_DescriptionTuple tuple) {
 			super();
 			this.cellText = cellText;
 			this.tuple = tuple;
@@ -273,7 +273,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			return cellText;
 		}
 
-		public ThinDescTuple getTuple() {
+		public I_DescriptionTuple getTuple() {
 			return tuple;
 		}
 

@@ -34,6 +34,12 @@ import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -50,8 +56,6 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinIdPart;
-import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinImageVersioned;
 import org.dwfa.vodb.types.ThinRelVersioned;
 import org.dwfa.vodb.types.TimePathId;
@@ -294,7 +298,7 @@ public class ImportUpdateJarReader implements ActionListener {
 
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);
-								} catch (DatabaseException e) {
+								} catch (Exception e) {
 									AceLog.alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
 								}
 							}
@@ -330,7 +334,7 @@ public class ImportUpdateJarReader implements ActionListener {
 					read = dis.read(buffer, read, size);
 				}
 				TupleInput input = new TupleInput(buffer);
-				ThinIdVersioned jarId = binding.entryToObject(input);
+				I_IdVersioned jarId = binding.entryToObject(input);
 				threadPool.execute(new SyncIdWithDb(jarId, latch));
 				processed++;
 			} catch (Throwable e) {
@@ -349,11 +353,11 @@ public class ImportUpdateJarReader implements ActionListener {
 	}
 
 	private class SyncIdWithDb implements Runnable {
-		ThinIdVersioned jarId;
+		I_IdVersioned jarId;
 
 		CountDownLatch idLatch;
 
-		public SyncIdWithDb(ThinIdVersioned jarId, CountDownLatch idLatch) {
+		public SyncIdWithDb(I_IdVersioned jarId, CountDownLatch idLatch) {
 			super();
 			this.jarId = jarId;
 			this.idLatch = idLatch;
@@ -362,9 +366,9 @@ public class ImportUpdateJarReader implements ActionListener {
 		public void run() {
 			try {
 				if (AceConfig.vodb.hasId(jarId.getUIDs())) {
-					ThinIdVersioned dbId = AceConfig.vodb.getId(jarId.getUIDs());
+					I_IdVersioned dbId = AceConfig.vodb.getId(jarId.getUIDs());
 					boolean changed = false;
-					for (ThinIdPart p : jarId.getVersions()) {
+					for (I_IdPart p : jarId.getVersions()) {
 						if (!dbId.hasVersion(p)) {
 							dbId.addVersion(p);
 							changed = true;
@@ -377,7 +381,7 @@ public class ImportUpdateJarReader implements ActionListener {
 					jarToDbNativeMap.add(jarId.getNativeId(), dbId.getNativeId());
 				} else {
 					int jarNativeId = jarId.getNativeId();
-					ThinIdVersioned dbId = jarId;
+					I_IdVersioned dbId = jarId;
 		        	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 					dbId.setNativeId(AceConfig.vodb.uuidToNativeWithGeneration(jarId.getUIDs(), idSource,
 							new Path(Integer.MIN_VALUE + 1,
@@ -413,7 +417,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			jarImage.convertIds(jarToDbNativeMap);
 			if (AceConfig.vodb.hasImage(jarImage
 					.getImageId())) {
-				ThinImageVersioned dbImage = AceConfig.vodb.getImage(jarImage.getImageId());
+				I_ImageVersioned dbImage = AceConfig.vodb.getImage(jarImage.getImageId());
 				if (dbImage.merge(jarImage)) {
 					AceConfig.vodb.writeImage(dbImage);
 					timePathSet.addAll(jarImage.getTimePathSet());
@@ -447,7 +451,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			jarRel.convertIds(jarToDbNativeMap);
 			if (AceConfig.vodb.hasRel(jarRel
 					.getRelId())) {
-				ThinRelVersioned dbRel = AceConfig.vodb.getRel(jarRel.getRelId());
+				I_RelVersioned dbRel = AceConfig.vodb.getRel(jarRel.getRelId());
 				if (dbRel.merge(jarRel)) {
 					AceConfig.vodb.writeRel(dbRel);
 					timePathSet.addAll(jarRel.getTimePathSet());
@@ -481,7 +485,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			jarDesc.convertIds(jarToDbNativeMap);
 			if (AceConfig.vodb.hasDescription(jarDesc
 					.getDescId())) {
-				ThinDescVersioned dbDesc = AceConfig.vodb.getDescription(jarDesc.getDescId());
+				I_DescriptionVersioned dbDesc = AceConfig.vodb.getDescription(jarDesc.getDescId());
 				if (dbDesc.merge(jarDesc)) {
 					AceConfig.vodb.writeDescription(dbDesc);
 					timePathSet.addAll(jarDesc.getTimePathSet());
@@ -514,7 +518,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			jarCon.convertIds(jarToDbNativeMap);
 			if (AceConfig.vodb.hasConcept(jarCon
 					.getConId())) {
-				ThinConVersioned dbCon = AceConfig.vodb.getConcept(jarCon
+				I_ConceptAttributeVersioned dbCon = AceConfig.vodb.getConcept(jarCon
 						.getConId());
 				if (dbCon.merge(jarCon)) {
 					AceConfig.vodb.writeConcept(dbCon);

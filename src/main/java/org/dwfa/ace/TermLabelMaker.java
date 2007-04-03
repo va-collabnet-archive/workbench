@@ -9,9 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -19,7 +20,55 @@ public class TermLabelMaker {
 	
 	public static final int LABEL_WIDTH = 330;
 	
-	public static JLabel newLabel(ThinDescTuple desc, boolean showLongForm, boolean showStatus) throws DatabaseException {
+	public static I_ImplementActiveLabel newLabel(I_ConceptAttributeTuple conAttribute, boolean showLongForm, boolean showStatus) throws DatabaseException {
+		ConceptBean statusBean = null;
+		String text = "null characteristic";
+		if (conAttribute != null) {
+			if (conAttribute.isDefined()) {
+				text = "defined";
+			} else {
+				text = "primitive";
+			}
+			statusBean = ConceptBean.get(conAttribute.getConceptStatus());
+		}
+		StringBuffer labelBuff = new StringBuffer();
+		StringBuffer toolTipBuff = new StringBuffer();
+		if (BasicHTML.isHTMLString(text)) {
+			text = text.substring(6);
+		} 
+		labelBuff.append("<html>");
+		labelBuff.append("<font face='Dialog' size='3'>");
+		labelBuff.append(text);
+		labelBuff.append(" &nbsp;</font>");
+		toolTipBuff.append("<html>");
+		StringBuffer writeBuff = labelBuff;
+		if (showLongForm) {
+			writeBuff = labelBuff;
+		} else {
+			writeBuff = toolTipBuff;
+		}
+
+		if (showStatus) {
+			writeBuff = labelBuff;
+			writeBuff.append("<br>");
+		} else {
+			writeBuff = toolTipBuff;
+			if (showLongForm == false) {
+				writeBuff.append("<br>");
+			}
+		}
+		writeBuff.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
+		if (statusBean != null) {
+			writeBuff.append(statusBean.getInitialText());
+		}
+		writeBuff.append("</font>&nbsp;");
+		
+		String labelHtml = labelBuff.toString();
+		String toolTipHtml = toolTipBuff.toString();
+		LabelForTuple ldt = new LabelForConceptAttributeTuple(conAttribute, showLongForm, showStatus);
+		return makeLabel(ldt, labelHtml, toolTipHtml);		
+	}
+	public static I_ImplementActiveLabel newLabel(I_DescriptionTuple desc, boolean showLongForm, boolean showStatus) throws DatabaseException {
 		ConceptBean typeBean = null;
 		ConceptBean statusBean = null;
 		String text = "null desc";
@@ -82,9 +131,10 @@ public class TermLabelMaker {
 		
 		String labelHtml = labelBuff.toString();
 		String toolTipHtml = toolTipBuff.toString();
-		return makeLabel(labelHtml, toolTipHtml);		
+		LabelForTuple ldt = new LabelForDescriptionTuple(desc, showLongForm, showStatus);
+		return makeLabel(ldt, labelHtml, toolTipHtml);		
 	}
-	public static JLabel newLabel(ThinRelTuple rel, boolean showLongForm, boolean showStatus) throws DatabaseException {
+	public static I_ImplementActiveLabel newLabel(I_RelTuple rel, boolean showLongForm, boolean showStatus) throws DatabaseException {
 		ConceptBean typeBean = ConceptBean.get(rel.getRelTypeId());
 		ConceptBean destBean = ConceptBean.get(rel.getC2Id());
 		ConceptBean refinabilityBean = ConceptBean.get(rel.getRefinabilityId());
@@ -131,15 +181,22 @@ public class TermLabelMaker {
 		
 		String labelHtml = labelBuff.toString();
 		String toolTipHtml = toolTipBuff.toString();
-		return makeLabel(labelHtml, toolTipHtml);		
+		LabelForRelationshipTuple lrt = new LabelForRelationshipTuple(rel, showLongForm, showStatus);
+		return makeLabel(lrt, labelHtml, toolTipHtml);		
 	}
 
-	public static JLabel makeLabel(String labelHtml, String toolTipHtml) {
-		JLabel descLabel = new JLabel(labelHtml);
-		descLabel.setBackground(Color.white);
-		descLabel.setOpaque(true);
+	public static I_ImplementActiveLabel makeLabel(I_ImplementActiveLabel activeLabel,
+			String labelHtml, String toolTipHtml) {
+		setupLabel(activeLabel.getLabel(), labelHtml, toolTipHtml);
+		
+		return activeLabel;
+	}
+	private static JLabel setupLabel(JLabel label, String labelHtml, String toolTipHtml) {
+		label.setText(labelHtml);
+		label.setBackground(Color.white);
+		label.setOpaque(true);
 
-		View v = BasicHTML.createHTMLView(descLabel, labelHtml);
+		View v = BasicHTML.createHTMLView(label, labelHtml);
 		v.setSize(LABEL_WIDTH, 0);
 		float prefYSpan = v.getPreferredSpan(View.Y_AXIS);	
 		float firstYSpan = prefYSpan;
@@ -158,13 +215,12 @@ public class TermLabelMaker {
 		}
 		
 		prefSize = new Dimension(prefSize.width + 10, prefSize.height + 4);
-		descLabel.setMaximumSize(prefSize);
-		descLabel.setSize(prefSize);
-		descLabel.setMinimumSize(prefSize);
-		descLabel.setPreferredSize(prefSize);
-		descLabel.setToolTipText(toolTipHtml);
-		
-		return descLabel;
+		label.setMaximumSize(prefSize);
+		label.setSize(prefSize);
+		label.setMinimumSize(prefSize);
+		label.setPreferredSize(prefSize);
+		label.setToolTipText(toolTipHtml);
+		return label;
 	}
 	public static JLabel makeLabel(String labelHtml) {
 		if (BasicHTML.isHTMLString(labelHtml) == false) {
@@ -173,7 +229,7 @@ public class TermLabelMaker {
 		if (labelHtml.endsWith(" &nbsp;") == false) {
 			labelHtml = labelHtml + " &nbsp;";
 		}
-		return makeLabel(labelHtml, null);
+		return setupLabel(new JLabel(), labelHtml, null);
 	}
 	public static ImageFilter getTransparentFilter() {
 		return transparentFilter;

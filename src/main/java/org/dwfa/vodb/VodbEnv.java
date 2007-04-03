@@ -16,6 +16,15 @@ import java.util.regex.Pattern;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.bpa.util.Stopwatch;
@@ -44,15 +53,10 @@ import org.dwfa.vodb.types.I_ProcessRelationships;
 import org.dwfa.vodb.types.I_ProcessTimeBranch;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinConPart;
-import org.dwfa.vodb.types.ThinConVersioned;
-import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinImageVersioned;
-import org.dwfa.vodb.types.ThinRelPart;
-import org.dwfa.vodb.types.ThinRelTuple;
 import org.dwfa.vodb.types.ThinRelVersioned;
 import org.dwfa.vodb.types.TimePathId;
 
@@ -139,7 +143,9 @@ public class VodbEnv {
 
 	}
 
-	/*
+	boolean preloadRels = false;
+	boolean preloadDescriptions = false;
+	/**
 	 * @todo find out of all secondary databases have to be opened when the
 	 * primary is opened? How do they get updated, etc?
 	 */
@@ -166,14 +172,18 @@ public class VodbEnv {
 		// getC1RelMap();
 		// getC2RelMap();
 
-		// PreloadConfig relPreloadConfig = new PreloadConfig();
-		// relPreloadConfig.setLoadLNs(true);
-		// relDb.preload(relPreloadConfig);
+		if (preloadRels) {
+			PreloadConfig relPreloadConfig = new PreloadConfig();
+			relPreloadConfig.setLoadLNs(true);
+			relDb.preload(relPreloadConfig);
+		}
 		DatabaseConfig descDbConfig = makeConfig(readOnly);
 		descDb = env.openDatabase(null, "desc", descDbConfig);
-		PreloadConfig descPreloadConfig = new PreloadConfig();
-		descPreloadConfig.setLoadLNs(true);
-		descDb.preload(descPreloadConfig);
+		if (preloadDescriptions) {
+			PreloadConfig descPreloadConfig = new PreloadConfig();
+			descPreloadConfig.setLoadLNs(true);
+			descDb.preload(descPreloadConfig);			
+		}
 		getConceptDescMap();
 
 		DatabaseConfig mapDbConfig = makeConfig(readOnly);
@@ -183,7 +193,7 @@ public class VodbEnv {
 		
 		//Reset the authority id so that each time the db starts, it gets a new authorityId. 
 		PrimordialId primId = PrimordialId.AUTHORITY_ID;
-		ThinIdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
+		I_IdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
 		ThinIdPart idPart = new ThinIdPart();
 		idPart.setIdStatus(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
 		idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
@@ -466,7 +476,7 @@ public class VodbEnv {
 		return c2RelMap;
 	}
 
-	public ThinConVersioned getConcept(int conceptId) throws DatabaseException {
+	public I_ConceptAttributeVersioned getConcept(int conceptId) throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting concept : " + conceptId);
@@ -481,18 +491,18 @@ public class VodbEnv {
 				logger.fine("Got concept: " + conceptId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
 			}
-			return (ThinConVersioned) conBinding.entryToObject(conceptValue);
+			return (I_ConceptAttributeVersioned) conBinding.entryToObject(conceptValue);
 		}
 		throw new DatabaseException("Concept: " + conceptId + " not found.");
 	}
 
-	public ThinDescVersioned getDescription(int descId)
+	public I_DescriptionVersioned getDescription(int descId)
 			throws DatabaseException {
 		DatabaseEntry descKey = new DatabaseEntry();
 		DatabaseEntry descValue = new DatabaseEntry();
 		intBinder.objectToEntry(descId, descKey);
 		if (descDb.get(null, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			return (ThinDescVersioned) descBinding.entryToObject(descValue);
+			return (I_DescriptionVersioned) descBinding.entryToObject(descValue);
 		}
 		throw new DatabaseException("Description: " + descId + " not found.");
 	}
@@ -517,12 +527,12 @@ public class VodbEnv {
 		return false;
 	}
 
-	public ThinRelVersioned getRel(int relId) throws DatabaseException {
+	public I_RelVersioned getRel(int relId) throws DatabaseException {
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
 		intBinder.objectToEntry(relId, relKey);
 		if (relDb.get(null, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			return (ThinRelVersioned) relBinding.entryToObject(relValue);
+			return (I_RelVersioned) relBinding.entryToObject(relValue);
 		}
 		throw new DatabaseException("Rel: " + relId + " not found.");
 	}
@@ -537,7 +547,7 @@ public class VodbEnv {
 		return false;
 	}
 
-	public List<ThinDescVersioned> getDescriptions(int conceptId)
+	public List<I_DescriptionVersioned> getDescriptions(int conceptId)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
@@ -555,7 +565,7 @@ public class VodbEnv {
 				null, null);
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
-		List<ThinDescVersioned> matches = new ArrayList<ThinDescVersioned>();
+		List<I_DescriptionVersioned> matches = new ArrayList<I_DescriptionVersioned>();
 		while (retVal == OperationStatus.SUCCESS) {
 			ThinDescVersioned descFromConceptId = (ThinDescVersioned) descBinding
 					.entryToObject(foundData);
@@ -595,9 +605,9 @@ public class VodbEnv {
 				null);
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
-		List<ThinRelTuple> returnRels = new ArrayList<ThinRelTuple>();
+		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 		while (retVal == OperationStatus.SUCCESS) {
-			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
+			I_RelVersioned relFromConceptId = (I_RelVersioned) relBinding
 					.entryToObject(foundData);
 			if (relFromConceptId.getC2Id() == conceptId) {
 				relFromConceptId.addTuples(allowedStatus, destRelTypes,
@@ -620,7 +630,7 @@ public class VodbEnv {
 		return false;
 	}
 
-	public List<ThinRelVersioned> getDestRels(int conceptId)
+	public List<I_RelVersioned> getDestRels(int conceptId)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
@@ -638,7 +648,7 @@ public class VodbEnv {
 				null);
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
-		List<ThinRelVersioned> matches = new ArrayList<ThinRelVersioned>();
+		List<I_RelVersioned> matches = new ArrayList<I_RelVersioned>();
 		while (retVal == OperationStatus.SUCCESS) {
 			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
 					.entryToObject(foundData);
@@ -677,7 +687,7 @@ public class VodbEnv {
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
 		while (retVal == OperationStatus.SUCCESS) {
-			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
+			I_RelVersioned relFromConceptId = (I_RelVersioned) relBinding
 					.entryToObject(foundData);
 			if (relFromConceptId.getC2Id() == conceptId) {
 				mySecCursor.close();
@@ -714,7 +724,7 @@ public class VodbEnv {
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
 		while (retVal == OperationStatus.SUCCESS) {
-			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
+			I_RelVersioned relFromConceptId = (I_RelVersioned) relBinding
 					.entryToObject(foundData);
 			if (relFromConceptId.getC2Id() == conceptId) {
 				if (destRelTypeIds == null) {
@@ -741,7 +751,7 @@ public class VodbEnv {
 		return false;
 	}
 
-	public List<ThinRelVersioned> getSrcRels(int conceptId)
+	public List<I_RelVersioned> getSrcRels(int conceptId)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
@@ -759,7 +769,7 @@ public class VodbEnv {
 				null);
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
-		List<ThinRelVersioned> matches = new ArrayList<ThinRelVersioned>();
+		List<I_RelVersioned> matches = new ArrayList<I_RelVersioned>();
 		while (retVal == OperationStatus.SUCCESS) {
 			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
 					.entryToObject(foundData);
@@ -799,9 +809,9 @@ public class VodbEnv {
 				null);
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
-		List<ThinRelTuple> tuples = new ArrayList<ThinRelTuple>();
+		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 		while (retVal == OperationStatus.SUCCESS) {
-			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
+			I_RelVersioned relFromConceptId = (I_RelVersioned) relBinding
 					.entryToObject(foundData);
 			if (relFromConceptId.getC1Id() == conceptId) {
 				relFromConceptId.addTuples(allowedStatus, sourceRelTypes,
@@ -842,7 +852,7 @@ public class VodbEnv {
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
 		while (retVal == OperationStatus.SUCCESS) {
-			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
+			I_RelVersioned relFromConceptId = (I_RelVersioned) relBinding
 					.entryToObject(foundData);
 			if (relFromConceptId.getC1Id() == conceptId) {
 				return true;
@@ -878,7 +888,7 @@ public class VodbEnv {
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
 				foundData, LockMode.DEFAULT);
 		while (retVal == OperationStatus.SUCCESS) {
-			ThinRelVersioned relFromConceptId = (ThinRelVersioned) relBinding
+			I_RelVersioned relFromConceptId = (I_RelVersioned) relBinding
 					.entryToObject(foundData);
 			if (relFromConceptId.getC1Id() == conceptId) {
 				if (srcRelTypeIds == null) {
@@ -1049,9 +1059,9 @@ public class VodbEnv {
 
 		public void processDesc(DatabaseEntry key, DatabaseEntry value)
 				throws Exception {
-			ThinDescVersioned desc = (ThinDescVersioned) descBinding
+			I_DescriptionVersioned desc = (I_DescriptionVersioned) descBinding
 					.entryToObject(value);
-			for (ThinDescPart d : desc.getVersions()) {
+			for (I_DescriptionPart d : desc.getVersions()) {
 				TimePathId tb = new TimePathId(d.getVersion(), d.getPathId());
 				values.add(tb);
 			}
@@ -1059,9 +1069,9 @@ public class VodbEnv {
 
 		public void processConcept(DatabaseEntry key, DatabaseEntry value)
 				throws IOException {
-			ThinConVersioned conc = (ThinConVersioned) conBinding
+			I_ConceptAttributeVersioned conc = (I_ConceptAttributeVersioned) conBinding
 					.entryToObject(value);
-			for (ThinConPart c : conc.getVersions()) {
+			for (I_ConceptAttributePart c : conc.getVersions()) {
 				TimePathId tb = new TimePathId(c.getVersion(), c.getPathId());
 				values.add(tb);
 			}
@@ -1069,9 +1079,9 @@ public class VodbEnv {
 
 		public void processRel(DatabaseEntry key, DatabaseEntry value)
 				throws Exception {
-			ThinRelVersioned rel = (ThinRelVersioned) relBinding
+			I_RelVersioned rel = (I_RelVersioned) relBinding
 					.entryToObject(value);
-			for (ThinRelPart r : rel.getVersions()) {
+			for (I_RelPart r : rel.getVersions()) {
 				TimePathId tb = new TimePathId(r.getVersion(), r.getPathId());
 				values.add(tb);
 			}
@@ -1196,7 +1206,7 @@ public class VodbEnv {
 	}
 
 	public int uuidToNative(UUID uid) throws TerminologyException, IOException {
-		ThinIdVersioned id = getId(uid);
+		I_IdVersioned id = getId(uid);
 		if (id != null) {
 			return id.getNativeId();
 		}
@@ -1204,7 +1214,7 @@ public class VodbEnv {
 	}
 
 	public int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException {
-		ThinIdVersioned id = getId(uids);
+		I_IdVersioned id = getId(uids);
 		if (id == null) {
 			throw new NoMappingException("No id for: " + uids);
 		}
@@ -1235,7 +1245,7 @@ public class VodbEnv {
 		return null;
 	}
 
-	public ThinIdVersioned getId(Collection<UUID> uids)
+	public I_IdVersioned getId(Collection<UUID> uids)
 			throws TerminologyException, IOException {
 		Set<ThinIdVersioned> ids = new HashSet<ThinIdVersioned>(1);
 		for (UUID uid : uids) {
@@ -1304,7 +1314,7 @@ public class VodbEnv {
 					lastId = (Integer) intBinder.entryToObject(foundKey);
 				}
 				idCursor.close();
-				ThinIdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
+				I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
 				// AceLog.info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
@@ -1348,7 +1358,7 @@ public class VodbEnv {
 					lastId = (Integer) intBinder.entryToObject(foundKey);
 				}
 				idCursor.close();
-				ThinIdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
+				I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
 				// AceLog.info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
@@ -1381,7 +1391,7 @@ public class VodbEnv {
 		return Integer.class; 
 	}
 
-	public void writeId(ThinIdVersioned id) throws DatabaseException {
+	public void writeId(I_IdVersioned id) throws DatabaseException {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(id.getNativeId(), idKey);
@@ -1389,7 +1399,7 @@ public class VodbEnv {
 		idDb.put(null, idKey, idValue);
 	}
 
-	public void deleteId(ThinIdVersioned id) throws DatabaseException {
+	public void deleteId(I_IdVersioned id) throws DatabaseException {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(id.getNativeId(), idKey);
@@ -1397,7 +1407,7 @@ public class VodbEnv {
 		idDb.delete(null, idKey);
 	}
 
-	public void writeImage(ThinImageVersioned image) throws DatabaseException {
+	public void writeImage(I_ImageVersioned image) throws DatabaseException {
 		DatabaseEntry imageKey = new DatabaseEntry();
 		DatabaseEntry imageValue = new DatabaseEntry();
 		intBinder.objectToEntry(image.getImageId(), imageKey);
@@ -1405,7 +1415,7 @@ public class VodbEnv {
 		imageDb.put(null, imageKey, imageValue);
 	}
 
-	public void writeConcept(ThinConVersioned concept) throws DatabaseException {
+	public void writeConcept(I_ConceptAttributeVersioned concept) throws DatabaseException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(concept.getConId(), key);
@@ -1413,7 +1423,7 @@ public class VodbEnv {
 		conceptDb.put(null, key, value);
 	}
 
-	public void writeRel(ThinRelVersioned rel) throws DatabaseException {
+	public void writeRel(I_RelVersioned rel) throws DatabaseException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(rel.getRelId(), key);
@@ -1421,7 +1431,7 @@ public class VodbEnv {
 		relDb.put(null, key, value);
 	}
 
-	public void writeDescription(ThinDescVersioned desc)
+	public void writeDescription(I_DescriptionVersioned desc)
 			throws DatabaseException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
@@ -1478,7 +1488,7 @@ public class VodbEnv {
 		return false;
 	}
 
-	public ThinImageVersioned getImage(UUID uid) throws TerminologyException, IOException, DatabaseException {
+	public I_ImageVersioned getImage(UUID uid) throws TerminologyException, IOException, DatabaseException {
 		return getImage(uuidToNative(uid));
 	}
 
@@ -1502,7 +1512,7 @@ public class VodbEnv {
 		return false;
 	}
 
-	public ThinImageVersioned getImage(int nativeId) throws DatabaseException {
+	public I_ImageVersioned getImage(int nativeId) throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting image : " + nativeId);
@@ -1517,7 +1527,7 @@ public class VodbEnv {
 				logger.fine("Got image: " + nativeId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
 			}
-			return (ThinImageVersioned) imageBinder.entryToObject(imageValue);
+			return (I_ImageVersioned) imageBinder.entryToObject(imageValue);
 		}
 		throw new DatabaseException("Concept: " + nativeId + " not found.");
 	}
@@ -1530,7 +1540,7 @@ public class VodbEnv {
 		return pathDb;
 	}
 
-	public List<ThinImageVersioned> getImages(int conceptId)
+	public List<I_ImageVersioned> getImages(int conceptId)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
@@ -1547,7 +1557,7 @@ public class VodbEnv {
 				null, null);
 		OperationStatus retVal = mySecCursor.getSearchKey(secondaryKey,
 				foundData, LockMode.DEFAULT);
-		List<ThinImageVersioned> matches = new ArrayList<ThinImageVersioned>();
+		List<I_ImageVersioned> matches = new ArrayList<I_ImageVersioned>();
 		while (retVal == OperationStatus.SUCCESS) {
 			ThinImageVersioned imageFromConceptId = (ThinImageVersioned) imageBinder
 					.entryToObject(foundData);
@@ -1583,13 +1593,13 @@ public class VodbEnv {
 						+ " elapsed time: " + timer.getElapsedTime() / 1000
 						+ " secs");
 			}
-			return ((ThinIdVersioned) idBinding.entryToObject(idValue))
+			return ((I_IdVersioned) idBinding.entryToObject(idValue))
 					.getUIDs();
 		}
 		throw new DatabaseException("Concept: " + nativeId + " not found.");
 	}
 
-	public ThinIdVersioned getId(int nativeId) throws DatabaseException {
+	public I_IdVersioned getId(int nativeId) throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting id record for : " + nativeId);
@@ -1605,7 +1615,7 @@ public class VodbEnv {
 						+ " elapsed time: " + timer.getElapsedTime() / 1000
 						+ " secs");
 			}
-			return (ThinIdVersioned) idBinding.entryToObject(idValue);
+			return (I_IdVersioned) idBinding.entryToObject(idValue);
 		}
 		throw new DatabaseException("Concept: " + nativeId + " not found.");
 	}

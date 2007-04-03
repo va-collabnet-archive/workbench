@@ -1,7 +1,7 @@
 package org.dwfa.vodb;
 
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
-import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.bind.EntryBinding;
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -70,7 +70,7 @@ public class C2KeyForRelCreator implements SecondaryKeyCreator {
             DatabaseEntry dataEntry,
             DatabaseEntry resultEntry)
 			throws DatabaseException {
-		ThinRelVersioned rel = (ThinRelVersioned) relBinding.entryToObject(dataEntry);
+		I_RelVersioned rel = (I_RelVersioned) relBinding.entryToObject(dataEntry);
 		relAndC2Id.setC2Id(rel.getC2Id());
 		relAndC2Id.setRelId(rel.getRelId());
 		relAndC2IdBinding.objectToEntry(relAndC2Id, resultEntry);

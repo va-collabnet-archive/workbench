@@ -16,14 +16,14 @@ import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinImagePart;
-import org.dwfa.vodb.types.ThinImageTuple;
-import org.dwfa.vodb.types.ThinImageVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -149,14 +149,14 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			if (cb == null) {
 				return 0;
 			}
-			List<ThinImageVersioned> images = new ArrayList<ThinImageVersioned>();
+			List<I_ImageVersioned> images = new ArrayList<I_ImageVersioned>();
 			images.addAll(cb.getImages());
 			images.addAll(cb.getUncommittedImages());
-			for (ThinImageVersioned i : images) {
+			for (I_ImageVersioned i : images) {
 				if (stopWork) {
 					return -1;
 				}
-				for (ThinImagePart part : i.getVersions()) {
+				for (I_ImagePart part : i.getVersions()) {
 					conceptsToFetch.add(part.getTypeId());
 					conceptsToFetch.add(part.getStatusId());
 					conceptsToFetch.add(part.getPathId());
@@ -205,8 +205,8 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	
 	public static class ImageWithImageTuple  {
 		ImageIcon image;
-		ThinImageTuple tuple;
-		public ImageWithImageTuple(ImageIcon image, ThinImageTuple tuple) {
+		I_ImageTuple tuple;
+		public ImageWithImageTuple(ImageIcon image, I_ImageTuple tuple) {
 			super();
 			this.image = image;
 			this.tuple = tuple;
@@ -214,15 +214,15 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		public ImageIcon getImage() {
 			return image;
 		}
-		public ThinImageTuple getTuple() {
+		public I_ImageTuple getTuple() {
 			return tuple;
 		}
 		
 	}
 	public static class StringWithImageTuple implements Comparable, I_CellTextWithTuple {
 		String cellText;
-		ThinImageTuple tuple;
-		public StringWithImageTuple(String cellText, ThinImageTuple tuple) {
+		I_ImageTuple tuple;
+		public StringWithImageTuple(String cellText, I_ImageTuple tuple) {
 			super();
 			this.cellText = cellText;
 			this.tuple = tuple;
@@ -230,7 +230,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		public String getCellText() {
 			return cellText;
 		}
-		public ThinImageTuple getTuple() {
+		public I_ImageTuple getTuple() {
 			return tuple;
 		}
 		
@@ -245,8 +245,8 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	private IMAGE_FIELD[] columns;
 	private SmallProgressPanel progress = new SmallProgressPanel();
 	private I_HostConceptPlugins host;
-	private List<ThinImageTuple> allTuples;
-	private List<ThinImageVersioned> allImages;
+	private List<I_ImageTuple> allImageTuples;
+	private ArrayList<I_ImageVersioned> allImages;
 
 	private boolean showHistory;
 	private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
@@ -280,13 +280,13 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 					return String.class;
 		}
 	}
-	protected ThinImageTuple getImage(int rowIndex)
+	protected I_ImageTuple getImage(int rowIndex)
 	throws DatabaseException {
 		if (tableConcept == null) {
 			return null;
 		}
 		if (showHistory) {
-			return allTuples.get(rowIndex);
+			return allImageTuples.get(rowIndex);
 		} else {
 			return getAllImages().get(rowIndex).getLastTuple();
 		}
@@ -295,9 +295,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		return referencedConcepts;
 
 	}
-	public List<ThinImageVersioned> getAllImages() throws DatabaseException {
+	public List<I_ImageVersioned> getAllImages() throws DatabaseException {
 		if (allImages == null) {
-			allImages = new ArrayList<ThinImageVersioned>();
+			allImages = new ArrayList<I_ImageVersioned>();
 			allImages.addAll(tableConcept.getUncommittedImages());
 			allImages.addAll(tableConcept.getImages());
 		}
@@ -309,13 +309,13 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		}
 		try {
 			if (showHistory) {
-				if (allTuples == null) {
-					allTuples = new ArrayList<ThinImageTuple>();
-					for (ThinImageVersioned i: getAllImages()) {
-						allTuples.addAll(i.getTuples());
+				if (allImageTuples == null) {
+					allImageTuples = new ArrayList<I_ImageTuple>();
+					for (I_ImageVersioned i: getAllImages()) {
+						allImageTuples.addAll(i.getTuples());
 					}
 				}
-				return allTuples.size();
+				return allImageTuples.size();
 			} else {
 				return getAllImages().size();
 			}
@@ -330,7 +330,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			if (rowIndex >= getRowCount()) {
 				return null;
 			}
-			ThinImageTuple image = getImage(rowIndex);
+			I_ImageTuple image = getImage(rowIndex);
 			if (image == null) {
 				return null;
 			}
@@ -379,7 +379,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
 	private String getPrefText(int id) throws DatabaseException {
 		ConceptBean cb = getReferencedConcepts().get(id);
-		ThinDescTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
@@ -394,7 +394,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		this.progress = progress;
 	}
 	public void propertyChange(PropertyChangeEvent evt) {
-		allTuples = null;
+		allImageTuples = null;
 		allImages = null;
 		if (getProgress() != null) {
 			getProgress().setVisible(true);
@@ -432,7 +432,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		try {
-			ThinImageTuple image = getImage(rowIndex);
+			I_ImageTuple image = getImage(rowIndex);
 			if (image.getVersion() == Integer.MAX_VALUE) {
 				switch (columns[columnIndex]) {
 				case IMAGE_ID:

@@ -8,10 +8,10 @@ import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_GetConceptData;
-import org.dwfa.vodb.types.ThinRelTuple;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -30,10 +30,10 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 		tree.addWorkerFinishedListener(this);
 		ancestors = new ArrayList<I_GetConceptData>();
 		ancestors.add(focus);
-		List<ThinRelTuple> rels = focus.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(), 
+		List<I_RelTuple> rels = focus.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(), 
 				config.getViewPositionSet(), true);
 		while (rels.size() > 0) {
-			for (ThinRelTuple r: rels) {
+			for (I_RelTuple r: rels) {
 				ConceptBean parent = ConceptBean.get(r.getC2Id());
 				ancestors.add(0, parent);
 				System.out.println("Adding parent: " + parent);
