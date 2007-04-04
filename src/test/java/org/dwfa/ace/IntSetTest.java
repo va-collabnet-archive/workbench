@@ -1,5 +1,8 @@
 package org.dwfa.ace;
 
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.vodb.types.IntSet;
+
 import junit.framework.TestCase;
 
 public class IntSetTest extends TestCase {
@@ -17,7 +20,7 @@ public class IntSetTest extends TestCase {
 	}
 
 	public void test() {
-		IntSet set = new IntSet();
+		I_IntSet set = new IntSet();
 		set.add(1);
 		set.add(3);
 		set.add(2);

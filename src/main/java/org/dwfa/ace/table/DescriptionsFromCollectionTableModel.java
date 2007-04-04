@@ -9,13 +9,13 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class DescriptionsFromCollectionTableModel extends DescriptionTableModel {
-	public DescriptionsFromCollectionTableModel(DESC_FIELD[] columns, AceFrameConfig config) {
+	public DescriptionsFromCollectionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
 		super(columns, config);
 	}
 

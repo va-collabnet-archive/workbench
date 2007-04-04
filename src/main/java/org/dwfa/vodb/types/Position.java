@@ -12,133 +12,166 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 import com.sleepycat.je.DatabaseException;
 
-public class Position implements Serializable {
+public class Position implements Serializable, I_Position {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	int version;
-	Path path;
+	I_Path path;
 
-	public Path getPath() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#getPath()
+	 */
+	public I_Path getPath() {
 		return path;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#getVersion()
+	 */
 	public int getVersion() {
 		return version;
 	}
 
-	public Position(int version, Path path) {
+	public Position(int version, I_Path path) {
 		super();
 		this.version = version;
 		this.path = path;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#isSubsequentOrEqualTo(int, int)
+	 */
 	public boolean isSubsequentOrEqualTo(int version, int pathId) {
 		if (equals(version, pathId)) {
 			return true;
 		}
-		if (path.conceptId == pathId) {
+		if (path.getConceptId() == pathId) {
 			return this.version >= version;
 		}
 		return checkSubsequentOrEqualToOrigins(path.getOrigins(), version, pathId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#isAntecedentOrEqualTo(int, int)
+	 */
 	public boolean isAntecedentOrEqualTo(int version, int pathId) {
 		if (equals(version, pathId)) {
 			return true;
 		}
-		if (path.conceptId == pathId) {
+		if (path.getConceptId() == pathId) {
 			return this.version <= version;
 		}
 		return checkAntecedentOrEqualToOrigins(path.getOrigins(), version, pathId);
 	}
-	private boolean checkSubsequentOrEqualToOrigins(List<Position> origins, int testVersion, int testPathId) {
-		for (Position origin: origins) {
-			if (testPathId == origin.path.conceptId) {
-				return origin.version >= testVersion;
-			} else if (checkSubsequentOrEqualToOrigins(origin.path.origins, testVersion, testPathId)) {
+	private boolean checkSubsequentOrEqualToOrigins(List<I_Position> origins, int testVersion, int testPathId) {
+		for (I_Position origin: origins) {
+			if (testPathId == origin.getPath().getConceptId()) {
+				return origin.getVersion() >= testVersion;
+			} else if (checkSubsequentOrEqualToOrigins(origin.getPath().getOrigins(), testVersion, testPathId)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	private boolean checkAntecedentOrEqualToOrigins(List<Position> origins, int testVersion, int testPathId) {
-		for (Position origin: origins) {
-			if (testPathId == origin.path.conceptId) {
-				return origin.version <= testVersion;
-			} else if (checkAntecedentOrEqualToOrigins(origin.path.origins, testVersion, testPathId)) {
+	private boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins, int testVersion, int testPathId) {
+		for (I_Position origin: origins) {
+			if (testPathId == origin.getPath().getConceptId()) {
+				return origin.getVersion() <= testVersion;
+			} else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins(), testVersion, testPathId)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean isAntecedentOrEqualTo(Position another) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#isAntecedentOrEqualTo(org.dwfa.vodb.types.Position)
+	 */
+	public boolean isAntecedentOrEqualTo(I_Position another) {
 		if (equals(another)) {
 			return true;
 		}
-		if (path.conceptId == another.path.conceptId) {
-			return version <= another.version;
+		if (path.getConceptId() == another.getPath().getConceptId()) {
+			return version <= another.getVersion();
 		}
-		return checkAntecedentOrEqualToOrigins(another.path.origins);
+		return checkAntecedentOrEqualToOrigins(another.getPath().getOrigins());
 	}
 	
-	public boolean checkAntecedentOrEqualToOrigins(List<Position> origins) {
-		for (Position origin: origins) {
-			if (path.conceptId == origin.path.conceptId) {
-				return version <= origin.version;
-			} else if (checkAntecedentOrEqualToOrigins(origin.path.origins)) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#checkAntecedentOrEqualToOrigins(java.util.List)
+	 */
+	public boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins) {
+		for (I_Position origin: origins) {
+			if (path.getConceptId() == origin.getPath().getConceptId()) {
+				return version <= origin.getVersion();
+			} else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins())) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public boolean isSubsequentOrEqualTo(Position another) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#isSubsequentOrEqualTo(org.dwfa.vodb.types.I_Position)
+	 */
+	public boolean isSubsequentOrEqualTo(I_Position another) {
 		return another.isAntecedentOrEqualTo(this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#equals(int, int)
+	 */
 	public boolean equals(int version, int pathId) {
-		return ((this.version == version) && (path.conceptId == pathId));
+		return ((this.version == version) && (path.getConceptId() == pathId));
 	}
 
-	public boolean equals(Position another) {
-		return ((version == another.version) && (path.conceptId == another.path.conceptId));
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#equals(org.dwfa.vodb.types.Position)
+	 */
+	public boolean equals(I_Position another) {
+		return ((version == another.getVersion()) && (path.getConceptId() == another.getPath().getConceptId()));
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return equals((Position) obj);
+		return equals((I_Position) obj);
 	}
 
 	@Override
 	public int hashCode() {
-		return HashFunction.hashCode(new int[] {version, path.conceptId});
+		return HashFunction.hashCode(new int[] {version, path.getConceptId()});
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Position#getDepth(int)
+	 */
 	public int getDepth(int pathId) {
 		int depth = 0;
-		if (pathId == path.conceptId) {
+		if (pathId == path.getConceptId()) {
 			return depth;
 		}
-		List<Position> depthOrigins = new ArrayList<Position>(path.origins);
+		List<I_Position> depthOrigins = new ArrayList<I_Position>(path.getOrigins());
 		while (depthOrigins.size() > 0) {
 			depth++;
-			for (Position o: depthOrigins) {
-				if (o.path.conceptId == pathId) {
+			for (I_Position o: depthOrigins) {
+				if (o.getPath().getConceptId() == pathId) {
 					return depth;
 				}
 			}
-			List<Position> newOrigins = new ArrayList<Position>();
-			for (Position p: depthOrigins) {
-				newOrigins.addAll(p.path.getOrigins());
+			List<I_Position> newOrigins = new ArrayList<I_Position>();
+			for (I_Position p: depthOrigins) {
+				newOrigins.addAll(p.getPath().getOrigins());
 			}
 			depthOrigins = newOrigins;
 		}
@@ -146,23 +179,23 @@ public class Position implements Serializable {
 		
 		return Integer.MAX_VALUE;
 	}
-	public static void writePosition(ObjectOutputStream out, Position p) throws IOException {
-		out.writeInt(p.version);
+	public static void writePosition(ObjectOutputStream out, I_Position p) throws IOException {
+		out.writeInt(p.getVersion());
 		try {
-			out.writeObject(AceConfig.vodb.nativeToUuid(p.path.conceptId));
+			out.writeObject(AceConfig.vodb.nativeToUuid(p.getPath().getConceptId()));
 		} catch (DatabaseException e) {
 			IOException newEx = new IOException();
 			newEx.initCause(e);
 			throw newEx;
 		}
-		out.writeInt(p.path.origins.size());
-		for (Position origin: p.path.origins) {
+		out.writeInt(p.getPath().getOrigins().size());
+		for (I_Position origin: p.getPath().getOrigins()) {
 			writePosition(out, origin);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Position readPosition(ObjectInputStream in) throws IOException, ClassNotFoundException  {
+	public static I_Position readPosition(ObjectInputStream in) throws IOException, ClassNotFoundException  {
 		int version = in.readInt();
 		int pathConceptId;
 		try {
@@ -173,7 +206,7 @@ public class Position implements Serializable {
 			throw newEx;
 		}
 		int size = in.readInt();
-		List<Position> origins = new ArrayList<Position>(size);
+		List<I_Position> origins = new ArrayList<I_Position>(size);
 		for (int i = 0; i < size; i++) {
 			origins.add(readPosition(in));
         }
@@ -181,18 +214,18 @@ public class Position implements Serializable {
         return new Position(version, p);
 	}
 
-	public static Set<Position> readPositionSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
+	public static Set<I_Position> readPositionSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int size = in.readInt();
-		Set<Position> positions = new HashSet<Position>(size);
+		Set<I_Position> positions = new HashSet<I_Position>(size);
 		for (int i = 0; i < size; i++) {
 			positions.add(readPosition(in));
 		}
 		return positions;
 	}
 	
-	public static void writePositionSet(ObjectOutputStream out, Set<Position> positions) throws IOException {
-		out.writeInt(positions.size());
-		for (Position p: positions) {
+	public static void writePositionSet(ObjectOutputStream out, Set<I_Position> viewPositions) throws IOException {
+		out.writeInt(viewPositions.size());
+		for (I_Position p: viewPositions) {
 			writePosition(out, p);
 		}
 	}
@@ -203,9 +236,9 @@ public class Position implements Serializable {
 		ConceptBean cb = ConceptBean.get(path.getConceptId());
 		try {
 			buff.append(cb.getInitialText());
-		} catch (DatabaseException e) {
+		} catch (IOException e) {
 			buff.append(e.getMessage());
-			e.printStackTrace();
+			AceLog.alertAndLogException(e);
 		}
 		buff.append(": ");
 		if (version == Integer.MAX_VALUE) {

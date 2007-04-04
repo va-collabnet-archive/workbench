@@ -1,10 +1,9 @@
 package org.dwfa.ace;
 
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JLabel;
-
-import com.sleepycat.je.DatabaseException;
 
 public interface I_ImplementActiveLabel {
 	
@@ -13,7 +12,7 @@ public interface I_ImplementActiveLabel {
 
 	public JLabel getLabel();
 	
-	public I_ImplementActiveLabel copy() throws DatabaseException;
+	public I_ImplementActiveLabel copy() throws IOException;
 	
 	public void addActionListener(ActionListener l);
 	public void removeActionListener(ActionListener l);

@@ -25,6 +25,7 @@ import java.util.zip.ZipEntry;
 import javax.swing.Timer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -129,8 +130,8 @@ public class JarWriter implements  ActionListener {
 			public void run() {
 				try {
 					exportJar();
-				} catch (TaskFailedException e1) {
-					e1.printStackTrace();
+				} catch (TaskFailedException ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		});
@@ -305,7 +306,7 @@ public class JarWriter implements  ActionListener {
 			
 			output.close();
 			upperProgressMessage = prefix + "Complete. Total time: " + allTime.getElapsedTime() / (1000 * 60) + " min.";
-			System.out.println("Total time: " + allTime.getElapsedTime());
+			AceLog.info("Total time: " + allTime.getElapsedTime());
 			continueWork = false;
 			
 			conceptFile.delete();
@@ -363,8 +364,8 @@ public class JarWriter implements  ActionListener {
 		output.putNextEntry(entry);
 
 		URL classUrl = theClass.getResource("/" + classFileName);
-		System.out.println(classUrl);
-		System.out.println(classUrl.getContent());
+		AceLog.info(classUrl.toString());
+		AceLog.info(classUrl.getContent().toString());
 		
 		InputStream classInputStream = classUrl.openStream();
 		int size = classInputStream.available();

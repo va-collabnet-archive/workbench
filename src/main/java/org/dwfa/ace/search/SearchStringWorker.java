@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.Timer;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -160,9 +161,9 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			}
 			updateMatches();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			AceLog.alertAndLogException(e);
 		} catch (ExecutionException e) {
-			e.printStackTrace();
+			AceLog.alertAndLogException(e);
 		}
 		searchPanel.removeStopActionListener(stopListener);
 		searchPanel.setShowProgress(false);

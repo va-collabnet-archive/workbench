@@ -5,11 +5,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
+import org.dwfa.ace.api.TimePathId;
 
 public class ThinRelVersioned implements I_RelVersioned {
 	private int relId;
@@ -174,8 +177,8 @@ public class ThinRelVersioned implements I_RelVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
 	 */
-	public void addTuples(IntSet allowedStatus, IntSet allowedTypes,
-			Set<Position> positions, List<I_RelTuple> returnRels, boolean addUncommitted) {
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_RelTuple> returnRels, boolean addUncommitted) {
 		Set<I_RelPart> uncommittedParts = new HashSet<I_RelPart>();
 		if (positions == null) {
 			List<I_RelPart> addedParts = new ArrayList<I_RelPart>();
@@ -213,7 +216,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 		} else {
 
 			Set<I_RelPart> addedParts = new HashSet<I_RelPart>();
-			for (Position position : positions) {
+			for (I_Position position : positions) {
 				Set<I_RelPart> rejectedParts = new HashSet<I_RelPart>();
 				ThinRelTuple possible = null;
 				for (I_RelPart part : versions) {
@@ -223,15 +226,15 @@ public class ThinRelVersioned implements I_RelVersioned {
 					} else if ((allowedStatus != null)
 							&& (!allowedStatus.contains(part.getStatusId()))) {
 						if (possible != null) {
-							Position rejectedStatusPosition = new Position(part
+							I_Position rejectedStatusPosition = new Position(part
 									.getVersion(), position.getPath()
 									.getMatchingPath(part.getPathId()));
-							Path possiblePath = position.getPath()
+							I_Path possiblePath = position.getPath()
 									.getMatchingPath(possible.getPathId());
-							Position possibleStatusPosition = new Position(
+							I_Position possibleStatusPosition = new Position(
 									possible.getVersion(), possiblePath);
 							
-							if (rejectedStatusPosition.path != null && 
+							if (rejectedStatusPosition.getPath() != null && 
 									rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
 									position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
 								possible = null;
@@ -274,16 +277,16 @@ public class ThinRelVersioned implements I_RelVersioned {
 
 				}
 				if (possible != null) {
-					Path possiblePath = position.getPath().getMatchingPath(
+					I_Path possiblePath = position.getPath().getMatchingPath(
 							possible.getPathId());
-					Position possibleStatusPosition = new Position(possible
+					I_Position possibleStatusPosition = new Position(possible
 							.getVersion(), possiblePath);
 					boolean addPart = true;
 					for (I_RelPart reject : rejectedParts) {
-						Position rejectedStatusPosition = new Position(reject
+						I_Position rejectedStatusPosition = new Position(reject
 								.getVersion(), position.getPath()
 								.getMatchingPath(reject.getPathId()));
-						if (rejectedStatusPosition.path != null && 
+						if (rejectedStatusPosition.getPath() != null && 
 								rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
 								position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
 							addPart = false;

@@ -1,7 +1,7 @@
 package org.dwfa.vodb.types;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
+import org.dwfa.ace.api.I_MapNativeToNative;
 
 
 public class ThinConPart implements I_ConceptAttributePart {

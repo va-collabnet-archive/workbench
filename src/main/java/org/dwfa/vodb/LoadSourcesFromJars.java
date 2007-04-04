@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.jar.JarFile;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.bpa.util.Stopwatch;
@@ -19,9 +20,9 @@ public class LoadSourcesFromJars {
 		timer.start();
 		AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
 		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
-		System.out.println("Starting to process AceAuxillary: " + Arrays.asList(args));
+		AceLog.info("Starting to process AceAuxillary: " + Arrays.asList(args));
 		loadConstants.execute(new JarFile(args[1]));
-		System.out.println("Finished loading constants. Elapsed time: "
+		AceLog.info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths(AceConfig.vodb);
 		AddImage.addStockImage(AceConfig.vodb);
@@ -30,9 +31,9 @@ public class LoadSourcesFromJars {
 			ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
 					AceConfig.vodb, loadConstants.getConstantToIntMap(),
 					releaseDates[0]);
-			System.out.println("Starting to process SNOMED.");
+			AceLog.info("Starting to process SNOMED.");
 			loadSnomed.execute(new JarFile(args[2]));
-			System.out.println("Finished loading terminologies. Elapsed time: "
+			AceLog.info("Finished loading terminologies. Elapsed time: "
 					+ timer.getElapsedTime());
 		}
 	}

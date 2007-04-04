@@ -14,6 +14,7 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddRelationship;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -77,9 +78,6 @@ public abstract class RelPlugin extends AbstractPlugin {
 
 		TableSorter relSortingTable = new TableSorter(model);
 		relTable = new JTableWithDragImage(relSortingTable);
-		relTable.setDragEnabled(true);
-		relTable.setTransferHandler(new TerminologyTransferHandler());
-		relTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		relSortingTable.setTableHeader(relTable.getTableHeader());
 		relSortingTable
 				.getTableHeader()
@@ -95,15 +93,7 @@ public abstract class RelPlugin extends AbstractPlugin {
 			column.setMinWidth(columnDesc.getMin());
 		}
 
-		relTable.getColumn(REL_FIELD.REL_TYPE).setCellEditor(
-				new RelTableModel.RelTypeFieldEditor(host.getConfig()));
-		relTable.getColumn(REL_FIELD.CHARACTERISTIC).setCellEditor(
-				new RelTableModel.RelCharactisticFieldEditor(host.getConfig()));
-		relTable.getColumn(REL_FIELD.REFINABILITY).setCellEditor(
-				new RelTableModel.RelRefinabilityFieldEditor(host.getConfig()));
-		relTable.getColumn(REL_FIELD.STATUS)
-				.setCellEditor(
-						new RelTableModel.RelStatusFieldEditor(host.getConfig()));
+		setupEditors(host);
 		relTable.addMouseListener(model
 				.makePopupListener(relTable, host.getConfig()));
 		// Set up tool tips for column headers.
@@ -122,6 +112,21 @@ public abstract class RelPlugin extends AbstractPlugin {
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory
 				.createLineBorder(Color.GRAY)));
 		return relPanel;
+	}
+
+	protected void setupEditors(I_HostConceptPlugins host) {
+		relTable.setDragEnabled(true);
+		relTable.setTransferHandler(new TerminologyTransferHandler());
+		relTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		relTable.getColumn(REL_FIELD.REL_TYPE).setCellEditor(
+				new RelTableModel.RelTypeFieldEditor(host.getConfig()));
+		relTable.getColumn(REL_FIELD.CHARACTERISTIC).setCellEditor(
+				new RelTableModel.RelCharactisticFieldEditor(host.getConfig()));
+		relTable.getColumn(REL_FIELD.REFINABILITY).setCellEditor(
+				new RelTableModel.RelRefinabilityFieldEditor(host.getConfig()));
+		relTable.getColumn(REL_FIELD.STATUS)
+				.setCellEditor(
+						new RelTableModel.RelStatusFieldEditor(host.getConfig()));
 	}
 
 	public JTableWithDragImage getRelTable() {

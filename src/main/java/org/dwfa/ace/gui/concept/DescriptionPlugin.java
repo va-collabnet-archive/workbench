@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddDescription;
 import org.dwfa.ace.table.DescriptionTableModel;
@@ -29,8 +31,6 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.bpa.util.TableSorter;
-
-import com.sleepycat.je.DatabaseException;
 
 public class DescriptionPlugin extends AbstractPlugin {
 
@@ -49,7 +49,7 @@ public class DescriptionPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			DESC_FIELD[] columnEnums = getDescColumns(host);
@@ -62,6 +62,7 @@ public class DescriptionPlugin extends AbstractPlugin {
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
+			setupEditorsAndRenderers(host);
 			descTableModel.propertyChange(evt);
 		}
 	}
@@ -72,6 +73,8 @@ public class DescriptionPlugin extends AbstractPlugin {
 			descPanel = getDescPanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 			host.addPropertyChangeListener("commit", this);
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			descTableModel.propertyChange(evt);
 		}
 		return descPanel;
 	}
@@ -160,6 +163,18 @@ public class DescriptionPlugin extends AbstractPlugin {
 		c.weighty = 1.0;
 		c.gridheight = 6;
 
+		setupEditorsAndRenderers(host);
+		descPanel.add(descTable, c);
+		descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
+				.createEmptyBorder(1, 1, 1, 3), BorderFactory
+				.createLineBorder(Color.GRAY)));
+
+		c.gridheight = 1;
+		c.gridx = 0;
+		return descPanel;
+	}
+
+	private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
 		DescriptionTableRenderer renderer = new DescriptionTableRenderer();
 		descTable.setDefaultRenderer(Boolean.class, renderer);
 		JComboBox comboBox = new JComboBox() {
@@ -196,14 +211,6 @@ public class DescriptionPlugin extends AbstractPlugin {
 
 		descTable.setDefaultRenderer(Number.class, renderer);
 		descTable.setDefaultRenderer(String.class, renderer);
-		descPanel.add(descTable, c);
-		descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
-
-		c.gridheight = 1;
-		c.gridx = 0;
-		return descPanel;
 	}
 
 }

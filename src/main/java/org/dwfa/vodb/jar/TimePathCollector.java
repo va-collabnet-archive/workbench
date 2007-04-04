@@ -3,9 +3,9 @@ package org.dwfa.vodb.jar;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.vodb.bind.TimePathIdBinder;
 import org.dwfa.vodb.types.I_ProcessTimeBranch;
-import org.dwfa.vodb.types.TimePathId;
 
 import com.sleepycat.je.DatabaseEntry;
 

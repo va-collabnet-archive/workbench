@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import org.dwfa.ace.api.I_HostConceptPlugins;
+
 public interface I_PluginToConceptPanel {
 	public List<JComponent> getToggleBarComponents();
 	public JComponent getComponent(I_HostConceptPlugins host);

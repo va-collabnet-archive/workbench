@@ -5,11 +5,12 @@ import java.util.List;
 
 import javax.swing.JTabbedPane;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.TimePathId;
 
 public class SelectPathAndPositionPanel extends JTabbedPane {
 
@@ -18,10 +19,10 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SelectPathAndPositionPanel(boolean selectPositionOnly, String purpose, AceFrameConfig aceConfig, PropertySetListenerGlue selectGlue) throws Exception {
+	public SelectPathAndPositionPanel(boolean selectPositionOnly, String purpose, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws Exception {
 		super();
 		List<TimePathId> timePathEntries = AceConfig.vodb.getTimePathList();
-		for (Path p: AceConfig.vodb.getPaths()) {
+		for (I_Path p: AceConfig.vodb.getPaths()) {
 			ConceptBean cb = ConceptBean.get(p.getConceptId());
 			int modTimeCount = 0;
 			for (TimePathId tp: timePathEntries) {
@@ -36,8 +37,8 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
 		}
 	}
 
-	public List<Position> getSelectedPositions() {
-		List<Position> positions = new ArrayList<Position>();
+	public List<I_Position> getSelectedPositions() {
+		List<I_Position> positions = new ArrayList<I_Position>();
 		for (int i = 0; i < getTabCount(); i++) {
 			PositionPanel pp = (PositionPanel) getComponentAt(i);
 			if (pp.isPositionSelected()) {

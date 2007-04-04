@@ -1,8 +1,8 @@
 package org.dwfa.ace;
 
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import java.io.IOException;
 
-import com.sleepycat.je.DatabaseException;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 
 public class LabelForConceptAttributeTuple extends LabelForTuple {
 
@@ -18,7 +18,7 @@ public class LabelForConceptAttributeTuple extends LabelForTuple {
 		this.conAttr = conAttr;
 	}
 
-	public I_ImplementActiveLabel copy() throws DatabaseException {
+	public I_ImplementActiveLabel copy() throws IOException {
 		return TermLabelMaker.newLabel(conAttr, isLongForm(), getShowStatus());
 	}
 

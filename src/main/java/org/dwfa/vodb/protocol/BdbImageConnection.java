@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.tapi.TerminologyException;
@@ -34,8 +35,8 @@ public class BdbImageConnection extends URLConnection {
 							if (image != null) {
 								return;
 							}
-						} catch (RuntimeException e) {
-							e.printStackTrace();
+						} catch (RuntimeException ex) {
+							AceLog.alertAndLogException(ex);
 						} 
 					}
 				} else {
@@ -60,8 +61,8 @@ public class BdbImageConnection extends URLConnection {
 		if (image == null) {
 			try {
 				connect();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException ex) {
+				AceLog.alertAndLogException(ex);
 				return null;
 			}
 		}

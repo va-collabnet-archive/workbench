@@ -15,6 +15,7 @@ import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -63,7 +64,7 @@ public class AceRunner {
 			AceConfig.setupAceConfig(aceConfig, aceConfigFile, cacheSize);
 		}
 		ACE.setAceConfig(aceConfig);
-		for (AceFrameConfig ace: aceConfig.aceFrames) {
+		for (I_ConfigAceFrame ace: aceConfig.aceFrames) {
 			if (ace.isActive()) {
 				AceFrame af = new AceFrame(args, lc, ace);
 				af.setVisible(true);

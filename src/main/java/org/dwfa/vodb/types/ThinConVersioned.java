@@ -5,13 +5,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.impl.LocalFixedConcept;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	private int conId;
@@ -109,8 +112,8 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addTuples(org.dwfa.ace.IntSet, java.util.Set, java.util.List)
 	 */
-	public void addTuples(IntSet allowedStatus,
-			Set<Position> positions, List<I_ConceptAttributeTuple> returnTuples) {
+	public void addTuples(I_IntSet allowedStatus,
+			Set<I_Position> positions, List<I_ConceptAttributeTuple> returnTuples) {
 		Set<ThinConPart> uncommittedParts = new HashSet<ThinConPart>();
 		if (positions == null) {
 			List<ThinConPart> addedParts = new ArrayList<ThinConPart>();
@@ -144,7 +147,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 		} else {
 
 			Set<ThinConPart> addedParts = new HashSet<ThinConPart>();
-			for (Position position : positions) {
+			for (I_Position position : positions) {
 				Set<ThinConPart> rejectedParts = new HashSet<ThinConPart>();
 				ThinConTuple possible = null;
 				for (I_ConceptAttributePart part : versions) {
@@ -155,12 +158,12 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 							&& (!allowedStatus
 									.contains(part.getConceptStatus()))) {
 						if (possible != null) {
-							Position rejectedStatusPosition = new Position(part
+							I_Position rejectedStatusPosition = new Position(part
 									.getVersion(), position.getPath()
 									.getMatchingPath(part.getPathId()));
-							Path possiblePath = position.getPath()
+							I_Path possiblePath = position.getPath()
 									.getMatchingPath(possible.getPathId());
-							Position possibleStatusPosition = new Position(
+							I_Position possibleStatusPosition = new Position(
 									possible.getVersion(), possiblePath);
 							if (position
 									.isSubsequentOrEqualTo(rejectedStatusPosition)) {
@@ -202,13 +205,13 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 
 				}
 				if (possible != null) {
-					Path possiblePath = position.getPath().getMatchingPath(
+					I_Path possiblePath = position.getPath().getMatchingPath(
 							possible.getPathId());
-					Position possibleStatusPosition = new Position(possible
+					I_Position possibleStatusPosition = new Position(possible
 							.getVersion(), possiblePath);
 					boolean addPart = true;
 					for (I_ConceptAttributePart reject : rejectedParts) {
-						Position rejectedStatusPosition = new Position(reject
+						I_Position rejectedStatusPosition = new Position(reject
 								.getVersion(), position.getPath()
 								.getMatchingPath(reject.getPathId()));
 						if ((rejectedStatusPosition

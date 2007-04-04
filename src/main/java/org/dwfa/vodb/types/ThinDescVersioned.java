@@ -7,13 +7,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.impl.LocalFixedDesc;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 public class ThinDescVersioned implements I_DescriptionVersioned {
 	private int descId;
@@ -115,8 +118,8 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTuples()
 	 */
-	public List<ThinDescTuple> getTuples() {
-		List<ThinDescTuple> tuples = new ArrayList<ThinDescTuple>();
+	public List<I_DescriptionTuple> getTuples() {
+		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
 		for (I_DescriptionPart p : getVersions()) {
 			tuples.add(new ThinDescTuple(this, p));
 		}
@@ -140,8 +143,8 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List)
 	 */
-	public void addTuples(IntSet allowedStatus, IntSet allowedTypes,
-			Set<Position> positions, List<I_DescriptionTuple> matchingTuples) {
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_DescriptionTuple> matchingTuples) {
 		Set<I_DescriptionPart> uncommittedParts = new HashSet<I_DescriptionPart>();
 		if (positions == null) {
 			List<I_DescriptionPart> addedParts = new ArrayList<I_DescriptionPart>();
@@ -178,7 +181,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 			}
 		} else {
 			Set<I_DescriptionPart> addedParts = new HashSet<I_DescriptionPart>();
-			for (Position position : positions) {
+			for (I_Position position : positions) {
 				Set<I_DescriptionPart> rejectedParts = new HashSet<I_DescriptionPart>();
 				ThinDescTuple possible = null;
 				for (I_DescriptionPart part : versions) {
@@ -191,9 +194,9 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 							Position rejectedStatusPosition = new Position(part
 									.getVersion(), position.getPath()
 									.getMatchingPath(part.getPathId()));
-							Path possiblePath = position.getPath()
+							I_Path possiblePath = position.getPath()
 									.getMatchingPath(possible.getPathId());
-							Position possibleStatusPosition = new Position(
+							I_Position possibleStatusPosition = new Position(
 									possible.getVersion(), possiblePath);
 							if (rejectedStatusPosition.path != null && 
 									rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
@@ -238,9 +241,9 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
 				}
 				if (possible != null) {
-					Path possiblePath = position.getPath().getMatchingPath(
+					I_Path possiblePath = position.getPath().getMatchingPath(
 							possible.getPathId());
-					Position possibleStatusPosition = new Position(possible
+					I_Position possibleStatusPosition = new Position(possible
 							.getVersion(), possiblePath);
 					boolean addPart = true;
 					for (I_DescriptionPart reject : rejectedParts) {
@@ -280,10 +283,10 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#merge(org.dwfa.vodb.types.ThinDescVersioned)
 	 */
-	public boolean merge(ThinDescVersioned jarDesc) {
+	public boolean merge(I_DescriptionVersioned jarDesc) {
 		HashSet<I_DescriptionPart> versionSet = new HashSet<I_DescriptionPart>(versions);
 		boolean changed = false;
-		for (I_DescriptionPart jarPart : jarDesc.versions) {
+		for (I_DescriptionPart jarPart : jarDesc.getVersions()) {
 			if (!versionSet.contains(jarPart)) {
 				changed = true;
 				versions.add(jarPart);

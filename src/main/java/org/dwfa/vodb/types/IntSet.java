@@ -1,4 +1,4 @@
-package org.dwfa.ace;
+package org.dwfa.vodb.types;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,11 +14,12 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.config.AceConfig;
 
 import com.sleepycat.je.DatabaseException;
 
-public class IntSet implements ListDataListener {
+public class IntSet implements ListDataListener, I_IntSet {
 	private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 	
 	private int[] setValues = new int[0];
@@ -32,13 +33,22 @@ public class IntSet implements ListDataListener {
 		this.setValues = new int[0];
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#contains(int)
+	 */
 	public boolean contains(int key) {
 		return Arrays.binarySearch(setValues, key) >= 0;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#getSetValues()
+	 */
 	public int[] getSetValues() {
 		return setValues;
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#add(int)
+	 */
 	public void add(int key) {
 		if (setValues.length == 0) {
 			setValues = new int[1];
@@ -60,6 +70,9 @@ public class IntSet implements ListDataListener {
 			setValues = newSet;
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#remove(int)
+	 */
 	public void remove(int key) {
 		int insertionPoint = Arrays.binarySearch(setValues, key);
 		if (insertionPoint < 0) {
@@ -75,22 +88,31 @@ public class IntSet implements ListDataListener {
 		setValues = newSet;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#addAll(int[])
+	 */
 	public void addAll(int[] keys) {
 		for (int i = 0; i < keys.length; i++) {
 			add(keys[i]);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
+	 */
 	public void removeAll(int[] keys) {
 		for (int i = 0; i < keys.length; i++) {
 			remove(keys[i]);
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#clear()
+	 */
 	public void clear() {
 		setValues = new int[0];
 	}
 	
-	public static void writeIntSet(ObjectOutputStream out, IntSet set) throws IOException {
+	public static void writeIntSet(ObjectOutputStream out, I_IntSet set) throws IOException {
 		if (set == null) {
 			out.writeInt(Integer.MIN_VALUE);
 			return;
@@ -127,6 +149,9 @@ public class IntSet implements ListDataListener {
         return returnSet;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#contentsChanged(javax.swing.event.ListDataEvent)
+	 */
 	public void contentsChanged(ListDataEvent e) {
 		handleChange(e);
 		for (ListDataListener l: listeners) {
@@ -143,6 +168,9 @@ public class IntSet implements ListDataListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#intervalAdded(javax.swing.event.ListDataEvent)
+	 */
 	public void intervalAdded(ListDataEvent e) {
 		handleChange(e);
 		for (ListDataListener l: listeners) {
@@ -150,15 +178,24 @@ public class IntSet implements ListDataListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#intervalRemoved(javax.swing.event.ListDataEvent)
+	 */
 	public void intervalRemoved(ListDataEvent e) {
 		handleChange(e);
 		for (ListDataListener l: listeners) {
 			l.intervalRemoved(e);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#addListDataListener(javax.swing.event.ListDataListener)
+	 */
 	public boolean addListDataListener(ListDataListener o) {
 		return listeners.add(o);
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_IntSet#removeListDataListener(javax.swing.event.ListDataListener)
+	 */
 	public boolean removeListDataListener(ListDataListener o) {
 		return listeners.remove(o);
 	}

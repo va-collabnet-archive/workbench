@@ -6,14 +6,14 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 
-import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.vodb.types.ConceptBean;
 
 public abstract class AbstractPopupFieldEditor extends DefaultCellEditor {
 	private static final long serialVersionUID = 1L;
 	private JComboBox combo;
-	AceFrameConfig config;
-	public AbstractPopupFieldEditor(AceFrameConfig config) {
+	I_ConfigAceFrame config;
+	public AbstractPopupFieldEditor(I_ConfigAceFrame config) {
 		super(new JComboBox());
 		combo = new JComboBox();
 		combo.setMaximumRowCount(20);

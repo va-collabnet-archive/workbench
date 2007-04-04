@@ -5,6 +5,7 @@ import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,13 +24,12 @@ import javax.swing.tree.DefaultTreeModel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class LineagePlugin extends AbstractPlugin {
 
@@ -52,7 +52,7 @@ public class LineagePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (host != null) {
 			updateLineageModel();
 		}
@@ -65,7 +65,8 @@ public class LineagePlugin extends AbstractPlugin {
 				lineagePanel = getLineagePanel(host);
 				host.addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, this);
 				host.addPropertyChangeListener("commit", this);
-			} catch (DatabaseException e) {
+				updateLineageModel();
+			} catch (IOException e) {
 				AceLog.alertAndLog(null, Level.SEVERE, "Database Exception: " + e.getLocalizedMessage(), e);
 			}
 		}
@@ -73,7 +74,7 @@ public class LineagePlugin extends AbstractPlugin {
 	}
 
 	private JComponent getLineagePanel(I_HostConceptPlugins host)
-			throws DatabaseException {
+			throws IOException {
 		JPanel lineagePanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -142,7 +143,7 @@ public class LineagePlugin extends AbstractPlugin {
 		return lineagePanel;
 	}
 
-	private void updateLineageModel() throws DatabaseException {
+	private void updateLineageModel() throws IOException {
 		DefaultTreeModel model = (DefaultTreeModel) lineageTree.getModel();
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
 		model.setRoot(root);
@@ -199,7 +200,7 @@ public class LineagePlugin extends AbstractPlugin {
 	}
 
 	private List<List<ConceptBean>> getLineage(ConceptBean bean, int depth)
-			throws DatabaseException {
+			throws IOException {
 		List<List<ConceptBean>> lineage = new ArrayList<List<ConceptBean>>();
 
 		List<I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(host.getConfig().getAllowedStatus(), 

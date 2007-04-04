@@ -42,6 +42,8 @@ public class ConceptTableRenderer extends AceTableRenderer {
 			if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
 				renderComponent.setText("");
 			}
+		} else {
+			setBorder(column, this, false, uncommitted);
 		}
 		if (isSelected == false) {
 			renderComponent.setBackground(colorForRow(row));

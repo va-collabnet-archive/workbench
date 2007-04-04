@@ -2,6 +2,7 @@ package org.dwfa.ace.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,18 +15,17 @@ import javax.swing.ImageIcon;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ImageTableModel extends AbstractTableModel implements PropertyChangeListener {
 
@@ -110,10 +110,10 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			}
 			try {
 				referencedConcepts = get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException ex) {
+				AceLog.alertAndLogException(ex);
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -189,8 +189,8 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 				get();
 			} catch (InterruptedException e) {
 				;
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			tableConcept = cb;
 			fireTableDataChanged();
@@ -281,7 +281,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		}
 	}
 	protected I_ImageTuple getImage(int rowIndex)
-	throws DatabaseException {
+	throws IOException {
 		if (tableConcept == null) {
 			return null;
 		}
@@ -295,7 +295,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		return referencedConcepts;
 
 	}
-	public List<I_ImageVersioned> getAllImages() throws DatabaseException {
+	public List<I_ImageVersioned> getAllImages() throws IOException {
 		if (allImages == null) {
 			allImages = new ArrayList<I_ImageVersioned>();
 			allImages.addAll(tableConcept.getUncommittedImages());
@@ -319,8 +319,8 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			} else {
 				return getAllImages().size();
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return 0;
 	}
@@ -371,13 +371,13 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 				}
 				return new StringWithImageTuple(Integer.toString(image.getPathId()), image);
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return null;
 	}
 
-	private String getPrefText(int id) throws DatabaseException {
+	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = getReferencedConcepts().get(id);
 		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
@@ -456,9 +456,8 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 				}
 			}
 			return false;
-		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return false;
 	}

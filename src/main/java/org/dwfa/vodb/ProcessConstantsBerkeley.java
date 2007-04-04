@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
@@ -21,7 +23,6 @@ import org.dwfa.vodb.bind.ThinIdVersionedBinding;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
@@ -44,7 +45,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 				
 		private Map<UUID, Integer> uuidToInt = new HashMap<UUID, Integer>();
 		
-		public int getIntId(Collection<UUID> uids, Path idPath, int version) throws Exception {
+		public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
 			for (UUID uid: uids) {
 				try {
 					return getIntId(uid, idPath, version);
@@ -54,7 +55,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 			}
 			throw new Exception("Can't find id for: " + uids);
 		}
-		public int getIntId(UUID uid, Path idPath, int version) throws Exception {
+		public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
 			if (uuidToInt.containsKey(uid)) {
 				return uuidToInt.get(uid);
 			}
@@ -91,7 +92,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	private VodbEnv vodb;
 	private IdMapper map;
 	
-	Path aceAuxPath;
+	I_Path aceAuxPath;
 
 	public ProcessConstantsBerkeley(VodbEnv vodb) throws DatabaseException {
 		super();
@@ -117,7 +118,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 			throw new UnsupportedOperationException("Long native id type is not currently supported. ");
 		}
 		aceAuxPath = new Path(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE),
-				new ArrayList<Position>());
+				new ArrayList<I_Position>());
 	}
 
 	@Override
@@ -126,7 +127,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	}
 	
 	@Override
-	public void cleanup(IntSet relsToIgnore) throws Exception {
+	public void cleanup(I_IntSet relsToIgnore) throws Exception {
 		//Nothing to do...
 	}
 

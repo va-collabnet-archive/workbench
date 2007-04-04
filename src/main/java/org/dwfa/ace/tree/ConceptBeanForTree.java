@@ -1,5 +1,6 @@
 package org.dwfa.ace.tree;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -7,21 +8,19 @@ import java.util.UUID;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.dwfa.ace.IntList;
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Position;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	ConceptBean bean;
@@ -44,7 +43,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		this.secondaryParentNode = secondaryParentNode;
 	}
 
-	public I_ConceptAttributeVersioned getConceptAttributes() throws DatabaseException {
+	public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
 		return bean.getConceptAttributes();
 	}
 
@@ -52,51 +51,51 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getConceptId();
 	}
 
-	public List<I_ConceptAttributeTuple> getConceptTuples(IntSet allowedStatus, Set<Position> positions) throws DatabaseException {
+	public List<I_ConceptAttributeTuple> getConceptTuples(I_IntSet allowedStatus, Set<I_Position> positions) throws IOException {
 		return bean.getConceptTuples(allowedStatus, positions);
 	}
 
-	public List<I_DescriptionVersioned> getDescriptions() throws DatabaseException {
+	public List<I_DescriptionVersioned> getDescriptions() throws IOException {
 		return bean.getDescriptions();
 	}
 
-	public List<I_DescriptionTuple> getDescriptionTuples(IntSet allowedStatus, IntSet allowedTypes, Set<Position> positions) throws DatabaseException {
+	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
 		return bean.getDescriptionTuples(allowedStatus, allowedTypes, positions);
 	}
 
-	public List<I_RelVersioned> getDestRels() throws DatabaseException {
+	public List<I_RelVersioned> getDestRels() throws IOException {
 		if (parentDepth > 0) {
 			return new ArrayList<I_RelVersioned>();
 		}
 		return bean.getDestRels();
 	}
 
-	public List<I_RelTuple> getDestRelTuples(IntSet allowedStatus, 
-			IntSet allowedTypes, Set<Position> positions, boolean addUncommitted) throws DatabaseException {
+	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
 		if (parentDepth > 0) {
 			return new ArrayList<I_RelTuple>();
 		}
 		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
 	}
 
-	public List<I_ImageVersioned> getImages() throws DatabaseException {
+	public List<I_ImageVersioned> getImages() throws IOException {
 		return bean.getImages();
 	}
 
-	public String getInitialText() throws DatabaseException {
+	public String getInitialText() throws IOException {
 		return bean.getInitialText();
 	}
 
-	public List<I_RelVersioned> getSourceRels() throws DatabaseException {
+	public List<I_RelVersioned> getSourceRels() throws IOException {
 		return bean.getSourceRels();
 	}
 
-	public List<I_RelTuple> getSourceRelTuples(IntSet allowedStatus, 
-			IntSet allowedTypes, Set<Position> positions, boolean addUncommitted) throws DatabaseException {
+	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
 		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
 	}
 
-	public List<UUID> getUids() throws DatabaseException {
+	public List<UUID> getUids() throws IOException {
 		return bean.getUids();
 	}
 
@@ -104,7 +103,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getUncommittedImages();
 	}
 
-	public boolean isLeaf(AceFrameConfig aceConfig, boolean addUncommitted) throws DatabaseException {
+	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException {
 		if (parentDepth > 0) {
 			return true;
 		}
@@ -152,19 +151,19 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getUncommittedSourceRels();
 	}
 
-	public I_IdVersioned getId() throws DatabaseException {
+	public I_IdVersioned getId() throws IOException {
 		return bean.getId();
 	}
 
-	public I_DescriptionTuple getDescTuple(AceFrameConfig config) throws DatabaseException {
+	public I_DescriptionTuple getDescTuple(I_ConfigAceFrame config) throws IOException {
 		return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
 	}
 
-	public I_DescriptionTuple getDescTuple(IntList prefOrder, AceFrameConfig config) throws DatabaseException {
+	public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
 		return bean.getDescTuple(prefOrder, config);
 	}
 
-	public IntSet getUncommittedIds() {
+	public I_IntSet getUncommittedIds() {
 		return bean.getUncommittedIds();
 	}
 	

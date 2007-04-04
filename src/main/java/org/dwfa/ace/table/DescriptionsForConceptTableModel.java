@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,22 +21,21 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
-
-import com.sleepycat.je.DatabaseException;
 
 public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		implements PropertyChangeListener {
@@ -78,10 +78,10 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			}
 			try {
 				referencedConcepts = get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException ex) {
+				AceLog.alertAndLogException(ex);
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -118,21 +118,31 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 				return 0;
 			}
 			List<I_DescriptionVersioned> descs = cb.getDescriptions();
+			addToConceptsToFetch(descs);
+			if (stopWork) {
+				return -1;
+			}
+			descs = cb.getUncommittedDescriptions();
+			if (stopWork) {
+				return -1;
+			}
+			addToConceptsToFetch(descs);
+			refConWorker = new ReferencedConceptsSwingWorker();
+			refConWorker.start();
+			return descs.size();
+		}
+
+		private void addToConceptsToFetch(List<I_DescriptionVersioned> descs) {
 			for (I_DescriptionVersioned d : descs) {
 				if (stopWork) {
-					return -1;
+					return;
 				}
 				for (I_DescriptionPart descVersion : d.getVersions()) {
 					conceptsToFetch.add(descVersion.getTypeId());
 					conceptsToFetch.add(descVersion.getStatusId());
 					conceptsToFetch.add(descVersion.getPathId());
 				}
-
 			}
-
-			refConWorker = new ReferencedConceptsSwingWorker();
-			refConWorker.start();
-			return descs.size();
 		}
 
 		@Override
@@ -155,8 +165,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 				get();
 			} catch (InterruptedException e) {
 				;
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -189,11 +199,11 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		this.host = host;
 		host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 	}
-	public List<I_DescriptionTuple> getDescriptions() throws DatabaseException {
+	public List<I_DescriptionTuple> getDescriptions() throws IOException {
 		List<I_DescriptionTuple> selectedTuples = new ArrayList<I_DescriptionTuple>();
-		IntSet allowedStatus = host.getConfig().getAllowedStatus();
-		IntSet allowedTypes = null;
-		Set<Position> positions = null;
+		I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
+		I_IntSet allowedTypes = null;
+		Set<I_Position> positions = null;
 		if (host.getUsePrefs()) {
 			allowedTypes = host.getConfig().getDescTypes();
 			positions = host.getConfig().getViewPositionSet();
@@ -216,7 +226,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 	}
 
 	protected I_DescriptionTuple getDescription(int rowIndex)
-			throws DatabaseException {
+			throws IOException {
 		
 		
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
@@ -239,8 +249,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 				allTuples = getDescriptions();
 			}
 			return allTuples.size();
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return 0;
 	}
@@ -264,7 +274,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 	public Map<Integer, ConceptBean> getReferencedConcepts() {
 		return referencedConcepts;
 	}
-	public PopupListener makePopupListener(JTable table, AceFrameConfig config) {
+	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
 		return new PopupListener(table, config);
 	}
 
@@ -276,7 +286,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				for (Path p : config.getEditingPathSet()) {
+				for (I_Path p : config.getEditingPathSet()) {
 					I_DescriptionPart newPart = selectedObject.getTuple()
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
@@ -298,7 +308,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 
 			public void actionPerformed(ActionEvent e) {
 				try {
-					for (Path p : config.getEditingPathSet()) {
+					for (I_Path p : config.getEditingPathSet()) {
 						I_DescriptionPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
@@ -312,8 +322,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 					ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getConceptId()));
 					allTuples = null;
 					DescriptionsForConceptTableModel.this.fireTableDataChanged();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		}
@@ -328,9 +338,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 
 		StringWithDescTuple selectedObject;
 
-		AceFrameConfig config;
+		I_ConfigAceFrame config;
 
-		public PopupListener(JTable table, AceFrameConfig config) {
+		public PopupListener(JTable table, I_ConfigAceFrame config) {
 			super();
 			this.table = table;
 			this.config = config;

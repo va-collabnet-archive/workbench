@@ -1,9 +1,9 @@
 package org.dwfa.ace;
 
 
-import org.dwfa.ace.api.I_RelTuple;
+import java.io.IOException;
 
-import com.sleepycat.je.DatabaseException;
+import org.dwfa.ace.api.I_RelTuple;
 
 
 public class LabelForRelationshipTuple extends LabelForTuple {
@@ -22,7 +22,7 @@ public class LabelForRelationshipTuple extends LabelForTuple {
 	}
 	
 
-	public I_ImplementActiveLabel copy() throws DatabaseException {
+	public I_ImplementActiveLabel copy() throws IOException {
 		return TermLabelMaker.newLabel(rel, isLongForm(), getShowStatus());
 	}
 

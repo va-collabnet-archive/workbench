@@ -1,9 +1,9 @@
 package org.dwfa.ace;
 
 
-import org.dwfa.ace.api.I_DescriptionTuple;
+import java.io.IOException;
 
-import com.sleepycat.je.DatabaseException;
+import org.dwfa.ace.api.I_DescriptionTuple;
 
 public class LabelForDescriptionTuple extends LabelForTuple {
 
@@ -16,10 +16,13 @@ public class LabelForDescriptionTuple extends LabelForTuple {
 	
 	public LabelForDescriptionTuple(I_DescriptionTuple desc, boolean longForm, boolean showStatus) {
 		super(longForm, showStatus);
+		if (desc == null) {
+			throw new NullPointerException("desc cannot be null...");
+		}
 		this.desc = desc;
 	}
 
-	public I_ImplementActiveLabel copy() throws DatabaseException {
+	public I_ImplementActiveLabel copy() throws IOException {
 		return TermLabelMaker.newLabel(desc, isLongForm(), getShowStatus());
 	}
 

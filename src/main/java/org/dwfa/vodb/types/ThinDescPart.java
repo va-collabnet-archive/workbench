@@ -1,7 +1,7 @@
 package org.dwfa.vodb.types;
 
 import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
+import org.dwfa.ace.api.I_MapNativeToNative;
 
 
 public class ThinDescPart implements I_DescriptionPart {

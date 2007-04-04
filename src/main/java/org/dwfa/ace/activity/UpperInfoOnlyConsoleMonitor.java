@@ -4,6 +4,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 
+import org.dwfa.ace.AceLog;
+
 public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 
 	public void addActionListener(ActionListener l) {
@@ -42,7 +44,7 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 	}
 
 	public void setProgressInfoUpper(String text) {
-		System.out.println(text);
+		AceLog.info(text);
 
 	}
 

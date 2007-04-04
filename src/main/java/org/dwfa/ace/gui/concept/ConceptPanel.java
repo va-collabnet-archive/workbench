@@ -27,7 +27,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -39,17 +38,19 @@ import javax.swing.event.ChangeListener;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
-import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.TermComponentSelectionListener;
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.AttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -58,7 +59,6 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_Transact;
-import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
@@ -502,10 +502,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					if (tdt != null) {
 						desc = tdt.getText();
 					} else {
-						desc = "null tdt: " + cb.getInitialText();
+						desc = cb.getInitialText();
 					}
-				} catch (DatabaseException e) {
-					e.printStackTrace();
+				} catch (IOException e) {
+					AceLog.alertAndLogException(e);
 					desc = termComponent.toString();
 				}
 				String shortDesc;
@@ -538,7 +538,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return historyButton.isSelected();
 	}
 
-	public AceFrameConfig getConfig() {
+	public I_ConfigAceFrame getConfig() {
 		return ace.getAceFrameConfig();
 	}
 
@@ -564,7 +564,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("viewPosition")) {
+		if (evt.getPropertyName().equals("viewPositions")) {
 			historyChangeActionListener.actionPerformed(null);
 		} else if (evt.getPropertyName().equals("commit")) {
 			this.firePropertyChange("commit", null, null);
@@ -582,24 +582,25 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return VIEW_TYPE.STATED;
 	}
 
-	public ConceptBean getHierarchySelection() {
+	public I_GetConceptData getHierarchySelection() {
 		return ace.getAceFrameConfig().getHierarchySelection();
 	}
 
 	public I_GetConceptData newConcept(UUID newConceptId, boolean defined)
 			throws TerminologyException, IOException {
 		canEdit();
-		ConceptBean newBean = ConceptBean.get(newConceptId);
 		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+				.getUids());
 		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+		ConceptBean newBean = ConceptBean.get(nid);
+		newBean.setPrimordial(true);
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
 				getConfig().getEditingPathSet().size());
-		for (Path p : getConfig().getEditingPathSet()) {
+		for (I_Path p : getConfig().getEditingPathSet()) {
 			ThinConPart attributePart = new ThinConPart();
 			attributePart.setVersion(Integer.MAX_VALUE);
 			attributePart.setDefined(defined);
@@ -627,22 +628,19 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				Integer.MAX_VALUE);
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), getConfig().getEditingPathSet().size());
-		ThinDescPart descPart = new ThinDescPart();
-		desc.addVersion(descPart);
 		boolean capStatus = false;
 		int status = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		int typeId = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
-						.getUids());
-		for (Path p : getConfig().getEditingPathSet()) {
+		for (I_Path p : getConfig().getEditingPathSet()) {
+			ThinDescPart descPart = new ThinDescPart();
 			descPart.setVersion(Integer.MAX_VALUE);
 			descPart.setPathId(p.getConceptId());
 			descPart.setInitialCaseSignificant(capStatus);
 			descPart.setLang(lang);
 			descPart.setStatusId(status);
 			descPart.setText(text);
-			descPart.setTypeId(typeId);
+			descPart.setTypeId(descType.getNid());
+			desc.addVersion(descPart);
 		}
 		concept.getUncommittedDescriptions().add(desc);
 		concept.getUncommittedIds().add(descId);
@@ -652,6 +650,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public I_RelVersioned newRelationship(UUID newRelUid,
 			I_GetConceptData concept) throws TerminologyException, IOException {
 		canEdit();
+		if (getConfig().getHierarchySelection() == null) {
+			throw new TerminologyException("<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
+		}
 		int idSource = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
@@ -660,11 +661,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), getConfig().getHierarchySelection()
 				.getConceptId(), 1);
-		ThinRelPart relPart = new ThinRelPart();
-		rel.addVersion(relPart);
 		int status = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		for (Path p : getConfig().getEditingPathSet()) {
+		for (I_Path p : getConfig().getEditingPathSet()) {
+			ThinRelPart relPart = new ThinRelPart();
 			relPart.setVersion(Integer.MAX_VALUE);
 			relPart.setPathId(p.getConceptId());
 			relPart.setStatusId(status);
@@ -675,6 +675,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			relPart.setRefinabilityId(getConfig()
 					.getDefaultRelationshipRefinability().getConceptId());
 			relPart.setGroup(0);
+			rel.addVersion(relPart);
 		}
 		concept.getUncommittedSourceRels().add(rel);
 		concept.getUncommittedIds().add(relId);
@@ -708,7 +709,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		int status = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 		
-		for (Path p : getConfig().getEditingPathSet()) {
+		for (I_Path p : getConfig().getEditingPathSet()) {
 			relPart.setVersion(Integer.MAX_VALUE);
 			relPart.setPathId(p.getConceptId());
 			relPart.setStatusId(status);
@@ -726,9 +727,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	private void canEdit() throws TerminologyException {
 		if (getConfig().getEditingPathSet().size() == 0) {
-			JOptionPane.showMessageDialog(this,
-					"You must select an editing path before editing...");
-			throw new TerminologyException("No editing path selected.");
+			throw new TerminologyException("<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
 		}
 	}
 }

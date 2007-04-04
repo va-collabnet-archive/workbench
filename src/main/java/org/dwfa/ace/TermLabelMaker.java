@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.plaf.basic.BasicHTML;
@@ -14,13 +15,11 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.vodb.types.ConceptBean;
 
-import com.sleepycat.je.DatabaseException;
-
 public class TermLabelMaker {
 	
 	public static final int LABEL_WIDTH = 330;
 	
-	public static I_ImplementActiveLabel newLabel(I_ConceptAttributeTuple conAttribute, boolean showLongForm, boolean showStatus) throws DatabaseException {
+	public static I_ImplementActiveLabel newLabel(I_ConceptAttributeTuple conAttribute, boolean showLongForm, boolean showStatus) throws IOException {
 		ConceptBean statusBean = null;
 		String text = "null characteristic";
 		if (conAttribute != null) {
@@ -68,7 +67,7 @@ public class TermLabelMaker {
 		LabelForTuple ldt = new LabelForConceptAttributeTuple(conAttribute, showLongForm, showStatus);
 		return makeLabel(ldt, labelHtml, toolTipHtml);		
 	}
-	public static I_ImplementActiveLabel newLabel(I_DescriptionTuple desc, boolean showLongForm, boolean showStatus) throws DatabaseException {
+	public static I_ImplementActiveLabel newLabel(I_DescriptionTuple desc, boolean showLongForm, boolean showStatus) throws IOException {
 		ConceptBean typeBean = null;
 		ConceptBean statusBean = null;
 		String text = "null desc";
@@ -134,7 +133,7 @@ public class TermLabelMaker {
 		LabelForTuple ldt = new LabelForDescriptionTuple(desc, showLongForm, showStatus);
 		return makeLabel(ldt, labelHtml, toolTipHtml);		
 	}
-	public static I_ImplementActiveLabel newLabel(I_RelTuple rel, boolean showLongForm, boolean showStatus) throws DatabaseException {
+	public static I_ImplementActiveLabel newLabel(I_RelTuple rel, boolean showLongForm, boolean showStatus) throws IOException {
 		ConceptBean typeBean = ConceptBean.get(rel.getRelTypeId());
 		ConceptBean destBean = ConceptBean.get(rel.getC2Id());
 		ConceptBean refinabilityBean = ConceptBean.get(rel.getRefinabilityId());

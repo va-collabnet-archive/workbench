@@ -17,7 +17,11 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyEvent;
 import java.awt.image.FilteredImageSource;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.Action;
@@ -31,12 +35,14 @@ import javax.swing.TransferHandler;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.vodb.types.ConceptBean;
@@ -94,9 +100,9 @@ public class JTreeWithDragImage extends JTree {
 					dge.startDrag(DragSource.DefaultCopyDrop, dragImage,
 							imageOffset, getTransferable(obj), dsl);
 				} catch (InvalidDnDOperationException e) {
-					System.out.println(e.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
+					AceLog.info(e.toString());
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		}
@@ -107,7 +113,7 @@ public class JTreeWithDragImage extends JTree {
 		}
 
 		public Image getDragImage(I_GetConceptData obj)
-				throws DatabaseException {
+				throws IOException {
 
 			I_DescriptionTuple desc = obj.getDescTuple(config
 					.getTreeDescPreferenceList(), config);
@@ -126,17 +132,31 @@ public class JTreeWithDragImage extends JTree {
 			return dragImage;
 		}
 	}
+	private class CommitListener implements PropertyChangeListener {
+
+		@SuppressWarnings("unchecked")
+		public void propertyChange(PropertyChangeEvent evt) {
+			DefaultTreeModel m = (DefaultTreeModel) JTreeWithDragImage.this.getModel();
+			DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
+			Enumeration<DefaultMutableTreeNode> childEnum = root.children();
+			while (childEnum.hasMoreElements()) {
+				m.nodeStructureChanged(childEnum.nextElement());
+			}
+			AceLog.info("Tree model changed");
+		}
+		
+	}
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private AceFrameConfig config;
+	private I_ConfigAceFrame config;
 
 	private List<ChangeListener> workerFinishedListeners = new ArrayList<ChangeListener>();
 
-	public JTreeWithDragImage(AceFrameConfig config) {
+	public JTreeWithDragImage(I_ConfigAceFrame config) {
 		super();
 		this.config = config;
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(
@@ -159,9 +179,10 @@ public class JTreeWithDragImage extends JTree {
 		map.put("cut", new AceTransferAction("cut"));
 		map.put("copy", new AceTransferAction("copy"));
 		map.put("paste", new AceTransferAction("paste"));
+		config.addPropertyChangeListener("commit", new CommitListener());
 	}
 
-	public AceFrameConfig getConfig() {
+	public I_ConfigAceFrame getConfig() {
 		return config;
 	}
 

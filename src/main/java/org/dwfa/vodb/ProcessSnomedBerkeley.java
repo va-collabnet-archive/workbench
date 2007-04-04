@@ -10,12 +10,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.activity.I_ShowActivity;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -29,7 +32,6 @@ import org.dwfa.vodb.bind.ThinIdVersionedBinding;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
@@ -139,7 +141,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 	//private Map<UUID, Integer> uuidToIntMap;	
 	private Stopwatch timer;
 	private I_ShowActivity monitor;
-	private Path snomedPath;
+	private I_Path snomedPath;
 	private int snomedType3UuidSource;
 	private int snomedIntIdSource;
 	private int currentId;
@@ -152,19 +154,19 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		this.timer.start();
 		monitor = new UpperInfoOnlyConsoleMonitor();
 		snomedPath = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()),
-				new ArrayList<Position>());
+				new ArrayList<I_Position>());
 		snomedType3UuidSource = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID.getUids());
 		snomedIntIdSource = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 		currentId = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 	}
 
-	public void cleanup(IntSet relsToIgnore) throws Exception {
+	public void cleanup(I_IntSet relsToIgnore) throws Exception {
 		printElapsedTime();
-		System.out.println("Creating concept->desc map.");
+		AceLog.info("Creating concept->desc map.");
 		vodb.getConceptDescMap();
 		//Update the history records for the relationships...
 		printElapsedTime();
-		System.out.println("Starting rel history update.");
+		AceLog.info("Starting rel history update.");
 		Cursor relC = vodb.getRelDb().openCursor(null, null);
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
@@ -201,10 +203,10 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			}			
 		}
 		relC.close();
-		System.out.println("Total rels: " + totalRels);
-		System.out.println("Compressed rels: " + compressedRels);
-		System.out.println("Retired rels: " + retiredRels);
-		System.out.println("Current rels: " + currentRels);
+		AceLog.info("Total rels: " + totalRels);
+		AceLog.info("Compressed rels: " + compressedRels);
+		AceLog.info("Retired rels: " + retiredRels);
+		AceLog.info("Current rels: " + currentRels);
 		printElapsedTime();
 		monitor.setProgressInfoUpper("Starting c1RelMap.");
 		vodb.createC1RelMap();
@@ -230,10 +232,10 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		Date end = new Date();
 		long elapsed = timer.getElapsedTime();
 		elapsed = elapsed / 1000;
-		System.out.println("Elapsed sec: " + elapsed);
+		AceLog.info("Elapsed sec: " + elapsed);
 		elapsed = elapsed / 60;
-		System.out.println("Elapsed min: " + elapsed);
-		System.out.println(end);
+		AceLog.info("Elapsed min: " + elapsed);
+		AceLog.info(end.toString());
 	}
 
 	
@@ -295,22 +297,23 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		
 		text = new String(text.getBytes(), "UTF-8");
 		if (text.getBytes()[0] < 0) {
-			System.out.println("********\n" + text + "\n length: " + text.length());
+			AceLog.info("********\n" + text + "\n length: " + text.length());
+			StringBuffer buff = new StringBuffer();
 			for (byte b: text.getBytes()) {
-				System.out.print((int)b);
-				System.out.print(' ');
+				buff.append((int)b);
+				buff.append(' ');
 			}
-			System.out.println("\n\nUTF 8:");
+			AceLog.info("\n\nUTF 8:");
 			for (byte b: text.getBytes("UTF-8")) {
-				System.out.print((int)b);
-				System.out.print(' ');
+				buff.append((int)b);
+				buff.append(' ');
 			}
-			System.out.println("\n\nUTF 16:");
+			AceLog.info("\n\nUTF 16:");
 			for (char c: text.toCharArray()) {
-				System.out.print(c);
-				System.out.print(' ');
+				buff.append(c);
+				buff.append(' ');
 			}
-			System.out.println();
+			AceLog.info(buff.toString());
 		}
 		ThinDescPart desc = new ThinDescPart();
 		desc.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));

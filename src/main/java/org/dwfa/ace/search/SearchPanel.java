@@ -29,10 +29,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -94,7 +94,7 @@ public class SearchPanel extends JPanel {
 	
 	private Set<I_ContainTermComponent> linkedComponents = new HashSet<I_ContainTermComponent>();
 
-	public SearchPanel(AceFrameConfig config) {
+	public SearchPanel(I_ConfigAceFrame config) {
 		super(new GridBagLayout());
 		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");

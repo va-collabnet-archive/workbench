@@ -6,11 +6,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 
 public class ThinImageVersioned implements I_ImageVersioned {
 	public ThinImageVersioned() {
@@ -52,7 +55,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#addVersion(org.dwfa.vodb.types.ThinImagePart)
 	 */
-	public boolean addVersion(ThinImagePart part) {
+	public boolean addVersion(I_ImagePart part) {
 		int index = versions.size() - 1;
 		if (index == -1) {
 			return versions.add(part);
@@ -88,8 +91,8 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
 	 */
-	public Collection<ThinImageTuple> getTuples() {
-		List<ThinImageTuple> tuples = new ArrayList<ThinImageTuple>();
+	public Collection<I_ImageTuple> getTuples() {
+		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
 		for (I_ImagePart p: getVersions()) {
 			tuples.add(new ThinImageTuple(this, p));
 		}
@@ -109,10 +112,10 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#merge(org.dwfa.vodb.types.ThinImageVersioned)
 	 */
-	public boolean merge(ThinImageVersioned jarImage) {
+	public boolean merge(I_ImageVersioned jarImage) {
 		HashSet<I_ImagePart> versionSet = new HashSet<I_ImagePart>(versions);
 		boolean changed = false;
-		for (I_ImagePart jarPart: jarImage.versions) {
+		for (I_ImagePart jarPart: jarImage.getVersions()) {
 			if (!versionSet.contains(jarPart)) {
 				changed = true;
 				versions.add(jarPart);
@@ -134,8 +137,8 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List)
 	 */
-	public void addTuples(IntSet allowedStatus, IntSet allowedTypes,
-			Set<Position> positions, List<ThinImageTuple> returnImages) {
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_ImageTuple> returnImages) {
 		Set<I_ImagePart> uncommittedParts = new HashSet<I_ImagePart>();
 		if (positions == null) {
 			List<I_ImagePart> addedParts = new ArrayList<I_ImagePart>();
@@ -173,7 +176,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 		} else {
 
 			Set<I_ImagePart> addedParts = new HashSet<I_ImagePart>();
-			for (Position position : positions) {
+			for (I_Position position : positions) {
 				Set<I_ImagePart> rejectedParts = new HashSet<I_ImagePart>();
 				ThinImageTuple possible = null;
 				for (I_ImagePart part : versions) {
@@ -183,12 +186,12 @@ public class ThinImageVersioned implements I_ImageVersioned {
 					} else if ((allowedStatus != null)
 							&& (!allowedStatus.contains(part.getStatusId()))) {
 						if (possible != null) {
-							Position rejectedStatusPosition = new Position(part
+							I_Position rejectedStatusPosition = new Position(part
 									.getVersion(), position.getPath()
 									.getMatchingPath(part.getPathId()));
-							Path possiblePath = position.getPath()
+							I_Path possiblePath = position.getPath()
 									.getMatchingPath(possible.getPathId());
-							Position possibleStatusPosition = new Position(
+							I_Position possibleStatusPosition = new Position(
 									possible.getVersion(), possiblePath);
 							if (position
 									.isSubsequentOrEqualTo(rejectedStatusPosition)) {
@@ -235,13 +238,13 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
 				}
 				if (possible != null) {
-					Path possiblePath = position.getPath().getMatchingPath(
+					I_Path possiblePath = position.getPath().getMatchingPath(
 							possible.getPathId());
-					Position possibleStatusPosition = new Position(possible
+					I_Position possibleStatusPosition = new Position(possible
 							.getVersion(), possiblePath);
 					boolean addPart = true;
 					for (I_ImagePart reject : rejectedParts) {
-						Position rejectedStatusPosition = new Position(reject
+						I_Position rejectedStatusPosition = new Position(reject
 								.getVersion(), position.getPath()
 								.getMatchingPath(reject.getPathId()));
 						if ((rejectedStatusPosition

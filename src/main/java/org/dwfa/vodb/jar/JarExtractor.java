@@ -10,6 +10,8 @@ import java.util.jar.JarFile;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.dwfa.ace.AceLog;
+
 public class JarExtractor {
 	public static void main(String[] args) {
 		
@@ -34,7 +36,7 @@ public class JarExtractor {
 			JarFile jf = new JarFile(new File(parts[0]));
 			for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
 				JarEntry je = e.nextElement();
-				System.out.println("Jar entry: " + je.getName() +
+				AceLog.info("Jar entry: " + je.getName() +
 						" compressed: " + je.getCompressedSize() +
 						" size: " + je.getSize() +
 						" time: " + new Date(je.getTime()) +
@@ -60,13 +62,13 @@ public class JarExtractor {
 				is.close();
 				f.setLastModified(je.getTime());
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException ex) {
+			AceLog.alertAndLogException(ex);
 		}
 
 		JOptionPane.showMessageDialog(new JFrame(),
 				"Eggs aren't supposed to be green.");
-    	System.out.println("[d] jar extractor exit...");
+    	AceLog.info("[d] jar extractor exit...");
 		System.exit(0);
 	}
 }

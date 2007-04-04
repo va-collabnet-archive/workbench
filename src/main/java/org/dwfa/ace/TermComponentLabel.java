@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -29,19 +30,18 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.dnd.ConceptTransferable;
+import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class TermComponentLabel extends JLabel implements FocusListener, I_ContainTermComponent {
 
 	private I_AmTermComponent termComponent;
 
-	private AceFrameConfig config;
+	private I_ConfigAceFrame config;
 		
 	private class TermLabelDragSourceListener implements DragSourceListener {
 
@@ -88,7 +88,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 	private static final long serialVersionUID = 1L;
 
 
-	public TermComponentLabel(AceFrameConfig config) {
+	public TermComponentLabel(I_ConfigAceFrame config) {
 		super("<html><font color=red>Empty");
 		this.config = config;
 		addFocusListener(this);
@@ -172,9 +172,9 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 					} else {
 						this.setText(cb.getInitialText());
 					}
-				} catch (DatabaseException e) {
+				} catch (IOException e) {
 					this.setText(e.getMessage());
-					e.printStackTrace();
+					AceLog.alertAndLogException(e);
 				}
 			} else {
 				this.setText(this.termComponent.toString());
@@ -198,7 +198,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		removePropertyChangeListener("termComponent", l);
 	}
 
-	public AceFrameConfig getConfig() {
+	public I_ConfigAceFrame getConfig() {
 		throw new UnsupportedOperationException();
 	}
 	

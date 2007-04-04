@@ -6,7 +6,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,30 +25,29 @@ import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_DoConceptDrop;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
-
-import com.sleepycat.je.DatabaseException;
 
 public abstract class RelTableModel extends AbstractTableModel implements
 		PropertyChangeListener, I_DoConceptDrop {
 	private List<I_RelTuple> allTuples;
 
-	//protected ConceptPanel parentPanel;
+	// protected ConceptPanel parentPanel;
 
 	protected I_GetConceptData tableBean = null;
 
@@ -140,10 +141,10 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			}
 			try {
 				referencedConcepts = get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException ex) {
+				AceLog.alertAndLogException(ex);
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			updator.normalCompletion();
@@ -221,8 +222,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				get();
 			} catch (InterruptedException e) {
 				;
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			tableBean = cb;
 			fireTableDataChanged();
@@ -287,7 +288,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		super();
 		this.columns = columns;
 		this.host = host;
-		this.host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
+		this.host.addPropertyChangeListener(
+				I_ContainTermComponent.TERM_COMPONENT, this);
 	}
 
 	public int getColumnCount() {
@@ -301,14 +303,14 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		try {
 			allTuples = getRels(tableBean, host.getUsePrefs(), getShowHistory());
 			return allTuples.size();
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return 0;
 	}
 
 	public abstract List<I_RelTuple> getRels(I_GetConceptData cb,
-			boolean usePrefs, boolean showHistory) throws DatabaseException;
+			boolean usePrefs, boolean showHistory) throws IOException;
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
@@ -329,19 +331,22 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						rel);
 			case SOURCE_ID:
 				if (referencedConcepts.containsKey(rel.getC1Id())) {
-					return new StringWithRelTuple(getPrefText(rel.getC1Id()), rel);
+					return new StringWithRelTuple(getPrefText(rel.getC1Id()),
+							rel);
 				}
 				return new StringWithRelTuple(Integer.toString(rel.getC1Id()),
 						rel);
 			case REL_TYPE:
 				if (referencedConcepts.containsKey(rel.getRelTypeId())) {
-					return new StringWithRelTuple(getPrefText(rel.getRelTypeId()), rel);
+					return new StringWithRelTuple(getPrefText(rel
+							.getRelTypeId()), rel);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
 						.getRelTypeId()), rel);
 			case DEST_ID:
 				if (referencedConcepts.containsKey(rel.getC2Id())) {
-					return new StringWithRelTuple(getPrefText(rel.getC2Id()), rel);
+					return new StringWithRelTuple(getPrefText(rel.getC2Id()),
+							rel);
 				}
 				return new StringWithRelTuple(Integer.toString(rel.getC2Id()),
 						rel);
@@ -350,19 +355,22 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						rel);
 			case REFINABILITY:
 				if (referencedConcepts.containsKey(rel.getRefinabilityId())) {
-					return new StringWithRelTuple(getPrefText(rel.getRefinabilityId()), rel);
+					return new StringWithRelTuple(getPrefText(rel
+							.getRefinabilityId()), rel);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
 						.getRefinabilityId()), rel);
 			case CHARACTERISTIC:
 				if (referencedConcepts.containsKey(rel.getCharacteristicId())) {
-					return new StringWithRelTuple(getPrefText(rel.getCharacteristicId()), rel);
+					return new StringWithRelTuple(getPrefText(rel
+							.getCharacteristicId()), rel);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
 						.getCharacteristicId()), rel);
 			case STATUS:
 				if (referencedConcepts.containsKey(rel.getStatusId())) {
-					return new StringWithRelTuple(getPrefText(rel.getStatusId()), rel);
+					return new StringWithRelTuple(
+							getPrefText(rel.getStatusId()), rel);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
 						.getStatusId()), rel);
@@ -375,24 +383,28 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						.getVersion()), rel);
 			case BRANCH:
 				if (referencedConcepts.containsKey(rel.getPathId())) {
-					return new StringWithRelTuple(getPrefText(rel.getPathId()), rel);
+					return new StringWithRelTuple(getPrefText(rel.getPathId()),
+							rel);
 				}
 				return new StringWithRelTuple(
 						Integer.toString(rel.getPathId()), rel);
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return "No case found for: " + field;
 	}
-	private String getPrefText(int id) throws DatabaseException {
+
+	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = referencedConcepts.get(id);
-		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig()
+				.getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
 			return desc.getText();
 		}
 		cb = referencedConcepts.get(id);
-		desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+		desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(),
+				host.getConfig());
 		return "null pref desc: " + cb.getInitialText();
 	}
 
@@ -418,13 +430,13 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			if (rel.getFixedPart().getTuples().size() == 1) {
 				return true;
 			} else {
-				return false;
+				return allUncommitted(rel);
 			}
 		case DEST_ID:
 			if (rel.getFixedPart().getTuples().size() == 1) {
 				return true;
 			} else {
-				return false;
+				return allUncommitted(rel);
 			}
 		case GROUP:
 			return true;
@@ -440,6 +452,17 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			return false;
 		}
 		return false;
+	}
+
+	private boolean allUncommitted(I_RelTuple rel) {
+		boolean allUncomitted = true;
+		for (I_RelTuple t : rel.getFixedPart().getTuples()) {
+			if (t.getVersion() != Integer.MAX_VALUE) {
+				allUncomitted = false;
+				continue;
+			}
+		}
+		return allUncomitted;
 	}
 
 	public void setValueAt(Object value, int row, int col) {
@@ -490,7 +513,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		case BRANCH:
 			break;
 		}
-		fireTableCellUpdated(row, col);
+		fireTableDataChanged();
 	}
 
 	public Class<?> getColumnClass(int c) {
@@ -524,7 +547,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		this.progress = progress;
 	}
 
-	public static class StringWithRelTuple implements Comparable, I_CellTextWithTuple {
+	public static class StringWithRelTuple implements Comparable,
+			I_CellTextWithTuple {
 		String cellText;
 
 		I_RelTuple tuple;
@@ -561,7 +585,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 		private static final long serialVersionUID = 1L;
 
-		public RelStatusFieldEditor(AceFrameConfig config) {
+		public RelStatusFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -575,6 +599,16 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			StringWithRelTuple swdt = (StringWithRelTuple) value;
 			return ConceptBean.get(swdt.getTuple().getStatusId());
 		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
 	}
 
 	public static class RelRefinabilityFieldEditor extends
@@ -582,7 +616,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 		private static final long serialVersionUID = 1L;
 
-		public RelRefinabilityFieldEditor(AceFrameConfig config) {
+		public RelRefinabilityFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -596,6 +630,16 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			StringWithRelTuple swdt = (StringWithRelTuple) value;
 			return ConceptBean.get(swdt.getTuple().getRefinabilityId());
 		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
 	}
 
 	public static class RelCharactisticFieldEditor extends
@@ -603,7 +647,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 		private static final long serialVersionUID = 1L;
 
-		public RelCharactisticFieldEditor(AceFrameConfig config) {
+		public RelCharactisticFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -617,13 +661,23 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			StringWithRelTuple swdt = (StringWithRelTuple) value;
 			return ConceptBean.get(swdt.getTuple().getCharacteristicId());
 		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
 	}
 
 	public static class RelTypeFieldEditor extends AbstractPopupFieldEditor {
 
 		private static final long serialVersionUID = 1L;
 
-		public RelTypeFieldEditor(AceFrameConfig config) {
+		public RelTypeFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -637,9 +691,20 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			StringWithRelTuple swdt = (StringWithRelTuple) value;
 			return ConceptBean.get(swdt.getTuple().getRelTypeId());
 		}
+
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
 	}
 
-	public PopupListener makePopupListener(JTable table, AceFrameConfig config) {
+	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
 		return new PopupListener(table, config);
 	}
 
@@ -656,7 +721,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 							.getTuple().getC1Id());
 					ConceptBean destBean = ConceptBean.get(selectedObject
 							.getTuple().getC2Id());
-					for (Path p : config.getEditingPathSet()) {
+					for (I_Path p : config.getEditingPathSet()) {
 						I_RelPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
@@ -666,16 +731,16 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						sourceBean.getSourceRel(
 								selectedObject.getTuple().getRelId())
 								.addVersion(newPart);
-						destBean
-								.getDestRel(selectedObject.getTuple().getRelId())
+						destBean.getDestRel(
+								selectedObject.getTuple().getRelId())
 								.addVersion(newPart);
 					}
 					ACE.addUncommitted(sourceBean);
 					ACE.addUncommitted(destBean);
 					allTuples = null;
 					RelTableModel.this.fireTableDataChanged();
-				} catch (DatabaseException e1) {
-					e1.printStackTrace();
+				} catch (IOException ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		}
@@ -692,21 +757,22 @@ public abstract class RelTableModel extends AbstractTableModel implements
 							.getTuple().getC1Id());
 					ConceptBean destBean = ConceptBean.get(selectedObject
 							.getTuple().getC2Id());
-					for (Path p : config.getEditingPathSet()) {
+					for (I_Path p : config.getEditingPathSet()) {
 						I_RelPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);
-						newPart.setStatusId((AceConfig.vodb
-								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-										.getUids())));
+						newPart
+								.setStatusId((AceConfig.vodb
+										.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
+												.getUids())));
 						referencedConcepts.put(newPart.getStatusId(),
 								ConceptBean.get(newPart.getStatusId()));
 						sourceBean.getSourceRel(
 								selectedObject.getTuple().getRelId())
 								.addVersion(newPart);
-						destBean
-								.getDestRel(selectedObject.getTuple().getRelId())
+						destBean.getDestRel(
+								selectedObject.getTuple().getRelId())
 								.addVersion(newPart);
 
 						selectedObject.getTuple().getRelVersioned()
@@ -716,8 +782,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					ACE.addUncommitted(destBean);
 					allTuples = null;
 					RelTableModel.this.fireTableDataChanged();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		}
@@ -732,9 +798,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 		StringWithRelTuple selectedObject;
 
-		AceFrameConfig config;
+		I_ConfigAceFrame config;
 
-		public PopupListener(JTable table, AceFrameConfig config) {
+		public PopupListener(JTable table, I_ConfigAceFrame config) {
 			super();
 			this.table = table;
 			this.config = config;
@@ -750,7 +816,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				popup = new JPopupMenu();
 				JMenuItem noActionItem = new JMenuItem("");
 				popup.add(noActionItem);
-				selectedObject = (StringWithRelTuple) table.getValueAt(row, column);
+				selectedObject = (StringWithRelTuple) table.getValueAt(row,
+						column);
 				JMenuItem changeItem = new JMenuItem("Change");
 				popup.add(changeItem);
 				changeItem.addActionListener(change);

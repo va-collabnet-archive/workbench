@@ -1,12 +1,14 @@
 package org.dwfa.ace.gui.concept;
 
+import java.io.IOException;
+
 import javax.swing.ImageIcon;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ConflictPlugin extends AbstractPlugin {
 	public ConflictPlugin() {
@@ -22,6 +24,11 @@ public class ConflictPlugin extends AbstractPlugin {
 			conflictPanel = new ConflictPanel();
 			host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 			host.addPropertyChangeListener("commit", this);
+			try {
+				conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
+			} catch (IOException e) {
+				AceLog.alertAndLogException(e);
+			}
 		}
 		return conflictPanel;
 	}
@@ -33,7 +40,7 @@ public class ConflictPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (showComponent() && conflictPanel != null) {
 			conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
 		}

@@ -4,24 +4,24 @@ import java.awt.event.ActionEvent;
 import java.util.UUID;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 public class AddRelationship extends AddComponent {
 
-	public AddRelationship(I_ContainTermComponent termContainer, AceFrameConfig config) {
+	public AddRelationship(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
 		super(termContainer, config);
 	}
 	
 	@Override
 	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e,
-			AceFrameConfig config) throws Exception {
+			I_ConfigAceFrame config) throws Exception {
 		ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
 		UUID newRelUid = UUID.randomUUID();
     	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
@@ -32,7 +32,7 @@ public class AddRelationship extends AddComponent {
 		ThinRelPart relPart = new ThinRelPart();
 		rel.addVersion(relPart);
 		int status = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		for (Path p: termContainer.getConfig().getEditingPathSet()) {
+		for (I_Path p: termContainer.getConfig().getEditingPathSet()) {
 			relPart.setVersion(Integer.MAX_VALUE);
 			relPart.setPathId(p.getConceptId());
 			relPart.setStatusId(status);

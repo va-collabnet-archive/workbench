@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.TimePathId;
 
 public class ThinIdTuple implements I_IdTuple {
 	I_IdVersioned core;

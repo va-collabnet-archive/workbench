@@ -16,13 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
@@ -44,7 +47,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      * @throws RemoteException
      * @throws QueryException
      */
-    public CreatePathPanel(AceFrameConfig aceConfig) throws Exception  {
+    public CreatePathPanel(I_ConfigAceFrame aceConfig) throws Exception  {
       super(new GridBagLayout());
       GridBagConstraints c = new GridBagConstraints();
       c.fill = GridBagConstraints.HORIZONTAL;
@@ -95,13 +98,13 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Create new path: " + desc.getText());
+        AceLog.info("Create new path: " + desc.getText());
         if (desc.getText() == null || desc.getText().length() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
             return;
         }
-        List<Position> origins = this.sppp.getSelectedPositions();
-        System.out.println(origins);
+        List<I_Position> origins = this.sppp.getSelectedPositions();
+        AceLog.info(origins.toString());
         if (origins.size() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must select at least one origin for path.");
             return;
@@ -113,7 +116,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         }
         try {
         	UUID newPathUid = UUID.randomUUID();
-        	Path p = new Path(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
+        	I_Path p = new Path(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
         	Date now = new Date();
         	int thinDate = ThinVersionHelper.convert(now.getTime());
         	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
@@ -168,13 +171,12 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	        	
         	
         	ACE.addUncommitted(cb);
-            System.out.println("Created new path: " + desc.getText() + " " + origins);
+            AceLog.info("Created new path: " + desc.getText() + " " + origins);
             this.desc.setText("");
             this.parent.setTermComponent(null);
             
         } catch (Exception ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+			AceLog.alertAndLogException(ex);
         }
     }
  

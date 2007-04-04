@@ -11,30 +11,35 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.DbToIoException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 import com.sleepycat.je.DatabaseException;
 
-public class Path implements I_Transact, Serializable {
+public class Path implements I_Transact, Serializable, I_Path {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	int conceptId;
-	List<Position> origins;
+	List<I_Position> origins;
 	
-	public Path(int conceptId, List<Position> origins) {
+	public Path(int conceptId, List<I_Position> origins) {
 		super();
 		this.conceptId = conceptId;
 		if (origins != null) {
 			this.origins = Collections.unmodifiableList(origins);			
 		} else {
-			this.origins = Collections.unmodifiableList(new ArrayList<Position>(0));
+			this.origins = Collections.unmodifiableList(new ArrayList<I_Position>(0));
 		}
 	}
 
@@ -52,24 +57,30 @@ public class Path implements I_Transact, Serializable {
 		return conceptId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Path#getConceptId()
+	 */
 	public int getConceptId() {
 		return conceptId;
 	}
 
-	public List<Position> getOrigins() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Path#getOrigins()
+	 */
+	public List<I_Position> getOrigins() {
 		return origins;
 	}
 	
-	public static List<Path> makeBasePaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException, IOException {
+	public static List<I_Path> makeBasePaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException, IOException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-		List<Path> basePaths = new ArrayList<Path>();
+		List<I_Path> basePaths = new ArrayList<I_Path>();
 		Path aceRelease = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
 		basePaths.add(aceRelease);
 
 		
 		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
-		List<Position> origins = new ArrayList<Position>(1);
+		List<I_Position> origins = new ArrayList<I_Position>(1);
 		origins.add(latestAceRelease);
 		
 		
@@ -80,28 +91,28 @@ public class Path implements I_Transact, Serializable {
 		Date releaseDate = dateFormat.parse("2006-07-31");
 		
 		Position snomed20060731Pos = new Position(ThinVersionHelper.convert(releaseDate.getTime()), snomedCore);
-		List<Position> snomed20060731Origins = new ArrayList<Position>(1);
+		List<I_Position> snomed20060731Origins = new ArrayList<I_Position>(1);
 		snomed20060731Origins.add(snomed20060731Pos);
 		Path snomed20060731 = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20060731.getUids()), snomed20060731Origins);
 		basePaths.add(snomed20060731);
 		
 		releaseDate = dateFormat.parse("2006-01-31");
 		Position snomed20060131Pos = new Position(ThinVersionHelper.convert(releaseDate.getTime()), snomedCore);
-		List<Position> snomed20060131Origins = new ArrayList<Position>(1);
+		List<I_Position> snomed20060131Origins = new ArrayList<I_Position>(1);
 		snomed20060131Origins.add(snomed20060131Pos);
 		Path snomed20060131 = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20060131.getUids()), snomed20060131Origins);
 		basePaths.add(snomed20060131);
 
 		releaseDate = dateFormat.parse("2005-07-31");
 		Position snomed20050731Pos = new Position(ThinVersionHelper.convert(releaseDate.getTime()), snomedCore);
-		List<Position> snomed20050731Origins = new ArrayList<Position>(1);
+		List<I_Position> snomed20050731Origins = new ArrayList<I_Position>(1);
 		snomed20050731Origins.add(snomed20050731Pos);
 		Path snomed20050731 = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20050731.getUids()), snomed20050731Origins);
 		basePaths.add(snomed20050731);
 
 		releaseDate = dateFormat.parse("2005-01-31");
 		Position snomed20050131Pos = new Position(ThinVersionHelper.convert(releaseDate.getTime()), snomedCore);
-		List<Position> snomed20050131Origins = new ArrayList<Position>(1);
+		List<I_Position> snomed20050131Origins = new ArrayList<I_Position>(1);
 		snomed20050131Origins.add(snomed20050131Pos);
 		Path snomed20050131 = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20050131.getUids()), snomed20050131Origins);
 		basePaths.add(snomed20050131);
@@ -113,15 +124,15 @@ public class Path implements I_Transact, Serializable {
 
 	}
 	
-	public static List<Path> makeTestSnomedPaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException, IOException {
+	public static List<I_Path> makeTestSnomedPaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException, IOException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-		List<Path> basePaths = new ArrayList<Path>();
+		List<I_Path> basePaths = new ArrayList<I_Path>();
 		Path aceRelease = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
 		basePaths.add(aceRelease);
 		
 		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
-		List<Position> origins = new ArrayList<Position>(1);
+		List<I_Position> origins = new ArrayList<I_Position>(1);
 		origins.add(latestAceRelease);
 		
 		
@@ -130,14 +141,14 @@ public class Path implements I_Transact, Serializable {
 		Date releaseDate = dateFormat.parse("2006-07-31");
 		
 		Position snomed20060731Pos = new Position(ThinVersionHelper.convert(releaseDate.getTime()), snomedCore);
-		List<Position> snomed20060731Origins = new ArrayList<Position>(1);
+		List<I_Position> snomed20060731Origins = new ArrayList<I_Position>(1);
 		snomed20060731Origins.add(snomed20060731Pos);
 		Path snomed20060731 = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20060731.getUids()), snomed20060731Origins);
 		basePaths.add(snomed20060731);
 		
 		releaseDate = dateFormat.parse("2005-01-31");
 		Position snomed20050131Pos = new Position(ThinVersionHelper.convert(releaseDate.getTime()), snomedCore);
-		List<Position> snomed20050131Origins = new ArrayList<Position>(1);
+		List<I_Position> snomed20050131Origins = new ArrayList<I_Position>(1);
 		snomed20050131Origins.add(snomed20050131Pos);
 		Path snomed20050131 = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20050131.getUids()), snomed20050131Origins);
 		basePaths.add(snomed20050131);
@@ -161,39 +172,42 @@ public class Path implements I_Transact, Serializable {
 			writeBasePaths(vodb);
 			vodb.sync();
 			vodb.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			AceLog.alertAndLogException(ex);
 		}
 		System.exit(0);
 	}
 
 	public static void writeBasePaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException, IOException {
-		List<Path> basePaths = makeBasePaths(vodb);
-		for (Path p: basePaths) {
+		List<I_Path> basePaths = makeBasePaths(vodb);
+		for (I_Path p: basePaths) {
 			vodb.writePath(p);
 		}
 	}
 
-	public Path getMatchingPath(int pathId) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Path#getMatchingPath(int)
+	 */
+	public I_Path getMatchingPath(int pathId) {
 		if (conceptId == pathId) {
 			return this;
 		}
-		for (Position origin: origins) {
-			if (origin.path.getMatchingPath(pathId) != null) {
-				return origin.path;
+		for (I_Position origin: origins) {
+			if (origin.getPath().getMatchingPath(pathId) != null) {
+				return origin.getPath();
 			}
 		}
 		return null;
 	}
 	
-    public static String toHtmlString(Path path) throws DatabaseException {
+    public static String toHtmlString(I_Path path) throws IOException {
         StringBuffer buff = new StringBuffer();
         buff.append("<html><font color='blue' size='+1'><u>");
         ConceptBean cb = ConceptBean.get(path.getConceptId());
         buff.append(cb.getInitialText());
         buff.append("</u></font>");
         if (path != null) {
-            for (Position origin: path.origins) {
+            for (I_Position origin: path.getOrigins()) {
                 buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
                 buff.append(origin);
             }
@@ -201,19 +215,32 @@ public class Path implements I_Transact, Serializable {
         return buff.toString();
     }
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Path#abort()
+	 */
 	public void abort() {
 		// Nothing to do...
 	}
 
-	public void commit(int version, Set<TimePathId> values) throws DatabaseException {
-		AceConfig.vodb.writePath(this);
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Path#commit(int, java.util.Set)
+	 */
+	public void commit(int version, Set<TimePathId> values) throws IOException {
+		try {
+			AceConfig.vodb.writePath(this);
+		} catch (DatabaseException e) {
+			throw new DbToIoException(e);
+		}
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_Path#convertIds(org.dwfa.ace.api.I_MapNativeToNative)
+	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		conceptId = jarToDbNativeMap.get(conceptId);
-		for (Position origin: origins) {
-			origin.path.convertIds(jarToDbNativeMap);
+		for (I_Position origin: origins) {
+			origin.getPath().convertIds(jarToDbNativeMap);
 		}
 	}
 

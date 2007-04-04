@@ -1,5 +1,6 @@
 package org.dwfa.ace.tree;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +9,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ExpandPathToNodeStateListener implements ChangeListener{
 
@@ -24,7 +24,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 
 	
 	
-	public ExpandPathToNodeStateListener(JTreeWithDragImage tree, AceFrameConfig config, I_GetConceptData focus) throws DatabaseException {
+	public ExpandPathToNodeStateListener(JTreeWithDragImage tree, I_ConfigAceFrame config, I_GetConceptData focus) throws IOException {
 		super();
 		this.tree = tree;
 		tree.addWorkerFinishedListener(this);
@@ -36,7 +36,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			for (I_RelTuple r: rels) {
 				ConceptBean parent = ConceptBean.get(r.getC2Id());
 				ancestors.add(0, parent);
-				System.out.println("Adding parent: " + parent);
+				AceLog.info("Adding parent: " + parent);
 				rels = parent.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(), 
 						config.getViewPositionSet(), true);
 				break;
@@ -48,7 +48,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			DefaultMutableTreeNode termRoot = (DefaultMutableTreeNode) rootNode.getChildAt(i);
 			tree.collapsePath(new TreePath(termRoot.getPath()));
 		}
-		System.out.println("All should be collapsed.");
+		AceLog.info("All should be collapsed.");
 		
 		for (I_GetConceptData child: ancestors) {
 			boolean found = false;
@@ -64,15 +64,15 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 				}
 			}
 			if (found == false) {
-				System.out.println("Could not find node for: " + child);
+				AceLog.info("Could not find node for: " + child);
 			}
 		}
 		
 		//TreePath pathToShow;
 		//tree.expandPath(pathToShow);
 		
-		System.out.println("Dropped on JTreeWithDragImage: " + focus);
-		System.out.println("Expansion list: " + ancestors);
+		AceLog.info("Dropped on JTreeWithDragImage: " + focus);
+		AceLog.info("Expansion list: " + ancestors);
 	}
 
 
@@ -97,7 +97,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 				}
 			}
 			if (found == false) {
-				System.out.println("Could not find node for: " + child);
+				AceLog.info("Could not find node for: " + child);
 				allFound = false;
 			} 
 		}

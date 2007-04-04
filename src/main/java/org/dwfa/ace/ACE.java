@@ -61,9 +61,13 @@ import org.dwfa.ace.actions.ImportChangesetJar;
 import org.dwfa.ace.actions.SaveEnvironment;
 import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
@@ -81,17 +85,16 @@ import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.svn.CheckoutPanel;
+import org.dwfa.vodb.DbToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_Transact;
-import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.TimePathId;
 
 import com.sleepycat.je.DatabaseException;
 
 public class ACE extends JPanel implements PropertyChangeListener {
 
-	private static List<I_Transact> uncommitted = new ArrayList<I_Transact>();
+	private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
 
 	public static void addUncommitted(I_Transact to) {
 		uncommitted.add(to);
@@ -104,22 +107,26 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	/*
 	 * 
 	 */
-	public static void commit() throws DatabaseException {
+	public static void commit() throws IOException {
 		Date now = new Date();
 		Set<TimePathId> values = new HashSet<TimePathId>();
 		int version = ThinVersionHelper.convert(now.getTime());
 		for (I_Transact cb : uncommitted) {
 			cb.commit(version, values);
 		}
-		AceConfig.vodb.addTimeBranchValues(values);
-		AceConfig.vodb.sync();
+		try {
+			AceConfig.vodb.addTimeBranchValues(values);
+			AceConfig.vodb.sync();
+		} catch (DatabaseException e) {
+			throw new DbToIoException(e);
+		}
 		uncommitted.clear();
-		for (AceFrameConfig frameConfig: getAceConfig().aceFrames) {
+		for (I_ConfigAceFrame frameConfig: getAceConfig().aceFrames) {
 			frameConfig.fireCommit();
 		}
 	}
 
-	public static void abort() throws DatabaseException {
+	public static void abort() throws IOException {
 		for (I_Transact cb : uncommitted) {
 			cb.abort();
 		}
@@ -204,8 +211,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			if (configPalette == null) {
 				try {
 					makeConfigPalette();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(configPalette);
@@ -219,8 +226,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			if (subversionPalette == null) {
 				try {
 					makeSubversionPalette();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(subversionPalette);
@@ -259,12 +266,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			if (showComponentButton.isSelected()
 					&& (showTreeButton.isSelected() == false)) {
 				dividerLocation = termTreeConceptSplit.getDividerLocation();
-				// System.out.println(dividerLocation);
+				// AceLog.info(dividerLocation);
 			}
 			if (showTreeButton.isSelected()
 					&& (showComponentButton.isSelected() == false)) {
 				dividerLocation = termTreeConceptSplit.getDividerLocation();
-				// System.out.println(dividerLocation);
+				// AceLog.info(dividerLocation);
 			}
 			if (e.getSource() == showComponentButton) {
 				if (showComponentButton.isSelected()) {
@@ -372,7 +379,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public static Timer timer = new Timer();
 
-	private AceFrameConfig aceFrameConfig;
+	private I_ConfigAceFrame aceFrameConfig;
 
 	private JPanel treeProgress;
 
@@ -416,7 +423,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		super(new GridBagLayout());
 	}
 
-	public void setup(AceFrameConfig aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
+	public void setup(I_ConfigAceFrame aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
 		this.aceFrameConfig = aceFrameConfig;
 		this.aceFrameConfig.addPropertyChangeListener(this);
 		searchPanel = new SearchPanel(aceFrameConfig);
@@ -596,7 +603,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		tabs.addTab("Path", new SelectPathAndPositionPanel(false, "for view",
 				aceFrameConfig, new PropertySetListenerGlue("removeViewPosition",
 						"addViewPosition", "replaceViewPosition",
-						"getViewPositionSet", Position.class, aceFrameConfig)));
+						"getViewPositionSet", I_Position.class, aceFrameConfig)));
 		tabs.addTab("View", makeViewConfig());
 		tabs.addTab("Edit", makeEditConfig());
 		tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
@@ -691,12 +698,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		return relPrefPanel;
 	}
 
-	private TerminologyList makeTermList(String title, IntSet conceptSet) {
+	private TerminologyList makeTermList(String title, I_IntSet set) {
 		TerminologyListModel browseDownRelModel = new TerminologyListModel();
-		for (int id : conceptSet.getSetValues()) {
+		for (int id : set.getSetValues()) {
 			browseDownRelModel.addElement(ConceptBean.get(id));
 		}
-		browseDownRelModel.addListDataListener(conceptSet);
+		browseDownRelModel.addListDataListener(set);
 		TerminologyList browseDownRelList = new TerminologyList(
 				browseDownRelModel);
 		browseDownRelList.setBorder(BorderFactory
@@ -774,9 +781,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		
 		return defaultsPanel;
 	}
-	private JComponent makePopupConfigPanel(IntSet popupSet, String borderLabel) {
+	private JComponent makePopupConfigPanel(I_IntSet set, String borderLabel) {
 
-		TerminologyList popupList = makeTermList(borderLabel, popupSet);
+		TerminologyList popupList = makeTermList(borderLabel, set);
 
 		JPanel popupPanel = new JPanel(new GridLayout(0, 1));
 		popupPanel.add(new JScrollPane(popupList));
@@ -859,10 +866,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		});
 		JScrollPane treeView = new JScrollPane(tree);
 		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
-			System.out.println("Child expand: " + id);
+			AceLog.info("Child expand: " + id);
 		}
 		for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
-			System.out.println("Parent expand: " + id);
+			AceLog.info("Parent expand: " + id);
 		}
 		for (int i = 0; i < tree.getRowCount(); i++) {
 			TreePath path = tree.getPathForRow(i);
@@ -930,12 +937,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(
 						expansionWorkers.keySet());
 				for (TreeIdPath key : allKeys) {
-					System.out.println("  Stopping all: " + key);
+					AceLog.info("  Stopping all: " + key);
 					removeAnyMatchingExpansionWorker(key, message);
 				}
 			} else {
 				if (expansionWorkers.containsKey(idPath)) {
-					System.out.println("  Stopping: " + idPath);
+					AceLog.info("  Stopping: " + idPath);
 					removeAnyMatchingExpansionWorker(idPath, message);
 				}
 
@@ -943,7 +950,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 						expansionWorkers.keySet());
 				for (TreeIdPath key : otherKeys) {
 					if (key.initiallyEqual(idPath)) {
-						System.out.println("  Stopping child: " + key);
+						AceLog.info("  Stopping child: " + key);
 						removeAnyMatchingExpansionWorker(key, message);
 					}
 				}
@@ -1092,7 +1099,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		tree.removeTreeSelectionListener(tsl);
 	}
 
-	public AceFrameConfig getAceFrameConfig() {
+	public I_ConfigAceFrame getAceFrameConfig() {
 		return aceFrameConfig;
 	}
 
@@ -1110,26 +1117,31 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		
 	}
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("viewPosition")) {
-			DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-			DefaultMutableTreeNode root = (DefaultMutableTreeNode) model
-					.getRoot();
-			stopWorkersOnPath(null, "stopping for property change");
-			for (int i = 0; i < root.getChildCount(); i++) {
-				DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root
-						.getChildAt(i);
-				I_GetConceptData cb = (I_GetConceptData) childNode
-						.getUserObject();
-				if (aceFrameConfig.getChildrenExpandedNodes().contains(
-						cb.getConceptId())) {
-					TreePath tp = new TreePath(childNode);
-					TreeExpansionEvent treeEvent = new TreeExpansionEvent(
-							model, tp);
-					handleCollapse(treeEvent);
-					treeTreeExpanded(treeEvent);
-				}
-			}
+		if (evt.getPropertyName().equals("viewPositions")) {
+			updateHierarchyView(evt.getPropertyName());
+		} else if (evt.getPropertyName().equals("commit")) {
+			updateHierarchyView(evt.getPropertyName());
+		} 
+	}
 
+	private void updateHierarchyView(String propChangeName) {
+		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model
+				.getRoot();
+		stopWorkersOnPath(null, "stopping for change in " + propChangeName);
+		for (int i = 0; i < root.getChildCount(); i++) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root
+					.getChildAt(i);
+			I_GetConceptData cb = (I_GetConceptData) childNode
+					.getUserObject();
+			if (aceFrameConfig.getChildrenExpandedNodes().contains(
+					cb.getConceptId())) {
+				TreePath tp = new TreePath(childNode);
+				TreeExpansionEvent treeEvent = new TreeExpansionEvent(
+						model, tp);
+				handleCollapse(treeEvent);
+				treeTreeExpanded(treeEvent);
+			}
 		}
 	}
 

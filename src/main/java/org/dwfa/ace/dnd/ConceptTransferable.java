@@ -14,8 +14,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 
-import com.sleepycat.je.DatabaseException;
-
 public class ConceptTransferable implements Transferable {
 
 	I_GetConceptData conceptTransferable;
@@ -50,7 +48,7 @@ public class ConceptTransferable implements Transferable {
 		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
 			try {
 				return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
-			} catch (DatabaseException e) {
+			} catch (IOException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (TerminologyException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -58,7 +56,7 @@ public class ConceptTransferable implements Transferable {
 		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
 			try {
 				return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
-			} catch (DatabaseException e) {
+			} catch (IOException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (TerminologyException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);

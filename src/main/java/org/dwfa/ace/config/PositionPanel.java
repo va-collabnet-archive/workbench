@@ -29,13 +29,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.bpa.gui.GridBagPanel;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.TimePathId;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -66,7 +70,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 
     private int fineControlSize = 10;
 
-    private Path path;
+    private I_Path path;
 
     private Position position;
 
@@ -78,7 +82,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 
 	private PropertySetListenerGlue selectGlue;
 
-	private AceFrameConfig aceConfig;
+	private I_ConfigAceFrame aceConfig;
 
     private class Setup implements Runnable {
         public void run() {
@@ -97,7 +101,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                     PositionPanel.this.dates.add(null); // For the top "latest"
                     // position...
                 }
-                System.out.println("Processing path: "
+                AceLog.info("Processing path: "
                         + ConceptBean.get(path.getConceptId()).getInitialText() +
                         " with " + dates.size()
                         + " coordinates");
@@ -154,13 +158,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                             addFiller(c);
                             // this.setBorder(BorderFactory.createTitledBorder("PositionPanel"));
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                			AceLog.alertAndLogException(ex);
                         }
                     }
                 });
 
             } catch (Exception ex) {
-                ex.printStackTrace();
+    			AceLog.alertAndLogException(ex);
             }
         }
     }
@@ -171,9 +175,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      * @throws RemoteException
      * 
      */
-    public PositionPanel(Path path,
+    public PositionPanel(I_Path path,
             boolean selectPositionOnly, String purpose,
-            String name, AceFrameConfig aceConfig, PropertySetListenerGlue selectGlue) throws DatabaseException {
+            String name, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws DatabaseException {
         super(new GridBagLayout(), name, null);
         Font defaultFont = new JLabel().getFont();
        	monoSpaceFont = new Font("Monospaced", defaultFont.getStyle(), defaultFont.getSize());
@@ -190,7 +194,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         this.selectGlue = selectGlue;
         this.editGlue = new PropertySetListenerGlue("removeEditingPath",
         	    "addEditingPath", "replaceEditingPath", "getEditingPathSet",
-                Path.class, aceConfig);
+                I_Path.class, aceConfig);
         new Thread(new Setup(), "PositionPanel Setup").start();
         Dimension size = new Dimension(330, 310);
         setSize(size);
@@ -474,7 +478,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             this.fineControl.addChangeListener(this);
         }
         if (this.position != null) {
-            Position oldPosition = this.position;
+            I_Position oldPosition = this.position;
         	Date d = this.dates.get(this.fineControl.getValue());
         	if (d == null) {
         		d = new Date(Long.MAX_VALUE);
@@ -485,7 +489,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                     this.selectGlue.replaceObj(oldPosition,
                             this.position);
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+        			AceLog.alertAndLogException(e1);
                 }
             }
         }
@@ -520,7 +524,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+			AceLog.alertAndLogException(ex);
         }
     }
 

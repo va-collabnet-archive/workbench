@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
-
-import com.sleepycat.je.DatabaseException;
 
 public class SrcRelPlugin extends RelPlugin {
 
@@ -31,6 +31,8 @@ public class SrcRelPlugin extends RelPlugin {
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 			host.addPropertyChangeListener("commit", this);
 			this.host = host;
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			srcRelTableModel.propertyChange(evt);
 		}
 		return pluginPanel;
 	}
@@ -55,7 +57,7 @@ public class SrcRelPlugin extends RelPlugin {
 		return new ImageIcon(ACE.class.getResource("/24x24/plain/node.png"));
 	}
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			REL_FIELD[] columnEnums = getSrcRelColumns(host.getShowHistory());
@@ -68,6 +70,7 @@ public class SrcRelPlugin extends RelPlugin {
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
+			setupEditors(host);
 			srcRelTableModel.propertyChange(evt);			
 		}
 	}

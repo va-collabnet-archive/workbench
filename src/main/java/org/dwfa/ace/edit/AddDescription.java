@@ -4,23 +4,23 @@ import java.awt.event.ActionEvent;
 import java.util.UUID;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class AddDescription extends AddComponent {
 
-	public AddDescription(I_ContainTermComponent termContainer, AceFrameConfig config) {
+	public AddDescription(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
 		super(termContainer, config);
 	}
 
 	@Override
-	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, AceFrameConfig config)
+	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config)
 			throws Exception {
 		ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
 		UUID newDescUid = UUID.randomUUID();
@@ -35,7 +35,7 @@ public class AddDescription extends AddComponent {
 		int status = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 		int typeId = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
 		String text = "New Description";
-		for (Path p: termContainer.getConfig().getEditingPathSet()) {
+		for (I_Path p: termContainer.getConfig().getEditingPathSet()) {
 			descPart.setVersion(Integer.MAX_VALUE);
 			descPart.setPathId(p.getConceptId());
 			descPart.setInitialCaseSignificant(capStatus);

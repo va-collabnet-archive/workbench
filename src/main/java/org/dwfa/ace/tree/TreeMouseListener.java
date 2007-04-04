@@ -3,6 +3,7 @@ package org.dwfa.ace.tree;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JTree;
@@ -11,16 +12,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.config.AceFrameConfig;
-
-import com.sleepycat.je.DatabaseException;
 
 public class TreeMouseListener implements MouseListener {
 
-	private AceFrameConfig aceConfig;
+	private I_ConfigAceFrame aceConfig;
 
-	public TreeMouseListener(AceFrameConfig aceConfig) {
+	public TreeMouseListener(I_ConfigAceFrame aceConfig) {
 		super();
 		this.aceConfig = aceConfig;
 	}
@@ -29,7 +28,7 @@ public class TreeMouseListener implements MouseListener {
 		JTree tree = (JTree) e.getSource();
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 		int selRow = tree.getRowForLocation(e.getX(), e.getY());
-		//System.out.println("Selected row: " + selRow);
+		//AceLog.info("Selected row: " + selRow);
 		TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
 		if (selPath != null) {
 			if (selRow != -1) {
@@ -58,7 +57,7 @@ public class TreeMouseListener implements MouseListener {
 				}
 				//tree.setSelectionPath(new TreePath(selPath.getPath()));
 				int newRow = tree.getRowForPath(selPath);
-				//System.out.println("New row: " + newRow);
+				//AceLog.info("New row: " + newRow);
 				tree.setSelectionInterval(newRow, newRow);
 			}
 		}
@@ -109,8 +108,8 @@ public class TreeMouseListener implements MouseListener {
 				model.nodesWereInserted(parentNode,
 						newNodeIndices);
 
-			} catch (DatabaseException e1) {
-				AceLog.alertAndLogException(e1);
+			} catch (IOException e) {
+				AceLog.alertAndLogException(e);
 			}
 		} else { // remove nodes
 			removeAllExtraParents(model, treeBean, parentNode);

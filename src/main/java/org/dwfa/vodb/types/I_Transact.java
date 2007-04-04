@@ -1,14 +1,15 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 import java.util.Set;
 
-import com.sleepycat.je.DatabaseException;
+import org.dwfa.ace.api.TimePathId;
 
 public interface I_Transact {
 
 	public void commit(int version, Set<TimePathId> values)
-			throws DatabaseException;
+			throws IOException;
 
-	public void abort() throws DatabaseException;
+	public void abort() throws IOException;
 
 }

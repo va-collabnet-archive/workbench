@@ -7,6 +7,7 @@ import javax.swing.JMenuItem;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
 
@@ -16,7 +17,7 @@ public class AceFrame extends ComponentFrame {
 
 	private ACE cdePanel;
 
-	public AceFrame(String[] args, LifeCycle lc, AceFrameConfig frameConfig) throws Exception {
+	public AceFrame(String[] args, LifeCycle lc, I_ConfigAceFrame frameConfig) throws Exception {
 		super(args, lc);
 
 		getCdePanel().setup(frameConfig);

@@ -5,11 +5,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class DescriptionTransferable implements Transferable {
 
@@ -35,16 +34,14 @@ public class DescriptionTransferable implements Transferable {
 		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
 			try {
 				return ConceptBean.get(tuple.getConceptId()).getConceptAttributes().getLocalFixedConcept();
-			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IOException e) {
+				AceLog.alertAndLogException(e);
 			}
 		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
 			try {
 				return ConceptBean.get(tuple.getConceptId()).getConceptAttributes().getLocalFixedConcept();
-			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IOException e) {
+				AceLog.alertAndLogException(e);
 			}
 		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
 			return tuple.getDescVersioned().toLocalFixedDesc();

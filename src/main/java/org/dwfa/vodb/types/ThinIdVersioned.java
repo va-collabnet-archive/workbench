@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.TimePathId;
 
 public class ThinIdVersioned implements I_IdVersioned {
 	public static final int SNOMED_CT_T3_PREFIX = 1;

@@ -1,14 +1,14 @@
 package org.dwfa.ace.list;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class TerminologyListModel extends AbstractListModel {
 
@@ -41,8 +41,8 @@ public class TerminologyListModel extends AbstractListModel {
 		boolean rv = elements.add(o);
 		fireIntervalAdded(this, elements.size() -1, elements.size() -1);
 		try {
-			System.out.println("Added: " + o.getInitialText());
-		} catch (DatabaseException e) {
+			AceLog.info("Added: " + o.getInitialText());
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		return rv;

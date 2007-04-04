@@ -121,30 +121,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 	}
 
 	public void componentResized(ComponentEvent e) {
-		setLocation(computeLocation(currentSide));
-
-		/*
-		SwingWorker worker = new SwingWorker<Point>() {
-        	
-            protected Point construct() throws Exception {
-                return computeLocation(currentSide);
-            }
-            protected void finished() {
-                try {
-                	Point newLoc = get();
-                	setLocation(newLoc);
-                } catch (CancellationException ex) {
-                	ex.printStackTrace();
-                } catch (ExecutionException ex) {
-                	ex.printStackTrace();
-                } catch (InterruptedException ex) {
-                	ex.printStackTrace();
-                }
-            }
-        };
-        worker.start();
-        */
-	
+		setLocation(computeLocation(currentSide));	
 	}
 
 	public void componentShown(ComponentEvent e) {

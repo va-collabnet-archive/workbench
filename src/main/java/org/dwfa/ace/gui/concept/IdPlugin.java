@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.IdTableModel;
 import org.dwfa.ace.table.IdTableRenderer;
@@ -28,8 +30,6 @@ import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.IdTableModel.ID_FIELD;
 import org.dwfa.ace.table.IdTableModel.StringWithIdTuple;
 import org.dwfa.bpa.util.TableSorter;
-
-import com.sleepycat.je.DatabaseException;
 
 public class IdPlugin extends AbstractPlugin {
 
@@ -50,7 +50,7 @@ public class IdPlugin extends AbstractPlugin {
 
 
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			ID_FIELD[] columnEnums = getIdColumns(host);
@@ -73,6 +73,8 @@ public class IdPlugin extends AbstractPlugin {
 			idPanel = getIdPanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 			host.addPropertyChangeListener("commit", this);
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			idTableModel.propertyChange(evt);
 		}
 		return idPanel;
 	}

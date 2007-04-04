@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.table.ImageTableModel;
 import org.dwfa.ace.table.ImageTableRenderer;
@@ -25,8 +27,6 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ImageTableModel.IMAGE_FIELD;
 import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
 import org.dwfa.bpa.util.TableSorter;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ImagePlugin extends AbstractPlugin {
 
@@ -45,7 +45,7 @@ public class ImagePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			IMAGE_FIELD[] columnEnums = getImageColumns(host);
@@ -70,6 +70,8 @@ public class ImagePlugin extends AbstractPlugin {
 			imagePanel = getImagePanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 			host.addPropertyChangeListener("commit", this);
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			imageTableModel.propertyChange(evt);
 		}
 		return imagePanel;
 	}

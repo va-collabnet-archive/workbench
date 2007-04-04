@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,23 +21,22 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
-
-import com.sleepycat.je.DatabaseException;
 
 public class IdTableModel extends AbstractTableModel implements
 		PropertyChangeListener {
@@ -120,10 +120,10 @@ public class IdTableModel extends AbstractTableModel implements
 			}
 			try {
 				referencedConcepts = get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException ex) {
+				AceLog.alertAndLogException(ex);
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -191,8 +191,8 @@ public class IdTableModel extends AbstractTableModel implements
 				get();
 			} catch (InterruptedException e) {
 				;
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -293,7 +293,7 @@ public class IdTableModel extends AbstractTableModel implements
 	public int getColumnCount() {
 		return columns.length;
 	}
-	private I_IdTuple getIdTuple(int rowIndex) throws DatabaseException {
+	private I_IdTuple getIdTuple(int rowIndex) throws IOException {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
@@ -308,9 +308,8 @@ public class IdTableModel extends AbstractTableModel implements
 		if (allTuples == null) {
 			try {
 				getIdTuple(0);
-			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IOException e) {
+				AceLog.alertAndLogException(e);
 			}
 		}
 		if (allTuples == null) {
@@ -318,7 +317,7 @@ public class IdTableModel extends AbstractTableModel implements
 		}
 		return allTuples.size();
 	}
-	private String getPrefText(int id) throws DatabaseException {
+	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = getReferencedConcepts().get(id);
 		I_DescriptionTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		String text = statusDesc.getText();
@@ -354,9 +353,9 @@ public class IdTableModel extends AbstractTableModel implements
 							.uncommittedHtml(), idTuple);
 				}
 				new ThinVersionHelper();
-				System.out.println("ID tuple version: " + idTuple.getVersion());
-				System.out.println("ID tuple time: " + ThinVersionHelper.convert(idTuple.getVersion()));
-				System.out.println("ID tuple formatted: " + ThinVersionHelper.format(idTuple
+				AceLog.info("ID tuple version: " + idTuple.getVersion());
+				AceLog.info("ID tuple time: " + ThinVersionHelper.convert(idTuple.getVersion()));
+				AceLog.info("ID tuple formatted: " + ThinVersionHelper.format(idTuple
 						.getVersion()));
 				
 				
@@ -369,8 +368,8 @@ public class IdTableModel extends AbstractTableModel implements
 				return new StringWithIdTuple(Integer.toString(idTuple
 						.getPathId()), idTuple);
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return null;
 	}
@@ -409,7 +408,7 @@ public class IdTableModel extends AbstractTableModel implements
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				for (Path p : config.getEditingPathSet()) {
+				for (I_Path p : config.getEditingPathSet()) {
 					I_IdPart newPart = selectedObject.getTuple()
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
@@ -431,7 +430,7 @@ public class IdTableModel extends AbstractTableModel implements
 
 			public void actionPerformed(ActionEvent e) {
 				try {
-					for (Path p : config.getEditingPathSet()) {
+					for (I_Path p : config.getEditingPathSet()) {
 						I_IdPart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
@@ -447,8 +446,8 @@ public class IdTableModel extends AbstractTableModel implements
 					ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNativeId()));
 					allTuples = null;
 					IdTableModel.this.fireTableDataChanged();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		}
@@ -463,9 +462,9 @@ public class IdTableModel extends AbstractTableModel implements
 
 		StringWithIdTuple selectedObject;
 
-		AceFrameConfig config;
+		I_ConfigAceFrame config;
 
-		public PopupListener(JTable table, AceFrameConfig config) {
+		public PopupListener(JTable table, I_ConfigAceFrame config) {
 			super();
 			this.table = table;
 			this.config = config;
@@ -508,14 +507,14 @@ public class IdTableModel extends AbstractTableModel implements
 			}
 		}
 	}
-	public PopupListener makePopupListener(JTable table, AceFrameConfig config) {
+	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
 		return new PopupListener(table, config);
 	}
 	public static class IdStatusFieldEditor extends AbstractPopupFieldEditor {
 
 		private static final long serialVersionUID = 1L;
 
-		public IdStatusFieldEditor(AceFrameConfig config) {
+		public IdStatusFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 

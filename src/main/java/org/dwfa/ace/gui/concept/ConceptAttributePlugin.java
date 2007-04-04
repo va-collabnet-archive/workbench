@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.table.ConceptTableModel;
 import org.dwfa.ace.table.ConceptTableRenderer;
 import org.dwfa.ace.table.I_CellTextWithTuple;
@@ -27,8 +29,6 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
 import org.dwfa.bpa.util.TableSorter;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ConceptAttributePlugin extends AbstractPlugin {
 
@@ -47,7 +47,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public void update() throws DatabaseException {
+	public void update() throws IOException {
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			CONCEPT_FIELD[] columnEnums = getConceptColumns(host);
@@ -70,6 +70,8 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 			host.addPropertyChangeListener("commit", this);
 			this.host = host;
+			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			conceptTableModel.propertyChange(evt);
 		}
 		return conceptAttributes;
 	}

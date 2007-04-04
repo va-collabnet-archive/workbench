@@ -11,18 +11,19 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinImagePart;
 import org.dwfa.vodb.types.ThinImageVersioned;
 
@@ -30,11 +31,11 @@ import com.sleepycat.je.DatabaseException;
 
 public class AddImage extends AddComponent {
 
-	public AddImage(I_ContainTermComponent termContainer, AceFrameConfig config) {
+	public AddImage(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
 		super(termContainer, config);
 	}
 
-	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, AceFrameConfig config) throws Exception {
+	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) throws Exception {
 			final File imageFile = FileDialogUtil
 					.getExistingFile("Select image file to associate with concept");
 			ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
@@ -56,7 +57,7 @@ public class AddImage extends AddComponent {
 				read = fis.read(image, read, size);
 			}
 			List<I_ImagePart> parts = new ArrayList<I_ImagePart>(1);
-			for (Path p : termContainer.getConfig().getEditingPathSet()) {
+			for (I_Path p : termContainer.getConfig().getEditingPathSet()) {
 				ThinImagePart imagePart = new ThinImagePart();
 				imagePart.setStatusId(AceConfig.vodb
 						.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
@@ -78,8 +79,8 @@ public class AddImage extends AddComponent {
 
 	public static void addStockImage(VodbEnv vodb) throws DatabaseException,
 			IOException, TerminologyException {
-		Path aceAuxPath = new Path(Integer.MIN_VALUE + 1,
-				new ArrayList<Position>());
+		I_Path aceAuxPath = new Path(Integer.MIN_VALUE + 1,
+				new ArrayList<I_Position>());
 
     	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 		int nativeImageId = vodb.uuidToNativeWithGeneration(UUID

@@ -2,18 +2,18 @@ package org.dwfa.ace.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import org.dwfa.ace.ACE;
-
-import com.sleepycat.je.DatabaseException;
+import org.dwfa.ace.AceLog;
 
 public class Abort implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		try {
 			ACE.abort();
-		} catch (DatabaseException e1) {
-			e1.printStackTrace();
+		} catch (IOException e1) {
+			AceLog.alertAndLogException(e1);
 		}
 	}
 

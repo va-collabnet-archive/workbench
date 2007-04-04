@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -16,15 +17,13 @@ import javax.swing.JToggleButton;
 
 import org.dwfa.ace.AceLog;
 
-import com.sleepycat.je.DatabaseException;
-
 public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener {
 
 	private class ToggleActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			try {
 				update();
-			} catch (DatabaseException e1) {
+			} catch (IOException e1) {
 				AceLog.alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 			for (ActionListener l: showComponentListeners) {
@@ -44,7 +43,7 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 	public void propertyChange(PropertyChangeEvent evt) {
 		try {
 			update();
-		} catch (DatabaseException e1) {
+		} catch (IOException e1) {
 			AceLog.alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
 		}
 	}
@@ -53,7 +52,7 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 		return Arrays.asList(new JComponent[] { getToggleButton() });
 	}
 
-	public abstract void update() throws DatabaseException;
+	public abstract void update() throws IOException;
 	
 	public final void addShowComponentListener(ActionListener l) {
 		showComponentListeners.add(l);

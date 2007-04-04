@@ -21,14 +21,15 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.swing.SwingWorker;
-import org.dwfa.vodb.types.Position;
 
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		ActionListener {
@@ -191,7 +192,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 					completeLatch.countDown();
 				}
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				AceLog.alertAndLogException(ex);
 			}
 			if (logger.isLoggable(Level.FINEST)) {
 				logger.finest("ExpandNodeSwingWorker " + workerId
@@ -257,11 +258,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		});
 		upperProgressMessage = "Construct " + node + workerIdStr;
 		I_GetConceptData cb = (I_GetConceptData) node.getUserObject();
-		IntSet allowedStatus = acePanel.getAceFrameConfig().getAllowedStatus();
-		IntSet destRelTypes = acePanel.getAceFrameConfig().getDestRelTypes();
-		IntSet sourceRelTypes = acePanel.getAceFrameConfig()
+		I_IntSet allowedStatus = acePanel.getAceFrameConfig().getAllowedStatus();
+		I_IntSet destRelTypes = acePanel.getAceFrameConfig().getDestRelTypes();
+		I_IntSet sourceRelTypes = acePanel.getAceFrameConfig()
 				.getSourceRelTypes();
-		Set<Position> positions = acePanel.getAceFrameConfig()
+		Set<I_Position> positions = acePanel.getAceFrameConfig()
 				.getViewPositionSet();
 
 		if ((destRelTypes.getSetValues().length == 0)
@@ -319,10 +320,10 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 					expandIfInList();
 				}
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+		} catch (InterruptedException ex) {
+			AceLog.alertAndLogException(ex);
+		} catch (ExecutionException ex) {
+			AceLog.alertAndLogException(ex);
 		}
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("ExpandNodeSwingWorker " + workerId + " finished.");
@@ -366,7 +367,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 				if (tree.isExpanded(tp) == false) {
 					tree.expandPath(tp);
 				} else {
-					System.out.println(" Already expanded");
+					AceLog.info(" Already expanded");
 				}
 			}
 

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -15,11 +16,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 
@@ -35,7 +35,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 	private static ImageIcon multiParentRoot = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/pin_green.png"));
 
-	private AceFrameConfig aceConfig;
+	private I_ConfigAceFrame aceConfig;
 	
 	private boolean drawsFocusBorderAroundIcon = false;
 
@@ -58,7 +58,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public TermTreeCellRenderer(AceFrameConfig aceConfig) {
+	public TermTreeCellRenderer(I_ConfigAceFrame aceConfig) {
 		super();
 		this.aceConfig = aceConfig;
 		setLeafIcon(null);
@@ -143,9 +143,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 				this.setText("ROOT? (User object is null)");
 			}
 
-		} catch (DatabaseException e) {
+		} catch (IOException e) {
 			this.setText(e.toString());
-			e.printStackTrace();
+			AceLog.alertAndLogException(e);
 		}
 		return this;
 	}

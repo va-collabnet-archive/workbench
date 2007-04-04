@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.fd.FileDialogUtil;
 
@@ -17,7 +18,7 @@ public class SaveEnvironment implements ActionListener {
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outFile));
 			oos.writeObject(AceConfig.config);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			AceLog.alertAndLogException(e1);
 		}
 
 	}

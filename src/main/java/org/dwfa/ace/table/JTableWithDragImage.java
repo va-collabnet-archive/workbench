@@ -102,10 +102,9 @@ public class JTableWithDragImage extends JTable {
 				dge.startDrag(DragSource.DefaultCopyDrop, dragImage,
 						imageOffset, t, dsl);
 			} catch (InvalidDnDOperationException e) {
-				System.out.println(e.toString());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				AceLog.info(e.toString());
+			} catch (Exception ex) {
+				AceLog.alertAndLogException(ex);
 			}
 		}
 

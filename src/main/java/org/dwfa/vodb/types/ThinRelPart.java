@@ -2,8 +2,8 @@ package org.dwfa.vodb.types;
 
 import java.util.Arrays;
 
+import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
 
 
 public class ThinRelPart implements I_RelPart {

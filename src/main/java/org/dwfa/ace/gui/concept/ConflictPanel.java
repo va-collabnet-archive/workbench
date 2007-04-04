@@ -39,20 +39,19 @@ import org.dwfa.ace.LabelForRelationshipTuple;
 import org.dwfa.ace.LabelForTuple;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ConflictPanel extends JPanel implements ActionListener {
 
@@ -152,7 +151,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 					.getClientProperty("partLabel");
 			try {
 				addToResolutionPanel(partLabel.copy());
-			} catch (DatabaseException e1) {
+			} catch (IOException e1) {
 				AceLog.alertAndLogException(e1);
 			}
 		}
@@ -208,7 +207,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
 	private ConceptBean cb;
 
-	private AceFrameConfig config;
+	private I_ConfigAceFrame config;
 
 	private JButton resolveButton = new JButton("implement");
 
@@ -352,8 +351,8 @@ public class ConflictPanel extends JPanel implements ActionListener {
 					}
 				}
 
-				for (Path editPath: config.getEditingPathSet()) {
-					Set<Position> positions = new HashSet<Position>();
+				for (I_Path editPath: config.getEditingPathSet()) {
+					Set<I_Position> positions = new HashSet<I_Position>();
 					positions.add(new Position(Integer.MAX_VALUE, editPath));
 					
 					for (I_DescriptionVersioned desc : cb.getDescriptions()) {
@@ -408,14 +407,14 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		}
 	}
 
-	private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, Path editPath, I_DescriptionVersioned desc) {
+	private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, I_Path editPath, I_DescriptionVersioned desc) {
 		I_DescriptionPart newPart = descsForResolution.get(desc.getDescId()).duplicatePart();
 		newPart.setVersion(Integer.MAX_VALUE);
 		newPart.setPathId(editPath.getConceptId());
 		desc.addVersion(newPart);
 	}
 
-	private void retireDescPart(Path editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
+	private void retireDescPart(I_Path editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
 		I_DescriptionPart newPart = desc.getLastTuple().duplicatePart();
 		newPart.setVersion(Integer.MAX_VALUE);
 		newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
@@ -423,14 +422,14 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		desc.addVersion(newPart);
 	}
 
-	private void addRelPart(HashMap<Integer, I_RelTuple> relsForResolution, Path editPath, I_RelVersioned rel) {
+	private void addRelPart(HashMap<Integer, I_RelTuple> relsForResolution, I_Path editPath, I_RelVersioned rel) {
 		I_RelPart newPart = relsForResolution.get(rel.getRelId()).duplicatePart();
 		newPart.setVersion(Integer.MAX_VALUE);
 		newPart.setPathId(editPath.getConceptId());
 		rel.addVersion(newPart);
 	}
 
-	private void retireRelPart(Path editPath, I_RelVersioned rel) throws IOException, TerminologyException {
+	private void retireRelPart(I_Path editPath, I_RelVersioned rel) throws IOException, TerminologyException {
 		I_RelPart newPart = rel.getLastTuple().duplicatePart();
 		newPart.setVersion(Integer.MAX_VALUE);
 		newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
@@ -450,7 +449,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			copy.getLabel()
 					.setMaximumSize((source.getLabel().getMaximumSize()));
 			addToResolutionPanel(copy);
-		} catch (DatabaseException e1) {
+		} catch (IOException e1) {
 			AceLog.alertAndLogException(e1);
 		}
 	}
@@ -484,8 +483,8 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		}
 	}
 
-	public void setConcept(ConceptBean cb, AceFrameConfig config)
-			throws DatabaseException {
+	public void setConcept(ConceptBean cb, I_ConfigAceFrame config)
+			throws IOException {
 		this.cb = cb;
 		this.config = config;
 		resolveButton.setEnabled(false);
@@ -551,7 +550,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			c.gridx = 0;
 			c.gridy = 0;
 
-			for (Position p : config.getViewPositionSet()) {
+			for (I_Position p : config.getViewPositionSet()) {
 				JPanel statePanel = getVersionView(p, config, conAttrColorMap, desColorMap,
 						relColorMap);
 				setMinAndMax(statePanel);
@@ -572,14 +571,14 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		try {
 			setConcept(cb, config);
 			revalidate();
-		} catch (DatabaseException e1) {
+		} catch (IOException e1) {
 			AceLog.alertAndLog(this, Level.SEVERE, "Database Exception: "
 					+ e1.getLocalizedMessage(), e1);
 		}
 	}
 
 	public List<I_ImplementActiveLabel> getCommonLabels(boolean showLongForm,
-			boolean showStatus, AceFrameConfig config) throws DatabaseException {
+			boolean showStatus, I_ConfigAceFrame config) throws IOException {
 		List<I_ImplementActiveLabel> labelList = new ArrayList<I_ImplementActiveLabel>();
 		
 		// concept attributes
@@ -639,17 +638,17 @@ public class ConflictPanel extends JPanel implements ActionListener {
 	}
 
 	public Collection<I_ImplementActiveLabel> getConflictingLabels(
-			boolean showLongForm, boolean showStatus, AceFrameConfig config,
+			boolean showLongForm, boolean showStatus, I_ConfigAceFrame config,
 			ConflictColors colors, Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
 			Map<I_DescriptionTuple, Color> descColorMap,
-			Map<I_RelTuple, Color> relColorMap) throws DatabaseException {
+			Map<I_RelTuple, Color> relColorMap) throws IOException {
 		
 		Set<I_ConceptAttributeTuple> allConAttrTuples = new HashSet<I_ConceptAttributeTuple>();
 		Set<I_DescriptionTuple> allDescTuples = new HashSet<I_DescriptionTuple>();
 		Set<I_RelTuple> allRelTuples = new HashSet<I_RelTuple>();
 		
-		for (Position p : config.getViewPositionSet()) {
-			Set<Position> positionSet = new HashSet<Position>();
+		for (I_Position p : config.getViewPositionSet()) {
+			Set<I_Position> positionSet = new HashSet<I_Position>();
 			positionSet.add(p);
 			
 			// concept attributes
@@ -716,10 +715,10 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		return labelList;
 	}
 
-	public JPanel getVersionView(Position p, AceFrameConfig config,
+	public JPanel getVersionView(I_Position p, I_ConfigAceFrame config,
 			Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
 			Map<I_DescriptionTuple, Color> desColorMap,
-			Map<I_RelTuple, Color> relColorMap) throws DatabaseException {
+			Map<I_RelTuple, Color> relColorMap) throws IOException {
 		JPanel versionView = getMinAndMaxPanel();
 		versionView.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -729,7 +728,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		c.weighty = 0;
 		c.gridx = 0;
 		c.gridy = 0;
-		Set<Position> posSet = new HashSet<Position>(1);
+		Set<I_Position> posSet = new HashSet<I_Position>(1);
 		posSet.add(p);
 		
 		// concept attributes

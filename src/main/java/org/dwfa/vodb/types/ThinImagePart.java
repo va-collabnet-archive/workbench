@@ -1,7 +1,7 @@
 package org.dwfa.vodb.types;
 
 import org.dwfa.ace.api.I_ImagePart;
-import org.dwfa.vodb.jar.I_MapNativeToNative;
+import org.dwfa.ace.api.I_MapNativeToNative;
 
 public class ThinImagePart implements I_ImagePart {
 	private int pathId;
@@ -85,11 +85,11 @@ public class ThinImagePart implements I_ImagePart {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart)
 	 */
-	public boolean hasNewData(ThinImagePart another) {
-		return ((this.pathId != another.pathId) ||
-				(this.statusId != another.statusId) ||
-				((this.textDescription.equals(another.textDescription) == false) ||
-				(this.typeId != another.typeId)));
+	public boolean hasNewData(I_ImagePart another) {
+		return ((this.pathId != another.getPathId()) ||
+				(this.statusId != another.getStatusId()) ||
+				((this.textDescription.equals(another.getTextDescription()) == false) ||
+				(this.typeId != another.getTypeId())));
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)

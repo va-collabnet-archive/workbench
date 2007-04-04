@@ -3,6 +3,8 @@ package org.dwfa.vodb.bind;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.dwfa.ace.AceLog;
+
 
 /**
  * Granularity of SNOMED version stamp is seconds, not milliseconds. Version stamps to not need to 
@@ -29,7 +31,7 @@ public class ThinVersionHelper {
 		timeZero.set(2028, 0, 1);
 		zeroRef = timeZero.getTimeInMillis();
 		*/
-		System.out.println("Zero ref is: " + timeZero);
+		AceLog.info("Zero ref is: " + timeZero);
 	}
 	private static ThreadLocal<SimpleDateFormat> dateFormatterTL = new ThreadLocal<SimpleDateFormat>();
 	

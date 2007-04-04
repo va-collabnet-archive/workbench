@@ -24,11 +24,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.DropButton;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.table.DescriptionTableModel;
@@ -45,8 +45,6 @@ import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescTuple;
 import org.dwfa.vodb.types.ThinDescVersioned;
-
-import com.sleepycat.je.DatabaseException;
 
 public class TerminologyTransferHandler extends TransferHandler {
 
@@ -295,15 +293,32 @@ public class TerminologyTransferHandler extends TransferHandler {
 								.getTransferData(conceptBeanFlavor);
 						table.setValueAt(obj.getConceptId(), row, column);
 					} catch (UnsupportedFlavorException e) {
-						AceLog.info(e.getMessage());
+						AceLog.info("Unsupported flavor: " + e.getMessage());
 					} catch (IOException e) {
-						e.printStackTrace();
+						AceLog.alertAndLogException(e);
 					}
 					return true;
+				} else {
+					AceLog.info("Cell is not editable");
+					return false;
 				}
+			} else {
+				AceLog.info("mouseLoc is null");
+				if (table.getSelectedRow() >= 0 && table.getSelectedColumn() >= 0) {
+					I_GetConceptData obj;
+					try {
+						obj = (I_GetConceptData) t
+						.getTransferData(conceptBeanFlavor);
+						table.setValueAt(obj.getConceptId(), table.getSelectedRow(), table.getSelectedColumn());
+						return true;
+					} catch (UnsupportedFlavorException e) {
+						AceLog.info("Unsupported flavor: " + e.getMessage());
+					} catch (IOException e) {
+						AceLog.alertAndLogException(e);
+					}
+				}
+				return false;
 			}
-			AceLog.info("Cell is not editable");
-			return false;
 		}
 		if (DropButton.class.isAssignableFrom(comp.getClass())) {
 			try {
@@ -322,7 +337,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 		if (JTreeWithDragImage.class.isAssignableFrom(comp.getClass())) {
 			try {
 				JTreeWithDragImage tree = (JTreeWithDragImage) comp;
-				AceFrameConfig config = tree.getConfig();
+				I_ConfigAceFrame config = tree.getConfig();
 				I_GetConceptData obj = (I_GetConceptData) t
 						.getTransferData(conceptBeanFlavor);
 				new ExpandPathToNodeStateListener(tree, config, obj);
@@ -330,9 +345,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
 				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			} catch (DatabaseException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			}
+			} 
 			return true;
 		}
 		try {

@@ -2,7 +2,11 @@ package org.dwfa.ace.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.EventObject;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComponent;
@@ -12,13 +16,12 @@ import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public abstract class DescriptionTableModel extends AbstractTableModel {
 
@@ -69,9 +72,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 	private SmallProgressPanel progress = new SmallProgressPanel();
 
-	private AceFrameConfig config;
+	private I_ConfigAceFrame config;
 
-	public DescriptionTableModel(DESC_FIELD[] columns, AceFrameConfig config) {
+	public DescriptionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
 		super();
 		this.columns = columns;
 		this.config = config;
@@ -94,7 +97,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public int getColumnCount() {
 		return columns.length;
 	}
-	private String getPrefText(int id) throws DatabaseException {
+	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = getReferencedConcepts().get(id);
 		I_DescriptionTuple desc = cb.getDescTuple(config.getTableDescPreferenceList(), config);
 		if (desc != null) {
@@ -157,14 +160,14 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				return new StringWithDescTuple(Integer.toString(desc
 						.getPathId()), desc);
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return null;
 	}
 
 	protected abstract I_DescriptionTuple getDescription(int rowIndex)
-			throws DatabaseException;
+			throws IOException;
 
 	public String getColumnName(int col) {
 		return columns[col].getColumnName();
@@ -173,10 +176,13 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public boolean isCellEditable(int row, int col) {
 		try {
 			if (getDescription(row).getVersion() == Integer.MAX_VALUE) {
+				if (AceLog.isLoggable(Level.FINER)) {
+					AceLog.finer("Cell is editable: " + row + " " + col);
+				}
 				return true;
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return false;
 	}
@@ -216,11 +222,10 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				case BRANCH:
 					break;
 				}
-				fireTableCellUpdated(row, col);
+				fireTableDataChanged();
 			}
-		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 	}
 
@@ -326,13 +331,23 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 					row, column);
 		}
 
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
 	}
 
 	public static class DescTypeFieldEditor extends AbstractPopupFieldEditor {
 
 		private static final long serialVersionUID = 1L;
 
-		public DescTypeFieldEditor(AceFrameConfig config) {
+		public DescTypeFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -346,13 +361,23 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			StringWithDescTuple swdt = (StringWithDescTuple) value;
 			return ConceptBean.get(swdt.getTuple().getTypeId());
 		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
 	}
 
 	public static class DescStatusFieldEditor extends AbstractPopupFieldEditor {
 
 		private static final long serialVersionUID = 1L;
 
-		public DescStatusFieldEditor(AceFrameConfig config) {
+		public DescStatusFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -365,6 +390,16 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		public ConceptBean getSelectedItem(Object value) {
 			StringWithDescTuple swdt = (StringWithDescTuple) value;
 			return ConceptBean.get(swdt.getTuple().getStatusId());
+		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
 		}
 	}
 

@@ -15,16 +15,19 @@ import java.util.regex.Pattern;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
-import org.dwfa.ace.IntSet;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.bpa.util.Stopwatch;
@@ -52,13 +55,11 @@ import org.dwfa.vodb.types.I_ProcessPaths;
 import org.dwfa.vodb.types.I_ProcessRelationships;
 import org.dwfa.vodb.types.I_ProcessTimeBranch;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinImageVersioned;
 import org.dwfa.vodb.types.ThinRelVersioned;
-import org.dwfa.vodb.types.TimePathId;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.je.Cursor;
@@ -586,8 +587,8 @@ public class VodbEnv {
 		return matches;
 	}
 
-	public boolean hasDestRelTuple(int conceptId, IntSet allowedStatus,
-			IntSet destRelTypes, Set<Position> positions)
+	public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus,
+			I_IntSet destRelTypes, Set<I_Position> positions)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
@@ -790,8 +791,8 @@ public class VodbEnv {
 		return matches;
 	}
 
-	public boolean hasSrcRelTuple(int conceptId, IntSet allowedStatus,
-			IntSet sourceRelTypes, Set<Position> positions)
+	public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus,
+			I_IntSet sourceRelTypes, Set<I_Position> positions)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
@@ -1291,7 +1292,7 @@ public class VodbEnv {
 		return false;
 	}
 
-	public int uuidToNativeWithGeneration(UUID uid, int source, Path idPath,
+	public int uuidToNativeWithGeneration(UUID uid, int source, I_Path idPath,
 			int version) throws TerminologyException, IOException {
 		List<UUID> uids = new ArrayList<UUID>(1);
 		uids.add(uid);
@@ -1299,7 +1300,7 @@ public class VodbEnv {
 	}
 
 	public int uuidToNativeWithGeneration(Collection<UUID> uids, int source,
-			Path idPath, int version) throws TerminologyException, IOException {
+			I_Path idPath, int version) throws TerminologyException, IOException {
 		try {
 			return uuidToNative(uids);
 		} catch (TerminologyException e) {
@@ -1344,7 +1345,7 @@ public class VodbEnv {
 	}
 
 	public int uuidToNativeWithGeneration(UUID uid, int source,
-			Collection<Path> idPaths, int version) throws TerminologyException, IOException {
+			Collection<I_Path> idPaths, int version) throws TerminologyException, IOException {
 		try {
 			return uuidToNative(uid);
 		} catch (NoMappingException e) {
@@ -1362,7 +1363,7 @@ public class VodbEnv {
 				// AceLog.info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
-				for (Path p : idPaths) {
+				for (I_Path p : idPaths) {
 					idPart.setIdStatus(uuidToNativeWithGeneration(
 							ArchitectonicAuxiliary.Concept.CURRENT.getUids(), source, p,
 							version));
@@ -1440,7 +1441,7 @@ public class VodbEnv {
 		descDb.put(null, key, value);
 	}
 
-	public void writePath(Path p) throws DatabaseException {
+	public void writePath(I_Path p) throws DatabaseException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(p.getConceptId(), key);
@@ -1448,7 +1449,7 @@ public class VodbEnv {
 		pathDb.put(null, key, value);
 	}
 
-	public Path getPath(int nativeId) throws DatabaseException {
+	public I_Path getPath(int nativeId) throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting path : " + nativeId);
@@ -1463,7 +1464,7 @@ public class VodbEnv {
 				logger.fine("Got path: " + nativeId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
 			}
-			return (Path) pathBinder.entryToObject(pathValue);
+			return (I_Path) pathBinder.entryToObject(pathValue);
 		}
 		throw new DatabaseException("Concept: " + nativeId + " not found.");
 	}

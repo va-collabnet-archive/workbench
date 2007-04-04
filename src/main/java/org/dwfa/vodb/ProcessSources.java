@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 import com.sleepycat.je.DatabaseException;
@@ -260,7 +260,7 @@ public abstract class ProcessSources  {
 		return releases;
 	}
 	public abstract void execute(File snomedDir) throws Exception;
-	public abstract void cleanup(IntSet relsToIgnore) throws Exception;
+	public abstract void cleanup(I_IntSet relsToIgnore) throws Exception;
 	public abstract void writeConcept(
 			Date releaseDate, Object conceptKey, Object conceptStatus, boolean defChar)
 			throws Exception;

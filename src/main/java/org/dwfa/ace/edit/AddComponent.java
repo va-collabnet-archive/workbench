@@ -6,14 +6,15 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.dwfa.ace.I_ContainTermComponent;
-import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 
 public abstract class AddComponent implements ActionListener {
 	private I_ContainTermComponent termContainer;
-	private AceFrameConfig config;
+	private I_ConfigAceFrame config;
 
-	public AddComponent(I_ContainTermComponent termContainer, AceFrameConfig config) {
+	public AddComponent(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
 		super();
 		this.termContainer = termContainer;
 		this.config = config;
@@ -27,11 +28,10 @@ public abstract class AddComponent implements ActionListener {
 			}
 			doEdit(termContainer, e, config);
 		} catch (Exception e1) {
-			JOptionPane.showMessageDialog(new JFrame(), e1.getMessage());
-			e1.printStackTrace();
+			AceLog.alertAndLogException(e1);
 		}
 	}
 
-	protected abstract void doEdit(I_ContainTermComponent termContainer, ActionEvent e, AceFrameConfig config) throws Exception;
+	protected abstract void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) throws Exception;
 
 }

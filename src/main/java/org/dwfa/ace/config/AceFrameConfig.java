@@ -12,17 +12,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.dwfa.ace.IntList;
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
+import org.dwfa.vodb.types.IntList;
+import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
 import com.sleepycat.je.DatabaseException;
 
-public class AceFrameConfig implements Serializable {
+public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/**
 	 * 
 	 */
@@ -36,31 +41,31 @@ public class AceFrameConfig implements Serializable {
     
     private boolean active = true;
     private String frameName = "Ace Frame";
-    private IntSet destRelTypes = new IntSet();
-    private IntSet sourceRelTypes = new IntSet();
-    private IntSet allowedStatus = new IntSet();
-    private IntSet descTypes = new IntSet();
-    private Set<Position> viewPositions = new HashSet<Position>();
+    private I_IntSet destRelTypes = new IntSet();
+    private I_IntSet sourceRelTypes = new IntSet();
+    private I_IntSet allowedStatus = new IntSet();
+    private I_IntSet descTypes = new IntSet();
+    private Set<I_Position> viewPositions = new HashSet<I_Position>();
     private Rectangle bounds = new Rectangle(0, 0, 1400, 1028);
-    private Set<Path> editingPathSet = new HashSet<Path>();
-    private IntSet childrenExpandedNodes = new IntSet();
-    private IntSet parentExpandedNodes = new IntSet();
-    private IntSet roots = new IntSet();
+    private Set<I_Path> editingPathSet = new HashSet<I_Path>();
+    private I_IntSet childrenExpandedNodes = new IntSet();
+    private I_IntSet parentExpandedNodes = new IntSet();
+    private I_IntSet roots = new IntSet();
     
-    private IntSet editRelTypePopup = new IntSet();
-    private IntSet editRelRefinabiltyPopup = new IntSet();
-    private IntSet editRelCharacteristicPopup = new IntSet();
-    private IntSet editDescTypePopup = new IntSet();
-    private IntSet editStatusTypePopup = new IntSet();
+    private I_IntSet editRelTypePopup = new IntSet();
+    private I_IntSet editRelRefinabiltyPopup = new IntSet();
+    private I_IntSet editRelCharacteristicPopup = new IntSet();
+    private I_IntSet editDescTypePopup = new IntSet();
+    private I_IntSet editStatusTypePopup = new IntSet();
 
-    private IntSet statedViewTypes = new IntSet();
-    private IntSet inferredViewTypes = new IntSet();
+    private I_IntSet statedViewTypes = new IntSet();
+    private I_IntSet inferredViewTypes = new IntSet();
     
-    private ConceptBean defaultStatus;
-    private ConceptBean defaultDescriptionType;
-    private ConceptBean defaultRelationshipType;
-    private ConceptBean defaultRelationshipCharacteristic;
-    private ConceptBean defaultRelationshipRefinability;
+    private I_GetConceptData defaultStatus;
+    private I_GetConceptData defaultDescriptionType;
+    private I_GetConceptData defaultRelationshipType;
+    private I_GetConceptData defaultRelationshipCharacteristic;
+    private I_GetConceptData defaultRelationshipRefinability;
     
     private IntList treeDescPreferenceList = new IntList();
     private IntList tableDescPreferenceList = new IntList();
@@ -68,7 +73,7 @@ public class AceFrameConfig implements Serializable {
     private IntList longLabelDescPreferenceList = new IntList();
 	private int termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
 	
-    private ConceptBean hierarchySelection;
+    private I_GetConceptData hierarchySelection;
     
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -145,9 +150,9 @@ public class AceFrameConfig implements Serializable {
             viewPositions = Position.readPositionSet(in);
             bounds = (Rectangle) in.readObject();
             if (objDataVersion >= 3) {
-            	editingPathSet = (Set<Path>) in.readObject();
+            	editingPathSet = (Set<I_Path>) in.readObject();
             } else {
-            	editingPathSet = new HashSet<Path>();
+            	editingPathSet = new HashSet<I_Path>();
             }
             if (objDataVersion >= 4) {
             	childrenExpandedNodes = IntSet.readIntSet(in);
@@ -244,335 +249,539 @@ public class AceFrameConfig implements Serializable {
     }
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#isActive()
+	 */
 	public boolean isActive() {
 		return active;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setActive(boolean)
+	 */
 	public void setActive(boolean active) {
 		this.active = active;
 	}
 
 
-	public IntSet getAllowedStatus() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getAllowedStatus()
+	 */
+	public I_IntSet getAllowedStatus() {
 		return allowedStatus;
 	}
 
 
-	public void setAllowedStatus(IntSet allowedStatus) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setAllowedStatus(org.dwfa.ace.api.IntSet)
+	 */
+	public void setAllowedStatus(I_IntSet allowedStatus) {
 		this.allowedStatus = allowedStatus;
 	}
 
 
-	public IntSet getDescTypes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDescTypes()
+	 */
+	public I_IntSet getDescTypes() {
 		return descTypes;
 	}
 
 
-	public void setDescTypes(IntSet allowedTypes) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDescTypes(org.dwfa.ace.api.IntSet)
+	 */
+	public void setDescTypes(I_IntSet allowedTypes) {
 		this.descTypes = allowedTypes;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getFrameName()
+	 */
 	public String getFrameName() {
 		return frameName;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setFrameName(java.lang.String)
+	 */
 	public void setFrameName(String frameName) {
 		this.frameName = frameName;
 	}
 
 
-	public void setViewPositions(Set<Position> positions) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setViewPositions(java.util.Set)
+	 */
+	public void setViewPositions(Set<I_Position> positions) {
 		this.viewPositions = positions;
 		this.changeSupport.firePropertyChange("viewPositions", null, positions);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getVetoSupport()
+	 */
 	public VetoableChangeSupport getVetoSupport() {
 		return vetoSupport;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setVetoSupport(java.beans.VetoableChangeSupport)
+	 */
 	public void setVetoSupport(VetoableChangeSupport vetoSupport) {
 		this.vetoSupport = vetoSupport;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getBounds()
+	 */
 	public Rectangle getBounds() {
 		return bounds;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setBounds(java.awt.Rectangle)
+	 */
 	public void setBounds(Rectangle bounds) {
 		this.bounds = bounds;
 	}
 
 
-	public IntSet getSourceRelTypes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getSourceRelTypes()
+	 */
+	public I_IntSet getSourceRelTypes() {
 		return sourceRelTypes;
 	}
 
 
-	public void setSourceRelTypes(IntSet browseDownRels) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setSourceRelTypes(org.dwfa.ace.api.IntSet)
+	 */
+	public void setSourceRelTypes(I_IntSet browseDownRels) {
 		this.sourceRelTypes = browseDownRels;
 	}
 
 
-	public IntSet getDestRelTypes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDestRelTypes()
+	 */
+	public I_IntSet getDestRelTypes() {
 		return destRelTypes;
 	}
 
 
-	public void setDestRelTypes(IntSet browseUpRels) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDestRelTypes(org.dwfa.ace.api.IntSet)
+	 */
+	public void setDestRelTypes(I_IntSet browseUpRels) {
 		this.destRelTypes = browseUpRels;
 	}
 	
-	public void addEditingPath(Path p) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types.Path)
+	 */
+	public void addEditingPath(I_Path p) {
 		editingPathSet.add(p);
 	}
-	public void removeEditingPath(Path p) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.types.Path)
+	 */
+	public void removeEditingPath(I_Path p) {
 		editingPathSet.remove(p);
 	}
-	public void replaceEditingPath(Path oldPath, Path newPath) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb.types.Path, org.dwfa.vodb.types.Path)
+	 */
+	public void replaceEditingPath(I_Path oldPath, I_Path newPath) {
 		this.editingPathSet.remove(oldPath);
 		this.editingPathSet.add(newPath);
 	}
-	public Set<Path> getEditingPathSet() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
+	 */
+	public Set<I_Path> getEditingPathSet() {
 		return editingPathSet;
 	}
 
-	public void addViewPosition(Position p) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#addViewPosition(org.dwfa.ace.api.I_Position)
+	 */
+	public void addViewPosition(I_Position p) {
 		viewPositions.add(p);
-		this.changeSupport.firePropertyChange("viewPosition", null, p);
+		this.changeSupport.firePropertyChange("viewPositions", null, p);
 	}
-	public void removeViewPosition(Position p) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#removeViewPosition(org.dwfa.ace.api.I_Position)
+	 */
+	public void removeViewPosition(I_Position p) {
 		viewPositions.remove(p);
-		this.changeSupport.firePropertyChange("viewPosition", p, null);
+		this.changeSupport.firePropertyChange("viewPositions", p, null);
 	}
-	public void replaceViewPosition(Position oldPosition, Position newPosition) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#replaceViewPosition(org.dwfa.ace.api.I_Position, org.dwfa.ace.api.I_Position)
+	 */
+	public void replaceViewPosition(I_Position oldPosition, I_Position newPosition) {
 		this.viewPositions.remove(oldPosition);
 		this.viewPositions.add(newPosition);
-		this.changeSupport.firePropertyChange("viewPosition", oldPosition, newPosition);
+		this.changeSupport.firePropertyChange("viewPositions", oldPosition, newPosition);
 	}
-	public Set<Position> getViewPositionSet() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getViewPositionSet()
+	 */
+	public Set<I_Position> getViewPositionSet() {
 		return viewPositions;
 	}
 
 
-	public IntSet getChildrenExpandedNodes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getChildrenExpandedNodes()
+	 */
+	public I_IntSet getChildrenExpandedNodes() {
 		return childrenExpandedNodes;
 	}
 
 
-	public IntSet getParentExpandedNodes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getParentExpandedNodes()
+	 */
+	public I_IntSet getParentExpandedNodes() {
 		return parentExpandedNodes;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.beans.PropertyChangeListener)
+	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		changeSupport.addPropertyChangeListener(listener);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#fireCommit()
+	 */
 	public void fireCommit() {
 		changeSupport.firePropertyChange("commit", null, null);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+	 */
 	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		changeSupport.addPropertyChangeListener(propertyName, listener);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java.beans.PropertyChangeListener)
+	 */
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		changeSupport.removePropertyChangeListener(listener);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+	 */
 	public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		changeSupport.removePropertyChangeListener(propertyName, listener);
 	}
 
 
-	public IntSet getRoots() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getRoots()
+	 */
+	public I_IntSet getRoots() {
 		return roots;
 	}
 
 
-	public void setRoots(IntSet roots) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setRoots(org.dwfa.ace.api.IntSet)
+	 */
+	public void setRoots(I_IntSet roots) {
 		this.roots = roots;
 	}
 
 
-	public IntSet getEditDescTypePopup() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditDescTypePopup()
+	 */
+	public I_IntSet getEditDescTypePopup() {
 		return editDescTypePopup;
 	}
 
 
-	public IntSet getEditRelCharacteristicPopup() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelCharacteristicPopup()
+	 */
+	public I_IntSet getEditRelCharacteristicPopup() {
 		return editRelCharacteristicPopup;
 	}
 
 
-	public IntSet getEditRelRefinabiltyPopup() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelRefinabiltyPopup()
+	 */
+	public I_IntSet getEditRelRefinabiltyPopup() {
 		return editRelRefinabiltyPopup;
 	}
 
 
-	public IntSet getEditRelTypePopup() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelTypePopup()
+	 */
+	public I_IntSet getEditRelTypePopup() {
 		return editRelTypePopup;
 	}
 
 
-	public IntSet getEditStatusTypePopup() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditStatusTypePopup()
+	 */
+	public I_IntSet getEditStatusTypePopup() {
 		return editStatusTypePopup;
 	}
 
 
-	public void setEditDescTypePopup(IntSet editDescTypePopup) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditDescTypePopup(org.dwfa.ace.api.IntSet)
+	 */
+	public void setEditDescTypePopup(I_IntSet editDescTypePopup) {
 		this.editDescTypePopup = editDescTypePopup;
 	}
 
 
-	public void setEditRelCharacteristicPopup(IntSet editRelCharacteristicPopup) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelCharacteristicPopup(org.dwfa.ace.api.IntSet)
+	 */
+	public void setEditRelCharacteristicPopup(I_IntSet editRelCharacteristicPopup) {
 		this.editRelCharacteristicPopup = editRelCharacteristicPopup;
 	}
 
 
-	public void setEditRelRefinabiltyPopup(IntSet editRelRefinabiltyPopup) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelRefinabiltyPopup(org.dwfa.ace.api.IntSet)
+	 */
+	public void setEditRelRefinabiltyPopup(I_IntSet editRelRefinabiltyPopup) {
 		this.editRelRefinabiltyPopup = editRelRefinabiltyPopup;
 	}
 
 
-	public void setEditRelTypePopup(IntSet editRelTypePopup) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelTypePopup(org.dwfa.ace.api.IntSet)
+	 */
+	public void setEditRelTypePopup(I_IntSet editRelTypePopup) {
 		this.editRelTypePopup = editRelTypePopup;
 	}
 
 
-	public void setEditStatusTypePopup(IntSet editStatusTypePopup) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditStatusTypePopup(org.dwfa.ace.api.IntSet)
+	 */
+	public void setEditStatusTypePopup(I_IntSet editStatusTypePopup) {
 		this.editStatusTypePopup = editStatusTypePopup;
 	}
 
 
-	public IntSet getInferredViewTypes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getInferredViewTypes()
+	 */
+	public I_IntSet getInferredViewTypes() {
 		return inferredViewTypes;
 	}
 
 
-	public void setInferredViewTypes(IntSet inferredViewTypes) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setInferredViewTypes(org.dwfa.ace.api.IntSet)
+	 */
+	public void setInferredViewTypes(I_IntSet inferredViewTypes) {
 		this.inferredViewTypes = inferredViewTypes;
 	}
 
 
-	public IntSet getStatedViewTypes() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getStatedViewTypes()
+	 */
+	public I_IntSet getStatedViewTypes() {
 		return statedViewTypes;
 	}
 
 
-	public void setStatedViewTypes(IntSet statedViewTypes) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setStatedViewTypes(org.dwfa.ace.api.IntSet)
+	 */
+	public void setStatedViewTypes(I_IntSet statedViewTypes) {
 		this.statedViewTypes = statedViewTypes;
 	}
 
 
-	public ConceptBean getDefaultDescriptionType() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultDescriptionType()
+	 */
+	public I_GetConceptData getDefaultDescriptionType() {
 		return defaultDescriptionType;
 	}
 
 
-	public void setDefaultDescriptionType(ConceptBean defaultDescriptionType) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultDescriptionType(org.dwfa.vodb.types.ConceptBean)
+	 */
+	public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType) {
 		this.defaultDescriptionType = defaultDescriptionType;
 	}
 
 
-	public ConceptBean getDefaultRelationshipCharacteristic() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipCharacteristic()
+	 */
+	public I_GetConceptData getDefaultRelationshipCharacteristic() {
 		return defaultRelationshipCharacteristic;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipCharacteristic(org.dwfa.vodb.types.ConceptBean)
+	 */
 	public void setDefaultRelationshipCharacteristic(
-			ConceptBean defaultRelationshipCharacteristic) {
+			I_GetConceptData defaultRelationshipCharacteristic) {
 		this.defaultRelationshipCharacteristic = defaultRelationshipCharacteristic;
 	}
 
 
-	public ConceptBean getDefaultRelationshipRefinability() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipRefinability()
+	 */
+	public I_GetConceptData getDefaultRelationshipRefinability() {
 		return defaultRelationshipRefinability;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipRefinability(org.dwfa.vodb.types.ConceptBean)
+	 */
 	public void setDefaultRelationshipRefinability(
-			ConceptBean defaultRelationshipRefinability) {
+			I_GetConceptData defaultRelationshipRefinability) {
 		this.defaultRelationshipRefinability = defaultRelationshipRefinability;
 	}
 
 
-	public ConceptBean getDefaultRelationshipType() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipType()
+	 */
+	public I_GetConceptData getDefaultRelationshipType() {
 		return defaultRelationshipType;
 	}
 
 
-	public void setDefaultRelationshipType(ConceptBean defaultRelationshipType) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipType(org.dwfa.vodb.types.ConceptBean)
+	 */
+	public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
 		this.defaultRelationshipType = defaultRelationshipType;
 	}
 
 
-	public ConceptBean getDefaultStatus() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultStatus()
+	 */
+	public I_GetConceptData getDefaultStatus() {
 		return defaultStatus;
 	}
 
 
-	public void setDefaultStatus(ConceptBean defaultStatus) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultStatus(org.dwfa.vodb.types.ConceptBean)
+	 */
+	public void setDefaultStatus(I_GetConceptData defaultStatus) {
 		this.defaultStatus = defaultStatus;
 	}
 
 
-	public IntList getTreeDescPreferenceList() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getTreeDescPreferenceList()
+	 */
+	public I_IntList getTreeDescPreferenceList() {
 		return treeDescPreferenceList;
 	}
 
 
-	public IntList getTableDescPreferenceList() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getTableDescPreferenceList()
+	 */
+	public I_IntList getTableDescPreferenceList() {
 		return tableDescPreferenceList;
 	}
 
 
-	public IntList getLongLabelDescPreferenceList() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getLongLabelDescPreferenceList()
+	 */
+	public I_IntList getLongLabelDescPreferenceList() {
 		return longLabelDescPreferenceList;
 	}
 
 
-	public IntList getShortLabelDescPreferenceList() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getShortLabelDescPreferenceList()
+	 */
+	public I_IntList getShortLabelDescPreferenceList() {
 		return shortLabelDescPreferenceList;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getTreeTermDividerLoc()
+	 */
 	public int getTreeTermDividerLoc() {
 		return termTreeDividerLoc;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setTreeTermDividerLoc(int)
+	 */
 	public void setTreeTermDividerLoc(int termTreeDividerLoc) {
 		this.termTreeDividerLoc = termTreeDividerLoc;
 	}
 
 
-	public ConceptBean getHierarchySelection() {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getHierarchySelection()
+	 */
+	public I_GetConceptData getHierarchySelection() {
 		return hierarchySelection;
 	}
 
 
-	public void setHierarchySelection(ConceptBean hierarchySelection) {
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setHierarchySelection(org.dwfa.vodb.types.ConceptBean)
+	 */
+	public void setHierarchySelection(I_GetConceptData hierarchySelection) {
 		Object old = this.hierarchySelection;
 		this.hierarchySelection = hierarchySelection;
 		this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getWorker()
+	 */
 	public MasterWorker getWorker() {
 		return worker;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setWorker(org.dwfa.bpa.worker.MasterWorker)
+	 */
 	public void setWorker(MasterWorker worker) {
 		Object old = this.worker;
 		this.worker = worker;
@@ -580,11 +789,17 @@ public class AceFrameConfig implements Serializable {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getStatusMessage()
+	 */
 	public String getStatusMessage() {
 		return statusMessage;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setStatusMessage(java.lang.String)
+	 */
 	public void setStatusMessage(String statusMessage) {
 		Object old = this.statusMessage;
 		this.statusMessage = statusMessage;

@@ -26,7 +26,9 @@ import javax.swing.JOptionPane;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.DocumentAuxiliary;
 import org.dwfa.cement.HL7;
@@ -40,6 +42,7 @@ import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.protocol.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 
@@ -113,7 +116,7 @@ public class AceConfig implements Serializable {
     			} catch (DatabaseException e) {
     				IOException ioe = new IOException(e.getMessage());
     				ioe.initCause(e);
-    				e.printStackTrace();
+    				AceLog.alertAndLogException(e);
     			}
             	aceFrames = (List<AceFrameConfig>) in.readObject();
         	}
@@ -193,7 +196,7 @@ public class AceConfig implements Serializable {
 			
 			
 			ACE.setAceConfig(config);
-			for (AceFrameConfig ace: config.aceFrames) {
+			for (I_ConfigAceFrame ace: config.aceFrames) {
 				if (ace.isActive()) {
 					AceFrame af = new AceFrame(new String[] { aceRiverConfigFile.getAbsolutePath() }, null, ace);
 					af.setVisible(true);
@@ -206,8 +209,8 @@ public class AceConfig implements Serializable {
 	public static void setupAceConfig(AceConfig config, File configFile, Long cacheSize) throws DatabaseException, ParseException, TerminologyException, IOException, FileNotFoundException {
 		AceConfig.vodb.setup(config.dbFolder, config.readOnly, cacheSize);
 		AceFrameConfig af = new AceFrameConfig();
-		Set<Position> positions = new HashSet<Position>();
-		for (Path p: Path.makeTestSnomedPaths(vodb)) {
+		Set<I_Position> positions = new HashSet<I_Position>();
+		for (I_Path p: Path.makeTestSnomedPaths(vodb)) {
 			positions.add(new Position(Integer.MAX_VALUE, p));
 		}
 		af.setViewPositions(positions);

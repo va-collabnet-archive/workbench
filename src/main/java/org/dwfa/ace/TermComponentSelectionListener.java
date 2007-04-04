@@ -1,6 +1,7 @@
 package org.dwfa.ace;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
@@ -8,10 +9,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
 import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class TermComponentSelectionListener implements TreeSelectionListener {
 
@@ -42,7 +42,7 @@ public class TermComponentSelectionListener implements TreeSelectionListener {
 			} else {
 				setLinkedComponent(e);
 			}
-		} catch (DatabaseException e1) {
+		} catch (IOException e1) {
 			AceLog.alertAndLog(Level.SEVERE, e1.getLocalizedMessage(), e1);
 		}
 	}

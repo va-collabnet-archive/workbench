@@ -25,6 +25,8 @@ public class AceLog {
 		alertAndLog(null, level, message, ex);
 	}
 	public static void alertAndLog(Component parent, Level level, String message, Throwable ex) {
+		logger.log(level, message, ex);
+		message = "<html>" + message;
 		if (level.intValue() <= Level.INFO.intValue()) {
 			JOptionPane.showMessageDialog(parent,
 					message,
@@ -35,17 +37,12 @@ public class AceLog {
 					message,
 				    "A warning has been logged",
 				    JOptionPane.WARNING_MESSAGE);
-			JOptionPane.showMessageDialog(parent,
-					message);
 		} else {
 			JOptionPane.showMessageDialog(parent,
 					message,
 				    "An error has been logged",
 				    JOptionPane.ERROR_MESSAGE);
-			JOptionPane.showMessageDialog(parent,
-					message);
 		} 
-		logger.log(level, message, ex);
 	}
 	public static void addHandler(Handler arg0) throws SecurityException {
 		logger.addHandler(arg0);

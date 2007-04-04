@@ -35,13 +35,17 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.fd.FileDialogUtil;
@@ -53,15 +57,12 @@ import org.dwfa.vodb.bind.ThinImageBinder;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
 import org.dwfa.vodb.bind.TimePathIdBinder;
 import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinImageVersioned;
 import org.dwfa.vodb.types.ThinRelVersioned;
-import org.dwfa.vodb.types.TimePathId;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.je.DatabaseException;
 
 public class ImportUpdateJarReader implements ActionListener {
 	
@@ -71,7 +72,7 @@ public class ImportUpdateJarReader implements ActionListener {
 		private IdHashMap(int size) {
 			map = new HashMap<Integer, Integer>(size);
 		}
-		public void add(int jarId, int dbId) throws DatabaseException {
+		public void add(int jarId, int dbId) throws IOException {
 			map.put(jarId, dbId);
 		}
 
@@ -177,15 +178,14 @@ public class ImportUpdateJarReader implements ActionListener {
 				public void run() {
 					try {
 						importJar(jarFile);
-					} catch (TaskFailedException e1) {
-						e1.printStackTrace();
+					} catch (TaskFailedException ex) {
+						AceLog.alertAndLogException(ex);
 					}
 				}
 
 			});
-		} catch (TaskFailedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (TaskFailedException ex) {
+			AceLog.alertAndLogException(ex);
 		}
 	}
 
@@ -239,7 +239,7 @@ public class ImportUpdateJarReader implements ActionListener {
 
 			for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
 				je = e.nextElement();
-				System.out.println("Jar entry: " + je.getName()
+				AceLog.info("Jar entry: " + je.getName()
 						+ " compressed: " + je.getCompressedSize() + " size: "
 						+ je.getSize() + " time: " + new Date(je.getTime())
 						+ " comment: " + je.getComment());
@@ -286,7 +286,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			if (config != null) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						for (AceFrameConfig ace: config.aceFrames) {
+						for (I_ConfigAceFrame ace: config.aceFrames) {
 							if (ace.isActive()) {
 								ACE cdePanel;
 								try {
@@ -326,7 +326,7 @@ public class ImportUpdateJarReader implements ActionListener {
 				int size = dis.readInt();
 				if (size > buffer.length) {
 					buffer = new byte[size];
-					System.out.println("Increasing id buffer: " + size);
+					AceLog.info("Increasing id buffer: " + size);
 				}
 				int read = dis.read(buffer, 0, size);
 				while (read != size) {
@@ -338,17 +338,17 @@ public class ImportUpdateJarReader implements ActionListener {
 				threadPool.execute(new SyncIdWithDb(jarId, latch));
 				processed++;
 			} catch (Throwable e) {
-				System.out.println("processed: " + processed);
+				AceLog.info("processed: " + processed);
 				dis.close();
-				e.printStackTrace();
+				AceLog.alertAndLogException(e);
 				throw new RuntimeException(e);
 			}
 		}
 		dis.close();
-		System.out.println("Awaiting latch");
+		AceLog.info("Awaiting latch");
 		latch.await();
 		latch = null;
-		System.out.println("Latch released");
+		AceLog.info("Latch released");
 		threadPool.shutdown();
 	}
 
@@ -385,12 +385,12 @@ public class ImportUpdateJarReader implements ActionListener {
 		        	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 					dbId.setNativeId(AceConfig.vodb.uuidToNativeWithGeneration(jarId.getUIDs(), idSource,
 							new Path(Integer.MIN_VALUE + 1,
-									new ArrayList<Position>()), Integer.MAX_VALUE));
+									new ArrayList<I_Position>()), Integer.MAX_VALUE));
 					AceConfig.vodb.writeId(dbId);
 					jarToDbNativeMap.add(jarNativeId, dbId.getNativeId());
 				}
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				AceLog.alertAndLogException(ex);
 			}
 			idLatch.countDown();
 		}
@@ -405,7 +405,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				System.out.println("Increasing image buffer: " + size);
+				AceLog.info("Increasing image buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -439,7 +439,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				System.out.println("Increasing relationship buffer: " + size);
+				AceLog.info("Increasing relationship buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -473,7 +473,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				System.out.println("Increasing description buffer: " + size);
+				AceLog.info("Increasing description buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -506,7 +506,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				System.out.println("Setting concept buffer size to: " + size);
+				AceLog.info("Setting concept buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -540,7 +540,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				System.out.println("Setting path buffer size to: " + size);
+				AceLog.info("Setting path buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -549,7 +549,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			}
 			TupleInput input = new TupleInput(buffer);
 			try {
-				Path jarPath = pathBinder.entryToObject(input);
+				I_Path jarPath = pathBinder.entryToObject(input);
 				jarPath.convertIds(jarToDbNativeMap);
 				if (AceConfig.vodb.hasPath(jarPath
 						.getConceptId())) {
@@ -558,7 +558,7 @@ public class ImportUpdateJarReader implements ActionListener {
 					AceConfig.vodb.writePath(jarPath);
 				}
 			} catch (RuntimeException e) {
-				System.out.println("processing paths: " + processed);
+				AceLog.info("processing paths: " + processed);
 				throw e;
 			}
 			processed++;
@@ -573,7 +573,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				System.out.println("Setting path buffer size to: " + size);
+				AceLog.info("Setting path buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -586,7 +586,7 @@ public class ImportUpdateJarReader implements ActionListener {
 				jarTimePath.convertIds(jarToDbNativeMap);
 				AceConfig.vodb.writeTimePath(jarTimePath);
 			} catch (RuntimeException e) {
-				System.out.println("processing paths: " + processed);
+				AceLog.info("processing paths: " + processed);
 				throw e;
 			}
 			processed++;

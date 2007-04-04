@@ -1,6 +1,6 @@
 package org.dwfa.vodb.bind;
 
-import org.dwfa.vodb.types.TimePathId;
+import org.dwfa.ace.api.TimePathId;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;

@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,23 +22,22 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.I_ContainTermComponent;
+import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.I_HostConceptPlugins;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.Path;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ConceptTableModel extends AbstractTableModel implements
 		PropertyChangeListener {
@@ -44,7 +45,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 		private static final long serialVersionUID = 1L;
 
-		public ConceptStatusFieldEditor(AceFrameConfig config) {
+		public ConceptStatusFieldEditor(I_ConfigAceFrame config) {
 			super(config);
 		}
 
@@ -57,6 +58,16 @@ public class ConceptTableModel extends AbstractTableModel implements
 		public ConceptBean getSelectedItem(Object value) {
 			StringWithConceptTuple swdt = (StringWithConceptTuple) value;
 			return ConceptBean.get(swdt.getTuple().getConceptStatus());
+		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
 		}
 	}
 
@@ -112,10 +123,10 @@ public class ConceptTableModel extends AbstractTableModel implements
 			}
 			try {
 				referencedConcepts = get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException ex) {
+				AceLog.alertAndLogException(ex);
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -183,8 +194,8 @@ public class ConceptTableModel extends AbstractTableModel implements
 				get();
 			} catch (InterruptedException e) {
 				;
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (ExecutionException ex) {
+				AceLog.alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -303,13 +314,13 @@ public class ConceptTableModel extends AbstractTableModel implements
 				return new StringWithConceptTuple(Integer.toString(conTuple
 						.getPathId()), conTuple);
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return null;
 	}
 
-	private String getPrefText(int id) throws DatabaseException {
+	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = getReferencedConcepts().get(id);
 		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (desc != null) {
@@ -320,7 +331,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 		return "null pref desc: " + cb.getInitialText();
 	}
 
-	private I_ConceptAttributeTuple getConceptTuple(int rowIndex) throws DatabaseException {
+	private I_ConceptAttributeTuple getConceptTuple(int rowIndex) throws IOException {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
@@ -352,8 +363,8 @@ public class ConceptTableModel extends AbstractTableModel implements
 			case BRANCH:
 				return false;
 			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			AceLog.alertAndLogException(e);
 		}
 		return false;
 	}
@@ -378,8 +389,8 @@ public class ConceptTableModel extends AbstractTableModel implements
 				break;
 			}
 			fireTableCellUpdated(row, col);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			AceLog.alertAndLogException(ex);
 		}
 	}
 
@@ -470,9 +481,8 @@ public class ConceptTableModel extends AbstractTableModel implements
 		if (allTuples == null) {
 			try {
 				getConceptTuple(0);
-			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IOException e) {
+				AceLog.alertAndLogException(e);
 			}
 		}
 		if (allTuples == null) {
@@ -481,7 +491,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 		return allTuples.size();
 	}
 
-	public PopupListener makePopupListener(JTable table, AceFrameConfig config) {
+	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
 		return new PopupListener(table, config);
 	}
 
@@ -493,7 +503,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				for (Path p : config.getEditingPathSet()) {
+				for (I_Path p : config.getEditingPathSet()) {
 					I_ConceptAttributePart newPart = selectedObject.getTuple()
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
@@ -515,7 +525,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 			public void actionPerformed(ActionEvent e) {
 				try {
-					for (Path p : config.getEditingPathSet()) {
+					for (I_Path p : config.getEditingPathSet()) {
 						I_ConceptAttributePart newPart = selectedObject.getTuple()
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
@@ -531,8 +541,8 @@ public class ConceptTableModel extends AbstractTableModel implements
 					ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getConId()));
 					allTuples = null;
 					ConceptTableModel.this.fireTableDataChanged();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					AceLog.alertAndLogException(ex);
 				}
 			}
 		}
@@ -547,9 +557,9 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 		StringWithConceptTuple selectedObject;
 
-		AceFrameConfig config;
+		I_ConfigAceFrame config;
 
-		public PopupListener(JTable table, AceFrameConfig config) {
+		public PopupListener(JTable table, I_ConfigAceFrame config) {
 			super();
 			this.table = table;
 			this.config = config;

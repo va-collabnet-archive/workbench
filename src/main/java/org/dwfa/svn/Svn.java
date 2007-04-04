@@ -1,5 +1,6 @@
 package org.dwfa.svn;
 
+import org.dwfa.ace.AceLog;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.NodeKind;
 import org.tigris.subversion.javahl.Notify2;
@@ -43,11 +44,11 @@ public class Svn {
 	public static void main(String[] args) throws ClientException {
 
 		String localRepo = "target/maven-javadoc-plugin";
-		System.out.println("checkout");
+		AceLog.info("checkout");
 		getSvnClient().checkout("http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-javadoc-plugin",
 				localRepo, Revision.HEAD, true);
-		System.out.println("cleanup");
+		AceLog.info("cleanup");
 		getSvnClient().cleanup(localRepo);
-		System.out.println("client version: " + getSvnClient().info(localRepo));
+		AceLog.info("client version: " + getSvnClient().info(localRepo));
 	}
 }

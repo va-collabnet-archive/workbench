@@ -17,8 +17,9 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.dwfa.ace.IntSet;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.vodb.types.I_ProcessRelationships;
+import org.dwfa.vodb.types.IntSet;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.je.DatabaseEntry;
@@ -54,7 +55,7 @@ public abstract class ProcessSnomed extends ProcessSources {
 			return value;
 		}
 		
-		public IntSet getIntSet() {
+		public I_IntSet getIntSet() {
 			int[] values = new int[ids.size()];
 			int index = 0;
 			for (Integer id: ids) {
