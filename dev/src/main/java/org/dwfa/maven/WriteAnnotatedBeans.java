@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -70,7 +71,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 	/**
 	 * @parameter
-	 * 
+	 * @required
 	 */
 	private String targetSubDir;
 
@@ -78,65 +79,82 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 	private File rootDir;
 
+	/**
+	 * The maven session
+	 * 
+	 * @parameter expression="${session}"
+	 * @required
+	 */
+	private MavenSession session;
+	
+	private String[] allowedGoals = new String[] { "install", "write-annotated-beans" };
+
 	public WriteAnnotatedBeans() {
 		super();
 	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		
-    	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
-    	for (Dependency d: dependencies) {
-    		if (d.getScope().equals("provided")) {
-    			//don't add
-    		} else {
-    			dependencyWithoutProvided.add(d);
-    		}
-    	}
-		
-		try {
-			rootDir = new File(this.outputDirectory, targetSubDir);
-			URLClassLoader libLoader = 
-				MojoUtil.getProjectClassLoaderWithoutProvided(
-						dependencies, localRepository, outputDirectory
-							+ "/classes/");
-			Class beanListClass = libLoader.loadClass(BeanList.class.getName());
-			for (Dependency d : dependencyWithoutProvided) {
+		String classNameNoDotClass = "";
+		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
+			getLog().info("writing annotated beans");
+		   	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
+	    	for (Dependency d: dependencies) {
+	    		if (d.getScope().equals("provided")) {
+	    			//don't add
+	    		} else {
+	    			dependencyWithoutProvided.add(d);
+	    		}
+	    	}
+			
+			try {
+				rootDir = new File(this.outputDirectory, targetSubDir);
+				URLClassLoader libLoader = 
+					MojoUtil.getProjectClassLoaderWithoutProvided(
+							dependencies, localRepository, outputDirectory
+								+ "/classes/");
+				Class beanListClass = libLoader.loadClass(BeanList.class.getName());
+				for (Dependency d : dependencyWithoutProvided) {
 
-				String dependencyPath = MojoUtil.dependencyToPath(
-						localRepository, d);
-				JarFile jf = new JarFile(dependencyPath);
-				Enumeration<JarEntry> jarEnum = jf.entries();
-				while (jarEnum.hasMoreElements()) {
-					JarEntry je = jarEnum.nextElement();
-					if (je.getName().endsWith(".class")) {
-						String className = je.getName().replace('/', '.');
-						String classNameNoDotClass = className.substring(0,
-								className.length() - 6);
-						Class<?> c = libLoader.loadClass(classNameNoDotClass);
-						Annotation a = c.getAnnotation(beanListClass);
-						if (c.getAnnotation(beanListClass) != null) {
-							BeanList bl = (BeanList) Proxy.newProxyInstance(
-									getClass().getClassLoader(),
-									new Class[] { BeanList.class },
-									new GenericInvocationHandler(a));
-							for (Spec s : bl.specs()) {
-								if (s.type().equals(BeanType.DATA_BEAN)) {
-									writeDataBean(c, s);
-								} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
-									writeGenericBean(c, s);
-								} else if (s.type().equals(BeanType.TASK_BEAN)) {
-									writeTaskBean(c, s);
+					String dependencyPath = MojoUtil.dependencyToPath(
+							localRepository, d);
+					JarFile jf = new JarFile(dependencyPath);
+					Enumeration<JarEntry> jarEnum = jf.entries();
+					while (jarEnum.hasMoreElements()) {
+						JarEntry je = jarEnum.nextElement();
+						if (je.getName().endsWith(".class")) {
+							String className = je.getName().replace('/', '.');
+							classNameNoDotClass = className.substring(0,
+									className.length() - 6);
+							Class<?> c = libLoader.loadClass(classNameNoDotClass);
+							Annotation a = c.getAnnotation(beanListClass);
+							if (c.getAnnotation(beanListClass) != null) {
+								BeanList bl = (BeanList) Proxy.newProxyInstance(
+										getClass().getClassLoader(),
+										new Class[] { BeanList.class },
+										new GenericInvocationHandler(a));
+								for (Spec s : bl.specs()) {
+									if (s.type().equals(BeanType.DATA_BEAN)) {
+										writeDataBean(c, s);
+									} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
+										writeGenericBean(c, s);
+									} else if (s.type().equals(BeanType.TASK_BEAN)) {
+										writeTaskBean(c, s);
+									}
 								}
 							}
 						}
 					}
-				}
 
+				}
+			} catch (Throwable e) {
+				getLog().error(e.getMessage() + " while loading " + classNameNoDotClass);
+				throw new MojoExecutionException(e.getMessage() + " while loading " + classNameNoDotClass, e);
 			}
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
+		} else {
+			getLog().info("Not writing. Not an allowed goal.");
+			
 		}
-	}
+ 	}
 
 	private void writeTaskBean(Class c, Spec spec)
 			throws MojoExecutionException {

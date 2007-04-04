@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.dependency.AbstractDependencyFilterMojo;
@@ -42,84 +43,96 @@ public class ServiceStarter extends AbstractDependencyFilterMojo {
 	 */
 	private String localRepository;
 
+	/**
+	 * The maven session
+	 * 
+	 * @parameter expression="${session}"
+	 * @required
+	 */
+	private MavenSession session;
+	
+	private String[] allowedGoals = new String[] { "run-app", "org.dwfa:dwfa-mojo:run-app", "dwfa-mojo:run-app" };
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (getProject() == null) {
-			project = thisProj;
-		}
-		Set artifacts = getResolvedDependencies(true);
+		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
+			if (getProject() == null) {
+				project = thisProj;
+			}
+			Set artifacts = getResolvedDependencies(true);
 
-		if (artifacts == null || artifacts.isEmpty()) {
-			getLog().info("No dependencies found.");
-		}
+			if (artifacts == null || artifacts.isEmpty()) {
+				getLog().info("No dependencies found.");
+			}
 
-		List artList = new ArrayList(artifacts);
-		try {
-			getLog().info(
-					"Current classloader: " + this.getClass().getClassLoader());
-			getLog().info(
-					"Current classloader class: "
-							+ this.getClass().getClassLoader().getClass()
-									.getCanonicalName());
+			List artList = new ArrayList(artifacts);
+			try {
+				getLog().info(
+						"Current classloader: " + this.getClass().getClassLoader());
+				getLog().info(
+						"Current classloader class: "
+								+ this.getClass().getClassLoader().getClass()
+										.getCanonicalName());
 
-			final URLClassLoader classLoader = MojoUtil
-					.getProjectClassLoader(artList);
-			getLog().info("Made classloader: " + classLoader);
-			
-			
-			Thread t = new Thread(new Runnable() {
+				final URLClassLoader classLoader = MojoUtil
+						.getProjectClassLoader(artList);
+				getLog().info("Made classloader: " + classLoader);
+				
+				
+				Thread t = new Thread(new Runnable() {
 
-				public void run() {
-					try {
+					public void run() {
+						try {
 
-						getLog().info("Started independent thread");
-						ClassLoader loader = Thread.currentThread()
-								.getContextClassLoader();
-						getLog().info("Using classloader: " + loader);
-						if (loader != classLoader) {
-							getLog().info(
-									"Resetting classloader to: " + classLoader);
-							Thread.currentThread().setContextClassLoader(
-									classLoader);
-							loader = Thread.currentThread()
+							getLog().info("Started independent thread");
+							ClassLoader loader = Thread.currentThread()
 									.getContextClassLoader();
+							getLog().info("Using classloader: " + loader);
+							if (loader != classLoader) {
+								getLog().info(
+										"Resetting classloader to: " + classLoader);
+								Thread.currentThread().setContextClassLoader(
+										classLoader);
+								loader = Thread.currentThread()
+										.getContextClassLoader();
+							}
+							getLog().info("Using classloader: " + loader);
+							Class mvnUtilClass = loader
+									.loadClass("org.dwfa.maven.MvnUtil");
+							Method setLocalRepositoryMethod = mvnUtilClass.getMethod(
+									"setLocalRepository", new Class[] { String.class });
+							setLocalRepositoryMethod.invoke(null, new Object[] { localRepository });
+							
+							
+
+							Class serviceStarterClass = Thread.currentThread()
+									.getContextClassLoader().loadClass(
+											"com.sun.jini.start.ServiceStarter");
+							Method mainMethod = serviceStarterClass.getMethod(
+									"main", new Class[] { String[].class });
+							getLog().info(
+									"ServiceStarter args: " + Arrays.asList(args));
+							mainMethod.invoke(null, new Object[] { args });
+						} catch (Exception e) {
+							getLog().error(e.getMessage(), e);
 						}
-						getLog().info("Using classloader: " + loader);
-						Class mvnUtilClass = loader
-								.loadClass("org.dwfa.maven.MvnUtil");
-						Method setLocalRepositoryMethod = mvnUtilClass.getMethod(
-								"setLocalRepository", new Class[] { String.class });
-						setLocalRepositoryMethod.invoke(null, new Object[] { localRepository });
-						
-						
-
-						Class serviceStarterClass = Thread.currentThread()
-								.getContextClassLoader().loadClass(
-										"com.sun.jini.start.ServiceStarter");
-						Method mainMethod = serviceStarterClass.getMethod(
-								"main", new Class[] { String[].class });
-						getLog().info(
-								"ServiceStarter args: " + Arrays.asList(args));
-						mainMethod.invoke(null, new Object[] { args });
-					} catch (Exception e) {
-						getLog().error(e.getMessage(), e);
 					}
-				}
-			});
-			t.setContextClassLoader(classLoader);
-			getLog().info("Starting independent thread");
-			t.run();
+				});
+				t.setContextClassLoader(classLoader);
+				getLog().info("Starting independent thread");
+				t.run();
 
-			Thread.sleep(Long.MAX_VALUE);
-		} catch (IOException e) {
-			// getLog().info(e);
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (SecurityException e) {
-			// getLog().info(e);
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (IllegalArgumentException e) {
-			// getLog().info(e);
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (InterruptedException e) {
+				Thread.sleep(Long.MAX_VALUE);
+			} catch (IOException e) {
+				// getLog().info(e);
+				throw new MojoExecutionException(e.getMessage(), e);
+			} catch (SecurityException e) {
+				// getLog().info(e);
+				throw new MojoExecutionException(e.getMessage(), e);
+			} catch (IllegalArgumentException e) {
+				// getLog().info(e);
+				throw new MojoExecutionException(e.getMessage(), e);
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
