@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,182 +96,226 @@ public class Transform extends AbstractMojo {
 	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		System.out.println("sourceRoots: " + sourceRoots);
+		
+		// calculate the SHA-1 hashcode for this mojo based on input
+		Sha1HashCodeGenerator generator;
+		String hashCode = "";
 		try {
-			for (OutputSpec outSpec: outputSpecs) {
-				for (I_TransformAndWrite tw: outSpec.getWriters()) {
-					File outputFile = new File(tw.getFileName());
-					outputFile.getParentFile().mkdirs();
-					FileOutputStream fos = new FileOutputStream(outputFile, tw.append());
-					OutputStreamWriter osw = new OutputStreamWriter(fos, tw.getOutputEncoding());
-					BufferedWriter bw = new BufferedWriter(osw);
-					tw.init(bw, this);
-				}
-				if(outSpec.getConstantSpecs() != null) {
-					for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
-						constantTransform.setup(this);
-						constantTransform.transform("test");
-						for (I_TransformAndWrite tw: outSpec.getWriters()) {
-							tw.addTransform(constantTransform);
-						}
+			generator = new Sha1HashCodeGenerator();
+			
+			for(int i = 0; i < outputSpecs.length; i++) {
+				generator.add(outputSpecs[i]);
+			}
+			
+			generator.add(idFileLoc);
+			generator.add(appendIdFiles);
+			generator.add(idEncoding);
+			generator.add(outputColumnDelimiter);
+			generator.add(outputCharacterDelimiter);		
+			
+			Iterator iter = sourceRoots.iterator();
+			while(iter.hasNext()) {
+				generator.add(iter.next());
+			}
+			
+			hashCode = generator.getHashCode();
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println(e);
+		}
+		
+		File goalFileDirectory = new File("target" + File.separator 
+				+ "completed-mojos");
+		File goalFile = new File(goalFileDirectory, hashCode);
+		
+		// check to see if this goal has been executed previously
+		if(!goalFile.exists()) {
+			// hasn't been executed previously
+			try {
+				for (OutputSpec outSpec: outputSpecs) {
+					for (I_TransformAndWrite tw: outSpec.getWriters()) {
+						File outputFile = new File(tw.getFileName());
+						outputFile.getParentFile().mkdirs();
+						FileOutputStream fos = new FileOutputStream(outputFile, tw.append());
+						OutputStreamWriter osw = new OutputStreamWriter(fos, tw.getOutputEncoding());
+						BufferedWriter bw = new BufferedWriter(osw);
+						tw.init(bw, this);
 					}
-				}
-				for (InputFileSpec spec : outSpec.getInputSpecs()) {
-					nextColumnId = 0;
-					Map columnTransformerMap = new HashMap();
-					getLog().info("Now processing file spec:\n\n" + spec);
-
-					for (I_ReadAndTransform t : spec.getColumnSpecs()) {
-						t.setup(this);
-						Set transformerSet = (Set) columnTransformerMap.get((Integer) t.getColumnId());
-						if (transformerSet == null) {
-							transformerSet = new HashSet();
-							columnTransformerMap.put((Integer) t.getColumnId(), transformerSet);
-						}
-						transformerSet.add(t);
-
-						for (I_TransformAndWrite tw: outSpec.getWriters()) {
-							tw.addTransform(t);
-						}
-					}
-					File inputFile = normalize(spec);
-					FileInputStream fs = new FileInputStream(inputFile);
-					InputStreamReader isr = new InputStreamReader(fs, spec
-							.getInputEncoding());
-					BufferedReader br = new BufferedReader(isr);
-					StreamTokenizer st = new StreamTokenizer(br);
-					st.resetSyntax();
-					st.wordChars('\u001F', '\u00FF');
-					st.whitespaceChars(spec.getInputColumnDelimiter(), spec
-							.getInputColumnDelimiter());
-					st.eolIsSignificant(true);
-					if (spec.skipFirstLine()) {
-						skipLine(st);
-					}
-					int tokenType = st.nextToken();
-					int rowCount = 0;
-					while (tokenType != StreamTokenizer.TT_EOF) {
-						int currentColumn = 0;
-						while (tokenType != '\r' && tokenType != '\n' && tokenType != StreamTokenizer.TT_EOF) {
-							/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-								getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
-								getLog().info("Current row:" + rowCount);
-							}*/
-
-							if(columnTransformerMap.get((Integer) currentColumn) == null) {
-								System.out.println("Current col:" + currentColumn);
-								System.out.println("Current row: " + rowCount);
-								System.out.println("Token: " + tokenType);
+					if(outSpec.getConstantSpecs() != null) {
+						for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
+							constantTransform.setup(this);
+							constantTransform.transform("test");
+							for (I_TransformAndWrite tw: outSpec.getWriters()) {
+								tw.addTransform(constantTransform);
 							}
-							for (Object tObj: (Set) columnTransformerMap.get((Integer) currentColumn)) {
-								I_ReadAndTransform t = (I_ReadAndTransform) tObj;
-								/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-									getLog().info("Transform for column: " + currentColumn + " is: " + t);
-								}*/
-								String result = t.transform(st.sval);
-								/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-									getLog().info("Transform: " + t + " result: " + result);
-								}*/
+						}
+					}
+					for (InputFileSpec spec : outSpec.getInputSpecs()) {
+						nextColumnId = 0;
+						Map columnTransformerMap = new HashMap();
+						getLog().info("Now processing file spec:\n\n" + spec);
+	
+						for (I_ReadAndTransform t : spec.getColumnSpecs()) {
+							t.setup(this);
+							Set transformerSet = (Set) columnTransformerMap.get((Integer) t.getColumnId());
+							if (transformerSet == null) {
+								transformerSet = new HashSet();
+								columnTransformerMap.put((Integer) t.getColumnId(), transformerSet);
 							}
-							// CR or LF
-							tokenType = st.nextToken();
-							currentColumn++;
+							transformerSet.add(t);
+	
+							for (I_TransformAndWrite tw: outSpec.getWriters()) {
+								tw.addTransform(t);
+							}
 						}
-
-
-						for (I_TransformAndWrite tw: outSpec.getWriters()) {
-							tw.processRec();
+						File inputFile = normalize(spec);
+						FileInputStream fs = new FileInputStream(inputFile);
+						InputStreamReader isr = new InputStreamReader(fs, spec
+								.getInputEncoding());
+						BufferedReader br = new BufferedReader(isr);
+						StreamTokenizer st = new StreamTokenizer(br);
+						st.resetSyntax();
+						st.wordChars('\u001F', '\u00FF');
+						st.whitespaceChars(spec.getInputColumnDelimiter(), spec
+								.getInputColumnDelimiter());
+						st.eolIsSignificant(true);
+						if (spec.skipFirstLine()) {
+							skipLine(st);
 						}
-
-
-						switch (tokenType) {
-							case '\r': // is CR
-								// LF
+						int tokenType = st.nextToken();
+						int rowCount = 0;
+						while (tokenType != StreamTokenizer.TT_EOF) {
+							int currentColumn = 0;
+							while (tokenType != '\r' && tokenType != '\n' && tokenType != StreamTokenizer.TT_EOF) {
+								/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+									getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
+									getLog().info("Current row:" + rowCount);
+								}*/
+	
+								if(columnTransformerMap.get((Integer) currentColumn) == null) {
+									System.out.println("Current col:" + currentColumn);
+									System.out.println("Current row: " + rowCount);
+									System.out.println("Token: " + tokenType);
+								}
+								for (Object tObj: (Set) columnTransformerMap.get((Integer) currentColumn)) {
+									I_ReadAndTransform t = (I_ReadAndTransform) tObj;
+									/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+										getLog().info("Transform for column: " + currentColumn + " is: " + t);
+									}*/
+									String result = t.transform(st.sval);
+									/*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+										getLog().info("Transform: " + t + " result: " + result);
+									}*/
+								}
+								// CR or LF
 								tokenType = st.nextToken();
-								break;
-							case '\n':  //LF
-								break;
-							case StreamTokenizer.TT_EOF: // End of file
-								break;
-							default:
-								throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
+								currentColumn++;
+							}
+	
+	
+							for (I_TransformAndWrite tw: outSpec.getWriters()) {
+								tw.processRec();
+							}
+	
+	
+							switch (tokenType) {
+								case '\r': // is CR
+									// LF
+									tokenType = st.nextToken();
+									break;
+								case '\n':  //LF
+									break;
+								case StreamTokenizer.TT_EOF: // End of file
+									break;
+								default:
+									throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
+							}
+							rowCount++;
+							// Beginning of loop
+							tokenType = st.nextToken();
 						}
-						rowCount++;
-						// Beginning of loop
-						tokenType = st.nextToken();
+						fs.close();
+						getLog().info("Processed: " + rowCount + " rows.");
 					}
-					fs.close();
-					getLog().info("Processed: " + rowCount + " rows.");
+					for (I_TransformAndWrite tw: outSpec.getWriters()) {
+						tw.close();
+					}
 				}
-				for (I_TransformAndWrite tw: outSpec.getWriters()) {
-					tw.close();
+	
+	
+	
+				if (uuidToNativeMap != null) {
+					getLog().info("ID map is not null.");
+					// write out id map...
+					File outputFileLoc = new File(idFileLoc);
+					outputFileLoc.getParentFile().mkdirs();
+	
+					FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, "uuidToNative.txt"), appendIdFiles);
+					OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
+					BufferedWriter bw = new BufferedWriter(osw);
+					if (includeHeader) {
+						bw.append("UUID");
+						bw.append(outputColumnDelimiter);
+						bw.append("NID");
+						bw.append("\n");
+					}
+					for (Iterator i = uuidToNativeMap.entrySet().iterator(); i.hasNext();) {
+						Map.Entry entry = (Entry) i.next();
+						bw.append(entry.getKey().toString());
+						bw.append(outputColumnDelimiter);
+						bw.append(entry.getValue().toString());
+						bw.append("\n");
+					}
+	
+					bw.close();
 				}
+	
+	
+				for (Iterator keyItr = sourceToUuidMapMap.keySet().iterator(); keyItr.hasNext();) {
+					String key = (String) keyItr.next();
+	
+					File outputFileLoc = new File(idFileLoc);
+					outputFileLoc.getParentFile().mkdirs();
+	
+					FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, key + "ToUuid.txt"), appendIdFiles);
+					OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
+					BufferedWriter bw = new BufferedWriter(osw);
+					if (includeHeader) {
+						bw.append(key.toUpperCase());
+						bw.append(outputColumnDelimiter);
+						bw.append("UUID");
+						bw.append("\n");
+					}
+	
+					Map idMap = (Map) sourceToUuidMapMap.get(key);
+					for (Iterator i = idMap.entrySet().iterator(); i.hasNext();) {
+						Map.Entry entry = (Entry) i.next();
+						bw.append(entry.getKey().toString());
+						bw.append(outputColumnDelimiter);
+						bw.append(entry.getValue().toString());
+						bw.append("\n");
+					}
+					bw.close();
+				}
+				
+				// create a new file to indicate this execution has completed
+				try {
+					goalFileDirectory.mkdirs();
+					goalFile.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	
+			} catch (FileNotFoundException e) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			} catch (UnsupportedEncodingException e) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			} catch (IOException e) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			} catch (Exception e) {
+				throw new MojoExecutionException(e.getMessage(), e);
 			}
-
-
-
-			if (uuidToNativeMap != null) {
-				getLog().info("ID map is not null.");
-				// write out id map...
-				File outputFileLoc = new File(idFileLoc);
-				outputFileLoc.getParentFile().mkdirs();
-
-				FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, "uuidToNative.txt"), appendIdFiles);
-				OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
-				BufferedWriter bw = new BufferedWriter(osw);
-				if (includeHeader) {
-					bw.append("UUID");
-					bw.append(outputColumnDelimiter);
-					bw.append("NID");
-					bw.append("\n");
-				}
-				for (Iterator i = uuidToNativeMap.entrySet().iterator(); i.hasNext();) {
-					Map.Entry entry = (Entry) i.next();
-					bw.append(entry.getKey().toString());
-					bw.append(outputColumnDelimiter);
-					bw.append(entry.getValue().toString());
-					bw.append("\n");
-				}
-
-				bw.close();
-			}
-
-
-			for (Iterator keyItr = sourceToUuidMapMap.keySet().iterator(); keyItr.hasNext();) {
-				String key = (String) keyItr.next();
-
-				File outputFileLoc = new File(idFileLoc);
-				outputFileLoc.getParentFile().mkdirs();
-
-				FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, key + "ToUuid.txt"), appendIdFiles);
-				OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
-				BufferedWriter bw = new BufferedWriter(osw);
-				if (includeHeader) {
-					bw.append(key.toUpperCase());
-					bw.append(outputColumnDelimiter);
-					bw.append("UUID");
-					bw.append("\n");
-				}
-
-				Map idMap = (Map) sourceToUuidMapMap.get(key);
-				for (Iterator i = idMap.entrySet().iterator(); i.hasNext();) {
-					Map.Entry entry = (Entry) i.next();
-					bw.append(entry.getKey().toString());
-					bw.append(outputColumnDelimiter);
-					bw.append(entry.getValue().toString());
-					bw.append("\n");
-				}
-				bw.close();
-			}
-
-		} catch (FileNotFoundException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (UnsupportedEncodingException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
+		} else {
+			getLog().info("Skipping goal - executed previously.");
 		}
 	}
 
