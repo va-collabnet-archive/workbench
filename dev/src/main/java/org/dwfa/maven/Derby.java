@@ -194,9 +194,9 @@ public class Derby extends AbstractMojo {
 			} catch (IOException e) {
 				throw new MojoExecutionException(e.getMessage(), e);
 			}
-		}
-		else {
+		} else {
 			// skip execution as it has already been done previously
+			getLog().info("Skipping goal - executed previously.");
 		}
 	}
 
