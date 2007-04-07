@@ -113,7 +113,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 				break;
 
 			default:
-				AceLog.alertAndLogException(new Exception(
+				AceLog.getLog().alertAndLogException(new Exception(
 						"Can't handle event id: " + e.getID() + " "
 								+ e.getActionCommand()));
 				break;
@@ -135,7 +135,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 				break;
 
 			default:
-				AceLog.alertAndLogException(new Exception(
+				AceLog.getLog().alertAndLogException(new Exception(
 						"Can't handle event id: " + e.getID() + " "
 								+ e.getActionCommand()));
 				break;
@@ -152,7 +152,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			try {
 				addToResolutionPanel(partLabel.copy());
 			} catch (IOException e1) {
-				AceLog.alertAndLogException(e1);
+				AceLog.getLog().alertAndLogException(e1);
 			}
 		}
 
@@ -398,7 +398,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 					}
 				}
 			} catch (Exception e) {
-				AceLog.alertAndLogException(e);
+				AceLog.getLog().alertAndLogException(e);
 			}
 			ACE.addUncommitted(cb);
 		} else {
@@ -450,7 +450,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 					.setMaximumSize((source.getLabel().getMaximumSize()));
 			addToResolutionPanel(copy);
 		} catch (IOException e1) {
-			AceLog.alertAndLogException(e1);
+			AceLog.getLog().alertAndLogException(e1);
 		}
 	}
 
@@ -572,7 +572,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			setConcept(cb, config);
 			revalidate();
 		} catch (IOException e1) {
-			AceLog.alertAndLog(this, Level.SEVERE, "Database Exception: "
+			AceLog.getLog().alertAndLog(this, Level.SEVERE, "Database Exception: "
 					+ e1.getLocalizedMessage(), e1);
 		}
 	}

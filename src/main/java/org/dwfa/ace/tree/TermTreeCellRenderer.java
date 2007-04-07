@@ -145,7 +145,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 
 		} catch (IOException e) {
 			this.setText(e.toString());
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return this;
 	}

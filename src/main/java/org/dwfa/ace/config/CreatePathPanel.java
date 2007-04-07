@@ -98,13 +98,13 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent e) {
-        AceLog.info("Create new path: " + desc.getText());
+        AceLog.getLog().info("Create new path: " + desc.getText());
         if (desc.getText() == null || desc.getText().length() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
             return;
         }
         List<I_Position> origins = this.sppp.getSelectedPositions();
-        AceLog.info(origins.toString());
+        AceLog.getLog().info(origins.toString());
         if (origins.size() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must select at least one origin for path.");
             return;
@@ -171,12 +171,12 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	        	
         	
         	ACE.addUncommitted(cb);
-            AceLog.info("Created new path: " + desc.getText() + " " + origins);
+            AceLog.getLog().info("Created new path: " + desc.getText() + " " + origins);
             this.desc.setText("");
             this.parent.setTermComponent(null);
             
         } catch (Exception ex) {
-			AceLog.alertAndLogException(ex);
+			AceLog.getLog().alertAndLogException(ex);
         }
     }
  

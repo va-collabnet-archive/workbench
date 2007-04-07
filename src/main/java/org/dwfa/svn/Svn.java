@@ -44,11 +44,11 @@ public class Svn {
 	public static void main(String[] args) throws ClientException {
 
 		String localRepo = "target/maven-javadoc-plugin";
-		AceLog.info("checkout");
+		AceLog.getLog().info("checkout");
 		getSvnClient().checkout("http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-javadoc-plugin",
 				localRepo, Revision.HEAD, true);
-		AceLog.info("cleanup");
+		AceLog.getLog().info("cleanup");
 		getSvnClient().cleanup(localRepo);
-		AceLog.info("client version: " + getSvnClient().info(localRepo));
+		AceLog.getLog().info("client version: " + getSvnClient().info(localRepo));
 	}
 }

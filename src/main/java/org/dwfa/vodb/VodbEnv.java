@@ -151,7 +151,7 @@ public class VodbEnv {
 	 * primary is opened? How do they get updated, etc?
 	 */
 	public void setup(File envHome, boolean readOnly, Long cacheSize) throws DatabaseException {
-		AceLog.info("Setting up db: " + envHome);
+		AceLog.getLog().info("Setting up db: " + envHome);
 		this.readOnly = readOnly;
 		LocalFixedTerminology.setStore(new VodbFixedServer(this));
 		envHome.mkdirs();
@@ -159,7 +159,7 @@ public class VodbEnv {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		if (cacheSize != null) {
 			envConfig.setCacheSize(cacheSize);
-			AceLog.info("Setting cache size to: " + cacheSize);
+			AceLog.getLog().info("Setting cache size to: " + cacheSize);
 		}
 
 		envConfig.setReadOnly(readOnly);
@@ -217,8 +217,8 @@ public class VodbEnv {
 		DatabaseConfig pathDbConfig = makeConfig(readOnly);
 		pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
 
-		AceLog.info("Cache percent: " + envConfig.getCachePercent());
-		AceLog.info("Cache size: " + envConfig.getCacheSize());
+		AceLog.getLog().info("Cache percent: " + envConfig.getCachePercent());
+		AceLog.getLog().info("Cache size: " + envConfig.getCacheSize());
 
 	}
 
@@ -1316,7 +1316,7 @@ public class VodbEnv {
 				}
 				idCursor.close();
 				I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
-				// AceLog.info("Last id: " + lastId + " NewId: " +
+				// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
 				for (UUID uid : uids) {
@@ -1360,7 +1360,7 @@ public class VodbEnv {
 				}
 				idCursor.close();
 				I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
-				// AceLog.info("Last id: " + lastId + " NewId: " +
+				// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
 				for (I_Path p : idPaths) {

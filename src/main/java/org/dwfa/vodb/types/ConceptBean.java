@@ -196,7 +196,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		for (I_RelVersioned rel : getDestRels()) {
 			/*
 			 * if ((conceptId == -2147444184) && (rel.getC1Id() == -2147326003)) {
-			 * AceLog.info("getSourceRelTuples for SNOMED CT Concept"); }
+			 * AceLog.getLog().info("getSourceRelTuples for SNOMED CT Concept"); }
 			 */
 			rel.addTuples(allowedStatus, allowedTypes, positions, returnRels,
 					addUncommitted);
@@ -262,7 +262,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		try {
 			return getInitialText();
 		} catch (IOException ex) {
-			AceLog.alertAndLogException(ex);
+			AceLog.getLog().alertAndLogException(ex);
 			return ex.toString();
 		} 
 	}
@@ -434,7 +434,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 */
 	public void commit(int version, Set<TimePathId> values) throws IOException {
 		// handle the parts first...
-		AceLog.info("Starting commit for ConceptBean: " + this);
+		AceLog.getLog().info("Starting commit for ConceptBean: " + this);
 		try {
 			if (images != null) {
 				for (I_ImageVersioned image : images) {
@@ -567,7 +567,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		} catch (DatabaseException e) {
 			throw new DbToIoException(e);
 		}
-		AceLog.info("Finished commit for ConceptBean: " + this);
+		AceLog.getLog().info("Finished commit for ConceptBean: " + this);
 	}
 
 	/*
@@ -937,7 +937,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	}
 
 	private void flushDestRels() {
-		AceLog.info("Flushing destination rels for: " + this);
+		AceLog.getLog().info("Flushing destination rels for: " + this);
 		this.destRels = null;
 	}
 

@@ -124,9 +124,9 @@ public class ConceptTableModel extends AbstractTableModel implements
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -195,7 +195,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -315,7 +315,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 						.getPathId()), conTuple);
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -364,7 +364,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 				return false;
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return false;
 	}
@@ -390,7 +390,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			}
 			fireTableCellUpdated(row, col);
 		} catch (Exception ex) {
-			AceLog.alertAndLogException(ex);
+			AceLog.getLog().alertAndLogException(ex);
 		}
 	}
 
@@ -482,7 +482,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			try {
 				getConceptTuple(0);
 			} catch (IOException e) {
-				AceLog.alertAndLogException(e);
+				AceLog.getLog().alertAndLogException(e);
 			}
 		}
 		if (allTuples == null) {
@@ -542,7 +542,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 					allTuples = null;
 					ConceptTableModel.this.fireTableDataChanged();
 				} catch (Exception ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 		}

@@ -100,9 +100,9 @@ public class JTreeWithDragImage extends JTree {
 					dge.startDrag(DragSource.DefaultCopyDrop, dragImage,
 							imageOffset, getTransferable(obj), dsl);
 				} catch (InvalidDnDOperationException e) {
-					AceLog.info(e.toString());
+					AceLog.getLog().info(e.toString());
 				} catch (Exception ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 		}
@@ -142,7 +142,7 @@ public class JTreeWithDragImage extends JTree {
 			while (childEnum.hasMoreElements()) {
 				m.nodeStructureChanged(childEnum.nextElement());
 			}
-			AceLog.info("Tree model changed");
+			AceLog.getLog().info("Tree model changed");
 		}
 		
 	}

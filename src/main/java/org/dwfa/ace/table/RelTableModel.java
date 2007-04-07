@@ -142,9 +142,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			updator.normalCompletion();
@@ -223,7 +223,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			}
 			tableBean = cb;
 			fireTableDataChanged();
@@ -304,7 +304,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			allTuples = getRels(tableBean, host.getUsePrefs(), getShowHistory());
 			return allTuples.size();
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return 0;
 	}
@@ -390,7 +390,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						Integer.toString(rel.getPathId()), rel);
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return "No case found for: " + field;
 	}
@@ -740,7 +740,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					allTuples = null;
 					RelTableModel.this.fireTableDataChanged();
 				} catch (IOException ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 		}
@@ -783,7 +783,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					allTuples = null;
 					RelTableModel.this.fireTableDataChanged();
 				} catch (Exception ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 		}

@@ -93,7 +93,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					try {
 						contentScroller.setViewportView(getContentPane());
 					} catch (DatabaseException e) {
-						AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE,
+						AceLog.getLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
 								"Database Exception: "
 										+ e.getLocalizedMessage(), e);
 					}
@@ -111,7 +111,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			try {
 				contentScroller.setViewportView(getContentPane());
 			} catch (DatabaseException e1) {
-				AceLog.alertAndLog(ConceptPanel.this, Level.SEVERE,
+				AceLog.getLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
 						"Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
@@ -469,7 +469,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						"Execution of " + bp.getName() + " complete.");
 			} catch (Exception e1) {
 				getConfig().setStatusMessage("Exception during execution.");
-				AceLog.alertAndLogException(e1);
+				AceLog.getLog().alertAndLogException(e1);
 			}
 		}
 
@@ -505,7 +505,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						desc = cb.getInitialText();
 					}
 				} catch (IOException e) {
-					AceLog.alertAndLogException(e);
+					AceLog.getLog().alertAndLogException(e);
 					desc = termComponent.toString();
 				}
 				String shortDesc;

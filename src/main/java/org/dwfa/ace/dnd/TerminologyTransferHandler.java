@@ -98,8 +98,8 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	protected Transferable createTransferable(JComponent c) {
-		if (AceLog.isLoggable(Level.FINE)) {
-			AceLog.fine("Creating a transferable for: " + c);
+		if (AceLog.getLog().isLoggable(Level.FINE)) {
+			AceLog.getLog().fine("Creating a transferable for: " + c);
 		}
 		if (JTree.class.isAssignableFrom(c.getClass())) {
 			JTree tree = (JTree) c;
@@ -211,8 +211,8 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	protected void exportDone(JComponent source, Transferable data, int action) {
-		if (AceLog.isLoggable(Level.FINE)) {
-			AceLog.fine("export done: " + source);
+		if (AceLog.getLog().isLoggable(Level.FINE)) {
+			AceLog.getLog().fine("export done: " + source);
 		}
 		super.exportDone(source, data, action);
 		if (action == MOVE) {
@@ -233,15 +233,15 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	public boolean importData(JComponent comp, Transferable t) {
-		if (AceLog.isLoggable(Level.FINE)) {
-			AceLog.fine("import: " + comp);
+		if (AceLog.getLog().isLoggable(Level.FINE)) {
+			AceLog.getLog().fine("import: " + comp);
 		}
 		if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
 			I_ContainTermComponent ictc = (I_ContainTermComponent) comp;
 			try {
 				Object obj = t.getTransferData(conceptBeanFlavor);
-				if (AceLog.isLoggable(Level.FINE)) {
-					AceLog.fine("Transfer data for conceptBeanFlavor is: " + obj);
+				if (AceLog.getLog().isLoggable(Level.FINE)) {
+					AceLog.getLog().fine("Transfer data for conceptBeanFlavor is: " + obj);
 				}
 				ConceptBean cb;
 				if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
@@ -253,9 +253,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 				ictc.setTermComponent(cb);
 				return true;
 			} catch (UnsupportedFlavorException e) {
-				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		}
 		if (TerminologyList.class.isAssignableFrom(comp.getClass())) {
@@ -273,9 +273,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 				model.addElement(cb);
 				return true;
 			} catch (UnsupportedFlavorException e) {
-				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		}
 
@@ -285,7 +285,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 			if (mouseLoc != null) {
 				int column = table.columnAtPoint(mouseLoc);
 				int row = table.rowAtPoint(mouseLoc);
-				AceLog.info("Dropping on JTable row: " + row + " column: "
+				AceLog.getLog().info("Dropping on JTable row: " + row + " column: "
 						+ column);
 				if (table.isCellEditable(row, column)) {
 					try {
@@ -293,17 +293,17 @@ public class TerminologyTransferHandler extends TransferHandler {
 								.getTransferData(conceptBeanFlavor);
 						table.setValueAt(obj.getConceptId(), row, column);
 					} catch (UnsupportedFlavorException e) {
-						AceLog.info("Unsupported flavor: " + e.getMessage());
+						AceLog.getLog().info("Unsupported flavor: " + e.getMessage());
 					} catch (IOException e) {
-						AceLog.alertAndLogException(e);
+						AceLog.getLog().alertAndLogException(e);
 					}
 					return true;
 				} else {
-					AceLog.info("Cell is not editable");
+					AceLog.getLog().info("Cell is not editable");
 					return false;
 				}
 			} else {
-				AceLog.info("mouseLoc is null");
+				AceLog.getLog().info("mouseLoc is null");
 				if (table.getSelectedRow() >= 0 && table.getSelectedColumn() >= 0) {
 					I_GetConceptData obj;
 					try {
@@ -312,9 +312,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 						table.setValueAt(obj.getConceptId(), table.getSelectedRow(), table.getSelectedColumn());
 						return true;
 					} catch (UnsupportedFlavorException e) {
-						AceLog.info("Unsupported flavor: " + e.getMessage());
+						AceLog.getLog().info("Unsupported flavor: " + e.getMessage());
 					} catch (IOException e) {
-						AceLog.alertAndLogException(e);
+						AceLog.getLog().alertAndLogException(e);
 					}
 				}
 				return false;
@@ -326,11 +326,11 @@ public class TerminologyTransferHandler extends TransferHandler {
 						.getTransferData(conceptBeanFlavor);
 				DropButton db = (DropButton) comp;
 				db.doDrop(obj);
-				AceLog.info("Dropped on DropButton: " + obj);
+				AceLog.getLog().info("Dropped on DropButton: " + obj);
 			} catch (UnsupportedFlavorException e) {
-				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 			return true;
 		}
@@ -342,9 +342,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 						.getTransferData(conceptBeanFlavor);
 				new ExpandPathToNodeStateListener(tree, config, obj);
 			} catch (UnsupportedFlavorException e) {
-				AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} 
 			return true;
 		}
@@ -361,28 +361,28 @@ public class TerminologyTransferHandler extends TransferHandler {
 				}
 			}
 		} catch (NoSuchMethodException e) {
-			if (AceLog.isLoggable(Level.FINE)) {
-				AceLog.fine("Can't paste: " + e.toString());
+			if (AceLog.getLog().isLoggable(Level.FINE)) {
+				AceLog.getLog().fine("Can't paste: " + e.toString());
 			}
 			// Nothing to do
 		} catch (UnsupportedFlavorException e) {
-			AceLog.log(Level.FINE, e.getLocalizedMessage(), e);
+			AceLog.getLog().log(Level.FINE, e.getLocalizedMessage(), e);
 		} catch (IOException e) {
-			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (IllegalArgumentException e) {
-			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (IllegalAccessException e) {
-			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (InvocationTargetException e) {
-			AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		return false;
 	}
 
 	@Override
 	public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-		if (AceLog.isLoggable(Level.FINE)) {
-			AceLog.fine("Can import: " + comp);
+		if (AceLog.getLog().isLoggable(Level.FINE)) {
+			AceLog.getLog().fine("Can import: " + comp);
 		}
 		if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
 			for (DataFlavor f : transferFlavors) {
@@ -421,8 +421,8 @@ public class TerminologyTransferHandler extends TransferHandler {
 				}
 			}
 		} catch (NoSuchMethodException e) {
-			if (AceLog.isLoggable(Level.FINE)) {
-				AceLog.fine("Can't paste: " + e.toString());
+			if (AceLog.getLog().isLoggable(Level.FINE)) {
+				AceLog.getLog().fine("Can't paste: " + e.toString());
 			}
 		}
 		return false;
@@ -430,15 +430,15 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	@Override
 	public int getSourceActions(JComponent c) {
-		if (AceLog.isLoggable(Level.FINE)) {
-			AceLog.fine("getSourceActions ");
+		if (AceLog.getLog().isLoggable(Level.FINE)) {
+			AceLog.getLog().fine("getSourceActions ");
 		}
 		return COPY_OR_MOVE;
 	}
 
 	public static DataFlavor[] getSupportedFlavors() {
-		if (AceLog.isLoggable(Level.FINE)) {
-			AceLog.fine("getSupportedFlavors ");
+		if (AceLog.getLog().isLoggable(Level.FINE)) {
+			AceLog.getLog().fine("getSupportedFlavors ");
 		}
 		return supportedFlavors;
 	}

@@ -111,9 +111,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -190,7 +190,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 			}
 			tableConcept = cb;
 			fireTableDataChanged();
@@ -320,7 +320,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 				return getAllImages().size();
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return 0;
 	}
@@ -372,7 +372,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 				return new StringWithImageTuple(Integer.toString(image.getPathId()), image);
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -457,7 +457,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			}
 			return false;
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return false;
 	}

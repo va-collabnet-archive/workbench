@@ -161,7 +161,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 						.getPathId()), desc);
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -176,13 +176,13 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public boolean isCellEditable(int row, int col) {
 		try {
 			if (getDescription(row).getVersion() == Integer.MAX_VALUE) {
-				if (AceLog.isLoggable(Level.FINER)) {
-					AceLog.finer("Cell is editable: " + row + " " + col);
+				if (AceLog.getLog().isLoggable(Level.FINER)) {
+					AceLog.getLog().finer("Cell is editable: " + row + " " + col);
 				}
 				return true;
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		return false;
 	}
@@ -225,7 +225,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				fireTableDataChanged();
 			}
 		} catch (IOException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 	}
 

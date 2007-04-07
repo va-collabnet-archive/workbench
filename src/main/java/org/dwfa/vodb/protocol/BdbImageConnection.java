@@ -36,7 +36,7 @@ public class BdbImageConnection extends URLConnection {
 								return;
 							}
 						} catch (RuntimeException ex) {
-							AceLog.alertAndLogException(ex);
+							AceLog.getLog().alertAndLogException(ex);
 						} 
 					}
 				} else {
@@ -62,7 +62,7 @@ public class BdbImageConnection extends URLConnection {
 			try {
 				connect();
 			} catch (IOException ex) {
-				AceLog.alertAndLogException(ex);
+				AceLog.getLog().alertAndLogException(ex);
 				return null;
 			}
 		}

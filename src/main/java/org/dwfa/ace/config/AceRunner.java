@@ -39,7 +39,7 @@ public class AceRunner {
 		} else {
 			argsStr = Arrays.asList(args).toString();
 		}
-		AceLog.info("\n*******************\n\n"
+		AceLog.getLog().info("\n*******************\n\n"
 				+ "Starting service with config file args: " + argsStr
 				+ "\n\n******************\n");
 		config = ConfigurationProvider.getInstance(args, getClass()
@@ -58,7 +58,7 @@ public class AceRunner {
 					"dbFolder", File.class, new File("target/berkeley-db"));
 			Long cacheSize = (Long) config.getEntry(this.getClass().getName(),
 					"cacheSize", Long.class, null);
-			AceLog.info("Cache size in config file: " + cacheSize);
+			AceLog.getLog().info("Cache size in config file: " + cacheSize);
 			aceConfig = new AceConfig(dbFolder);
 			setupDatabase(aceConfig);
 			AceConfig.setupAceConfig(aceConfig, aceConfigFile, cacheSize);
@@ -82,7 +82,7 @@ public class AceRunner {
 			if (n == JOptionPane.YES_OPTION) {
 				AceConfig.extractMavenLib(aceConfig);
 			} else {
-				AceLog.info("Exiting, user did not want to extract the DB from maven.");
+				AceLog.getLog().info("Exiting, user did not want to extract the DB from maven.");
 				return;
 			}
 		}

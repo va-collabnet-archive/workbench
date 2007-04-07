@@ -161,9 +161,9 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			}
 			updateMatches();
 		} catch (InterruptedException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		} catch (ExecutionException e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		searchPanel.removeStopActionListener(stopListener);
 		searchPanel.setShowProgress(false);

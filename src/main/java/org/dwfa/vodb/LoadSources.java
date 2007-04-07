@@ -20,25 +20,25 @@ public class LoadSources {
 			timer.start();
 			AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
 			loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
-			AceLog.info("Starting to process AceAuxillary.");
+			AceLog.getLog().info("Starting to process AceAuxillary.");
 			loadConstants.execute(new File(args[1]));
-			AceLog.info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
+			AceLog.getLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
 			Path.writeBasePaths(AceConfig.vodb);
 			AddImage.addStockImage(AceConfig.vodb);
 			int[] releaseDates = loadConstants.getReleaseDates();
 			if (args.length > 2) {
 				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.vodb,
 						loadConstants.getConstantToIntMap(), releaseDates[0]);
-				AceLog.info("Starting to process SNOMED.");
+				AceLog.getLog().info("Starting to process SNOMED.");
 				loadSnomed.execute(new File(args[2]));
-				AceLog.info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());
+				AceLog.getLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());
 			} 
 			
 		} catch (Exception e) {
 			if (loadConstants != null) {
 				loadConstants.getLog().log(Level.SEVERE, e.toString(), e);
 			} else {
-				AceLog.alertAndLogException(e);
+				AceLog.getLog().alertAndLogException(e);
 			}
 		}
 	}

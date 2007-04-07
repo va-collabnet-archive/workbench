@@ -13,7 +13,7 @@ public class Commit implements ActionListener {
 		try {
 			ACE.commit();
 		} catch (IOException e1) {
-			AceLog.alertAndLogException(e1);
+			AceLog.getLog().alertAndLogException(e1);
 		}
 
 	}

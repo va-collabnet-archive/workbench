@@ -173,7 +173,7 @@ public class Path implements I_Transact, Serializable, I_Path {
 			vodb.sync();
 			vodb.close();
 		} catch (Exception ex) {
-			AceLog.alertAndLogException(ex);
+			AceLog.getLog().alertAndLogException(ex);
 		}
 		System.exit(0);
 	}

@@ -37,8 +37,8 @@ public class AceTransferAction extends AbstractAction implements UIResource {
             TransferHandler th = c.getTransferHandler();
             Clipboard clipboard = getClipboard(c);
             String name = (String) getValue(Action.NAME);
-            if (AceLog.isLoggable(Level.FINE)) {
-            	AceLog.fine("Doing transfer action: " + name
+            if (AceLog.getLog().isLoggable(Level.FINE)) {
+            	AceLog.getLog().fine("Doing transfer action: " + name
                         + " with transfer handler: " + th);
             }
 
@@ -57,10 +57,10 @@ public class AceTransferAction extends AbstractAction implements UIResource {
                         trans = clipboard.getContents(null);
                     }
                 } else {
-                	AceLog.log(Level.WARNING, "clipboard, th, or name is null: " + clipboard + " " + th + " " + name);
+                	AceLog.getLog().log(Level.WARNING, "clipboard, th, or name is null: " + clipboard + " " + th + " " + name);
                 }
             } catch (IllegalStateException ise) {
-            	AceLog.log(Level.SEVERE, ise.getMessage(), ise);
+            	AceLog.getLog().log(Level.SEVERE, ise.getMessage(), ise);
                 UIManager.getLookAndFeel().provideErrorFeedback(c);
                 return;
             }

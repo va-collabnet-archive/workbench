@@ -49,17 +49,17 @@ public class ConceptTransferable implements Transferable {
 			try {
 				return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
 			} catch (IOException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (TerminologyException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		} else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
 			try {
 				return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
 			} catch (IOException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			} catch (TerminologyException e) {
-				AceLog.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				AceLog.getLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		} else if (flavor.equals(DataFlavor.stringFlavor)) {
 			return conceptTransferable.toString();

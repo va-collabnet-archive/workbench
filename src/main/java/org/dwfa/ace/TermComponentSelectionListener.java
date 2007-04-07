@@ -43,7 +43,7 @@ public class TermComponentSelectionListener implements TreeSelectionListener {
 				setLinkedComponent(e);
 			}
 		} catch (IOException e1) {
-			AceLog.alertAndLog(Level.SEVERE, e1.getLocalizedMessage(), e1);
+			AceLog.getLog().alertAndLog(Level.SEVERE, e1.getLocalizedMessage(), e1);
 		}
 	}
 

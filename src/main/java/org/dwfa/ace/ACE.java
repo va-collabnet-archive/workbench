@@ -212,7 +212,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				try {
 					makeConfigPalette();
 				} catch (Exception ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(configPalette);
@@ -227,7 +227,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				try {
 					makeSubversionPalette();
 				} catch (Exception ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(subversionPalette);
@@ -266,12 +266,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			if (showComponentButton.isSelected()
 					&& (showTreeButton.isSelected() == false)) {
 				dividerLocation = termTreeConceptSplit.getDividerLocation();
-				// AceLog.info(dividerLocation);
+				// AceLog.getLog().info(dividerLocation);
 			}
 			if (showTreeButton.isSelected()
 					&& (showComponentButton.isSelected() == false)) {
 				dividerLocation = termTreeConceptSplit.getDividerLocation();
-				// AceLog.info(dividerLocation);
+				// AceLog.getLog().info(dividerLocation);
 			}
 			if (e.getSource() == showComponentButton) {
 				if (showComponentButton.isSelected()) {
@@ -866,10 +866,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		});
 		JScrollPane treeView = new JScrollPane(tree);
 		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
-			AceLog.info("Child expand: " + id);
+			AceLog.getLog().info("Child expand: " + id);
 		}
 		for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
-			AceLog.info("Parent expand: " + id);
+			AceLog.getLog().info("Parent expand: " + id);
 		}
 		for (int i = 0; i < tree.getRowCount(); i++) {
 			TreePath path = tree.getPathForRow(i);
@@ -937,12 +937,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(
 						expansionWorkers.keySet());
 				for (TreeIdPath key : allKeys) {
-					AceLog.info("  Stopping all: " + key);
+					AceLog.getLog().info("  Stopping all: " + key);
 					removeAnyMatchingExpansionWorker(key, message);
 				}
 			} else {
 				if (expansionWorkers.containsKey(idPath)) {
-					AceLog.info("  Stopping: " + idPath);
+					AceLog.getLog().info("  Stopping: " + idPath);
 					removeAnyMatchingExpansionWorker(idPath, message);
 				}
 
@@ -950,7 +950,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 						expansionWorkers.keySet());
 				for (TreeIdPath key : otherKeys) {
 					if (key.initiallyEqual(idPath)) {
-						AceLog.info("  Stopping child: " + key);
+						AceLog.getLog().info("  Stopping child: " + key);
 						removeAnyMatchingExpansionWorker(key, message);
 					}
 				}

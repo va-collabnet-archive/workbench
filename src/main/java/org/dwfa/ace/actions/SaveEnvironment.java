@@ -18,7 +18,7 @@ public class SaveEnvironment implements ActionListener {
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outFile));
 			oos.writeObject(AceConfig.config);
 		} catch (Exception e1) {
-			AceLog.alertAndLogException(e1);
+			AceLog.getLog().alertAndLogException(e1);
 		}
 
 	}

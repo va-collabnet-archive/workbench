@@ -41,7 +41,7 @@ public class TerminologyListModel extends AbstractListModel {
 		boolean rv = elements.add(o);
 		fireIntervalAdded(this, elements.size() -1, elements.size() -1);
 		try {
-			AceLog.info("Added: " + o.getInitialText());
+			AceLog.getLog().info("Added: " + o.getInitialText());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

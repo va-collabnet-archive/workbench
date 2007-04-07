@@ -238,7 +238,7 @@ public class Position implements Serializable, I_Position {
 			buff.append(cb.getInitialText());
 		} catch (IOException e) {
 			buff.append(e.getMessage());
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 		buff.append(": ");
 		if (version == Integer.MAX_VALUE) {

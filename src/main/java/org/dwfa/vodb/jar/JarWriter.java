@@ -131,7 +131,7 @@ public class JarWriter implements  ActionListener {
 				try {
 					exportJar();
 				} catch (TaskFailedException ex) {
-					AceLog.alertAndLogException(ex);
+					AceLog.getLog().alertAndLogException(ex);
 				}
 			}
 		});
@@ -306,7 +306,7 @@ public class JarWriter implements  ActionListener {
 			
 			output.close();
 			upperProgressMessage = prefix + "Complete. Total time: " + allTime.getElapsedTime() / (1000 * 60) + " min.";
-			AceLog.info("Total time: " + allTime.getElapsedTime());
+			AceLog.getLog().info("Total time: " + allTime.getElapsedTime());
 			continueWork = false;
 			
 			conceptFile.delete();
@@ -364,8 +364,8 @@ public class JarWriter implements  ActionListener {
 		output.putNextEntry(entry);
 
 		URL classUrl = theClass.getResource("/" + classFileName);
-		AceLog.info(classUrl.toString());
-		AceLog.info(classUrl.getContent().toString());
+		AceLog.getLog().info(classUrl.toString());
+		AceLog.getLog().info(classUrl.getContent().toString());
 		
 		InputStream classInputStream = classUrl.openStream();
 		int size = classInputStream.available();

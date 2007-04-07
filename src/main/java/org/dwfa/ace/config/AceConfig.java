@@ -116,7 +116,7 @@ public class AceConfig implements Serializable {
     			} catch (DatabaseException e) {
     				IOException ioe = new IOException(e.getMessage());
     				ioe.initCause(e);
-    				AceLog.alertAndLogException(e);
+    				AceLog.getLog().alertAndLogException(e);
     			}
             	aceFrames = (List<AceFrameConfig>) in.readObject();
         	}
@@ -152,7 +152,7 @@ public class AceConfig implements Serializable {
 			
 			if (config.isDbCreated() == false) {
 				
-				AceLog.info("DB not created");
+				AceLog.getLog().info("DB not created");
 				int n = JOptionPane.showConfirmDialog(
 					    new JFrame(),
 					    "Would you like to extract the db from your maven repository?",
@@ -161,7 +161,7 @@ public class AceConfig implements Serializable {
 				if (n == JOptionPane.YES_OPTION) {
 					extractMavenLib(config);
 				} else {
-					AceLog.info("Exiting, user did not want to extract the DB from maven.");
+					AceLog.getLog().info("Exiting, user did not want to extract the DB from maven.");
 					return;
 				}
 			}
@@ -176,7 +176,7 @@ public class AceConfig implements Serializable {
 			File logConfigFile = new File(configFile.getParent(), config.loggerRiverConfigFile);
 			if (logConfigFile.exists() == false) {
 	            URL logConfigUrl = AceConfig.class.getResource("/org/dwfa/resources/core/config/logViewer.config");
-	            AceLog.info("Config file does not exist... " + logConfigUrl);
+	            AceLog.getLog().info("Config file does not exist... " + logConfigUrl);
 				InputStream is = logConfigUrl.openStream();
 				FileOutputStream fos = new FileOutputStream(logConfigFile);
 				FileIO.copyFile(is, fos, true);
@@ -187,7 +187,7 @@ public class AceConfig implements Serializable {
 			File aceRiverConfigFile = new File(configFile.getParent(), config.getAceRiverConfigFile());
 			if (aceRiverConfigFile.exists() == false) {
 	            URL configUrl = AceConfig.class.getResource("/org/dwfa/ace/config/ace.config");
-	            AceLog.info("Config file does not exist... " + configUrl);
+	            AceLog.getLog().info("Config file does not exist... " + configUrl);
 				InputStream is = configUrl.openStream();
 				FileOutputStream fos = new FileOutputStream(aceRiverConfigFile);
 				FileIO.copyFile(is, fos, true);
@@ -203,7 +203,7 @@ public class AceConfig implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			AceLog.alertAndLogException(e);
+			AceLog.getLog().alertAndLogException(e);
 		}
 	}
 	public static void setupAceConfig(AceConfig config, File configFile, Long cacheSize) throws DatabaseException, ParseException, TerminologyException, IOException, FileNotFoundException {
@@ -389,19 +389,19 @@ public class AceConfig implements Serializable {
 	public static void extractMavenLib(AceConfig config) throws IOException {
 		URL dbUrl = AceConfig.class.getClassLoader().getResource("locator.txt");
 		
-		AceLog.info(" url: " + dbUrl);
+		AceLog.getLog().info(" url: " + dbUrl);
 		String[] pathParts = dbUrl.getPath().split("!");
 		String[] fileProtocolParts = pathParts[0].split(":");
 		
 		File srcJarFile = new File(fileProtocolParts[1].replace("foundation", "ace-bdb").replace("dwfa", "jehri"));
 		File targetDir = config.dbFolder.getParentFile();
-		AceLog.info("Jar file: " + srcJarFile);
+		AceLog.getLog().info("Jar file: " + srcJarFile);
 		if (targetDir.exists() && targetDir.lastModified() == srcJarFile.lastModified()) {
-			AceLog.info("ace-db is current...");
+			AceLog.getLog().info("ace-db is current...");
 		} else {
-			AceLog.info("ace-db needs update...");
+			AceLog.getLog().info("ace-db needs update...");
 			targetDir.mkdirs();
-			AceLog.info("Now extracting into: " + targetDir.getCanonicalPath());
+			AceLog.getLog().info("Now extracting into: " + targetDir.getCanonicalPath());
 			JarExtractor.execute(srcJarFile, targetDir);
 			targetDir.setLastModified(srcJarFile.lastModified());
 		}

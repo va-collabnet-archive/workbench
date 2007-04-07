@@ -28,7 +28,7 @@ public class TreeMouseListener implements MouseListener {
 		JTree tree = (JTree) e.getSource();
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 		int selRow = tree.getRowForLocation(e.getX(), e.getY());
-		//AceLog.info("Selected row: " + selRow);
+		//AceLog.getLog().info("Selected row: " + selRow);
 		TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
 		if (selPath != null) {
 			if (selRow != -1) {
@@ -57,7 +57,7 @@ public class TreeMouseListener implements MouseListener {
 				}
 				//tree.setSelectionPath(new TreePath(selPath.getPath()));
 				int newRow = tree.getRowForPath(selPath);
-				//AceLog.info("New row: " + newRow);
+				//AceLog.getLog().info("New row: " + newRow);
 				tree.setSelectionInterval(newRow, newRow);
 			}
 		}
@@ -89,7 +89,7 @@ public class TreeMouseListener implements MouseListener {
 					if (t.getC2Id() == parentBean
 							.getConceptId() && treeBean
 							.getParentDepth() == 0) {
-						AceLog.info(" parent depth: " + treeBean
+						AceLog.getLog().info(" parent depth: " + treeBean
 						.getParentDepth());
 						continue;
 					}
@@ -109,7 +109,7 @@ public class TreeMouseListener implements MouseListener {
 						newNodeIndices);
 
 			} catch (IOException e) {
-				AceLog.alertAndLogException(e);
+				AceLog.getLog().alertAndLogException(e);
 			}
 		} else { // remove nodes
 			removeAllExtraParents(model, treeBean, parentNode);

@@ -27,7 +27,7 @@ public class ConflictPlugin extends AbstractPlugin {
 			try {
 				conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
 			} catch (IOException e) {
-				AceLog.alertAndLogException(e);
+				AceLog.getLog().alertAndLogException(e);
 			}
 		}
 		return conflictPanel;
