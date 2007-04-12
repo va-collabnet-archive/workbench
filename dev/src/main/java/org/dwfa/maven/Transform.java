@@ -193,20 +193,21 @@ public class Transform extends AbstractMojo {
                                     getLog().info("Current row:" + rowCount);
                                 }*/
 
-                                if(columnTransformerMap.get((Integer) currentColumn) == null) {
-                                    System.out.println("Current col:" + currentColumn);
-                                    System.out.println("Current row: " + rowCount);
-                                    System.out.println("Token: " + tokenType);
-                                }
-                                for (Object tObj: (Set) columnTransformerMap.get((Integer) currentColumn)) {
-                                    I_ReadAndTransform t = (I_ReadAndTransform) tObj;
-                                    /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                        getLog().info("Transform for column: " + currentColumn + " is: " + t);
-                                    }*/
-                                    String result = t.transform(st.sval);
-                                    /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                        getLog().info("Transform: " + t + " result: " + result);
-                                    }*/
+                                if (columnTransformerMap.get((Integer)
+                                        currentColumn) == null) {
+                                } else {
+                                    for (Object tObj: (Set)
+                                            columnTransformerMap.get((Integer)
+                                            currentColumn)) {
+                                        I_ReadAndTransform t = (I_ReadAndTransform) tObj;
+                                        /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+                                            getLog().info("Transform for column: " + currentColumn + " is: " + t);
+                                        }*/
+                                        String result = t.transform(st.sval);
+                                        /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
+                                            getLog().info("Transform: " + t + " result: " + result);
+                                        }*/
+                                    }
                                 }
                                 // CR or LF
                                 tokenType = st.nextToken();
