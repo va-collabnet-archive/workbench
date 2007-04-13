@@ -3,8 +3,11 @@ package org.dwfa.ace.api;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
+import java.util.Collection;
 import java.util.Set;
 
+import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.worker.MasterWorker;
 
 public interface I_ConfigAceFrame {
@@ -153,5 +156,9 @@ public interface I_ConfigAceFrame {
 	public String getStatusMessage();
 
 	public void setStatusMessage(String statusMessage);
+	
+	public Collection<I_ReadChangeSet> getChangeSetReaders();
+	
+	public Collection<I_WriteChangeSet> getChangeSetWriters();
 
 }
