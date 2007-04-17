@@ -85,6 +85,10 @@ public class InstructionPanel extends GridBagPanel {
         this.editorPane.setText(html);
     }
 
+    public String getInstruction() {
+        return this.editorPane.getText();
+    }
+
     public void setInstruction(URL url) throws IOException {
         this.editorPane.setPage(url);
     }

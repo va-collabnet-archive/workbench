@@ -86,6 +86,7 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     public synchronized Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+    	worker.getCurrentWorkspace().setStatusMessage("<html><font color='red'>Waiting for user input.");
         evaluateStart(process, worker);
         I_Workspace ws = worker.getCurrentWorkspace();
         ws.setWorkspaceVisible(true);
@@ -130,6 +131,7 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
         } catch (InvocationTargetException e1) {
             throw new TaskFailedException(e1);
         }
+    	worker.getCurrentWorkspace().setStatusMessage("");
         evaluateAfterAction(process, worker, exitCondition);
         return this.exitCondition;
     }

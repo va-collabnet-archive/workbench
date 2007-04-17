@@ -1,6 +1,7 @@
 package org.dwfa.clock.task;
 
 import java.beans.BeanDescriptor;
+import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 public class IncrementWorkerSimulationClockBeanInfo extends SimpleBeanInfo {
@@ -19,4 +20,9 @@ public class IncrementWorkerSimulationClockBeanInfo extends SimpleBeanInfo {
         bd.setDisplayName("<html><font color='green'><center>Increment Worker<br>Simulation Clock");
         return bd;
     }
+    
+	public PropertyDescriptor[] getPropertyDescriptors() {
+		return new PropertyDescriptor[] {};
+	}
+
 }

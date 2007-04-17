@@ -248,7 +248,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                         }
                     }
                 } catch (IntrospectionException e) {
-                    logger.log(Level.SEVERE, e.toString(), e);
+                    logger.log(Level.SEVERE, "Processing " + task.getName(), e);
                 }
             }
             for (I_ContainData dc : getDataContainers()) {
