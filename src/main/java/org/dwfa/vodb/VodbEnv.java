@@ -1241,7 +1241,7 @@ public class VodbEnv {
 				return (ThinIdVersioned) idBinding.entryToObject(idValue);
 			}
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 		return null;
 	}
@@ -1339,7 +1339,7 @@ public class VodbEnv {
 				idDb.put(null, idKey, idValue);
 				return newId.getNativeId();
 			} catch (DatabaseException ex) {
-				throw new DbToIoException(ex);
+				throw new ToIoException(ex);
 			}
 		}
 	}
@@ -1383,7 +1383,7 @@ public class VodbEnv {
 				idDb.put(null, idKey, idValue);
 				return newId.getNativeId();
 			} catch (DatabaseException e2) {
-				throw new DbToIoException(e2);
+				throw new ToIoException(e2);
 			}
 		}
 	}
@@ -1600,7 +1600,7 @@ public class VodbEnv {
 		throw new DatabaseException("Concept: " + nativeId + " not found.");
 	}
 
-	public I_IdVersioned getId(int nativeId) throws DatabaseException {
+	public I_IdVersioned getId(int nativeId) throws IOException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting id record for : " + nativeId);
@@ -1610,15 +1610,19 @@ public class VodbEnv {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, idKey);
-		if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("Got id record for: " + nativeId
-						+ " elapsed time: " + timer.getElapsedTime() / 1000
-						+ " secs");
+		try {
+			if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("Got id record for: " + nativeId
+							+ " elapsed time: " + timer.getElapsedTime() / 1000
+							+ " secs");
+				}
+				return (I_IdVersioned) idBinding.entryToObject(idValue);
 			}
-			return (I_IdVersioned) idBinding.entryToObject(idValue);
+		} catch (DatabaseException e) {
+			new ToIoException(e);
 		}
-		throw new DatabaseException("Concept: " + nativeId + " not found.");
+		throw new ToIoException(new DatabaseException("Concept: " + nativeId + " not found."));
 	}
 
 	public List<TimePathId> getTimePathList() throws Exception {

@@ -58,6 +58,7 @@ import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportBaselineJar;
 import org.dwfa.ace.actions.ImportChangesetJar;
+import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveEnvironment;
 import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
@@ -66,7 +67,10 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
@@ -85,10 +89,9 @@ import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.svn.CheckoutPanel;
-import org.dwfa.vodb.DbToIoException;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_Transact;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -103,6 +106,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public static void removeUncommitted(I_Transact to) {
 		uncommitted.remove(to);
 	}
+	
+	private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
+	
+	private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
 
 	/*
 	 * 
@@ -110,15 +117,25 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public static void commit() throws IOException {
 		Date now = new Date();
 		Set<TimePathId> values = new HashSet<TimePathId>();
+		for (I_WriteChangeSet writer: csWriters) {
+			writer.open();
+		}
 		int version = ThinVersionHelper.convert(now.getTime());
+		
 		for (I_Transact cb : uncommitted) {
+			for (I_WriteChangeSet writer: csWriters) {
+				writer.writeChanges(cb, ThinVersionHelper.convert(version));
+			}
 			cb.commit(version, values);
 		}
 		try {
 			AceConfig.vodb.addTimeBranchValues(values);
 			AceConfig.vodb.sync();
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
+		}
+		for (I_WriteChangeSet writer: csWriters) {
+			writer.commit();
 		}
 		uncommitted.clear();
 		for (I_ConfigAceFrame frameConfig: getAceConfig().aceFrames) {
@@ -498,14 +515,18 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public void addFileMenu(JMenuBar menuBar) {
 		JMenuItem menuItem = null;
-		menuItem = new JMenuItem("Export baseline jar...");
+		menuItem = new JMenuItem("Export Baseline Jar...");
 		menuItem.addActionListener(new WriteJar(aceConfig));
 		fileMenu.add(menuItem);
 		fileMenu.addSeparator();
-		menuItem = new JMenuItem("Import changeset jar...");
+		menuItem = new JMenuItem("Import Java Changeset...");
+		menuItem.addActionListener(new ImportJavaChangeset());
+		fileMenu.add(menuItem);
+		fileMenu.addSeparator();
+		menuItem = new JMenuItem("Import Changeset Jar...");
 		menuItem.addActionListener(new ImportChangesetJar());
 		fileMenu.add(menuItem);
-		menuItem = new JMenuItem("Import baseline jar...");
+		menuItem = new JMenuItem("Import Baseline Jar...");
 		menuItem.addActionListener(new ImportBaselineJar());
 		fileMenu.add(menuItem);
 		fileMenu.addSeparator();
@@ -575,7 +596,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		subversionPalette = new CdePalette(new BorderLayout(),
 				new RightPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
-		CheckoutPanel svnTable = new CheckoutPanel();
+		CheckoutPanel svnTable = new CheckoutPanel(aceFrameConfig);
 		tabs.addTab("checkout", new JScrollPane(svnTable));
 
 		layers.add(subversionPalette, JLayeredPane.PALETTE_LAYER);
@@ -1163,6 +1184,14 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		} else {
 			throw new UnsupportedOperationException("Ace.aceConfig is already set");
 		}
+	}
+
+	public static Set<I_ReadChangeSet> getCsReaders() {
+		return csReaders;
+	}
+
+	public static Set<I_WriteChangeSet> getCsWriters() {
+		return csWriters;
 	}
 
 }

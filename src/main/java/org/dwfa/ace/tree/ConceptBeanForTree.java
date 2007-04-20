@@ -20,6 +20,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.utypes.UniversalAceBean;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree {
@@ -165,6 +167,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 
 	public I_IntSet getUncommittedIds() {
 		return bean.getUncommittedIds();
+	}
+
+	public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
+		return bean.getUniversalAceBean();
 	}
 	
 	/*

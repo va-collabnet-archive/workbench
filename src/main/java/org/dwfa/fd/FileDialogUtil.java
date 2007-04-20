@@ -2,17 +2,23 @@ package org.dwfa.fd;
 
 import java.awt.FileDialog;
 import java.io.File;
+import java.io.FilenameFilter;
 
 import javax.swing.JFrame;
 
 import org.dwfa.bpa.process.TaskFailedException;
 
 public class FileDialogUtil {
-	public static File getNewFile(String frameTitle) throws TaskFailedException {
+	public static File getNewFile(String frameTitle, File defaultFile) throws TaskFailedException {
 		// Create a file dialog box to prompt for a new file to display
 		FileDialog f = new FileDialog(new JFrame(), frameTitle,
 				FileDialog.SAVE);
-		f.setDirectory(System.getProperty("user.dir"));
+		if (defaultFile != null) {
+			f.setDirectory(defaultFile.getParent());
+			f.setFile(defaultFile.getName());
+		} else {
+			f.setDirectory(System.getProperty("user.dir"));
+		}
 		f.setVisible(true); // Display dialog and wait for response
 		if (f.getFile() != null) {
 			File directory = new File(f.getDirectory(), f.getFile());
@@ -21,12 +27,33 @@ public class FileDialogUtil {
 		}
 		f.dispose(); // Get rid of the dialog box
 		throw new TaskFailedException("User canceled operation. ");
+		
 	}
+	
+	public static File getNewFile(String frameTitle) throws TaskFailedException {
+		return getNewFile(frameTitle, null);
+	}
+	
 	public static File getExistingFile(String frameTitle) throws TaskFailedException {
+		return getExistingFile(frameTitle, null);
+	}
+	public static File getExistingFile(String frameTitle, FilenameFilter filter) throws TaskFailedException {
+		return getExistingFile(frameTitle, filter, null);
+	}
+
+	public static File getExistingFile(String frameTitle, FilenameFilter filter, File defaultDirectory) throws TaskFailedException {
 		// Create a file dialog box to prompt for a new file to display
 		FileDialog f = new FileDialog(new JFrame(), frameTitle,
 				FileDialog.LOAD);
-		f.setDirectory(System.getProperty("user.dir"));
+		if (defaultDirectory != null) {
+			f.setDirectory(defaultDirectory.getAbsolutePath());
+		} else {
+			f.setDirectory(System.getProperty("user.dir"));
+		}
+		if (filter != null) {
+			f.setFilenameFilter(filter);
+		}
+		
 		f.setVisible(true); // Display dialog and wait for response
 		if (f.getFile() != null) {
 			File directory = new File(f.getDirectory(), f.getFile());

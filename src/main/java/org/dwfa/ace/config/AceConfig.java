@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -29,6 +30,7 @@ import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.DocumentAuxiliary;
 import org.dwfa.cement.HL7;
@@ -334,7 +336,14 @@ public class AceConfig implements Serializable {
 		af.setDefaultRelationshipType(ConceptBean.get(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 		af.setDefaultRelationshipCharacteristic(ConceptBean.get(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()));
 		af.setDefaultRelationshipRefinability(ConceptBean.get(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids()));
+		
+		af.setSvnRepository("https://ace-demo.aceworkspace.net/svn/ace-demo/trunk/dev/change-sets");
+		af.setSvnWorkingCopy("target/change-sets");
+		af.setChangeSetWriterFileName(UUID.randomUUID().toString() + ".jcs");
 
+		af.getChangeSetWriters().add(new BinaryChangeSetWriter(new File(af.getSvnWorkingCopy(), af.getChangeSetWriterFileName()), 
+				new File(af.getSvnWorkingCopy(), "." + af.getChangeSetWriterFileName())));
+		
 		config.aceFrames.add(af);
 		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);

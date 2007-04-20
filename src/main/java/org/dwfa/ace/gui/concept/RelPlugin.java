@@ -53,6 +53,8 @@ public abstract class RelPlugin extends AbstractPlugin {
 		c.gridx++;
 		relPanel.add(progress, c);
 		model.setProgress(progress);
+		progress.setActive(false);
+		progress.setProgressInfo("");
 
 		c.anchor = GridBagConstraints.WEST;
 		c.gridx = 0;

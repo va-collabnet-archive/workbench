@@ -123,8 +123,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	int nativePathId = AceConfig.vodb.uuidToNativeWithGeneration(newPathUid, idSource,
         			p, thinDate);
         	Path newPath = new Path(nativePathId, origins);
-        	ACE.addUncommitted(newPath);
-        	// path id and uuid == the corresponding concepts UUID...
+         	// path id and uuid == the corresponding concepts UUID...
         	
         	ConceptBean cb = ConceptBean.get(nativePathId);
         	
@@ -169,8 +168,9 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	relV.addVersion(relPart);
         	cb.getUncommittedSourceRels().add(relV);
         	        	
-        	
         	ACE.addUncommitted(cb);
+           	ACE.addUncommitted(newPath);
+           	
             AceLog.getLog().info("Created new path: " + desc.getText() + " " + origins);
             this.desc.setText("");
             this.parent.setTermComponent(null);

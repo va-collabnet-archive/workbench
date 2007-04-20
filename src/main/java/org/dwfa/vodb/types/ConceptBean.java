@@ -33,10 +33,12 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.DbToIoException;
+import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -74,6 +76,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	private int conceptId;
 
+	private static int dataVersion = 1;
+
 	private I_IdVersioned id;
 
 	private I_ConceptAttributeVersioned conceptAttributes;
@@ -97,7 +101,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	private I_IntSet uncommittedIds;
 
 	private List<UUID> uids;
-	
+
 	private boolean primordial = false;
 
 	private ConceptBean(int conceptId) {
@@ -119,7 +123,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				conceptAttributes = AceConfig.vodb.getConcept(conceptId);
 			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
+				throw new ToIoException(e);
 			}
 		}
 		return conceptAttributes;
@@ -140,8 +144,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet,
 	 *      java.util.Set)
 	 */
-	public List<I_ConceptAttributeTuple> getConceptTuples(I_IntSet allowedStatus,
-			Set<I_Position> positionSet) throws IOException {
+	public List<I_ConceptAttributeTuple> getConceptTuples(
+			I_IntSet allowedStatus, Set<I_Position> positionSet)
+			throws IOException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
 		getConceptAttributes().addTuples(allowedStatus, positionSet,
 				returnTuples);
@@ -154,9 +159,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptionTuples(org.dwfa.ace.IntSet,
 	 *      org.dwfa.ace.IntSet, java.util.Set)
 	 */
-	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positionSet)
-			throws IOException {
+	public List<I_DescriptionTuple> getDescriptionTuples(
+			I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positionSet) throws IOException {
 		List<I_DescriptionTuple> returnRels = new ArrayList<I_DescriptionTuple>();
 		for (I_DescriptionVersioned desc : getDescriptions()) {
 			desc
@@ -217,7 +222,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				descriptions = AceConfig.vodb.getDescriptions(conceptId);
 			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
+				throw new ToIoException(e);
 			}
 		}
 		return descriptions;
@@ -233,7 +238,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				destRels = AceConfig.vodb.getDestRels(conceptId);
 			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
+				throw new ToIoException(e);
 			}
 		}
 		return destRels;
@@ -252,7 +257,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				sourceRels = AceConfig.vodb.getSrcRels(conceptId);
 			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
+				throw new ToIoException(e);
 			}
 		}
 		return sourceRels;
@@ -264,7 +269,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		} catch (IOException ex) {
 			AceLog.getLog().alertAndLogException(ex);
 			return ex.toString();
-		} 
+		}
 	}
 
 	/*
@@ -333,13 +338,13 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 			return true;
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 	}
 
-	private boolean hasDestRelTuples(I_IntSet allowedStatus, I_IntSet destRelTypes,
-			Set<I_Position> positions, boolean addUncommitted)
-			throws IOException {
+	private boolean hasDestRelTuples(I_IntSet allowedStatus,
+			I_IntSet destRelTypes, Set<I_Position> positions,
+			boolean addUncommitted) throws IOException {
 		if (destRelTypes.getSetValues().length > 0) {
 			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 			if (destRels != null) {
@@ -355,7 +360,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					return AceConfig.vodb.hasDestRelTuple(conceptId,
 							allowedStatus, destRelTypes, positions);
 				} catch (DatabaseException e) {
-					throw new DbToIoException(e);
+					throw new ToIoException(e);
 				}
 			}
 		}
@@ -380,7 +385,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					return AceConfig.vodb.hasSrcRelTuple(conceptId,
 							allowedStatus, sourceRelTypes, positions);
 				} catch (DatabaseException e) {
-					throw new DbToIoException(e);
+					throw new ToIoException(e);
 				}
 			}
 		}
@@ -397,7 +402,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				images = AceConfig.vodb.getImages(conceptId);
 			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
+				throw new ToIoException(e);
 			}
 		}
 		return images;
@@ -480,21 +485,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			}
 			if (sourceRels != null) {
-				for (I_RelVersioned rel : sourceRels) {
-					boolean changed = false;
-					for (I_RelPart p : rel.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							ConceptBean destBean = ConceptBean.get(rel.getC2Id());
-							destBean.flushDestRels();
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-							changed = true;
-						}
-					}
-					if (changed) {
-						AceConfig.vodb.writeRel(rel);
-					}
-				}
+				flushDestRelsOnTargetBeans(version, values);
 			}
 			destRels = null;
 
@@ -565,9 +556,50 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 			setPrimordial(false);
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 		AceLog.getLog().info("Finished commit for ConceptBean: " + this);
+	}
+
+	private void flushDestRelsOnTargetBeans(int version, Set<TimePathId> values)
+			throws DatabaseException, IOException {
+		for (I_RelVersioned rel : getSourceRels()) {
+			boolean changed = false;
+			for (I_RelPart p : rel.getVersions()) {
+				if (p.getVersion() == Integer.MAX_VALUE) {
+					ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+					destBean.flushDestRels();
+					p.setVersion(version);
+					values.add(new TimePathId(version, p.getPathId()));
+					changed = true;
+				}
+			}
+			if (changed) {
+				AceConfig.vodb.writeRel(rel);
+			}
+		}
+	}
+
+	private void flushDestRelsOnTargetBeans() throws DatabaseException,
+			IOException {
+		for (I_RelVersioned rel : getSourceRels()) {
+			ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+			destBean.flushDestRels();
+		}
+	}
+
+
+
+	public void flush() throws DatabaseException, IOException {
+		conceptAttributes = null;
+		uncommittedConceptAttributes = null;
+		descriptions = null;
+		uncommittedDescriptions = null;
+		sourceRels = null;
+		uncommittedSourceRels = null;
+		images = null;
+		uncommittedImages = null;
+		flushDestRelsOnTargetBeans();
 	}
 
 	/*
@@ -654,7 +686,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			}
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 	}
 
@@ -668,7 +700,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				uids = AceConfig.vodb.nativeToUuid(conceptId);
 			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
+				throw new ToIoException(e);
 			}
 		}
 		return uids;
@@ -810,11 +842,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public I_IdVersioned getId() throws IOException {
 		if (id == null) {
-			try {
-				id = AceConfig.vodb.getId(conceptId);
-			} catch (DatabaseException e) {
-				throw new DbToIoException(e);
-			}
+			id = AceConfig.vodb.getId(conceptId);
 		}
 		return id;
 	}
@@ -921,11 +949,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (uncommittedIds != null) {
 			for (int id : uncommittedIds.getSetValues()) {
 				I_IdVersioned idv;
-				try {
-					idv = AceConfig.vodb.getId(id);
-				} catch (DatabaseException e) {
-					throw new DbToIoException(e);
-				}
+				idv = AceConfig.vodb.getId(id);
 				for (I_IdPart p : idv.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
@@ -947,6 +971,52 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public void setPrimordial(boolean primordial) {
 		this.primordial = primordial;
+	}
+
+	public UniversalAceBean getUniversalAceBean() throws IOException,
+			TerminologyException {
+		UniversalAceBean uab = new UniversalAceBean();
+
+		uab.setId(getId().getUniversal());
+
+		if (conceptAttributes != null) {
+			uab.setConceptAttributes(conceptAttributes.getUniversal());
+		}
+
+		for (I_DescriptionVersioned desc : getDescriptions()) {
+			uab.getDescriptions().add(desc.getUniversal());
+		}
+
+		for (I_RelVersioned rel : getSourceRels()) {
+			uab.getSourceRels().add(rel.getUniversal());
+		}
+
+		for (I_ImageVersioned image : getImages()) {
+			uab.getImages().add(image.getUniversal());
+		}
+
+		if (uncommittedConceptAttributes != null) {
+			uab.setUncommittedConceptAttributes(uncommittedConceptAttributes
+					.getUniversal());
+		}
+
+		for (I_DescriptionVersioned desc : getUncommittedDescriptions()) {
+			uab.getUncommittedDescriptions().add(desc.getUniversal());
+		}
+
+		for (I_RelVersioned rel : getUncommittedSourceRels()) {
+			uab.getUncommittedSourceRels().add(rel.getUniversal());
+		}
+
+		for (I_ImageVersioned image : getUncommittedImages()) {
+			uab.getUncommittedImages().add(image.getUniversal());
+		}
+
+		for (int nid : getUncommittedIds().getSetValues()) {
+			I_IdVersioned idv = AceConfig.vodb.getId(nid);
+			uab.getUncommittedIds().add(idv.getUniversal());
+		}
+		return uab;
 	}
 
 }

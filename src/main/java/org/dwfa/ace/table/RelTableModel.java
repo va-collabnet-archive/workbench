@@ -86,19 +86,15 @@ public abstract class RelTableModel extends AbstractTableModel implements
 								+ "/" + progressBar.getMaximum() + "   ");
 						fireTableDataChanged();
 						if (progressBar.getValue() == progressBar.getMaximum()) {
-							normalCompletion();
+							normalCompletionForUpdator();
 						}
 					}
 				} else {
 					updateTimer.stop();
 				}
 			}
-
-			public void normalCompletion() {
-				if (progress != null) {
-					progress.setProgressInfo("   " + getRowCount() + "   ");
-					progress.setActive(false);
-				}
+			public void normalCompletionForUpdator() {
+				normalCompletion();
 			}
 
 		}
@@ -135,7 +131,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				progress.setEnabled(false);
 			}
 			if (stopWork) {
-				updator.normalCompletion();
+				updator.normalCompletionForUpdator();
 				fireTableDataChanged();
 				return;
 			}
@@ -147,7 +143,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				AceLog.getLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
-			updator.normalCompletion();
+			updator.normalCompletionForUpdator();
 			stopWork = true;
 		}
 
@@ -220,6 +216,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			}
 			try {
 				get();
+				normalCompletion();
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
@@ -866,6 +863,12 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				fireTableStructureChanged();
 				return;
 			}
+		}
+	}
+	public void normalCompletion() {
+		if (progress != null) {
+			progress.setProgressInfo("   " + getRowCount() + "   ");
+			progress.setActive(false);
 		}
 	}
 

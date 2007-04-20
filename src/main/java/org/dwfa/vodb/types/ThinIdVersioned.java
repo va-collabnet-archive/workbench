@@ -1,6 +1,8 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +12,11 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.utypes.UniversalAceIdentification;
+import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinIdVersioned implements I_IdVersioned {
 	public static final int SNOMED_CT_T3_PREFIX = 1;
@@ -113,6 +120,23 @@ public class ThinIdVersioned implements I_IdVersioned {
 			tuples.add(new ThinIdTuple(this, p));
 		}
 		return tuples;
+	}
+	private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
+		return LocalFixedTerminology.getStore().getUids(id);
+	}
+	
+	public UniversalAceIdentification getUniversal() throws IOException, TerminologyException {
+		UniversalAceIdentification universal = new UniversalAceIdentification(this.versions.size());
+		for (I_IdPart part: versions) {
+			UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
+			universalPart.setIdStatus(getUids(part.getIdStatus()));
+			universalPart.setPathId(getUids(part.getPathId()));
+			universalPart.setSource(getUids(part.getSource()));
+			universalPart.setSourceId(part.getSourceId());
+			universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
+			universal.addVersion(universalPart);
+		}
+		return universal;
 	}
 
 }

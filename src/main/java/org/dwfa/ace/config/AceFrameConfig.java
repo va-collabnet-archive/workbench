@@ -7,17 +7,21 @@ import java.beans.VetoableChangeSupport;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
@@ -32,7 +36,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 12;
+    private static final int dataVersion = 14;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -74,6 +78,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	private int termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
 	
     private I_GetConceptData hierarchySelection;
+    
+    // 14
+    private String repositoryUrlStr;
+    private String svnWorkingCopy;
+    private String changeSetWriterFileName;
     
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -130,7 +139,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 			newEx.initCause(e);
 			throw newEx;
 		}
-
+		out.writeObject(this.getChangeSetReaders());
+		out.writeObject(this.getChangeSetWriters());
+		//14
+		out.writeObject(repositoryUrlStr);
+		out.writeObject(svnWorkingCopy);
+		out.writeObject(changeSetWriterFileName);
     }
 
 
@@ -242,6 +256,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 					throw newEx;
 				}
             } 
+            if (objDataVersion >= 13) {
+            	Collection<I_ReadChangeSet> readers = (Collection<I_ReadChangeSet>) in.readObject();
+            	this.getChangeSetReaders().addAll(readers);
+            	Collection<I_WriteChangeSet> writers = (Collection<I_WriteChangeSet>) in.readObject();
+            	this.getChangeSetWriters().addAll(writers);
+            }
+            if (objDataVersion >= 14) {
+        		repositoryUrlStr = (String) in.readObject();
+        		svnWorkingCopy = (String) in.readObject();
+        		changeSetWriterFileName = (String) in.readObject();
+            }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -804,6 +829,52 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		Object old = this.statusMessage;
 		this.statusMessage = statusMessage;
 		this.changeSupport.firePropertyChange("statusMessage", old, statusMessage);
+	}
+
+
+	public Collection<I_ReadChangeSet> getChangeSetReaders() {
+		return ACE.getCsReaders();
+	}
+
+
+	public Collection<I_WriteChangeSet> getChangeSetWriters() {
+		return ACE.getCsWriters();
+	}
+
+
+	public String getChangeSetWriterFileName() {
+		return changeSetWriterFileName;
+	}
+
+
+	public void setChangeSetWriterFileName(String changeSetWriterFileName) {
+		Object old = this.changeSetWriterFileName;
+		this.changeSetWriterFileName = changeSetWriterFileName;
+		this.changeSupport.firePropertyChange("changeSetWriterFileName", old, changeSetWriterFileName);
+	}
+
+
+	public String getSvnRepository() {
+		return repositoryUrlStr;
+	}
+
+
+	public void setSvnRepository(String repositoryUrlStr) {
+		Object old = this.repositoryUrlStr;
+		this.repositoryUrlStr = repositoryUrlStr;
+		this.changeSupport.firePropertyChange("repositoryUrlStr", old, repositoryUrlStr);
+	}
+
+
+	public String getSvnWorkingCopy() {
+		return svnWorkingCopy;
+	}
+
+
+	public void setSvnWorkingCopy(String svnWorkingCopy) {
+		Object old = this.svnWorkingCopy;
+		this.svnWorkingCopy = svnWorkingCopy;
+		this.changeSupport.firePropertyChange("svnWorkingCopy", old, svnWorkingCopy);
 	}
 
 }

@@ -1,9 +1,12 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +18,13 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.utypes.UniversalAceDescription;
+import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
 import org.dwfa.tapi.I_DescribeConceptLocally;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedDesc;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinDescVersioned implements I_DescriptionVersioned {
 	private int descId;
@@ -326,6 +334,25 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 		return new LocalFixedDesc(descId, part.getStatusId(), conceptId,
 				part.getInitialCaseSignificant(), part.getTypeId(), part.getText(),
 				part.getLang());
+	}
+	private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
+		return LocalFixedTerminology.getStore().getUids(id);
+	}
+	
+	public UniversalAceDescription getUniversal() throws IOException, TerminologyException {
+		UniversalAceDescription universal = new UniversalAceDescription(getUids(descId), getUids(conceptId), this.versionCount());
+		for (I_DescriptionPart part: versions) {
+			UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
+			universalPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
+			universalPart.setLang(part.getLang());
+			universalPart.setPathId(getUids(part.getPathId()));
+			universalPart.setStatusId(getUids(part.getStatusId()));
+			universalPart.setText(part.getText());
+			universalPart.setTypeId(getUids(part.getTypeId()));
+			universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
+			universal.addVersion(universalPart);
+		}
+		return universal;
 	}
 
 }

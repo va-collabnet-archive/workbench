@@ -1,9 +1,12 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -13,6 +16,11 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.utypes.UniversalAceRelationship;
+import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinRelVersioned implements I_RelVersioned {
 	private int relId;
@@ -32,7 +40,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 		this.versions = new ArrayList<I_RelPart>(count);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#addVersion(org.dwfa.vodb.types.I_RelPart)
 	 */
 	public boolean addVersion(I_RelPart rel) {
@@ -45,28 +55,36 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#addVersionNoRedundancyCheck(org.dwfa.vodb.types.ThinRelPart)
 	 */
 	public boolean addVersionNoRedundancyCheck(I_RelPart rel) {
 		return versions.add(rel);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getVersions()
 	 */
 	public List<I_RelPart> getVersions() {
 		return versions;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#versionCount()
 	 */
 	public int versionCount() {
 		return versions.size();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#addRetiredRec(int[], int)
 	 */
 	public boolean addRetiredRec(int[] releases, int retiredStatusId) {
@@ -94,7 +112,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#removeRedundantRecs()
 	 */
 	public boolean removeRedundantRecs() {
@@ -128,28 +148,36 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return buff.toString();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getC1Id()
 	 */
 	public int getC1Id() {
 		return componentOneId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getC2Id()
 	 */
 	public int getC2Id() {
 		return componentTwoId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getRelId()
 	 */
 	public int getRelId() {
 		return relId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getTuples()
 	 */
 	public List<I_RelTuple> getTuples() {
@@ -160,25 +188,33 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return tuples;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getFirstTuple()
 	 */
 	public I_RelTuple getFirstTuple() {
 		return new ThinRelTuple(this, versions.get(0));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getLastTuple()
 	 */
 	public I_RelTuple getLastTuple() {
 		return new ThinRelTuple(this, versions.get(versions.size() - 1));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet,
+	 *      org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
 	 */
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positions, List<I_RelTuple> returnRels, boolean addUncommitted) {
+			Set<I_Position> positions, List<I_RelTuple> returnRels,
+			boolean addUncommitted) {
 		Set<I_RelPart> uncommittedParts = new HashSet<I_RelPart>();
 		if (positions == null) {
 			List<I_RelPart> addedParts = new ArrayList<I_RelPart>();
@@ -226,17 +262,19 @@ public class ThinRelVersioned implements I_RelVersioned {
 					} else if ((allowedStatus != null)
 							&& (!allowedStatus.contains(part.getStatusId()))) {
 						if (possible != null) {
-							I_Position rejectedStatusPosition = new Position(part
-									.getVersion(), position.getPath()
-									.getMatchingPath(part.getPathId()));
+							I_Position rejectedStatusPosition = new Position(
+									part.getVersion(), position.getPath()
+											.getMatchingPath(part.getPathId()));
 							I_Path possiblePath = position.getPath()
 									.getMatchingPath(possible.getPathId());
 							I_Position possibleStatusPosition = new Position(
 									possible.getVersion(), possiblePath);
-							
-							if (rejectedStatusPosition.getPath() != null && 
-									rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
-									position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
+
+							if (rejectedStatusPosition.getPath() != null
+									&& rejectedStatusPosition
+											.isSubsequentOrEqualTo(possibleStatusPosition)
+									&& position
+											.isSubsequentOrEqualTo(rejectedStatusPosition)) {
 								possible = null;
 							}
 						}
@@ -286,9 +324,11 @@ public class ThinRelVersioned implements I_RelVersioned {
 						I_Position rejectedStatusPosition = new Position(reject
 								.getVersion(), position.getPath()
 								.getMatchingPath(reject.getPathId()));
-						if (rejectedStatusPosition.getPath() != null && 
-								rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition) && 
-								position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
+						if (rejectedStatusPosition.getPath() != null
+								&& rejectedStatusPosition
+										.isSubsequentOrEqualTo(possibleStatusPosition)
+								&& position
+										.isSubsequentOrEqualTo(rejectedStatusPosition)) {
 							addPart = false;
 							continue;
 						}
@@ -300,13 +340,15 @@ public class ThinRelVersioned implements I_RelVersioned {
 			}
 		}
 		if (addUncommitted) {
-			for (I_RelPart p: uncommittedParts) {
+			for (I_RelPart p : uncommittedParts) {
 				returnRels.add(new ThinRelTuple(this, p));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
 	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
@@ -319,7 +361,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#merge(org.dwfa.vodb.types.ThinRelVersioned)
 	 */
 	public boolean merge(I_RelVersioned jarRel) {
@@ -334,7 +378,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return changed;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getTimePathSet()
 	 */
 	public Set<TimePathId> getTimePathSet() {
@@ -345,12 +391,37 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return tpSet;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#setC2Id(int)
 	 */
 	public void setC2Id(int destId) {
 		componentTwoId = destId;
-		
+
+	}
+
+	private static Collection<UUID> getUids(int id) throws IOException,
+			TerminologyException {
+		return LocalFixedTerminology.getStore().getUids(id);
+	}
+
+	public UniversalAceRelationship getUniversal() throws IOException,
+			TerminologyException {
+		UniversalAceRelationship universal = new UniversalAceRelationship(getUids(relId), getUids(componentOneId), getUids(componentTwoId),
+				versions.size());
+		for (I_RelPart part : versions) {
+			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
+			universalPart.setPathId(getUids(part.getPathId()));
+			universalPart.setStatusId(getUids(part.getStatusId()));
+			universalPart.setCharacteristicId(getUids(part.getCharacteristicId()));
+			universalPart.setGroup(part.getGroup());
+			universalPart.setRefinabilityId(getUids(part.getRefinabilityId()));
+			universalPart.setRelTypeId(getUids(part.getRelTypeId()));
+			universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
+			universal.addVersion(universalPart);
+		}
+		return universal;
 	}
 
 }

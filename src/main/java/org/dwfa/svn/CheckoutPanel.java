@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.DirEntry;
 import org.tigris.subversion.javahl.Revision;
@@ -64,7 +65,7 @@ public class CheckoutPanel extends JPanel {
 	private JTextField repository;
 	private JTextField workingCopy;
 
-	public CheckoutPanel() {
+	public CheckoutPanel(I_ConfigAceFrame aceFrameConfig) {
 		super(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx = 0;
@@ -83,10 +84,10 @@ public class CheckoutPanel extends JPanel {
 		c.weightx = 1;
 		c.gridwidth = 2;
 		c.anchor = GridBagConstraints.WEST;
-		repository = new JTextField("http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-javadoc-plugin");
+		repository = new JTextField(aceFrameConfig.getSvnRepository());
 		this.add(repository, c);
 		c.gridy++;
-		workingCopy = new JTextField("target/maven-javadoc-plugin");
+		workingCopy = new JTextField(aceFrameConfig.getSvnWorkingCopy());
 		this.add(workingCopy, c);
 		c.gridwidth = 1;
 		c.gridy++;

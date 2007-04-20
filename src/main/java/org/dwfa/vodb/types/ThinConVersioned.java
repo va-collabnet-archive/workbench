@@ -1,9 +1,12 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -13,8 +16,13 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
+import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedConcept;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	private int conId;
@@ -249,5 +257,21 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	public int hashCode() {
 		return conId;
 	}
-
+	
+	private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
+		return LocalFixedTerminology.getStore().getUids(id);
+	}
+	
+	public UniversalAceConceptAttributes getUniversal() throws IOException, TerminologyException {
+		UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(getUids(conId), this.versionCount());
+		for (I_ConceptAttributePart part: versions) {
+			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
+			universalPart.setConceptStatus(getUids(part.getConceptStatus()));
+			universalPart.setDefined(part.isDefined());
+			universalPart.setPathId(getUids(part.getPathId()));
+			universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
+			conceptAttributes.addVersion(universalPart);
+		}
+		return conceptAttributes;
+	}
 }

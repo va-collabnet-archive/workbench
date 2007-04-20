@@ -95,7 +95,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 			I_DescriptionVersioned vDesc = server.getDescription(descriptionNid);
 			return vDesc.toLocalFixedDesc();
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 				descList.add(desc.toLocalFixedDesc());
 			}
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 		return descList;
 	}
@@ -120,7 +120,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 			I_ConceptAttributeVersioned vCon = server.getConcept(conceptNid);
 			return vCon.getLocalFixedConcept();
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 	}
 
@@ -138,7 +138,7 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 		try {
 			return server.nativeToUuid(nid);
 		} catch (DatabaseException e) {
-			throw new DbToIoException(e);
+			throw new ToIoException(e);
 		}
 	}
 
