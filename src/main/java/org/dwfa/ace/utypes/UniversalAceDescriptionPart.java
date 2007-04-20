@@ -1,0 +1,105 @@
+package org.dwfa.ace.utypes;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.UUID;
+
+public class UniversalAceDescriptionPart implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Collection<UUID> pathId;
+	private long time;
+	private Collection<UUID> statusId;
+	private String text;
+	private boolean initialCaseSignificant;
+	private Collection<UUID> typeId; 
+	private String lang;
+
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getPathId()
+	 */
+	public Collection<UUID> getPathId() {
+		return pathId;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setPathId(int)
+	 */
+	public void setPathId(Collection<UUID> pathId) {
+		this.pathId = pathId;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getInitialCaseSignificant()
+	 */
+	public boolean getInitialCaseSignificant() {
+		return initialCaseSignificant;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setInitialCaseSignificant(boolean)
+	 */
+	public void setInitialCaseSignificant(boolean capStatus) {
+		this.initialCaseSignificant = capStatus;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getLang()
+	 */
+	public String getLang() {
+		return lang;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setLang(java.lang.String)
+	 */
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getStatusId()
+	 */
+	public Collection<UUID> getStatusId() {
+		return statusId;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setStatusId(int)
+	 */
+	public void setStatusId(Collection<UUID> status) {
+		this.statusId = status;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getText()
+	 */
+	public String getText() {
+		return text;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setText(java.lang.String)
+	 */
+	public void setText(String text) {
+		this.text = text;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getTypeId()
+	 */
+	public Collection<UUID> getTypeId() {
+		return typeId;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setTypeId(int)
+	 */
+	public void setTypeId(Collection<UUID> typeInt) {
+		this.typeId = typeInt;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#getVersion()
+	 */
+	public long getTime() {
+		return time;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_DescriptionPart#setVersion(int)
+	 */
+	public void setTime(long version) {
+		this.time = version;
+	}
+
+}

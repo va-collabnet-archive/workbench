@@ -1,10 +1,13 @@
 package org.dwfa.ace.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
+import org.dwfa.tapi.TerminologyException;
 
 public interface I_DescriptionVersioned {
 
@@ -36,5 +39,7 @@ public interface I_DescriptionVersioned {
 	public Set<TimePathId> getTimePathSet();
 
 	public I_DescribeConceptLocally toLocalFixedDesc();
+	
+	public UniversalAceDescription getUniversal() throws IOException, TerminologyException;
 
 }

@@ -1,31 +1,36 @@
 package org.dwfa.ace.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.TerminologyException;
 
 public interface I_ConceptAttributeVersioned {
 
-	public abstract boolean addVersion(I_ConceptAttributePart part);
+	public boolean addVersion(I_ConceptAttributePart part);
 
-	public abstract List<I_ConceptAttributePart> getVersions();
+	public List<I_ConceptAttributePart> getVersions();
 
-	public abstract int versionCount();
+	public int versionCount();
 
-	public abstract int getConId();
+	public int getConId();
 
-	public abstract List<I_ConceptAttributeTuple> getTuples();
+	public List<I_ConceptAttributeTuple> getTuples();
 
-	public abstract void convertIds(I_MapNativeToNative jarToDbNativeMap);
+	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-	public abstract boolean merge(I_ConceptAttributeVersioned jarCon);
+	public boolean merge(I_ConceptAttributeVersioned jarCon);
 
-	public abstract Set<TimePathId> getTimePathSet();
+	public Set<TimePathId> getTimePathSet();
 
-	public abstract void addTuples(I_IntSet allowedStatus,
+	public void addTuples(I_IntSet allowedStatus,
 			Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples);
 
-	public abstract I_ConceptualizeLocally getLocalFixedConcept();
+	public I_ConceptualizeLocally getLocalFixedConcept();
+	
+	public UniversalAceConceptAttributes getUniversal() throws IOException, TerminologyException;
 
 }

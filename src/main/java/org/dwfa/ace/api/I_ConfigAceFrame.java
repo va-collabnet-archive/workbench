@@ -160,5 +160,14 @@ public interface I_ConfigAceFrame {
 	public Collection<I_ReadChangeSet> getChangeSetReaders();
 	
 	public Collection<I_WriteChangeSet> getChangeSetWriters();
+	
+	public void setSvnRepository(String repositoryUrlStr);
+	public String getSvnRepository();
+	
+	public void setSvnWorkingCopy(String svnWorkingCopy);
+	public String getSvnWorkingCopy();
+
+	public void setChangeSetWriterFileName(String changeSetWriterFileName);
+	public String getChangeSetWriterFileName();
 
 }

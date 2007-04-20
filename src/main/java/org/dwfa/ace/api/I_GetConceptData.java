@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.utypes.UniversalAceBean;
+import org.dwfa.tapi.TerminologyException;
+
 
 
 public interface I_GetConceptData extends I_AmTermComponent {
@@ -54,4 +57,6 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public I_DescriptionTuple getDescTuple(I_IntList treeDescPreferenceList, I_ConfigAceFrame config) throws IOException;
 
 	public I_IntSet getUncommittedIds();
+	
+	public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException;
 }
