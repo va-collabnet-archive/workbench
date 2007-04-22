@@ -47,11 +47,18 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
      *  
      */
     public HtmlHandler(JEditorPane logOut) throws IOException {
+        this(logOut, "logger ");
+        
+    }
+    public HtmlHandler(JEditorPane logOut, String loggerName) throws IOException {
         super();
         this.logOut = logOut;
+        if (loggerName.endsWith(" ") == false) {
+        	loggerName = loggerName + " ";
+        }
         File root = new File("logs");
         root.mkdirs();
-        FileWriter fw = new FileWriter(new File(root, "logger " + fileName.format(new Date()) + ".html"));
+        FileWriter fw = new FileWriter(new File(root, loggerName + fileName.format(new Date()) + ".html"));
         this.logFile = new BufferedWriter(fw);
         this.logFile.write("<html>");
         
