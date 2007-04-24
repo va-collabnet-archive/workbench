@@ -87,8 +87,9 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeCellRenderer;
 import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
+import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
-import org.dwfa.svn.CheckoutPanel;
+import org.dwfa.svn.SvnPanel;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -99,16 +100,40 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
 
+	private static List<I_Transact> imported = new ArrayList<I_Transact>();
+
+	public static void addImported(I_Transact to) {
+		imported.add(to);
+		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+			frameConfig.setCommitEnabled(true);
+			if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+				frameConfig.addImported((I_GetConceptData) to);
+			}
+		}
+	}
+
 	public static void addUncommitted(I_Transact to) {
 		uncommitted.add(to);
+		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+			frameConfig.setCommitEnabled(true);
+			if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+				frameConfig.addUncommitted((I_GetConceptData) to);
+			}
+		}
 	}
 
 	public static void removeUncommitted(I_Transact to) {
 		uncommitted.remove(to);
+		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+			frameConfig.addUncommitted(null);
+			if (uncommitted.size() == 0) {
+				frameConfig.setCommitEnabled(false);
+			}
+		}
 	}
-	
+
 	private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
-	
+
 	private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
 
 	/*
@@ -117,13 +142,15 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public static void commit() throws IOException {
 		Date now = new Date();
 		Set<TimePathId> values = new HashSet<TimePathId>();
-		for (I_WriteChangeSet writer: csWriters) {
+		for (I_WriteChangeSet writer : csWriters) {
 			writer.open();
 		}
 		int version = ThinVersionHelper.convert(now.getTime());
-		
+		AceLog.getEditLog().info(
+				"Starting commit: " + version + " (" + now.getTime() + ")");
+
 		for (I_Transact cb : uncommitted) {
-			for (I_WriteChangeSet writer: csWriters) {
+			for (I_WriteChangeSet writer : csWriters) {
 				writer.writeChanges(cb, ThinVersionHelper.convert(version));
 			}
 			cb.commit(version, values);
@@ -134,13 +161,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
-		for (I_WriteChangeSet writer: csWriters) {
+		for (I_WriteChangeSet writer : csWriters) {
 			writer.commit();
 		}
 		uncommitted.clear();
-		for (I_ConfigAceFrame frameConfig: getAceConfig().aceFrames) {
-			frameConfig.fireCommit();
-		}
+		fireCommit();
+		AceLog.getEditLog().info(
+				"Finished commit: " + version + " (" + now.getTime() + ")");
 	}
 
 	public static void abort() throws IOException {
@@ -148,6 +175,14 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			cb.abort();
 		}
 		uncommitted.clear();
+		fireCommit();
+	}
+
+	private static void fireCommit() {
+		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+			frameConfig.fireCommit();
+			frameConfig.setCommitEnabled(false);
+		}
 	}
 
 	/*
@@ -187,13 +222,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			}
 		}
 	}
-	
+
 	private class StatusChangeListener implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent evt) {
 			statusLabel.setText((String) evt.getNewValue());
 		}
-		
+
 	}
 
 	private class ManageBottomPaneActionListener implements ActionListener {
@@ -229,7 +264,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				try {
 					makeConfigPalette();
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(configPalette);
@@ -244,7 +279,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				try {
 					makeSubversionPalette();
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(subversionPalette);
@@ -253,7 +288,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	}
 
-	
 	private class HistoryPaletteActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -264,7 +298,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			historyPalette.togglePalette();
 		}
 	}
-
 
 	private class TogglePanelsActionListener implements ActionListener,
 			ComponentListener {
@@ -373,6 +406,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JToggleButton showComponentButton;
 
 	private JToggleButton showTreeButton;
+
 	private JToggleButton showSubversionButton;
 
 	private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
@@ -380,7 +414,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
 
 	private CdePalette configPalette;
-	
+
 	private CdePalette subversionPalette;
 
 	private JToggleButton showHistoryButton;
@@ -405,6 +439,18 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JMenu fileMenu = new JMenu("File");
 
 	private JMenu editMenu = new JMenu("Edit");
+
+	private JButton commitButton;
+
+	private JButton cancelButton;
+
+	private TerminologyListModel viewerHistoryTableModel = new TerminologyListModel();
+
+	private TerminologyListModel commitHistoryTableModel = new TerminologyListModel();
+
+	private TerminologyListModel importHistoryTableModel = new TerminologyListModel();
+
+	private JToggleButton showPreferencesButton;
 
 	/**
 	 * 
@@ -432,7 +478,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	 * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
 	 * 
 	 * @param aceFrameConfig
-	 * @throws DatabaseException 
+	 * @throws DatabaseException
 	 * 
 	 * @throws DatabaseException
 	 */
@@ -440,7 +486,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		super(new GridBagLayout());
 	}
 
-	public void setup(I_ConfigAceFrame aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
+	public void setup(I_ConfigAceFrame aceFrameConfig)
+			throws DatabaseException, IOException, ClassNotFoundException {
 		this.aceFrameConfig = aceFrameConfig;
 		this.aceFrameConfig.addPropertyChangeListener(this);
 		searchPanel = new SearchPanel(aceFrameConfig);
@@ -464,16 +511,16 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridy++;
 		c.gridwidth = 2;
 		add(getBottomPanel(), c);
-		aceFrameConfig.addPropertyChangeListener("statusMessage", new StatusChangeListener());
+		aceFrameConfig.addPropertyChangeListener("statusMessage",
+				new StatusChangeListener());
 	}
-	
-	
 
 	public JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		addToMenuBar(menuBar);
 		return menuBar;
 	}
+
 	public JMenuBar addToMenuBar(JMenuBar menuBar) {
 		addFileMenu(menuBar);
 		addEditMenu(menuBar);
@@ -536,7 +583,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		menuBar.add(fileMenu);
 	}
 
-	private JComponent getContentPanel() throws DatabaseException, IOException, ClassNotFoundException {
+	private JComponent getContentPanel() throws DatabaseException, IOException,
+			ClassNotFoundException {
 		termTree = getHierarchyPanel();
 		/*
 		 * String htmlLabel = "<html><img src='" +
@@ -563,9 +611,11 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		termTree.setMinimumSize(new Dimension(0, 0));
 		termTreeConceptSplit.setOneTouchExpandable(true);
 		termTreeConceptSplit.setContinuousLayout(true);
-		termTreeConceptSplit.setDividerLocation(aceFrameConfig.getTreeTermDividerLoc());
+		termTreeConceptSplit.setDividerLocation(aceFrameConfig
+				.getTreeTermDividerLoc());
 		termTreeConceptSplit.setResizeWeight(0.5);
-		termTreeConceptSplit.setLastDividerLocation(aceFrameConfig.getTreeTermDividerLoc());
+		termTreeConceptSplit.setLastDividerLocation(aceFrameConfig
+				.getTreeTermDividerLoc());
 
 		upperLowerSplit.setTopComponent(termTreeConceptSplit);
 		upperLowerSplit.setBottomComponent(searchPanel);
@@ -589,15 +639,15 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 		return content;
 	}
-	
+
 	private void makeSubversionPalette() throws Exception {
-		
+
 		JLayeredPane layers = getRootPane().getLayeredPane();
 		subversionPalette = new CdePalette(new BorderLayout(),
 				new RightPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
-		CheckoutPanel svnTable = new CheckoutPanel(aceFrameConfig);
-		tabs.addTab("checkout", new JScrollPane(svnTable));
+		SvnPanel svnTable = new SvnPanel(aceFrameConfig);
+		tabs.addTab("change sets", svnTable);
 
 		layers.add(subversionPalette, JLayeredPane.PALETTE_LAYER);
 		subversionPalette.add(tabs, BorderLayout.CENTER);
@@ -622,9 +672,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				new RightPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.addTab("Path", new SelectPathAndPositionPanel(false, "for view",
-				aceFrameConfig, new PropertySetListenerGlue("removeViewPosition",
-						"addViewPosition", "replaceViewPosition",
-						"getViewPositionSet", I_Position.class, aceFrameConfig)));
+				aceFrameConfig, new PropertySetListenerGlue(
+						"removeViewPosition", "addViewPosition",
+						"replaceViewPosition", "getViewPositionSet",
+						I_Position.class, aceFrameConfig)));
 		tabs.addTab("View", makeViewConfig());
 		tabs.addTab("Edit", makeEditConfig());
 		tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
@@ -647,6 +698,26 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	}
 
+	private void removeConfigPalette() {
+		if (configPalette != null) {
+			CdePalette oldPallette = configPalette;
+			configPalette = null;
+			oldPallette.setVisible(false);
+			JLayeredPane layers = getRootPane().getLayeredPane();
+			layers.remove(oldPallette);
+		}
+		if (showPreferencesButton.isSelected()) {
+			try {
+				makeConfigPalette();
+				getRootPane().getLayeredPane().moveToFront(configPalette);
+				configPalette.togglePalette();
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		 }
+
+	}
+
 	private JComponent makeDescPrefPanel() {
 
 		TerminologyListModel descTypeTableModel = new TerminologyListModel();
@@ -662,60 +733,77 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		descPrefPanel.add(new JScrollPane(descList));
 
 		TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
-		for (int id: aceFrameConfig.getShortLabelDescPreferenceList().getListValues()) {
+		for (int id : aceFrameConfig.getShortLabelDescPreferenceList()
+				.getListValues()) {
 			shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
 		}
-		shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getShortLabelDescPreferenceList());
-		TerminologyList shortLabelOrderList = new TerminologyList(shortLabelPrefOrderTableModel); 
+		shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
+				.getShortLabelDescPreferenceList());
+		TerminologyList shortLabelOrderList = new TerminologyList(
+				shortLabelPrefOrderTableModel);
 
 		shortLabelOrderList.setBorder(BorderFactory
 				.createTitledBorder("Short Label preference order: "));
 		descPrefPanel.add(new JScrollPane(shortLabelOrderList));
-		
+
 		TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
-		for (int id: aceFrameConfig.getLongLabelDescPreferenceList().getListValues()) {
+		for (int id : aceFrameConfig.getLongLabelDescPreferenceList()
+				.getListValues()) {
 			longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
 		}
-		longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getLongLabelDescPreferenceList());
-		TerminologyList longLabelOrderList = new TerminologyList(longLabelPrefOrderTableModel); 
+		longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
+				.getLongLabelDescPreferenceList());
+		TerminologyList longLabelOrderList = new TerminologyList(
+				longLabelPrefOrderTableModel);
 
 		longLabelOrderList.setBorder(BorderFactory
 				.createTitledBorder("Long label preference order: "));
 		descPrefPanel.add(new JScrollPane(longLabelOrderList));
-		
+
 		TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
-		for (int id: aceFrameConfig.getTreeDescPreferenceList().getListValues()) {
+		for (int id : aceFrameConfig.getTreeDescPreferenceList()
+				.getListValues()) {
 			treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
 		}
-		treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig.getTreeDescPreferenceList());
-		TerminologyList treePrefOrderList = new TerminologyList(treeDescPrefOrderTableModel); 
+		treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig
+				.getTreeDescPreferenceList());
+		TerminologyList treePrefOrderList = new TerminologyList(
+				treeDescPrefOrderTableModel);
 
 		treePrefOrderList.setBorder(BorderFactory
 				.createTitledBorder("Tree preference order: "));
 		descPrefPanel.add(new JScrollPane(treePrefOrderList));
 
 		TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
-		for (int id: aceFrameConfig.getTableDescPreferenceList().getListValues()) {
+		for (int id : aceFrameConfig.getTableDescPreferenceList()
+				.getListValues()) {
 			descPrefOrderTableModel.addElement(ConceptBean.get(id));
 		}
-		descPrefOrderTableModel.addListDataListener(aceFrameConfig.getTableDescPreferenceList());
-		TerminologyList prefOrderList = new TerminologyList(descPrefOrderTableModel); 
+		descPrefOrderTableModel.addListDataListener(aceFrameConfig
+				.getTableDescPreferenceList());
+		TerminologyList prefOrderList = new TerminologyList(
+				descPrefOrderTableModel);
 
 		prefOrderList.setBorder(BorderFactory
 				.createTitledBorder("Table preference order: "));
 		descPrefPanel.add(new JScrollPane(prefOrderList));
-		
+
 		return descPrefPanel;
 	}
 
 	private JComponent makeRelPrefPanel() {
 
-				
 		JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
-		relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:", aceFrameConfig.getDestRelTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList("child relationships:", aceFrameConfig.getSourceRelTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList("stated view characteristic types:", aceFrameConfig.getStatedViewTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList("inferred view characteristic types:", aceFrameConfig.getInferredViewTypes())));
+		relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:",
+				aceFrameConfig.getDestRelTypes())));
+		relPrefPanel.add(new JScrollPane(makeTermList("child relationships:",
+				aceFrameConfig.getSourceRelTypes())));
+		relPrefPanel.add(new JScrollPane(makeTermList(
+				"stated view characteristic types:", aceFrameConfig
+						.getStatedViewTypes())));
+		relPrefPanel.add(new JScrollPane(makeTermList(
+				"inferred view characteristic types:", aceFrameConfig
+						.getInferredViewTypes())));
 		return relPrefPanel;
 	}
 
@@ -727,8 +815,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		browseDownRelModel.addListDataListener(set);
 		TerminologyList browseDownRelList = new TerminologyList(
 				browseDownRelModel);
-		browseDownRelList.setBorder(BorderFactory
-				.createTitledBorder(title));
+		browseDownRelList.setBorder(BorderFactory.createTitledBorder(title));
 		return browseDownRelList;
 	}
 
@@ -737,13 +824,14 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		for (int id : aceFrameConfig.getAllowedStatus().getSetValues()) {
 			statusValuesModel.addElement(ConceptBean.get(id));
 		}
-		statusValuesModel.addListDataListener(aceFrameConfig.getAllowedStatus());
+		statusValuesModel
+				.addListDataListener(aceFrameConfig.getAllowedStatus());
 		TerminologyList statusList = new TerminologyList(statusValuesModel);
 		statusList.setBorder(BorderFactory
 				.createTitledBorder("Status values for display:"));
 		return statusList;
 	}
-	
+
 	private JComponent makeRootPrefPanel() {
 		TerminologyListModel rootModel = new TerminologyListModel();
 		for (int id : aceFrameConfig.getRoots().getSetValues()) {
@@ -768,40 +856,87 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JTabbedPane makeEditConfig() throws Exception {
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.addTab("defaults", new JScrollPane(madeDefaultsPanel()));
-		tabs.addTab("rel type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelTypePopup(), "Relationship types for popup:")));
-		tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelRefinabiltyPopup(), "Relationship types for popup:")));
-		tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelCharacteristicPopup(), "Relationship types for popup:")));
-		tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditDescTypePopup(), "Description types for popup:")));
-		tabs.addTab("status", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditStatusTypePopup(), "Status values for popup:")));
+		tabs.addTab("rel type", new JScrollPane(makePopupConfigPanel(
+				aceFrameConfig.getEditRelTypePopup(),
+				"Relationship types for popup:")));
+		tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(
+				aceFrameConfig.getEditRelRefinabiltyPopup(),
+				"Relationship types for popup:")));
+		tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(
+				aceFrameConfig.getEditRelCharacteristicPopup(),
+				"Relationship types for popup:")));
+		tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(
+				aceFrameConfig.getEditDescTypePopup(),
+				"Description types for popup:")));
+		tabs.addTab("status", new JScrollPane(makePopupConfigPanel(
+				aceFrameConfig.getEditStatusTypePopup(),
+				"Status values for popup:")));
 		return tabs;
 	}
 
 	private JComponent madeDefaultsPanel() {
 		JPanel defaultsPanel = new JPanel(new GridLayout(0, 1));
-		
-		TermComponentLabel defaultStatus = new TermComponentLabel(aceFrameConfig);
-		defaultStatus.setBorder(BorderFactory.createTitledBorder("Default status: "));
-		defaultsPanel.add(defaultStatus);
-		
-		TermComponentLabel defaultDescType = new TermComponentLabel(aceFrameConfig);
-		defaultDescType.setBorder(BorderFactory.createTitledBorder("Default description type: "));
-		defaultsPanel.add(defaultDescType);
-		
-		TermComponentLabel defaultRelType = new TermComponentLabel(aceFrameConfig);
-		defaultRelType.setBorder(BorderFactory.createTitledBorder("Default relationship type: "));
-		defaultsPanel.add(defaultRelType);
-		
-		TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(aceFrameConfig);
-		defaultRelCharacteristicType.setBorder(BorderFactory.createTitledBorder("Default relationship characteristic: "));
-		defaultsPanel.add(defaultRelCharacteristicType);
-		
-		TermComponentLabel defaultRelRefinabilityType = new TermComponentLabel(aceFrameConfig);
-		defaultRelRefinabilityType.setBorder(BorderFactory.createTitledBorder("Default relationship refinability: "));
-		defaultsPanel.add(defaultRelRefinabilityType);
-		
-		
+
+		TermComponentLabel defaultStatus = new TermComponentLabel(
+				aceFrameConfig);
+		defaultStatus.setTermComponent(aceFrameConfig.getDefaultStatus());
+		defaultStatus.addPropertyChangeListener("defaultStatus",
+				new PropertyListenerGlue("setDefaultStatus",
+						I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(defaultsPanel, defaultStatus, "Default status: ");
+
+		TermComponentLabel defaultDescType = new TermComponentLabel(
+				aceFrameConfig);
+		defaultDescType.setTermComponent(aceFrameConfig
+				.getDefaultDescriptionType());
+		defaultDescType.addPropertyChangeListener("defaultDescriptionType",
+				new PropertyListenerGlue("setDefaultDescriptionType",
+						I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(defaultsPanel, defaultDescType, "Default description type: ");
+
+		TermComponentLabel defaultRelType = new TermComponentLabel(
+				aceFrameConfig);
+		defaultRelType.setTermComponent(aceFrameConfig
+				.getDefaultRelationshipType());
+		defaultRelType.addPropertyChangeListener("defaultRelationshipType",
+				new PropertyListenerGlue("setDefaultRelationshipType",
+						I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(defaultsPanel, defaultRelType, "Default relationship type: ");
+
+		TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(
+				aceFrameConfig);
+		defaultRelCharacteristicType.setTermComponent(aceFrameConfig
+				.getDefaultRelationshipCharacteristic());
+		defaultRelCharacteristicType.addPropertyChangeListener(
+				"defaultRelationshipCharacteristic", new PropertyListenerGlue(
+						"setDefaultRelationshipCharacteristic",
+						I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(defaultsPanel, defaultRelCharacteristicType,
+				"Default relationship characteristic: ");
+
+		TermComponentLabel defaultRelRefinability = new TermComponentLabel(
+				aceFrameConfig);
+		defaultRelRefinability.setTermComponent(aceFrameConfig
+				.getDefaultRelationshipRefinability());
+		defaultRelRefinability.addPropertyChangeListener(
+				"defaultRelationshipRefinability", new PropertyListenerGlue(
+						"setDefaultRelationshipRefinability",
+						I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(defaultsPanel, defaultRelRefinability,
+				"Default relationship refinability: ");
+
 		return defaultsPanel;
 	}
+
+	private void wrapAndAdd(JPanel defaultsPanel,
+			TermComponentLabel defaultLabel, String borderTitle) {
+		JPanel defaultStatusPanel = new JPanel(new GridLayout(1, 1));
+		defaultStatusPanel.setBorder(BorderFactory
+				.createTitledBorder(borderTitle));
+		defaultStatusPanel.add(defaultLabel);
+		defaultsPanel.add(defaultStatusPanel);
+	}
+
 	private JComponent makePopupConfigPanel(I_IntSet set, String borderLabel) {
 
 		TerminologyList popupList = makeTermList(borderLabel, set);
@@ -816,8 +951,16 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		historyPalette = new CdePalette(new BorderLayout(),
 				new LeftPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
-		tabs.addTab("viewer history", new JLabel("viewer"));
-		tabs.addTab("commit history", new JLabel("commit"));
+
+		TerminologyList viewerList = new TerminologyList(
+				viewerHistoryTableModel);
+		tabs.addTab("viewer", new JScrollPane(viewerList));
+		TerminologyList commitList = new TerminologyList(
+				commitHistoryTableModel);
+		tabs.addTab("uncommitted", new JScrollPane(commitList));
+		TerminologyList importList = new TerminologyList(
+				importHistoryTableModel);
+		tabs.addTab("imported", new JScrollPane(importList));
 		historyPalette.add(tabs, BorderLayout.CENTER);
 		historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
@@ -848,10 +991,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
-		
-		for (int rootId: aceFrameConfig.getRoots().getSetValues()) {
-			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(
-					rootId, 0, false), true));
+
+		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
+			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
+					0, false), true));
 		}
 		model.setRoot(root);
 		/*
@@ -887,10 +1030,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		});
 		JScrollPane treeView = new JScrollPane(tree);
 		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
-			AceLog.getLog().info("Child expand: " + id);
+			AceLog.getAppLog().info("Child expand: " + id);
 		}
 		for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
-			AceLog.getLog().info("Parent expand: " + id);
+			AceLog.getAppLog().info("Parent expand: " + id);
 		}
 		for (int i = 0; i < tree.getRowCount(); i++) {
 			TreePath path = tree.getPathForRow(i);
@@ -907,12 +1050,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	protected void treeValueChanged(TreeSelectionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
+				.getLastPathComponent();
 		String s = evt.isAddedPath() ? "Selected " + node : "";
 		aceFrameConfig.setStatusMessage(s);
 		if (node != null) {
 			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-			.getUserObject();
+					.getUserObject();
 			aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
 		} else {
 			aceFrameConfig.setHierarchySelection(null);
@@ -921,7 +1065,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	protected void treeTreeCollapsed(TreeExpansionEvent evt) {
 		I_GetConceptDataForTree userObject = handleCollapse(evt);
-		aceFrameConfig.getChildrenExpandedNodes().remove(userObject.getConceptId());
+		aceFrameConfig.getChildrenExpandedNodes().remove(
+				userObject.getConceptId());
 
 	}
 
@@ -958,12 +1103,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(
 						expansionWorkers.keySet());
 				for (TreeIdPath key : allKeys) {
-					AceLog.getLog().info("  Stopping all: " + key);
+					AceLog.getAppLog().info("  Stopping all: " + key);
 					removeAnyMatchingExpansionWorker(key, message);
 				}
 			} else {
 				if (expansionWorkers.containsKey(idPath)) {
-					AceLog.getLog().info("  Stopping: " + idPath);
+					AceLog.getAppLog().info("  Stopping: " + idPath);
 					removeAnyMatchingExpansionWorker(idPath, message);
 				}
 
@@ -971,31 +1116,32 @@ public class ACE extends JPanel implements PropertyChangeListener {
 						expansionWorkers.keySet());
 				for (TreeIdPath key : otherKeys) {
 					if (key.initiallyEqual(idPath)) {
-						AceLog.getLog().info("  Stopping child: " + key);
+						AceLog.getAppLog().info("  Stopping child: " + key);
 						removeAnyMatchingExpansionWorker(key, message);
 					}
 				}
 			}
 		}
 	}
+
 	private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
 		synchronized (expansionWorkers) {
 			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
 			if (foundWorker != null) {
 				foundWorker.stopWork(message);
 				expansionWorkers.remove(key);
-			}			
+			}
 		}
 	}
 
-
-	public void removeExpansionWorker(TreeIdPath key, ExpandNodeSwingWorker worker, String message) {
+	public void removeExpansionWorker(TreeIdPath key,
+			ExpandNodeSwingWorker worker, String message) {
 		synchronized (expansionWorkers) {
 			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
 			if ((worker != null) && (foundWorker == worker)) {
 				worker.stopWork(message);
 				expansionWorkers.remove(key);
-			}			
+			}
 		}
 	}
 
@@ -1010,17 +1156,17 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
 					.getUserObject();
 			if (userObject != null) {
-				aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
+				aceFrameConfig.getChildrenExpandedNodes().add(
+						userObject.getConceptId());
 				aceFrameConfig.setStatusMessage("Expanding " + node + "...");
 				ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker(
-						(DefaultTreeModel) tree.getModel(), tree,
-						node, new CompareConceptBeanInitialText(), this);
+						(DefaultTreeModel) tree.getModel(), tree, node,
+						new CompareConceptBeanInitialText(), this);
 				treeExpandThread.execute(worker);
 				expansionWorkers.put(idPath, worker);
 			}
 		}
 	}
-
 
 	JPanel getTopPanel() {
 		JPanel topPanel = new JPanel(new GridBagLayout());
@@ -1055,7 +1201,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showComponentButton.addActionListener(resizeListener);
 		topPanel.add(showComponentButton, c);
 		c.gridx++;
-		treeProgress = new JPanel(new GridLayout(1,1));
+		treeProgress = new JPanel(new GridLayout(1, 1));
 		topPanel.add((JPanel) treeProgress, c);
 		c.gridx++;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -1064,18 +1210,19 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.fill = GridBagConstraints.NONE;
 		c.weightx = 0;
 		c.gridx++;
-		//topPanel.add(getComponentToggles2(), c);
-		//c.gridx++;
-		
+		// topPanel.add(getComponentToggles2(), c);
+		// c.gridx++;
+
 		showSubversionButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/svn.png")));
 		topPanel.add(showSubversionButton, c);
-		showSubversionButton.addActionListener(new SubversionPaletteActionListener());
+		showSubversionButton
+				.addActionListener(new SubversionPaletteActionListener());
 		c.gridx++;
-		JToggleButton vpb = new JToggleButton(new ImageIcon(ACE.class
+		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
-		vpb.addActionListener(new ConfigPaletteActionListener());
-		topPanel.add(vpb, c);
+		showPreferencesButton.addActionListener(new ConfigPaletteActionListener());
+		topPanel.add(showPreferencesButton, c);
 		c.gridx++;
 
 		return topPanel;
@@ -1098,13 +1245,15 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.fill = GridBagConstraints.NONE;
 		c.weightx = 0;
 		c.gridx++;
-		JButton cancel = new JButton("cancel");
-		cancel.addActionListener(new Abort());
-		bottomPanel.add(cancel, c);
+		cancelButton = new JButton("cancel");
+		cancelButton.setEnabled(false);
+		cancelButton.addActionListener(new Abort());
+		bottomPanel.add(cancelButton, c);
 		c.gridx++;
-		JButton commit = new JButton("commit");
-		commit.addActionListener(new Commit());
-		bottomPanel.add(commit, c);
+		commitButton = new JButton("commit");
+		commitButton.setEnabled(false);
+		commitButton.addActionListener(new Commit());
+		bottomPanel.add(commitButton, c);
 		c.gridx++;
 		bottomPanel.add(new JLabel("   "), c);
 		c.gridx++;
@@ -1135,31 +1284,61 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public void setTreeActivityPanel(ActivityPanel ap) {
 		treeProgress.removeAll();
 		treeProgress.add(ap);
-		
+
 	}
+
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("viewPositions")) {
 			updateHierarchyView(evt.getPropertyName());
 		} else if (evt.getPropertyName().equals("commit")) {
 			updateHierarchyView(evt.getPropertyName());
-		} 
+			commitHistoryTableModel.clear();
+			removeConfigPalette();
+		} else if (evt.getPropertyName().equals("commitEnabled")) {
+			commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
+			if (aceFrameConfig.isCommitEnabled()) {
+				commitButton
+						.setText("<html><b><font color='green'>commit</font></b>");
+			} else {
+				commitButton.setText("commit");
+			}
+			cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+		} else if (evt.getPropertyName().equals("lastViewed")) {
+			viewerHistoryTableModel.addElement(0, (ConceptBean) evt
+					.getNewValue());
+			while (viewerHistoryTableModel.getSize() > 40) {
+				viewerHistoryTableModel.removeElement(viewerHistoryTableModel
+						.getSize() - 1);
+			}
+		} else if (evt.getPropertyName().equals("uncommitted")) {
+			commitHistoryTableModel.clear();
+			for (I_Transact t : uncommitted) {
+				if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+					commitHistoryTableModel.addElement((ConceptBean) t);
+				}
+			}
+		} else if (evt.getPropertyName().equals("imported")) {
+			importHistoryTableModel.clear();
+			for (I_Transact t : imported) {
+				if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+					importHistoryTableModel.addElement((ConceptBean) t);
+				}
+			}
+		}
 	}
 
 	private void updateHierarchyView(String propChangeName) {
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model
-				.getRoot();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 		stopWorkersOnPath(null, "stopping for change in " + propChangeName);
 		for (int i = 0; i < root.getChildCount(); i++) {
 			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root
 					.getChildAt(i);
-			I_GetConceptData cb = (I_GetConceptData) childNode
-					.getUserObject();
+			I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
 			if (aceFrameConfig.getChildrenExpandedNodes().contains(
 					cb.getConceptId())) {
 				TreePath tp = new TreePath(childNode);
-				TreeExpansionEvent treeEvent = new TreeExpansionEvent(
-						model, tp);
+				TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
 				handleCollapse(treeEvent);
 				treeTreeExpanded(treeEvent);
 			}
@@ -1180,9 +1359,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public static void setAceConfig(AceConfig aceConfig) {
 		if (ACE.aceConfig == null) {
-			ACE.aceConfig = aceConfig;			
+			ACE.aceConfig = aceConfig;
 		} else {
-			throw new UnsupportedOperationException("Ace.aceConfig is already set");
+			throw new UnsupportedOperationException(
+					"Ace.aceConfig is already set");
 		}
 	}
 

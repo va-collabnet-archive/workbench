@@ -135,13 +135,13 @@ public class ImportBaselineJarReader implements ActionListener {
 					try {
 						importJar(jarFile);
 					} catch (TaskFailedException ex) {
-						AceLog.getLog().alertAndLogException(ex);
+						AceLog.getAppLog().alertAndLogException(ex);
 					}
 				}
 
 			});
 		} catch (TaskFailedException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 	}
 
@@ -193,7 +193,7 @@ public class ImportBaselineJarReader implements ActionListener {
 
 			for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
 				je = e.nextElement();
-				AceLog.getLog().info("Jar entry: " + je.getName()
+				AceLog.getAppLog().info("Jar entry: " + je.getName()
 						+ " compressed: " + je.getCompressedSize() + " size: "
 						+ je.getSize() + " time: " + new Date(je.getTime())
 						+ " comment: " + je.getComment());
@@ -254,7 +254,7 @@ public class ImportBaselineJarReader implements ActionListener {
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);
 								} catch (Exception e) {
-									AceLog.getLog().alertAndLogException(e);
+									AceLog.getAppLog().alertAndLogException(e);
 								}
 							}
 						}
@@ -279,7 +279,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				int size = dis.readInt();
 				if (size > buffer.length) {
 					buffer = new byte[size];
-					AceLog.getLog().info("Increasing id buffer: " + size);
+					AceLog.getAppLog().info("Increasing id buffer: " + size);
 				}
 				int read = dis.read(buffer, 0, size);
 				while (read != size) {
@@ -291,9 +291,9 @@ public class ImportBaselineJarReader implements ActionListener {
 				AceConfig.vodb.writeId(jarId);
 				processed++;
 			} catch (Throwable e) {
-				AceLog.getLog().info("processed: " + processed);
+				AceLog.getAppLog().info("processed: " + processed);
 				dis.close();
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 				throw new RuntimeException(e);
 			}
 		}
@@ -308,7 +308,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Increasing image buffer: " + size);
+				AceLog.getAppLog().info("Increasing image buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -332,7 +332,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Increasing relationship buffer: " + size);
+				AceLog.getAppLog().info("Increasing relationship buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -356,7 +356,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Increasing description buffer: " + size);
+				AceLog.getAppLog().info("Increasing description buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -379,7 +379,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Setting concept buffer size to: " + size);
+				AceLog.getAppLog().info("Setting concept buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -401,7 +401,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Setting path buffer size to: " + size);
+				AceLog.getAppLog().info("Setting path buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -413,7 +413,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				I_Path jarPath = pathBinder.entryToObject(input);
 				AceConfig.vodb.writePath(jarPath);
 			} catch (RuntimeException e) {
-				AceLog.getLog().info("processing paths: " + processed);
+				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;
 			}
 			processed++;
@@ -428,7 +428,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Setting path buffer size to: " + size);
+				AceLog.getAppLog().info("Setting path buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -440,7 +440,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				TimePathId jarTimePath = (TimePathId) timePathIdBinder.entryToObject(input);
 				AceConfig.vodb.writeTimePath(jarTimePath);
 			} catch (RuntimeException e) {
-				AceLog.getLog().info("processing paths: " + processed);
+				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;
 			}
 			processed++;

@@ -19,6 +19,7 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
@@ -151,7 +152,7 @@ public class VodbEnv {
 	 * primary is opened? How do they get updated, etc?
 	 */
 	public void setup(File envHome, boolean readOnly, Long cacheSize) throws DatabaseException {
-		AceLog.getLog().info("Setting up db: " + envHome);
+		AceLog.getAppLog().info("Setting up db: " + envHome);
 		this.readOnly = readOnly;
 		LocalFixedTerminology.setStore(new VodbFixedServer(this));
 		envHome.mkdirs();
@@ -159,7 +160,7 @@ public class VodbEnv {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		if (cacheSize != null) {
 			envConfig.setCacheSize(cacheSize);
-			AceLog.getLog().info("Setting cache size to: " + cacheSize);
+			AceLog.getAppLog().info("Setting cache size to: " + cacheSize);
 		}
 
 		envConfig.setReadOnly(readOnly);
@@ -170,8 +171,8 @@ public class VodbEnv {
 
 		DatabaseConfig relDbConfig = makeConfig(readOnly);
 		relDb = env.openDatabase(null, "rel", relDbConfig);
-		// getC1RelMap();
-		// getC2RelMap();
+		getC1RelMap();
+		getC2RelMap();
 
 		if (preloadRels) {
 			PreloadConfig relPreloadConfig = new PreloadConfig();
@@ -189,8 +190,7 @@ public class VodbEnv {
 
 		DatabaseConfig mapDbConfig = makeConfig(readOnly);
 		idDb = env.openDatabase(null, "idDb", mapDbConfig);
-		// uidToIdMap = createUidToIdMap();
-		// srcIdToIdMap = createSrcIdToIdMap();
+		uidToIdMap = createUidToIdMap();
 		
 		//Reset the authority id so that each time the db starts, it gets a new authorityId. 
 		PrimordialId primId = PrimordialId.AUTHORITY_ID;
@@ -208,7 +208,7 @@ public class VodbEnv {
 
 		DatabaseConfig imageDbConfig = makeConfig(readOnly);
 		imageDb = env.openDatabase(null, "imageDb", imageDbConfig);
-		// getConceptImageMap();
+		getConceptImageMap();
 
 		DatabaseConfig timeBranchDbConfig = makeConfig(readOnly);
 		timeBranchDb = env.openDatabase(null, "timeBranchDb",
@@ -217,8 +217,8 @@ public class VodbEnv {
 		DatabaseConfig pathDbConfig = makeConfig(readOnly);
 		pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
 
-		AceLog.getLog().info("Cache percent: " + envConfig.getCachePercent());
-		AceLog.getLog().info("Cache size: " + envConfig.getCacheSize());
+		AceLog.getAppLog().info("Cache percent: " + envConfig.getCachePercent());
+		AceLog.getAppLog().info("Cache size: " + envConfig.getCacheSize());
 
 	}
 
@@ -967,7 +967,7 @@ public class VodbEnv {
 	 * @throws DatabaseException
 	 */
 	public void search(I_TrackContinuation tracker, Pattern p,
-			Collection<ThinDescVersioned> matches, CountDownLatch latch)
+			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.INFO)) {
@@ -982,7 +982,7 @@ public class VodbEnv {
 				ThinDescVersioned descV = (ThinDescVersioned) descBinding
 						.entryToObject(foundData);
 				ACE.threadPool.execute(new CheckAndProcessMatch(p, matches,
-						descV));
+						descV, root));
 			} else {
 				while (latch.getCount() > 0) {
 					latch.countDown();
@@ -1008,18 +1008,25 @@ public class VodbEnv {
 		Collection<ThinDescVersioned> matches;
 
 		ThinDescVersioned descV;
+		
+		I_GetConceptData root;
 
 		public CheckAndProcessMatch(Pattern p,
-				Collection<ThinDescVersioned> matches, ThinDescVersioned descV) {
+				Collection<ThinDescVersioned> matches, ThinDescVersioned descV, I_GetConceptData root) {
 			super();
 			this.p = p;
 			this.matches = matches;
 			this.descV = descV;
+			this.root = root;
 		}
 
 		public void run() {
 			if (descV.matches(p)) {
-				matches.add(descV);
+				if (root == null) {
+					matches.add(descV);
+				} else {
+					throw new UnsupportedOperationException();
+				}
 			}
 		}
 
@@ -1398,6 +1405,9 @@ public class VodbEnv {
 		intBinder.objectToEntry(id.getNativeId(), idKey);
 		idBinding.objectToEntry(id, idValue);
 		idDb.put(null, idKey, idValue);
+		if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Writing nativeId : " + id);
+		}
 	}
 
 	public void deleteId(I_IdVersioned id) throws DatabaseException {
@@ -1466,7 +1476,7 @@ public class VodbEnv {
 			}
 			return (I_Path) pathBinder.entryToObject(pathValue);
 		}
-		throw new DatabaseException("Concept: " + nativeId + " not found.");
+		throw new DatabaseException("Path: " + nativeId + " not found.");
 	}
 
 	public boolean hasPath(int nativeId) throws DatabaseException {

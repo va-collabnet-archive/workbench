@@ -36,7 +36,7 @@ public class JarExtractor {
 			JarFile jf = new JarFile(new File(parts[0]));
 			for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
 				JarEntry je = e.nextElement();
-				AceLog.getLog().info("Jar entry: " + je.getName() +
+				AceLog.getAppLog().info("Jar entry: " + je.getName() +
 						" compressed: " + je.getCompressedSize() +
 						" size: " + je.getSize() +
 						" time: " + new Date(je.getTime()) +
@@ -63,12 +63,12 @@ public class JarExtractor {
 				f.setLastModified(je.getTime());
 			}
 		} catch (IOException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 
 		JOptionPane.showMessageDialog(new JFrame(),
 				"Eggs aren't supposed to be green.");
-    	AceLog.getLog().info("[d] jar extractor exit...");
+    	AceLog.getAppLog().info("[d] jar extractor exit...");
 		System.exit(0);
 	}
 }

@@ -20,9 +20,9 @@ public class LoadSourcesFromJars {
 		timer.start();
 		AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
 		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
-		AceLog.getLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
+		AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
 		loadConstants.execute(new JarFile(args[1]));
-		AceLog.getLog().info("Finished loading constants. Elapsed time: "
+		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths(AceConfig.vodb);
 		AddImage.addStockImage(AceConfig.vodb);
@@ -31,9 +31,9 @@ public class LoadSourcesFromJars {
 			ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
 					AceConfig.vodb, loadConstants.getConstantToIntMap(),
 					releaseDates[0]);
-			AceLog.getLog().info("Starting to process SNOMED.");
+			AceLog.getAppLog().info("Starting to process SNOMED.");
 			loadSnomed.execute(new JarFile(args[2]));
-			AceLog.getLog().info("Finished loading terminologies. Elapsed time: "
+			AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: "
 					+ timer.getElapsedTime());
 		}
 	}

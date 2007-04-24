@@ -2,6 +2,7 @@ package org.dwfa.ace.config;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
@@ -64,8 +65,10 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
       
       c.gridy++;
       parent = new TermComponentLabel(aceConfig);
-      parent.setBorder(BorderFactory.createTitledBorder("Parent for path:"));
-      this.add(parent, c);
+       JPanel parentHolder = new JPanel(new GridLayout(1,1));
+      parentHolder.add(parent);
+      parentHolder.setBorder(BorderFactory.createTitledBorder("Parent for path:"));
+     this.add(parentHolder, c);
       
       
       JButton createButton = new JButton("create");
@@ -98,13 +101,21 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent e) {
-        AceLog.getLog().info("Create new path: " + desc.getText());
+    	int n = JOptionPane.showConfirmDialog(
+    		    this,
+    		    "This operation will perform an immediate commit of all changes. \n\nDo you wish to proceed?",
+    		    "Confirm commit...",
+    		    JOptionPane.YES_NO_OPTION); 
+    	if (n != JOptionPane.YES_OPTION) {
+    		return;
+    	}
+        AceLog.getAppLog().info("Create new path: " + desc.getText());
         if (desc.getText() == null || desc.getText().length() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
             return;
         }
         List<I_Position> origins = this.sppp.getSelectedPositions();
-        AceLog.getLog().info(origins.toString());
+        AceLog.getAppLog().info(origins.toString());
         if (origins.size() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must select at least one origin for path.");
             return;
@@ -126,6 +137,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
          	// path id and uuid == the corresponding concepts UUID...
         	
         	ConceptBean cb = ConceptBean.get(nativePathId);
+           	cb.getUncommittedIds().add(nativePathId);
         	
         	//Needs a concept record...
         	I_ConceptAttributeVersioned con = new ThinConVersioned(nativePathId, 1);
@@ -136,7 +148,8 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	part.setDefined(false);
         	con.addVersion(part);
         	cb.setUncommittedConceptAttributes(con);
-        	
+           	cb.getUncommittedIds().add(con.getConId());
+         	
         	//Needs a description record...
         	int nativeDescId = AceConfig.vodb.uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
         			p, thinDate);
@@ -151,6 +164,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	descPart.setText(desc.getText());
         	descV.addVersion(descPart);
         	cb.getUncommittedDescriptions().add(descV);
+           	cb.getUncommittedIds().add(descV.getDescId());
         	
         	//Needs a relationship record...
         	int nativeRelId = AceConfig.vodb.uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
@@ -167,16 +181,19 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	relPart.setGroup(0);
         	relV.addVersion(relPart);
         	cb.getUncommittedSourceRels().add(relV);
-        	        	
+          	cb.getUncommittedIds().add(relV.getRelId());
+        	        	        	
         	ACE.addUncommitted(cb);
+            ACE.commit();
            	ACE.addUncommitted(newPath);
            	
-            AceLog.getLog().info("Created new path: " + desc.getText() + " " + origins);
+            AceLog.getAppLog().info("Created new path: " + desc.getText() + " " + origins);
             this.desc.setText("");
             this.parent.setTermComponent(null);
+            ACE.commit();
             
         } catch (Exception ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
         }
     }
  

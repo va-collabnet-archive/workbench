@@ -79,9 +79,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -166,7 +166,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -250,7 +250,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			}
 			return allTuples.size();
 		} catch (IOException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return 0;
 	}
@@ -323,7 +323,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 					allTuples = null;
 					DescriptionsForConceptTableModel.this.fireTableDataChanged();
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}

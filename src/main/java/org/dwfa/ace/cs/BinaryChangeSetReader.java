@@ -1,19 +1,27 @@
 package org.dwfa.ace.cs;
 
 import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceBean;
@@ -29,7 +37,6 @@ import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
@@ -58,82 +65,104 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	private static final long serialVersionUID = 1L;
 
 	private File changeSetFile;
+	
+	private I_Count counter;
 
 	public BinaryChangeSetReader() {
 		super();
 	}
+
 	public void read() throws IOException, ClassNotFoundException {
 		try {
-		FileInputStream fis = new FileInputStream(changeSetFile);
-		BufferedInputStream bis = new BufferedInputStream(fis);
-		ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(fis));
-		Class readerClass = (Class) ois.readObject();
-		if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
-			AceLog.getLog().info("Now reading change set with BinaryChangeSetReader");
-		} else {
-			AceLog.getLog().warning("ReaderClass " + readerClass.getName() + " is not assignable from BinaryChangeSetReader...");
-		}
-		
-		AceLog.getLog().info("Read: " + ois.readObject());
-		while (fis.available() > 0) {
-			String comment = (String) ois.readObject();
-			long time = ois.readLong();
-			Object obj = ois.readObject();
-			if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
-				AceLog.getLog().warning("Read UniversalAceBean... ");
-				commitAceBean((UniversalAceBean) obj, time);
-			} if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
-				AceLog.getLog().warning("Read UniversalAcePath... ");
-				commitAcePath((UniversalAcePath) obj, time);
+			FileInputStream fis = new FileInputStream(changeSetFile);
+			BufferedInputStream bis = new BufferedInputStream(fis);
+			ObjectInputStream ois = new ObjectInputStream(bis);
+			Class readerClass = (Class) ois.readObject();
+			if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
+				AceLog.getEditLog().fine(
+						"Now reading change set with BinaryChangeSetReader");
 			} else {
-				throw new IOException("Can't handle class: "
-						+ obj.getClass().getName());
+				AceLog.getAppLog()
+						.warning("ReaderClass "
+									+ readerClass.getName()
+									+ " is not assignable from BinaryChangeSetReader...");
 			}
-		}
-		AceLog.getLog().warning("Now syncing database... ");
-		AceConfig.vodb.sync();
+
+			Set<TimePathId> values = new HashSet<TimePathId>();
+			try {
+				while (true) {
+					long time = ois.readLong();
+					Object obj = ois.readObject();
+					if (counter != null) {
+						counter.increment();
+					}
+					if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
+						AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
+						ACE.addImported(commitAceBean((UniversalAceBean) obj, time, values));
+					} else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
+						AceLog.getEditLog().fine("Read UniversalAcePath... " + obj);
+						commitAcePath((UniversalAcePath) obj, time);
+					} else {
+						throw new IOException("Can't handle class: "
+								+ obj.getClass().getName());
+					}
+
+				}
+			} catch (EOFException ex) {
+
+			}
+			AceConfig.vodb.addTimeBranchValues(values);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		} catch (TerminologyException e) {
 			throw new ToIoException(e);
 		}
 	}
-	private void commitAcePath(UniversalAcePath path, long time) throws DatabaseException, TerminologyException, IOException {
+
+	private void commitAcePath(UniversalAcePath path, long time)
+			throws DatabaseException, TerminologyException, IOException {
+		AceLog.getEditLog().fine("Importing new universal path: \n" + path);
 		List<I_Position> origins = null;
 		try {
 			I_Path newPath = AceConfig.vodb.getPath(getNid(path.getPathId()));
-			AceLog.getLog().info("Importing path that already exists: \n" + path + "\n\n" + newPath);
+			AceLog.getEditLog().fine(
+					"Importing path that already exists: \n" + path + "\n\n"
+							+ newPath);
 		} catch (DatabaseException e) {
 			if (path.getOrigins() != null) {
 				origins = new ArrayList<I_Position>(path.getOrigins().size());
-				for (UniversalAcePosition pos: path.getOrigins()) {
-					I_Path thinPath = AceConfig.vodb.getPath(getNid(pos.getPathId()));
-					origins.add(new Position(ThinVersionHelper.convert(pos.getTime()), thinPath));
+				for (UniversalAcePosition pos : path.getOrigins()) {
+					I_Path thinPath = AceConfig.vodb.getPath(getNid(pos
+							.getPathId()));
+					origins.add(new Position(ThinVersionHelper.convert(pos
+							.getTime()), thinPath));
 				}
 			}
 			Path newPath = new Path(getNid(path.getPathId()), origins);
+			AceLog.getEditLog().fine("writing new path: \n" + newPath);
 			AceConfig.vodb.writePath(newPath);
-			AceLog.getLog().info("Importing new path: \n" + newPath);
 		}
-		
+
 	}
-	private void commitAceBean(UniversalAceBean bean, long time)
+
+	private ConceptBean commitAceBean(UniversalAceBean bean, long time, Set<TimePathId> values)
 			throws IOException, ClassNotFoundException {
 		try {
 			// Do all the commiting...
-			commitUncommittedIds(time, bean);
-			commitUncommittedDescriptions(time, bean);
-			commitUncommittedRelationships(time, bean);
-			commitUncommittedConceptAttributes(time, bean);
-			commitUncommittedImages(time, bean);
+			commitUncommittedIds(time, bean, values);
+			commitUncommittedDescriptions(time, bean, values);
+			commitUncommittedRelationships(time, bean, values);
+			commitUncommittedConceptAttributes(time, bean, values);
+			commitUncommittedImages(time, bean, values);
 
-			commitDescriptionChanges(time, bean);
-			commitRelationshipChanges(time, bean);
-			commitConceptAttributeChanges(time, bean);
-			commitImageChanges(time, bean);
-			
+			commitDescriptionChanges(time, bean, values);
+			commitRelationshipChanges(time, bean, values);
+			commitConceptAttributeChanges(time, bean, values);
+			commitImageChanges(time, bean, values);
+
 			ConceptBean localBean = ConceptBean.get(bean.getId().getUIDs());
 			localBean.flush();
+			return localBean;
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		} catch (TerminologyException e) {
@@ -146,14 +175,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		return AceConfig.vodb.uuidToNative(uids);
 	}
 
-	private void commitConceptAttributeChanges(long time,
-			UniversalAceBean bean) throws DatabaseException,
-			TerminologyException, IOException {
+	private void commitConceptAttributeChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
+			throws DatabaseException, TerminologyException, IOException {
 		if (bean.getConceptAttributes() != null) {
 			UniversalAceConceptAttributes attributes = bean
 					.getConceptAttributes();
 			ThinConVersioned thinAttributes = (ThinConVersioned) AceConfig.vodb
-			.getConcept(getNid(attributes.getConId()));
+					.getConcept(getNid(attributes.getConId()));
 			boolean changed = false;
 			for (UniversalAceConceptAttributesPart part : attributes
 					.getVersions()) {
@@ -165,17 +193,19 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setDefined(part.isDefined());
 					newPart.setVersion(ThinVersionHelper.convert(time));
 					thinAttributes.addVersion(newPart);
+					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				}
 			}
 			if (changed) {
 				AceConfig.vodb.writeConcept(thinAttributes);
-				AceLog.getLog().info("Importing changed attributes: \n" + thinAttributes);
+				AceLog.getEditLog().fine(
+						"Importing changed attributes: \n" + thinAttributes);
 			}
 		}
 	}
 
 	private void commitUncommittedConceptAttributes(long time,
-			UniversalAceBean bean) throws DatabaseException,
+			UniversalAceBean bean, Set<TimePathId> values) throws DatabaseException,
 			TerminologyException, IOException {
 		if (bean.getUncommittedConceptAttributes() != null) {
 			UniversalAceConceptAttributes attributes = bean
@@ -191,26 +221,28 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				if (part.getTime() == Long.MAX_VALUE) {
 					newPart.setVersion(ThinVersionHelper.convert(time));
 				} else {
-					newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+					newPart.setVersion(ThinVersionHelper
+							.convert(part.getTime()));
 				}
+				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				thinAttributes.addVersion(newPart);
 			}
 			try {
 				ThinConVersioned oldVersioned = (ThinConVersioned) AceConfig.vodb
 						.getConcept(thinAttributes.getConId());
 				oldVersioned.merge(thinAttributes);
-				AceLog.getLog().info(
+				AceLog.getEditLog().fine(
 						"Merging attributes with existing (should have been null): \n"
 								+ thinAttributes + "\n\n" + oldVersioned);
 			} catch (DatabaseException e) {
 				// expected exception...
 			}
 			AceConfig.vodb.writeConcept(thinAttributes);
-			AceLog.getLog().info("Importing attributes: \n" + thinAttributes);
+			AceLog.getEditLog().fine("Importing attributes: \n" + thinAttributes);
 		}
 	}
 
-	private void commitImageChanges(long time, UniversalAceBean bean)
+	private void commitImageChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceImage image : bean.getImages()) {
 			ThinImageVersioned thinImage = (ThinImageVersioned) AceConfig.vodb
@@ -226,16 +258,17 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setTypeId(getNid(part.getTypeId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
 					thinImage.addVersion(newPart);
+					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				}
 			}
 			if (changed) {
 				AceConfig.vodb.writeImage(thinImage);
-				AceLog.getLog().info("Importing image changes: \n" + thinImage);
+				AceLog.getEditLog().fine("Importing image changes: \n" + thinImage);
 			}
 		}
 	}
 
-	private void commitUncommittedImages(long time, UniversalAceBean bean)
+	private void commitUncommittedImages(long time, UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceImage image : bean.getUncommittedImages()) {
 			ThinImageVersioned thinImage = new ThinImageVersioned(getNid(image
@@ -251,73 +284,86 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				if (part.getTime() == Long.MAX_VALUE) {
 					newPart.setVersion(ThinVersionHelper.convert(time));
 				} else {
-					newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+					newPart.setVersion(ThinVersionHelper
+							.convert(part.getTime()));
 				}
+				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				thinImage.addVersion(newPart);
 			}
 			try {
 				ThinImageVersioned oldVersioned = (ThinImageVersioned) AceConfig.vodb
 						.getImage(thinImage.getImageId());
 				oldVersioned.merge(thinImage);
-				AceLog.getLog().info(
+				AceLog.getEditLog().fine(
 						"Merging image with existing (should have been null): \n"
 								+ thinImage + "\n\n" + oldVersioned);
 			} catch (DatabaseException e) {
 				// expected exception...
 			}
 			AceConfig.vodb.writeImage(thinImage);
-			AceLog.getLog().info("Importing image: \n" + thinImage);
+			AceLog.getEditLog().fine("Importing image: \n" + thinImage);
 		}
 	}
-	private void commitUncommittedRelationships(long time, UniversalAceBean bean)
-	throws DatabaseException, TerminologyException, IOException {
-for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
-	ThinRelVersioned thinRel = new ThinRelVersioned(getNid(rel
-			.getRelId()), getNid(rel.getC1Id()), getNid(rel.getC2Id()),
-			rel.versionCount());
-	for (UniversalAceRelationshipPart part : rel.getVersions()) {
-		ThinRelPart newPart = new ThinRelPart();
-		newPart.setCharacteristicId(getNid(part.getCharacteristicId()));
-		newPart.setGroup(part.getGroup());
-		newPart.setPathId(getNid(part.getPathId()));
-		newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-		newPart.setRelTypeId(getNid(part.getRelTypeId()));
-		newPart.setStatusId(getNid(part.getStatusId()));
-		newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
-		if (part.getTime() == Long.MAX_VALUE) {
-			newPart.setVersion(ThinVersionHelper.convert(time));
-		} else {
-			newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+
+	private void commitUncommittedRelationships(long time, UniversalAceBean bean, Set<TimePathId> values)
+			throws DatabaseException, TerminologyException, IOException {
+		for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
+			ThinRelVersioned thinRel = new ThinRelVersioned(getNid(rel
+					.getRelId()), getNid(rel.getC1Id()), getNid(rel.getC2Id()),
+					rel.versionCount());
+			for (UniversalAceRelationshipPart part : rel.getVersions()) {
+				ThinRelPart newPart = new ThinRelPart();
+				newPart.setCharacteristicId(getNid(part.getCharacteristicId()));
+				newPart.setGroup(part.getGroup());
+				newPart.setPathId(getNid(part.getPathId()));
+				newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
+				newPart.setRelTypeId(getNid(part.getRelTypeId()));
+				newPart.setStatusId(getNid(part.getStatusId()));
+				newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+				if (part.getTime() == Long.MAX_VALUE) {
+					newPart.setVersion(ThinVersionHelper.convert(time));
+				} else {
+					newPart.setVersion(ThinVersionHelper
+							.convert(part.getTime()));
+				}
+				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+				thinRel.addVersion(newPart);
+			}
+			try {
+				ThinRelVersioned oldVersioned = (ThinRelVersioned) AceConfig.vodb
+						.getRel(thinRel.getRelId());
+				oldVersioned.merge(thinRel);
+				AceLog.getEditLog().fine(
+						"Merging rel with existing (should have been null): \n"
+								+ thinRel + "\n\n" + oldVersioned);
+			} catch (DatabaseException e) {
+				// expected exception...
+			}
+			AceConfig.vodb.writeRel(thinRel);
+			if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+				AceLog.getEditLog().fine("Importing rel: \n" + thinRel);
+				List<I_RelVersioned> destRels = AceConfig.vodb.getDestRels(thinRel.getC2Id());
+				if (destRels.contains(thinRel)) {
+					AceLog.getEditLog().fine("found in dest rels.");
+				} else {
+					AceLog.getEditLog().severe("NOT found in dest rels: " + destRels);
+				}
+			}
 		}
-		thinRel.addVersion(newPart);
 	}
-	try {
-		ThinRelVersioned oldVersioned = (ThinRelVersioned) AceConfig.vodb
-				.getRel(thinRel.getRelId());
-		oldVersioned.merge(thinRel);
-		AceLog.getLog().info(
-				"Merging rel with existing (should have been null): \n"
-						+ thinRel + "\n\n" + oldVersioned);
-	} catch (DatabaseException e) {
-		// expected exception...
-	}
-	AceConfig.vodb.writeRel(thinRel);
-	AceLog.getLog().info("Importing rel: \n" + thinRel);
-}
-}
 
-
-	private void commitRelationshipChanges(long time, UniversalAceBean bean)
+	private void commitRelationshipChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceRelationship rel : bean.getSourceRels()) {
 			ThinRelVersioned thinRel = (ThinRelVersioned) AceConfig.vodb
-			.getRel(getNid(rel.getRelId()));
+					.getRel(getNid(rel.getRelId()));
 			boolean changed = false;
 			for (UniversalAceRelationshipPart part : rel.getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
 					changed = true;
 					ThinRelPart newPart = new ThinRelPart();
-					newPart.setCharacteristicId(getNid(part.getCharacteristicId()));
+					newPart.setCharacteristicId(getNid(part
+							.getCharacteristicId()));
 					newPart.setGroup(part.getGroup());
 					newPart.setPathId(getNid(part.getPathId()));
 					newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
@@ -325,16 +371,17 @@ for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 					newPart.setStatusId(getNid(part.getStatusId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
 					thinRel.addVersion(newPart);
+					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				}
 			}
 			if (changed) {
 				AceConfig.vodb.writeRel(thinRel);
-				AceLog.getLog().info("Importing rel: \n" + thinRel);
+				AceLog.getEditLog().fine("Importing rel: \n" + thinRel);
 			}
 		}
 	}
 
-	private void commitDescriptionChanges(long time, UniversalAceBean bean)
+	private void commitDescriptionChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceDescription desc : bean.getDescriptions()) {
 			ThinDescVersioned thinDesc = (ThinDescVersioned) AceConfig.vodb
@@ -352,17 +399,18 @@ for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 					newPart.setText(part.getText());
 					newPart.setTypeId(getNid(part.getTypeId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
+					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 					thinDesc.addVersion(newPart);
 				}
 			}
 			if (changed) {
 				AceConfig.vodb.writeDescription(thinDesc);
-				AceLog.getLog().info("Importing desc changes: \n" + thinDesc);
+				AceLog.getEditLog().fine("Importing desc changes: \n" + thinDesc);
 			}
 		}
 	}
 
-	private void commitUncommittedDescriptions(long time, UniversalAceBean bean)
+	private void commitUncommittedDescriptions(long time, UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
 			ThinDescVersioned thinDesc = new ThinDescVersioned(getNid(desc
@@ -381,28 +429,31 @@ for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 				if (part.getTime() == Long.MAX_VALUE) {
 					newPart.setVersion(ThinVersionHelper.convert(time));
 				} else {
-					newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+					newPart.setVersion(ThinVersionHelper
+							.convert(part.getTime()));
 				}
+				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				thinDesc.addVersion(newPart);
 			}
 			try {
 				ThinDescVersioned oldDescVersioned = (ThinDescVersioned) AceConfig.vodb
 						.getDescription(thinDesc.getDescId());
 				oldDescVersioned.merge(thinDesc);
-				AceLog.getLog().info(
+				AceLog.getEditLog().fine(
 						"Merging desc with existing (should have been null): \n"
 								+ thinDesc + "\n\n" + oldDescVersioned);
 			} catch (DatabaseException e) {
 				// expected exception...
 			}
 			AceConfig.vodb.writeDescription(thinDesc);
-			AceLog.getLog().info("Importing desc: \n" + thinDesc);
+			AceLog.getEditLog().fine("Importing desc: \n" + thinDesc);
 		}
 	}
 
-	private void commitUncommittedIds(long time, UniversalAceBean bean)
+	private void commitUncommittedIds(long time, UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceIdentification id : bean.getUncommittedIds()) {
+			AceLog.getEditLog().fine("commitUncommittedIds: " + id);
 			ThinIdVersioned tid = null;
 			for (UniversalAceIdentificationPart part : id.getVersions()) {
 				I_Path path = AceConfig.vodb.getPath(AceConfig.vodb
@@ -410,9 +461,10 @@ for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 				if (tid == null) {
 					try {
 						int nid = getNid(id.getUIDs());
-						AceLog.getLog().info(
+						AceLog.getEditLog().fine(
 								"Uncommitted id already exists: \n" + id);
 						tid = (ThinIdVersioned) AceConfig.vodb.getId(nid);
+						AceLog.getEditLog().fine("found ThinIdVersioned: " + tid);
 					} catch (NoMappingException ex) {
 						/*
 						 * Generate on the ARCHITECTONIC_BRANCH for now, it will
@@ -420,25 +472,27 @@ for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 						 * database, with the proper branch and version values.
 						 */
 						int nid = AceConfig.vodb
-								.uuidToNativeWithGeneration(
-										ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-												.getUids(), Integer.MAX_VALUE,
+								.uuidToNativeWithGeneration(id.getUIDs(), Integer.MAX_VALUE,
 										path, ThinVersionHelper.convert(time));
 						tid = new ThinIdVersioned(nid, id.getVersions().size());
+						AceLog.getEditLog().fine("created ThinIdVersioned: " + tid);
 					}
 				}
 				ThinIdPart newPart = new ThinIdPart();
 				newPart.setIdStatus(getNid(part.getIdStatus()));
-				newPart
-						.setPathId(AceConfig.vodb
+				newPart.setPathId(AceConfig.vodb
 								.uuidToNative(part.getPathId()));
-				newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+				newPart.setSource(getNid(part.getSource()));
+				newPart.setSourceId(part.getSourceId());
 				if (part.getTime() == Long.MAX_VALUE) {
 					newPart.setVersion(ThinVersionHelper.convert(time));
 				} else {
-					newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+					newPart.setVersion(ThinVersionHelper
+							.convert(part.getTime()));
 				}
+				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
 				tid.addVersion(newPart);
+				AceLog.getEditLog().fine(" add version: " + newPart);
 			}
 			/*
 			 * The ARCHITECTONIC_BRANCH will be overridden here with the proper
@@ -447,11 +501,17 @@ for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 			AceConfig.vodb.writeId(tid);
 		}
 	}
+
 	public File getChangeSetFile() {
 		return changeSetFile;
 	}
+
 	public void setChangeSetFile(File changeSetFile) {
 		this.changeSetFile = changeSetFile;
+	}
+
+	public void setCounter(I_Count counter) {
+		this.counter = counter;
 	}
 
 }

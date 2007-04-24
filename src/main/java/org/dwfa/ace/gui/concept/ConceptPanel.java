@@ -58,6 +58,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
@@ -79,6 +80,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 		public void propertyChange(PropertyChangeEvent evt) {
 			updateTab(label.getTermComponent());
+			if (label.getTermComponent() != null) {
+				ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
+			}
 			firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt
 					.getNewValue());
 		}
@@ -93,7 +97,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					try {
 						contentScroller.setViewportView(getContentPane());
 					} catch (DatabaseException e) {
-						AceLog.getLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+						AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
 								"Database Exception: "
 										+ e.getLocalizedMessage(), e);
 					}
@@ -111,7 +115,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			try {
 				contentScroller.setViewportView(getContentPane());
 			} catch (DatabaseException e1) {
-				AceLog.getLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+				AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
 						"Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
 		}
@@ -469,7 +473,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						"Execution of " + bp.getName() + " complete.");
 			} catch (Exception e1) {
 				getConfig().setStatusMessage("Exception during execution.");
-				AceLog.getLog().alertAndLogException(e1);
+				AceLog.getAppLog().alertAndLogException(e1);
 			}
 		}
 
@@ -505,7 +509,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						desc = cb.getInitialText();
 					}
 				} catch (IOException e) {
-					AceLog.getLog().alertAndLogException(e);
+					AceLog.getAppLog().alertAndLogException(e);
 					desc = termComponent.toString();
 				}
 				String shortDesc;
@@ -567,6 +571,17 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		if (evt.getPropertyName().equals("viewPositions")) {
 			historyChangeActionListener.actionPerformed(null);
 		} else if (evt.getPropertyName().equals("commit")) {
+			if (label.getTermComponent() != null ) {
+				ConceptBean cb = (ConceptBean) label.getTermComponent();
+				try {
+					if (cb.getConceptAttributes() == null) {
+						label.setTermComponent(null);
+					}
+				} catch (IOException e) {
+					label.setTermComponent(null);
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			}
 			this.firePropertyChange("commit", null, null);
 		}
 	}
@@ -594,6 +609,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				.getUids());
 		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+		AceLog.getEditLog().info("Creating new concept: " + newConceptId + " (" + nid + ") defined: " + defined);
 		ConceptBean newBean = ConceptBean.get(nid);
 		newBean.setPrimordial(true);
 		int status = AceConfig.vodb
@@ -626,6 +642,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		int descId = AceConfig.vodb.uuidToNativeWithGeneration(
 				newDescriptionId, idSource, getConfig().getEditingPathSet(),
 				Integer.MAX_VALUE);
+		AceLog.getEditLog().info("Creating new description: " + newDescriptionId + " (" + descId + "): " + text);
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), getConfig().getEditingPathSet().size());
 		boolean capStatus = false;
@@ -658,6 +675,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						.getUids());
 		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+		AceLog.getEditLog().info("Creating new relationship 1: " + newRelUid + " (" + relId + ") from " + 
+				concept.getUids() + " to " + getConfig().getHierarchySelection().getUids());
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), getConfig().getHierarchySelection()
 				.getConceptId(), 1);
@@ -699,6 +718,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
 		
+		AceLog.getEditLog().info("Creating new relationship 2: " + newRelUid + " (" + relId + ") from " + 
+				concept.getUids() + " to " + relDestination.getUids());
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), relDestination.getNid(), getConfig().getEditingPathSet().size());
 		
@@ -729,5 +750,29 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		if (getConfig().getEditingPathSet().size() == 0) {
 			throw new TerminologyException("<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
 		}
+	}
+
+	public void forget(I_GetConceptData concept) {
+		try {
+			AceLog.getEditLog().info("Forgetting: " + concept.getUids());
+		} catch (IOException e) {
+			AceLog.getEditLog().alertAndLogException(e);
+		}
+		ACE.removeUncommitted((I_Transact) concept);
+		label.setTermComponent(null);
+	}
+
+	public void forget(I_DescriptionVersioned desc) {
+		throw new UnsupportedOperationException();
+		
+	}
+
+	public void forget(I_RelVersioned rel) {
+		throw new UnsupportedOperationException();
+		
+	}
+
+	public LogWithAlerts getEditLog() {
+		return AceLog.getEditLog();
 	}
 }

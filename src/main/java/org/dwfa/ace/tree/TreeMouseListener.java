@@ -89,7 +89,7 @@ public class TreeMouseListener implements MouseListener {
 					if (t.getC2Id() == parentBean
 							.getConceptId() && treeBean
 							.getParentDepth() == 0) {
-						AceLog.getLog().info(" parent depth: " + treeBean
+						AceLog.getAppLog().info(" parent depth: " + treeBean
 						.getParentDepth());
 						continue;
 					}
@@ -109,7 +109,7 @@ public class TreeMouseListener implements MouseListener {
 						newNodeIndices);
 
 			} catch (IOException e) {
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		} else { // remove nodes
 			removeAllExtraParents(model, treeBean, parentNode);

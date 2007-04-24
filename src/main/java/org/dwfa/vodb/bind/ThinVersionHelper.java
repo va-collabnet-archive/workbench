@@ -31,7 +31,7 @@ public class ThinVersionHelper {
 		timeZero.set(2028, 0, 1);
 		zeroRef = timeZero.getTimeInMillis();
 		*/
-		AceLog.getLog().info("Zero ref is: " + timeZero);
+		AceLog.getAppLog().info("Zero ref is: " + timeZero);
 	}
 	private static ThreadLocal<SimpleDateFormat> dateFormatterTL = new ThreadLocal<SimpleDateFormat>();
 	

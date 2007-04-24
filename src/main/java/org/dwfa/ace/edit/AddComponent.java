@@ -28,7 +28,7 @@ public abstract class AddComponent implements ActionListener {
 			}
 			doEdit(termContainer, e, config);
 		} catch (Exception e1) {
-			AceLog.getLog().alertAndLogException(e1);
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
 

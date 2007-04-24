@@ -49,13 +49,19 @@ public class Path implements I_Transact, Serializable, I_Path {
 		}
 	}
 
-	public boolean equals(Path another) {
-		return (conceptId == another.conceptId);
+	public boolean equals(I_Path another) {
+		return (conceptId == another.getConceptId());
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return equals((Path) obj);
+		if (obj == null) {
+			return false;
+		}
+		if (I_Path.class.isAssignableFrom(obj.getClass())) {
+			return equals((I_Path) obj);
+		}
+		return false;
 	}
 
 	@Override
@@ -156,16 +162,15 @@ public class Path implements I_Transact, Serializable, I_Path {
 			throws DatabaseException, ParseException, TerminologyException,
 			IOException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		List<I_Position> origins = new ArrayList<I_Position>(1);
 
 		List<I_Path> basePaths = new ArrayList<I_Path>();
 		Path aceRelease = new Path(
 				vodb
 						.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
 								.getUids()), null);
-		basePaths.add(aceRelease);
-
+		//basePaths.add(aceRelease);
 		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
-		List<I_Position> origins = new ArrayList<I_Position>(1);
 		origins.add(latestAceRelease);
 
 		Path snomedCore = new Path(vodb
@@ -212,7 +217,7 @@ public class Path implements I_Transact, Serializable, I_Path {
 			vodb.sync();
 			vodb.close();
 		} catch (Exception ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 		System.exit(0);
 	}

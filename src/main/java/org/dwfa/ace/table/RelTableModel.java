@@ -138,9 +138,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			updator.normalCompletionForUpdator();
@@ -220,7 +220,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			tableBean = cb;
 			fireTableDataChanged();
@@ -301,7 +301,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			allTuples = getRels(tableBean, host.getUsePrefs(), getShowHistory());
 			return allTuples.size();
 		} catch (IOException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return 0;
 	}
@@ -387,7 +387,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						Integer.toString(rel.getPathId()), rel);
 			}
 		} catch (IOException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return "No case found for: " + field;
 	}
@@ -737,7 +737,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					allTuples = null;
 					RelTableModel.this.fireTableDataChanged();
 				} catch (IOException ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}
@@ -780,7 +780,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					allTuples = null;
 					RelTableModel.this.fireTableDataChanged();
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}

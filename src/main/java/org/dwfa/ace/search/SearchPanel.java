@@ -33,6 +33,7 @@ import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -93,6 +94,8 @@ public class SearchPanel extends JPanel {
 	private TableSorter sortingTable;
 	
 	private Set<I_ContainTermComponent> linkedComponents = new HashSet<I_ContainTermComponent>();
+
+	private TermComponentLabel rootConceptLabel;
 
 	public SearchPanel(I_ConfigAceFrame config) {
 		super(new GridBagLayout());
@@ -173,7 +176,7 @@ public class SearchPanel extends JPanel {
 		gbc.gridx++;
 		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		TermComponentLabel rootConceptLabel = new TermComponentLabel(config);
+		rootConceptLabel = new TermComponentLabel(config);
 		add(rootConceptLabel, gbc);
 
 		gbc.gridx++;
@@ -284,5 +287,9 @@ public class SearchPanel extends JPanel {
 	}
 	public void removeLinkedComponent(I_ContainTermComponent component) {
 		linkedComponents.remove(component);
+	}
+
+	public I_GetConceptData getRootConcept() {
+		return (I_GetConceptData) rootConceptLabel.getTermComponent();
 	}
 }

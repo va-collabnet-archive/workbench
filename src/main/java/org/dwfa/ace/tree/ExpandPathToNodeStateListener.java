@@ -36,7 +36,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			for (I_RelTuple r: rels) {
 				ConceptBean parent = ConceptBean.get(r.getC2Id());
 				ancestors.add(0, parent);
-				AceLog.getLog().info("Adding parent: " + parent);
+				AceLog.getAppLog().info("Adding parent: " + parent);
 				rels = parent.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(), 
 						config.getViewPositionSet(), true);
 				break;
@@ -48,7 +48,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			DefaultMutableTreeNode termRoot = (DefaultMutableTreeNode) rootNode.getChildAt(i);
 			tree.collapsePath(new TreePath(termRoot.getPath()));
 		}
-		AceLog.getLog().info("All should be collapsed.");
+		AceLog.getAppLog().info("All should be collapsed.");
 		
 		for (I_GetConceptData child: ancestors) {
 			boolean found = false;
@@ -64,15 +64,15 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 				}
 			}
 			if (found == false) {
-				AceLog.getLog().info("Could not find node for: " + child);
+				AceLog.getAppLog().info("Could not find node for: " + child);
 			}
 		}
 		
 		//TreePath pathToShow;
 		//tree.expandPath(pathToShow);
 		
-		AceLog.getLog().info("Dropped on JTreeWithDragImage: " + focus);
-		AceLog.getLog().info("Expansion list: " + ancestors);
+		AceLog.getAppLog().info("Dropped on JTreeWithDragImage: " + focus);
+		AceLog.getAppLog().info("Expansion list: " + ancestors);
 	}
 
 
@@ -97,7 +97,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 				}
 			}
 			if (found == false) {
-				AceLog.getLog().info("Could not find node for: " + child);
+				AceLog.getAppLog().info("Could not find node for: " + child);
 				allFound = false;
 			} 
 		}

@@ -98,13 +98,13 @@ public class JTableWithDragImage extends JTable {
 			Point imageOffset = new Point(-10, -(dragImage.getHeight(JTableWithDragImage.this) + 1));
 			try {
 				Transferable t = getTransferable(obj, column);
-				AceLog.getLog().info("Created transferable: " + t);
+				AceLog.getAppLog().info("Created transferable: " + t);
 				dge.startDrag(DragSource.DefaultCopyDrop, dragImage,
 						imageOffset, t, dsl);
 			} catch (InvalidDnDOperationException e) {
-				AceLog.getLog().info(e.toString());
+				AceLog.getAppLog().info(e.toString());
 			} catch (Exception ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 		}
 

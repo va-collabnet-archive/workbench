@@ -12,6 +12,7 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
 
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -162,13 +163,13 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public List<I_DescriptionTuple> getDescriptionTuples(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positionSet) throws IOException {
-		List<I_DescriptionTuple> returnRels = new ArrayList<I_DescriptionTuple>();
+		List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
 		for (I_DescriptionVersioned desc : getDescriptions()) {
 			desc
 					.addTuples(allowedStatus, allowedTypes, positionSet,
-							returnRels);
+							returnDescriptions);
 		}
-		return returnRels;
+		return returnDescriptions;
 	}
 
 	/*
@@ -267,7 +268,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		try {
 			return getInitialText();
 		} catch (IOException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 			return ex.toString();
 		}
 	}
@@ -439,7 +440,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 */
 	public void commit(int version, Set<TimePathId> values) throws IOException {
 		// handle the parts first...
-		AceLog.getLog().info("Starting commit for ConceptBean: " + this);
+		AceLog.getEditLog().info("Starting commit for ConceptBean: " + this);
+		StringBuffer buff = null;
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			buff = new StringBuffer();
+		}
 		try {
 			if (images != null) {
 				for (I_ImageVersioned image : images) {
@@ -449,6 +454,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 							p.setVersion(version);
 							values.add(new TimePathId(version, p.getPathId()));
 							changed = true;
+							if (buff != null) {
+								buff.append("\n  Committing: " + p);
+							}
 						}
 					}
 					if (changed) {
@@ -463,6 +471,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
 						changed = true;
+						if (buff != null) {
+							buff.append("\n  Committing: " + p);
+						}
 					}
 					if (changed) {
 						AceConfig.vodb.writeConcept(conceptAttributes);
@@ -477,6 +488,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 							p.setVersion(version);
 							values.add(new TimePathId(version, p.getPathId()));
 							changed = true;
+							if (buff != null) {
+								buff.append("\n  Committing: " + p);
+							}
 						}
 					}
 					if (changed) {
@@ -498,6 +512,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					AceConfig.vodb.writeImage(image);
+					if (buff != null) {
+						buff.append("\n  Committing: " + image);
+					}
 				}
 				uncommittedImages = null;
 				images = null;
@@ -508,6 +525,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						p.setVersion(version);
 						values.add(new TimePathId(version, p.getPathId()));
+						if (buff != null) {
+							buff.append("\n  Committing: " + p);
+						}
 					}
 				}
 				AceConfig.vodb.writeConcept(uncommittedConceptAttributes);
@@ -523,6 +543,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					AceConfig.vodb.writeDescription(desc);
+					if (buff != null) {
+						buff.append("\n  Committing: " + desc);
+					}
 				}
 				uncommittedDescriptions = null;
 				descriptions = null;
@@ -538,6 +561,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					AceConfig.vodb.writeRel(rel);
+					if (buff != null) {
+						buff.append("\n  Committing: " + rel);
+					}
 				}
 				uncommittedSourceRels = null;
 				sourceRels = null;
@@ -552,13 +578,19 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					AceConfig.vodb.writeId(idv);
+					if (buff != null) {
+						buff.append("\n  Committing: " + idv);
+					}
 				}
 			}
 			setPrimordial(false);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
-		AceLog.getLog().info("Finished commit for ConceptBean: " + this);
+		AceLog.getAppLog().info("Finished commit for ConceptBean: " + this);
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(buff.toString());
+		}
 	}
 
 	private void flushDestRelsOnTargetBeans(int version, Set<TimePathId> values)
@@ -638,53 +670,51 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 
 			// remove uncommitted parts...
-			for (ListIterator<I_ConceptAttributePart> partItr = conceptAttributes
-					.getVersions().listIterator(); partItr.hasNext();) {
-				I_ConceptAttributePart part = partItr.next();
-				if (part.getVersion() == Integer.MAX_VALUE) {
-					partItr.remove();
-				}
-			}
-
-			for (I_DescriptionVersioned desc : descriptions) {
-				for (ListIterator<I_DescriptionPart> partItr = desc
+			if (conceptAttributes != null) {
+				for (ListIterator<I_ConceptAttributePart> partItr = conceptAttributes
 						.getVersions().listIterator(); partItr.hasNext();) {
-					I_DescriptionPart part = partItr.next();
+					I_ConceptAttributePart part = partItr.next();
 					if (part.getVersion() == Integer.MAX_VALUE) {
 						partItr.remove();
+					}
+				}
+			}
+			if (descriptions != null) {
+				for (I_DescriptionVersioned desc : descriptions) {
+					for (ListIterator<I_DescriptionPart> partItr = desc
+							.getVersions().listIterator(); partItr.hasNext();) {
+						I_DescriptionPart part = partItr.next();
+						if (part.getVersion() == Integer.MAX_VALUE) {
+							partItr.remove();
+						}
 					}
 				}
 			}
 
-			for (I_RelVersioned srcRel : sourceRels) {
-				for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
-						.listIterator(); partItr.hasNext();) {
-					I_RelPart part = partItr.next();
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						partItr.remove();
+			if (sourceRels != null) {
+				for (I_RelVersioned srcRel : sourceRels) {
+					for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
+							.listIterator(); partItr.hasNext();) {
+						I_RelPart part = partItr.next();
+						if (part.getVersion() == Integer.MAX_VALUE) {
+							partItr.remove();
+						}
+					}
+				}
+			}
+			
+			if (images != null) {
+				for (I_ImageVersioned img : images) {
+					for (ListIterator<I_ImagePart> partItr = img.getVersions()
+							.listIterator(); partItr.hasNext();) {
+						I_ImagePart part = partItr.next();
+						if (part.getVersion() == Integer.MAX_VALUE) {
+							partItr.remove();
+						}
 					}
 				}
 			}
 
-			for (I_RelVersioned srcRel : destRels) {
-				for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
-						.listIterator(); partItr.hasNext();) {
-					I_RelPart part = partItr.next();
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						partItr.remove();
-					}
-				}
-			}
-
-			for (I_ImageVersioned img : images) {
-				for (ListIterator<I_ImagePart> partItr = img.getVersions()
-						.listIterator(); partItr.hasNext();) {
-					I_ImagePart part = partItr.next();
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						partItr.remove();
-					}
-				}
-			}
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
@@ -961,7 +991,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	}
 
 	private void flushDestRels() {
-		AceLog.getLog().info("Flushing destination rels for: " + this);
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine("Flushing destination rels for: " + this);
+		}
 		this.destRels = null;
 	}
 

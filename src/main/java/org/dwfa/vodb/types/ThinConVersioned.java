@@ -274,4 +274,20 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 		}
 		return conceptAttributes;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("NativeId: ");
+		buf.append(conId);
+		buf.append(" parts: ");
+		buf.append(versions.size());
+		buf.append("\n  ");
+		for (I_ConceptAttributePart p: versions) {
+			buf.append(p);
+			buf.append("\n  ");
+		}
+		return buf.toString();
+	}
+
 }

@@ -36,7 +36,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 14;
+    private static final int dataVersion = 15;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -84,8 +84,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private String svnWorkingCopy;
     private String changeSetWriterFileName;
     
+    // 15
+    private String username;
+    private String password;
+    
     private transient MasterWorker worker;
     private transient String statusMessage;
+    private transient boolean commitEnabled = false;
+    private transient I_GetConceptData lastViewed;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -145,12 +151,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		out.writeObject(repositoryUrlStr);
 		out.writeObject(svnWorkingCopy);
 		out.writeObject(changeSetWriterFileName);
-    }
+		//15
+		out.writeObject(username);
+		out.writeObject(password);
+   }
 
 
     @SuppressWarnings("unchecked")
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
+    	commitEnabled = false;
         int objDataVersion = in.readInt();
         if (objDataVersion >= 1) {
             this.vetoSupport = new VetoableChangeSupport(this);
@@ -267,6 +277,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         		svnWorkingCopy = (String) in.readObject();
         		changeSetWriterFileName = (String) in.readObject();
             }
+            if (objDataVersion >= 15) {
+        		username = (String) in.readObject();
+        		password = (String) in.readObject();
+             }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -877,4 +891,60 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		this.changeSupport.firePropertyChange("svnWorkingCopy", old, svnWorkingCopy);
 	}
 
+
+	public String getPassword() {
+		return password;
+	}
+
+
+	public void setPassword(String password) {
+		Object old = this.password;
+		this.password = password;
+		this.changeSupport.firePropertyChange("password", old, password);
+	}
+
+
+	public String getUsername() {
+		return username;
+	}
+
+
+	public void setUsername(String username) {
+		Object old = this.username;
+		this.username = username;
+		this.changeSupport.firePropertyChange("username", old, username);
+	}
+
+
+	public boolean isCommitEnabled() {
+		return commitEnabled;
+	}
+
+
+	public void setCommitEnabled(boolean commitEnabled) {
+		boolean old = this.commitEnabled;
+		this.commitEnabled = commitEnabled;
+		this.changeSupport.firePropertyChange("commitEnabled", old, commitEnabled);
+	}
+
+
+	public I_GetConceptData getLastViewed() {
+		return lastViewed;
+	}
+
+
+	public void setLastViewed(I_GetConceptData lastViewed) {
+		if (lastViewed != null) {
+			Object old = this.lastViewed;
+			this.lastViewed = lastViewed;
+			this.changeSupport.firePropertyChange("lastViewed", old, lastViewed);
+		}
+	}
+
+	public void addUncommitted(I_GetConceptData uncommitted) {
+		this.changeSupport.firePropertyChange("uncommitted", null, uncommitted);
+	}
+	public void addImported(I_GetConceptData imported) {
+		this.changeSupport.firePropertyChange("imported", null, imported);
+	}
 }

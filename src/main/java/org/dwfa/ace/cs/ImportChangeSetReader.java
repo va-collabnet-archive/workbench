@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarInputStream;
@@ -20,13 +21,14 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.vodb.bind.ThinDescVersionedBinding;
 
-public class ImportChangeSetReader implements ActionListener {
+public class ImportChangeSetReader implements ActionListener, I_Count {
 
 
 
@@ -115,31 +117,38 @@ public class ImportChangeSetReader implements ActionListener {
 				public void run() {
 					try {
 						importChangeSet(csFile);
+						ACE.commit();
 					} catch (TaskFailedException ex) {
-						AceLog.getLog().alertAndLogException(ex);
+						AceLog.getAppLog().alertAndLogException(ex);
+					} catch (IOException ex) {
+						AceLog.getAppLog().alertAndLogException(ex);
 					}
 				}
 
 			});
 		} catch (TaskFailedException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 	}
 
 	protected void importChangeSet(File csFile) throws TaskFailedException {
 		try {
 
-			lowerProgressMessage = "Processing change set.";
+			lowerProgressMessage = "Processing change set";
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(csFile));
 			Class readerClass = (Class) ois.readObject();
 			ois.close();
 			I_ReadChangeSet reader = (I_ReadChangeSet) readerClass.newInstance();
+			processed = 0;
+			reader.setCounter(this);
 			reader.setChangeSetFile(csFile);
 			reader.read();
 			
-			lowerProgressMessage = "Starting sync.";
+			lowerProgressMessage = "Starting sync ";
 			AceConfig.vodb.sync();
+			upperProgressMessage = "Import complete";
+			lowerProgressMessage = "Finished sync. Components imported: ";
 
 			continueWork = false;
 			if (config != null) {
@@ -158,7 +167,7 @@ public class ImportChangeSetReader implements ActionListener {
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);
 								} catch (Exception e) {
-									AceLog.getLog().alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
+									AceLog.getEditLog().alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
 								}
 							}
 						}
@@ -177,6 +186,10 @@ public class ImportChangeSetReader implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		continueWork = false;
 		lowerProgressMessage = "User stopped action";
+	}
+
+	public void increment() {
+		processed++;
 	}
 
 }

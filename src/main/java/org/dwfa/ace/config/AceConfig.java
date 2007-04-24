@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -37,6 +38,7 @@ import org.dwfa.cement.HL7;
 import org.dwfa.cement.QueueType;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
+import org.dwfa.log.HtmlHandler;
 import org.dwfa.log.LogViewerFrame;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
@@ -118,7 +120,7 @@ public class AceConfig implements Serializable {
     			} catch (DatabaseException e) {
     				IOException ioe = new IOException(e.getMessage());
     				ioe.initCause(e);
-    				AceLog.getLog().alertAndLogException(e);
+    				AceLog.getAppLog().alertAndLogException(e);
     			}
             	aceFrames = (List<AceFrameConfig>) in.readObject();
         	}
@@ -133,9 +135,14 @@ public class AceConfig implements Serializable {
         this.vetoSupport = new VetoableChangeSupport(this);
         this.changeSupport = new PropertyChangeSupport(this);
     }
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SecurityException, IOException {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
+		AceLog.getEditLog().setLevel(Level.FINER);
+		HtmlHandler h = new HtmlHandler(null, "edits");
+		h.setLevel(Level.FINER);
+		AceLog.getEditLog().addHandler(h);
+		AceLog.getEditLog().info("Setting up for editing.");
 		try {
 			String fileStr;
 			if (args.length == 0) {
@@ -154,7 +161,7 @@ public class AceConfig implements Serializable {
 			
 			if (config.isDbCreated() == false) {
 				
-				AceLog.getLog().info("DB not created");
+				AceLog.getAppLog().info("DB not created");
 				int n = JOptionPane.showConfirmDialog(
 					    new JFrame(),
 					    "Would you like to extract the db from your maven repository?",
@@ -163,7 +170,7 @@ public class AceConfig implements Serializable {
 				if (n == JOptionPane.YES_OPTION) {
 					extractMavenLib(config);
 				} else {
-					AceLog.getLog().info("Exiting, user did not want to extract the DB from maven.");
+					AceLog.getAppLog().info("Exiting, user did not want to extract the DB from maven.");
 					return;
 				}
 			}
@@ -178,7 +185,7 @@ public class AceConfig implements Serializable {
 			File logConfigFile = new File(configFile.getParent(), config.loggerRiverConfigFile);
 			if (logConfigFile.exists() == false) {
 	            URL logConfigUrl = AceConfig.class.getResource("/org/dwfa/resources/core/config/logViewer.config");
-	            AceLog.getLog().info("Config file does not exist... " + logConfigUrl);
+	            AceLog.getAppLog().info("Config file does not exist... " + logConfigUrl);
 				InputStream is = logConfigUrl.openStream();
 				FileOutputStream fos = new FileOutputStream(logConfigFile);
 				FileIO.copyFile(is, fos, true);
@@ -189,13 +196,12 @@ public class AceConfig implements Serializable {
 			File aceRiverConfigFile = new File(configFile.getParent(), config.getAceRiverConfigFile());
 			if (aceRiverConfigFile.exists() == false) {
 	            URL configUrl = AceConfig.class.getResource("/org/dwfa/ace/config/ace.config");
-	            AceLog.getLog().info("Config file does not exist... " + configUrl);
+	            AceLog.getAppLog().info("Config file does not exist... " + configUrl);
 				InputStream is = configUrl.openStream();
 				FileOutputStream fos = new FileOutputStream(aceRiverConfigFile);
 				FileIO.copyFile(is, fos, true);
 				is.close();
 			}
-			
 			
 			ACE.setAceConfig(config);
 			for (I_ConfigAceFrame ace: config.aceFrames) {
@@ -205,7 +211,7 @@ public class AceConfig implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 	public static void setupAceConfig(AceConfig config, File configFile, Long cacheSize) throws DatabaseException, ParseException, TerminologyException, IOException, FileNotFoundException {
@@ -216,7 +222,9 @@ public class AceConfig implements Serializable {
 			positions.add(new Position(Integer.MAX_VALUE, p));
 		}
 		af.setViewPositions(positions);
-		
+		for (I_Position pos: positions) {
+			af.addEditingPath(pos.getPath());
+		}
 		IntSet statusPopupTypes = new IntSet();
 		statusPopupTypes.add(vodb.getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
 		statusPopupTypes.add(vodb.getId(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getNativeId());
@@ -335,7 +343,7 @@ public class AceConfig implements Serializable {
 		
 		af.setDefaultRelationshipType(ConceptBean.get(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 		af.setDefaultRelationshipCharacteristic(ConceptBean.get(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()));
-		af.setDefaultRelationshipRefinability(ConceptBean.get(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids()));
+		af.setDefaultRelationshipRefinability(ConceptBean.get(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()));
 		
 		af.setSvnRepository("https://ace-demo.aceworkspace.net/svn/ace-demo/trunk/dev/change-sets");
 		af.setSvnWorkingCopy("target/change-sets");
@@ -398,19 +406,19 @@ public class AceConfig implements Serializable {
 	public static void extractMavenLib(AceConfig config) throws IOException {
 		URL dbUrl = AceConfig.class.getClassLoader().getResource("locator.txt");
 		
-		AceLog.getLog().info(" url: " + dbUrl);
+		AceLog.getAppLog().info(" url: " + dbUrl);
 		String[] pathParts = dbUrl.getPath().split("!");
 		String[] fileProtocolParts = pathParts[0].split(":");
 		
 		File srcJarFile = new File(fileProtocolParts[1].replace("foundation", "ace-bdb").replace("dwfa", "jehri"));
 		File targetDir = config.dbFolder.getParentFile();
-		AceLog.getLog().info("Jar file: " + srcJarFile);
+		AceLog.getAppLog().info("Jar file: " + srcJarFile);
 		if (targetDir.exists() && targetDir.lastModified() == srcJarFile.lastModified()) {
-			AceLog.getLog().info("ace-db is current...");
+			AceLog.getAppLog().info("ace-db is current...");
 		} else {
-			AceLog.getLog().info("ace-db needs update...");
+			AceLog.getAppLog().info("ace-db needs update...");
 			targetDir.mkdirs();
-			AceLog.getLog().info("Now extracting into: " + targetDir.getCanonicalPath());
+			AceLog.getAppLog().info("Now extracting into: " + targetDir.getCanonicalPath());
 			JarExtractor.execute(srcJarFile, targetDir);
 			targetDir.setLastModified(srcJarFile.lastModified());
 		}

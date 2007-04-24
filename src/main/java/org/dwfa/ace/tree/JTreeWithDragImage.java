@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -100,9 +101,9 @@ public class JTreeWithDragImage extends JTree {
 					dge.startDrag(DragSource.DefaultCopyDrop, dragImage,
 							imageOffset, getTransferable(obj), dsl);
 				} catch (InvalidDnDOperationException e) {
-					AceLog.getLog().info(e.toString());
+					AceLog.getAppLog().info(e.toString());
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}
@@ -142,7 +143,9 @@ public class JTreeWithDragImage extends JTree {
 			while (childEnum.hasMoreElements()) {
 				m.nodeStructureChanged(childEnum.nextElement());
 			}
-			AceLog.getLog().info("Tree model changed");
+			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				AceLog.getAppLog().fine("Tree model changed");
+			}
 		}
 		
 	}
@@ -180,6 +183,7 @@ public class JTreeWithDragImage extends JTree {
 		map.put("copy", new AceTransferAction("copy"));
 		map.put("paste", new AceTransferAction("paste"));
 		config.addPropertyChangeListener("commit", new CommitListener());
+		config.addPropertyChangeListener("viewPositions", new CommitListener());
 	}
 
 	public I_ConfigAceFrame getConfig() {

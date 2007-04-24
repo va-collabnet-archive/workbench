@@ -179,13 +179,13 @@ public class ImportUpdateJarReader implements ActionListener {
 					try {
 						importJar(jarFile);
 					} catch (TaskFailedException ex) {
-						AceLog.getLog().alertAndLogException(ex);
+						AceLog.getAppLog().alertAndLogException(ex);
 					}
 				}
 
 			});
 		} catch (TaskFailedException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 	}
 
@@ -239,7 +239,7 @@ public class ImportUpdateJarReader implements ActionListener {
 
 			for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
 				je = e.nextElement();
-				AceLog.getLog().info("Jar entry: " + je.getName()
+				AceLog.getAppLog().info("Jar entry: " + je.getName()
 						+ " compressed: " + je.getCompressedSize() + " size: "
 						+ je.getSize() + " time: " + new Date(je.getTime())
 						+ " comment: " + je.getComment());
@@ -299,7 +299,7 @@ public class ImportUpdateJarReader implements ActionListener {
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);
 								} catch (Exception e) {
-									AceLog.getLog().alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
+									AceLog.getAppLog().alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
 								}
 							}
 						}
@@ -326,7 +326,7 @@ public class ImportUpdateJarReader implements ActionListener {
 				int size = dis.readInt();
 				if (size > buffer.length) {
 					buffer = new byte[size];
-					AceLog.getLog().info("Increasing id buffer: " + size);
+					AceLog.getAppLog().info("Increasing id buffer: " + size);
 				}
 				int read = dis.read(buffer, 0, size);
 				while (read != size) {
@@ -338,17 +338,17 @@ public class ImportUpdateJarReader implements ActionListener {
 				threadPool.execute(new SyncIdWithDb(jarId, latch));
 				processed++;
 			} catch (Throwable e) {
-				AceLog.getLog().info("processed: " + processed);
+				AceLog.getAppLog().info("processed: " + processed);
 				dis.close();
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 				throw new RuntimeException(e);
 			}
 		}
 		dis.close();
-		AceLog.getLog().info("Awaiting latch");
+		AceLog.getAppLog().info("Awaiting latch");
 		latch.await();
 		latch = null;
-		AceLog.getLog().info("Latch released");
+		AceLog.getAppLog().info("Latch released");
 		threadPool.shutdown();
 	}
 
@@ -390,7 +390,7 @@ public class ImportUpdateJarReader implements ActionListener {
 					jarToDbNativeMap.add(jarNativeId, dbId.getNativeId());
 				}
 			} catch (Exception ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			idLatch.countDown();
 		}
@@ -405,7 +405,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Increasing image buffer: " + size);
+				AceLog.getAppLog().info("Increasing image buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -439,7 +439,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Increasing relationship buffer: " + size);
+				AceLog.getAppLog().info("Increasing relationship buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -473,7 +473,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Increasing description buffer: " + size);
+				AceLog.getAppLog().info("Increasing description buffer: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -506,7 +506,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Setting concept buffer size to: " + size);
+				AceLog.getAppLog().info("Setting concept buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -540,7 +540,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Setting path buffer size to: " + size);
+				AceLog.getAppLog().info("Setting path buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -558,7 +558,7 @@ public class ImportUpdateJarReader implements ActionListener {
 					AceConfig.vodb.writePath(jarPath);
 				}
 			} catch (RuntimeException e) {
-				AceLog.getLog().info("processing paths: " + processed);
+				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;
 			}
 			processed++;
@@ -573,7 +573,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			int size = dis.readInt();
 			if (size > buffer.length) {
 				buffer = new byte[size];
-				AceLog.getLog().info("Setting path buffer size to: " + size);
+				AceLog.getAppLog().info("Setting path buffer size to: " + size);
 			}
 			int read = dis.read(buffer, 0, size);
 			while (read != size) {
@@ -586,7 +586,7 @@ public class ImportUpdateJarReader implements ActionListener {
 				jarTimePath.convertIds(jarToDbNativeMap);
 				AceConfig.vodb.writeTimePath(jarTimePath);
 			} catch (RuntimeException e) {
-				AceLog.getLog().info("processing paths: " + processed);
+				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;
 			}
 			processed++;

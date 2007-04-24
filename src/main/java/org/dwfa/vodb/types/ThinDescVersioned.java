@@ -95,7 +95,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
-		buff.append("ThinDescVersioned: relId: ");
+		buff.append("ThinDescVersioned: desc: ");
 		buff.append(descId);
 		buff.append("\n     ConceptId: ");
 		buff.append(conceptId);

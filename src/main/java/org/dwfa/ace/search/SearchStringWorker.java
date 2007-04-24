@@ -148,7 +148,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				.synchronizedCollection(new TreeSet<ThinDescVersioned>(
 						new ThinDescVersionedComparator()));
 		new MatchUpdator();
-		AceConfig.vodb.search(this, p, matches, completeLatch);
+		AceConfig.vodb.search(this, p, matches, completeLatch, searchPanel.getRootConcept());
 		completeLatch.await();
 		return updater;
 	}
@@ -161,9 +161,9 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			}
 			updateMatches();
 		} catch (InterruptedException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (ExecutionException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		searchPanel.removeStopActionListener(stopListener);
 		searchPanel.setShowProgress(false);

@@ -44,7 +44,7 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 	}
 
 	public void setProgressInfoUpper(String text) {
-		AceLog.getLog().info(text);
+		AceLog.getAppLog().info(text);
 
 	}
 

@@ -424,4 +424,18 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return universal;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (ThinRelVersioned.class.isAssignableFrom(obj.getClass())) {
+			ThinRelVersioned another = (ThinRelVersioned) obj;
+			return relId == another.relId;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return relId;
+	}
+
 }

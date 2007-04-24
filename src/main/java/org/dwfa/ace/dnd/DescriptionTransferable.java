@@ -35,13 +35,13 @@ public class DescriptionTransferable implements Transferable {
 			try {
 				return ConceptBean.get(tuple.getConceptId()).getConceptAttributes().getLocalFixedConcept();
 			} catch (IOException e) {
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
 			try {
 				return ConceptBean.get(tuple.getConceptId()).getConceptAttributes().getLocalFixedConcept();
 			} catch (IOException e) {
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}  else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
 			return tuple.getDescVersioned().toLocalFixedDesc();

@@ -67,7 +67,7 @@ public class LineagePlugin extends AbstractPlugin {
 				host.addPropertyChangeListener("commit", this);
 				updateLineageModel();
 			} catch (IOException e) {
-				AceLog.getLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e.getLocalizedMessage(), e);
+				AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e.getLocalizedMessage(), e);
 			}
 		}
 		return lineagePanel;
@@ -152,14 +152,14 @@ public class LineagePlugin extends AbstractPlugin {
 		if (bean != null) {
 			lineageRenderer.setFocusBean(bean);
 			List<List<ConceptBean>> lineage = getLineage(bean, 0);
-			if (AceLog.getLog().isLoggable(Level.FINE)) {
+			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				StringBuffer buf = new StringBuffer();
 				buf.append("Lineage for: " + bean);
 				for (List<ConceptBean> parentLine : lineage) {
 					buf.append("\n");
 					buf.append(parentLine);
 				}
-				AceLog.getLog().fine(buf.toString());
+				AceLog.getAppLog().fine(buf.toString());
 			}
 			addLineageToNode(lineage, root);
 			model.nodeStructureChanged(root);

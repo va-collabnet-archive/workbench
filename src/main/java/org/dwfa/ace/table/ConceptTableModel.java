@@ -124,9 +124,9 @@ public class ConceptTableModel extends AbstractTableModel implements
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -159,7 +159,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			}
 			conceptsToFetch.clear();
 			referencedConcepts.clear();
-			if (cb == null) {
+			if ((cb == null) || (cb.getConceptAttributes() == null)) {
 				return 0;
 			}
 			I_ConceptAttributeVersioned concept = cb.getConceptAttributes();
@@ -195,7 +195,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -315,7 +315,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 						.getPathId()), conTuple);
 			}
 		} catch (IOException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -333,7 +333,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 	private I_ConceptAttributeTuple getConceptTuple(int rowIndex) throws IOException {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
-		if (cb == null) {
+		if ((cb == null) || (cb.getConceptAttributes() == null))  {
 			return null;
 		}
 		if (allTuples == null) {
@@ -364,7 +364,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 				return false;
 			}
 		} catch (IOException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return false;
 	}
@@ -390,7 +390,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			}
 			fireTableCellUpdated(row, col);
 		} catch (Exception ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 	}
 
@@ -482,7 +482,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 			try {
 				getConceptTuple(0);
 			} catch (IOException e) {
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 		if (allTuples == null) {
@@ -542,7 +542,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 					allTuples = null;
 					ConceptTableModel.this.fireTableDataChanged();
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}

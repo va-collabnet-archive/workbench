@@ -13,7 +13,7 @@ public class Abort implements ActionListener {
 		try {
 			ACE.abort();
 		} catch (IOException e1) {
-			AceLog.getLog().alertAndLogException(e1);
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
 

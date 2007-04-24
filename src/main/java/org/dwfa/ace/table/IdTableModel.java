@@ -121,9 +121,9 @@ public class IdTableModel extends AbstractTableModel implements
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 			if (getProgress() != null) {
@@ -192,7 +192,7 @@ public class IdTableModel extends AbstractTableModel implements
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
 
@@ -309,7 +309,7 @@ public class IdTableModel extends AbstractTableModel implements
 			try {
 				getIdTuple(0);
 			} catch (IOException e) {
-				AceLog.getLog().alertAndLogException(e);
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 		if (allTuples == null) {
@@ -353,9 +353,9 @@ public class IdTableModel extends AbstractTableModel implements
 							.uncommittedHtml(), idTuple);
 				}
 				new ThinVersionHelper();
-				AceLog.getLog().info("ID tuple version: " + idTuple.getVersion());
-				AceLog.getLog().info("ID tuple time: " + ThinVersionHelper.convert(idTuple.getVersion()));
-				AceLog.getLog().info("ID tuple formatted: " + ThinVersionHelper.format(idTuple
+				AceLog.getAppLog().info("ID tuple version: " + idTuple.getVersion());
+				AceLog.getAppLog().info("ID tuple time: " + ThinVersionHelper.convert(idTuple.getVersion()));
+				AceLog.getAppLog().info("ID tuple formatted: " + ThinVersionHelper.format(idTuple
 						.getVersion()));
 				
 				
@@ -369,7 +369,7 @@ public class IdTableModel extends AbstractTableModel implements
 						.getPathId()), idTuple);
 			}
 		} catch (IOException e) {
-			AceLog.getLog().alertAndLogException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -447,7 +447,7 @@ public class IdTableModel extends AbstractTableModel implements
 					allTuples = null;
 					IdTableModel.this.fireTableDataChanged();
 				} catch (Exception ex) {
-					AceLog.getLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}

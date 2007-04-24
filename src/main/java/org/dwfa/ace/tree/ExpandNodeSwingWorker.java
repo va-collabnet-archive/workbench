@@ -192,7 +192,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 					completeLatch.countDown();
 				}
 			} catch (Exception ex) {
-				AceLog.getLog().alertAndLogException(ex);
+				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			if (logger.isLoggable(Level.FINEST)) {
 				logger.finest("ExpandNodeSwingWorker " + workerId
@@ -321,9 +321,9 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 				}
 			}
 		} catch (InterruptedException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		} catch (ExecutionException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("ExpandNodeSwingWorker " + workerId + " finished.");
@@ -367,7 +367,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 				if (tree.isExpanded(tp) == false) {
 					tree.expandPath(tp);
 				} else {
-					AceLog.getLog().info(" Already expanded");
+					AceLog.getAppLog().info(" Already expanded");
 				}
 			}
 

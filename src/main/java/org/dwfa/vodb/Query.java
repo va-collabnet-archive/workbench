@@ -27,14 +27,14 @@ public class Query {
 	public static void main(String[] args) {
 		start = new Date();
 		VodbEnv vodb = new VodbEnv();
-		AceLog.getLog().info("Opened env.");
+		AceLog.getAppLog().info("Opened env.");
 		printElapsedTime();
 		try {
 			ThinDescVersionedBinding descBinder = new ThinDescVersionedBinding();
 			ConceptIdKeyForDescCreator descForConceptKeyCreator = 
 				new ConceptIdKeyForDescCreator(descBinder);
 			vodb.setup(new File("berkeley-db"), true, 600000000L);
-			AceLog.getLog().info("Setup env.");
+			AceLog.getAppLog().info("Setup env.");
 			printElapsedTime();
 			doQuery(vodb, descBinder, "SNOMED CT Concept");
 			doQuery(vodb, descBinder, "Architectonic Auxillary");
@@ -44,10 +44,10 @@ public class Query {
 			doConceptQuery(vodb, descBinder, descForConceptKeyCreator, "SNOMED CT Concept");
 			
 			vodb.close();
-			AceLog.getLog().info("closed env.");
+			AceLog.getAppLog().info("closed env.");
 			printElapsedTime();
 		} catch (DatabaseException ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
 		}
 
 
@@ -60,8 +60,8 @@ public class Query {
 		int failCount = 0;
 		TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 		Cursor descC = vodb.getDescDb().openCursor(null, null);
-		AceLog.getLog().info("------------------------------------------");
-		AceLog.getLog().info("Started query cursor for: " + queryString);
+		AceLog.getAppLog().info("------------------------------------------");
+		AceLog.getAppLog().info("Started query cursor for: " + queryString);
 		DatabaseEntry descKey = new DatabaseEntry();
 		DatabaseEntry descValue = new DatabaseEntry();
 		while (descC.getNext(descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
@@ -70,18 +70,18 @@ public class Query {
 			I_DescriptionVersioned vdesc = (I_DescriptionVersioned) descBinder.entryToObject(descValue);
 			if (vdesc.matches(Pattern.compile(queryString))) {
 				matchCount++;
-				AceLog.getLog().info("descKeyInt: " + descKeyInt);
-				AceLog.getLog().info(vdesc.toString());
+				AceLog.getAppLog().info("descKeyInt: " + descKeyInt);
+				AceLog.getAppLog().info(vdesc.toString());
 			} else {
 				failCount++;
 			}
 		}
-		AceLog.getLog().info("descCount: " + descCount);
-		AceLog.getLog().info("matchCount: " + matchCount);
-		AceLog.getLog().info("failCount: " + failCount);
-		AceLog.getLog().info("finished query.");
+		AceLog.getAppLog().info("descCount: " + descCount);
+		AceLog.getAppLog().info("matchCount: " + matchCount);
+		AceLog.getAppLog().info("failCount: " + failCount);
+		AceLog.getAppLog().info("finished query.");
 		printElapsedTime();
-		AceLog.getLog().info("------------------------------------------");
+		AceLog.getAppLog().info("------------------------------------------");
 		descC.close();
 		start = oldStart;
 	}
@@ -93,8 +93,8 @@ public class Query {
 		int matchCount = 0;
 		int failCount = 0;
 		Cursor descC = vodb.getDescDb().openCursor(null, null);
-		AceLog.getLog().info("------------------------------------------");
-		AceLog.getLog().info("Started quick query cursor for: " + queryString);
+		AceLog.getAppLog().info("------------------------------------------");
+		AceLog.getAppLog().info("Started quick query cursor for: " + queryString);
 		DatabaseEntry descKey = new DatabaseEntry();
 		DatabaseEntry descValue = new DatabaseEntry();
 		while (descC.getNext(descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
@@ -109,12 +109,12 @@ public class Query {
 			}
 			*/
 		}
-		AceLog.getLog().info("descCount: " + descCount);
-		AceLog.getLog().info("matchCount: " + matchCount);
-		AceLog.getLog().info("failCount: " + failCount);
-		AceLog.getLog().info("finished  quick query.");
+		AceLog.getAppLog().info("descCount: " + descCount);
+		AceLog.getAppLog().info("matchCount: " + matchCount);
+		AceLog.getAppLog().info("failCount: " + failCount);
+		AceLog.getAppLog().info("finished  quick query.");
 		printElapsedTime();
-		AceLog.getLog().info("------------------------------------------");
+		AceLog.getAppLog().info("------------------------------------------");
 		descC.close();
 		start = oldStart;
 	}
@@ -129,8 +129,8 @@ public class Query {
 		int matchCount = 0;
 		int failCount = 0;
 		Cursor descC = vodb.getDescDb().openCursor(null, null);
-		AceLog.getLog().info("------------------------------------------");
-		AceLog.getLog().info("Started do concept query cursor for: " + queryString);
+		AceLog.getAppLog().info("------------------------------------------");
+		AceLog.getAppLog().info("Started do concept query cursor for: " + queryString);
 		DatabaseEntry descKey = new DatabaseEntry();
 		DatabaseEntry descValue = new DatabaseEntry();
 		while (descC.getNext(descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
@@ -139,9 +139,9 @@ public class Query {
 			I_DescriptionVersioned descFromTextSearch = (I_DescriptionVersioned) descBinder.entryToObject(descValue);
 			if (descFromTextSearch.matches(Pattern.compile(queryString))) {
 				matchCount++;
-				AceLog.getLog().info("   ---------------------------------------");
-				AceLog.getLog().info(descFromTextSearch.toString());
-				AceLog.getLog().info("   ---------------------------------------");
+				AceLog.getAppLog().info("   ---------------------------------------");
+				AceLog.getAppLog().info(descFromTextSearch.toString());
+				AceLog.getAppLog().info("   ---------------------------------------");
 				
 				DatabaseEntry secondaryKey = 
 			        new DatabaseEntry();
@@ -167,21 +167,21 @@ public class Query {
 			        retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
 			    } 		
 				mySecCursor.close();
-				AceLog.getLog().info("++++++++ Concept Query Result(s) ++++++++++");
+				AceLog.getAppLog().info("++++++++ Concept Query Result(s) ++++++++++");
 				for (I_DescriptionVersioned desc: matches) {
-					AceLog.getLog().info(desc.toString());
+					AceLog.getAppLog().info(desc.toString());
 				}
-				AceLog.getLog().info("+++++++++++++++++++++++++++++++++++++++++++");
+				AceLog.getAppLog().info("+++++++++++++++++++++++++++++++++++++++++++");
 			} else {
 				failCount++;
 			}
 		}
-		AceLog.getLog().info("descCount: " + descCount);
-		AceLog.getLog().info("matchCount: " + matchCount);
-		AceLog.getLog().info("failCount: " + failCount);
-		AceLog.getLog().info("finished  quick query.");
+		AceLog.getAppLog().info("descCount: " + descCount);
+		AceLog.getAppLog().info("matchCount: " + matchCount);
+		AceLog.getAppLog().info("failCount: " + failCount);
+		AceLog.getAppLog().info("finished  quick query.");
 		printElapsedTime();
-		AceLog.getLog().info("------------------------------------------");
+		AceLog.getAppLog().info("------------------------------------------");
 		descC.close();
 		start = oldStart;
 	}
@@ -190,10 +190,10 @@ public class Query {
 		Date end = new Date();
 		long elapsed = end.getTime() - start.getTime();
 		elapsed = elapsed / 1000;
-		AceLog.getLog().info("Elapsed sec: " + elapsed);
+		AceLog.getAppLog().info("Elapsed sec: " + elapsed);
 		elapsed = elapsed / 60;
-		AceLog.getLog().info("Elapsed min: " + elapsed);
-		AceLog.getLog().info(end.toString());
+		AceLog.getAppLog().info("Elapsed min: " + elapsed);
+		AceLog.getAppLog().info(end.toString());
 	}
 
 }

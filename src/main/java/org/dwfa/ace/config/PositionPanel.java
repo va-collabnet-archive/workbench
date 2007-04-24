@@ -101,7 +101,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                     PositionPanel.this.dates.add(null); // For the top "latest"
                     // position...
                 }
-                AceLog.getLog().info("Processing path: "
+                AceLog.getAppLog().info("Processing path: "
                         + ConceptBean.get(path.getConceptId()).getInitialText() +
                         " with " + dates.size()
                         + " coordinates");
@@ -158,13 +158,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                             addFiller(c);
                             // this.setBorder(BorderFactory.createTitledBorder("PositionPanel"));
                         } catch (Exception ex) {
-                			AceLog.getLog().alertAndLogException(ex);
+                			AceLog.getAppLog().alertAndLogException(ex);
                         }
                     }
                 });
 
             } catch (Exception ex) {
-    			AceLog.getLog().alertAndLogException(ex);
+    			AceLog.getAppLog().alertAndLogException(ex);
             }
         }
     }
@@ -489,7 +489,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                     this.selectGlue.replaceObj(oldPosition,
                             this.position);
                 } catch (Exception e1) {
-        			AceLog.getLog().alertAndLogException(e1);
+        			AceLog.getAppLog().alertAndLogException(e1);
                 }
             }
         }
@@ -524,7 +524,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                 }
             }
         } catch (Exception ex) {
-			AceLog.getLog().alertAndLogException(ex);
+			AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 

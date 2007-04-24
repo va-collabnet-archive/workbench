@@ -174,7 +174,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 					}
 				} catch (IOException e) {
 					this.setText(e.getMessage());
-					AceLog.getLog().alertAndLogException(e);
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			} else {
 				this.setText(this.termComponent.toString());
