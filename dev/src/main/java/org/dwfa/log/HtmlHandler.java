@@ -75,9 +75,10 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SwingUtilities.invokeLater(new AddRecord(htmlRecord));
-
-    }
+        if (logOut != null) {
+            SwingUtilities.invokeLater(new AddRecord(htmlRecord));
+        }
+     }
     private class AddRecord implements Runnable {
         String htmlRecord;
         /**
