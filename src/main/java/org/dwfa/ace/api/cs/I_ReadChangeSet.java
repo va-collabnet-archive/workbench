@@ -10,5 +10,7 @@ public interface I_ReadChangeSet extends Serializable {
 
 	public void setChangeSetFile(File changeSetFile);
 	
+	public void setCounter(I_Count counter);
+	
 
 }

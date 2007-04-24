@@ -21,10 +21,10 @@ public class UniversalAceImage implements Serializable {
 		super();
 	}
 	
-	public UniversalAceImage(Collection<UUID> nativeId, byte[] image, List<UniversalAceImagePart> versions, String format, 
+	public UniversalAceImage(Collection<UUID> imageId, byte[] image, List<UniversalAceImagePart> versions, String format, 
 			Collection<UUID> conceptId) {
 		super();
-		this.imageId = nativeId;
+		this.imageId = imageId;
 		this.image = image;
 		this.versions = versions;
 		this.format = format;
@@ -73,6 +73,25 @@ public class UniversalAceImage implements Serializable {
 	 */
 	public Collection<UUID> getConceptId() {
 		return conceptId;
+	}
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append(this.getClass().getSimpleName());
+		buff.append(": ");
+		buff.append(imageId);
+		buff.append(" conid: ");
+		buff.append(conceptId);
+		buff.append(" ");
+		buff.append(format);
+		buff.append("\n");
+		for (UniversalAceImagePart part : versions) {
+			buff.append("     ");
+			buff.append(part.toString());
+			buff.append("\n");
+		}
+
+		return buff.toString();
 	}
 
 }

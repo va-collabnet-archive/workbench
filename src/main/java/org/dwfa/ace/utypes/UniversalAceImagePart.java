@@ -15,6 +15,13 @@ public class UniversalAceImagePart implements Serializable {
 	private Collection<UUID> statusId;
 	private String textDescription;
 	private Collection<UUID> typeId;
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() +
+		" textDescription: " + textDescription +
+		" typeId: " + typeId +
+		" status: " + statusId + " path: " + pathId + " time: " + time;
+	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#getPathId()
 	 */

@@ -49,6 +49,19 @@ public class UniversalAceBean implements Serializable {
 		out.writeObject(uncommittedDescriptions);
 		out.writeObject(uncommittedImages);
 	}
+	
+	public String toString() {
+		return "UniversalAceBean: " + id +
+				"\n  attributes: " + conceptAttributes + 
+				"\n descriptions: " + descriptions + 
+				"\n sourceRels: " + sourceRels + 
+				"\n images: " + images + 
+				"\n uncommittedIds: " + uncommittedIds + 
+				"\n uncommittedConceptAttributes: " + uncommittedConceptAttributes + 
+				"\n uncommittedSourceRels: " + uncommittedSourceRels + 
+				"\n uncommittedDescriptions: " + uncommittedDescriptions + 
+				"\n uncommittedImages: " + uncommittedImages; 
+	}
 
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream in) throws IOException,

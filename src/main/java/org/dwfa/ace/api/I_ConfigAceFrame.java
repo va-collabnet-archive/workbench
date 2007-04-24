@@ -169,5 +169,21 @@ public interface I_ConfigAceFrame {
 
 	public void setChangeSetWriterFileName(String changeSetWriterFileName);
 	public String getChangeSetWriterFileName();
+	
+	public void setUsername(String username);
+	public String getUsername();
+	
+	public void setPassword(String password);
+	public String getPassword();
+	
+	public void setCommitEnabled(boolean enabled);
+	public boolean isCommitEnabled();
+	
+	public void addUncommitted(I_GetConceptData conceptBean);
+	
+	public void addImported(I_GetConceptData conceptBean);
+	
+	public void setLastViewed(I_GetConceptData conceptBean);
+	public I_GetConceptData getLastViewed();
 
 }

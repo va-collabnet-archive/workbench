@@ -17,6 +17,15 @@ public class UniversalAceRelationshipPart implements Serializable {
 	private Collection<UUID> characteristicId;
 	private Collection<UUID> refinabilityId;
 	private int group;
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() +
+		" relTypeId: " + relTypeId +
+		" characteristicId: " + characteristicId +
+		" refinabilityId: " + refinabilityId +
+		" group: " + group +
+		" status: " + statusId + " path: " + pathId + " time: " + time;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelPart#getPathId()

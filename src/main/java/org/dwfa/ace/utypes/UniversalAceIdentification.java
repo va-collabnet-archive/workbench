@@ -47,5 +47,19 @@ public class UniversalAceIdentification implements Serializable {
 		}
 		return false;
 	}
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append(this.getClass().getSimpleName());
+		buff.append(": ");
+		buff.append("\n");
+		for (UniversalAceIdentificationPart part : versions) {
+			buff.append("     ");
+			buff.append(part.toString());
+			buff.append("\n");
+		}
+
+		return buff.toString();
+	}
 	
 }

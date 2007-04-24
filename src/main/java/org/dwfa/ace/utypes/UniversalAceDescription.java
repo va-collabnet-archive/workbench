@@ -66,6 +66,23 @@ public class UniversalAceDescription implements Serializable {
 	public Collection<UUID> getDescId() {
 		return descId;
 	}
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append(this.getClass().getSimpleName());
+		buff.append(": ");
+		buff.append(descId);
+		buff.append(" conId:");
+		buff.append(conceptId);
+		buff.append("\n");
+		for (UniversalAceDescriptionPart part : versions) {
+			buff.append("     ");
+			buff.append(part.toString());
+			buff.append("\n");
+		}
+
+		return buff.toString();
+	}
 
 
 }

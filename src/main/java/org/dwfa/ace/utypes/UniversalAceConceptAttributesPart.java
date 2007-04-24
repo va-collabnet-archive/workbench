@@ -62,5 +62,10 @@ public class UniversalAceConceptAttributesPart implements Serializable {
 	public void setTime(long version) {
 		this.time = version;
 	}
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " defined: " + defined + " status: " + conceptStatus + " path: " + pathId + " time: " + time;
+	}
 
+	
 }

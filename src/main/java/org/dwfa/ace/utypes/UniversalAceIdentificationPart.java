@@ -15,6 +15,13 @@ public class UniversalAceIdentificationPart implements Serializable {
 	private Collection<UUID> source;
 	private Object sourceId;
 	
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() +
+		" sourceId: " + sourceId +
+		" source: " + source +
+		" status: " + idStatus + " path: " + pathId + " time: " + time;
+	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdPart#getPathId()
 	 */

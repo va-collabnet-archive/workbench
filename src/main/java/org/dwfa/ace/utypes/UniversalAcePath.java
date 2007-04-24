@@ -28,4 +28,9 @@ public class UniversalAcePath implements Serializable {
 	public List<UUID> getPathId() {
 		return pathId;
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " id: " + pathId + " origins: " + origins;
+	}
 }

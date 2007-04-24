@@ -57,6 +57,8 @@ public class NewConcept extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
+		I_TermFactory termFactory= null;
+		I_GetConceptData newConcept = null;
 		try {
 			@SuppressWarnings("unused") //here to demo how to get the configuration.
 			I_GetConceptData concept = (I_GetConceptData) worker
@@ -66,13 +68,13 @@ public class NewConcept extends AbstractTask {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 					.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
 			
-			I_TermFactory termFactory = (I_TermFactory) worker
+			termFactory = (I_TermFactory) worker
 					.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
 			
 			I_HostConceptPlugins host = (I_HostConceptPlugins) worker
 					.readAttachement(AttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 			
-			I_GetConceptData newConcept = termFactory.newConcept(UUID.randomUUID(), false);
+			newConcept = termFactory.newConcept(UUID.randomUUID(), false);
 
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", "New Fully Specified Description",
 					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize());
@@ -86,9 +88,19 @@ public class NewConcept extends AbstractTask {
 
 			return Condition.CONTINUE;
 		} catch (TerminologyException e) {
+			undoEdits(newConcept, termFactory);
 			throw new TaskFailedException(e);
 		} catch (IOException e) {
+			undoEdits(newConcept, termFactory);
 			throw new TaskFailedException(e);
+		}
+	}
+
+	private void undoEdits(I_GetConceptData newConcept, I_TermFactory termFactory) {
+		if (termFactory != null) {
+			if (newConcept != null) {
+				termFactory.forget(newConcept);
+			}
 		}
 	}
 

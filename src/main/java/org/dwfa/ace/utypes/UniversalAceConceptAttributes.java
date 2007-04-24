@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_DescriptionPart;
+
 public class UniversalAceConceptAttributes implements Serializable {
 
 	/**
@@ -23,7 +25,9 @@ public class UniversalAceConceptAttributes implements Serializable {
 		this.versions = new ArrayList<UniversalAceConceptAttributesPart>(count);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb.types.ThinConPart)
 	 */
 	public boolean addVersion(UniversalAceConceptAttributesPart part) {
@@ -36,25 +40,47 @@ public class UniversalAceConceptAttributes implements Serializable {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getVersions()
 	 */
 	public List<UniversalAceConceptAttributesPart> getVersions() {
 		return versions;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#versionCount()
 	 */
 	public int versionCount() {
 		return versions.size();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getConId()
 	 */
 	public Collection<UUID> getConId() {
 		return conId;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append(this.getClass().getSimpleName());
+		buff.append(": ");
+		buff.append(conId);
+		buff.append("\n");
+		for (UniversalAceConceptAttributesPart part : versions) {
+			buff.append("     ");
+			buff.append(part.toString());
+			buff.append("\n");
+		}
+
+		return buff.toString();
 	}
 
 }

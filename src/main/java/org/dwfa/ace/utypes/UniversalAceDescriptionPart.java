@@ -16,6 +16,14 @@ public class UniversalAceDescriptionPart implements Serializable {
 	private boolean initialCaseSignificant;
 	private Collection<UUID> typeId; 
 	private String lang;
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " text: " + text +
+		" initialCaseSignificant: " + initialCaseSignificant +
+		" typeId: " + typeId +
+		" lang: " + lang +
+		" status: " + statusId + " path: " + pathId + " time: " + time;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionPart#getPathId()

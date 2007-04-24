@@ -85,5 +85,24 @@ public class UniversalAceRelationship implements Serializable {
 		componentTwoId = destId;
 		
 	}
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append(this.getClass().getSimpleName());
+		buff.append(": ");
+		buff.append(relId);
+		buff.append(" componentOneId: ");
+		buff.append(componentOneId);
+		buff.append(" componentTwoId: ");
+		buff.append(componentTwoId);
+		buff.append("\n");
+		for (UniversalAceRelationshipPart part : versions) {
+			buff.append("     ");
+			buff.append(part.toString());
+			buff.append("\n");
+		}
+
+		return buff.toString();
+	}
 
 }
