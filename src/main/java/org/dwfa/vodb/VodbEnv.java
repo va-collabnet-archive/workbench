@@ -48,6 +48,7 @@ import org.dwfa.vodb.bind.TimePathIdBinder;
 import org.dwfa.vodb.bind.UuidBinding;
 import org.dwfa.vodb.jar.PathCollector;
 import org.dwfa.vodb.jar.TimePathCollector;
+import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_ProcessConcepts;
 import org.dwfa.vodb.types.I_ProcessDescriptions;
 import org.dwfa.vodb.types.I_ProcessIds;
@@ -389,7 +390,8 @@ public class VodbEnv {
 
 	}
 
-	public void close() throws DatabaseException {
+	public void close() {
+		try {
 		sync();
 		if (env != null) {
 			if (conceptDb != null) {
@@ -430,6 +432,9 @@ public class VodbEnv {
 			}
 			// env.cleanLog();
 			env.close();
+		}
+		} catch (DatabaseException e) {
+			logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -1534,13 +1539,14 @@ public class VodbEnv {
 		DatabaseEntry imageValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, imageKey);
 		if (imageDb.get(null, imageKey, imageValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			I_ImageVersioned image = (I_ImageVersioned) imageBinder.entryToObject(imageValue);
 			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("Got image: " + nativeId + " elapsed time: "
+				logger.fine("Got image: " + nativeId + " for concept: " + ConceptBean.get(image.getConceptId()) + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
 			}
-			return (I_ImageVersioned) imageBinder.entryToObject(imageValue);
+			return image;
 		}
-		throw new DatabaseException("Concept: " + nativeId + " not found.");
+		throw new DatabaseException("Image for: " + nativeId + " not found.");
 	}
 
 	public Database getImageDb() {

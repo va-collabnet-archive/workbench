@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -101,10 +102,12 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                     PositionPanel.this.dates.add(null); // For the top "latest"
                     // position...
                 }
-                AceLog.getAppLog().info("Processing path: "
-                        + ConceptBean.get(path.getConceptId()).getInitialText() +
-                        " with " + dates.size()
-                        + " coordinates");
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("Processing path: "
+                            + ConceptBean.get(path.getConceptId()).getInitialText() +
+                            " with " + dates.size()
+                            + " coordinates");
+                }
                 PositionPanel.this.positionStrings = new ArrayList<String>();
                 for (Iterator<Date> sortedDateItr = PositionPanel.this.dates
                         .iterator(); sortedDateItr.hasNext();) {

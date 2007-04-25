@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.URL;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
@@ -16,6 +17,7 @@ import net.jini.config.ConfigurationProvider;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -33,6 +35,8 @@ public class AceRunner {
 			throws Exception {
 		this.args = args;
 		this.lc = lc;
+		AceLog.getAppLog().info("java.protocol.handler.pkgs: " + System.getProperty("java.protocol.handler.pkgs"));
+		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
 		String argsStr;
 		if (args == null) {
 			argsStr = "null";

@@ -1,4 +1,4 @@
-package org.dwfa.vodb.protocol;
+package org.dwfa.ace.url.tiuid;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

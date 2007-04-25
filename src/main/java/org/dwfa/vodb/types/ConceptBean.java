@@ -402,6 +402,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (images == null) {
 			try {
 				images = AceConfig.vodb.getImages(conceptId);
+				AceLog.getAppLog().info("Retrieved images: " + images + " for: " + conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}

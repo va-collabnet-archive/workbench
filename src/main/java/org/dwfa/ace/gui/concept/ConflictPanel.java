@@ -150,7 +150,15 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			LabelForTuple partLabel = (LabelForTuple) addPopup
 					.getClientProperty("partLabel");
 			try {
-				addToResolutionPanel(partLabel.copy());
+				I_ImplementActiveLabel copy = partLabel.copy();
+				copy.getLabel().setBorder(partLabel.getLabel().getBorder());
+				copy.getLabel().setPreferredSize(
+						(partLabel.getLabel().getPreferredSize()));
+				copy.getLabel()
+						.setMinimumSize((partLabel.getLabel().getMinimumSize()));
+				copy.getLabel()
+						.setMaximumSize((partLabel.getLabel().getMaximumSize()));
+				addToResolutionPanel(copy);
 			} catch (IOException e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}

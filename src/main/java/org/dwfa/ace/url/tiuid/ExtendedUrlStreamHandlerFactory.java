@@ -1,7 +1,8 @@
-package org.dwfa.vodb.protocol;
+package org.dwfa.ace.url.tiuid;
 
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+
 
 public class ExtendedUrlStreamHandlerFactory implements URLStreamHandlerFactory {
 	public static String PROTOCOL="tiuid";

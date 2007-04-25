@@ -88,7 +88,7 @@ public class AddImage extends AddComponent {
 				idSource, aceAuxPath,
 				Integer.MIN_VALUE);
 		int nativeConceptId = vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+				.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
 		URL imageURL = AddImage.class
 				.getResource("/Informatics-Circle-Small.gif");
 		InputStream fis = imageURL.openStream();
