@@ -15,6 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import net.jini.config.Configuration;
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
@@ -103,7 +105,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
 	}
 
-	public ImportChangeSetReader() {
+	public ImportChangeSetReader(final Configuration riverConfig) {
 		try {
 			final File csFile = FileDialogUtil
 					.getExistingFile("Select Java Change Set to Import...", new FilenameFilter() {
@@ -116,7 +118,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 			ACE.threadPool.execute(new Runnable() {
 				public void run() {
 					try {
-						importChangeSet(csFile);
+						importChangeSet(csFile, riverConfig);
 						ACE.commit();
 					} catch (TaskFailedException ex) {
 						AceLog.getAppLog().alertAndLogException(ex);
@@ -131,7 +133,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 		}
 	}
 
-	protected void importChangeSet(File csFile) throws TaskFailedException {
+	protected void importChangeSet(File csFile, final Configuration riverConfig) throws TaskFailedException {
 		try {
 
 			lowerProgressMessage = "Processing change set";
@@ -158,7 +160,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 							if (ace.isActive()) {
 								ACE cdePanel;
 								try {
-									cdePanel = new ACE();
+									cdePanel = new ACE(riverConfig);
 									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);

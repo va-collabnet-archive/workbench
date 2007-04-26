@@ -76,7 +76,7 @@ public class AceFrame extends ComponentFrame {
 	}
 	public ACE getCdePanel() {
 		if (cdePanel == null) {
-			cdePanel = new ACE();
+			cdePanel = new ACE(config);
 		}
 		return cdePanel;
 	}

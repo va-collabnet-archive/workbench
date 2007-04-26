@@ -9,36 +9,52 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class CdePalette extends JPanel implements ComponentListener {
 	private static final long serialVersionUID = 1L;
 	private static enum Side{TOP, BOTTOM, LEFT, RIGHT};
+	public static int increment = 50;
+	
 	private class PaletteMover implements ActionListener {
 		private Point currentLocation;
 		private Point endLocation;
-		private int delay = 30;
-		private int increment = 1000;
+		private int delay = 20;
 		private Timer t;
+		private JPanel ghostPanel = new JPanel();
 		
-		public PaletteMover(Point currentLocation, Point endLocation) {
+		public PaletteMover(Point currentLocation, Point endLocation, boolean selected) {
 			super();
 			this.currentLocation = currentLocation;
 			this.endLocation = endLocation;
 			t = new Timer(delay, this);
 			t.start();	
+			JLayeredPane layers = getRootPane().getLayeredPane();
+			layers.add(ghostPanel, JLayeredPane.PALETTE_LAYER);
+			ghostPanel.setBounds(getBounds());
+			ghostPanel.setVisible(selected);
+			getRootPane().getLayeredPane().moveToFront(ghostPanel);
+			setVisible(false);
+			setLocation(endLocation);
+
 		}
 
 		public void stop() {
 			t.stop();
 			t.removeActionListener(this);
+			setLocation(endLocation);
+			setVisible(true);
+			JLayeredPane layers = getRootPane().getLayeredPane();
+			layers.moveToFront(CdePalette.this);
+			layers.remove(ghostPanel);
 		}
 
 		private void movePalette() {
 			if (Math.abs(currentLocation.x - endLocation.x) < increment) {
 				currentLocation.x = endLocation.x;
-				setLocation(currentLocation);
+				ghostPanel.setLocation(currentLocation);
 				stop();
 				return;
 			} else  if (currentLocation.x > endLocation.x) {
@@ -46,7 +62,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 			} else {
 				currentLocation.x = currentLocation.x + increment;
 			}
-			setLocation(currentLocation);
+			ghostPanel.setLocation(currentLocation);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -83,7 +99,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 		super.paintComponent(g);
 	}
 	
-	public void togglePalette() {
+	public void togglePalette(boolean selected) {
 		Point locatorBounds = locator.getPalettePoint();
 		if (getBounds().x == locatorBounds.x) {
 			currentSide = Side.RIGHT;
@@ -93,7 +109,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 		if (mover != null) {
 			mover.stop();
 		}
-		mover = new PaletteMover(getLocation(), computeLocation(currentSide));
+		mover = new PaletteMover(getLocation(), computeLocation(currentSide), selected);
 	}
 	
 	public Point computeLocation(Side newSide) {

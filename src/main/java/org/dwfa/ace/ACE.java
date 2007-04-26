@@ -14,9 +14,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +32,7 @@ import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.security.auth.login.LoginException;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -53,6 +58,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+
+import net.jini.config.Configuration;
+import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.Commit;
@@ -87,8 +95,11 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeCellRenderer;
 import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
+import org.dwfa.bpa.gui.ProcessBuilderPanel;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
+import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -135,6 +146,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
 
 	private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
+	
+	protected final static int MENU_MASK = Toolkit.getDefaultToolkit()
+	    .getMenuShortcutKeyMask();
+
 
 	/*
 	 * 
@@ -223,6 +238,14 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		}
 	}
 
+	public class MoveListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent evt) {
+			viewer.getMoveListener().actionPerformed(evt);
+
+		}
+
+	}
 	private class StatusChangeListener implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent evt) {
@@ -268,7 +291,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(configPalette);
-			configPalette.togglePalette();
+			configPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 
 	}
@@ -283,7 +306,36 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				}
 			}
 			getRootPane().getLayeredPane().moveToFront(subversionPalette);
-			subversionPalette.togglePalette();
+			subversionPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
+		}
+
+	}
+
+	private class QueuesPaletteActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			if (queuePalette == null) {
+				try {
+					makeQueuePalette();
+				} catch (Exception ex) {
+					AceLog.getAppLog().alertAndLogException(ex);
+				}
+			}
+			getRootPane().getLayeredPane().moveToFront(queuePalette);
+			queuePalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
+		}
+
+	}
+	private class ProcessPaletteActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			if (processPalette == null) {
+				try {
+					makeProcessPalette();
+				} catch (Exception ex) {
+					AceLog.getAppLog().alertAndLogException(ex);
+				}
+			}
+			getRootPane().getLayeredPane().moveToFront(processPalette);
+			processPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 
 	}
@@ -295,7 +347,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				makeHistoryPalette();
 			}
 			getRootPane().getLayeredPane().moveToFront(historyPalette);
-			historyPalette.togglePalette();
+			historyPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 	}
 
@@ -381,6 +433,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	}
 
+	protected JMenuItem addQueueMI, moveToDiskMI;
+
+	private QueueViewerPanel viewer;
+
 	private JLabel statusLabel = new JLabel();
 
 	private JTreeWithDragImage tree;
@@ -408,6 +464,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JToggleButton showTreeButton;
 
 	private JToggleButton showSubversionButton;
+	
+	private JToggleButton showQueuesButton;
+	
+	private JToggleButton showProcessBuilder;
 
 	private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
 
@@ -416,6 +476,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private CdePalette configPalette;
 
 	private CdePalette subversionPalette;
+
+	private CdePalette queuePalette;
+
+	private CdePalette processPalette;
 
 	private JToggleButton showHistoryButton;
 
@@ -452,6 +516,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private JToggleButton showPreferencesButton;
 
+	private Configuration config;
+
 	/**
 	 * 
 	 */
@@ -482,8 +548,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	 * 
 	 * @throws DatabaseException
 	 */
-	public ACE() {
+	public ACE(Configuration config) {
 		super(new GridBagLayout());
+		this.config = config;
 	}
 
 	public void setup(I_ConfigAceFrame aceFrameConfig)
@@ -515,17 +582,19 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				new StatusChangeListener());
 	}
 
-	public JMenuBar createMenuBar() {
+	public JMenuBar createMenuBar() throws LoginException, SecurityException, ConfigurationException, IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
 		JMenuBar menuBar = new JMenuBar();
 		addToMenuBar(menuBar);
 		return menuBar;
 	}
 
-	public JMenuBar addToMenuBar(JMenuBar menuBar) {
+	public JMenuBar addToMenuBar(JMenuBar menuBar) throws LoginException, SecurityException, ConfigurationException, IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
 		addFileMenu(menuBar);
 		addEditMenu(menuBar);
 		return menuBar;
 	}
+
+
 
 	private void addEditMenu(JMenuBar menuBar) {
 		JMenuItem menuItem;
@@ -560,26 +629,68 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		menuBar.add(editMenu);
 	}
 
-	public void addFileMenu(JMenuBar menuBar) {
+	public void addFileMenu(JMenuBar menuBar) throws LoginException, ConfigurationException, IOException, PrivilegedActionException, SecurityException, IntrospectionException, InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
 		JMenuItem menuItem = null;
 		menuItem = new JMenuItem("Export Baseline Jar...");
 		menuItem.addActionListener(new WriteJar(aceConfig));
 		fileMenu.add(menuItem);
 		fileMenu.addSeparator();
 		menuItem = new JMenuItem("Import Java Changeset...");
-		menuItem.addActionListener(new ImportJavaChangeset());
+		menuItem.addActionListener(new ImportJavaChangeset(config));
 		fileMenu.add(menuItem);
 		fileMenu.addSeparator();
 		menuItem = new JMenuItem("Import Changeset Jar...");
-		menuItem.addActionListener(new ImportChangesetJar());
+		menuItem.addActionListener(new ImportChangesetJar(config));
 		fileMenu.add(menuItem);
 		menuItem = new JMenuItem("Import Baseline Jar...");
-		menuItem.addActionListener(new ImportBaselineJar());
+		menuItem.addActionListener(new ImportBaselineJar(config));
 		fileMenu.add(menuItem);
 		fileMenu.addSeparator();
 		menuItem = new JMenuItem("Save Environment...");
 		menuItem.addActionListener(new SaveEnvironment());
 		fileMenu.add(menuItem);
+
+		// Process builder
+		processWorker =  new MasterWorker(config);
+		this.processBuilderPanel = new ProcessBuilderPanel(config, processWorker);
+		fileMenu.add(newProcessMI = new JMenuItem("New Process"));
+		newProcessMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+				MENU_MASK));
+		newProcessMI.addActionListener(this.processBuilderPanel
+				.getNewProcessActionListener());
+		fileMenu.add(readProcessMI = new JMenuItem("Read Process"));
+		readProcessMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
+				MENU_MASK));
+		readProcessMI.addActionListener(this.processBuilderPanel
+				.getReadProcessActionListener());
+
+		fileMenu.add(takeProcessNoTranMI = new JMenuItem(
+				"Take Process (no transaction)"));
+		takeProcessNoTranMI.addActionListener(this.processBuilderPanel
+				.getTakeNoTranProcessActionListener());
+
+
+		fileMenu.addSeparator();
+		fileMenu.add(saveProcessMI = new JMenuItem("Save Process"));
+		saveProcessMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+				MENU_MASK));
+		saveProcessMI.addActionListener(this.processBuilderPanel
+				.getSaveProcessActionListener());
+        
+        fileMenu.add(saveForLauncherQueueMI = new JMenuItem("Save for Launcher Queue"));
+        saveForLauncherQueueMI.addActionListener(this.processBuilderPanel
+                .getSaveForLauncherQueueActionListener());
+               
+        
+        fileMenu.add(saveAsXmlMI = new JMenuItem("Save as XML"));
+        saveAsXmlMI.addActionListener(this.processBuilderPanel
+                .getSaveAsXmlActionListener());
+
+        fileMenu.addSeparator();
+        fileMenu.add(moveToDiskMI = new JMenuItem(
+				"Take Selected Processes and Save To Disk"));
+		moveToDiskMI.addActionListener(new MoveListener());
+		
 		menuBar.add(fileMenu);
 	}
 
@@ -640,6 +751,61 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		return content;
 	}
 
+	protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI,
+	takeProcessTranMI, saveProcessMI, saveForLauncherQueueMI,
+    saveAsXmlMI;
+
+	private boolean firstStartup = true;
+
+	private ProcessBuilderPanel processBuilderPanel;
+
+	private MasterWorker processWorker;
+
+	private void makeProcessPalette() throws Exception {
+		JLayeredPane layers = getRootPane().getLayeredPane();
+		processPalette = new CdePalette(new BorderLayout(),
+				new RightPalettePoint());
+		layers.add(processPalette, JLayeredPane.PALETTE_LAYER);
+		processPalette.add(processBuilderPanel, BorderLayout.CENTER);
+		processPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
+		int height = getHeight() - topPanel.getHeight();
+		Rectangle topBounds = topPanel.getBounds();
+		processPalette.setSize(width, height);
+
+		processPalette.setLocation(new Point(topBounds.x + topBounds.width,
+				topBounds.y + topBounds.height + 1));
+		processPalette.setOpaque(true);
+		processPalette.doLayout();
+		addComponentListener(processPalette);
+		processPalette.setVisible(true);
+		
+	}
+	
+	private void makeQueuePalette() throws Exception {
+		JLayeredPane layers = getRootPane().getLayeredPane();
+		queuePalette = new CdePalette(new BorderLayout(),
+				new RightPalettePoint());
+		layers.add(queuePalette, JLayeredPane.PALETTE_LAYER);
+		
+		MasterWorker worker = new MasterWorker(config);
+		viewer = new QueueViewerPanel(config, worker);
+
+		queuePalette.add(viewer, BorderLayout.CENTER);
+		queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
+		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
+		int height = getHeight() - topPanel.getHeight();
+		Rectangle topBounds = topPanel.getBounds();
+		queuePalette.setSize(width, height);
+
+		queuePalette.setLocation(new Point(topBounds.x + topBounds.width,
+				topBounds.y + topBounds.height + 1));
+		queuePalette.setOpaque(true);
+		queuePalette.doLayout();
+		addComponentListener(queuePalette);
+		queuePalette.setVisible(true);
+		
+	}
 	private void makeSubversionPalette() throws Exception {
 
 		JLayeredPane layers = getRootPane().getLayeredPane();
@@ -710,7 +876,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			try {
 				makeConfigPalette();
 				getRootPane().getLayeredPane().moveToFront(configPalette);
-				configPalette.togglePalette();
+				configPalette.togglePalette(showPreferencesButton.isSelected());
 			} catch (Exception ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
@@ -1168,7 +1334,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		}
 	}
 
-	JPanel getTopPanel() {
+	private JPanel getTopPanel() {
 		JPanel topPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -1213,16 +1379,34 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		// topPanel.add(getComponentToggles2(), c);
 		// c.gridx++;
 
+		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/svn.png")));
+		topPanel.add(showQueuesButton, c);
+		showQueuesButton
+				.addActionListener(new QueuesPaletteActionListener());
+		showQueuesButton.setToolTipText("Show the queue viewer...");
+		c.gridx++;
+
+		showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/svn.png")));
+		topPanel.add(showProcessBuilder, c);
+		showProcessBuilder
+				.addActionListener(new ProcessPaletteActionListener());
+		showProcessBuilder.setToolTipText("Show the process builder...");
+		c.gridx++;
+
 		showSubversionButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/svn.png")));
 		topPanel.add(showSubversionButton, c);
 		showSubversionButton
 				.addActionListener(new SubversionPaletteActionListener());
+		showSubversionButton.setToolTipText("Show Subversion panel...");
 		c.gridx++;
 		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
 		showPreferencesButton.addActionListener(new ConfigPaletteActionListener());
 		topPanel.add(showPreferencesButton, c);
+		showPreferencesButton.setToolTipText("Show preferences panel...");
 		c.gridx++;
 
 		return topPanel;

@@ -29,6 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import net.jini.config.Configuration;
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
@@ -168,7 +170,7 @@ public class ImportUpdateJarReader implements ActionListener {
 
 	}
 
-	public ImportUpdateJarReader() {
+	public ImportUpdateJarReader(final Configuration riverConfig) {
 		try {
 			final File jarFile = FileDialogUtil
 					.getExistingFile("Select update jar file to import");
@@ -177,7 +179,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			ACE.threadPool.execute(new Runnable() {
 				public void run() {
 					try {
-						importJar(jarFile);
+						importJar(jarFile, riverConfig);
 					} catch (TaskFailedException ex) {
 						AceLog.getAppLog().alertAndLogException(ex);
 					}
@@ -189,7 +191,7 @@ public class ImportUpdateJarReader implements ActionListener {
 		}
 	}
 
-	protected void importJar(File jarFile) throws TaskFailedException {
+	protected void importJar(File jarFile, final Configuration riverConfig) throws TaskFailedException {
 		try {
 			JarFile jf = new JarFile(jarFile);
 			Manifest mf = jf.getManifest();
@@ -290,7 +292,7 @@ public class ImportUpdateJarReader implements ActionListener {
 							if (ace.isActive()) {
 								ACE cdePanel;
 								try {
-									cdePanel = new ACE();
+									cdePanel = new ACE(riverConfig);
 									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);
