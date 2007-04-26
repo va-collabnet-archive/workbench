@@ -1380,7 +1380,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		// c.gridx++;
 
 		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/svn.png")));
+				.getResource("/32x32/plain/outbox_out.png")));
 		topPanel.add(showQueuesButton, c);
 		showQueuesButton
 				.addActionListener(new QueuesPaletteActionListener());
@@ -1388,7 +1388,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridx++;
 
 		showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/svn.png")));
+				.getResource("/32x32/plain/branch_element.png")));
 		topPanel.add(showProcessBuilder, c);
 		showProcessBuilder
 				.addActionListener(new ProcessPaletteActionListener());
