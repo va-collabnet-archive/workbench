@@ -55,9 +55,9 @@ public class ProcessBuilderFrame extends ComponentFrame {
 
 	private boolean firstStartup = true;
 
-	private ProcessBuilderPanel builder;
+	private ProcessBuilderPanel processBuilderPanel;
 
-	private MasterWorker worker;
+	private MasterWorker processWorker;
 
 
 	/**
@@ -68,7 +68,7 @@ public class ProcessBuilderFrame extends ComponentFrame {
 		super(args, lc);
 
 		this.getContentPane().setLayout(new GridLayout(1, 1));
-		this.getContentPane().add(builder);
+		this.getContentPane().add(processBuilderPanel);
 
 		// ;
 
@@ -96,7 +96,7 @@ public class ProcessBuilderFrame extends ComponentFrame {
 						ObjectInputStream ois = new ObjectInputStream(bis);
 						I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
 								.readObject();
-						worker.execute(process);
+						processWorker.execute(process);
                         logger.info("Finished business process: "
 								+ startupFiles[i]);
 					} catch (Throwable e1) {
@@ -125,23 +125,23 @@ public class ProcessBuilderFrame extends ComponentFrame {
 	 * @see org.dwfa.bpa.util.ComponentFrame#addAppMenus(javax.swing.JMenuBar)
 	 */
 	public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
-		worker =  new MasterWorker(config);
-		this.builder = new ProcessBuilderPanel(config, worker);
+		processWorker =  new MasterWorker(config);
+		this.processBuilderPanel = new ProcessBuilderPanel(config, processWorker);
 		mainMenuBar.add(fileMenu = new JMenu("File"));
 		fileMenu.add(newProcessMI = new JMenuItem("New Process"));
 		newProcessMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
 				MENU_MASK));
-		newProcessMI.addActionListener(this.builder
+		newProcessMI.addActionListener(this.processBuilderPanel
 				.getNewProcessActionListener());
 		fileMenu.add(readProcessMI = new JMenuItem("Read Process"));
 		readProcessMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
 				MENU_MASK));
-		readProcessMI.addActionListener(this.builder
+		readProcessMI.addActionListener(this.processBuilderPanel
 				.getReadProcessActionListener());
 
 		fileMenu.add(takeProcessNoTranMI = new JMenuItem(
 				"Take Process (no transaction)"));
-		takeProcessNoTranMI.addActionListener(this.builder
+		takeProcessNoTranMI.addActionListener(this.processBuilderPanel
 				.getTakeNoTranProcessActionListener());
 
 
@@ -149,16 +149,16 @@ public class ProcessBuilderFrame extends ComponentFrame {
 		fileMenu.add(saveProcessMI = new JMenuItem("Save Process"));
 		saveProcessMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				MENU_MASK));
-		saveProcessMI.addActionListener(this.builder
+		saveProcessMI.addActionListener(this.processBuilderPanel
 				.getSaveProcessActionListener());
         
         fileMenu.add(saveForLauncherQueueMI = new JMenuItem("Save for Launcher Queue"));
-        saveForLauncherQueueMI.addActionListener(this.builder
+        saveForLauncherQueueMI.addActionListener(this.processBuilderPanel
                 .getSaveForLauncherQueueActionListener());
                
         
         fileMenu.add(saveAsXmlMI = new JMenuItem("Save as XML"));
-        saveAsXmlMI.addActionListener(this.builder
+        saveAsXmlMI.addActionListener(this.processBuilderPanel
                 .getSaveAsXmlActionListener());
                
         
