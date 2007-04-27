@@ -281,17 +281,20 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	}
 
-	private class ConfigPaletteActionListener implements ActionListener {
+	private class PreferencesPaletteActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (configPalette == null) {
+			if (preferencesPalette == null) {
 				try {
 					makeConfigPalette();
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
-			getRootPane().getLayeredPane().moveToFront(configPalette);
-			configPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
+			if (showPreferencesButton.isSelected()) {
+				getRootPane().getLayeredPane().moveToFront(preferencesPalette);
+				deselectOthers(showPreferencesButton);
+			}
+			preferencesPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 
 	}
@@ -305,7 +308,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
-			getRootPane().getLayeredPane().moveToFront(subversionPalette);
+			if (showSubversionButton.isSelected()) {
+				getRootPane().getLayeredPane().moveToFront(subversionPalette);
+				deselectOthers(showSubversionButton);
+			}
 			subversionPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 
@@ -320,7 +326,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
-			getRootPane().getLayeredPane().moveToFront(queuePalette);
+			if (showQueuesButton.isSelected()) {
+				getRootPane().getLayeredPane().moveToFront(queuePalette);
+				deselectOthers(showQueuesButton);
+			}
 			queuePalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 
@@ -334,7 +343,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
-			getRootPane().getLayeredPane().moveToFront(processPalette);
+			if (showProcessBuilder.isSelected()) {
+				getRootPane().getLayeredPane().moveToFront(processPalette);
+				deselectOthers(showProcessBuilder);
+			}
 			processPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 
@@ -346,7 +358,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			if (historyPalette == null) {
 				makeHistoryPalette();
 			}
-			getRootPane().getLayeredPane().moveToFront(historyPalette);
+			if (((JToggleButton)e.getSource()).isSelected()) {
+				getRootPane().getLayeredPane().moveToFront(historyPalette);
+			}
 			historyPalette.togglePalette(((JToggleButton)e.getSource()).isSelected());
 		}
 	}
@@ -468,12 +482,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JToggleButton showQueuesButton;
 	
 	private JToggleButton showProcessBuilder;
-
+	
 	private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
 
 	private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
 
-	private CdePalette configPalette;
+	private CdePalette preferencesPalette;
 
 	private CdePalette subversionPalette;
 
@@ -551,6 +565,30 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public ACE(Configuration config) {
 		super(new GridBagLayout());
 		this.config = config;
+	}
+	
+	public void deselectOthers(JToggleButton selectedOne) {
+		AceLog.getAppLog().info("Deselecting others");
+		if (showPreferencesButton != selectedOne) {
+			if (showPreferencesButton.isSelected()) {
+				showPreferencesButton.doClick();
+			}
+		}
+		if (showSubversionButton != selectedOne) {
+			if (showSubversionButton.isSelected()) {
+				showSubversionButton.doClick();
+			}
+		}
+		if (showQueuesButton != selectedOne) {
+			if (showQueuesButton.isSelected()) {
+				showQueuesButton.doClick();
+			}
+		}
+		if (showProcessBuilder != selectedOne) {
+			if (showProcessBuilder.isSelected()) {
+				showProcessBuilder.doClick();
+			}
+		}
 	}
 
 	public void setup(I_ConfigAceFrame aceFrameConfig)
@@ -834,7 +872,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private void makeConfigPalette() throws Exception {
 		JLayeredPane layers = getRootPane().getLayeredPane();
-		configPalette = new CdePalette(new BorderLayout(),
+		preferencesPalette = new CdePalette(new BorderLayout(),
 				new RightPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.addTab("Path", new SelectPathAndPositionPanel(false, "for view",
@@ -846,28 +884,28 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		tabs.addTab("Edit", makeEditConfig());
 		tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
 
-		layers.add(configPalette, JLayeredPane.PALETTE_LAYER);
-		configPalette.add(tabs, BorderLayout.CENTER);
-		configPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+		layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
+		preferencesPalette.add(tabs, BorderLayout.CENTER);
+		preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
 		int width = 500;
 		int height = 550;
 		Rectangle topBounds = topPanel.getBounds();
-		configPalette.setSize(width, height);
+		preferencesPalette.setSize(width, height);
 
-		configPalette.setLocation(new Point(topBounds.x + topBounds.width,
+		preferencesPalette.setLocation(new Point(topBounds.x + topBounds.width,
 				topBounds.y + topBounds.height + 1));
-		configPalette.setOpaque(true);
-		configPalette.doLayout();
-		addComponentListener(configPalette);
-		configPalette.setVisible(true);
+		preferencesPalette.setOpaque(true);
+		preferencesPalette.doLayout();
+		addComponentListener(preferencesPalette);
+		preferencesPalette.setVisible(true);
 
 	}
 
 	private void removeConfigPalette() {
-		if (configPalette != null) {
-			CdePalette oldPallette = configPalette;
-			configPalette = null;
+		if (preferencesPalette != null) {
+			CdePalette oldPallette = preferencesPalette;
+			preferencesPalette = null;
 			oldPallette.setVisible(false);
 			JLayeredPane layers = getRootPane().getLayeredPane();
 			layers.remove(oldPallette);
@@ -875,8 +913,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		if (showPreferencesButton.isSelected()) {
 			try {
 				makeConfigPalette();
-				getRootPane().getLayeredPane().moveToFront(configPalette);
-				configPalette.togglePalette(showPreferencesButton.isSelected());
+				getRootPane().getLayeredPane().moveToFront(preferencesPalette);
+				preferencesPalette.togglePalette(showPreferencesButton.isSelected());
 			} catch (Exception ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
@@ -1380,7 +1418,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		// c.gridx++;
 
 		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/outbox_out.png")));
+				.getResource("/32x32/plain/inbox.png")));
 		topPanel.add(showQueuesButton, c);
 		showQueuesButton
 				.addActionListener(new QueuesPaletteActionListener());
@@ -1404,7 +1442,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridx++;
 		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
-		showPreferencesButton.addActionListener(new ConfigPaletteActionListener());
+		showPreferencesButton.addActionListener(new PreferencesPaletteActionListener());
 		topPanel.add(showPreferencesButton, c);
 		showPreferencesButton.setToolTipText("Show preferences panel...");
 		c.gridx++;
