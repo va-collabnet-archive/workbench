@@ -10,8 +10,8 @@ public class SimpleMessageRenderer implements I_RenderMessage {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String source = "";
-	public SimpleMessageRenderer(String source2) {
-		// TODO Auto-generated constructor stub
+	public SimpleMessageRenderer(String source) {
+		this.source = source;
 	}
 
 	public void renderMessage(I_EncodeBusinessProcess process, I_Work worker) {

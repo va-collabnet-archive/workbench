@@ -14,9 +14,17 @@ import org.dwfa.clock.I_KeepIncrementalTime;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-
+/**
+ * Execution of this task increments the worker's clock by the standard increment
+ * defined with the workers simulation clock was set by the Set Worker Simulation 
+ * Clock task. 
+ * 
+ * Execution of this task has no effect on the Master Simulation Clock. 
+ * @author kec
+ *
+ */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/grid/clock", type = BeanType.TASK_BEAN)})
 public class IncrementWorkerSimulationClock extends AbstractTask {
     
     private static final long serialVersionUID = 1;

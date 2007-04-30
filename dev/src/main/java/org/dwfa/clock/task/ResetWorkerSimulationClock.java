@@ -15,8 +15,18 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * Execution of this task resets the worker's clock to the same value as the master simulation clock.
+ * 
+ *  This task would typically be executed when a worker has completed executing a simulation component to 
+ *  reset the clock to it's baseline state before picking up a new simulation component and allowing it's execution. 
+
+* Execution of this task has no effect on the Master Simulation Clock. 
+ * @author kec
+ *
+ */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/grid/clock", type = BeanType.TASK_BEAN)})
 public class ResetWorkerSimulationClock extends AbstractTask {
     
     private static final long serialVersionUID = 1;

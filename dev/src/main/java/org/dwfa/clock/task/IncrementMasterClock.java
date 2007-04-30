@@ -11,8 +11,14 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * Execution of this task increments the master clock by one unit. 
+ * The size of the unit is determined by the configuration of the master clock. The
+ * Master clock is a network accessible service. A properly configured simulation environment
+ * will only have one master clock. 
+ */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/grid/clock", type = BeanType.TASK_BEAN)})
 public class IncrementMasterClock extends MasterClockTask {
     
     private static final long serialVersionUID = 1;

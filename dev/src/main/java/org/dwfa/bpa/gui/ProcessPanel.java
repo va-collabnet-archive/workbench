@@ -204,7 +204,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            String rootName = "rename";
+            String rootName = "rename-key";
             String attachmentName = rootName;
             int counter = 1;
             while (process.getAttachmentKeys().contains(attachmentName)) {
@@ -616,13 +616,22 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         this.add(new JLabel(new Integer(process.getAttachmentKeys().size())
                 .toString(), JLabel.LEFT), c);
         c.gridx++;
+        c.weightx = 0;
         this.add(new JLabel(), c);
-        c.gridx++;
-        this.add(addAttachment, c);
+        c.anchor = GridBagConstraints.EAST;
 
-        c.gridx++;
-        this.add(addEmptyAttachmentKey, c);
-        c.gridy++;
+        c.fill = GridBagConstraints.NONE;
+               c.gridx++;
+        addEmptyAttachmentKey.setVisible(viewAttachments.isSelected());
+       this.add(addEmptyAttachmentKey, c);
+
+       c.gridx++;
+        addAttachment.setVisible(viewAttachments.isSelected());
+        this.add(addAttachment, c);
+        c.anchor = GridBagConstraints.WEST;
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+       c.gridy++;
         if (viewAttachments.isSelected()) {
             attachmentTableModel = new ProcessAttachmentTableModel(this.process);
             attachmentSortingTable = new TableSorter(attachmentTableModel);

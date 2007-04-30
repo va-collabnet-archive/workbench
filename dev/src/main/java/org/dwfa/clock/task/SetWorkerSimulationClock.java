@@ -12,8 +12,19 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * Sets the worker's clock to an incremental time clock that is based on 
+ * a master simulation clock plus an offset. The magnitude of the increment is 
+ * set by this task with a granularity of milliseconds. 
+ * Execution of the Increment Worker Simulation Clock increments the 
+ * workers clock by the amount defined by this task. 
+ * 
+ * Execution of this task has no effect on the Master Simulation Clock. 
+ * @author kec
+ *
+ */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/sim/clock", type = BeanType.TASK_BEAN)})
 public class SetWorkerSimulationClock extends MasterClockTask {
     private static final long serialVersionUID = 1;
 

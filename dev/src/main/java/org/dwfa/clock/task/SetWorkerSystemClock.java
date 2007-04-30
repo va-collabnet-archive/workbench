@@ -14,8 +14,15 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * Sets the worker's clock to use the system clock. 
+ * 
+ * Executing this task has no effect on the Master Simulation Clock. 
+ * @author kec
+ *
+ */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/sim/clock", type = BeanType.TASK_BEAN)})
 public class SetWorkerSystemClock extends AbstractTask {
     
     private static final long serialVersionUID = 1;

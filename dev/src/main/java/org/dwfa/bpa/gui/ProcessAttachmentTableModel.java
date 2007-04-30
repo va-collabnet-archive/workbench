@@ -37,7 +37,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
 
     public static final int SIZE = 3;
 
-   private String[] columnNames = { "class", "name", "value", "size" };
+   private String[] columnNames = { "class", "key name", "attachment value", "size" };
 
     public ProcessAttachmentTableModel(I_EncodeBusinessProcess process) {
         super();
