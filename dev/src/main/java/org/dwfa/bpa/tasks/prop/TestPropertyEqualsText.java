@@ -25,7 +25,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/property", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/test tasks", type = BeanType.TASK_BEAN)})
 public class TestPropertyEqualsText extends AbstractTask {
 
     private String localPropName = "";

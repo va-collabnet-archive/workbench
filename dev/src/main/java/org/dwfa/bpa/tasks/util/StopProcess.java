@@ -24,7 +24,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/flow", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/flow tasks", type = BeanType.TASK_BEAN)})
 public class StopProcess extends AbstractTask {
 
     private static final long serialVersionUID = 1;

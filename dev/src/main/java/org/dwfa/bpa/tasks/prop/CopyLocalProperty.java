@@ -22,7 +22,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/property", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/copy tasks", type = BeanType.TASK_BEAN)})
 public class CopyLocalProperty extends AbstractTask {
 
     private String originalPropName = "";

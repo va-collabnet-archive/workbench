@@ -14,7 +14,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/process", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/misc tasks", type = BeanType.TASK_BEAN)})
 public class RenderMessage extends AbstractTask {
 
 

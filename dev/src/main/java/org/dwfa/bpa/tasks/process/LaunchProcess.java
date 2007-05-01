@@ -28,7 +28,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/process", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/start tasks", type = BeanType.TASK_BEAN)})
 public class LaunchProcess extends AbstractTask {
 
     private int processTaskId = -1;

@@ -28,7 +28,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/util", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/list tasks", type = BeanType.TASK_BEAN)})
 public class FromListToElement extends AbstractTask {
 
     private static final long serialVersionUID = 1;

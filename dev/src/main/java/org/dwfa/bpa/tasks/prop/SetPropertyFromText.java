@@ -27,7 +27,7 @@ import org.dwfa.bpa.worker.EditorGlueForWorker;
  * 
  * */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/property", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/set tasks", type = BeanType.TASK_BEAN)})
 public class SetPropertyFromText extends AbstractTask {
 
     private String localPropName = "";

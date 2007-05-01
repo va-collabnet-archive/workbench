@@ -26,7 +26,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/util", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/processes/look and feel", type = BeanType.TASK_BEAN)})
 public class SetMetalLookAndFeel extends AbstractTask {
 
     private static final long serialVersionUID = 1;
