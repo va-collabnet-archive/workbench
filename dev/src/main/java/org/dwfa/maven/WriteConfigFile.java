@@ -10,7 +10,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
@@ -56,20 +55,12 @@ public class WriteConfigFile extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
-		for (Dependency d: dependencies) {
-			if (d.getScope().equals("provided")) {
-				//don't add
-			} else {
-				dependencyWithoutProvided.add(d);
-			}
-		}
         this.outputDirectory.mkdirs();
         for (int i = 0; i < specs.length; i++) {
             System.out.println(specs[i]);
             try {
-                URLClassLoader libLoader = MojoUtil.getProjectClassLoader(
-                		dependencyWithoutProvided, localRepository, this.outputDirectory + "/classes/");
+                URLClassLoader libLoader = MojoUtil.getProjectClassLoaderWithoutProvided(
+                		dependencies, localRepository, this.outputDirectory + "/classes/");
                 Class specClass = libLoader.loadClass(specs[i].getClassName());
                 Constructor specConstructor = specClass.getConstructor(new Class[] {});
                 Object obj = specConstructor.newInstance(new Object[] {});

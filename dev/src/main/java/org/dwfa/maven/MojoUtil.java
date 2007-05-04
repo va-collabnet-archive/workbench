@@ -94,7 +94,9 @@ public class MojoUtil {
     	for (Dependency d: dependencies) {
     		if (d.getScope().equals("provided")) {
     			//don't add
-    		} else {
+    		} else if (d.getScope().equals("runtime-directory")) {
+    			//don't add
+    		} else{
     			dependencyWithoutProvided.add(d);
     		}
     	}

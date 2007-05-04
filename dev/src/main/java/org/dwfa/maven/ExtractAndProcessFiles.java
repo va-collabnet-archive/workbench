@@ -75,7 +75,13 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 				if (d.getScope().equals("provided")) {
 					l.info("Skipping provided: " + d);
 					continue;
-				}
+				} 
+				
+				if (d.getScope().equals("runtime-directory")) {
+					l.info("Skipping runtime-directory: " + d);
+					continue;
+				} 
+				
 				
 				String dependencyPath = MojoUtil.dependencyToPath(
 						localRepository, d);

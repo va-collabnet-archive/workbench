@@ -71,6 +71,7 @@ public class GenerateScripts extends AbstractMojo {
 		 */
         startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle");
         startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
+        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
 		configureScript(jars);
 	}
 

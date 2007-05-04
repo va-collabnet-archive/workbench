@@ -114,6 +114,15 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 								+ "/classes/");
 				Class beanListClass = libLoader.loadClass(BeanList.class.getName());
 				for (Dependency d : dependencyWithoutProvided) {
+					if (d.getScope().equals("provided")) {
+						getLog().info("Skipping provided: " + d);
+						continue;
+					} 
+					
+					if (d.getScope().equals("runtime-directory")) {
+						getLog().info("Skipping runtime-directory: " + d);
+						continue;
+					} 
 
 					String dependencyPath = MojoUtil.dependencyToPath(
 							localRepository, d);
