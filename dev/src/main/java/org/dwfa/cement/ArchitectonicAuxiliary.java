@@ -623,6 +623,29 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     		throw e;
     	}
     }
+
+    private static List<I_ConceptualizeUniversally> preferredDescPrefList;
+    public static List<I_ConceptualizeUniversally> getUniversalPreferredDescPrefList() {
+    	if (preferredDescPrefList == null) {
+       		preferredDescPrefList = new ArrayList<I_ConceptualizeUniversally>();
+
+       		preferredDescPrefList.add(Concept.XHTML_PREFERRED_DESC_TYPE);
+    		preferredDescPrefList.add(Concept.PREFERRED_DESCRIPTION_TYPE);
+    		preferredDescPrefList.add(Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE);
+     		preferredDescPrefList.add(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE);
+     		preferredDescPrefList.add(Concept.SYNONYM_DESCRIPTION_TYPE);
+     		preferredDescPrefList.add(Concept.ENTRY_DESCRIPTION_TYPE);
+    	}
+    	return preferredDescPrefList;
+    }
+    public static List<I_ConceptualizeLocally> getLocalPreferredDescPrefList() throws IOException, TerminologyException {
+		List<I_ConceptualizeLocally> localList = new ArrayList<I_ConceptualizeLocally>();
+		for (I_ConceptualizeUniversally uc: getUniversalPreferredDescPrefList()) {
+			localList.add(uc.localize());
+		}
+		return localList;
+    }
+    
     private static List<I_ConceptualizeUniversally> toStringDescPrefList;
     public static List<I_ConceptualizeUniversally> getToStringDescPrefList() {
     	if (toStringDescPrefList == null) {
