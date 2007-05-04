@@ -46,9 +46,13 @@ public class CdePalette extends JPanel implements ComponentListener {
 			t.removeActionListener(this);
 			setLocation(endLocation);
 			setVisible(true);
-			JLayeredPane layers = getRootPane().getLayeredPane();
-			layers.moveToFront(CdePalette.this);
-			layers.remove(ghostPanel);
+			if (getRootPane() != null) {
+				JLayeredPane layers = getRootPane().getLayeredPane();
+				if (layers != null) {
+					layers.moveToFront(CdePalette.this);
+					layers.remove(ghostPanel);
+				}
+			}
 		}
 
 		private void movePalette() {
