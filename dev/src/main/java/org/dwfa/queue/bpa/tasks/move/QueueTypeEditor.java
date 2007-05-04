@@ -16,7 +16,6 @@ import java.io.IOException;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.termviewer.DefaultTermViewerModel;
 import org.dwfa.termviewer.view.concept.ConceptLabel;
 
 
@@ -34,7 +33,7 @@ public class QueueTypeEditor extends PropertyEditorSupport
     private static final long serialVersionUID = 1L;
 
     
-    private ConceptLabel editor = new ConceptLabel(DefaultTermViewerModel.get());
+    private ConceptLabel editor = new ConceptLabel();
     /**
      * @param arg0
      */
