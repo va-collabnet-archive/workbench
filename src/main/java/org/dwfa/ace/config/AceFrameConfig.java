@@ -36,7 +36,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 15;
+    private static final int dataVersion = 16;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -87,6 +87,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     // 15
     private String username;
     private String password;
+    
+    // 16
+    private AceConfig masterConfig;
     
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -154,6 +157,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		//15
 		out.writeObject(username);
 		out.writeObject(password);
+		//16
+		out.writeObject(masterConfig);
    }
 
 
@@ -281,11 +286,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         		username = (String) in.readObject();
         		password = (String) in.readObject();
              }
+            if (objDataVersion >= 16) {
+            	masterConfig = (AceConfig) in.readObject();
+             }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
 
     }
+
+
+	public AceFrameConfig(AceConfig masterConfig) {
+		super();
+		this.masterConfig = masterConfig;
+	}
 
 
 	/* (non-Javadoc)
@@ -893,19 +907,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 
 	public String getPassword() {
-		return password;
+		return masterConfig.getPassword();
 	}
 
 
 	public void setPassword(String password) {
-		Object old = this.password;
-		this.password = password;
-		this.changeSupport.firePropertyChange("password", old, password);
+		masterConfig.setPassword(password);
 	}
 
 
 	public String getUsername() {
-		return username;
+		return masterConfig.getUsername();
 	}
 
 
@@ -946,5 +958,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 	public void addImported(I_GetConceptData imported) {
 		this.changeSupport.firePropertyChange("imported", null, imported);
+	}
+
+
+	public AceConfig getMasterConfig() {
+		return masterConfig;
+	}
+
+
+	public void setMasterConfig(AceConfig masterConfig) {
+		this.masterConfig = masterConfig;
 	}
 }

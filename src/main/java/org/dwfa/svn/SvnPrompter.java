@@ -75,6 +75,9 @@ public class SvnPrompter implements PromptUserPassword3 {
 			promptPane.add(new JLabel(""));
 		}
 		SpringUtilities.makeCompactGrid(promptPane, 3, 2, 6, 6, 6, 6);
+		userTextField.requestFocusInWindow();
+		userTextField.setSelectionStart(0);
+		userTextField.setSelectionEnd(Integer.MAX_VALUE);
 		int action = JOptionPane.showConfirmDialog(parentContainer, promptPane,
 				"Enter username/password:", JOptionPane.OK_CANCEL_OPTION);
 		if (action == JOptionPane.CANCEL_OPTION) {
