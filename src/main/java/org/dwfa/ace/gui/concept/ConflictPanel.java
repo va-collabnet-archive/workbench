@@ -165,6 +165,35 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		}
 
 	}
+	private class AddAllListener implements ActionListener {
+
+		List<LabelForTuple> tuples = new ArrayList<LabelForTuple>();
+		
+		public AddAllListener(List<LabelForTuple> tuples) {
+			super();
+			this.tuples = tuples;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			for (LabelForTuple partLabel: tuples) {
+				try {
+					I_ImplementActiveLabel copy = partLabel.copy();
+					copy.getLabel().setBorder(partLabel.getLabel().getBorder());
+					copy.getLabel().setPreferredSize(
+							(partLabel.getLabel().getPreferredSize()));
+					copy.getLabel()
+							.setMinimumSize((partLabel.getLabel().getMinimumSize()));
+					copy.getLabel()
+							.setMaximumSize((partLabel.getLabel().getMaximumSize()));
+					addToResolutionPanelIfNew(copy);
+				} catch (IOException e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
+			}
+		}
+
+	}
+
 
 	private class RemoveListener implements ActionListener {
 
@@ -478,9 +507,14 @@ public class ConflictPanel extends JPanel implements ActionListener {
 	}
 
 	private void addToResolutionPanel(I_ImplementActiveLabel activeLabel) {
+		addToResolutionPanel(activeLabel, true);
+	}
+	private void addToResolutionPanel(I_ImplementActiveLabel activeLabel, boolean showAlert) {
 		if (resolutionLabels.contains(activeLabel)) {
-			JOptionPane.showMessageDialog(ConflictPanel.this,
-					"Tuple is already part of resolution...");
+			if (showAlert) {
+				JOptionPane.showMessageDialog(ConflictPanel.this,
+				"Tuple is already part of resolution...");
+			}
 		} else {
 			resolveButton.setEnabled(true);
 			resolveButton.setVisible(true);
@@ -489,6 +523,10 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			resolutionPartPanel.add(activeLabel.getLabel());
 			resolutionPartPanel.revalidate();
 		}
+	}
+
+	private void addToResolutionPanelIfNew(I_ImplementActiveLabel activeLabel) {
+		addToResolutionPanel(activeLabel, false);
 	}
 
 	public void setConcept(ConceptBean cb, I_ConfigAceFrame config)
@@ -738,6 +776,16 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		c.gridy = 0;
 		Set<I_Position> posSet = new HashSet<I_Position>(1);
 		posSet.add(p);
+		c.gridx = 1;
+		
+		JButton addAll = new JButton("add all");
+		List<LabelForTuple> tuples = new ArrayList<LabelForTuple>();
+		addAll.addActionListener(new AddAllListener(tuples));
+		c.anchor = GridBagConstraints.NORTHEAST;
+		versionView.add(addAll, c);
+		c.gridx = 0;
+		c.gridwidth = 2;
+		c.anchor = GridBagConstraints.NORTHWEST;
 		
 		// concept attributes
 		List<I_ConceptAttributeTuple> conAttrList = this.cb.getConceptTuples(config
@@ -745,6 +793,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		for (I_ConceptAttributeTuple t : conAttrList) {
 			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, false,
 					false);
+			tuples.add((LabelForTuple) tLabel);
 			tLabel.addActionListener(versionLabelListener);
 			Color conflictColor = conAttrColorMap.get(t);
 			setBorder(tLabel.getLabel(), conflictColor);
@@ -758,6 +807,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		for (I_DescriptionTuple t : descList) {
 			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, false,
 					false);
+			tuples.add((LabelForTuple) tLabel);
 			tLabel.addActionListener(versionLabelListener);
 			Color conflictColor = desColorMap.get(t);
 			setBorder(tLabel.getLabel(), conflictColor);
@@ -770,6 +820,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		for (I_RelTuple t : relList) {
 			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, false,
 					false);
+			tuples.add((LabelForTuple) tLabel);
 			tLabel.addActionListener(versionLabelListener);
 			Color conflictColor = relColorMap.get(t);
 			setBorder(tLabel.getLabel(), conflictColor);
