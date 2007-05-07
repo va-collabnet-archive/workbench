@@ -25,16 +25,17 @@ public class CollectionEditorContainer extends JPanel {
 	private class ShowComponentActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			conceptPanelScroller.setVisible(showComponentView.isSelected());
 			if (showComponentView.isSelected()) {
 				showProcessBuilder.setSelected(false);
-				showListOnly.setSelected(false);
 				listSplit.setBottomComponent(conceptPanelScroller);
 				if (lastDividerLocation > 0) {
 					listSplit.setDividerLocation(lastDividerLocation);
 				} else {
 					listSplit.setDividerLocation(0.30);
 				}
+			}
+			if (showOnlyList()) {
+				showListOnly();
 			}
 		}
 		
@@ -43,10 +44,8 @@ public class CollectionEditorContainer extends JPanel {
 	private class ShowProcessBuilderActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			processBuilder.setVisible(showProcessBuilder.isSelected());
 			if (showProcessBuilder.isSelected()) {
 				showComponentView.setSelected(false);
-				showListOnly.setSelected(false);
 				listSplit.setBottomComponent(processBuilder);
 				if (lastDividerLocation > 0) {
 					listSplit.setDividerLocation(lastDividerLocation);
@@ -54,22 +53,24 @@ public class CollectionEditorContainer extends JPanel {
 					listSplit.setDividerLocation(0.30);
 				}
 			}
-		}
-		
-	}
-	private class ShowListOnlyActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			if (showListOnly.isSelected()) {
-				showProcessBuilder.setSelected(false);
-				showComponentView.setSelected(false);
-				lastDividerLocation = listSplit.getDividerLocation();
-				listSplit.setDividerLocation(1.0);
-				listSplit.setBottomComponent(new JPanel());
+			if (showOnlyList()) {
+				showListOnly();
 			}
 		}
-	}
 
+		
+	}
+	private void showListOnly() {
+		int dividerLocation = listSplit.getDividerLocation();
+		if (dividerLocation != 3000) {
+			lastDividerLocation = dividerLocation;
+			listSplit.setBottomComponent(new JPanel());	
+			listSplit.setDividerLocation(3000);
+		}
+	}
+	private boolean showOnlyList() {
+		return showComponentView.isSelected() == false && showProcessBuilder.isSelected() == false;
+	}
 	int lastDividerLocation = -1;
 	/**
 	 * 
@@ -79,14 +80,16 @@ public class CollectionEditorContainer extends JPanel {
 	private JComponent processBuilder;
 	private JToggleButton showComponentView;
 	private JToggleButton showProcessBuilder;
-	private JToggleButton showListOnly;
 	private JSplitPane listSplit;
 
 	public CollectionEditorContainer(JList list, ACE ace, JPanel descListProcessBuilderPanel) throws DatabaseException, IOException, ClassNotFoundException {
 		super(new GridBagLayout());
 		this.processBuilder = descListProcessBuilderPanel;
-		conceptPanelScroller = new JScrollPane(new ConceptPanel(ace,
-				LINK_TYPE.UNLINKED));
+		ConceptPanel cp = new ConceptPanel(ace,
+				LINK_TYPE.LIST_LINK, true);
+		cp.setLinkedList(list);
+		cp.changeLinkListener(LINK_TYPE.LIST_LINK);
+		conceptPanelScroller = new JScrollPane(cp);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
@@ -126,14 +129,9 @@ public class CollectionEditorContainer extends JPanel {
 		listEditorTopPanel.add(showComponentView, c);
 		c.gridx++;
 		showProcessBuilder = new JToggleButton(new ImageIcon(
-				ACE.class.getResource("/32x32/plain/branch_element.png")));
+				ACE.class.getResource("/32x32/plain/cube_molecule.png")));
 		listEditorTopPanel.add(showProcessBuilder, c);
 		showProcessBuilder.addActionListener(new ShowProcessBuilderActionListener());
-		c.gridx++;
-		showListOnly = new JToggleButton(new ImageIcon(
-				ACE.class.getResource("/32x32/plain/branch_element.png")));
-		listEditorTopPanel.add(showListOnly, c);
-		showListOnly.addActionListener(new ShowListOnlyActionListener());
 		c.gridx++;
 		c.weightx = 1.0;
 		listEditorTopPanel.add(new JLabel(" "), c);

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -13,16 +15,20 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class TermComponentSelectionListener implements TreeSelectionListener {
+public class TermComponentTreeSelectionListener implements TreeSelectionListener {
 
 	I_ContainTermComponent linkedComponent;
 
-	public TermComponentSelectionListener(I_ContainTermComponent linkedComponent) {
+	public TermComponentTreeSelectionListener(I_ContainTermComponent linkedComponent) {
 		super();
 		this.linkedComponent = linkedComponent;
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
+		handleChange(e);
+	}
+
+	private void handleChange(TreeSelectionEvent e) {
 		try {
 			ConceptBean currentBean = (ConceptBean) linkedComponent
 					.getTermComponent();

@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -39,7 +40,8 @@ import javax.swing.event.ChangeListener;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.TermComponentLabel;
-import org.dwfa.ace.TermComponentSelectionListener;
+import org.dwfa.ace.TermComponentListSelectionListener;
+import org.dwfa.ace.TermComponentTreeSelectionListener;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
@@ -73,7 +75,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		I_TermFactory, PropertyChangeListener {
 
 	public enum LINK_TYPE {
-		UNLINKED, SEARCH_LINK, TREE_LINK
+		UNLINKED, SEARCH_LINK, TREE_LINK, LIST_LINK
 	};
 
 	private class LabelListener implements PropertyChangeListener {
@@ -81,7 +83,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		public void propertyChange(PropertyChangeEvent evt) {
 			updateTab(label.getTermComponent());
 			if (label.getTermComponent() != null) {
-				ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
+				ace.getAceFrameConfig().setLastViewed(
+						(I_GetConceptData) label.getTermComponent());
 			}
 			firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt
 					.getNewValue());
@@ -97,7 +100,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					try {
 						contentScroller.setViewportView(getContentPane());
 					} catch (DatabaseException e) {
-						AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+						AceLog.getAppLog().alertAndLog(
+								ConceptPanel.this,
+								Level.SEVERE,
 								"Database Exception: "
 										+ e.getLocalizedMessage(), e);
 					}
@@ -140,11 +145,17 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public static ImageIcon TREE_LINK_ICON = new ImageIcon(ACE.class
 			.getResource("/24x24/plain/carabiner_tree.png"));
 
+	public static ImageIcon LIST_LINK_ICON = new ImageIcon(ACE.class
+			.getResource("/24x24/plain/carabiner_up_arrow.png"));
+
 	public static ImageIcon SMALL_SEARCH_LINK_ICON = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/find.png"));
 
 	public static ImageIcon SMALL_TREE_LINK_ICON = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/text_tree.png"));
+
+	public static ImageIcon SMALL_LIST_LINK_ICON = new ImageIcon(ACE.class
+			.getResource("/16x16/plain/arrow_up_green.png"));
 
 	private ConflictPlugin conflictPlugin = new ConflictPlugin();
 
@@ -277,6 +288,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				} else if (value == UNLINKED_ICON) {
 					setToolTipText("This panel is not linked to other selections");
 					tabIcon = null;
+				} else if (value == LIST_LINK_ICON) {
+					setToolTipText("This panel is linked to the list selection above");
+					tabIcon = SMALL_LIST_LINK_ICON;
 				}
 			}
 		}
@@ -295,8 +309,19 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		this(ace, link, null);
 	}
 
+	public ConceptPanel(ACE ace, LINK_TYPE link, boolean enableListLink)
+			throws DatabaseException, IOException, ClassNotFoundException {
+		this(ace, link, null, enableListLink);
+	}
+
 	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs)
 			throws DatabaseException, IOException, ClassNotFoundException {
+		this(ace, link, conceptTabs, false);
+	}
+
+	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs,
+			boolean enableListLink) throws DatabaseException, IOException,
+			ClassNotFoundException {
 		super(new GridBagLayout());
 		this.ace = ace;
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
@@ -304,9 +329,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		this.ace.getAceFrameConfig().addPropertyChangeListener(this);
 		this.conceptTabs = conceptTabs;
 		GridBagConstraints c = new GridBagConstraints();
+
 		LinkListModel linkSpinnerModel = new LinkListModel(new ImageIcon[] {
 				UNLINKED_ICON, SEARCH_LINK_ICON, TREE_LINK_ICON }, link
 				.ordinal());
+		if (enableListLink) {
+			linkSpinnerModel = new LinkListModel(new ImageIcon[] {
+					UNLINKED_ICON, SEARCH_LINK_ICON, TREE_LINK_ICON,
+					LIST_LINK_ICON }, link.ordinal());
+		}
 		JSpinner linkSpinner = new JSpinner(linkSpinnerModel);
 		linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
 
@@ -546,23 +577,35 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return ace.getAceFrameConfig();
 	}
 
-	TermComponentSelectionListener treeListener;
+	private TermComponentTreeSelectionListener treeListener;
+	private TermComponentListSelectionListener listListener;
+	private JList linkedList;
 
-	private void changeLinkListener(LINK_TYPE type) {
+	public void changeLinkListener(LINK_TYPE type) {
 		if (treeListener != null) {
 			ace.removeTreeSelectionListener(treeListener);
 			treeListener = null;
-			ace.removeSearchLinkedComponent(this);
 		}
+		if (listListener != null) {
+			linkedList.removeListSelectionListener(listListener);
+			listListener = null;
+		}
+		ace.removeSearchLinkedComponent(this);
 		switch (type) {
 		case TREE_LINK:
-			treeListener = new TermComponentSelectionListener(this);
+			treeListener = new TermComponentTreeSelectionListener(this);
 			ace.addTreeSelectionListener(treeListener);
 			break;
 		case SEARCH_LINK:
 			ace.addSearchLinkedComponent(this);
 			break;
 		case UNLINKED:
+			break;
+		case LIST_LINK:
+			if (linkedList != null) {
+				listListener = new TermComponentListSelectionListener(this);
+				linkedList.addListSelectionListener(listListener);
+			}
 			break;
 		}
 	}
@@ -571,7 +614,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		if (evt.getPropertyName().equals("viewPositions")) {
 			historyChangeActionListener.actionPerformed(null);
 		} else if (evt.getPropertyName().equals("commit")) {
-			if (label.getTermComponent() != null ) {
+			if (label.getTermComponent() != null) {
 				ConceptBean cb = (ConceptBean) label.getTermComponent();
 				try {
 					if (cb.getConceptAttributes() == null) {
@@ -605,11 +648,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			throws TerminologyException, IOException {
 		canEdit();
 		int idSource = AceConfig.vodb
-		.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-				.getUids());
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
 		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-		AceLog.getEditLog().info("Creating new concept: " + newConceptId + " (" + nid + ") defined: " + defined);
+		AceLog.getEditLog().info(
+				"Creating new concept: " + newConceptId + " (" + nid
+						+ ") defined: " + defined);
 		ConceptBean newBean = ConceptBean.get(nid);
 		newBean.setPrimordial(true);
 		int status = AceConfig.vodb
@@ -642,7 +687,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		int descId = AceConfig.vodb.uuidToNativeWithGeneration(
 				newDescriptionId, idSource, getConfig().getEditingPathSet(),
 				Integer.MAX_VALUE);
-		AceLog.getEditLog().info("Creating new description: " + newDescriptionId + " (" + descId + "): " + text);
+		AceLog.getEditLog().info(
+				"Creating new description: " + newDescriptionId + " (" + descId
+						+ "): " + text);
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), getConfig().getEditingPathSet().size());
 		boolean capStatus = false;
@@ -668,15 +715,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			I_GetConceptData concept) throws TerminologyException, IOException {
 		canEdit();
 		if (getConfig().getHierarchySelection() == null) {
-			throw new TerminologyException("<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
+			throw new TerminologyException(
+					"<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
 		}
 		int idSource = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
 		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-		AceLog.getEditLog().info("Creating new relationship 1: " + newRelUid + " (" + relId + ") from " + 
-				concept.getUids() + " to " + getConfig().getHierarchySelection().getUids());
+		AceLog.getEditLog().info(
+				"Creating new relationship 1: " + newRelUid + " (" + relId
+						+ ") from " + concept.getUids() + " to "
+						+ getConfig().getHierarchySelection().getUids());
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), getConfig().getHierarchySelection()
 				.getConceptId(), 1);
@@ -704,8 +754,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public I_RelVersioned newRelationship(UUID newRelUid,
-			I_GetConceptData concept, 
-			I_ConceptualizeLocally relType,
+			I_GetConceptData concept, I_ConceptualizeLocally relType,
 			I_ConceptualizeLocally relDestination,
 			I_ConceptualizeLocally relCharacteristic,
 			I_ConceptualizeLocally relRefinability, int relGroup)
@@ -714,22 +763,25 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		int idSource = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
-		
+
 		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
 				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-		
-		AceLog.getEditLog().info("Creating new relationship 2: " + newRelUid + " (" + relId + ") from " + 
-				concept.getUids() + " to " + relDestination.getUids());
+
+		AceLog.getEditLog().info(
+				"Creating new relationship 2: " + newRelUid + " (" + relId
+						+ ") from " + concept.getUids() + " to "
+						+ relDestination.getUids());
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
-				.getConceptId(), relDestination.getNid(), getConfig().getEditingPathSet().size());
-		
+				.getConceptId(), relDestination.getNid(), getConfig()
+				.getEditingPathSet().size());
+
 		ThinRelPart relPart = new ThinRelPart();
-		
+
 		rel.addVersion(relPart);
-		
+
 		int status = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		
+
 		for (I_Path p : getConfig().getEditingPathSet()) {
 			relPart.setVersion(Integer.MAX_VALUE);
 			relPart.setPathId(p.getConceptId());
@@ -748,7 +800,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	private void canEdit() throws TerminologyException {
 		if (getConfig().getEditingPathSet().size() == 0) {
-			throw new TerminologyException("<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
+			throw new TerminologyException(
+					"<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
 		}
 	}
 
@@ -764,15 +817,23 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public void forget(I_DescriptionVersioned desc) {
 		throw new UnsupportedOperationException();
-		
+
 	}
 
 	public void forget(I_RelVersioned rel) {
 		throw new UnsupportedOperationException();
-		
+
 	}
 
 	public LogWithAlerts getEditLog() {
 		return AceLog.getEditLog();
+	}
+
+	public JList getLinkedList() {
+		return linkedList;
+	}
+
+	public void setLinkedList(JList linkedList) {
+		this.linkedList = linkedList;
 	}
 }

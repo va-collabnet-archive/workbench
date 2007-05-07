@@ -62,33 +62,34 @@ public class ProcessBuilderContainer extends JPanel {
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
 		addActionButton(processBuilderPanel.getNewProcessActionListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
+				"/24x24/plain/cube_molecule_new.png",
 				"new process",
 				listEditorTopPanel, c);
 		addActionButton(processBuilderPanel.getReadProcessActionListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
+				"/24x24/plain/read_from_disk.png",
 				"read process",
 				listEditorTopPanel, c);
 		
 		addActionButton(processBuilderPanel.getTakeNoTranProcessActionListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
+				"/24x24/plain/outbox_out.png",
 				"take process (no transaction)",
 				listEditorTopPanel, c);
 		
 		addActionButton(processBuilderPanel.getSaveProcessActionListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
+				"/24x24/plain/save_to_disk.png",
 				"save process",
 				listEditorTopPanel, c);
 		
 		addActionButton(processBuilderPanel.getSaveForLauncherQueueActionListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
+				"/24x24/plain/inbox_into.png",
 				"save for queue",
 				listEditorTopPanel, c);
-		
+		/*
 		addActionButton(processBuilderPanel.getSaveAsXmlActionListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
+				"/24x24/plain/save_as_xml.png",
 				"save as XML",
 				listEditorTopPanel, c);
+		*/
 		c.weightx = 1.0;
 		listEditorTopPanel.add(new JLabel(" "), c); //filler
 		c.gridx++;

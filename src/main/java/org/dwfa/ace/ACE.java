@@ -881,15 +881,15 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.weighty = 0;
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
-		addActionButton(new MoveListener(), 
-				"/32x32/plain/bullet_triangle_blue.png",
-				"Take Selected Processes and Save To Disk",
-				listEditorTopPanel, c);
+		listEditorTopPanel.add(new JLabel(" "), c); //placeholder for left sided button
 		c.weightx = 1.0;
 		listEditorTopPanel.add(new JLabel(" "), c); //filler
 		c.gridx++;
 		c.weightx = 0.0;
-		listEditorTopPanel.add(new JLabel(" "), c); //right sided buttons
+		addActionButton(new MoveListener(), 
+				"/24x24/plain/outbox_out.png",
+				"Take Selected Processes and Save To Disk (no transaction)",
+				listEditorTopPanel, c);
 		return listEditorTopPanel;
 
 	}
@@ -1476,7 +1476,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridx++;
 
 		showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/branch_element.png")));
+				.getResource("/32x32/plain/cube_molecule.png")));
 		topPanel.add(showProcessBuilder, c);
 		showProcessBuilder
 				.addActionListener(new ProcessPaletteActionListener());
