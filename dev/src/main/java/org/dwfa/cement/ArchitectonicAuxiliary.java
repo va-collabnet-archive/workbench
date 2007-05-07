@@ -658,6 +658,18 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	return toStringDescPrefList;
     }
     
+    private static List<I_ConceptualizeUniversally> fullySpecifiedDescPrefList;
+    public static List<I_ConceptualizeUniversally> getFullySpecifiedDescPrefList() {
+    	if (fullySpecifiedDescPrefList == null) {
+    		fullySpecifiedDescPrefList = new ArrayList<I_ConceptualizeUniversally>();
+    		fullySpecifiedDescPrefList.add(Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE);
+    		fullySpecifiedDescPrefList.add(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE);
+    		fullySpecifiedDescPrefList.add(Concept.XHTML_PREFERRED_DESC_TYPE);
+    		fullySpecifiedDescPrefList.add(Concept.PREFERRED_DESCRIPTION_TYPE);
+    	}
+    	return fullySpecifiedDescPrefList;
+    }
+    
     private static Map<I_StoreLocalFixedTerminology, List<I_ConceptualizeLocally>> localToStringDescPrefListMap = new HashMap<I_StoreLocalFixedTerminology, List<I_ConceptualizeLocally>>();
     public static List<I_ConceptualizeLocally> getLocalToStringDescPrefList(I_StoreLocalFixedTerminology termServer) throws Exception {
     	if (localToStringDescPrefListMap.get(termServer) == null) {
@@ -669,4 +681,17 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	}
     	return localToStringDescPrefListMap.get(termServer);
     }
+    
+    private static List<I_ConceptualizeLocally> localFullySpecifiedDescPrefList;
+    ;
+    public static List<I_ConceptualizeLocally> getLocalFullySpecifiedDescPrefList() throws Exception {
+    	if (localFullySpecifiedDescPrefList == null) {
+    		localFullySpecifiedDescPrefList = new ArrayList<I_ConceptualizeLocally>();
+    		for (I_ConceptualizeUniversally uc: getFullySpecifiedDescPrefList()) {
+    			localFullySpecifiedDescPrefList.add(uc.localize());
+    		}
+    	}
+    	return localFullySpecifiedDescPrefList;
+    }
+    
 }
