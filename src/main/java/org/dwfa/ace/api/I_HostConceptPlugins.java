@@ -14,5 +14,7 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
 	public VIEW_TYPE getViewType();
 	
 	public I_GetConceptData getHierarchySelection();
+
+	public void unlink();
 	
 }

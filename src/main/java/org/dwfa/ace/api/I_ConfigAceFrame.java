@@ -6,6 +6,9 @@ import java.beans.VetoableChangeSupport;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.swing.JList;
+import javax.swing.JPanel;
+
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -185,5 +188,12 @@ public interface I_ConfigAceFrame {
 	
 	public void setLastViewed(I_GetConceptData conceptBean);
 	public I_GetConceptData getLastViewed();
+	
+	public JList getBatchConceptList();
+	
+	public I_HostConceptPlugins getConceptViewer(int index);
+	public void selectConceptViewer(int hostIndex);
+	
+	public JPanel getWorkflowPanel();
 
 }
