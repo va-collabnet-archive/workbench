@@ -8,11 +8,9 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.list.TerminologyListModel;
-import org.dwfa.ace.tree.I_GetConceptDataForTree;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class TermComponentListSelectionListener implements

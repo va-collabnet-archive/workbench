@@ -836,4 +836,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public void setLinkedList(JList linkedList) {
 		this.linkedList = linkedList;
 	}
+
+	public void unlink() {
+		changeLinkListener(LINK_TYPE.UNLINKED);
+	}
 }

@@ -1,5 +1,6 @@
 package org.dwfa.ace.config;
 
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -19,7 +20,7 @@ public class AceFrame extends ComponentFrame {
 
 	public AceFrame(String[] args, LifeCycle lc, I_ConfigAceFrame frameConfig) throws Exception {
 		super(args, lc);
-
+		((AceFrameConfig) frameConfig).setAceFrame(this);
 		getCdePanel().setup(frameConfig);
 		setName(frameConfig.getFrameName());
 		setContentPane(cdePanel);
@@ -79,6 +80,9 @@ public class AceFrame extends ComponentFrame {
 			cdePanel = new ACE(config);
 		}
 		return cdePanel;
+	}
+	public JList getBatchConceptList() {
+		return getCdePanel().getBatchConceptList();
 	}
 
 }

@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -468,7 +469,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private ConceptPanel c1Panel;
 
-	private JComponent c2Panel;
+	private ConceptPanel c2Panel;
 
 	private JComponent termTree;
 
@@ -538,6 +539,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JToggleButton showPreferencesButton;
 
 	private Configuration config;
+
+	private JList batchConceptList;
+
+	private ArrayList<ConceptPanel> conceptPanels;
 
 	/**
 	 * 
@@ -737,18 +742,26 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		 * src='" + ACE.class.getResource("/triangle_yellow_exclamation.gif")
 		 * +"' border='0' ></html>"; c1Panel = new JLabel(htmlLabel);
 		 */
+		conceptPanels = new ArrayList<ConceptPanel>();
 		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs);
+		conceptPanels.add(c1Panel);
 		c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs);
+		conceptPanels.add(c2Panel);
 		conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel,
 				"Tree Linked");
 		conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON,
 				c2Panel, "Search Linked");
-		conceptTabs.addTab("Empty", null, new ConceptPanel(this,
-				LINK_TYPE.UNLINKED, conceptTabs), "Unlinked");
-		conceptTabs.addTab("Empty 2", null, new ConceptPanel(this,
-				LINK_TYPE.UNLINKED, conceptTabs), "Unlinked 2");
-		conceptTabs.addTab("Description List", getDescListEditor());
-		conceptTabs.addTab("Concept List", getConceptListEditor());
+		
+		ConceptPanel c3panel = new ConceptPanel(this,
+				LINK_TYPE.UNLINKED, conceptTabs);
+		conceptPanels.add(c3panel);
+		conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
+		ConceptPanel c4panel = new ConceptPanel(this,
+				LINK_TYPE.UNLINKED, conceptTabs);
+		conceptPanels.add(c3panel);
+		conceptTabs.addTab("Empty 2", null, c4panel, "Unlinked 2");
+		//conceptTabs.addTab("Description List", getDescListEditor());
+		conceptTabs.addTab("List", getConceptListEditor());
 
 		conceptTabs.setMinimumSize(new Dimension(0, 0));
 		c2Panel.setMinimumSize(new Dimension(0, 0));
@@ -790,7 +803,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private Component getConceptListEditor() throws DatabaseException,
 			IOException, ClassNotFoundException {
-		return new CollectionEditorContainer(new TerminologyList(), this, descListProcessBuilderPanel);
+		batchConceptList = new TerminologyList();
+		return new CollectionEditorContainer(batchConceptList, this, descListProcessBuilderPanel);
 	}
 
 	private Component getDescListEditor() throws DatabaseException,
@@ -1645,6 +1659,18 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public static Set<I_WriteChangeSet> getCsWriters() {
 		return csWriters;
+	}
+
+	public JList getBatchConceptList() {
+		return batchConceptList;
+	}
+
+	public ArrayList<ConceptPanel> getConceptPanels() {
+		return conceptPanels;
+	}
+
+	public JTabbedPane getConceptTabs() {
+		return conceptTabs;
 	}
 
 }

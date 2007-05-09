@@ -13,9 +13,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.JList;
+import javax.swing.JPanel;
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -95,6 +99,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient String statusMessage;
     private transient boolean commitEnabled = false;
     private transient I_GetConceptData lastViewed;
+    private transient AceFrame aceFrame;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -969,4 +974,36 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void setMasterConfig(AceConfig masterConfig) {
 		this.masterConfig = masterConfig;
 	}
+
+
+	public AceFrame getAceFrame() {
+		return aceFrame;
+	}
+
+
+	public void setAceFrame(AceFrame aceFrame) {
+		this.aceFrame = aceFrame;
+	}
+
+
+	public JList getBatchConceptList() {
+		return aceFrame.getBatchConceptList();
+	}
+
+
+	public I_HostConceptPlugins getConceptViewer(int index) {
+		return aceFrame.getCdePanel().getConceptPanels().get(index);
+	}
+	
+	public void selectConceptViewer(int index) {
+		aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index);
+	}
+
+
+	public JPanel getWorkflowPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }
