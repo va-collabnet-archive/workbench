@@ -9,26 +9,28 @@ import org.dwfa.maven.transform.*;
  */
 
 public class AppendTransform extends AbstractTransform {
-	
+
 	String param;
 	public String transform(String input) throws Exception {
 		StringBuffer sb = new StringBuffer();
 
-		//sb.append('"');
 		for (int i = 0; i < input.length(); i++) {
 			char c = input.charAt(i);
 			sb.append(c);
 			if (c == '"') {
 				sb.append('"');
-			}	
+			}
 		}
 		sb.append(' ');
 		sb.append(param);
-		//sb.append('"');
 
-		return setLastTransform(sb.toString());
+        if (getChainedTransform() != null) {
+            return setLastTransform(getChainedTransform().transform(sb.toString()));
+        } else {
+            return setLastTransform(sb.toString());
+        }
 	}
 	public void setupImpl(Transform transformer) {
-		
+
 	}
 }
