@@ -30,6 +30,14 @@ public interface I_GetConceptData extends I_AmTermComponent {
 			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted)
 			throws IOException;
 
+	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted)
+			throws IOException;
+
+	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted)
+			throws IOException;
+
 	public List<I_DescriptionVersioned> getDescriptions() throws IOException;
 
 	public List<I_RelVersioned> getDestRels() throws IOException;
