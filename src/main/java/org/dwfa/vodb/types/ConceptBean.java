@@ -165,9 +165,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			Set<I_Position> positionSet) throws IOException {
 		List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
 		for (I_DescriptionVersioned desc : getDescriptions()) {
-			desc
-					.addTuples(allowedStatus, allowedTypes, positionSet,
-							returnDescriptions);
+			desc.addTuples(allowedStatus, allowedTypes, positionSet,
+					returnDescriptions);
 		}
 		return returnDescriptions;
 	}
@@ -402,7 +401,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (images == null) {
 			try {
 				images = AceConfig.vodb.getImages(conceptId);
-				AceLog.getAppLog().info("Retrieved images: " + images + " for: " + conceptId);
+				AceLog.getAppLog().info(
+						"Retrieved images: " + images + " for: " + conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -621,8 +621,6 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 	}
 
-
-
 	public void flush() throws DatabaseException, IOException {
 		conceptAttributes = null;
 		uncommittedConceptAttributes = null;
@@ -703,7 +701,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					}
 				}
 			}
-			
+
 			if (images != null) {
 				for (I_ImageVersioned img : images) {
 					for (ListIterator<I_ImagePart> partItr = img.getVersions()
@@ -1050,6 +1048,43 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			uab.getUncommittedIds().add(idv.getUniversal());
 		}
 		return uab;
+	}
+
+	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted) throws IOException {
+		Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+		for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes,
+				positions, addUncommitted)) {
+			returnValues.add(ConceptBean.get(rel.getC1Id()));
+		}
+		return returnValues;
+	}
+
+	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted) throws IOException {
+		Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+		for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes,
+				positions, addUncommitted)) {
+			returnValues.add(ConceptBean.get(rel.getC2Id()));
+		}
+		return returnValues;
+	}
+
+	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted) throws IOException {
+		Set parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
+		if (parents.contains(this)) {
+			return true;
+		}
+		for (I_GetConceptData childParent: child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted)) {
+			if (this.isParentOf(childParent, allowedStatus, allowedTypes, positions, addUncommitted)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

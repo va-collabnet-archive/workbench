@@ -97,8 +97,11 @@ public class SearchPanel extends JPanel {
 
 	private TermComponentLabel rootConceptLabel;
 
+	private I_ConfigAceFrame config;
+
 	public SearchPanel(I_ConfigAceFrame config) {
 		super(new GridBagLayout());
+		this.config = config;
 		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
 		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
@@ -241,7 +244,7 @@ public class SearchPanel extends JPanel {
 			setShowProgress(true);
 			model.setDescriptions(new ArrayList<ThinDescVersioned>());
 			ACE.threadPool.execute(new SearchStringWorker(this, model,
-					searchPhraseField.getText()));
+					searchPhraseField.getText(), config));
 		} else {
 			JOptionPane.showMessageDialog(getRootPane(),
 					"The search string must be longer than 2 characters: "

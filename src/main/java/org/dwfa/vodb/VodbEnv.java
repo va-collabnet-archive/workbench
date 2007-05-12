@@ -25,6 +25,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -1029,7 +1030,7 @@ public class VodbEnv {
 	 * @throws DatabaseException
 	 */
 	public void search(I_TrackContinuation tracker, Pattern p,
-			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root)
+			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root, I_ConfigAceFrame config)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.INFO)) {
@@ -1044,7 +1045,7 @@ public class VodbEnv {
 				ThinDescVersioned descV = (ThinDescVersioned) descBinding
 						.entryToObject(foundData);
 				ACE.threadPool.execute(new CheckAndProcessMatch(p, matches,
-						descV, root));
+						descV, root, config));
 			} else {
 				while (latch.getCount() > 0) {
 					latch.countDown();
@@ -1072,14 +1073,17 @@ public class VodbEnv {
 		ThinDescVersioned descV;
 		
 		I_GetConceptData root;
+		
+		I_ConfigAceFrame config;
 
 		public CheckAndProcessMatch(Pattern p,
-				Collection<ThinDescVersioned> matches, ThinDescVersioned descV, I_GetConceptData root) {
+				Collection<ThinDescVersioned> matches, ThinDescVersioned descV, I_GetConceptData root, I_ConfigAceFrame config) {
 			super();
 			this.p = p;
 			this.matches = matches;
 			this.descV = descV;
 			this.root = root;
+			this.config = config;
 		}
 
 		public void run() {
@@ -1087,7 +1091,15 @@ public class VodbEnv {
 				if (root == null) {
 					matches.add(descV);
 				} else {
-					throw new UnsupportedOperationException();
+					ConceptBean descConcept = ConceptBean.get(descV.getConceptId());
+					try {
+						if  (root.isParentOf(descConcept, config.getAllowedStatus(), config.getDestRelTypes(), 
+								config.getViewPositionSet(), true)) {
+							matches.add(descV);
+						}
+					} catch (IOException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					}
 				}
 			}
 		}

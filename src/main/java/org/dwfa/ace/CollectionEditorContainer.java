@@ -10,6 +10,10 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -28,6 +33,8 @@ import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
 import org.dwfa.ace.task.AttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.bpa.ExecutionRecord;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
 
 import com.sleepycat.je.DatabaseException;
@@ -205,6 +212,7 @@ public class CollectionEditorContainer extends JPanel {
 	}
 	private class PluginListener implements ActionListener {
 		File pluginProcessFile;
+       	String exceptionMessage;
 
 		private PluginListener(File pluginProcessFile) {
 			super();
@@ -216,10 +224,10 @@ public class CollectionEditorContainer extends JPanel {
 				FileInputStream fis = new FileInputStream(pluginProcessFile);
 				BufferedInputStream bis = new BufferedInputStream(fis);
 				ObjectInputStream ois = new ObjectInputStream(bis);
-				BusinessProcess bp = (BusinessProcess) ois.readObject();
+				final BusinessProcess bp = (BusinessProcess) ois.readObject();
 				ois.close();
 				getConfig().setStatusMessage("Executing: " + bp.getName());
-				MasterWorker worker = getConfig().getWorker();
+				final MasterWorker worker = getConfig().getWorker();
 				// Set concept bean
 				// Set config
 				JList conceptList = getConfig().getBatchConceptList();
@@ -239,9 +247,44 @@ public class CollectionEditorContainer extends JPanel {
 						cp);
 				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
 						.name(), cp);
-				worker.execute(bp);
-				getConfig().setStatusMessage(
-						"Execution of " + bp.getName() + " complete.");
+ 	            Runnable r = new Runnable() {
+	                public void run() {
+	                    I_EncodeBusinessProcess process = bp;
+	                    try {
+	                    	worker.getLogger().info("Worker: " + worker.getWorkerDesc() + 
+	                        		" (" + worker.getId() + ") executing process: " + 
+	                        		process.getName());
+	                        worker.execute(process);
+	                        SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(process
+	                                .getExecutionRecords());
+	                        Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
+	                        StringBuffer buff = new StringBuffer();
+	                        while (recordItr.hasNext()) {
+	                            ExecutionRecord rec = recordItr
+	                                    .next();
+	                            buff.append("\n");
+	                            buff.append(rec.toString());
+	                        }
+	                        worker.getLogger().info(buff.toString());
+	                        exceptionMessage = "";
+	                    } catch (Throwable e1) {
+	                    	worker.getLogger().log(Level.WARNING, e1.toString(), e1);
+	                        exceptionMessage = e1.toString();
+	                    }
+	                    SwingUtilities.invokeLater(new Runnable() {
+	                        public void run() {
+	                        	getConfig().setStatusMessage("<html><font color='#006400'>execute");
+	                            if (exceptionMessage.equals("")) {
+	                            	getConfig().setStatusMessage("<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
+	        	                } else {
+	                            	getConfig().setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>" + exceptionMessage);
+	                            }
+	                        }
+	                    });
+	                }
+
+	            };
+	            new Thread(r).start();
 			} catch (Exception e1) {
 				getConfig().setStatusMessage("Exception during execution.");
 				AceLog.getAppLog().alertAndLogException(e1);

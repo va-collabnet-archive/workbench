@@ -13,6 +13,7 @@ import javax.swing.Timer;
 
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.swing.SwingWorker;
@@ -35,6 +36,8 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 	private Collection<ThinDescVersioned> matches;
 
 	private DescriptionsFromCollectionTableModel model;
+	
+	I_ConfigAceFrame config;
 
 	private class MatchUpdator implements ActionListener {
 		Timer updateTimer;
@@ -117,8 +120,10 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 	}
 
 	public SearchStringWorker(SearchPanel searchPanel, 
-			DescriptionsFromCollectionTableModel model, String patternString) {
+			DescriptionsFromCollectionTableModel model, String patternString,
+			I_ConfigAceFrame config) {
 		super();
+		this.config = config;
 		this.model = model;
 		this.searchPanel = searchPanel;
 		this.searchPanel.addStopActionListener(stopListener);
@@ -148,7 +153,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				.synchronizedCollection(new TreeSet<ThinDescVersioned>(
 						new ThinDescVersionedComparator()));
 		new MatchUpdator();
-		AceConfig.vodb.search(this, p, matches, completeLatch, searchPanel.getRootConcept());
+		AceConfig.vodb.search(this, p, matches, completeLatch, searchPanel.getRootConcept(), config);
 		completeLatch.await();
 		return updater;
 	}

@@ -13,6 +13,7 @@ import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
@@ -171,6 +172,18 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 
 	public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
 		return bean.getUniversalAceBean();
+	}
+
+	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
+		return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions, addUncommitted);
+	}
+
+	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
+		return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
+	}
+
+	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
+		return bean.isParentOf(child, allowedStatus, allowedTypes, positions, addUncommitted);
 	}
 	
 	/*

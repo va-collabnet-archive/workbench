@@ -32,12 +32,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Timer;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.Action;
@@ -82,7 +86,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.TimePathId;
@@ -106,8 +109,10 @@ import org.dwfa.ace.tree.TermTreeCellRenderer;
 import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
@@ -1655,10 +1660,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				FileInputStream fis = new FileInputStream(pluginProcessFile);
 				BufferedInputStream bis = new BufferedInputStream(fis);
 				ObjectInputStream ois = new ObjectInputStream(bis);
-				BusinessProcess bp = (BusinessProcess) ois.readObject();
+				final BusinessProcess bp = (BusinessProcess) ois.readObject();
 				ois.close();
 				aceFrameConfig.setStatusMessage("Executing: " + bp.getName());
-				MasterWorker worker = aceFrameConfig.getWorker();
+				final MasterWorker worker = aceFrameConfig.getWorker();
 				
 				worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
 						aceFrameConfig);
@@ -1668,9 +1673,46 @@ public class ACE extends JPanel implements PropertyChangeListener {
 						this);
 				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
 						.name(), this);
-				worker.execute(bp);
-				aceFrameConfig.setStatusMessage(
-						"Execution of " + bp.getName() + " complete.");
+	            Runnable r = new Runnable() {
+	                private String exceptionMessage;
+
+					public void run() {
+	                    I_EncodeBusinessProcess process = bp;
+	                    try {
+	                    	worker.getLogger().info("Worker: " + worker.getWorkerDesc() + 
+	                        		" (" + worker.getId() + ") executing process: " + 
+	                        		process.getName());
+	                        worker.execute(process);
+	                        SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(process
+	                                .getExecutionRecords());
+	                        Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
+	                        StringBuffer buff = new StringBuffer();
+	                        while (recordItr.hasNext()) {
+	                            ExecutionRecord rec = recordItr
+	                                    .next();
+	                            buff.append("\n");
+	                            buff.append(rec.toString());
+	                        }
+	                        worker.getLogger().info(buff.toString());
+	                        exceptionMessage = "";
+	                    } catch (Throwable e1) {
+	                    	worker.getLogger().log(Level.WARNING, e1.toString(), e1);
+	                        exceptionMessage = e1.toString();
+	                    }
+	                    SwingUtilities.invokeLater(new Runnable() {
+	                        public void run() {
+	                        	aceFrameConfig.setStatusMessage("<html><font color='#006400'>execute");
+	                            if (exceptionMessage.equals("")) {
+	                            	aceFrameConfig.setStatusMessage("<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
+	        	                } else {
+	        	                	aceFrameConfig.setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>" + exceptionMessage);
+	                            }
+	                        }
+	                    });
+	                }
+
+	            };
+	            new Thread(r).start();
 			} catch (Exception e1) {
 				aceFrameConfig.setStatusMessage("Exception during execution.");
 				AceLog.getAppLog().alertAndLogException(e1);
