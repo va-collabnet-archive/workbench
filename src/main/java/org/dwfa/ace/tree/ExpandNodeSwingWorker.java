@@ -76,7 +76,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		public void actionPerformed(ActionEvent e) {
 			if (addToViewer) {
 				addToViewer = false;
-				ActivityViewer.addActivity(activity);
+				try {
+					ActivityViewer.addActivity(activity);
+				} catch (Exception e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
 			}
 			if (lowerProgressMessage.startsWith("counting")) {
 				activity.setProgressInfoLower(lowerProgressMessage

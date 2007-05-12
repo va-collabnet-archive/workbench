@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.task.AttachmentKeys;
 import org.dwfa.bpa.gui.ProcessBuilderPanel;
 import org.dwfa.bpa.worker.MasterWorker;
 
@@ -27,7 +29,7 @@ public class ProcessBuilderContainer extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public ProcessBuilderContainer(Configuration config)
+	public ProcessBuilderContainer(Configuration config, I_ConfigAceFrame aceFrameConfig)
 			throws ConfigurationException, LoginException, IOException,
 			PrivilegedActionException, IntrospectionException,
 			InvocationTargetException, IllegalAccessException,
@@ -35,6 +37,11 @@ public class ProcessBuilderContainer extends JPanel {
 			NoSuchMethodException {
 		super(new GridBagLayout());
 		MasterWorker processWorker = new MasterWorker(config);
+		if (aceFrameConfig == null) {
+			throw new NullPointerException("aceFrameConfig cannot be null...");
+		}
+		processWorker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
+
 		ProcessBuilderPanel processBuilderPanel = new ProcessBuilderPanel(
 				config, processWorker);
 

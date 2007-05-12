@@ -463,6 +463,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;
 					toggleBar.add(pluginButton, c);
+					AceLog.getAppLog().info("adding component plugin: " + f.getName());
+				} else {
+					JButton pluginButton = new JButton(bp.getName());
+					pluginButton.setToolTipText(bp.getSubject());
+					pluginButton.addActionListener(new PluginListener(f));
+					c.gridx++;
+					toggleBar.add(pluginButton, c);
+					AceLog.getAppLog().info("adding component plugin: " + f.getName());
 				}
 			}
 		}

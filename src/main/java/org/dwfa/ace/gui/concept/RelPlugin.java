@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -65,14 +66,20 @@ public abstract class RelPlugin extends AbstractPlugin {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		c.gridheight = 2;
-		DropButton rowAddAfter = new DropButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")), model);
-		relPanel.add(rowAddAfter, c);
-		rowAddAfter.setEnabled(enableEdit);
-		rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
 		if (enableEdit) {
+			DropButton rowAddAfter = new DropButton(new ImageIcon(ACE.class
+					.getResource("/24x24/plain/row_add_after.png")), model);
+			relPanel.add(rowAddAfter, c);
+			rowAddAfter.setEnabled(enableEdit);
+			rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
 			rowAddAfter.setTransferHandler(new TerminologyTransferHandler());
-			// rowAddAfter.setDragEnabled(true);
+		} else {
+			JPanel filler = new JPanel();
+			filler.setMaximumSize(new Dimension(40, 32));
+			filler.setMinimumSize(new Dimension(40, 32));
+			filler.setPreferredSize(new Dimension(40, 32));
+			relPanel.add(filler, c);
+			
 		}
 		c.gridheight = 1;
 		c.gridx++;

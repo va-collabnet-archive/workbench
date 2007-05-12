@@ -52,7 +52,11 @@ public class TermComponentListSelectionListener implements
 	private void setLinkedComponent(ListSelectionEvent e) {
 		JList list = (JList) e.getSource();
 		TerminologyListModel model = (TerminologyListModel) list.getModel();
-		linkedComponent.setTermComponent(model.getElementAt(list.getSelectedIndex()));
+		if (list.getSelectedIndex() == -1) {
+			linkedComponent.setTermComponent(null);
+		} else {
+			linkedComponent.setTermComponent(model.getElementAt(list.getSelectedIndex()));
+		}
 	}
 
 }

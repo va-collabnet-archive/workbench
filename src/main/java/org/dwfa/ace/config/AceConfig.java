@@ -337,6 +337,7 @@ public class AceConfig implements Serializable {
 				break;
 			case 2:
 			default:
+	        	System.out.println("System.exit from AceConfig ");
 				System.exit(0);
 
 			}

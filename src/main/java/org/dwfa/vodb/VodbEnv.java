@@ -1,5 +1,11 @@
 package org.dwfa.vodb;
 
+import java.awt.AWTEvent;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +21,8 @@ import java.util.regex.Pattern;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
+import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -145,15 +153,51 @@ public class VodbEnv {
 	public VodbEnv() {
 
 	}
+	private class StartupListener implements AWTEventListener {
+
+		public void eventDispatched(AWTEvent event) {
+			KeyEvent ke = (KeyEvent) event;
+			if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				activity.setProgressInfoUpper("Loading the terminology (preload false)");
+				preloadRels = false;
+				preloadDescriptions = false;
+				Toolkit.getDefaultToolkit().removeAWTEventListener(this);
+			}
+			
+		}
+		
+	}
 
 	boolean preloadRels = false;
-	boolean preloadDescriptions = false;
+	boolean preloadDescriptions = true;
+
+	private ActivityPanel activity;
 	/**
 	 * @todo find out of all secondary databases have to be opened when the
 	 * primary is opened? How do they get updated, etc?
 	 */
 	public void setup(File envHome, boolean readOnly, Long cacheSize) throws DatabaseException {
+		activity = new ActivityPanel(true, true);
+		StartupListener l = new StartupListener();
+		Toolkit.getDefaultToolkit().addAWTEventListener(l, AWTEvent.KEY_EVENT_MASK);
+
 		AceLog.getAppLog().info("Setting up db: " + envHome);
+		activity.setIndeterminate(true);
+		activity.setProgressInfoUpper("Loading the terminology");
+		activity.setProgressInfoLower("Setting up the environment...");
+		activity.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+	        	System.out.println("System.exit from activity action listener: " + e.getActionCommand());
+				System.exit(0);
+			}
+		});
+		try {
+			ActivityViewer.addActivity(activity);
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+		
+		
 		this.readOnly = readOnly;
 		LocalFixedTerminology.setStore(new VodbFixedServer(this));
 		envHome.mkdirs();
@@ -163,26 +207,32 @@ public class VodbEnv {
 			envConfig.setCacheSize(cacheSize);
 			AceLog.getAppLog().info("Setting cache size to: " + cacheSize);
 		}
+		activity.setProgressInfoLower("Setting cache size to: " + cacheSize);
 
 		envConfig.setReadOnly(readOnly);
 		envConfig.setAllowCreate(!readOnly);
 		env = new Environment(envHome, envConfig);
 		DatabaseConfig conceptDbConfig = makeConfig(readOnly);
+		activity.setProgressInfoLower("Opening concepts...");
 		conceptDb = env.openDatabase(null, "concept", conceptDbConfig);
 
 		DatabaseConfig relDbConfig = makeConfig(readOnly);
+		activity.setProgressInfoLower("Opening relationships...");
 		relDb = env.openDatabase(null, "rel", relDbConfig);
 		getC1RelMap();
 		getC2RelMap();
 
 		if (preloadRels) {
+			activity.setProgressInfoLower("Loading relationships...");
 			PreloadConfig relPreloadConfig = new PreloadConfig();
 			relPreloadConfig.setLoadLNs(true);
 			relDb.preload(relPreloadConfig);
 		}
 		DatabaseConfig descDbConfig = makeConfig(readOnly);
 		descDb = env.openDatabase(null, "desc", descDbConfig);
+		activity.setProgressInfoLower("Opening descriptions...");
 		if (preloadDescriptions) {
+			activity.setProgressInfoLower("Loading descriptions...");
 			PreloadConfig descPreloadConfig = new PreloadConfig();
 			descPreloadConfig.setLoadLNs(true);
 			descDb.preload(descPreloadConfig);			
@@ -190,6 +240,7 @@ public class VodbEnv {
 		getConceptDescMap();
 
 		DatabaseConfig mapDbConfig = makeConfig(readOnly);
+		activity.setProgressInfoLower("Opening ids...");
 		idDb = env.openDatabase(null, "idDb", mapDbConfig);
 		uidToIdMap = createUidToIdMap();
 		
@@ -208,19 +259,25 @@ public class VodbEnv {
 
 
 		DatabaseConfig imageDbConfig = makeConfig(readOnly);
+		activity.setProgressInfoLower("Opening images...");
 		imageDb = env.openDatabase(null, "imageDb", imageDbConfig);
 		getConceptImageMap();
 
 		DatabaseConfig timeBranchDbConfig = makeConfig(readOnly);
+		activity.setProgressInfoLower("Opening time branches...");
 		timeBranchDb = env.openDatabase(null, "timeBranchDb",
 				timeBranchDbConfig);
 
 		DatabaseConfig pathDbConfig = makeConfig(readOnly);
+		activity.setProgressInfoLower("Opening paths...");
 		pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
 
 		AceLog.getAppLog().info("Cache percent: " + envConfig.getCachePercent());
 		AceLog.getAppLog().info("Cache size: " + envConfig.getCacheSize());
-
+		
+		activity.setProgressInfoLower("complete");
+		activity.complete();
+		Toolkit.getDefaultToolkit().removeAWTEventListener(l);
 	}
 
 	private void createConceptDescMap() throws DatabaseException {

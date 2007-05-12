@@ -996,13 +996,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 	
 	public void selectConceptViewer(int index) {
-		aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index);
+		aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index -1);
 	}
 
 
 	public JPanel getWorkflowPanel() {
-		// TODO Auto-generated method stub
-		return null;
+		return aceFrame.getCdePanel().getWorkflowPanel();
 	}
 
 

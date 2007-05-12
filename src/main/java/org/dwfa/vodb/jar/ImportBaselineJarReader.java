@@ -106,7 +106,11 @@ public class ImportBaselineJarReader implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if (firstUpdate) {
 				firstUpdate = false;
-				ActivityViewer.addActivity(activity);
+				try {
+					ActivityViewer.addActivity(activity);
+				} catch (Exception e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
 			}
 			activity.setIndeterminate(total == -1);
 			activity.setValue(processed);

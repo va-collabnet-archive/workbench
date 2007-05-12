@@ -7,28 +7,76 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import net.jini.config.ConfigurationException;
+
+import org.dwfa.bpa.util.ComponentFrame;
+
 public class ActivityViewer {
 
-	private static ActivityViewer viewer = new ActivityViewer();
+	private static ActivityViewer viewer ;
 
-	JFrame viewerFrame = new JFrame("Activity Viewer");
+	private class ActivityViewerFrame extends ComponentFrame {
+
+		public ActivityViewerFrame() throws Exception {
+			super(null, null);
+		}
+
+		@Override
+		public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public JMenuItem getNewWindowMenu() {
+			return null;
+		}
+
+		@Override
+		public String getNextFrameName() throws ConfigurationException {
+			return "Activity Viewer";
+		}
+
+		@Override
+		public JMenu getQuitMenu() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public void addInternalFrames(JMenu menu) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
+	ComponentFrame viewerFrame;
 
 	JPanel activitiesPanel = new JPanel(new GridLayout(0, 1));
 
 	List<I_ShowActivity> activitiesList = new ArrayList<I_ShowActivity>();
 
-	private ActivityViewer() {
+	private ActivityViewer() throws Exception {
 		super();
+		viewerFrame = new ActivityViewerFrame();
 		JScrollPane scroller = new JScrollPane();
 		scroller
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		viewerFrame.setContentPane(scroller);
-		viewerFrame.setLocation(20, 1000);
+		viewerFrame.setLocation(20, 20);
 		viewerFrame.setSize(500, 300);
 		viewerFrame.setVisible(true);
 
@@ -51,7 +99,10 @@ public class ActivityViewer {
 
 	}
 
-	public static void addActivity(I_ShowActivity activity) {
+	public static void addActivity(I_ShowActivity activity) throws Exception {
+		if (viewer == null) {
+			viewer = new ActivityViewer();
+		}
 		while (viewer.activitiesList.size() > 10) {
 			viewer.activitiesList.remove(9);
 		}

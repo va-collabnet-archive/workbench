@@ -19,7 +19,12 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
@@ -77,6 +82,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.TimePathId;
@@ -91,6 +97,7 @@ import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.search.SearchPanel;
+import org.dwfa.ace.task.AttachmentKeys;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
@@ -98,6 +105,7 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeCellRenderer;
 import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
+import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -373,6 +381,20 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		}
 	}
 
+	private class AddressPaletteActionListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			if (addressPalette == null) {
+				makeAddressPalette();
+			}
+			if (((JToggleButton) e.getSource()).isSelected()) {
+				getRootPane().getLayeredPane().moveToFront(addressPalette);
+			}
+			addressPalette.togglePalette(((JToggleButton) e.getSource())
+					.isSelected());
+		}
+	}
+
 	private class TogglePanelsActionListener implements ActionListener,
 			ComponentListener {
 		private Integer origWidth;
@@ -607,6 +629,31 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			throws DatabaseException, IOException, ClassNotFoundException {
 		this.aceFrameConfig = aceFrameConfig;
 		this.aceFrameConfig.addPropertyChangeListener(this);
+		try {
+			masterProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
+			descListProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
+			conceptListProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
+		} catch (LoginException e) {
+			throw new RuntimeException(e);
+		} catch (ConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (PrivilegedActionException e) {
+			throw new RuntimeException(e);
+		} catch (IntrospectionException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (PropertyVetoException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
 		searchPanel = new SearchPanel(aceFrameConfig);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -712,9 +759,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		menuItem.addActionListener(new SaveEnvironment());
 		fileMenu.add(menuItem);
 
-		masterProcessBuilderPanel = new ProcessBuilderContainer(config);
-		descListProcessBuilderPanel = new ProcessBuilderContainer(config);
-		conceptListProcessBuilderPanel = new ProcessBuilderContainer(config);
 
 		menuBar.add(fileMenu);
 	}
@@ -822,6 +866,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JPanel descListProcessBuilderPanel;
 	private JPanel conceptListProcessBuilderPanel;
 
+	private JPanel workflowPanel;
+
+	private JToggleButton showAddressesButton;
+
+	private CdePalette addressPalette;
+
 	private void makeProcessPalette() throws Exception {
 		JLayeredPane layers = getRootPane().getLayeredPane();
 		processPalette = new CdePalette(new BorderLayout(),
@@ -850,6 +900,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		layers.add(queuePalette, JLayeredPane.PALETTE_LAYER);
 
 		MasterWorker worker = new MasterWorker(config);
+		worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
 		queuePalette.add(makeQueueViewerPanel(config, worker), BorderLayout.CENTER);
 		queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
@@ -1246,6 +1297,26 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		historyPalette.setVisible(true);
 	}
 
+	private void makeAddressPalette() {
+		JLayeredPane layers = getRootPane().getLayeredPane();
+		addressPalette = new CdePalette(new BorderLayout(),
+				new LeftPalettePoint());
+		addressPalette.add(new JLabel("List of addresses"), BorderLayout.CENTER);
+		addressPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+		layers.add(addressPalette, JLayeredPane.PALETTE_LAYER);
+		int width = 400;
+		int height = 500;
+		Rectangle topBounds = topPanel.getBounds();
+		addressPalette.setSize(width, height);
+
+		addressPalette.setLocation(new Point(topBounds.x - width, topBounds.y
+				+ topBounds.height + 1));
+		addressPalette.setOpaque(true);
+		addressPalette.doLayout();
+		addComponentListener(addressPalette);
+		addressPalette.setVisible(true);
+	}
+
 	JComponent getHierarchyPanel() {
 		tree = new JTreeWithDragImage(aceFrameConfig);
 		tree.putClientProperty("JTree.lineStyle", "None");
@@ -1437,7 +1508,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		}
 	}
 
-	private JPanel getTopPanel() {
+	private JPanel getTopPanel() throws IOException, ClassNotFoundException {
 		JPanel topPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -1450,6 +1521,15 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showHistoryButton.addActionListener(new HistoryPaletteActionListener());
 		topPanel.add(showHistoryButton, c);
 		c.gridx++;
+		showAddressesButton = new JToggleButton(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/address_book3.png")));
+		showAddressesButton
+				.setToolTipText("history of user commits and concepts viewed");
+		showAddressesButton.addActionListener(new AddressPaletteActionListener());
+		topPanel.add(showAddressesButton, c);
+		c.gridx++;
+		
+		//address_book3.png
 		topPanel.add(new JPanel(), c);
 		c.gridx++;
 		c.fill = GridBagConstraints.NONE;
@@ -1475,13 +1555,60 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridx++;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
-		topPanel.add(new JPanel(), c);
+		workflowPanel = new JPanel();
+		topPanel.add(workflowPanel, c);
 		c.fill = GridBagConstraints.NONE;
 		c.weightx = 0;
 		c.gridx++;
 		// topPanel.add(getComponentToggles2(), c);
 		// c.gridx++;
+		
+		
+		File componentPluginDir = new File("plugins" + File.separator
+				+ "viewer");
+		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+			public boolean accept(File arg0, String fileName) {
+				return fileName.toLowerCase().endsWith(".bp");
+			}
 
+		});
+		
+		if (plugins != null) {
+			c.weightx = 0.0;
+			c.weightx = 0.0;
+			c.fill = GridBagConstraints.NONE;
+			for (File f : plugins) {
+				FileInputStream fis = new FileInputStream(f);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+				ObjectInputStream ois = new ObjectInputStream(bis);
+				BusinessProcess bp = (BusinessProcess) ois.readObject();
+				ois.close();
+				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
+				if (iconBytes != null) {
+					ImageIcon icon = new ImageIcon(iconBytes);
+					JButton pluginButton = new JButton(icon);
+					pluginButton.setToolTipText(bp.getSubject());
+					pluginButton.addActionListener(new PluginListener(f));
+					c.gridx++;
+					topPanel.add(pluginButton, c);
+					AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+				} else {
+					JButton pluginButton = new JButton(bp.getName());
+					pluginButton.setToolTipText(bp.getSubject());
+					pluginButton.addActionListener(new PluginListener(f));
+					c.gridx++;
+					topPanel.add(pluginButton, c);
+					AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+				}
+			}
+		}
+		
+
+		c.gridx++;
+		topPanel.add(new JLabel("   "), c);
+		c.gridx++;
+
+		
 		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/inbox.png")));
 		topPanel.add(showQueuesButton, c);
@@ -1515,6 +1642,43 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		return topPanel;
 	}
 
+	private class PluginListener implements ActionListener {
+		File pluginProcessFile;
+
+		private PluginListener(File pluginProcessFile) {
+			super();
+			this.pluginProcessFile = pluginProcessFile;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+				FileInputStream fis = new FileInputStream(pluginProcessFile);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+				ObjectInputStream ois = new ObjectInputStream(bis);
+				BusinessProcess bp = (BusinessProcess) ois.readObject();
+				ois.close();
+				aceFrameConfig.setStatusMessage("Executing: " + bp.getName());
+				MasterWorker worker = aceFrameConfig.getWorker();
+				
+				worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
+						aceFrameConfig);
+				worker.writeAttachment(
+						AttachmentKeys.I_GET_CONCEPT_DATA.name(), null);
+				worker.writeAttachment(AttachmentKeys.I_TERM_FACTORY.name(),
+						this);
+				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
+						.name(), this);
+				worker.execute(bp);
+				aceFrameConfig.setStatusMessage(
+						"Execution of " + bp.getName() + " complete.");
+			} catch (Exception e1) {
+				aceFrameConfig.setStatusMessage("Exception during execution.");
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+		}
+
+	}
+	
 	JPanel getBottomPanel() {
 		JPanel bottomPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -1671,6 +1835,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public JTabbedPane getConceptTabs() {
 		return conceptTabs;
+	}
+
+	public JPanel getWorkflowPanel() {
+		return workflowPanel;
 	}
 
 }
