@@ -53,6 +53,11 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 	 */
 	private List<DependencySpec> dependenciesToProcess;
 
+	/**
+	 * @parameter
+	 */
+	private String dataLocationInJar;
+
 	private String[] allowedGoals = new String[] { "install" };
 
 	/**
@@ -64,7 +69,11 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 	private MavenSession session;
 
 	public void execute() throws MojoExecutionException {
+		getLog().info(" data prefix: " + dataLocationInJar);
 		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
+			if ((dataLocationInJar != null) && dependenciesToProcess.size() > 1) {
+				throw new MojoExecutionException("Only one dependency is allowed with a data prefix specification");
+			}
 			String[] args = new String[3];
 			int argIndex = 0;
 			args[argIndex++] = outputDirectory.getAbsolutePath();
@@ -95,7 +104,11 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 					}
 				}
 
-				LoadSourcesFromJars.main(args);
+				if (dataLocationInJar == null) {
+					LoadSourcesFromJars.main(args);
+				} else {
+					LoadSourcesFromJars.loadFromSingleJar(args[0], args[1], dataLocationInJar);
+				}
 
 			} catch (Exception ex) {
 				throw new MojoExecutionException(
@@ -120,5 +133,13 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 		buff.append(dep.getVersion());
 		buff.append(".jar");
 		return buff.toString();
+	}
+
+	public String getDataLocationInJar() {
+		return dataLocationInJar;
+	}
+
+	public void setDataLocationInJar(String dataLocationInJar) {
+		this.dataLocationInJar = dataLocationInJar;
 	}
 }
