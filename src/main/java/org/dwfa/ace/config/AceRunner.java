@@ -65,7 +65,7 @@ public class AceRunner {
 			AceLog.getAppLog().info("Cache size in config file: " + cacheSize);
 			aceConfig = new AceConfig(dbFolder);
 			setupDatabase(aceConfig);
-			AceConfig.setupAceConfig(aceConfig, aceConfigFile, cacheSize);
+			AceConfig.setupAceConfig(aceConfig, aceConfigFile, cacheSize, false);
 		}
 		ACE.setAceConfig(aceConfig);
 		for (I_ConfigAceFrame ace: aceConfig.aceFrames) {

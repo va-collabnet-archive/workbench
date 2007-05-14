@@ -1529,7 +1529,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showAddressesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/address_book3.png")));
 		showAddressesButton
-				.setToolTipText("history of user commits and concepts viewed");
+				.setToolTipText("address book of project participants");
 		showAddressesButton.addActionListener(new AddressPaletteActionListener());
 		topPanel.add(showAddressesButton, c);
 		c.gridx++;

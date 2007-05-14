@@ -2,6 +2,7 @@ package org.dwfa.ace.search;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -39,6 +40,8 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 	
 	I_ConfigAceFrame config;
 
+	private boolean lucene;
+
 	private class MatchUpdator implements ActionListener {
 		Timer updateTimer;
 		public MatchUpdator() {
@@ -70,12 +73,12 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
 	}
 
-	private class ProgressUpdator implements I_UpdateProgress {
+	private class RegexProgressUpdator implements I_UpdateProgress {
 		Timer updateTimer;
 
 		boolean firstUpdate = true;
 
-		public ProgressUpdator() {
+		public RegexProgressUpdator() {
 			super();
 			updateTimer = new Timer(100, this);
 			updateTimer.start();
@@ -118,10 +121,66 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		}
 
 	}
+	public class LuceneProgressUpdator implements I_UpdateProgress {
+		Timer updateTimer;
+
+		boolean firstUpdate = true;
+
+		private String info;
+
+		public LuceneProgressUpdator() {
+			super();
+			updateTimer = new Timer(100, this);
+			updateTimer.start();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.dwfa.ace.search.I_UpdateProgress#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			if (continueWork) {
+				if (firstUpdate) {
+					searchPanel.setProgressIndeterminate(true);
+					searchPanel.setProgressMaximum(descCount);
+					firstUpdate = false;
+				}
+				searchPanel
+						.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
+								.getCount()));
+				searchPanel.setProgressInfo("   " + info +  ")");
+				if (searchPanel.getProgressValue() == searchPanel.getProgressMaximum()) {
+					normalCompletion();
+				}
+			} else {
+				updateTimer.stop();
+			}
+		}
+
+		public void setIndeterminate(boolean value) {
+			searchPanel.setProgressIndeterminate(value);
+		}
+		
+		public void normalCompletion() {
+			updateTimer.stop();
+			if (firstUpdate) {
+				searchPanel.setProgressIndeterminate(false);
+				searchPanel.setProgressMaximum(descCount);
+				firstUpdate = false;
+			}
+			searchPanel.setProgressValue(descCount);
+			searchPanel.setProgressInfo(
+					"   Searched " + searchPanel.getProgressMaximum() + " descriptions   ");
+		}
+		
+		public void setProgressInfo(String info) {
+			this.info = info;
+		}
+
+	}
 
 	public SearchStringWorker(SearchPanel searchPanel, 
 			DescriptionsFromCollectionTableModel model, String patternString,
-			I_ConfigAceFrame config) {
+			I_ConfigAceFrame config, boolean lucene) {
 		super();
 		this.config = config;
 		this.model = model;
@@ -131,6 +190,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				"   Searching for " + patternString + "   ");
 		this.searchPanel.setProgressIndeterminate(true);
 		this.patternString = patternString;
+		this.lucene = lucene;
 
 	}
 
@@ -145,16 +205,32 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			continueWork = false;
 			throw new Exception("Search string to short: " + patternString);
 		}
-		descCount = AceConfig.vodb.countDescriptions();
-		ProgressUpdator updater = new ProgressUpdator();
-		completeLatch = new CountDownLatch(descCount);
-		Pattern p = Pattern.compile(patternString);
 		matches = Collections
 				.synchronizedCollection(new TreeSet<ThinDescVersioned>(
 						new ThinDescVersionedComparator()));
-		new MatchUpdator();
-		AceConfig.vodb.search(this, p, matches, completeLatch, searchPanel.getRootConcept(), config);
-		completeLatch.await();
+		I_UpdateProgress updater;
+		if (lucene) {
+			updater = new LuceneProgressUpdator();
+			File luceneDir = new File("lucene");
+			boolean makeIndex = (luceneDir.exists() == false);
+			if (makeIndex) {
+				descCount = AceConfig.vodb.countDescriptions();
+				completeLatch = new CountDownLatch(descCount + 1);
+			} else {
+				completeLatch = new CountDownLatch(1);
+			}
+			new MatchUpdator();
+			AceConfig.vodb.searchLucene(this, patternString, matches, completeLatch, 
+					searchPanel.getRootConcept(), config, luceneDir, (LuceneProgressUpdator) updater);
+		} else {
+			updater = new RegexProgressUpdator();
+			descCount = AceConfig.vodb.countDescriptions();
+			completeLatch = new CountDownLatch(descCount);
+			Pattern p = Pattern.compile(patternString);
+			new MatchUpdator();
+			AceConfig.vodb.searchRegex(this, p, matches, completeLatch, searchPanel.getRootConcept(), config);
+			completeLatch.await();
+		}
 		return updater;
 	}
 

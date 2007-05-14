@@ -225,7 +225,7 @@ public class AceConfig implements Serializable {
 			long defaultCacheSize = 600000000L;
 			File configFile = new File(fileStr);
 			if (configFile.exists() == false) {
-				setupAceConfig(config, configFile, defaultCacheSize);
+				setupAceConfig(config, configFile, defaultCacheSize, false);
 			} else {
 				FileInputStream fis = new FileInputStream(configFile);
 				ObjectInputStream ois = new ObjectInputStream(fis);
@@ -286,39 +286,30 @@ public class AceConfig implements Serializable {
 		}
 	}
 
-	private static IOException loopOpenOrCreateConfig(long defaultCacheSize, IOException ioe) throws TaskFailedException, ClassNotFoundException, DatabaseException, ParseException, TerminologyException, IOException {
+	private static IOException loopOpenOrCreateConfig(long defaultCacheSize,
+			IOException ioe) throws TaskFailedException,
+			ClassNotFoundException, DatabaseException, ParseException,
+			TerminologyException, IOException {
 		try {
 			// Custom button text
-			Object[] options = { "Select Config",
-					"New Config", "Cancel" };
-			int n = JOptionPane
-					.showOptionDialog(
-							null,
-							"Would you like to select or "
-									+ "\ncreate a configuration file?",
-							"Authorization failure",
-							JOptionPane.YES_NO_CANCEL_OPTION,
-							JOptionPane.QUESTION_MESSAGE,
-							null, options, options[0]);
+			Object[] options = { "Select Config", "New Config", "Cancel" };
+			int n = JOptionPane.showOptionDialog(null,
+					"Would you like to select or "
+							+ "\ncreate a configuration file?",
+					"Authorization failure", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			switch (n) {
 			case 0:
 				// for reading existing
-				File inFile = FileDialogUtil
-						.getExistingFile(
-								"Select a configuration file",
-								new FilenameFilter() {
-									public boolean accept(
-											File dir,
-											String name) {
-										return name
-												.endsWith(".ace");
-									}
-								});
+				File inFile = FileDialogUtil.getExistingFile(
+						"Select a configuration file", new FilenameFilter() {
+							public boolean accept(File dir, String name) {
+								return name.endsWith(".ace");
+							}
+						});
 				ObjectInputStream configStream = new ObjectInputStream(
-						new BufferedInputStream(
-								new FileInputStream(inFile)));
-				config = (AceConfig) configStream
-						.readObject();
+						new BufferedInputStream(new FileInputStream(inFile)));
+				config = (AceConfig) configStream.readObject();
 
 				break;
 			case 1:
@@ -326,24 +317,21 @@ public class AceConfig implements Serializable {
 				File outFile = FileDialogUtil
 						.getNewFile("Save environment to config file...");
 				if (outFile.getName().endsWith(".ace") == false) {
-					outFile = new File(outFile
-							.getParentFile(), outFile
+					outFile = new File(outFile.getParentFile(), outFile
 							.getName()
 							+ ".ace");
 				}
 				config = new AceConfig();
-				setupAceConfig(config, outFile,
-						defaultCacheSize);
+				setupAceConfig(config, outFile, defaultCacheSize, false);
 				break;
 			case 2:
 			default:
-	        	System.out.println("System.exit from AceConfig ");
+				System.out.println("System.exit from AceConfig ");
 				System.exit(0);
 
 			}
 		} catch (IOException innerIoe) {
-			if (innerIoe.getMessage().equalsIgnoreCase(
-					authFailureMsg)) {
+			if (innerIoe.getMessage().equalsIgnoreCase(authFailureMsg)) {
 				ioe = innerIoe;
 			} else {
 				throw innerIoe;
@@ -353,7 +341,7 @@ public class AceConfig implements Serializable {
 	}
 
 	public static void setupAceConfig(AceConfig config, File configFile,
-			Long cacheSize) throws DatabaseException, ParseException,
+			Long cacheSize, boolean includeSnomed) throws DatabaseException, ParseException,
 			TerminologyException, IOException, FileNotFoundException {
 		AceConfig.vodb.setup(config.dbFolder, config.readOnly, cacheSize);
 		SvnPrompter prompter = new SvnPrompter();
@@ -377,6 +365,9 @@ public class AceConfig implements Serializable {
 				.add(vodb.getId(
 						ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 						.getNativeId());
+		statusPopupTypes.add(vodb.getId(
+				ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids())
+				.getNativeId());
 		statusPopupTypes
 				.add(vodb.getId(
 						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
@@ -478,14 +469,24 @@ public class AceConfig implements Serializable {
 		relTypes.add(vodb.getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
-		relTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids()).getNativeId());
+		if (includeSnomed) {
+			relTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids()).getNativeId());
+		}
 		af.setEditRelTypePopup(relTypes);
 
 		IntSet roots = new IntSet();
 		roots.add(vodb.getId(
 				ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
 						.getUids()).getNativeId());
-		roots.add(vodb.getId(SNOMED.Concept.ROOT.getUids()).getNativeId());
+		roots.add(vodb.getId(
+				ArchitectonicAuxiliary.Concept.STATUS
+						.getUids()).getNativeId());
+		roots.add(vodb.getId(
+				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE
+						.getUids()).getNativeId());
+		if (includeSnomed) {
+			roots.add(vodb.getId(SNOMED.Concept.ROOT.getUids()).getNativeId());
+		}
 		roots.add(vodb.getId(
 				DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY.getUids())
 				.getNativeId());
@@ -504,6 +505,9 @@ public class AceConfig implements Serializable {
 				.add(vodb.getId(
 						ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 						.getNativeId());
+		allowedStatus.add(vodb.getId(
+				ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids())
+				.getNativeId());
 		allowedStatus
 				.add(vodb.getId(
 						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
@@ -526,8 +530,10 @@ public class AceConfig implements Serializable {
 		destRelTypes.add(vodb.getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
-		destRelTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids())
-				.getNativeId());
+		if (includeSnomed) {
+			destRelTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids())
+					.getNativeId());
+		}
 		af.setDestRelTypes(destRelTypes);
 
 		IntSet sourceRelTypes = new IntSet();

@@ -11,14 +11,15 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -79,7 +80,8 @@ public class SearchPanel extends JPanel {
 
 	private JButton searchButton;
 
-	private JCheckBox regexCheck;
+	private JRadioButton regexRadio;
+	private JRadioButton luceneRadio;
 
 	private JButton searchSetting;
 
@@ -140,10 +142,19 @@ public class SearchPanel extends JPanel {
 
 		gbc.gridx++;
 		gbc.weightx = 0;
-		regexCheck = new JCheckBox("regex");
-		regexCheck.setSelected(true);
-		add(regexCheck, gbc);
+		regexRadio = new JRadioButton("regex");
+		regexRadio.setSelected(false);
+		add(regexRadio, gbc);
+		gbc.gridy++;
+		luceneRadio = new JRadioButton("lucene");
+		luceneRadio.setSelected(true);
+		add(luceneRadio, gbc);
+		
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(regexRadio);
+		bg.add(luceneRadio);
 
+		gbc.gridy--;
 		gbc.gridx++;
 		progressInfo = new JLabel();
 		progressInfo.setVisible(false);
@@ -235,7 +246,7 @@ public class SearchPanel extends JPanel {
 		stopButton.setVisible(show);
 		progressInfo.setVisible(show);
 		progressBar.setVisible(show);
-		regexCheck.setVisible(!show);
+		regexRadio.setVisible(!show);
 		searchSetting.setVisible(!show);
 	}
 
@@ -244,7 +255,7 @@ public class SearchPanel extends JPanel {
 			setShowProgress(true);
 			model.setDescriptions(new ArrayList<ThinDescVersioned>());
 			ACE.threadPool.execute(new SearchStringWorker(this, model,
-					searchPhraseField.getText(), config));
+					searchPhraseField.getText(), config, luceneRadio.isSelected()));
 		} else {
 			JOptionPane.showMessageDialog(getRootPane(),
 					"The search string must be longer than 2 characters: "

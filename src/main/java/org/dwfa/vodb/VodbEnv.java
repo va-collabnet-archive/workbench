@@ -19,6 +19,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.activity.ActivityPanel;
@@ -27,6 +38,7 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
@@ -40,6 +52,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.search.I_TrackContinuation;
+import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
@@ -159,9 +172,9 @@ public class VodbEnv {
 		public void eventDispatched(AWTEvent event) {
 			KeyEvent ke = (KeyEvent) event;
 			if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-				activity.setProgressInfoUpper("Loading the terminology (preload false)");
 				preloadRels = false;
-				preloadDescriptions = false;
+				preloadDescriptions = !preloadDescriptions;
+				activity.setProgressInfoUpper("Loading the terminology (preload descriptions = " + preloadDescriptions + ")");
 				Toolkit.getDefaultToolkit().removeAWTEventListener(this);
 			}
 			
@@ -170,7 +183,7 @@ public class VodbEnv {
 	}
 
 	boolean preloadRels = false;
-	boolean preloadDescriptions = true;
+	boolean preloadDescriptions = false;
 
 	private ActivityPanel activity;
 	/**
@@ -1029,7 +1042,7 @@ public class VodbEnv {
 	 * @param latch
 	 * @throws DatabaseException
 	 */
-	public void search(I_TrackContinuation tracker, Pattern p,
+	public void searchRegex(I_TrackContinuation tracker, Pattern p,
 			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root, I_ConfigAceFrame config)
 			throws DatabaseException {
 		Stopwatch timer = null;
@@ -1044,7 +1057,7 @@ public class VodbEnv {
 			if (tracker.continueWork()) {
 				ThinDescVersioned descV = (ThinDescVersioned) descBinding
 						.entryToObject(foundData);
-				ACE.threadPool.execute(new CheckAndProcessMatch(p, matches,
+				ACE.threadPool.execute(new CheckAndProcessRegexMatch(p, matches,
 						descV, root, config));
 			} else {
 				while (latch.getCount() > 0) {
@@ -1064,8 +1077,92 @@ public class VodbEnv {
 			timer.stop();
 		}
 	}
-
-	private static class CheckAndProcessMatch implements Runnable {
+	public void searchLucene(I_TrackContinuation tracker, String query,
+			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root, 
+			I_ConfigAceFrame config, File luceneDir, LuceneProgressUpdator updater)
+			throws DatabaseException, IOException, ParseException {
+		Stopwatch timer = null;
+		if (logger.isLoggable(Level.INFO)) {
+			timer = new Stopwatch();
+			timer.start();
+		}
+		if (luceneDir.exists() == false) {
+			luceneDir.mkdirs();
+			Directory dir = FSDirectory.getDirectory(luceneDir, true);
+			IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(), true);
+			writer.setUseCompoundFile(true);
+			writer.mergeFactor = 10000;
+			Cursor descCursor = getDescDb().openCursor(null, null);
+			DatabaseEntry foundKey = new DatabaseEntry();
+			DatabaseEntry foundData = new DatabaseEntry();
+			while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				if (tracker.continueWork()) {
+					ThinDescVersioned descV = (ThinDescVersioned) descBinding
+							.entryToObject(foundData);
+					Document doc = new Document();
+					doc.add(Field.Keyword("dnid", Integer.toString(descV.getDescId())));
+					doc.add(Field.Keyword("cnid", Integer.toString(descV.getConceptId())));
+					String lastDesc = null;
+					for (I_DescriptionTuple tuple: descV.getTuples()) {
+						if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
+							doc.add(Field.UnStored("desc", tuple.getText()));
+						}
+						
+					}
+					writer.addDocument(doc);
+				} else {
+					while (latch.getCount() > 0) {
+						latch.countDown();
+					}
+					break;
+				}
+				latch.countDown();
+			}
+			descCursor.close();
+			if (tracker.continueWork()) {
+				logger.info("Optimizing index time: " + timer.getElapsedTime());
+				writer.optimize();
+			}
+			writer.close();
+			latch.countDown();
+			if (logger.isLoggable(Level.INFO)) {
+				if (tracker.continueWork()) {
+					logger.info("Index time: " + timer.getElapsedTime());
+				} else  {
+					logger.info("Index Canceled. Elapsed time: " + timer.getElapsedTime());
+				}
+				timer.stop();
+			}
+		}
+		updater.setIndeterminate(true);
+		if (luceneSearcher == null) {
+			updater.setProgressInfo("Opening search index...");
+			luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
+		}
+		updater.setProgressInfo("Starting lucene query...");
+		long startTime = System.currentTimeMillis();
+		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
+		updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime) + " ms.");
+		Hits hits = luceneSearcher.search(q);
+		for (int i = 0; i < hits.length(); i++) {
+			Document doc = hits.doc(i);
+			float score = hits.score(i);
+			logger.info("Hit: " + doc + " Score: " + score);
+			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, matches,
+					root, config, VodbEnv.this));
+		}
+		if (logger.isLoggable(Level.INFO)) {
+			if (tracker.continueWork()) {
+				logger.info("Search time: " + timer.getElapsedTime());
+			} else  {
+				logger.info("Search Canceled. Elapsed time: " + timer.getElapsedTime());
+			}
+			timer.stop();
+		}
+	}
+	IndexSearcher luceneSearcher = null;
+	
+	private static class CheckAndProcessRegexMatch implements Runnable {
 		Pattern p;
 
 		Collection<ThinDescVersioned> matches;
@@ -1076,7 +1173,7 @@ public class VodbEnv {
 		
 		I_ConfigAceFrame config;
 
-		public CheckAndProcessMatch(Pattern p,
+		public CheckAndProcessRegexMatch(Pattern p,
 				Collection<ThinDescVersioned> matches, ThinDescVersioned descV, I_GetConceptData root, I_ConfigAceFrame config) {
 			super();
 			this.p = p;
@@ -1102,6 +1199,54 @@ public class VodbEnv {
 					}
 				}
 			}
+		}
+
+	}
+	private static class CheckAndProcessLuceneMatch implements Runnable {
+
+		Collection<ThinDescVersioned> matches;
+
+				
+		I_GetConceptData root;
+		
+		I_ConfigAceFrame config;
+		
+		Document doc;
+		
+		VodbEnv env;
+
+		public CheckAndProcessLuceneMatch(Document doc,
+				Collection<ThinDescVersioned> matches, I_GetConceptData root, I_ConfigAceFrame config,
+				VodbEnv env) {
+			super();
+			this.doc = doc;
+			this.matches = matches;
+			this.root = root;
+			this.config = config;
+			this.env = env;
+		}
+
+		public void run() {
+			int nid = Integer.parseInt(doc.get("dnid"));
+			try {
+			ThinDescVersioned descV = (ThinDescVersioned) env.getDescription(nid);
+				if (root == null) {
+					matches.add(descV);
+				} else {
+					ConceptBean descConcept = ConceptBean.get(descV.getConceptId());
+					try {
+						if  (root.isParentOf(descConcept, config.getAllowedStatus(), config.getDestRelTypes(), 
+								config.getViewPositionSet(), true)) {
+							matches.add(descV);
+						}
+					} catch (IOException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					}
+				}
+			} catch (DatabaseException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+			
 		}
 
 	}

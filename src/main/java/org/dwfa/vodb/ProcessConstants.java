@@ -58,15 +58,18 @@ public abstract class ProcessConstants extends ProcessSources {
 		cleanup(null);
 	}
 
-	public void execute(JarFile constantJar) throws Exception {
+	public void execute(JarFile constantJar) throws Exception { 
+		execute(constantJar, "org/jehri/cement/");
+	}
+	public void execute(JarFile constantJar, String dataDir) throws Exception {
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Enumeration<JarEntry> jarEnum = constantJar.entries();
 		while (jarEnum.hasMoreElements()) {
 			JarEntry je = jarEnum.nextElement();
-			if (je.getName().startsWith("org/jehri/cement/") &&
+			if (je.getName().startsWith(dataDir) &&
 					je.getName().endsWith(".txt")) {
-				int startIndex = "org/jehri/cement/".length();
+				int startIndex = dataDir.length();
 				int endIndex = startIndex + "yyyy-MM-dd".length();
 				Date releaseDate = dateFormat.parse(je.getName().substring(startIndex, endIndex));
 				addReleaseDate(releaseDate);
