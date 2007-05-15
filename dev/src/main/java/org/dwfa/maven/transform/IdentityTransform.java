@@ -10,16 +10,7 @@ public class IdentityTransform extends AbstractTransform implements I_ReadAndTra
 	}
 
 	public String transform(String input) throws Exception {
-		StringBuffer sb = new StringBuffer();
-
-		for (int i = 0; i < input.length(); i++) {
-			char c = input.charAt(i);
-			sb.append(c);
-			if (c == '"') {
-				sb.append('"');
-			}	
-		}
-		return setLastTransform(sb.toString());
+		return setLastTransform(input);
 	}
 
 }

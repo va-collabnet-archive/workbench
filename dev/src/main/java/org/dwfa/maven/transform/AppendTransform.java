@@ -17,9 +17,6 @@ public class AppendTransform extends AbstractTransform {
 		for (int i = 0; i < input.length(); i++) {
 			char c = input.charAt(i);
 			sb.append(c);
-			if (c == '"') {
-				sb.append('"');
-			}
 		}
 		sb.append(' ');
 		sb.append(param);

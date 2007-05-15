@@ -10,16 +10,13 @@ public class IdentityTransformWithQuoteDelimiters extends AbstractTransform impl
 	}
 
 	public String transform(String input) throws Exception {
-		
+
 		if (input.contains("\"") || input.contains(",")) {
 			StringBuffer sb = new StringBuffer();
 			sb.append('"');
 			for (int i = 0; i < input.length(); i++) {
 				char c = input.charAt(i);
 				sb.append(c);
-				if (c == '"') {
-					sb.append('"');
-				}	
 			}
 			sb.append('"');
 			return setLastTransform(sb.toString());

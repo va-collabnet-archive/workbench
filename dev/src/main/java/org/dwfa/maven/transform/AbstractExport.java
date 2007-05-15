@@ -25,7 +25,7 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 	private String statusTransformName;
 	private Map uuidToNativeMap;
 	private Set activeSet = new HashSet();
-	
+
 	/**
 	 * @parameter
 	 */
@@ -86,11 +86,16 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 		if (exportOnlyActive == false) {
 			writeRec();
 		} else {
-			if(statusTransform != null) {
-				if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
-					writeRec();
-				}
-				else {
+			if (statusTransform != null) {
+                try {
+    				if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
+    					writeRec();
+    				}
+                } catch (NumberFormatException e) {
+                    //System.out.println("Number format exception in "
+                    //        + "AbstractExport parsing: "
+                     //       + statusTransform.getLastTransform());
+                    // ??
 					writeRec();
 				}
 			}
@@ -98,7 +103,7 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 	}
 
 	public abstract void writeRec() throws IOException;
-	
+
 	public String getFileName() {
 		return fileName;
 	}
@@ -125,7 +130,7 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 		}
 	}
 	protected abstract void writeColumns(Writer w) throws IOException;
-	
+
 	public final void addTransform(I_ReadAndTransform t) {
 		if (exportOnlyActive) {
 			if (statusTransformName.equals(t.getName())) {
@@ -134,9 +139,9 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 		}
 		addTransformToSubclass(t);
 	}
-	
+
 	protected abstract void addTransformToSubclass(I_ReadAndTransform t);
-	
+
 	public void close() throws IOException {
 		prepareForClose();
 		w.close();
