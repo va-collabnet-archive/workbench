@@ -9,6 +9,7 @@ import org.dwfa.ace.AceLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.vodb.ProcessConstants.FORMAT;
 import org.dwfa.vodb.types.Path;
 
 public class LoadSourcesFromJars {
@@ -32,7 +33,7 @@ public class LoadSourcesFromJars {
 		AceConfig.vodb.setup(new File(dbDir), false, 600000000L);
 		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
 		AceLog.getAppLog().info("Starting to process " + jarFile + ": " + dataPrefix);
-		loadConstants.execute(new JarFile(jarFile), dataPrefix);
+		loadConstants.execute(new JarFile(jarFile), dataPrefix, FORMAT.ACE);
 		Path.writeBasePaths(AceConfig.vodb);
 		AddImage.addStockImage(AceConfig.vodb);
 		AceLog.getAppLog().info("Finished loading " + jarFile + ". Elapsed time: "
@@ -70,7 +71,7 @@ public class LoadSourcesFromJars {
 		AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
 		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
 		AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
-		loadConstants.execute(new JarFile(args[1]), "org/jehri/cement/");
+		loadConstants.execute(new JarFile(args[1]), "org/jehri/cement/", FORMAT.SNOMED);
 		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths(AceConfig.vodb);

@@ -44,13 +44,13 @@ public abstract class ProcessConstants extends ProcessSources {
 				fr = new FileReader(contentFile);
 				BufferedReader br = new BufferedReader(fr);
 				if (contentFile.getName().startsWith("concepts")) {
-					readConcepts(br, releaseDate);
+					readConcepts(br, releaseDate, FORMAT.SNOMED);
 				} else if (contentFile.getName().startsWith(
 						"descriptions")) {
-					readDescriptions(br, releaseDate);
+					readDescriptions(br, releaseDate, FORMAT.SNOMED);
 				} else if (contentFile.getName().startsWith(
 						"relationships")) {
-					readRelationships(br, releaseDate);
+					readRelationships(br, releaseDate, FORMAT.SNOMED);
 				}
 				br.close();
 			}
@@ -59,9 +59,11 @@ public abstract class ProcessConstants extends ProcessSources {
 	}
 
 	public void execute(JarFile constantJar) throws Exception { 
-		execute(constantJar, "org/jehri/cement/");
+		execute(constantJar, "org/jehri/cement/", FORMAT.SNOMED);
 	}
-	public void execute(JarFile constantJar, String dataDir) throws Exception {
+	
+	public static enum FORMAT { SNOMED, ACE };
+	public void execute(JarFile constantJar, String dataDir, FORMAT format) throws Exception {
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Enumeration<JarEntry> jarEnum = constantJar.entries();
@@ -77,19 +79,19 @@ public abstract class ProcessConstants extends ProcessSources {
 				if (je.getName().contains("concepts")) {
 					InputStreamReader isr = new InputStreamReader(
 							constantJar.getInputStream(je));
-					readConcepts(isr, releaseDate);
+					readConcepts(isr, releaseDate, format);
 					isr.close();
 				} else if (je.getName().contains("descriptions")) {
 					InputStreamReader isr = new InputStreamReader(
 							constantJar.getInputStream(je));
 					readDescriptions(new InputStreamReader(
-							constantJar.getInputStream(je)), releaseDate);
+							constantJar.getInputStream(je)), releaseDate, format);
 					isr.close();
 				} else if (je.getName().contains("relationships")) {
 					InputStreamReader isr = new InputStreamReader(
 							constantJar.getInputStream(je));
 					readRelationships(new InputStreamReader(
-							constantJar.getInputStream(je)), releaseDate);
+							constantJar.getInputStream(je)), releaseDate, format);
 					isr.close();
 				}
 			}

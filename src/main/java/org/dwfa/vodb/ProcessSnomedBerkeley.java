@@ -240,7 +240,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 
 	
 	public void writeConcept(Date releaseDate, Object conceptKey,
-			Object conceptStatus, boolean defChar) throws Exception {
+			Object conceptStatus, boolean defChar, Object ignoredPath) throws Exception {
 		ThinConPart con = new ThinConPart();
 		con.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
 		con.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
@@ -292,7 +292,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 
 	public void writeDescription(Date releaseDate, Object descriptionId,
 			Object status, Object conceptId, String text, boolean capStatus,
-			Object typeInt, String lang) throws Exception {
+			Object typeInt, String lang, Object ignoredPath) throws Exception {
 		
 		
 		text = new String(text.getBytes(), "UTF-8");
@@ -342,9 +342,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		}	
 	}
 
-	public void writeRelationship(Date releaseDate, Object relID,
+	public void writeRelationship(Date releaseDate, Object relID, Object statusIdIgnored,
 			Object conceptOneID, Object relationshipTypeConceptID,
-			Object conceptTwoID, Object characteristic, Object refinability, int group)
+			Object conceptTwoID, Object characteristic, Object refinability, int group, Object ignoredPath)
 			throws Exception {
 		ThinRelPart rel = new ThinRelPart();
 		rel.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));

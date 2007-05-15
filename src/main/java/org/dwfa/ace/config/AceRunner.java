@@ -51,24 +51,23 @@ public class AceRunner {
 		File aceConfigFile = (File) config.getEntry(this.getClass().getName(),
 				"aceConfigFile", File.class, new File(
 						"src/main/config/config.ace"));
-		AceConfig aceConfig;
 		if (aceConfigFile.exists()) {
 			ObjectInputStream ois = new ObjectInputStream(
 					new BufferedInputStream(new FileInputStream(aceConfigFile)));
-			aceConfig = (AceConfig) ois.readObject();
-			setupDatabase(aceConfig);
+			AceConfig.config = (AceConfig) ois.readObject();
+			setupDatabase(AceConfig.config);
 		} else {
 			File dbFolder = (File) config.getEntry(this.getClass().getName(),
 					"dbFolder", File.class, new File("target/berkeley-db"));
 			Long cacheSize = (Long) config.getEntry(this.getClass().getName(),
 					"cacheSize", Long.class, null);
 			AceLog.getAppLog().info("Cache size in config file: " + cacheSize);
-			aceConfig = new AceConfig(dbFolder);
-			setupDatabase(aceConfig);
-			AceConfig.setupAceConfig(aceConfig, aceConfigFile, cacheSize, false);
+			AceConfig.config = new AceConfig(dbFolder);
+			setupDatabase(AceConfig.config);
+			AceConfig.setupAceConfig(AceConfig.config, aceConfigFile, cacheSize, false);
 		}
-		ACE.setAceConfig(aceConfig);
-		for (I_ConfigAceFrame ace: aceConfig.aceFrames) {
+		ACE.setAceConfig(AceConfig.config);
+		for (I_ConfigAceFrame ace: AceConfig.config.aceFrames) {
 			if (ace.isActive()) {
 				AceFrame af = new AceFrame(args, lc, ace);
 				af.setVisible(true);

@@ -94,9 +94,11 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 					searchPanel.setProgressMaximum(descCount);
 					firstUpdate = false;
 				}
-				searchPanel
-						.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
-								.getCount()));
+				if (completeLatch != null) {
+					searchPanel
+					.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
+							.getCount()));
+				}
 				searchPanel.setProgressInfo("   " +
 						searchPanel.getProgressValue() + "/" + searchPanel.getProgressMaximum()
 								+ " descriptions   ");
@@ -144,9 +146,11 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 					searchPanel.setProgressMaximum(descCount);
 					firstUpdate = false;
 				}
-				searchPanel
-						.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
-								.getCount()));
+				if (completeLatch != null) {
+					searchPanel
+					.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
+							.getCount()));
+				}
 				searchPanel.setProgressInfo("   " + info +  ")");
 				if (searchPanel.getProgressValue() == searchPanel.getProgressMaximum()) {
 					normalCompletion();

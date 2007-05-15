@@ -134,10 +134,10 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 
 	@Override
 	public void writeConcept(Date releaseDate, Object conceptKey,
-			Object conceptStatus, boolean defChar) throws Exception {
+			Object conceptStatus, boolean defChar, Object pathId) throws Exception {
 		int version = ThinVersionHelper.convert(releaseDate.getTime());
 		ThinConPart con = new ThinConPart();
-		con.setPathId(map.getIntId(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(), aceAuxPath, version));
+		con.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
 		con.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		con.setConceptStatus(map.getIntId((UUID) conceptStatus, aceAuxPath, version));
 		con.setDefined(defChar);
@@ -162,10 +162,10 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	@Override
 	public void writeDescription(Date releaseDate, Object descriptionId,
 			Object status, Object conceptId, String text, boolean capStatus,
-			Object typeInt, String lang) throws Exception {
+			Object typeInt, String lang, Object pathID) throws Exception {
 		int version = ThinVersionHelper.convert(releaseDate.getTime());
 		ThinDescPart desc = new ThinDescPart();
-		desc.setPathId(map.getIntId(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(), aceAuxPath, version));
+		desc.setPathId(map.getIntId((Collection<UUID>) pathID, aceAuxPath, version));
 		desc.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		desc.setStatusId(map.getIntId((UUID) status, aceAuxPath, ThinVersionHelper.convert(releaseDate.getTime())));
 		desc.setInitialCaseSignificant(capStatus);
@@ -192,15 +192,15 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	}
 
 	@Override
-	public void writeRelationship(Date releaseDate, Object relID,
+	public void writeRelationship(Date releaseDate, Object relID, Object statusId, 
 			Object conceptOneID, Object relationshipTypeConceptID,
 			Object conceptTwoID, Object characteristic, Object refinability,
-			int group) throws Exception {
+			int group, Object pathId) throws Exception {
 		int version = ThinVersionHelper.convert(releaseDate.getTime());
 		ThinRelPart rel = new ThinRelPart();
-		rel.setPathId(map.getIntId(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(), aceAuxPath, version));
+		rel.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
 		rel.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
-		rel.setStatusId(map.getIntId(ArchitectonicAuxiliary.Concept.CURRENT.getUids(), aceAuxPath, version));
+		rel.setStatusId(map.getIntId((Collection<UUID>) statusId, aceAuxPath, version));
 		rel.setCharacteristicId(map.getIntId((UUID) characteristic, aceAuxPath, version));
 		rel.setGroup(group);
 		rel.setRefinabilityId(map.getIntId((UUID) refinability, aceAuxPath, version));

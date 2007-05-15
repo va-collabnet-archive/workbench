@@ -256,7 +256,7 @@ public class VodbEnv {
 		DatabaseConfig mapDbConfig = makeConfig(readOnly);
 		activity.setProgressInfoLower("Opening ids...");
 		idDb = env.openDatabase(null, "idDb", mapDbConfig);
-		uidToIdMap = createUidToIdMap();
+		createUidToIdMap();
 		
 		//Reset the authority id so that each time the db starts, it gets a new authorityId. 
 		PrimordialId primId = PrimordialId.AUTHORITY_ID;
@@ -295,53 +295,60 @@ public class VodbEnv {
 	}
 
 	private void createConceptDescMap() throws DatabaseException {
-		ConceptIdKeyForDescCreator descConceptKeyCreator = new ConceptIdKeyForDescCreator(
-				descBinding);
+		if (conceptDescMap == null) {
+			ConceptIdKeyForDescCreator descConceptKeyCreator = new ConceptIdKeyForDescCreator(
+					descBinding);
 
-		SecondaryConfig descByConceptIdConfig = new SecondaryConfig();
-		descByConceptIdConfig.setReadOnly(readOnly);
-		descByConceptIdConfig.setDeferredWrite(true);
-		descByConceptIdConfig.setAllowCreate(!readOnly);
-		descByConceptIdConfig.setSortedDuplicates(false);
-		descByConceptIdConfig.setKeyCreator(descConceptKeyCreator);
-		descByConceptIdConfig.setAllowPopulate(true);
+			SecondaryConfig descByConceptIdConfig = new SecondaryConfig();
+			descByConceptIdConfig.setReadOnly(readOnly);
+			descByConceptIdConfig.setDeferredWrite(true);
+			descByConceptIdConfig.setAllowCreate(!readOnly);
+			descByConceptIdConfig.setSortedDuplicates(false);
+			descByConceptIdConfig.setKeyCreator(descConceptKeyCreator);
+			descByConceptIdConfig.setAllowPopulate(true);
 
-		conceptDescMap = env.openSecondaryDatabase(null, "conceptDescMap",
-				descDb, descByConceptIdConfig);
+			conceptDescMap = env.openSecondaryDatabase(null, "conceptDescMap",
+					descDb, descByConceptIdConfig);
+		}
 	}
 
 	public void createC1RelMap() throws DatabaseException {
-		C1KeyForRelCreator c1ToRelKeyCreator = new C1KeyForRelCreator(
-				relBinding);
+		if (c1RelMap == null) {
+			C1KeyForRelCreator c1ToRelKeyCreator = new C1KeyForRelCreator(
+					relBinding);
 
-		SecondaryConfig relByC1IdConfig = new SecondaryConfig();
-		relByC1IdConfig.setReadOnly(readOnly);
-		relByC1IdConfig.setDeferredWrite(true);
-		relByC1IdConfig.setAllowCreate(!readOnly);
-		relByC1IdConfig.setSortedDuplicates(false);
-		relByC1IdConfig.setKeyCreator(c1ToRelKeyCreator);
-		relByC1IdConfig.setAllowPopulate(true);
+			SecondaryConfig relByC1IdConfig = new SecondaryConfig();
+			relByC1IdConfig.setReadOnly(readOnly);
+			relByC1IdConfig.setDeferredWrite(true);
+			relByC1IdConfig.setAllowCreate(!readOnly);
+			relByC1IdConfig.setSortedDuplicates(false);
+			relByC1IdConfig.setKeyCreator(c1ToRelKeyCreator);
+			relByC1IdConfig.setAllowPopulate(true);
 
-		c1RelMap = env.openSecondaryDatabase(null, "c1RelMap", relDb,
-				relByC1IdConfig);
+			c1RelMap = env.openSecondaryDatabase(null, "c1RelMap", relDb,
+					relByC1IdConfig);
+		}
 	}
 
 	public void createConceptImageMap() throws DatabaseException {
-		ConceptKeyForImageCreator concToImageKeyCreator = new ConceptKeyForImageCreator();
+		if (conceptImageMap == null) {
+			ConceptKeyForImageCreator concToImageKeyCreator = new ConceptKeyForImageCreator();
 
-		SecondaryConfig imageByConConfig = new SecondaryConfig();
-		imageByConConfig.setReadOnly(readOnly);
-		imageByConConfig.setDeferredWrite(true);
-		imageByConConfig.setAllowCreate(!readOnly);
-		imageByConConfig.setSortedDuplicates(true);
-		imageByConConfig.setKeyCreator(concToImageKeyCreator);
-		imageByConConfig.setAllowPopulate(true);
+			SecondaryConfig imageByConConfig = new SecondaryConfig();
+			imageByConConfig.setReadOnly(readOnly);
+			imageByConConfig.setDeferredWrite(true);
+			imageByConConfig.setAllowCreate(!readOnly);
+			imageByConConfig.setSortedDuplicates(true);
+			imageByConConfig.setKeyCreator(concToImageKeyCreator);
+			imageByConConfig.setAllowPopulate(true);
 
-		conceptImageMap = env.openSecondaryDatabase(null, "conceptImageMap",
-				imageDb, imageByConConfig);
+			conceptImageMap = env.openSecondaryDatabase(null, "conceptImageMap",
+					imageDb, imageByConConfig);
+		}
 	}
 
 	public void createC2RelMap() throws DatabaseException {
+		if (c2RelMap == null) {
 		C2KeyForRelCreator c2ToRelKeyCreator = new C2KeyForRelCreator(
 				relBinding);
 
@@ -355,15 +362,17 @@ public class VodbEnv {
 
 		c2RelMap = env.openSecondaryDatabase(null, "c2RelMap", relDb,
 				relByC2IdConfig);
+		}
 	}
 
 	public void createIdMaps() throws DatabaseException {
 		if (uidToIdMap == null) {
-			uidToIdMap = createUidToIdMap();
+			createUidToIdMap();
 		}
 	}
 
-	private SecondaryDatabase createUidToIdMap() throws DatabaseException {
+	private void createUidToIdMap() throws DatabaseException {
+		if (uidToIdMap == null) {
 		SecondaryConfig uidToIdMapConfig = new SecondaryConfig();
 		uidToIdMapConfig.setReadOnly(readOnly);
 		uidToIdMapConfig.setDeferredWrite(true);
@@ -372,8 +381,9 @@ public class VodbEnv {
 		uidToIdMapConfig.setMultiKeyCreator(new UidKeyCreator(uuidBinding,
 				idBinding));
 		uidToIdMapConfig.setAllowPopulate(true);
-		return env.openSecondaryDatabase(null, "uidToIdMap", getIdDb(),
+		uidToIdMap = env.openSecondaryDatabase(null, "uidToIdMap", getIdDb(),
 				uidToIdMapConfig);
+		}
 	}
 
 	private DatabaseConfig makeConfig(boolean readOnly) {
@@ -994,7 +1004,7 @@ public class VodbEnv {
 
 	public SecondaryDatabase getUidToIdMap() throws DatabaseException {
 		if (uidToIdMap == null) {
-			uidToIdMap = createUidToIdMap();
+			createUidToIdMap();
 		}
 		return uidToIdMap;
 	}

@@ -18,6 +18,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.vodb.ProcessConstants.FORMAT;
 import org.dwfa.vodb.types.I_ProcessRelationships;
 import org.dwfa.vodb.types.IntSet;
 
@@ -91,13 +92,13 @@ public abstract class ProcessSnomed extends ProcessSources {
 					
 					BufferedReader br = new BufferedReader(isr);
 					if (contentFile.getName().startsWith("sct_concepts_")) {
-						readConcepts(br, releaseDate);
+						readConcepts(br, releaseDate, FORMAT.SNOMED);
 					} else if (contentFile.getName().startsWith(
 							"sct_descriptions_")) {
-						readDescriptions(br, releaseDate);
+						readDescriptions(br, releaseDate, FORMAT.SNOMED);
 					} else if (contentFile.getName().startsWith(
 							"sct_relationships_")) {
-						readRelationships(br, releaseDate);
+						readRelationships(br, releaseDate, FORMAT.SNOMED);
 					}
 					br.close();
 				}
@@ -127,20 +128,20 @@ public abstract class ProcessSnomed extends ProcessSources {
 				if (processConcepts && je.getName().contains("concepts")) {
 					InputStreamReader isr = new InputStreamReader(
 							snomedJar.getInputStream(je), Charset.forName("UTF-8"));
-					readConcepts(isr, releaseDate);
+					readConcepts(isr, releaseDate, FORMAT.SNOMED);
 					isr.close();
 				} else if (processDescriptions && je.getName().contains("descriptions")) {
 					InputStream is = snomedJar.getInputStream(je);
 					InputStreamReader isr = new InputStreamReader(
 							is, Charset.forName("UTF-8"));
 					readDescriptions(new InputStreamReader(
-							snomedJar.getInputStream(je)), releaseDate);
+							snomedJar.getInputStream(je)), releaseDate, FORMAT.SNOMED);
 					isr.close();
 				} else if (processRels && je.getName().contains("relationships")) {
 					InputStreamReader isr = new InputStreamReader(
 							snomedJar.getInputStream(je), Charset.forName("UTF-8"));
 					readRelationships(new InputStreamReader(
-							snomedJar.getInputStream(je)), releaseDate);
+							snomedJar.getInputStream(je)), releaseDate, FORMAT.SNOMED);
 					isr.close();
 				}
 			}

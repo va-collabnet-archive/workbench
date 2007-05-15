@@ -102,6 +102,11 @@ public class Path implements I_Transact, Serializable, I_Path {
 		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
 		List<I_Position> origins = new ArrayList<I_Position>(1);
 		origins.add(latestAceRelease);
+		
+		Path tgaPath = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.TGA_DATA.getUids()), origins);
+		basePaths.add(tgaPath);
+		Path amtPath = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.AMT_SOURCE_DATA.getUids()), origins);
+		basePaths.add(amtPath);
 
 		Path snomedCore = new Path(vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE

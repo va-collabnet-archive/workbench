@@ -46,6 +46,7 @@ import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.log.HtmlHandler;
 import org.dwfa.log.LogViewerFrame;
 import org.dwfa.svn.SvnPrompter;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
@@ -485,17 +486,12 @@ public class AceConfig implements Serializable {
 				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE
 						.getUids()).getNativeId());
 		if (includeSnomed) {
-			roots.add(vodb.getId(SNOMED.Concept.ROOT.getUids()).getNativeId());
+			addIfNotNull(roots, SNOMED.Concept.ROOT);
 		}
-		roots.add(vodb.getId(
-				DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY.getUids())
-				.getNativeId());
-		roots.add(vodb
-				.getId(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids())
-				.getNativeId());
-		roots.add(vodb.getId(HL7.Concept.HL7.getUids()).getNativeId());
-		roots.add(vodb.getId(QueueType.Concept.QUEUE_TYPE.getUids())
-				.getNativeId());
+		addIfNotNull(roots, DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY);
+		addIfNotNull(roots, RefsetAuxiliary.Concept.REFSET_AUXILIARY);
+		addIfNotNull(roots, HL7.Concept.HL7);
+		addIfNotNull(roots, QueueType.Concept.QUEUE_TYPE);
 		af.setRoots(roots);
 
 		IntSet allowedStatus = new IntSet();
@@ -531,8 +527,10 @@ public class AceConfig implements Serializable {
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
 		if (includeSnomed) {
-			destRelTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids())
-					.getNativeId());
+			if (vodb.getId(SNOMED.Concept.ROOT.getUids()) != null) {
+				destRelTypes.add(vodb.getId(SNOMED.Concept.ROOT.getUids())
+						.getNativeId());
+			}
 		}
 		af.setDestRelTypes(destRelTypes);
 
@@ -699,6 +697,12 @@ public class AceConfig implements Serializable {
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(config);
 		oos.close();
+	}
+
+	private static void addIfNotNull(IntSet roots, I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
+		if (vodb.getId(concept.getUids()) != null) {
+			roots.add(vodb.getId(concept.getUids()).getNativeId());
+		}
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
