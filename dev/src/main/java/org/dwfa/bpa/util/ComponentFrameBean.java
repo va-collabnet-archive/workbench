@@ -247,11 +247,13 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         // platforms.
         if (!MAC_OS_X) {
             JMenu quitMenu = this.compMenuIniter.getQuitMenu();
-            quitMenu.addSeparator();
-            quitMenu.add(quitMI = new JMenuItem("Quit"));
-            quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                    MENU_MASK));
-            quitMI.addActionListener(this);
+            if (quitMenu != null) {
+                quitMenu.addSeparator();
+                quitMenu.add(quitMI = new JMenuItem("Quit"));
+                quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+                        MENU_MASK));
+                quitMI.addActionListener(this);
+            }
         }
         
         mainMenuBar.add(editMenu = new JMenu("Edit"));
