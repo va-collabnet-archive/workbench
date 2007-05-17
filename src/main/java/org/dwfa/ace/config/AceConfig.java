@@ -182,7 +182,7 @@ public class AceConfig implements Serializable {
 
 	public static void main(String[] args) throws SecurityException,
 			IOException {
-		//System.setProperty("apple.laf.useScreenMenuBar", "true");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
 		AceLog.getEditLog().setLevel(Level.FINER);
 		HtmlHandler h = new HtmlHandler(null, "edits");
