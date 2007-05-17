@@ -79,7 +79,7 @@ public class SvnPrompter implements PromptUserPassword3 {
 		userTextField.setSelectionStart(0);
 		userTextField.setSelectionEnd(Integer.MAX_VALUE);
 		int action = JOptionPane.showConfirmDialog(parentContainer, promptPane,
-				"Enter username/password:", JOptionPane.OK_CANCEL_OPTION);
+				realm, JOptionPane.OK_CANCEL_OPTION);
 		if (action == JOptionPane.CANCEL_OPTION) {
 			userAllowedSave = false;
 			return false;

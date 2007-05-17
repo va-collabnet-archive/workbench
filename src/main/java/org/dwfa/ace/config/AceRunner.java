@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
@@ -31,7 +32,7 @@ public class AceRunner {
 
 	protected Configuration config;
 
-	public AceRunner(String[] args, LifeCycle lc)
+	public AceRunner(final String[] args, final LifeCycle lc)
 			throws Exception {
 		this.args = args;
 		this.lc = lc;
@@ -67,10 +68,20 @@ public class AceRunner {
 			AceConfig.setupAceConfig(AceConfig.config, aceConfigFile, cacheSize, false);
 		}
 		ACE.setAceConfig(AceConfig.config);
-		for (I_ConfigAceFrame ace: AceConfig.config.aceFrames) {
+		for (final I_ConfigAceFrame ace: AceConfig.config.aceFrames) {
 			if (ace.isActive()) {
-				AceFrame af = new AceFrame(args, lc, ace);
-				af.setVisible(true);
+				SwingUtilities.invokeLater(new Runnable() {
+
+					public void run() {
+						try {
+							AceFrame af = new AceFrame(args, lc, ace);
+							af.setVisible(true);
+						} catch (Exception e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						}
+					}
+					
+				});
 			}
 		}
 	}

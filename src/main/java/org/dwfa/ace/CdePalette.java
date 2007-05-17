@@ -103,6 +103,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 		super.paintComponent(g);
 	}
 	
+	
 	public void togglePalette(boolean selected) {
 		Point locatorBounds = locator.getPalettePoint();
 		if (getBounds().x == locatorBounds.x) {
@@ -113,6 +114,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 		if (mover != null) {
 			mover.stop();
 		}
+		setLocation(getLocation().x, locator.getPalettePoint().y);
 		mover = new PaletteMover(getLocation(), computeLocation(currentSide), selected);
 	}
 	

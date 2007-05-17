@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.swing.SwingTask;
@@ -158,28 +159,48 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 		progressBar.setIndeterminate(newValue);
 	}
 
-	public void setMaximum(int n) {
-		progressBar.setMaximum(n);
+	public void setMaximum(final int n) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressBar.setMaximum(n);
+			}
+		});
 	}
 
-	public void setValue(int n) {
-		progressBar.setValue(n);
+	public void setValue(final int n) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressBar.setValue(n);
+			}
+		});
 	}
 
 	public void complete() {
-		stopButton.setVisible(false);
-		progressBar.setVisible(false);
-		if (showDelete) {
-			ACE.timer.schedule(new ShowDeleteButton(), 1000);
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				stopButton.setVisible(false);
+				progressBar.setVisible(false);
+				if (showDelete) {
+					ACE.timer.schedule(new ShowDeleteButton(), 1000);
+				}
+			}
+		});
 	}
 
-	public void addActionListener(ActionListener l) {
-		stopButton.addActionListener(l);
+	public void addActionListener(final ActionListener l) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				stopButton.addActionListener(l);
+			}
+		});
 	}
 
-	public void removeActionListener(ActionListener l) {
-		stopButton.removeActionListener(l);
+	public void removeActionListener(final ActionListener l) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				stopButton.removeActionListener(l);
+			}
+		});
 	}
 
 }

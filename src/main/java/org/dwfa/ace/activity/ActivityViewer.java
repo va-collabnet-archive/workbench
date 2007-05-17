@@ -13,9 +13,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import net.jini.config.ConfigurationException;
 
+import org.dwfa.ace.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 
 public class ActivityViewer {
@@ -99,28 +101,42 @@ public class ActivityViewer {
 
 	}
 
-	public static void addActivity(I_ShowActivity activity) throws Exception {
-		if (viewer == null) {
-			viewer = new ActivityViewer();
-		}
-		while (viewer.activitiesList.size() > 10) {
-			viewer.activitiesList.remove(9);
-		}
-		viewer.activitiesList.add(0, activity);
-		viewer.activitiesPanel.removeAll();
-		for (I_ShowActivity a : viewer.activitiesList) {
-			viewer.activitiesPanel.add(a.getViewPanel());
-		}
-		tickleSize();
+	public static void addActivity(final I_ShowActivity activity) throws Exception {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
+				if (viewer == null) {
+					try {
+						viewer = new ActivityViewer();
+					} catch (Exception e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					}
+				}
+				while (viewer.activitiesList.size() > 10) {
+					viewer.activitiesList.remove(9);
+				}
+				viewer.activitiesList.add(0, activity);
+				viewer.activitiesPanel.removeAll();
+				for (I_ShowActivity a : viewer.activitiesList) {
+					viewer.activitiesPanel.add(a.getViewPanel());
+				}
+				tickleSize();
+			}
+			
+		});
 	}
 
-	public static void removeActivity(I_ShowActivity activity) {
+	public static void removeActivity(final I_ShowActivity activity) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
 		viewer.activitiesList.remove(activity);
 		viewer.activitiesPanel.removeAll();
 		for (I_ShowActivity a : viewer.activitiesList) {
 			viewer.activitiesPanel.add(a.getViewPanel());
 		}
 		tickleSize();
+			}});
 	}
 
 	private static void tickleSize() {
