@@ -11,6 +11,8 @@ import java.net.URL;
 
 import org.dwfa.bpa.htmlbrowser.JavaBrowser;
 
+import com.sun.org.apache.xerces.internal.util.URI;
+
 /**
  * This class provides a method to access a "native" web browser on the host
  * platform. If it cannot access a native web browser, it will create a
@@ -65,28 +67,29 @@ public class PlatformWebBrowser {
 	 */
 	private static class JnlpOpener implements I_OpenURL {
 
-		Object javaxJnlpBasicService;
+		Object desktopObject;
 
-		Method showDocumentMethod;
+		Method browseMethod;
 
 		public JnlpOpener() throws ClassNotFoundException, SecurityException,
 				NoSuchMethodException, IllegalArgumentException,
 				IllegalAccessException, InvocationTargetException {
-			Class jnlpServiceManagerClass = Class
-					.forName("javax.jnlp.ServiceManager");
-			Method lookupMethod = jnlpServiceManagerClass.getMethod("lookup",
-					new Class[] { String.class });
-			javaxJnlpBasicService = lookupMethod.invoke(null,
-					new Object[] { "javax.jnlp.BasicService" });
-			showDocumentMethod = javaxJnlpBasicService.getClass().getMethod(
-					"showDocument", new Class[] { URL.class });
+			
+			Class desktopClass = Class
+			.forName("java.awt.Desktop");
+			
+			Method getDesktopMethod = desktopClass.getMethod("getDesktop", new Class[] {});
+			desktopObject = getDesktopMethod.invoke(null);
+			browseMethod = desktopObject.getClass().getMethod("browse", new Class[] { URI.class });
+			
 		}
 
 		public boolean openURL(URL url) {
 
 			try {
-				return (Boolean) showDocumentMethod.invoke(
-						javaxJnlpBasicService, new Object[] { url });
+				browseMethod.invoke(
+						desktopObject, new Object[] { url.toURI() });
+				return true;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
