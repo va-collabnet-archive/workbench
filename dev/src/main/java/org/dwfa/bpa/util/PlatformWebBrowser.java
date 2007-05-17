@@ -65,13 +65,13 @@ public class PlatformWebBrowser {
 	 * @author kec
 	 *
 	 */
-	private static class JnlpOpener implements I_OpenURL {
+	private static class DesktopOpener implements I_OpenURL {
 
 		Object desktopObject;
 
 		Method browseMethod;
 
-		public JnlpOpener() throws ClassNotFoundException, SecurityException,
+		public DesktopOpener() throws ClassNotFoundException, SecurityException,
 				NoSuchMethodException, IllegalArgumentException,
 				IllegalAccessException, InvocationTargetException {
 			
@@ -132,7 +132,7 @@ public class PlatformWebBrowser {
 					if (MAC_OS_X) {
 						opener = new OpenMacWebBrowser();
 					} else {
-						opener = new JnlpOpener();
+						opener = new DesktopOpener();
 					}
 				}
 			} catch (Exception e) {
