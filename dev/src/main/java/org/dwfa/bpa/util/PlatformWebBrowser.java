@@ -1,7 +1,7 @@
 /*
  * Created on Jan 17, 2006
  *
- * Copyright 2006 by Informatics, Inc. 
+ * Copyright 2006 by Informatics, Inc.
  */
 package org.dwfa.bpa.util;
 
@@ -11,16 +11,14 @@ import java.net.URL;
 
 import org.dwfa.bpa.htmlbrowser.JavaBrowser;
 
-import com.sun.org.apache.xerces.internal.util.URI;
-
 /**
  * This class provides a method to access a "native" web browser on the host
  * platform. If it cannot access a native web browser, it will create a
  * swing-based web browser that is cross platform, but very poor at rendering
  * content.
- * 
+ *
  * @author kec
- * 
+ *
  */
 public class PlatformWebBrowser {
 	private interface I_OpenURL {
@@ -60,7 +58,7 @@ public class PlatformWebBrowser {
 	}
 
 	/**
-	 * Another option is to consider exec functions. "start file.html" 
+	 * Another option is to consider exec functions. "start file.html"
 	 * opens the file in the default web browser on Windows XP.
 	 * @author kec
 	 *
@@ -74,14 +72,17 @@ public class PlatformWebBrowser {
 		public DesktopOpener() throws ClassNotFoundException, SecurityException,
 				NoSuchMethodException, IllegalArgumentException,
 				IllegalAccessException, InvocationTargetException {
-			
-			Class desktopClass = Class
-			.forName("java.awt.Desktop");
-			
-			Method getDesktopMethod = desktopClass.getMethod("getDesktop", new Class[] {});
+
+			Class desktopClass =
+                    Class.forName("java.awt.Desktop");
+
+			Method getDesktopMethod = desktopClass.getMethod("getDesktop",
+                    new Class[] {});
 			desktopObject = getDesktopMethod.invoke(null);
-			browseMethod = desktopObject.getClass().getMethod("browse", new Class[] { URI.class });
-			
+
+			browseMethod = desktopObject.getClass().getMethod("browse",
+                    new Class[] { Class.forName("java.net.URI") });
+
 		}
 
 		public boolean openURL(URL url) {
