@@ -7,6 +7,7 @@ package org.dwfa.bpa.gui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,17 +150,20 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
             return -1;
         }
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(object);
-            byte[] bytes = baos.toByteArray();
-            oos.close();
-            baos.close();
-            return bytes.length;
-        } catch (Exception e) {
+        	if (Serializable.class.isAssignableFrom(object.getClass())) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(object);
+                byte[] bytes = baos.toByteArray();
+                oos.close();
+                baos.close();
+                return bytes.length;
+        	} 
+        	return -2;
+         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-        return -1;
+        return -3;
     }
 
     public void setWidths(JTable table) {
