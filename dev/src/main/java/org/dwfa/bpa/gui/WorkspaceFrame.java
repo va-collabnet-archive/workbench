@@ -22,13 +22,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import net.jini.config.ConfigurationException;
@@ -45,55 +43,6 @@ import org.dwfa.bpa.util.ComponentFrame;
  * 
  */
 public class WorkspaceFrame extends ComponentFrame implements ActionListener {
-
-    public class ProcessMenuActionListener implements ActionListener {
-        private class MenuProcessThread implements Runnable {
-            
-            private String action;
-            
-            
-            /**
-             * @param action
-             */
-            public MenuProcessThread(String action) {
-                super();
-                // TODO Auto-generated constructor stub
-                this.action = action;
-            }
-
-
-            public void run() {
-                try {
-                    ObjectInputStream ois = new ObjectInputStream(
-                            new BufferedInputStream(new FileInputStream(
-                                    processFile)));
-                    I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-                            .readObject();
-                    ois.close();
-                    process.execute(worker);
-                    worker.commitTransactionIfActive();
-                } catch (Exception ex) {
-                    worker.getLogger().log(Level.SEVERE, ex.getMessage(),
-                            ex);
-                    JOptionPane.showMessageDialog(WorkspaceFrame.this, "<html>Exception processing action: " + 
-                            action + "<p><p>" + 
-                            ex.getMessage() + "<p><p>See log for details.");
-                }
-            }
-        };
-        private File processFile;
-        
-        
-
-        public ProcessMenuActionListener(File processFile) {
-            super();
-            this.processFile = processFile;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            new Thread(new MenuProcessThread(e.getActionCommand()), "Menu Process Execution").start();
-        }
-    }
 
     /**
      * 
@@ -267,7 +216,7 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                         if (f.listFiles() != null) {
                             for (File processFile : f.listFiles()) {
                                 ActionListener processMenuListener = new ProcessMenuActionListener(
-                                        processFile);
+                                        processFile, worker);
                                 ObjectInputStream ois = new ObjectInputStream(
                                         new BufferedInputStream(new FileInputStream(
                                                 processFile)));
