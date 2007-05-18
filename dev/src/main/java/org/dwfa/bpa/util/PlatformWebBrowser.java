@@ -58,35 +58,39 @@ public class PlatformWebBrowser {
 	}
 
 	/**
-	 * Another option is to consider exec functions. "start file.html" 
+	 * Another option is to consider exec functions. "start file.html"
 	 * opens the file in the default web browser on Windows XP.
 	 * @author kec
 	 *
 	 */
-	private static class JnlpOpener implements I_OpenURL {
+	private static class DesktopOpener implements I_OpenURL {
 
-		Object javaxJnlpBasicService;
+		Object desktopObject;
 
-		Method showDocumentMethod;
+		Method browseMethod;
 
-		public JnlpOpener() throws ClassNotFoundException, SecurityException,
+		public DesktopOpener() throws ClassNotFoundException, SecurityException,
 				NoSuchMethodException, IllegalArgumentException,
 				IllegalAccessException, InvocationTargetException {
-			Class jnlpServiceManagerClass = Class
-					.forName("javax.jnlp.ServiceManager");
-			Method lookupMethod = jnlpServiceManagerClass.getMethod("lookup",
-					new Class[] { String.class });
-			javaxJnlpBasicService = lookupMethod.invoke(null,
-					new Object[] { "javax.jnlp.BasicService" });
-			showDocumentMethod = javaxJnlpBasicService.getClass().getMethod(
-					"showDocument", new Class[] { URL.class });
+
+			Class desktopClass =
+                    Class.forName("java.awt.Desktop");
+
+			Method getDesktopMethod = desktopClass.getMethod("getDesktop",
+                    new Class[] {});
+			desktopObject = getDesktopMethod.invoke(null);
+
+			browseMethod = desktopObject.getClass().getMethod("browse",
+                    new Class[] { Class.forName("java.net.URI") });
+
 		}
 
 		public boolean openURL(URL url) {
 
 			try {
-				return (Boolean) showDocumentMethod.invoke(
-						javaxJnlpBasicService, new Object[] { url });
+				browseMethod.invoke(
+						desktopObject, new Object[] { url.toURI() });
+				return true;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -129,7 +133,7 @@ public class PlatformWebBrowser {
 					if (MAC_OS_X) {
 						opener = new OpenMacWebBrowser();
 					} else {
-						opener = new JnlpOpener();
+						opener = new DesktopOpener();
 					}
 				}
 			} catch (Exception e) {

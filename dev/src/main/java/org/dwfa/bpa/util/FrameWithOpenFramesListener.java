@@ -76,7 +76,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
 
     protected JMenuBar mainMenuBar = new JMenuBar();
 
-    protected JMenu bundleMenu, windowMenu, helpMenu;
+    protected JMenu bundleMenu, windowMenu;
 
     protected JMenuItem addQueueMI;
 
@@ -203,6 +203,11 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         // platforms.
         if (!MAC_OS_X) {
             mainMenuBar.add(bundleMenu = new JMenu(menuName));
+            bundleMenu.add(aboutMI = new JMenuItem("About..."));
+            aboutMI.addActionListener(this);
+            bundleMenu.add(optionsMI = new JMenuItem("Options"));
+            optionsMI.addActionListener(this);
+            bundleMenu.addSeparator();
             bundleMenu.addSeparator();
             bundleMenu.add(quitMI = new JMenuItem("Quit"));
             quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
@@ -217,25 +222,6 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
             JMenuItem menuItem = new JMenuItem(frame.getTitle());
             menuItem.addActionListener(new BringWindowToFront(frame));
             windowMenu.add(menuItem);
-        }
-
-        mainMenuBar.add(helpMenu = new JMenu("Help"));
-        helpMenu.add(docsMI = new JMenuItem("Online Documentation"));
-        docsMI.addActionListener(new ShowApiListener());
-        helpMenu.addSeparator();
-        helpMenu.add(supportMI = new JMenuItem("Technical Support"));
-        // About menu item is provided on Mac OS X.. only make it on other
-        // platforms.
-        // Options/Prefs menu item is provided on Mac OS X.. only make it on
-        // other platforms.
-        if (!MAC_OS_X) {
-            helpMenu.addSeparator();
-            helpMenu.addSeparator();
-            helpMenu.add(optionsMI = new JMenuItem("Options"));
-            helpMenu.addActionListener(this);
-            helpMenu.addSeparator();
-            helpMenu.add(aboutMI = new JMenuItem("About..."));
-            aboutMI.addActionListener(this);
         }
 
         setJMenuBar(mainMenuBar);

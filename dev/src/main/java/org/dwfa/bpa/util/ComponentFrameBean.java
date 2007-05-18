@@ -76,11 +76,11 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
 
     private JMenuBar mainMenuBar;
 
-    private JMenu editMenu, windowMenu, helpMenu;
+    private JMenu editMenu, windowMenu, bundleMenu;
 
     private JMenuItem cutMI, copyMI, pasteMI, quitMI;
 
-    private JMenuItem docsMI, supportMI, optionsMI, aboutMI;
+    private JMenuItem optionsMI, aboutMI;
 
     /**
      * Cache of our <code>LifeCycle</code> object TODO implement the lifeCycle
@@ -247,14 +247,27 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         // platforms.
         if (!MAC_OS_X) {
             JMenu quitMenu = this.compMenuIniter.getQuitMenu();
-            quitMenu.addSeparator();
-            quitMenu.add(quitMI = new JMenuItem("Quit"));
-            quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                    MENU_MASK));
-            quitMI.addActionListener(this);
+            if (quitMenu != null) {
+                quitMenu.addSeparator();
+                quitMenu.add(quitMI = new JMenuItem("Quit"));
+                quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+                        MENU_MASK));
+                quitMI.addActionListener(this);
+            }
         }
         
-        mainMenuBar.add(editMenu = new JMenu("Edit"));
+        // About menu item is provided on Mac OS X.. only make it on other
+        // platforms.
+        // Options/Prefs menu item is provided on Mac OS X.. only make it on
+        // other platforms.
+        if (!MAC_OS_X) {
+            mainMenuBar.add(bundleMenu = new JMenu("Bundle"));
+            bundleMenu.addSeparator();
+            bundleMenu.add(aboutMI = new JMenuItem("About..."));
+            aboutMI.addActionListener(this);
+        }
+        
+       mainMenuBar.add(editMenu = new JMenu("Edit"));
         TransferActionListener actionListener = new TransferActionListener();
         
         cutMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CutAction());
@@ -279,25 +292,6 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         mainMenuBar.add(windowMenu = new JMenu("Window"));
         addFramesToWindowMenu();
 
-        mainMenuBar.add(helpMenu = new JMenu("Help"));
-        helpMenu.add(docsMI = new JMenuItem("Online Documentation"));
-        docsMI.addActionListener(new ShowApiListener());
-        helpMenu.addSeparator();
-        supportMI = new JMenuItem("Technical Support");
-        helpMenu.add(supportMI);
-        // About menu item is provided on Mac OS X.. only make it on other
-        // platforms.
-        // Options/Prefs menu item is provided on Mac OS X.. only make it on
-        // other platforms.
-        if (!MAC_OS_X) {
-            helpMenu.addSeparator();
-            helpMenu.addSeparator();
-            helpMenu.add(optionsMI = new JMenuItem("Options"));
-            optionsMI.addActionListener(this);
-            helpMenu.addSeparator();
-            helpMenu.add(aboutMI = new JMenuItem("About..."));
-            aboutMI.addActionListener(this);
-        }
 
         this.frame.setJMenuBar(mainMenuBar);
     }
