@@ -103,6 +103,8 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
     
     private JFrame frame;
     private I_InitComponentMenus compMenuIniter;
+
+	private boolean hiddenFrame;
     public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter, boolean hiddenFrame) throws Exception {
         this(args, lc, frame, compMenuIniter, new JMenuBar(), hiddenFrame);
 }
@@ -127,7 +129,10 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         this.config = ConfigurationProvider.getInstance(args, getClass()
                 .getClassLoader());
         this.lifeCycle = lc;
-        if (hiddenFrame == false) {
+        this.hiddenFrame = hiddenFrame;
+    }
+	public void setup() throws Exception {
+		if (hiddenFrame == false) {
             OpenFrames.addFrame(this.frame);
         }
         OpenFrames.addNewWindowMenuItemGenerator(compMenuIniter);
@@ -140,7 +145,7 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         macOSXRegistration();
 
         this.frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-    }
+	}
 
     // Generic registration with the Mac OS X application menu. Checks the
     // platform, then attempts
@@ -242,7 +247,28 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
 
 
     public final void addMenus() throws Exception {
-        this.compMenuIniter.addAppMenus(mainMenuBar);
+        mainMenuBar.add(editMenu = new JMenu("Edit"));
+        TransferActionListener actionListener = new TransferActionListener();
+        
+        cutMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CutAction());
+        cutMI.setText("Cut");
+        cutMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        cutMI.addActionListener(actionListener);
+        editMenu.add(cutMI);
+        copyMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CopyAction());
+        copyMI.setText("Copy");
+        copyMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        copyMI.addActionListener(actionListener);
+        editMenu.add(copyMI);
+        pasteMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.PasteAction());
+        pasteMI.setText("Paste");
+        pasteMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        pasteMI.addActionListener(actionListener);
+        editMenu.add(pasteMI);
+       this.compMenuIniter.addAppMenus(mainMenuBar);
         // Quit menu item is provided on Mac OS X.. only make it on other
         // platforms.
         if (!MAC_OS_X) {
@@ -267,27 +293,6 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
             aboutMI.addActionListener(this);
         }
         
-       mainMenuBar.add(editMenu = new JMenu("Edit"));
-        TransferActionListener actionListener = new TransferActionListener();
-        
-        cutMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CutAction());
-        cutMI.setText("Cut");
-        cutMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        cutMI.addActionListener(actionListener);
-        editMenu.add(cutMI);
-        copyMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CopyAction());
-        copyMI.setText("Copy");
-        copyMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        copyMI.addActionListener(actionListener);
-        editMenu.add(copyMI);
-        pasteMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.PasteAction());
-        pasteMI.setText("Paste");
-        pasteMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        pasteMI.addActionListener(actionListener);
-        editMenu.add(pasteMI);
         
         mainMenuBar.add(windowMenu = new JMenu("Window"));
         addFramesToWindowMenu();
@@ -438,5 +443,29 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
 	}
 	public void reOpenApplication() {
 		System.out.println("ComponentFrameBean: reOpenApplication()");		
+	}
+	public JMenu getBundleMenu() {
+		return bundleMenu;
+	}
+	public void setBundleMenu(JMenu bundleMenu) {
+		this.bundleMenu = bundleMenu;
+	}
+	public JMenu getEditMenu() {
+		return editMenu;
+	}
+	public void setEditMenu(JMenu editMenu) {
+		this.editMenu = editMenu;
+	}
+	public JMenuBar getMainMenuBar() {
+		return mainMenuBar;
+	}
+	public void setMainMenuBar(JMenuBar mainMenuBar) {
+		this.mainMenuBar = mainMenuBar;
+	}
+	public JMenu getWindowMenu() {
+		return windowMenu;
+	}
+	public void setWindowMenu(JMenu windowMenu) {
+		this.windowMenu = windowMenu;
 	}
 }

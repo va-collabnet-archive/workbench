@@ -112,6 +112,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
                 .getClassLoader());
         this.setTitle(this.getNextFrameName());
         this.cfb = new ComponentFrameBean(args, lc, this, this, hiddenFrame);
+        this.cfb.setup();
     }
 
     
