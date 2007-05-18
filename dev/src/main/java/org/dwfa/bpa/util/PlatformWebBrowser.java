@@ -25,7 +25,7 @@ public class PlatformWebBrowser {
 		public boolean openURL(URL url);
 	}
 
-	private static boolean tryNativeBrowser = false;
+	private static boolean tryNativeBrowser = true;
 
 	private static class OpenMacWebBrowser implements I_OpenURL {
 		Class fileManagerClass;
