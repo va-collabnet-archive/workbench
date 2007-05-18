@@ -37,7 +37,7 @@ public class AceFrame extends ComponentFrame {
 
 	@Override
 	public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
-		getCdePanel().addFileMenu(mainMenuBar);		
+		getCdePanel().addToMenuBar(mainMenuBar, cfb.getEditMenu());		
 	}
 	/**
 	 * @see org.dwfa.bpa.util.ComponentFrame#getQuitMenu()
@@ -75,7 +75,7 @@ public class AceFrame extends ComponentFrame {
         count++;
         return title;
 	}
-	public ACE getCdePanel() {
+	public ACE getCdePanel()  {
 		if (cdePanel == null) {
 			cdePanel = new ACE(config);
 		}

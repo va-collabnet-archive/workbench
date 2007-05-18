@@ -22,6 +22,7 @@ import java.beans.PropertyVetoException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -111,6 +112,7 @@ import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
+import org.dwfa.bpa.gui.ProcessMenuActionListener;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -552,8 +554,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private JMenu fileMenu = new JMenu("File");
 
-	private JMenu editMenu = new JMenu("Edit");
-
 	private JButton commitButton;
 
 	private JButton cancelButton;
@@ -571,6 +571,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private JList batchConceptList;
 
 	private ArrayList<ConceptPanel> conceptPanels;
+
+	private MasterWorker menuWorker;
 
 	/**
 	 * 
@@ -606,12 +608,21 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	 * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
 	 * 
 	 * @param aceFrameConfig
+	 * @throws PrivilegedActionException 
+	 * @throws IOException 
+	 * @throws ConfigurationException 
+	 * @throws LoginException 
 	 * @throws DatabaseException
 	 * 
 	 * @throws DatabaseException
 	 */
 	public ACE(Configuration config) {
 		super(new GridBagLayout());
+		try {
+			menuWorker = new MasterWorker(config);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} 
 		this.config = config;
 	}
 
@@ -702,22 +713,96 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			IllegalAccessException, PropertyVetoException,
 			ClassNotFoundException, NoSuchMethodException {
 		JMenuBar menuBar = new JMenuBar();
-		addToMenuBar(menuBar);
+		JMenu editMenu = new JMenu("Edit");
+		menuBar.add(editMenu);
+		addToMenuBar(menuBar, editMenu);
 		return menuBar;
 	}
 
-	public JMenuBar addToMenuBar(JMenuBar menuBar) throws LoginException,
+	public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu) throws LoginException,
 			SecurityException, ConfigurationException, IOException,
 			PrivilegedActionException, IntrospectionException,
 			InvocationTargetException, IllegalAccessException,
 			PropertyVetoException, ClassNotFoundException,
 			NoSuchMethodException {
 		addFileMenu(menuBar);
-		addEditMenu(menuBar);
+		addEditMenu(menuBar, editMenu);
+		addProcessMenus(menuBar);
+		
 		return menuBar;
 	}
+	
+	public void addProcessMenus(JMenuBar menuBar) throws FileNotFoundException, IOException, ClassNotFoundException {
 
-	private void addEditMenu(JMenuBar menuBar) {
+		File menuDir = new File("plugins/menu");
+        if (menuDir.listFiles() != null) {
+            addProcessMenuItems(menuBar, menuDir);
+        }
+    }
+
+	private void addProcessMenuItems(JMenuBar menuBar, File menuDir) throws IOException, FileNotFoundException, ClassNotFoundException {
+		for (File f : menuDir.listFiles()) {
+		    JMenu newMenu;
+		    if (f.isDirectory()) {
+		        if (f.getName().equals("File")) {
+		            newMenu = this.fileMenu;
+		        } else {
+		            newMenu = new JMenu(f.getName());
+		            menuBar.add(newMenu);
+		        }
+		        if (f.listFiles() != null) {
+		            for (File processFile : f.listFiles()) {
+		            	if (processFile.isDirectory()) {
+		            		JMenu submenu = new JMenu(processFile.getName());
+		            		newMenu.add(submenu);
+		            		addSubmenMenuItems(submenu, processFile);
+		            	} else {
+			                ActionListener processMenuListener = new ProcessMenuActionListener(
+			                        processFile, menuWorker);
+			                ObjectInputStream ois = new ObjectInputStream(
+			                        new BufferedInputStream(new FileInputStream(
+			                                processFile)));
+			                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+			                        .readObject();
+			                ois.close();
+			                JMenuItem processMenuItem = new JMenuItem(process
+			                        .getName());
+			                processMenuItem.addActionListener(processMenuListener);
+			                newMenu.add(processMenuItem);
+		            	}
+		            }
+		        }
+		        if (newMenu == fileMenu) {
+		            fileMenu.addSeparator();
+		        }
+		    }
+		}
+	}
+	private void addSubmenMenuItems(JMenu subMenu, File menuDir) throws IOException, FileNotFoundException, ClassNotFoundException {
+		for (File f : menuDir.listFiles()) {
+			if (f.isDirectory()) {
+				JMenu newSubMenu = new JMenu(f.getName());
+				subMenu.add(newSubMenu);
+				addSubmenMenuItems(newSubMenu, f);
+		    } else {
+                ActionListener processMenuListener = new ProcessMenuActionListener(
+                        f, menuWorker);
+                ObjectInputStream ois = new ObjectInputStream(
+                        new BufferedInputStream(new FileInputStream(
+                                f)));
+                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+                        .readObject();
+                ois.close();
+                JMenuItem processMenuItem = new JMenuItem(process
+                        .getName());
+                processMenuItem.addActionListener(processMenuListener);
+                subMenu.add(processMenuItem);
+		    }
+		}
+	}
+
+	private void addEditMenu(JMenuBar menuBar, JMenu editMenu) {
+		editMenu.removeAll();
 		JMenuItem menuItem;
 		editMenu.setMnemonic(KeyEvent.VK_E);
 		TransferActionListener actionListener = new TransferActionListener();
@@ -1863,10 +1948,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				treeTreeExpanded(treeEvent);
 			}
 		}
-	}
-
-	public JMenu getEditMenu() {
-		return editMenu;
 	}
 
 	public JMenu getFileMenu() {
