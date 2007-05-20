@@ -4,6 +4,8 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JList;
@@ -164,12 +166,6 @@ public interface I_ConfigAceFrame {
 	
 	public Collection<I_WriteChangeSet> getChangeSetWriters();
 	
-	public void setSvnRepository(String repositoryUrlStr);
-	public String getSvnRepository();
-	
-	public void setSvnWorkingCopy(String svnWorkingCopy);
-	public String getSvnWorkingCopy();
-
 	public void setChangeSetWriterFileName(String changeSetWriterFileName);
 	public String getChangeSetWriterFileName();
 	
@@ -195,5 +191,11 @@ public interface I_ConfigAceFrame {
 	public void selectConceptViewer(int hostIndex);
 	
 	public JPanel getWorkflowPanel();
+	
+	public List<String> getAddressesList();
+	
+	public List<String> getSelectedAddresses();
+	
+	public Map<String, SubversionData> getSubversionMap();
 
 }
