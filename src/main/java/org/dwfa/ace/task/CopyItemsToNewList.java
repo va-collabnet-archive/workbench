@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.JList;
@@ -65,11 +66,11 @@ public class CopyItemsToNewList extends AbstractTask {
             JList conceptList = config.getBatchConceptList();
             ListModel model = conceptList.getModel();
 
-            ArrayList<I_GetConceptData> temporaryList
-                    = new ArrayList<I_GetConceptData>();
+            ArrayList<Collection<UUID>> temporaryList
+                    = new ArrayList<Collection<UUID>>();
 
             for (int i = 0; i < model.getSize(); i++) {
-                temporaryList.add((I_GetConceptData) model.getElementAt(i));
+                temporaryList.add(((I_GetConceptData) model.getElementAt(i)).getUids());
                 if (worker.getLogger().isLoggable(Level.FINE)) {
                     worker.getLogger().fine(("Adding concept to temporary list: "
                             + (I_GetConceptData) model.getElementAt(i)));
@@ -86,7 +87,9 @@ public class CopyItemsToNewList extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
-        }
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+		}
     }
 
     public int[] getDataContainerIds() {

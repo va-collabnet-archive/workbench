@@ -7,13 +7,16 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -60,10 +63,13 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
-            ArrayList<I_GetConceptData> temporaryList =
-                (ArrayList<I_GetConceptData>) process.readProperty(listName);
+            ArrayList<Collection<UUID>> temporaryList =
+                (ArrayList<Collection<UUID>>) process.readProperty(listName);
 
-            I_GetConceptData concept = (I_GetConceptData) temporaryList.remove(0);
+            I_TermFactory termFactory = (I_TermFactory) worker
+			.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
+
+			I_GetConceptData concept = termFactory.getConcept((Collection<UUID>) temporaryList.remove(0));
 
             process.setProperty(this.conceptKey, concept);
 			return Condition.CONTINUE;
@@ -75,7 +81,11 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
-        }
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+		} catch (IOException e) {
+            throw new TaskFailedException(e);
+		}
 	}
 
 	public Collection<Condition> getConditions() {

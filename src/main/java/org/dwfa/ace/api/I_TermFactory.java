@@ -49,7 +49,8 @@ public interface I_TermFactory {
 			I_ConceptualizeLocally relType,
 			I_ConceptualizeLocally relDestination,
 			I_ConceptualizeLocally relCharacteristic,
-			I_ConceptualizeLocally relRefinability, int relGroup)
+			I_ConceptualizeLocally relRefinability, 
+			I_ConceptualizeLocally relStatus, int relGroup)
 			throws TerminologyException, IOException;
 	
 	public LogWithAlerts getEditLog();
@@ -61,4 +62,6 @@ public interface I_TermFactory {
 	public void forget(I_GetConceptData concept);
 	public void forget(I_DescriptionVersioned desc);
 	public void forget(I_RelVersioned rel);
+	
+	public void addUncommitted(I_GetConceptData concept);
 }

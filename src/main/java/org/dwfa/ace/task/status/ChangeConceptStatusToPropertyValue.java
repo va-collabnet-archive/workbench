@@ -101,6 +101,7 @@ public class ChangeConceptStatusToPropertyValue extends AbstractTask {
 			for (I_ConceptAttributePart p: partsToAdd) {
 				concept.getConceptAttributes().addVersion(p);
 			}
+			termFactory.addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);

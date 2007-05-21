@@ -29,6 +29,17 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
 		add(CoreServices.CO_LauncherQueue);
 		add(CoreServices.CO_OutboxQueue);
 		add(CoreServices.CO_SyncQueue);
+		
+		add(CO_queue_kp_user2_editor_Inbox);
+		//add(CO_queue_kp_user2_editor_Outbox);
+		add(CO_queue_kp_user3_editor_Inbox);
+		//add(CO_queue_kp_user3_editor_Outbox);
+		add(CO_queue_va_user1_editor_Inbox);
+		//add(CO_queue_va_user1_editor_Outbox);
+		add(CO_queue_va_user1_assignmentManager_Inbox);
+		//add(CO_queue_va_user1_assignmentManager_Outbox);
+		add(CO_queue_va_user4_editor_Inbox);
+		//add(CO_queue_va_user4_editor_Outbox);
 				
 		add(CoreServices.CO_GenericWorkerManager);
 		add(CoreServices.CO_GenericWorkerManagerNewFrame);
@@ -76,5 +87,47 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
             true, 
             false, false, "");
     
+    public static ServiceConfigOption CO_queue_kp_user2_editor_Inbox = configInbox("queue.kp.user2.editor.Inbox");
+    public static ServiceConfigOption CO_queue_kp_user2_editor_Outbox = configOutbox("queue.kp.user2.editor.Outbox");
+    public static ServiceConfigOption CO_queue_kp_user3_editor_Inbox = configInbox("queue.kp.user3.editor.Inbox");
+    public static ServiceConfigOption CO_queue_kp_user3_editor_Outbox = configOutbox("queue.kp.user3.editor.Outbox");
+    public static ServiceConfigOption CO_queue_va_user1_editor_Inbox = configInbox("queue.va.user1.editor.Inbox");
+    public static ServiceConfigOption CO_queue_va_user1_editor_Outbox = configOutbox("queue.va.user1.editor.Outbox");
+    public static ServiceConfigOption CO_queue_va_user1_assignmentManager_Inbox = configInbox("queue.va.user1.assignmentManager.Inbox");
+    public static ServiceConfigOption CO_queue_va_user1_assignmentManager_Outbox = configOutbox("queue.va.user1.assignmentManager.Outbox");
+    public static ServiceConfigOption CO_queue_va_user4_editor_Inbox = configInbox("queue.va.user4.editor.Inbox");
+    public static ServiceConfigOption CO_queue_va_user4_editor_Outbox = configOutbox("queue.va.user4.editor.Outbox");
+   	
+    	   public static ServiceConfigOption configInbox(String queueName) {
+    		   ServiceConfigOption sco = new ServiceConfigOption(CoreServices.INBOX_QUEUE + queueName, "config${/}" + queueName + ".policy", 
+            "config${/}" + queueName + "Secure.policy", CoreServices.INBOX_QUEUE_PROP + queueName,
+            "Publishes an Inbox Queue for business processes. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            CoreServices.dwaPath,
+            "org.dwfa.queue.QueueServer",
+            new String[] { "config${/}" + queueName + ".config" }, 
+            new String[] { "config${/}" + queueName + "Secure.config" }, 
+            true, false, true, 
+            "<html>Every workflow node needs at least one inbox queue to recieve processes<br>" + 
+            " from other nodes. Please ensure that at least one of the machines in this node<br>" + 
+            " has an inbox queue.");
+    		   sco.setPrefix(queueName.replace('.', '_'));
+    		   return sco;
+    }
+    
+    
+    public static ServiceConfigOption configOutbox(String queueName) {
+    	   ServiceConfigOption sco = new ServiceConfigOption(CoreServices.OUTBOX_QUEUE + queueName, "config${/}" + queueName + ".policy", "config${/}" + queueName + "Secure.policy", 
+    			CoreServices.OUTBOX_QUEUE_PROP + queueName,
+                "Publishes an OutBox Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+                CoreServices.dwaPath, "org.dwfa.queue.QueueServer",
+                new String[] { "config${/}" + queueName + ".config" }, 
+                new String[] { "config${/}" + queueName + "Secure.config" }, 
+                true, false, true,
+                "<html>Every workflow node needs at least one outbox queue to send processes<br>" + 
+                " to other nodes. Please ensure that at least one of the machines in this node<br>" + 
+                " has an outbox queue.");
+   		   sco.setPrefix(queueName.replace('.', '_'));
+		   return sco;
+    }
 
 }

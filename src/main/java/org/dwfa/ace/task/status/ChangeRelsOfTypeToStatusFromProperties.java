@@ -114,6 +114,7 @@ public class ChangeRelsOfTypeToStatusFromProperties extends AbstractTask {
 					}
 				}
 			}
+			termFactory.addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);

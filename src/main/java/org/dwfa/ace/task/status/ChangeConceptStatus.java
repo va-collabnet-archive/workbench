@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -88,6 +89,9 @@ public class ChangeConceptStatus extends AbstractTask {
 				positionsForEdit.add(termFactory.newPosition(editPath, Integer.MAX_VALUE));
 			}
 			I_GetConceptData newStatusConcept = termFactory.getConcept(newStatus.ids);
+			if (newStatusConcept == null) {
+				throw new TaskFailedException("newStatusConcept is null. Ids: " + Arrays.asList(newStatus.ids));
+			}
 			for (I_Path editPath: config.getEditingPathSet()) {
 				List<I_ConceptAttributeTuple>  tuples = concept.getConceptTuples(
 						null, positionsForEdit);
@@ -104,6 +108,7 @@ public class ChangeConceptStatus extends AbstractTask {
 			for (I_ConceptAttributePart p: partsToAdd) {
 				concept.getConceptAttributes().addVersion(p);
 			}
+			termFactory.addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);

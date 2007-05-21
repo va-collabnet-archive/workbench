@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.status;
+package org.dwfa.ace.task.rel;
 
 import java.beans.IntrospectionException;
 import java.io.IOException;
@@ -6,17 +6,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.task.AttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -26,13 +19,14 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
+import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/status", type = BeanType.TASK_BEAN) })
-public class ChangeRelsOfTypeToStatus extends AbstractTask {
+public class CreateRelationship extends AbstractTask {
 
 	/**
 	 * 
@@ -42,23 +36,35 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 	private static final int dataVersion = 1;
 	
     private String activeConceptPropName = AttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    
+    private String relParentPropName = AttachmentKeys.NEW_STATUS.getAttachmentKey();
+    
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-    private TermEntry newStatus = new TermEntry(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+    private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+    private TermEntry relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+    private TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
-		out.writeObject(relType);
-		out.writeObject(newStatus);
+		out.writeObject(relParentPropName);
 		out.writeObject(activeConceptPropName);
+		out.writeObject(relType);
+		out.writeObject(relCharacteristic);
+		out.writeObject(relRefinability);
+		out.writeObject(relStatus);
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == dataVersion) {
-			relType = (TermEntry) in.readObject();
-			newStatus = (TermEntry) in.readObject();
+			relParentPropName = (String) in.readObject();
 			activeConceptPropName = (String) in.readObject();
+			relType = (TermEntry) in.readObject();
+			relCharacteristic = (TermEntry) in.readObject();
+			relRefinability = (TermEntry) in.readObject();
+			relStatus = (TermEntry) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -84,37 +90,15 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 			
 			I_TermFactory termFactory = (I_TermFactory) worker
 			.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
+			I_GetConceptData relParentConcept = (I_GetConceptData) process.readProperty(relParentPropName);
 
-			
-			Set<I_Position> positionsForEdit = new HashSet<I_Position>();
-			for (I_Path editPath: config.getEditingPathSet()) {
-				positionsForEdit.add(termFactory.newPosition(editPath, Integer.MAX_VALUE));
-			}
-			I_GetConceptData newStatusConcept = termFactory.getConcept(newStatus.ids);
-			I_GetConceptData relTypeConcept = termFactory.getConcept(relType.ids);
-			I_IntSet typeSet = termFactory.newIntSet();
-			typeSet.add(relTypeConcept.getConceptId());
-			
-			for (I_RelTuple relTuple: concept.getSourceRelTuples(config.getAllowedStatus(), 
-						typeSet, positionsForEdit, false)) {
-				for (I_Path editPath: config.getEditingPathSet()) {
-					List<I_RelTuple>  editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), 
-							typeSet, positionsForEdit, false);
-					Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
-					for (I_RelTuple t: editTuples) {
-						if (t.getStatusId() != newStatusConcept.getConceptId()) {
-							I_RelPart newPart = t.duplicatePart();
-							newPart.setPathId(editPath.getConceptId());
-							newPart.setVersion(Integer.MAX_VALUE);
-							newPart.setStatusId(newStatusConcept.getConceptId());
-							partsToAdd.add(newPart);
-						}
-					}
-					for (I_RelPart p: partsToAdd) {
-						relTuple.getFixedPart().addVersion(p);
-					}
-				}
-			}
+			termFactory.newRelationship(UUID.randomUUID(),
+					concept, 
+					(I_ConceptualizeLocally) termFactory.getConcept(relType.ids),
+					(I_ConceptualizeLocally) relParentConcept,
+					(I_ConceptualizeLocally) termFactory.getConcept(relCharacteristic.ids),
+					(I_ConceptualizeLocally) termFactory.getConcept(relRefinability.ids), 
+					(I_ConceptualizeLocally) termFactory.getConcept(relStatus.ids),0);
 			termFactory.addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
@@ -148,12 +132,28 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 		this.activeConceptPropName = propName;
 	}
 
-	public TermEntry getNewStatus() {
-		return newStatus;
+	public String getRelParentPropName() {
+		return relParentPropName;
 	}
 
-	public void setNewStatus(TermEntry newStatus) {
-		this.newStatus = newStatus;
+	public void setRelParentPropName(String newStatusPropName) {
+		this.relParentPropName = newStatusPropName;
+	}
+
+	public TermEntry getRelCharacteristic() {
+		return relCharacteristic;
+	}
+
+	public void setRelCharacteristic(TermEntry relCharacteristic) {
+		this.relCharacteristic = relCharacteristic;
+	}
+
+	public TermEntry getRelRefinability() {
+		return relRefinability;
+	}
+
+	public void setRelRefinability(TermEntry relRefinability) {
+		this.relRefinability = relRefinability;
 	}
 
 	public TermEntry getRelType() {
