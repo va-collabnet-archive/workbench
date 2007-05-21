@@ -58,7 +58,10 @@ public class LoadSourcesFromJars {
 		//monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
 		AceConfig.vodb.populateTimeBranchDb();
 		printElapsedTime();
+		//AceConfig.monitor.setProgressInfoUpper("Starting makeLuceneIndex().");
+		AceConfig.vodb.makeLuceneIndex();
 		//AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
+		printElapsedTime();
 		AceConfig.vodb.close();
 		printElapsedTime();
 	}

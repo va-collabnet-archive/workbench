@@ -163,10 +163,13 @@ public class VodbEnv {
 	private Database timeBranchDb;
 
 	private SecondaryDatabase conceptImageMap;
+	
+	private File luceneDir;
 
 	public VodbEnv() {
 
 	}
+
 	private class StartupListener implements AWTEventListener {
 
 		public void eventDispatched(AWTEvent event) {
@@ -174,26 +177,32 @@ public class VodbEnv {
 			if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
 				preloadRels = false;
 				preloadDescriptions = !preloadDescriptions;
-				activity.setProgressInfoUpper("Loading the terminology (preload descriptions = " + preloadDescriptions + ")");
+				activity
+						.setProgressInfoUpper("Loading the terminology (preload descriptions = "
+								+ preloadDescriptions + ")");
 				Toolkit.getDefaultToolkit().removeAWTEventListener(this);
 			}
-			
+
 		}
-		
+
 	}
 
 	boolean preloadRels = false;
+
 	boolean preloadDescriptions = false;
 
 	private ActivityPanel activity;
+
 	/**
 	 * @todo find out of all secondary databases have to be opened when the
-	 * primary is opened? How do they get updated, etc?
+	 *       primary is opened? How do they get updated, etc?
 	 */
-	public void setup(File envHome, boolean readOnly, Long cacheSize) throws DatabaseException {
+	public void setup(File envHome, boolean readOnly, Long cacheSize)
+			throws DatabaseException {
 		activity = new ActivityPanel(true, true);
 		StartupListener l = new StartupListener();
-		Toolkit.getDefaultToolkit().addAWTEventListener(l, AWTEvent.KEY_EVENT_MASK);
+		Toolkit.getDefaultToolkit().addAWTEventListener(l,
+				AWTEvent.KEY_EVENT_MASK);
 
 		AceLog.getAppLog().info("Setting up db: " + envHome);
 		activity.setIndeterminate(true);
@@ -201,7 +210,9 @@ public class VodbEnv {
 		activity.setProgressInfoLower("Setting up the environment...");
 		activity.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-	        	System.out.println("System.exit from activity action listener: " + e.getActionCommand());
+				System.out
+						.println("System.exit from activity action listener: "
+								+ e.getActionCommand());
 				System.exit(0);
 			}
 		});
@@ -210,11 +221,11 @@ public class VodbEnv {
 		} catch (Exception e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
-		
-		
+
 		this.readOnly = readOnly;
 		LocalFixedTerminology.setStore(new VodbFixedServer(this));
 		envHome.mkdirs();
+		luceneDir = new File(envHome, "lucene");
 
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		if (cacheSize != null) {
@@ -249,7 +260,7 @@ public class VodbEnv {
 			activity.setProgressInfoLower("Loading descriptions...");
 			PreloadConfig descPreloadConfig = new PreloadConfig();
 			descPreloadConfig.setLoadLNs(true);
-			descDb.preload(descPreloadConfig);			
+			descDb.preload(descPreloadConfig);
 		}
 		getConceptDescMap();
 
@@ -257,20 +268,23 @@ public class VodbEnv {
 		activity.setProgressInfoLower("Opening ids...");
 		idDb = env.openDatabase(null, "idDb", mapDbConfig);
 		createUidToIdMap();
-		
-		//Reset the authority id so that each time the db starts, it gets a new authorityId. 
+
+		// Reset the authority id so that each time the db starts, it gets a new
+		// authorityId.
 		PrimordialId primId = PrimordialId.AUTHORITY_ID;
-		I_IdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
+		I_IdVersioned thinId = new ThinIdVersioned(primId
+				.getNativeId(Integer.MIN_VALUE), 1);
 		ThinIdPart idPart = new ThinIdPart();
-		idPart.setIdStatus(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
-		idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
-		idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
+		idPart.setIdStatus(PrimordialId.CURRENT_ID
+				.getNativeId(Integer.MIN_VALUE));
+		idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID
+				.getNativeId(Integer.MIN_VALUE));
+		idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID
+				.getNativeId(Integer.MIN_VALUE));
 		idPart.setSourceId(UUID.randomUUID());
 		idPart.setVersion(Integer.MIN_VALUE);
 		thinId.addVersion(idPart);
 		writeId(thinId);
-		
-
 
 		DatabaseConfig imageDbConfig = makeConfig(readOnly);
 		activity.setProgressInfoLower("Opening images...");
@@ -286,9 +300,10 @@ public class VodbEnv {
 		activity.setProgressInfoLower("Opening paths...");
 		pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
 
-		AceLog.getAppLog().info("Cache percent: " + envConfig.getCachePercent());
+		AceLog.getAppLog()
+				.info("Cache percent: " + envConfig.getCachePercent());
 		AceLog.getAppLog().info("Cache size: " + envConfig.getCacheSize());
-		
+
 		activity.setProgressInfoLower("complete");
 		activity.complete();
 		Toolkit.getDefaultToolkit().removeAWTEventListener(l);
@@ -342,26 +357,26 @@ public class VodbEnv {
 			imageByConConfig.setKeyCreator(concToImageKeyCreator);
 			imageByConConfig.setAllowPopulate(true);
 
-			conceptImageMap = env.openSecondaryDatabase(null, "conceptImageMap",
-					imageDb, imageByConConfig);
+			conceptImageMap = env.openSecondaryDatabase(null,
+					"conceptImageMap", imageDb, imageByConConfig);
 		}
 	}
 
 	public void createC2RelMap() throws DatabaseException {
 		if (c2RelMap == null) {
-		C2KeyForRelCreator c2ToRelKeyCreator = new C2KeyForRelCreator(
-				relBinding);
+			C2KeyForRelCreator c2ToRelKeyCreator = new C2KeyForRelCreator(
+					relBinding);
 
-		SecondaryConfig relByC2IdConfig = new SecondaryConfig();
-		relByC2IdConfig.setReadOnly(readOnly);
-		relByC2IdConfig.setDeferredWrite(true);
-		relByC2IdConfig.setAllowCreate(!readOnly);
-		relByC2IdConfig.setSortedDuplicates(false);
-		relByC2IdConfig.setKeyCreator(c2ToRelKeyCreator);
-		relByC2IdConfig.setAllowPopulate(true);
+			SecondaryConfig relByC2IdConfig = new SecondaryConfig();
+			relByC2IdConfig.setReadOnly(readOnly);
+			relByC2IdConfig.setDeferredWrite(true);
+			relByC2IdConfig.setAllowCreate(!readOnly);
+			relByC2IdConfig.setSortedDuplicates(false);
+			relByC2IdConfig.setKeyCreator(c2ToRelKeyCreator);
+			relByC2IdConfig.setAllowPopulate(true);
 
-		c2RelMap = env.openSecondaryDatabase(null, "c2RelMap", relDb,
-				relByC2IdConfig);
+			c2RelMap = env.openSecondaryDatabase(null, "c2RelMap", relDb,
+					relByC2IdConfig);
 		}
 	}
 
@@ -373,16 +388,16 @@ public class VodbEnv {
 
 	private void createUidToIdMap() throws DatabaseException {
 		if (uidToIdMap == null) {
-		SecondaryConfig uidToIdMapConfig = new SecondaryConfig();
-		uidToIdMapConfig.setReadOnly(readOnly);
-		uidToIdMapConfig.setDeferredWrite(true);
-		uidToIdMapConfig.setAllowCreate(!readOnly);
-		uidToIdMapConfig.setSortedDuplicates(false);
-		uidToIdMapConfig.setMultiKeyCreator(new UidKeyCreator(uuidBinding,
-				idBinding));
-		uidToIdMapConfig.setAllowPopulate(true);
-		uidToIdMap = env.openSecondaryDatabase(null, "uidToIdMap", getIdDb(),
-				uidToIdMapConfig);
+			SecondaryConfig uidToIdMapConfig = new SecondaryConfig();
+			uidToIdMapConfig.setReadOnly(readOnly);
+			uidToIdMapConfig.setDeferredWrite(true);
+			uidToIdMapConfig.setAllowCreate(!readOnly);
+			uidToIdMapConfig.setSortedDuplicates(false);
+			uidToIdMapConfig.setMultiKeyCreator(new UidKeyCreator(uuidBinding,
+					idBinding));
+			uidToIdMapConfig.setAllowPopulate(true);
+			uidToIdMap = env.openSecondaryDatabase(null, "uidToIdMap",
+					getIdDb(), uidToIdMapConfig);
 		}
 	}
 
@@ -473,47 +488,47 @@ public class VodbEnv {
 
 	public void close() {
 		try {
-		sync();
-		if (env != null) {
-			if (conceptDb != null) {
-				conceptDb.close();
+			sync();
+			if (env != null) {
+				if (conceptDb != null) {
+					conceptDb.close();
+				}
+				if (relDb != null) {
+					relDb.close();
+				}
+				if (conceptDescMap != null) {
+					conceptDescMap.close();
+				}
+				if (descDb != null) {
+					descDb.close();
+				}
+				if (conceptImageMap != null) {
+					conceptImageMap.close();
+				}
+				if (imageDb != null) {
+					imageDb.close();
+				}
+				if (uidToIdMap != null) {
+					uidToIdMap.close();
+				}
+				if (c1RelMap != null) {
+					c1RelMap.close();
+				}
+				if (c2RelMap != null) {
+					c2RelMap.close();
+				}
+				if (idDb != null) {
+					idDb.close();
+				}
+				if (timeBranchDb != null) {
+					timeBranchDb.close();
+				}
+				if (pathDb != null) {
+					pathDb.close();
+				}
+				// env.cleanLog();
+				env.close();
 			}
-			if (relDb != null) {
-				relDb.close();
-			}
-			if (conceptDescMap != null) {
-				conceptDescMap.close();
-			}
-			if (descDb != null) {
-				descDb.close();
-			}
-			if (conceptImageMap != null) {
-				conceptImageMap.close();
-			}
-			if (imageDb != null) {
-				imageDb.close();
-			}
-			if (uidToIdMap != null) {
-				uidToIdMap.close();
-			}
-			if (c1RelMap != null) {
-				c1RelMap.close();
-			}
-			if (c2RelMap != null) {
-				c2RelMap.close();
-			}
-			if (idDb != null) {
-				idDb.close();
-			}
-			if (timeBranchDb != null) {
-				timeBranchDb.close();
-			}
-			if (pathDb != null) {
-				pathDb.close();
-			}
-			// env.cleanLog();
-			env.close();
-		}
 		} catch (DatabaseException e) {
 			logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
@@ -563,7 +578,8 @@ public class VodbEnv {
 		return c2RelMap;
 	}
 
-	public I_ConceptAttributeVersioned getConcept(int conceptId) throws DatabaseException {
+	public I_ConceptAttributeVersioned getConcept(int conceptId)
+			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting concept : " + conceptId);
@@ -578,7 +594,8 @@ public class VodbEnv {
 				logger.fine("Got concept: " + conceptId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
 			}
-			return (I_ConceptAttributeVersioned) conBinding.entryToObject(conceptValue);
+			return (I_ConceptAttributeVersioned) conBinding
+					.entryToObject(conceptValue);
 		}
 		throw new DatabaseException("Concept: " + conceptId + " not found.");
 	}
@@ -589,7 +606,8 @@ public class VodbEnv {
 		DatabaseEntry descValue = new DatabaseEntry();
 		intBinder.objectToEntry(descId, descKey);
 		if (descDb.get(null, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			return (I_DescriptionVersioned) descBinding.entryToObject(descValue);
+			return (I_DescriptionVersioned) descBinding
+					.entryToObject(descValue);
 		}
 		throw new DatabaseException("Description: " + descId + " not found.");
 	}
@@ -1053,7 +1071,8 @@ public class VodbEnv {
 	 * @throws DatabaseException
 	 */
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
-			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root, I_ConfigAceFrame config)
+			Collection<ThinDescVersioned> matches, CountDownLatch latch,
+			I_GetConceptData root, I_ConfigAceFrame config)
 			throws DatabaseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.INFO)) {
@@ -1067,8 +1086,8 @@ public class VodbEnv {
 			if (tracker.continueWork()) {
 				ThinDescVersioned descV = (ThinDescVersioned) descBinding
 						.entryToObject(foundData);
-				ACE.threadPool.execute(new CheckAndProcessRegexMatch(p, matches,
-						descV, root, config));
+				ACE.threadPool.execute(new CheckAndProcessRegexMatch(p,
+						matches, descV, root, config));
 			} else {
 				while (latch.getCount() > 0) {
 					latch.countDown();
@@ -1081,68 +1100,28 @@ public class VodbEnv {
 		if (logger.isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				logger.info("Search time: " + timer.getElapsedTime());
-			} else  {
-				logger.info("Canceled. Elapsed time: " + timer.getElapsedTime());
+			} else {
+				logger
+						.info("Canceled. Elapsed time: "
+								+ timer.getElapsedTime());
 			}
 			timer.stop();
 		}
 	}
+
 	public void searchLucene(I_TrackContinuation tracker, String query,
-			Collection<ThinDescVersioned> matches, CountDownLatch latch, I_GetConceptData root, 
-			I_ConfigAceFrame config, File luceneDir, LuceneProgressUpdator updater)
-			throws DatabaseException, IOException, ParseException {
+			Collection<ThinDescVersioned> matches, CountDownLatch latch,
+			I_GetConceptData root, I_ConfigAceFrame config,
+			LuceneProgressUpdator updater) throws DatabaseException,
+			IOException, ParseException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.INFO)) {
 			timer = new Stopwatch();
 			timer.start();
 		}
 		if (luceneDir.exists() == false) {
-			luceneDir.mkdirs();
-			Directory dir = FSDirectory.getDirectory(luceneDir, true);
-			IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(), true);
-			writer.setUseCompoundFile(true);
-			writer.mergeFactor = 10000;
-			Cursor descCursor = getDescDb().openCursor(null, null);
-			DatabaseEntry foundKey = new DatabaseEntry();
-			DatabaseEntry foundData = new DatabaseEntry();
-			while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				if (tracker.continueWork()) {
-					ThinDescVersioned descV = (ThinDescVersioned) descBinding
-							.entryToObject(foundData);
-					Document doc = new Document();
-					doc.add(Field.Keyword("dnid", Integer.toString(descV.getDescId())));
-					doc.add(Field.Keyword("cnid", Integer.toString(descV.getConceptId())));
-					String lastDesc = null;
-					for (I_DescriptionTuple tuple: descV.getTuples()) {
-						if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
-							doc.add(Field.UnStored("desc", tuple.getText()));
-						}
-						
-					}
-					writer.addDocument(doc);
-				} else {
-					while (latch.getCount() > 0) {
-						latch.countDown();
-					}
-					break;
-				}
-				latch.countDown();
-			}
-			descCursor.close();
-			if (tracker.continueWork()) {
-				logger.info("Optimizing index time: " + timer.getElapsedTime());
-				writer.optimize();
-			}
-			writer.close();
-			latch.countDown();
-			if (logger.isLoggable(Level.INFO)) {
-				if (tracker.continueWork()) {
-					logger.info("Index time: " + timer.getElapsedTime());
-				} else  {
-					logger.info("Index Canceled. Elapsed time: " + timer.getElapsedTime());
-				}
-				timer.stop();
-			}
+			updater.setProgressInfo("Making lucene index -- this may take a while...");
+			makeLuceneIndex();
 		}
 		updater.setIndeterminate(true);
 		if (luceneSearcher == null) {
@@ -1152,7 +1131,9 @@ public class VodbEnv {
 		updater.setProgressInfo("Starting lucene query...");
 		long startTime = System.currentTimeMillis();
 		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
-		updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime) + " ms.");
+		updater.setProgressInfo("Query complete in "
+				+ Long.toString(System.currentTimeMillis() - startTime)
+				+ " ms.");
 		Hits hits = luceneSearcher.search(q);
 		for (int i = 0; i < hits.length(); i++) {
 			Document doc = hits.doc(i);
@@ -1164,27 +1145,69 @@ public class VodbEnv {
 		if (logger.isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				logger.info("Search time: " + timer.getElapsedTime());
-			} else  {
-				logger.info("Search Canceled. Elapsed time: " + timer.getElapsedTime());
+			} else {
+				logger.info("Search Canceled. Elapsed time: "
+						+ timer.getElapsedTime());
 			}
 			timer.stop();
 		}
 	}
+
+	public void makeLuceneIndex()
+			throws IOException, DatabaseException {
+		Stopwatch timer = new Stopwatch();
+		timer.start();
+		luceneDir.mkdirs();
+		Directory dir = FSDirectory.getDirectory(luceneDir, true);
+		IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(), true);
+		writer.setUseCompoundFile(true);
+		writer.mergeFactor = 10000;
+		Cursor descCursor = getDescDb().openCursor(null, null);
+		DatabaseEntry foundKey = new DatabaseEntry();
+		DatabaseEntry foundData = new DatabaseEntry();
+		while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			ThinDescVersioned descV = (ThinDescVersioned) descBinding
+					.entryToObject(foundData);
+			Document doc = new Document();
+			doc.add(Field.Keyword("dnid", Integer.toString(descV.getDescId())));
+			doc.add(Field.Keyword("cnid", Integer
+					.toString(descV.getConceptId())));
+			String lastDesc = null;
+			for (I_DescriptionTuple tuple : descV.getTuples()) {
+				if (lastDesc == null
+						|| lastDesc.equals(tuple.getText()) == false) {
+					doc.add(Field.UnStored("desc", tuple.getText()));
+				}
+
+			}
+			writer.addDocument(doc);
+		}
+		descCursor.close();
+		logger.info("Optimizing index time: " + timer.getElapsedTime());
+		writer.optimize();
+		writer.close();
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info("Index time: " + timer.getElapsedTime());
+			timer.stop();
+		}
+	}
+
 	IndexSearcher luceneSearcher = null;
-	
+
 	private static class CheckAndProcessRegexMatch implements Runnable {
 		Pattern p;
 
 		Collection<ThinDescVersioned> matches;
 
 		ThinDescVersioned descV;
-		
+
 		I_GetConceptData root;
-		
+
 		I_ConfigAceFrame config;
 
 		public CheckAndProcessRegexMatch(Pattern p,
-				Collection<ThinDescVersioned> matches, ThinDescVersioned descV, I_GetConceptData root, I_ConfigAceFrame config) {
+				Collection<ThinDescVersioned> matches, ThinDescVersioned descV,
+				I_GetConceptData root, I_ConfigAceFrame config) {
 			super();
 			this.p = p;
 			this.matches = matches;
@@ -1198,9 +1221,11 @@ public class VodbEnv {
 				if (root == null) {
 					matches.add(descV);
 				} else {
-					ConceptBean descConcept = ConceptBean.get(descV.getConceptId());
+					ConceptBean descConcept = ConceptBean.get(descV
+							.getConceptId());
 					try {
-						if  (root.isParentOf(descConcept, config.getAllowedStatus(), config.getDestRelTypes(), 
+						if (root.isParentOf(descConcept, config
+								.getAllowedStatus(), config.getDestRelTypes(),
 								config.getViewPositionSet(), true)) {
 							matches.add(descV);
 						}
@@ -1212,22 +1237,22 @@ public class VodbEnv {
 		}
 
 	}
+
 	private static class CheckAndProcessLuceneMatch implements Runnable {
 
 		Collection<ThinDescVersioned> matches;
 
-				
 		I_GetConceptData root;
-		
+
 		I_ConfigAceFrame config;
-		
+
 		Document doc;
-		
+
 		VodbEnv env;
 
 		public CheckAndProcessLuceneMatch(Document doc,
-				Collection<ThinDescVersioned> matches, I_GetConceptData root, I_ConfigAceFrame config,
-				VodbEnv env) {
+				Collection<ThinDescVersioned> matches, I_GetConceptData root,
+				I_ConfigAceFrame config, VodbEnv env) {
 			super();
 			this.doc = doc;
 			this.matches = matches;
@@ -1239,13 +1264,16 @@ public class VodbEnv {
 		public void run() {
 			int nid = Integer.parseInt(doc.get("dnid"));
 			try {
-			ThinDescVersioned descV = (ThinDescVersioned) env.getDescription(nid);
+				ThinDescVersioned descV = (ThinDescVersioned) env
+						.getDescription(nid);
 				if (root == null) {
 					matches.add(descV);
 				} else {
-					ConceptBean descConcept = ConceptBean.get(descV.getConceptId());
+					ConceptBean descConcept = ConceptBean.get(descV
+							.getConceptId());
 					try {
-						if  (root.isParentOf(descConcept, config.getAllowedStatus(), config.getDestRelTypes(), 
+						if (root.isParentOf(descConcept, config
+								.getAllowedStatus(), config.getDestRelTypes(),
 								config.getViewPositionSet(), true)) {
 							matches.add(descV);
 						}
@@ -1256,7 +1284,7 @@ public class VodbEnv {
 			} catch (DatabaseException e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
-			
+
 		}
 
 	}
@@ -1450,7 +1478,8 @@ public class VodbEnv {
 		throw new NoMappingException("No id for: " + uid);
 	}
 
-	public int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException {
+	public int uuidToNative(Collection<UUID> uids) throws TerminologyException,
+			IOException {
 		I_IdVersioned id = getId(uids);
 		if (id == null) {
 			throw new NoMappingException("No id for: " + uids);
@@ -1458,7 +1487,8 @@ public class VodbEnv {
 		return id.getNativeId();
 	}
 
-	public ThinIdVersioned getId(UUID uid) throws TerminologyException, IOException {
+	public ThinIdVersioned getId(UUID uid) throws TerminologyException,
+			IOException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting nativeId : " + uid);
@@ -1536,7 +1566,8 @@ public class VodbEnv {
 	}
 
 	public int uuidToNativeWithGeneration(Collection<UUID> uids, int source,
-			I_Path idPath, int version) throws TerminologyException, IOException {
+			I_Path idPath, int version) throws TerminologyException,
+			IOException {
 		try {
 			return uuidToNative(uids);
 		} catch (TerminologyException e) {
@@ -1557,11 +1588,11 @@ public class VodbEnv {
 				ThinIdPart idPart = new ThinIdPart();
 				for (UUID uid : uids) {
 					idPart.setIdStatus(uuidToNativeWithGeneration(
-							ArchitectonicAuxiliary.Concept.CURRENT.getUids(), source,
-							idPath, version));
-					idPart.setPathId(uuidToNativeWithGeneration(
-							ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(),
+							ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
 							source, idPath, version));
+					idPart.setPathId(uuidToNativeWithGeneration(
+							ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
+									.getUids(), source, idPath, version));
 					idPart.setSource(source);
 					idPart.setSourceId(uid);
 					idPart.setVersion(version);
@@ -1581,7 +1612,8 @@ public class VodbEnv {
 	}
 
 	public int uuidToNativeWithGeneration(UUID uid, int source,
-			Collection<I_Path> idPaths, int version) throws TerminologyException, IOException {
+			Collection<I_Path> idPaths, int version)
+			throws TerminologyException, IOException {
 		try {
 			return uuidToNative(uid);
 		} catch (NoMappingException e) {
@@ -1601,11 +1633,11 @@ public class VodbEnv {
 				ThinIdPart idPart = new ThinIdPart();
 				for (I_Path p : idPaths) {
 					idPart.setIdStatus(uuidToNativeWithGeneration(
-							ArchitectonicAuxiliary.Concept.CURRENT.getUids(), source, p,
-							version));
-					idPart.setPathId(uuidToNativeWithGeneration(
-							ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(),
+							ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
 							source, p, version));
+					idPart.setPathId(uuidToNativeWithGeneration(
+							ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
+									.getUids(), source, p, version));
 					idPart.setSource(source);
 					idPart.setSourceId(uid);
 					idPart.setVersion(version);
@@ -1623,9 +1655,9 @@ public class VodbEnv {
 			}
 		}
 	}
-	
+
 	public Class getNativeIdClass() {
-		return Integer.class; 
+		return Integer.class;
 	}
 
 	public void writeId(I_IdVersioned id) throws DatabaseException {
@@ -1655,7 +1687,8 @@ public class VodbEnv {
 		imageDb.put(null, imageKey, imageValue);
 	}
 
-	public void writeConcept(I_ConceptAttributeVersioned concept) throws DatabaseException {
+	public void writeConcept(I_ConceptAttributeVersioned concept)
+			throws DatabaseException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(concept.getConId(), key);
@@ -1728,7 +1761,8 @@ public class VodbEnv {
 		return false;
 	}
 
-	public I_ImageVersioned getImage(UUID uid) throws TerminologyException, IOException, DatabaseException {
+	public I_ImageVersioned getImage(UUID uid) throws TerminologyException,
+			IOException, DatabaseException {
 		return getImage(uuidToNative(uid));
 	}
 
@@ -1763,10 +1797,13 @@ public class VodbEnv {
 		DatabaseEntry imageValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, imageKey);
 		if (imageDb.get(null, imageKey, imageValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			I_ImageVersioned image = (I_ImageVersioned) imageBinder.entryToObject(imageValue);
+			I_ImageVersioned image = (I_ImageVersioned) imageBinder
+					.entryToObject(imageValue);
 			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("Got image: " + nativeId + " for concept: " + ConceptBean.get(image.getConceptId()) + " elapsed time: "
-						+ timer.getElapsedTime() / 1000 + " secs");
+				logger.fine("Got image: " + nativeId + " for concept: "
+						+ ConceptBean.get(image.getConceptId())
+						+ " elapsed time: " + timer.getElapsedTime() / 1000
+						+ " secs");
 			}
 			return image;
 		}
@@ -1834,8 +1871,7 @@ public class VodbEnv {
 						+ " elapsed time: " + timer.getElapsedTime() / 1000
 						+ " secs");
 			}
-			return ((I_IdVersioned) idBinding.entryToObject(idValue))
-					.getUIDs();
+			return ((I_IdVersioned) idBinding.entryToObject(idValue)).getUIDs();
 		}
 		throw new DatabaseException("Concept: " + nativeId + " not found.");
 	}
@@ -1862,7 +1898,8 @@ public class VodbEnv {
 		} catch (DatabaseException e) {
 			new ToIoException(e);
 		}
-		throw new ToIoException(new DatabaseException("Concept: " + nativeId + " not found."));
+		throw new ToIoException(new DatabaseException("Concept: " + nativeId
+				+ " not found."));
 	}
 
 	public List<TimePathId> getTimePathList() throws Exception {

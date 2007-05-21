@@ -2,7 +2,6 @@ package org.dwfa.ace.search;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -215,17 +214,10 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		I_UpdateProgress updater;
 		if (lucene) {
 			updater = new LuceneProgressUpdator();
-			File luceneDir = new File("lucene");
-			boolean makeIndex = (luceneDir.exists() == false);
-			if (makeIndex) {
-				descCount = AceConfig.vodb.countDescriptions();
-				completeLatch = new CountDownLatch(descCount + 1);
-			} else {
-				completeLatch = new CountDownLatch(1);
-			}
+			completeLatch = new CountDownLatch(1);
 			new MatchUpdator();
 			AceConfig.vodb.searchLucene(this, patternString, matches, completeLatch, 
-					searchPanel.getRootConcept(), config, luceneDir, (LuceneProgressUpdator) updater);
+					searchPanel.getRootConcept(), config, (LuceneProgressUpdator) updater);
 		} else {
 			updater = new RegexProgressUpdator();
 			descCount = AceConfig.vodb.countDescriptions();
