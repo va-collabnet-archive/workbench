@@ -64,6 +64,7 @@ public class ConceptTableRenderer extends AceTableRenderer {
 				table.setRowHeight(row, (int) (prefYSpan + 4));
 			}
 		}
+        renderComponent.setToolTipText(swt.getCellText());
 		return renderComponent;
 	}
 }

@@ -37,6 +37,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
@@ -725,12 +726,19 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						newPart.setVersion(Integer.MAX_VALUE);
 						selectedObject.getTuple().getRelVersioned()
 								.getVersions().add(newPart);
-						sourceBean.getSourceRel(
-								selectedObject.getTuple().getRelId())
-								.addVersion(newPart);
-						destBean.getDestRel(
-								selectedObject.getTuple().getRelId())
-								.addVersion(newPart);
+						
+						I_RelVersioned srcRel = sourceBean.getSourceRel(
+								selectedObject.getTuple().getRelId());
+						I_RelVersioned destRel = destBean.getDestRel(
+								selectedObject.getTuple().getRelId());
+						if ((srcRel != null) && (destRel != null)) {
+							srcRel.addVersion(newPart);
+							destRel.addVersion(newPart);
+						} else {
+							AceLog.getAppLog().alertAndLogException(new Exception("srcRel: " + srcRel + 
+									" destRel: " + destRel + 
+									" cannot be null"));
+						}
 					}
 					ACE.addUncommitted(sourceBean);
 					ACE.addUncommitted(destBean);
@@ -835,9 +843,18 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		private void maybeShowPopup(MouseEvent e) {
 			if (e.isPopupTrigger()) {
 				if (config.getEditingPathSet().size() > 0) {
-					makePopup(e);
-					if (popup != null) {
-						popup.show(e.getComponent(), e.getX(), e.getY());
+					int column = table.columnAtPoint(e.getPoint());
+					int row = table.rowAtPoint(e.getPoint());
+					selectedObject = (StringWithRelTuple) table.getValueAt(row,
+							column);
+					if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+						JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
+						"<html>To change an uncommitted relationship, <br>use the cancel button, or change the value<br>directly on the uncommitted concept...");
+					} else {
+						makePopup(e);
+						if (popup != null) {
+							popup.show(e.getComponent(), e.getX(), e.getY());
+						}
 					}
 				} else {
 					JOptionPane.showMessageDialog(table.getTopLevelAncestor(),

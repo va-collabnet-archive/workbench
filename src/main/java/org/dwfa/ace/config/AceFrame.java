@@ -23,6 +23,7 @@ public class AceFrame extends ComponentFrame {
 		((AceFrameConfig) frameConfig).setAceFrame(this);
 		getCdePanel().setup(frameConfig);
 		setName(frameConfig.getFrameName());
+		setTitle("User: " + frameConfig.getUsername());
 		setContentPane(cdePanel);
 		setBounds(frameConfig.getBounds());
 		

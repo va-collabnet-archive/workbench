@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -52,7 +53,9 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
@@ -67,6 +70,8 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntSet;
+import org.dwfa.vodb.types.Position;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
@@ -889,5 +894,22 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public void unlink() {
 		changeLinkListener(LINK_TYPE.UNLINKED);
+	}
+
+	public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException {
+		return ConceptBean.get(ids);
+	}
+
+	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public I_Position newPosition(I_Path path, int version) {
+		return new Position(version, path);
+	}
+
+	public I_IntSet newIntSet() {
+		return new IntSet();
 	}
 }

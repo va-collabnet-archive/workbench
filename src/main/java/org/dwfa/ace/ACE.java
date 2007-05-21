@@ -976,6 +976,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private CdePalette addressPalette;
 
+	private JList addressList;
+
 	private void makeProcessPalette() throws Exception {
 		JLayeredPane layers = getRootPane().getLayeredPane();
 		processPalette = new CdePalette(new BorderLayout(),
@@ -1072,8 +1074,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		subversionPalette = new CdePalette(new BorderLayout(),
 				new RightPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
-		SvnPanel svnTable = new SvnPanel(aceFrameConfig);
-		tabs.addTab("change sets", svnTable);
+		for (String key: aceFrameConfig.getSubversionMap().keySet()) {
+			SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
+			tabs.addTab("change sets", svnTable);
+		}
 
 		layers.add(subversionPalette, JLayeredPane.PALETTE_LAYER);
 		subversionPalette.add(tabs, BorderLayout.CENTER);
@@ -1408,8 +1412,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		JLayeredPane layers = getRootPane().getLayeredPane();
 		addressPalette = new CdePalette(new BorderLayout(),
 				new LeftPalettePoint());
+		addressList = new JList(aceFrameConfig.getAddressesList().toArray());
 		addressPalette
-				.add(new JLabel("List of addresses"), BorderLayout.CENTER);
+				.add(new JScrollPane(addressList), BorderLayout.CENTER);
 		addressPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		layers.add(addressPalette, JLayeredPane.PALETTE_LAYER);
 		int width = 400;
@@ -1989,6 +1994,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public JPanel getWorkflowPanel() {
 		return workflowPanel;
+	}
+
+	public JList getAddressList() {
+		return addressList;
 	}
 
 }

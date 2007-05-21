@@ -470,7 +470,8 @@ public class AceConfig implements Serializable {
 		relTypes.add(vodb.getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
-		if (includeSnomed) {
+
+		if (vodb.getId(SNOMED.Concept.IS_A.getUids()) != null) {
 			relTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids()).getNativeId());
 		}
 		af.setEditRelTypePopup(relTypes);
@@ -485,9 +486,7 @@ public class AceConfig implements Serializable {
 		roots.add(vodb.getId(
 				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		if (includeSnomed) {
-			addIfNotNull(roots, SNOMED.Concept.ROOT);
-		}
+		addIfNotNull(roots, SNOMED.Concept.ROOT);
 		addIfNotNull(roots, DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY);
 		addIfNotNull(roots, RefsetAuxiliary.Concept.REFSET_AUXILIARY);
 		addIfNotNull(roots, HL7.Concept.HL7);
@@ -526,12 +525,11 @@ public class AceConfig implements Serializable {
 		destRelTypes.add(vodb.getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
-		if (includeSnomed) {
-			if (vodb.getId(SNOMED.Concept.ROOT.getUids()) != null) {
-				destRelTypes.add(vodb.getId(SNOMED.Concept.ROOT.getUids())
-						.getNativeId());
-			}
+		if (vodb.getId(SNOMED.Concept.IS_A.getUids()) != null) {
+			destRelTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids())
+					.getNativeId());
 		}
+		
 		af.setDestRelTypes(destRelTypes);
 
 		IntSet sourceRelTypes = new IntSet();
@@ -691,6 +689,9 @@ public class AceConfig implements Serializable {
 						.getSvnWorkingCopy(), "."
 						+ af.getChangeSetWriterFileName())));
 
+  		af.getAddressesList().add("sample.user1.editor");
+  		af.getAddressesList().add("sample.user1.assignmentManager");
+  		af.getAddressesList().add("sample.user2.editor");
 		config.aceFrames.add(af);
 		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);

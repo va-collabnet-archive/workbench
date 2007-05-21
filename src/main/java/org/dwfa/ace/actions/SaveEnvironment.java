@@ -14,7 +14,7 @@ public class SaveEnvironment implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		try {
-			File outFile = FileDialogUtil.getNewFile("Save environment to config file...");
+			File outFile = FileDialogUtil.getNewFile("Save environment to new profile...", new File("profile/profile.ace"));
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outFile));
 			oos.writeObject(AceConfig.config);
 		} catch (Exception e1) {

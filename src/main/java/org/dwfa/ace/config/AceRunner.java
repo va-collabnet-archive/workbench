@@ -3,6 +3,7 @@ package org.dwfa.ace.config;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
@@ -19,6 +20,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
+import org.dwfa.fd.FileDialogUtil;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -52,7 +54,16 @@ public class AceRunner {
 		File aceConfigFile = (File) config.getEntry(this.getClass().getName(),
 				"aceConfigFile", File.class, new File(
 						"src/main/config/config.ace"));
+		
 		if (aceConfigFile.exists()) {
+			// Put up a dialog to select the config file...
+			aceConfigFile = FileDialogUtil.getExistingFile("Please select your user profile:", new FilenameFilter() {
+
+				public boolean accept(File dir, String name) {
+					return name.toLowerCase().endsWith(".ace");
+				}}, aceConfigFile);
+			
+			
 			ObjectInputStream ois = new ObjectInputStream(
 					new BufferedInputStream(new FileInputStream(aceConfigFile)));
 			AceConfig.config = (AceConfig) ois.readObject();

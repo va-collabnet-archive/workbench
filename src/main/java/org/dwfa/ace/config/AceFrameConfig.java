@@ -7,9 +7,12 @@ import java.beans.VetoableChangeSupport;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +27,7 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -40,7 +44,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 16;
+    private static final int dataVersion = 19;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -84,8 +88,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_GetConceptData hierarchySelection;
     
     // 14
-    private String repositoryUrlStr;
-    private String svnWorkingCopy;
+    //private String repositoryUrlStr;
+    //private String svnWorkingCopy;
     private String changeSetWriterFileName;
     
     // 15
@@ -94,6 +98,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     // 16
     private AceConfig masterConfig;
+    
+    // 17
+    private List<String> addressesList = new ArrayList<String>();
+    
+    // 18
+    private String adminUsername;
+    private String adminPassword;
+    
+    // 19
+    private Map<String, SubversionData> subversionMap = new HashMap<String, SubversionData>();
     
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -156,14 +170,24 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		out.writeObject(this.getChangeSetReaders());
 		out.writeObject(this.getChangeSetWriters());
 		//14
-		out.writeObject(repositoryUrlStr);
-		out.writeObject(svnWorkingCopy);
+		out.writeObject(null);
+		out.writeObject(null);
 		out.writeObject(changeSetWriterFileName);
 		//15
 		out.writeObject(username);
 		out.writeObject(password);
 		//16
 		out.writeObject(masterConfig);
+		
+		//17 
+		out.writeObject(addressesList);
+		
+		// 18
+		out.writeObject(adminUsername);
+		out.writeObject(adminPassword);
+		
+		// 19
+		out.writeObject(subversionMap);
    }
 
 
@@ -283,8 +307,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	this.getChangeSetWriters().addAll(writers);
             }
             if (objDataVersion >= 14) {
-        		repositoryUrlStr = (String) in.readObject();
-        		svnWorkingCopy = (String) in.readObject();
+        		in.readObject(); // repositoryUrlStr deprecated
+        		in.readObject(); // svnWorkingCopy deprecated
         		changeSetWriterFileName = (String) in.readObject();
             }
             if (objDataVersion >= 15) {
@@ -294,6 +318,32 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 16) {
             	masterConfig = (AceConfig) in.readObject();
              }
+            
+            if (objDataVersion >= 17) {
+            	addressesList = (List<String>) in.readObject();
+            	if (addressesList.size() == 0) {
+            		addressesList.add("sample.user1.editor");
+            		addressesList.add("sample.user1.assignmentManager");
+            		addressesList.add("sample.user2.editor");
+            	}
+            } else {
+            	addressesList = new ArrayList<String>();
+           		addressesList.add("sample.user1.editor");
+        		addressesList.add("sample.user1.assignmentManager");
+        		addressesList.add("sample.user2.editor");
+            }
+            if (objDataVersion >= 18) {
+            	adminUsername = (String) in.readObject();
+            	adminPassword = (String) in.readObject();
+            } else {
+            	adminUsername = "admin";
+            	adminPassword = "help";
+            }
+            if (objDataVersion >= 19) {
+            	subversionMap = (Map<String, SubversionData>) in.readObject();
+            } else {
+            	subversionMap = new HashMap<String, SubversionData>();
+            }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -886,27 +936,34 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		this.changeSupport.firePropertyChange("changeSetWriterFileName", old, changeSetWriterFileName);
 	}
 
+	private SubversionData getChangeSetSubversionData() {
+		if (subversionMap.get("change sets") == null) {
+		   	SubversionData svd = new SubversionData();
+	    	subversionMap.put("change sets", svd);
+		}
+		return subversionMap.get("change sets");
+	}
 
 	public String getSvnRepository() {
-		return repositoryUrlStr;
+		return subversionMap.get("change sets").getRepositoryUrlStr();
 	}
 
 
 	public void setSvnRepository(String repositoryUrlStr) {
-		Object old = this.repositoryUrlStr;
-		this.repositoryUrlStr = repositoryUrlStr;
+		Object old = getChangeSetSubversionData().getRepositoryUrlStr();
+		getChangeSetSubversionData().setRepositoryUrlStr(repositoryUrlStr);
 		this.changeSupport.firePropertyChange("repositoryUrlStr", old, repositoryUrlStr);
 	}
 
 
 	public String getSvnWorkingCopy() {
-		return svnWorkingCopy;
+		return getChangeSetSubversionData().getWorkingCopyStr();
 	}
 
 
 	public void setSvnWorkingCopy(String svnWorkingCopy) {
-		Object old = this.svnWorkingCopy;
-		this.svnWorkingCopy = svnWorkingCopy;
+		Object old =  getChangeSetSubversionData().getWorkingCopyStr();
+		getChangeSetSubversionData().setWorkingCopyStr(svnWorkingCopy);
 		this.changeSupport.firePropertyChange("svnWorkingCopy", old, svnWorkingCopy);
 	}
 
@@ -1003,6 +1060,47 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public JPanel getWorkflowPanel() {
 		return aceFrame.getCdePanel().getWorkflowPanel();
 	}
+
+
+	public List<String> getAddressesList() {
+		return addressesList;
+	}
+
+
+	public List<String> getSelectedAddresses() {
+		List<String> addresses = new ArrayList<String>();
+		for (Object address: aceFrame.getCdePanel().getAddressList().getSelectedValues()) {
+			addresses.add((String) address);
+		}
+		return addresses;
+	}
+
+
+	public String getAdminPassword() {
+		return adminPassword;
+	}
+
+
+	public void setAdminPassword(String adminPassword) {
+		this.adminPassword = adminPassword;
+	}
+
+
+	public String getAdminUsername() {
+		return adminUsername;
+	}
+
+
+	public void setAdminUsername(String adminUsername) {
+		this.adminUsername = adminUsername;
+	}
+
+
+	public Map<String, SubversionData> getSubversionMap() {
+		return subversionMap;
+	}
+	
+	
 
 
 }

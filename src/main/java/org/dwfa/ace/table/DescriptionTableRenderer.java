@@ -67,6 +67,7 @@ public class DescriptionTableRenderer extends AceTableRenderer {
 			}
 		}
 
+        renderComponent.setToolTipText(swt.getCellText());
 		return renderComponent;
 	}
 

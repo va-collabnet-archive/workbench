@@ -40,6 +40,7 @@ public class RelationshipTableRenderer extends AceTableRenderer {
         	renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
         	renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
         }		
+        renderComponent.setToolTipText(swt.getCellText());
 		return renderComponent;
 	}
 
