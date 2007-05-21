@@ -689,9 +689,11 @@ public class AceConfig implements Serializable {
 						.getSvnWorkingCopy(), "."
 						+ af.getChangeSetWriterFileName())));
 
-  		af.getAddressesList().add("sample.user1.editor");
-  		af.getAddressesList().add("sample.user1.assignmentManager");
-  		af.getAddressesList().add("sample.user2.editor");
+  		af.getAddressesList().add("va.user1.editor");
+  		af.getAddressesList().add("va.user1.assignmentManager");
+ 		af.getAddressesList().add("kp.user2.editor");
+ 		af.getAddressesList().add("kp.user3.editor");
+ 		af.getAddressesList().add("va.user4.editor");
 		config.aceFrames.add(af);
 		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);

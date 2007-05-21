@@ -322,15 +322,19 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 17) {
             	addressesList = (List<String>) in.readObject();
             	if (addressesList.size() == 0) {
-            		addressesList.add("sample.user1.editor");
-            		addressesList.add("sample.user1.assignmentManager");
-            		addressesList.add("sample.user2.editor");
+            		addressesList.add("va.user1.editor");
+            		addressesList.add("va.user1.assignmentManager");
+            		addressesList.add("kp.user2.editor");
+            		addressesList.add("kp.user3.editor");
+            		addressesList.add("va.user4.editor");
             	}
             } else {
             	addressesList = new ArrayList<String>();
-           		addressesList.add("sample.user1.editor");
-        		addressesList.add("sample.user1.assignmentManager");
-        		addressesList.add("sample.user2.editor");
+        		addressesList.add("va.user1.editor");
+        		addressesList.add("va.user1.assignmentManager");
+        		addressesList.add("kp.user2.editor");
+        		addressesList.add("kp.user3.editor");
+        		addressesList.add("va.user4.editor");
             }
             if (objDataVersion >= 18) {
             	adminUsername = (String) in.readObject();
