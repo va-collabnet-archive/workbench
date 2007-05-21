@@ -1,9 +1,9 @@
 package org.dwfa.ace;
 
+import junit.framework.TestCase;
+
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.vodb.types.IntSet;
-
-import junit.framework.TestCase;
 
 public class IntSetTest extends TestCase {
 

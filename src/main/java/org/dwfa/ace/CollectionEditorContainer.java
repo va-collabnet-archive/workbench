@@ -274,6 +274,9 @@ public class CollectionEditorContainer extends JPanel {
 	                    SwingUtilities.invokeLater(new Runnable() {
 	                        public void run() {
 	                        	getConfig().setStatusMessage("<html><font color='#006400'>execute");
+	                        	I_GetConceptData conceptInPanel = (I_GetConceptData) cp.getTermComponent();
+	                        	cp.setTermComponent(null);
+	                        	cp.setTermComponent(conceptInPanel);
 	                            if (exceptionMessage.equals("")) {
 	                            	getConfig().setStatusMessage("<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
 	        	                } else {

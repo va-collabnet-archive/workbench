@@ -5,8 +5,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-import org.dwfa.ace.AceLog;
-
 
 public class Handler extends URLStreamHandler {
 

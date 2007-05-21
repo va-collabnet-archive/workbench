@@ -17,6 +17,8 @@ public class TermComponentListSelectionListener implements
 		ListSelectionListener {
 
 	I_ContainTermComponent linkedComponent;
+	
+	private boolean warnForUncommitted = false;
 
 	public TermComponentListSelectionListener(I_ContainTermComponent linkedComponent) {
 		super();
@@ -29,12 +31,16 @@ public class TermComponentListSelectionListener implements
 					.getTermComponent();
 			if (currentBean != null) {
 				if (currentBean.isUncommitted()) {
-					int option = JOptionPane.showConfirmDialog((Component) linkedComponent, 
-							"This view contains an uncommited concept. If you continue, the " +
-							"focused concept will change...", 
-							"Uncommitted component", 
-							JOptionPane.OK_CANCEL_OPTION);
-					if (JOptionPane.OK_OPTION == option) {
+					if (warnForUncommitted) {
+						int option = JOptionPane.showConfirmDialog((Component) linkedComponent, 
+								"This view contains an uncommited concept. If you continue, the " +
+								"focused concept will change...", 
+								"Uncommitted component", 
+								JOptionPane.OK_CANCEL_OPTION);
+						if (JOptionPane.OK_OPTION == option) {
+							setLinkedComponent(e);
+						}
+					} else {
 						setLinkedComponent(e);
 					}
 				} else {
@@ -57,6 +63,14 @@ public class TermComponentListSelectionListener implements
 		} else {
 			linkedComponent.setTermComponent(model.getElementAt(list.getSelectedIndex()));
 		}
+	}
+
+	public boolean getWarnForUncommitted() {
+		return warnForUncommitted;
+	}
+
+	public void setWarnForUncommitted(boolean warnForUncommitted) {
+		this.warnForUncommitted = warnForUncommitted;
 	}
 
 }

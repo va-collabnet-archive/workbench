@@ -812,7 +812,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			I_GetConceptData concept, I_ConceptualizeLocally relType,
 			I_ConceptualizeLocally relDestination,
 			I_ConceptualizeLocally relCharacteristic,
-			I_ConceptualizeLocally relRefinability, int relGroup)
+			I_ConceptualizeLocally relRefinability, I_ConceptualizeLocally relStatus, int relGroup)
 			throws TerminologyException, IOException {
 		canEdit();
 		int idSource = AceConfig.vodb
@@ -834,8 +834,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 		rel.addVersion(relPart);
 
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = relStatus.getNid();
 
 		for (I_Path p : getConfig().getEditingPathSet()) {
 			relPart.setVersion(Integer.MAX_VALUE);
@@ -901,8 +900,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return ConceptBean.get(Arrays.asList(ids));
 	}
 
 	public I_Position newPosition(I_Path path, int version) {
@@ -911,5 +909,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public I_IntSet newIntSet() {
 		return new IntSet();
+	}
+
+	public void addUncommitted(I_GetConceptData concept) {
+		ACE.addUncommitted((I_Transact) concept);
 	}
 }

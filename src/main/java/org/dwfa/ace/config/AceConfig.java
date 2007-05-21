@@ -358,6 +358,7 @@ public class AceConfig implements Serializable {
 		af.setViewPositions(positions);
 		for (I_Position pos : positions) {
 			af.addEditingPath(pos.getPath());
+			break;
 		}
 		IntSet statusPopupTypes = new IntSet();
 		statusPopupTypes.add(vodb.getId(
