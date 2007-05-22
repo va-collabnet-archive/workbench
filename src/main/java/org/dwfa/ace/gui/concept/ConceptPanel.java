@@ -809,10 +809,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public I_RelVersioned newRelationship(UUID newRelUid,
-			I_GetConceptData concept, I_ConceptualizeLocally relType,
-			I_ConceptualizeLocally relDestination,
-			I_ConceptualizeLocally relCharacteristic,
-			I_ConceptualizeLocally relRefinability, I_ConceptualizeLocally relStatus, int relGroup)
+			I_GetConceptData concept, I_GetConceptData relType,
+			I_GetConceptData relDestination,
+			I_GetConceptData relCharacteristic,
+			I_GetConceptData relRefinability, I_GetConceptData relStatus, int relGroup)
 			throws TerminologyException, IOException {
 		canEdit();
 		int idSource = AceConfig.vodb
@@ -827,22 +827,22 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						+ ") from " + concept.getUids() + " to "
 						+ relDestination.getUids());
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
-				.getConceptId(), relDestination.getNid(), getConfig()
+				.getConceptId(), relDestination.getConceptId(), getConfig()
 				.getEditingPathSet().size());
 
 		ThinRelPart relPart = new ThinRelPart();
 
 		rel.addVersion(relPart);
 
-		int status = relStatus.getNid();
+		int status = relStatus.getConceptId();
 
 		for (I_Path p : getConfig().getEditingPathSet()) {
 			relPart.setVersion(Integer.MAX_VALUE);
 			relPart.setPathId(p.getConceptId());
 			relPart.setStatusId(status);
-			relPart.setRelTypeId(relType.getNid());
-			relPart.setCharacteristicId(relCharacteristic.getNid());
-			relPart.setRefinabilityId(relRefinability.getNid());
+			relPart.setRelTypeId(relType.getConceptId());
+			relPart.setCharacteristicId(relCharacteristic.getConceptId());
+			relPart.setRefinabilityId(relRefinability.getConceptId());
 			relPart.setGroup(relGroup);
 		}
 		concept.getUncommittedSourceRels().add(rel);
