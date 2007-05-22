@@ -1,0 +1,83 @@
+package org.dwfa.queue.bpa.tasks.move;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Collection;
+
+import org.dwfa.bpa.process.Condition;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
+
+@BeanList(specs = 
+{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+public class RemoveNonSerializableAttachments extends AbstractTask {
+
+    private static final long serialVersionUID = 1;
+
+    private static final int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+     }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        }
+
+    }
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      org.dwfa.bpa.process.I_Work)
+	 */
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+			throws TaskFailedException {
+		return Condition.CONTINUE;
+	}
+
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      org.dwfa.bpa.process.I_Work)
+	 */
+	public void complete(I_EncodeBusinessProcess process, I_Work worker)
+			throws TaskFailedException {
+		try {
+            for (String key: process.getAttachmentKeys()) {
+           		Object value = process.readAttachement(key);
+           		if (value != null) {
+           			if (Serializable.class.isAssignableFrom(value.getClass())) {
+           				// then OK
+           			} else {
+           				process.writeAttachment(key, null);
+           			}
+            	}
+            }
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		}
+	}
+
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+	 */
+	public Collection<Condition> getConditions() {
+		return AbstractTask.CONTINUE_CONDITION;
+	}
+
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+	 */
+	public int[] getDataContainerIds() {
+		return new int[0];
+	}
+}
