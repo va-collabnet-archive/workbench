@@ -19,13 +19,12 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
-import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/status", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/relationship", type = BeanType.TASK_BEAN) })
 public class CreateRelationship extends AbstractTask {
 
 	/**
@@ -37,7 +36,7 @@ public class CreateRelationship extends AbstractTask {
 	
     private String activeConceptPropName = AttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     
-    private String relParentPropName = AttachmentKeys.NEW_STATUS.getAttachmentKey();
+    private String relParentPropName = AttachmentKeys.REL_PARENT.getAttachmentKey();
     
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
     private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
@@ -94,11 +93,11 @@ public class CreateRelationship extends AbstractTask {
 
 			termFactory.newRelationship(UUID.randomUUID(),
 					concept, 
-					(I_ConceptualizeLocally) termFactory.getConcept(relType.ids),
-					(I_ConceptualizeLocally) relParentConcept,
-					(I_ConceptualizeLocally) termFactory.getConcept(relCharacteristic.ids),
-					(I_ConceptualizeLocally) termFactory.getConcept(relRefinability.ids), 
-					(I_ConceptualizeLocally) termFactory.getConcept(relStatus.ids),0);
+					termFactory.getConcept(relType.ids),
+					relParentConcept,
+					termFactory.getConcept(relCharacteristic.ids),
+					termFactory.getConcept(relRefinability.ids), 
+					termFactory.getConcept(relStatus.ids),0);
 			termFactory.addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
@@ -162,6 +161,14 @@ public class CreateRelationship extends AbstractTask {
 
 	public void setRelType(TermEntry relType) {
 		this.relType = relType;
+	}
+
+	public TermEntry getRelStatus() {
+		return relStatus;
+	}
+
+	public void setRelStatus(TermEntry relStatus) {
+		this.relStatus = relStatus;
 	}
 
 }

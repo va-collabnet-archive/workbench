@@ -46,11 +46,11 @@ public interface I_TermFactory {
 	 */
 	public I_RelVersioned newRelationship(UUID newRelUid,
 			I_GetConceptData concept, 
-			I_ConceptualizeLocally relType,
-			I_ConceptualizeLocally relDestination,
-			I_ConceptualizeLocally relCharacteristic,
-			I_ConceptualizeLocally relRefinability, 
-			I_ConceptualizeLocally relStatus, int relGroup)
+			I_GetConceptData relType,
+			I_GetConceptData relDestination,
+			I_GetConceptData relCharacteristic,
+			I_GetConceptData relRefinability, 
+			I_GetConceptData relStatus, int relGroup)
 			throws TerminologyException, IOException;
 	
 	public LogWithAlerts getEditLog();
