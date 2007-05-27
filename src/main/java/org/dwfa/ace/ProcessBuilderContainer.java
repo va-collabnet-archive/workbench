@@ -19,7 +19,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.gui.ProcessBuilderPanel;
 import org.dwfa.bpa.worker.MasterWorker;
 
@@ -40,7 +40,7 @@ public class ProcessBuilderContainer extends JPanel {
 		if (aceFrameConfig == null) {
 			throw new NullPointerException("aceFrameConfig cannot be null...");
 		}
-		processWorker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
+		processWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
 
 		ProcessBuilderPanel processBuilderPanel = new ProcessBuilderPanel(
 				config, processWorker);

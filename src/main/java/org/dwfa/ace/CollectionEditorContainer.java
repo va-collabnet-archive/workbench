@@ -31,7 +31,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
-import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -239,13 +240,10 @@ public class CollectionEditorContainer extends JPanel {
 				}
 
 				
-				worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
+				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 						getConfig());
-				worker.writeAttachment(
-						AttachmentKeys.I_GET_CONCEPT_DATA.name(), concept);
-				worker.writeAttachment(AttachmentKeys.I_TERM_FACTORY.name(),
-						cp);
-				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
+				bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), concept);
+				worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
 						.name(), cp);
  	            Runnable r = new Runnable() {
 	                public void run() {

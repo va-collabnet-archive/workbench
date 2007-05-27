@@ -40,6 +40,7 @@ import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.TableSorter.SortOrder;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
@@ -208,7 +209,7 @@ public class SearchPanel extends JPanel {
 		gbc.gridheight = 1;
 
 		model = new DescriptionsFromCollectionTableModel(
-				new DESC_FIELD[] { DESC_FIELD.TEXT }, config);
+				new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.TEXT }, config);
 		sortingTable = new TableSorter(model);
 		descTable = new JTableWithDragImage(sortingTable);
 		descTable.setDragEnabled(true);
@@ -231,6 +232,7 @@ public class SearchPanel extends JPanel {
 				.getTableHeader()
 				.setToolTipText(
 						"Click to specify sorting; Control-Click to specify secondary sorting");
+		sortingTable.setSortingStatus(0, SortOrder.DESCENDING);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridwidth = 6;

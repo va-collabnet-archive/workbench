@@ -50,39 +50,28 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinConPart;
-import org.dwfa.vodb.types.ThinConVersioned;
-import org.dwfa.vodb.types.ThinDescPart;
-import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinRelPart;
-import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.je.DatabaseException;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
-		I_TermFactory, PropertyChangeListener {
+		PropertyChangeListener {
 
 	public enum LINK_TYPE {
 		UNLINKED, SEARCH_LINK, TREE_LINK, LIST_LINK
@@ -508,14 +497,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				// Set concept bean
 				// Set config
 
-				worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
+				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 						getConfig());
-				worker.writeAttachment(
-						AttachmentKeys.I_GET_CONCEPT_DATA.name(), label
+				bp.writeAttachment(
+						ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), label
 								.getTermComponent());
-				worker.writeAttachment(AttachmentKeys.I_TERM_FACTORY.name(),
-						ConceptPanel.this);
-				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
+				worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
 						.name(), ConceptPanel.this);
  	            Runnable r = new Runnable() {
 	                private String exceptionMessage;
@@ -699,185 +686,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return ace.getAceFrameConfig().getHierarchySelection();
 	}
 
-	public I_GetConceptData newConcept(UUID newConceptId, boolean defined)
-			throws TerminologyException, IOException {
-		canEdit();
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
-				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-		AceLog.getEditLog().info(
-				"Creating new concept: " + newConceptId + " (" + nid
-						+ ") defined: " + defined);
-		ConceptBean newBean = ConceptBean.get(nid);
-		newBean.setPrimordial(true);
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
-				getConfig().getEditingPathSet().size());
-		for (I_Path p : getConfig().getEditingPathSet()) {
-			ThinConPart attributePart = new ThinConPart();
-			attributePart.setVersion(Integer.MAX_VALUE);
-			attributePart.setDefined(defined);
-			attributePart.setPathId(p.getConceptId());
-			attributePart.setConceptStatus(status);
-			conceptAttributes.addVersion(attributePart);
-		}
-		newBean.setUncommittedConceptAttributes(conceptAttributes);
-		newBean.getUncommittedIds().add(nid);
-		ACE.addUncommitted(newBean);
-		return newBean;
-	}
-
-	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
-			I_GetConceptData concept, String lang, String text,
-			I_ConceptualizeLocally descType) throws TerminologyException,
-			IOException {
-		canEdit();
-		ACE.addUncommitted((I_Transact) concept);
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-		int descId = AceConfig.vodb.uuidToNativeWithGeneration(
-				newDescriptionId, idSource, getConfig().getEditingPathSet(),
-				Integer.MAX_VALUE);
-		AceLog.getEditLog().info(
-				"Creating new description: " + newDescriptionId + " (" + descId
-						+ "): " + text);
-		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
-				.getConceptId(), getConfig().getEditingPathSet().size());
-		boolean capStatus = false;
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		for (I_Path p : getConfig().getEditingPathSet()) {
-			ThinDescPart descPart = new ThinDescPart();
-			descPart.setVersion(Integer.MAX_VALUE);
-			descPart.setPathId(p.getConceptId());
-			descPart.setInitialCaseSignificant(capStatus);
-			descPart.setLang(lang);
-			descPart.setStatusId(status);
-			descPart.setText(text);
-			descPart.setTypeId(descType.getNid());
-			desc.addVersion(descPart);
-		}
-		concept.getUncommittedDescriptions().add(desc);
-		concept.getUncommittedIds().add(descId);
-		return desc;
-	}
-
-	public I_RelVersioned newRelationship(UUID newRelUid,
-			I_GetConceptData concept) throws TerminologyException, IOException {
-		canEdit();
-		if (getConfig().getHierarchySelection() == null) {
-			throw new TerminologyException(
-					"<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
-		}
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
-				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-		AceLog.getEditLog().info(
-				"Creating new relationship 1: " + newRelUid + " (" + relId
-						+ ") from " + concept.getUids() + " to "
-						+ getConfig().getHierarchySelection().getUids());
-		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
-				.getConceptId(), getConfig().getHierarchySelection()
-				.getConceptId(), 1);
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		for (I_Path p : getConfig().getEditingPathSet()) {
-			ThinRelPart relPart = new ThinRelPart();
-			relPart.setVersion(Integer.MAX_VALUE);
-			relPart.setPathId(p.getConceptId());
-			relPart.setStatusId(status);
-			relPart.setRelTypeId(getConfig().getDefaultRelationshipType()
-					.getConceptId());
-			relPart.setCharacteristicId(getConfig()
-					.getDefaultRelationshipCharacteristic().getConceptId());
-			relPart.setRefinabilityId(getConfig()
-					.getDefaultRelationshipRefinability().getConceptId());
-			relPart.setGroup(0);
-			rel.addVersion(relPart);
-		}
-		concept.getUncommittedSourceRels().add(rel);
-		concept.getUncommittedIds().add(relId);
-		ACE.addUncommitted((I_Transact) concept);
-		return rel;
-
-	}
-
-	public I_RelVersioned newRelationship(UUID newRelUid,
-			I_GetConceptData concept, I_GetConceptData relType,
-			I_GetConceptData relDestination,
-			I_GetConceptData relCharacteristic,
-			I_GetConceptData relRefinability, I_GetConceptData relStatus, int relGroup)
-			throws TerminologyException, IOException {
-		canEdit();
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-
-		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
-				idSource, getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-
-		AceLog.getEditLog().info(
-				"Creating new relationship 2: " + newRelUid + " (" + relId
-						+ ") from " + concept.getUids() + " to "
-						+ relDestination.getUids());
-		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
-				.getConceptId(), relDestination.getConceptId(), getConfig()
-				.getEditingPathSet().size());
-
-		ThinRelPart relPart = new ThinRelPart();
-
-		rel.addVersion(relPart);
-
-		int status = relStatus.getConceptId();
-
-		for (I_Path p : getConfig().getEditingPathSet()) {
-			relPart.setVersion(Integer.MAX_VALUE);
-			relPart.setPathId(p.getConceptId());
-			relPart.setStatusId(status);
-			relPart.setRelTypeId(relType.getConceptId());
-			relPart.setCharacteristicId(relCharacteristic.getConceptId());
-			relPart.setRefinabilityId(relRefinability.getConceptId());
-			relPart.setGroup(relGroup);
-		}
-		concept.getUncommittedSourceRels().add(rel);
-		concept.getUncommittedIds().add(relId);
-		ACE.addUncommitted((I_Transact) concept);
-		return rel;
-
-	}
-
-	private void canEdit() throws TerminologyException {
-		if (getConfig().getEditingPathSet().size() == 0) {
-			throw new TerminologyException(
-					"<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
-		}
-	}
-
-	public void forget(I_GetConceptData concept) {
-		try {
-			AceLog.getEditLog().info("Forgetting: " + concept.getUids());
-		} catch (IOException e) {
-			AceLog.getEditLog().alertAndLogException(e);
-		}
-		ACE.removeUncommitted((I_Transact) concept);
-		label.setTermComponent(null);
-	}
-
-	public void forget(I_DescriptionVersioned desc) {
-		throw new UnsupportedOperationException();
-
-	}
-
-	public void forget(I_RelVersioned rel) {
-		throw new UnsupportedOperationException();
-
-	}
 
 	public LogWithAlerts getEditLog() {
 		return AceLog.getEditLog();

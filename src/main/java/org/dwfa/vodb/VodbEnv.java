@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,16 +50,22 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.search.I_TrackContinuation;
+import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
+import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.BranchTimeBinder;
 import org.dwfa.vodb.bind.PathBinder;
 import org.dwfa.vodb.bind.ThinConVersionedBinding;
@@ -78,11 +85,17 @@ import org.dwfa.vodb.types.I_ProcessImages;
 import org.dwfa.vodb.types.I_ProcessPaths;
 import org.dwfa.vodb.types.I_ProcessRelationships;
 import org.dwfa.vodb.types.I_ProcessTimeBranch;
+import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
+import org.dwfa.vodb.types.Position;
+import org.dwfa.vodb.types.ThinConPart;
+import org.dwfa.vodb.types.ThinConVersioned;
+import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinImageVersioned;
+import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -104,7 +117,7 @@ import com.sleepycat.je.SecondaryDatabase;
  * @author kec
  * 
  */
-public class VodbEnv {
+public class VodbEnv implements I_TermFactory {
 	private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
 
 	private Environment env;
@@ -163,11 +176,11 @@ public class VodbEnv {
 	private Database timeBranchDb;
 
 	private SecondaryDatabase conceptImageMap;
-	
+
 	private File luceneDir;
 
 	public VodbEnv() {
-
+		LocalVersionedTerminology.set(this);
 	}
 
 	private class StartupListener implements AWTEventListener {
@@ -1110,7 +1123,7 @@ public class VodbEnv {
 	}
 
 	public void searchLucene(I_TrackContinuation tracker, String query,
-			Collection<ThinDescVersioned> matches, CountDownLatch latch,
+			Collection<LuceneMatch> matches, CountDownLatch latch,
 			I_GetConceptData root, I_ConfigAceFrame config,
 			LuceneProgressUpdator updater) throws DatabaseException,
 			IOException, ParseException {
@@ -1120,7 +1133,8 @@ public class VodbEnv {
 			timer.start();
 		}
 		if (luceneDir.exists() == false) {
-			updater.setProgressInfo("Making lucene index -- this may take a while...");
+			updater
+					.setProgressInfo("Making lucene index -- this may take a while...");
 			makeLuceneIndex();
 		}
 		updater.setIndeterminate(true);
@@ -1139,7 +1153,7 @@ public class VodbEnv {
 			Document doc = hits.doc(i);
 			float score = hits.score(i);
 			logger.info("Hit: " + doc + " Score: " + score);
-			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, matches,
+			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, score, matches,
 					root, config, VodbEnv.this));
 		}
 		if (logger.isLoggable(Level.INFO)) {
@@ -1153,8 +1167,7 @@ public class VodbEnv {
 		}
 	}
 
-	public void makeLuceneIndex()
-			throws IOException, DatabaseException {
+	public void makeLuceneIndex() throws IOException, DatabaseException {
 		Stopwatch timer = new Stopwatch();
 		timer.start();
 		luceneDir.mkdirs();
@@ -1240,7 +1253,7 @@ public class VodbEnv {
 
 	private static class CheckAndProcessLuceneMatch implements Runnable {
 
-		Collection<ThinDescVersioned> matches;
+		Collection<LuceneMatch> matches;
 
 		I_GetConceptData root;
 
@@ -1250,11 +1263,14 @@ public class VodbEnv {
 
 		VodbEnv env;
 
-		public CheckAndProcessLuceneMatch(Document doc,
-				Collection<ThinDescVersioned> matches, I_GetConceptData root,
+		private float score;
+
+		public CheckAndProcessLuceneMatch(Document doc, float score,
+				Collection<LuceneMatch> matches, I_GetConceptData root,
 				I_ConfigAceFrame config, VodbEnv env) {
 			super();
 			this.doc = doc;
+			this.score = score;
 			this.matches = matches;
 			this.root = root;
 			this.config = config;
@@ -1266,8 +1282,9 @@ public class VodbEnv {
 			try {
 				ThinDescVersioned descV = (ThinDescVersioned) env
 						.getDescription(nid);
+				LuceneMatch match = new LuceneMatch(descV, score);
 				if (root == null) {
-					matches.add(descV);
+					matches.add(match);
 				} else {
 					ConceptBean descConcept = ConceptBean.get(descV
 							.getConceptId());
@@ -1275,7 +1292,7 @@ public class VodbEnv {
 						if (root.isParentOf(descConcept, config
 								.getAllowedStatus(), config.getDestRelTypes(),
 								config.getViewPositionSet(), true)) {
-							matches.add(descV);
+							matches.add(match);
 						}
 					} catch (IOException e) {
 						AceLog.getAppLog().alertAndLogException(e);
@@ -1944,6 +1961,214 @@ public class VodbEnv {
 		btBinder.objectToEntry(jarTimePath, key);
 		tbBinder.objectToEntry(jarTimePath, value);
 		timeBranchDb.put(null, key, value);
+	}
+
+	public void forget(I_GetConceptData concept) {
+		try {
+			AceLog.getEditLog().info("Forgetting: " + concept.getUids());
+		} catch (IOException e) {
+			AceLog.getEditLog().alertAndLogException(e);
+		}
+		ACE.removeUncommitted((I_Transact) concept);
+	}
+
+	public void forget(I_DescriptionVersioned desc) {
+		throw new UnsupportedOperationException();
+
+	}
+
+	public void forget(I_RelVersioned rel) {
+		throw new UnsupportedOperationException();
+
+	}
+
+	public LogWithAlerts getEditLog() {
+		return AceLog.getEditLog();
+	}
+
+	public I_GetConceptData newConcept(UUID newConceptId, boolean defined, 
+			I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException, IOException {
+		canEdit(aceFrameConfig);
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
+				idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+		AceLog.getEditLog().info(
+				"Creating new concept: " + newConceptId + " (" + nid
+						+ ") defined: " + defined);
+		ConceptBean newBean = ConceptBean.get(nid);
+		newBean.setPrimordial(true);
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
+				aceFrameConfig.getEditingPathSet().size());
+		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+			ThinConPart attributePart = new ThinConPart();
+			attributePart.setVersion(Integer.MAX_VALUE);
+			attributePart.setDefined(defined);
+			attributePart.setPathId(p.getConceptId());
+			attributePart.setConceptStatus(status);
+			conceptAttributes.addVersion(attributePart);
+		}
+		newBean.setUncommittedConceptAttributes(conceptAttributes);
+		newBean.getUncommittedIds().add(nid);
+		ACE.addUncommitted(newBean);
+		return newBean;
+	}
+
+	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
+			I_GetConceptData concept, String lang, String text,
+			I_ConceptualizeLocally descType, 
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
+			IOException {
+		canEdit(aceFrameConfig);
+		ACE.addUncommitted((I_Transact) concept);
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		int descId = AceConfig.vodb.uuidToNativeWithGeneration(
+				newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
+				Integer.MAX_VALUE);
+		AceLog.getEditLog().info(
+				"Creating new description: " + newDescriptionId + " (" + descId
+						+ "): " + text);
+		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
+				.getConceptId(), aceFrameConfig.getEditingPathSet().size());
+		boolean capStatus = false;
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+			ThinDescPart descPart = new ThinDescPart();
+			descPart.setVersion(Integer.MAX_VALUE);
+			descPart.setPathId(p.getConceptId());
+			descPart.setInitialCaseSignificant(capStatus);
+			descPart.setLang(lang);
+			descPart.setStatusId(status);
+			descPart.setText(text);
+			descPart.setTypeId(descType.getNid());
+			desc.addVersion(descPart);
+		}
+		concept.getUncommittedDescriptions().add(desc);
+		concept.getUncommittedIds().add(descId);
+		return desc;
+	}
+	private void canEdit(I_ConfigAceFrame aceFrameConfig) throws TerminologyException {
+		if (aceFrameConfig.getEditingPathSet().size() == 0) {
+			throw new TerminologyException(
+					"<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
+		}
+	}
+
+	public I_RelVersioned newRelationship(UUID newRelUid,
+			I_GetConceptData concept, 
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
+		canEdit(aceFrameConfig);
+		if (aceFrameConfig.getHierarchySelection() == null) {
+			throw new TerminologyException(
+					"<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
+		}
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
+				idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+		AceLog.getEditLog().info(
+				"Creating new relationship 1: " + newRelUid + " (" + relId
+						+ ") from " + concept.getUids() + " to "
+						+ aceFrameConfig.getHierarchySelection().getUids());
+		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
+				.getConceptId(), aceFrameConfig.getHierarchySelection()
+				.getConceptId(), 1);
+		int status = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+			ThinRelPart relPart = new ThinRelPart();
+			relPart.setVersion(Integer.MAX_VALUE);
+			relPart.setPathId(p.getConceptId());
+			relPart.setStatusId(status);
+			relPart.setRelTypeId(aceFrameConfig.getDefaultRelationshipType()
+					.getConceptId());
+			relPart.setCharacteristicId(aceFrameConfig
+					.getDefaultRelationshipCharacteristic().getConceptId());
+			relPart.setRefinabilityId(aceFrameConfig
+					.getDefaultRelationshipRefinability().getConceptId());
+			relPart.setGroup(0);
+			rel.addVersion(relPart);
+		}
+		concept.getUncommittedSourceRels().add(rel);
+		concept.getUncommittedIds().add(relId);
+		ACE.addUncommitted((I_Transact) concept);
+		return rel;
+
+	}
+
+	public I_RelVersioned newRelationship(UUID newRelUid,
+			I_GetConceptData concept, I_GetConceptData relType,
+			I_GetConceptData relDestination,
+			I_GetConceptData relCharacteristic,
+			I_GetConceptData relRefinability, I_GetConceptData relStatus,
+			int relGroup, 
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
+		canEdit(aceFrameConfig);
+		int idSource = AceConfig.vodb
+				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+						.getUids());
+
+		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
+				idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+
+		AceLog.getEditLog().info(
+				"Creating new relationship 2: " + newRelUid + " (" + relId
+						+ ") from " + concept.getUids() + " to "
+						+ relDestination.getUids());
+		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
+				.getConceptId(), relDestination.getConceptId(), aceFrameConfig
+				.getEditingPathSet().size());
+
+		ThinRelPart relPart = new ThinRelPart();
+
+		rel.addVersion(relPart);
+
+		int status = relStatus.getConceptId();
+
+		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+			relPart.setVersion(Integer.MAX_VALUE);
+			relPart.setPathId(p.getConceptId());
+			relPart.setStatusId(status);
+			relPart.setRelTypeId(relType.getConceptId());
+			relPart.setCharacteristicId(relCharacteristic.getConceptId());
+			relPart.setRefinabilityId(relRefinability.getConceptId());
+			relPart.setGroup(relGroup);
+		}
+		concept.getUncommittedSourceRels().add(rel);
+		concept.getUncommittedIds().add(relId);
+		ACE.addUncommitted((I_Transact) concept);
+		return rel;
+
+	}
+
+	public I_GetConceptData getConcept(Collection<UUID> ids)
+			throws TerminologyException, IOException {
+		return ConceptBean.get(ids);
+	}
+
+	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException,
+			IOException {
+		return ConceptBean.get(Arrays.asList(ids));
+	}
+
+	public I_Position newPosition(I_Path path, int version) {
+		return new Position(version, path);
+	}
+
+	public I_IntSet newIntSet() {
+		return new IntSet();
+	}
+
+	public void addUncommitted(I_GetConceptData concept) {
+		ACE.addUncommitted((I_Transact) concept);
 	}
 
 }

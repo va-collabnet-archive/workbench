@@ -102,7 +102,7 @@ import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.search.SearchPanel;
-import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
@@ -1006,7 +1006,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		layers.add(queuePalette, JLayeredPane.PALETTE_LAYER);
 
 		MasterWorker worker = new MasterWorker(config);
-		worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
+		worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 				aceFrameConfig);
 		queuePalette.add(makeQueueViewerPanel(config, worker),
 				BorderLayout.CENTER);
@@ -1773,13 +1773,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				aceFrameConfig.setStatusMessage("Executing: " + bp.getName());
 				final MasterWorker worker = aceFrameConfig.getWorker();
 
-				worker.writeAttachment(AttachmentKeys.ACE_FRAME_CONFIG.name(),
+				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 						aceFrameConfig);
-				worker.writeAttachment(
-						AttachmentKeys.I_GET_CONCEPT_DATA.name(), null);
-				worker.writeAttachment(AttachmentKeys.I_TERM_FACTORY.name(),
-						this);
-				worker.writeAttachment(AttachmentKeys.I_HOST_CONCEPT_PLUGINS
+				worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
 						.name(), this);
 				Runnable r = new Runnable() {
 					private String exceptionMessage;

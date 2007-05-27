@@ -30,7 +30,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public enum DESC_FIELD {
+	public enum DESC_FIELD { SCORE("score", 5, 100, 100),
 		DESC_ID("did", 5, 100, 100), CON_ID("cid", 5, 100, 100), TEXT("text",
 				5, 300, 2000), LANG("lang", 5, 30, 30), CASE_FIXED("case", 5,
 				35, 35), STATUS("status", 5, 50, 50), TYPE("type", 5, 85, 85), VERSION(
@@ -117,6 +117,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			}
 
 			switch (columns[columnIndex]) {
+			case SCORE: 
+				return getScore(rowIndex);
 			case DESC_ID:
 				return new StringWithDescTuple(Integer.toString(desc
 						.getDescId()), desc);
@@ -406,6 +408,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public DESC_FIELD[] getColumnEnums() {
 		return columns;
 	}
-
+	
+	public abstract String getScore(int rowIndex);
 
 }

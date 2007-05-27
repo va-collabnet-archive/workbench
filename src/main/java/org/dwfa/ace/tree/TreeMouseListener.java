@@ -72,6 +72,9 @@ public class TreeMouseListener implements MouseListener {
 				.getParent();
 		I_GetConceptDataForTree parentBean = (I_GetConceptDataForTree) parentNode
 				.getUserObject();
+		if (parentBean == null) {
+			return;
+		}
 		if (addNodes) {
 	        aceConfig.getParentExpandedNodes().add(treeBean.getConceptId());
 			List<I_RelTuple> tuples;

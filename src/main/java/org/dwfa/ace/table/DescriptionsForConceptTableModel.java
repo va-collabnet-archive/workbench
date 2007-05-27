@@ -386,4 +386,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		}
 	}
 
+	@Override
+	public String getScore(int rowIndex) {
+		return "";
+	}
+
 }

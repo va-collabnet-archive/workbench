@@ -11,6 +11,7 @@ import javax.swing.event.TableModelEvent;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
@@ -24,6 +25,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	 */
 	private static final long serialVersionUID = 1L;
 	private List<ThinDescVersioned> descriptionList = new ArrayList<ThinDescVersioned>();
+	private List<Float> scoreList = new ArrayList<Float>();
 	
 	@Override
 	public I_DescriptionTuple getDescription(int rowIndex) {
@@ -36,10 +38,31 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 
 	public void setDescriptions(Collection<ThinDescVersioned> descriptions) {
 		descriptionList = new ArrayList<ThinDescVersioned>(descriptions);
+		scoreList = null;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				fireTableChanged(new TableModelEvent(DescriptionsFromCollectionTableModel.this));
 			}});
+	}
+	
+	public void setLuceneMatches(Collection<LuceneMatch> matches) {
+		descriptionList = new ArrayList<ThinDescVersioned>(matches.size());
+		scoreList = new ArrayList<Float>(matches.size());
+		for (LuceneMatch m: matches) {
+			descriptionList.add(m.getDesc());
+			scoreList.add(m.getScore());
+		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				fireTableChanged(new TableModelEvent(DescriptionsFromCollectionTableModel.this));
+			}});
+	}
+	
+	public String getScore(int rowIndex) {
+		if (scoreList != null) {
+			return scoreList.get(rowIndex).toString();
+		}
+		return "";
 	}
 	
 

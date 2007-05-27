@@ -33,7 +33,8 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
 	private int descCount;
 
-	private Collection<ThinDescVersioned> matches;
+	private Collection<ThinDescVersioned> regexMatches;
+	private Collection<LuceneMatch> luceneMatches;
 
 	private DescriptionsFromCollectionTableModel model;
 	
@@ -118,7 +119,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			}
 			searchPanel.setProgressValue(descCount);
 			searchPanel.setProgressInfo(
-					"   Searched " + searchPanel.getProgressMaximum() + " descriptions   ");
+					"   Starting lucene search   ");
 		}
 
 	}
@@ -171,8 +172,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				firstUpdate = false;
 			}
 			searchPanel.setProgressValue(descCount);
-			searchPanel.setProgressInfo(
-					"   Searched " + searchPanel.getProgressMaximum() + " descriptions   ");
+			searchPanel.setProgressInfo(" Search complete, fetching results ");
 		}
 		
 		public void setProgressInfo(String info) {
@@ -198,7 +198,11 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 	}
 
 	public void updateMatches() {
-		this.model.setDescriptions(matches);
+		if (luceneMatches != null) {
+			this.model.setLuceneMatches(luceneMatches);
+		} else {
+			this.model.setDescriptions(regexMatches);
+		}
 		
 	}
 
@@ -208,23 +212,25 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			continueWork = false;
 			throw new Exception("Search string to short: " + patternString);
 		}
-		matches = Collections
-				.synchronizedCollection(new TreeSet<ThinDescVersioned>(
-						new ThinDescVersionedComparator()));
 		I_UpdateProgress updater;
 		if (lucene) {
+			luceneMatches = Collections
+			.synchronizedCollection(new TreeSet<LuceneMatch>());
 			updater = new LuceneProgressUpdator();
 			completeLatch = new CountDownLatch(1);
 			new MatchUpdator();
-			AceConfig.vodb.searchLucene(this, patternString, matches, completeLatch, 
+			AceConfig.vodb.searchLucene(this, patternString, luceneMatches, completeLatch, 
 					searchPanel.getRootConcept(), config, (LuceneProgressUpdator) updater);
 		} else {
+			regexMatches = Collections
+			.synchronizedCollection(new TreeSet<ThinDescVersioned>(
+					new ThinDescVersionedComparator()));
 			updater = new RegexProgressUpdator();
 			descCount = AceConfig.vodb.countDescriptions();
 			completeLatch = new CountDownLatch(descCount);
 			Pattern p = Pattern.compile(patternString);
 			new MatchUpdator();
-			AceConfig.vodb.searchRegex(this, p, matches, completeLatch, searchPanel.getRootConcept(), config);
+			AceConfig.vodb.searchRegex(this, p, regexMatches, completeLatch, searchPanel.getRootConcept(), config);
 			completeLatch.await();
 		}
 		return updater;
