@@ -10,8 +10,9 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -34,9 +35,9 @@ public class CreateRelationship extends AbstractTask {
 
 	private static final int dataVersion = 1;
 	
-    private String activeConceptPropName = AttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     
-    private String relParentPropName = AttachmentKeys.REL_PARENT.getAttachmentKey();
+    private String relParentPropName = ProcessAttachmentKeys.REL_PARENT.getAttachmentKey();
     
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
     private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
@@ -80,25 +81,24 @@ public class CreateRelationship extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-				.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
 			I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
 			if (config.getEditingPathSet().size() == 0) {
 				throw new TaskFailedException("You must select at least one editing path. ");
 			}
 			
-			I_TermFactory termFactory = (I_TermFactory) worker
-			.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
 			I_GetConceptData relParentConcept = (I_GetConceptData) process.readProperty(relParentPropName);
 
-			termFactory.newRelationship(UUID.randomUUID(),
+			LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(),
 					concept, 
-					termFactory.getConcept(relType.ids),
+					LocalVersionedTerminology.get().getConcept(relType.ids),
 					relParentConcept,
-					termFactory.getConcept(relCharacteristic.ids),
-					termFactory.getConcept(relRefinability.ids), 
-					termFactory.getConcept(relStatus.ids),0);
-			termFactory.addUncommitted(concept);
+					LocalVersionedTerminology.get().getConcept(relCharacteristic.ids),
+					LocalVersionedTerminology.get().getConcept(relRefinability.ids), 
+					LocalVersionedTerminology.get().getConcept(relStatus.ids),0,
+					config);
+			LocalVersionedTerminology.get().addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);

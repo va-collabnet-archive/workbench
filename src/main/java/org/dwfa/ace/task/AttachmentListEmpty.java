@@ -24,7 +24,7 @@ public class AttachmentListEmpty extends AbstractTask {
 
 	private static final int dataVersion = 1;
 
-    private String listName = AttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
+    private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);

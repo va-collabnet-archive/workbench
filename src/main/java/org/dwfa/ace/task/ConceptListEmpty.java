@@ -45,7 +45,7 @@ public class ConceptListEmpty extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-				.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 		JList conceptList = config.getBatchConceptList();
 		if (conceptList.getModel().getSize() == 0) {
 			return Condition.TRUE;

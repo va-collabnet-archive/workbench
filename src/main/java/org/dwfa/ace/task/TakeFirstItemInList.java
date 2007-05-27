@@ -31,7 +31,7 @@ public class TakeFirstItemInList extends AbstractTask {
 
 	private static final int dataVersion = 1;
 	
-    private String propName = AttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String propName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
@@ -60,7 +60,7 @@ public class TakeFirstItemInList extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			I_GetConceptData concept = (I_GetConceptData) model.removeElement(0);

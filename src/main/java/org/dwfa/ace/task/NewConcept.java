@@ -10,6 +10,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -57,41 +58,38 @@ public class NewConcept extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
-		I_TermFactory termFactory= null;
 		I_GetConceptData newConcept = null;
 		try {
 			@SuppressWarnings("unused") //here to demo how to get the configuration.
 			I_GetConceptData concept = (I_GetConceptData) worker
-					.readAttachement(AttachmentKeys.I_GET_CONCEPT_DATA.name());
+					.readAttachement(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name());
 			
 			@SuppressWarnings("unused") //here to demo how to get the configuration.
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
-			
-			termFactory = (I_TermFactory) worker
-					.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
+					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
 			I_HostConceptPlugins host = (I_HostConceptPlugins) worker
-					.readAttachement(AttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
+					.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 			
-			newConcept = termFactory.newConcept(UUID.randomUUID(), false);
+			newConcept = LocalVersionedTerminology.get().newConcept(UUID.randomUUID(), false, config);
 
-			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", "New Fully Specified Description",
-					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize());
+			LocalVersionedTerminology.get().newDescription(UUID.randomUUID(), newConcept, "en", "New Fully Specified Description",
+					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(),
+					config);
 			
-			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", "New Preferred Description",
-					ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize());
+			LocalVersionedTerminology.get().newDescription(UUID.randomUUID(), newConcept, "en", "New Preferred Description",
+					ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), config);
 			
-			termFactory.newRelationship(UUID.randomUUID(), newConcept);
+			LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(), newConcept, config);
 			
 			host.setTermComponent(newConcept);
 
 			return Condition.CONTINUE;
 		} catch (TerminologyException e) {
-			undoEdits(newConcept, termFactory);
+			undoEdits(newConcept, LocalVersionedTerminology.get());
 			throw new TaskFailedException(e);
 		} catch (IOException e) {
-			undoEdits(newConcept, termFactory);
+			undoEdits(newConcept, LocalVersionedTerminology.get());
 			throw new TaskFailedException(e);
 		}
 	}

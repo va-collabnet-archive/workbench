@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -31,9 +31,9 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 
 	private static final int dataVersion = 1;
 
-    private String listName = AttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
+    private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
 
-    private String conceptKey = AttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String conceptKey = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
@@ -66,10 +66,7 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
             ArrayList<Collection<UUID>> temporaryList =
                 (ArrayList<Collection<UUID>>) process.readProperty(listName);
 
-            I_TermFactory termFactory = (I_TermFactory) worker
-			.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
-
-			I_GetConceptData concept = termFactory.getConcept((Collection<UUID>) temporaryList.remove(0));
+			I_GetConceptData concept = LocalVersionedTerminology.get().getConcept((Collection<UUID>) temporaryList.remove(0));
 
             process.setProperty(this.conceptKey, concept);
 			return Condition.CONTINUE;

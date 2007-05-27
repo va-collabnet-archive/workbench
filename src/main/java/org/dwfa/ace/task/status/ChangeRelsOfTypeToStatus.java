@@ -17,8 +17,9 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.task.AttachmentKeys;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -41,7 +42,7 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 
 	private static final int dataVersion = 1;
 	
-    private String activeConceptPropName = AttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
     private TermEntry newStatus = new TermEntry(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 
@@ -75,24 +76,21 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-				.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
 			I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
 			if (config.getEditingPathSet().size() == 0) {
 				throw new TaskFailedException("You must select at least one editing path. ");
 			}
 			
-			I_TermFactory termFactory = (I_TermFactory) worker
-			.readAttachement(AttachmentKeys.I_TERM_FACTORY.name());
-
 			
 			Set<I_Position> positionsForEdit = new HashSet<I_Position>();
 			for (I_Path editPath: config.getEditingPathSet()) {
-				positionsForEdit.add(termFactory.newPosition(editPath, Integer.MAX_VALUE));
+				positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
 			}
-			I_GetConceptData newStatusConcept = termFactory.getConcept(newStatus.ids);
-			I_GetConceptData relTypeConcept = termFactory.getConcept(relType.ids);
-			I_IntSet typeSet = termFactory.newIntSet();
+			I_GetConceptData newStatusConcept = LocalVersionedTerminology.get().getConcept(newStatus.ids);
+			I_GetConceptData relTypeConcept = LocalVersionedTerminology.get().getConcept(relType.ids);
+			I_IntSet typeSet = LocalVersionedTerminology.get().newIntSet();
 			typeSet.add(relTypeConcept.getConceptId());
 			
 			for (I_RelTuple relTuple: concept.getSourceRelTuples(config.getAllowedStatus(), 
@@ -115,7 +113,7 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 					}
 				}
 			}
-			termFactory.addUncommitted(concept);
+			LocalVersionedTerminology.get().addUncommitted(concept);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);

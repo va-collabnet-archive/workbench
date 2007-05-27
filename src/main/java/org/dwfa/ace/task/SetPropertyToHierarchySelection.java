@@ -26,7 +26,7 @@ public class SetPropertyToHierarchySelection extends AbstractTask {
 	private static final long serialVersionUID = 1L;
 
 	private static final int dataVersion = 1;
-    private String propName = AttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
+    private String propName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -58,7 +58,7 @@ public class SetPropertyToHierarchySelection extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			process.setProperty(propName, config.getHierarchySelection());
 			return Condition.CONTINUE;
 		} catch (IntrospectionException e) {

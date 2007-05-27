@@ -35,7 +35,7 @@ public class CopyItemsToNewList extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String listName = AttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
+    private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -62,7 +62,7 @@ public class CopyItemsToNewList extends AbstractTask {
                                 throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                    .readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+                    .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             JList conceptList = config.getBatchConceptList();
             ListModel model = conceptList.getModel();
 

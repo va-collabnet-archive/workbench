@@ -54,7 +54,7 @@ public class AddChildrenToList extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG.name());
+					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
 			I_GetConceptData concept = config.getHierarchySelection();
 	

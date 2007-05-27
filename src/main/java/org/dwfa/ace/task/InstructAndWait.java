@@ -94,7 +94,7 @@ public class InstructAndWait extends AbstractTask {
 		try {
 			this.done = false;
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(AttachmentKeys.ACE_FRAME_CONFIG
+			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 					.name());
 	final JPanel workflowPanel = config.getWorkflowPanel();
 			SwingUtilities.invokeAndWait(new Runnable() {

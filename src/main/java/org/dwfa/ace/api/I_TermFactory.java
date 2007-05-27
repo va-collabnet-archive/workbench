@@ -10,13 +10,15 @@ import org.dwfa.util.LogWithAlerts;
 
 public interface I_TermFactory {
 
-	public I_GetConceptData newConcept(UUID newConceptId, boolean defined) throws TerminologyException, IOException;
+	public I_GetConceptData newConcept(UUID newConceptId, boolean defined, 
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 	
 	public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException;
 	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException;
 
 	public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept,
-			String lang, String text, I_ConceptualizeLocally descType) throws TerminologyException, IOException;
+			String lang, String text, I_ConceptualizeLocally descType, 
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 	
 	/**
 	 * Uses the configuration to set default values for the relationship, and uses the
@@ -28,7 +30,8 @@ public interface I_TermFactory {
 	 * @throws TerminologyException
 	 * @throws IOException
 	 */
-	public I_RelVersioned newRelationship(UUID newRelUid, I_GetConceptData concept) throws TerminologyException, IOException;
+	public I_RelVersioned newRelationship(UUID newRelUid, I_GetConceptData concept, 
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 
 	/**
 	 * New relationship that <em>DOES NOT</em> use the default values 
@@ -50,7 +53,8 @@ public interface I_TermFactory {
 			I_GetConceptData relDestination,
 			I_GetConceptData relCharacteristic,
 			I_GetConceptData relRefinability, 
-			I_GetConceptData relStatus, int relGroup)
+			I_GetConceptData relStatus, int relGroup, 
+			I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException;
 	
 	public LogWithAlerts getEditLog();
