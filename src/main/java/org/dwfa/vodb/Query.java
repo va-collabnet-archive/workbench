@@ -1,6 +1,7 @@
 package org.dwfa.vodb;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -47,6 +48,8 @@ public class Query {
 			AceLog.getAppLog().info("closed env.");
 			printElapsedTime();
 		} catch (DatabaseException ex) {
+			AceLog.getAppLog().alertAndLogException(ex);
+		} catch (IOException ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
 

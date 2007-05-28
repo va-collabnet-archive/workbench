@@ -161,9 +161,7 @@ public class AceConfig implements Serializable {
 				}
 				try {
 					AceConfig.vodb.setup(dbFolder, readOnly, cacheSize);
-				} catch (DatabaseException e) {
-					IOException ioe = new IOException(e.getMessage());
-					ioe.initCause(e);
+				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 				aceFrames = (List<AceFrameConfig>) in.readObject();

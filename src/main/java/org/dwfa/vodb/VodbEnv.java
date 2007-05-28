@@ -44,13 +44,13 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -117,7 +117,7 @@ import com.sleepycat.je.SecondaryDatabase;
  * @author kec
  * 
  */
-public class VodbEnv implements I_TermFactory {
+public class VodbEnv implements I_ImplementTermFactory {
 	private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
 
 	private Environment env;
@@ -211,115 +211,121 @@ public class VodbEnv implements I_TermFactory {
 	 *       primary is opened? How do they get updated, etc?
 	 */
 	public void setup(File envHome, boolean readOnly, Long cacheSize)
-			throws DatabaseException {
-		activity = new ActivityPanel(true, true);
-		StartupListener l = new StartupListener();
-		Toolkit.getDefaultToolkit().addAWTEventListener(l,
-				AWTEvent.KEY_EVENT_MASK);
-
-		AceLog.getAppLog().info("Setting up db: " + envHome);
-		activity.setIndeterminate(true);
-		activity.setProgressInfoUpper("Loading the terminology");
-		activity.setProgressInfoLower("Setting up the environment...");
-		activity.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out
-						.println("System.exit from activity action listener: "
-								+ e.getActionCommand());
-				System.exit(0);
-			}
-		});
+			throws IOException {
 		try {
-			ActivityViewer.addActivity(activity);
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
+			activity = new ActivityPanel(true, true);
+			StartupListener l = new StartupListener();
+			Toolkit.getDefaultToolkit().addAWTEventListener(l,
+					AWTEvent.KEY_EVENT_MASK);
+
+			AceLog.getAppLog().info("Setting up db: " + envHome);
+			activity.setIndeterminate(true);
+			activity.setProgressInfoUpper("Loading the terminology");
+			activity.setProgressInfoLower("Setting up the environment...");
+			activity.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					System.out
+							.println("System.exit from activity action listener: "
+									+ e.getActionCommand());
+					System.exit(0);
+				}
+			});
+			try {
+				ActivityViewer.addActivity(activity);
+			} catch (Exception e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+
+			this.readOnly = readOnly;
+			LocalFixedTerminology.setStore(new VodbFixedServer(this));
+			envHome.mkdirs();
+			luceneDir = new File(envHome, "lucene");
+
+			EnvironmentConfig envConfig = new EnvironmentConfig();
+			if (cacheSize != null) {
+				envConfig.setCacheSize(cacheSize);
+				AceLog.getAppLog().info("Setting cache size to: " + cacheSize);
+			}
+			activity
+					.setProgressInfoLower("Setting cache size to: " + cacheSize);
+
+			envConfig.setReadOnly(readOnly);
+			envConfig.setAllowCreate(!readOnly);
+			env = new Environment(envHome, envConfig);
+			DatabaseConfig conceptDbConfig = makeConfig(readOnly);
+			activity.setProgressInfoLower("Opening concepts...");
+			conceptDb = env.openDatabase(null, "concept", conceptDbConfig);
+
+			DatabaseConfig relDbConfig = makeConfig(readOnly);
+			activity.setProgressInfoLower("Opening relationships...");
+			relDb = env.openDatabase(null, "rel", relDbConfig);
+			getC1RelMap();
+			getC2RelMap();
+
+			if (preloadRels) {
+				activity.setProgressInfoLower("Loading relationships...");
+				PreloadConfig relPreloadConfig = new PreloadConfig();
+				relPreloadConfig.setLoadLNs(true);
+				relDb.preload(relPreloadConfig);
+			}
+			DatabaseConfig descDbConfig = makeConfig(readOnly);
+			descDb = env.openDatabase(null, "desc", descDbConfig);
+			activity.setProgressInfoLower("Opening descriptions...");
+			if (preloadDescriptions) {
+				activity.setProgressInfoLower("Loading descriptions...");
+				PreloadConfig descPreloadConfig = new PreloadConfig();
+				descPreloadConfig.setLoadLNs(true);
+				descDb.preload(descPreloadConfig);
+			}
+			getConceptDescMap();
+
+			DatabaseConfig mapDbConfig = makeConfig(readOnly);
+			activity.setProgressInfoLower("Opening ids...");
+			idDb = env.openDatabase(null, "idDb", mapDbConfig);
+			createUidToIdMap();
+
+			// Reset the authority id so that each time the db starts, it gets a
+			// new
+			// authorityId.
+			PrimordialId primId = PrimordialId.AUTHORITY_ID;
+			I_IdVersioned thinId = new ThinIdVersioned(primId
+					.getNativeId(Integer.MIN_VALUE), 1);
+			ThinIdPart idPart = new ThinIdPart();
+			idPart.setIdStatus(PrimordialId.CURRENT_ID
+					.getNativeId(Integer.MIN_VALUE));
+			idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID
+					.getNativeId(Integer.MIN_VALUE));
+			idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID
+					.getNativeId(Integer.MIN_VALUE));
+			idPart.setSourceId(UUID.randomUUID());
+			idPart.setVersion(Integer.MIN_VALUE);
+			thinId.addVersion(idPart);
+			writeId(thinId);
+
+			DatabaseConfig imageDbConfig = makeConfig(readOnly);
+			activity.setProgressInfoLower("Opening images...");
+			imageDb = env.openDatabase(null, "imageDb", imageDbConfig);
+			getConceptImageMap();
+
+			DatabaseConfig timeBranchDbConfig = makeConfig(readOnly);
+			activity.setProgressInfoLower("Opening time branches...");
+			timeBranchDb = env.openDatabase(null, "timeBranchDb",
+					timeBranchDbConfig);
+
+			DatabaseConfig pathDbConfig = makeConfig(readOnly);
+			activity.setProgressInfoLower("Opening paths...");
+			pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
+
+			AceLog.getAppLog().info(
+					"Cache percent: " + envConfig.getCachePercent());
+			AceLog.getAppLog().info("Cache size: " + envConfig.getCacheSize());
+
+			activity.setProgressInfoLower("complete");
+			activity.complete();
+			Toolkit.getDefaultToolkit().removeAWTEventListener(l);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
 		}
-
-		this.readOnly = readOnly;
-		LocalFixedTerminology.setStore(new VodbFixedServer(this));
-		envHome.mkdirs();
-		luceneDir = new File(envHome, "lucene");
-
-		EnvironmentConfig envConfig = new EnvironmentConfig();
-		if (cacheSize != null) {
-			envConfig.setCacheSize(cacheSize);
-			AceLog.getAppLog().info("Setting cache size to: " + cacheSize);
-		}
-		activity.setProgressInfoLower("Setting cache size to: " + cacheSize);
-
-		envConfig.setReadOnly(readOnly);
-		envConfig.setAllowCreate(!readOnly);
-		env = new Environment(envHome, envConfig);
-		DatabaseConfig conceptDbConfig = makeConfig(readOnly);
-		activity.setProgressInfoLower("Opening concepts...");
-		conceptDb = env.openDatabase(null, "concept", conceptDbConfig);
-
-		DatabaseConfig relDbConfig = makeConfig(readOnly);
-		activity.setProgressInfoLower("Opening relationships...");
-		relDb = env.openDatabase(null, "rel", relDbConfig);
-		getC1RelMap();
-		getC2RelMap();
-
-		if (preloadRels) {
-			activity.setProgressInfoLower("Loading relationships...");
-			PreloadConfig relPreloadConfig = new PreloadConfig();
-			relPreloadConfig.setLoadLNs(true);
-			relDb.preload(relPreloadConfig);
-		}
-		DatabaseConfig descDbConfig = makeConfig(readOnly);
-		descDb = env.openDatabase(null, "desc", descDbConfig);
-		activity.setProgressInfoLower("Opening descriptions...");
-		if (preloadDescriptions) {
-			activity.setProgressInfoLower("Loading descriptions...");
-			PreloadConfig descPreloadConfig = new PreloadConfig();
-			descPreloadConfig.setLoadLNs(true);
-			descDb.preload(descPreloadConfig);
-		}
-		getConceptDescMap();
-
-		DatabaseConfig mapDbConfig = makeConfig(readOnly);
-		activity.setProgressInfoLower("Opening ids...");
-		idDb = env.openDatabase(null, "idDb", mapDbConfig);
-		createUidToIdMap();
-
-		// Reset the authority id so that each time the db starts, it gets a new
-		// authorityId.
-		PrimordialId primId = PrimordialId.AUTHORITY_ID;
-		I_IdVersioned thinId = new ThinIdVersioned(primId
-				.getNativeId(Integer.MIN_VALUE), 1);
-		ThinIdPart idPart = new ThinIdPart();
-		idPart.setIdStatus(PrimordialId.CURRENT_ID
-				.getNativeId(Integer.MIN_VALUE));
-		idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID
-				.getNativeId(Integer.MIN_VALUE));
-		idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID
-				.getNativeId(Integer.MIN_VALUE));
-		idPart.setSourceId(UUID.randomUUID());
-		idPart.setVersion(Integer.MIN_VALUE);
-		thinId.addVersion(idPart);
-		writeId(thinId);
-
-		DatabaseConfig imageDbConfig = makeConfig(readOnly);
-		activity.setProgressInfoLower("Opening images...");
-		imageDb = env.openDatabase(null, "imageDb", imageDbConfig);
-		getConceptImageMap();
-
-		DatabaseConfig timeBranchDbConfig = makeConfig(readOnly);
-		activity.setProgressInfoLower("Opening time branches...");
-		timeBranchDb = env.openDatabase(null, "timeBranchDb",
-				timeBranchDbConfig);
-
-		DatabaseConfig pathDbConfig = makeConfig(readOnly);
-		activity.setProgressInfoLower("Opening paths...");
-		pathDb = env.openDatabase(null, "pathDb", pathDbConfig);
-
-		AceLog.getAppLog()
-				.info("Cache percent: " + envConfig.getCachePercent());
-		AceLog.getAppLog().info("Cache size: " + envConfig.getCacheSize());
-
-		activity.setProgressInfoLower("complete");
-		activity.complete();
-		Toolkit.getDefaultToolkit().removeAWTEventListener(l);
 	}
 
 	private void createConceptDescMap() throws DatabaseException {
@@ -1153,8 +1159,8 @@ public class VodbEnv implements I_TermFactory {
 			Document doc = hits.doc(i);
 			float score = hits.score(i);
 			logger.info("Hit: " + doc + " Score: " + score);
-			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, score, matches,
-					root, config, VodbEnv.this));
+			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, score,
+					matches, root, config, VodbEnv.this));
 		}
 		if (logger.isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
@@ -1986,15 +1992,16 @@ public class VodbEnv implements I_TermFactory {
 		return AceLog.getEditLog();
 	}
 
-	public I_GetConceptData newConcept(UUID newConceptId, boolean defined, 
-			I_ConfigAceFrame aceFrameConfig)
-			throws TerminologyException, IOException {
+	public I_GetConceptData newConcept(UUID newConceptId, boolean defined,
+			I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
+			IOException {
 		canEdit(aceFrameConfig);
 		int idSource = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
-		int nid = AceConfig.vodb.uuidToNativeWithGeneration(newConceptId,
-				idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+		int nid = AceConfig.vodb
+				.uuidToNativeWithGeneration(newConceptId, idSource,
+						aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new concept: " + newConceptId + " (" + nid
 						+ ") defined: " + defined);
@@ -2020,9 +2027,8 @@ public class VodbEnv implements I_TermFactory {
 
 	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
 			I_GetConceptData concept, String lang, String text,
-			I_ConceptualizeLocally descType, 
-			I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
-			IOException {
+			I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
 		ACE.addUncommitted((I_Transact) concept);
 		int idSource = AceConfig.vodb
@@ -2054,7 +2060,9 @@ public class VodbEnv implements I_TermFactory {
 		concept.getUncommittedIds().add(descId);
 		return desc;
 	}
-	private void canEdit(I_ConfigAceFrame aceFrameConfig) throws TerminologyException {
+
+	private void canEdit(I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException {
 		if (aceFrameConfig.getEditingPathSet().size() == 0) {
 			throw new TerminologyException(
 					"<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
@@ -2062,8 +2070,8 @@ public class VodbEnv implements I_TermFactory {
 	}
 
 	public I_RelVersioned newRelationship(UUID newRelUid,
-			I_GetConceptData concept, 
-			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
+			I_GetConceptData concept, I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
 		if (aceFrameConfig.getHierarchySelection() == null) {
 			throw new TerminologyException(
@@ -2072,8 +2080,9 @@ public class VodbEnv implements I_TermFactory {
 		int idSource = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
-		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
-				idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+		int relId = AceConfig.vodb
+				.uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
+						.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new relationship 1: " + newRelUid + " (" + relId
 						+ ") from " + concept.getUids() + " to "
@@ -2109,15 +2118,16 @@ public class VodbEnv implements I_TermFactory {
 			I_GetConceptData relDestination,
 			I_GetConceptData relCharacteristic,
 			I_GetConceptData relRefinability, I_GetConceptData relStatus,
-			int relGroup, 
-			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException {
+			int relGroup, I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
 		int idSource = AceConfig.vodb
 				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
 
-		int relId = AceConfig.vodb.uuidToNativeWithGeneration(newRelUid,
-				idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+		int relId = AceConfig.vodb
+				.uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
+						.getEditingPathSet(), Integer.MAX_VALUE);
 
 		AceLog.getEditLog().info(
 				"Creating new relationship 2: " + newRelUid + " (" + relId
