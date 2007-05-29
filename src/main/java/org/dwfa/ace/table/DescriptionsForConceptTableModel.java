@@ -313,7 +313,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);
-						newPart.setStatusId(AceConfig.vodb
+						newPart.setStatusId(AceConfig.getVodb()
 								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
 										.getUids()));
 						selectedObject.getTuple().getDescVersioned()

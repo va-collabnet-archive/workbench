@@ -24,7 +24,7 @@ public class RelationshipWriter extends TermWriter implements I_ProcessRelations
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateRelationships(this);
+		AceConfig.getVodb().iterateRelationships(this);
 		dos.close();
 		return null;
 	}

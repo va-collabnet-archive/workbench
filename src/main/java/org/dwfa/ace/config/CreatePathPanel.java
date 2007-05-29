@@ -127,11 +127,11 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         }
         try {
         	UUID newPathUid = UUID.randomUUID();
-        	I_Path p = new Path(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
+        	I_Path p = new Path(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
         	Date now = new Date();
         	int thinDate = ThinVersionHelper.convert(now.getTime());
-        	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        	int nativePathId = AceConfig.vodb.uuidToNativeWithGeneration(newPathUid, idSource,
+        	int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+        	int nativePathId = AceConfig.getVodb().uuidToNativeWithGeneration(newPathUid, idSource,
         			p, thinDate);
         	Path newPath = new Path(nativePathId, origins);
          	// path id and uuid == the corresponding concepts UUID...
@@ -142,24 +142,24 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	//Needs a concept record...
         	I_ConceptAttributeVersioned con = new ThinConVersioned(nativePathId, 1);
         	ThinConPart part = new ThinConPart();
-        	part.setPathId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+        	part.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
         	part.setVersion(Integer.MAX_VALUE);
-        	part.setConceptStatus(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+        	part.setConceptStatus(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
         	part.setDefined(false);
         	con.addVersion(part);
         	cb.setUncommittedConceptAttributes(con);
            	cb.getUncommittedIds().add(con.getConId());
          	
         	//Needs a description record...
-        	int nativeDescId = AceConfig.vodb.uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
+        	int nativeDescId = AceConfig.getVodb().uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
         			p, thinDate);
         	ThinDescVersioned descV = new ThinDescVersioned(nativeDescId, nativePathId, 1);
         	ThinDescPart descPart = new ThinDescPart();
-        	descPart.setPathId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+        	descPart.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
         	descPart.setVersion(Integer.MAX_VALUE);
-        	descPart.setStatusId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+        	descPart.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
         	descPart.setInitialCaseSignificant(true);
-        	descPart.setTypeId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+        	descPart.setTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
         	descPart.setLang("en");
         	descPart.setText(desc.getText());
         	descV.addVersion(descPart);
@@ -167,17 +167,17 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
            	cb.getUncommittedIds().add(descV.getDescId());
         	
         	//Needs a relationship record...
-        	int nativeRelId = AceConfig.vodb.uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
+        	int nativeRelId = AceConfig.getVodb().uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
         			p, thinDate);
         	ThinRelVersioned relV = new ThinRelVersioned(nativeRelId, nativePathId, 
         			selectedParent.getConceptId(), 1);
         	ThinRelPart relPart = new ThinRelPart();
-        	relPart.setPathId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+        	relPart.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
         	relPart.setVersion(Integer.MAX_VALUE);
-        	relPart.setStatusId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-        	relPart.setRelTypeId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-        	relPart.setCharacteristicId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()));
-        	relPart.setRefinabilityId(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()));
+        	relPart.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+        	relPart.setRelTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+        	relPart.setCharacteristicId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()));
+        	relPart.setRefinabilityId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()));
         	relPart.setGroup(0);
         	relV.addVersion(relPart);
         	cb.getUncommittedSourceRels().add(relV);

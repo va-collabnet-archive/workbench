@@ -219,18 +219,18 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			updater = new LuceneProgressUpdator();
 			completeLatch = new CountDownLatch(1);
 			new MatchUpdator();
-			AceConfig.vodb.searchLucene(this, patternString, luceneMatches, completeLatch, 
+			AceConfig.getVodb().searchLucene(this, patternString, luceneMatches, completeLatch, 
 					searchPanel.getRootConcept(), config, (LuceneProgressUpdator) updater);
 		} else {
 			regexMatches = Collections
 			.synchronizedCollection(new TreeSet<ThinDescVersioned>(
 					new ThinDescVersionedComparator()));
 			updater = new RegexProgressUpdator();
-			descCount = AceConfig.vodb.countDescriptions();
+			descCount = AceConfig.getVodb().countDescriptions();
 			completeLatch = new CountDownLatch(descCount);
 			Pattern p = Pattern.compile(patternString);
 			new MatchUpdator();
-			AceConfig.vodb.searchRegex(this, p, regexMatches, completeLatch, searchPanel.getRootConcept(), config);
+			AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getRootConcept(), config);
 			completeLatch.await();
 		}
 		return updater;

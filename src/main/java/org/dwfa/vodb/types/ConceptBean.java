@@ -67,17 +67,34 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public static ConceptBean get(UUID uid) throws TerminologyException,
 			IOException {
-		return get(AceConfig.vodb.uuidToNative(uid));
+		return get(AceConfig.getVodb().uuidToNative(uid));
 	}
 
 	public static ConceptBean get(Collection<UUID> uids)
 			throws TerminologyException, IOException {
-		return get(AceConfig.vodb.uuidToNative(uids));
+		return get(AceConfig.getVodb().uuidToNative(uids));
 	}
 
 	private int conceptId;
 
 	private static int dataVersion = 1;
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		throw new IOException("This class is deliberately not serializable...");
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			//
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+		throw new IOException("This class is deliberately not serializable...");
+	}
+
 
 	private I_IdVersioned id;
 
@@ -122,7 +139,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		if (conceptAttributes == null) {
 			try {
-				conceptAttributes = AceConfig.vodb.getConcept(conceptId);
+				conceptAttributes = AceConfig.getVodb().getConcept(conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -220,7 +237,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		if (descriptions == null) {
 			try {
-				descriptions = AceConfig.vodb.getDescriptions(conceptId);
+				descriptions = AceConfig.getVodb().getDescriptions(conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -236,7 +253,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public List<I_RelVersioned> getDestRels() throws IOException {
 		if (destRels == null) {
 			try {
-				destRels = AceConfig.vodb.getDestRels(conceptId);
+				destRels = AceConfig.getVodb().getDestRels(conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -255,7 +272,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		if (sourceRels == null) {
 			try {
-				sourceRels = AceConfig.vodb.getSrcRels(conceptId);
+				sourceRels = AceConfig.getVodb().getSrcRels(conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -322,7 +339,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						return false;
 					}
 				} else {
-					if (AceConfig.vodb.hasDestRels(conceptId)) {
+					if (AceConfig.getVodb().hasDestRels(conceptId)) {
 						return false;
 					}
 				}
@@ -331,7 +348,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						return false;
 					}
 				} else {
-					if (AceConfig.vodb.hasSrcRels(conceptId)) {
+					if (AceConfig.getVodb().hasSrcRels(conceptId)) {
 						return false;
 					}
 				}
@@ -357,7 +374,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			} else {
 				try {
-					return AceConfig.vodb.hasDestRelTuple(conceptId,
+					return AceConfig.getVodb().hasDestRelTuple(conceptId,
 							allowedStatus, destRelTypes, positions);
 				} catch (DatabaseException e) {
 					throw new ToIoException(e);
@@ -382,7 +399,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			} else {
 				try {
-					return AceConfig.vodb.hasSrcRelTuple(conceptId,
+					return AceConfig.getVodb().hasSrcRelTuple(conceptId,
 							allowedStatus, sourceRelTypes, positions);
 				} catch (DatabaseException e) {
 					throw new ToIoException(e);
@@ -400,7 +417,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public List<I_ImageVersioned> getImages() throws IOException {
 		if (images == null) {
 			try {
-				images = AceConfig.vodb.getImages(conceptId);
+				images = AceConfig.getVodb().getImages(conceptId);
 				AceLog.getAppLog().info(
 						"Retrieved images: " + images + " for: " + conceptId);
 			} catch (DatabaseException e) {
@@ -461,7 +478,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					if (changed) {
-						AceConfig.vodb.writeImage(image);
+						AceConfig.getVodb().writeImage(image);
 					}
 				}
 			}
@@ -477,7 +494,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					if (changed) {
-						AceConfig.vodb.writeConcept(conceptAttributes);
+						AceConfig.getVodb().writeConcept(conceptAttributes);
 					}
 				}
 			}
@@ -495,7 +512,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					if (changed) {
-						AceConfig.vodb.writeDescription(desc);
+						AceConfig.getVodb().writeDescription(desc);
 					}
 				}
 			}
@@ -512,7 +529,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 							values.add(new TimePathId(version, p.getPathId()));
 						}
 					}
-					AceConfig.vodb.writeImage(image);
+					AceConfig.getVodb().writeImage(image);
 					if (buff != null) {
 						buff.append("\n  Committing: " + image);
 					}
@@ -531,7 +548,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 				}
-				AceConfig.vodb.writeConcept(uncommittedConceptAttributes);
+				AceConfig.getVodb().writeConcept(uncommittedConceptAttributes);
 				uncommittedConceptAttributes = null;
 				conceptAttributes = null;
 			}
@@ -543,7 +560,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 							values.add(new TimePathId(version, p.getPathId()));
 						}
 					}
-					AceConfig.vodb.writeDescription(desc);
+					AceConfig.getVodb().writeDescription(desc);
 					if (buff != null) {
 						buff.append("\n  Committing: " + desc);
 					}
@@ -561,7 +578,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 							values.add(new TimePathId(version, p.getPathId()));
 						}
 					}
-					AceConfig.vodb.writeRel(rel);
+					AceConfig.getVodb().writeRel(rel);
 					if (buff != null) {
 						buff.append("\n  Committing: " + rel);
 					}
@@ -571,14 +588,14 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 			if (uncommittedIds != null) {
 				for (int id : uncommittedIds.getSetValues()) {
-					I_IdVersioned idv = AceConfig.vodb.getId(id);
+					I_IdVersioned idv = AceConfig.getVodb().getId(id);
 					for (I_IdPart p : idv.getVersions()) {
 						if (p.getVersion() == Integer.MAX_VALUE) {
 							p.setVersion(version);
 							values.add(new TimePathId(version, p.getPathId()));
 						}
 					}
-					AceConfig.vodb.writeId(idv);
+					AceConfig.getVodb().writeId(idv);
 					if (buff != null) {
 						buff.append("\n  Committing: " + idv);
 					}
@@ -608,7 +625,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			}
 			if (changed) {
-				AceConfig.vodb.writeRel(rel);
+				AceConfig.getVodb().writeRel(rel);
 			}
 		}
 	}
@@ -649,7 +666,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			if (uncommittedIds != null) {
 				boolean delete = true;
 				for (int id : uncommittedIds.getSetValues()) {
-					I_IdVersioned idv = AceConfig.vodb.getId(id);
+					I_IdVersioned idv = AceConfig.getVodb().getId(id);
 					for (ListIterator<I_IdPart> itr = idv.getVersions()
 							.listIterator(); itr.hasNext();) {
 						I_IdPart p = itr.next();
@@ -660,9 +677,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					if (delete) {
-						AceConfig.vodb.deleteId(idv);
+						AceConfig.getVodb().deleteId(idv);
 					} else {
-						AceConfig.vodb.writeId(idv);
+						AceConfig.getVodb().writeId(idv);
 					}
 				}
 				uncommittedIds = null;
@@ -727,7 +744,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public List<UUID> getUids() throws IOException {
 		if (uids == null) {
 			try {
-				uids = AceConfig.vodb.nativeToUuid(conceptId);
+				uids = AceConfig.getVodb().nativeToUuid(conceptId);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -871,7 +888,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public I_IdVersioned getId() throws IOException {
 		if (id == null) {
-			id = AceConfig.vodb.getId(conceptId);
+			id = AceConfig.getVodb().getId(conceptId);
 		}
 		return id;
 	}
@@ -978,7 +995,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (uncommittedIds != null) {
 			for (int id : uncommittedIds.getSetValues()) {
 				I_IdVersioned idv;
-				idv = AceConfig.vodb.getId(id);
+				idv = AceConfig.getVodb().getId(id);
 				for (I_IdPart p : idv.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;
@@ -1044,7 +1061,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 
 		for (int nid : getUncommittedIds().getSetValues()) {
-			I_IdVersioned idv = AceConfig.vodb.getId(nid);
+			I_IdVersioned idv = AceConfig.getVodb().getId(nid);
 			uab.getUncommittedIds().add(idv.getUniversal());
 		}
 		return uab;

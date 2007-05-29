@@ -768,7 +768,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);
 						newPart
-								.setStatusId((AceConfig.vodb
+								.setStatusId((AceConfig.getVodb()
 										.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
 												.getUids())));
 						referencedConcepts.put(newPart.getStatusId(),

@@ -22,7 +22,7 @@ public class DescritionWriter extends TermWriter implements I_ProcessDescription
 		count++;
 	}
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateDescriptions(this);
+		AceConfig.getVodb().iterateDescriptions(this);
 		dos.close();
 		return null;
 	}

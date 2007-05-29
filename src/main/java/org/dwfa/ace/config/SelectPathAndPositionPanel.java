@@ -21,8 +21,8 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
 
 	public SelectPathAndPositionPanel(boolean selectPositionOnly, String purpose, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws Exception {
 		super();
-		List<TimePathId> timePathEntries = AceConfig.vodb.getTimePathList();
-		for (I_Path p: AceConfig.vodb.getPaths()) {
+		List<TimePathId> timePathEntries = AceConfig.getVodb().getTimePathList();
+		for (I_Path p: AceConfig.getVodb().getPaths()) {
 			ConceptBean cb = ConceptBean.get(p.getConceptId());
 			int modTimeCount = 0;
 			for (TimePathId tp: timePathEntries) {

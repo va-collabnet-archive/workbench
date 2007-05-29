@@ -31,7 +31,7 @@ public class BdbImageConnection extends URLConnection {
 					String[] ids = queryString.split(",");
 					for (String id: ids) {
 						try {
-							image = AceConfig.vodb.getImage(UUID.fromString(id));
+							image = AceConfig.getVodb().getImage(UUID.fromString(id));
 							if (image != null) {
 								return;
 							}
@@ -40,10 +40,10 @@ public class BdbImageConnection extends URLConnection {
 						} 
 					}
 				} else {
-					image = AceConfig.vodb.getImage(UUID.fromString(queryString));
+					image = AceConfig.getVodb().getImage(UUID.fromString(queryString));
 				}
 			} else {
-				image = AceConfig.vodb.getImage(UUID.fromString(url.getQuery()));
+				image = AceConfig.getVodb().getImage(UUID.fromString(url.getQuery()));
 			}
 		} catch (DatabaseException e) {
 			IOException ex = new IOException();

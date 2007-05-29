@@ -188,8 +188,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			cb.commit(version, values);
 		}
 		try {
-			AceConfig.vodb.addTimeBranchValues(values);
-			AceConfig.vodb.sync();
+			AceConfig.getVodb().addTimeBranchValues(values);
+			AceConfig.getVodb().sync();
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
@@ -659,8 +659,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					aceFrameConfig);
 			descListProcessBuilderPanel = new ProcessBuilderContainer(config,
 					aceFrameConfig);
-			conceptListProcessBuilderPanel = new ProcessBuilderContainer(
-					config, aceFrameConfig);
 		} catch (LoginException e) {
 			throw new RuntimeException(e);
 		} catch (ConfigurationException e) {
@@ -952,23 +950,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				descListProcessBuilderPanel);
 	}
 
-	private Component getDescListEditor() throws DatabaseException,
-			IOException, ClassNotFoundException {
-		return new CollectionEditorContainer(new TerminologyList(), this,
-				descListProcessBuilderPanel);
-	}
-
 	protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI,
 			takeProcessTranMI, saveProcessMI, saveForLauncherQueueMI,
 			saveAsXmlMI;
 
-	private boolean firstStartup = true;
-
 	private JPanel masterProcessBuilderPanel;
 
 	private JPanel descListProcessBuilderPanel;
-
-	private JPanel conceptListProcessBuilderPanel;
 
 	private JPanel workflowPanel;
 

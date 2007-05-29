@@ -132,6 +132,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void writeConcept(Date releaseDate, Object conceptKey,
 			Object conceptStatus, boolean defChar, Object pathId) throws Exception {
@@ -159,6 +160,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void writeDescription(Date releaseDate, Object descriptionId,
 			Object status, Object conceptId, String text, boolean capStatus,
@@ -191,6 +193,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		}	
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void writeRelationship(Date releaseDate, Object relID, Object statusId, 
 			Object conceptOneID, Object relationshipTypeConceptID,

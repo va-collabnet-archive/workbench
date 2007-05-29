@@ -54,7 +54,6 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
@@ -1933,7 +1932,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public List<Path> getPaths() throws Exception {
 		PathCollector collector = new PathCollector();
-		AceConfig.vodb.iteratePaths(collector);
+		iteratePaths(collector);
 		return collector.getPaths();
 	}
 
@@ -1996,19 +1995,16 @@ public class VodbEnv implements I_ImplementTermFactory {
 			I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
 			IOException {
 		canEdit(aceFrameConfig);
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
-		int nid = AceConfig.vodb
-				.uuidToNativeWithGeneration(newConceptId, idSource,
+		int nid = uuidToNativeWithGeneration(newConceptId, idSource,
 						aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new concept: " + newConceptId + " (" + nid
 						+ ") defined: " + defined);
 		ConceptBean newBean = ConceptBean.get(nid);
 		newBean.setPrimordial(true);
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
 				aceFrameConfig.getEditingPathSet().size());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -2031,10 +2027,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
 		ACE.addUncommitted((I_Transact) concept);
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
-		int descId = AceConfig.vodb.uuidToNativeWithGeneration(
+		int descId = uuidToNativeWithGeneration(
 				newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
 				Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
@@ -2043,8 +2038,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), aceFrameConfig.getEditingPathSet().size());
 		boolean capStatus = false;
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 			ThinDescPart descPart = new ThinDescPart();
 			descPart.setVersion(Integer.MAX_VALUE);
@@ -2077,11 +2071,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 			throw new TerminologyException(
 					"<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
 		}
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
-		int relId = AceConfig.vodb
-				.uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
+		int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
 						.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new relationship 1: " + newRelUid + " (" + relId
@@ -2090,8 +2082,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), aceFrameConfig.getHierarchySelection()
 				.getConceptId(), 1);
-		int status = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 			ThinRelPart relPart = new ThinRelPart();
 			relPart.setVersion(Integer.MAX_VALUE);
@@ -2121,12 +2112,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 			int relGroup, I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
-		int idSource = AceConfig.vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 						.getUids());
 
-		int relId = AceConfig.vodb
-				.uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
+		int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
 						.getEditingPathSet(), Integer.MAX_VALUE);
 
 		AceLog.getEditLog().info(
@@ -2179,6 +2168,18 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public void addUncommitted(I_GetConceptData concept) {
 		ACE.addUncommitted((I_Transact) concept);
+	}
+	public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
+		LoadSourcesFromJars.loadFromSingleJar(jarFile, dataPrefix);
+	}
+	/**
+	 * 
+	 * @param args
+	 * @throws Exception
+	 * @deprecated use loadFromSingleJar
+	 */
+	public void loadFromMultipleJars(String[] args) throws Exception {
+		LoadSourcesFromJars.main(args);
 	}
 
 }

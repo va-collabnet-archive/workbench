@@ -282,8 +282,8 @@ public class JarWriter implements  ActionListener {
 			setAttributesForEntry(entries, descFile.getName(), descCounter.getCount());
 			setAttributesForEntry(entries, relFile.getName(), relCounter.getCount());
 			
-			int minId  = AceConfig.vodb.getMinId();
-			int maxId  = AceConfig.vodb.getMaxId();
+			int minId  = AceConfig.getVodb().getMinId();
+			int maxId  = AceConfig.getVodb().getMaxId();
 			setAttributesForEntry(entries, idFile.getName(), idCounter.getCount(), true, minId, maxId);
 			setAttributesForEntry(entries, imageFile.getName(), imageCounter.getCount());
 			setAttributesForEntry(entries, pathFile.getName(), pathCounter.getCount());

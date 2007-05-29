@@ -24,7 +24,7 @@ public class TimePathWriter extends TermWriter implements I_ProcessTimeBranch {
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateTimeBranch(this);
+		AceConfig.getVodb().iterateTimeBranch(this);
 		dos.close();
 		return null;
 	}

@@ -23,7 +23,7 @@ public class ImageWriter extends TermWriter implements I_ProcessImages {
 		count++;
 	}
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateImages(this);
+		AceConfig.getVodb().iterateImages(this);
 		dos.close();
 		return null;
 	}

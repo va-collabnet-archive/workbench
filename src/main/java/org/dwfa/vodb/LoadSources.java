@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.logging.Level;
 
 import org.dwfa.ace.AceLog;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.bpa.util.Stopwatch;
@@ -13,21 +14,21 @@ public class LoadSources {
 
 	private static Stopwatch timer;
 	public static void main(String[] args) { 
-		AceConfig.vodb = new VodbEnv();
+		LocalVersionedTerminology.set(new VodbEnv());
 		ProcessConstantsBerkeley loadConstants = null;
 		try {
 			timer = new Stopwatch();
 			timer.start();
-			AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
-			loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
+			AceConfig.getVodb().setup(new File(args[0]), false, 600000000L);
+			loadConstants = new ProcessConstantsBerkeley(AceConfig.getVodb());
 			AceLog.getAppLog().info("Starting to process AceAuxillary.");
 			loadConstants.execute(new File(args[1]));
 			AceLog.getAppLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
-			Path.writeBasePaths(AceConfig.vodb);
-			AddImage.addStockImage(AceConfig.vodb);
+			Path.writeBasePaths(AceConfig.getVodb());
+			AddImage.addStockImage(AceConfig.getVodb());
 			int[] releaseDates = loadConstants.getReleaseDates();
 			if (args.length > 2) {
-				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.vodb,
+				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(),
 						loadConstants.getConstantToIntMap(), releaseDates[0]);
 				AceLog.getAppLog().info("Starting to process SNOMED.");
 				loadSnomed.execute(new File(args[2]));

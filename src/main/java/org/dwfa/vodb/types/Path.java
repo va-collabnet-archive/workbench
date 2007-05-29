@@ -283,7 +283,7 @@ public class Path implements I_Transact, Serializable, I_Path {
 	 */
 	public void commit(int version, Set<TimePathId> values) throws IOException {
 		try {
-			AceConfig.vodb.writePath(this);
+			AceConfig.getVodb().writePath(this);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
@@ -308,11 +308,11 @@ public class Path implements I_Transact, Serializable, I_Path {
 			List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(
 					origins.size());
 			for (I_Position position : origins) {
-				universalOrigins.add(new UniversalAcePosition(AceConfig.vodb
+				universalOrigins.add(new UniversalAcePosition(AceConfig.getVodb()
 						.nativeToUuid(position.getPath().getConceptId()),
 						ThinVersionHelper.convert(position.getVersion())));
 			}
-			return new UniversalAcePath(AceConfig.vodb.nativeToUuid(conceptId),
+			return new UniversalAcePath(AceConfig.getVodb().nativeToUuid(conceptId),
 					universalOrigins);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);

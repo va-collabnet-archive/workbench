@@ -24,7 +24,7 @@ public class ConceptWriter extends TermWriter implements I_ProcessConcepts {
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateConcepts(this);
+		AceConfig.getVodb().iterateConcepts(this);
 		dos.close();
 		return null;
 	}

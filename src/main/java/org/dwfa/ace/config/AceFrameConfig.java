@@ -140,11 +140,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntSet.writeIntSet(out, inferredViewTypes);
         
 		try {
-			out.writeObject(AceConfig.vodb.nativeToUuid(defaultStatus.getConceptId()));
-			out.writeObject(AceConfig.vodb.nativeToUuid(defaultDescriptionType.getConceptId()));
-			out.writeObject(AceConfig.vodb.nativeToUuid(defaultRelationshipType.getConceptId()));
-			out.writeObject(AceConfig.vodb.nativeToUuid(defaultRelationshipCharacteristic.getConceptId()));
-			out.writeObject(AceConfig.vodb.nativeToUuid(defaultRelationshipRefinability.getConceptId()));
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultStatus.getConceptId()));
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultDescriptionType.getConceptId()));
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipType.getConceptId()));
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipCharacteristic.getConceptId()));
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipRefinability.getConceptId()));
 		} catch (DatabaseException e) {
 			IOException newEx = new IOException();
 			newEx.initCause(e);
@@ -158,7 +158,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		out.writeInt(termTreeDividerLoc);
 		try {
 			if (hierarchySelection != null) {
-				out.writeObject(AceConfig.vodb.nativeToUuid(hierarchySelection.getConceptId()));				
+				out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));				
 			} else {
 				out.writeObject(null);				
 			}
@@ -246,11 +246,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 8) {
                 try {
-					defaultStatus = ConceptBean.get(AceConfig.vodb.uuidToNative((List<UUID>) in.readObject()));
-	                defaultDescriptionType = ConceptBean.get(AceConfig.vodb.uuidToNative((List<UUID>) in.readObject()));
-	                defaultRelationshipType = ConceptBean.get(AceConfig.vodb.uuidToNative((List<UUID>) in.readObject()));
-	                defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.vodb.uuidToNative((List<UUID>) in.readObject()));
-	                defaultRelationshipRefinability = ConceptBean.get(AceConfig.vodb.uuidToNative((List<UUID>) in.readObject()));
+					defaultStatus = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+	                defaultDescriptionType = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+	                defaultRelationshipType = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+	                defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+	                defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
 				} catch (Exception e) {
 					IOException newEx = new IOException();
 					newEx.initCause(e);
@@ -258,11 +258,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 				}
             } else {
 				try {
-					defaultStatus = ConceptBean.get(AceConfig.vodb.getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
-	                defaultDescriptionType = ConceptBean.get(AceConfig.vodb.getId(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNativeId());
-	                defaultRelationshipType = ConceptBean.get(AceConfig.vodb.getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNativeId());
-	                defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.vodb.getId(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNativeId());
-	                defaultRelationshipRefinability = ConceptBean.get(AceConfig.vodb.getId(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNativeId());
+					defaultStatus = ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
+	                defaultDescriptionType = ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNativeId());
+	                defaultRelationshipType = ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNativeId());
+	                defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNativeId());
+	                defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNativeId());
 				} catch (Exception e) {
 					IOException newEx = new IOException();
 					newEx.initCause(e);
@@ -292,7 +292,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	try {
             		List<UUID> uuidList = (List<UUID>) in.readObject();
             		if (uuidList != null) {
-                		hierarchySelection = ConceptBean.get(AceConfig.vodb.uuidToNative(uuidList));
+                		hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
             		}
 				} catch (Exception e) {
 					IOException newEx = new IOException();

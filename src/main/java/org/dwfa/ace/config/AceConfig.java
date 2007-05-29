@@ -33,6 +33,7 @@ import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -71,8 +72,6 @@ public class AceConfig implements Serializable {
 
 	private static final int dataVersion = 4;
 
-	public static VodbEnv vodb = new VodbEnv();
-
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
 	private static String DEFAULT_ACE_CONFIG_FILE = "ace.config";
@@ -102,10 +101,13 @@ public class AceConfig implements Serializable {
 
 	public AceConfig() throws DatabaseException {
 		super();
+		if (LocalVersionedTerminology.get() == null) {
+			LocalVersionedTerminology.set(new VodbEnv());
+		}
 	}
 
 	public AceConfig(File dbFolder) throws DatabaseException {
-		super();
+		this();
 		this.dbFolder = dbFolder;
 	}
 
@@ -160,7 +162,7 @@ public class AceConfig implements Serializable {
 					cacheSize = null;
 				}
 				try {
-					AceConfig.vodb.setup(dbFolder, readOnly, cacheSize);
+					AceConfig.getVodb().setup(dbFolder, readOnly, cacheSize);
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
@@ -342,7 +344,7 @@ public class AceConfig implements Serializable {
 	public static void setupAceConfig(AceConfig config, File configFile,
 			Long cacheSize, boolean includeSnomed) throws DatabaseException, ParseException,
 			TerminologyException, IOException, FileNotFoundException {
-		AceConfig.vodb.setup(config.dbFolder, config.readOnly, cacheSize);
+		AceConfig.getVodb().setup(config.dbFolder, config.readOnly, cacheSize);
 		SvnPrompter prompter = new SvnPrompter();
 		prompter.prompt("config file", "username");
 		config.setUsername(prompter.getUsername());
@@ -350,7 +352,7 @@ public class AceConfig implements Serializable {
 
 		AceFrameConfig af = new AceFrameConfig(config);
 		Set<I_Position> positions = new HashSet<I_Position>();
-		for (I_Path p : Path.makeTestSnomedPaths(vodb)) {
+		for (I_Path p : Path.makeTestSnomedPaths(AceConfig.getVodb())) {
 			positions.add(new Position(Integer.MAX_VALUE, p));
 		}
 		af.setViewPositions(positions);
@@ -359,130 +361,130 @@ public class AceConfig implements Serializable {
 			break;
 		}
 		IntSet statusPopupTypes = new IntSet();
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
 		statusPopupTypes
-				.add(vodb.getId(
+				.add(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 						.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids())
 				.getNativeId());
 		statusPopupTypes
-				.add(vodb.getId(
+				.add(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
 						.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.CONSTANT.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.INACTIVE.getUids())
 				.getNativeId());
 		statusPopupTypes
-				.add(vodb.getId(
+				.add(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.RETIRED.getUids())
 						.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.DUPLICATE.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.OUTDATED.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.AMBIGUOUS.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids())
 				.getNativeId());
 		statusPopupTypes
-				.add(vodb.getId(
+				.add(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
 						.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.INAPPROPRIATE.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids())
 				.getNativeId());
-		statusPopupTypes.add(vodb.getId(
+		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
 				.getNativeId());
 		af.setEditStatusTypePopup(statusPopupTypes);
 
 		IntSet descPopupTypes = new IntSet();
-		descPopupTypes.add(vodb.getId(
+		descPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descPopupTypes.add(vodb.getId(
+		descPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descPopupTypes.add(vodb.getId(
+		descPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descPopupTypes.add(vodb.getId(
+		descPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descPopupTypes.add(vodb
+		descPopupTypes.add(AceConfig.getVodb()
 				.getId(
 						ArchitectonicAuxiliary.Concept.ENTRY_DESCRIPTION_TYPE
 								.getUids()).getNativeId());
-		descPopupTypes.add(vodb.getId(
+		descPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.XHTML_DEF.getUids())
 				.getNativeId());
 		af.setEditDescTypePopup(descPopupTypes);
 
 		IntSet relCharacteristic = new IntSet();
-		relCharacteristic.add(vodb.getId(
+		relCharacteristic.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids())
 				.getNativeId());
-		relCharacteristic.add(vodb.getId(
+		relCharacteristic.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids())
 				.getNativeId());
-		relCharacteristic.add(vodb.getId(
+		relCharacteristic.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC
 						.getUids()).getNativeId());
-		relCharacteristic.add(vodb.getId(
+		relCharacteristic.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC
 						.getUids()).getNativeId());
-		relCharacteristic.add(vodb.getId(
+		relCharacteristic.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC
 						.getUids()).getNativeId());
 		af.setEditRelCharacteristicPopup(relCharacteristic);
 
 		IntSet relRefinabilty = new IntSet();
-		relRefinabilty.add(vodb
+		relRefinabilty.add(AceConfig.getVodb()
 				.getId(
 						ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY
 								.getUids()).getNativeId());
-		relRefinabilty.add(vodb.getId(
+		relRefinabilty.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids())
 				.getNativeId());
-		relRefinabilty.add(vodb.getId(
+		relRefinabilty.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids())
 				.getNativeId());
 		af.setEditRelRefinabiltyPopup(relRefinabilty);
 
 		IntSet relTypes = new IntSet();
-		relTypes.add(vodb.getId(
+		relTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
 
-		if (vodb.getId(SNOMED.Concept.IS_A.getUids()) != null) {
-			relTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids()).getNativeId());
+		if (AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids()) != null) {
+			relTypes.add(AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids()).getNativeId());
 		}
 		af.setEditRelTypePopup(relTypes);
 
 		IntSet roots = new IntSet();
-		roots.add(vodb.getId(
+		roots.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
 						.getUids()).getNativeId());
-		roots.add(vodb.getId(
+		roots.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.STATUS
 						.getUids()).getNativeId());
-		roots.add(vodb.getId(
+		roots.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE
 						.getUids()).getNativeId());
 		addIfNotNull(roots, SNOMED.Concept.ROOT);
@@ -493,39 +495,39 @@ public class AceConfig implements Serializable {
 		af.setRoots(roots);
 
 		IntSet allowedStatus = new IntSet();
-		allowedStatus.add(vodb.getId(
+		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
 		allowedStatus
-				.add(vodb.getId(
+				.add(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 						.getNativeId());
-		allowedStatus.add(vodb.getId(
+		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids())
 				.getNativeId());
 		allowedStatus
-				.add(vodb.getId(
+				.add(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
 						.getNativeId());
-		allowedStatus.add(vodb.getId(
+		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
 				.getNativeId());
-		allowedStatus.add(vodb.getId(
+		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.CONFLICTING.getUids())
 				.getNativeId());
-		allowedStatus.add(vodb.getId(
+		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.CONSTANT.getUids())
 				.getNativeId());
-		allowedStatus.add(vodb.getId(
+		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())
 				.getNativeId());
 		af.setAllowedStatus(allowedStatus);
 
 		IntSet destRelTypes = new IntSet();
-		destRelTypes.add(vodb.getId(
+		destRelTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());
-		if (vodb.getId(SNOMED.Concept.IS_A.getUids()) != null) {
-			destRelTypes.add(vodb.getId(SNOMED.Concept.IS_A.getUids())
+		if (AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids()) != null) {
+			destRelTypes.add(AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids())
 					.getNativeId());
 		}
 		
@@ -535,77 +537,77 @@ public class AceConfig implements Serializable {
 		af.setSourceRelTypes(sourceRelTypes);
 
 		IntSet descTypes = new IntSet();
-		descTypes.add(vodb.getId(
+		descTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descTypes.add(vodb.getId(
+		descTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descTypes.add(vodb.getId(
+		descTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
-		descTypes.add(vodb.getId(
+		descTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids())
 				.getNativeId());
-		descTypes.add(vodb.getId(
+		descTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.XHTML_DEF.getUids())
 				.getNativeId());
 		af.setDescTypes(descTypes);
 
 		IntSet inferredViewTypes = new IntSet();
-		inferredViewTypes.add(vodb.getId(
+		inferredViewTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids())
 				.getNativeId());
 		af.setInferredViewTypes(inferredViewTypes);
 
 		IntSet statedViewTypes = new IntSet();
-		statedViewTypes.add(vodb.getId(
+		statedViewTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids())
 				.getNativeId());
-		statedViewTypes.add(vodb.getId(
+		statedViewTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
 						.getUids()).getNativeId());
-		statedViewTypes.add(vodb.getId(
+		statedViewTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC
 						.getUids()).getNativeId());
-		statedViewTypes.add(vodb.getId(
+		statedViewTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC
 						.getUids()).getNativeId());
-		statedViewTypes.add(vodb.getId(
+		statedViewTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC
 						.getUids()).getNativeId());
 		af.setStatedViewTypes(statedViewTypes);
 
-		af.setDefaultDescriptionType(ConceptBean.get(AceConfig.vodb.getId(
+		af.setDefaultDescriptionType(ConceptBean.get(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
 						.getUids()).getNativeId()));
-		af.setDefaultRelationshipCharacteristic(ConceptBean.get(AceConfig.vodb
+		af.setDefaultRelationshipCharacteristic(ConceptBean.get(AceConfig.getVodb()
 				.getId(
 						ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
 								.getUids()).getNativeId()));
-		af.setDefaultRelationshipRefinability(ConceptBean.get(AceConfig.vodb
+		af.setDefaultRelationshipRefinability(ConceptBean.get(AceConfig.getVodb()
 				.getId(
 						ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
 								.getUids()).getNativeId()));
-		af.setDefaultRelationshipType(ConceptBean.get(AceConfig.vodb.getId(
+		af.setDefaultRelationshipType(ConceptBean.get(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId()));
 		af
-				.setDefaultStatus(ConceptBean.get(AceConfig.vodb.getId(
+				.setDefaultStatus(ConceptBean.get(AceConfig.getVodb().getId(
 						ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
 						.getNativeId()));
 
 		af
 				.getTreeDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
 		af
 				.getTreeDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
@@ -613,14 +615,14 @@ public class AceConfig implements Serializable {
 		af
 				.getShortLabelDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
 		af
 				.getShortLabelDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
@@ -628,14 +630,14 @@ public class AceConfig implements Serializable {
 		af
 				.getLongLabelDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
 		af
 				.getLongLabelDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
@@ -643,14 +645,14 @@ public class AceConfig implements Serializable {
 		af
 				.getTableDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
 		af
 				.getTableDescPreferenceList()
 				.add(
-						vodb
+						AceConfig.getVodb()
 								.getId(
 										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 												.getUids()).getNativeId());
@@ -702,8 +704,8 @@ public class AceConfig implements Serializable {
 	}
 
 	private static void addIfNotNull(IntSet roots, I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
-		if (vodb.getId(concept.getUids()) != null) {
-			roots.add(vodb.getId(concept.getUids()).getNativeId());
+		if (AceConfig.getVodb().getId(concept.getUids()) != null) {
+			roots.add(AceConfig.getVodb().getId(concept.getUids()).getNativeId());
 		}
 	}
 
@@ -816,6 +818,10 @@ public class AceConfig implements Serializable {
 		Object old = this.username;
 		this.username = username;
 		this.changeSupport.firePropertyChange("username", old, username);
+	}
+
+	public static VodbEnv getVodb() {
+		return (VodbEnv) LocalVersionedTerminology.get();
 	}
 
 }

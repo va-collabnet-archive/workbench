@@ -12,6 +12,7 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.io.FileIO;
 
 public class BinaryChangeSetWriter implements I_WriteChangeSet {
 
@@ -49,7 +50,7 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 	public void commit() throws IOException {
 		tempOut.flush();
 		tempOut.close();
-		//tempFile.renameTo(changeSetFile);
+		tempFile.renameTo(changeSetFile);
 	}
 
 	public void open() throws IOException {
@@ -61,10 +62,8 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 			oos.flush();
 			oos.close();
 		}
-		/*
 		FileIO.copyFile(changeSetFile.getCanonicalPath(), tempFile
 				.getCanonicalPath());
-				*/
 		tempOut = new NoHeaderObjectOutputStream(new FileOutputStream(changeSetFile, true));
 	}
 

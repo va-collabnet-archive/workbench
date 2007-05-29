@@ -15,7 +15,7 @@ public class TimePathCounter extends TermCounter implements I_ProcessTimeBranch 
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateTimeBranch(this);
+		AceConfig.getVodb().iterateTimeBranch(this);
 		return null;
 	}
 }

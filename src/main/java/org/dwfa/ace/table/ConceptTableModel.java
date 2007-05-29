@@ -530,7 +530,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 								.duplicatePart();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);
-						newPart.setConceptStatus(AceConfig.vodb
+						newPart.setConceptStatus(AceConfig.getVodb()
 								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
 										.getUids()));
 						getReferencedConcepts().put(newPart.getConceptStatus(), 

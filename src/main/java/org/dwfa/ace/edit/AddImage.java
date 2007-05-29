@@ -17,7 +17,7 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.tapi.TerminologyException;
@@ -44,8 +44,8 @@ public class AddImage extends AddComponent {
 			if (format.length() > 5) {
 				throw new Exception("Illegal format extension");
 			}
-        	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-			int nativeId = AceConfig.vodb.uuidToNativeWithGeneration(UUID
+        	int idSource = LocalVersionedTerminology.get().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+			int nativeId = LocalVersionedTerminology.get().uuidToNativeWithGeneration(UUID
 					.randomUUID(), idSource,
 					config.getEditingPathSet(), Integer.MAX_VALUE);
 			FileInputStream fis = new FileInputStream(imageFile);
@@ -59,12 +59,12 @@ public class AddImage extends AddComponent {
 			List<I_ImagePart> parts = new ArrayList<I_ImagePart>(1);
 			for (I_Path p : termContainer.getConfig().getEditingPathSet()) {
 				ThinImagePart imagePart = new ThinImagePart();
-				imagePart.setStatusId(AceConfig.vodb
+				imagePart.setStatusId(LocalVersionedTerminology.get()
 						.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 				imagePart.setPathId(p.getConceptId());
 				imagePart.setVersion(Integer.MAX_VALUE);
 				imagePart.setTextDescription("");
-				imagePart.setTypeId(AceConfig.vodb
+				imagePart.setTypeId(LocalVersionedTerminology.get()
 						.uuidToNative(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids()));
 				parts.add(imagePart);
 			}
@@ -82,7 +82,7 @@ public class AddImage extends AddComponent {
 		I_Path aceAuxPath = new Path(Integer.MIN_VALUE + 1,
 				new ArrayList<I_Position>());
 
-    	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+    	int idSource = LocalVersionedTerminology.get().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 		int nativeImageId = vodb.uuidToNativeWithGeneration(UUID
 				.fromString("1c4214ec-147a-11db-ac5d-0800200c9a66"),
 				idSource, aceAuxPath,

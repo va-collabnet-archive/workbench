@@ -16,7 +16,7 @@ public class PathCounter extends TermCounter implements I_ProcessPaths {
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iteratePaths(this);
+		AceConfig.getVodb().iteratePaths(this);
 		return null;
 	}
 

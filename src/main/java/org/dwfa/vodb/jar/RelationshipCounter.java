@@ -9,7 +9,7 @@ public class RelationshipCounter extends TermCounter implements
 		I_ProcessRelationships {
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateRelationships(this);
+		AceConfig.getVodb().iterateRelationships(this);
 		return null;
 	}
 

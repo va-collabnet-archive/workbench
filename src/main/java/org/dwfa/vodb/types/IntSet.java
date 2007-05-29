@@ -120,7 +120,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 		out.writeInt(set.getSetValues().length);
         for (int i: set.getSetValues()) {
         	try {
-				out.writeObject(AceConfig.vodb.nativeToUuid(i));
+				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);
@@ -138,7 +138,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 		int[] set = new int[size];
         for (int i = 0; i < size; i++) {
         	try {
-        		set[i] = AceConfig.vodb.uuidToNative((List<UUID>) in.readObject());
+        		set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
 			} catch (Exception e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);

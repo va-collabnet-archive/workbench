@@ -22,7 +22,7 @@ public class IdWriter extends TermWriter implements I_ProcessIds {
 		count++;
 	}
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateIds(this);
+		AceConfig.getVodb().iterateIds(this);
 		dos.close();
 		return null;
 	}

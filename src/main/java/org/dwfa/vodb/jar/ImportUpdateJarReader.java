@@ -275,18 +275,18 @@ public class ImportUpdateJarReader implements ActionListener {
 					processTimePaths(jf.getInputStream(je));
 				} 
 			}
-			AceConfig.vodb.addTimeBranchValues(timePathSet);
+			AceConfig.getVodb().addTimeBranchValues(timePathSet);
 			
 			lowerProgressMessage = "Starting c1RelMap.";
-			AceConfig.vodb.createC1RelMap();
+			AceConfig.getVodb().createC1RelMap();
 			lowerProgressMessage = "Starting c2RelMap.";
-			AceConfig.vodb.createC2RelMap();
+			AceConfig.getVodb().createC2RelMap();
 			lowerProgressMessage = "Starting createIdMaps.";
-			AceConfig.vodb.createIdMaps();
+			AceConfig.getVodb().createIdMaps();
 			lowerProgressMessage = "Starting createConceptImageMap.";
-			AceConfig.vodb.createConceptImageMap();
+			AceConfig.getVodb().createConceptImageMap();
 			lowerProgressMessage = "Starting sync.";
-			AceConfig.vodb.sync();
+			AceConfig.getVodb().sync();
 
 			continueWork = false;
 			if (config != null) {
@@ -371,8 +371,8 @@ public class ImportUpdateJarReader implements ActionListener {
 
 		public void run() {
 			try {
-				if (AceConfig.vodb.hasId(jarId.getUIDs())) {
-					I_IdVersioned dbId = AceConfig.vodb.getId(jarId.getUIDs());
+				if (AceConfig.getVodb().hasId(jarId.getUIDs())) {
+					I_IdVersioned dbId = AceConfig.getVodb().getId(jarId.getUIDs());
 					boolean changed = false;
 					for (I_IdPart p : jarId.getVersions()) {
 						if (!dbId.hasVersion(p)) {
@@ -381,18 +381,18 @@ public class ImportUpdateJarReader implements ActionListener {
 						}
 					}
 					if (changed) {
-						AceConfig.vodb.writeId(dbId);
+						AceConfig.getVodb().writeId(dbId);
 						timePathSet.addAll(jarId.getTimePathSet());
 					}
 					jarToDbNativeMap.add(jarId.getNativeId(), dbId.getNativeId());
 				} else {
 					int jarNativeId = jarId.getNativeId();
 					I_IdVersioned dbId = jarId;
-		        	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-					dbId.setNativeId(AceConfig.vodb.uuidToNativeWithGeneration(jarId.getUIDs(), idSource,
+		        	int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+					dbId.setNativeId(AceConfig.getVodb().uuidToNativeWithGeneration(jarId.getUIDs(), idSource,
 							new Path(Integer.MIN_VALUE + 1,
 									new ArrayList<I_Position>()), Integer.MAX_VALUE));
-					AceConfig.vodb.writeId(dbId);
+					AceConfig.getVodb().writeId(dbId);
 					jarToDbNativeMap.add(jarNativeId, dbId.getNativeId());
 				}
 			} catch (Exception ex) {
@@ -421,15 +421,15 @@ public class ImportUpdateJarReader implements ActionListener {
 			TupleInput input = new TupleInput(buffer);
 			ThinImageVersioned jarImage = binding.entryToObject(input);
 			jarImage.convertIds(jarToDbNativeMap);
-			if (AceConfig.vodb.hasImage(jarImage
+			if (AceConfig.getVodb().hasImage(jarImage
 					.getImageId())) {
-				I_ImageVersioned dbImage = AceConfig.vodb.getImage(jarImage.getImageId());
+				I_ImageVersioned dbImage = AceConfig.getVodb().getImage(jarImage.getImageId());
 				if (dbImage.merge(jarImage)) {
-					AceConfig.vodb.writeImage(dbImage);
+					AceConfig.getVodb().writeImage(dbImage);
 					timePathSet.addAll(jarImage.getTimePathSet());
 				}
 			} else {
-				AceConfig.vodb.writeImage(jarImage);
+				AceConfig.getVodb().writeImage(jarImage);
 			}
 			processed++;
 		}
@@ -455,15 +455,15 @@ public class ImportUpdateJarReader implements ActionListener {
 			TupleInput input = new TupleInput(buffer);
 			ThinRelVersioned jarRel = binding.entryToObject(input);
 			jarRel.convertIds(jarToDbNativeMap);
-			if (AceConfig.vodb.hasRel(jarRel
+			if (AceConfig.getVodb().hasRel(jarRel
 					.getRelId())) {
-				I_RelVersioned dbRel = AceConfig.vodb.getRel(jarRel.getRelId());
+				I_RelVersioned dbRel = AceConfig.getVodb().getRel(jarRel.getRelId());
 				if (dbRel.merge(jarRel)) {
-					AceConfig.vodb.writeRel(dbRel);
+					AceConfig.getVodb().writeRel(dbRel);
 					timePathSet.addAll(jarRel.getTimePathSet());
 				}
 			} else {
-				AceConfig.vodb.writeRel(jarRel);
+				AceConfig.getVodb().writeRel(jarRel);
 			}
 			processed++;
 		}
@@ -489,15 +489,15 @@ public class ImportUpdateJarReader implements ActionListener {
 			TupleInput input = new TupleInput(buffer);
 			ThinDescVersioned jarDesc = binding.entryToObject(input);
 			jarDesc.convertIds(jarToDbNativeMap);
-			if (AceConfig.vodb.hasDescription(jarDesc
+			if (AceConfig.getVodb().hasDescription(jarDesc
 					.getDescId())) {
-				I_DescriptionVersioned dbDesc = AceConfig.vodb.getDescription(jarDesc.getDescId());
+				I_DescriptionVersioned dbDesc = AceConfig.getVodb().getDescription(jarDesc.getDescId());
 				if (dbDesc.merge(jarDesc)) {
-					AceConfig.vodb.writeDescription(dbDesc);
+					AceConfig.getVodb().writeDescription(dbDesc);
 					timePathSet.addAll(jarDesc.getTimePathSet());
 				}
 			} else {
-				AceConfig.vodb.writeDescription(jarDesc);
+				AceConfig.getVodb().writeDescription(jarDesc);
 			}
 			processed++;
 		}
@@ -522,17 +522,17 @@ public class ImportUpdateJarReader implements ActionListener {
 			TupleInput input = new TupleInput(buffer);
 			ThinConVersioned jarCon = binding.entryToObject(input);
 			jarCon.convertIds(jarToDbNativeMap);
-			if (AceConfig.vodb.hasConcept(jarCon
+			if (AceConfig.getVodb().hasConcept(jarCon
 					.getConId())) {
-				I_ConceptAttributeVersioned dbCon = AceConfig.vodb.getConcept(jarCon
+				I_ConceptAttributeVersioned dbCon = AceConfig.getVodb().getConcept(jarCon
 						.getConId());
 				if (dbCon.merge(jarCon)) {
-					AceConfig.vodb.writeConcept(dbCon);
+					AceConfig.getVodb().writeConcept(dbCon);
 					timePathSet.addAll(jarCon.getTimePathSet());
 				}
 				
 			} else {
-				AceConfig.vodb.writeConcept(jarCon);
+				AceConfig.getVodb().writeConcept(jarCon);
 			}
 			processed++;
 		}
@@ -557,11 +557,11 @@ public class ImportUpdateJarReader implements ActionListener {
 			try {
 				I_Path jarPath = pathBinder.entryToObject(input);
 				jarPath.convertIds(jarToDbNativeMap);
-				if (AceConfig.vodb.hasPath(jarPath
+				if (AceConfig.getVodb().hasPath(jarPath
 						.getConceptId())) {
 					//Nothing to do, paths don't have versioned parts
 				} else {
-					AceConfig.vodb.writePath(jarPath);
+					AceConfig.getVodb().writePath(jarPath);
 				}
 			} catch (RuntimeException e) {
 				AceLog.getAppLog().info("processing paths: " + processed);
@@ -590,7 +590,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			try {
 				TimePathId jarTimePath = (TimePathId) timePathIdBinder.entryToObject(input);
 				jarTimePath.convertIds(jarToDbNativeMap);
-				AceConfig.vodb.writeTimePath(jarTimePath);
+				AceConfig.getVodb().writeTimePath(jarTimePath);
 			} catch (RuntimeException e) {
 				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;

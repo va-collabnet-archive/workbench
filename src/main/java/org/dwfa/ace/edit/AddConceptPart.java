@@ -26,7 +26,7 @@ public class AddConceptPart extends AddComponent {
 			part.setVersion(Integer.MAX_VALUE);
 			part.setPathId(p.getConceptId());
 			part.setDefined(false);
-			part.setConceptStatus(AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+			part.setConceptStatus(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 			cb.getConceptAttributes().getVersions().add(part);
 		}
 		ACE.addUncommitted(cb);

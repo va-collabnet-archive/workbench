@@ -26,6 +26,11 @@ public class ActivityViewer {
 
 	private class ActivityViewerFrame extends ComponentFrame {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public ActivityViewerFrame() throws Exception {
 			super(null, null);
 		}

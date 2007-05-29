@@ -236,7 +236,7 @@ public class JTableWithDragImage extends JTable {
 		private Transferable transferableFromIWImgT(Object obj) throws DatabaseException {
 			ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
 			return new StringSelection("<img src='ace:"
-					+ AceConfig.vodb.nativeToUuid(iwit.tuple.getImageId())
+					+ AceConfig.getVodb().nativeToUuid(iwit.tuple.getImageId())
 					+ "'>");
 		}
 
@@ -247,7 +247,7 @@ public class JTableWithDragImage extends JTable {
 			switch (field) {
 			case IMAGE_ID:
 				return new StringSelection("<img src='ace:"
-						+ AceConfig.vodb.nativeToUuid(swit.getTuple().getImageId())
+						+ AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId())
 						+ "'>");
 			case CON_ID:
 				return new ConceptTransferable(ConceptBean.get(swit.getTuple().getConceptId()));
@@ -255,7 +255,7 @@ public class JTableWithDragImage extends JTable {
 				return new StringSelection(swit.getTuple().getTextDescription());
 			case IMAGE:
 				return new StringSelection("<img src='ace:"
-						+ AceConfig.vodb.nativeToUuid(swit.getTuple().getImageId())
+						+ AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId())
 						+ "'>");
 			case FORMAT:
 				return new StringSelection(swit.getTuple().getFormat());

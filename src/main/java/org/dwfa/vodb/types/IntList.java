@@ -47,7 +47,7 @@ public class IntList implements ListDataListener, I_IntList {
 		out.writeInt(list.size());
         for (int i: list.listValues) {
         	try {
-				out.writeObject(AceConfig.vodb.nativeToUuid(i));
+				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);
@@ -65,7 +65,7 @@ public class IntList implements ListDataListener, I_IntList {
 		int[] list = new int[size];
         for (int i = 0; i < size; i++) {
         	try {
-        		list[i] = AceConfig.vodb.uuidToNative((List<UUID>) in.readObject());
+        		list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
 			} catch (TerminologyException e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);

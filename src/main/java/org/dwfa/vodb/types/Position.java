@@ -182,7 +182,7 @@ public class Position implements Serializable, I_Position {
 	public static void writePosition(ObjectOutputStream out, I_Position p) throws IOException {
 		out.writeInt(p.getVersion());
 		try {
-			out.writeObject(AceConfig.vodb.nativeToUuid(p.getPath().getConceptId()));
+			out.writeObject(AceConfig.getVodb().nativeToUuid(p.getPath().getConceptId()));
 		} catch (DatabaseException e) {
 			IOException newEx = new IOException();
 			newEx.initCause(e);
@@ -199,7 +199,7 @@ public class Position implements Serializable, I_Position {
 		int version = in.readInt();
 		int pathConceptId;
 		try {
-			pathConceptId = AceConfig.vodb.uuidToNative((List<UUID>) in.readObject());
+			pathConceptId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
 		} catch (TerminologyException e) {
 			IOException newEx = new IOException();
 			newEx.initCause(e);

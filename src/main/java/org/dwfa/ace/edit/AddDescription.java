@@ -24,16 +24,16 @@ public class AddDescription extends AddComponent {
 			throws Exception {
 		ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
 		UUID newDescUid = UUID.randomUUID();
-    	int idSource = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-		int descId = AceConfig.vodb.uuidToNativeWithGeneration(newDescUid, idSource,
+    	int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+		int descId = AceConfig.getVodb().uuidToNativeWithGeneration(newDescUid, idSource,
 				config.getEditingPathSet(), Integer.MAX_VALUE);
 		ThinDescVersioned desc = new ThinDescVersioned(descId, cb.getConceptId(), 1);
 		ThinDescPart descPart = new ThinDescPart();
 		desc.addVersion(descPart);
 		boolean capStatus = false;
 		String lang = "en";
-		int status = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-		int typeId = AceConfig.vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+		int status = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int typeId = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
 		String text = "New Description";
 		for (I_Path p: termContainer.getConfig().getEditingPathSet()) {
 			descPart.setVersion(Integer.MAX_VALUE);

@@ -1,12 +1,11 @@
 package org.dwfa.vodb;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.jar.JarFile;
 
 import org.dwfa.ace.AceLog;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.vodb.ProcessConstants.FORMAT;
@@ -25,64 +24,60 @@ public class LoadSourcesFromJars {
 		AceLog.getAppLog().info(end.toString());
 	}
 
-	public static void loadFromSingleJar(String dbDir, String jarFile, String dataPrefix) throws Exception {
-		AceConfig.vodb = new VodbEnv();
+	public static void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
 		ProcessConstantsBerkeley loadConstants = null;
 		timer = new Stopwatch();
 		timer.start();
-		AceConfig.vodb.setup(new File(dbDir), false, 600000000L);
-		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
+		loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Starting to process " + jarFile + ": " + dataPrefix);
 		loadConstants.execute(new JarFile(jarFile), dataPrefix, FORMAT.ACE);
-		Path.writeBasePaths(AceConfig.vodb);
-		AddImage.addStockImage(AceConfig.vodb);
+		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
+		AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Finished loading " + jarFile + ". Elapsed time: "
 				+ timer.getElapsedTime());
 		printElapsedTime();
 		AceLog.getAppLog().info("Creating concept->desc map.");
-		AceConfig.vodb.getConceptDescMap();
+		((VodbEnv) LocalVersionedTerminology.get()).getConceptDescMap();
 		//Update the history records for the relationships...
 		printElapsedTime();
 
 		//monitor.setProgressInfoUpper("Starting c1RelMap.");
-		AceConfig.vodb.createC1RelMap();
+		((VodbEnv) LocalVersionedTerminology.get()).createC1RelMap();
 		printElapsedTime();
 		//monitor.setProgressInfoUpper("Starting c2RelMap.");
-		AceConfig.vodb.createC2RelMap();
+		((VodbEnv) LocalVersionedTerminology.get()).createC2RelMap();
 		printElapsedTime();
 		//monitor.setProgressInfoUpper("Starting createIdMaps.");
-		AceConfig.vodb.createIdMaps();
+		((VodbEnv) LocalVersionedTerminology.get()).createIdMaps();
 		printElapsedTime();
 		//monitor.setProgressInfoUpper("Starting createConceptImageMap.");
-		AceConfig.vodb.createConceptImageMap();
+		((VodbEnv) LocalVersionedTerminology.get()).createConceptImageMap();
 		//monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
-		AceConfig.vodb.populateTimeBranchDb();
+		((VodbEnv) LocalVersionedTerminology.get()).populateTimeBranchDb();
 		printElapsedTime();
 		//AceConfig.monitor.setProgressInfoUpper("Starting makeLuceneIndex().");
-		AceConfig.vodb.makeLuceneIndex();
+		((VodbEnv) LocalVersionedTerminology.get()).makeLuceneIndex();
 		//AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
 		printElapsedTime();
-		AceConfig.vodb.close();
+		((VodbEnv) LocalVersionedTerminology.get()).close();
 		printElapsedTime();
 	}
 
 	public static void main(String[] args) throws Exception {
-		AceConfig.vodb = new VodbEnv();
 		ProcessConstantsBerkeley loadConstants = null;
 		timer = new Stopwatch();
 		timer.start();
-		AceConfig.vodb.setup(new File(args[0]), false, 600000000L);
-		loadConstants = new ProcessConstantsBerkeley(AceConfig.vodb);
+		loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
 		loadConstants.execute(new JarFile(args[1]), "org/jehri/cement/", FORMAT.SNOMED);
 		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
-		Path.writeBasePaths(AceConfig.vodb);
-		AddImage.addStockImage(AceConfig.vodb);
+		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
+		AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
 		int[] releaseDates = loadConstants.getReleaseDates();
 		if (args.length > 2) {
 			ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
-					AceConfig.vodb, loadConstants.getConstantToIntMap(),
+					(VodbEnv) LocalVersionedTerminology.get(), loadConstants.getConstantToIntMap(),
 					releaseDates[0]);
 			AceLog.getAppLog().info("Starting to process SNOMED.");
 			loadSnomed.execute(new JarFile(args[2]));

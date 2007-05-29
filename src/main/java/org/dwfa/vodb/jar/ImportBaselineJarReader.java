@@ -231,17 +231,17 @@ public class ImportBaselineJarReader implements ActionListener {
 			}
 
 			lowerProgressMessage = "Starting c1RelMap.";
-			AceConfig.vodb.createC1RelMap();
+			AceConfig.getVodb().createC1RelMap();
 			lowerProgressMessage = "Starting c2RelMap.";
-			AceConfig.vodb.createC2RelMap();
+			AceConfig.getVodb().createC2RelMap();
 			lowerProgressMessage = "Starting createIdMaps.";
-			AceConfig.vodb.createIdMaps();
+			AceConfig.getVodb().createIdMaps();
 			lowerProgressMessage = "Starting createConceptImageMap.";
-			AceConfig.vodb.createConceptImageMap();
+			AceConfig.getVodb().createConceptImageMap();
 			lowerProgressMessage = "Starting populateTimeBranchDb().";
-			AceConfig.vodb.populateTimeBranchDb();
+			AceConfig.getVodb().populateTimeBranchDb();
 			lowerProgressMessage = "Starting sync.";
-			AceConfig.vodb.sync();
+			AceConfig.getVodb().sync();
 			
 			continueWork = false;
 			if (config != null) {
@@ -294,7 +294,7 @@ public class ImportBaselineJarReader implements ActionListener {
 				}
 				TupleInput input = new TupleInput(buffer);
 				I_IdVersioned jarId = binding.entryToObject(input);
-				AceConfig.vodb.writeId(jarId);
+				AceConfig.getVodb().writeId(jarId);
 				processed++;
 			} catch (Throwable e) {
 				AceLog.getAppLog().info("processed: " + processed);
@@ -323,7 +323,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			}
 			TupleInput input = new TupleInput(buffer);
 			I_ImageVersioned jarImage = binding.entryToObject(input);
-			AceConfig.vodb.writeImage(jarImage);
+			AceConfig.getVodb().writeImage(jarImage);
 			processed++;
 		}
 		dis.close();
@@ -347,7 +347,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			}
 			TupleInput input = new TupleInput(buffer);
 			I_RelVersioned jarRel = binding.entryToObject(input);
-			AceConfig.vodb.writeRel(jarRel);
+			AceConfig.getVodb().writeRel(jarRel);
 			processed++;
 		}
 		dis.close();
@@ -371,7 +371,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			}
 			TupleInput input = new TupleInput(buffer);
 			I_DescriptionVersioned jarDesc = binding.entryToObject(input);
-			AceConfig.vodb.writeDescription(jarDesc);
+			AceConfig.getVodb().writeDescription(jarDesc);
 			processed++;
 		}
 		dis.close();
@@ -394,7 +394,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			}
 			TupleInput input = new TupleInput(buffer);
 			I_ConceptAttributeVersioned jarCon = binding.entryToObject(input);
-			AceConfig.vodb.writeConcept(jarCon);
+			AceConfig.getVodb().writeConcept(jarCon);
 			processed++;
 		}
 		dis.close();
@@ -417,7 +417,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			TupleInput input = new TupleInput(buffer);
 			try {
 				I_Path jarPath = pathBinder.entryToObject(input);
-				AceConfig.vodb.writePath(jarPath);
+				AceConfig.getVodb().writePath(jarPath);
 			} catch (RuntimeException e) {
 				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;
@@ -444,7 +444,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			TupleInput input = new TupleInput(buffer);
 			try {
 				TimePathId jarTimePath = (TimePathId) timePathIdBinder.entryToObject(input);
-				AceConfig.vodb.writeTimePath(jarTimePath);
+				AceConfig.getVodb().writeTimePath(jarTimePath);
 			} catch (RuntimeException e) {
 				AceLog.getAppLog().info("processing paths: " + processed);
 				throw e;

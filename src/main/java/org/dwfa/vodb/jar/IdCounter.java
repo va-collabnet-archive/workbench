@@ -8,7 +8,7 @@ import com.sleepycat.je.DatabaseEntry;
 public class IdCounter extends TermCounter implements I_ProcessIds {
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateIds(this);
+		AceConfig.getVodb().iterateIds(this);
 		return null;
 	}
 

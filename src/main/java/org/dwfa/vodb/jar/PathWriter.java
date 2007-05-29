@@ -25,7 +25,7 @@ public class PathWriter extends TermWriter implements I_ProcessPaths {
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iteratePaths(this);
+		AceConfig.getVodb().iteratePaths(this);
 		dos.close();
 		return null;
 	}

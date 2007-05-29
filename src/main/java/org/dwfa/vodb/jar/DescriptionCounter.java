@@ -17,7 +17,7 @@ public class DescriptionCounter extends TermCounter implements
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateDescriptions(this);
+		AceConfig.getVodb().iterateDescriptions(this);
 		return null;
 	}
 

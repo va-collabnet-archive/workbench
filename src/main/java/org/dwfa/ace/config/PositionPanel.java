@@ -89,7 +89,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         public void run() {
             try {
             	dates = new ArrayList<Date>();
-            	for (TimePathId tp: AceConfig.vodb.getTimePathList()) {
+            	for (TimePathId tp: AceConfig.getVodb().getTimePathList()) {
             		if (tp.getPathId() == path.getConceptId()) {
             			dates.add(new Date(ThinVersionHelper.convert(tp.getTime())));
             		}

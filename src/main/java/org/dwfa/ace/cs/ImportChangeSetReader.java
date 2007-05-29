@@ -152,7 +152,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 			reader.read();
 			
 			lowerProgressMessage = "Starting sync ";
-			AceConfig.vodb.sync();
+			AceConfig.getVodb().sync();
 			upperProgressMessage = "Import complete";
 			lowerProgressMessage = "Finished sync. Components imported: ";
 

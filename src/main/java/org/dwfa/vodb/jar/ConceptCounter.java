@@ -15,7 +15,7 @@ public class ConceptCounter extends TermCounter implements I_ProcessConcepts {
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateConcepts(this);
+		AceConfig.getVodb().iterateConcepts(this);
 		return null;
 	}
 

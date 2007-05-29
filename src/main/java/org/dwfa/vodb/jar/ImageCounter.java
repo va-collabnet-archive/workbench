@@ -16,7 +16,7 @@ public class ImageCounter extends TermCounter implements I_ProcessImages {
 	}
 
 	public Object call() throws Exception {
-		AceConfig.vodb.iterateImages(this);
+		AceConfig.getVodb().iterateImages(this);
 		return null;
 	}
 
