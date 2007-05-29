@@ -45,6 +45,7 @@ public class AttachmentListEmpty extends AbstractTask {
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
 	 */
+	@SuppressWarnings("unchecked")
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 	    try {

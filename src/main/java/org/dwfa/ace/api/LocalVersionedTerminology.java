@@ -30,5 +30,6 @@ public class LocalVersionedTerminology {
 	public static void openDefaultFactory(File envHome, boolean readOnly, Long cacheSize) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 		open((Class<I_ImplementTermFactory>) Class.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly, cacheSize);
 	}
+	
 }
 

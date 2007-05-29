@@ -17,7 +17,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;

@@ -68,4 +68,29 @@ public interface I_TermFactory {
 	public void forget(I_RelVersioned rel);
 	
 	public void addUncommitted(I_GetConceptData concept);
+	
+	public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception;
+	/**
+	 * 
+	 * @param args
+	 * @throws Exception
+	 * @deprecated use loadFromSingleJar
+	 */
+	public void loadFromMultipleJars(String[] args) throws Exception;
+	
+	public int uuidToNative(UUID uid) throws TerminologyException, IOException;
+
+	public int uuidToNative(Collection<UUID> uids) throws TerminologyException,
+			IOException;
+	
+	public int uuidToNativeWithGeneration(Collection<UUID> uids, int source,
+			I_Path idPath, int version) throws TerminologyException,
+			IOException;
+	
+	public int uuidToNativeWithGeneration(UUID uid, int source,
+			Collection<I_Path> idPaths, int version)
+			throws TerminologyException, IOException;
+	
+	public int uuidToNativeWithGeneration(UUID uid, int source, I_Path idPath,
+			int version) throws TerminologyException, IOException;
 }

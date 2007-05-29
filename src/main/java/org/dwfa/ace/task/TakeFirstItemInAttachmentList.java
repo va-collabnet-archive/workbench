@@ -60,6 +60,7 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
