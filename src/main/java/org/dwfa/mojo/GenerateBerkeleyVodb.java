@@ -12,8 +12,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
-import org.dwfa.vodb.LoadSourcesFromJars;
 
 /**
  * Goal which touches a timestamp file.
@@ -105,9 +105,11 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 				}
 
 				if (dataLocationInJar == null) {
-					LoadSourcesFromJars.main(args);
+					LocalVersionedTerminology.openDefaultFactory(outputDirectory, false, 600000000L);
+					LocalVersionedTerminology.get().loadFromMultipleJars(args);
 				} else {
-					LoadSourcesFromJars.loadFromSingleJar(args[0], args[1], dataLocationInJar);
+					LocalVersionedTerminology.openDefaultFactory(outputDirectory, false, 600000000L);
+					LocalVersionedTerminology.get().loadFromSingleJar(args[1], dataLocationInJar);
 				}
 
 			} catch (Exception ex) {
