@@ -17,6 +17,9 @@ public class IdentityTransformWithQuoteDelimiters extends AbstractTransform impl
 			for (int i = 0; i < input.length(); i++) {
 				char c = input.charAt(i);
 				sb.append(c);
+				if (c == '"') {
+					sb.append('"');
+				}	
 			}
 			sb.append('"');
 			return setLastTransform(sb.toString());
