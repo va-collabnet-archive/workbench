@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -21,58 +22,67 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * Takes/removes the first item in a specified attachment list.
+ * @author Christine Hill
+ *
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
 public class TakeFirstItemInAttachmentList extends AbstractTask {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
     private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
 
     private String conceptKey = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
         out.writeObject(listName);
         out.writeObject(conceptKey);
-	}
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
             listName = (String) in.readObject();
             conceptKey = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	}
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    public void complete(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
+        // Nothing to do...
 
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
+    @SuppressWarnings("unchecked")
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
+        try {
             ArrayList<Collection<UUID>> temporaryList =
                 (ArrayList<Collection<UUID>>) process.readProperty(listName);
 
-			I_GetConceptData concept = LocalVersionedTerminology.get().getConcept((Collection<UUID>) temporaryList.remove(0));
+            if (worker.getLogger().isLoggable(Level.FINE)) {
+                worker.getLogger().fine(("Removing first item in attachment list."));
+            }
+
+            I_GetConceptData concept = LocalVersionedTerminology.get().getConcept((Collection<UUID>) temporaryList.remove(0));
 
             process.setProperty(this.conceptKey, concept);
-			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
@@ -81,18 +91,18 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
-		} catch (IOException e) {
+        } catch (IOException e) {
             throw new TaskFailedException(e);
-		}
-	}
+        }
+    }
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
     public String getListName() {
         return listName;

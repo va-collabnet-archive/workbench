@@ -23,14 +23,12 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Creates a new attachment list based on an (initially) hardcoded file name.
- * The file name may also be edited as a text string via the user interface.
- * The file should consist of a list of UUIDs.
+ * Creates an attachment list based on a previously selected file.
  * @author Christine Hill
  *
  */
 @BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
-public class NewAttachmentListFromFile extends AbstractTask {
+public class NewAttachmentListFromChosenFile extends AbstractTask {
 
     /**
      *
@@ -39,14 +37,27 @@ public class NewAttachmentListFromFile extends AbstractTask {
 
     private static final int dataVersion = 1;
 
+
+    /**
+     * The key used by file attachment.
+     */
+    private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
+
+    /**
+     * The input file name.
+     */
     private String fileName = "C:/working/au-ct/change-sets/target/classes/change-sets/Concepts_modified.txt";
 
+    /**
+     * The name/key of the attachment list.
+     */
     private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(fileName);
         out.writeObject(listName);
+        out.writeObject(fileKey);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -55,6 +66,7 @@ public class NewAttachmentListFromFile extends AbstractTask {
         if (objDataVersion == dataVersion) {
             fileName = (String) in.readObject();
             listName = (String) in.readObject();
+            fileKey = (String) in.readObject();
         } else {
             throw new IOException(
                     "Can't handle dataversion: " + objDataVersion);
@@ -69,18 +81,23 @@ public class NewAttachmentListFromFile extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
         try {
+            fileName = (String) process.readProperty(fileKey);
 
             ArrayList<Collection<UUID>> temporaryList
                     = new ArrayList<Collection<UUID>>();
 
-            if (worker.getLogger().isLoggable(Level.FINE)) {
-                worker.getLogger().fine(("Reading in file: " + fileName));
+            if (worker.getLogger().isLoggable(Level.INFO)) {
+                worker.getLogger().info(("Reading in file: " + fileName));
             }
 
             BufferedReader in = new BufferedReader(new FileReader(fileName));
 
+            // read file into list
             String currentLine = in.readLine();
             while (currentLine != null) {
+                if (worker.getLogger().isLoggable(Level.FINE)) {
+                    worker.getLogger().fine(("From file: " + currentLine));
+                }
                 LinkedList<UUID> list = new LinkedList<UUID>();
                 list.add(UUID.fromString(currentLine));
                 temporaryList.add(list);
@@ -88,6 +105,7 @@ public class NewAttachmentListFromFile extends AbstractTask {
             }
 
             in.close();
+
             process.setProperty(this.listName, temporaryList);
 
             return Condition.CONTINUE;
@@ -126,5 +144,13 @@ public class NewAttachmentListFromFile extends AbstractTask {
 
     public void setListName(String listName) {
         this.listName = listName;
+    }
+
+    public String getFileKey() {
+        return fileKey;
+    }
+
+    public void setFileKey(String fileKey) {
+        this.fileKey = fileKey;
     }
 }

@@ -7,11 +7,12 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+/**
+ * Bean info for AttachmentListEmpty class.
+ */
 public class AttachmentListEmptyBeanInfo extends SimpleBeanInfo {
 
-    /**
-     *
-     */
+
     public AttachmentListEmptyBeanInfo() {
         super();
      }

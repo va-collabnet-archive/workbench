@@ -24,7 +24,11 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-
+/**
+ * Copies items from the editor's concept list to an attachment list.
+ * @author Christine Hill
+ *
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
 public class CopyItemsToNewList extends AbstractTask {
 
@@ -72,7 +76,7 @@ public class CopyItemsToNewList extends AbstractTask {
             for (int i = 0; i < model.getSize(); i++) {
                 temporaryList.add(((I_GetConceptData) model.getElementAt(i)).getUids());
                 if (worker.getLogger().isLoggable(Level.FINE)) {
-                    worker.getLogger().fine(("Adding concept to temporary list: "
+                    worker.getLogger().fine(("Adding concept to attachment list: "
                             + (I_GetConceptData) model.getElementAt(i)));
                 }
             }
@@ -89,7 +93,7 @@ public class CopyItemsToNewList extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IOException e) {
             throw new TaskFailedException(e);
-		}
+        }
     }
 
     public int[] getDataContainerIds() {

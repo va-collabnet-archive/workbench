@@ -5,14 +5,14 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
+/**
+ *  Bean info for NewAttachmentListFromFile.
+ *  @author Christine Hill
+ */
 public class NewAttachmentListFromFileBeanInfo extends SimpleBeanInfo {
 
-    /**
-     *
-     */
     public NewAttachmentListFromFileBeanInfo() {
         super();
      }

@@ -7,6 +7,11 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+/**
+ * Bean info for CopyItemsToNewList class.
+ * @author Christine Hill
+ *
+ */
 public class CopyItemsToNewListBeanInfo extends SimpleBeanInfo {
 
     /**

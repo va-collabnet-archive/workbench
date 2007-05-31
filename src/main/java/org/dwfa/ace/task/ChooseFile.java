@@ -1,17 +1,14 @@
 package org.dwfa.ace.task;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.beans.IntrospectionException;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.logging.Level;
-import java.util.LinkedList;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -23,14 +20,12 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Creates a new attachment list based on an (initially) hardcoded file name.
- * The file name may also be edited as a text string via the user interface.
- * The file should consist of a list of UUIDs.
+ * Opens a file dialog so that user can choose a file location.
  * @author Christine Hill
  *
  */
 @BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
-public class NewAttachmentListFromFile extends AbstractTask {
+public class ChooseFile extends AbstractTask {
 
     /**
      *
@@ -39,14 +34,20 @@ public class NewAttachmentListFromFile extends AbstractTask {
 
     private static final int dataVersion = 1;
 
+    /**
+     * The input file path.
+     */
     private String fileName = "C:/working/au-ct/change-sets/target/classes/change-sets/Concepts_modified.txt";
 
-    private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
+    /**
+     * The key used by file attachment.
+     */
+    private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(fileName);
-        out.writeObject(listName);
+        out.writeObject(fileKey);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -54,7 +55,7 @@ public class NewAttachmentListFromFile extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             fileName = (String) in.readObject();
-            listName = (String) in.readObject();
+            fileKey = (String) in.readObject();
         } else {
             throw new IOException(
                     "Can't handle dataversion: " + objDataVersion);
@@ -69,26 +70,21 @@ public class NewAttachmentListFromFile extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
         try {
+            // prompt for location of file
+            FileDialog dialog = new FileDialog(new Frame(),
+                "Please select a file");
+            dialog.setVisible(true);
+            fileName = dialog.getDirectory() + dialog.getFile();
 
-            ArrayList<Collection<UUID>> temporaryList
-                    = new ArrayList<Collection<UUID>>();
-
-            if (worker.getLogger().isLoggable(Level.FINE)) {
-                worker.getLogger().fine(("Reading in file: " + fileName));
+            if (fileName == null) {
+                throw new TaskFailedException("User failed to select a file.");
             }
 
-            BufferedReader in = new BufferedReader(new FileReader(fileName));
-
-            String currentLine = in.readLine();
-            while (currentLine != null) {
-                LinkedList<UUID> list = new LinkedList<UUID>();
-                list.add(UUID.fromString(currentLine));
-                temporaryList.add(list);
-                currentLine = in.readLine();
+            if (worker.getLogger().isLoggable(Level.INFO)) {
+                worker.getLogger().info(("Selected file: " + fileName));
             }
 
-            in.close();
-            process.setProperty(this.listName, temporaryList);
+            process.setProperty(this.fileKey, fileName);
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -98,8 +94,6 @@ public class NewAttachmentListFromFile extends AbstractTask {
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
             throw new TaskFailedException(e);
         }
     }
@@ -120,11 +114,11 @@ public class NewAttachmentListFromFile extends AbstractTask {
         this.fileName = fileName;
     }
 
-    public String getListName() {
-        return listName;
+    public String getFileKey() {
+        return fileKey;
     }
 
-    public void setListName(String listName) {
-        this.listName = listName;
+    public void setFileKey(String fileKey) {
+        this.fileKey = fileKey;
     }
 }
