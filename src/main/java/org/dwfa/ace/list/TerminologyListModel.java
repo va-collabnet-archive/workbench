@@ -6,9 +6,9 @@ import java.util.List;
 
 import javax.swing.AbstractListModel;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.log.AceLog;
 
 public class TerminologyListModel extends AbstractListModel implements I_ModelTerminologyList {
 

@@ -10,7 +10,7 @@ import java.util.jar.JarFile;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.dwfa.ace.AceLog;
+import org.dwfa.ace.log.AceLog;
 
 public class JarExtractor {
 	public static void main(String[] args) {

@@ -7,8 +7,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.bind.ThinDescVersionedBinding;
 import org.dwfa.vodb.types.ThinDescVersioned;
 

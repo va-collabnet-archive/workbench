@@ -25,7 +25,6 @@ import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_DoConceptDrop;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.SmallProgressPanel;
@@ -39,6 +38,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;

@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 

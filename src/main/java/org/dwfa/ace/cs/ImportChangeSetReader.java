@@ -18,7 +18,6 @@ import javax.swing.Timer;
 import net.jini.config.Configuration;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -26,6 +25,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.vodb.bind.ThinDescVersionedBinding;

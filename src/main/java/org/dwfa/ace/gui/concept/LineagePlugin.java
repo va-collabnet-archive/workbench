@@ -22,11 +22,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.vodb.types.ConceptBean;

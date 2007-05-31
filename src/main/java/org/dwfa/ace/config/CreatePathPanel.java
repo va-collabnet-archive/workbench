@@ -17,12 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;

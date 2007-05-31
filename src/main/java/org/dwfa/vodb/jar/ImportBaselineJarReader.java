@@ -23,7 +23,6 @@ import javax.swing.Timer;
 import net.jini.config.Configuration;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -36,6 +35,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.vodb.bind.PathBinder;

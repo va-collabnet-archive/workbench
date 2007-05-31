@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
+import org.dwfa.ace.log.AceLog;
 
 public class Abort implements ActionListener {
 

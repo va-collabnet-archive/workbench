@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.jar.JarFile;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.edit.AddImage;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.vodb.ProcessConstants.FORMAT;
 import org.dwfa.vodb.types.Path;

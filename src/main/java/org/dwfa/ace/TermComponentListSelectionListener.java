@@ -11,6 +11,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class TermComponentListSelectionListener implements

@@ -29,12 +29,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -162,6 +162,7 @@ public class AceConfig implements Serializable {
 					cacheSize = null;
 				}
 				try {
+					LocalVersionedTerminology.set(new VodbEnv());
 					AceConfig.getVodb().setup(dbFolder, readOnly, cacheSize);
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);

@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 
 import javax.mail.AuthenticationFailedException;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.svn.SvnPrompter;
 
 public class ChangeEnvironmentPassword implements ActionListener {

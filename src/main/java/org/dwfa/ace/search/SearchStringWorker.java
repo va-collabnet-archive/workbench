@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.Timer;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.types.ThinDescVersioned;

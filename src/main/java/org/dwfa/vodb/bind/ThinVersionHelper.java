@@ -3,7 +3,7 @@ package org.dwfa.vodb.bind;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.dwfa.ace.AceLog;
+import org.dwfa.ace.log.AceLog;
 
 
 /**

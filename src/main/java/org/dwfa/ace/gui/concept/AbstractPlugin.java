@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JToggleButton;
 
-import org.dwfa.ace.AceLog;
+import org.dwfa.ace.log.AceLog;
 
 public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener {
 

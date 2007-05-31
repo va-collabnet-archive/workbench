@@ -5,9 +5,9 @@ import java.io.IOException;
 import javax.swing.ImageIcon;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ConflictPlugin extends AbstractPlugin {

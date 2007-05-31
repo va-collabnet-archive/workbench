@@ -39,13 +39,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 import com.sleepycat.je.DatabaseException;

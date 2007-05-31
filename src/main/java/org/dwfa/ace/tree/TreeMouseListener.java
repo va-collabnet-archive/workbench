@@ -11,9 +11,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.log.AceLog;
 
 public class TreeMouseListener implements MouseListener {
 

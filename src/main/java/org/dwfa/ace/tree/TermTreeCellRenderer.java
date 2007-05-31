@@ -16,9 +16,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class TermTreeCellRenderer extends DefaultTreeCellRenderer {

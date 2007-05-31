@@ -30,12 +30,12 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.DescriptionTransferable;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;

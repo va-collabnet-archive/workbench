@@ -2,7 +2,7 @@ package org.dwfa.svn;
 
 
 
-import org.dwfa.ace.AceLog;
+import org.dwfa.ace.log.AceLog;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.NodeKind;
 import org.tigris.subversion.javahl.Notify2;

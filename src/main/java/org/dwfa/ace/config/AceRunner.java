@@ -17,8 +17,8 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.fd.FileDialogUtil;
 

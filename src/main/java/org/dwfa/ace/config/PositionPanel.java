@@ -30,11 +30,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.gui.GridBagPanel;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.vodb.bind.ThinVersionHelper;

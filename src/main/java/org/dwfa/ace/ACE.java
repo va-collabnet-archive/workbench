@@ -101,6 +101,7 @@ import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.tree.ConceptBeanForTree;

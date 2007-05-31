@@ -3,10 +3,10 @@ package org.dwfa.vodb;
 import java.io.File;
 import java.util.logging.Level;
 
-import org.dwfa.ace.AceLog;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.edit.AddImage;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.vodb.types.Path;
 

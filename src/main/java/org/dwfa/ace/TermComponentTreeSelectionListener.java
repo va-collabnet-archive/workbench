@@ -10,6 +10,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
 import org.dwfa.vodb.types.ConceptBean;
 

@@ -17,7 +17,7 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
-import org.dwfa.ace.AceLog;
+import org.dwfa.ace.log.AceLog;
 
 public class AceTransferAction extends AbstractAction implements UIResource {
 
