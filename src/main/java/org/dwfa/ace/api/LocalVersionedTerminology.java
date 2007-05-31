@@ -3,6 +3,8 @@ package org.dwfa.ace.api;
 import java.io.File;
 import java.io.IOException;
 
+import org.dwfa.ace.log.AceLog;
+
 
 public class LocalVersionedTerminology {
 	private static I_TermFactory factory;
@@ -14,6 +16,7 @@ public class LocalVersionedTerminology {
 	public static void set(I_TermFactory factory) {
 		if (LocalVersionedTerminology.factory == null ||
 				LocalVersionedTerminology.factory == factory) {
+			AceLog.getAppLog().info("Setting LocalVersionedTerminology to: " + factory);
 			LocalVersionedTerminology.factory = factory;
 		} else {
 			throw new RuntimeException("LocalVersionedTerminology.factory is already set to: " + LocalVersionedTerminology.factory);
