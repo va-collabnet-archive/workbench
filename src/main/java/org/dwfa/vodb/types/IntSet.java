@@ -50,6 +50,10 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 * @see org.dwfa.ace.api.I_IntSet#add(int)
 	 */
 	public void add(int key) {
+		addNoIntervalAdded(key);
+		intervalAdded(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
+	}
+	private void addNoIntervalAdded(int key) {
 		if (setValues.length == 0) {
 			setValues = new int[1];
 			setValues[0] = key;
@@ -74,6 +78,10 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 * @see org.dwfa.ace.api.I_IntSet#remove(int)
 	 */
 	public void remove(int key) {
+		removeNoIntervalRemoved(key);
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
+	}
+	private void removeNoIntervalRemoved(int key) {
 		int insertionPoint = Arrays.binarySearch(setValues, key);
 		if (insertionPoint < 0) {
 			return;
@@ -93,8 +101,9 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 */
 	public void addAll(int[] keys) {
 		for (int i = 0; i < keys.length; i++) {
-			add(keys[i]);
+			addNoIntervalAdded(keys[i]);
 		}
+		intervalAdded(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
@@ -103,6 +112,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 		for (int i = 0; i < keys.length; i++) {
 			remove(keys[i]);
 		}
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
 	}
 	
 	/* (non-Javadoc)
@@ -110,6 +120,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 */
 	public void clear() {
 		setValues = new int[0];
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
 	}
 	
 	public static void writeIntSet(ObjectOutputStream out, I_IntSet set) throws IOException {
@@ -153,7 +164,9 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 * @see org.dwfa.ace.api.I_IntSet#contentsChanged(javax.swing.event.ListDataEvent)
 	 */
 	public void contentsChanged(ListDataEvent e) {
-		handleChange(e);
+		if (e.getSource() != this) {
+			handleChange(e);
+		}
 		for (ListDataListener l: listeners) {
 			l.contentsChanged(e);
 		}
@@ -172,7 +185,9 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 * @see org.dwfa.ace.api.I_IntSet#intervalAdded(javax.swing.event.ListDataEvent)
 	 */
 	public void intervalAdded(ListDataEvent e) {
-		handleChange(e);
+		if (e.getSource() != this) {
+			handleChange(e);
+		}
 		for (ListDataListener l: listeners) {
 			l.intervalAdded(e);
 		}
@@ -182,7 +197,9 @@ public class IntSet implements ListDataListener, I_IntSet {
 	 * @see org.dwfa.ace.api.I_IntSet#intervalRemoved(javax.swing.event.ListDataEvent)
 	 */
 	public void intervalRemoved(ListDataEvent e) {
-		handleChange(e);
+		if (e.getSource() != this) {
+			handleChange(e);
+		}
 		for (ListDataListener l: listeners) {
 			l.intervalRemoved(e);
 		}

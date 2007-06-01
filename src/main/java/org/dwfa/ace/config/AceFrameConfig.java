@@ -18,6 +18,8 @@ import java.util.UUID;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -351,15 +353,34 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
-
+        addListeners();
     }
 
 
 	public AceFrameConfig(AceConfig masterConfig) {
 		super();
 		this.masterConfig = masterConfig;
+        addListeners();
 	}
 
+	private void addListeners() {
+		this.roots.addListDataListener(new ListDataListener() {
+
+			public void contentsChanged(ListDataEvent e) {
+				changeSupport.firePropertyChange("roots", null, roots);
+			}
+
+			public void intervalAdded(ListDataEvent e) {
+				changeSupport.firePropertyChange("roots", null, roots);
+			}
+
+			public void intervalRemoved(ListDataEvent e) {
+				changeSupport.firePropertyChange("roots", null, roots);
+			}
+			
+		});
+		
+	}
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#isActive()

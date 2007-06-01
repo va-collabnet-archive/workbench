@@ -1335,7 +1335,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void populateTimeBranchDb() throws Exception {
 		Set<TimePathId> values = new HashSet<TimePathId>();
 		DescChangesProcessor p = new DescChangesProcessor(values);
-		iterateDescriptions(p);
+		iterateDescriptionEntries(p);
 		iterateConcepts(p);
 		iterateRelationships(p);
 		addTimeBranchValues(values);
@@ -1391,7 +1391,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	}
 
-	public void iterateDescriptions(I_ProcessDescriptionEntries processor)
+	public void iterateDescriptionEntries(I_ProcessDescriptionEntries processor)
 			throws Exception {
 		Cursor descCursor = getDescDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
@@ -2316,14 +2316,14 @@ public class VodbEnv implements I_ImplementTermFactory {
 			throws Exception {
 		ProcessorWrapper wrapper = new ProcessorWrapper();
 		wrapper.setDescProcessor(processor);
-		iterateDescriptions(wrapper);
+		iterateDescriptionEntries(wrapper);
 	}
 
 	public void iterateIds(org.dwfa.ace.api.I_ProcessIds processor)
 			throws Exception {
 		ProcessorWrapper wrapper = new ProcessorWrapper();
 		wrapper.setIdProcessor(processor);
-		iterateConcepts(wrapper);
+		iterateIdEntries(wrapper);
 	}
 
 	public void iterateImages(I_ProcessImages processor) throws Exception {
@@ -2334,15 +2334,16 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	public void iteratePaths(I_ProcessPaths processor) throws Exception {
-		// TODO Auto-generated method stub
-
+		ProcessorWrapper wrapper = new ProcessorWrapper();
+		wrapper.setPathProcessor(processor);
+		iteratePaths(wrapper);
 	}
 
 	public void iterateRelationships(I_ProcessRelationships processor)
 			throws Exception {
 		ProcessorWrapper wrapper = new ProcessorWrapper();
 		wrapper.setRelProcessor(processor);
-		iterateConcepts(wrapper);
+		iterateRelationships(wrapper);
 	}
 
 }

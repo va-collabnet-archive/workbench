@@ -68,6 +68,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -1424,6 +1425,17 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	JComponent getHierarchyPanel() {
+		if (tree != null) {
+			for (TreeExpansionListener tel: tree.getTreeExpansionListeners()) {
+				tree.removeTreeExpansionListener(tel);
+			}
+			for (TreeSelectionListener tsl: tree.getTreeSelectionListeners()) {
+				tree.removeTreeSelectionListener(tsl);
+			}
+			for (TreeWillExpandListener twel: tree.getTreeWillExpandListeners()) {
+				tree.removeTreeWillExpandListener(twel);
+			}
+		}
 		tree = new JTreeWithDragImage(aceFrameConfig);
 		tree.putClientProperty("JTree.lineStyle", "None");
 		tree.addMouseListener(new TreeMouseListener(aceFrameConfig));
@@ -1923,6 +1935,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					importHistoryTableModel.addElement((ConceptBean) t);
 				}
 			}
+		} else if (evt.getPropertyName().equals("roots")) {
+			termTreeConceptSplit.setLeftComponent(getHierarchyPanel());
 		}
 	}
 
