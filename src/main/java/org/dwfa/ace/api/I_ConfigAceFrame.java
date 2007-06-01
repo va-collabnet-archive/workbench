@@ -197,5 +197,21 @@ public interface I_ConfigAceFrame {
 	public List<String> getSelectedAddresses();
 	
 	public Map<String, SubversionData> getSubversionMap();
+	
+	public void setShowHierarchyView(boolean shown);
+	
+	public void showListView();
+	
+	public void setShowAddresses(boolean shown);
+	
+	public void setShowComponentView(boolean shown);
+	
+	public void setShowSearch(boolean shown);
+	
+	public void performLuceneSearch(String query, I_GetConceptData root);
+	
+	public void setShowPreferences(boolean shown);
+	
+	public void setShowHistory(boolean shown);
 
 }

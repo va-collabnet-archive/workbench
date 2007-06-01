@@ -93,4 +93,12 @@ public interface I_TermFactory {
 	
 	public int uuidToNativeWithGeneration(UUID uid, int source, I_Path idPath,
 			int version) throws TerminologyException, IOException;
+	
+	public void iterateDescriptions(I_ProcessDescriptions processor) throws Exception;
+	public void iterateRelationships(I_ProcessRelationships processor) throws Exception;
+	public void iterateConceptAttributes(I_ProcessConceptAttributes processor) throws Exception;
+	public void iterateIds(I_ProcessIds processor) throws Exception;
+	public void iterateImages(I_ProcessImages processor) throws Exception;
+	public void iteratePaths(I_ProcessPaths processor) throws Exception;
+
 }
