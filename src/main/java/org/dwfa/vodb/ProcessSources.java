@@ -17,6 +17,7 @@ package org.dwfa.vodb;
  * limitations under the License.
  */
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -47,6 +48,67 @@ public abstract class ProcessSources  {
 	public ProcessSources(boolean skipFirstLine) throws DatabaseException {
 		super();
 		this.skipFirstLine = skipFirstLine;
+	}
+
+	public void readLicitWords(BufferedReader br) throws IOException {
+		long start = System.currentTimeMillis();
+		int licitWords = 0;
+		StreamTokenizer st = new StreamTokenizer(br);
+		st.resetSyntax();
+		st.wordChars('\u001F', '\u00FF');
+		st.whitespaceChars('\t', '\t');
+		st.eolIsSignificant(true);
+
+		int tokenType = st.nextToken();
+		while (tokenType != StreamTokenizer.TT_EOF) {
+			writeLicitWord(st.sval);
+			licitWords++;
+			
+			// CR or LF
+			tokenType = st.nextToken();
+			if (tokenType == 13) { // is CR
+				// LF
+				tokenType = st.nextToken();
+			}
+
+			// Beginning of loop
+			tokenType = st.nextToken();
+		}
+		getLog().info(
+				"Process time: " + (System.currentTimeMillis() - start)
+						+ " Parsed licit words: " + licitWords);
+	}
+
+	public abstract void writeLicitWord(String word) throws IOException;
+	public abstract void writeIllicitWord(String word) throws IOException;
+	public abstract void optimizeLicitWords() throws IOException;
+
+	public void readIllicitWords(BufferedReader br) throws Exception {
+		long start = System.currentTimeMillis();
+		int illicitWords = 0;
+		StreamTokenizer st = new StreamTokenizer(br);
+		st.resetSyntax();
+		st.wordChars('\u001F', '\u00FF');
+		st.whitespaceChars('\t', '\t');
+		st.eolIsSignificant(true);
+		int tokenType = st.nextToken();
+		while (tokenType != StreamTokenizer.TT_EOF) {
+			writeIllicitWord(st.sval);
+			illicitWords++;
+			
+			// CR or LF
+			tokenType = st.nextToken();
+			if (tokenType == 13) { // is CR
+				// LF
+				tokenType = st.nextToken();
+			}
+
+			// Beginning of loop
+			tokenType = st.nextToken();
+		}
+		getLog().info(
+				"Process time: " + (System.currentTimeMillis() - start)
+						+ " Parsed illicit words: " + illicitWords);
 	}
 
 	protected void readConcepts(Reader r,

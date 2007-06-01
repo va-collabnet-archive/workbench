@@ -212,6 +212,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private ActivityPanel activity;
 
+	private File licitWordsDir;
+
+	private File illicitWordsDir;
+
 	/**
 	 * @todo find out of all secondary databases have to be opened when the
 	 *       primary is opened? How do they get updated, etc?
@@ -246,6 +250,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 			LocalFixedTerminology.setStore(new VodbFixedServer(this));
 			envHome.mkdirs();
 			luceneDir = new File(envHome, "lucene");
+			licitWordsDir = new File(envHome, "lucene-licit");
+			illicitWordsDir = new File(envHome, "lucene-illicit");
 
 			EnvironmentConfig envConfig = new EnvironmentConfig();
 			if (cacheSize != null) {
@@ -1147,7 +1153,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		if (luceneDir.exists() == false) {
 			updater
 					.setProgressInfo("Making lucene index -- this may take a while...");
-			makeLuceneIndex();
+			makeLuceneDescriptionIndex();
 		}
 		updater.setIndeterminate(true);
 		if (luceneSearcher == null) {
@@ -1179,7 +1185,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 	}
 
-	public void makeLuceneIndex() throws IOException, DatabaseException {
+	public void makeLuceneDescriptionIndex() throws IOException, DatabaseException {
 		Stopwatch timer = new Stopwatch();
 		timer.start();
 		luceneDir.mkdirs();
@@ -1218,6 +1224,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	IndexSearcher luceneSearcher = null;
+
+	private IndexSearcher luceneLicitSearcher;
+
+	private IndexWriter licitIndexWriter;
 
 	private static class CheckAndProcessRegexMatch implements Runnable {
 		Pattern p;
@@ -2380,6 +2390,51 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void iterateConcepts(I_ProcessConcepts processor) throws Exception {
 		ConceptIteratorWrapper wrapper = new ConceptIteratorWrapper(processor);
 		iterateConceptAttributeEntries(wrapper);
+	}
+
+	private void writeTolicitIndex(String word, String type) throws IOException {
+		if (licitIndexWriter == null) {
+			Directory dir = FSDirectory.getDirectory(illicitWordsDir, true);
+			licitIndexWriter = new IndexWriter(dir, new StandardAnalyzer(), true);
+			licitIndexWriter.setUseCompoundFile(true);
+			licitIndexWriter.mergeFactor = 10000;
+		}
+		Document doc = new Document();
+		doc.add(Field.Keyword("type", type));
+		doc.add(Field.UnStored("word", word));
+		licitIndexWriter.addDocument(doc);
+	}
+
+	public void writeIllicitWord(String word) throws IOException {
+		writeTolicitIndex(word, "i");
+	}
+
+	public void writeLicitWord(String word) throws IOException {
+		writeTolicitIndex(word, "l");
+	}
+	
+	public void optimizeLicitWords() throws IOException {
+		if (licitIndexWriter != null) {
+			licitIndexWriter.optimize();
+		}
+	}
+	
+	public Hits searchLicitWords(String query) throws IOException, ParseException {
+		query = "type:\"l\" " + query;
+		return doLicitSearch(query);
+	}
+
+	public Hits doLicitSearch(String query) throws IOException, ParseException {
+		if (luceneLicitSearcher == null) {
+			luceneLicitSearcher = new IndexSearcher(licitWordsDir.getAbsolutePath());
+		}
+		Query q = QueryParser.parse(query, "word", new StandardAnalyzer());
+		return luceneLicitSearcher.search(q);
+	}
+	
+	public Hits searchIllicitWords(String query) throws IOException, ParseException {
+		query = "type:\"i\" " + query;
+		return doLicitSearch(query);
 	}
 
 }

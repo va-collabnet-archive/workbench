@@ -1,5 +1,6 @@
 package org.dwfa.vodb;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -128,7 +129,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	
 	@Override
 	public void cleanup(I_IntSet relsToIgnore) throws Exception {
-		//Nothing to do...
+		optimizeLicitWords();
 	}
 
 
@@ -230,6 +231,23 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 
 	public Map<UUID, Integer> getConstantToIntMap() {
 		return map.uuidToInt;
+	}
+
+	@Override
+	public void writeIllicitWord(String word) throws IOException {
+		vodb.writeIllicitWord(word);
+		
+	}
+
+	@Override
+	public void writeLicitWord(String word)  throws IOException {
+		vodb.writeLicitWord(word);
+		
+	}
+
+	@Override
+	public void optimizeLicitWords() throws IOException {
+		vodb.optimizeLicitWords();
 	}
 
 

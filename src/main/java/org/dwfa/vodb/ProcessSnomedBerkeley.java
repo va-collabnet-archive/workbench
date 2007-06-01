@@ -223,8 +223,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		vodb.populateTimeBranchDb();
 		printElapsedTime();
 		monitor.setProgressInfoUpper("Starting makeLuceneIndex().");
-		vodb.makeLuceneIndex();
+		vodb.makeLuceneDescriptionIndex();
 		printElapsedTime();
+		optimizeLicitWords();
 		monitor.setProgressInfoUpper("Starting cleanup.");
 		vodb.close();
 		printElapsedTime();
@@ -385,8 +386,21 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 	@Override
 	public void iterateRelationships(MakeRelSet oldRelItr) throws Exception {
 		vodb.iterateRelationships(oldRelItr);
-		
 	}
 
+	@Override
+	public void writeIllicitWord(String word) throws IOException {
+		vodb.writeIllicitWord(word);	
+	}
+
+	@Override
+	public void writeLicitWord(String word)  throws IOException {
+		vodb.writeLicitWord(word);
+	}
 	
+	@Override
+	public void optimizeLicitWords() throws IOException {
+		vodb.optimizeLicitWords();
+	}
+
 }

@@ -51,12 +51,19 @@ public abstract class ProcessConstants extends ProcessSources {
 				} else if (contentFile.getName().startsWith(
 						"relationships")) {
 					readRelationships(br, releaseDate, FORMAT.SNOMED);
+				} else if (contentFile.getName().startsWith(
+						"illicit_words")) {
+					readIllicitWords(br);
+				} else if (contentFile.getName().startsWith(
+						"licit_words")) {
+					readLicitWords(br);
 				}
 				br.close();
 			}
 		}
 		cleanup(null);
 	}
+
 
 	public void execute(JarFile constantJar) throws Exception { 
 		execute(constantJar, "org/jehri/cement/", FORMAT.SNOMED);
