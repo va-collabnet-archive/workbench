@@ -19,7 +19,8 @@ public class LocalVersionedTerminology {
 			AceLog.getAppLog().info("Setting LocalVersionedTerminology to: " + factory);
 			LocalVersionedTerminology.factory = factory;
 		} else {
-			throw new RuntimeException("LocalVersionedTerminology.factory is already set to: " + LocalVersionedTerminology.factory);
+			throw new RuntimeException("LocalVersionedTerminology.factory is already set to: " + LocalVersionedTerminology.factory +
+					" new factory: " + factory);
 		}
 	}
 	
