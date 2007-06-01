@@ -3,11 +3,11 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessPaths;
+import org.dwfa.vodb.types.I_ProcessPathEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class PathWriter extends TermWriter implements I_ProcessPaths {
+public class PathWriter extends TermWriter implements I_ProcessPathEntries {
 
 	public PathWriter(OutputStream outStream) {
 		super(outStream);

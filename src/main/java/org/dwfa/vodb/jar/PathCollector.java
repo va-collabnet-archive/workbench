@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.vodb.bind.PathBinder;
-import org.dwfa.vodb.types.I_ProcessPaths;
+import org.dwfa.vodb.types.I_ProcessPathEntries;
 import org.dwfa.vodb.types.Path;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class PathCollector implements I_ProcessPaths {
+public class PathCollector implements I_ProcessPathEntries {
 	List<Path> paths = new ArrayList<Path>();
 	PathBinder binder = new PathBinder();
 	public PathCollector() {

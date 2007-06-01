@@ -308,4 +308,11 @@ public class SearchPanel extends JPanel {
 	public I_GetConceptData getRootConcept() {
 		return (I_GetConceptData) rootConceptLabel.getTermComponent();
 	}
+
+	public void performLuceneSearch(String query, I_GetConceptData root) {
+		luceneRadio.setSelected(true);
+		rootConceptLabel.setTermComponent(root);
+		searchPhraseField.setText(query);
+		startSearch();
+	}
 }

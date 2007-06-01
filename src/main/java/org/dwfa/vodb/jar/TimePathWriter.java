@@ -3,11 +3,11 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessTimeBranch;
+import org.dwfa.vodb.types.I_ProcessTimeBranchEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class TimePathWriter extends TermWriter implements I_ProcessTimeBranch {
+public class TimePathWriter extends TermWriter implements I_ProcessTimeBranchEntries {
 
 	public TimePathWriter(OutputStream outStream) {
 		super(outStream);

@@ -1,12 +1,12 @@
 package org.dwfa.vodb.jar;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessRelationships;
+import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
 public class RelationshipCounter extends TermCounter implements
-		I_ProcessRelationships {
+		I_ProcessRelationshipEntries {
 
 	public Object call() throws Exception {
 		AceConfig.getVodb().iterateRelationships(this);

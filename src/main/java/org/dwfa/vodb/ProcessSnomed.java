@@ -19,7 +19,7 @@ import java.util.jar.JarFile;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.vodb.ProcessConstants.FORMAT;
-import org.dwfa.vodb.types.I_ProcessRelationships;
+import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 import org.dwfa.vodb.types.IntSet;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -33,7 +33,7 @@ public abstract class ProcessSnomed extends ProcessSources {
 		this.constantDate = constantDate;
 	}
 
-	static class MakeRelSet implements I_ProcessRelationships {
+	static class MakeRelSet implements I_ProcessRelationshipEntries {
 		List<Integer> ids = new ArrayList<Integer>();
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();

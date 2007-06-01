@@ -9,6 +9,7 @@ import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
 
@@ -84,6 +85,35 @@ public class AceFrame extends ComponentFrame {
 	}
 	public JList getBatchConceptList() {
 		return getCdePanel().getBatchConceptList();
+	}
+	public void performLuceneSearch(String query, I_GetConceptData root) {
+		getCdePanel().performLuceneSearch(query, root);
+		
+	}
+	public void setShowAddresses(boolean show) {
+		getCdePanel().setShowAddresses(show);
+		
+	}
+	public void setShowComponentView(boolean show) {
+		getCdePanel().setShowComponentView(show);		
+	}
+	public void setShowHierarchyView(boolean show) {
+		getCdePanel().setShowHierarchyView(show);
+		
+	}
+	public void setShowHistory(boolean show) {
+		getCdePanel().setShowHistory(show);
+	}
+	public void setShowPreferences(boolean show) {
+		getCdePanel().setShowPreferences(show);
+		
+	}
+	public void setShowSearch(boolean show) {
+		getCdePanel().setShowSearch(show);
+		
+	}
+	public void showListView() {
+		getCdePanel().showListView();
 	}
 
 }

@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.vodb.bind.TimePathIdBinder;
-import org.dwfa.vodb.types.I_ProcessTimeBranch;
+import org.dwfa.vodb.types.I_ProcessTimeBranchEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class TimePathCollector implements I_ProcessTimeBranch {
+public class TimePathCollector implements I_ProcessTimeBranchEntries {
 	List<TimePathId> timePathList = new ArrayList<TimePathId>();
 	TimePathIdBinder binder = new TimePathIdBinder();
 	public TimePathCollector() {

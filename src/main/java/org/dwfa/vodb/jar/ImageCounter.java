@@ -1,11 +1,11 @@
 package org.dwfa.vodb.jar;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessImages;
+import org.dwfa.vodb.types.I_ProcessImageEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class ImageCounter extends TermCounter implements I_ProcessImages {
+public class ImageCounter extends TermCounter implements I_ProcessImageEntries {
 
 	public void processImages(DatabaseEntry key, DatabaseEntry value)
 			throws Exception {

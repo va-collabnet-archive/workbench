@@ -3,11 +3,11 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessIds;
+import org.dwfa.vodb.types.I_ProcessIdEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class IdWriter extends TermWriter implements I_ProcessIds {
+public class IdWriter extends TermWriter implements I_ProcessIdEntries {
 
 	public IdWriter(OutputStream outStream) {
 		super(outStream);
@@ -22,7 +22,7 @@ public class IdWriter extends TermWriter implements I_ProcessIds {
 		count++;
 	}
 	public Object call() throws Exception {
-		AceConfig.getVodb().iterateIds(this);
+		AceConfig.getVodb().iterateIdEntries(this);
 		dos.close();
 		return null;
 	}

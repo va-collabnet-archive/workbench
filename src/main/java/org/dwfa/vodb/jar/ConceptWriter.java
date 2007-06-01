@@ -3,11 +3,11 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessConcepts;
+import org.dwfa.vodb.types.I_ProcessConceptEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class ConceptWriter extends TermWriter implements I_ProcessConcepts {
+public class ConceptWriter extends TermWriter implements I_ProcessConceptEntries {
 
 	public ConceptWriter(OutputStream outStream) {
 		super(outStream);

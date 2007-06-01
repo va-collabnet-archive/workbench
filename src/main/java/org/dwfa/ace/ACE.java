@@ -944,11 +944,15 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		return content;
 	}
 
+	CollectionEditorContainer conceptListEditor;
 	private Component getConceptListEditor() throws DatabaseException,
 			IOException, ClassNotFoundException {
-		batchConceptList = new TerminologyList();
-		return new CollectionEditorContainer(batchConceptList, this,
+		if (conceptListEditor == null) {
+			batchConceptList = new TerminologyList();
+			conceptListEditor =  new CollectionEditorContainer(batchConceptList, this,
 				descListProcessBuilderPanel);
+		}
+		return conceptListEditor;
 	}
 
 	protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI,
@@ -1983,6 +1987,39 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public JList getAddressList() {
 		return addressList;
+	}
+
+	public void performLuceneSearch(String query, I_GetConceptData root) {
+		searchPanel.performLuceneSearch(query, root);
+	}
+
+	public void setShowAddresses(boolean show) {
+		showAddressesButton.setSelected(show);	
+	}
+
+	public void setShowComponentView(boolean show) {
+		showComponentButton.setSelected(show);
+	}
+
+	public void setShowHierarchyView(boolean show) {
+		showTreeButton.setSelected(show);
+	}
+
+	public void setShowHistory(boolean show) {
+		showHistoryButton.setSelected(show);
+	}
+
+	public void setShowPreferences(boolean show) {
+		showPreferencesButton.setSelected(show);
+	}
+
+	public void setShowSearch(boolean show) {
+		showSearchButton.setSelected(show);
+	}
+
+	public void showListView() {
+		showComponentButton.setSelected(true);
+		conceptTabs.setSelectedComponent(conceptListEditor);
 	}
 
 }

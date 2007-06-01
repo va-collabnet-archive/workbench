@@ -1,11 +1,11 @@
 package org.dwfa.vodb.jar;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessTimeBranch;
+import org.dwfa.vodb.types.I_ProcessTimeBranchEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class TimePathCounter extends TermCounter implements I_ProcessTimeBranch {
+public class TimePathCounter extends TermCounter implements I_ProcessTimeBranchEntries {
 
 	public void processTimeBranch(DatabaseEntry key, DatabaseEntry value) throws Exception {
 		if (canceled) {

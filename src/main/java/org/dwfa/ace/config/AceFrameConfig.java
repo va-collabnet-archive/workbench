@@ -1103,8 +1103,45 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public Map<String, SubversionData> getSubversionMap() {
 		return subversionMap;
 	}
-	
-	
 
+
+	public void performLuceneSearch(String query, I_GetConceptData root) {
+		aceFrame.performLuceneSearch(query, root);
+	}
+
+
+	public void setShowAddresses(boolean show) {
+		aceFrame.setShowAddresses(show);
+	}
+
+
+	public void setShowComponentView(boolean show) {
+		aceFrame.setShowComponentView(show);
+	}
+
+
+	public void setShowHierarchyView(boolean show) {
+		aceFrame.setShowHierarchyView(show);
+	}
+
+
+	public void setShowHistory(boolean show) {
+		aceFrame.setShowHistory(show);
+	}
+
+
+	public void setShowPreferences(boolean show) {
+		aceFrame.setShowPreferences(show);
+	}
+
+
+	public void setShowSearch(boolean show) {
+		aceFrame.setShowSearch(show);
+	}
+
+
+	public void showListView() {
+		aceFrame.showListView();
+	}
 
 }

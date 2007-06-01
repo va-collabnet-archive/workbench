@@ -3,11 +3,11 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessRelationships;
+import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class RelationshipWriter extends TermWriter implements I_ProcessRelationships {
+public class RelationshipWriter extends TermWriter implements I_ProcessRelationshipEntries {
 
 	public RelationshipWriter(OutputStream outStream) {
 		super(outStream);

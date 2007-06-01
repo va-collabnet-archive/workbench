@@ -1,15 +1,15 @@
 package org.dwfa.vodb;
 
-import org.dwfa.vodb.types.I_ProcessConcepts;
-import org.dwfa.vodb.types.I_ProcessDescriptions;
-import org.dwfa.vodb.types.I_ProcessIds;
-import org.dwfa.vodb.types.I_ProcessImages;
-import org.dwfa.vodb.types.I_ProcessRelationships;
+import org.dwfa.vodb.types.I_ProcessConceptEntries;
+import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
+import org.dwfa.vodb.types.I_ProcessIdEntries;
+import org.dwfa.vodb.types.I_ProcessImageEntries;
+import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class Counter implements I_ProcessConcepts, I_ProcessRelationships,
-		I_ProcessDescriptions, I_ProcessIds, I_ProcessImages {
+public class Counter implements I_ProcessConceptEntries, I_ProcessRelationshipEntries,
+		I_ProcessDescriptionEntries, I_ProcessIdEntries, I_ProcessImageEntries {
 
 	int concepts = 0;
 	int descriptions = 0;

@@ -47,6 +47,12 @@ import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ProcessConceptAttributes;
+import org.dwfa.ace.api.I_ProcessDescriptions;
+import org.dwfa.ace.api.I_ProcessIds;
+import org.dwfa.ace.api.I_ProcessImages;
+import org.dwfa.ace.api.I_ProcessPaths;
+import org.dwfa.ace.api.I_ProcessRelationships;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -77,13 +83,13 @@ import org.dwfa.vodb.bind.UuidBinding;
 import org.dwfa.vodb.jar.PathCollector;
 import org.dwfa.vodb.jar.TimePathCollector;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_ProcessConcepts;
-import org.dwfa.vodb.types.I_ProcessDescriptions;
-import org.dwfa.vodb.types.I_ProcessIds;
-import org.dwfa.vodb.types.I_ProcessImages;
-import org.dwfa.vodb.types.I_ProcessPaths;
-import org.dwfa.vodb.types.I_ProcessRelationships;
-import org.dwfa.vodb.types.I_ProcessTimeBranch;
+import org.dwfa.vodb.types.I_ProcessConceptEntries;
+import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
+import org.dwfa.vodb.types.I_ProcessIdEntries;
+import org.dwfa.vodb.types.I_ProcessImageEntries;
+import org.dwfa.vodb.types.I_ProcessPathEntries;
+import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
+import org.dwfa.vodb.types.I_ProcessTimeBranchEntries;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
@@ -160,13 +166,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	C1KeyForRelCreator c1KeyCreator = new C1KeyForRelCreator(relBinding);
 
-	ThinIdVersionedBinding idBinding = new ThinIdVersionedBinding();
+	static ThinIdVersionedBinding idBinding = new ThinIdVersionedBinding();
 
 	BranchTimeBinder btBinder = new BranchTimeBinder();
 
 	TimePathIdBinder tbBinder = new TimePathIdBinder();
 
-	ThinImageBinder imageBinder = new ThinImageBinder();
+	static ThinImageBinder imageBinder = new ThinImageBinder();
 
 	UuidBinding uuidBinding = new UuidBinding();
 
@@ -1335,8 +1341,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 		addTimeBranchValues(values);
 	}
 
-	private static class DescChangesProcessor implements I_ProcessDescriptions,
-			I_ProcessConcepts, I_ProcessRelationships {
+	private static class DescChangesProcessor implements
+			I_ProcessDescriptionEntries, I_ProcessConceptEntries,
+			I_ProcessRelationshipEntries {
 		Set<TimePathId> values;
 
 		public DescChangesProcessor(Set<TimePathId> values) {
@@ -1384,7 +1391,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	}
 
-	public void iterateDescriptions(I_ProcessDescriptions processor)
+	public void iterateDescriptions(I_ProcessDescriptionEntries processor)
 			throws Exception {
 		Cursor descCursor = getDescDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
@@ -1400,7 +1407,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		descCursor.close();
 	}
 
-	public void iterateRelationships(I_ProcessRelationships processor)
+	public void iterateRelationships(I_ProcessRelationshipEntries processor)
 			throws Exception {
 		Cursor relCursor = getRelDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
@@ -1416,7 +1423,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 		relCursor.close();
 	}
 
-	public void iterateConcepts(I_ProcessConcepts processor) throws Exception {
+	public void iterateConcepts(I_ProcessConceptEntries processor)
+			throws Exception {
 		Cursor concCursor = getConceptDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
@@ -1431,7 +1439,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		concCursor.close();
 	}
 
-	public void iterateIds(I_ProcessIds processor) throws Exception {
+	public void iterateIdEntries(I_ProcessIdEntries processor) throws Exception {
 		Cursor idCursor = getIdDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
@@ -1446,7 +1454,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		idCursor.close();
 	}
 
-	public void iterateImages(I_ProcessImages processor) throws Exception {
+	public void iterateImages(I_ProcessImageEntries processor) throws Exception {
 		Cursor imageCursor = getImageDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
@@ -1461,7 +1469,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		imageCursor.close();
 	}
 
-	public void iteratePaths(I_ProcessPaths processor) throws Exception {
+	public void iteratePaths(I_ProcessPathEntries processor) throws Exception {
 		Cursor pathCursor = getPathDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
@@ -1476,7 +1484,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		pathCursor.close();
 	}
 
-	public void iterateTimeBranch(I_ProcessTimeBranch processor)
+	public void iterateTimeBranch(I_ProcessTimeBranchEntries processor)
 			throws Exception {
 		Cursor timeBranchCursor = getTimeBranchDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
@@ -1996,15 +2004,16 @@ public class VodbEnv implements I_ImplementTermFactory {
 			IOException {
 		canEdit(aceFrameConfig);
 		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
+				.getUids());
 		int nid = uuidToNativeWithGeneration(newConceptId, idSource,
-						aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new concept: " + newConceptId + " (" + nid
 						+ ") defined: " + defined);
 		ConceptBean newBean = ConceptBean.get(nid);
 		newBean.setPrimordial(true);
-		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
+				.getUids());
 		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
 				aceFrameConfig.getEditingPathSet().size());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -2028,17 +2037,17 @@ public class VodbEnv implements I_ImplementTermFactory {
 		canEdit(aceFrameConfig);
 		ACE.addUncommitted((I_Transact) concept);
 		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-		int descId = uuidToNativeWithGeneration(
-				newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
-				Integer.MAX_VALUE);
+				.getUids());
+		int descId = uuidToNativeWithGeneration(newDescriptionId, idSource,
+				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new description: " + newDescriptionId + " (" + descId
 						+ "): " + text);
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), aceFrameConfig.getEditingPathSet().size());
 		boolean capStatus = false;
-		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
+				.getUids());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 			ThinDescPart descPart = new ThinDescPart();
 			descPart.setVersion(Integer.MAX_VALUE);
@@ -2072,9 +2081,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 					"<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
 		}
 		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
-		int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
-						.getEditingPathSet(), Integer.MAX_VALUE);
+				.getUids());
+		int relId = uuidToNativeWithGeneration(newRelUid, idSource,
+				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
 		AceLog.getEditLog().info(
 				"Creating new relationship 1: " + newRelUid + " (" + relId
 						+ ") from " + concept.getUids() + " to "
@@ -2082,7 +2091,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), aceFrameConfig.getHierarchySelection()
 				.getConceptId(), 1);
-		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
+				.getUids());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 			ThinRelPart relPart = new ThinRelPart();
 			relPart.setVersion(Integer.MAX_VALUE);
@@ -2113,10 +2123,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
 		int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-						.getUids());
+				.getUids());
 
-		int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig
-						.getEditingPathSet(), Integer.MAX_VALUE);
+		int relId = uuidToNativeWithGeneration(newRelUid, idSource,
+				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
 
 		AceLog.getEditLog().info(
 				"Creating new relationship 2: " + newRelUid + " (" + relId
@@ -2169,9 +2179,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void addUncommitted(I_GetConceptData concept) {
 		ACE.addUncommitted((I_Transact) concept);
 	}
-	public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
+
+	public void loadFromSingleJar(String jarFile, String dataPrefix)
+			throws Exception {
 		LoadSourcesFromJars.loadFromSingleJar(jarFile, dataPrefix);
 	}
+
 	/**
 	 * 
 	 * @param args
@@ -2180,6 +2193,156 @@ public class VodbEnv implements I_ImplementTermFactory {
 	 */
 	public void loadFromMultipleJars(String[] args) throws Exception {
 		LoadSourcesFromJars.main(args);
+	}
+
+	private static class ProcessorWrapper implements
+			I_ProcessDescriptionEntries, I_ProcessConceptEntries,
+			I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessPathEntries {
+		
+		I_ProcessConceptAttributes conceptAttributeProcessor;
+		I_ProcessDescriptions descProcessor;
+		I_ProcessRelationships relProcessor;
+		I_ProcessIds idProcessor;
+		I_ProcessImages imageProcessor;
+		I_ProcessPaths pathProcessor;
+
+		public ProcessorWrapper() {
+			super();
+		}
+
+		public void processDesc(DatabaseEntry key, DatabaseEntry value)
+				throws Exception {
+			I_DescriptionVersioned desc = (I_DescriptionVersioned) descBinding
+					.entryToObject(value);
+			descProcessor.processDescription(desc);
+		}
+
+		public void processConcept(DatabaseEntry key, DatabaseEntry value)
+				throws Exception {
+			I_ConceptAttributeVersioned conc = (I_ConceptAttributeVersioned) conBinding
+					.entryToObject(value);
+			conceptAttributeProcessor.processConceptAttributes(conc);
+		}
+
+		public void processRel(DatabaseEntry key, DatabaseEntry value)
+				throws Exception {
+			I_RelVersioned rel = (I_RelVersioned) relBinding
+					.entryToObject(value);
+			relProcessor.processRelationship(rel);
+		}
+
+		public DatabaseEntry getDataEntry() {
+			return new DatabaseEntry();
+		}
+
+		public DatabaseEntry getKeyEntry() {
+			return new DatabaseEntry();
+		}
+
+		public I_ProcessConceptAttributes getConceptAttributeProcessor() {
+			return conceptAttributeProcessor;
+		}
+
+		public void setConceptAttributeProcessor(
+				I_ProcessConceptAttributes conceptAttributeProcessor) {
+			this.conceptAttributeProcessor = conceptAttributeProcessor;
+		}
+
+		public I_ProcessDescriptions getDescProcessor() {
+			return descProcessor;
+		}
+
+		public void setDescProcessor(I_ProcessDescriptions descProcessor) {
+			this.descProcessor = descProcessor;
+		}
+
+		public I_ProcessRelationships getRelProcessor() {
+			return relProcessor;
+		}
+
+		public void setRelProcessor(I_ProcessRelationships relProcessor) {
+			this.relProcessor = relProcessor;
+		}
+
+		public org.dwfa.ace.api.I_ProcessIds getIdProcessor() {
+			return idProcessor;
+		}
+
+		public void setIdProcessor(org.dwfa.ace.api.I_ProcessIds processor) {
+			this.idProcessor = processor;
+		}
+
+		public void processId(DatabaseEntry key, DatabaseEntry value) throws Exception {
+			I_IdVersioned idv = (I_IdVersioned) idBinding.entryToObject(value);
+			this.idProcessor.processId(idv);
+		}
+
+		public I_ProcessImages getImageProcessor() {
+			return imageProcessor;
+		}
+
+		public void setImageProcessor(I_ProcessImages imageProcessor) {
+			this.imageProcessor = imageProcessor;
+		}
+
+		public void processImages(DatabaseEntry key, DatabaseEntry value) throws Exception {
+			I_ImageVersioned imageV = (I_ImageVersioned) imageBinder.entryToObject(value);
+			this.imageProcessor.processImages(imageV);
+		}
+
+		public I_ProcessPaths getPathProcessor() {
+			return pathProcessor;
+		}
+
+		public void setPathProcessor(I_ProcessPaths pathProcessor) {
+			this.pathProcessor = pathProcessor;
+		}
+
+		public void processPath(DatabaseEntry key, DatabaseEntry value) throws Exception {
+			I_Path path = (I_Path) pathBinder.entryToObject(value);
+			this.pathProcessor.processPath(path);
+		}
+
+	}
+
+	public void iterateConceptAttributes(I_ProcessConceptAttributes processor)
+			throws Exception {
+		ProcessorWrapper wrapper = new ProcessorWrapper();
+		wrapper.setConceptAttributeProcessor(processor);
+		iterateConcepts(wrapper);
+	}
+
+	public void iterateDescriptions(I_ProcessDescriptions processor)
+			throws Exception {
+		ProcessorWrapper wrapper = new ProcessorWrapper();
+		wrapper.setDescProcessor(processor);
+		iterateDescriptions(wrapper);
+	}
+
+	public void iterateIds(org.dwfa.ace.api.I_ProcessIds processor)
+			throws Exception {
+		ProcessorWrapper wrapper = new ProcessorWrapper();
+		wrapper.setIdProcessor(processor);
+		iterateConcepts(wrapper);
+	}
+
+	public void iterateImages(I_ProcessImages processor) throws Exception {
+		ProcessorWrapper wrapper = new ProcessorWrapper();
+		wrapper.setImageProcessor(processor);
+		iterateImages(wrapper);
+
+	}
+
+	public void iteratePaths(I_ProcessPaths processor) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void iterateRelationships(I_ProcessRelationships processor)
+			throws Exception {
+		ProcessorWrapper wrapper = new ProcessorWrapper();
+		wrapper.setRelProcessor(processor);
+		iterateConcepts(wrapper);
 	}
 
 }

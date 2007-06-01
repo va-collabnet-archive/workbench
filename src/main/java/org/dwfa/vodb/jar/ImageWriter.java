@@ -3,11 +3,11 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessImages;
+import org.dwfa.vodb.types.I_ProcessImageEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class ImageWriter extends TermWriter implements I_ProcessImages {
+public class ImageWriter extends TermWriter implements I_ProcessImageEntries {
 
 	public ImageWriter(OutputStream outStream) {
 		super(outStream);
