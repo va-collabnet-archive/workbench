@@ -1,13 +1,13 @@
 package org.dwfa.vodb.jar;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessConceptEntries;
+import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class ConceptCounter extends TermCounter implements I_ProcessConceptEntries {
+public class ConceptCounter extends TermCounter implements I_ProcessConceptAttributeEntries {
 
-	public void processConcept(DatabaseEntry key, DatabaseEntry value) throws Exception {
+	public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value) throws Exception {
 		if (canceled) {
 			throw new InterruptedException();
 		}
@@ -15,7 +15,7 @@ public class ConceptCounter extends TermCounter implements I_ProcessConceptEntri
 	}
 
 	public Object call() throws Exception {
-		AceConfig.getVodb().iterateConcepts(this);
+		AceConfig.getVodb().iterateConceptAttributeEntries(this);
 		return null;
 	}
 

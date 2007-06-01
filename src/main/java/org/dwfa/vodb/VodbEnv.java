@@ -48,6 +48,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConceptAttributes;
+import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
 import org.dwfa.ace.api.I_ProcessIds;
 import org.dwfa.ace.api.I_ProcessImages;
@@ -83,7 +84,7 @@ import org.dwfa.vodb.bind.UuidBinding;
 import org.dwfa.vodb.jar.PathCollector;
 import org.dwfa.vodb.jar.TimePathCollector;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.I_ProcessConceptEntries;
+import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
 import org.dwfa.vodb.types.I_ProcessIdEntries;
 import org.dwfa.vodb.types.I_ProcessImageEntries;
@@ -1336,13 +1337,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 		Set<TimePathId> values = new HashSet<TimePathId>();
 		DescChangesProcessor p = new DescChangesProcessor(values);
 		iterateDescriptionEntries(p);
-		iterateConcepts(p);
+		iterateConceptAttributeEntries(p);
 		iterateRelationships(p);
 		addTimeBranchValues(values);
 	}
 
 	private static class DescChangesProcessor implements
-			I_ProcessDescriptionEntries, I_ProcessConceptEntries,
+			I_ProcessDescriptionEntries, I_ProcessConceptAttributeEntries,
 			I_ProcessRelationshipEntries {
 		Set<TimePathId> values;
 
@@ -1361,7 +1362,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 			}
 		}
 
-		public void processConcept(DatabaseEntry key, DatabaseEntry value)
+		public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value)
 				throws IOException {
 			I_ConceptAttributeVersioned conc = (I_ConceptAttributeVersioned) conBinding
 					.entryToObject(value);
@@ -1423,14 +1424,14 @@ public class VodbEnv implements I_ImplementTermFactory {
 		relCursor.close();
 	}
 
-	public void iterateConcepts(I_ProcessConceptEntries processor)
+	public void iterateConceptAttributeEntries(I_ProcessConceptAttributeEntries processor)
 			throws Exception {
 		Cursor concCursor = getConceptDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
 		while (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			try {
-				processor.processConcept(foundKey, foundData);
+				processor.processConceptAttributeEntry(foundKey, foundData);
 			} catch (Exception e) {
 				concCursor.close();
 				throw e;
@@ -2196,7 +2197,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	private static class ProcessorWrapper implements
-			I_ProcessDescriptionEntries, I_ProcessConceptEntries,
+			I_ProcessDescriptionEntries, I_ProcessConceptAttributeEntries,
 			I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessPathEntries {
 		
 		I_ProcessConceptAttributes conceptAttributeProcessor;
@@ -2217,7 +2218,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 			descProcessor.processDescription(desc);
 		}
 
-		public void processConcept(DatabaseEntry key, DatabaseEntry value)
+		public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value)
 				throws Exception {
 			I_ConceptAttributeVersioned conc = (I_ConceptAttributeVersioned) conBinding
 					.entryToObject(value);
@@ -2304,12 +2305,42 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 
 	}
+	
+	public static class ConceptIteratorWrapper implements I_ProcessConceptAttributeEntries {
+
+		I_ProcessConcepts processor;
+		
+		
+		public ConceptIteratorWrapper(I_ProcessConcepts processor) {
+			super();
+			this.processor = processor;
+		}
+
+
+
+		public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value) throws Exception {
+			I_ConceptAttributeVersioned conAttrVersioned = (I_ConceptAttributeVersioned) conBinding
+			.entryToObject(value);
+			ConceptBean bean = ConceptBean.get(conAttrVersioned.getConId());
+			processor.processConcept(bean);
+		}
+
+
+		public DatabaseEntry getDataEntry() {
+			return new DatabaseEntry();
+		}
+
+		public DatabaseEntry getKeyEntry() {
+			return new DatabaseEntry();
+		}
+		
+	}
 
 	public void iterateConceptAttributes(I_ProcessConceptAttributes processor)
 			throws Exception {
 		ProcessorWrapper wrapper = new ProcessorWrapper();
 		wrapper.setConceptAttributeProcessor(processor);
-		iterateConcepts(wrapper);
+		iterateConceptAttributeEntries(wrapper);
 	}
 
 	public void iterateDescriptions(I_ProcessDescriptions processor)
@@ -2344,6 +2375,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 		ProcessorWrapper wrapper = new ProcessorWrapper();
 		wrapper.setRelProcessor(processor);
 		iterateRelationships(wrapper);
+	}
+
+	public void iterateConcepts(I_ProcessConcepts processor) throws Exception {
+		ConceptIteratorWrapper wrapper = new ConceptIteratorWrapper(processor);
+		iterateConceptAttributeEntries(wrapper);
 	}
 
 }

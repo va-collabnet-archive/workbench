@@ -1,6 +1,6 @@
 package org.dwfa.vodb;
 
-import org.dwfa.vodb.types.I_ProcessConceptEntries;
+import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
 import org.dwfa.vodb.types.I_ProcessIdEntries;
 import org.dwfa.vodb.types.I_ProcessImageEntries;
@@ -8,7 +8,7 @@ import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class Counter implements I_ProcessConceptEntries, I_ProcessRelationshipEntries,
+public class Counter implements I_ProcessConceptAttributeEntries, I_ProcessRelationshipEntries,
 		I_ProcessDescriptionEntries, I_ProcessIdEntries, I_ProcessImageEntries {
 
 	int concepts = 0;
@@ -22,7 +22,7 @@ public class Counter implements I_ProcessConceptEntries, I_ProcessRelationshipEn
 		super();
 	}
 
-	public void processConcept(DatabaseEntry key, DatabaseEntry value) throws Exception {
+	public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value) throws Exception {
 		concepts++;
 		total++;
 	}

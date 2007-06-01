@@ -364,6 +364,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 	private void addListeners() {
+		addRootListener();
+		
+	}
+
+
+	private void addRootListener() {
 		this.roots.addListDataListener(new ListDataListener() {
 
 			public void contentsChanged(ListDataEvent e) {
@@ -379,7 +385,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 			}
 			
 		});
-		
 	}
 
 	/* (non-Javadoc)
@@ -642,6 +647,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 */
 	public void setRoots(I_IntSet roots) {
 		this.roots = roots;
+		addRootListener();
+		changeSupport.firePropertyChange("roots", null, roots);
 	}
 
 

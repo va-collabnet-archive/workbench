@@ -49,7 +49,6 @@ import org.dwfa.log.LogViewerFrame;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.VodbEnv;
@@ -163,6 +162,9 @@ public class AceConfig implements Serializable {
 					cacheSize = null;
 				}
 				try {
+					if (AceConfig.getVodb() == null) {
+						new VodbEnv();
+					}
 					AceConfig.getVodb().setup(dbFolder, readOnly, cacheSize);
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);

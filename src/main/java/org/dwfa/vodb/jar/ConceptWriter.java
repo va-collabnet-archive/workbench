@@ -3,17 +3,17 @@ package org.dwfa.vodb.jar;
 import java.io.OutputStream;
 
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.vodb.types.I_ProcessConceptEntries;
+import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class ConceptWriter extends TermWriter implements I_ProcessConceptEntries {
+public class ConceptWriter extends TermWriter implements I_ProcessConceptAttributeEntries {
 
 	public ConceptWriter(OutputStream outStream) {
 		super(outStream);
 	}
 
-	public void processConcept(DatabaseEntry key, DatabaseEntry value) throws Exception {
+	public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value) throws Exception {
 		if (canceled) {
 			throw new InterruptedException();
 		}
@@ -24,7 +24,7 @@ public class ConceptWriter extends TermWriter implements I_ProcessConceptEntries
 	}
 
 	public Object call() throws Exception {
-		AceConfig.getVodb().iterateConcepts(this);
+		AceConfig.getVodb().iterateConceptAttributeEntries(this);
 		dos.close();
 		return null;
 	}
