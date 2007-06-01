@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.Hits;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -101,5 +103,10 @@ public interface I_TermFactory {
 	public void iterateIds(I_ProcessIds processor) throws Exception;
 	public void iterateImages(I_ProcessImages processor) throws Exception;
 	public void iteratePaths(I_ProcessPaths processor) throws Exception;
+	
+	public Hits searchLicitWords(String query) throws IOException, ParseException;
+
+	public Hits doLicitSearch(String query) throws IOException, ParseException;
+
 
 }

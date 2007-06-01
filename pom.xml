@@ -54,6 +54,11 @@
       <version>1.4</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>lucene</groupId>
+      <artifactId>lucene</artifactId>
+      <version>1.4.3</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
