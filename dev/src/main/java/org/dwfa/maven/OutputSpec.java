@@ -7,6 +7,10 @@ public class OutputSpec {
 	
 	public String toString() {
 		StringBuffer b = new StringBuffer();
+		b.append("\nInputFileSpec: \n");
+		for (InputFileSpec is: inputSpecs) {
+			b.append(is);
+		}
 		b.append("\nWriters: \n");
 		for (I_TransformAndWrite w: writers) {
 			b.append(w);

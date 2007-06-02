@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -98,7 +99,8 @@ public class Transform extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-
+    	getLog().info("starting transform: " + Arrays.asList(outputSpecs));
+    	
         // calculate the SHA-1 hashcode for this mojo based on input
         Sha1HashCodeGenerator generator;
         String hashCode = "";
