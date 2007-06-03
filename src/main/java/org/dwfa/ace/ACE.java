@@ -1656,7 +1656,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showTreeButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/text_tree.png")));
 		showTreeButton
-				.setToolTipText("Show the tree view of the terminology content.");
+				.setToolTipText("Show the hierarchy view of the terminology content.");
 		showTreeButton.setSelected(true);
 		showTreeButton.addActionListener(resizeListener);
 		topPanel.add(showTreeButton, c);

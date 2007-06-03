@@ -282,7 +282,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					setToolTipText("This panel is linked to the search selection");
 					tabIcon = SMALL_SEARCH_LINK_ICON;
 				} else if (value == TREE_LINK_ICON) {
-					setToolTipText("This panel is linked to the tree selection");
+					setToolTipText("This panel is linked to the hierarchy selection");
 					tabIcon = SMALL_TREE_LINK_ICON;
 				} else if (value == UNLINKED_ICON) {
 					setToolTipText("This panel is not linked to other selections");

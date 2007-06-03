@@ -17,7 +17,6 @@ package org.dwfa.vodb;
  * limitations under the License.
  */
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -50,7 +49,7 @@ public abstract class ProcessSources  {
 		this.skipFirstLine = skipFirstLine;
 	}
 
-	public void readLicitWords(BufferedReader br) throws IOException {
+	public void readLicitWords(Reader br) throws IOException {
 		long start = System.currentTimeMillis();
 		int licitWords = 0;
 		StreamTokenizer st = new StreamTokenizer(br);
@@ -83,7 +82,7 @@ public abstract class ProcessSources  {
 	public abstract void writeIllicitWord(String word) throws IOException;
 	public abstract void optimizeLicitWords() throws IOException;
 
-	public void readIllicitWords(BufferedReader br) throws Exception {
+	public void readIllicitWords(Reader br) throws Exception {
 		long start = System.currentTimeMillis();
 		int illicitWords = 0;
 		StreamTokenizer st = new StreamTokenizer(br);

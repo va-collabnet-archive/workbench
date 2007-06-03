@@ -214,8 +214,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private File licitWordsDir;
 
-	private File illicitWordsDir;
-
+	public void setup(Object envHome, boolean readOnly, Long cacheSize)
+	throws IOException {
+		setup((File) envHome, readOnly, cacheSize);
+	}
 	/**
 	 * @todo find out of all secondary databases have to be opened when the
 	 *       primary is opened? How do they get updated, etc?
@@ -251,7 +253,6 @@ public class VodbEnv implements I_ImplementTermFactory {
 			envHome.mkdirs();
 			luceneDir = new File(envHome, "lucene");
 			licitWordsDir = new File(envHome, "lucene-licit");
-			illicitWordsDir = new File(envHome, "lucene-illicit");
 
 			EnvironmentConfig envConfig = new EnvironmentConfig();
 			if (cacheSize != null) {
@@ -445,7 +446,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return env;
 	}
 
-	public void sync() throws DatabaseException {
+	public void sync() throws IOException {
+		try {
 		if (env.getConfig().getReadOnly()) {
 			return;
 		}
@@ -514,10 +516,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 				env.sync();
 			}
 		}
-
+		} catch (DatabaseException ex) {
+			throw new ToIoException(ex);
+		}
 	}
 
-	public void close() {
+	public void close() throws IOException {
 		try {
 			sync();
 			if (env != null) {
@@ -2394,7 +2398,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private void writeTolicitIndex(String word, String type) throws IOException {
 		if (licitIndexWriter == null) {
-			Directory dir = FSDirectory.getDirectory(illicitWordsDir, true);
+			Directory dir = FSDirectory.getDirectory(licitWordsDir, true);
 			licitIndexWriter = new IndexWriter(dir, new StandardAnalyzer(), true);
 			licitIndexWriter.setUseCompoundFile(true);
 			licitIndexWriter.mergeFactor = 10000;
@@ -2435,6 +2439,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public Hits searchIllicitWords(String query) throws IOException, ParseException {
 		query = "type:\"i\" " + query;
 		return doLicitSearch(query);
+	}
+
+	public void checkpoint() throws IOException {
+		this.sync();
 	}
 
 }
