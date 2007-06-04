@@ -21,6 +21,7 @@ public interface I_TermFactory {
 	public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept,
 			String lang, String text, I_ConceptualizeLocally descType, 
 			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
+	public I_DescriptionVersioned getDescription(int dnid) throws TerminologyException, IOException;
 	
 	/**
 	 * Uses the configuration to set default values for the relationship, and uses the
