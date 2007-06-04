@@ -91,12 +91,8 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 
 	public I_DescribeConceptLocally getDescription(int descriptionNid)
 			throws IOException, TerminologyException {
-		try {
 			I_DescriptionVersioned vDesc = server.getDescription(descriptionNid);
 			return vDesc.toLocalFixedDesc();
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
 	}
 
 	public Collection<I_DescribeConceptLocally> getDescriptionsForConcept(

@@ -442,7 +442,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				AceLog.getEditLog().fine(
 						"Merging desc with existing (should have been null): \n"
 								+ thinDesc + "\n\n" + oldDescVersioned);
-			} catch (DatabaseException e) {
+			} catch (IOException e) {
 				// expected exception...
 			}
 			AceConfig.getVodb().writeDescription(thinDesc);

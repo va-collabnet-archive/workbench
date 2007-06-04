@@ -215,9 +215,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 	private File licitWordsDir;
 
 	public void setup(Object envHome, boolean readOnly, Long cacheSize)
-	throws IOException {
+			throws IOException {
 		setup((File) envHome, readOnly, cacheSize);
 	}
+
 	/**
 	 * @todo find out of all secondary databases have to be opened when the
 	 *       primary is opened? How do they get updated, etc?
@@ -448,74 +449,74 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public void sync() throws IOException {
 		try {
-		if (env.getConfig().getReadOnly()) {
-			return;
-		}
-		if (env != null) {
-			if (conceptDb != null) {
-				if (!conceptDb.getConfig().getReadOnly()) {
-					conceptDb.sync();
+			if (env.getConfig().getReadOnly()) {
+				return;
+			}
+			if (env != null) {
+				if (conceptDb != null) {
+					if (!conceptDb.getConfig().getReadOnly()) {
+						conceptDb.sync();
+					}
+				}
+				if (relDb != null) {
+					if (!relDb.getConfig().getReadOnly()) {
+						relDb.sync();
+					}
+				}
+				if (descDb != null) {
+					if (!descDb.getConfig().getReadOnly()) {
+						descDb.sync();
+					}
+				}
+				if (conceptImageMap != null) {
+					if (!conceptImageMap.getConfig().getReadOnly()) {
+						conceptImageMap.sync();
+					}
+				}
+				if (imageDb != null) {
+					if (!imageDb.getConfig().getReadOnly()) {
+						imageDb.sync();
+					}
+				}
+				if (uidToIdMap != null) {
+					if (!uidToIdMap.getConfig().getReadOnly()) {
+						uidToIdMap.sync();
+					}
+				}
+				if (conceptDescMap != null) {
+					if (!conceptDescMap.getConfig().getReadOnly()) {
+						conceptDescMap.sync();
+					}
+				}
+				if (c1RelMap != null) {
+					if (!c1RelMap.getConfig().getReadOnly()) {
+						c1RelMap.sync();
+					}
+				}
+				if (c2RelMap != null) {
+					if (!c2RelMap.getConfig().getReadOnly()) {
+						c2RelMap.sync();
+					}
+				}
+				if (idDb != null) {
+					if (!idDb.getConfig().getReadOnly()) {
+						idDb.sync();
+					}
+				}
+				if (timeBranchDb != null) {
+					if (!timeBranchDb.getConfig().getReadOnly()) {
+						timeBranchDb.sync();
+					}
+				}
+				if (pathDb != null) {
+					if (!pathDb.getConfig().getReadOnly()) {
+						pathDb.sync();
+					}
+				}
+				if (!env.getConfig().getReadOnly()) {
+					env.sync();
 				}
 			}
-			if (relDb != null) {
-				if (!relDb.getConfig().getReadOnly()) {
-					relDb.sync();
-				}
-			}
-			if (descDb != null) {
-				if (!descDb.getConfig().getReadOnly()) {
-					descDb.sync();
-				}
-			}
-			if (conceptImageMap != null) {
-				if (!conceptImageMap.getConfig().getReadOnly()) {
-					conceptImageMap.sync();
-				}
-			}
-			if (imageDb != null) {
-				if (!imageDb.getConfig().getReadOnly()) {
-					imageDb.sync();
-				}
-			}
-			if (uidToIdMap != null) {
-				if (!uidToIdMap.getConfig().getReadOnly()) {
-					uidToIdMap.sync();
-				}
-			}
-			if (conceptDescMap != null) {
-				if (!conceptDescMap.getConfig().getReadOnly()) {
-					conceptDescMap.sync();
-				}
-			}
-			if (c1RelMap != null) {
-				if (!c1RelMap.getConfig().getReadOnly()) {
-					c1RelMap.sync();
-				}
-			}
-			if (c2RelMap != null) {
-				if (!c2RelMap.getConfig().getReadOnly()) {
-					c2RelMap.sync();
-				}
-			}
-			if (idDb != null) {
-				if (!idDb.getConfig().getReadOnly()) {
-					idDb.sync();
-				}
-			}
-			if (timeBranchDb != null) {
-				if (!timeBranchDb.getConfig().getReadOnly()) {
-					timeBranchDb.sync();
-				}
-			}
-			if (pathDb != null) {
-				if (!pathDb.getConfig().getReadOnly()) {
-					pathDb.sync();
-				}
-			}
-			if (!env.getConfig().getReadOnly()) {
-				env.sync();
-			}
-		}
 		} catch (DatabaseException ex) {
 			throw new ToIoException(ex);
 		}
@@ -636,15 +637,19 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	public I_DescriptionVersioned getDescription(int descId)
-			throws DatabaseException {
+			throws IOException {
 		DatabaseEntry descKey = new DatabaseEntry();
 		DatabaseEntry descValue = new DatabaseEntry();
 		intBinder.objectToEntry(descId, descKey);
-		if (descDb.get(null, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			return (I_DescriptionVersioned) descBinding
-					.entryToObject(descValue);
+		try {
+			if (descDb.get(null, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				return (I_DescriptionVersioned) descBinding
+						.entryToObject(descValue);
+			}
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
 		}
-		throw new DatabaseException("Description: " + descId + " not found.");
+		throw new IOException("Description: " + descId + " not found.");
 	}
 
 	public boolean hasDescription(int descId) throws DatabaseException {
@@ -1189,41 +1194,47 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 	}
 
-	public void makeLuceneDescriptionIndex() throws IOException, DatabaseException {
-		Stopwatch timer = new Stopwatch();
-		timer.start();
-		luceneDir.mkdirs();
-		Directory dir = FSDirectory.getDirectory(luceneDir, true);
-		IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(), true);
-		writer.setUseCompoundFile(true);
-		writer.mergeFactor = 10000;
-		Cursor descCursor = getDescDb().openCursor(null, null);
-		DatabaseEntry foundKey = new DatabaseEntry();
-		DatabaseEntry foundData = new DatabaseEntry();
-		while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			ThinDescVersioned descV = (ThinDescVersioned) descBinding
-					.entryToObject(foundData);
-			Document doc = new Document();
-			doc.add(Field.Keyword("dnid", Integer.toString(descV.getDescId())));
-			doc.add(Field.Keyword("cnid", Integer
-					.toString(descV.getConceptId())));
-			String lastDesc = null;
-			for (I_DescriptionTuple tuple : descV.getTuples()) {
-				if (lastDesc == null
-						|| lastDesc.equals(tuple.getText()) == false) {
-					doc.add(Field.UnStored("desc", tuple.getText()));
-				}
+	public void makeLuceneDescriptionIndex() throws IOException {
+		try {
+			Stopwatch timer = new Stopwatch();
+			timer.start();
+			luceneDir.mkdirs();
+			Directory dir = FSDirectory.getDirectory(luceneDir, true);
+			IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(),
+					true);
+			writer.setUseCompoundFile(true);
+			writer.mergeFactor = 10000;
+			Cursor descCursor = getDescDb().openCursor(null, null);
+			DatabaseEntry foundKey = new DatabaseEntry();
+			DatabaseEntry foundData = new DatabaseEntry();
+			while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				ThinDescVersioned descV = (ThinDescVersioned) descBinding
+						.entryToObject(foundData);
+				Document doc = new Document();
+				doc.add(Field.Keyword("dnid", Integer.toString(descV
+						.getDescId())));
+				doc.add(Field.Keyword("cnid", Integer.toString(descV
+						.getConceptId())));
+				String lastDesc = null;
+				for (I_DescriptionTuple tuple : descV.getTuples()) {
+					if (lastDesc == null
+							|| lastDesc.equals(tuple.getText()) == false) {
+						doc.add(Field.UnStored("desc", tuple.getText()));
+					}
 
+				}
+				writer.addDocument(doc);
 			}
-			writer.addDocument(doc);
-		}
-		descCursor.close();
-		logger.info("Optimizing index time: " + timer.getElapsedTime());
-		writer.optimize();
-		writer.close();
-		if (logger.isLoggable(Level.INFO)) {
-			logger.info("Index time: " + timer.getElapsedTime());
-			timer.stop();
+			descCursor.close();
+			logger.info("Optimizing index time: " + timer.getElapsedTime());
+			writer.optimize();
+			writer.close();
+			if (logger.isLoggable(Level.INFO)) {
+				logger.info("Index time: " + timer.getElapsedTime());
+				timer.stop();
+			}
+		} catch (DatabaseException ex) {
+			throw new ToIoException(ex);
 		}
 	}
 
@@ -1324,7 +1335,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 						AceLog.getAppLog().alertAndLogException(e);
 					}
 				}
-			} catch (DatabaseException e1) {
+			} catch (IOException e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
 
@@ -1376,8 +1387,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 			}
 		}
 
-		public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value)
-				throws IOException {
+		public void processConceptAttributeEntry(DatabaseEntry key,
+				DatabaseEntry value) throws IOException {
 			I_ConceptAttributeVersioned conc = (I_ConceptAttributeVersioned) conBinding
 					.entryToObject(value);
 			for (I_ConceptAttributePart c : conc.getVersions()) {
@@ -1438,8 +1449,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 		relCursor.close();
 	}
 
-	public void iterateConceptAttributeEntries(I_ProcessConceptAttributeEntries processor)
-			throws Exception {
+	public void iterateConceptAttributeEntries(
+			I_ProcessConceptAttributeEntries processor) throws Exception {
 		Cursor concCursor = getConceptDb().openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
@@ -2212,13 +2223,19 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private static class ProcessorWrapper implements
 			I_ProcessDescriptionEntries, I_ProcessConceptAttributeEntries,
-			I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessPathEntries {
-		
+			I_ProcessRelationshipEntries, I_ProcessIdEntries,
+			I_ProcessImageEntries, I_ProcessPathEntries {
+
 		I_ProcessConceptAttributes conceptAttributeProcessor;
+
 		I_ProcessDescriptions descProcessor;
+
 		I_ProcessRelationships relProcessor;
+
 		I_ProcessIds idProcessor;
+
 		I_ProcessImages imageProcessor;
+
 		I_ProcessPaths pathProcessor;
 
 		public ProcessorWrapper() {
@@ -2232,8 +2249,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 			descProcessor.processDescription(desc);
 		}
 
-		public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value)
-				throws Exception {
+		public void processConceptAttributeEntry(DatabaseEntry key,
+				DatabaseEntry value) throws Exception {
 			I_ConceptAttributeVersioned conc = (I_ConceptAttributeVersioned) conBinding
 					.entryToObject(value);
 			conceptAttributeProcessor.processConceptAttributes(conc);
@@ -2287,7 +2304,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 			this.idProcessor = processor;
 		}
 
-		public void processId(DatabaseEntry key, DatabaseEntry value) throws Exception {
+		public void processId(DatabaseEntry key, DatabaseEntry value)
+				throws Exception {
 			I_IdVersioned idv = (I_IdVersioned) idBinding.entryToObject(value);
 			this.idProcessor.processId(idv);
 		}
@@ -2300,8 +2318,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 			this.imageProcessor = imageProcessor;
 		}
 
-		public void processImages(DatabaseEntry key, DatabaseEntry value) throws Exception {
-			I_ImageVersioned imageV = (I_ImageVersioned) imageBinder.entryToObject(value);
+		public void processImages(DatabaseEntry key, DatabaseEntry value)
+				throws Exception {
+			I_ImageVersioned imageV = (I_ImageVersioned) imageBinder
+					.entryToObject(value);
 			this.imageProcessor.processImages(imageV);
 		}
 
@@ -2313,32 +2333,31 @@ public class VodbEnv implements I_ImplementTermFactory {
 			this.pathProcessor = pathProcessor;
 		}
 
-		public void processPath(DatabaseEntry key, DatabaseEntry value) throws Exception {
+		public void processPath(DatabaseEntry key, DatabaseEntry value)
+				throws Exception {
 			I_Path path = (I_Path) pathBinder.entryToObject(value);
 			this.pathProcessor.processPath(path);
 		}
 
 	}
-	
-	public static class ConceptIteratorWrapper implements I_ProcessConceptAttributeEntries {
+
+	public static class ConceptIteratorWrapper implements
+			I_ProcessConceptAttributeEntries {
 
 		I_ProcessConcepts processor;
-		
-		
+
 		public ConceptIteratorWrapper(I_ProcessConcepts processor) {
 			super();
 			this.processor = processor;
 		}
 
-
-
-		public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value) throws Exception {
+		public void processConceptAttributeEntry(DatabaseEntry key,
+				DatabaseEntry value) throws Exception {
 			I_ConceptAttributeVersioned conAttrVersioned = (I_ConceptAttributeVersioned) conBinding
-			.entryToObject(value);
+					.entryToObject(value);
 			ConceptBean bean = ConceptBean.get(conAttrVersioned.getConId());
 			processor.processConcept(bean);
 		}
-
 
 		public DatabaseEntry getDataEntry() {
 			return new DatabaseEntry();
@@ -2347,7 +2366,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		public DatabaseEntry getKeyEntry() {
 			return new DatabaseEntry();
 		}
-		
+
 	}
 
 	public void iterateConceptAttributes(I_ProcessConceptAttributes processor)
@@ -2399,7 +2418,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 	private void writeTolicitIndex(String word, String type) throws IOException {
 		if (licitIndexWriter == null) {
 			Directory dir = FSDirectory.getDirectory(licitWordsDir, true);
-			licitIndexWriter = new IndexWriter(dir, new StandardAnalyzer(), true);
+			licitIndexWriter = new IndexWriter(dir, new StandardAnalyzer(),
+					true);
 			licitIndexWriter.setUseCompoundFile(true);
 			licitIndexWriter.mergeFactor = 10000;
 		}
@@ -2416,33 +2436,47 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void writeLicitWord(String word) throws IOException {
 		writeTolicitIndex(word, "l");
 	}
-	
+
 	public void optimizeLicitWords() throws IOException {
 		if (licitIndexWriter != null) {
 			licitIndexWriter.optimize();
 		}
 	}
-	
-	public Hits searchLicitWords(String query) throws IOException, ParseException {
+
+	public Hits searchLicitWords(String query) throws IOException,
+			ParseException {
 		query = "type:\"l\" " + query;
 		return doLicitSearch(query);
 	}
 
 	public Hits doLicitSearch(String query) throws IOException, ParseException {
 		if (luceneLicitSearcher == null) {
-			luceneLicitSearcher = new IndexSearcher(licitWordsDir.getAbsolutePath());
+			luceneLicitSearcher = new IndexSearcher(licitWordsDir
+					.getAbsolutePath());
 		}
 		Query q = QueryParser.parse(query, "word", new StandardAnalyzer());
 		return luceneLicitSearcher.search(q);
 	}
-	
-	public Hits searchIllicitWords(String query) throws IOException, ParseException {
+
+	public Hits searchIllicitWords(String query) throws IOException,
+			ParseException {
 		query = "type:\"i\" " + query;
 		return doLicitSearch(query);
 	}
 
 	public void checkpoint() throws IOException {
 		this.sync();
+	}
+
+	public Hits doLuceneSearch(String query) throws IOException, ParseException {
+		if (luceneDir.exists() == false) {
+			makeLuceneDescriptionIndex();
+		}
+		if (luceneSearcher == null) {
+			luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
+		}
+		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
+		return luceneSearcher.search(q);
 	}
 
 }
