@@ -107,6 +107,8 @@ public interface I_TermFactory {
 	public Hits searchLicitWords(String query) throws IOException, ParseException;
 
 	public Hits doLicitSearch(String query) throws IOException, ParseException;
+	
+	public Hits doLuceneSearch(String query) throws IOException, ParseException;
 
 
 }
