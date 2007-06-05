@@ -2,6 +2,8 @@ package org.dwfa.ace.api;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.lucene.queryParser.ParseException;
@@ -62,7 +64,15 @@ public interface I_TermFactory {
 	
 	public LogWithAlerts getEditLog();
 	
-	public I_Position newPosition(I_Path path, int version);
+	public I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException;
+	
+	public I_Path getPath(UUID[] ids) throws TerminologyException, IOException;
+	
+	public List<I_Path> getPaths() throws Exception;
+	
+	public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException;
+	
+	public I_Position newPosition(I_Path path, int version) throws TerminologyException, IOException;
 	
 	public I_IntSet newIntSet();
 	
