@@ -60,6 +60,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
@@ -1964,7 +1965,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return tpCollector.getTimePathIdList();
 	}
 
-	public List<Path> getPaths() throws Exception {
+	public List<I_Path> getPaths() throws Exception {
 		PathCollector collector = new PathCollector();
 		iteratePaths(collector);
 		return collector.getPaths();
@@ -2477,6 +2478,33 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
 		return luceneSearcher.search(q);
+	}
+
+	public I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException {
+		try {
+			return getPath(uuidToNative(uids));
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
+	}
+
+	public I_Path getPath(UUID[] uuids) throws TerminologyException, IOException {
+		try {
+			return getPath(uuidToNative(Arrays.asList(uuids)));
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		} 
+	}
+
+	public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException {
+		Path newPath = new Path(pathConcept.getConceptId(), new ArrayList<I_Position>(origins));
+		AceLog.getEditLog().fine("writing new path: \n" + newPath);
+		try {
+			AceConfig.getVodb().writePath(newPath);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
+		return newPath;
 	}
 
 }

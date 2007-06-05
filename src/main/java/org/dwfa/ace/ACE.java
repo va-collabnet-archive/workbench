@@ -280,9 +280,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		boolean hidden = true;
 
 		public void actionPerformed(ActionEvent e) {
+			AceLog.getAppLog().info(" bottomPaneAction: " + e);
 			if (showSearchButton == e.getSource()) {
+				AceLog.getAppLog().info(" 1. ");
 				if (showSearchButton.isSelected()) {
+					AceLog.getAppLog().info(" 2. ");
 					if (hidden) {
+						AceLog.getAppLog().info(" 3. ");
 						if (lastLocation == 0) {
 							lastLocation = upperLowerSplit.getHeight() - 200;
 						}
@@ -291,6 +295,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					}
 
 				} else {
+					AceLog.getAppLog().info(" 4. ");
 					lastLocation = upperLowerSplit.getDividerLocation();
 					upperLowerSplit.setDividerLocation(upperLowerSplit
 							.getHeight());
