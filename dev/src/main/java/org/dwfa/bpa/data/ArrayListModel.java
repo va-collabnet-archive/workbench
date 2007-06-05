@@ -102,9 +102,7 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 		this.listeners.remove(l);
 	}
 
-	public List<T> getList() {
-		return data;
-	}
+
 	/**
 	 * @param o
 	 * @return
@@ -114,7 +112,7 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 	
 	public boolean add(T o) {
 		boolean rv = data.add(o);
-        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, data.size(), data.size());
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, data.size() - 2, data.size());
         notifyListenersContentChanged(e);
         return rv;
 	}
@@ -167,7 +165,10 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 	 * 
 	 */
 	public void clear() {
+		int size = data.size();
 		data.clear();
+	    ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, size);
+	    notifyListenersContentChanged(e);
 	}
 	/**
 	 * @param o
@@ -247,7 +248,13 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 	 * @return
 	 */
 	public boolean removeAll(Collection c) {
-		throw new UnsupportedOperationException();
+		boolean removed = false;
+		for (Object o: c) {
+			if (remove(o)) {
+				removed = true;
+			}
+		}
+		return removed;
 	}
 	/**
 	 * @param c

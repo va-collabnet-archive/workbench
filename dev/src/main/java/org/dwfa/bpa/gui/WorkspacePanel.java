@@ -679,7 +679,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     public List<GridBagPanel> getPanelList() {
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
                 .getModel();
-        return listModel.getList();
+        return listModel;
     }
 
     /**
