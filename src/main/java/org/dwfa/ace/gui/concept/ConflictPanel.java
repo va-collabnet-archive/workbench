@@ -699,7 +699,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 			
 			// concept attributes
 			List<I_ConceptAttributeTuple> conAttrTuplesForPosition = this.cb
-				.getConceptTuples(config.getAllowedStatus(),
+				.getConceptAttributeTuples(config.getAllowedStatus(),
 					positionSet);
 			allConAttrTuples.addAll(conAttrTuplesForPosition);
 
@@ -788,7 +788,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		
 		// concept attributes
-		List<I_ConceptAttributeTuple> conAttrList = this.cb.getConceptTuples(config
+		List<I_ConceptAttributeTuple> conAttrList = this.cb.getConceptAttributeTuples(config
 				.getAllowedStatus(), posSet);
 		for (I_ConceptAttributeTuple t : conAttrList) {
 			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, false,

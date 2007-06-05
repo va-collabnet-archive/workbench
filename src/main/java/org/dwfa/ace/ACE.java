@@ -95,6 +95,7 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
@@ -553,7 +554,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public static Timer timer = new Timer();
 
-	private I_ConfigAceFrame aceFrameConfig;
+	private AceFrameConfig aceFrameConfig;
 
 	private JPanel treeProgress;
 
@@ -659,7 +660,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public void setup(I_ConfigAceFrame aceFrameConfig)
 			throws DatabaseException, IOException, ClassNotFoundException {
-		this.aceFrameConfig = aceFrameConfig;
+		this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
 		this.aceFrameConfig.addPropertyChangeListener(this);
 		try {
 			masterProcessBuilderPanel = new ProcessBuilderContainer(config,
@@ -976,6 +977,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	private CdePalette addressPalette;
 
 	private JList addressList;
+
+	private PreferencesPaletteActionListener preferencesActionListener;
+
+	private HistoryPaletteActionListener hpal;
+
+	private AddressPaletteActionListener apal;
 
 	private void makeProcessPalette() throws Exception {
 		JLayeredPane layers = getRootPane().getLayeredPane();
@@ -1411,7 +1418,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		JLayeredPane layers = getRootPane().getLayeredPane();
 		addressPalette = new CdePalette(new BorderLayout(),
 				new LeftPalettePoint());
-		addressList = new JList(aceFrameConfig.getAddressesList().toArray());
+		addressList = new JList(aceFrameConfig.getAddressesList());
 		addressPalette
 				.add(new JScrollPane(addressList), BorderLayout.CENTER);
 		addressPalette.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -1641,15 +1648,17 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				.getResource("/32x32/plain/history2.png")));
 		showHistoryButton
 				.setToolTipText("history of user commits and concepts viewed");
-		showHistoryButton.addActionListener(new HistoryPaletteActionListener());
+		hpal = new HistoryPaletteActionListener();
+		showHistoryButton.addActionListener(hpal);
 		topPanel.add(showHistoryButton, c);
 		c.gridx++;
 		showAddressesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/address_book3.png")));
 		showAddressesButton
 				.setToolTipText("address book of project participants");
+		apal = new AddressPaletteActionListener();
 		showAddressesButton
-				.addActionListener(new AddressPaletteActionListener());
+				.addActionListener(apal);
 		topPanel.add(showAddressesButton, c);
 		c.gridx++;
 
@@ -1756,8 +1765,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridx++;
 		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
+		preferencesActionListener = new PreferencesPaletteActionListener();
 		showPreferencesButton
-				.addActionListener(new PreferencesPaletteActionListener());
+				.addActionListener(preferencesActionListener);
 		topPanel.add(showPreferencesButton, c);
 		showPreferencesButton.setToolTipText("Show preferences panel...");
 		c.gridx++;
@@ -2013,32 +2023,49 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	public void setShowAddresses(boolean show) {
-		showAddressesButton.setSelected(show);	
+		if (show != showAddressesButton.isSelected()) {
+			showAddressesButton.setSelected(show);
+			apal.actionPerformed(new ActionEvent(showAddressesButton, 0, "toggle"));
+		}
 	}
 
 	public void setShowComponentView(boolean show) {
-		showComponentButton.setSelected(show);
+		if (show != showComponentButton.isSelected()) {
+			showComponentButton.setSelected(show);
+			resizeListener.actionPerformed(new ActionEvent(showComponentButton, 0, "toggle"));
+		}
 	}
 
 	public void setShowHierarchyView(boolean show) {
-		showTreeButton.setSelected(show);
+		if (show != showTreeButton.isSelected()) {
+			showTreeButton.setSelected(show);
+			resizeListener.actionPerformed(new ActionEvent(showTreeButton, 0, "toggle"));
+		}
 	}
 
 	public void setShowHistory(boolean show) {
-		showHistoryButton.setSelected(show);
+		if (show != showHistoryButton.isSelected()) {
+			showHistoryButton.setSelected(show);
+			hpal.actionPerformed(new ActionEvent(showHistoryButton, 0, "toggle"));
+		}
 	}
 
 	public void setShowPreferences(boolean show) {
-		showPreferencesButton.setSelected(show);
+		if (show != showPreferencesButton.isSelected()) {
+			showPreferencesButton.setSelected(show);
+			preferencesActionListener.actionPerformed(new ActionEvent(showPreferencesButton, 0, "toggle"));
+		}
 	}
 
 	public void setShowSearch(boolean show) {
-		showSearchButton.setSelected(show);
+		if (show != showSearchButton.isSelected()) {
+			showSearchButton.setSelected(show);
+			bottomPanelActionListener.actionPerformed(new ActionEvent(showSearchButton, 0, "toggle"));
+		}
 	}
 
 	public void showListView() {
-		showComponentButton.setSelected(true);
+		setShowComponentView(true);
 		conceptTabs.setSelectedComponent(conceptListEditor);
 	}
-
 }

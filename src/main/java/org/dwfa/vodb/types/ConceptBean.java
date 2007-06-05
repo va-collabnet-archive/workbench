@@ -162,7 +162,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet,
 	 *      java.util.Set)
 	 */
-	public List<I_ConceptAttributeTuple> getConceptTuples(
+	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positionSet)
 			throws IOException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
@@ -871,7 +871,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		for (I_Position p : config.getViewPositionSet()) {
 			Set<I_Position> positionSet = new HashSet<I_Position>();
 			positionSet.add(p);
-			List<I_ConceptAttributeTuple> tuplesForPosition = getConceptTuples(
+			List<I_ConceptAttributeTuple> tuplesForPosition = getConceptAttributeTuples(
 					config.getAllowedStatus(), positionSet);
 			if (commonTuples == null) {
 				commonTuples = new HashSet<I_ConceptAttributeTuple>();

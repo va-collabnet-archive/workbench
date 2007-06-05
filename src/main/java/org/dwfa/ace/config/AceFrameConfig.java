@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
@@ -102,7 +103,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private AceConfig masterConfig;
     
     // 17
-    private List<String> addressesList = new ArrayList<String>();
+    private ArrayListModel<String> addressesList = new ArrayListModel<String>();
     
     // 18
     private String adminUsername;
@@ -322,7 +323,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
              }
             
             if (objDataVersion >= 17) {
-            	addressesList = (List<String>) in.readObject();
+            	List<String> listObject = (List<String>) in.readObject();
+            	if (ArrayList.class.isAssignableFrom(listObject.getClass())) {
+            		addressesList = (ArrayListModel<String>) listObject;
+            	} else {
+               		addressesList = new ArrayListModel<String>(listObject);
+            	}
             	if (addressesList.size() == 0) {
             		addressesList.add("va.user1.editor");
             		addressesList.add("va.user1.assignmentManager");
@@ -331,8 +337,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             		addressesList.add("va.user4.editor");
             	}
             } else {
-            	addressesList = new ArrayList<String>();
-        		addressesList.add("va.user1.editor");
+         		addressesList = new ArrayListModel<String>();
+         		addressesList.add("va.user1.editor");
         		addressesList.add("va.user1.assignmentManager");
         		addressesList.add("kp.user2.editor");
         		addressesList.add("kp.user3.editor");
@@ -1094,7 +1100,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 
-	public List<String> getAddressesList() {
+	public ArrayListModel<String> getAddressesList() {
 		return addressesList;
 	}
 

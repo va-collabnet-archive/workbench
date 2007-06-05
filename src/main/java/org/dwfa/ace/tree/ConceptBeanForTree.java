@@ -54,8 +54,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getConceptId();
 	}
 
-	public List<I_ConceptAttributeTuple> getConceptTuples(I_IntSet allowedStatus, Set<I_Position> positions) throws IOException {
-		return bean.getConceptTuples(allowedStatus, positions);
+	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions) throws IOException {
+		return bean.getConceptAttributeTuples(allowedStatus, positions);
 	}
 
 	public List<I_DescriptionVersioned> getDescriptions() throws IOException {
