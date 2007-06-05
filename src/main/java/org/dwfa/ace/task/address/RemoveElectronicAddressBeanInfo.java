@@ -29,7 +29,7 @@ public class RemoveElectronicAddressBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(RemoveElectronicAddress.class);
-        bd.setDisplayName("<html><font color='green'><center>Remove Electronic<br>Address");
+        bd.setDisplayName("<html><font color='green'><center>Remove Selected<br>Electronic Address");
         return bd;
     }
 

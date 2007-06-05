@@ -16,7 +16,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
 	public int getConceptId();
 
-	public List<I_ConceptAttributeTuple> getConceptTuples(I_IntSet allowedStatus,
+	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus,
 			Set<I_Position> positions) throws IOException;
 
 	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
