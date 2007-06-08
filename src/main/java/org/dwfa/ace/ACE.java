@@ -220,9 +220,11 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	private static void fireCommit() {
-		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-			frameConfig.fireCommit();
-			frameConfig.setCommitEnabled(false);
+		if (getAceConfig() != null) {
+			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+				frameConfig.fireCommit();
+				frameConfig.setCommitEnabled(false);
+			}
 		}
 	}
 
