@@ -48,8 +48,12 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 	}
 
 	public void commit() throws IOException {
-		tempOut.flush();
-		tempOut.close();
+
+		if (tempOut != null) {
+			tempOut.flush();
+			tempOut.close();
+			tempOut = null;
+		}
 		tempFile.renameTo(changeSetFile);
 	}
 

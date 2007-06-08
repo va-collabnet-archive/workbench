@@ -136,30 +136,36 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	public static void addImported(I_Transact to) {
 		imported.add(to);
-		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-			frameConfig.setCommitEnabled(true);
-			if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-				frameConfig.addImported((I_GetConceptData) to);
+		if (aceConfig != null) {
+			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+				frameConfig.setCommitEnabled(true);
+				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+					frameConfig.addImported((I_GetConceptData) to);
+				}
 			}
 		}
 	}
 
 	public static void addUncommitted(I_Transact to) {
 		uncommitted.add(to);
-		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-			frameConfig.setCommitEnabled(true);
-			if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-				frameConfig.addUncommitted((I_GetConceptData) to);
+		if (aceConfig != null) {
+			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+				frameConfig.setCommitEnabled(true);
+				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+					frameConfig.addUncommitted((I_GetConceptData) to);
+				}
 			}
 		}
 	}
 
 	public static void removeUncommitted(I_Transact to) {
 		uncommitted.remove(to);
-		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-			frameConfig.addUncommitted(null);
-			if (uncommitted.size() == 0) {
-				frameConfig.setCommitEnabled(false);
+		if (aceConfig != null) {
+			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+				frameConfig.addUncommitted(null);
+				if (uncommitted.size() == 0) {
+					frameConfig.setCommitEnabled(false);
+				}
 			}
 		}
 	}
@@ -591,14 +597,16 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 		public Point getPalettePoint() {
 			return new Point(topPanel.getLocation().x + topPanel.getWidth(),
-					topPanel.getLocation().y + topPanel.getHeight() + 1 + getMenuSpacer());
+					topPanel.getLocation().y + topPanel.getHeight() + 1
+							+ getMenuSpacer());
 		}
 
 	}
 
 	private int getMenuSpacer() {
-		if (System.getProperty("apple.laf.useScreenMenuBar") != null &&
-				System.getProperty("apple.laf.useScreenMenuBar").equals("true")) {
+		if (System.getProperty("apple.laf.useScreenMenuBar") != null
+				&& System.getProperty("apple.laf.useScreenMenuBar").equals(
+						"true")) {
 			return 0;
 		}
 		return 24;
@@ -616,10 +624,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	 * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
 	 * 
 	 * @param aceFrameConfig
-	 * @throws PrivilegedActionException 
-	 * @throws IOException 
-	 * @throws ConfigurationException 
-	 * @throws LoginException 
+	 * @throws PrivilegedActionException
+	 * @throws IOException
+	 * @throws ConfigurationException
+	 * @throws LoginException
 	 * @throws DatabaseException
 	 * 
 	 * @throws DatabaseException
@@ -630,7 +638,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			menuWorker = new MasterWorker(config);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		} 
+		}
 		this.config = config;
 	}
 
@@ -725,85 +733,88 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		return menuBar;
 	}
 
-	public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu) throws LoginException,
-			SecurityException, ConfigurationException, IOException,
-			PrivilegedActionException, IntrospectionException,
+	public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu)
+			throws LoginException, SecurityException, ConfigurationException,
+			IOException, PrivilegedActionException, IntrospectionException,
 			InvocationTargetException, IllegalAccessException,
 			PropertyVetoException, ClassNotFoundException,
 			NoSuchMethodException {
 		addFileMenu(menuBar);
 		addEditMenu(menuBar, editMenu);
 		addProcessMenus(menuBar);
-		
+
 		return menuBar;
 	}
-	
-	public void addProcessMenus(JMenuBar menuBar) throws FileNotFoundException, IOException, ClassNotFoundException {
+
+	public void addProcessMenus(JMenuBar menuBar) throws FileNotFoundException,
+			IOException, ClassNotFoundException {
 
 		File menuDir = new File("plugins/menu");
-        if (menuDir.listFiles() != null) {
-            addProcessMenuItems(menuBar, menuDir);
-        }
-    }
-
-	private void addProcessMenuItems(JMenuBar menuBar, File menuDir) throws IOException, FileNotFoundException, ClassNotFoundException {
-		for (File f : menuDir.listFiles()) {
-		    JMenu newMenu;
-		    if (f.isDirectory()) {
-		        if (f.getName().equals("File")) {
-		            newMenu = this.fileMenu;
-		        } else {
-		            newMenu = new JMenu(f.getName());
-		            menuBar.add(newMenu);
-		        }
-		        if (f.listFiles() != null) {
-		            for (File processFile : f.listFiles()) {
-		            	if (processFile.isDirectory()) {
-		            		JMenu submenu = new JMenu(processFile.getName());
-		            		newMenu.add(submenu);
-		            		addSubmenMenuItems(submenu, processFile);
-		            	} else {
-			                ActionListener processMenuListener = new ProcessMenuActionListener(
-			                        processFile, menuWorker);
-			                ObjectInputStream ois = new ObjectInputStream(
-			                        new BufferedInputStream(new FileInputStream(
-			                                processFile)));
-			                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-			                        .readObject();
-			                ois.close();
-			                JMenuItem processMenuItem = new JMenuItem(process
-			                        .getName());
-			                processMenuItem.addActionListener(processMenuListener);
-			                newMenu.add(processMenuItem);
-		            	}
-		            }
-		        }
-		        if (newMenu == fileMenu) {
-		            fileMenu.addSeparator();
-		        }
-		    }
+		if (menuDir.listFiles() != null) {
+			addProcessMenuItems(menuBar, menuDir);
 		}
 	}
-	private void addSubmenMenuItems(JMenu subMenu, File menuDir) throws IOException, FileNotFoundException, ClassNotFoundException {
+
+	private void addProcessMenuItems(JMenuBar menuBar, File menuDir)
+			throws IOException, FileNotFoundException, ClassNotFoundException {
+		for (File f : menuDir.listFiles()) {
+			JMenu newMenu;
+			if (f.isDirectory()) {
+				if (f.getName().equals("File")) {
+					newMenu = this.fileMenu;
+				} else {
+					newMenu = new JMenu(f.getName());
+					menuBar.add(newMenu);
+				}
+				if (f.listFiles() != null) {
+					for (File processFile : f.listFiles()) {
+						if (processFile.isDirectory()) {
+							JMenu submenu = new JMenu(processFile.getName());
+							newMenu.add(submenu);
+							addSubmenMenuItems(submenu, processFile);
+						} else {
+							ActionListener processMenuListener = new ProcessMenuActionListener(
+									processFile, menuWorker);
+							ObjectInputStream ois = new ObjectInputStream(
+									new BufferedInputStream(
+											new FileInputStream(processFile)));
+							I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+									.readObject();
+							ois.close();
+							JMenuItem processMenuItem = new JMenuItem(process
+									.getName());
+							processMenuItem
+									.addActionListener(processMenuListener);
+							newMenu.add(processMenuItem);
+						}
+					}
+				}
+				if (newMenu == fileMenu) {
+					fileMenu.addSeparator();
+				}
+			}
+		}
+	}
+
+	private void addSubmenMenuItems(JMenu subMenu, File menuDir)
+			throws IOException, FileNotFoundException, ClassNotFoundException {
 		for (File f : menuDir.listFiles()) {
 			if (f.isDirectory()) {
 				JMenu newSubMenu = new JMenu(f.getName());
 				subMenu.add(newSubMenu);
 				addSubmenMenuItems(newSubMenu, f);
-		    } else {
-                ActionListener processMenuListener = new ProcessMenuActionListener(
-                        f, menuWorker);
-                ObjectInputStream ois = new ObjectInputStream(
-                        new BufferedInputStream(new FileInputStream(
-                                f)));
-                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-                        .readObject();
-                ois.close();
-                JMenuItem processMenuItem = new JMenuItem(process
-                        .getName());
-                processMenuItem.addActionListener(processMenuListener);
-                subMenu.add(processMenuItem);
-		    }
+			} else {
+				ActionListener processMenuListener = new ProcessMenuActionListener(
+						f, menuWorker);
+				ObjectInputStream ois = new ObjectInputStream(
+						new BufferedInputStream(new FileInputStream(f)));
+				I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+						.readObject();
+				ois.close();
+				JMenuItem processMenuItem = new JMenuItem(process.getName());
+				processMenuItem.addActionListener(processMenuListener);
+				subMenu.add(processMenuItem);
+			}
 		}
 	}
 
@@ -952,12 +963,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	CollectionEditorContainer conceptListEditor;
+
 	private Component getConceptListEditor() throws DatabaseException,
 			IOException, ClassNotFoundException {
 		if (conceptListEditor == null) {
 			batchConceptList = new TerminologyList();
-			conceptListEditor =  new CollectionEditorContainer(batchConceptList, this,
-				descListProcessBuilderPanel);
+			conceptListEditor = new CollectionEditorContainer(batchConceptList,
+					this, descListProcessBuilderPanel);
 		}
 		return conceptListEditor;
 	}
@@ -1062,7 +1074,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
 		listEditorTopPanel.add(new JLabel(" "), c); // placeholder for left
-													// sided button
+		// sided button
 		c.weightx = 1.0;
 		listEditorTopPanel.add(new JLabel(" "), c); // filler
 		c.gridx++;
@@ -1080,7 +1092,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		subversionPalette = new CdePalette(new BorderLayout(),
 				new RightPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
-		for (String key: aceFrameConfig.getSubversionMap().keySet()) {
+		for (String key : aceFrameConfig.getSubversionMap().keySet()) {
 			SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
 			tabs.addTab("change sets", svnTable);
 		}
@@ -1419,8 +1431,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		addressPalette = new CdePalette(new BorderLayout(),
 				new LeftPalettePoint());
 		addressList = new JList(aceFrameConfig.getAddressesList());
-		addressPalette
-				.add(new JScrollPane(addressList), BorderLayout.CENTER);
+		addressPalette.add(new JScrollPane(addressList), BorderLayout.CENTER);
 		addressPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		layers.add(addressPalette, JLayeredPane.PALETTE_LAYER);
 		int width = 400;
@@ -1438,13 +1449,14 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	JComponent getHierarchyPanel() {
 		if (tree != null) {
-			for (TreeExpansionListener tel: tree.getTreeExpansionListeners()) {
+			for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
 				tree.removeTreeExpansionListener(tel);
 			}
-			for (TreeSelectionListener tsl: tree.getTreeSelectionListeners()) {
+			for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
 				tree.removeTreeSelectionListener(tsl);
 			}
-			for (TreeWillExpandListener twel: tree.getTreeWillExpandListeners()) {
+			for (TreeWillExpandListener twel : tree
+					.getTreeWillExpandListeners()) {
 				tree.removeTreeWillExpandListener(twel);
 			}
 		}
@@ -1657,8 +1669,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showAddressesButton
 				.setToolTipText("address book of project participants");
 		apal = new AddressPaletteActionListener();
-		showAddressesButton
-				.addActionListener(apal);
+		showAddressesButton.addActionListener(apal);
 		topPanel.add(showAddressesButton, c);
 		c.gridx++;
 
@@ -1766,8 +1777,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
 		preferencesActionListener = new PreferencesPaletteActionListener();
-		showPreferencesButton
-				.addActionListener(preferencesActionListener);
+		showPreferencesButton.addActionListener(preferencesActionListener);
 		topPanel.add(showPreferencesButton, c);
 		showPreferencesButton.setToolTipText("Show preferences panel...");
 		c.gridx++;
@@ -1793,10 +1803,11 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				aceFrameConfig.setStatusMessage("Executing: " + bp.getName());
 				final MasterWorker worker = aceFrameConfig.getWorker();
 
-				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
-						aceFrameConfig);
-				worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
-						.name(), this);
+				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG
+						.name(), aceFrameConfig);
+				worker.writeAttachment(
+						WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
+						this);
 				Runnable r = new Runnable() {
 					private String exceptionMessage;
 
@@ -2025,42 +2036,49 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public void setShowAddresses(boolean show) {
 		if (show != showAddressesButton.isSelected()) {
 			showAddressesButton.setSelected(show);
-			apal.actionPerformed(new ActionEvent(showAddressesButton, 0, "toggle"));
+			apal.actionPerformed(new ActionEvent(showAddressesButton, 0,
+					"toggle"));
 		}
 	}
 
 	public void setShowComponentView(boolean show) {
 		if (show != showComponentButton.isSelected()) {
 			showComponentButton.setSelected(show);
-			resizeListener.actionPerformed(new ActionEvent(showComponentButton, 0, "toggle"));
+			resizeListener.actionPerformed(new ActionEvent(showComponentButton,
+					0, "toggle"));
 		}
 	}
 
 	public void setShowHierarchyView(boolean show) {
 		if (show != showTreeButton.isSelected()) {
 			showTreeButton.setSelected(show);
-			resizeListener.actionPerformed(new ActionEvent(showTreeButton, 0, "toggle"));
+			resizeListener.actionPerformed(new ActionEvent(showTreeButton, 0,
+					"toggle"));
 		}
 	}
 
 	public void setShowHistory(boolean show) {
 		if (show != showHistoryButton.isSelected()) {
 			showHistoryButton.setSelected(show);
-			hpal.actionPerformed(new ActionEvent(showHistoryButton, 0, "toggle"));
+			hpal
+					.actionPerformed(new ActionEvent(showHistoryButton, 0,
+							"toggle"));
 		}
 	}
 
 	public void setShowPreferences(boolean show) {
 		if (show != showPreferencesButton.isSelected()) {
 			showPreferencesButton.setSelected(show);
-			preferencesActionListener.actionPerformed(new ActionEvent(showPreferencesButton, 0, "toggle"));
+			preferencesActionListener.actionPerformed(new ActionEvent(
+					showPreferencesButton, 0, "toggle"));
 		}
 	}
 
 	public void setShowSearch(boolean show) {
 		if (show != showSearchButton.isSelected()) {
 			showSearchButton.setSelected(show);
-			bottomPanelActionListener.actionPerformed(new ActionEvent(showSearchButton, 0, "toggle"));
+			bottomPanelActionListener.actionPerformed(new ActionEvent(
+					showSearchButton, 0, "toggle"));
 		}
 	}
 

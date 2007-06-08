@@ -60,7 +60,11 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.cs.BinaryChangeSetReader;
+import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
@@ -2505,6 +2509,39 @@ public class VodbEnv implements I_ImplementTermFactory {
 			throw new ToIoException(e);
 		}
 		return newPath;
+	}
+
+	public void commit() throws Exception {
+		ACE.commit();
+		
+	}
+
+	public void addChangeSetWriter(I_WriteChangeSet csw) {
+		ACE.getCsWriters().add(csw);
+		
+	}
+
+	public I_ReadChangeSet newBinaryChangeSetReader(File changeSetFile) {
+		BinaryChangeSetReader bcs = new BinaryChangeSetReader();
+		bcs.setChangeSetFile(changeSetFile);
+		return bcs;
+	}
+
+	public I_WriteChangeSet newBinaryChangeSetWriter(File changeSetFile) {
+		File tempChangeSetFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".temp");
+		BinaryChangeSetWriter bcs = new BinaryChangeSetWriter(changeSetFile, tempChangeSetFile);
+		return bcs;
+	}
+
+	public void removeChangeSetWriter(I_WriteChangeSet csw) {
+		ACE.getCsWriters().remove(csw);
+	}
+
+	public void closeChangeSets() throws IOException {
+		for (I_WriteChangeSet cs: ACE.getCsWriters()) {
+			cs.commit();
+		}
+		ACE.getCsWriters().clear();
 	}
 
 }
