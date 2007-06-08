@@ -1,5 +1,6 @@
 package org.dwfa.ace.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.UUID;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
+import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -81,6 +84,12 @@ public interface I_TermFactory {
 	public void forget(I_RelVersioned rel);
 	
 	public void addUncommitted(I_GetConceptData concept);
+	public void commit() throws Exception;
+	public void addChangeSetWriter(I_WriteChangeSet writer);
+	public void removeChangeSetWriter(I_WriteChangeSet writer);
+	public void closeChangeSets() throws IOException;
+	public I_WriteChangeSet newBinaryChangeSetWriter(File changeSetFile) throws IOException;
+	public I_ReadChangeSet newBinaryChangeSetReader(File changeSetFile) throws IOException;
 	
 	public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception;
 	/**
