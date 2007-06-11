@@ -18,7 +18,7 @@
   <distributionManagement>
     <site>
       <id>aceworkspace.net</id>
-      <url>file://ciweb/webapps/foundation</url>
+      <url>file:///ciweb/webapps/foundation</url>
     </site>
   </distributionManagement>  <scm>
     <connection>scm:svn:https://foundation.aceworkspace.net/svn/foundation/trunk/dev</connection>
