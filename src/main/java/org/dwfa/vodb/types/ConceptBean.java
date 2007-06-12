@@ -138,11 +138,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			return uncommittedConceptAttributes;
 		}
 		if (conceptAttributes == null) {
-			try {
-				conceptAttributes = AceConfig.getVodb().getConcept(conceptId);
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
+				conceptAttributes = AceConfig.getVodb().getConceptAttributes(conceptId);
 		}
 		return conceptAttributes;
 	}
