@@ -8,6 +8,11 @@
   <version>1.0-SNAPSHOT</version>
   <name>Ace plugins for Maven</name>
   <url>http://www.informatics.com</url>
+  <scm>
+    <connection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</connection>
+    <developerConnection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</developerConnection>
+    <url>https://term-mojo.aceworkspace.net/source/browse/term-mojo/trunk/dev/</url>
+  </scm>
   <dependencies>
     <dependency>
       <version>2.0.1-SNAPSHOT</version>
