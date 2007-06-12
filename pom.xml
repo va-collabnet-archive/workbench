@@ -8,6 +8,11 @@
   <version>1.0-SNAPSHOT</version>
   <name>ACE API</name>
   <url>http://www.informatics.com</url>
+  <scm>
+    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</connection>
+    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</developerConnection>
+    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
