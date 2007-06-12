@@ -47,4 +47,4 @@ public class Among {
     public Method method; /* method to use if substring matches */
     public SnowballProgram methodobject; /* object to invoke method on */
    
-};
+}
