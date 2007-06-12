@@ -1154,6 +1154,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			preferencesPalette = null;
 			oldPallette.setVisible(false);
 			JLayeredPane layers = getRootPane().getLayeredPane();
+			oldPallette.removeGhost();
 			layers.remove(oldPallette);
 		}
 		if (showPreferencesButton.isSelected()) {

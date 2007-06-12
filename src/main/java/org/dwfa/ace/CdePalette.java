@@ -17,13 +17,13 @@ public class CdePalette extends JPanel implements ComponentListener {
 	private static final long serialVersionUID = 1L;
 	private static enum Side{TOP, BOTTOM, LEFT, RIGHT};
 	public static int increment = 50;
+	private JPanel ghostPanel = new JPanel();
 	
 	private class PaletteMover implements ActionListener {
 		private Point currentLocation;
 		private Point endLocation;
 		private int delay = 20;
 		private Timer t;
-		private JPanel ghostPanel = new JPanel();
 		
 		public PaletteMover(Point currentLocation, Point endLocation, boolean selected) {
 			super();
@@ -46,14 +46,9 @@ public class CdePalette extends JPanel implements ComponentListener {
 			t.removeActionListener(this);
 			setLocation(endLocation);
 			setVisible(true);
-			if (getRootPane() != null) {
-				JLayeredPane layers = getRootPane().getLayeredPane();
-				if (layers != null) {
-					layers.moveToFront(CdePalette.this);
-					layers.remove(ghostPanel);
-				}
-			}
+			removeGhost();
 		}
+
 
 		private void movePalette() {
 			if (Math.abs(currentLocation.x - endLocation.x) < increment) {
@@ -82,6 +77,15 @@ public class CdePalette extends JPanel implements ComponentListener {
 		this.locator = locator;
 	}
 
+	public void removeGhost() {
+		if (getRootPane() != null) {
+			JLayeredPane layers = getRootPane().getLayeredPane();
+			if (layers != null) {
+				layers.moveToFront(CdePalette.this);
+				layers.remove(ghostPanel);
+			}
+		}
+	}
 	public CdePalette(boolean isDoubleBuffered, I_GetPalettePoint locator) {
 		super(isDoubleBuffered);
 		this.locator = locator;
