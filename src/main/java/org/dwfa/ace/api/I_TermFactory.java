@@ -22,6 +22,9 @@ public interface I_TermFactory {
 	
 	public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException;
 	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException;
+	public I_GetConceptData getConcept(int nid) throws TerminologyException, IOException;
+	
+	public Collection<UUID> getUids(int nid) throws TerminologyException, IOException;
 
 	public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept,
 			String lang, String text, I_ConceptualizeLocally descType, 
