@@ -1209,9 +1209,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 					true);
 			writer.setUseCompoundFile(true);
 			writer.mergeFactor = 10000;
+			writer.maxMergeDocs = Integer.MAX_VALUE;
+			writer.minMergeDocs = 1000;
 			Cursor descCursor = getDescDb().openCursor(null, null);
 			DatabaseEntry foundKey = new DatabaseEntry();
 			DatabaseEntry foundData = new DatabaseEntry();
+			int counter = 0;
+			int optimizeInterval = 10000;
 			while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				ThinDescVersioned descV = (ThinDescVersioned) descBinding
 						.entryToObject(foundData);
@@ -1229,6 +1233,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 				}
 				writer.addDocument(doc);
+				counter++;
+				if (counter == optimizeInterval) {
+					writer.optimize();
+				}
 			}
 			descCursor.close();
 			logger.info("Optimizing index time: " + timer.getElapsedTime());
