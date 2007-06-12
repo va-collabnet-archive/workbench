@@ -223,7 +223,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		vodb.populateTimeBranchDb();
 		printElapsedTime();
 		monitor.setProgressInfoUpper("Starting makeLuceneIndex().");
-		vodb.makeLuceneDescriptionIndex();
+		vodb.createLuceneDescriptionIndex();
 		printElapsedTime();
 		optimizeLicitWords();
 		monitor.setProgressInfoUpper("Starting cleanup.");

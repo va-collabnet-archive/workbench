@@ -1171,7 +1171,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		if (luceneDir.exists() == false) {
 			updater
 					.setProgressInfo("Making lucene index -- this may take a while...");
-			makeLuceneDescriptionIndex();
+			createLuceneDescriptionIndex();
 		}
 		updater.setIndeterminate(true);
 		if (luceneSearcher == null) {
@@ -1203,7 +1203,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 	}
 
-	public void makeLuceneDescriptionIndex() throws IOException {
+	public void createLuceneDescriptionIndex() throws IOException {
 		try {
 			Stopwatch timer = new Stopwatch();
 			timer.start();
@@ -1240,6 +1240,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 				counter++;
 				if (counter == optimizeInterval) {
 					writer.optimize();
+					counter = 0;
 				}
 			}
 			descCursor.close();
@@ -2487,7 +2488,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public Hits doLuceneSearch(String query) throws IOException, ParseException {
 		if (luceneDir.exists() == false) {
-			makeLuceneDescriptionIndex();
+			createLuceneDescriptionIndex();
 		}
 		if (luceneSearcher == null) {
 			luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
