@@ -619,8 +619,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return c2RelMap;
 	}
 
-	public I_ConceptAttributeVersioned getConcept(int conceptId)
-			throws DatabaseException {
+	public I_ConceptAttributeVersioned getConceptAttributes(int conceptId)
+			throws IOException {
 		Stopwatch timer = null;
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting concept : " + conceptId);
@@ -630,15 +630,19 @@ public class VodbEnv implements I_ImplementTermFactory {
 		DatabaseEntry conceptKey = new DatabaseEntry();
 		DatabaseEntry conceptValue = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, conceptKey);
-		if (conceptDb.get(null, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("Got concept: " + conceptId + " elapsed time: "
-						+ timer.getElapsedTime() / 1000 + " secs");
+		try {
+			if (conceptDb.get(null, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("Got concept: " + conceptId + " elapsed time: "
+							+ timer.getElapsedTime() / 1000 + " secs");
+				}
+				return (I_ConceptAttributeVersioned) conBinding
+						.entryToObject(conceptValue);
 			}
-			return (I_ConceptAttributeVersioned) conBinding
-					.entryToObject(conceptValue);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
 		}
-		throw new DatabaseException("Concept: " + conceptId + " not found.");
+		throw new ToIoException(new DatabaseException("Concept: " + conceptId + " not found."));
 	}
 
 	public I_DescriptionVersioned getDescription(int descId)
@@ -2490,6 +2494,18 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
 		return luceneSearcher.search(q);
+	}
+
+	public I_GetConceptData getConcept(int nativeId) throws TerminologyException, IOException {
+		return ConceptBean.get(nativeId);
+	}
+
+	public Collection<UUID> getUids(int nativeId) throws TerminologyException, IOException {
+		try {
+			return nativeToUuid(nativeId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException {

@@ -524,7 +524,7 @@ public class ImportUpdateJarReader implements ActionListener {
 			jarCon.convertIds(jarToDbNativeMap);
 			if (AceConfig.getVodb().hasConcept(jarCon
 					.getConId())) {
-				I_ConceptAttributeVersioned dbCon = AceConfig.getVodb().getConcept(jarCon
+				I_ConceptAttributeVersioned dbCon = AceConfig.getVodb().getConceptAttributes(jarCon
 						.getConId());
 				if (dbCon.merge(jarCon)) {
 					AceConfig.getVodb().writeConcept(dbCon);

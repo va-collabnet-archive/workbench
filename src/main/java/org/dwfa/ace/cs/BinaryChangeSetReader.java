@@ -234,8 +234,11 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				AceLog.getEditLog().fine(
 						"Merging attributes with existing (should have been null): \n"
 								+ thinAttributes + "\n\n" + oldVersioned);
-			} catch (DatabaseException e) {
-				// expected exception...
+			} catch (IOException e) {
+				if (ToIoException.class.isAssignableFrom(e.getClass())) {
+					// expected exception...
+				}
+				else throw e;
 			}
 			AceConfig.getVodb().writeConcept(thinAttributes);
 			AceLog.getEditLog().fine("Importing attributes: \n" + thinAttributes);

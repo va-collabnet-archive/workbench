@@ -112,12 +112,8 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 
 	public I_ConceptualizeLocally getConcept(int conceptNid)
 			throws IOException, TerminologyException {
-		try {
-			I_ConceptAttributeVersioned vCon = server.getConcept(conceptNid);
+			I_ConceptAttributeVersioned vCon = server.getConceptAttributes(conceptNid);
 			return vCon.getLocalFixedConcept();
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
 	}
 
 	public int getNid(UUID uid) throws IOException, TerminologyException {
