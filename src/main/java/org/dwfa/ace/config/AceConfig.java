@@ -523,6 +523,15 @@ public class AceConfig implements Serializable {
 		allowedStatus.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())
 				.getNativeId());
+		allowedStatus.add(AceConfig.getVodb().getId(
+				ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DESC_STYLE_ERROR.getUids())
+				.getNativeId());
+		allowedStatus.add(AceConfig.getVodb().getId(
+				ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DUPLICATE.getUids())
+				.getNativeId());
+		allowedStatus.add(AceConfig.getVodb().getId(
+				ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_REL_ERROR.getUids())
+				.getNativeId());
 		af.setAllowedStatus(allowedStatus);
 
 		IntSet destRelTypes = new IntSet();

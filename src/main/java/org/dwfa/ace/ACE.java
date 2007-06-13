@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -174,9 +175,19 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
 
-	protected final static int MENU_MASK = Toolkit.getDefaultToolkit()
-			.getMenuShortcutKeyMask();
+	protected final static int MENU_MASK = getMenuMask();
 
+	private static int getMenuMask() {
+		try {
+			return Toolkit.getDefaultToolkit()
+			.getMenuShortcutKeyMask();
+		} catch (HeadlessException e) {
+			//
+		}
+		return 0;
+	}
+	
+	
 	/*
 	 * 
 	 */
