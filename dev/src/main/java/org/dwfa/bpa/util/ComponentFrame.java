@@ -6,6 +6,7 @@
 package org.dwfa.bpa.util;
 
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -36,8 +37,17 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     
 	protected static Logger logger = Logger.getLogger(ComponentFrame.class.getName());
 	protected ComponentFrameBean cfb;
-    protected final static int MENU_MASK = Toolkit.getDefaultToolkit()
-    .getMenuShortcutKeyMask();
+	protected final static int MENU_MASK = getMenuMask();
+
+	private static int getMenuMask() {
+		try {
+			return Toolkit.getDefaultToolkit()
+			.getMenuShortcutKeyMask();
+		} catch (HeadlessException e) {
+			//
+		}
+		return 0;
+	}
     protected Configuration config;
     private String[] args;
     private LifeCycle lc;
