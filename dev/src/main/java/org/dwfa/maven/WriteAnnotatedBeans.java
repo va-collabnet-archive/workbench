@@ -95,6 +95,11 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		String classNameNoDotClass = "";
+		getLog().info("java.class.version: " + System.getProperty("java.class.version"));
+		getLog().info("java.vendor: " + System.getProperty("java.vendor"));
+		getLog().info("java.version: " + System.getProperty("java.version"));
+		getLog().info("os.arch: " + System.getProperty("os.arch"));
+		getLog().info("os.name: " + System.getProperty("os.name"));
 		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
 			getLog().info("writing annotated beans");
 		   	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
