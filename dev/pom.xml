@@ -11,7 +11,7 @@
   <groupId>org.dwfa</groupId>
   <artifactId>dwfa-mojo</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>dwfa maven plugin</name>
+  <name>DWFA MOJO (maven plugin)</name>
   <url>http://www.informatics.com</url>
   <issueManagement>
     <system>Scarab</system>
