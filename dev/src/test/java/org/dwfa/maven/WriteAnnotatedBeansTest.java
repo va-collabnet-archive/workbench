@@ -23,7 +23,7 @@ import org.dwfa.util.bean.BeanList;
 
 public class WriteAnnotatedBeansTest extends TestCase {
 
-	private File outputDirectory = new File(UUID.randomUUID().toString());
+	private File outputDirectory = new File("target/" + UUID.randomUUID().toString());
 	private MavenSession session;
 	private String localRepositoryStr;
 
@@ -69,6 +69,7 @@ public class WriteAnnotatedBeansTest extends TestCase {
 		}
 	}
 	public void testExecute() {
+		outputDirectory.mkdirs();
 		WriteAnnotatedBeans writer = new WriteAnnotatedBeans();
 		Dependency d = new Dependency();
 		d.setGroupId("org.dwfa");
