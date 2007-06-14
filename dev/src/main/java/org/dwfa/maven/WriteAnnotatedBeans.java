@@ -153,10 +153,13 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 										new GenericInvocationHandler(a));
 								for (Spec s : bl.specs()) {
 									if (s.type().equals(BeanType.DATA_BEAN)) {
+										getLog().info("Writing data bean: " + s.beanName());
 										writeDataBean(c, s);
 									} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
+										getLog().info("Writing generic bean: " + s.beanName());
 										writeGenericBean(c, s);
 									} else if (s.type().equals(BeanType.TASK_BEAN)) {
+										getLog().info("Writing task bean: " + s.beanName());
 										writeTaskBean(c, s);
 									}
 								}

@@ -84,8 +84,10 @@ public class WriteAnnotatedBeansTest extends TestCase {
 		try {
 			writer.execute();
 		} catch (MojoExecutionException e) {
+			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		} catch (MojoFailureException e) {
+			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		}
 	}
