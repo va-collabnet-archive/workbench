@@ -100,6 +100,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		getLog().info("java.version: " + System.getProperty("java.version"));
 		getLog().info("os.arch: " + System.getProperty("os.arch"));
 		getLog().info("os.name: " + System.getProperty("os.name"));
+		getLog().info("java.home: " + System.getProperty("java.home"));
 		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
 		   	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
 	    	for (Dependency d: dependencies) {
