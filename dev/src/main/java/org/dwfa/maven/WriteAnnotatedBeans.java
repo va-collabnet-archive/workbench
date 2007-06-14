@@ -144,7 +144,6 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 							String className = je.getName().replace('/', '.');
 							classNameNoDotClass = className.substring(0,
 									className.length() - 6);
-							getLog().info("loading: " + classNameNoDotClass);
 							Class<?> c = libLoader.loadClass(classNameNoDotClass);
 							Annotation a = c.getAnnotation(beanListClass);
 							if (c.getAnnotation(beanListClass) != null) {
