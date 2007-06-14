@@ -101,7 +101,6 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		getLog().info("os.arch: " + System.getProperty("os.arch"));
 		getLog().info("os.name: " + System.getProperty("os.name"));
 		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
-			getLog().info("writing annotated beans");
 		   	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
 	    	for (Dependency d: dependencies) {
 	    		if (d.getScope().equals("provided")) {
@@ -136,6 +135,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 					String dependencyPath = MojoUtil.dependencyToPath(
 							localRepository, d);
+					getLog().info("writing annotated beans for: " + dependencyPath);
 					JarFile jf = new JarFile(dependencyPath);
 					Enumeration<JarEntry> jarEnum = jf.entries();
 					while (jarEnum.hasMoreElements()) {
@@ -144,6 +144,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 							String className = je.getName().replace('/', '.');
 							classNameNoDotClass = className.substring(0,
 									className.length() - 6);
+							getLog().info("loading: " + classNameNoDotClass);
 							Class<?> c = libLoader.loadClass(classNameNoDotClass);
 							Annotation a = c.getAnnotation(beanListClass);
 							if (c.getAnnotation(beanListClass) != null) {
@@ -153,13 +154,10 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 										new GenericInvocationHandler(a));
 								for (Spec s : bl.specs()) {
 									if (s.type().equals(BeanType.DATA_BEAN)) {
-										getLog().info("Writing data bean: " + s.beanName());
 										writeDataBean(c, s);
 									} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
-										getLog().info("Writing generic bean: " + s.beanName());
 										writeGenericBean(c, s);
 									} else if (s.type().equals(BeanType.TASK_BEAN)) {
-										getLog().info("Writing task bean: " + s.beanName());
 										writeTaskBean(c, s);
 									}
 								}
@@ -255,6 +253,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		} else {
 			beanFile = new File(beanDir, s.beanName() + suffix);
 		}
+		getLog().info("  Writing: " + beanFile.getName());
 		FileOutputStream fos = new FileOutputStream(beanFile);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);

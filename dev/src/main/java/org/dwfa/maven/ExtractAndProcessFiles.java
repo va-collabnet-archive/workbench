@@ -64,7 +64,12 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Log l = getLog();
 		UUID randomId = UUID.randomUUID();
-		l.info("Now executing ExtractAndProcessFiles: " + Arrays.asList(specs));
+		StringBuffer listbuffer = new StringBuffer();
+		for (Object obj: specs) {
+			listbuffer.append("\n");
+			listbuffer.append(obj);
+		}
+		l.info("Now executing ExtractAndProcessFiles: " + listbuffer.toString());
 		for (ExtractAndProcessSpec spec : specs) {
 			Pattern filePattern = Pattern.compile(spec.getFilePatternStr());
 			File rootDir = new File(outputDirectory, spec.getDestDir());
