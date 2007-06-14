@@ -107,6 +107,9 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 	    		if (d.getScope().equals("provided")) {
 	    			//don't add
 	    		} else {
+	    			if (d.getScope().equals("system")) {
+	    				getLog().info("System dependency: " + d);
+	    			}
 	    			dependencyWithoutProvided.add(d);
 	    		}
 	    	}
