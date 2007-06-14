@@ -85,7 +85,11 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
 	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		rootDir = new File(outputDirectory, targetSubDir);
+		if (targetSubDir != null) {
+			rootDir = new File(outputDirectory, targetSubDir);
+		} else {
+			rootDir = outputDirectory;
+		}
 		for (int i = 0; i < specs.length; i++) {
 			//System.out.println(specs[i]);
 			if (specs[i].getType().equalsIgnoreCase("task")) {
@@ -256,6 +260,22 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
 		this.getLog().error(e);
 		this.e = e;
 		
+	}
+
+	public File getOutputDirectory() {
+		return outputDirectory;
+	}
+
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
+	public String getTargetSubDir() {
+		return targetSubDir;
+	}
+
+	public void setTargetSubDir(String targetSubDir) {
+		this.targetSubDir = targetSubDir;
 	}
 
 	

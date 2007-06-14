@@ -112,7 +112,12 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 	    	}
 			
 			try {
-				rootDir = new File(this.outputDirectory, targetSubDir);
+				if (targetSubDir != null) {
+					rootDir = new File(this.outputDirectory, targetSubDir);
+				} else {
+					rootDir = this.outputDirectory;
+
+				}
 				URLClassLoader libLoader = 
 					MojoUtil.getProjectClassLoaderWithoutProvided(
 							dependencies, localRepository, outputDirectory
@@ -328,6 +333,38 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		this.getLog().error(e);
 		this.e = e;
 
+	}
+
+	public File getOutputDirectory() {
+		return outputDirectory;
+	}
+
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
+	public MavenSession getSession() {
+		return session;
+	}
+
+	public void setSession(MavenSession session) {
+		this.session = session;
+	}
+
+	public List<Dependency> getDependencies() {
+		return dependencies;
+	}
+
+	public void setDependencies(List<Dependency> dependencies) {
+		this.dependencies = dependencies;
+	}
+
+	public String getLocalRepository() {
+		return localRepository;
+	}
+
+	public void setLocalRepository(String localRepository) {
+		this.localRepository = localRepository;
 	}
 
 }
