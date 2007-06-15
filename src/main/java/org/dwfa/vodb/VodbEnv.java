@@ -63,6 +63,7 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
@@ -2567,6 +2568,19 @@ public class VodbEnv implements I_ImplementTermFactory {
 			cs.commit();
 		}
 		ACE.getCsWriters().clear();
+	}
+
+	public I_ConfigAceFrame newAceFrameConfig() throws TerminologyException, IOException {
+		if (AceConfig.config == null) {
+			try {
+				AceConfig.config = new AceConfig();
+			} catch (DatabaseException e) {
+				throw new ToIoException(e);
+			}
+		}
+		AceFrameConfig frameConfig = new AceFrameConfig(AceConfig.config);
+		AceConfig.config.aceFrames.add(frameConfig);
+		return frameConfig;
 	}
 
 }
