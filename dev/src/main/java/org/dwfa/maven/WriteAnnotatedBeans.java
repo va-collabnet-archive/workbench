@@ -106,7 +106,10 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 	    	for (Dependency d: dependencies) {
 	    		if (d.getScope().equals("provided")) {
 	    			//don't add
-	    		} else {
+	    		} else if (d.getGroupId().endsWith("jini")) {
+	    			//don't add
+    				getLog().info("Skipping: " + d);
+	    		} else{
 	    			if (d.getScope().equals("system")) {
 	    				getLog().info("System dependency: " + d);
 	    			}
