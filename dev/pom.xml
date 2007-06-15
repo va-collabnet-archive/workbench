@@ -12,7 +12,7 @@
   <groupId>org.dwfa</groupId>
   <artifactId>foundation</artifactId>
   <packaging>jar</packaging>
-  <name>foundation module</name>
+  <name>Dwfa foundation module</name>
   <url>http://mgr.cubit.aceworkspace.net:8081/dwfa/foundation/</url>
   <inceptionYear>2004</inceptionYear>
   <organization>
