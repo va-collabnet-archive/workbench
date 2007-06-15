@@ -148,7 +148,7 @@ public class GenerateScripts extends AbstractMojo {
 				}
 			}
 			File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir
-					+ fileSep + scriptName + "OsX.sh");
+					+ fileSep + scriptName + "Linux.sh");
 
 				fw = new FileWriter(linuxScript);
 				// fw.write("export
