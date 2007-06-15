@@ -21,8 +21,15 @@ public interface I_RelVersioned {
 
 	public boolean removeRedundantRecs();
 
+	/**
+	 * 
+	 * @return the native id of the source concept (c1) of this relationship
+ 	 */
 	public int getC1Id();
-
+	/**
+	 * 
+	 * @return the native id of the destination concept (c2) of this relationship
+	 */
 	public int getC2Id();
 
 	public int getRelId();

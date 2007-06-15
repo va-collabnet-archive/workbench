@@ -20,6 +20,8 @@ public interface I_TermFactory {
 	public I_GetConceptData newConcept(UUID newConceptId, boolean defined, 
 			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 	
+	I_ConfigAceFrame newAceFrameConfig() throws TerminologyException, IOException;
+	
 	public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException;
 	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException;
 	public I_GetConceptData getConcept(int nid) throws TerminologyException, IOException;
