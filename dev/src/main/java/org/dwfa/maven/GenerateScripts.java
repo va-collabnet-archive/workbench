@@ -174,7 +174,7 @@ public class GenerateScripts extends AbstractMojo {
 				if (System.getProperty("os.name").startsWith("Windows") == false) {
 					try {
 						Runtime.getRuntime().exec(
-								"chmod a+x " + unixScript.getPath());
+								"chmod a+x " + linuxScript.getPath());
 					} catch (RuntimeException e) {
 						// Ignore, may be running on windows, and the permissions
 						// don't matter there...;
