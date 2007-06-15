@@ -147,6 +147,39 @@ public class GenerateScripts extends AbstractMojo {
 					// don't matter there...;
 				}
 			}
+			File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir
+					+ fileSep + scriptName + "OsX.sh");
+
+				fw = new FileWriter(linuxScript);
+				// fw.write("export
+				// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
+				fw.write("java \\\n");
+				fw.write("     -Xms" + startHeap + "  \\\n");
+				fw.write("     -Xmx" + maxHeap + " \\\n");
+				fw.write("     -Djava.security.manager=  \\\n");
+				fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
+				fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
+				fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
+				fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
+				fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
+				fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
+				fw.write("     -cp ");
+				for (File f : Arrays.asList(jars)) {
+					fw.write(libDir + "/" + f.getName() + ":");
+				}
+				fw.write(" \\\n");
+				fw
+						.write("     com.sun.jini.start.ServiceStarter config/" + startFileName + " \n");
+				fw.close();
+				if (System.getProperty("os.name").startsWith("Windows") == false) {
+					try {
+						Runtime.getRuntime().exec(
+								"chmod a+x " + unixScript.getPath());
+					} catch (RuntimeException e) {
+						// Ignore, may be running on windows, and the permissions
+						// don't matter there...;
+					}
+				}
 		} catch (IOException e) {
 			throw new MojoExecutionException("Error creating script file.", e);
 		}
