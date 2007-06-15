@@ -2583,4 +2583,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return frameConfig;
 	}
 
+	I_ConfigAceFrame activeAceFrameConfig;
+	public I_ConfigAceFrame getActiveAceFrameConfig() throws TerminologyException, IOException {
+		return activeAceFrameConfig;
+	}
+
+	public void setActiveAceFrameConfig(I_ConfigAceFrame activeAceFrameConfig) throws TerminologyException, IOException {
+		this.activeAceFrameConfig = activeAceFrameConfig;
+	}
+
 }
