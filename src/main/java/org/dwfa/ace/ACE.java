@@ -214,6 +214,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			throw new ToIoException(e);
 		}
 		for (I_WriteChangeSet writer : csWriters) {
+			AceLog.getEditLog().info(
+					"Committing writer: " + writer.toString());
 			writer.commit();
 		}
 		uncommitted.clear();

@@ -16,6 +16,11 @@ import org.dwfa.util.io.FileIO;
 
 public class BinaryChangeSetWriter implements I_WriteChangeSet {
 
+	@Override
+	public String toString() {
+		return "BinaryChangeSetWriter: changeSetFile: "  + changeSetFile + " tempFile: " + tempFile;
+	}
+
 	/**
 	 * 
 	 */
