@@ -86,14 +86,6 @@ public class VodbFindDuplicates extends AbstractMojo {
 	 */
 	private File dupPotMatchResults;
 
-	/**
-	 * Location of editing paths
-	 * 
-	 * @parameter 
-	 * @required
-	 */
-	private I_ConfigAceFrame config = null;
-
 	
 	/**
 	 * Location of the lucene directory.
@@ -179,7 +171,6 @@ public class VodbFindDuplicates extends AbstractMojo {
 															// (terminology
 															// server object)
 
-			config = termFactory.getActiveAceFrameConfig();
 			
 			xhtmlFullySpecifed = termFactory
 					.getConcept(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE
@@ -271,9 +262,9 @@ public class VodbFindDuplicates extends AbstractMojo {
 					.getAbsolutePath());
 			I_GetConceptData rootConcept = termFactory
 					.getConcept(new UUID[] { UUID.fromString(searchRootUuidStr) }); //
-			I_IntSet allowedStatus = config.getAllowedStatus();
-			I_IntSet allowedRelTypes = config.getDestRelTypes();
-			Set<I_Position> positions = config.getViewPositionSet();
+			I_IntSet allowedStatus = termFactory.getActiveAceFrameConfig().getAllowedStatus();
+			I_IntSet allowedRelTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+			Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
 
 			setupTable();
 			
@@ -344,17 +335,17 @@ public class VodbFindDuplicates extends AbstractMojo {
 									//create new relationship w/ potential duplicate as the type and change status to flagged as Current
 									termFactory.newRelationship(newRelUid, rootChild, 
 											 isPotDupRelType, potDupConcept, charAdditional,
-											 notRefinable, flaggedCurrent, 0, config);
+											 notRefinable, flaggedCurrent, 0, termFactory.getActiveAceFrameConfig());
 									
 									//change concept status to be flagged as potential duplicate							
 									Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
 									//integer.max-value is uncommitted
 									Set<I_Position> positionsForEdit = new HashSet<I_Position>();
-									for (I_Path editPath: config.getEditingPathSet()) {
+									for (I_Path editPath: termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
 										positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
 									}
 									
-									for (I_Path editPath: config.getEditingPathSet()) {
+									for (I_Path editPath: termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
 										List<I_ConceptAttributeTuple>  tuples = rootChild.getConceptAttributeTuples(
 												null, positionsForEdit);
 										for (I_ConceptAttributeTuple t: tuples) {
