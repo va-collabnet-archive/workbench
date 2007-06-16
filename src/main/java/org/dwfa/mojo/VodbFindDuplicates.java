@@ -267,7 +267,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 			// searches in children of a the root concept
 			Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(
 					allowedStatus, allowedRelTypes, positions, false);
-						
+			
 			for (I_GetConceptData rootChild : rootChildren) {
 				// print out rootChild description here...
 				boolean needToWriterootChild = true;
@@ -309,12 +309,17 @@ public class VodbFindDuplicates extends AbstractMojo {
 							// rootChild
 						} else {
 							// test if actual dup or pot dup or not a dup relationship exists...
+							I_GetConceptData hitConcept = termFactory.getConcept(cnid);
 							boolean alreadyDone = false;
-							if (seeIfDupRelExists(alreadyDone, rootChild.getSourceRels()) ||
-									seeIfDupRelExists(alreadyDone, rootChild.getSourceRels())) {
+							if (seeIfDupRelExists(alreadyDone, rootChild.getSourceRels(), hitConcept) ||
+									seeIfDupRelExists(alreadyDone, rootChild.getDestRels(), hitConcept) ||
+									seeIfDupRelExists(alreadyDone, rootChild.getUncommittedSourceRels(), hitConcept) ||
+											seeIfDupRelExists(alreadyDone, hitConcept.getUncommittedSourceRels(), rootChild)) {
 								alreadyDone = true;
 								break;
 							}
+
+							
 							if (alreadyDone == false) {
 //								 do something useful here
 							
@@ -413,10 +418,11 @@ public class VodbFindDuplicates extends AbstractMojo {
 	}
 
 
-	private boolean seeIfDupRelExists(boolean alreadyDone, Collection<I_RelVersioned> rels) {
+	private boolean seeIfDupRelExists(boolean alreadyDone, Collection<I_RelVersioned> rels, I_GetConceptData destConcept) {
 		for (I_RelVersioned rel: rels) {
 			for (I_RelTuple rt: rel.getTuples()) {
-				if (dupRelTypeSet.contains(rt.getRelTypeId())) {
+				if (dupRelTypeSet.contains(rt.getRelTypeId()) &&
+						rt.getC2Id() == destConcept.getConceptId()) {
 					// Already done... Ignore somehow
 					alreadyDone = true;
 					break;
