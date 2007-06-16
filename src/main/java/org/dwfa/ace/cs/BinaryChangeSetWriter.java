@@ -59,7 +59,9 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 			tempOut.close();
 			tempOut = null;
 		}
-		tempFile.renameTo(changeSetFile);
+		FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile
+				.getCanonicalPath());
+		tempFile.delete();
 	}
 
 	public void open() throws IOException {
@@ -73,7 +75,7 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 		}
 		FileIO.copyFile(changeSetFile.getCanonicalPath(), tempFile
 				.getCanonicalPath());
-		tempOut = new NoHeaderObjectOutputStream(new FileOutputStream(changeSetFile, true));
+		tempOut = new NoHeaderObjectOutputStream(new FileOutputStream(tempFile, true));
 	}
 
 	public void writeChanges(I_Transact change, long time) throws IOException {

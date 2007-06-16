@@ -195,6 +195,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		Date now = new Date();
 		Set<TimePathId> values = new HashSet<TimePathId>();
 		for (I_WriteChangeSet writer : csWriters) {
+			AceLog.getEditLog().info(
+					"Opening writer: " + writer.toString());
 			writer.open();
 		}
 		int version = ThinVersionHelper.convert(now.getTime());
