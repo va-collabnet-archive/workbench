@@ -19,7 +19,7 @@ public class VodbOpen  extends AbstractMojo {
 	/**
 	 * Location of the vodb directory.
 	 * 
-	 * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
+	 * @parameter default-value="${project.build.directory}/generated-resources/berkeley-db"
 	 * @required
 	 */
 	File vodbDirectory;
