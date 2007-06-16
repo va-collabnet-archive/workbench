@@ -1,6 +1,7 @@
 package org.dwfa.mojo;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -14,10 +15,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
  * 
@@ -34,7 +33,7 @@ public class VodbCreateNewPath extends AbstractMojo {
      * @parameter
      * @required
      */
-    UniversalAcePosition[] origins;
+	SimpleUniversalAcePath[] origins;
 
     /**
      * Path UUID
@@ -75,9 +74,9 @@ public class VodbCreateNewPath extends AbstractMojo {
             I_ConfigAceFrame activeConfig = tf.getActiveAceFrameConfig();
 
             Set<I_Position> pathOrigins = new HashSet<I_Position>(origins.length);
-            for (UniversalAcePosition pos : origins) {
+            for (SimpleUniversalAcePath pos : origins) {
                 I_Path originPath = tf.getPath(pos.getPathId());
-                pathOrigins.add(tf.newPosition(originPath, ThinVersionHelper.convert(pos.getTime())));
+                pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
             }
 
             I_GetConceptData parent = tf.getConcept(new UUID[] { UUID.fromString(parentUUID) });
@@ -92,11 +91,15 @@ public class VodbCreateNewPath extends AbstractMojo {
                               ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
 
             tf.newRelationship(UUID.randomUUID(), pathConcept, activeConfig);
+            
+            tf.newPath(pathOrigins, pathConcept);
         } catch (TerminologyException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }
+        } catch (ParseException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+		}
     }
 
 }

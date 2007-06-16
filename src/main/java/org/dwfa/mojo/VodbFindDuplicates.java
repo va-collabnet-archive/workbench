@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,13 +24,20 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.text.StringToWord;
@@ -64,7 +73,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 	/**
 	 * Location of the lucene directory.
 	 * 
-	 * @parameter expression="${project.build.directory}/generated-resources/berkeley-db/lucene"
+	 * @parameter default-value="${project.build.directory}/generated-resources/berkeley-db/lucene"
 	 * @required
 	 */
 	private File luceneDir;
@@ -72,12 +81,20 @@ public class VodbFindDuplicates extends AbstractMojo {
 	/**
 	 * Location of the lucene directory.
 	 * 
-	 * @parameter expression="${project.build.directory}/dupPotMatchResults"
+	 * @parameter default-value="${project.build.directory}/dupPotMatchResults"
 	 * @required
 	 */
 	private File dupPotMatchResults;
 
+	/**
+	 * Location of editing paths
+	 * 
+	 * @parameter 
+	 * @required
+	 */
+	private I_ConfigAceFrame config = null;
 
+	
 	/**
 	 * Location of the lucene directory.
 	 * 
@@ -96,7 +113,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 	/**
 	 * Location of the lucene directory.
 	 * 
-	 * @parameter expression="${project.build.directory}/dupPotMatchResults/details"
+	 * @parameter default-value="${project.build.directory}/dupPotMatchResults/details"
 	 * @required
 	 */
 	private File rootDir;
@@ -115,7 +132,23 @@ public class VodbFindDuplicates extends AbstractMojo {
 
 	private I_GetConceptData xhtmlsynonym;
 
-	private I_IntSet typeSet;
+	private I_GetConceptData isPotDupRelType;
+	
+	private I_GetConceptData isActualDupRel;
+	
+	private I_GetConceptData isNotDupRel;
+	
+	private I_GetConceptData flaggedPotDup;
+	
+	private I_GetConceptData flaggedCurrent;
+	
+	private I_GetConceptData charAdditional;
+	
+	private I_GetConceptData notRefinable;
+	
+	private I_IntSet descTypeSet;
+	
+	private I_IntSet dupRelTypeSet;
 
 	private I_GetConceptData rootConcept;
 
@@ -146,6 +179,8 @@ public class VodbFindDuplicates extends AbstractMojo {
 															// (terminology
 															// server object)
 
+			config = termFactory.getActiveAceFrameConfig();
+			
 			xhtmlFullySpecifed = termFactory
 					.getConcept(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE
 							.getUids());
@@ -164,14 +199,36 @@ public class VodbFindDuplicates extends AbstractMojo {
 			xhtmlsynonym = termFactory
 					.getConcept(ArchitectonicAuxiliary.Concept.XHTML_SYNONYM_DESC_TYPE
 							.getUids());
+			
+			flaggedPotDup = termFactory
+			.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DUPLICATE.getUids());
+			
+			isPotDupRelType = termFactory
+			.getConcept(ArchitectonicAuxiliary.Concept.IS_POT_DUP_REL.getUids());
+			
+			isActualDupRel = termFactory
+			.getConcept(ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.getUids());
+			
+			isNotDupRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_NOT_A_DUP_REL.getUids());
 
-			typeSet = termFactory.newIntSet();
-			typeSet.add(xhtmlFullySpecifed.getConceptId());
-			typeSet.add(xhtmlPreferred.getConceptId());
-			typeSet.add(preferred.getConceptId());
-			typeSet.add(fullySpecified.getConceptId());
-			typeSet.add(synonym.getConceptId());
-			typeSet.add(xhtmlsynonym.getConceptId());
+			charAdditional = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC.getUids());
+			
+			notRefinable = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+			
+			flaggedCurrent = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			
+			descTypeSet = termFactory.newIntSet();
+			descTypeSet.add(xhtmlFullySpecifed.getConceptId());
+			descTypeSet.add(xhtmlPreferred.getConceptId());
+			descTypeSet.add(preferred.getConceptId());
+			descTypeSet.add(fullySpecified.getConceptId());
+			descTypeSet.add(synonym.getConceptId());
+			descTypeSet.add(xhtmlsynonym.getConceptId());
+			
+			dupRelTypeSet = termFactory.newIntSet();
+			dupRelTypeSet.add(isPotDupRelType.getConceptId());
+			dupRelTypeSet.add(isActualDupRel.getConceptId());
+			dupRelTypeSet.add(isNotDupRel.getConceptId());
 
 			rootConcept = termFactory.getConcept(new UUID[] { UUID
 					.fromString(searchRootUuidStr) }); //
@@ -181,7 +238,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 				findDupsUsingTermFactory(threshold);
 				break;
 			case Fuzzy:
-				findDupsUsingFuzzy(threshold);
+				findDupsUsingFuzzy(threshold, htmlReportFile);
 				break;
 			case Snowball:
 				findDupsUsingSnowball(threshold);
@@ -199,8 +256,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 		}
 	}
 
-
-	private void findDupsUsingFuzzy(double threshold)
+	private void findDupsUsingFuzzy(double threshold, File htmlReportFile)
 			throws MojoExecutionException {
 
 		HashSet<I_DescriptionVersioned> potDupSet = new HashSet<I_DescriptionVersioned>();
@@ -215,9 +271,9 @@ public class VodbFindDuplicates extends AbstractMojo {
 					.getAbsolutePath());
 			I_GetConceptData rootConcept = termFactory
 					.getConcept(new UUID[] { UUID.fromString(searchRootUuidStr) }); //
-			I_IntSet allowedStatus = null;
-			I_IntSet allowedRelTypes = null;
-			Set<I_Position> positions = null;
+			I_IntSet allowedStatus = config.getAllowedStatus();
+			I_IntSet allowedRelTypes = config.getDestRelTypes();
+			Set<I_Position> positions = config.getViewPositionSet();
 
 			setupTable();
 			
@@ -231,7 +287,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 				
 				getLog().info("Checking for dups on: " + rootChild.toString());				
 				
-				I_IntSet allowedTypes = typeSet;
+				I_IntSet allowedTypes = descTypeSet;
 				for (I_DescriptionTuple childDesc : rootChild
 						.getDescriptionTuples(allowedStatus, allowedTypes,
 								positions)) {
@@ -265,44 +321,95 @@ public class VodbFindDuplicates extends AbstractMojo {
 							// ignore because it is a match of the current
 							// rootChild
 						} else {
-							// do something useful here
-							int dnid = Integer.parseInt(d.get("dnid"));
-							I_DescriptionVersioned potDup = termFactory
-									.getDescription(dnid);
-							if (typeSet.contains(potDup.getFirstTuple().getTypeId())) {
-								getLog().info("dnid: " + dnid + "  potential duplicate: "
-												+ potDup.getFirstTuple().getText() + " score: "+ score);
-
-								if (needToWriterootChild) {
-									dwfaDupDataWriter.append(rootChild
-											.toString());
-									dwfaDupDataWriter.append("\n");
-									writeSearchConceptToHtmlTableRow(rootChild);
-									needToWriterootChild = false;
-								}
-
-								potDupSet.add(potDup);
-								if (reasonMap.containsKey(potDup) == false) {
-									reasonMap.put(potDup,new ArrayList<String>());
-								}
-								StringBuffer reasonBuf = new StringBuffer();
-								reasonBuf.append(childDesc.getText() +" ("+ queryDescType + ")         score: " + score);
-							
-								if (explanationRequested) {
-									reasonBuf.append("<br>");
-									reasonBuf.append(luceneSearcher.explain(apiQuery, hits.id(i)));
-									reasonBuf.append("<br>");
-								}
-								reasonMap.get(potDup).add(reasonBuf.toString());
+							// test if actual dup or pot dup or not a dup relationship exists...
+							boolean alreadyDone = false;
+							if (seeIfDupRelExists(alreadyDone, rootChild.getSourceRels()) ||
+									seeIfDupRelExists(alreadyDone, rootChild.getSourceRels())) {
+								alreadyDone = true;
+								break;
 							}
-						}
+							if (alreadyDone == false) {
+//								 do something useful here
+								int dnid = Integer.parseInt(d.get("dnid"));
+								I_DescriptionVersioned potDup = termFactory
+										.getDescription(dnid);
+								
+								
+								if (descTypeSet.contains(potDup.getFirstTuple().getTypeId())) {
+									getLog().info("dnid: " + dnid + "  potential duplicate: "
+													+ potDup.getFirstTuple().getText() + " score: "+ score);
+									I_GetConceptData potDupConcept = termFactory.getConcept(potDup.getConceptId());
+									UUID newRelUid = null;
 
+									//create new relationship w/ potential duplicate as the type and change status to flagged as Current
+									termFactory.newRelationship(newRelUid, rootChild, 
+											 isPotDupRelType, potDupConcept, charAdditional,
+											 notRefinable, flaggedCurrent, 0, config);
+									
+									//change concept status to be flagged as potential duplicate							
+									Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
+									//integer.max-value is uncommitted
+									Set<I_Position> positionsForEdit = new HashSet<I_Position>();
+									for (I_Path editPath: config.getEditingPathSet()) {
+										positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
+									}
+									
+									for (I_Path editPath: config.getEditingPathSet()) {
+										List<I_ConceptAttributeTuple>  tuples = rootChild.getConceptAttributeTuples(
+												null, positionsForEdit);
+										for (I_ConceptAttributeTuple t: tuples) {
+											if (t.getConceptStatus() != flaggedPotDup.getConceptId()) {
+												I_ConceptAttributePart newPart = t.duplicatePart();
+												newPart.setPathId(editPath.getConceptId());
+												newPart.setVersion(Integer.MAX_VALUE);
+												newPart.setConceptStatus(flaggedPotDup.getConceptId());
+												partsToAdd.add(newPart);
+											}
+										}
+									}
+									for (I_ConceptAttributePart p: partsToAdd) {
+										rootChild.getConceptAttributes().addVersion(p);
+									}
+									LocalVersionedTerminology.get().addUncommitted(rootChild);
+					
+									//writing search UUIDs to file for assignment
+									if (needToWriterootChild) {
+										boolean first = true;
+										for (UUID uid : rootChild.getUids()) {
+											if (first) {
+												first = false;
+											} else {
+												dwfaDupDataWriter.append('\t');
+											}
+											dwfaDupDataWriter.append(uid.toString());										
+										}
+										dwfaDupDataWriter.append("\n");
+										writeSearchConceptToHtmlTableRow(rootChild);
+										needToWriterootChild = false;	
+									}
+
+									potDupSet.add(potDup);
+									if (reasonMap.containsKey(potDup) == false) {
+										reasonMap.put(potDup,new ArrayList<String>());
+									}
+									StringBuffer reasonBuf = new StringBuffer();
+									reasonBuf.append(childDesc.getText() +" ("+ queryDescType + ")         score: " + score);
+								
+									if (explanationRequested) {
+										reasonBuf.append("<br>");
+										reasonBuf.append(luceneSearcher.explain(apiQuery, hits.id(i)));
+										reasonBuf.append("<br>");
+									}
+									reasonMap.get(potDup).add(reasonBuf.toString());
+								}								
+							}							
+						}
 					}
 				}
 				for (I_DescriptionVersioned desc : potDupSet) {
 					writePotDupRowToHtmlTable(reasonMap.get(desc), desc);
 				}
-				writeToDetailHTMLFile(potDupSet, rootChild, reasonMap);
+				writeToDetailHTMLFile(potDupSet, rootChild, reasonMap, htmlReportFile);
 				potDupSet.clear();
 
 			}
@@ -314,8 +421,25 @@ public class VodbFindDuplicates extends AbstractMojo {
 		} 
 	}
 
+
+	private boolean seeIfDupRelExists(boolean alreadyDone, Collection<I_RelVersioned> rels) {
+		for (I_RelVersioned rel: rels) {
+			for (I_RelTuple rt: rel.getTuples()) {
+				if (dupRelTypeSet.contains(rt.getRelTypeId())) {
+					// Already done... Ignore somehow
+					alreadyDone = true;
+					break;
+				}
+			}
+			if (alreadyDone) {
+				break;
+			}
+		}
+		return alreadyDone;
+	}
+
 	private void writeToDetailHTMLFile(HashSet<I_DescriptionVersioned> potDupSet, I_GetConceptData rootChild, 
-			Map<I_DescriptionVersioned, List<String>> reasonMap) throws IOException, TerminologyException {
+			Map<I_DescriptionVersioned, List<String>> reasonMap, File htmlReportFile) throws IOException, TerminologyException {
 
 		File detailHtmlFile = new File(rootDir, rootChild.getUids().get(0) + ".html");		
 		FileWriter detailWriter = new FileWriter(detailHtmlFile);
@@ -338,10 +462,12 @@ public class VodbFindDuplicates extends AbstractMojo {
 		//write search concept
 		htmlReportDetailWriter.append("<tr>");
 		htmlReportDetailWriter.append("<td colspan=2 >");
-		htmlReportDetailWriter.append(rootChild.toString());
+		htmlReportDetailWriter.append(rootChild.toString() + "&nbsp;&nbsp;&nbsp;&nbsp; ");
+		htmlReportDetailWriter.append("<a href=\"" +".." + File.separator + htmlReportFile.getName() +"\">All Pot Dups</a>");
 		htmlReportDetailWriter.append("</td>\n");
 		htmlReportDetailWriter.append("<td align=right>");
-		htmlReportDetailWriter.append(Integer.toString(rootChild.getConceptId()));
+		htmlReportDetailWriter.append(Integer.toString(rootChild.getConceptId()) );
+		
 		htmlReportDetailWriter.append("</td>\n");
 		htmlReportDetailWriter.append("</tr>\n");
 				
@@ -354,9 +480,12 @@ public class VodbFindDuplicates extends AbstractMojo {
 			//htmlReportWriter.append("<font color=#252525> (of type: " + potDupType + ")</font>");
 			htmlReportDetailWriter.append(" --" + potDupType + "--");
 			htmlReportDetailWriter.append("</td>");
-
+		
 			htmlReportDetailWriter.append("<td bgcolor=#99CCCC align=right>");
 			htmlReportDetailWriter.append(Integer.toString(desc.getConceptId()));
+
+	
+			
 			htmlReportDetailWriter.append("</td>");
 			
 			htmlReportDetailWriter.append("<td bgcolor=#99CCCC align=right>");
@@ -483,7 +612,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 
 				boolean needToWriterootChild = true;
 
-				I_IntSet allowedTypes = typeSet;
+				I_IntSet allowedTypes = descTypeSet;
 				for (I_DescriptionTuple childDesc : rootChild
 						.getDescriptionTuples(allowedStatus, allowedTypes,
 								positions)) {
@@ -602,7 +731,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 			for (I_GetConceptData rootChild : rootChildren) {
 				// print out rootChild description here...
 				getLog().info("Checking for dups on: " + rootChild.toString());
-				I_IntSet allowedTypes = typeSet;
+				I_IntSet allowedTypes = descTypeSet;
 				for (I_DescriptionTuple childDesc : rootChild
 						.getDescriptionTuples(allowedStatus, allowedTypes,
 								positions)) {

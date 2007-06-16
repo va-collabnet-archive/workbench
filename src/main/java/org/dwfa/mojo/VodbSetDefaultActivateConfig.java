@@ -27,7 +27,7 @@ import org.dwfa.tapi.TerminologyException;
 
 /**
  * 
- * @goal vodb-activate-config
+ * @goal vodb-set-default-config
  * 
  * @phase process-resources
  * @requiresDependencyResolution compile
