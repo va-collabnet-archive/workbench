@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +36,6 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.text.StringToWord;
@@ -321,19 +319,20 @@ public class VodbFindDuplicates extends AbstractMojo {
 							}
 							if (alreadyDone == false) {
 //								 do something useful here
+							
 								int dnid = Integer.parseInt(d.get("dnid"));
 								I_DescriptionVersioned potDup = termFactory
 										.getDescription(dnid);
 								
-								
 								if (descTypeSet.contains(potDup.getFirstTuple().getTypeId())) {
 									getLog().info("dnid: " + dnid + "  potential duplicate: "
 													+ potDup.getFirstTuple().getText() + " score: "+ score);
+									
 									I_GetConceptData potDupConcept = termFactory.getConcept(potDup.getConceptId());
-									UUID newRelUid = null;
-
+								
 									//create new relationship w/ potential duplicate as the type and change status to flagged as Current
-									termFactory.newRelationship(newRelUid, rootChild, 
+									
+									termFactory.newRelationship(UUID.randomUUID(), rootChild, 
 											 isPotDupRelType, potDupConcept, charAdditional,
 											 notRefinable, flaggedCurrent, 0, termFactory.getActiveAceFrameConfig());
 									
@@ -370,13 +369,15 @@ public class VodbFindDuplicates extends AbstractMojo {
 											if (first) {
 												first = false;
 											} else {
-												dwfaDupDataWriter.append('\t');
+												dwfaDupDataWriter.append("\t");	
 											}
+											getLog().info("uid = "+uid.toString());
 											dwfaDupDataWriter.append(uid.toString());										
 										}
 										dwfaDupDataWriter.append("\n");
 										writeSearchConceptToHtmlTableRow(rootChild);
 										needToWriterootChild = false;	
+										dwfaDupDataWriter.flush();
 									}
 
 									potDupSet.add(potDup);
