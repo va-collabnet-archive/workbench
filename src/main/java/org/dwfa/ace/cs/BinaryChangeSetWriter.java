@@ -59,8 +59,13 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 			tempOut.close();
 			tempOut = null;
 		}
-		FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile
-				.getCanonicalPath());
+        String canonicalFileString = tempFile.getCanonicalPath();
+        if (tempFile.renameTo(changeSetFile) == false) {
+            System.out.println("tempFile.renameTo failed. Attempting FileIO.copyFile...");
+            FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile
+                            .getCanonicalPath());
+        }
+        tempFile = new File(canonicalFileString);
 		tempFile.delete();
 	}
 

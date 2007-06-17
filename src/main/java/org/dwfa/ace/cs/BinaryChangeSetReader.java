@@ -181,7 +181,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			UniversalAceConceptAttributes attributes = bean
 					.getConceptAttributes();
 			ThinConVersioned thinAttributes = (ThinConVersioned) AceConfig.getVodb()
-					.getConcept(getNid(attributes.getConId()));
+					.getConceptAttributes(getNid(attributes.getConId()));
 			boolean changed = false;
 			for (UniversalAceConceptAttributesPart part : attributes
 					.getVersions()) {
@@ -229,14 +229,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			}
 			try {
 				ThinConVersioned oldVersioned = (ThinConVersioned) AceConfig.getVodb()
-						.getConcept(thinAttributes.getConId());
+						.getConceptAttributes(thinAttributes.getConId());
 				oldVersioned.merge(thinAttributes);
 				AceLog.getEditLog().fine(
 						"Merging attributes with existing (should have been null): \n"
 								+ thinAttributes + "\n\n" + oldVersioned);
 			} catch (IOException e) {
 				if (ToIoException.class.isAssignableFrom(e.getClass())) {
-					// expected exception...
+					// expected exception if this is a new concept...
 				}
 				else throw e;
 			}
