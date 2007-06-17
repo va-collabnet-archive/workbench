@@ -421,11 +421,13 @@ public class VodbFindDuplicates extends AbstractMojo {
 	private boolean seeIfDupRelExists(boolean alreadyDone, Collection<I_RelVersioned> rels, I_GetConceptData destConcept) {
 		for (I_RelVersioned rel: rels) {
 			for (I_RelTuple rt: rel.getTuples()) {
-				if (dupRelTypeSet.contains(rt.getRelTypeId()) &&
-						rt.getC2Id() == destConcept.getConceptId()) {
-					// Already done... Ignore somehow
-					alreadyDone = true;
-					break;
+				if ((rt.getC2Id() == destConcept.getConceptId()) ||
+						(rt.getC1Id() == destConcept.getConceptId())) {
+					if (dupRelTypeSet.contains(rt.getRelTypeId())) {
+						// Already done... Ignore somehow
+						alreadyDone = true;
+						break;
+					}
 				}
 			}
 			if (alreadyDone) {
