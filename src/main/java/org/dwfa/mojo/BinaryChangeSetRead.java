@@ -1,7 +1,6 @@
 package org.dwfa.mojo;
 
 import java.io.File;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,9 +22,7 @@ public class BinaryChangeSetRead extends AbstractMojo {
 	/**
 	 * The change set directory
 	 * 
-	 * @parameter expression="${project.build.directory}/generated-resources/changesets/"
-
-	 * @required
+	 * @parameter default-value="${project.build.directory}/generated-resources/changesets/"
 	 */
 	File changeSetDir;
 	
@@ -35,7 +32,7 @@ public class BinaryChangeSetRead extends AbstractMojo {
 	 * @parameter 
 	 * @required
 	 */
-	String changeSetFileName = UUID.randomUUID() + ".bcs";
+	String changeSetFileName;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
