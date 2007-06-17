@@ -311,10 +311,10 @@ public class VodbFindDuplicates extends AbstractMojo {
 							// test if actual dup or pot dup or not a dup relationship exists...
 							I_GetConceptData hitConcept = termFactory.getConcept(cnid);
 							boolean alreadyDone = false;
-							if (seeIfDupRelExists(alreadyDone, rootChild.getSourceRels(), hitConcept) ||
-									seeIfDupRelExists(alreadyDone, rootChild.getDestRels(), hitConcept) ||
-									seeIfDupRelExists(alreadyDone, rootChild.getUncommittedSourceRels(), hitConcept) ||
-											seeIfDupRelExists(alreadyDone, hitConcept.getUncommittedSourceRels(), rootChild)) {
+							if (seeIfDupRelExists(rootChild.getSourceRels(), hitConcept) ||
+									seeIfDupRelExists(rootChild.getDestRels(), hitConcept) ||
+									seeIfDupRelExists(rootChild.getUncommittedSourceRels(), hitConcept) ||
+											seeIfDupRelExists(hitConcept.getUncommittedSourceRels(), rootChild)) {
 								alreadyDone = true;
 								break;
 							}
@@ -418,23 +418,20 @@ public class VodbFindDuplicates extends AbstractMojo {
 	}
 
 
-	private boolean seeIfDupRelExists(boolean alreadyDone, Collection<I_RelVersioned> rels, I_GetConceptData destConcept) {
+	private boolean seeIfDupRelExists(Collection<I_RelVersioned> rels, I_GetConceptData destConcept) {
+		
 		for (I_RelVersioned rel: rels) {
 			for (I_RelTuple rt: rel.getTuples()) {
 				if ((rt.getC2Id() == destConcept.getConceptId()) ||
 						(rt.getC1Id() == destConcept.getConceptId())) {
 					if (dupRelTypeSet.contains(rt.getRelTypeId())) {
 						// Already done... Ignore somehow
-						alreadyDone = true;
-						break;
+						return true;
 					}
 				}
 			}
-			if (alreadyDone) {
-				break;
-			}
 		}
-		return alreadyDone;
+		return false;
 	}
 
 	private void writeToDetailHTMLFile(HashSet<I_DescriptionVersioned> potDupSet, I_GetConceptData rootChild, 
