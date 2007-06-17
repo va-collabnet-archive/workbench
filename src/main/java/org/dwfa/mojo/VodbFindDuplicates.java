@@ -425,7 +425,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 				if ((rt.getC2Id() == destConcept.getConceptId()) ||
 						(rt.getC1Id() == destConcept.getConceptId())) {
 					if (dupRelTypeSet.contains(rt.getRelTypeId())) {
-						// Already done... Ignore somehow
+						// Already done...
 						return true;
 					}
 				}
