@@ -49,6 +49,13 @@ public class VodbMonitorBranches extends AbstractMojo {
     private ConceptDescriptor branchToCopyTo;
 
     /**
+     * The updated status of any copied concepts.
+     * @parameter
+     * @required
+     */
+    private ConceptDescriptor updatedStatus;
+
+    /**
      * Branches which will be compared.
      * @parameter
      * @required
@@ -108,6 +115,9 @@ public class VodbMonitorBranches extends AbstractMojo {
                         flaggedConcept.getVerifiedConcept().getUids()).
                         getConceptId();
             }
+
+            int updatedStatusId = termFactory.getConcept(
+                    updatedStatus.getVerifiedConcept().getUids()).getConceptId();
 
             // get origins
             I_Path architectonicPath = termFactory.getPath(
@@ -237,6 +247,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                     I_ConceptAttributePart newPart = tuple.duplicatePart();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
+                    newPart.setConceptStatus(updatedStatusId);
                     tuple.getConVersioned().addVersion(newPart);
                 }
                 // copy latest descriptions to new path/version
@@ -244,6 +255,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                     I_DescriptionPart newPart = tuple.duplicatePart();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
+                    newPart.setStatusId(updatedStatusId);
                     tuple.getDescVersioned().addVersion(newPart);
                 }
                 // copy latest relationships to new path/version
@@ -251,6 +263,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                     I_RelPart newPart = tuple.duplicatePart();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
+                    newPart.setStatusId(updatedStatusId);
                     tuple.getRelVersioned().addVersion(newPart);
                 }
             } else {
