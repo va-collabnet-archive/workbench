@@ -21,9 +21,11 @@ import java.beans.PropertyVetoException;
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -64,6 +66,7 @@ import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.tapi.NoMappingException;
+import org.dwfa.util.io.FileIO;
 
 /**
  * @author kec
@@ -129,7 +132,9 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                     return name.endsWith(".bean") || name.endsWith(".xml") ||
                    	name.toLowerCase().endsWith(".png") ||
                    	name.toLowerCase().endsWith(".jpg") ||
-                   	name.toLowerCase().endsWith(".jpeg") ||
+                    name.toLowerCase().endsWith(".jpeg") ||
+                    name.toLowerCase().endsWith(".html") ||
+                    name.toLowerCase().endsWith(".txt") ||
                    	name.toLowerCase().endsWith(".gif");
                 }
             });
@@ -164,6 +169,14 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                         addAttachment(obj, attachmentName);
                         layoutComponents();
 
+                    } else if ((f.getFile().toLowerCase().endsWith(".html")) || 
+                            (f.getFile().toLowerCase().endsWith(".txt"))) {
+                        FileReader fr = new FileReader(processFile);
+                        BufferedReader br = new BufferedReader(fr);
+                        String fileString = FileIO.readerToString(br);
+                        attachmentName = f.getFile();
+                        addAttachment(fileString, attachmentName);
+                        layoutComponents();
                     } else {
                     	// Handle a graphic image...
                         FileInputStream fis = new FileInputStream(processFile);
