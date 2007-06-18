@@ -1,5 +1,8 @@
 package org.dwfa.mojo;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,16 +38,39 @@ public class VodbCopyLatestComponent extends AbstractMojo {
      * copied to.
      * @parameter
      */
-    private String branchToCopyTo;
+    private ConceptDescriptor branchToCopyTo;
 
     /**
      * Branch which will be copied to new branch.
      * @parameter
      */
-    private String branchToCopy;
+    private ConceptDescriptor branchToCopy;
+
+    /**
+     * The html output file location.
+     * @parameter expression="${project.build.directory}/classes"
+     */
+    private File outputHtmlDirectory;
+
+    /**
+     * The html output file name.
+     * @parameter
+     */
+    private String outputHtmlFileName = "report.html";
 
     private class CopyLatestComponent implements I_ProcessConcepts {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        private I_TermFactory termFactory;
+        private I_GetConceptData branchToCopyConcept;
+        private I_GetConceptData branchToCopyToConcept;
+        private int numberCopiedComponents;
+
+        public CopyLatestComponent() throws Exception {
+            termFactory = LocalVersionedTerminology.get();
+            branchToCopyConcept = branchToCopy.getVerifiedConcept();
+            branchToCopyToConcept = branchToCopyTo.getVerifiedConcept();
+            numberCopiedComponents = 0;
+        }
+
         public void processConcept(I_GetConceptData concept) throws Exception {
 
             // get origins
@@ -58,13 +84,12 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             origins.add(originPosition);
 
             // get the copy-to concept/path
-            I_GetConceptData copyToConcept = getConceptFromString(branchToCopyTo);
-            I_Path copyToPath = termFactory.newPath(origins, copyToConcept);
+            I_Path copyToPath = termFactory.newPath(origins,
+                    branchToCopyToConcept);
 
             // get concept/path/position of the branch being copied
-            I_GetConceptData oldConcept = getConceptFromString(branchToCopy);
             I_Path oldPath = termFactory.newPath(origins,
-                        oldConcept);
+                        branchToCopyConcept);
             I_Position oldPosition = termFactory.newPosition(oldPath,
                     Integer.MAX_VALUE);
             Set<I_Position> positions = new HashSet<I_Position>();
@@ -103,29 +128,55 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 tuple.getRelVersioned().addVersion(newPart);
             }
 
+            numberCopiedComponents++;
             termFactory.addUncommitted(concept);
         }
 
-        private I_GetConceptData getConceptFromString(String conceptString)
-                throws Exception {
-            if (conceptString.equals("TGA_TEST_DATA")) {
-                return termFactory.getConcept(ArchitectonicAuxiliary.Concept.
-                        TGA_TEST_DATA.getUids());
-            } else if (conceptString.equals("TGA_DATA")) {
-                return termFactory.getConcept(ArchitectonicAuxiliary.Concept.
-                        TGA_DATA.getUids());
-            } else {
-                throw new Exception("Don't recognise specified branch: "
-                        + conceptString);
-            }
+        public I_GetConceptData getBranchToCopyConcept() {
+            return branchToCopyConcept;
+        }
+
+        public void setBranchToCopyConcept(I_GetConceptData branchToCopyConcept) {
+            this.branchToCopyConcept = branchToCopyConcept;
+        }
+
+        public I_GetConceptData getBranchToCopyToConcept() {
+            return branchToCopyToConcept;
+        }
+
+        public void setBranchToCopyToConcept(I_GetConceptData branchToCopyToConcept) {
+            this.branchToCopyToConcept = branchToCopyToConcept;
+        }
+
+        public int getNumberCopiedComponents() {
+            return numberCopiedComponents;
+        }
+
+        public void setNumberCopiedComponents(int numberCopiedComponents) {
+            this.numberCopiedComponents = numberCopiedComponents;
         }
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        CopyLatestComponent copy = new CopyLatestComponent();
         try {
+            CopyLatestComponent copy = new CopyLatestComponent();
             termFactory.iterateConcepts(copy);
+            String message = "Successfully copied "
+                            + copy.getNumberCopiedComponents()
+                            + " latest components on '"
+                            + branchToCopy.getDescription()
+                            + "' branch to '" + branchToCopyTo.getDescription()
+                            + "' branch.";
+            getLog().info(message);
+
+            outputHtmlDirectory.mkdirs();
+            BufferedWriter htmlWriter = new BufferedWriter(new BufferedWriter(
+                    new FileWriter(outputHtmlDirectory + File.separator
+                            + outputHtmlFileName)));
+
+            htmlWriter.append(message);
+            htmlWriter.close();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
