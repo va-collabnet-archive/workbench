@@ -1104,31 +1104,32 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	private void makeSubversionPalette() throws Exception {
+	    if (subversionPalette == null) {
+            JLayeredPane layers = getRootPane().getLayeredPane();
+            subversionPalette = new CdePalette(new BorderLayout(),
+                    new RightPalettePoint());
+            JTabbedPane tabs = new JTabbedPane();
+            for (String key : aceFrameConfig.getSubversionMap().keySet()) {
+                SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
+                tabs.addTab("change sets", svnTable);
+            }
 
-		JLayeredPane layers = getRootPane().getLayeredPane();
-		subversionPalette = new CdePalette(new BorderLayout(),
-				new RightPalettePoint());
-		JTabbedPane tabs = new JTabbedPane();
-		for (String key : aceFrameConfig.getSubversionMap().keySet()) {
-			SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
-			tabs.addTab("change sets", svnTable);
-		}
+            layers.add(subversionPalette, JLayeredPane.PALETTE_LAYER);
+            subversionPalette.add(tabs, BorderLayout.CENTER);
+            subversionPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
-		layers.add(subversionPalette, JLayeredPane.PALETTE_LAYER);
-		subversionPalette.add(tabs, BorderLayout.CENTER);
-		subversionPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+            int width = 650;
+            int height = 550;
+            Rectangle topBounds = topPanel.getBounds();
+            subversionPalette.setSize(width, height);
 
-		int width = 650;
-		int height = 550;
-		Rectangle topBounds = topPanel.getBounds();
-		subversionPalette.setSize(width, height);
-
-		subversionPalette.setLocation(new Point(topBounds.x + topBounds.width,
-				topBounds.y + topBounds.height + 1));
-		subversionPalette.setOpaque(true);
-		subversionPalette.doLayout();
-		addComponentListener(subversionPalette);
-		subversionPalette.setVisible(true);
+            subversionPalette.setLocation(new Point(topBounds.x + topBounds.width,
+                    topBounds.y + topBounds.height + 1));
+            subversionPalette.setOpaque(true);
+            subversionPalette.doLayout();
+            addComponentListener(subversionPalette);
+            subversionPalette.setVisible(true);
+        }
 	}
 
 	private void makeConfigPalette() throws Exception {
@@ -2104,4 +2105,13 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		setShowComponentView(true);
 		conceptTabs.setSelectedComponent(conceptListEditor);
 	}
+
+    public void setupSvn() {
+        try {
+            makeSubversionPalette();
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
+    
 }

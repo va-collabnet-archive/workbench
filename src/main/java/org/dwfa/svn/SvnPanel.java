@@ -50,7 +50,7 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			purge(svd);
+			purge(svd, authenticator);
 		}
 
 	}
@@ -62,7 +62,7 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			checkout(svd);
+			checkout(svd, authenticator);
 		}
 
 	}
@@ -74,7 +74,7 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			update(svd);
+			update(svd, authenticator);
 		}
 	}
 	private class CommitListener implements ActionListener {
@@ -85,7 +85,7 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			commit(svd);
+			commit(svd, authenticator);
 		}
 	}
 	private class CleanupListener implements ActionListener {
@@ -96,7 +96,7 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			cleanup(svd);
+			cleanup(svd, authenticator);
 		}
 
 	}
@@ -108,7 +108,7 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			status(svd);
+			status(svd, authenticator);
 		}
 
 	}
@@ -223,7 +223,7 @@ public class SvnPanel extends JPanel {
 		
 	}
 	
-	private void logDetails(SubversionData svd) throws ClientException {
+	private static void logDetails(SubversionData svd) throws ClientException {
 		if (SvnLog.isLoggable(Level.FINE)) {
 			SvnLog.fine("working copy Author: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getAuthor());
 			SvnLog.fine("working copy CopyRev: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getCopyRev());
@@ -242,10 +242,10 @@ public class SvnPanel extends JPanel {
 			SvnLog.fine("working copy LastDateTextUpdate: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastDateTextUpdate());
 		}
 	}
-	public void status(SubversionData svd) {
+	public static void status(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting status");
 		try {
-			handleAuthentication();
+			handleAuthentication(authenticator);
 			Status[] status = Svn.getSvnClient().status(svd.getWorkingCopyStr(), false, false, false);
 			for (Status s: status) {
 				SvnLog.info("Managed: " + s.isManaged() + " status: " + s.getTextStatusDescription() + " " + s.getPath());	
@@ -256,10 +256,10 @@ public class SvnPanel extends JPanel {
 		}
 		SvnLog.info("finished status");
 	}
-	public void cleanup(SubversionData svd) {
+	public static void cleanup(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting cleanup");
 		try {
-			handleAuthentication();
+			handleAuthentication(authenticator);
 			Svn.getSvnClient().cleanup(svd.getWorkingCopyStr());
 			logDetails(svd);
 		} catch (ClientException e) {
@@ -267,7 +267,7 @@ public class SvnPanel extends JPanel {
 		}
 		SvnLog.info("finished cleanup");
 	}
-	public void commit(SubversionData svd) {
+	public static void commit(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("Starting Commit");
 		try {
 			
@@ -282,7 +282,7 @@ public class SvnPanel extends JPanel {
 				}
 			}
 			
-			handleAuthentication();
+			handleAuthentication(authenticator);
 			Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, true);
 			logDetails(svd);
 		} catch (ClientException e) {
@@ -290,10 +290,10 @@ public class SvnPanel extends JPanel {
 		}
 		SvnLog.info("finished commit");
 	}
-	public void purge(SubversionData svd) {
+	public static void purge(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("Starting purge");
 		try {
-			handleAuthentication();
+			handleAuthentication(authenticator);
 			Status[] status = Svn.getSvnClient().status(svd.getWorkingCopyStr(), false, false, false);
 			for (Status s: status) {
 				if (s.isManaged() == true) {
@@ -310,10 +310,10 @@ public class SvnPanel extends JPanel {
 		}
 		SvnLog.info("finished purge");
 	}
-	public void update(SubversionData svd) {
+	public static void update(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting update");
 		try {
-			handleAuthentication();
+			handleAuthentication(authenticator);
 			Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, true);
 			logDetails(svd);
 		} catch (ClientException e) {
@@ -321,10 +321,10 @@ public class SvnPanel extends JPanel {
 		}
 		SvnLog.info("finished update");
 	}
-	public void checkout(SubversionData svd) {
+	public static void checkout(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting get");
 		try {
-			handleAuthentication();
+			handleAuthentication(authenticator);
 			Svn.getSvnClient().checkout(svd.getRepositoryUrlStr(),
 					svd.getWorkingCopyStr(), Revision.HEAD, true);
 			logDetails(svd);
@@ -333,9 +333,13 @@ public class SvnPanel extends JPanel {
 		}
 		SvnLog.info("finished get");
 	}
-	private void handleAuthentication() {
+	private static void handleAuthentication(SvnPrompter authenticator) {
 		Svn.getSvnClient().password("");
 		Svn.getSvnClient().setPrompt(authenticator);
 	}
+
+    public SvnPrompter getAuthenticator() {
+        return authenticator;
+    }
 	
 }

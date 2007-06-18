@@ -143,7 +143,7 @@ public class SvnPrompter implements PromptUserPassword3 {
 
 	/**
 	 * Ask the user for username and password The entered username/password is
-	 * retrieved by the getUsername getPasswort methods.
+	 * retrieved by the getUsername getPassword methods.
 	 */
 	public boolean prompt(String realm, String username) {
 		return prompt(realm, username, false);

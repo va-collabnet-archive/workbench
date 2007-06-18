@@ -35,6 +35,8 @@ import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.svn.SvnPanel;
+import org.dwfa.svn.SvnPrompter;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
@@ -1178,4 +1180,47 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		aceFrame.showListView();
 	}
 
+
+    public void svnCheckout(SubversionData svd) {
+        aceFrame.setupSvn();
+        SvnPanel.checkout(svd, getAuthenticator(svd));
+    }
+
+
+    private SvnPrompter getAuthenticator(SubversionData svd) {
+        SvnPrompter authenticator = new SvnPrompter();
+        authenticator.setUsername(svd.getUsername());
+        authenticator.setPassword(svd.getPassword());
+        return authenticator;
+    }
+
+
+    public void svnCleanup(SubversionData svd) {
+        aceFrame.setupSvn();
+        SvnPanel.cleanup(svd, getAuthenticator(svd));
+    }
+
+
+    public void svnCommit(SubversionData svd) {
+        aceFrame.setupSvn();
+        SvnPanel.commit(svd, getAuthenticator(svd));
+    }
+
+
+    public void svnPurge(SubversionData svd) {
+        aceFrame.setupSvn();
+        SvnPanel.purge(svd, getAuthenticator(svd));
+    }
+
+
+    public void svnStatus(SubversionData svd) {
+        aceFrame.setupSvn();
+        SvnPanel.status(svd, getAuthenticator(svd));
+    }
+
+
+    public void svnUpdate(SubversionData svd) {
+        aceFrame.setupSvn();
+        SvnPanel.update(svd, getAuthenticator(svd));
+    }
 }

@@ -115,5 +115,9 @@ public class AceFrame extends ComponentFrame {
 	public void showListView() {
 		getCdePanel().showListView();
 	}
+    
+    public void setupSvn() {
+        getCdePanel().setupSvn();
+    }
 
 }
