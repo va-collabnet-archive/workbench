@@ -102,7 +102,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private String password;
     
     // 16
-    private AceConfig masterConfig;
+    private transient AceConfig masterConfig; 
     
     // 17
     private ArrayListModel<String> addressesList = new ArrayListModel<String>();
@@ -182,7 +182,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		out.writeObject(username);
 		out.writeObject(password);
 		//16
-		out.writeObject(masterConfig);
+		out.writeObject(null);
 		
 		//17 
 		out.writeObject(addressesList);
@@ -1009,17 +1009,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 
 	public String getPassword() {
-		return masterConfig.getPassword();
+        if (password == null) {
+            password = "";
+        }
+		return password;
 	}
 
 
 	public void setPassword(String password) {
-		masterConfig.setPassword(password);
+        Object old = this.password;
+        this.password = password;
+        this.changeSupport.firePropertyChange("password", old, password);
 	}
 
 
 	public String getUsername() {
-		return masterConfig.getUsername();
+        if (username == null) {
+            username = "";
+        }
+		return username;
 	}
 
 

@@ -36,6 +36,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -220,6 +221,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private File licitWordsDir;
 
+    private File envHome;
+
+    private Long cacheSize;
+
 	public void setup(Object envHome, boolean readOnly, Long cacheSize)
 			throws IOException {
 		setup((File) envHome, readOnly, cacheSize);
@@ -232,6 +237,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void setup(File envHome, boolean readOnly, Long cacheSize)
 			throws IOException {
 		try {
+            this.envHome = envHome;
+            this.cacheSize = cacheSize;
 			activity = new ActivityPanel(true, true);
 			StartupListener l = new StartupListener();
 			Toolkit.getDefaultToolkit().addAWTEventListener(l,
@@ -2591,5 +2598,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void setActiveAceFrameConfig(I_ConfigAceFrame activeAceFrameConfig) throws TerminologyException, IOException {
 		this.activeAceFrameConfig = activeAceFrameConfig;
 	}
+
+    public I_ConfigAceDb newAceDbConfig() {
+         return new AceConfig(envHome, readOnly, cacheSize);
+    }
 
 }

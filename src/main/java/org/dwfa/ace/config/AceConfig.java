@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -59,7 +60,7 @@ import org.dwfa.vodb.types.Position;
 
 import com.sleepycat.je.DatabaseException;
 
-public class AceConfig implements Serializable {
+public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	private static File dbFolderOverride = null;
 
@@ -82,7 +83,7 @@ public class AceConfig implements Serializable {
 	private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(
 			this);
 
-	public List<AceFrameConfig> aceFrames = new ArrayList<AceFrameConfig>();
+	public List<I_ConfigAceFrame> aceFrames = new ArrayList<I_ConfigAceFrame>();
 
 	private File dbFolder = new File("../test/berkeley-db");
 
@@ -111,11 +112,13 @@ public class AceConfig implements Serializable {
 		this.dbFolder = dbFolder;
 	}
 
-	public AceConfig(File dbFolder, boolean readOnly) throws DatabaseException {
-		super();
-		this.dbFolder = dbFolder;
-		this.readOnly = readOnly;
-	}
+
+	public AceConfig(File dbFolder, boolean readOnly, Long cacheSize) {
+        super();
+        this.dbFolder = dbFolder;
+        this.readOnly = readOnly;
+        this.cacheSize = cacheSize;
+    }
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -138,14 +141,6 @@ public class AceConfig implements Serializable {
 			if (objDataVersion >= 4) {
 				username = (String) in.readObject();
 				password = (String) in.readObject();
-				SvnPrompter prompter = new SvnPrompter();
-				prompter.prompt("config file", username);
-				if (username.equals(prompter.getUsername())
-						&& password.equals(prompter.getPassword())) {
-					// continue
-				} else {
-					throw new IOException(authFailureMsg);
-				}
 			} else {
 				username = null;
 				password = null;
@@ -169,7 +164,7 @@ public class AceConfig implements Serializable {
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
-				aceFrames = (List<AceFrameConfig>) in.readObject();
+				aceFrames = (List<I_ConfigAceFrame>) in.readObject();
 			}
 			if (objDataVersion >= 2) {
 				loggerRiverConfigFile = (String) in.readObject();
@@ -354,6 +349,8 @@ public class AceConfig implements Serializable {
 		config.setPassword(prompter.getPassword());
 
 		AceFrameConfig af = new AceFrameConfig(config);
+        af.setUsername(prompter.getUsername());
+        af.setPassword(prompter.getPassword());
 		Set<I_Position> positions = new HashSet<I_Position>();
 		for (I_Path p : Path.makeTestSnomedPaths(AceConfig.getVodb())) {
 			positions.add(new Position(Integer.MAX_VALUE, p));
@@ -835,5 +832,25 @@ public class AceConfig implements Serializable {
 	public static VodbEnv getVodb() {
 		return (VodbEnv) LocalVersionedTerminology.get();
 	}
+
+    public List<I_ConfigAceFrame> getAceFrames() {
+        return aceFrames;
+    }
+
+    public Long getCacheSize() {
+        return cacheSize;
+    }
+
+    public void setCacheSize(Long cacheSize) {
+        this.cacheSize = cacheSize;
+    }
+
+    public File getDbFolder() {
+        return dbFolder;
+    }
+
+    public void setDbFolder(File dbFolder) {
+        this.dbFolder = dbFolder;
+    }
 
 }
