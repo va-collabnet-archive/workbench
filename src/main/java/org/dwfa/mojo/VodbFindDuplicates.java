@@ -40,6 +40,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.text.StringToWord;
 
 /**
+ * Uses lucene search api to search versioned database 
+ * @author Susan Castillo
+ *
+ */
+/**
  * 
  * @goal vodb-find-duplicates
  * 
