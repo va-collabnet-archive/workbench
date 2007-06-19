@@ -26,7 +26,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/flow tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/flow tasks", type = BeanType.TASK_BEAN)})
 public class ChangeProcessInstanceId extends AbstractTask {
 
     private static final long serialVersionUID = 1;
