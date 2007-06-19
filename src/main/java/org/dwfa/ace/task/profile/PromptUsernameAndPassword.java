@@ -166,4 +166,12 @@ public class PromptUsernameAndPassword extends AbstractTask {
         System.exit(0);
     }
 
+    public String getPromptMessage() {
+        return promptMessage;
+    }
+
+    public void setPromptMessage(String promptMessage) {
+        this.promptMessage = promptMessage;
+    }
+
 }

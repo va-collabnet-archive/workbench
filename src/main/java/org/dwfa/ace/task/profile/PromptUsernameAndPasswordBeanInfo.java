@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class PromptUsernameAndPasswordBeanInfo extends SimpleBeanInfo {
@@ -12,7 +13,14 @@ public class PromptUsernameAndPasswordBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
-             PropertyDescriptor usernamePropName =
+            PropertyDescriptor promptMessage =
+                new PropertyDescriptor("promptMessage", getBeanDescriptor().getBeanClass());
+            promptMessage.setBound(true);
+            promptMessage.setPropertyEditorClass(JTextFieldEditor.class);
+            promptMessage.setDisplayName("<html><font color='green'>prompt message:");
+            promptMessage.setShortDescription("The prompt message.");
+
+            PropertyDescriptor usernamePropName =
                 new PropertyDescriptor("usernamePropName", getBeanDescriptor().getBeanClass());
             usernamePropName.setBound(true);
             usernamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
@@ -27,7 +35,7 @@ public class PromptUsernameAndPasswordBeanInfo extends SimpleBeanInfo {
             passwordPropName.setShortDescription("The property that contains the password.");
 
             PropertyDescriptor rv[] =
-                { usernamePropName, passwordPropName };
+                { promptMessage, usernamePropName, passwordPropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
@@ -38,7 +46,7 @@ public class PromptUsernameAndPasswordBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(PromptUsernameAndPassword.class);
-        bd.setDisplayName("<html><font color='green'><center>Prompt username/password");
+        bd.setDisplayName("<html><font color='green'><center>prompt<br>username/password");
         return bd;
     }
 }
