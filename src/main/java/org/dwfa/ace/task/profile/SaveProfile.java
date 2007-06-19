@@ -11,6 +11,10 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import org.dwfa.ace.api.I_ConfigAceDb;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ImplementTermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -39,6 +43,7 @@ public class SaveProfile extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profileDir);
+        out.writeObject(usernamePropName);
         out.writeObject(profilePropName);
     }
 
@@ -46,6 +51,7 @@ public class SaveProfile extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             profileDir = (String) in.readObject();
+            usernamePropName = (String) in.readObject();
             profilePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -58,14 +64,17 @@ public class SaveProfile extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+            I_ImplementTermFactory termFactory = (I_ImplementTermFactory) LocalVersionedTerminology.get();
+            I_ConfigAceDb aceConfig = termFactory.newAceDbConfig();
             String username = (String) process.readProperty(usernamePropName);
-            Object profile = process.readProperty(profilePropName);
-            File profileFile = new File(profileDir, username);
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            aceConfig.getAceFrames().add(profile);
+            File profileFile = new File(profileDir, username + ".ace");
             profileFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(profileFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(profile);
+            oos.writeObject(aceConfig);
             oos.close();
             
             return Condition.CONTINUE;
@@ -106,5 +115,13 @@ public class SaveProfile extends AbstractTask {
 
     public void setUsernamePropName(String usernamePropName) {
         this.usernamePropName = usernamePropName;
+    }
+
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
     }
 }

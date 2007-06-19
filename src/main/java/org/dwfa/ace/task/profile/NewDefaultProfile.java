@@ -119,6 +119,7 @@ public class NewDefaultProfile extends AbstractTask {
         this.profilePropName = address;
     }
 
+    
     public static I_ConfigAceFrame newProfile(String username, String password, 
         String adminUsername, String adminPassword)
             throws TerminologyException, IOException {
@@ -285,8 +286,9 @@ public class NewDefaultProfile extends AbstractTask {
             activeConfig.setChangeSetWriterFileName(activeConfig.getUsername() + "." + UUID.randomUUID().toString()
                     + ".jcs");
         }
+        
         I_Path editPath = tf.getPath(Concept.ARCHITECTONIC_BRANCH.getUids());
-        activeConfig.addEditingPath(editPath);
+        //activeConfig.addEditingPath(editPath);
 
         I_Position viewPosition = tf.newPosition(editPath, Integer.MAX_VALUE);
         Set<I_Position> viewSet = new HashSet<I_Position>();

@@ -60,7 +60,7 @@ public class NewDefaultProfileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(NewDefaultProfile.class);
-        bd.setDisplayName("<html><font color='green'><center>New Default Profile");
+        bd.setDisplayName("<html><font color='green'><center>new default profile");
         return bd;
     }
 }

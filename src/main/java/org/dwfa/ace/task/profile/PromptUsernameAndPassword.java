@@ -71,8 +71,8 @@ public class PromptUsernameAndPassword extends AbstractTask {
 
             Prompter p = new Prompter();
             p.prompt(promptMessage, username, password);
-            process.setProperty(usernamePropName, p.getPassword());
-            process.setProperty(passwordPropName, p.getUsername());
+            process.setProperty(usernamePropName, p.getUsername());
+            process.setProperty(passwordPropName, p.getPassword());
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
