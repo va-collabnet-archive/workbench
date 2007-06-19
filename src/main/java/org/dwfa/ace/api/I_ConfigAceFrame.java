@@ -175,6 +175,12 @@ public interface I_ConfigAceFrame {
 	public void setPassword(String password);
 	public String getPassword();
 	
+    public String getAdminPassword();
+    public void setAdminPassword(String adminPassword);
+
+    public String getAdminUsername();
+    public void setAdminUsername(String adminUsername);
+    
 	public void setCommitEnabled(boolean enabled);
 	public boolean isCommitEnabled();
 	
@@ -197,6 +203,13 @@ public interface I_ConfigAceFrame {
 	public List<String> getSelectedAddresses();
 	
 	public Map<String, SubversionData> getSubversionMap();
+    
+    public void svnCheckout(SubversionData svd);
+    public void svnCommit(SubversionData svd);
+    public void svnCleanup(SubversionData svd);
+    public void svnStatus(SubversionData svd);
+    public void svnPurge(SubversionData svd);
+    public void svnUpdate(SubversionData svd);
 	
 	public void setShowHierarchyView(boolean shown);
 	
