@@ -86,6 +86,7 @@ import org.dwfa.vodb.bind.ThinDescVersionedBinding;
 import org.dwfa.vodb.bind.ThinIdVersionedBinding;
 import org.dwfa.vodb.bind.ThinImageBinder;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.bind.TimePathIdBinder;
 import org.dwfa.vodb.bind.UuidBinding;
 import org.dwfa.vodb.jar.PathCollector;
@@ -2601,6 +2602,14 @@ public class VodbEnv implements I_ImplementTermFactory {
 
     public I_ConfigAceDb newAceDbConfig() {
          return new AceConfig(envHome, readOnly, cacheSize);
+    }
+
+    public long convertToThickVersion(int version) {
+        return ThinVersionHelper.convert(version);
+    }
+
+    public int convertToThinVersion(long time) {
+        return ThinVersionHelper.convert(time);
     }
 
 }
