@@ -11,19 +11,19 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
  * @author Susan Castillo	
  *
  */
-public class SelectAddressesInAddressBookBeanInfo {
+public class GetSelectedAddressesBeanInfo {
 
     /**
      *
      */
-    public SelectAddressesInAddressBookBeanInfo() {
+    public GetSelectedAddressesBeanInfo() {
         super();
      }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             PropertyDescriptor addressesSelected =
-                new PropertyDescriptor("addressesSelected", SelectAddressesInAddressBook.class);
+                new PropertyDescriptor("addressesSelected", GetSelectedAddresses.class);
             addressesSelected.setBound(true);
             addressesSelected.setPropertyEditorClass(CheckboxEditor.class);
             addressesSelected.setDisplayName("<html><font color='green'>Select Addresses<br>in Address Book");
@@ -39,7 +39,7 @@ public class SelectAddressesInAddressBookBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(SelectAddressesInAddressBook.class);
+        BeanDescriptor bd = new BeanDescriptor(GetSelectedAddresses.class);
         bd.setDisplayName("<html><font color='green'><center>Show or Hide <br>Select Addresses<br>Address Book");
         return bd;
     }

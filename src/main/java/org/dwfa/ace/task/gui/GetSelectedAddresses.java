@@ -27,7 +27,7 @@ import org.dwfa.util.bean.Spec;
  */
 @BeanList(specs = { @Spec(directory = "tasks/ace/gui", type = BeanType.TASK_BEAN) })
 
-public class SelectAddressesInAddressBook extends AbstractTask {
+public class GetSelectedAddresses extends AbstractTask {
 
     /**
      *
@@ -65,9 +65,7 @@ public class SelectAddressesInAddressBook extends AbstractTask {
         try {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            boolean showAddressBook = true;
-            configFrame.setShowAddresses(showAddressBook);
-            
+          
             String selectedAddresses = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();           
             addressesSelected = configFrame.getSelectedAddresses();
             
