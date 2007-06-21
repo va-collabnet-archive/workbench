@@ -45,7 +45,7 @@ public class WriteAttachmentToDiskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(WriteAttachmentToDiskBeanInfo.class);
+        BeanDescriptor bd = new BeanDescriptor(WriteAttachmentToDisk.class);
         bd.setDisplayName("<html><font color='green'><center>Write Attachment<br>to Disk");
         return bd;
     }

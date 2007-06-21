@@ -25,7 +25,7 @@ import org.dwfa.util.bean.Spec;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/gui", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/address", type = BeanType.TASK_BEAN) })
 
 public class GetSelectedAddresses extends AbstractTask {
 
@@ -37,7 +37,9 @@ public class GetSelectedAddresses extends AbstractTask {
     private static final int dataVersion = 1;
     
     private List<String> addressesSelected;
-
+    
+    private String selectedAddresses = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(addressesSelected);
@@ -66,9 +68,9 @@ public class GetSelectedAddresses extends AbstractTask {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
           
-            String selectedAddresses = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();           
-            addressesSelected = configFrame.getSelectedAddresses();
             
+            addressesSelected = configFrame.getSelectedAddresses();
+			worker.getLogger().info("Addresses Selected: " + addressesSelected);
             process.setProperty(selectedAddresses, addressesSelected);
          
             return Condition.CONTINUE;

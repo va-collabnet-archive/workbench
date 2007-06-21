@@ -3,15 +3,16 @@ package org.dwfa.ace.task.gui;
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.CheckboxEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info to SelectAddressesInAddressBook class.
  * @author Susan Castillo	
  *
  */
-public class GetSelectedAddressesBeanInfo {
+public class GetSelectedAddressesBeanInfo extends SimpleBeanInfo {
 
     /**
      *
@@ -23,11 +24,11 @@ public class GetSelectedAddressesBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             PropertyDescriptor addressesSelected =
-                new PropertyDescriptor("addressesSelected", GetSelectedAddresses.class);
+                new PropertyDescriptor("selectedAddresses", GetSelectedAddresses.class);
             addressesSelected.setBound(true);
-            addressesSelected.setPropertyEditorClass(CheckboxEditor.class);
-            addressesSelected.setDisplayName("<html><font color='green'>Select Addresses<br>in Address Book");
-            addressesSelected.setShortDescription("Select Addresses");
+            addressesSelected.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            addressesSelected.setDisplayName("<html><font color='green'>Get Selected Addresses:");
+            addressesSelected.setShortDescription("Get Addresses");
 
             PropertyDescriptor rv[] = { addressesSelected };
             return rv;
@@ -40,7 +41,7 @@ public class GetSelectedAddressesBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetSelectedAddresses.class);
-        bd.setDisplayName("<html><font color='green'><center>Show or Hide <br>Select Addresses<br>Address Book");
+        bd.setDisplayName("<html><font color='green'><center>Get Selected<br>Addresses");
         return bd;
     }
 
