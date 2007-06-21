@@ -1,12 +1,15 @@
 package org.dwfa.ace.task.gui;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -65,12 +68,22 @@ public class SelectAddressesInAddressBook extends AbstractTask {
             boolean showAddressBook = true;
             configFrame.setShowAddresses(showAddressBook);
             
+            String selectedAddresses = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();           
             addressesSelected = configFrame.getSelectedAddresses();
             
+            process.setProperty(selectedAddresses, addressesSelected);
+         
             return Condition.CONTINUE;
+            
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        }
+        } catch (IntrospectionException e) {
+        	throw new TaskFailedException(e);
+		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
+		} catch (InvocationTargetException e) {
+			throw new TaskFailedException(e);
+		}
     }
 
     public int[] getDataContainerIds() {
