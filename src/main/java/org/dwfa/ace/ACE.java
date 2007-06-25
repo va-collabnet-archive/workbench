@@ -78,7 +78,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.actions.Abort;
-import org.dwfa.ace.actions.ChangeEnvironmentPassword;
+import org.dwfa.ace.actions.ChangeFramePassword;
 import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportBaselineJar;
 import org.dwfa.ace.actions.ImportChangesetJar;
@@ -892,7 +892,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		fileMenu.add(menuItem);
 		fileMenu.addSeparator();
 		menuItem = new JMenuItem("Change Password...");
-		menuItem.addActionListener(new ChangeEnvironmentPassword());
+		menuItem.addActionListener(new ChangeFramePassword(this));
 		fileMenu.add(menuItem);
 		menuItem = new JMenuItem("Save Environment...");
 		menuItem.addActionListener(new SaveEnvironment());

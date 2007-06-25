@@ -30,9 +30,9 @@ public class SvnPrompter implements PromptUserPassword3 {
 			boolean showAnswer, boolean maySave) {
 		JPanel promptPane = new JPanel(new SpringLayout());
 		promptPane.add(new JLabel(question, JLabel.RIGHT));
-		JTextField userTextField = new JTextField(10);
+		JTextField userTextField = new JTextField(20);
 		if (showAnswer == false) {
-			userTextField = new JPasswordField(10);
+			userTextField = new JPasswordField(20);
 		}
 		userTextField.setText("");
 		promptPane.add(userTextField);
@@ -60,11 +60,11 @@ public class SvnPrompter implements PromptUserPassword3 {
 	public boolean prompt(String realm, String username, boolean maySave) {
 		JPanel promptPane = new JPanel(new SpringLayout());
 		promptPane.add(new JLabel("username:", JLabel.RIGHT));
-		JTextField userTextField = new JTextField(10);
+		JTextField userTextField = new JTextField(15);
 		userTextField.setText(username);
 		promptPane.add(userTextField);
 		promptPane.add(new JLabel("password:", JLabel.RIGHT));
-		JPasswordField pwd = new JPasswordField(10);
+		JPasswordField pwd = new JPasswordField(15);
 		promptPane.add(pwd);
 		JCheckBox save = new JCheckBox("");
 		if (maySave) {

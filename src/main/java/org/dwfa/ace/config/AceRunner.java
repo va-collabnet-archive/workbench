@@ -85,7 +85,7 @@ public class AceRunner {
                     SvnPrompter prompter = new SvnPrompter();
                     boolean login = true;
                     while (login) {
-                        prompter.prompt("Enter username and password for: " + ace.getFrameName(), ace.getUsername());
+                        prompter.prompt("Please authenticate for: " + ace.getFrameName(), ace.getUsername());
                         if (ace.getUsername().equals(prompter.getUsername())
                                 && ace.getPassword().equals(prompter.getPassword())) {
                             login = false;
