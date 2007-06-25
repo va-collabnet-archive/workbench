@@ -5,22 +5,22 @@ import java.util.ArrayList;
 import org.dwfa.config.CoreServices;
 import org.dwfa.config.ServiceConfigOption;
 
-public class AceServices extends ArrayList<ServiceConfigOption> {
+public class AceLocalServices extends ArrayList<ServiceConfigOption> {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AceServices() {
+	public AceLocalServices() {
 		super();
 		/* Order is important. You want the registration services to start
 		 * in the first phase, and the queue viewer to start in the last phase. 
 		 */
-		add(CoreServices.CO_ClassServer);
-		add(CoreServices.CO_ServiceRegistrar);
+		//add(CoreServices.CO_ClassServer);
+		//add(CoreServices.CO_ServiceRegistrar);
 		add(CoreServices.CO_TransactionAggregator);
-		add(CoreServices.CO_TransactionManager);
+		add(CO_LocalTransactionManager);
 		//add(CoreServices.CO_Timer);
 
 		add(CoreServices.CO_AgingQueue);
@@ -42,14 +42,14 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
 		add(CO_queue_va_user4_editor_Inbox);
 		//add(CO_queue_va_user4_editor_Outbox);
 				
-		add(CoreServices.CO_GenericWorkerManager);
-		add(CoreServices.CO_GenericWorkerManagerNewFrame);
-		add(CoreServices.CO_JavaSpace);
+		//add(CoreServices.CO_GenericWorkerManager);
+		//add(CoreServices.CO_GenericWorkerManagerNewFrame);
+		//add(CoreServices.CO_JavaSpace);
 		add(CoreServices.CO_LogManagerService);
 		add(CoreServices.CO_LogViewerNewFrame);
 		add(CoreServices.CO_PhantomFrame);
-		add(CoreServices.CO_ServiceBrowserNewFrame);
-		add(CO_FormBuilderNewFrame);
+		//add(CoreServices.CO_ServiceBrowserNewFrame);
+		//add(CO_FormBuilderNewFrame);
 		add(CO_AceEditor);
 
 	}
@@ -130,5 +130,17 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
    		   sco.setPrefix(queueName.replace('.', '_'));
 		   return sco;
     }
+
+    public static String LOCAL_TRANSACTION_MANAGER = "Local Transaction Manager";
+    public static String LOCAL_TRANSACTION_MANAGER_PROP = "org.dwfa.LOCAL_TRANSACTION_MANAGER";
+    public static ServiceConfigOption CO_LocalTransactionManager = new ServiceConfigOption(
+    		LOCAL_TRANSACTION_MANAGER, "config${/}transactionManager.policy", 
+            "config${/}transactionManagerSecure.policy", LOCAL_TRANSACTION_MANAGER_PROP,
+            "There must be at least one on the network, or you run services that use transactions. ",
+            true, ":8081/\", VHelp.addDlVersion(\"mahalo-dl\"), \"", "lib", "VHelp.addLibVersion(\"mahalo\")",
+            "com.sun.jini.mahalo.LocalTransactionManager",
+            new String[] { "config${/}transactionManager.config" }, 
+            new String[] { "config${/}transactionManagerSecure.config" }, 
+            true, false, false, "");
 
 }

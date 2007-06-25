@@ -23,10 +23,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.DocumentAuxiliary;
-import org.dwfa.cement.HL7;
-import org.dwfa.cement.QueueType;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
@@ -185,13 +181,13 @@ public class NewDefaultProfile extends AbstractTask {
 
         I_IntSet roots = tf.newIntSet();
         roots.add(tf.uuidToNative(Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids()));
-        roots.add(tf.uuidToNative(Concept.STATUS.getUids()));
-        roots.add(tf.uuidToNative(Concept.DESCRIPTION_TYPE.getUids()));
+        //roots.add(tf.uuidToNative(Concept.STATUS.getUids()));
+        //roots.add(tf.uuidToNative(Concept.DESCRIPTION_TYPE.getUids()));
         addIfNotNull(roots, SNOMED.Concept.ROOT, tf);
-        addIfNotNull(roots, DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY, tf);
-        addIfNotNull(roots, RefsetAuxiliary.Concept.REFSET_AUXILIARY, tf);
-        addIfNotNull(roots, HL7.Concept.HL7, tf);
-        addIfNotNull(roots, QueueType.Concept.QUEUE_TYPE, tf);
+        //addIfNotNull(roots, DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY, tf);
+        //addIfNotNull(roots, RefsetAuxiliary.Concept.REFSET_AUXILIARY, tf);
+        //addIfNotNull(roots, HL7.Concept.HL7, tf);
+        //addIfNotNull(roots, QueueType.Concept.QUEUE_TYPE, tf);
         activeConfig.setRoots(roots);
 
         I_IntSet allowedStatus = tf.newIntSet();
