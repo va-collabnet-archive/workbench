@@ -1,14 +1,18 @@
-package org.dwfa.ace.task.profile;
+package org.dwfa.ace.task.view;
 
 import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -23,8 +27,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/profile", type = BeanType.TASK_BEAN) })
-public class SetEditPath extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ace/view", type = BeanType.TASK_BEAN) })
+public class SetViewPosition extends AbstractTask {
 
     /**
      * 
@@ -33,22 +37,28 @@ public class SetEditPath extends AbstractTask {
 
     private static final int dataVersion = 1;
     
-     private TermEntry editPathEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+    private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+     private TermEntry viewPathEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
      private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
+     private String positionStr = "latest";
+
      private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(editPathEntry);
+        out.writeObject(viewPathEntry);
         out.writeObject(profilePropName);
+        out.writeObject(positionStr);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            editPathEntry = (TermEntry) in.readObject();
+            viewPathEntry = (TermEntry) in.readObject();
             profilePropName = (String) in.readObject();
+            positionStr = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -66,9 +76,17 @@ public class SetEditPath extends AbstractTask {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
 
-            I_Path editPath = LocalVersionedTerminology.get().getPath(editPathEntry.ids);
+            I_Path path = LocalVersionedTerminology.get().getPath(viewPathEntry.ids);
+            int version = Integer.MAX_VALUE;
+            if (positionStr.equalsIgnoreCase("latest")) {
+                version = Integer.MAX_VALUE;
+            } else {
+                Date date = dateParser.parse(positionStr);
+                version = LocalVersionedTerminology.get().convertToThinVersion(date.getTime());
+            }
 
-            profile.addEditingPath(editPath);
+            I_Position position = LocalVersionedTerminology.get().newPosition(path, version);
+            profile.addViewPosition(position);
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -82,6 +100,8 @@ public class SetEditPath extends AbstractTask {
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (ParseException e) {
             throw new TaskFailedException(e);
         }
     }
@@ -103,12 +123,20 @@ public class SetEditPath extends AbstractTask {
         this.profilePropName = profilePropName;
     }
 
-    public TermEntry getEditPathEntry() {
-        return editPathEntry;
+    public TermEntry getViewPathEntry() {
+        return viewPathEntry;
     }
 
-    public void setEditPathEntry(TermEntry editPathEntry) {
-        this.editPathEntry = editPathEntry;
+    public void setViewPathEntry(TermEntry editPathEntry) {
+        this.viewPathEntry = editPathEntry;
+    }
+
+    public String getPositionStr() {
+        return positionStr;
+    }
+
+    public void setPositionStr(String positionStr) {
+        this.positionStr = positionStr;
     }
 
 }

@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.profile;
+package org.dwfa.ace.task.path;
 
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
@@ -6,9 +6,8 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
-public class SetEditPathBeanInfo extends SimpleBeanInfo {
+public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
     
 
     public PropertyDescriptor[] getPropertyDescriptors() {
@@ -21,15 +20,15 @@ public class SetEditPathBeanInfo extends SimpleBeanInfo {
             profilePropName.setShortDescription("The property containing the profile to change.");
 
 
-            PropertyDescriptor editPathEntry =
-                new PropertyDescriptor("editPathEntry", getBeanDescriptor().getBeanClass());
-            editPathEntry.setBound(true);
-            editPathEntry.setPropertyEditorClass(QueueTypeEditor.class);
-            editPathEntry.setDisplayName("<html><font color='green'>editing path:");
-            editPathEntry.setShortDescription("The property that contains the editing path.");
+            PropertyDescriptor editPathConceptPropName =
+                new PropertyDescriptor("editPathConceptPropName", getBeanDescriptor().getBeanClass());
+            editPathConceptPropName.setBound(true);
+            editPathConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editPathConceptPropName.setDisplayName("<html><font color='green'>editing path prop:");
+            editPathConceptPropName.setShortDescription("The property name that contains the editing path.");
 
             PropertyDescriptor rv[] =
-                { profilePropName, editPathEntry };
+                { profilePropName, editPathConceptPropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
@@ -39,8 +38,8 @@ public class SetEditPathBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(SetEditPath.class);
-        bd.setDisplayName("<html><font color='green'><center>save profile");
+        BeanDescriptor bd = new BeanDescriptor(SetEditPathFromProperty.class);
+        bd.setDisplayName("<html><font color='green'><center>set edit path<br>from property");
         return bd;
     }
 }
