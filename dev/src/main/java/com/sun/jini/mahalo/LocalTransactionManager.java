@@ -221,6 +221,7 @@ class LocalTransactionManager implements TxnManager,
 	 *            <code>LifeCycle</code> reference used for callback
 	 */
 	LocalTransactionManager(String[] args, LifeCycle lc) throws Exception {
+        JiniManager.setLocalOnly(true);
 		if (operationsLogger.isLoggable(Level.FINER)) {
 			operationsLogger.entering(this.getClass().getName(),
 					"TxnManagerImpl", new Object[] { Arrays.asList(args), lc });
