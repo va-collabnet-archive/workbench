@@ -5,10 +5,11 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
- * Bean info to SelectAddressesInAddressBook class.
+ * Bean info to GetSelectedAddresses class.
  * @author Susan Castillo	
  *
  */
@@ -22,20 +23,21 @@ public class GetSelectedAddressesBeanInfo extends SimpleBeanInfo {
      }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
-        try {
-            PropertyDescriptor addressesSelected =
-                new PropertyDescriptor("selectedAddresses", GetSelectedAddresses.class);
-            addressesSelected.setBound(true);
-            addressesSelected.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            addressesSelected.setDisplayName("<html><font color='green'>Get Selected Addresses:");
-            addressesSelected.setShortDescription("Get Addresses");
+       try {
+          PropertyDescriptor selectedAddresses =
+              new PropertyDescriptor("selectedAddresses", GetSelectedAddresses.class);
+            selectedAddresses.setBound(true);
+            selectedAddresses.setPropertyEditorClass(PropertyNameLabelEditor.class);
+ 
+            selectedAddresses.setDisplayName("<html><font color='green'>Get Selected Addresses:");
+            selectedAddresses.setShortDescription("Get Addresses");
 
-            PropertyDescriptor rv[] = { addressesSelected };
+           PropertyDescriptor rv[] = { selectedAddresses };
             return rv;
-        } catch (IntrospectionException e) {
-             throw new Error(e.toString());
+      } catch (IntrospectionException e) {
+            throw new Error(e.toString());
         }
-    }
+   }
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */

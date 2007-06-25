@@ -36,20 +36,20 @@ public class GetSelectedAddresses extends AbstractTask {
 
     private static final int dataVersion = 1;
     
-    private List<String> addressesSelected;
-    
     private String selectedAddresses = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(addressesSelected);
+        out.writeObject(selectedAddresses);
+ //       out.writeObject(addressesSelected);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        addressesSelected = (List<String>) in.readObject();
+        	selectedAddresses = (String) in.readObject();
+ //       addressesSelected = (List<String>) in.readObject();
 
         } else {
             throw new IOException(
@@ -65,11 +65,12 @@ public class GetSelectedAddresses extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
+            
+        	I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
           
             
-            addressesSelected = configFrame.getSelectedAddresses();
+        	List<String> addressesSelected = configFrame.getSelectedAddresses();
 			worker.getLogger().info("Addresses Selected: " + addressesSelected);
             process.setProperty(selectedAddresses, addressesSelected);
          
@@ -94,13 +95,13 @@ public class GetSelectedAddresses extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-
-	public List<String> getAddressesSelected() {
-		return addressesSelected;
+	public String getSelectedAddresses() {
+		return selectedAddresses;
 	}
 
-	public void setAddressesSelected(List<String> addressesSelected) {
-		this.addressesSelected = addressesSelected;
+	public void setSelectedAddresses(String selectedAddresses) {
+		this.selectedAddresses = selectedAddresses;
 	}
+
 }
 
