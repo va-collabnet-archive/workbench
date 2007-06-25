@@ -1,27 +1,26 @@
 package com.sun.jini.mahalo;
 
 
-import net.jini.core.transaction.*;
-import net.jini.core.transaction.server.*;
-
-import com.sun.jini.mahalo.*;
-import com.sun.jini.mahalo.log.*;
-import com.sun.jini.thread.*;
-
-import java.rmi.activation.ActivateFailedException;
-import java.rmi.RemoteException;
-import java.rmi.NoSuchObjectException;
-import java.rmi.MarshalException;
-import java.rmi.StubNotFoundException;
-import java.rmi.UnexpectedException;
-import java.rmi.UnknownHostException;
-import java.rmi.UnmarshalException;
-import java.rmi.ConnectIOException;
 import java.rmi.AccessException;
 import java.rmi.ConnectException;
-
+import java.rmi.ConnectIOException;
+import java.rmi.MarshalException;
+import java.rmi.NoSuchObjectException;
+import java.rmi.RemoteException;
+import java.rmi.UnknownHostException;
+import java.rmi.activation.ActivateFailedException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.jini.core.transaction.Transaction;
+import net.jini.core.transaction.TransactionException;
+import net.jini.core.transaction.server.ServerTransaction;
+import net.jini.core.transaction.server.TransactionConstants;
+import net.jini.core.transaction.server.TransactionParticipant;
+
+import com.sun.jini.mahalo.log.ClientLog;
+import com.sun.jini.thread.TaskManager;
+import com.sun.jini.thread.WakeupManager;
 
 
 /**
@@ -252,7 +251,6 @@ public class LocalCommitJob extends Job implements TransactionConstants {
 	int tmp = 0;
 	int count = 0;
 
-	checkresults:
 	for (int i = 0; i < results.length; i++) {
 	    tmp = ((Integer)results[i]).intValue();
 

@@ -2,7 +2,6 @@ package com.sun.jini.mahalo;
 
 import java.rmi.RemoteException;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -524,7 +523,6 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 		}
 
 		try {
-			Enumeration joined = joinvec.elements();
 			int numparts = joinvec.size();
 			LocalParticipantHandle[] phs = new LocalParticipantHandle[numparts];
 			joinvec.copyInto(phs);
@@ -872,7 +870,6 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 							"Transaction already COMMITTED");
 			}
 
-			Enumeration joined = joinvec.elements();
 			int numparts = joinvec.size();
 			LocalParticipantHandle[] phs = new LocalParticipantHandle[numparts];
 			joinvec.copyInto(phs);

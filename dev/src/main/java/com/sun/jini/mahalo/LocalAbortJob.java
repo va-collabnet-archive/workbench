@@ -255,7 +255,6 @@ public class LocalAbortJob extends Job implements TransactionConstants {
 	int tmp = 0;
 	int count = 0;
 
-	checkresults:
 	for (int i = 0; i < results.length; i++) {
 	    tmp = ((Integer)results[i]).intValue();
 
