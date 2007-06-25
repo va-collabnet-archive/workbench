@@ -36,6 +36,14 @@ public class GenerateScripts extends AbstractMojo {
 	 * @parameter
 	 */
 	private String libDir;
+	
+	/**
+	 * Location to write the script files.
+	 * 
+	 * @parameter
+	 */
+	private String[] scriptNames;
+
 
 	private static final String fileSep = System.getProperty("file.separator","/");
 
@@ -69,10 +77,24 @@ public class GenerateScripts extends AbstractMojo {
 		 * if (jars != null) { for (File f: Arrays.asList(jars)) {
 		 * System.out.println("lib: " + f); } }
 		 */
-        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle");
-        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
-        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
-		configureScript(jars);
+		if (scriptNames == null) {
+	        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle");
+	        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
+	        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
+	        startAllScript(jars, "ace", "start-ace-local.config", "1400m", "1400m", "Ace Bundle");
+			configureScript(jars);
+		} else {
+			for (String name: scriptNames) {
+				if (name.equalsIgnoreCase("startCore")) {
+			        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle");
+				} else if (name.equalsIgnoreCase("startJehri")) {
+			        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
+				} else if (name.equalsIgnoreCase("startAce")) {
+			        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
+			        startAllScript(jars, "ace", "start-ace-local.config", "1400m", "1400m", "Ace Bundle");
+				}
+			}
+		}
 	}
 
 	/**
