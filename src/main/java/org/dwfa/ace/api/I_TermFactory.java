@@ -137,6 +137,9 @@ public interface I_TermFactory {
 	public Hits doLicitSearch(String query) throws IOException, ParseException;
 	
 	public Hits doLuceneSearch(String query) throws IOException, ParseException;
+    
+    public int convertToThinVersion(long time);
+    public long convertToThickVersion(int version);
 
 
 }
