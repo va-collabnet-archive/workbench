@@ -36,7 +36,7 @@ import net.jini.lookup.ServiceItemFilter;
 public class JiniManager implements I_LookupServices {
 	public static Logger logger = Logger.getLogger(JiniManager.class.getName());
 
-	private static boolean localOnly = true;
+	private static boolean localOnly = false;
 
 	private static JiniManager singelton;
 
