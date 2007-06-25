@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -64,6 +65,7 @@ import org.dwfa.bpa.process.I_DescribeObject;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_SelectObjects;
 import org.dwfa.bpa.process.NoMatchingEntryException;
+import org.dwfa.jini.JiniManager;
 import org.dwfa.jini.LookupJiniAndLocal;
 import org.dwfa.jini.TransactionParticipantAggregator;
 
@@ -256,32 +258,49 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      *             if a problem occurs
      */
     protected void init() throws Exception {
-        LoginContext loginContext = (LoginContext) config
-                .getEntry(this.getClass().getName(), "loginContext",
-                        LoginContext.class, null);
-        if (loginContext == null) {
-            getLogger().info(
-                    "initAsSubject: " + this.getClass().getName() + " "
-                            + this.getServiceID() + " with no login context.");
-            initAsSubject();
-        } else {
-            loginContext.login();
-            StringBuffer message = new StringBuffer();
-            message.append("initAsSubject: " + this.getClass().getName() + " "
-                    + this.getServiceID() + " with subject");
-            if (getLogger().isLoggable(Level.FINE)) {
-                message.append(loginContext.getSubject());
-            }
-            message.append(".");
+        if (JiniManager.isLocalOnly()) {
+        	List<Entry> entryList = new ArrayList<Entry>();
+            Entry[] entries = (Entry[]) this.config.getEntry(this.getClass()
+                    .getName(), "entries", Entry[].class, new Entry[] {});
+            entryList.addAll(Arrays.asList(entries));
+            
 
-            getLogger().info(message.toString());
-            Subject.doAsPrivileged(loginContext.getSubject(),
-                    new PrivilegedExceptionAction() {
-                        public Object run() throws Exception {
-                            initAsSubject();
-                            return null;
-                        }
-                    }, null);
+             Entry[] moreEntries = getFixedServiceEntries();
+             entryList.addAll(Arrays.asList(moreEntries));
+             
+             ServiceItem serviceItem = new ServiceItem(this.getServiceID(),
+                    this, (Entry[]) entryList.toArray(new Entry[entryList
+                            .size()]));
+            LookupJiniAndLocal.addToLocalServices(serviceItem);
+
+        } else {
+            LoginContext loginContext = (LoginContext) config
+            .getEntry(this.getClass().getName(), "loginContext",
+                    LoginContext.class, null);
+           if (loginContext == null) {
+                getLogger().info(
+                        "initAsSubject: " + this.getClass().getName() + " "
+                                + this.getServiceID() + " with no login context.");
+                initAsSubject();
+            } else {
+                loginContext.login();
+                StringBuffer message = new StringBuffer();
+                message.append("initAsSubject: " + this.getClass().getName() + " "
+                        + this.getServiceID() + " with subject");
+                if (getLogger().isLoggable(Level.FINE)) {
+                    message.append(loginContext.getSubject());
+                }
+                message.append(".");
+
+                getLogger().info(message.toString());
+                Subject.doAsPrivileged(loginContext.getSubject(),
+                        new PrivilegedExceptionAction() {
+                            public Object run() throws Exception {
+                                initAsSubject();
+                                return null;
+                            }
+                        }, null);
+            }
         }
     }
 

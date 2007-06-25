@@ -87,17 +87,21 @@ public class TransactionParticipantAggregator implements
 		LoginContext loginContext = (LoginContext) config
 				.getEntry(this.getClass().getName(), "loginContext",
 						LoginContext.class, null);
-		if (loginContext == null) {
-			initAsSubject();
+		if (JiniManager.isLocalOnly()) {
+			proxy = this;
 		} else {
-			loginContext.login();
-			Subject.doAsPrivileged(loginContext.getSubject(),
-					new PrivilegedExceptionAction() {
-						public Object run() throws Exception {
-							initAsSubject();
-							return null;
-						}
-					}, null);
+			if (loginContext == null) {
+				initAsSubject();
+			} else {
+				loginContext.login();
+				Subject.doAsPrivileged(loginContext.getSubject(),
+						new PrivilegedExceptionAction() {
+							public Object run() throws Exception {
+								initAsSubject();
+								return null;
+							}
+						}, null);
+			}
 		}
 
 	}

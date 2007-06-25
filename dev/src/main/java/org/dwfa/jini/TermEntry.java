@@ -51,11 +51,13 @@ public class TermEntry implements Entry, Comparable {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null) {
-			TermEntry another = (TermEntry) obj;
-			HashSet<UUID> anotherIdSet = new HashSet<UUID>(Arrays.asList(another.ids));
-			for (UUID id: ids) {
-				if (anotherIdSet.contains(id)) {
-					return true;
+			if (TermEntry.class.isAssignableFrom(obj.getClass())) {
+				TermEntry another = (TermEntry) obj;
+				HashSet<UUID> anotherIdSet = new HashSet<UUID>(Arrays.asList(another.ids));
+				for (UUID id: ids) {
+					if (anotherIdSet.contains(id)) {
+						return true;
+					}
 				}
 			}
 		}

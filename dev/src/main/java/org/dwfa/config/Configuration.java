@@ -9,15 +9,25 @@ import java.util.List;
 public class Configuration {
 	List<ServiceConfigOption> options;
 	boolean rmiSecure = false;
+	boolean localOnly = false;
 	
 	
-    public Configuration(List<ServiceConfigOption> options, boolean rmiSecure) {
+    public Configuration(List<ServiceConfigOption> options, boolean rmiSecure,
+    		boolean localOnly) {
 		super();
 		this.options = options;
 		this.rmiSecure = rmiSecure;
+		this.localOnly = localOnly;
 	}
+    public Configuration(ServiceConfigOption[] options, boolean rmiSecure, boolean localOnly) {
+    	this(Arrays.asList(options), rmiSecure, localOnly);
+    }
     public Configuration(ServiceConfigOption[] options, boolean rmiSecure) {
-    	this(Arrays.asList(options), rmiSecure);
+    	this(Arrays.asList(options), rmiSecure, false);
+    }
+
+    public Configuration(List<ServiceConfigOption> options, boolean rmiSecure) {
+    	this(options, rmiSecure, false);
     }
 
 	public void writeToFile(String fileName) throws IOException {
@@ -44,7 +54,11 @@ public class Configuration {
     
         buff.append("com.sun.jini.start {\n");
     
-        buff.append("   private static host = ConfigUtil.getHostAddress();\n");
+        if (localOnly) {
+            buff.append("   private static host = \"localhost\";\n");
+        } else {
+            buff.append("   private static host = ConfigUtil.getHostAddress();\n");        	
+        }
         buff.append('\n');
         buff.append("   private static jskCodebase = ConfigUtil.concat(new String[] { \"http://\", host, \":8081/\", VHelp.addDlVersion(\"jsk-dl\")});\n");
         buff.append("   private static jskMdURL = ConfigUtil.concat(new String[] { \"httpmd://\", host, \":8081/\",  VHelp.addDlVersion(\"jsk-dl\"), \";sha=0\"});\n");

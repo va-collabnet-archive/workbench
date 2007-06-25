@@ -32,8 +32,22 @@ public class ElectronicAddress extends AbstractEntry {
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object other) {
-		return this.address.equals(other);
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (ElectronicAddress.class.isAssignableFrom(obj.getClass())) {
+			ElectronicAddress other = (ElectronicAddress) obj;
+			if ((this.address == null) || (other.address == null)) {
+				if ((this.address == null) && (other.address == null)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			return this.address.equals(other.address);
+		}
+		return false;
 	}
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -45,6 +59,6 @@ public class ElectronicAddress extends AbstractEntry {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return this.address;
+		return "Electronic address: " + this.address;
 	}
 }

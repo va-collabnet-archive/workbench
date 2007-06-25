@@ -21,4 +21,13 @@ public class ConfigUtil {
 	public static void setUniqueJvmGroup(String uniqueJvmGroup) {
 		ConfigUtil.uniqueJvmGroup = uniqueJvmGroup;
 	}
+	
+	public static void main(String[] args) {
+		try {
+			System.out.println("getHostIPAddress(): " + InetAddress.getLocalHost().getHostAddress());
+			
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+	}
 }

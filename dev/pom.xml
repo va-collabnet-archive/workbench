@@ -22,7 +22,13 @@
     <url>https://core.aceworkspace.net/source/browse/core/trunk/dev/</url>
   </scm>
   <dependencies>
-    <dependency>
+      <dependency>
+          <groupId>org.dwfa.jini</groupId>
+          <artifactId>mahalo</artifactId>
+          <scope>compile</scope>
+          <version>2.1</version>
+      </dependency>
+      <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4</version>

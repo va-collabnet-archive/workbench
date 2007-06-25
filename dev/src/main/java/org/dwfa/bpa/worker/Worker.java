@@ -84,7 +84,7 @@ public abstract class Worker implements I_Work {
 
 	public void writeAttachment(String key, Object value) {
 		attachments.put(key, value);
-		
+
 	}
 
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -96,8 +96,9 @@ public abstract class Worker implements I_Work {
 	private Stack<I_EncodeBusinessProcess> processStack = new Stack<I_EncodeBusinessProcess>();
 
 	protected static List<Worker> workerList = new ArrayList<Worker>();
+
 	protected static Logger logger = Logger.getLogger(I_Work.class.getName());
-	
+
 	private I_KeepTime timer = new SystemTime();
 
 	/**
@@ -106,7 +107,7 @@ public abstract class Worker implements I_Work {
 	public Logger getLogger() {
 		return logger;
 	}
-	
+
 	private HashMap<String, Object> attachments = new HashMap<String, Object>();
 
 	protected Configuration config;
@@ -122,7 +123,7 @@ public abstract class Worker implements I_Work {
 	private JiniManager jiniManager;
 
 	private ServerTransaction activeTransaction;
-	
+
 	private ServerTransaction webTransaction;
 
 	private ServerTransaction nextTransaction;
@@ -215,13 +216,18 @@ public abstract class Worker implements I_Work {
 		Long tranDurLong = (Long) this.config.getEntry(this.getClass()
 				.getName(), "tranDurLong", Long.class);
 		this.transactionDuration = tranDurLong.longValue();
-		logger.info(" getting serviceDiscovery");
-		ServiceDiscoveryManager serviceDiscovery = (ServiceDiscoveryManager) config
-				.getEntry(this.getClass().getName(), "serviceDiscovery",
-						ServiceDiscoveryManager.class);
 
 		logger.info("making jiniManager");
-		this.jiniManager = new JiniManager(serviceDiscovery);
+		if (JiniManager.isLocalOnly()) {
+			this.jiniManager = JiniManager.getLocalOnlyJiniManager();
+
+		} else {
+			logger.info(" getting serviceDiscovery");
+			ServiceDiscoveryManager serviceDiscovery = (ServiceDiscoveryManager) config
+					.getEntry(this.getClass().getName(), "serviceDiscovery",
+							ServiceDiscoveryManager.class);
+			this.jiniManager = new JiniManager(serviceDiscovery);
+		}
 
 		// testLookup(serviceDiscovery);
 	}
@@ -230,15 +236,14 @@ public abstract class Worker implements I_Work {
 			throws ConfigurationException, LoginException, IOException,
 			PrivilegedActionException {
 		this(config, (UUID) config.getEntry(workerClass.getName(),
-				"workerUuid", UUID.class, UUID.randomUUID()),
-				(String) config.getEntry(workerClass.getName(), "name",
-						String.class, "Anonomous " + workerClass.getName()));
+				"workerUuid", UUID.class, UUID.randomUUID()), (String) config
+				.getEntry(workerClass.getName(), "name", String.class,
+						"Anonomous " + workerClass.getName()));
 	}
 
 	public String toString() {
 		return this.desc + " (" + this.id + ")";
 	}
-
 
 	public synchronized Condition execute(I_EncodeBusinessProcess process)
 			throws TaskFailedException {
@@ -263,7 +268,7 @@ public abstract class Worker implements I_Work {
 			throw ex;
 		}
 	}
-	
+
 	public boolean isExecuting() {
 		return executing;
 	}
@@ -286,16 +291,16 @@ public abstract class Worker implements I_Work {
 				this.commitTransactionIfActive();
 				if (logger.isLoggable(Level.INFO)) {
 					logger.info(this.getWorkerDesc() + "; process: "
-							+ process.getName() + " (" + process.getProcessID() + ") "
-							+ " Committing transaction: " + condition);
+							+ process.getName() + " (" + process.getProcessID()
+							+ ") " + " Committing transaction: " + condition);
 				}
 			} else {
 				this.webTransaction = this.activeTransaction;
 				this.setActiveTransaction(null);
 				if (logger.isLoggable(Level.INFO)) {
 					logger.info(this.getWorkerDesc() + "; process: "
-							+ process.getName() + " (" + process.getProcessID() + ") "
-							+ " Saving web transaction");
+							+ process.getName() + " (" + process.getProcessID()
+							+ ") " + " Saving web transaction");
 				}
 			}
 			return condition;
@@ -303,7 +308,7 @@ public abstract class Worker implements I_Work {
 			throw new TaskFailedException(e);
 		}
 	}
-	
+
 	public void restoreWebTransaction() {
 		this.setActiveTransaction(this.webTransaction);
 	}
@@ -394,14 +399,15 @@ public abstract class Worker implements I_Work {
 	}
 
 	public Transaction getTransactionIfActive() throws LeaseDeniedException,
-	RemoteException, InterruptedException, IOException,
-	PrivilegedActionException, UnknownTransactionException {
+			RemoteException, InterruptedException, IOException,
+			PrivilegedActionException, UnknownTransactionException {
 		if ((activeTransaction != null)
 				&& (activeTransaction.getState() != TransactionConstants.ACTIVE)) {
 			activeTransaction = null;
 		}
 		return activeTransaction;
 	}
+
 	public void discardActiveTransaction() {
 		this.setActiveTransaction(null);
 	}
@@ -682,15 +688,19 @@ public abstract class Worker implements I_Work {
 	public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches,
 			ServiceItemFilter filter) throws InterruptedException,
 			RemoteException, ConfigurationException {
-		logger.info("Looking up (3): " + tmpl + " filter: " + filter
-				+ " worker: " + this.getWorkerDescWithId() + "\n ClassLoader: "
-				+ this.getClass().getClassLoader() + "\n jiniManager: "
-				+ this.jiniManager);
+		if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Looking up (3): " + tmpl + " filter: " + filter
+					+ " worker: " + this.getWorkerDescWithId()
+					+ "\n ClassLoader: " + this.getClass().getClassLoader()
+					+ "\n jiniManager: " + this.jiniManager);
+		}
 		try {
 			ServiceItem[] results = this.jiniManager.lookup(tmpl, maxMatches,
 					addServiceProxyFilter(filter));
-			logger.info("Looking up resulted in: " + results.length
-					+ " matches.");
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("Looking up resulted in: " + results.length
+						+ " matches.");
+			}
 			if (results.length == 0) {
 				logger.info("Trying same lookup again.");
 				results = this.jiniManager.lookup(tmpl, maxMatches,
@@ -831,12 +841,22 @@ public abstract class Worker implements I_Work {
 				+ " worker: " + this.getWorkerDescWithId() + "\n ClassLoader: "
 				+ this.getClass().getClassLoader() + "\n jiniManager: "
 				+ this.jiniManager);
+
+		if (tmpl.attributeSetTemplates != null) {
+			for (Entry e : tmpl.attributeSetTemplates) {
+				if (e == null) {
+					throw new NullPointerException();
+				}
+			}
+		}
 		try {
 			ServiceItem[] results = this.jiniManager.lookup(tmpl, minMatches,
 					maxMatches, addServiceProxyFilter(filter), waitDur,
 					lookupLocal);
-			logger.info("Looking up resulted in: " + results.length
+			if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Looking up resulted in: " + results.length
 					+ " matches.");
+			}
 			/*
 			 * if (results.length == 0) { logger.info("Trying same lookup
 			 * again."); results = this.jiniManager.lookup(tmpl, minMatches,
@@ -882,9 +902,15 @@ public abstract class Worker implements I_Work {
 
 		logger.info("Looking up: " + tmpl + " filter: " + filter + " worker: "
 				+ this.getWorkerDescWithId());
-		return Worker.this.jiniManager.getAllGroupsServiceDiscoveryManager()
-				.lookup(tmpl, minMatches, maxMatches,
-						addServiceProxyFilter(filter), waitDur);
+		if (JiniManager.isLocalOnly()) {
+			return Worker.this.jiniManager.lookup(tmpl, minMatches, maxMatches,
+					addServiceProxyFilter(filter), waitDur);
+		} else {
+			return Worker.this.jiniManager
+					.getAllGroupsServiceDiscoveryManager().lookup(tmpl,
+							minMatches, maxMatches,
+							addServiceProxyFilter(filter), waitDur);
+		}
 	}
 
 	public Transaction createTransaction(final long transactionDuration)
@@ -954,7 +980,7 @@ public abstract class Worker implements I_Work {
 	public void setTimer(I_KeepTime timer) {
 		this.timer = timer;
 	}
-	
+
 	public long getTime() throws RemoteException {
 		return timer.getTime();
 	}
