@@ -42,14 +42,15 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
 		add(CO_queue_va_user4_editor_Inbox);
 		//add(CO_queue_va_user4_editor_Outbox);
 				
-		add(CoreServices.CO_GenericWorkerManager);
-		add(CoreServices.CO_GenericWorkerManagerNewFrame);
-		add(CoreServices.CO_JavaSpace);
+		//add(CoreServices.CO_GenericWorkerManager);
+		//add(CoreServices.CO_GenericWorkerManagerNewFrame);
+		//add(CoreServices.CO_JavaSpace);
 		add(CoreServices.CO_LogManagerService);
 		add(CoreServices.CO_LogViewerNewFrame);
 		add(CoreServices.CO_PhantomFrame);
 		add(CoreServices.CO_ServiceBrowserNewFrame);
-		add(CO_FormBuilderNewFrame);
+        add(CoreServices.CO_ProcessBuilder);
+		//add(CO_FormBuilderNewFrame);
 		add(CO_AceEditor);
 
 	}
