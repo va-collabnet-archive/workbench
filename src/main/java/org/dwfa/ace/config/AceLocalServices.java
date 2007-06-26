@@ -19,8 +19,8 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
 		 */
 		//add(CoreServices.CO_ClassServer);
 		//add(CoreServices.CO_ServiceRegistrar);
+        add(CO_LocalTransactionManager);
 		add(CoreServices.CO_TransactionAggregator);
-		add(CO_LocalTransactionManager);
 		//add(CoreServices.CO_Timer);
 
 		add(CoreServices.CO_AgingQueue);
