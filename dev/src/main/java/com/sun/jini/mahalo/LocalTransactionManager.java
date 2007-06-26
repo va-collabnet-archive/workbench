@@ -50,7 +50,6 @@ import net.jini.core.transaction.server.CrashCountException;
 import net.jini.core.transaction.server.ServerTransaction;
 import net.jini.core.transaction.server.TransactionManager;
 import net.jini.core.transaction.server.TransactionParticipant;
-import net.jini.export.ProxyAccessor;
 import net.jini.id.Uuid;
 import net.jini.id.UuidFactory;
 import net.jini.security.TrustVerifier;
@@ -88,8 +87,8 @@ import com.sun.jini.thread.WakeupManager;
  */
 class LocalTransactionManager implements TxnManager,
 		LeaseExpirationMgr.Expirer, LogRecovery, TxnSettler,
-		com.sun.jini.constants.TimeConstants, LocalLandlord, ServerProxyTrust,
-		ProxyAccessor {
+		com.sun.jini.constants.TimeConstants, LocalLandlord, ServerProxyTrust
+		 {
 	/** Logger for (successful) service startup message */
 	static final Logger startupLogger = Logger.getLogger(TxnManager.MAHALO
 			+ ".startup");
@@ -1031,29 +1030,12 @@ class LocalTransactionManager implements TxnManager,
 	// Startup
 
 	public Object getProxy() {
-		if (operationsLogger.isLoggable(Level.FINER)) {
-			operationsLogger.entering(this.getClass().getName(), "getProxy");
-		}
-		if (operationsLogger.isLoggable(Level.FINER)) {
-			operationsLogger.exiting(this.getClass().getName(), "getProxy",
-					serverStub);
-		}
-		return serverStub;
+		return null;
 	}
 
 	/* inherit javadoc */
 	public Object getServiceProxy() {
-		if (operationsLogger.isLoggable(Level.FINER)) {
-			operationsLogger.entering(this.getClass().getName(),
-					"getServiceProxy");
-		}
-		readyState.check();
-
-		if (operationsLogger.isLoggable(Level.FINER)) {
-			operationsLogger.exiting(this.getClass().getName(),
-					"getServiceProxy", serverStub);
-		}
-		return serverStub;
+		return null;
 	}
 
 	/**
