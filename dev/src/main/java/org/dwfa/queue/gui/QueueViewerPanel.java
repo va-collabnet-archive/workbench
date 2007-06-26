@@ -47,6 +47,7 @@ import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceTemplate;
 import net.jini.id.Uuid;
 import net.jini.id.UuidFactory;
+import net.jini.lookup.ServiceItemFilter;
 import net.jini.lookup.entry.Name;
 
 import org.dwfa.bpa.ExecutionRecord;
@@ -78,6 +79,8 @@ public class QueueViewerPanel extends JPanel {
 	EntryID processEntryID;
 
 	private static Logger logger = QueueViewerFrame.logger;
+    
+    private ServiceItemFilter queuefilter;
 
 	private class ExecuteProcessActionListener implements ActionListener {
 		Configuration config;
@@ -467,10 +470,16 @@ public class QueueViewerPanel extends JPanel {
 
 	JTable tableOfQueueEntries;
 
-	public QueueViewerPanel(Configuration jiniConfig, I_Work worker)
+    public QueueViewerPanel(Configuration jiniConfig, I_Work worker)
+    throws RemoteException, InterruptedException, IOException,
+    ConfigurationException, PrivilegedActionException {
+        this(jiniConfig, worker, null);
+    }
+    public QueueViewerPanel(Configuration jiniConfig, I_Work worker, ServiceItemFilter queuefilter)
 			throws RemoteException, InterruptedException, IOException,
 			ConfigurationException, PrivilegedActionException {
 		super(new GridBagLayout());
+        this.queuefilter = queuefilter;
 		this.worker = worker;
 		this.splitPane.setLeftComponent(createTableOfQueues());
 		this.splitPane.setRightComponent(this.queueContentsSplitPane);
@@ -537,7 +546,7 @@ public class QueueViewerPanel extends JPanel {
 			ServiceTemplate template = new ServiceTemplate(null,
 					new Class[] { I_QueueProcesses.class }, null);
 
-			ServiceItem[] services = worker.lookup(template, 1, 50, null,
+			ServiceItem[] services = worker.lookup(template, 1, 50, queuefilter,
 					1000 * 5);
 
 			if (logger.isLoggable(Level.FINE)) {
