@@ -54,6 +54,8 @@ public class ExtractAndProcessSpec {
 	private String destDir;
 
 	private SubstutionSpec[] substitutions = new SubstutionSpec[0];
+    
+    private boolean retainDirStructure = false;
 
 	public ExtractAndProcessSpec() {
 		super();
@@ -98,5 +100,15 @@ public class ExtractAndProcessSpec {
 	public void setSubstitutions(SubstutionSpec[] substitutions) {
 		this.substitutions = substitutions;
 	}
+
+
+    public boolean getRetainDirStructure() {
+        return retainDirStructure;
+    }
+
+
+    public void setRetainDirStructure(boolean retainDirStructure) {
+        this.retainDirStructure = retainDirStructure;
+    }
 	
 }
