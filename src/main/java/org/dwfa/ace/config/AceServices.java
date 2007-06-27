@@ -30,6 +30,7 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
 		add(CoreServices.CO_OutboxQueue);
 		add(CoreServices.CO_SyncQueue);
 		add(CoreServices.CO_Inbox);
+        add(CoreServices.CO_MultiQueueStarter);
 		
 		add(CO_queue_kp_user2_editor_Inbox);
 		//add(CO_queue_kp_user2_editor_Outbox);

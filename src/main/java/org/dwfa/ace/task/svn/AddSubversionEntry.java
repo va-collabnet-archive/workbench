@@ -38,16 +38,25 @@ public class AddSubversionEntry extends AbstractTask {
     
     private String prompt = "enter data for new subversion repository: ";
     private String keyName = "repoKey";
+    private String repoUrl = "https://amt-edit-bundle.au-ct.org/svn/amt-edit-bundle/trunk/dev/src/main/profiles/users";
+    private String workingCopy = "profiles/users";
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        out.writeObject(prompt);
+        out.writeObject(keyName);
+        out.writeObject(repoUrl);
+        out.writeObject(workingCopy);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            //
+            prompt = (String) in.readObject();
+            keyName = (String) in.readObject();
+            repoUrl = (String) in.readObject();
+            workingCopy = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -67,7 +76,7 @@ public class AddSubversionEntry extends AbstractTask {
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             SubversionData svd = config.getSubversionMap().get(keyName);
             if (svd == null) {
-                svd = new SubversionData("https://amt.au-ct.org/svn/amt/trunk/docs", "queue/m1");
+                svd = new SubversionData(repoUrl, workingCopy);
             }
             
             Prompter p = new Prompter();
@@ -199,6 +208,22 @@ public class AddSubversionEntry extends AbstractTask {
              e.printStackTrace();
         }
         System.exit(0);
+    }
+
+    public String getRepoUrl() {
+        return repoUrl;
+    }
+
+    public void setRepoUrl(String repoUrl) {
+        this.repoUrl = repoUrl;
+    }
+
+    public String getWorkingCopy() {
+        return workingCopy;
+    }
+
+    public void setWorkingCopy(String workingCopy) {
+        this.workingCopy = workingCopy;
     }
 
  }

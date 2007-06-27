@@ -226,5 +226,9 @@ public interface I_ConfigAceFrame {
 	public void setShowPreferences(boolean shown);
 	
 	public void setShowHistory(boolean shown);
+    
+    public void setShowAllQueues(boolean show);
+    
+    public List<String> getQueueAddressesToShow();
 
 }

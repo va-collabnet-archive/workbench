@@ -30,16 +30,17 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
 		add(CoreServices.CO_OutboxQueue);
 		add(CoreServices.CO_SyncQueue);
 		add(CoreServices.CO_Inbox);
+        add(CoreServices.CO_MultiQueueStarter);
 		
-		add(CO_queue_kp_user2_editor_Inbox);
+		//add(CO_queue_kp_user2_editor_Inbox);
 		//add(CO_queue_kp_user2_editor_Outbox);
-		add(CO_queue_kp_user3_editor_Inbox);
+		//add(CO_queue_kp_user3_editor_Inbox);
 		//add(CO_queue_kp_user3_editor_Outbox);
-		add(CO_queue_va_user1_editor_Inbox);
+		//add(CO_queue_va_user1_editor_Inbox);
 		//add(CO_queue_va_user1_editor_Outbox);
-		add(CO_queue_va_user1_assignmentManager_Inbox);
+		//add(CO_queue_va_user1_assignmentManager_Inbox);
 		//add(CO_queue_va_user1_assignmentManager_Outbox);
-		add(CO_queue_va_user4_editor_Inbox);
+		//add(CO_queue_va_user4_editor_Inbox);
 		//add(CO_queue_va_user4_editor_Outbox);
 				
 		//add(CoreServices.CO_GenericWorkerManager);

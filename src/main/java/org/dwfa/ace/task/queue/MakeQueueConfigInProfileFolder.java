@@ -1,20 +1,16 @@
-package org.dwfa.ace.task.profile;
+package org.dwfa.ace.task.queue;
 
 import java.beans.IntrospectionException;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
-import org.dwfa.ace.api.I_ConfigAceDb;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_ImplementTermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -24,9 +20,10 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.util.io.FileIO;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/profile", type = BeanType.TASK_BEAN) })
-public class SaveProfile extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ace/queue", type = BeanType.TASK_BEAN) })
+public class MakeQueueConfigInProfileFolder extends AbstractTask {
 
     /**
      * 
@@ -35,24 +32,25 @@ public class SaveProfile extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String profileDir = "profiles";
+    private String profileDir = "profiles/users";
+
+    private String template = "config/queue.config";
 
     private String usernamePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
-    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profileDir);
+        out.writeObject(template);
         out.writeObject(usernamePropName);
-        out.writeObject(profilePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             profileDir = (String) in.readObject();
+            template = (String) in.readObject();
             usernamePropName = (String) in.readObject();
-            profilePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -64,18 +62,16 @@ public class SaveProfile extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ImplementTermFactory termFactory = (I_ImplementTermFactory) LocalVersionedTerminology.get();
-            I_ConfigAceDb aceConfig = termFactory.newAceDbConfig();
             String username = (String) process.readProperty(usernamePropName);
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            aceConfig.getAceFrames().add(profile);
-            File profileFile = new File(profileDir, username + File.separator + username + ".ace");
-            profileFile.getParentFile().mkdirs();
-            FileOutputStream fos = new FileOutputStream(profileFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(aceConfig);
-            oos.close();
+            String configTemplate = FileIO.readerToString(new FileReader(template));
+            configTemplate = configTemplate.replace("username", username);
+            
+            File outputFile = new File(profileDir, username + File.separatorChar + "queue" + 
+                                       File.separatorChar + "queue.config");
+            outputFile.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(outputFile);
+            fw.append(configTemplate);
+            fw.close();
             
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -117,11 +113,11 @@ public class SaveProfile extends AbstractTask {
         this.usernamePropName = usernamePropName;
     }
 
-    public String getProfilePropName() {
-        return profilePropName;
+    public String getTemplate() {
+        return template;
     }
 
-    public void setProfilePropName(String profilePropName) {
-        this.profilePropName = profilePropName;
+    public void setTemplate(String template) {
+        this.template = template;
     }
 }

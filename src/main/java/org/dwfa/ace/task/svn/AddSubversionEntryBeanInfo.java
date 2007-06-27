@@ -13,6 +13,20 @@ public class AddSubversionEntryBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
+            PropertyDescriptor repoUrl =
+                new PropertyDescriptor("repoUrl", getBeanDescriptor().getBeanClass());
+            repoUrl.setBound(true);
+            repoUrl.setPropertyEditorClass(JTextFieldEditor.class);
+            repoUrl.setDisplayName("<html><font color='green'>repoUrl:");
+            repoUrl.setShortDescription("The URL of the repository to checkout.");
+
+            PropertyDescriptor workingCopy =
+                new PropertyDescriptor("workingCopy", getBeanDescriptor().getBeanClass());
+            workingCopy.setBound(true);
+            workingCopy.setPropertyEditorClass(JTextFieldEditor.class);
+            workingCopy.setDisplayName("<html><font color='green'>working copy:");
+            workingCopy.setShortDescription("The local directory to hold the working copy.");
+
             PropertyDescriptor prompt =
                 new PropertyDescriptor("prompt", getBeanDescriptor().getBeanClass());
             prompt.setBound(true);
@@ -28,7 +42,7 @@ public class AddSubversionEntryBeanInfo extends SimpleBeanInfo {
             keyName.setShortDescription("The key for the subversion entry.");
 
             PropertyDescriptor rv[] =
-                { prompt, keyName };
+                { prompt, keyName, repoUrl, workingCopy };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
