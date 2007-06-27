@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 
+import org.dwfa.jini.JiniManager;
 import org.dwfa.jini.LookupJiniAndLocal;
 
 import net.jini.config.Configuration;
@@ -46,23 +47,22 @@ import com.sun.jini.start.LifeCycle;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class LogManagerService implements I_ManageLogs {
-	
-	public static final String VERSION_STRING = "1.0";
-    LogManagerAdaptor adaptor = new LogManagerAdaptor(LogManager
-            .getLogManager());
 
-    private static Logger logger = Logger.getLogger(LogManagerService.class
-            .getName());
+    public static final String VERSION_STRING = "1.0";
+
+    LogManagerAdaptor adaptor = new LogManagerAdaptor(LogManager.getLogManager());
+
+    private static Logger logger = Logger.getLogger(LogManagerService.class.getName());
 
     /**
      * Cache of our <code>LifeCycle</code> object TODO implement the lifeCycle
      * destroy methods. See TxnManagerImpl for an example.
      */
     @SuppressWarnings("unused")
-	private LifeCycle lifeCycle = null;
+    private LifeCycle lifeCycle = null;
 
     private JoinManager joinManager;
 
@@ -75,14 +75,12 @@ public class LogManagerService implements I_ManageLogs {
     private ServiceID serviceId;
 
     /**
-     *  
+     * 
      */
     public LogManagerService(String[] args, LifeCycle lc) throws Exception {
-		logger.info("\n*******************\n\n" + 
-				"Starting service with config file: " + Arrays.asList(args) +
-				"\n\n******************\n");
-        this.config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
+        logger.info("\n*******************\n\n" + "Starting service with config file: " + Arrays.asList(args)
+                + "\n\n******************\n");
+        this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
         this.init();
     }
@@ -95,20 +93,30 @@ public class LogManagerService implements I_ManageLogs {
      *             if a problem occurs
      */
     protected void init() throws Exception {
-        LoginContext loginContext = (LoginContext) config
-                .getEntry(this.getClass().getName(), "loginContext",
-                        LoginContext.class, null);
-        if (loginContext == null) {
-            initAsSubject();
+        if (JiniManager.isLocalOnly()) {
+            List<Entry> entryList = new ArrayList<Entry>();
+            Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
+                                                             new Entry[] {});
+            entryList.addAll(Arrays.asList(entries));
+
+            ServiceItem serviceItem = new ServiceItem(this.getServiceID(), this, (Entry[]) entryList
+                    .toArray(new Entry[entryList.size()]));
+            LookupJiniAndLocal.addToLocalServices(serviceItem);
+
         } else {
-            loginContext.login();
-            Subject.doAsPrivileged(loginContext.getSubject(),
-                    new PrivilegedExceptionAction() {
-                        public Object run() throws Exception {
-                            initAsSubject();
-                            return null;
-                        }
-                    }, null);
+            LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
+                                                                       LoginContext.class, null);
+            if (loginContext == null) {
+                initAsSubject();
+            } else {
+                loginContext.login();
+                Subject.doAsPrivileged(loginContext.getSubject(), new PrivilegedExceptionAction() {
+                    public Object run() throws Exception {
+                        initAsSubject();
+                        return null;
+                    }
+                }, null);
+            }
         }
     }
 
@@ -128,27 +136,24 @@ public class LogManagerService implements I_ManageLogs {
         /* Get the discovery manager, for discovering lookup services */
         DiscoveryManagement discoveryManager;
         try {
-        		discoveryManager = (DiscoveryManagement) config.getEntry(this
-                .getClass().getName(), "discoveryManager",
-                DiscoveryManagement.class);
+            discoveryManager = (DiscoveryManagement) config.getEntry(this.getClass().getName(), "discoveryManager",
+                                                                     DiscoveryManagement.class);
         } catch (NoSuchEntryException e) {
-        	    logger.warning("No entry for discoveryManager in config file. " + e.toString());
-        	       String[] groups = (String[]) config.getEntry(this
-        	                .getClass().getName(), "groups", String[].class);
-        		discoveryManager = new LookupDiscovery(groups, config);
+            logger.warning("No entry for discoveryManager in config file. " + e.toString());
+            String[] groups = (String[]) config.getEntry(this.getClass().getName(), "groups", String[].class);
+            discoveryManager = new LookupDiscovery(groups, config);
         }
 
-        Entry[] entries = (Entry[]) this.config.getEntry(this.getClass()
-                .getName(), "entries", Entry[].class, new Entry[] {});
+        Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
+                                                         new Entry[] {});
 
         /* Get the join manager, for joining lookup services */
-        joinManager = new JoinManager(smartProxy, entries, getServiceID(),
-                discoveryManager, null /* leaseMgr */, config);
+        joinManager = new JoinManager(smartProxy, entries, getServiceID(), discoveryManager, null /* leaseMgr */,
+                                      config);
 
-        Entry[] moreEntries = new Entry[] { new ServiceInfo(
-                "Log manager service", "Informatics, Inc.",
-                "Informatics, Inc.", VERSION_STRING, "Log manager",
-                "no serial number") };
+        Entry[] moreEntries = new Entry[] { new ServiceInfo("Log manager service", "Informatics, Inc.",
+                                                            "Informatics, Inc.", VERSION_STRING, "Log manager",
+                                                            "no serial number") };
         joinManager.addAttributes(moreEntries);
 
         ArrayList<Entry> entryList = new ArrayList<Entry>(Arrays.asList(entries));
@@ -166,8 +171,8 @@ public class LogManagerService implements I_ManageLogs {
 
         }
 
-        ServiceItem serviceItem = new ServiceItem(createServiceID(), this,
-                (Entry[]) entryList.toArray(new Entry[entryList.size()]));
+        ServiceItem serviceItem = new ServiceItem(createServiceID(), this, (Entry[]) entryList
+                .toArray(new Entry[entryList.size()]));
         LookupJiniAndLocal.addToLocalServices(serviceItem);
     }
 
@@ -180,12 +185,10 @@ public class LogManagerService implements I_ManageLogs {
      * @throws RemoteException
      *             if a remote communication problem occurs
      */
-    protected Exporter getExporter() throws ConfigurationException,
-            RemoteException {
+    protected Exporter getExporter() throws ConfigurationException, RemoteException {
         return (Exporter) config
-                .getEntry(this.getClass().getName(), "exporter",
-                        Exporter.class, new BasicJeriExporter(TcpServerEndpoint
-                                .getInstance(0), new BasicILFactory()));
+                .getEntry(this.getClass().getName(), "exporter", Exporter.class,
+                          new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory()));
     }
 
     /** Returns the service ID for this server. */
@@ -199,8 +202,7 @@ public class LogManagerService implements I_ManageLogs {
     /** Creates a new service ID. */
     protected static ServiceID createServiceID() {
         Uuid uuid = UuidFactory.generate();
-        return new ServiceID(uuid.getMostSignificantBits(), uuid
-                .getLeastSignificantBits());
+        return new ServiceID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
     }
 
     /**
@@ -238,8 +240,7 @@ public class LogManagerService implements I_ManageLogs {
      * @see org.dwfa.log.I_ManageLogs#isLoggable(java.lang.String,
      *      java.util.logging.Level)
      */
-    public boolean isLoggable(String loggerName, Level level)
-            throws RemoteException {
+    public boolean isLoggable(String loggerName, Level level) throws RemoteException {
         return adaptor.isLoggable(loggerName, level);
     }
 
@@ -248,8 +249,7 @@ public class LogManagerService implements I_ManageLogs {
      * @see org.dwfa.log.I_ManageLogs#addRemoteHandler(java.lang.String,
      *      org.dwfa.log.I_PublishLogRecord)
      */
-    public boolean addRemoteHandler(String loggerName,
-            I_PublishLogRecord remoteHandler) throws RemoteException {
+    public boolean addRemoteHandler(String loggerName, I_PublishLogRecord remoteHandler) throws RemoteException {
         Logger logger = Logger.getLogger(loggerName);
         RemoteHandlerAdaptor adaptor = null;
         if (this.remoteHandlerAdaptors.containsKey(remoteHandler.getId())) {
@@ -263,13 +263,15 @@ public class LogManagerService implements I_ManageLogs {
         return true;
 
     }
+
     Map<Uuid, RemoteHandlerAdaptor> remoteHandlerAdaptors = new HashMap<Uuid, RemoteHandlerAdaptor>();
 
     /**
-     * @see org.dwfa.log.I_ManageLogs#removeRemoteHandler(java.lang.String, net.jini.id.Uuid)
+     * @see org.dwfa.log.I_ManageLogs#removeRemoteHandler(java.lang.String,
+     *      net.jini.id.Uuid)
      */
     public void removeRemoteHandler(String loggerName, Uuid id) {
-        RemoteHandlerAdaptor adaptor = this.remoteHandlerAdaptors.get(id);  
+        RemoteHandlerAdaptor adaptor = this.remoteHandlerAdaptors.get(id);
         Logger logger = Logger.getLogger(loggerName);
         logger.removeHandler(adaptor);
         this.remoteHandlerAdaptors.remove(id);

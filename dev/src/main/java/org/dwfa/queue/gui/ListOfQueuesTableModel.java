@@ -49,6 +49,11 @@ public class ListOfQueuesTableModel extends AbstractTableModel {
         return String.class;
     }
     
+    public void clear() {
+        queues.clear();
+        fireTableDataChanged();
+    }
+    
     public boolean isCellEditable(int row, int col) {
         return false;
     }

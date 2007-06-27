@@ -228,7 +228,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         this.nodeInboxAddress = (String) this.config.getEntry(this.getClass()
                 .getName(), "nodeInboxAddress", String.class);
         this.directory = (File) this.config.getEntry(this.getClass().getName(),
-                "directory", File.class);
+                "directory", File.class, new File(args[0]).getParentFile());
         this.directory.mkdirs();
         this.nativeComparator = (Comparator<T>) this.config.getEntry(this
                 .getClass().getName(), "nativeComparator", Comparator.class);

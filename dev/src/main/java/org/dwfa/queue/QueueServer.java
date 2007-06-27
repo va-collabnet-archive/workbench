@@ -44,7 +44,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
 
     /** The server proxy, for use by getProxyVerifier */
     protected I_QueueProcesses serverProxy;
-    private static Logger logger = Logger.getLogger(QueueServer.class
+    protected static Logger logger = Logger.getLogger(QueueServer.class
             .getName());
 
     private List<I_GetWorkFromQueue> workerList = new ArrayList<I_GetWorkFromQueue>();

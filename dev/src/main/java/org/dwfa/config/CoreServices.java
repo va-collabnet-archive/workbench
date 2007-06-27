@@ -433,6 +433,16 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             true, false, false,
             "");
    
+    public static String MULTI_QUEUE_STARTER = "Multi queue starter";
+    public static String MULTI_QUEUE_STARTER_PROP = "org.dwfa.MULTI_QUEUE_STARTER";
+    public static ServiceConfigOption CO_MultiQueueStarter = new ServiceConfigOption(MULTI_QUEUE_STARTER, "config${/}multiQueueStarter.policy", "config${/}multiQueueStarterSecure.policy", MULTI_QUEUE_STARTER_PROP,
+            "Starts all the queues in a directory. ", true, "", "lib",
+            dwaPath, "org.dwfa.queue.MultiQueueStarter",
+            new String[] { "config${/}multiQueueStarter.config" }, 
+            new String[] { "config${/}multiQueueStarterSecure.config" }, 
+            true, false, false,
+            "");
+   
     public static String WEB_SERVER = "Web Server";
     public static String WEB_SERVER_PROP = "org.dwfa.WEB_SERVER";
     public static ServiceConfigOption CO_WebServer = new ServiceConfigOption(WEB_SERVER, "config${/}webServer.policy", "config${/}webServerSecure.policy", WEB_SERVER_PROP,
