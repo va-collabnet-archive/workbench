@@ -76,6 +76,7 @@ import javax.swing.tree.TreePath;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
+import net.jini.lookup.ServiceItemFilter;
 
 import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.ChangeFramePassword;
@@ -284,11 +285,24 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	public class MoveListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent evt) {
-			viewer.getMoveListener().actionPerformed(evt);
+			queueViewer.getMoveListener().actionPerformed(evt);
 
 		}
 
 	}
+    
+    public class ShowAllQueuesListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent evt) {
+            JToggleButton showButton = (JToggleButton) evt.getSource();
+            aceFrameConfig.setShowAllQueues(showButton.isSelected());
+            try {
+                queueViewer.refreshQueues();
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+    }
 
 	private class StatusChangeListener implements PropertyChangeListener {
 
@@ -304,13 +318,9 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		boolean hidden = true;
 
 		public void actionPerformed(ActionEvent e) {
-			AceLog.getAppLog().info(" bottomPaneAction: " + e);
 			if (showSearchButton == e.getSource()) {
-				AceLog.getAppLog().info(" 1. ");
 				if (showSearchButton.isSelected()) {
-					AceLog.getAppLog().info(" 2. ");
 					if (hidden) {
-						AceLog.getAppLog().info(" 3. ");
 						if (lastLocation == 0) {
 							lastLocation = upperLowerSplit.getHeight() - 200;
 						}
@@ -319,7 +329,6 @@ public class ACE extends JPanel implements PropertyChangeListener {
 					}
 
 				} else {
-					AceLog.getAppLog().info(" 4. ");
 					lastLocation = upperLowerSplit.getDividerLocation();
 					upperLowerSplit.setDividerLocation(upperLowerSplit
 							.getHeight());
@@ -381,6 +390,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				getRootPane().getLayeredPane().moveToFront(queuePalette);
 				deselectOthers(showQueuesButton);
 			}
+            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
+                                   conceptTabs.getHeight() + 4);
 			queuePalette.togglePalette(((JToggleButton) e.getSource())
 					.isSelected());
 		}
@@ -400,6 +411,8 @@ public class ACE extends JPanel implements PropertyChangeListener {
 				getRootPane().getLayeredPane().moveToFront(processPalette);
 				deselectOthers(showProcessBuilder);
 			}
+            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
+                                   conceptTabs.getHeight() + 4);
 			processPalette.togglePalette(((JToggleButton) e.getSource())
 					.isSelected());
 		}
@@ -518,7 +531,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	protected JMenuItem addQueueMI, moveToDiskMI;
 
-	private QueueViewerPanel viewer;
+	private QueueViewerPanel queueViewer;
 
 	private JLabel statusLabel = new JLabel();
 
@@ -901,16 +914,26 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		menuBar.add(fileMenu);
 	}
 
-	private static void addActionButton(ActionListener actionListener,
-			String resource, String tooltipText, JPanel topPanel,
-			GridBagConstraints c) {
-		JButton newProcess = new JButton(new ImageIcon(ACE.class
-				.getResource(resource)));
-		newProcess.setToolTipText(tooltipText);
-		newProcess.addActionListener(actionListener);
-		topPanel.add(newProcess, c);
-		c.gridx++;
-	}
+    private static void addActionButton(ActionListener actionListener,
+        String resource, String tooltipText, JPanel topPanel,
+        GridBagConstraints c) {
+    JButton newProcess = new JButton(new ImageIcon(ACE.class
+            .getResource(resource)));
+    newProcess.setToolTipText(tooltipText);
+    newProcess.addActionListener(actionListener);
+    topPanel.add(newProcess, c);
+    c.gridx++;
+}
+    private static void addActionToggleButton(ActionListener actionListener,
+        String resource, String tooltipText, JPanel topPanel,
+        GridBagConstraints c) {
+    JToggleButton newProcess = new JToggleButton(new ImageIcon(ACE.class
+            .getResource(resource)));
+    newProcess.setToolTipText(tooltipText);
+    newProcess.addActionListener(actionListener);
+    topPanel.add(newProcess, c);
+    c.gridx++;
+}
 
 	private JComponent getContentPanel() throws DatabaseException, IOException,
 			ClassNotFoundException {
@@ -1043,7 +1066,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		MasterWorker worker = new MasterWorker(config);
 		worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
 				aceFrameConfig);
-		queuePalette.add(makeQueueViewerPanel(config, worker),
+		queuePalette.add(makeQueueViewerPanel(config, worker, aceFrameConfig.getInboxQueueFilter()),
 				BorderLayout.CENTER);
 		queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
@@ -1060,10 +1083,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	}
 
-	public JPanel makeQueueViewerPanel(Configuration config, MasterWorker worker)
+	public JPanel makeQueueViewerPanel(Configuration config, MasterWorker worker, ServiceItemFilter queueFilter)
 			throws RemoteException, InterruptedException, IOException,
 			ConfigurationException, PrivilegedActionException {
-		viewer = new QueueViewerPanel(config, worker);
+		queueViewer = new QueueViewerPanel(config, worker, queueFilter);
 		JPanel combinedPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -1076,7 +1099,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		c.gridy++;
 		c.weighty = 1;
 		c.fill = GridBagConstraints.BOTH;
-		combinedPanel.add(viewer, c);
+		combinedPanel.add(queueViewer, c);
 		return combinedPanel;
 
 	}
@@ -1096,9 +1119,12 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		listEditorTopPanel.add(new JLabel(" "), c); // filler
 		c.gridx++;
 		c.weightx = 0.0;
-		addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
-				"Take Selected Processes and Save To Disk (no transaction)",
-				listEditorTopPanel, c);
+        addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
+                        "Take Selected Processes and Save To Disk (no transaction)",
+                        listEditorTopPanel, c);
+        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/outbox_out.png",
+                        "Show all queues",
+                        listEditorTopPanel, c);
 		return listEditorTopPanel;
 
 	}

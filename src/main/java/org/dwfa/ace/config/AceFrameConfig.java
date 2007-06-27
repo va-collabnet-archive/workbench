@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import net.jini.core.entry.Entry;
+import net.jini.core.lookup.ServiceItem;
+import net.jini.lookup.ServiceItemFilter;
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -32,9 +37,11 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.vodb.types.ConceptBean;
@@ -49,7 +56,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 19;
+    private static final int dataVersion = 20;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -113,6 +120,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     // 19
     private Map<String, SubversionData> subversionMap = new HashMap<String, SubversionData>();
+    
+    //20
+    private boolean showAllQueues = false;
+    private ArrayListModel<String> queueAddressesToShow = new ArrayListModel<String>();
     
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -193,6 +204,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		
 		// 19
 		out.writeObject(subversionMap);
+        
+        // 20
+        out.writeBoolean(showAllQueues);
+        out.writeObject(queueAddressesToShow);
    }
 
 
@@ -357,6 +372,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	subversionMap = (Map<String, SubversionData>) in.readObject();
             } else {
             	subversionMap = new HashMap<String, SubversionData>();
+            }
+            if (objDataVersion >= 20) {
+                showAllQueues = in.readBoolean();
+                queueAddressesToShow = (ArrayListModel<String>) in.readObject();
+            } else {
+                showAllQueues = false;
+                queueAddressesToShow = new ArrayListModel<String>();
+                queueAddressesToShow.add(username);
             }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -1230,5 +1253,49 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void svnUpdate(SubversionData svd) {
         aceFrame.setupSvn();
         SvnPanel.update(svd, getAuthenticator(svd));
+    }
+
+
+    public class QueueFilter implements ServiceItemFilter {
+
+        public boolean check(ServiceItem item) {
+            if (showAllQueues) {
+                return true;
+            }
+            HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays.asList(item.attributeSets));
+            for (String address: queueAddressesToShow) {
+                if (itemAttributes.contains(new ElectronicAddress(address))) {
+                    AceLog.getAppLog().info(" true");
+                   return true;
+                }
+            }
+            return false;
+        }
+        
+    }
+    public ServiceItemFilter getInboxQueueFilter() {
+        return new QueueFilter();
+    }
+
+
+    public boolean getShowAllQueues() {
+        return showAllQueues;
+    }
+
+
+    public void setShowAllQueues(boolean showAllQueues) {
+        boolean old = this.showAllQueues;
+        this.showAllQueues = showAllQueues;
+        this.changeSupport.firePropertyChange("showAllQueues", old, showAllQueues);
+    }
+
+
+    public ArrayListModel<String> getQueueAddressesToShow() {
+        return queueAddressesToShow;
+    }
+
+
+    public void setQueueAddressesToShow(ArrayListModel<String> queueAddressesToShow) {
+        this.queueAddressesToShow = queueAddressesToShow;
     }
 }
