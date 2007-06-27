@@ -1298,4 +1298,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setQueueAddressesToShow(ArrayListModel<String> queueAddressesToShow) {
         this.queueAddressesToShow = queueAddressesToShow;
     }
+
+
+    public void setShowProcessBuilder(boolean show) {
+        aceFrame.setShowProcessBuilder(show);
+    }
+
+
+    public void setShowQueueViewer(boolean show) {
+        aceFrame.setShowQueueViewer(show);
+        
+    }
 }

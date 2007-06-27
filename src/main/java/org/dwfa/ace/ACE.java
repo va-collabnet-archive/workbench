@@ -1036,6 +1036,10 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	private AddressPaletteActionListener apal;
 
+    private ProcessPaletteActionListener showProcessBuilderActionListener;
+
+    private QueuesPaletteActionListener showQueuesActionListener;
+
 	private void makeProcessPalette() throws Exception {
 		JLayeredPane layers = getRootPane().getLayeredPane();
 		processPalette = new CdePalette(new BorderLayout(),
@@ -1800,15 +1804,17 @@ public class ACE extends JPanel implements PropertyChangeListener {
 		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/inbox.png")));
 		topPanel.add(showQueuesButton, c);
-		showQueuesButton.addActionListener(new QueuesPaletteActionListener());
+        showQueuesActionListener = new QueuesPaletteActionListener();
+		showQueuesButton.addActionListener(showQueuesActionListener);
 		showQueuesButton.setToolTipText("Show the queue viewer...");
 		c.gridx++;
 
 		showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/cube_molecule.png")));
 		topPanel.add(showProcessBuilder, c);
+        showProcessBuilderActionListener = new ProcessPaletteActionListener();
 		showProcessBuilder
-				.addActionListener(new ProcessPaletteActionListener());
+				.addActionListener(showProcessBuilderActionListener);
 		showProcessBuilder.setToolTipText("Show the process builder...");
 		c.gridx++;
 
@@ -2137,6 +2143,24 @@ public class ACE extends JPanel implements PropertyChangeListener {
             makeSubversionPalette();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
+
+    public void setShowProcessBuilder(boolean show) {
+        AceLog.getAppLog().info("set show process builder: " + show);
+        if (show != showProcessBuilder.isSelected()) {
+            showProcessBuilder.setSelected(show);
+            showProcessBuilderActionListener.actionPerformed(new ActionEvent(
+                    showProcessBuilder, 0, "toggle"));
+        }
+    }
+
+    public void setShowQueueViewer(boolean show) {
+        AceLog.getAppLog().info("set show process builder: " + show);
+        if (show != showQueuesButton.isSelected()) {
+            showQueuesButton.setSelected(show);
+            showQueuesActionListener.actionPerformed(new ActionEvent(
+                    showQueuesButton, 0, "toggle"));
         }
     }
     

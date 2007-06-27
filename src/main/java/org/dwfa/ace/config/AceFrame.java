@@ -119,5 +119,11 @@ public class AceFrame extends ComponentFrame {
     public void setupSvn() {
         getCdePanel().setupSvn();
     }
+    public void setShowProcessBuilder(boolean show) {
+        getCdePanel().setShowProcessBuilder(show);
+    }
+    public void setShowQueueViewer(boolean show) {
+        getCdePanel().setShowQueueViewer(show);
+    }
 
 }
