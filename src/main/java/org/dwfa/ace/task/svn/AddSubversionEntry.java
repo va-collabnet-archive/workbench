@@ -1,8 +1,10 @@
 package org.dwfa.ace.task.svn;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import javax.swing.JFrame;
@@ -72,6 +74,7 @@ public class AddSubversionEntry extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
+            addUserInfo(process);
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             SubversionData svd = config.getSubversionMap().get(keyName);
@@ -91,7 +94,19 @@ public class AddSubversionEntry extends AbstractTask {
              return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
         }
+    }
+    
+
+    protected void addUserInfo(I_EncodeBusinessProcess process) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException {
+        // subclass may override to include user info, for this task, we make no modifications...
+        
     }
 
     public Collection<Condition> getConditions() {

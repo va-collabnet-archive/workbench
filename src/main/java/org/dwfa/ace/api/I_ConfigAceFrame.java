@@ -229,6 +229,10 @@ public interface I_ConfigAceFrame {
     
     public void setShowAllQueues(boolean show);
     
+    public void setShowQueueViewer(boolean show);
+    
+    public void setShowProcessBuilder(boolean show);
+    
     public List<String> getQueueAddressesToShow();
 
 }

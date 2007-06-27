@@ -35,7 +35,7 @@ public class SaveProfile extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String profileDir = "profiles";
+    private String profileDir = "profiles/users";
 
     private String usernamePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();

@@ -17,6 +17,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.queue.QueueServer;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -72,6 +73,7 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
             FileWriter fw = new FileWriter(outputFile);
             fw.append(configTemplate);
             fw.close();
+            new QueueServer(new String[] { outputFile.getCanonicalPath() }, null);
             
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -85,6 +87,8 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
         } catch (FileNotFoundException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
