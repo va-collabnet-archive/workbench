@@ -1126,7 +1126,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
         addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
                         "Take Selected Processes and Save To Disk (no transaction)",
                         listEditorTopPanel, c);
-        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/outbox_out.png",
+        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png",
                         "Show all queues",
                         listEditorTopPanel, c);
 		return listEditorTopPanel;
