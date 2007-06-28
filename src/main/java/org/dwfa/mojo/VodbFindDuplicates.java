@@ -287,6 +287,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 			for (I_GetConceptData rootChild : rootChildren) {
 				// print out rootChild description here...
 				boolean needToWriterootChild = true;
+				boolean needToWriteDetailHtml = false;
 				
 //				getLog().info("Checking for dups on: " + rootChild.toString());				
 				
@@ -334,7 +335,6 @@ public class VodbFindDuplicates extends AbstractMojo {
 								alreadyDone = true;
 								break;
 							}
-
 							
 							if (alreadyDone == false) {
 //								 do something useful here
@@ -397,6 +397,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 										dwfaDupDataWriter.append("\n");
 										writeSearchConceptToHtmlTableRow(rootChild);
 										needToWriterootChild = false;	
+										needToWriteDetailHtml = true;
 										dwfaDupDataWriter.flush();
 									}
 
@@ -413,15 +414,18 @@ public class VodbFindDuplicates extends AbstractMojo {
 										reasonBuf.append("<br>");
 									}
 									reasonMap.get(potDup).add(reasonBuf.toString());
+									
 								}								
 							}							
 						}
 					}
 				}
-				for (I_DescriptionVersioned desc : potDupSet) {
-					writePotDupRowToHtmlTable(reasonMap.get(desc), desc);
+				if (needToWriteDetailHtml) {
+					for (I_DescriptionVersioned desc : potDupSet) {
+						writePotDupRowToHtmlTable(reasonMap.get(desc), desc);
+					}
+					writeToDetailHTMLFile(potDupSet, rootChild, reasonMap, htmlReportFile);
 				}
-				writeToDetailHTMLFile(potDupSet, rootChild, reasonMap, htmlReportFile);
 				potDupSet.clear();
 
 			}
