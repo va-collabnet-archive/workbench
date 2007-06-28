@@ -10,25 +10,23 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Takes/removes the first item in a specified attachment list of lists returns concept.
- * @author Christine Hill
- *
- */
+* Takes/removes the first item (UUID) in a specified attachment list of lists and returns a UUID.
+* @author Susan Castillo
+*
+*/
 @BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
-public class TakeFirstItemInAttachmentList extends AbstractTask {
+
+public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
     /**
      *
@@ -37,23 +35,23 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
+    private String listNamePropName = ProcessAttachmentKeys.DUP_UUID_L2.getAttachmentKey();
 
-    private String conceptKey = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String uuidListPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(listName);
-        out.writeObject(conceptKey);
+        out.writeObject(listNamePropName);
+        out.writeObject(uuidListPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            listName = (String) in.readObject();
-            conceptKey = (String) in.readObject();
+        	listNamePropName = (String) in.readObject();
+            uuidListPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -66,20 +64,20 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 
     }
 
-    @SuppressWarnings("unchecked")
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
             ArrayList<Collection<UUID>> temporaryList =
-                (ArrayList<Collection<UUID>>) process.readProperty(listName);
+                (ArrayList<Collection<UUID>>) process.readProperty(listNamePropName);
 
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
 
-            I_GetConceptData concept = LocalVersionedTerminology.get().getConcept((Collection<UUID>) temporaryList.remove(0));
+            Collection<UUID> uuid = temporaryList.remove(0);
+			worker.getLogger().info("uuid: " + uuid);
 
-            process.setProperty(this.conceptKey, concept);
+            process.setProperty(this.uuidListPropName, uuid);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -88,10 +86,6 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (TerminologyException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
             throw new TaskFailedException(e);
         }
     }
@@ -104,20 +98,21 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
         return new int[] {};
     }
 
-    public String getListName() {
-        return listName;
-    }
+	public String getUuidListPropName() {
+		return uuidListPropName;
+	}
 
-    public void setListName(String listName) {
-        this.listName = listName;
-    }
+	public void setUuidListPropName(String uuidListPropName) {
+		this.uuidListPropName = uuidListPropName;
+	}
 
-    public String getConceptKey() {
-        return conceptKey;
-    }
+	public String getListNamePropName() {
+		return listNamePropName;
+	}
 
-    public void setConceptKey(String conceptKey) {
-        this.conceptKey = conceptKey;
-    }
+	public void setListNamePropName(String listNamePropName) {
+		this.listNamePropName = listNamePropName;
+	}
 
 }
+

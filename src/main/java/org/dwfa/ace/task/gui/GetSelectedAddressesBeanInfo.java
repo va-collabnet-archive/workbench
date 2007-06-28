@@ -23,15 +23,15 @@ public class GetSelectedAddressesBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
        try {
-          PropertyDescriptor selectedAddresses =
-              new PropertyDescriptor("selectedAddresses", GetSelectedAddresses.class);
-            selectedAddresses.setBound(true);
-            selectedAddresses.setPropertyEditorClass(PropertyNameLabelEditor.class);
+          PropertyDescriptor selectedAddressesPropName =
+              new PropertyDescriptor("selectedAddressesPropName", GetSelectedAddresses.class);
+            selectedAddressesPropName.setBound(true);
+            selectedAddressesPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
  
-            selectedAddresses.setDisplayName("<html><font color='green'>Get Selected Addresses:");
-            selectedAddresses.setShortDescription("Get Addresses");
+            selectedAddressesPropName.setDisplayName("<html><font color='green'>Get Selected Addresses:");
+            selectedAddressesPropName.setShortDescription("Get Addresses");
 
-           PropertyDescriptor rv[] = { selectedAddresses };
+           PropertyDescriptor rv[] = { selectedAddressesPropName };
             return rv;
       } catch (IntrospectionException e) {
             throw new Error(e.toString());

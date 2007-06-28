@@ -20,22 +20,15 @@ public class ShowFileInWebBrowserBeanInfo extends SimpleBeanInfo {
     
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-			PropertyDescriptor reasonForDupHtmlStrPropName =
-			     new PropertyDescriptor("reasonForDupHtmlStrPropName", ShowFileInWebBrowser.class);
-			reasonForDupHtmlStrPropName.setBound(true);
-			reasonForDupHtmlStrPropName.setDisplayName("<html><font color='green'>HTLM Reason for Dup key:");
-			reasonForDupHtmlStrPropName.setShortDescription("html data key");
-			reasonForDupHtmlStrPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-			
-			PropertyDescriptor uuidStrPropName =
-			     new PropertyDescriptor("uuidStrPropName", ShowFileInWebBrowser.class);
-			uuidStrPropName.setBound(true);
-			uuidStrPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-			uuidStrPropName.setDisplayName("<html><font color='green'>Uuid data key:");
-			uuidStrPropName.setShortDescription("Uuid data key.");
+			PropertyDescriptor detailHtmlFileNameProp =
+			     new PropertyDescriptor("detailHtmlFileNameProp", ShowFileInWebBrowser.class);
+			detailHtmlFileNameProp.setBound(true);
+			detailHtmlFileNameProp.setDisplayName("<html><font color='green'>Detail Html File:");
+			detailHtmlFileNameProp.setShortDescription("html file");
+			detailHtmlFileNameProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
 
 			
-            PropertyDescriptor rv[] = {reasonForDupHtmlStrPropName,  uuidStrPropName};
+            PropertyDescriptor rv[] = {detailHtmlFileNameProp};
             return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());

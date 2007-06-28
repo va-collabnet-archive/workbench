@@ -36,20 +36,18 @@ public class GetSelectedAddresses extends AbstractTask {
 
     private static final int dataVersion = 1;
     
-    private String selectedAddresses = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();
+    private String selectedAddressesPropName = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(selectedAddresses);
- //       out.writeObject(addressesSelected);
+        out.writeObject(selectedAddressesPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	selectedAddresses = (String) in.readObject();
- //       addressesSelected = (List<String>) in.readObject();
+        	selectedAddressesPropName = (String) in.readObject();
 
         } else {
             throw new IOException(
@@ -72,7 +70,7 @@ public class GetSelectedAddresses extends AbstractTask {
             
         	List<String> addressesSelected = configFrame.getSelectedAddresses();
 			worker.getLogger().info("Addresses Selected: " + addressesSelected);
-            process.setProperty(selectedAddresses, addressesSelected);
+            process.setProperty(selectedAddressesPropName, addressesSelected);
          
             return Condition.CONTINUE;
             
@@ -95,12 +93,12 @@ public class GetSelectedAddresses extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public String getSelectedAddresses() {
-		return selectedAddresses;
+	public String getSelectedAddressesPropName() {
+		return selectedAddressesPropName;
 	}
 
-	public void setSelectedAddresses(String selectedAddresses) {
-		this.selectedAddresses = selectedAddresses;
+	public void setSelectedAddressesPropName(String selectedAddresses) {
+		this.selectedAddressesPropName = selectedAddresses;
 	}
 
 }

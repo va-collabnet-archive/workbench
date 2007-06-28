@@ -5,30 +5,28 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Takes/removes the first item in a specified attachment list of lists returns concept.
- * @author Christine Hill
- *
- */
+* Takes/removes the first item (UUID) in a specified attachment list and returns a UUID.
+* @author Susan Castillo
+*
+*/
 @BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
-public class TakeFirstItemInAttachmentList extends AbstractTask {
+
+public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
 
     /**
      *
@@ -37,23 +35,25 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String listName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
-
-    private String conceptKey = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+ //   private String conceptKey = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    
+    private String uuidListPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
+    
+    private String potDupUuidPropName = ProcessAttachmentKeys.POT_DUP_UUID.getAttachmentKey();
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(listName);
-        out.writeObject(conceptKey);
+        out.writeObject(uuidListPropName);
+        out.writeObject(potDupUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            listName = (String) in.readObject();
-            conceptKey = (String) in.readObject();
+            uuidListPropName = (String) in.readObject();
+            potDupUuidPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -66,20 +66,23 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
 
     }
 
-    @SuppressWarnings("unchecked")
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            ArrayList<Collection<UUID>> temporaryList =
-                (ArrayList<Collection<UUID>>) process.readProperty(listName);
-
+            
+            List<UUID> temporaryListUuid = (List<UUID>) process.readProperty(uuidListPropName);
+            
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
+        
+            worker.getLogger().info("uuidListPropName: " + uuidListPropName);
+            worker.getLogger().info("temporaryListUuid: " + temporaryListUuid);
+            UUID uuid = (UUID) temporaryListUuid.remove(0);
+			worker.getLogger().info("uuid: " + uuid);
 
-            I_GetConceptData concept = LocalVersionedTerminology.get().getConcept((Collection<UUID>) temporaryList.remove(0));
-
-            process.setProperty(this.conceptKey, concept);
+            process.setProperty(this.potDupUuidPropName, uuid);
+            
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -88,10 +91,6 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (TerminologyException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
             throw new TaskFailedException(e);
         }
     }
@@ -104,20 +103,24 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
         return new int[] {};
     }
 
-    public String getListName() {
-        return listName;
-    }
+	public String getUuidListPropName() {
+		return uuidListPropName;
+	}
 
-    public void setListName(String listName) {
-        this.listName = listName;
-    }
+	public void setUuidListPropName(String uuidListPropName) {
+		this.uuidListPropName = uuidListPropName;
+	}
 
-    public String getConceptKey() {
-        return conceptKey;
-    }
+	public String getPotDupUuidPropName() {
+		return potDupUuidPropName;
+	}
 
-    public void setConceptKey(String conceptKey) {
-        this.conceptKey = conceptKey;
-    }
+	public void setPotDupUuidPropName(String potDupUuidPropName) {
+		this.potDupUuidPropName = potDupUuidPropName;
+	}
+
+
 
 }
+
+

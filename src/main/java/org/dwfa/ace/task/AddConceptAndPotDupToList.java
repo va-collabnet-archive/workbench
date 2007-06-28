@@ -70,9 +70,9 @@ public class AddConceptAndPotDupToList extends AbstractTask {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
-			UUID conceptUid = UUID.fromString((String) process.readProperty(conceptUuidStrPropName));
+			UUID conceptUid = (UUID) process.readProperty(conceptUuidStrPropName);
 			I_GetConceptData conceptWithPotDup = LocalVersionedTerminology.get().getConcept(new UUID[]{conceptUid});
-	
+			
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			I_IntSet potDupTypeSet = LocalVersionedTerminology.get().newIntSet();

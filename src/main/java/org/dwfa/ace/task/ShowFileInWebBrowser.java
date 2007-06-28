@@ -26,7 +26,7 @@ import org.dwfa.util.bean.Spec;
  *
  */
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
 public class ShowFileInWebBrowser extends AbstractTask {
 
 	
@@ -34,23 +34,19 @@ public class ShowFileInWebBrowser extends AbstractTask {
 
 	private static final int dataVersion = 1;
 	
-	private String reasonForDupHtmlStrPropName = ProcessAttachmentKeys.HTML_STR.getAttachmentKey();
-    
-    private String uuidStrPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
+    private String detailHtmlFileNameProp = ProcessAttachmentKeys.DETAIL_HTML_FILE.getAttachmentKey();
     
 
         private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
-		out.writeObject(reasonForDupHtmlStrPropName);
-		out.writeObject(uuidStrPropName);
+		out.writeObject(detailHtmlFileNameProp);
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == dataVersion) {
-			reasonForDupHtmlStrPropName = (String) in.readObject();
-			uuidStrPropName = (String) in.readObject();
+			detailHtmlFileNameProp = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -66,15 +62,18 @@ public class ShowFileInWebBrowser extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
-			
-			String uuidString = (String) process.readProperty(uuidStrPropName);
-			worker.getLogger().info("STR uuid is: " + uuidString);
-			File htmlFile = new File("temp", uuidString + ".html");
+			String test1 = (String) process.readProperty(detailHtmlFileNameProp);
+			worker.getLogger().info("test1: " + test1);
+			File htmlFile = new File((String) process.readProperty(detailHtmlFileNameProp));
+			URL fileUrl = htmlFile.toURL();
+			/**String uuidString = (String) process.readProperty(uuidStrPropName);
+			//worker.getLogger().info("STR uuid is: " + uuidString);
+			//File htmlFile = new File("temp", uuidString + ".html");
 			worker.getLogger().info("htmlfile is: " + htmlFile);
 			URL fileUrl = htmlFile.toURL();
 			
 			String htmlData = (String) process.readProperty(reasonForDupHtmlStrPropName);
-			worker.getLogger().info("STR html is: " + htmlData);
+			worker.getLogger().info("STR html is: " + htmlData);**/
 			
 			worker.getLogger().info("URL: " + fileUrl.toString());
 	      	PlatformWebBrowser.openURL(fileUrl);
@@ -103,20 +102,12 @@ public class ShowFileInWebBrowser extends AbstractTask {
 		return new int[] {};
 	}
 
-	public String getReasonForDupHtmlStrPropName() {
-		return reasonForDupHtmlStrPropName;
+	public String getDetailHtmlFileNameProp() {
+		return detailHtmlFileNameProp;
 	}
 
-	public void setReasonForDupHtmlStrPropName(String reasonForDupHtmlStr) {
-		this.reasonForDupHtmlStrPropName = reasonForDupHtmlStr;
-	}
-
-	public String getUuidStrPropName() {
-		return uuidStrPropName;
-	}
-
-	public void setUuidStrPropName(String uuidStrPropName) {
-		this.uuidStrPropName = uuidStrPropName;
+	public void setDetailHtmlFileNameProp(String detailHtmlFileNameProp) {
+		this.detailHtmlFileNameProp = detailHtmlFileNameProp;
 	}
 
 }

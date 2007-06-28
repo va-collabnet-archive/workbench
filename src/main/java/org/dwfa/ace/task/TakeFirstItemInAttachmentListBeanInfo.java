@@ -48,7 +48,7 @@ public class TakeFirstItemInAttachmentListBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInAttachmentList.class);
-        bd.setDisplayName("<html><font color='green'><center>Take First Item<br>In Attachment<br> List");
+        bd.setDisplayName("<html><font color='green'><center>Take First Item<br>In Attachment List<br> Return Concept");
         return bd;
     }
 
