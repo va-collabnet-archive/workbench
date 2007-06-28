@@ -74,6 +74,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
 	public void read() throws IOException, ClassNotFoundException {
 		try {
+            int count = 0;
 			FileInputStream fis = new FileInputStream(changeSetFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			ObjectInputStream ois = new ObjectInputStream(bis);
@@ -93,6 +94,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				while (true) {
 					long time = ois.readLong();
 					Object obj = ois.readObject();
+                    count++;
 					if (counter != null) {
 						counter.increment();
 					}
@@ -112,6 +114,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
 			}
 			AceConfig.getVodb().addTimeBranchValues(values);
+            AceLog.getAppLog().info("Change set imported " + count + " changed concepts");
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		} catch (TerminologyException e) {

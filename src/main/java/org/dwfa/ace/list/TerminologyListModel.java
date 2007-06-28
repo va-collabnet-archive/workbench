@@ -1,6 +1,5 @@
 package org.dwfa.ace.list;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import javax.swing.AbstractListModel;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.dwfa.ace.log.AceLog;
 
 public class TerminologyListModel extends AbstractListModel implements I_ModelTerminologyList {
 
@@ -40,11 +38,6 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
 	public boolean addElement(I_GetConceptData o) {
 		boolean rv = elements.add(o);
 		fireIntervalAdded(this, elements.size() -1, elements.size() -1);
-		try {
-			AceLog.getAppLog().info("Added: " + o.getInitialText());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 		return rv;
 	}
 	public void addElement(int index, I_GetConceptData element) {

@@ -682,9 +682,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 				.get(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
 						.getUids()));
 
-		af
-				.setSvnRepository("https://ace-demo.aceworkspace.net/svn/ace-demo/trunk/dev/change-sets");
-		af.setSvnWorkingCopy("target/change-sets");
 		if (config.getUsername() == null) {
 			af.setChangeSetWriterFileName("nullUser."
 					+ UUID.randomUUID().toString() + ".jcs");
@@ -692,12 +689,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			af.setChangeSetWriterFileName(config.getUsername() + "."
 					+ UUID.randomUUID().toString() + ".jcs");
 		}
-
+        File changeSetRoot = new File("profiles" + File.separator + config.getUsername());
 		af.getChangeSetWriters().add(
-				new BinaryChangeSetWriter(new File(af.getSvnWorkingCopy(), af
-						.getChangeSetWriterFileName()), new File(af
-						.getSvnWorkingCopy(), "."
-						+ af.getChangeSetWriterFileName())));
+                
+				new BinaryChangeSetWriter(new File(changeSetRoot, 
+                                                   af.getChangeSetWriterFileName()), 
+                        new File(changeSetRoot, 
+                                 "." + af.getChangeSetWriterFileName())));
 
   		af.getAddressesList().add("va.user1.editor");
   		af.getAddressesList().add("va.user1.assignmentManager");

@@ -2180,11 +2180,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 		int relId = uuidToNativeWithGeneration(newRelUid, idSource,
 				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
-
-		AceLog.getEditLog().info(
-				"Creating new relationship 2: " + newRelUid + " (" + relId
-						+ ") from " + concept.getUids() + " to "
-						+ relDestination.getUids());
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            AceLog.getEditLog().fine(
+                                    "Creating new relationship 2: " + newRelUid + " (" + relId
+                                            + ") from " + concept.getUids() + " to "
+                                            + relDestination.getUids());
+        }
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), relDestination.getConceptId(), aceFrameConfig
 				.getEditingPathSet().size());
