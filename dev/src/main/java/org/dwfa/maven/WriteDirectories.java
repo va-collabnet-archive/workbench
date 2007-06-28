@@ -27,37 +27,38 @@ import org.apache.maven.plugin.logging.Log;
 
 public class WriteDirectories extends AbstractMojo {
 
-	/**
-	 * Location of the build directory.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private File outputDirectory;
+    /**
+     * Location of the build directory.
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
 
-	/**
-	 * @parameter expression="${project.dependencies}"
-	 * @required
-	 */
-	private List<Dependency> dependencies;
+    /**
+     * @parameter expression="${project.dependencies}"
+     * @required
+     */
+    private List<Dependency> dependencies;
 
-	/**
-	 * @parameter expression="${settings.localRepository}"
-	 * @required
-	 */
-	private String localRepository;
+    /**
+     * @parameter expression="${settings.localRepository}"
+     * @required
+     */
+    private String localRepository;
 
-	/**
-	 * @parameter
-	 * 
-	 */
-	private String targetSubDir;
+    /**
+     * @parameter
+     * 
+     */
+    private String targetSubDir;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		Log l = getLog();
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        Log l = getLog();
         l.info("Now executing WriteDirectories: ");
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + dependencies + outputDirectory.getCanonicalPath())) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + dependencies
+                    + outputDirectory.getCanonicalPath())) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -65,54 +66,54 @@ public class WriteDirectories extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-		File rootDir = this.outputDirectory;
-		if (targetSubDir != null) {
-			rootDir = new File(this.outputDirectory, targetSubDir);
-		}
-			for (Dependency d : dependencies) {
-				if (d.getScope().equals("runtime-directory") == false) {
-					//l.info("Skipping: " + d);
-					continue;
-				}
-				l.info("Processing: " + d);
-				
-				String dependencyPath = MojoUtil.dependencyToPath(
-						localRepository, d);
-				try {
+        File rootDir = this.outputDirectory;
+        if (targetSubDir != null) {
+            rootDir = new File(this.outputDirectory, targetSubDir);
+        }
+        for (Dependency d : dependencies) {
+            if (d.getScope().equals("runtime-directory") == false) {
+                // l.info("Skipping: " + d);
+                continue;
+            }
+            l.info("Processing: " + d);
 
-					FileInputStream fis = new FileInputStream(dependencyPath);
-					BufferedInputStream bis = new BufferedInputStream(fis);
-					JarInputStream jis = new JarInputStream(bis);
-					JarEntry je = jis.getNextJarEntry();
-					while (je != null) {
-						//l.info(" entry: " + je.getName());
-						if (je.getName().contains("META-INF") == false) {
-							//l.info(" entry ok");
-							
-							File destFile = new File(rootDir, je.getName());
-							destFile.getParentFile().mkdirs();
-							if (je.isDirectory()) {
-								destFile.mkdirs();
-							}  else {
-								OutputStream fos = new FileOutputStream(destFile);
-								byte[] buffer = new byte[10240];
-								long bytesToRead = je.getSize();
-								while (bytesToRead > 0) { // write contents of 'is' to
-									// 'fos'
-									int bytesRead = jis.read(buffer);
-									fos.write(buffer, 0, bytesRead);
-									bytesToRead = bytesToRead - bytesRead;
-								}
-								fos.close();
-								destFile.setLastModified(je.getTime());
-							}
-						}
-						je = jis.getNextJarEntry();
-					}
-					jis.close();
-				} catch (Exception e) {
-					throw new MojoExecutionException(e.getMessage() + " path:" + dependencyPath, e);
-				}
-			}
-	}
+            String dependencyPath = MojoUtil.dependencyToPath(localRepository, d);
+            try {
+
+                FileInputStream fis = new FileInputStream(dependencyPath);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                JarInputStream jis = new JarInputStream(bis);
+                JarEntry je = jis.getNextJarEntry();
+                while (je != null) {
+                    // l.info(" entry: " + je.getName());
+                    if (je.getName().contains("META-INF") == false) {
+                        // l.info(" entry ok");
+
+                        File destFile = new File(rootDir, je.getName());
+                        destFile.getParentFile().mkdirs();
+                        if (je.isDirectory()) {
+                            destFile.mkdirs();
+                        } else {
+                            OutputStream fos = new FileOutputStream(destFile);
+                            byte[] buffer = new byte[10240];
+                            long bytesToRead = je.getSize();
+                            while (bytesToRead > 0) { // write contents of
+                                                        // 'is' to
+                                // 'fos'
+                                int bytesRead = jis.read(buffer);
+                                fos.write(buffer, 0, bytesRead);
+                                bytesToRead = bytesToRead - bytesRead;
+                            }
+                            fos.close();
+                            destFile.setLastModified(je.getTime());
+                        }
+                    }
+                    je = jis.getNextJarEntry();
+                }
+                jis.close();
+            } catch (Exception e) {
+                throw new MojoExecutionException(e.getMessage() + " path:" + dependencyPath, e);
+            }
+        }
+    }
 }

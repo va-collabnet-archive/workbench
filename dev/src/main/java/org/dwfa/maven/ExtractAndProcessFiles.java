@@ -112,6 +112,13 @@ public class ExtractAndProcessFiles extends AbstractMojo {
                         if (m.find()) {
 
                             File destFile = new File(rootDir, je.getName().substring(je.getName().lastIndexOf('/') + 1));
+                            if (spec.getRetainDirStructure()) {
+                                if (je.getName().startsWith("/")) {
+                                    destFile = new File(rootDir, je.getName().substring(1));
+                                } else {
+                                    destFile = new File(rootDir, je.getName());
+                                }
+                            }
                             destFile.getParentFile().mkdirs();
                             if (je.isDirectory()) {
                                 destFile.mkdirs();
