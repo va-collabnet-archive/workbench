@@ -139,6 +139,7 @@ public interface I_TermFactory {
 	public Hits doLuceneSearch(String query) throws IOException, ParseException;
     
     public int convertToThinVersion(long time);
+    public int convertToThinVersion(String dateStr) throws java.text.ParseException;
     public long convertToThickVersion(int version);
 
 

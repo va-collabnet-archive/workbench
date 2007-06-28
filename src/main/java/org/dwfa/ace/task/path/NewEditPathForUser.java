@@ -6,9 +6,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -16,6 +22,8 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -31,13 +39,19 @@ public class NewEditPathForUser extends AbstractTask {
 
     private static final int dataVersion = 1;
     
-     private String editPathConceptPropName = ProcessAttachmentKeys.EDIT_PATH_CONCEPT.getAttachmentKey();
-
+    private TermEntry parentPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+    
      private String userPropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
+     
+     private String originTime = "latest";
+
+     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
      private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(editPathConceptPropName);
+        out.writeObject(parentPathTermEntry);
+        out.writeObject(originTime);
+        out.writeObject(profilePropName);
         out.writeObject(userPropName);
     }
 
@@ -45,7 +59,9 @@ public class NewEditPathForUser extends AbstractTask {
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            editPathConceptPropName = (String) in.readObject();
+            parentPathTermEntry = (TermEntry) in.readObject();
+            originTime = (String) in.readObject();
+            profilePropName = (String) in.readObject();
             userPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -63,17 +79,30 @@ public class NewEditPathForUser extends AbstractTask {
             throws TaskFailedException {
         try {
             String username = (String) process.readProperty(userPropName);
-            
-            //I_GetConceptData newConcept = LocalVersionedTerminology.get().newConcept(UUID.randomUUID(), false, config);
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            I_GetConceptData newPathConcept = tf.newConcept(UUID.randomUUID(), false, profile);
 
+            tf.newDescription(UUID.randomUUID(), newPathConcept, "en", username + " development editing path",
+                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(),
+                    profile);
             
-            I_GetConceptData editPathConcept = (I_GetConceptData) process.readProperty(editPathConceptPropName);
-
+            tf.newDescription(UUID.randomUUID(), newPathConcept, "en", username + " dev path",
+                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), profile);
             
-            I_Path editPath = LocalVersionedTerminology.get().getPath(editPathConcept.getUids());
-
-            process.setProperty(editPathConceptPropName, editPathConcept);
-            //profile.addEditingPath(editPath);
+            tf.newRelationship(UUID.randomUUID(), newPathConcept, profile);
+            
+            tf.commit();
+            
+            Set<I_Position> origins = new HashSet<I_Position>();
+            
+            I_Path parentPath = tf.getPath(parentPathTermEntry.ids);
+            origins.add(tf.newPosition(parentPath, tf.convertToThinVersion(originTime)));
+            
+            I_Path editPath = tf.newPath(origins, newPathConcept);
+            profile.getEditingPathSet().clear();
+            profile.addEditingPath(editPath);
+            tf.commit();
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -87,6 +116,8 @@ public class NewEditPathForUser extends AbstractTask {
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
@@ -108,12 +139,28 @@ public class NewEditPathForUser extends AbstractTask {
         this.userPropName = profilePropName;
     }
 
-    public String getEditPathConceptPropName() {
-        return editPathConceptPropName;
+    public String getOriginTime() {
+        return originTime;
     }
 
-    public void setEditPathConceptPropName(String editPathEntry) {
-        this.editPathConceptPropName = editPathEntry;
+    public void setOriginTime(String originTime) {
+        this.originTime = originTime;
+    }
+
+    public TermEntry getParentPathTermEntry() {
+        return parentPathTermEntry;
+    }
+
+    public void setParentPathTermEntry(TermEntry parentPath) {
+        this.parentPathTermEntry = parentPath;
+    }
+
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
     }
 
 }
