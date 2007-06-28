@@ -44,7 +44,10 @@ public class ExtractAndProcessSpec {
 		public void setReplacementStr(String replacementStr) {
 			this.replacementStr = replacementStr;
 		}
-		
+		public String toString() {
+		    return "propertyName: " + propertyName + " patternStr: " + patternStr + " replacementStr: " 
+            + replacementStr + " nullAction: " + nullAction;
+        }
 	}
 	
 	public enum NULL_ACTION { PROMPT, MAKE_UUID, REPLACE_LITERAL, EMPTY_STRING };

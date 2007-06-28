@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -128,5 +129,24 @@ public class MojoUtil {
 		}
 		return allowedGoal;
 	}
+    public static boolean alreadyRun(Log l, String input) throws NoSuchAlgorithmException, IOException {
+        Sha1HashCodeGenerator generator = new Sha1HashCodeGenerator();
+        generator.add(input);
+        String hashCode = generator.getHashCode();
+
+        File goalFileDirectory = new File("target" + File.separator + "completed-mojos");
+        File goalFile = new File(goalFileDirectory, hashCode);
+
+        // check to see if this goal has been executed previously
+        if (!goalFile.exists()) {
+            // create a new file to indicate this execution has completed
+                goalFileDirectory.mkdirs();
+                goalFile.createNewFile();
+        } else {
+            l.info("Previously executed. Now stopping.");
+            return true;
+        }
+        return false;
+    }
 
 }

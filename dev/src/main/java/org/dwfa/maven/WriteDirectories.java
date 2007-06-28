@@ -4,7 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -53,7 +55,16 @@ public class WriteDirectories extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Log l = getLog();
-		l.info("Now executing WriteDirectories: ");
+        l.info("Now executing WriteDirectories: ");
+        try {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + dependencies + outputDirectory.getCanonicalPath())) {
+                return;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
 		File rootDir = this.outputDirectory;
 		if (targetSubDir != null) {
 			rootDir = new File(this.outputDirectory, targetSubDir);

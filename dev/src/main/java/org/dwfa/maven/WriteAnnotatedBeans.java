@@ -95,12 +95,14 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		String classNameNoDotClass = "";
+        /*
 		getLog().info("java.class.version: " + System.getProperty("java.class.version"));
 		getLog().info("java.vendor: " + System.getProperty("java.vendor"));
 		getLog().info("java.version: " + System.getProperty("java.version"));
 		getLog().info("os.arch: " + System.getProperty("os.arch"));
 		getLog().info("os.name: " + System.getProperty("os.name"));
 		getLog().info("java.home: " + System.getProperty("java.home"));
+        */
 		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
 		   	List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
 	    	for (Dependency d: dependencies) {
@@ -108,7 +110,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 	    			//don't add
 	    		} else if (d.getGroupId().endsWith("jini")) {
 	    			//don't add
-    				getLog().info("Skipping: " + d);
+    				//getLog().info("Skipping: " + d);
 	    		} else{
 	    			if (d.getScope().equals("system")) {
 	    				getLog().info("System dependency: " + d);
@@ -131,18 +133,16 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 				Class beanListClass = libLoader.loadClass(BeanList.class.getName());
 				for (Dependency d : dependencyWithoutProvided) {
 					if (d.getScope().equals("provided")) {
-						getLog().info("Skipping provided: " + d);
 						continue;
 					} 
 					
 					if (d.getScope().equals("runtime-directory")) {
-						getLog().info("Skipping runtime-directory: " + d);
 						continue;
 					} 
 
 					String dependencyPath = MojoUtil.dependencyToPath(
 							localRepository, d);
-					getLog().info("writing annotated beans for: " + dependencyPath);
+					//getLog().info("writing annotated beans for: " + dependencyPath);
 					JarFile jf = new JarFile(dependencyPath);
 					Enumeration<JarEntry> jarEnum = jf.entries();
 					while (jarEnum.hasMoreElements()) {
@@ -259,7 +259,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		} else {
 			beanFile = new File(beanDir, s.beanName() + suffix);
 		}
-		getLog().info("  Writing: " + beanFile.getName());
+		//getLog().info("  Writing: " + beanFile.getName());
 		FileOutputStream fos = new FileOutputStream(beanFile);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);

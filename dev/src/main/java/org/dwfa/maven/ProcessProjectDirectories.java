@@ -58,24 +58,31 @@ public class ProcessProjectDirectories extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Log l = getLog();
-        UUID randomId = UUID.randomUUID();
-        StringBuffer listbuffer = new StringBuffer();
-        for (Object obj : specs) {
-            listbuffer.append("\n");
-            listbuffer.append(obj);
-        }
-        l.info("Now executing ProcessProjectDirectories: " + listbuffer.toString());
-        for (ExtractAndProcessSpec spec : specs) {
-            Pattern filePattern = Pattern.compile(spec.getFilePatternStr());
-            File rootDir = new File(outputDirectory, spec.getDestDir());
-            List<RegexReplace> replacers = null;
-            try {
+        try {
+            Log l = getLog();
+            l.info("Now executing ProcessProjectDirectories");
+            UUID randomId = UUID.randomUUID();
+            StringBuffer listbuffer = new StringBuffer();
+            for (Object obj : specs) {
+                listbuffer.append("\n");
+                listbuffer.append(obj);
+            }
+            String input = listbuffer.toString();
+            // l.info(input);
+            // calculate the SHA-1 hashcode for this mojo based on input
+            if (MojoUtil.alreadyRun(l, input)) {
+                return;
+            }
+
+            for (ExtractAndProcessSpec spec : specs) {
+                Pattern filePattern = Pattern.compile(spec.getFilePatternStr());
+                File rootDir = new File(outputDirectory, spec.getDestDir());
+                List<RegexReplace> replacers = null;
                 List<File> matches = new ArrayList<File>();
                 addFileMatches(new File("."), filePattern, matches);
                 for (File f : matches) {
                     if (f.isHidden() || f.getName().startsWith(".")) {
-                        //ignore hidden files...;
+                        // ignore hidden files...;
                     } else {
                         File destFile = new File(rootDir, f.getName());
                         if (spec.getRetainDirStructure()) {
@@ -138,18 +145,18 @@ public class ProcessProjectDirectories extends AbstractMojo {
                             fw.close();
                         } else {
                             if (f.equals(destFile) == false) {
-                                l.info(" copying: " + f.getCanonicalPath() + " to " + destFile.getCanonicalPath()); 
                                 FileIO.copyFile(f, destFile);
                             }
                         }
                     }
                 }
 
-            } catch (Exception e) {
-                throw new MojoExecutionException(e.getMessage() + " spec" + spec, e);
             }
-
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
+
     }
+
 
 }
