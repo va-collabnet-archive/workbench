@@ -2,6 +2,8 @@ package org.dwfa.mojo;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -9,6 +11,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.maven.MojoUtil;
 
 /**
  * 
@@ -26,7 +29,7 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
      * @parameter default-value="${project.build.directory}/generated-resources/changesets/"
      */
     String changeSetDirStr;
- 
+
     /**
      * changeSetSuffix
      * 
@@ -34,10 +37,17 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
      */
     String changeSetSuffix;
 
-    
     public void execute() throws MojoExecutionException, MojoFailureException {
-            I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology
-                .get();
+        try {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDirStr + changeSetSuffix)) {
+                return;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+        I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology.get();
         try {
             File changeSetDir = new File(changeSetDirStr);
             File[] changeSets = changeSetDir.listFiles(new FileFilter() {
@@ -45,10 +55,10 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
                 public boolean accept(File f) {
                     return f.getName().endsWith(changeSetSuffix);
                 }
-                
+
             });
             if (changeSets != null) {
-                for (File csf: changeSets) {
+                for (File csf : changeSets) {
                     getLog().info("Importing: " + csf.getName());
                     I_ReadChangeSet reader = termFactoryImpl.newBinaryChangeSetReader(csf);
                     reader.read();
@@ -58,6 +68,6 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
             }
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }       
+        }
     }
 }

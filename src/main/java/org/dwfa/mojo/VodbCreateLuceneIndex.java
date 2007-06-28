@@ -2,6 +2,7 @@ package org.dwfa.mojo;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -17,6 +18,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_ProcessDescriptions;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.maven.MojoUtil;
 
 public class VodbCreateLuceneIndex extends AbstractMojo {
 	
@@ -84,6 +86,15 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 				
 	}
 	public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath())) {
+                return;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 
 		try {

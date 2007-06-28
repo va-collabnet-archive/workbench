@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.text.StringToWord;
 
@@ -151,6 +153,15 @@ public class VodbFindDuplicates extends AbstractMojo {
 	private BufferedWriter dwfaDupDataWriter;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
+           try {
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath())) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            } catch (IOException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
 		try {
 			double threshold = Double.parseDouble(thresholdStr);
 			DupFinderType finderType = DupFinderType.valueOf(searchTypeStr);
