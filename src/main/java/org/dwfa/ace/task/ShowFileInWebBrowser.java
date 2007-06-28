@@ -66,17 +66,10 @@ public class ShowFileInWebBrowser extends AbstractTask {
 			worker.getLogger().info("test1: " + test1);
 			File htmlFile = new File((String) process.readProperty(detailHtmlFileNameProp));
 			URL fileUrl = htmlFile.toURL();
-			/**String uuidString = (String) process.readProperty(uuidStrPropName);
-			//worker.getLogger().info("STR uuid is: " + uuidString);
-			//File htmlFile = new File("temp", uuidString + ".html");
-			worker.getLogger().info("htmlfile is: " + htmlFile);
-			URL fileUrl = htmlFile.toURL();
-			
-			String htmlData = (String) process.readProperty(reasonForDupHtmlStrPropName);
-			worker.getLogger().info("STR html is: " + htmlData);**/
 			
 			worker.getLogger().info("URL: " + fileUrl.toString());
 	      	PlatformWebBrowser.openURL(fileUrl);
+	   
 			return Condition.CONTINUE;
 			
 		} catch (IllegalArgumentException e) {

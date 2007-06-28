@@ -80,9 +80,12 @@ public class AddConceptAndPotDupToList extends AbstractTask {
 			potDupTypeSet.add(potDupRelType.getConceptId());
 			model.clear();
 			model.addElement(conceptWithPotDup);
-			
-			
-			for (I_GetConceptData child: conceptWithPotDup.getDestRelOrigins(config.getAllowedStatus(), 
+
+			for (I_GetConceptData child: conceptWithPotDup.getSourceRelTargets(config.getAllowedStatus(), 
+					potDupTypeSet, config.getViewPositionSet(), true)) {
+				worker.getLogger().info("Found child with view positions: " + child);
+			}
+			for (I_GetConceptData child: conceptWithPotDup.getSourceRelTargets(config.getAllowedStatus(), 
 					potDupTypeSet, config.getViewPositionSet(), true)) {
 				model.addElement(child);
 			}
