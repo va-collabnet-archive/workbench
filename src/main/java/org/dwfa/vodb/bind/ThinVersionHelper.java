@@ -1,5 +1,6 @@
 package org.dwfa.vodb.bind;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -57,6 +58,17 @@ public class ThinVersionHelper {
 		return added * 1000;
 	}
 	
+    public static int convert(String dateStr) throws ParseException {
+        if (dateStr.equalsIgnoreCase("latest")) {
+            return Integer.MAX_VALUE;
+        }         SimpleDateFormat formatter = dateFormatterTL.get();
+        if (formatter == null) {
+            formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            dateFormatterTL.set(formatter);
+        }
+        Date d = formatter.parse(dateStr);
+        return convert(d.getTime());
+    }
 	public static String format(int version) {
 		if (version == Integer.MAX_VALUE) {
 			return "uncommitted";

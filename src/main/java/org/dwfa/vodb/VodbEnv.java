@@ -2613,5 +2613,8 @@ public class VodbEnv implements I_ImplementTermFactory {
     public int convertToThinVersion(long time) {
         return ThinVersionHelper.convert(time);
     }
+    public int convertToThinVersion(String dateStr) throws java.text.ParseException {
+        return ThinVersionHelper.convert(dateStr);
+    }
 
 }

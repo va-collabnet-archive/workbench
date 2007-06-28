@@ -1,5 +1,8 @@
 package org.dwfa.ace.config;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -10,6 +13,7 @@ import net.jini.config.ConfigurationException;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
 
@@ -60,10 +64,25 @@ public class AceFrame extends ComponentFrame {
     }
     private static int count = 0;
 
+    public class NewAceFrame implements ActionListener {
+
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                AceFrame newFrame = new AceFrame(getArgs(), getLc(), cdePanel.getAceFrameConfig());
+                newFrame.setTitle(getNextFrameName());
+                newFrame.setVisible(true);
+            } catch (Exception e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+            
+        }
+        
+    }
 
 	public JMenuItem getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem("Ace Viewer");
-        newWindow.addActionListener(new NewFrame(this.getArgs(), this.getLc()));
+        newWindow.addActionListener(new NewAceFrame());
         return newWindow;
 	}
 
