@@ -75,6 +75,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	public void read() throws IOException, ClassNotFoundException {
 		try {
             int count = 0;
+            int conceptCount = 0;
+            int pathCount = 0;
 			FileInputStream fis = new FileInputStream(changeSetFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			ObjectInputStream ois = new ObjectInputStream(bis);
@@ -99,10 +101,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						counter.increment();
 					}
 					if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
+                        conceptCount++;
 						AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
 						ACE.addImported(commitAceBean((UniversalAceBean) obj, time, values));
 					} else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
-						AceLog.getEditLog().fine("Read UniversalAcePath... " + obj);
+                        pathCount++;
+						AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
 						commitAcePath((UniversalAcePath) obj, time);
 					} else {
 						throw new IOException("Can't handle class: "
@@ -114,7 +118,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
 			}
 			AceConfig.getVodb().addTimeBranchValues(values);
-            AceLog.getAppLog().info("Change set imported " + count + " changed concepts");
+            AceLog.getAppLog().info("Change set imported " + count + " change objects. Concepts: " + conceptCount + " paths: " + pathCount);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		} catch (TerminologyException e) {

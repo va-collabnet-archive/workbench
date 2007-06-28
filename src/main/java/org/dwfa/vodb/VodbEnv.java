@@ -1802,6 +1802,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		intBinder.objectToEntry(p.getConceptId(), key);
 		pathBinder.objectToEntry(p, value);
 		pathDb.put(null, key, value);
+        ACE.addUncommitted((I_Transact) p);
 	}
 
 	public I_Path getPath(int nativeId) throws DatabaseException {
