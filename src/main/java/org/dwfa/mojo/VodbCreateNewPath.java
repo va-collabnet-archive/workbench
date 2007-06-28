@@ -92,6 +92,9 @@ public class VodbCreateNewPath extends AbstractMojo {
 
             tf.newRelationship(UUID.randomUUID(), pathConcept, activeConfig);
             
+//          need to do an immedate commit so that new concept will be avaible to path when read from changeset
+            tf.commit(); 
+            
             tf.newPath(pathOrigins, pathConcept);
         } catch (TerminologyException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -99,7 +102,9 @@ public class VodbCreateNewPath extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (ParseException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
+		} catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
     }
 
 }
