@@ -10,7 +10,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
+import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class SetPropertyFromTextBeanInfo extends SimpleBeanInfo {
@@ -23,7 +23,7 @@ public class SetPropertyFromTextBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor valueTextPropertyName =
                 new PropertyDescriptor("valueText", SetPropertyFromText.class);
             valueTextPropertyName.setBound(true);
-            valueTextPropertyName.setPropertyEditorClass(JTextFieldEditorOneLine.class);
+            valueTextPropertyName.setPropertyEditorClass(JTextFieldEditor.class);
             valueTextPropertyName.setDisplayName("<html><font color='green'>New value:");
             valueTextPropertyName.setShortDescription("Text representation of the new property value. ");
             

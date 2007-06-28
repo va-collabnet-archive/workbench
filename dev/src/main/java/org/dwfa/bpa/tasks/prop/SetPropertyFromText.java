@@ -5,22 +5,18 @@
  */
 package org.dwfa.bpa.tasks.prop;
 
-import java.beans.PropertyDescriptor;
-import java.beans.PropertyEditor;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
-import org.dwfa.bpa.PropertyDescriptorWithTarget;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.bpa.worker.EditorGlueForWorker;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 /**
  * @author kec<p>
  * Sets the specified property to the text provided in the task.
@@ -63,24 +59,7 @@ public class SetPropertyFromText extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            PropertyDescriptor[] localDescriptors = process
-                    .getAllPropertiesBeanInfo().getPropertyDescriptors();
-            PropertyDescriptorWithTarget localDescriptor = null;
-            for (PropertyDescriptor d : localDescriptors) {
-                if (PropertyDescriptorWithTarget.class.isAssignableFrom(d
-                        .getClass())) {
-                    PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
-                    if (dwt.getLabel().equals(this.localPropName)) {
-                        localDescriptor = dwt;
-                        break;
-                    }
-                }
-            }
-            PropertyEditor editor = localDescriptor
-                    .createPropertyEditor(localDescriptor.getTarget());
-            editor.addPropertyChangeListener(new EditorGlueForWorker(editor,
-                    localDescriptor.getWriteMethod(), localDescriptor.getTarget(), worker));
-            editor.setAsText(this.valueText);
+        	process.setProperty(localPropName, valueText);
 
         } catch (Exception e) {
             throw new TaskFailedException(e);
