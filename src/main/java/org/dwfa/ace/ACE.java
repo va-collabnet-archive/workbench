@@ -1110,8 +1110,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 	}
 
 	public JPanel makeQueueViewerPanel(Configuration config, MasterWorker worker, ServiceItemFilter queueFilter)
-			throws RemoteException, InterruptedException, IOException,
-			ConfigurationException, PrivilegedActionException {
+			throws Exception {
 		queueViewer = new QueueViewerPanel(config, worker, queueFilter);
 		JPanel combinedPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
