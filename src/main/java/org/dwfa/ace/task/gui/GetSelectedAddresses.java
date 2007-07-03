@@ -69,9 +69,10 @@ public class GetSelectedAddresses extends AbstractTask {
           
             
         	List<String> addressesSelected = configFrame.getSelectedAddresses();
-			worker.getLogger().info("Addresses Selected: " + addressesSelected);
-            process.setProperty(selectedAddressesPropName, addressesSelected);
-         
+        	
+			worker.getLogger().info("Addresses Selected in GETSELECTEDAddresses: " + addressesSelected);
+            process.setProperty(this.selectedAddressesPropName, addressesSelected);
+
             return Condition.CONTINUE;
             
         } catch (IllegalArgumentException e) {

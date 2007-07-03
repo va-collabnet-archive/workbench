@@ -1,0 +1,102 @@
+package org.dwfa.ace.task;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.util.Collection;
+
+import org.dwfa.bpa.process.Condition;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
+import org.dwfa.util.io.FileIO;
+
+@BeanList(specs = 
+{ @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN)})
+/**
+ * Write the contents of an html file to a property
+ * @author Susan Castillo
+ *
+ */
+public class CopyHtmlFileToProperty extends AbstractTask {
+
+    private static final long serialVersionUID = 1;
+
+    private static final int dataVersion = 1;
+    
+    private String htmlDataPropName = ProcessAttachmentKeys.HTML_STR.getAttachmentKey();
+    private String detailHtmlFileNameProp = ProcessAttachmentKeys.DETAIL_HTML_FILE.getAttachmentKey();
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(htmlDataPropName);
+        out.writeObject(detailHtmlFileNameProp);
+     }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+        	htmlDataPropName = (String) in.readObject();
+        	detailHtmlFileNameProp = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        }
+
+    }
+    public CopyHtmlFileToProperty() throws MalformedURLException {
+        super();
+    }
+
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
+        try {
+
+			String detailHtmlFileName = (String) process.readProperty(detailHtmlFileNameProp);			
+			worker.getLogger().info("html file is: " + detailHtmlFileName);
+			String dataString = FileIO.readerToString(new FileReader(detailHtmlFileName));
+			worker.getLogger().info("data String is: "+dataString);
+			process.setProperty(htmlDataPropName, dataString);
+			
+            return Condition.CONTINUE;
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
+
+    public void complete(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
+
+    }
+
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    public int[] getDataContainerIds() {
+        return new int[] {  };
+    }
+
+	public String getHtmlDataPropName() {
+		return htmlDataPropName;
+	}
+
+	public void setHtmlDataPropName(String htmlDataPropName) {
+		this.htmlDataPropName = htmlDataPropName;
+	}
+
+	public String getDetailHtmlFileNameProp() {
+		return detailHtmlFileNameProp;
+	}
+
+	public void setDetailHtmlFileNameProp(String detailHtmlFileNameProp) {
+		this.detailHtmlFileNameProp = detailHtmlFileNameProp;
+	}
+
+}
+
