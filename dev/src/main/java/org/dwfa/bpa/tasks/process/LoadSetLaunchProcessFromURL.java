@@ -43,10 +43,14 @@ import org.dwfa.bpa.tasks.AbstractTask;
 public class LoadSetLaunchProcessFromURL extends AbstractTask {
 
     private URL processURL = new URL("http://www.informatics.com/hello.xml");
+    private String originator;
+    private String destination;
+    private String processName;
+    private String processSubject;
 
-    private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 2;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -56,8 +60,11 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
+        if (objDataVersion <= dataVersion) {
             processURL = (URL) in.readObject();
+        	if (objDataVersion >= 2) {
+        		
+        	} 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -85,6 +92,19 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
             } else {
                 processToLaunch = (I_EncodeBusinessProcess) process
                         .getObjectFromURL(processURL);
+            }
+            
+            if (processSubject != null) {
+            	processToLaunch.setSubject(processSubject);
+            }
+            if (processName != null) {
+            	processToLaunch.setName(processName);
+            }
+            if (destination != null) {
+            	processToLaunch.setDestination(destination);
+            }
+            if (originator != null) {
+            	processToLaunch.setOriginator(originator);
             }
 
             // Set properties...
@@ -147,5 +167,37 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
             throws MalformedURLException {
         this.processURL = new URL(processURLString);
     }
+
+	public String getDestination() {
+		return destination;
+	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+	public String getOriginator() {
+		return originator;
+	}
+
+	public void setOriginator(String originator) {
+		this.originator = originator;
+	}
+
+	public String getProcessName() {
+		return processName;
+	}
+
+	public void setProcessName(String processName) {
+		this.processName = processName;
+	}
+
+	public String getProcessSubject() {
+		return processSubject;
+	}
+
+	public void setProcessSubject(String processSubject) {
+		this.processSubject = processSubject;
+	}
 
 }
