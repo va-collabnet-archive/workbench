@@ -60,6 +60,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
+import org.dwfa.jini.TransactionParticipantAggregator;
 
 /**
  * @author kec
@@ -285,6 +286,29 @@ public class QueueViewerPanel extends JPanel {
 
     }
 
+    private class CommitListener implements ActionListener {
+
+        /**
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            QueueAdaptor qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(),
+                                                                                      0);
+            //System.out.println(" Transaction committed. Performing queue refresh. ");
+
+            if (qAdaptor == null) {
+                // nothing to do...
+            } else {
+                try {
+                    updateQueueModelAndDisplay(qAdaptor.queue);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+
+    }
     private class RefreshListener implements ActionListener {
 
         /**
@@ -366,7 +390,7 @@ public class QueueViewerPanel extends JPanel {
         }
 
     }
-
+    
     private class QueueSelectionListener implements ListSelectionListener {
 
         public void valueChanged(ListSelectionEvent e) {
@@ -421,14 +445,12 @@ public class QueueViewerPanel extends JPanel {
 
     JTable tableOfQueueEntries;
 
-    public QueueViewerPanel(Configuration jiniConfig, I_Work worker) throws RemoteException, InterruptedException,
-            IOException, ConfigurationException, PrivilegedActionException {
+    public QueueViewerPanel(Configuration jiniConfig, I_Work worker) throws Exception {
         this(jiniConfig, worker, null);
     }
 
     public QueueViewerPanel(Configuration jiniConfig, I_Work worker, ServiceItemFilter queuefilter)
-            throws RemoteException, InterruptedException, IOException, ConfigurationException,
-            PrivilegedActionException {
+            throws Exception {
         super(new GridBagLayout());
         this.queuefilter = queuefilter;
         this.worker = worker;
@@ -458,6 +480,7 @@ public class QueueViewerPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add(statusPanel, c);
         getQueues(QueueViewerPanel.this.worker);
+        TransactionParticipantAggregator.addCommitListener(new CommitListener());
 
     }
 
