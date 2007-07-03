@@ -13,6 +13,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -398,6 +399,26 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
 	}
 
+    private class ResizeComponentAdaptor extends ComponentAdapter {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    if (queuePalette != null) {
+                        queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
+                                             conceptTabs.getHeight() + 4);
+                    } 
+                    if (processPalette != null) {
+                        processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
+                                               conceptTabs.getHeight() + 4);
+                    }
+                }
+                
+            });
+         }
+        
+    }
 	private class ProcessPaletteActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if (processPalette == null) {
@@ -670,6 +691,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
 			throw new RuntimeException(e);
 		}
 		this.config = config;
+        this.addComponentListener(new ResizeComponentAdaptor());
 	}
 
 	public void deselectOthers(JToggleButton selectedOne) {

@@ -2,6 +2,9 @@ package org.dwfa.ace.config;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
 
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -16,12 +19,51 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.tapi.TerminologyException;
 
 import com.sun.jini.start.LifeCycle;
 
 public class AceFrame extends ComponentFrame {
 
 	private ACE cdePanel;
+    
+    private class AceWindowActionListener implements WindowListener {
+
+        public void windowActivated(WindowEvent e) {
+            doWindowActivation();
+        }
+
+ 
+        public void windowClosed(WindowEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void windowClosing(WindowEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void windowDeactivated(WindowEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void windowDeiconified(WindowEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void windowIconified(WindowEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void windowOpened(WindowEvent e) {
+            doWindowActivation();
+        }
+        
+    }
 
 	public AceFrame(String[] args, LifeCycle lc, I_ConfigAceFrame frameConfig) throws Exception {
 		super(args, lc);
@@ -31,10 +73,20 @@ public class AceFrame extends ComponentFrame {
 		setTitle("User: " + frameConfig.getUsername());
 		setContentPane(cdePanel);
 		setBounds(frameConfig.getBounds());
-		
 		MasterWorker worker = new MasterWorker(config);
 		cdePanel.getAceFrameConfig().setWorker(worker);
+        doWindowActivation();
+        this.addWindowListener(new AceWindowActionListener());
 	}
+    private void doWindowActivation() {
+        try {
+            AceConfig.getVodb().setActiveAceFrameConfig(getCdePanel().getAceFrameConfig());
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
 
 	/**
 	 * 

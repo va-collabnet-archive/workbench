@@ -104,6 +104,7 @@ public class CollectionEditorContainer extends JPanel {
 	private JSplitPane listSplit;
 	private ACE ace;
 	private ConceptPanel cp;
+    private ShowComponentActionListener showComponentActionListener;
 
 	public I_ConfigAceFrame getConfig() {
 		return ace.getAceFrameConfig();
@@ -130,6 +131,8 @@ public class CollectionEditorContainer extends JPanel {
 		c.weighty = 1;
 		c.fill = GridBagConstraints.BOTH;
 		add(getListSplit(list, ace), c);
+        showComponentView.setSelected(true);
+        showComponentActionListener.actionPerformed(new ActionEvent(showComponentView, 0, "show"));
 	}
 
 	private JSplitPane getListSplit(JList list, ACE ace) throws DatabaseException,
@@ -153,7 +156,8 @@ public class CollectionEditorContainer extends JPanel {
 		c.fill = GridBagConstraints.BOTH;
 		showComponentView = new JToggleButton(new ImageIcon(
 				ACE.class.getResource("/32x32/plain/component.png")));
-		showComponentView.addActionListener(new ShowComponentActionListener());
+        showComponentActionListener = new ShowComponentActionListener();
+		showComponentView.addActionListener(showComponentActionListener);
 		listEditorTopPanel.add(showComponentView, c);
 		c.gridx++;
 		showProcessBuilder = new JToggleButton(new ImageIcon(

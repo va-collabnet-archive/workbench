@@ -4,8 +4,11 @@
 package org.dwfa.svn;
 
 import java.awt.Container;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,6 +50,16 @@ public class SvnPrompter implements PromptUserPassword3 {
 		promptPane.add(new JLabel(" "));
 		promptPane.add(new JLabel(" "));
 		SpringUtilities.makeCompactGrid(promptPane, 3, 2, 6, 6, 6, 6);
+        userTextField.setSelectionStart(0);
+        userTextField.setSelectionEnd(Integer.MAX_VALUE);
+        userTextField.requestFocusInWindow();
+        userTextField.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent evt) {
+                JComponent c = (JComponent) evt.getComponent();
+                c.requestFocusInWindow();
+            }
+        });
 		int action = JOptionPane.showConfirmDialog(parentContainer, promptPane, realm,
 				JOptionPane.OK_CANCEL_OPTION);
 		if (action == JOptionPane.CANCEL_OPTION) {
@@ -78,6 +91,14 @@ public class SvnPrompter implements PromptUserPassword3 {
 		userTextField.requestFocusInWindow();
 		userTextField.setSelectionStart(0);
 		userTextField.setSelectionEnd(Integer.MAX_VALUE);
+        userTextField.requestFocusInWindow();
+        userTextField.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent evt) {
+                JComponent c = (JComponent) evt.getComponent();
+                c.requestFocusInWindow();
+            }
+        });
 		int action = JOptionPane.showConfirmDialog(parentContainer, promptPane,
 				realm, JOptionPane.OK_CANCEL_OPTION);
 		if (action == JOptionPane.CANCEL_OPTION) {

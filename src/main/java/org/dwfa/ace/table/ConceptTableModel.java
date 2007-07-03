@@ -347,25 +347,23 @@ public class ConceptTableModel extends AbstractTableModel implements
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		try {
-			if (getConceptTuple(row).getVersion() != Integer.MAX_VALUE) {
-				return false;
-			}
-			switch (columns[col]) {
-			case CON_ID:
-				return false;
-			case STATUS:
-				return true;
-			case DEFINED:
-				return true;
-			case VERSION:
-				return false;
-			case BRANCH:
-				return false;
-			}
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
+		/*
+        if (getConceptTuple(row).getVersion() != Integer.MAX_VALUE) {
+        	return false;
+        }
+        */
+        switch (columns[col]) {
+        case CON_ID:
+        	return false;
+        case STATUS:
+        	return true;
+        case DEFINED:
+        	return true;
+        case VERSION:
+        	return false;
+        case BRANCH:
+        	return false;
+        }
 		return false;
 	}
 
