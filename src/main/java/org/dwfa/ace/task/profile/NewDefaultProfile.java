@@ -82,6 +82,12 @@ public class NewDefaultProfile extends AbstractTask {
             String adminPassword = (String) process.readProperty(adminPasswordPropName);
             I_ConfigAceFrame newProfile = newProfile(username, password, 
                 adminUsername, adminPassword);
+            if (newProfile.getAddressesList().contains(username) == false) {
+                newProfile.getAddressesList().add(username);
+            }
+            if (newProfile.getQueueAddressesToShow().contains(username) == false) {
+                newProfile.getQueueAddressesToShow().add(username);
+            }
             process.setProperty(profilePropName, newProfile);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {

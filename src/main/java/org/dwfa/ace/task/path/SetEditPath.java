@@ -1,16 +1,15 @@
 package org.dwfa.ace.task.path;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -35,12 +34,9 @@ public class SetEditPath extends AbstractTask {
     
      private TermEntry editPathEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-
      private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(editPathEntry);
-        out.writeObject(profilePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -48,7 +44,6 @@ public class SetEditPath extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             editPathEntry = (TermEntry) in.readObject();
-            profilePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -64,20 +59,15 @@ public class SetEditPath extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-
-            I_Path editPath = LocalVersionedTerminology.get().getPath(editPathEntry.ids);
-
-            profile.addEditingPath(editPath);
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_Path editPath = tf.getPath(editPathEntry.ids);
+            I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
+            Set<I_Path> editSet = frameConfig.getEditingPathSet();
+            editSet.clear();
+            frameConfig.addEditingPath(editPath);
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {
             throw new TaskFailedException(e);
@@ -92,15 +82,6 @@ public class SetEditPath extends AbstractTask {
 
     public int[] getDataContainerIds() {
         return new int[] {};
-    }
-
-
-    public String getProfilePropName() {
-        return profilePropName;
-    }
-
-    public void setProfilePropName(String profilePropName) {
-        this.profilePropName = profilePropName;
     }
 
     public TermEntry getEditPathEntry() {
