@@ -57,6 +57,7 @@ import org.dwfa.bpa.process.I_DescribeQueueEntry;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
 
@@ -297,20 +298,7 @@ public class QueueViewerPanel extends JPanel {
                 // nothing to do...
             } else {
                 try {
-                    tableOfQueueEntriesModel = new QueueTableModel(qAdaptor.queue);
-                    tableOfQueueEntriesSorter = new TableSorter(tableOfQueueEntriesModel);
-                    tableOfQueueEntries = new JTable(tableOfQueueEntriesSorter);
-                    tableOfQueueEntriesSorter.setTableHeader(tableOfQueueEntries.getTableHeader());
-
-                    // Set up tool tips for column headers.
-                    tableOfQueueEntriesSorter.getTableHeader()
-                            .setToolTipText("Click to specify sorting; Control-Click to specify secondary sorting");
-                    tableOfQueueEntries.getSelectionModel()
-                            .addListSelectionListener(new ProcessSelectionActionListener(tableOfQueueEntriesSorter));
-                    int dividerLocation = queueContentsSplitPane.getDividerLocation();
-                    queueContentsSplitPane.setTopComponent(new JScrollPane(tableOfQueueEntries));
-                    queueContentsSplitPane.setBottomComponent(new JPanel());
-                    queueContentsSplitPane.setDividerLocation(dividerLocation);
+                    updateQueueModelAndDisplay(qAdaptor.queue);
 
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -332,9 +320,9 @@ public class QueueViewerPanel extends JPanel {
          */
         public void valueChanged(ListSelectionEvent ev) {
             // Ignore extra messages.
-            if (ev.getValueIsAdjusting())
+            if (ev.getValueIsAdjusting()) {
                 return;
-
+            }
             ListSelectionModel lsm = (ListSelectionModel) ev.getSource();
             if (lsm.isSelectionEmpty()) {
                 // no rows are selected
@@ -347,15 +335,26 @@ public class QueueViewerPanel extends JPanel {
             } else {
                 try {
                     int firstSelectedRow = sorter.modelIndex(lsm.getMinSelectionIndex());
+                    tableOfQueueEntriesModel.updateQueueData();
                     I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(firstSelectedRow);
                     processEntryID = processMeta.getEntryID();
-                    process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
-                    ProcessPanel processPanel = new ProcessPanel(process, worker);
-                    int dividerLoc = queueContentsSplitPane.getDividerLocation();
-                    queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
-                    queueContentsSplitPane.setDividerLocation(dividerLoc);
-                    execute.setText("<html><font color='#006400'>execute");
-                    execute.setEnabled(true);
+                    try {
+                        process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
+                        ProcessPanel processPanel = new ProcessPanel(process, worker);
+                        int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                        queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
+                        queueContentsSplitPane.setDividerLocation(dividerLoc);
+                        execute.setText("<html><font color='#006400'>execute");
+                        execute.setEnabled(true);
+                    } catch (NoMatchingEntryException ex) {
+                        System.out.println(" NoMatchingEntry: " + ex);
+                        lsm.clearSelection();
+                        int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                        queueContentsSplitPane.setBottomComponent(new JLabel("No matching entry"));
+                        queueContentsSplitPane.setDividerLocation(dividerLoc);
+                        execute.setText("execute");
+                        execute.setEnabled(false);
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     int dividerLoc = queueContentsSplitPane.getDividerLocation();
@@ -363,6 +362,7 @@ public class QueueViewerPanel extends JPanel {
                     queueContentsSplitPane.setDividerLocation(dividerLoc);
                 }
             }
+
         }
 
     }
@@ -386,7 +386,7 @@ public class QueueViewerPanel extends JPanel {
                                                                              "<html>No process is selected secondary to exception: <br>"
                                                                                      + e1.toString()));
                         queueContentsSplitPane.setDividerLocation(dividerLoc);
-                        logger.log(Level.WARNING, e.toString(), e);
+                        logger.log(Level.WARNING, e1.toString(), e1);
                     }
                 }
             } else {
@@ -611,6 +611,8 @@ public class QueueViewerPanel extends JPanel {
         return worker;
     }
 
+    private I_QueueProcesses selectedQueue;
+
     /**
      * @param queue
      * @throws RemoteException
@@ -621,24 +623,43 @@ public class QueueViewerPanel extends JPanel {
 
             public void run() {
                 try {
-                    tableOfQueueEntriesModel = new QueueTableModel(queue);
-                    tableOfQueueEntriesSortingTable = new TableSorter(tableOfQueueEntriesModel);
-                    tableOfQueueEntries = new JTable(tableOfQueueEntriesSortingTable);
-                    tableOfQueueEntriesSortingTable.setTableHeader(tableOfQueueEntries.getTableHeader());
+                    if (selectedQueue != queue) {
+                        selectedQueue = queue;
+                        tableOfQueueEntriesModel = new QueueTableModel(queue);
+                        tableOfQueueEntriesSortingTable = new TableSorter(tableOfQueueEntriesModel);
+                        tableOfQueueEntries = new JTable(tableOfQueueEntriesSortingTable);
+                        tableOfQueueEntriesSortingTable.setTableHeader(tableOfQueueEntries.getTableHeader());
 
-                    // Set up tool tips for column headers.
-                    tableOfQueueEntriesSortingTable.getTableHeader()
-                            .setToolTipText("Click to specify sorting; Control-Click to specify secondary sorting");
+                        // Set up tool tips for column headers.
+                        tableOfQueueEntriesSortingTable.getTableHeader()
+                                .setToolTipText("Click to specify sorting; Control-Click to specify secondary sorting");
 
-                    tableOfQueueEntries
-                            .getSelectionModel()
-                            .addListSelectionListener(
-                                                      new ProcessSelectionActionListener(
-                                                                                         tableOfQueueEntriesSortingTable));
-                    queueContentsSplitPane.setTopComponent(new JScrollPane(tableOfQueueEntries));
-                    int dividerLoc = queueContentsSplitPane.getDividerLocation();
-                    queueContentsSplitPane.setBottomComponent(new JLabel("No process is selected"));
-                    queueContentsSplitPane.setDividerLocation(dividerLoc);
+                        tableOfQueueEntries
+                                .getSelectionModel()
+                                .addListSelectionListener(
+                                                          new ProcessSelectionActionListener(
+                                                                                             tableOfQueueEntriesSortingTable));
+                        queueContentsSplitPane.setTopComponent(new JScrollPane(tableOfQueueEntries));
+                        int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                        queueContentsSplitPane.setBottomComponent(new JLabel("No process is selected"));
+                        queueContentsSplitPane.setDividerLocation(dividerLoc);
+                    } else {
+                        int selectedRow = tableOfQueueEntries.getSelectedRow();
+                        EntryID selectedEntry = null;
+                        if (selectedRow >= 0) {
+                            selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(selectedRow, 6);
+                        }
+                        tableOfQueueEntriesModel.updateQueueData();
+                        if (selectedEntry != null) {
+                            for (int row = 0; row < tableOfQueueEntries.getRowCount(); row++) {
+                                EntryID entry = (EntryID) tableOfQueueEntries.getModel().getValueAt(row, 6);
+                                if (entry.equals(selectedEntry)) {
+                                    tableOfQueueEntries.getSelectionModel().addSelectionInterval(row, row);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     logger.log(Level.SEVERE, e.toString(), e);

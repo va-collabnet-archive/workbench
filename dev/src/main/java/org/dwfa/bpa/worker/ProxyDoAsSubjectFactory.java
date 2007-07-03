@@ -6,8 +6,10 @@
 package org.dwfa.bpa.worker;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedExceptionAction;
 
 import javax.security.auth.Subject;
@@ -54,13 +56,35 @@ public class ProxyDoAsSubjectFactory {
         }
         private Object invokeNoSubject(Method method,
                 Object[] args) throws Throwable {
-            return method.invoke(rootObj, args);
+            try {
+                return method.invoke(rootObj, args);
+            } catch (UndeclaredThrowableException e) {
+               throw e.getCause();
+            } catch (InvocationTargetException e) {
+               throw e.getCause();
+            } catch (Throwable e) {
+                System.out.println("Caught Throwable: " + e.getClass().getName());
+                System.out.println(" Cause: " + e.getCause().getClass().getName());
+                e.printStackTrace();
+               throw e.getCause();
+            }
         }
         private Object invokeAsSubject(final Method method,
                 final Object[] args) throws Throwable {
             return Subject.doAs(worker.getLoginContext().getSubject(), new PrivilegedExceptionAction() {
                 public Object run() throws Exception {
-                    return method.invoke(rootObj, args);
+                    try {
+                        return method.invoke(rootObj, args);
+                    } catch (UndeclaredThrowableException e) {
+                        throw (Exception) e.getCause();
+                    } catch (InvocationTargetException e) {
+                       throw (Exception) e.getCause();
+                    } catch (Throwable e) {
+                        System.out.println("Caught Throwable: " + e.getClass().getName());
+                        System.out.println(" Cause: " + e.getCause().getClass().getName());
+                        e.printStackTrace();
+                       throw (Exception) e.getCause();
+                    }
                 }
             });
         }

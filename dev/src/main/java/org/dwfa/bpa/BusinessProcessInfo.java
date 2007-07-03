@@ -152,4 +152,23 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
     public UUID getObjectID() {
         return this.getProcessID().getUuid();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (I_DescribeQueueEntry.class.isAssignableFrom(obj.getClass())) {
+            I_DescribeQueueEntry another = (I_DescribeQueueEntry) obj;
+            return toString().equals(another.toString());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return entryID.hashCode();
+    }
+    
+    
 }

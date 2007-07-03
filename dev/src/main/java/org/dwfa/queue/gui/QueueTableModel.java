@@ -31,13 +31,15 @@ public class QueueTableModel extends AbstractTableModel {
     "yyyy.MM.dd HH:mm:ss");
 
     private String[] columnNames = { "Name", "Subject", "Deadline",
-            "Priority", "Originator", "Process ID" };
+            "Priority", "Originator", "Process ID", "Entry ID" };
 
     private Object[][] rowData;
     
     private List<I_DescribeQueueEntry> metaList = new ArrayList<I_DescribeQueueEntry>();
 
     private I_QueueProcesses queue;
+    
+    Collection<I_DescribeBusinessProcess> metaData;
 
     /**
      * @throws RemoteException
@@ -48,7 +50,20 @@ public class QueueTableModel extends AbstractTableModel {
             IOException {
         super();
         this.queue = queue;
-        Collection<I_DescribeBusinessProcess> metaData = queue.getProcessMetaData(new SelectAll());
+        updateQueueData();
+    }
+
+    public void updateQueueData() throws RemoteException, IOException {
+        
+        Collection<I_DescribeBusinessProcess> newData = queue.getProcessMetaData(new SelectAll());
+        if (metaData == null) {
+            metaData = new ArrayList<I_DescribeBusinessProcess>(newData);
+        } else if (newData.equals(metaData)) {
+            return;
+        } else {
+            metaData = new ArrayList<I_DescribeBusinessProcess>(newData);
+            metaList = new ArrayList<I_DescribeQueueEntry>();
+        }
 
         this.rowData = new Object[metaData.size()][columnNames.length];
         int i = 0;
@@ -58,12 +73,20 @@ public class QueueTableModel extends AbstractTableModel {
             metaList.add(meta);
             rowData[i][0] = meta.getName();
             rowData[i][1] = meta.getSubject();
-            rowData[i][2] = dateFormat.format(meta.getDeadline());
+            if (meta.getDeadline() == null) {
+                rowData[i][2] = "unspecified";
+            } else if (meta.getDeadline().getTime() == Long.MAX_VALUE) {
+                rowData[i][2] = "unspecified";
+            } else {
+                rowData[i][2] = dateFormat.format(meta.getDeadline());
+            }
             rowData[i][3] = meta.getPriority();
             rowData[i][4] = meta.getOriginator();
             rowData[i][5] = meta.getProcessID();
+            rowData[i][6] = meta.getEntryID();
             i++;
         }
+        fireTableDataChanged();
     }
     
     public I_DescribeQueueEntry getRowMetaData(int row) {
@@ -75,6 +98,9 @@ public class QueueTableModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
+        if (rowData == null) {
+            rowData = new Object[0][columnNames.length];
+        }
         return rowData.length;
     }
 

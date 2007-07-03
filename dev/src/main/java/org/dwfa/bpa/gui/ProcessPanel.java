@@ -471,7 +471,11 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
             throws PropertyVetoException, Exception {
         super(new GridBagLayout());
 
-        viewCombo.setSelectedIndex(1);
+        if (process.getMessageRenderer() != null) {
+            viewCombo.setSelectedIndex(2);
+        } else {
+            viewCombo.setSelectedIndex(1);
+        }
         viewCombo.addActionListener(new SetPanelActionListener());
 
         this.process = process;
