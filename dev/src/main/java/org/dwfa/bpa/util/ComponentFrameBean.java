@@ -15,7 +15,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,10 +49,10 @@ import com.sun.jini.start.LifeCycle;
 
 /**
  * @author kec
- *
+ * 
  */
-public class ComponentFrameBean implements ActionListener,
-I_ManageStandardAppFunctions, ListDataListener, WindowListener {
+public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFunctions, ListDataListener,
+        WindowListener {
     protected static Logger logger = Logger.getLogger(ComponentFrameBean.class.getName());
 
     public class ShowApiListener implements ActionListener {
@@ -63,14 +65,15 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
 
                 String userDir = System.getProperty("user.dir");
                 File startFile = new File(userDir + "/site/index.html");
-                
+
                 PlatformWebBrowser.openURL(startFile.toURL());
             } catch (Exception ex) {
-             logger.log(Level.SEVERE, ex.getMessage(), ex);   
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-
     }
+
+    List<I_DoQuitActions> quitList = new ArrayList<I_DoQuitActions>();
 
     private JDialog aboutBox, prefs;
 
@@ -87,52 +90,58 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
      * destroy methods. See TxnManagerImpl for an example.
      */
     @SuppressWarnings("unused")
-	private LifeCycle lifeCycle = null;
+    private LifeCycle lifeCycle = null;
 
     /** The jini configuration file for this object */
     protected Configuration config;
 
     // Ask AWT which menu modifier we should be using.
-    protected final static int MENU_MASK = Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask();
+    protected final static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     // Check that we are on Mac OS X. This is crucial to loading and using the
     // OSXAdapter class.
-    public static boolean MAC_OS_X = (System.getProperty("os.name")
-            .toLowerCase().startsWith("mac os x"));
-    
+    public static boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
+
     private JFrame frame;
+
     private I_InitComponentMenus compMenuIniter;
 
-	private boolean hiddenFrame;
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter, boolean hiddenFrame) throws Exception {
+    private boolean hiddenFrame;
+
+    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
+            boolean hiddenFrame) throws Exception {
         this(args, lc, frame, compMenuIniter, new JMenuBar(), hiddenFrame);
-}
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter) throws Exception {
+    }
+
+    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter)
+            throws Exception {
         this(args, lc, frame, compMenuIniter, new JMenuBar());
-}
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, 
-            I_InitComponentMenus compMenuIniter, JMenuBar mainMenuBar) throws Exception {
+    }
+
+    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
+            JMenuBar mainMenuBar) throws Exception {
         this(args, lc, frame, compMenuIniter, mainMenuBar, false);
     }
+
     /**
      * @param title
      * @throws Exception
      */
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, 
-            I_InitComponentMenus compMenuIniter, JMenuBar mainMenuBar, boolean hiddenFrame) throws Exception {
+    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
+            JMenuBar mainMenuBar, boolean hiddenFrame) throws Exception {
         super();
         this.mainMenuBar = mainMenuBar;
         this.frame = frame;
         this.frame.addWindowListener(this);
         this.compMenuIniter = compMenuIniter;
-        this.config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
+        this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
         this.hiddenFrame = hiddenFrame;
+        this.quitList.add(new StandardQuitter());
     }
-	public void setup() throws Exception {
-		if (hiddenFrame == false) {
+
+    public void setup() throws Exception {
+        if (hiddenFrame == false) {
             OpenFrames.addFrame(this.frame);
         }
         OpenFrames.addNewWindowMenuItemGenerator(compMenuIniter);
@@ -145,7 +154,7 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         macOSXRegistration();
 
         this.frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	}
+    }
 
     // Generic registration with the Mac OS X application menu. Checks the
     // platform, then attempts
@@ -156,27 +165,36 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
     public final void macOSXRegistration() {
         if (MAC_OS_X) {
             try {
-                Class osxAdapterClass = Thread.currentThread().getContextClassLoader().loadClass("org.dwfa.app.OSXAdapter");
-                Constructor c = osxAdapterClass.getConstructor(new Class[] {I_ManageStandardAppFunctions.class });
+                Class osxAdapterClass = Thread.currentThread().getContextClassLoader()
+                        .loadClass("org.dwfa.app.OSXAdapter");
+                Constructor c = osxAdapterClass.getConstructor(new Class[] { I_ManageStandardAppFunctions.class });
                 c.newInstance(new Object[] { this });
             } catch (NoClassDefFoundError e) {
                 // This will be thrown first if the OSXAdapter is loaded on a
                 // system without the EAWT
                 // because OSXAdapter extends ApplicationAdapter in its def
-                logger.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.", e);   
+                logger
+                        .log(
+                             Level.SEVERE,
+                             "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.",
+                             e);
             } catch (ClassNotFoundException e) {
                 // This shouldn't be reached; if there's a problem with the
                 // OSXAdapter we should get the
                 // above NoClassDefFoundError first.
-                logger.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.", e);   
+                logger
+                        .log(
+                             Level.SEVERE,
+                             "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.",
+                             e);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);   
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }
 
     /**
-     *  
+     * 
      */
     private void setupAbout() {
         aboutBox = AboutBox.getAboutBox();
@@ -184,16 +202,15 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
     }
 
     /**
-     *  
+     * 
      */
     private void setupPrefs() {
         prefs = new JDialog(this.frame, "Preferences");
 
-        UIManager.LookAndFeelInfo[] lookAndFeels = UIManager
-                .getInstalledLookAndFeels();
+        UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
 
-        //      Create the combo box, select item at index 4.
-        //      Indices start at 0, so 4 specifies the pig.
+        // Create the combo box, select item at index 4.
+        // Indices start at 0, so 4 specifies the pig.
         JComboBox lookAndFeelList = new JComboBox(lookAndFeels);
         lookAndFeelList.setRenderer(new DefaultListCellRenderer() {
 
@@ -202,12 +219,10 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
              */
             private static final long serialVersionUID = 1L;
 
-            public Component getListCellRendererComponent(JList list,
-                    Object value, int index, boolean isSelected,
-                    boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
                 UIManager.LookAndFeelInfo lafValue = (UIManager.LookAndFeelInfo) value;
-                super.getListCellRendererComponent(list, lafValue.getName(),
-                        index, isSelected, cellHasFocus);
+                super.getListCellRendererComponent(list, lafValue.getName(), index, isSelected, cellHasFocus);
                 return this;
             }
 
@@ -218,57 +233,52 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
             public void actionPerformed(ActionEvent e) {
                 try {
                     JComboBox comboBox = (JComboBox) e.getSource();
-                    UIManager.LookAndFeelInfo lafInfo = (LookAndFeelInfo) comboBox
-                            .getSelectedItem();
+                    UIManager.LookAndFeelInfo lafInfo = (LookAndFeelInfo) comboBox.getSelectedItem();
                     UIManager.setLookAndFeel(lafInfo.getClassName());
 
                     SwingUtilities.updateComponentTreeUI(ComponentFrameBean.this.frame);
 
                 } catch (ClassNotFoundException e1) {
-                    logger.log(Level.SEVERE, e1.getMessage(), e1);   
+                    logger.log(Level.SEVERE, e1.getMessage(), e1);
                 } catch (InstantiationException e1) {
-                    logger.log(Level.SEVERE, e1.getMessage(), e1);   
+                    logger.log(Level.SEVERE, e1.getMessage(), e1);
                 } catch (IllegalAccessException e1) {
-                    logger.log(Level.SEVERE, e1.getMessage(), e1);   
+                    logger.log(Level.SEVERE, e1.getMessage(), e1);
                 } catch (UnsupportedLookAndFeelException e1) {
-                    logger.log(Level.SEVERE, e1.getMessage(), e1);   
+                    logger.log(Level.SEVERE, e1.getMessage(), e1);
                 }
             }
         });
         lookAndFeelList.setSelectedItem(UIManager.getLookAndFeel());
-        //petList.addActionListener(this);
+        // petList.addActionListener(this);
 
         prefs.getContentPane().setLayout(new GridLayout(2, 1));
         prefs.getContentPane().add(lookAndFeelList);
     }
-    
-
-    
-
 
     public final void addMenus() throws Exception {
         mainMenuBar.add(editMenu = new JMenu("Edit"));
         TransferActionListener actionListener = new TransferActionListener();
-        
+
         cutMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CutAction());
         cutMI.setText("Cut");
-        cutMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        cutMI.setAccelerator(KeyStroke
+                .getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         cutMI.addActionListener(actionListener);
         editMenu.add(cutMI);
         copyMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.CopyAction());
         copyMI.setText("Copy");
-        copyMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        copyMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMask()));
         copyMI.addActionListener(actionListener);
         editMenu.add(copyMI);
         pasteMI = new JMenuItem(new javax.swing.text.DefaultEditorKit.PasteAction());
         pasteMI.setText("Paste");
-        pasteMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        pasteMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMask()));
         pasteMI.addActionListener(actionListener);
         editMenu.add(pasteMI);
-       this.compMenuIniter.addAppMenus(mainMenuBar);
+        this.compMenuIniter.addAppMenus(mainMenuBar);
         // Quit menu item is provided on Mac OS X.. only make it on other
         // platforms.
         if (!MAC_OS_X) {
@@ -276,12 +286,11 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
             if (quitMenu != null) {
                 quitMenu.addSeparator();
                 quitMenu.add(quitMI = new JMenuItem("Quit"));
-                quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                        MENU_MASK));
+                quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, MENU_MASK));
                 quitMI.addActionListener(this);
             }
         }
-        
+
         // About menu item is provided on Mac OS X.. only make it on other
         // platforms.
         // Options/Prefs menu item is provided on Mac OS X.. only make it on
@@ -292,14 +301,13 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
             bundleMenu.add(aboutMI = new JMenuItem("About..."));
             aboutMI.addActionListener(this);
         }
-        
-        
+
         mainMenuBar.add(windowMenu = new JMenu("Window"));
         addFramesToWindowMenu();
 
-
         this.frame.setJMenuBar(mainMenuBar);
     }
+
     /**
      * 
      */
@@ -312,23 +320,23 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         windowMenu.addSeparator();
         Collection<JFrame> openFrames = OpenFrames.getFrames();
         synchronized (openFrames) {
-            for (JFrame frame: openFrames) {
+            for (JFrame frame : openFrames) {
                 JMenuItem menuItem = new JMenuItem(frame.getTitle());
                 menuItem.addActionListener(new BringWindowToFront(frame));
                 windowMenu.add(menuItem);
-            }        	
+            }
         }
         Collection<JMenuItem> newWindowMenuItems = OpenFrames.getNewWindowMenuItems();
         synchronized (newWindowMenuItems) {
             logger.log(Level.FINEST, "Trying to add new items.");
-            for (JMenuItem newWindowMenu: newWindowMenuItems) {
+            for (JMenuItem newWindowMenu : newWindowMenuItems) {
                 if (newWindowMenu != null) {
                     submenu.add(newWindowMenu);
                     logger.log(Level.FINEST, "Adding new window item: " + newWindowMenu.getText());
                 }
             }
         }
-        
+
     }
 
     public final void actionPerformed(ActionEvent e) {
@@ -349,8 +357,7 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
     // is selected from the application menu.
     public final void about() {
         aboutBox.pack();
-        aboutBox.setLocation((int) this.frame.getLocation().getX() + 22, (int) this.frame
-                .getLocation().getY() + 22);
+        aboutBox.setLocation((int) this.frame.getLocation().getX() + 22, (int) this.frame.getLocation().getY() + 22);
         aboutBox.setResizable(false);
         aboutBox.setVisible(true);
         aboutBox.toFront();
@@ -361,8 +368,7 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
     // is selected from the application menu.
     public final void preferences() {
         prefs.setSize(320, 240);
-        prefs.setLocation((int) this.frame.getLocation().getX() + 22, (int) this.frame
-                .getLocation().getY() + 22);
+        prefs.setLocation((int) this.frame.getLocation().getX() + 22, (int) this.frame.getLocation().getY() + 22);
         prefs.setResizable(false);
         prefs.setVisible(true);
     }
@@ -372,18 +378,35 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
     // is selected from the application menu, Cmd-Q is pressed, or "Quit" is
     // selected from the Dock.
     public final boolean quit() {
-        int option = JOptionPane.showConfirmDialog(this.frame,
-                "Are you sure you want to quit?", "[a] Quit?",
-                JOptionPane.YES_NO_OPTION);
-        System.out.println("Quit option: " + option);
-        if (option == JOptionPane.YES_OPTION) {
-        	System.out.println("[a] Quit option selected...");
-        	if (MAC_OS_X) {
+        boolean quit = false;
+        for (I_DoQuitActions quitter : quitList) {
+            quit = quitter.quit();
+            if (quit == false) {
+                return false;
+            }
+        }
+         if (quit) {
+            System.out.println("[a] Quit option selected...");
+            if (MAC_OS_X) {
                 return true;
-        	}
-        	System.exit(0);
+            }
+            System.exit(0);
         }
         return false;
+    }
+
+    public class StandardQuitter implements I_DoQuitActions {
+
+        public boolean quit() {
+            int option = JOptionPane.showConfirmDialog(ComponentFrameBean.this.frame, "Are you sure you want to quit?",
+                                                       "Quit?", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
     /**
@@ -408,64 +431,87 @@ I_ManageStandardAppFunctions, ListDataListener, WindowListener {
         addFramesToWindowMenu();
         this.compMenuIniter.addInternalFrames(this.windowMenu);
     }
+
     public void windowOpened(WindowEvent e) {
-        
+
     }
+
     public void windowClosing(WindowEvent e) {
         if (this.frame.getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE) {
             OpenFrames.removeFrameListener(this);
-            OpenFrames.removeFrame(this.frame);            
+            OpenFrames.removeFrame(this.frame);
         }
     }
+
     public void windowClosed(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowClosed()");		
+        System.out.println("ComponentFrameBean: windowClosed()");
     }
+
     public void windowIconified(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowIconified()");		
+        System.out.println("ComponentFrameBean: windowIconified()");
     }
+
     public void windowDeiconified(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowDeiconified()");		
+        System.out.println("ComponentFrameBean: windowDeiconified()");
     }
+
     public void windowActivated(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowActivated()");		
+        System.out.println("ComponentFrameBean: windowActivated()");
     }
+
     public void windowDeactivated(WindowEvent e) {
-		System.out.println("ComponentFrameBean: windowDeactivated()");		
+        System.out.println("ComponentFrameBean: windowDeactivated()");
     }
-	public void openApplication() {
-		System.out.println("ComponentFrameBean: openApplication()");		
-	}
-	public void openFile() {
-		throw new UnsupportedOperationException();		
-	}
-	public void printFile() {
-		throw new UnsupportedOperationException();		
-	}
-	public void reOpenApplication() {
-		System.out.println("ComponentFrameBean: reOpenApplication()");		
-	}
-	public JMenu getBundleMenu() {
-		return bundleMenu;
-	}
-	public void setBundleMenu(JMenu bundleMenu) {
-		this.bundleMenu = bundleMenu;
-	}
-	public JMenu getEditMenu() {
-		return editMenu;
-	}
-	public void setEditMenu(JMenu editMenu) {
-		this.editMenu = editMenu;
-	}
-	public JMenuBar getMainMenuBar() {
-		return mainMenuBar;
-	}
-	public void setMainMenuBar(JMenuBar mainMenuBar) {
-		this.mainMenuBar = mainMenuBar;
-	}
-	public JMenu getWindowMenu() {
-		return windowMenu;
-	}
-	public void setWindowMenu(JMenu windowMenu) {
-		this.windowMenu = windowMenu;
-	}
+
+    public void openApplication() {
+        System.out.println("ComponentFrameBean: openApplication()");
+    }
+
+    public void openFile() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void printFile() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void reOpenApplication() {
+        System.out.println("ComponentFrameBean: reOpenApplication()");
+    }
+
+    public JMenu getBundleMenu() {
+        return bundleMenu;
+    }
+
+    public void setBundleMenu(JMenu bundleMenu) {
+        this.bundleMenu = bundleMenu;
+    }
+
+    public JMenu getEditMenu() {
+        return editMenu;
+    }
+
+    public void setEditMenu(JMenu editMenu) {
+        this.editMenu = editMenu;
+    }
+
+    public JMenuBar getMainMenuBar() {
+        return mainMenuBar;
+    }
+
+    public void setMainMenuBar(JMenuBar mainMenuBar) {
+        this.mainMenuBar = mainMenuBar;
+    }
+
+    public JMenu getWindowMenu() {
+        return windowMenu;
+    }
+
+    public void setWindowMenu(JMenu windowMenu) {
+        this.windowMenu = windowMenu;
+    }
+
+    public List<I_DoQuitActions> getQuitList() {
+        return quitList;
+    }
 }

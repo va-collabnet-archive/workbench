@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -153,4 +154,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     }
     
     public abstract int getCount();
+    public List<I_DoQuitActions> getQuitList() {
+        return cfb.getQuitList();
+    }
 }

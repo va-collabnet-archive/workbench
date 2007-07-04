@@ -33,6 +33,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
         this.pack();
         this.setVisible(true);
         OpenFrames.addFrameListener(this);
+        getQuitList().clear();
     }
 
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
