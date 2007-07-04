@@ -14,7 +14,11 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.gui.SpringUtilities;
 import org.dwfa.bpa.process.Condition;
@@ -119,18 +123,55 @@ public class PromptUsernameAndPassword extends AbstractTask {
             JPanel promptPane = new JPanel(new SpringLayout());
             parentFrame.getContentPane().add(promptPane);
             promptPane.add(new JLabel("username:", JLabel.RIGHT));
-            JTextField userTextField = new JTextField(10);
+            final JTextField userTextField = new JTextField(15);
             userTextField.setText(username);
             promptPane.add(userTextField);
             promptPane.add(new JLabel("password:", JLabel.RIGHT));
-            JPasswordField pwd = new JPasswordField(10);
+            JPasswordField pwd = new JPasswordField(15);
             pwd.setText(password);
             promptPane.add(pwd);
             SpringUtilities.makeCompactGrid(promptPane, 2, 2, 6, 6, 6, 6);
             userTextField.requestFocusInWindow();
             userTextField.setSelectionStart(0);
             userTextField.setSelectionEnd(Integer.MAX_VALUE);
-            int action = JOptionPane.showConfirmDialog(parentFrame, promptPane, prompt, JOptionPane.OK_CANCEL_OPTION);
+            userTextField.addAncestorListener(new AncestorListener() {
+
+                public void ancestorAdded(AncestorEvent arg0) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                            AceLog.getAppLog().info("userTextField requesting focus in window");
+                            userTextField.requestFocusInWindow();
+                        }
+                    });
+                }
+
+                public void ancestorMoved(AncestorEvent arg0) {
+                }
+
+                public void ancestorRemoved(AncestorEvent arg0) {
+                }
+            });
+            promptPane.addAncestorListener(new AncestorListener() {
+
+                public void ancestorAdded(AncestorEvent arg0) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                            AceLog.getAppLog().info("userTextField requesting focus in window");
+                            userTextField.requestFocusInWindow();
+                        }
+                    });
+                }
+
+                public void ancestorMoved(AncestorEvent arg0) {
+                }
+
+                public void ancestorRemoved(AncestorEvent arg0) {
+                }
+            });
+            int action = JOptionPane.showOptionDialog(parentFrame, promptPane, prompt, 
+                                                      JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
             if (action == JOptionPane.CANCEL_OPTION) {
                 throw new TaskFailedException("User canceled operation.");
             }

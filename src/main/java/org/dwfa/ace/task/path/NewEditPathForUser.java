@@ -90,7 +90,12 @@ public class NewEditPathForUser extends AbstractTask {
             tf.newDescription(UUID.randomUUID(), newPathConcept, "en", username + " dev path",
                     ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);
             
-            tf.newRelationship(UUID.randomUUID(), newPathConcept, activeProfile);
+            I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+            I_GetConceptData relDestination = tf.getConcept(parentPathTermEntry.ids);
+            I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            I_GetConceptData relStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            tf.newRelationship(UUID.randomUUID(), newPathConcept, relType, relDestination, relCharacteristic, relRefinability, relStatus, 0, activeProfile);
             
             tf.commit();
             

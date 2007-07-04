@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
@@ -196,7 +197,6 @@ public interface I_ConfigAceFrame {
 	public I_HostConceptPlugins getConceptViewer(int index);
 	public void selectConceptViewer(int hostIndex);
 	
-	public JPanel getWorkflowPanel();
 	
 	public List<String> getAddressesList();
 	
@@ -234,5 +234,17 @@ public interface I_ConfigAceFrame {
     public void setShowProcessBuilder(boolean show);
     
     public List<String> getQueueAddressesToShow();
+    
+    public JPanel getWorkflowPanel();
+    
+    public JPanel getSignpostPanel();
+    
+    public void setShowSignpostPanel(boolean show);
+    
+    public void setSignpostToggleVisible(boolean show);
+    
+    public void setSignpostToggleEnabled(boolean enabled);
+    
+    public void setSignpostToggleIcon(ImageIcon icon);
 
 }
