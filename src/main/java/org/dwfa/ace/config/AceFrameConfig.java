@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.ListDataEvent;
@@ -1307,6 +1308,35 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void setShowQueueViewer(boolean show) {
         aceFrame.setShowQueueViewer(show);
+        
+    }
+
+
+    public JPanel getSignpostPanel() {
+        return aceFrame.getSignpostPanel();
+    }
+
+
+    public void setShowSignpostPanel(boolean show) {
+        aceFrame.setShowSignpostPanel(show);
+        
+    }
+
+
+    public void setSignpostToggleVisible(boolean visible) {
+        aceFrame.setShowSignpostToggleVisible(visible);
+        
+    }
+
+
+    public void setSignpostToggleEnabled(boolean enabled) {
+        aceFrame.setShowSignpostToggleEnabled(enabled);
+        
+    }
+
+
+    public void setSignpostToggleIcon(ImageIcon icon) {
+        aceFrame.setSignpostToggleIcon(icon);
         
     }
 }

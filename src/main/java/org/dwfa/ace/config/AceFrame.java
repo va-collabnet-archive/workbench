@@ -6,10 +6,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
 import net.jini.config.ConfigurationException;
 
@@ -76,6 +78,7 @@ public class AceFrame extends ComponentFrame {
 		MasterWorker worker = new MasterWorker(config);
 		cdePanel.getAceFrameConfig().setWorker(worker);
         doWindowActivation();
+        getQuitList().add(cdePanel);
         this.addWindowListener(new AceWindowActionListener());
 	}
     private void doWindowActivation() {
@@ -195,6 +198,26 @@ public class AceFrame extends ComponentFrame {
     }
     public void setShowQueueViewer(boolean show) {
         getCdePanel().setShowQueueViewer(show);
+    }
+    
+    public JPanel getSignpostPanel() {
+        return getCdePanel().getSignpostPanel();
+    }
+
+    public void setShowSignpostPanel(boolean show) {
+        getCdePanel().setShowSignpostPanel(show);
+    }
+
+    public void setShowSignpostToggleVisible(boolean visible) {
+        getCdePanel().setShowSignpostToggleVisible(visible);
+    }
+
+    public void setShowSignpostToggleEnabled(boolean enabled) {
+        getCdePanel().setShowSignpostToggleEnabled(enabled);
+    }
+
+    public void setSignpostToggleIcon(ImageIcon icon) {
+        getCdePanel().setSignpostToggleIcon(icon);
     }
 
 }

@@ -68,6 +68,7 @@ public class AceRunner {
                                                               new BufferedInputStream(
                                                                                       new FileInputStream(aceConfigFile)));
                 AceConfig.config = (AceConfig) ois.readObject();
+                AceConfig.config.setConfigFile(aceConfigFile);
                 setupDatabase(AceConfig.config);
             } else {
                 File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class,
@@ -75,6 +76,7 @@ public class AceRunner {
                 Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
                 AceLog.getAppLog().info("Cache size in config file: " + cacheSize);
                 AceConfig.config = new AceConfig(dbFolder);
+                AceConfig.config.setConfigFile(aceConfigFile);
                 setupDatabase(AceConfig.config);
                 AceConfig.setupAceConfig(AceConfig.config, aceConfigFile, cacheSize, false);
             }

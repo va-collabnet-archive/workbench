@@ -29,7 +29,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,6 +57,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -85,7 +85,8 @@ import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportBaselineJar;
 import org.dwfa.ace.actions.ImportChangesetJar;
 import org.dwfa.ace.actions.ImportJavaChangeset;
-import org.dwfa.ace.actions.SaveEnvironment;
+import org.dwfa.ace.actions.SaveProfile;
+import org.dwfa.ace.actions.SaveProfileAs;
 import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -122,6 +123,7 @@ import org.dwfa.bpa.gui.ProcessMenuActionListener;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
@@ -131,167 +133,158 @@ import org.dwfa.vodb.types.ConceptBean;
 
 import com.sleepycat.je.DatabaseException;
 
-public class ACE extends JPanel implements PropertyChangeListener {
+public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
-	private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
+    private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
 
-	private static List<I_Transact> imported = new ArrayList<I_Transact>();
+    private static List<I_Transact> imported = new ArrayList<I_Transact>();
 
-	public static void addImported(I_Transact to) {
-		imported.add(to);
-		if (aceConfig != null) {
-			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-				frameConfig.setCommitEnabled(true);
-				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-					frameConfig.addImported((I_GetConceptData) to);
-				}
-			}
-		}
-	}
+    public static void addImported(I_Transact to) {
+        imported.add(to);
+        if (aceConfig != null) {
+            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                frameConfig.setCommitEnabled(true);
+                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+                    frameConfig.addImported((I_GetConceptData) to);
+                }
+            }
+        }
+    }
 
-	public static void addUncommitted(I_Transact to) {
-		uncommitted.add(to);
-		if (aceConfig != null) {
-			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-				frameConfig.setCommitEnabled(true);
-				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-					frameConfig.addUncommitted((I_GetConceptData) to);
-				}
-			}
-		}
-	}
+    public static void addUncommitted(I_Transact to) {
+        uncommitted.add(to);
+        if (aceConfig != null) {
+            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                frameConfig.setCommitEnabled(true);
+                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+                    frameConfig.addUncommitted((I_GetConceptData) to);
+                }
+            }
+        }
+    }
 
-	public static void removeUncommitted(I_Transact to) {
-		uncommitted.remove(to);
-		if (aceConfig != null) {
-			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-				frameConfig.addUncommitted(null);
-				if (uncommitted.size() == 0) {
-					frameConfig.setCommitEnabled(false);
-				}
-			}
-		}
-	}
+    public static void removeUncommitted(I_Transact to) {
+        uncommitted.remove(to);
+        if (aceConfig != null) {
+            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                frameConfig.addUncommitted(null);
+                if (uncommitted.size() == 0) {
+                    frameConfig.setCommitEnabled(false);
+                }
+            }
+        }
+    }
 
-	private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
+    private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
 
-	private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
+    private static Set<I_ReadChangeSet> csReaders = new HashSet<I_ReadChangeSet>();
 
-	protected final static int MENU_MASK = getMenuMask();
+    protected final static int MENU_MASK = getMenuMask();
 
-	private static int getMenuMask() {
-		try {
-			return Toolkit.getDefaultToolkit()
-			.getMenuShortcutKeyMask();
-		} catch (HeadlessException e) {
-			//
-		}
-		return 0;
-	}
-	
-	
-	/*
-	 * 
-	 */
-	public static void commit() throws IOException {
-		Date now = new Date();
-		Set<TimePathId> values = new HashSet<TimePathId>();
-		for (I_WriteChangeSet writer : csWriters) {
-			AceLog.getEditLog().info(
-					"Opening writer: " + writer.toString());
-			writer.open();
-		}
-		int version = ThinVersionHelper.convert(now.getTime());
-		AceLog.getEditLog().info(
-				"Starting commit: " + version + " (" + now.getTime() + ")");
+    private static int getMenuMask() {
+        try {
+            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        } catch (HeadlessException e) {
+            //
+        }
+        return 0;
+    }
 
-		for (I_Transact cb : uncommitted) {
-			for (I_WriteChangeSet writer : csWriters) {
-				writer.writeChanges(cb, ThinVersionHelper.convert(version));
-			}
-			cb.commit(version, values);
-		}
-		try {
-			AceConfig.getVodb().addTimeBranchValues(values);
-			AceConfig.getVodb().sync();
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-		for (I_WriteChangeSet writer : csWriters) {
-			AceLog.getEditLog().info(
-					"Committing writer: " + writer.toString());
-			writer.commit();
-		}
-		uncommitted.clear();
-		fireCommit();
-		AceLog.getEditLog().info(
-				"Finished commit: " + version + " (" + now.getTime() + ")");
-	}
+    /*
+     * 
+     */
+    public static void commit() throws IOException {
+        Date now = new Date();
+        Set<TimePathId> values = new HashSet<TimePathId>();
+        for (I_WriteChangeSet writer : csWriters) {
+            AceLog.getEditLog().info("Opening writer: " + writer.toString());
+            writer.open();
+        }
+        int version = ThinVersionHelper.convert(now.getTime());
+        AceLog.getEditLog().info("Starting commit: " + version + " (" + now.getTime() + ")");
 
-	public static void abort() throws IOException {
-		for (I_Transact cb : uncommitted) {
-			cb.abort();
-		}
-		uncommitted.clear();
-		fireCommit();
-	}
+        for (I_Transact cb : uncommitted) {
+            for (I_WriteChangeSet writer : csWriters) {
+                writer.writeChanges(cb, ThinVersionHelper.convert(version));
+            }
+            cb.commit(version, values);
+        }
+        try {
+            AceConfig.getVodb().addTimeBranchValues(values);
+            AceConfig.getVodb().sync();
+        } catch (DatabaseException e) {
+            throw new ToIoException(e);
+        }
+        for (I_WriteChangeSet writer : csWriters) {
+            AceLog.getEditLog().info("Committing writer: " + writer.toString());
+            writer.commit();
+        }
+        uncommitted.clear();
+        fireCommit();
+        AceLog.getEditLog().info("Finished commit: " + version + " (" + now.getTime() + ")");
+    }
 
-	private static void fireCommit() {
-		if (getAceConfig() != null) {
-			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-				frameConfig.fireCommit();
-				frameConfig.setCommitEnabled(false);
-			}
-		}
-	}
+    public static void abort() throws IOException {
+        for (I_Transact cb : uncommitted) {
+            cb.abort();
+        }
+        uncommitted.clear();
+        fireCommit();
+    }
 
-	/*
-	 * A class that tracks the focused component. This is necessary to delegate
-	 * the menu cut/copy/paste commands to the right component. An instance of
-	 * this class is listening and when the user fires one of these commands, it
-	 * calls the appropriate action on the currently focused component.
-	 */
-	private class TransferActionListener implements ActionListener,
-			PropertyChangeListener {
-		private JComponent focusOwner = null;
+    private static void fireCommit() {
+        if (getAceConfig() != null) {
+            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                frameConfig.fireCommit();
+                frameConfig.setCommitEnabled(false);
+            }
+        }
+    }
 
-		public TransferActionListener() {
-			KeyboardFocusManager manager = KeyboardFocusManager
-					.getCurrentKeyboardFocusManager();
-			manager.addPropertyChangeListener("permanentFocusOwner", this);
-		}
+    /*
+     * A class that tracks the focused component. This is necessary to delegate
+     * the menu cut/copy/paste commands to the right component. An instance of
+     * this class is listening and when the user fires one of these commands, it
+     * calls the appropriate action on the currently focused component.
+     */
+    private class TransferActionListener implements ActionListener, PropertyChangeListener {
+        private JComponent focusOwner = null;
 
-		public void propertyChange(PropertyChangeEvent e) {
-			Object o = e.getNewValue();
-			if (o instanceof JComponent) {
-				focusOwner = (JComponent) o;
-			} else {
-				focusOwner = null;
-			}
-		}
+        public TransferActionListener() {
+            KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            manager.addPropertyChangeListener("permanentFocusOwner", this);
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			if (focusOwner == null) {
-				return;
-			}
-			String action = (String) e.getActionCommand();
-			Action a = focusOwner.getActionMap().get(action);
-			if (a != null) {
-				a.actionPerformed(new ActionEvent(focusOwner,
-						ActionEvent.ACTION_PERFORMED, null));
-			}
-		}
-	}
+        public void propertyChange(PropertyChangeEvent e) {
+            Object o = e.getNewValue();
+            if (o instanceof JComponent) {
+                focusOwner = (JComponent) o;
+            } else {
+                focusOwner = null;
+            }
+        }
 
-	public class MoveListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (focusOwner == null) {
+                return;
+            }
+            String action = (String) e.getActionCommand();
+            Action a = focusOwner.getActionMap().get(action);
+            if (a != null) {
+                a.actionPerformed(new ActionEvent(focusOwner, ActionEvent.ACTION_PERFORMED, null));
+            }
+        }
+    }
 
-		public void actionPerformed(ActionEvent evt) {
-			queueViewer.getMoveListener().actionPerformed(evt);
+    public class MoveListener implements ActionListener {
 
-		}
+        public void actionPerformed(ActionEvent evt) {
+            queueViewer.getMoveListener().actionPerformed(evt);
 
-	}
-    
+        }
+
+    }
+
     public class ShowAllQueuesListener implements ActionListener {
 
         public void actionPerformed(ActionEvent evt) {
@@ -305,99 +298,113 @@ public class ACE extends JPanel implements PropertyChangeListener {
         }
     }
 
-	private class StatusChangeListener implements PropertyChangeListener {
+    private class StatusChangeListener implements PropertyChangeListener {
 
-		public void propertyChange(PropertyChangeEvent evt) {
-			statusLabel.setText((String) evt.getNewValue());
-		}
+        public void propertyChange(PropertyChangeEvent evt) {
+            statusLabel.setText((String) evt.getNewValue());
+        }
 
-	}
+    }
 
-	private class ManageBottomPaneActionListener implements ActionListener {
-		int lastLocation = 0;
+    private class ManageBottomPaneActionListener implements ActionListener {
+        int lastLocation = 0;
 
-		boolean hidden = true;
+        boolean hidden = true;
 
-		public void actionPerformed(ActionEvent e) {
-			if (showSearchButton == e.getSource()) {
-				if (showSearchButton.isSelected()) {
-					if (hidden) {
-						if (lastLocation == 0) {
-							lastLocation = upperLowerSplit.getHeight() - 200;
-						}
-						upperLowerSplit.setDividerLocation(lastLocation);
-						hidden = false;
-					}
+        public void actionPerformed(ActionEvent e) {
+            //AceLog.getAppLog().info("bottom panel action: " + e);
+            boolean show = showSearchToggle.isSelected() || showSignpostPanelToggle.isSelected();
+            if (show) {
+                if (showSearchToggle == e.getSource()) {
+                    if (showSignpostPanelToggle.isSelected()) {
+                        showSignpostPanelToggle.setSelected(false);
+                    }
+                    int splitLoc = upperLowerSplit.getDividerLocation();
+                    upperLowerSplit.setBottomComponent(searchPanel);
+                    upperLowerSplit.setDividerLocation(splitLoc);
+                } else if (showSignpostPanelToggle == e.getSource()) {
+                    if (showSearchToggle.isSelected()) {
+                        showSearchToggle.setSelected(false);
+                    }
+                    int splitLoc = upperLowerSplit.getDividerLocation();
+                    upperLowerSplit.setBottomComponent(signpostPanel);
+                    upperLowerSplit.setDividerLocation(splitLoc);
+                }
+                if (hidden) {
+                    //AceLog.getAppLog().info("showing bottom panel");
+                    if (lastLocation == 0) {
+                        lastLocation = upperLowerSplit.getHeight() - 200;
+                    }
+                    upperLowerSplit.setDividerLocation(lastLocation);
+                    hidden = false;
+                } else {
+                    //AceLog.getAppLog().info("bottom panel is already shown");
+                }
+            } else {
+                //AceLog.getAppLog().info("hiding bottom panel");
+                lastLocation = upperLowerSplit.getDividerLocation();
+                upperLowerSplit.setDividerLocation(upperLowerSplit.getHeight());
+                hidden = true;
+            }
+        }
 
-				} else {
-					lastLocation = upperLowerSplit.getDividerLocation();
-					upperLowerSplit.setDividerLocation(upperLowerSplit
-							.getHeight());
-					hidden = true;
-				}
-			}
-		}
+    }
 
-	}
+    private class PreferencesPaletteActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (preferencesPalette == null) {
+                try {
+                    makeConfigPalette();
+                } catch (Exception ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+            if (showPreferencesButton.isSelected()) {
+                getRootPane().getLayeredPane().moveToFront(preferencesPalette);
+                deselectOthers(showPreferencesButton);
+            }
+            preferencesPalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+        }
 
-	private class PreferencesPaletteActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			if (preferencesPalette == null) {
-				try {
-					makeConfigPalette();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-			if (showPreferencesButton.isSelected()) {
-				getRootPane().getLayeredPane().moveToFront(preferencesPalette);
-				deselectOthers(showPreferencesButton);
-			}
-			preferencesPalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
-		}
+    }
 
-	}
+    private class SubversionPaletteActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (subversionPalette == null) {
+                try {
+                    makeSubversionPalette();
+                } catch (Exception ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+            if (showSubversionButton.isSelected()) {
+                getRootPane().getLayeredPane().moveToFront(subversionPalette);
+                deselectOthers(showSubversionButton);
+            }
+            subversionPalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+        }
 
-	private class SubversionPaletteActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			if (subversionPalette == null) {
-				try {
-					makeSubversionPalette();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-			if (showSubversionButton.isSelected()) {
-				getRootPane().getLayeredPane().moveToFront(subversionPalette);
-				deselectOthers(showSubversionButton);
-			}
-			subversionPalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
-		}
+    }
 
-	}
+    private class QueuesPaletteActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (queuePalette == null) {
+                try {
+                    makeQueuePalette();
+                } catch (Exception ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+            if (showQueuesButton.isSelected()) {
+                getRootPane().getLayeredPane().moveToFront(queuePalette);
+                deselectOthers(showQueuesButton);
+            }
+            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
+                    .getHeight() + 4);
+            queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+        }
 
-	private class QueuesPaletteActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			if (queuePalette == null) {
-				try {
-					makeQueuePalette();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-			if (showQueuesButton.isSelected()) {
-				getRootPane().getLayeredPane().moveToFront(queuePalette);
-				deselectOthers(showQueuesButton);
-			}
-            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
-                                   conceptTabs.getHeight() + 4);
-			queuePalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
-		}
-
-	}
+    }
 
     private class ResizeComponentAdaptor extends ComponentAdapter {
         @Override
@@ -406,759 +413,712 @@ public class ACE extends JPanel implements PropertyChangeListener {
 
                 public void run() {
                     if (queuePalette != null) {
-                        queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
+                        queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
                                              conceptTabs.getHeight() + 4);
-                    } 
+                    }
                     if (processPalette != null) {
-                        processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
+                        processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
                                                conceptTabs.getHeight() + 4);
                     }
                 }
-                
+
             });
-         }
-        
+        }
+
     }
-	private class ProcessPaletteActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			if (processPalette == null) {
-				try {
-					makeProcessPalette();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-			if (showProcessBuilder.isSelected()) {
-				getRootPane().getLayeredPane().moveToFront(processPalette);
-				deselectOthers(showProcessBuilder);
-			}
-            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), 
-                                   conceptTabs.getHeight() + 4);
-			processPalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
-		}
-
-	}
-
-	private class HistoryPaletteActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			if (historyPalette == null) {
-				makeHistoryPalette();
-			}
-			if (((JToggleButton) e.getSource()).isSelected()) {
-				getRootPane().getLayeredPane().moveToFront(historyPalette);
-			}
-			historyPalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
-		}
-	}
-
-	private class AddressPaletteActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			if (addressPalette == null) {
-				makeAddressPalette();
-			}
-			if (((JToggleButton) e.getSource()).isSelected()) {
-				getRootPane().getLayeredPane().moveToFront(addressPalette);
-			}
-			addressPalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
-		}
-	}
-
-	private class TogglePanelsActionListener implements ActionListener,
-			ComponentListener {
-		private Integer origWidth;
-
-		private Integer dividerLocation;
-
-		private Rectangle bounds;
-
-		public void actionPerformed(ActionEvent e) {
-			bounds = getTopLevelAncestor().getBounds();
-			if (origWidth == null) {
-				getRootPane().addComponentListener(this);
-				origWidth = bounds.width;
-			}
-			if (showComponentButton.isSelected()
-					&& (showTreeButton.isSelected() == false)) {
-				dividerLocation = termTreeConceptSplit.getDividerLocation();
-				// AceLog.getLog().info(dividerLocation);
-			}
-			if (showTreeButton.isSelected()
-					&& (showComponentButton.isSelected() == false)) {
-				dividerLocation = termTreeConceptSplit.getDividerLocation();
-				// AceLog.getLog().info(dividerLocation);
-			}
-			if (e.getSource() == showComponentButton) {
-				if (showComponentButton.isSelected()) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							if (showTreeButton.isSelected()) {
-								termTreeConceptSplit
-										.setDividerLocation(dividerLocation);
-							} else {
-								termTreeConceptSplit.setDividerLocation(0);
-							}
-						}
-					});
-				} else {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							termTreeConceptSplit.setDividerLocation(3000);
-							if (showTreeButton.isSelected() == false) {
-								showTreeButton.setSelected(true);
-							}
-						}
-					});
-				}
-			} else if (e.getSource() == showTreeButton) {
-				if (showTreeButton.isSelected()) {
-					if (showComponentButton.isSelected()) {
-						termTreeConceptSplit
-								.setDividerLocation(dividerLocation);
-					} else {
-						termTreeConceptSplit.setDividerLocation(3000);
-					}
-				} else {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							termTreeConceptSplit.setDividerLocation(0);
-							showComponentButton.setSelected(true);
-						}
-					});
-				}
-			}
-		}
 
-		public void componentHidden(ComponentEvent e) {
-		}
+    private class ProcessPaletteActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (processPalette == null) {
+                try {
+                    makeProcessPalette();
+                } catch (Exception ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+            if (showProcessBuilder.isSelected()) {
+                getRootPane().getLayeredPane().moveToFront(processPalette);
+                deselectOthers(showProcessBuilder);
+            }
+            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
+                    .getHeight() + 4);
+            processPalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+        }
+
+    }
+
+    private class HistoryPaletteActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            if (historyPalette == null) {
+                makeHistoryPalette();
+            }
+            if (((JToggleButton) e.getSource()).isSelected()) {
+                getRootPane().getLayeredPane().moveToFront(historyPalette);
+            }
+            historyPalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+        }
+    }
+
+    private class AddressPaletteActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            if (addressPalette == null) {
+                makeAddressPalette();
+            }
+            if (((JToggleButton) e.getSource()).isSelected()) {
+                getRootPane().getLayeredPane().moveToFront(addressPalette);
+            }
+            addressPalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+        }
+    }
+
+    private class TogglePanelsActionListener implements ActionListener, ComponentListener {
+        private Integer origWidth;
+
+        private Integer dividerLocation;
+
+        private Rectangle bounds;
+
+        public void actionPerformed(ActionEvent e) {
+            bounds = getTopLevelAncestor().getBounds();
+            if (origWidth == null) {
+                getRootPane().addComponentListener(this);
+                origWidth = bounds.width;
+            }
+            if (showComponentButton.isSelected() && (showTreeButton.isSelected() == false)) {
+                dividerLocation = termTreeConceptSplit.getDividerLocation();
+                // AceLog.getLog().info(dividerLocation);
+            }
+            if (showTreeButton.isSelected() && (showComponentButton.isSelected() == false)) {
+                dividerLocation = termTreeConceptSplit.getDividerLocation();
+                // AceLog.getLog().info(dividerLocation);
+            }
+            if (e.getSource() == showComponentButton) {
+                if (showComponentButton.isSelected()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (showTreeButton.isSelected()) {
+                                termTreeConceptSplit.setDividerLocation(dividerLocation);
+                            } else {
+                                termTreeConceptSplit.setDividerLocation(0);
+                            }
+                        }
+                    });
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            termTreeConceptSplit.setDividerLocation(3000);
+                            if (showTreeButton.isSelected() == false) {
+                                showTreeButton.setSelected(true);
+                            }
+                        }
+                    });
+                }
+            } else if (e.getSource() == showTreeButton) {
+                if (showTreeButton.isSelected()) {
+                    if (showComponentButton.isSelected()) {
+                        termTreeConceptSplit.setDividerLocation(dividerLocation);
+                    } else {
+                        termTreeConceptSplit.setDividerLocation(3000);
+                    }
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            termTreeConceptSplit.setDividerLocation(0);
+                            showComponentButton.setSelected(true);
+                        }
+                    });
+                }
+            }
+        }
 
-		public void componentMoved(ComponentEvent e) {
-		}
+        public void componentHidden(ComponentEvent e) {
+        }
 
-		public void componentResized(ComponentEvent e) {
-			bounds = getTopLevelAncestor().getBounds();
-			origWidth = bounds.width;
-			dividerLocation = termTreeConceptSplit.getDividerLocation();
-		}
+        public void componentMoved(ComponentEvent e) {
+        }
 
-		public void componentShown(ComponentEvent e) {
-		}
+        public void componentResized(ComponentEvent e) {
+            bounds = getTopLevelAncestor().getBounds();
+            origWidth = bounds.width;
+            dividerLocation = termTreeConceptSplit.getDividerLocation();
+        }
 
-	}
+        public void componentShown(ComponentEvent e) {
+        }
 
-	protected JMenuItem addQueueMI, moveToDiskMI;
+    }
 
-	private QueueViewerPanel queueViewer;
+    protected JMenuItem addQueueMI, moveToDiskMI;
 
-	private JLabel statusLabel = new JLabel();
+    private QueueViewerPanel queueViewer;
 
-	private JTreeWithDragImage tree;
+    private JLabel statusLabel = new JLabel();
 
-	private JPanel topPanel;
+    private JTreeWithDragImage tree;
 
-	private JTabbedPane conceptTabs = new JTabbedPane();
+    private JPanel topPanel;
 
-	private ConceptPanel c1Panel;
+    private JTabbedPane conceptTabs = new JTabbedPane();
 
-	private ConceptPanel c2Panel;
+    private ConceptPanel c1Panel;
 
-	private JComponent termTree;
+    private ConceptPanel c2Panel;
 
-	private SearchPanel searchPanel;
+    private JComponent termTree;
 
-	private JSplitPane upperLowerSplit = new JSplitPane(
-			JSplitPane.VERTICAL_SPLIT);
+    private SearchPanel searchPanel;
 
-	private JSplitPane termTreeConceptSplit = new JSplitPane(
-			JSplitPane.HORIZONTAL_SPLIT);
+    private JSplitPane upperLowerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-	private JToggleButton showComponentButton;
+    private JSplitPane termTreeConceptSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
-	private JToggleButton showTreeButton;
+    private JToggleButton showComponentButton;
 
-	private JToggleButton showSubversionButton;
+    private JToggleButton showTreeButton;
 
-	private JToggleButton showQueuesButton;
+    private JToggleButton showSubversionButton;
 
-	private JToggleButton showProcessBuilder;
+    private JToggleButton showQueuesButton;
 
-	private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
+    private JToggleButton showProcessBuilder;
 
-	private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
+    private TogglePanelsActionListener resizeListener = new TogglePanelsActionListener();
 
-	private CdePalette preferencesPalette;
+    private ManageBottomPaneActionListener bottomPanelActionListener = new ManageBottomPaneActionListener();
 
-	private CdePalette subversionPalette;
+    private CdePalette preferencesPalette;
 
-	private CdePalette queuePalette;
+    private CdePalette subversionPalette;
 
-	private CdePalette processPalette;
+    private CdePalette queuePalette;
 
-	private JToggleButton showHistoryButton;
+    private CdePalette processPalette;
 
-	private CdePalette historyPalette;
+    private JToggleButton showHistoryButton;
 
-	private JToggleButton showSearchButton;
+    private CdePalette historyPalette;
 
-	public static ExecutorService threadPool = Executors.newFixedThreadPool(5);
+    private JToggleButton showSearchToggle;
 
-	public static ExecutorService treeExpandThread = Executors
-			.newFixedThreadPool(1);
+    public static ExecutorService threadPool = Executors.newFixedThreadPool(5);
 
-	public static Timer timer = new Timer();
+    public static ExecutorService treeExpandThread = Executors.newFixedThreadPool(1);
 
-	private AceFrameConfig aceFrameConfig;
+    public static Timer timer = new Timer();
 
-	private JPanel treeProgress;
+    private AceFrameConfig aceFrameConfig;
 
-	private static AceConfig aceConfig;
+    private JPanel treeProgress;
 
-	private JMenu fileMenu = new JMenu("File");
+    private static AceConfig aceConfig;
 
-	private JButton commitButton;
+    private JMenu fileMenu = new JMenu("File");
 
-	private JButton cancelButton;
+    private JButton commitButton;
 
-	private TerminologyListModel viewerHistoryTableModel = new TerminologyListModel();
+    private JButton cancelButton;
 
-	private TerminologyListModel commitHistoryTableModel = new TerminologyListModel();
+    private TerminologyListModel viewerHistoryTableModel = new TerminologyListModel();
 
-	private TerminologyListModel importHistoryTableModel = new TerminologyListModel();
+    private TerminologyListModel commitHistoryTableModel = new TerminologyListModel();
 
-	private JToggleButton showPreferencesButton;
+    private TerminologyListModel importHistoryTableModel = new TerminologyListModel();
 
-	private Configuration config;
+    private JToggleButton showPreferencesButton;
 
-	private JList batchConceptList;
+    private Configuration config;
 
-	private ArrayList<ConceptPanel> conceptPanels;
+    private JList batchConceptList;
 
-	private MasterWorker menuWorker;
+    private ArrayList<ConceptPanel> conceptPanels;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private MasterWorker menuWorker;
 
-	private class RightPalettePoint implements I_GetPalettePoint {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-		public Point getPalettePoint() {
-			return new Point(topPanel.getLocation().x + topPanel.getWidth(),
-					topPanel.getLocation().y + topPanel.getHeight() + 1
-							+ getMenuSpacer());
-		}
+    private class RightPalettePoint implements I_GetPalettePoint {
 
-	}
+        public Point getPalettePoint() {
+            return new Point(topPanel.getLocation().x + topPanel.getWidth(), topPanel.getLocation().y
+                    + topPanel.getHeight() + 1 + getMenuSpacer());
+        }
 
-	private int getMenuSpacer() {
-		if (System.getProperty("apple.laf.useScreenMenuBar") != null
-				&& System.getProperty("apple.laf.useScreenMenuBar").equals(
-						"true")) {
-			return 0;
-		}
-		return 24;
-	}
+    }
 
-	private class LeftPalettePoint implements I_GetPalettePoint {
+    private int getMenuSpacer() {
+        if (System.getProperty("apple.laf.useScreenMenuBar") != null
+                && System.getProperty("apple.laf.useScreenMenuBar").equals("true")) {
+            return 0;
+        }
+        return 24;
+    }
 
-		public Point getPalettePoint() {
-			return new Point(topPanel.getLocation().x, topPanel.getLocation().y
-					+ topPanel.getHeight() + getMenuSpacer() + 1);
-		}
-	}
+    private class LeftPalettePoint implements I_GetPalettePoint {
 
-	/**
-	 * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
-	 * 
-	 * @param aceFrameConfig
-	 * @throws PrivilegedActionException
-	 * @throws IOException
-	 * @throws ConfigurationException
-	 * @throws LoginException
-	 * @throws DatabaseException
-	 * 
-	 * @throws DatabaseException
-	 */
-	public ACE(Configuration config) {
-		super(new GridBagLayout());
-		try {
-			menuWorker = new MasterWorker(config);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		this.config = config;
+        public Point getPalettePoint() {
+            return new Point(topPanel.getLocation().x, topPanel.getLocation().y + topPanel.getHeight()
+                    + getMenuSpacer() + 1);
+        }
+    }
+
+    /**
+     * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
+     * 
+     * @param aceFrameConfig
+     * @throws PrivilegedActionException
+     * @throws IOException
+     * @throws ConfigurationException
+     * @throws LoginException
+     * @throws DatabaseException
+     * 
+     * @throws DatabaseException
+     */
+    public ACE(Configuration config) {
+        super(new GridBagLayout());
+        try {
+            menuWorker = new MasterWorker(config);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        this.config = config;
         this.addComponentListener(new ResizeComponentAdaptor());
-	}
+    }
 
-	public void deselectOthers(JToggleButton selectedOne) {
-		AceLog.getAppLog().info("Deselecting others");
-		if (showPreferencesButton != selectedOne) {
-			if (showPreferencesButton.isSelected()) {
-				showPreferencesButton.doClick();
-			}
-		}
-		if (showSubversionButton != selectedOne) {
-			if (showSubversionButton.isSelected()) {
-				showSubversionButton.doClick();
-			}
-		}
-		if (showQueuesButton != selectedOne) {
-			if (showQueuesButton.isSelected()) {
-				showQueuesButton.doClick();
-			}
-		}
-		if (showProcessBuilder != selectedOne) {
-			if (showProcessBuilder.isSelected()) {
-				showProcessBuilder.doClick();
-			}
-		}
-	}
+    public void deselectOthers(JToggleButton selectedOne) {
+        AceLog.getAppLog().info("Deselecting others");
+        if (showPreferencesButton != selectedOne) {
+            if (showPreferencesButton.isSelected()) {
+                showPreferencesButton.doClick();
+            }
+        }
+        if (showSubversionButton != selectedOne) {
+            if (showSubversionButton.isSelected()) {
+                showSubversionButton.doClick();
+            }
+        }
+        if (showQueuesButton != selectedOne) {
+            if (showQueuesButton.isSelected()) {
+                showQueuesButton.doClick();
+            }
+        }
+        if (showProcessBuilder != selectedOne) {
+            if (showProcessBuilder.isSelected()) {
+                showProcessBuilder.doClick();
+            }
+        }
+    }
 
-	public void setup(I_ConfigAceFrame aceFrameConfig)
-			throws DatabaseException, IOException, ClassNotFoundException {
-		this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
-		this.aceFrameConfig.addPropertyChangeListener(this);
-		try {
-			masterProcessBuilderPanel = new ProcessBuilderContainer(config,
-					aceFrameConfig);
-			descListProcessBuilderPanel = new ProcessBuilderContainer(config,
-					aceFrameConfig);
-		} catch (LoginException e) {
-			throw new RuntimeException(e);
-		} catch (ConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (PrivilegedActionException e) {
-			throw new RuntimeException(e);
-		} catch (IntrospectionException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (PropertyVetoException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
-		searchPanel = new SearchPanel(aceFrameConfig);
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth = 2;
-		topPanel = getTopPanel();
-		add(topPanel, c);
-		c.gridy++;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		add(getContentPanel(), c);
-		c.gridx = 0;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.gridy++;
-		c.gridwidth = 2;
-		add(getBottomPanel(), c);
-		aceFrameConfig.addPropertyChangeListener("statusMessage",
-				new StatusChangeListener());
-	}
+    public void setup(I_ConfigAceFrame aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
+        this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
+        this.aceFrameConfig.addPropertyChangeListener(this);
+        try {
+            masterProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
+            descListProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
+        } catch (LoginException e) {
+            throw new RuntimeException(e);
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (PrivilegedActionException e) {
+            throw new RuntimeException(e);
+        } catch (IntrospectionException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (PropertyVetoException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        searchPanel = new SearchPanel(aceFrameConfig);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 2;
+        topPanel = getTopPanel();
+        add(topPanel, c);
+        c.gridy++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        add(getContentPanel(), c);
+        c.gridx = 0;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.gridy++;
+        c.gridwidth = 2;
+        add(getBottomPanel(), c);
+        aceFrameConfig.addPropertyChangeListener("statusMessage", new StatusChangeListener());
+    }
 
-	public JMenuBar createMenuBar() throws LoginException, SecurityException,
-			ConfigurationException, IOException, PrivilegedActionException,
-			IntrospectionException, InvocationTargetException,
-			IllegalAccessException, PropertyVetoException,
-			ClassNotFoundException, NoSuchMethodException {
-		JMenuBar menuBar = new JMenuBar();
-		JMenu editMenu = new JMenu("Edit");
-		menuBar.add(editMenu);
-		addToMenuBar(menuBar, editMenu);
-		return menuBar;
-	}
+    public JMenuBar createMenuBar() throws LoginException, SecurityException, ConfigurationException, IOException,
+            PrivilegedActionException, IntrospectionException, InvocationTargetException, IllegalAccessException,
+            PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu editMenu = new JMenu("Edit");
+        menuBar.add(editMenu);
+        addToMenuBar(menuBar, editMenu);
+        return menuBar;
+    }
 
-	public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu)
-			throws LoginException, SecurityException, ConfigurationException,
-			IOException, PrivilegedActionException, IntrospectionException,
-			InvocationTargetException, IllegalAccessException,
-			PropertyVetoException, ClassNotFoundException,
-			NoSuchMethodException {
-		addFileMenu(menuBar);
-		addEditMenu(menuBar, editMenu);
-		addProcessMenus(menuBar);
+    public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu) throws LoginException, SecurityException,
+            ConfigurationException, IOException, PrivilegedActionException, IntrospectionException,
+            InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
+            NoSuchMethodException {
+        addFileMenu(menuBar);
+        addEditMenu(menuBar, editMenu);
+        addProcessMenus(menuBar);
 
-		return menuBar;
-	}
+        return menuBar;
+    }
 
-	public void addProcessMenus(JMenuBar menuBar) throws FileNotFoundException,
-			IOException, ClassNotFoundException {
+    public void addProcessMenus(JMenuBar menuBar) throws FileNotFoundException, IOException, ClassNotFoundException {
 
-		File menuDir = new File("plugins/menu");
-		if (menuDir.listFiles() != null) {
-			addProcessMenuItems(menuBar, menuDir);
-		}
-	}
+        File menuDir = new File("plugins/menu");
+        if (menuDir.listFiles() != null) {
+            addProcessMenuItems(menuBar, menuDir);
+        }
+    }
 
-	private void addProcessMenuItems(JMenuBar menuBar, File menuDir)
-			throws IOException, FileNotFoundException, ClassNotFoundException {
-		for (File f : menuDir.listFiles()) {
-			JMenu newMenu;
-			if (f.isDirectory()) {
-				if (f.getName().equals("File")) {
-					newMenu = this.fileMenu;
-				} else {
-					newMenu = new JMenu(f.getName());
-					menuBar.add(newMenu);
-				}
-				if (f.listFiles() != null) {
-					for (File processFile : f.listFiles()) {
-						if (processFile.isDirectory()) {
-							JMenu submenu = new JMenu(processFile.getName());
-							newMenu.add(submenu);
-							addSubmenMenuItems(submenu, processFile);
-						} else {
-							ActionListener processMenuListener = new ProcessMenuActionListener(
-									processFile, menuWorker);
-							ObjectInputStream ois = new ObjectInputStream(
-									new BufferedInputStream(
-											new FileInputStream(processFile)));
-							I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-									.readObject();
-							ois.close();
-							JMenuItem processMenuItem = new JMenuItem(process
-									.getName());
-							processMenuItem
-									.addActionListener(processMenuListener);
-							newMenu.add(processMenuItem);
-						}
-					}
-				}
-				if (newMenu == fileMenu) {
-					fileMenu.addSeparator();
-				}
-			}
-		}
-	}
+    private void addProcessMenuItems(JMenuBar menuBar, File menuDir) throws IOException, FileNotFoundException,
+            ClassNotFoundException {
+        for (File f : menuDir.listFiles()) {
+            JMenu newMenu;
+            if (f.isDirectory()) {
+                if (f.getName().equals("File")) {
+                    newMenu = this.fileMenu;
+                } else {
+                    newMenu = new JMenu(f.getName());
+                    menuBar.add(newMenu);
+                }
+                if (f.listFiles() != null) {
+                    for (File processFile : f.listFiles()) {
+                        if (processFile.isDirectory()) {
+                            JMenu submenu = new JMenu(processFile.getName());
+                            newMenu.add(submenu);
+                            addSubmenMenuItems(submenu, processFile);
+                        } else {
+                            ActionListener processMenuListener = new ProcessMenuActionListener(processFile, menuWorker);
+                            ObjectInputStream ois = new ObjectInputStream(
+                                                                          new BufferedInputStream(
+                                                                                                  new FileInputStream(
+                                                                                                                      processFile)));
+                            I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                            ois.close();
+                            JMenuItem processMenuItem = new JMenuItem(process.getName());
+                            processMenuItem.addActionListener(processMenuListener);
+                            newMenu.add(processMenuItem);
+                        }
+                    }
+                }
+                if (newMenu == fileMenu) {
+                    fileMenu.addSeparator();
+                }
+            }
+        }
+    }
 
-	private void addSubmenMenuItems(JMenu subMenu, File menuDir)
-			throws IOException, FileNotFoundException, ClassNotFoundException {
-		for (File f : menuDir.listFiles()) {
-			if (f.isDirectory()) {
-				JMenu newSubMenu = new JMenu(f.getName());
-				subMenu.add(newSubMenu);
-				addSubmenMenuItems(newSubMenu, f);
-			} else {
-				ActionListener processMenuListener = new ProcessMenuActionListener(
-						f, menuWorker);
-				ObjectInputStream ois = new ObjectInputStream(
-						new BufferedInputStream(new FileInputStream(f)));
-				I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-						.readObject();
-				ois.close();
-				JMenuItem processMenuItem = new JMenuItem(process.getName());
-				processMenuItem.addActionListener(processMenuListener);
-				subMenu.add(processMenuItem);
-			}
-		}
-	}
+    private void addSubmenMenuItems(JMenu subMenu, File menuDir) throws IOException, FileNotFoundException,
+            ClassNotFoundException {
+        for (File f : menuDir.listFiles()) {
+            if (f.isDirectory()) {
+                JMenu newSubMenu = new JMenu(f.getName());
+                subMenu.add(newSubMenu);
+                addSubmenMenuItems(newSubMenu, f);
+            } else {
+                ActionListener processMenuListener = new ProcessMenuActionListener(f, menuWorker);
+                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                ois.close();
+                JMenuItem processMenuItem = new JMenuItem(process.getName());
+                processMenuItem.addActionListener(processMenuListener);
+                subMenu.add(processMenuItem);
+            }
+        }
+    }
 
-	private void addEditMenu(JMenuBar menuBar, JMenu editMenu) {
-		editMenu.removeAll();
-		JMenuItem menuItem;
-		editMenu.setMnemonic(KeyEvent.VK_E);
-		TransferActionListener actionListener = new TransferActionListener();
+    private void addEditMenu(JMenuBar menuBar, JMenu editMenu) {
+        editMenu.removeAll();
+        JMenuItem menuItem;
+        editMenu.setMnemonic(KeyEvent.VK_E);
+        TransferActionListener actionListener = new TransferActionListener();
 
-		menuItem = new JMenuItem("Cut");
-		menuItem.setActionCommand((String) TransferHandler.getCutAction()
-				.getValue(Action.NAME));
-		menuItem.addActionListener(actionListener);
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit
-				.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menuItem.setMnemonic(KeyEvent.VK_T);
-		editMenu.add(menuItem);
-		menuItem = new JMenuItem("Copy");
-		menuItem.setActionCommand((String) TransferHandler.getCopyAction()
-				.getValue(Action.NAME));
-		menuItem.addActionListener(actionListener);
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit
-				.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menuItem.setMnemonic(KeyEvent.VK_C);
-		editMenu.add(menuItem);
-		menuItem = new JMenuItem("Paste");
-		menuItem.setActionCommand((String) TransferHandler.getPasteAction()
-				.getValue(Action.NAME));
-		menuItem.addActionListener(actionListener);
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit
-				.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menuItem.setMnemonic(KeyEvent.VK_P);
-		editMenu.add(menuItem);
+        menuItem = new JMenuItem("Cut");
+        menuItem.setActionCommand((String) TransferHandler.getCutAction().getValue(Action.NAME));
+        menuItem.addActionListener(actionListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMask()));
+        menuItem.setMnemonic(KeyEvent.VK_T);
+        editMenu.add(menuItem);
+        menuItem = new JMenuItem("Copy");
+        menuItem.setActionCommand((String) TransferHandler.getCopyAction().getValue(Action.NAME));
+        menuItem.addActionListener(actionListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMask()));
+        menuItem.setMnemonic(KeyEvent.VK_C);
+        editMenu.add(menuItem);
+        menuItem = new JMenuItem("Paste");
+        menuItem.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
+        menuItem.addActionListener(actionListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMask()));
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        editMenu.add(menuItem);
 
-		menuBar.add(editMenu);
-	}
+        menuBar.add(editMenu);
+    }
 
-	public void addFileMenu(JMenuBar menuBar) throws LoginException,
-			ConfigurationException, IOException, PrivilegedActionException,
-			SecurityException, IntrospectionException,
-			InvocationTargetException, IllegalAccessException,
-			PropertyVetoException, ClassNotFoundException,
-			NoSuchMethodException {
-		JMenuItem menuItem = null;
-		menuItem = new JMenuItem("Export Baseline Jar...");
-		menuItem.addActionListener(new WriteJar(aceConfig));
-		fileMenu.add(menuItem);
-		fileMenu.addSeparator();
-		menuItem = new JMenuItem("Import Java Changeset...");
-		menuItem.addActionListener(new ImportJavaChangeset(config));
-		fileMenu.add(menuItem);
-		fileMenu.addSeparator();
-		menuItem = new JMenuItem("Import Changeset Jar...");
-		menuItem.addActionListener(new ImportChangesetJar(config));
-		fileMenu.add(menuItem);
-		menuItem = new JMenuItem("Import Baseline Jar...");
-		menuItem.addActionListener(new ImportBaselineJar(config));
-		fileMenu.add(menuItem);
-		fileMenu.addSeparator();
-		menuItem = new JMenuItem("Change Password...");
-		menuItem.addActionListener(new ChangeFramePassword(this));
-		fileMenu.add(menuItem);
-		menuItem = new JMenuItem("Save Environment...");
-		menuItem.addActionListener(new SaveEnvironment());
-		fileMenu.add(menuItem);
+    public void addFileMenu(JMenuBar menuBar) throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException, SecurityException, IntrospectionException, InvocationTargetException,
+            IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
+        JMenuItem menuItem = null;
+        menuItem = new JMenuItem("Export Baseline Jar...");
+        menuItem.addActionListener(new WriteJar(aceConfig));
+        fileMenu.add(menuItem);
+        fileMenu.addSeparator();
+        menuItem = new JMenuItem("Import Java Changeset...");
+        menuItem.addActionListener(new ImportJavaChangeset(config));
+        fileMenu.add(menuItem);
+        fileMenu.addSeparator();
+        menuItem = new JMenuItem("Import Changeset Jar...");
+        menuItem.addActionListener(new ImportChangesetJar(config));
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Import Baseline Jar...");
+        menuItem.addActionListener(new ImportBaselineJar(config));
+        fileMenu.add(menuItem);
+        fileMenu.addSeparator();
+        menuItem = new JMenuItem("Change Password...");
+        menuItem.addActionListener(new ChangeFramePassword(this));
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Save Profile");
+        menuItem.addActionListener(new SaveProfile());
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Save Profile As...");
+        menuItem.addActionListener(new SaveProfileAs());
+        fileMenu.add(menuItem);
 
-		menuBar.add(fileMenu);
-	}
+        menuBar.add(fileMenu);
+    }
 
-    private static void addActionButton(ActionListener actionListener,
-        String resource, String tooltipText, JPanel topPanel,
-        GridBagConstraints c) {
-    JButton newProcess = new JButton(new ImageIcon(ACE.class
-            .getResource(resource)));
-    newProcess.setToolTipText(tooltipText);
-    newProcess.addActionListener(actionListener);
-    topPanel.add(newProcess, c);
-    c.gridx++;
-}
-    private static void addActionToggleButton(ActionListener actionListener,
-        String resource, String tooltipText, JPanel topPanel,
-        GridBagConstraints c) {
-    JToggleButton newProcess = new JToggleButton(new ImageIcon(ACE.class
-            .getResource(resource)));
-    newProcess.setToolTipText(tooltipText);
-    newProcess.addActionListener(actionListener);
-    topPanel.add(newProcess, c);
-    c.gridx++;
-}
+    private static void addActionButton(ActionListener actionListener, String resource, String tooltipText,
+        JPanel topPanel, GridBagConstraints c) {
+        JButton newProcess = new JButton(new ImageIcon(ACE.class.getResource(resource)));
+        newProcess.setToolTipText(tooltipText);
+        newProcess.addActionListener(actionListener);
+        topPanel.add(newProcess, c);
+        c.gridx++;
+    }
 
-	private JComponent getContentPanel() throws DatabaseException, IOException,
-			ClassNotFoundException {
-		termTree = getHierarchyPanel();
-		/*
-		 * String htmlLabel = "<html><img src='" +
-		 * ACE.class.getResource("/circle_red_x.gif") +"' border='0' ><img
-		 * src='" + ACE.class.getResource("/triangle_yellow_exclamation.gif")
-		 * +"' border='0' ></html>"; c1Panel = new JLabel(htmlLabel);
-		 */
-		conceptPanels = new ArrayList<ConceptPanel>();
-		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs);
-		conceptPanels.add(c1Panel);
-		c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs);
-		conceptPanels.add(c2Panel);
-		conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel,
-				"Tree Linked");
-		conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON,
-				c2Panel, "Search Linked");
+    private static void addActionToggleButton(ActionListener actionListener, String resource, String tooltipText,
+        JPanel topPanel, GridBagConstraints c) {
+        JToggleButton newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
+        newProcess.setToolTipText(tooltipText);
+        newProcess.addActionListener(actionListener);
+        topPanel.add(newProcess, c);
+        c.gridx++;
+    }
 
-		ConceptPanel c3panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
-				conceptTabs);
-		conceptPanels.add(c3panel);
-		conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
-		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
-				conceptTabs);
-		conceptPanels.add(c3panel);
-		conceptTabs.addTab("Empty 2", null, c4panel, "Unlinked 2");
-		// conceptTabs.addTab("Description List", getDescListEditor());
-		conceptTabs.addTab("List", getConceptListEditor());
+    private JComponent getContentPanel() throws DatabaseException, IOException, ClassNotFoundException {
+        termTree = getHierarchyPanel();
+        /*
+         * String htmlLabel = "<html><img src='" +
+         * ACE.class.getResource("/circle_red_x.gif") +"' border='0' ><img
+         * src='" + ACE.class.getResource("/triangle_yellow_exclamation.gif")
+         * +"' border='0' ></html>"; c1Panel = new JLabel(htmlLabel);
+         */
+        conceptPanels = new ArrayList<ConceptPanel>();
+        c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs);
+        conceptPanels.add(c1Panel);
+        c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs);
+        conceptPanels.add(c2Panel);
+        conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "Tree Linked");
+        conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "Search Linked");
 
-		conceptTabs.setMinimumSize(new Dimension(0, 0));
-		c2Panel.setMinimumSize(new Dimension(0, 0));
+        ConceptPanel c3panel = new ConceptPanel(this, LINK_TYPE.UNLINKED, conceptTabs);
+        conceptPanels.add(c3panel);
+        conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
+        ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.UNLINKED, conceptTabs);
+        conceptPanels.add(c3panel);
+        conceptTabs.addTab("Empty 2", null, c4panel, "Unlinked 2");
+        // conceptTabs.addTab("Description List", getDescListEditor());
+        conceptTabs.addTab("List", getConceptListEditor());
 
-		termTreeConceptSplit.setRightComponent(conceptTabs);
-		termTreeConceptSplit.setLeftComponent(termTree);
-		termTree.setMinimumSize(new Dimension(0, 0));
-		termTreeConceptSplit.setOneTouchExpandable(true);
-		termTreeConceptSplit.setContinuousLayout(true);
-		termTreeConceptSplit.setDividerLocation(aceFrameConfig
-				.getTreeTermDividerLoc());
-		termTreeConceptSplit.setResizeWeight(0.5);
-		termTreeConceptSplit.setLastDividerLocation(aceFrameConfig
-				.getTreeTermDividerLoc());
+        conceptTabs.setMinimumSize(new Dimension(0, 0));
+        c2Panel.setMinimumSize(new Dimension(0, 0));
 
-		upperLowerSplit.setTopComponent(termTreeConceptSplit);
-		upperLowerSplit.setBottomComponent(searchPanel);
-		upperLowerSplit.setOneTouchExpandable(true);
-		upperLowerSplit.setContinuousLayout(true);
-		upperLowerSplit.setResizeWeight(1);
-		upperLowerSplit.setLastDividerLocation(500);
-		upperLowerSplit.setDividerLocation(2000);
-		searchPanel.setMinimumSize(new Dimension(0, 0));
+        termTreeConceptSplit.setRightComponent(conceptTabs);
+        termTreeConceptSplit.setLeftComponent(termTree);
+        termTree.setMinimumSize(new Dimension(0, 0));
+        termTreeConceptSplit.setOneTouchExpandable(true);
+        termTreeConceptSplit.setContinuousLayout(true);
+        termTreeConceptSplit.setDividerLocation(aceFrameConfig.getTreeTermDividerLoc());
+        termTreeConceptSplit.setResizeWeight(0.5);
+        termTreeConceptSplit.setLastDividerLocation(aceFrameConfig.getTreeTermDividerLoc());
 
-		JPanel content = new JPanel();
-		content.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.gridheight = 2;
-		c.fill = GridBagConstraints.BOTH;
-		content.add(upperLowerSplit, c);
+        upperLowerSplit.setTopComponent(termTreeConceptSplit);
+        upperLowerSplit.setBottomComponent(searchPanel);
+        upperLowerSplit.setOneTouchExpandable(true);
+        upperLowerSplit.setContinuousLayout(true);
+        upperLowerSplit.setResizeWeight(1);
+        upperLowerSplit.setLastDividerLocation(500);
+        upperLowerSplit.setDividerLocation(2000);
+        searchPanel.setMinimumSize(new Dimension(0, 0));
 
-		return content;
-	}
+        JPanel content = new JPanel();
+        content.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridheight = 2;
+        c.fill = GridBagConstraints.BOTH;
+        content.add(upperLowerSplit, c);
 
-	CollectionEditorContainer conceptListEditor;
+        return content;
+    }
 
-	private Component getConceptListEditor() throws DatabaseException,
-			IOException, ClassNotFoundException {
-		if (conceptListEditor == null) {
-			batchConceptList = new TerminologyList();
-			conceptListEditor = new CollectionEditorContainer(batchConceptList,
-					this, descListProcessBuilderPanel);
-		}
-		return conceptListEditor;
-	}
+    CollectionEditorContainer conceptListEditor;
 
-	protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI,
-			takeProcessTranMI, saveProcessMI, saveForLauncherQueueMI,
-			saveAsXmlMI;
+    private Component getConceptListEditor() throws DatabaseException, IOException, ClassNotFoundException {
+        if (conceptListEditor == null) {
+            batchConceptList = new TerminologyList();
+            conceptListEditor = new CollectionEditorContainer(batchConceptList, this, descListProcessBuilderPanel);
+        }
+        return conceptListEditor;
+    }
 
-	private JPanel masterProcessBuilderPanel;
+    protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI, takeProcessTranMI, saveProcessMI,
+            saveForLauncherQueueMI, saveAsXmlMI;
 
-	private JPanel descListProcessBuilderPanel;
+    private JPanel masterProcessBuilderPanel;
 
-	private JPanel workflowPanel;
+    private JPanel descListProcessBuilderPanel;
 
-	private JToggleButton showAddressesButton;
+    private JPanel workflowPanel;
 
-	private CdePalette addressPalette;
+    private JPanel signpostPanel = new JPanel();
 
-	private JList addressList;
+    private JToggleButton showAddressesButton;
 
-	private PreferencesPaletteActionListener preferencesActionListener;
+    private CdePalette addressPalette;
 
-	private HistoryPaletteActionListener hpal;
+    private JList addressList;
 
-	private AddressPaletteActionListener apal;
+    private PreferencesPaletteActionListener preferencesActionListener;
+
+    private HistoryPaletteActionListener hpal;
+
+    private AddressPaletteActionListener apal;
 
     private ProcessPaletteActionListener showProcessBuilderActionListener;
 
     private QueuesPaletteActionListener showQueuesActionListener;
 
-	private void makeProcessPalette() throws Exception {
-		JLayeredPane layers = getRootPane().getLayeredPane();
-		processPalette = new CdePalette(new BorderLayout(),
-				new RightPalettePoint());
-		layers.add(processPalette, JLayeredPane.PALETTE_LAYER);
-		processPalette.add(masterProcessBuilderPanel, BorderLayout.CENTER);
-		processPalette.setBorder(BorderFactory.createRaisedBevelBorder());
-		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
-		int height = getHeight() - topPanel.getHeight();
-		Rectangle topBounds = topPanel.getBounds();
-		processPalette.setSize(width, height);
+    private JToggleButton showSignpostPanelToggle;
 
-		processPalette.setLocation(new Point(topBounds.x + topBounds.width,
-				topBounds.y + topBounds.height + 1));
-		processPalette.setOpaque(true);
-		processPalette.doLayout();
-		addComponentListener(processPalette);
-		processPalette.setVisible(true);
+    private void makeProcessPalette() throws Exception {
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        processPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
+        layers.add(processPalette, JLayeredPane.PALETTE_LAYER);
+        processPalette.add(masterProcessBuilderPanel, BorderLayout.CENTER);
+        processPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+        int width = getWidth() - termTreeConceptSplit.getDividerLocation();
+        int height = getHeight() - topPanel.getHeight();
+        Rectangle topBounds = topPanel.getBounds();
+        processPalette.setSize(width, height);
 
-	}
+        processPalette.setLocation(new Point(topBounds.x + topBounds.width, topBounds.y + topBounds.height + 1));
+        processPalette.setOpaque(true);
+        processPalette.doLayout();
+        addComponentListener(processPalette);
+        processPalette.setVisible(true);
 
-	private void makeQueuePalette() throws Exception {
-		JLayeredPane layers = getRootPane().getLayeredPane();
-		queuePalette = new CdePalette(new BorderLayout(),
-				new RightPalettePoint());
-		layers.add(queuePalette, JLayeredPane.PALETTE_LAYER);
+    }
 
-		MasterWorker worker = new MasterWorker(config);
-		worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
-				aceFrameConfig);
-		queuePalette.add(makeQueueViewerPanel(config, worker, aceFrameConfig.getInboxQueueFilter()),
-				BorderLayout.CENTER);
-		queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
-		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
-		int height = getHeight() - topPanel.getHeight();
-		Rectangle topBounds = topPanel.getBounds();
-		queuePalette.setSize(width, height);
+    private void makeQueuePalette() throws Exception {
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        queuePalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
+        layers.add(queuePalette, JLayeredPane.PALETTE_LAYER);
 
-		queuePalette.setLocation(new Point(topBounds.x + topBounds.width,
-				topBounds.y + topBounds.height + 1));
-		queuePalette.setOpaque(true);
-		queuePalette.doLayout();
-		addComponentListener(queuePalette);
-		queuePalette.setVisible(true);
+        MasterWorker worker = new MasterWorker(config);
+        worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
+        queuePalette.add(makeQueueViewerPanel(config, worker, aceFrameConfig.getInboxQueueFilter()),
+                         BorderLayout.CENTER);
+        queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
+        int width = getWidth() - termTreeConceptSplit.getDividerLocation();
+        int height = getHeight() - topPanel.getHeight();
+        Rectangle topBounds = topPanel.getBounds();
+        queuePalette.setSize(width, height);
 
-	}
+        queuePalette.setLocation(new Point(topBounds.x + topBounds.width, topBounds.y + topBounds.height + 1));
+        queuePalette.setOpaque(true);
+        queuePalette.doLayout();
+        addComponentListener(queuePalette);
+        queuePalette.setVisible(true);
 
-	public JPanel makeQueueViewerPanel(Configuration config, MasterWorker worker, ServiceItemFilter queueFilter)
-			throws Exception {
-		queueViewer = new QueueViewerPanel(config, worker, queueFilter);
-		JPanel combinedPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.gridheight = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		combinedPanel.add(getQueueViewerTopPanel(), c);
-		c.gridy++;
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		combinedPanel.add(queueViewer, c);
-		return combinedPanel;
+    }
 
-	}
+    public JPanel makeQueueViewerPanel(Configuration config, MasterWorker worker, ServiceItemFilter queueFilter)
+            throws Exception {
+        queueViewer = new QueueViewerPanel(config, worker, queueFilter);
+        JPanel combinedPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        combinedPanel.add(getQueueViewerTopPanel(), c);
+        c.gridy++;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        combinedPanel.add(queueViewer, c);
+        return combinedPanel;
 
-	private JPanel getQueueViewerTopPanel() {
-		JPanel listEditorTopPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.gridheight = 1;
-		c.fill = GridBagConstraints.BOTH;
-		listEditorTopPanel.add(new JLabel(" "), c); // placeholder for left
-		// sided button
-		c.weightx = 1.0;
-		listEditorTopPanel.add(new JLabel(" "), c); // filler
-		c.gridx++;
-		c.weightx = 0.0;
+    }
+
+    private JPanel getQueueViewerTopPanel() {
+        JPanel listEditorTopPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0;
+        c.weighty = 0;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.BOTH;
+        listEditorTopPanel.add(new JLabel(" "), c); // placeholder for left
+        // sided button
+        c.weightx = 1.0;
+        listEditorTopPanel.add(new JLabel(" "), c); // filler
+        c.gridx++;
+        c.weightx = 0.0;
         addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
-                        "Take Selected Processes and Save To Disk (no transaction)",
-                        listEditorTopPanel, c);
-        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png",
-                        "Show all queues",
-                        listEditorTopPanel, c);
-		return listEditorTopPanel;
+                        "Take Selected Processes and Save To Disk (no transaction)", listEditorTopPanel, c);
+        addActionToggleButton(new ShowAllQueuesListener(), "/24x24/plain/funnel_delete.png", "Show all queues",
+                              listEditorTopPanel, c);
+        return listEditorTopPanel;
 
-	}
+    }
 
-	private void makeSubversionPalette() throws Exception {
-	    if (subversionPalette == null) {
+    private void makeSubversionPalette() throws Exception {
+        if (subversionPalette == null) {
             JLayeredPane layers = getRootPane().getLayeredPane();
-            subversionPalette = new CdePalette(new BorderLayout(),
-                    new RightPalettePoint());
+            subversionPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
             JTabbedPane tabs = new JTabbedPane();
             for (String key : aceFrameConfig.getSubversionMap().keySet()) {
                 SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
@@ -1174,990 +1134,888 @@ public class ACE extends JPanel implements PropertyChangeListener {
             Rectangle topBounds = topPanel.getBounds();
             subversionPalette.setSize(width, height);
 
-            subversionPalette.setLocation(new Point(topBounds.x + topBounds.width,
-                    topBounds.y + topBounds.height + 1));
+            subversionPalette.setLocation(new Point(topBounds.x + topBounds.width, topBounds.y + topBounds.height + 1));
             subversionPalette.setOpaque(true);
             subversionPalette.doLayout();
             addComponentListener(subversionPalette);
             subversionPalette.setVisible(true);
         }
-	}
-
-	private void makeConfigPalette() throws Exception {
-		JLayeredPane layers = getRootPane().getLayeredPane();
-		preferencesPalette = new CdePalette(new BorderLayout(),
-				new RightPalettePoint());
-		JTabbedPane tabs = new JTabbedPane();
-		tabs.addTab("Path", new SelectPathAndPositionPanel(false, "for view",
-				aceFrameConfig, new PropertySetListenerGlue(
-						"removeViewPosition", "addViewPosition",
-						"replaceViewPosition", "getViewPositionSet",
-						I_Position.class, aceFrameConfig)));
-		tabs.addTab("View", makeViewConfig());
-		tabs.addTab("Edit", makeEditConfig());
-		tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
-
-		layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
-		preferencesPalette.add(tabs, BorderLayout.CENTER);
-		preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
-
-		int width = 500;
-		int height = 550;
-		preferencesPalette.setSize(width, height);
-
-		Rectangle topBounds = topPanel.getBounds();
-		preferencesPalette.setLocation(new Point(topBounds.x + topBounds.width,
-				topBounds.y + topBounds.height + 1));
-		preferencesPalette.setOpaque(true);
-		preferencesPalette.doLayout();
-		addComponentListener(preferencesPalette);
-		preferencesPalette.setVisible(true);
-
-	}
-
-	private void removeConfigPalette() {
-		if (preferencesPalette != null) {
-			CdePalette oldPallette = preferencesPalette;
-			preferencesPalette = null;
-			oldPallette.setVisible(false);
-			JLayeredPane layers = getRootPane().getLayeredPane();
-			oldPallette.removeGhost();
-			layers.remove(oldPallette);
-		}
-		if (showPreferencesButton.isSelected()) {
-			try {
-				makeConfigPalette();
-				getRootPane().getLayeredPane().moveToFront(preferencesPalette);
-				preferencesPalette.togglePalette(showPreferencesButton
-						.isSelected());
-			} catch (Exception ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-		}
-
-	}
-
-	private JComponent makeDescPrefPanel() {
-
-		TerminologyListModel descTypeTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getDescTypes().getSetValues()) {
-			descTypeTableModel.addElement(ConceptBean.get(id));
-		}
-		descTypeTableModel.addListDataListener(aceFrameConfig.getDescTypes());
-		TerminologyList descList = new TerminologyList(descTypeTableModel);
-		descList.setBorder(BorderFactory
-				.createTitledBorder("Description types: "));
-
-		JPanel descPrefPanel = new JPanel(new GridLayout(0, 1));
-		descPrefPanel.add(new JScrollPane(descList));
-
-		TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getShortLabelDescPreferenceList()
-				.getListValues()) {
-			shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
-		}
-		shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
-				.getShortLabelDescPreferenceList());
-		TerminologyList shortLabelOrderList = new TerminologyList(
-				shortLabelPrefOrderTableModel);
-
-		shortLabelOrderList.setBorder(BorderFactory
-				.createTitledBorder("Short Label preference order: "));
-		descPrefPanel.add(new JScrollPane(shortLabelOrderList));
-
-		TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getLongLabelDescPreferenceList()
-				.getListValues()) {
-			longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
-		}
-		longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
-				.getLongLabelDescPreferenceList());
-		TerminologyList longLabelOrderList = new TerminologyList(
-				longLabelPrefOrderTableModel);
-
-		longLabelOrderList.setBorder(BorderFactory
-				.createTitledBorder("Long label preference order: "));
-		descPrefPanel.add(new JScrollPane(longLabelOrderList));
-
-		TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getTreeDescPreferenceList()
-				.getListValues()) {
-			treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
-		}
-		treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig
-				.getTreeDescPreferenceList());
-		TerminologyList treePrefOrderList = new TerminologyList(
-				treeDescPrefOrderTableModel);
-
-		treePrefOrderList.setBorder(BorderFactory
-				.createTitledBorder("Tree preference order: "));
-		descPrefPanel.add(new JScrollPane(treePrefOrderList));
-
-		TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getTableDescPreferenceList()
-				.getListValues()) {
-			descPrefOrderTableModel.addElement(ConceptBean.get(id));
-		}
-		descPrefOrderTableModel.addListDataListener(aceFrameConfig
-				.getTableDescPreferenceList());
-		TerminologyList prefOrderList = new TerminologyList(
-				descPrefOrderTableModel);
-
-		prefOrderList.setBorder(BorderFactory
-				.createTitledBorder("Table preference order: "));
-		descPrefPanel.add(new JScrollPane(prefOrderList));
-
-		return descPrefPanel;
-	}
-
-	private JComponent makeRelPrefPanel() {
-
-		JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
-		relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:",
-				aceFrameConfig.getDestRelTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList("child relationships:",
-				aceFrameConfig.getSourceRelTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList(
-				"stated view characteristic types:", aceFrameConfig
-						.getStatedViewTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList(
-				"inferred view characteristic types:", aceFrameConfig
-						.getInferredViewTypes())));
-		return relPrefPanel;
-	}
-
-	private TerminologyList makeTermList(String title, I_IntSet set) {
-		TerminologyListModel browseDownRelModel = new TerminologyListModel();
-		for (int id : set.getSetValues()) {
-			browseDownRelModel.addElement(ConceptBean.get(id));
-		}
-		browseDownRelModel.addListDataListener(set);
-		TerminologyList browseDownRelList = new TerminologyList(
-				browseDownRelModel);
-		browseDownRelList.setBorder(BorderFactory.createTitledBorder(title));
-		return browseDownRelList;
-	}
-
-	private JComponent makeStatusPrefPanel() {
-		TerminologyListModel statusValuesModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getAllowedStatus().getSetValues()) {
-			statusValuesModel.addElement(ConceptBean.get(id));
-		}
-		statusValuesModel
-				.addListDataListener(aceFrameConfig.getAllowedStatus());
-		TerminologyList statusList = new TerminologyList(statusValuesModel);
-		statusList.setBorder(BorderFactory
-				.createTitledBorder("Status values for display:"));
-		return statusList;
-	}
-
-	private JComponent makeRootPrefPanel() {
-		TerminologyListModel rootModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getRoots().getSetValues()) {
-			rootModel.addElement(ConceptBean.get(id));
-		}
-		rootModel.addListDataListener(aceFrameConfig.getRoots());
-		TerminologyList statusList = new TerminologyList(rootModel);
-		statusList.setBorder(BorderFactory
-				.createTitledBorder("Hierarchy roots:"));
-		return statusList;
-	}
-
-	private JTabbedPane makeViewConfig() throws Exception {
-		JTabbedPane tabs = new JTabbedPane();
-		tabs.addTab("descriptions", makeDescPrefPanel());
-		tabs.addTab("relationships", makeRelPrefPanel());
-		tabs.addTab("status", makeStatusPrefPanel());
-		tabs.addTab("roots", makeRootPrefPanel());
-		return tabs;
-	}
-
-	private JTabbedPane makeEditConfig() throws Exception {
-		JTabbedPane tabs = new JTabbedPane();
-		tabs.addTab("defaults", new JScrollPane(madeDefaultsPanel()));
-		tabs.addTab("rel type", new JScrollPane(makePopupConfigPanel(
-				aceFrameConfig.getEditRelTypePopup(),
-				"Relationship types for popup:")));
-		tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(
-				aceFrameConfig.getEditRelRefinabiltyPopup(),
-				"Relationship refinability for popup:")));
-		tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(
-				aceFrameConfig.getEditRelCharacteristicPopup(),
-				"Relationship characteristics for popup:")));
-		tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(
-				aceFrameConfig.getEditDescTypePopup(),
-				"Description types for popup:")));
-		tabs.addTab("status", new JScrollPane(makePopupConfigPanel(
-				aceFrameConfig.getEditStatusTypePopup(),
-				"Status values for popup:")));
-		return tabs;
-	}
-
-	private JComponent madeDefaultsPanel() {
-		JPanel defaultsPanel = new JPanel(new GridLayout(0, 1));
-
-		TermComponentLabel defaultStatus = new TermComponentLabel(
-				aceFrameConfig);
-		defaultStatus.setTermComponent(aceFrameConfig.getDefaultStatus());
-		defaultStatus.addPropertyChangeListener("defaultStatus",
-				new PropertyListenerGlue("setDefaultStatus",
-						I_GetConceptData.class, aceFrameConfig));
-		wrapAndAdd(defaultsPanel, defaultStatus, "Default status: ");
-
-		TermComponentLabel defaultDescType = new TermComponentLabel(
-				aceFrameConfig);
-		defaultDescType.setTermComponent(aceFrameConfig
-				.getDefaultDescriptionType());
-		defaultDescType.addPropertyChangeListener("defaultDescriptionType",
-				new PropertyListenerGlue("setDefaultDescriptionType",
-						I_GetConceptData.class, aceFrameConfig));
-		wrapAndAdd(defaultsPanel, defaultDescType, "Default description type: ");
-
-		TermComponentLabel defaultRelType = new TermComponentLabel(
-				aceFrameConfig);
-		defaultRelType.setTermComponent(aceFrameConfig
-				.getDefaultRelationshipType());
-		defaultRelType.addPropertyChangeListener("defaultRelationshipType",
-				new PropertyListenerGlue("setDefaultRelationshipType",
-						I_GetConceptData.class, aceFrameConfig));
-		wrapAndAdd(defaultsPanel, defaultRelType, "Default relationship type: ");
-
-		TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(
-				aceFrameConfig);
-		defaultRelCharacteristicType.setTermComponent(aceFrameConfig
-				.getDefaultRelationshipCharacteristic());
-		defaultRelCharacteristicType.addPropertyChangeListener(
-				"defaultRelationshipCharacteristic", new PropertyListenerGlue(
-						"setDefaultRelationshipCharacteristic",
-						I_GetConceptData.class, aceFrameConfig));
-		wrapAndAdd(defaultsPanel, defaultRelCharacteristicType,
-				"Default relationship characteristic: ");
-
-		TermComponentLabel defaultRelRefinability = new TermComponentLabel(
-				aceFrameConfig);
-		defaultRelRefinability.setTermComponent(aceFrameConfig
-				.getDefaultRelationshipRefinability());
-		defaultRelRefinability.addPropertyChangeListener(
-				"defaultRelationshipRefinability", new PropertyListenerGlue(
-						"setDefaultRelationshipRefinability",
-						I_GetConceptData.class, aceFrameConfig));
-		wrapAndAdd(defaultsPanel, defaultRelRefinability,
-				"Default relationship refinability: ");
-
-		return defaultsPanel;
-	}
-
-	private void wrapAndAdd(JPanel defaultsPanel,
-			TermComponentLabel defaultLabel, String borderTitle) {
-		JPanel defaultStatusPanel = new JPanel(new GridLayout(1, 1));
-		defaultStatusPanel.setBorder(BorderFactory
-				.createTitledBorder(borderTitle));
-		defaultStatusPanel.add(defaultLabel);
-		defaultsPanel.add(defaultStatusPanel);
-	}
-
-	private JComponent makePopupConfigPanel(I_IntSet set, String borderLabel) {
-
-		TerminologyList popupList = makeTermList(borderLabel, set);
-
-		JPanel popupPanel = new JPanel(new GridLayout(0, 1));
-		popupPanel.add(new JScrollPane(popupList));
-		return popupPanel;
-	}
-
-	private void makeHistoryPalette() {
-		JLayeredPane layers = getRootPane().getLayeredPane();
-		historyPalette = new CdePalette(new BorderLayout(),
-				new LeftPalettePoint());
-		JTabbedPane tabs = new JTabbedPane();
-
-		TerminologyList viewerList = new TerminologyList(
-				viewerHistoryTableModel);
-		tabs.addTab("viewer", new JScrollPane(viewerList));
-		TerminologyList commitList = new TerminologyList(
-				commitHistoryTableModel);
-		tabs.addTab("uncommitted", new JScrollPane(commitList));
-		TerminologyList importList = new TerminologyList(
-				importHistoryTableModel);
-		tabs.addTab("imported", new JScrollPane(importList));
-		historyPalette.add(tabs, BorderLayout.CENTER);
-		historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
-		layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
-		int width = 400;
-		int height = 500;
-		Rectangle topBounds = topPanel.getBounds();
-		historyPalette.setSize(width, height);
-
-		historyPalette.setLocation(new Point(topBounds.x - width, topBounds.y
-				+ topBounds.height + 1));
-		historyPalette.setOpaque(true);
-		historyPalette.doLayout();
-		addComponentListener(historyPalette);
-		historyPalette.setVisible(true);
-	}
-
-	private void makeAddressPalette() {
-		JLayeredPane layers = getRootPane().getLayeredPane();
-		addressPalette = new CdePalette(new BorderLayout(),
-				new LeftPalettePoint());
-		addressList = new JList(aceFrameConfig.getAddressesList());
-		addressPalette.add(new JScrollPane(addressList), BorderLayout.CENTER);
-		addressPalette.setBorder(BorderFactory.createRaisedBevelBorder());
-		layers.add(addressPalette, JLayeredPane.PALETTE_LAYER);
-		int width = 400;
-		int height = 500;
-		Rectangle topBounds = topPanel.getBounds();
-		addressPalette.setSize(width, height);
-
-		addressPalette.setLocation(new Point(topBounds.x - width, topBounds.y
-				+ topBounds.height + 1));
-		addressPalette.setOpaque(true);
-		addressPalette.doLayout();
-		addComponentListener(addressPalette);
-		addressPalette.setVisible(true);
-	}
-
-	JComponent getHierarchyPanel() {
-		if (tree != null) {
-			for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
-				tree.removeTreeExpansionListener(tel);
-			}
-			for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
-				tree.removeTreeSelectionListener(tsl);
-			}
-			for (TreeWillExpandListener twel : tree
-					.getTreeWillExpandListeners()) {
-				tree.removeTreeWillExpandListener(twel);
-			}
-		}
-		tree = new JTreeWithDragImage(aceFrameConfig);
-		tree.putClientProperty("JTree.lineStyle", "None");
-		tree.addMouseListener(new TreeMouseListener(aceFrameConfig));
-		tree.setLargeModel(true);
-		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		tree.setTransferHandler(new TerminologyTransferHandler());
-		tree.setDragEnabled(true);
-		tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));
-		tree.setRootVisible(false);
-		tree.setShowsRootHandles(true);
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
-
-		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
-			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
-					0, false), true));
-		}
-		model.setRoot(root);
-		/*
-		 * Since nodes are added dynamically in this application, the only true
-		 * leaf nodes are nodes that don't allow children to be added. (By
-		 * default, askAllowsChildren is false and all nodes without children
-		 * are considered to be leaves.)
-		 * 
-		 * But there's a complication: when the tree structure changes, JTree
-		 * pre-expands the root node unless it's a leaf. To avoid having the
-		 * root pre-expanded, we set askAllowsChildren *after* assigning the new
-		 * root.
-		 */
-
-		model.setAsksAllowsChildren(true);
-
-		tree.addTreeExpansionListener(new TreeExpansionListener() {
-			public void treeExpanded(TreeExpansionEvent evt) {
-				treeTreeExpanded(evt);
-			}
-
-			public void treeCollapsed(TreeExpansionEvent evt) {
-				treeTreeCollapsed(evt);
-			}
-		});
-
-		tree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			public void valueChanged(TreeSelectionEvent evt) {
-				treeValueChanged(evt);
-			}
-
-		});
-		JScrollPane treeView = new JScrollPane(tree);
-		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
-			AceLog.getAppLog().info("Child expand: " + id);
-		}
-		for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
-			AceLog.getAppLog().info("Parent expand: " + id);
-		}
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			TreePath path = tree.getPathForRow(i);
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path
-					.getLastPathComponent();
-			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-					.getUserObject();
-			if (aceFrameConfig.getChildrenExpandedNodes().contains(
-					treeBean.getConceptId())) {
-				tree.expandPath(new TreePath(node.getPath()));
-			}
-		}
-		return treeView;
-	}
-
-	protected void treeValueChanged(TreeSelectionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String s = evt.isAddedPath() ? "Selected " + node : "";
-		aceFrameConfig.setStatusMessage(s);
-		if (node != null) {
-			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-					.getUserObject();
-			aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
-		} else {
-			aceFrameConfig.setHierarchySelection(null);
-		}
-	}
-
-	protected void treeTreeCollapsed(TreeExpansionEvent evt) {
-		I_GetConceptDataForTree userObject = handleCollapse(evt);
-		aceFrameConfig.getChildrenExpandedNodes().remove(
-				userObject.getConceptId());
-
-	}
-
-	private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt) {
-		System.out
-				.println("Collapsing " + evt.getPath().getLastPathComponent());
-		TreeIdPath idPath = new TreeIdPath(evt.getPath());
-		stopWorkersOnPath(idPath, "stopping for collapse");
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		node.removeAllChildren();
-		I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
-				.getUserObject();
-
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-
-		/*
-		 * To avoid having JTree re-expand the root node, we disable
-		 * ask-allows-children when we notify JTree about the new node
-		 * structure.
-		 */
-
-		model.setAsksAllowsChildren(false);
-		model.nodeStructureChanged(node);
-		model.setAsksAllowsChildren(true);
-
-		aceFrameConfig.setStatusMessage("Collapsed " + node);
-		return userObject;
-	}
-
-	private void stopWorkersOnPath(TreeIdPath idPath, String message) {
-		synchronized (expansionWorkers) {
-			if (idPath == null) {
-				List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(
-						expansionWorkers.keySet());
-				for (TreeIdPath key : allKeys) {
-					AceLog.getAppLog().info("  Stopping all: " + key);
-					removeAnyMatchingExpansionWorker(key, message);
-				}
-			} else {
-				if (expansionWorkers.containsKey(idPath)) {
-					AceLog.getAppLog().info("  Stopping: " + idPath);
-					removeAnyMatchingExpansionWorker(idPath, message);
-				}
-
-				List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(
-						expansionWorkers.keySet());
-				for (TreeIdPath key : otherKeys) {
-					if (key.initiallyEqual(idPath)) {
-						AceLog.getAppLog().info("  Stopping child: " + key);
-						removeAnyMatchingExpansionWorker(key, message);
-					}
-				}
-			}
-		}
-	}
-
-	private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if (foundWorker != null) {
-				foundWorker.stopWork(message);
-				expansionWorkers.remove(key);
-			}
-		}
-	}
-
-	public void removeExpansionWorker(TreeIdPath key,
-			ExpandNodeSwingWorker worker, String message) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if ((worker != null) && (foundWorker == worker)) {
-				worker.stopWork(message);
-				expansionWorkers.remove(key);
-			}
-		}
-	}
-
-	public static Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
-
-	protected void treeTreeExpanded(TreeExpansionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		TreeIdPath idPath = new TreeIdPath(evt.getPath());
-		synchronized (expansionWorkers) {
-			stopWorkersOnPath(idPath, "stopping before expansion");
-			I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
-					.getUserObject();
-			if (userObject != null) {
-				aceFrameConfig.getChildrenExpandedNodes().add(
-						userObject.getConceptId());
-				aceFrameConfig.setStatusMessage("Expanding " + node + "...");
-				ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker(
-						(DefaultTreeModel) tree.getModel(), tree, node,
-						new CompareConceptBeanInitialText(), this);
-				treeExpandThread.execute(worker);
-				expansionWorkers.put(idPath, worker);
-			}
-		}
-	}
-
-	private JPanel getTopPanel() throws IOException, ClassNotFoundException {
-		JPanel topPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		showHistoryButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/history2.png")));
-		showHistoryButton
-				.setToolTipText("history of user commits and concepts viewed");
-		hpal = new HistoryPaletteActionListener();
-		showHistoryButton.addActionListener(hpal);
-		topPanel.add(showHistoryButton, c);
-		c.gridx++;
-		showAddressesButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/address_book3.png")));
-		showAddressesButton
-				.setToolTipText("address book of project participants");
-		apal = new AddressPaletteActionListener();
-		showAddressesButton.addActionListener(apal);
-		topPanel.add(showAddressesButton, c);
-		c.gridx++;
-
-		// address_book3.png
-		topPanel.add(new JPanel(), c);
-		c.gridx++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0;
-		showTreeButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/text_tree.png")));
-		showTreeButton
-				.setToolTipText("Show the hierarchy view of the terminology content.");
-		showTreeButton.setSelected(true);
-		showTreeButton.addActionListener(resizeListener);
-		topPanel.add(showTreeButton, c);
-		c.gridx++;
-		showComponentButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/components.png")));
-		showComponentButton
-				.setToolTipText("Show the component view of the terminology content.");
-		showComponentButton.setSelected(true);
-		showComponentButton.addActionListener(resizeListener);
-		topPanel.add(showComponentButton, c);
-		c.gridx++;
-		treeProgress = new JPanel(new GridLayout(1, 1));
-		topPanel.add((JPanel) treeProgress, c);
-		c.gridx++;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		workflowPanel = new JPanel();
-		topPanel.add(workflowPanel, c);
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0;
-		c.gridx++;
-		// topPanel.add(getComponentToggles2(), c);
-		// c.gridx++;
-
-		File componentPluginDir = new File("plugins" + File.separator
-				+ "viewer");
-		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
-			public boolean accept(File arg0, String fileName) {
-				return fileName.toLowerCase().endsWith(".bp");
-			}
-
-		});
-
-		if (plugins != null) {
-			c.weightx = 0.0;
-			c.weightx = 0.0;
-			c.fill = GridBagConstraints.NONE;
-			for (File f : plugins) {
-				FileInputStream fis = new FileInputStream(f);
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				BusinessProcess bp = (BusinessProcess) ois.readObject();
-				ois.close();
-				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
-				if (iconBytes != null) {
-					ImageIcon icon = new ImageIcon(iconBytes);
-					JButton pluginButton = new JButton(icon);
-					pluginButton.setToolTipText(bp.getSubject());
-					pluginButton.addActionListener(new PluginListener(f));
-					c.gridx++;
-					topPanel.add(pluginButton, c);
-					AceLog.getAppLog().info(
-							"adding viewer plugin: " + f.getName());
-				} else {
-					JButton pluginButton = new JButton(bp.getName());
-					pluginButton.setToolTipText(bp.getSubject());
-					pluginButton.addActionListener(new PluginListener(f));
-					c.gridx++;
-					topPanel.add(pluginButton, c);
-					AceLog.getAppLog().info(
-							"adding viewer plugin: " + f.getName());
-				}
-			}
-		}
-
-		c.gridx++;
-		topPanel.add(new JLabel("   "), c);
-		c.gridx++;
-
-		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/inbox.png")));
-		topPanel.add(showQueuesButton, c);
+    }
+
+    private void makeConfigPalette() throws Exception {
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        preferencesPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Path",
+                    new SelectPathAndPositionPanel(false, "for view", aceFrameConfig,
+                                                   new PropertySetListenerGlue("removeViewPosition", "addViewPosition",
+                                                                               "replaceViewPosition",
+                                                                               "getViewPositionSet", I_Position.class,
+                                                                               aceFrameConfig)));
+        tabs.addTab("View", makeViewConfig());
+        tabs.addTab("Edit", makeEditConfig());
+        tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
+
+        layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
+        preferencesPalette.add(tabs, BorderLayout.CENTER);
+        preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+
+        int width = 500;
+        int height = 550;
+        preferencesPalette.setSize(width, height);
+
+        Rectangle topBounds = topPanel.getBounds();
+        preferencesPalette.setLocation(new Point(topBounds.x + topBounds.width, topBounds.y + topBounds.height + 1));
+        preferencesPalette.setOpaque(true);
+        preferencesPalette.doLayout();
+        addComponentListener(preferencesPalette);
+        preferencesPalette.setVisible(true);
+
+    }
+
+    private void removeConfigPalette() {
+        if (preferencesPalette != null) {
+            CdePalette oldPallette = preferencesPalette;
+            preferencesPalette = null;
+            oldPallette.setVisible(false);
+            JLayeredPane layers = getRootPane().getLayeredPane();
+            oldPallette.removeGhost();
+            layers.remove(oldPallette);
+        }
+        if (showPreferencesButton.isSelected()) {
+            try {
+                makeConfigPalette();
+                getRootPane().getLayeredPane().moveToFront(preferencesPalette);
+                preferencesPalette.togglePalette(showPreferencesButton.isSelected());
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+    }
+
+    private JComponent makeDescPrefPanel() {
+
+        TerminologyListModel descTypeTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getDescTypes().getSetValues()) {
+            descTypeTableModel.addElement(ConceptBean.get(id));
+        }
+        descTypeTableModel.addListDataListener(aceFrameConfig.getDescTypes());
+        TerminologyList descList = new TerminologyList(descTypeTableModel);
+        descList.setBorder(BorderFactory.createTitledBorder("Description types: "));
+
+        JPanel descPrefPanel = new JPanel(new GridLayout(0, 1));
+        descPrefPanel.add(new JScrollPane(descList));
+
+        TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getShortLabelDescPreferenceList().getListValues()) {
+            shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getShortLabelDescPreferenceList());
+        TerminologyList shortLabelOrderList = new TerminologyList(shortLabelPrefOrderTableModel);
+
+        shortLabelOrderList.setBorder(BorderFactory.createTitledBorder("Short Label preference order: "));
+        descPrefPanel.add(new JScrollPane(shortLabelOrderList));
+
+        TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getLongLabelDescPreferenceList().getListValues()) {
+            longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getLongLabelDescPreferenceList());
+        TerminologyList longLabelOrderList = new TerminologyList(longLabelPrefOrderTableModel);
+
+        longLabelOrderList.setBorder(BorderFactory.createTitledBorder("Long label preference order: "));
+        descPrefPanel.add(new JScrollPane(longLabelOrderList));
+
+        TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getTreeDescPreferenceList().getListValues()) {
+            treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig.getTreeDescPreferenceList());
+        TerminologyList treePrefOrderList = new TerminologyList(treeDescPrefOrderTableModel);
+
+        treePrefOrderList.setBorder(BorderFactory.createTitledBorder("Tree preference order: "));
+        descPrefPanel.add(new JScrollPane(treePrefOrderList));
+
+        TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getTableDescPreferenceList().getListValues()) {
+            descPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        descPrefOrderTableModel.addListDataListener(aceFrameConfig.getTableDescPreferenceList());
+        TerminologyList prefOrderList = new TerminologyList(descPrefOrderTableModel);
+
+        prefOrderList.setBorder(BorderFactory.createTitledBorder("Table preference order: "));
+        descPrefPanel.add(new JScrollPane(prefOrderList));
+
+        return descPrefPanel;
+    }
+
+    private JComponent makeRelPrefPanel() {
+
+        JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
+        relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:", aceFrameConfig.getDestRelTypes())));
+        relPrefPanel.add(new JScrollPane(makeTermList("child relationships:", aceFrameConfig.getSourceRelTypes())));
+        relPrefPanel.add(new JScrollPane(makeTermList("stated view characteristic types:", aceFrameConfig
+                .getStatedViewTypes())));
+        relPrefPanel.add(new JScrollPane(makeTermList("inferred view characteristic types:", aceFrameConfig
+                .getInferredViewTypes())));
+        return relPrefPanel;
+    }
+
+    private TerminologyList makeTermList(String title, I_IntSet set) {
+        TerminologyListModel browseDownRelModel = new TerminologyListModel();
+        for (int id : set.getSetValues()) {
+            browseDownRelModel.addElement(ConceptBean.get(id));
+        }
+        browseDownRelModel.addListDataListener(set);
+        TerminologyList browseDownRelList = new TerminologyList(browseDownRelModel);
+        browseDownRelList.setBorder(BorderFactory.createTitledBorder(title));
+        return browseDownRelList;
+    }
+
+    private JComponent makeStatusPrefPanel() {
+        TerminologyListModel statusValuesModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getAllowedStatus().getSetValues()) {
+            statusValuesModel.addElement(ConceptBean.get(id));
+        }
+        statusValuesModel.addListDataListener(aceFrameConfig.getAllowedStatus());
+        TerminologyList statusList = new TerminologyList(statusValuesModel);
+        statusList.setBorder(BorderFactory.createTitledBorder("Status values for display:"));
+        return statusList;
+    }
+
+    private JComponent makeRootPrefPanel() {
+        TerminologyListModel rootModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getRoots().getSetValues()) {
+            rootModel.addElement(ConceptBean.get(id));
+        }
+        rootModel.addListDataListener(aceFrameConfig.getRoots());
+        TerminologyList statusList = new TerminologyList(rootModel);
+        statusList.setBorder(BorderFactory.createTitledBorder("Hierarchy roots:"));
+        return statusList;
+    }
+
+    private JTabbedPane makeViewConfig() throws Exception {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("descriptions", makeDescPrefPanel());
+        tabs.addTab("relationships", makeRelPrefPanel());
+        tabs.addTab("status", makeStatusPrefPanel());
+        tabs.addTab("roots", makeRootPrefPanel());
+        return tabs;
+    }
+
+    private JTabbedPane makeEditConfig() throws Exception {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("defaults", new JScrollPane(madeDefaultsPanel()));
+        tabs.addTab("rel type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelTypePopup(),
+                                                                     "Relationship types for popup:")));
+        tabs.addTab("rel refinabilty",
+                    new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditRelRefinabiltyPopup(),
+                                                         "Relationship refinability for popup:")));
+        tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                .getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
+        tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditDescTypePopup(),
+                                                                      "Description types for popup:")));
+        tabs.addTab("status", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditStatusTypePopup(),
+                                                                   "Status values for popup:")));
+        return tabs;
+    }
+
+    private JComponent madeDefaultsPanel() {
+        JPanel defaultsPanel = new JPanel(new GridLayout(0, 1));
+
+        TermComponentLabel defaultStatus = new TermComponentLabel(aceFrameConfig);
+        defaultStatus.setTermComponent(aceFrameConfig.getDefaultStatus());
+        defaultStatus.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setDefaultStatus",
+                                                                                          I_GetConceptData.class,
+                                                                                          aceFrameConfig));
+        wrapAndAdd(defaultsPanel, defaultStatus, "Default status: ");
+
+        TermComponentLabel defaultDescType = new TermComponentLabel(aceFrameConfig);
+        defaultDescType.setTermComponent(aceFrameConfig.getDefaultDescriptionType());
+        defaultDescType.addPropertyChangeListener("defaultDescriptionType",
+                                                  new PropertyListenerGlue("setDefaultDescriptionType",
+                                                                           I_GetConceptData.class, aceFrameConfig));
+        wrapAndAdd(defaultsPanel, defaultDescType, "Default description type: ");
+
+        TermComponentLabel defaultRelType = new TermComponentLabel(aceFrameConfig);
+        defaultRelType.setTermComponent(aceFrameConfig.getDefaultRelationshipType());
+        defaultRelType.addPropertyChangeListener("defaultRelationshipType",
+                                                 new PropertyListenerGlue("setDefaultRelationshipType",
+                                                                          I_GetConceptData.class, aceFrameConfig));
+        wrapAndAdd(defaultsPanel, defaultRelType, "Default relationship type: ");
+
+        TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(aceFrameConfig);
+        defaultRelCharacteristicType.setTermComponent(aceFrameConfig.getDefaultRelationshipCharacteristic());
+        defaultRelCharacteristicType
+                .addPropertyChangeListener("defaultRelationshipCharacteristic",
+                                           new PropertyListenerGlue("setDefaultRelationshipCharacteristic",
+                                                                    I_GetConceptData.class, aceFrameConfig));
+        wrapAndAdd(defaultsPanel, defaultRelCharacteristicType, "Default relationship characteristic: ");
+
+        TermComponentLabel defaultRelRefinability = new TermComponentLabel(aceFrameConfig);
+        defaultRelRefinability.setTermComponent(aceFrameConfig.getDefaultRelationshipRefinability());
+        defaultRelRefinability.addPropertyChangeListener("defaultRelationshipRefinability",
+                                                         new PropertyListenerGlue("setDefaultRelationshipRefinability",
+                                                                                  I_GetConceptData.class,
+                                                                                  aceFrameConfig));
+        wrapAndAdd(defaultsPanel, defaultRelRefinability, "Default relationship refinability: ");
+
+        return defaultsPanel;
+    }
+
+    private void wrapAndAdd(JPanel defaultsPanel, TermComponentLabel defaultLabel, String borderTitle) {
+        JPanel defaultStatusPanel = new JPanel(new GridLayout(1, 1));
+        defaultStatusPanel.setBorder(BorderFactory.createTitledBorder(borderTitle));
+        defaultStatusPanel.add(defaultLabel);
+        defaultsPanel.add(defaultStatusPanel);
+    }
+
+    private JComponent makePopupConfigPanel(I_IntSet set, String borderLabel) {
+
+        TerminologyList popupList = makeTermList(borderLabel, set);
+
+        JPanel popupPanel = new JPanel(new GridLayout(0, 1));
+        popupPanel.add(new JScrollPane(popupList));
+        return popupPanel;
+    }
+
+    private void makeHistoryPalette() {
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        historyPalette = new CdePalette(new BorderLayout(), new LeftPalettePoint());
+        JTabbedPane tabs = new JTabbedPane();
+
+        TerminologyList viewerList = new TerminologyList(viewerHistoryTableModel);
+        tabs.addTab("viewer", new JScrollPane(viewerList));
+        TerminologyList commitList = new TerminologyList(commitHistoryTableModel);
+        tabs.addTab("uncommitted", new JScrollPane(commitList));
+        TerminologyList importList = new TerminologyList(importHistoryTableModel);
+        tabs.addTab("imported", new JScrollPane(importList));
+        historyPalette.add(tabs, BorderLayout.CENTER);
+        historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+        layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
+        int width = 400;
+        int height = 500;
+        Rectangle topBounds = topPanel.getBounds();
+        historyPalette.setSize(width, height);
+
+        historyPalette.setLocation(new Point(topBounds.x - width, topBounds.y + topBounds.height + 1));
+        historyPalette.setOpaque(true);
+        historyPalette.doLayout();
+        addComponentListener(historyPalette);
+        historyPalette.setVisible(true);
+    }
+
+    private void makeAddressPalette() {
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        addressPalette = new CdePalette(new BorderLayout(), new LeftPalettePoint());
+        addressList = new JList(aceFrameConfig.getAddressesList());
+        addressPalette.add(new JScrollPane(addressList), BorderLayout.CENTER);
+        addressPalette.setBorder(BorderFactory.createRaisedBevelBorder());
+        layers.add(addressPalette, JLayeredPane.PALETTE_LAYER);
+        int width = 400;
+        int height = 500;
+        Rectangle topBounds = topPanel.getBounds();
+        addressPalette.setSize(width, height);
+
+        addressPalette.setLocation(new Point(topBounds.x - width, topBounds.y + topBounds.height + 1));
+        addressPalette.setOpaque(true);
+        addressPalette.doLayout();
+        addComponentListener(addressPalette);
+        addressPalette.setVisible(true);
+    }
+
+    JComponent getHierarchyPanel() {
+        if (tree != null) {
+            for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
+                tree.removeTreeExpansionListener(tel);
+            }
+            for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
+                tree.removeTreeSelectionListener(tsl);
+            }
+            for (TreeWillExpandListener twel : tree.getTreeWillExpandListeners()) {
+                tree.removeTreeWillExpandListener(twel);
+            }
+        }
+        tree = new JTreeWithDragImage(aceFrameConfig);
+        tree.putClientProperty("JTree.lineStyle", "None");
+        tree.addMouseListener(new TreeMouseListener(aceFrameConfig));
+        tree.setLargeModel(true);
+        // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        tree.setTransferHandler(new TerminologyTransferHandler());
+        tree.setDragEnabled(true);
+        tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
+
+        for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
+            root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId, 0, false), true));
+        }
+        model.setRoot(root);
+        /*
+         * Since nodes are added dynamically in this application, the only true
+         * leaf nodes are nodes that don't allow children to be added. (By
+         * default, askAllowsChildren is false and all nodes without children
+         * are considered to be leaves.)
+         * 
+         * But there's a complication: when the tree structure changes, JTree
+         * pre-expands the root node unless it's a leaf. To avoid having the
+         * root pre-expanded, we set askAllowsChildren *after* assigning the new
+         * root.
+         */
+
+        model.setAsksAllowsChildren(true);
+
+        tree.addTreeExpansionListener(new TreeExpansionListener() {
+            public void treeExpanded(TreeExpansionEvent evt) {
+                treeTreeExpanded(evt);
+            }
+
+            public void treeCollapsed(TreeExpansionEvent evt) {
+                treeTreeCollapsed(evt);
+            }
+        });
+
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
+
+            public void valueChanged(TreeSelectionEvent evt) {
+                treeValueChanged(evt);
+            }
+
+        });
+        JScrollPane treeView = new JScrollPane(tree);
+        for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
+            AceLog.getAppLog().info("Child expand: " + id);
+        }
+        for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
+            AceLog.getAppLog().info("Parent expand: " + id);
+        }
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            TreePath path = tree.getPathForRow(i);
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+            ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
+            if (aceFrameConfig.getChildrenExpandedNodes().contains(treeBean.getConceptId())) {
+                tree.expandPath(new TreePath(node.getPath()));
+            }
+        }
+        return treeView;
+    }
+
+    protected void treeValueChanged(TreeSelectionEvent evt) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        String s = evt.isAddedPath() ? "Selected " + node : "";
+        aceFrameConfig.setStatusMessage(s);
+        if (node != null) {
+            ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
+            aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
+        } else {
+            aceFrameConfig.setHierarchySelection(null);
+        }
+    }
+
+    protected void treeTreeCollapsed(TreeExpansionEvent evt) {
+        I_GetConceptDataForTree userObject = handleCollapse(evt);
+        aceFrameConfig.getChildrenExpandedNodes().remove(userObject.getConceptId());
+
+    }
+
+    private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt) {
+        System.out.println("Collapsing " + evt.getPath().getLastPathComponent());
+        TreeIdPath idPath = new TreeIdPath(evt.getPath());
+        stopWorkersOnPath(idPath, "stopping for collapse");
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        node.removeAllChildren();
+        I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
+
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+
+        /*
+         * To avoid having JTree re-expand the root node, we disable
+         * ask-allows-children when we notify JTree about the new node
+         * structure.
+         */
+
+        model.setAsksAllowsChildren(false);
+        model.nodeStructureChanged(node);
+        model.setAsksAllowsChildren(true);
+
+        aceFrameConfig.setStatusMessage("Collapsed " + node);
+        return userObject;
+    }
+
+    private void stopWorkersOnPath(TreeIdPath idPath, String message) {
+        synchronized (expansionWorkers) {
+            if (idPath == null) {
+                List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
+                for (TreeIdPath key : allKeys) {
+                    AceLog.getAppLog().info("  Stopping all: " + key);
+                    removeAnyMatchingExpansionWorker(key, message);
+                }
+            } else {
+                if (expansionWorkers.containsKey(idPath)) {
+                    AceLog.getAppLog().info("  Stopping: " + idPath);
+                    removeAnyMatchingExpansionWorker(idPath, message);
+                }
+
+                List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
+                for (TreeIdPath key : otherKeys) {
+                    if (key.initiallyEqual(idPath)) {
+                        AceLog.getAppLog().info("  Stopping child: " + key);
+                        removeAnyMatchingExpansionWorker(key, message);
+                    }
+                }
+            }
+        }
+    }
+
+    private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
+        synchronized (expansionWorkers) {
+            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+            if (foundWorker != null) {
+                foundWorker.stopWork(message);
+                expansionWorkers.remove(key);
+            }
+        }
+    }
+
+    public void removeExpansionWorker(TreeIdPath key, ExpandNodeSwingWorker worker, String message) {
+        synchronized (expansionWorkers) {
+            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+            if ((worker != null) && (foundWorker == worker)) {
+                worker.stopWork(message);
+                expansionWorkers.remove(key);
+            }
+        }
+    }
+
+    public static Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
+
+    protected void treeTreeExpanded(TreeExpansionEvent evt) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        TreeIdPath idPath = new TreeIdPath(evt.getPath());
+        synchronized (expansionWorkers) {
+            stopWorkersOnPath(idPath, "stopping before expansion");
+            I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
+            if (userObject != null) {
+                aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
+                aceFrameConfig.setStatusMessage("Expanding " + node + "...");
+                ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
+                                                                         node, new CompareConceptBeanInitialText(),
+                                                                         this);
+                treeExpandThread.execute(worker);
+                expansionWorkers.put(idPath, worker);
+            }
+        }
+    }
+
+    private JPanel getTopPanel() throws IOException, ClassNotFoundException {
+        JPanel topPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        showHistoryButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/history2.png")));
+        showHistoryButton.setToolTipText("history of user commits and concepts viewed");
+        hpal = new HistoryPaletteActionListener();
+        showHistoryButton.addActionListener(hpal);
+        topPanel.add(showHistoryButton, c);
+        c.gridx++;
+        showAddressesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/address_book3.png")));
+        showAddressesButton.setToolTipText("address book of project participants");
+        apal = new AddressPaletteActionListener();
+        showAddressesButton.addActionListener(apal);
+        topPanel.add(showAddressesButton, c);
+        c.gridx++;
+
+        // address_book3.png
+        topPanel.add(new JPanel(), c);
+        c.gridx++;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
+        showTreeButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/text_tree.png")));
+        showTreeButton.setToolTipText("Show the hierarchy view of the terminology content.");
+        showTreeButton.setSelected(true);
+        showTreeButton.addActionListener(resizeListener);
+        topPanel.add(showTreeButton, c);
+        c.gridx++;
+        showComponentButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/components.png")));
+        showComponentButton.setToolTipText("Show the component view of the terminology content.");
+        showComponentButton.setSelected(true);
+        showComponentButton.addActionListener(resizeListener);
+        topPanel.add(showComponentButton, c);
+        c.gridx++;
+        treeProgress = new JPanel(new GridLayout(1, 1));
+        topPanel.add((JPanel) treeProgress, c);
+        c.gridx++;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1;
+        workflowPanel = new JPanel();
+        topPanel.add(workflowPanel, c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
+        c.gridx++;
+        // topPanel.add(getComponentToggles2(), c);
+        // c.gridx++;
+
+        File componentPluginDir = new File("plugins" + File.separator + "viewer");
+        File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+            public boolean accept(File arg0, String fileName) {
+                return fileName.toLowerCase().endsWith(".bp");
+            }
+
+        });
+
+        if (plugins != null) {
+            c.weightx = 0.0;
+            c.weightx = 0.0;
+            c.fill = GridBagConstraints.NONE;
+            for (File f : plugins) {
+                FileInputStream fis = new FileInputStream(f);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                ObjectInputStream ois = new ObjectInputStream(bis);
+                BusinessProcess bp = (BusinessProcess) ois.readObject();
+                ois.close();
+                byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
+                if (iconBytes != null) {
+                    ImageIcon icon = new ImageIcon(iconBytes);
+                    JButton pluginButton = new JButton(icon);
+                    pluginButton.setToolTipText(bp.getSubject());
+                    pluginButton.addActionListener(new PluginListener(f));
+                    c.gridx++;
+                    topPanel.add(pluginButton, c);
+                    AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+                } else {
+                    JButton pluginButton = new JButton(bp.getName());
+                    pluginButton.setToolTipText(bp.getSubject());
+                    pluginButton.addActionListener(new PluginListener(f));
+                    c.gridx++;
+                    topPanel.add(pluginButton, c);
+                    AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+                }
+            }
+        }
+
+        c.gridx++;
+        topPanel.add(new JLabel("   "), c);
+        c.gridx++;
+
+        showQueuesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/inbox.png")));
+        topPanel.add(showQueuesButton, c);
         showQueuesActionListener = new QueuesPaletteActionListener();
-		showQueuesButton.addActionListener(showQueuesActionListener);
-		showQueuesButton.setToolTipText("Show the queue viewer...");
-		c.gridx++;
+        showQueuesButton.addActionListener(showQueuesActionListener);
+        showQueuesButton.setToolTipText("Show the queue viewer...");
+        c.gridx++;
 
-		showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/cube_molecule.png")));
-		topPanel.add(showProcessBuilder, c);
+        showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
+        topPanel.add(showProcessBuilder, c);
         showProcessBuilderActionListener = new ProcessPaletteActionListener();
-		showProcessBuilder
-				.addActionListener(showProcessBuilderActionListener);
-		showProcessBuilder.setToolTipText("Show the process builder...");
-		c.gridx++;
+        showProcessBuilder.addActionListener(showProcessBuilderActionListener);
+        showProcessBuilder.setToolTipText("Show the process builder...");
+        c.gridx++;
 
-		showSubversionButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/svn.png")));
-		topPanel.add(showSubversionButton, c);
-		showSubversionButton
-				.addActionListener(new SubversionPaletteActionListener());
-		showSubversionButton.setToolTipText("Show Subversion panel...");
-		c.gridx++;
-		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/preferences.png")));
-		preferencesActionListener = new PreferencesPaletteActionListener();
-		showPreferencesButton.addActionListener(preferencesActionListener);
-		topPanel.add(showPreferencesButton, c);
-		showPreferencesButton.setToolTipText("Show preferences panel...");
-		c.gridx++;
+        showSubversionButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/svn.png")));
+        topPanel.add(showSubversionButton, c);
+        showSubversionButton.addActionListener(new SubversionPaletteActionListener());
+        showSubversionButton.setToolTipText("Show Subversion panel...");
+        c.gridx++;
+        showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
+        preferencesActionListener = new PreferencesPaletteActionListener();
+        showPreferencesButton.addActionListener(preferencesActionListener);
+        topPanel.add(showPreferencesButton, c);
+        showPreferencesButton.setToolTipText("Show preferences panel...");
+        c.gridx++;
 
-		return topPanel;
-	}
+        return topPanel;
+    }
 
-	private class PluginListener implements ActionListener {
-		File pluginProcessFile;
+    private class PluginListener implements ActionListener {
+        File pluginProcessFile;
 
-		private PluginListener(File pluginProcessFile) {
-			super();
-			this.pluginProcessFile = pluginProcessFile;
-		}
+        private PluginListener(File pluginProcessFile) {
+            super();
+            this.pluginProcessFile = pluginProcessFile;
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			try {
-				FileInputStream fis = new FileInputStream(pluginProcessFile);
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				final BusinessProcess bp = (BusinessProcess) ois.readObject();
-				ois.close();
-				aceFrameConfig.setStatusMessage("Executing: " + bp.getName());
-				final MasterWorker worker = aceFrameConfig.getWorker();
+        public void actionPerformed(ActionEvent e) {
+            try {
+                FileInputStream fis = new FileInputStream(pluginProcessFile);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                ObjectInputStream ois = new ObjectInputStream(bis);
+                final BusinessProcess bp = (BusinessProcess) ois.readObject();
+                ois.close();
+                aceFrameConfig.setStatusMessage("Executing: " + bp.getName());
+                final MasterWorker worker = aceFrameConfig.getWorker();
 
-				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-						.name(), aceFrameConfig);
-				worker.writeAttachment(
-						WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
-						this);
-				Runnable r = new Runnable() {
-					private String exceptionMessage;
+                worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
+                worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), this);
+                Runnable r = new Runnable() {
+                    private String exceptionMessage;
 
-					public void run() {
-						I_EncodeBusinessProcess process = bp;
-						try {
-							worker.getLogger().info(
-									"Worker: " + worker.getWorkerDesc() + " ("
-											+ worker.getId()
-											+ ") executing process: "
-											+ process.getName());
-							worker.execute(process);
-							SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
-									process.getExecutionRecords());
-							Iterator<ExecutionRecord> recordItr = sortedRecords
-									.iterator();
-							StringBuffer buff = new StringBuffer();
-							while (recordItr.hasNext()) {
-								ExecutionRecord rec = recordItr.next();
-								buff.append("\n");
-								buff.append(rec.toString());
-							}
-							worker.getLogger().info(buff.toString());
-							exceptionMessage = "";
-						} catch (Throwable e1) {
-							worker.getLogger().log(Level.WARNING,
-									e1.toString(), e1);
-							exceptionMessage = e1.toString();
-						}
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								aceFrameConfig
-										.setStatusMessage("<html><font color='#006400'>execute");
-								if (exceptionMessage.equals("")) {
-									aceFrameConfig
-											.setStatusMessage("<html>Execution of <font color='blue'>"
-													+ bp.getName()
-													+ "</font> complete.");
-								} else {
-									aceFrameConfig
-											.setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
-													+ exceptionMessage);
-								}
-							}
-						});
-					}
+                    public void run() {
+                        I_EncodeBusinessProcess process = bp;
+                        try {
+                            worker.getLogger().info(
+                                                    "Worker: " + worker.getWorkerDesc() + " (" + worker.getId()
+                                                            + ") executing process: " + process.getName());
+                            worker.execute(process);
+                            SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(process
+                                    .getExecutionRecords());
+                            Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
+                            StringBuffer buff = new StringBuffer();
+                            while (recordItr.hasNext()) {
+                                ExecutionRecord rec = recordItr.next();
+                                buff.append("\n");
+                                buff.append(rec.toString());
+                            }
+                            worker.getLogger().info(buff.toString());
+                            exceptionMessage = "";
+                        } catch (Throwable e1) {
+                            worker.getLogger().log(Level.WARNING, e1.toString(), e1);
+                            exceptionMessage = e1.toString();
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                aceFrameConfig.setStatusMessage("<html><font color='#006400'>execute");
+                                if (exceptionMessage.equals("")) {
+                                    aceFrameConfig.setStatusMessage("<html>Execution of <font color='blue'>"
+                                            + bp.getName() + "</font> complete.");
+                                } else {
+                                    aceFrameConfig
+                                            .setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
+                                                    + exceptionMessage);
+                                }
+                            }
+                        });
+                    }
 
-				};
-				new Thread(r).start();
-			} catch (Exception e1) {
-				aceFrameConfig.setStatusMessage("Exception during execution.");
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
-		}
+                };
+                new Thread(r).start();
+            } catch (Exception e1) {
+                aceFrameConfig.setStatusMessage("Exception during execution.");
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+        }
 
-	}
+    }
 
-	JPanel getBottomPanel() {
-		JPanel bottomPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		showSearchButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/find.png")));
-		showSearchButton.addActionListener(bottomPanelActionListener);
-		bottomPanel.add(showSearchButton, c);
-		c.gridx++;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		bottomPanel.add(statusLabel, c);
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0;
-		c.gridx++;
-		cancelButton = new JButton("cancel");
-		cancelButton.setEnabled(false);
-		cancelButton.addActionListener(new Abort());
-		bottomPanel.add(cancelButton, c);
-		c.gridx++;
-		commitButton = new JButton("commit");
-		commitButton.setEnabled(false);
-		commitButton.addActionListener(new Commit());
-		bottomPanel.add(commitButton, c);
-		c.gridx++;
-		bottomPanel.add(new JLabel("   "), c);
-		c.gridx++;
+    JPanel getBottomPanel() {
+        JPanel bottomPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        showSearchToggle = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/find.png")));
+        showSearchToggle.addActionListener(bottomPanelActionListener);
+        bottomPanel.add(showSearchToggle, c);
+        c.gridx++;
+        showSignpostPanelToggle = new JToggleButton(new ImageIcon(ACE.class
+                .getResource("/32x32/plain/signpost.png")));
+        showSignpostPanelToggle.addActionListener(bottomPanelActionListener);
+        bottomPanel.add(showSignpostPanelToggle, c);
+        c.gridx++;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1;
+        bottomPanel.add(statusLabel, c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
+        c.gridx++;
+        cancelButton = new JButton("cancel");
+        cancelButton.setEnabled(false);
+        cancelButton.addActionListener(new Abort());
+        bottomPanel.add(cancelButton, c);
+        c.gridx++;
+        commitButton = new JButton("commit");
+        commitButton.setEnabled(false);
+        commitButton.addActionListener(new Commit());
+        bottomPanel.add(commitButton, c);
+        c.gridx++;
+        bottomPanel.add(new JLabel("   "), c);
+        c.gridx++;
 
-		return bottomPanel;
-	}
+        signpostPanel = new JPanel();
+        signpostPanel.add(new JLabel("Signpost Panel"));
 
-	public void addTreeSelectionListener(TreeSelectionListener tsl) {
-		tree.addTreeSelectionListener(tsl);
-	}
+        return bottomPanel;
+    }
 
-	public void removeTreeSelectionListener(TreeSelectionListener tsl) {
-		tree.removeTreeSelectionListener(tsl);
-	}
+    public void addTreeSelectionListener(TreeSelectionListener tsl) {
+        tree.addTreeSelectionListener(tsl);
+    }
 
-	public I_ConfigAceFrame getAceFrameConfig() {
-		return aceFrameConfig;
-	}
+    public void removeTreeSelectionListener(TreeSelectionListener tsl) {
+        tree.removeTreeSelectionListener(tsl);
+    }
 
-	public void addSearchLinkedComponent(I_ContainTermComponent component) {
-		searchPanel.addLinkedComponent(component);
-	}
+    public I_ConfigAceFrame getAceFrameConfig() {
+        return aceFrameConfig;
+    }
 
-	public void removeSearchLinkedComponent(I_ContainTermComponent component) {
-		searchPanel.removeLinkedComponent(component);
-	}
+    public void addSearchLinkedComponent(I_ContainTermComponent component) {
+        searchPanel.addLinkedComponent(component);
+    }
 
-	public void setTreeActivityPanel(ActivityPanel ap) {
-		treeProgress.removeAll();
-		treeProgress.add(ap);
+    public void removeSearchLinkedComponent(I_ContainTermComponent component) {
+        searchPanel.removeLinkedComponent(component);
+    }
 
-	}
+    public void setTreeActivityPanel(ActivityPanel ap) {
+        treeProgress.removeAll();
+        treeProgress.add(ap);
 
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("viewPositions")) {
-			updateHierarchyView(evt.getPropertyName());
-		} else if (evt.getPropertyName().equals("commit")) {
-			updateHierarchyView(evt.getPropertyName());
-			commitHistoryTableModel.clear();
-			removeConfigPalette();
-		} else if (evt.getPropertyName().equals("commitEnabled")) {
-			commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
-			if (aceFrameConfig.isCommitEnabled()) {
-				commitButton
-						.setText("<html><b><font color='green'>commit</font></b>");
-			} else {
-				commitButton.setText("commit");
-			}
-			cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
-		} else if (evt.getPropertyName().equals("lastViewed")) {
-			viewerHistoryTableModel.addElement(0, (ConceptBean) evt
-					.getNewValue());
-			while (viewerHistoryTableModel.getSize() > 40) {
-				viewerHistoryTableModel.removeElement(viewerHistoryTableModel
-						.getSize() - 1);
-			}
-		} else if (evt.getPropertyName().equals("uncommitted")) {
-			commitHistoryTableModel.clear();
-			for (I_Transact t : uncommitted) {
-				if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-					commitHistoryTableModel.addElement((ConceptBean) t);
-				}
-			}
-		} else if (evt.getPropertyName().equals("imported")) {
-			importHistoryTableModel.clear();
-			for (I_Transact t : imported) {
-				if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-					importHistoryTableModel.addElement((ConceptBean) t);
-				}
-			}
-		} else if (evt.getPropertyName().equals("roots")) {
-			termTreeConceptSplit.setLeftComponent(getHierarchyPanel());
-		}
-	}
+    }
 
-	private void updateHierarchyView(String propChangeName) {
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		stopWorkersOnPath(null, "stopping for change in " + propChangeName);
-		for (int i = 0; i < root.getChildCount(); i++) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root
-					.getChildAt(i);
-			I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
-			if (aceFrameConfig.getChildrenExpandedNodes().contains(
-					cb.getConceptId())) {
-				TreePath tp = new TreePath(childNode);
-				TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
-				handleCollapse(treeEvent);
-				treeTreeExpanded(treeEvent);
-			}
-		}
-	}
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("viewPositions")) {
+            updateHierarchyView(evt.getPropertyName());
+        } else if (evt.getPropertyName().equals("commit")) {
+            updateHierarchyView(evt.getPropertyName());
+            commitHistoryTableModel.clear();
+            removeConfigPalette();
+        } else if (evt.getPropertyName().equals("commitEnabled")) {
+            commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
+            if (aceFrameConfig.isCommitEnabled()) {
+                commitButton.setText("<html><b><font color='green'>commit</font></b>");
+            } else {
+                commitButton.setText("commit");
+            }
+            cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+        } else if (evt.getPropertyName().equals("lastViewed")) {
+            viewerHistoryTableModel.addElement(0, (ConceptBean) evt.getNewValue());
+            while (viewerHistoryTableModel.getSize() > 40) {
+                viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
+            }
+        } else if (evt.getPropertyName().equals("uncommitted")) {
+            commitHistoryTableModel.clear();
+            for (I_Transact t : uncommitted) {
+                if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+                    commitHistoryTableModel.addElement((ConceptBean) t);
+                }
+            }
+        } else if (evt.getPropertyName().equals("imported")) {
+            importHistoryTableModel.clear();
+            for (I_Transact t : imported) {
+                if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+                    importHistoryTableModel.addElement((ConceptBean) t);
+                }
+            }
+        } else if (evt.getPropertyName().equals("roots")) {
+            termTreeConceptSplit.setLeftComponent(getHierarchyPanel());
+        }
+    }
 
-	public JMenu getFileMenu() {
-		return fileMenu;
-	}
+    private void updateHierarchyView(String propChangeName) {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+        stopWorkersOnPath(null, "stopping for change in " + propChangeName);
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root.getChildAt(i);
+            I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
+            if (aceFrameConfig.getChildrenExpandedNodes().contains(cb.getConceptId())) {
+                TreePath tp = new TreePath(childNode);
+                TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
+                handleCollapse(treeEvent);
+                treeTreeExpanded(treeEvent);
+            }
+        }
+    }
 
-	public static AceConfig getAceConfig() {
-		return aceConfig;
-	}
+    public JMenu getFileMenu() {
+        return fileMenu;
+    }
 
-	public static void setAceConfig(AceConfig aceConfig) {
-		if (ACE.aceConfig == null) {
-			ACE.aceConfig = aceConfig;
-		} else {
-			throw new UnsupportedOperationException(
-					"Ace.aceConfig is already set");
-		}
-	}
+    public static AceConfig getAceConfig() {
+        return aceConfig;
+    }
 
-	public static Set<I_ReadChangeSet> getCsReaders() {
-		return csReaders;
-	}
+    public static void setAceConfig(AceConfig aceConfig) {
+        if (ACE.aceConfig == null) {
+            ACE.aceConfig = aceConfig;
+        } else {
+            throw new UnsupportedOperationException("Ace.aceConfig is already set");
+        }
+    }
 
-	public static Set<I_WriteChangeSet> getCsWriters() {
-		return csWriters;
-	}
+    public static Set<I_ReadChangeSet> getCsReaders() {
+        return csReaders;
+    }
 
-	public JList getBatchConceptList() {
-		return batchConceptList;
-	}
+    public static Set<I_WriteChangeSet> getCsWriters() {
+        return csWriters;
+    }
 
-	public ArrayList<ConceptPanel> getConceptPanels() {
-		return conceptPanels;
-	}
+    public JList getBatchConceptList() {
+        return batchConceptList;
+    }
 
-	public JTabbedPane getConceptTabs() {
-		return conceptTabs;
-	}
+    public ArrayList<ConceptPanel> getConceptPanels() {
+        return conceptPanels;
+    }
 
-	public JPanel getWorkflowPanel() {
-		return workflowPanel;
-	}
+    public JTabbedPane getConceptTabs() {
+        return conceptTabs;
+    }
 
-	public JList getAddressList() {
-		return addressList;
-	}
+    public JPanel getWorkflowPanel() {
+        return workflowPanel;
+    }
 
-	public void performLuceneSearch(String query, I_GetConceptData root) {
-		searchPanel.performLuceneSearch(query, root);
-	}
+    public JList getAddressList() {
+        return addressList;
+    }
 
-	public void setShowAddresses(boolean show) {
-		if (show != showAddressesButton.isSelected()) {
-			showAddressesButton.setSelected(show);
-			apal.actionPerformed(new ActionEvent(showAddressesButton, 0,
-					"toggle"));
-		}
-	}
+    public void performLuceneSearch(String query, I_GetConceptData root) {
+        searchPanel.performLuceneSearch(query, root);
+    }
 
-	public void setShowComponentView(boolean show) {
-		if (show != showComponentButton.isSelected()) {
-			showComponentButton.setSelected(show);
-			resizeListener.actionPerformed(new ActionEvent(showComponentButton,
-					0, "toggle"));
-		}
-	}
+    public void setShowAddresses(boolean show) {
+        if (show != showAddressesButton.isSelected()) {
+            showAddressesButton.setSelected(show);
+            apal.actionPerformed(new ActionEvent(showAddressesButton, 0, "toggle"));
+        }
+    }
 
-	public void setShowHierarchyView(boolean show) {
-		if (show != showTreeButton.isSelected()) {
-			showTreeButton.setSelected(show);
-			resizeListener.actionPerformed(new ActionEvent(showTreeButton, 0,
-					"toggle"));
-		}
-	}
+    public void setShowComponentView(boolean show) {
+        if (show != showComponentButton.isSelected()) {
+            showComponentButton.setSelected(show);
+            resizeListener.actionPerformed(new ActionEvent(showComponentButton, 0, "toggle"));
+        }
+    }
 
-	public void setShowHistory(boolean show) {
-		if (show != showHistoryButton.isSelected()) {
-			showHistoryButton.setSelected(show);
-			hpal
-					.actionPerformed(new ActionEvent(showHistoryButton, 0,
-							"toggle"));
-		}
-	}
+    public void setShowHierarchyView(boolean show) {
+        if (show != showTreeButton.isSelected()) {
+            showTreeButton.setSelected(show);
+            resizeListener.actionPerformed(new ActionEvent(showTreeButton, 0, "toggle"));
+        }
+    }
 
-	public void setShowPreferences(boolean show) {
-		if (show != showPreferencesButton.isSelected()) {
-			showPreferencesButton.setSelected(show);
-			preferencesActionListener.actionPerformed(new ActionEvent(
-					showPreferencesButton, 0, "toggle"));
-		}
-	}
+    public void setShowHistory(boolean show) {
+        if (show != showHistoryButton.isSelected()) {
+            showHistoryButton.setSelected(show);
+            hpal.actionPerformed(new ActionEvent(showHistoryButton, 0, "toggle"));
+        }
+    }
 
-	public void setShowSearch(boolean show) {
-		if (show != showSearchButton.isSelected()) {
-			showSearchButton.setSelected(show);
-			bottomPanelActionListener.actionPerformed(new ActionEvent(
-					showSearchButton, 0, "toggle"));
-		}
-	}
+    public void setShowPreferences(boolean show) {
+        if (show != showPreferencesButton.isSelected()) {
+            showPreferencesButton.setSelected(show);
+            preferencesActionListener.actionPerformed(new ActionEvent(showPreferencesButton, 0, "toggle"));
+        }
+    }
 
-	public void showListView() {
-		setShowComponentView(true);
-		conceptTabs.setSelectedComponent(conceptListEditor);
-	}
+    public void setShowSearch(boolean show) {
+        if (show != showSearchToggle.isSelected()) {
+            showSearchToggle.setSelected(show);
+            bottomPanelActionListener.actionPerformed(new ActionEvent(showSearchToggle, 0, "toggle"));
+        }
+    }
+
+    public void showListView() {
+        setShowComponentView(true);
+        conceptTabs.setSelectedComponent(conceptListEditor);
+    }
 
     public void setupSvn() {
         try {
@@ -2171,8 +2029,7 @@ public class ACE extends JPanel implements PropertyChangeListener {
         AceLog.getAppLog().info("set show process builder: " + show);
         if (show != showProcessBuilder.isSelected()) {
             showProcessBuilder.setSelected(show);
-            showProcessBuilderActionListener.actionPerformed(new ActionEvent(
-                    showProcessBuilder, 0, "toggle"));
+            showProcessBuilderActionListener.actionPerformed(new ActionEvent(showProcessBuilder, 0, "toggle"));
         }
     }
 
@@ -2180,9 +2037,44 @@ public class ACE extends JPanel implements PropertyChangeListener {
         AceLog.getAppLog().info("set show process builder: " + show);
         if (show != showQueuesButton.isSelected()) {
             showQueuesButton.setSelected(show);
-            showQueuesActionListener.actionPerformed(new ActionEvent(
-                    showQueuesButton, 0, "toggle"));
+            showQueuesActionListener.actionPerformed(new ActionEvent(showQueuesButton, 0, "toggle"));
         }
     }
-    
+
+    public boolean quit() {
+        int option = JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
+                                                   JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            try {
+                AceConfig.config.save();
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+                return false;
+            }
+        }
+        return true;
+    }
+    public JPanel getSignpostPanel() {
+        return signpostPanel;
+    }
+
+    public void setShowSignpostPanel(boolean show) {
+        if (show != showSignpostPanelToggle.isSelected()) {
+            showSignpostPanelToggle.setSelected(show);
+            bottomPanelActionListener.actionPerformed(new ActionEvent(showSignpostPanelToggle, 0, "toggle"));
+        }
+    }
+
+    public void setShowSignpostToggleVisible(boolean visible) {
+        showSignpostPanelToggle.setVisible(visible);
+    }
+
+    public void setShowSignpostToggleEnabled(boolean enabled) {
+        showSignpostPanelToggle.setEnabled(enabled);
+    }
+
+    public void setSignpostToggleIcon(ImageIcon icon) {
+        showSignpostPanelToggle.setIcon(icon);
+    }
+
 }

@@ -33,6 +33,7 @@ public class ActivityViewer {
 
 		public ActivityViewerFrame() throws Exception {
 			super(null, null);
+            getQuitList().clear();
 		}
 
 		@Override

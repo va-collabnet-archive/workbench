@@ -5,6 +5,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -99,6 +100,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	private String username;
 
 	private String password;
+    
+    private transient File configFile;
 
 	public AceConfig() throws DatabaseException {
 		super();
@@ -849,6 +852,25 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     public void setDbFolder(File dbFolder) {
         this.dbFolder = dbFolder;
+    }
+
+    public File getConfigFile() {
+        return configFile;
+    }
+
+    public void setConfigFile(File configFile) {
+        this.configFile = configFile;
+    }
+    
+    public void save() throws IOException {
+        if (configFile == null) {
+            throw new IOException("configFile is null. Please set before saving. ");
+        } 
+        FileOutputStream fos = new FileOutputStream(configFile);
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(this);
+        oos.close();
     }
 
 }

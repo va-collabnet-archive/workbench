@@ -4,17 +4,16 @@
 package org.dwfa.svn;
 
 import java.awt.Container;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import org.dwfa.bpa.gui.SpringUtilities;
 import org.tigris.subversion.javahl.PromptUserPassword3;
@@ -33,10 +32,11 @@ public class SvnPrompter implements PromptUserPassword3 {
 			boolean showAnswer, boolean maySave) {
 		JPanel promptPane = new JPanel(new SpringLayout());
 		promptPane.add(new JLabel(question, JLabel.RIGHT));
-		JTextField userTextField = new JTextField(20);
+		JTextField userTextFieldMaybe = new JTextField(20);
 		if (showAnswer == false) {
-			userTextField = new JPasswordField(20);
+            userTextFieldMaybe = new JPasswordField(20);
 		}
+        final JTextField userTextField = userTextFieldMaybe;
 		userTextField.setText("");
 		promptPane.add(userTextField);
 		JCheckBox save = new JCheckBox("");
@@ -52,16 +52,21 @@ public class SvnPrompter implements PromptUserPassword3 {
 		SpringUtilities.makeCompactGrid(promptPane, 3, 2, 6, 6, 6, 6);
         userTextField.setSelectionStart(0);
         userTextField.setSelectionEnd(Integer.MAX_VALUE);
-        userTextField.requestFocusInWindow();
-        userTextField.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent evt) {
-                JComponent c = (JComponent) evt.getComponent();
-                c.requestFocusInWindow();
+        userTextField.addAncestorListener(new AncestorListener() {
+
+            public void ancestorAdded(AncestorEvent arg0) {
+                System.out.println("requesting focus 0");
+                userTextField.requestFocusInWindow();
+            }
+
+            public void ancestorMoved(AncestorEvent arg0) {
+            }
+
+            public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-		int action = JOptionPane.showConfirmDialog(parentContainer, promptPane, realm,
-				JOptionPane.OK_CANCEL_OPTION);
+		int action = JOptionPane.showOptionDialog(parentContainer, promptPane, realm,
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
 		if (action == JOptionPane.CANCEL_OPTION) {
 			userAllowedSave = false;
 			return null;
@@ -73,7 +78,7 @@ public class SvnPrompter implements PromptUserPassword3 {
 	public boolean prompt(String realm, String username, boolean maySave) {
 		JPanel promptPane = new JPanel(new SpringLayout());
 		promptPane.add(new JLabel("username:", JLabel.RIGHT));
-		JTextField userTextField = new JTextField(15);
+		final JTextField userTextField = new JTextField(15);
 		userTextField.setText(username);
 		promptPane.add(userTextField);
 		promptPane.add(new JLabel("password:", JLabel.RIGHT));
@@ -91,16 +96,20 @@ public class SvnPrompter implements PromptUserPassword3 {
 		userTextField.requestFocusInWindow();
 		userTextField.setSelectionStart(0);
 		userTextField.setSelectionEnd(Integer.MAX_VALUE);
-        userTextField.requestFocusInWindow();
-        userTextField.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent evt) {
-                JComponent c = (JComponent) evt.getComponent();
-                c.requestFocusInWindow();
+        userTextField.addAncestorListener(new AncestorListener() {
+
+            public void ancestorAdded(AncestorEvent arg0) {
+                userTextField.requestFocusInWindow();
+            }
+
+            public void ancestorMoved(AncestorEvent arg0) {
+            }
+
+            public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-		int action = JOptionPane.showConfirmDialog(parentContainer, promptPane,
-				realm, JOptionPane.OK_CANCEL_OPTION);
+		int action = JOptionPane.showOptionDialog(parentContainer, promptPane, realm, 
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
 		if (action == JOptionPane.CANCEL_OPTION) {
 			userAllowedSave = false;
 			return false;
