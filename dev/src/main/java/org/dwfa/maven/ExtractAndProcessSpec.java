@@ -59,6 +59,8 @@ public class ExtractAndProcessSpec {
 	private SubstutionSpec[] substitutions = new SubstutionSpec[0];
     
     private boolean retainDirStructure = false;
+    
+    private boolean executable = false;
 
 	public ExtractAndProcessSpec() {
 		super();
@@ -112,6 +114,16 @@ public class ExtractAndProcessSpec {
 
     public void setRetainDirStructure(boolean retainDirStructure) {
         this.retainDirStructure = retainDirStructure;
+    }
+
+
+    public boolean isExecutable() {
+        return executable;
+    }
+
+
+    public void setExecutable(boolean executable) {
+        this.executable = executable;
     }
 	
 }

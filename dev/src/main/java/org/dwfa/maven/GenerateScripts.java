@@ -23,12 +23,19 @@ public class GenerateScripts extends AbstractMojo {
 	 */
 	private File outputDirectory;
 
-	/**
-	 * Location to write the script files.
-	 * 
-	 * @parameter
-	 */
-	private String scriptOutputDir;
+    /**
+     * Location to write the script files.
+     * 
+     * @parameter
+     */
+    private String scriptOutputDir;
+
+    /**
+     * Location of the jar files.
+     * 
+     * @parameter
+     */
+    private String jarDir;
 
 	/**
 	 * Location of the libraries.
@@ -65,14 +72,24 @@ public class GenerateScripts extends AbstractMojo {
 		}
 		l.info("scriptOutputDir: " + scriptOutputDir);
 		l.info("outputDirectory: " + outputDirectory);
+        
+        File[] jars;
+        if (jarDir != null) {
+            jars = new File(outputDirectory + fileSep + jarDir).listFiles(new FileFilter() {
 
-		File[] jars = new File(outputDirectory + fileSep + scriptOutputDir
-				+ libDir).listFiles(new FileFilter() {
+                        public boolean accept(File pathname) {
+                            return pathname.getPath().endsWith(".jar");
+                        }
+                    });
+        } else {
+            jars = new File(outputDirectory + fileSep + scriptOutputDir
+                            + libDir).listFiles(new FileFilter() {
 
-			public boolean accept(File pathname) {
-				return pathname.getPath().endsWith(".jar");
-			}
-		});
+                        public boolean accept(File pathname) {
+                            return pathname.getPath().endsWith(".jar");
+                        }
+                    });
+        }
 		/*
 		 * if (jars != null) { for (File f: Arrays.asList(jars)) {
 		 * System.out.println("lib: " + f); } }
@@ -107,6 +124,7 @@ public class GenerateScripts extends AbstractMojo {
 				+ scriptOutputDir + fileSep + scriptName + ".bat");
 
 		try {
+            windowScript.getParentFile().mkdirs();
 			FileWriter fw = new FileWriter(windowScript);
 			// fw.write("export
 			// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
@@ -136,6 +154,7 @@ public class GenerateScripts extends AbstractMojo {
 				+ fileSep + scriptName + "OsX.sh");
 
 		try {
+            unixScript.getParentFile().mkdirs();
 			FileWriter fw = new FileWriter(unixScript);
 			// fw.write("export
 			// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
@@ -171,6 +190,7 @@ public class GenerateScripts extends AbstractMojo {
 			}
 			File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir
 					+ fileSep + scriptName + "Linux.sh");
+            linuxScript.getParentFile().mkdirs();
 
 				fw = new FileWriter(linuxScript);
 				// fw.write("export

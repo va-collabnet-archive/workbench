@@ -148,6 +148,17 @@ public class ProcessProjectDirectories extends AbstractMojo {
                                 FileIO.copyFile(f, destFile);
                             }
                         }
+                        if (spec.isExecutable()) {
+                            if (System.getProperty("os.name").startsWith("Windows") == false) {
+                                try {
+                                    Runtime.getRuntime().exec(
+                                            "chmod a+x " + destFile.getPath());
+                                } catch (RuntimeException e) {
+                                    // Ignore, may be running on windows, and the permissions
+                                    // don't matter there...;
+                                }
+                            }
+                        }
                     }
                 }
 
