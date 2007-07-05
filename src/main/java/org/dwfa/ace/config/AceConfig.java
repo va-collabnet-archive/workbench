@@ -700,10 +700,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 						.getUids()));
 
 		if (config.getUsername() == null) {
-			af.setChangeSetWriterFileName("nullUser."
+			config.setChangeSetWriterFileName("nullUser."
 					+ UUID.randomUUID().toString() + ".jcs");
 		} else {
-			af.setChangeSetWriterFileName(config.getUsername() + "."
+			config.setChangeSetWriterFileName(config.getUsername() + "."
 					+ UUID.randomUUID().toString() + ".jcs");
 		}
         config.changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + config.getUsername());
@@ -723,9 +723,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	}
     
     public void addChangeSetWriters() {
-        ACE.getCsWriters().add(new BinaryChangeSetWriter(new File(config.changeSetRoot, 
+        ACE.getCsWriters().add(new BinaryChangeSetWriter(new File(changeSetRoot, 
                                                                   getChangeSetWriterFileName()), 
-                                                                  new File(config.changeSetRoot, 
+                                                                  new File(changeSetRoot, 
                                                                            "." + getChangeSetWriterFileName())));
     }
 

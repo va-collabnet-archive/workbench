@@ -988,16 +988,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 
-	public String getChangeSetWriterFileName() {
-		return changeSetWriterFileName;
-	}
-
-
-	public void setChangeSetWriterFileName(String changeSetWriterFileName) {
-		Object old = this.changeSetWriterFileName;
-		this.changeSetWriterFileName = changeSetWriterFileName;
-		this.changeSupport.firePropertyChange("changeSetWriterFileName", old, changeSetWriterFileName);
-	}
 
 	private SubversionData getChangeSetSubversionData() {
 		if (subversionMap.get("change sets") == null) {
