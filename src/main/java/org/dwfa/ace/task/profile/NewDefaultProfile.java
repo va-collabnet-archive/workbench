@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntList;
@@ -281,13 +280,6 @@ public class NewDefaultProfile extends AbstractTask {
         activeConfig.setDefaultRelationshipType(tf.getConcept(Concept.IS_A_REL.getUids()));
         activeConfig.setDefaultRelationshipCharacteristic(tf.getConcept(Concept.DEFINING_CHARACTERISTIC.getUids()));
         activeConfig.setDefaultRelationshipRefinability(tf.getConcept(Concept.OPTIONAL_REFINABILITY.getUids()));
-
-        if (activeConfig.getUsername() == null) {
-            activeConfig.setChangeSetWriterFileName("nullUser." + UUID.randomUUID().toString() + ".jcs");
-        } else {
-            activeConfig.setChangeSetWriterFileName(activeConfig.getUsername() + "." + UUID.randomUUID().toString()
-                    + ".jcs");
-        }
         
         I_Path editPath = tf.getPath(Concept.ARCHITECTONIC_BRANCH.getUids());
         //activeConfig.addEditingPath(editPath);

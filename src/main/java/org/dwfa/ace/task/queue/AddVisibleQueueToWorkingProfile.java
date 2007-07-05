@@ -9,7 +9,6 @@ import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -20,7 +19,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/queue", type = BeanType.TASK_BEAN) })
-public class AddVisibleQueueFromProperty extends AbstractTask {
+public class AddVisibleQueueToWorkingProfile extends AbstractTask {
 
     /**
      *
@@ -30,10 +29,12 @@ public class AddVisibleQueueFromProperty extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String visibleQueuePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(visibleQueuePropName);
+        out.writeObject(profilePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -41,6 +42,7 @@ public class AddVisibleQueueFromProperty extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             visibleQueuePropName = (String) in.readObject();
+            profilePropName = (String) in.readObject();
         } else {
             throw new IOException(
                     "Can't handle dataversion: " + objDataVersion);
@@ -59,12 +61,11 @@ public class AddVisibleQueueFromProperty extends AbstractTask {
                 throw new TaskFailedException("Visible queue prop name is null.");
             }
             String address = (String) process.readProperty(visibleQueuePropName);
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-
-             configFrame.getQueueAddressesToShow().add(address);
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+ 
+            profile.getQueueAddressesToShow().add(address);
              worker.getLogger().info("Added visible queue: " + address + " to visible list: " + 
-                                     configFrame.getQueueAddressesToShow());
+                                     profile.getQueueAddressesToShow());
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -91,5 +92,13 @@ public class AddVisibleQueueFromProperty extends AbstractTask {
 
     public void setVisibleQueuePropName(String address) {
         this.visibleQueuePropName = address;
+    }
+
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
     }
 }

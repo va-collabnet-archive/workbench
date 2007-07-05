@@ -16,7 +16,11 @@ public class SetSignpostToggleIconBeanInfo extends SimpleBeanInfo {
             iconResource.setBound(true);
             iconResource.setPropertyEditorClass(JTextFieldEditor.class);
             iconResource.setDisplayName("<html><font color='green'>Signpost toggle icon");
-            iconResource.setShortDescription("Set the signpost toggle icon from classpath resource.");
+            iconResource.setShortDescription("Set the signpost toggle icon from classpath resource.<br><br>" +
+                                             "help.png, help2.png, question_and_answer.png,<br>" +
+                                             "about.png, lightbulb.png, lightbulb_on.png,<br>" + 
+                                             "message.png, message_add.png, message_delete.png,<br>" +
+                                             "gear.png, gear_view.png, gears.png, gears_view.png");
 
             PropertyDescriptor rv[] = { iconResource };
             return rv;

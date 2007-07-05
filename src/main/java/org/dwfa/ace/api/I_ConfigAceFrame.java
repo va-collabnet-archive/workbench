@@ -167,9 +167,6 @@ public interface I_ConfigAceFrame {
 	
 	public Collection<I_WriteChangeSet> getChangeSetWriters();
 	
-	public void setChangeSetWriterFileName(String changeSetWriterFileName);
-	public String getChangeSetWriterFileName();
-	
 	public void setUsername(String username);
 	public String getUsername();
 	

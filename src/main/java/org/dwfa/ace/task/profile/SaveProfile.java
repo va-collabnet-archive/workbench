@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -69,6 +70,8 @@ public class SaveProfile extends AbstractTask {
             String username = (String) process.readProperty(usernamePropName);
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
             aceConfig.getAceFrames().add(profile);
+            aceConfig.setChangeSetRoot(new File("profiles" + File.separator + "users" + File.separator + username));
+            aceConfig.setChangeSetWriterFileName(username + "." + UUID.randomUUID().toString() + ".jcs");
             File profileFile = new File(profileDir, username + File.separator + username + ".ace");
             profileFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(profileFile);

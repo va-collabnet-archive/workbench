@@ -14,4 +14,12 @@ public interface I_ConfigAceDb {
 
     public void setDbFolder(File dbFolder);
 
+    public File getChangeSetRoot();
+
+    public void setChangeSetRoot(File changeSetRoot);
+
+    public String getChangeSetWriterFileName();
+
+    public void setChangeSetWriterFileName(String changeSetWriterFileName);
+
 }
