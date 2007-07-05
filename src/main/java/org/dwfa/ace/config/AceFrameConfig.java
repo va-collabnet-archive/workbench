@@ -184,8 +184,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 			newEx.initCause(e);
 			throw newEx;
 		}
-		out.writeObject(this.getChangeSetReaders());
-		out.writeObject(this.getChangeSetWriters());
+		out.writeObject(null);
+		out.writeObject(null);
 		//14
 		out.writeObject(null);
 		out.writeObject(null);
@@ -322,10 +322,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 				}
             } 
             if (objDataVersion >= 13) {
+                // Do nothing here, the change set readers and writers are now managed differently, and should be null... 
             	Collection<I_ReadChangeSet> readers = (Collection<I_ReadChangeSet>) in.readObject();
-            	this.getChangeSetReaders().addAll(readers);
             	Collection<I_WriteChangeSet> writers = (Collection<I_WriteChangeSet>) in.readObject();
-            	this.getChangeSetWriters().addAll(writers);
             }
             if (objDataVersion >= 14) {
         		in.readObject(); // repositoryUrlStr deprecated
@@ -1264,7 +1263,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 return true;
             }
             HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays.asList(item.attributeSets));
-            for (String address: queueAddressesToShow) {
+             for (String address: queueAddressesToShow) {
                 if (itemAttributes.contains(new ElectronicAddress(address))) {
                     AceLog.getAppLog().info(" true");
                    return true;

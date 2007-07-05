@@ -62,7 +62,7 @@ public class AceRunner {
                                                                    public boolean accept(File dir, String name) {
                                                                        return name.toLowerCase().endsWith(".ace");
                                                                    }
-                                                               }, aceConfigFile);
+                                                               }, new File("profiles" + File.separator + "users"));
 
                 ObjectInputStream ois = new ObjectInputStream(
                                                               new BufferedInputStream(
@@ -81,6 +81,7 @@ public class AceRunner {
                 AceConfig.setupAceConfig(AceConfig.config, aceConfigFile, cacheSize, false);
             }
             ACE.setAceConfig(AceConfig.config);
+            AceConfig.config.addChangeSetWriters();
             int successCount = 0;
             for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
                 if (ace.isActive()) {

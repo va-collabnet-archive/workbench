@@ -72,11 +72,12 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 4;
+	private static final int dataVersion = 5;
 
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
 	private static String DEFAULT_ACE_CONFIG_FILE = "ace.config";
+
 
 	private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(
 			this);
@@ -100,6 +101,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	private String username;
 
 	private String password;
+    
+    // 5
+    private File changeSetRoot;
+    private String changeSetWriterFileName;
     
     private transient File configFile;
 
@@ -131,7 +136,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		out.writeBoolean(readOnly);
 		out.writeObject(cacheSize);
 		out.writeObject(aceFrames);
-		out.writeObject(loggerRiverConfigFile);
+        out.writeObject(loggerRiverConfigFile);
+        out.writeObject(changeSetRoot);
+        out.writeObject(changeSetWriterFileName);
 	}
 
 	private static final String authFailureMsg = "Username and password do not match.";
@@ -174,6 +181,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			} else {
 				loggerRiverConfigFile = DEFAULT_LOGGER_CONFIG_FILE;
 			}
+            if (objDataVersion >= 5) {
+                changeSetRoot = (File) in.readObject();
+                changeSetWriterFileName = (String) in.readObject();
+            } else {
+                changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + username);
+                changeSetWriterFileName = username + "." + UUID.randomUUID().toString() + ".jcs";
+            }
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -692,13 +706,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			af.setChangeSetWriterFileName(config.getUsername() + "."
 					+ UUID.randomUUID().toString() + ".jcs");
 		}
-        File changeSetRoot = new File("profiles" + File.separator + config.getUsername());
-		af.getChangeSetWriters().add(
-                
-				new BinaryChangeSetWriter(new File(changeSetRoot, 
-                                                   af.getChangeSetWriterFileName()), 
-                        new File(changeSetRoot, 
-                                 "." + af.getChangeSetWriterFileName())));
+        config.changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + config.getUsername());
+        config.addChangeSetWriters();
 
   		af.getAddressesList().add("va.user1.editor");
   		af.getAddressesList().add("va.user1.assignmentManager");
@@ -712,6 +721,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		oos.writeObject(config);
 		oos.close();
 	}
+    
+    public void addChangeSetWriters() {
+        ACE.getCsWriters().add(new BinaryChangeSetWriter(new File(config.changeSetRoot, 
+                                                                  getChangeSetWriterFileName()), 
+                                                                  new File(config.changeSetRoot, 
+                                                                           "." + getChangeSetWriterFileName())));
+    }
 
 	private static void addIfNotNull(IntSet roots, I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
 		if (AceConfig.getVodb().getId(concept.getUids()) != null) {
@@ -871,6 +887,22 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(this);
         oos.close();
+    }
+
+    public File getChangeSetRoot() {
+        return changeSetRoot;
+    }
+
+    public void setChangeSetRoot(File changeSetRoot) {
+        this.changeSetRoot = changeSetRoot;
+    }
+
+    public String getChangeSetWriterFileName() {
+        return changeSetWriterFileName;
+    }
+
+    public void setChangeSetWriterFileName(String changeSetWriterFileName) {
+        this.changeSetWriterFileName = changeSetWriterFileName;
     }
 
 }
