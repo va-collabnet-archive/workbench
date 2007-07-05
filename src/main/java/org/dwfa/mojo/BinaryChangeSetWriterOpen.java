@@ -33,7 +33,7 @@ public class BinaryChangeSetWriterOpen extends AbstractMojo {
 	 * 
 	 * @parameter 
 	 */
-	String changeSetFileName = UUID.randomUUID() + ".bcs";
+	String changeSetFileName = UUID.randomUUID() + ".jcs";
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
