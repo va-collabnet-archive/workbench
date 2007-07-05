@@ -917,21 +917,22 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
         c.gridy = 0;
         JScrollPane dataScroller = new JScrollPane(dataPanel);
         File[] dataBeanDirFile = new File("data").listFiles();
-        for (File f: dataBeanDirFile) {
-            
-            if (f.getName().endsWith(".data")) {
-                try {
-                    FileInputStream fis = new FileInputStream(f);
-                    BufferedInputStream bis = new BufferedInputStream(fis);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    DataContainer data = (DataContainer) ois.readObject();
-                    ois.close();
-                    createDataPanelAndAdd(worker, dataPanel, c, data);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Exception processing " + 
-                            f + " (" + ex.toString() + ")", ex);
-                } 
-             }
+        if (dataBeanDirFile != null) {
+            for (File f: dataBeanDirFile) {         
+                if (f.getName().endsWith(".data")) {
+                    try {
+                        FileInputStream fis = new FileInputStream(f);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        ObjectInputStream ois = new ObjectInputStream(bis);
+                        DataContainer data = (DataContainer) ois.readObject();
+                        ois.close();
+                        createDataPanelAndAdd(worker, dataPanel, c, data);
+                    } catch (Exception ex) {
+                        logger.log(Level.WARNING, "Exception processing " + 
+                                f + " (" + ex.toString() + ")", ex);
+                    } 
+                 }
+            }
         }
         c.weighty = 1;
         dataPanel.add(new JPanel(), c);
