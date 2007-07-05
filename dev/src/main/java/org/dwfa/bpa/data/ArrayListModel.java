@@ -303,4 +303,9 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 		return data.toArray(a);
 	}
 
+    @Override
+    public String toString() {
+        return data.toString();
+    }
+
 }
