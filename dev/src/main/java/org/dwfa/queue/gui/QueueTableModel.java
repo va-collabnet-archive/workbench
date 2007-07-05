@@ -77,6 +77,8 @@ public class QueueTableModel extends AbstractTableModel {
                 rowData[i][2] = "unspecified";
             } else if (meta.getDeadline().getTime() == Long.MAX_VALUE) {
                 rowData[i][2] = "unspecified";
+            } else if (meta.getDeadline().getTime() == Long.MIN_VALUE) {
+                rowData[i][2] = "immediate";
             } else {
                 rowData[i][2] = dateFormat.format(meta.getDeadline());
             }
