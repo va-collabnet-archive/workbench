@@ -373,6 +373,7 @@ class LocalTransactionManager implements TxnManager,
 
 	public TransactionManager.Created create(long lease)
 			throws LeaseDeniedException {
+		lease = Long.MAX_VALUE;
 		if (operationsLogger.isLoggable(Level.FINER)) {
 			operationsLogger.entering(this.getClass().getName(), "create",
 					new Long(lease));
