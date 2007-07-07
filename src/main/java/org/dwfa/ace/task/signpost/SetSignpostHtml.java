@@ -86,22 +86,6 @@ public class SetSignpostHtml extends AbstractTask {
                     }
                 }
             });
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-                public void run() {
-                    Component[] components = signpostPanel.getComponents();
-                    for (int i = 0; i < components.length; i++) {
-                        signpostPanel.remove(components[i]);
-                    }
-                    signpostPanel.validate();
-                    Container cont = signpostPanel;
-                    while (cont != null) {
-                        cont.validate();
-                        cont = cont.getParent();
-                    }
-                }
-
-            });
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
