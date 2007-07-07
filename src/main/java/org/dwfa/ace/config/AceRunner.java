@@ -55,6 +55,13 @@ public class AceRunner {
                                                         new File("src/main/config/config.ace"));
 
             if (aceConfigFile.exists()) {
+            	File profileDir = new File("profiles" + File.separator + "users");
+            	if (profileDir.exists() == false) {
+            		profileDir = new File("profiles");
+            		if (profileDir.exists() == false) {
+            			profileDir.mkdirs();
+            		}
+            	}
                 // Put up a dialog to select the config file...
                 aceConfigFile = FileDialogUtil.getExistingFile("Please select your user profile:",
                                                                new FilenameFilter() {
@@ -62,7 +69,7 @@ public class AceRunner {
                                                                    public boolean accept(File dir, String name) {
                                                                        return name.toLowerCase().endsWith(".ace");
                                                                    }
-                                                               }, new File("profiles" + File.separator + "users"));
+                                                               }, profileDir);
 
                 ObjectInputStream ois = new ObjectInputStream(
                                                               new BufferedInputStream(

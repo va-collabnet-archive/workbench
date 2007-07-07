@@ -2,6 +2,7 @@ package org.dwfa.ace;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -315,6 +316,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             //AceLog.getAppLog().info("bottom panel action: " + e);
             boolean show = showSearchToggle.isSelected() || showSignpostPanelToggle.isSelected();
             if (show) {
+            	Container shownContainer = null;
                 if (showSearchToggle == e.getSource()) {
                     if (showSignpostPanelToggle.isSelected()) {
                         showSignpostPanelToggle.setSelected(false);
@@ -322,6 +324,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     int splitLoc = upperLowerSplit.getDividerLocation();
                     upperLowerSplit.setBottomComponent(searchPanel);
                     upperLowerSplit.setDividerLocation(splitLoc);
+                    shownContainer = searchPanel;
                 } else if (showSignpostPanelToggle == e.getSource()) {
                     if (showSearchToggle.isSelected()) {
                         showSearchToggle.setSelected(false);
@@ -329,6 +332,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     int splitLoc = upperLowerSplit.getDividerLocation();
                     upperLowerSplit.setBottomComponent(signpostPanel);
                     upperLowerSplit.setDividerLocation(splitLoc);
+                    shownContainer = signpostPanel;
                 }
                 if (hidden) {
                     //AceLog.getAppLog().info("showing bottom panel");
@@ -339,6 +343,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     hidden = false;
                 } else {
                     //AceLog.getAppLog().info("bottom panel is already shown");
+                }
+                while (shownContainer != null) {
+                	shownContainer.validate();
+                	shownContainer = shownContainer.getParent();
                 }
             } else {
                 //AceLog.getAppLog().info("hiding bottom panel");

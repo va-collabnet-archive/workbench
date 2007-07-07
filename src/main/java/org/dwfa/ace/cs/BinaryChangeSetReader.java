@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -65,64 +66,103 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	private static final long serialVersionUID = 1L;
 
 	private File changeSetFile;
-	
+
 	private I_Count counter;
+
+	private ObjectInputStream ois;
+
+	private int count = 0;
+
+	private int conceptCount = 0;
+
+	private int pathCount = 0;
+
+	private boolean initialized = false;
+
+	private Long nextCommit;
 
 	public BinaryChangeSetReader() {
 		super();
 	}
 
-	public void read() throws IOException, ClassNotFoundException {
+	public long nextCommitTime() throws IOException, ClassNotFoundException {
+		lazyInit();
+		if (nextCommit == null) {
+			nextCommit = ois.readLong();
+		}
+		return nextCommit;
+	}
+
+	public void readUntil(long endTime) throws IOException, ClassNotFoundException {
+		HashSet<TimePathId> values = new HashSet<TimePathId>();
+		while (nextCommitTime() < endTime) {
+			try {
+				Object obj = ois.readObject();
+				count++;
+				if (counter != null) {
+					counter.increment();
+				}
+				if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
+					conceptCount++;
+					AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
+					ACE.addImported(commitAceBean((UniversalAceBean) obj, nextCommit,
+							values));
+				} else if (UniversalAcePath.class.isAssignableFrom(obj
+						.getClass())) {
+					pathCount++;
+					AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
+					commitAcePath((UniversalAcePath) obj, nextCommit);
+				} else {
+					throw new IOException("Can't handle class: "
+							+ obj.getClass().getName());
+				}
+				nextCommit = ois.readLong();
+			} catch (EOFException ex) {
+				ois.close();
+				AceLog.getEditLog().info("End of change set. ");
+				nextCommit = Long.MAX_VALUE;
+			} catch (DatabaseException e) {
+				throw new ToIoException(e);
+			} catch (TerminologyException e) {
+				throw new ToIoException(e);
+			}
+		}
 		try {
-            int count = 0;
-            int conceptCount = 0;
-            int pathCount = 0;
+			AceLog.getEditLog().info("Committing time branches: " + values);
+			AceConfig.getVodb().addTimeBranchValues(values);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
+		AceLog.getAppLog().info(
+				"Change set imported " + count
+						+ " change objects. Concepts: " + conceptCount
+						+ " paths: " + pathCount);
+
+	}
+
+	public void read() throws IOException, ClassNotFoundException {
+		readUntil(Long.MAX_VALUE);
+	}
+
+	private void lazyInit() throws FileNotFoundException, IOException,
+			ClassNotFoundException {
+		if (initialized == false) {
 			FileInputStream fis = new FileInputStream(changeSetFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-			ObjectInputStream ois = new ObjectInputStream(bis);
+			ois = new ObjectInputStream(bis);
 			Class readerClass = (Class) ois.readObject();
 			if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
 				AceLog.getEditLog().fine(
 						"Now reading change set with BinaryChangeSetReader");
 			} else {
-				AceLog.getAppLog()
-						.warning("ReaderClass "
-									+ readerClass.getName()
-									+ " is not assignable from BinaryChangeSetReader...");
+				AceLog
+						.getAppLog()
+						.warning(
+								"ReaderClass "
+										+ readerClass.getName()
+										+ " is not assignable from BinaryChangeSetReader...");
 			}
-
-			Set<TimePathId> values = new HashSet<TimePathId>();
-			try {
-				while (true) {
-					long time = ois.readLong();
-					Object obj = ois.readObject();
-                    count++;
-					if (counter != null) {
-						counter.increment();
-					}
-					if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
-                        conceptCount++;
-						AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
-						ACE.addImported(commitAceBean((UniversalAceBean) obj, time, values));
-					} else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
-                        pathCount++;
-						AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
-						commitAcePath((UniversalAcePath) obj, time);
-					} else {
-						throw new IOException("Can't handle class: "
-								+ obj.getClass().getName());
-					}
-
-				}
-			} catch (EOFException ex) {
-
-			}
-			AceConfig.getVodb().addTimeBranchValues(values);
-            AceLog.getAppLog().info("Change set imported " + count + " change objects. Concepts: " + conceptCount + " paths: " + pathCount);
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		} catch (TerminologyException e) {
-			throw new ToIoException(e);
+			initialized = true;
 		}
 	}
 
@@ -131,7 +171,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		AceLog.getEditLog().fine("Importing new universal path: \n" + path);
 		List<I_Position> origins = null;
 		try {
-			I_Path newPath = AceConfig.getVodb().getPath(getNid(path.getPathId()));
+			I_Path newPath = AceConfig.getVodb().getPath(
+					getNid(path.getPathId()));
 			AceLog.getEditLog().fine(
 					"Importing path that already exists: \n" + path + "\n\n"
 							+ newPath);
@@ -139,8 +180,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			if (path.getOrigins() != null) {
 				origins = new ArrayList<I_Position>(path.getOrigins().size());
 				for (UniversalAcePosition pos : path.getOrigins()) {
-					I_Path thinPath = AceConfig.getVodb().getPath(getNid(pos
-							.getPathId()));
+					I_Path thinPath = AceConfig.getVodb().getPath(
+							getNid(pos.getPathId()));
 					origins.add(new Position(ThinVersionHelper.convert(pos
 							.getTime()), thinPath));
 				}
@@ -152,9 +193,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
 	}
 
-	private ConceptBean commitAceBean(UniversalAceBean bean, long time, Set<TimePathId> values)
-			throws IOException, ClassNotFoundException {
+	private ConceptBean commitAceBean(UniversalAceBean bean, long time,
+			Set<TimePathId> values) throws IOException, ClassNotFoundException {
 		try {
+			if (time == Long.MAX_VALUE) {
+				throw new IOException("commit time = Long.MAX_VALUE");
+			}
 			// Do all the commiting...
 			commitUncommittedIds(time, bean, values);
 			commitUncommittedDescriptions(time, bean, values);
@@ -182,13 +226,15 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		return AceConfig.getVodb().uuidToNative(uids);
 	}
 
-	private void commitConceptAttributeChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
+	private void commitConceptAttributeChanges(long time,
+			UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		if (bean.getConceptAttributes() != null) {
 			UniversalAceConceptAttributes attributes = bean
 					.getConceptAttributes();
-			ThinConVersioned thinAttributes = (ThinConVersioned) AceConfig.getVodb()
-					.getConceptAttributes(getNid(attributes.getConId()));
+			ThinConVersioned thinAttributes = (ThinConVersioned) AceConfig
+					.getVodb().getConceptAttributes(
+							getNid(attributes.getConId()));
 			boolean changed = false;
 			for (UniversalAceConceptAttributesPart part : attributes
 					.getVersions()) {
@@ -200,7 +246,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setDefined(part.isDefined());
 					newPart.setVersion(ThinVersionHelper.convert(time));
 					thinAttributes.addVersion(newPart);
-					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+					values.add(new TimePathId(newPart.getVersion(), newPart
+							.getPathId()));
 				}
 			}
 			if (changed) {
@@ -212,8 +259,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	}
 
 	private void commitUncommittedConceptAttributes(long time,
-			UniversalAceBean bean, Set<TimePathId> values) throws DatabaseException,
-			TerminologyException, IOException {
+			UniversalAceBean bean, Set<TimePathId> values)
+			throws DatabaseException, TerminologyException, IOException {
 		if (bean.getUncommittedConceptAttributes() != null) {
 			UniversalAceConceptAttributes attributes = bean
 					.getUncommittedConceptAttributes();
@@ -231,12 +278,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
 				}
-				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+				values.add(new TimePathId(newPart.getVersion(), newPart
+						.getPathId()));
 				thinAttributes.addVersion(newPart);
 			}
 			try {
-				ThinConVersioned oldVersioned = (ThinConVersioned) AceConfig.getVodb()
-						.getConceptAttributes(thinAttributes.getConId());
+				ThinConVersioned oldVersioned = (ThinConVersioned) AceConfig
+						.getVodb().getConceptAttributes(
+								thinAttributes.getConId());
 				oldVersioned.merge(thinAttributes);
 				AceLog.getEditLog().fine(
 						"Merging attributes with existing (should have been null): \n"
@@ -244,19 +293,21 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			} catch (IOException e) {
 				if (ToIoException.class.isAssignableFrom(e.getClass())) {
 					// expected exception if this is a new concept...
-				}
-				else throw e;
+				} else
+					throw e;
 			}
 			AceConfig.getVodb().writeConcept(thinAttributes);
-			AceLog.getEditLog().fine("Importing attributes: \n" + thinAttributes);
+			AceLog.getEditLog().fine(
+					"Importing attributes: \n" + thinAttributes);
 		}
 	}
 
-	private void commitImageChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
-			throws DatabaseException, TerminologyException, IOException {
+	private void commitImageChanges(long time, UniversalAceBean bean,
+			Set<TimePathId> values) throws DatabaseException,
+			TerminologyException, IOException {
 		for (UniversalAceImage image : bean.getImages()) {
-			ThinImageVersioned thinImage = (ThinImageVersioned) AceConfig.getVodb()
-					.getImage(getNid(image.getImageId()));
+			ThinImageVersioned thinImage = (ThinImageVersioned) AceConfig
+					.getVodb().getImage(getNid(image.getImageId()));
 			boolean changed = false;
 			for (UniversalAceImagePart part : image.getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
@@ -268,18 +319,21 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setTypeId(getNid(part.getTypeId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
 					thinImage.addVersion(newPart);
-					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+					values.add(new TimePathId(newPart.getVersion(), newPart
+							.getPathId()));
 				}
 			}
 			if (changed) {
 				AceConfig.getVodb().writeImage(thinImage);
-				AceLog.getEditLog().fine("Importing image changes: \n" + thinImage);
+				AceLog.getEditLog().fine(
+						"Importing image changes: \n" + thinImage);
 			}
 		}
 	}
 
-	private void commitUncommittedImages(long time, UniversalAceBean bean, Set<TimePathId> values)
-			throws DatabaseException, TerminologyException, IOException {
+	private void commitUncommittedImages(long time, UniversalAceBean bean,
+			Set<TimePathId> values) throws DatabaseException,
+			TerminologyException, IOException {
 		for (UniversalAceImage image : bean.getUncommittedImages()) {
 			ThinImageVersioned thinImage = new ThinImageVersioned(getNid(image
 					.getImageId()), image.getImage(),
@@ -297,12 +351,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
 				}
-				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+				values.add(new TimePathId(newPart.getVersion(), newPart
+						.getPathId()));
 				thinImage.addVersion(newPart);
 			}
 			try {
-				ThinImageVersioned oldVersioned = (ThinImageVersioned) AceConfig.getVodb()
-						.getImage(thinImage.getImageId());
+				ThinImageVersioned oldVersioned = (ThinImageVersioned) AceConfig
+						.getVodb().getImage(thinImage.getImageId());
 				oldVersioned.merge(thinImage);
 				AceLog.getEditLog().fine(
 						"Merging image with existing (should have been null): \n"
@@ -315,7 +370,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		}
 	}
 
-	private void commitUncommittedRelationships(long time, UniversalAceBean bean, Set<TimePathId> values)
+	private void commitUncommittedRelationships(long time,
+			UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
 			ThinRelVersioned thinRel = new ThinRelVersioned(getNid(rel
@@ -336,12 +392,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
 				}
-				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+				values.add(new TimePathId(newPart.getVersion(), newPart
+						.getPathId()));
 				thinRel.addVersion(newPart);
 			}
 			try {
-				ThinRelVersioned oldVersioned = (ThinRelVersioned) AceConfig.getVodb()
-						.getRel(thinRel.getRelId());
+				ThinRelVersioned oldVersioned = (ThinRelVersioned) AceConfig
+						.getVodb().getRel(thinRel.getRelId());
 				oldVersioned.merge(thinRel);
 				AceLog.getEditLog().fine(
 						"Merging rel with existing (should have been null): \n"
@@ -352,18 +409,21 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			AceConfig.getVodb().writeRel(thinRel);
 			if (AceLog.getEditLog().isLoggable(Level.FINE)) {
 				AceLog.getEditLog().fine("Importing rel: \n" + thinRel);
-				List<I_RelVersioned> destRels = AceConfig.getVodb().getDestRels(thinRel.getC2Id());
+				List<I_RelVersioned> destRels = AceConfig.getVodb()
+						.getDestRels(thinRel.getC2Id());
 				if (destRels.contains(thinRel)) {
 					AceLog.getEditLog().fine("found in dest rels.");
 				} else {
-					AceLog.getEditLog().severe("NOT found in dest rels: " + destRels);
+					AceLog.getEditLog().severe(
+							"NOT found in dest rels: " + destRels);
 				}
 			}
 		}
 	}
 
-	private void commitRelationshipChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
-			throws DatabaseException, TerminologyException, IOException {
+	private void commitRelationshipChanges(long time, UniversalAceBean bean,
+			Set<TimePathId> values) throws DatabaseException,
+			TerminologyException, IOException {
 		for (UniversalAceRelationship rel : bean.getSourceRels()) {
 			ThinRelVersioned thinRel = (ThinRelVersioned) AceConfig.getVodb()
 					.getRel(getNid(rel.getRelId()));
@@ -381,7 +441,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setStatusId(getNid(part.getStatusId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
 					thinRel.addVersion(newPart);
-					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+					values.add(new TimePathId(newPart.getVersion(), newPart
+							.getPathId()));
 				}
 			}
 			if (changed) {
@@ -391,11 +452,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		}
 	}
 
-	private void commitDescriptionChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
-			throws DatabaseException, TerminologyException, IOException {
+	private void commitDescriptionChanges(long time, UniversalAceBean bean,
+			Set<TimePathId> values) throws DatabaseException,
+			TerminologyException, IOException {
 		for (UniversalAceDescription desc : bean.getDescriptions()) {
-			ThinDescVersioned thinDesc = (ThinDescVersioned) AceConfig.getVodb()
-					.getDescription(getNid(desc.getDescId()));
+			ThinDescVersioned thinDesc = (ThinDescVersioned) AceConfig
+					.getVodb().getDescription(getNid(desc.getDescId()));
 			boolean changed = false;
 			for (UniversalAceDescriptionPart part : desc.getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
@@ -409,18 +471,21 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setText(part.getText());
 					newPart.setTypeId(getNid(part.getTypeId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
-					values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+					values.add(new TimePathId(newPart.getVersion(), newPart
+							.getPathId()));
 					thinDesc.addVersion(newPart);
 				}
 			}
 			if (changed) {
 				AceConfig.getVodb().writeDescription(thinDesc);
-				AceLog.getEditLog().fine("Importing desc changes: \n" + thinDesc);
+				AceLog.getEditLog().fine(
+						"Importing desc changes: \n" + thinDesc);
 			}
 		}
 	}
 
-	private void commitUncommittedDescriptions(long time, UniversalAceBean bean, Set<TimePathId> values)
+	private void commitUncommittedDescriptions(long time,
+			UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
 			ThinDescVersioned thinDesc = new ThinDescVersioned(getNid(desc
@@ -442,12 +507,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
 				}
-				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+				values.add(new TimePathId(newPart.getVersion(), newPart
+						.getPathId()));
 				thinDesc.addVersion(newPart);
 			}
 			try {
-				ThinDescVersioned oldDescVersioned = (ThinDescVersioned) AceConfig.getVodb()
-						.getDescription(thinDesc.getDescId());
+				ThinDescVersioned oldDescVersioned = (ThinDescVersioned) AceConfig
+						.getVodb().getDescription(thinDesc.getDescId());
 				oldDescVersioned.merge(thinDesc);
 				AceLog.getEditLog().fine(
 						"Merging desc with existing (should have been null): \n"
@@ -460,21 +526,23 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		}
 	}
 
-	private void commitUncommittedIds(long time, UniversalAceBean bean, Set<TimePathId> values)
-			throws DatabaseException, TerminologyException, IOException {
+	private void commitUncommittedIds(long time, UniversalAceBean bean,
+			Set<TimePathId> values) throws DatabaseException,
+			TerminologyException, IOException {
 		for (UniversalAceIdentification id : bean.getUncommittedIds()) {
 			AceLog.getEditLog().fine("commitUncommittedIds: " + id);
 			ThinIdVersioned tid = null;
 			for (UniversalAceIdentificationPart part : id.getVersions()) {
-				I_Path path = AceConfig.getVodb().getPath(AceConfig.getVodb()
-						.uuidToNative(part.getPathId()));
+				I_Path path = AceConfig.getVodb().getPath(
+						AceConfig.getVodb().uuidToNative(part.getPathId()));
 				if (tid == null) {
 					try {
 						int nid = getNid(id.getUIDs());
 						AceLog.getEditLog().fine(
 								"Uncommitted id already exists: \n" + id);
 						tid = (ThinIdVersioned) AceConfig.getVodb().getId(nid);
-						AceLog.getEditLog().fine("found ThinIdVersioned: " + tid);
+						AceLog.getEditLog().fine(
+								"found ThinIdVersioned: " + tid);
 					} catch (NoMappingException ex) {
 						/*
 						 * Generate on the ARCHITECTONIC_BRANCH for now, it will
@@ -482,16 +550,18 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						 * database, with the proper branch and version values.
 						 */
 						int nid = AceConfig.getVodb()
-								.uuidToNativeWithGeneration(id.getUIDs(), Integer.MAX_VALUE,
-										path, ThinVersionHelper.convert(time));
+								.uuidToNativeWithGeneration(id.getUIDs(),
+										Integer.MAX_VALUE, path,
+										ThinVersionHelper.convert(time));
 						tid = new ThinIdVersioned(nid, id.getVersions().size());
-						AceLog.getEditLog().fine("created ThinIdVersioned: " + tid);
+						AceLog.getEditLog().fine(
+								"created ThinIdVersioned: " + tid);
 					}
 				}
 				ThinIdPart newPart = new ThinIdPart();
 				newPart.setIdStatus(getNid(part.getIdStatus()));
-				newPart.setPathId(AceConfig.getVodb()
-								.uuidToNative(part.getPathId()));
+				newPart.setPathId(AceConfig.getVodb().uuidToNative(
+						part.getPathId()));
 				newPart.setSource(getNid(part.getSource()));
 				newPart.setSourceId(part.getSourceId());
 				if (part.getTime() == Long.MAX_VALUE) {
@@ -500,7 +570,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
 				}
-				values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+				values.add(new TimePathId(newPart.getVersion(), newPart
+						.getPathId()));
 				tid.addVersion(newPart);
 				AceLog.getEditLog().fine(" add version: " + newPart);
 			}

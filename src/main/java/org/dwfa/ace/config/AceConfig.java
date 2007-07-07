@@ -709,11 +709,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         config.changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + config.getUsername());
         config.addChangeSetWriters();
 
-  		af.getAddressesList().add("va.user1.editor");
-  		af.getAddressesList().add("va.user1.assignmentManager");
- 		af.getAddressesList().add("kp.user2.editor");
- 		af.getAddressesList().add("kp.user3.editor");
- 		af.getAddressesList().add("va.user4.editor");
 		config.aceFrames.add(af);
 		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);

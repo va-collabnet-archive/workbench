@@ -39,7 +39,7 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.bpa.data.ArrayListModel;
+import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
@@ -113,7 +113,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient AceConfig masterConfig; 
     
     // 17
-    private ArrayListModel<String> addressesList = new ArrayListModel<String>();
+    private SortedSetModel<String> addressesList = new SortedSetModel<String>();
     
     // 18
     private String adminUsername;
@@ -124,7 +124,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     //20
     private boolean showAllQueues = false;
-    private ArrayListModel<String> queueAddressesToShow = new ArrayListModel<String>();
+    private SortedSetModel<String> queueAddressesToShow = new SortedSetModel<String>();
     
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -340,26 +340,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
              }
             
             if (objDataVersion >= 17) {
-            	List<String> listObject = (List<String>) in.readObject();
-            	if (ArrayList.class.isAssignableFrom(listObject.getClass())) {
-            		addressesList = (ArrayListModel<String>) listObject;
-            	} else {
-               		addressesList = new ArrayListModel<String>(listObject);
-            	}
-            	if (addressesList.size() == 0) {
-            		addressesList.add("va.user1.editor");
-            		addressesList.add("va.user1.assignmentManager");
-            		addressesList.add("kp.user2.editor");
-            		addressesList.add("kp.user3.editor");
-            		addressesList.add("va.user4.editor");
-            	}
+           		addressesList = new SortedSetModel<String>((Collection<String>) in.readObject());
             } else {
-         		addressesList = new ArrayListModel<String>();
-         		addressesList.add("va.user1.editor");
-        		addressesList.add("va.user1.assignmentManager");
-        		addressesList.add("kp.user2.editor");
-        		addressesList.add("kp.user3.editor");
-        		addressesList.add("va.user4.editor");
+         		addressesList = new SortedSetModel<String>();
             }
             if (objDataVersion >= 18) {
             	adminUsername = (String) in.readObject();
@@ -375,10 +358,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 20) {
                 showAllQueues = in.readBoolean();
-                queueAddressesToShow = (ArrayListModel<String>) in.readObject();
+                queueAddressesToShow = new SortedSetModel<String>((Collection<String>) in.readObject());
             } else {
                 showAllQueues = false;
-                queueAddressesToShow = new ArrayListModel<String>();
+                queueAddressesToShow = new SortedSetModel<String>();
                 queueAddressesToShow.add(username);
             }
        } else {
@@ -1123,7 +1106,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 
-	public ArrayListModel<String> getAddressesList() {
+	public SortedSetModel<String> getAddressesList() {
 		return addressesList;
 	}
 
@@ -1280,12 +1263,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
 
-    public ArrayListModel<String> getQueueAddressesToShow() {
+    public SortedSetModel<String> getQueueAddressesToShow() {
         return queueAddressesToShow;
     }
 
 
-    public void setQueueAddressesToShow(ArrayListModel<String> queueAddressesToShow) {
+    public void setQueueAddressesToShow(SortedSetModel<String> queueAddressesToShow) {
         this.queueAddressesToShow = queueAddressesToShow;
     }
 
