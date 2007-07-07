@@ -1844,7 +1844,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
 
         signpostPanel = new JPanel();
-        signpostPanel.add(new JLabel("Signpost Panel"));
+        signpostPanel.add(new JLabel("Signpost Panel " + new Date()));
 
         return bottomPanel;
     }
