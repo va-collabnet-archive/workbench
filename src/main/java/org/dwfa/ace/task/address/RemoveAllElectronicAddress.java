@@ -59,7 +59,7 @@ public class RemoveAllElectronicAddress extends AbstractTask {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-            List<String> list = configFrame.getAddressesList();
+            Collection<String> list = configFrame.getAddressesList();
             list.clear();
 
             list = configFrame.getAddressesList();

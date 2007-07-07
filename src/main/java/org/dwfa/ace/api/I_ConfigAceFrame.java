@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 
 public interface I_ConfigAceFrame {
@@ -195,7 +196,7 @@ public interface I_ConfigAceFrame {
 	public void selectConceptViewer(int hostIndex);
 	
 	
-	public List<String> getAddressesList();
+	public SortedSetModel<String> getAddressesList();
 	
 	public List<String> getSelectedAddresses();
 	
@@ -230,7 +231,7 @@ public interface I_ConfigAceFrame {
     
     public void setShowProcessBuilder(boolean show);
     
-    public List<String> getQueueAddressesToShow();
+    public Collection<String> getQueueAddressesToShow();
     
     public JPanel getWorkflowPanel();
     

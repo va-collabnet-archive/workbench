@@ -3,7 +3,10 @@ package org.dwfa.ace.task.signpost;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -51,16 +54,24 @@ public class SetShowSignpostPanel extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
+        final I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
+        .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+             SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+		            configFrame.setShowSignpostPanel(show);
+				}
+            });
 
-            configFrame.setShowSignpostPanel(show);
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        }
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+		} catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+		}
     }
 
     public int[] getDataContainerIds() {

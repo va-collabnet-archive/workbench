@@ -11,7 +11,7 @@ public class InstructAndWaitBeanInfo extends SimpleBeanInfo {
 	   public PropertyDescriptor[] getPropertyDescriptors() {
 	        try {  
 	            PropertyDescriptor instruction =
-	                new PropertyDescriptor("instruction", InstructAndWait.class);
+	                new PropertyDescriptor("instruction", getBeanDescriptor().getBeanClass());
 	            instruction.setBound(true);
 	            instruction.setPropertyEditorClass(JTextFieldEditor.class);
 	            instruction.setDisplayName("<html><font color='green'>Instruction:");

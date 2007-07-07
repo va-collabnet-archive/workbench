@@ -59,7 +59,7 @@ public class RemoveElectronicAddress extends AbstractTask {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-            List<String> list = configFrame.getAddressesList();
+            Collection<String> list = configFrame.getAddressesList();
             Iterator iterator = list.iterator();
             while (iterator.hasNext()) {
                 if (worker.getLogger().isLoggable(Level.INFO)) {

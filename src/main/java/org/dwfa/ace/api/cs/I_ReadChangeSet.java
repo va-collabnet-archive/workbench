@@ -6,6 +6,10 @@ import java.io.Serializable;
 
 public interface I_ReadChangeSet extends Serializable {
 	
+	public long nextCommitTime() throws IOException, ClassNotFoundException;
+
+	public void readUntil(long time) throws IOException, ClassNotFoundException;
+
 	public void read() throws IOException, ClassNotFoundException;
 
 	public void setChangeSetFile(File changeSetFile);
