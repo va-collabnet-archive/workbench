@@ -354,6 +354,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 upperLowerSplit.setDividerLocation(upperLowerSplit.getHeight());
                 hidden = true;
             }
+            resizePalttes();
         }
 
     }
@@ -417,20 +418,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private class ResizeComponentAdaptor extends ComponentAdapter {
         @Override
         public void componentResized(ComponentEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    if (queuePalette != null) {
-                        queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
-                                             conceptTabs.getHeight() + 4);
-                    }
-                    if (processPalette != null) {
-                        processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
-                                               conceptTabs.getHeight() + 4);
-                    }
-                }
-
-            });
+            resizePalttes();
         }
 
     }
@@ -749,6 +737,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             throw new RuntimeException(e);
         }
         searchPanel = new SearchPanel(aceFrameConfig);
+        searchPanel.addComponentListener(new ResizePalettesListener());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -1845,8 +1834,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         signpostPanel = new JPanel();
         signpostPanel.add(new JLabel("Signpost Panel " + new Date()));
+        signpostPanel.addComponentListener(new ResizePalettesListener());
+
 
         return bottomPanel;
+    }
+    public class ResizePalettesListener implements ComponentListener {
+		public void componentHidden(ComponentEvent e) {
+			resizePalttes();	
+		}
+
+		public void componentMoved(ComponentEvent e) {
+			resizePalttes();	
+		}
+
+		public void componentResized(ComponentEvent e) {
+			resizePalttes();	
+		}
+
+		public void componentShown(ComponentEvent e) {
+			resizePalttes();	
+		}
     }
 
     public void addTreeSelectionListener(TreeSelectionListener tsl) {
@@ -2084,5 +2092,42 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setSignpostToggleIcon(ImageIcon icon) {
         showSignpostPanelToggle.setIcon(icon);
     }
+
+	private void resizePalttes() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+		    public void run() {
+		        if (queuePalette != null) {
+		            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+		                                 conceptTabs.getHeight() + 4);
+                    revalidateAllParents(queuePalette);
+                    //revalidateAllDescendants(queuePalette);
+		        }
+		        if (processPalette != null) {
+		            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+		                                   conceptTabs.getHeight() + 4);
+                    revalidateAllParents(processPalette);
+                    //revalidateAllDescendants(processPalette);
+		        }
+		    }
+
+			private void revalidateAllParents(Container cont) {
+				while (cont != null) {
+				    cont.validate();
+				    cont = cont.getParent();
+				}
+			}
+			private void revalidateAllDescendants(Container cont) {
+				while (cont != null) {
+				    cont.validate();
+				    for (Component desc: cont.getComponents()) {
+				    	if (Container.class.isAssignableFrom(desc.getClass())) {
+				    		revalidateAllDescendants((Container) desc);
+				    	}
+				    }
+				}
+			}
+		});
+	}
 
 }
