@@ -17,7 +17,7 @@ import javax.swing.JComboBox;
 
 public abstract class AbstractComboEditor implements PropertyEditor, ItemListener {
 
-	private class EditorComponent extends JComboBox {
+	public class EditorComponent extends JComboBox {
 
 		/**
 		 * 
