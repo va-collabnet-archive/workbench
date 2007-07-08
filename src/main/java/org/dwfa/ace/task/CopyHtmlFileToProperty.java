@@ -19,7 +19,7 @@ import org.dwfa.util.io.FileIO;
 @BeanList(specs = 
 { @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN)})
 /**
- * Write the contents of an html file to a property
+ * Copy the contents of an html file to a property
  * @author Susan Castillo
  *
  */
@@ -58,9 +58,9 @@ public class CopyHtmlFileToProperty extends AbstractTask {
         try {
 
 			String detailHtmlFileName = (String) process.readProperty(detailHtmlFileNameProp);			
-			worker.getLogger().info("html file is: " + detailHtmlFileName);
+//			worker.getLogger().info("html file is: " + detailHtmlFileName);
 			String dataString = FileIO.readerToString(new FileReader(detailHtmlFileName));
-			worker.getLogger().info("data String is: "+dataString);
+//			worker.getLogger().info("data String is: "+dataString);
 			process.setProperty(htmlDataPropName, dataString);
 			
             return Condition.CONTINUE;
