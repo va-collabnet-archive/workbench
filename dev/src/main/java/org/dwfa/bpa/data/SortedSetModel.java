@@ -61,7 +61,7 @@ public class SortedSetModel<T> implements ListModel, SortedSet<T>, Serializable 
 
 	public SortedSetModel() {
 		super();
-		this.data = Collections.synchronizedSortedSet(new TreeSet<T>(data));
+		this.data = Collections.synchronizedSortedSet(new TreeSet<T>());
 	}
 
 	/**
