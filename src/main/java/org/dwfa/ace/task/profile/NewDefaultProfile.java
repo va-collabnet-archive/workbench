@@ -132,7 +132,7 @@ public class NewDefaultProfile extends AbstractTask {
         activeConfig.setAdminPassword(adminPassword);
         activeConfig.setAdminUsername(adminUsername);
 
-        I_IntSet statusPopupTypes = tf.newIntSet();
+        I_IntList statusPopupTypes = tf.newIntList();
         statusPopupTypes.add(tf.uuidToNative(Concept.ACTIVE.getUids()));
         statusPopupTypes.add(tf.uuidToNative(Concept.CURRENT.getUids()));
         statusPopupTypes.add(tf.uuidToNative(Concept.FLAGGED_FOR_REVIEW.getUids()));
@@ -151,7 +151,7 @@ public class NewDefaultProfile extends AbstractTask {
         statusPopupTypes.add(tf.uuidToNative(Concept.PENDING_MOVE.getUids()));
         activeConfig.setEditStatusTypePopup(statusPopupTypes);
 
-        I_IntSet descPopupTypes = tf.newIntSet();
+        I_IntList descPopupTypes = tf.newIntList();
         descPopupTypes.add(tf.uuidToNative(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
         descPopupTypes.add(tf.uuidToNative(Concept.PREFERRED_DESCRIPTION_TYPE.getUids()));
         descPopupTypes.add(tf.uuidToNative(Concept.SYNONYM_DESCRIPTION_TYPE.getUids()));
@@ -160,7 +160,7 @@ public class NewDefaultProfile extends AbstractTask {
         descPopupTypes.add(tf.uuidToNative(Concept.XHTML_DEF.getUids()));
         activeConfig.setEditDescTypePopup(descPopupTypes);
 
-        I_IntSet relCharacteristic = tf.newIntSet();
+        I_IntList relCharacteristic = tf.newIntList();
         relCharacteristic.add(tf.uuidToNative(Concept.STATED_RELATIONSHIP.getUids()));
         relCharacteristic.add(tf.uuidToNative(Concept.INFERRED_RELATIONSHIP.getUids()));
         relCharacteristic.add(tf.uuidToNative(Concept.QUALIFIER_CHARACTERISTIC.getUids()));
@@ -168,13 +168,13 @@ public class NewDefaultProfile extends AbstractTask {
         relCharacteristic.add(tf.uuidToNative(Concept.ADDITIONAL_CHARACTERISTIC.getUids()));
         activeConfig.setEditRelCharacteristicPopup(relCharacteristic);
 
-        I_IntSet relRefinabilty = tf.newIntSet();
+        I_IntList relRefinabilty = tf.newIntList();
         relRefinabilty.add(tf.uuidToNative(Concept.MANDATORY_REFINABILITY.getUids()));
         relRefinabilty.add(tf.uuidToNative(Concept.OPTIONAL_REFINABILITY.getUids()));
         relRefinabilty.add(tf.uuidToNative(Concept.NOT_REFINABLE.getUids()));
         activeConfig.setEditRelRefinabiltyPopup(relRefinabilty);
 
-        I_IntSet relTypes = tf.newIntSet();
+        I_IntList relTypes = tf.newIntList();
         relTypes.add(tf.uuidToNative(Concept.IS_A_REL.getUids()));
 
         try {

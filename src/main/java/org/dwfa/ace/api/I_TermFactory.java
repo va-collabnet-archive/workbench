@@ -142,5 +142,7 @@ public interface I_TermFactory {
     public int convertToThinVersion(String dateStr) throws java.text.ParseException;
     public long convertToThickVersion(int version);
 
+	public I_IntList newIntList();
+
 
 }

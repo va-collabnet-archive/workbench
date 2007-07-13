@@ -49,6 +49,12 @@ public interface I_ConfigAceFrame {
 
 	public void setSourceRelTypes(I_IntSet browseDownRels);
 
+	/**
+	 * Get the destination rel types that should be used
+	 * to determine children of a concept in a hierarchy
+	 * display. These types are typically the is-a relationship
+	 * types. 
+	 */
 	public I_IntSet getDestRelTypes();
 
 	public void setDestRelTypes(I_IntSet browseUpRels);
@@ -90,25 +96,25 @@ public interface I_ConfigAceFrame {
 
 	public void setRoots(I_IntSet roots);
 
-	public I_IntSet getEditDescTypePopup();
+	public I_IntList getEditDescTypePopup();
 
-	public I_IntSet getEditRelCharacteristicPopup();
+	public I_IntList getEditRelCharacteristicPopup();
 
-	public I_IntSet getEditRelRefinabiltyPopup();
+	public I_IntList getEditRelRefinabiltyPopup();
 
-	public I_IntSet getEditRelTypePopup();
+	public I_IntList getEditRelTypePopup();
 
-	public I_IntSet getEditStatusTypePopup();
+	public I_IntList getEditStatusTypePopup();
 
-	public void setEditDescTypePopup(I_IntSet editDescTypePopup);
+	public void setEditDescTypePopup(I_IntList editDescTypePopup);
 
-	public void setEditRelCharacteristicPopup(I_IntSet editRelCharacteristicPopup);
+	public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup);
 
-	public void setEditRelRefinabiltyPopup(I_IntSet editRelRefinabiltyPopup);
+	public void setEditRelRefinabiltyPopup(I_IntList editRelRefinabiltyPopup);
 
-	public void setEditRelTypePopup(I_IntSet editRelTypePopup);
+	public void setEditRelTypePopup(I_IntList editRelTypePopup);
 
-	public void setEditStatusTypePopup(I_IntSet editStatusTypePopup);
+	public void setEditStatusTypePopup(I_IntList editStatusTypePopup);
 
 	public I_IntSet getInferredViewTypes();
 

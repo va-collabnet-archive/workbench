@@ -67,5 +67,7 @@ public interface I_IntList extends ListDataListener {
 	public <T> T[] toArray(T[] a);
 
 	public List<Integer> getListValues();
+	
+	public int[] getListArray();
 
 }
