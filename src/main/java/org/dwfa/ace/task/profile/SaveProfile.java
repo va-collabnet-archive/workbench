@@ -70,16 +70,26 @@ public class SaveProfile extends AbstractTask {
             String username = (String) process.readProperty(usernamePropName);
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
             aceConfig.getAceFrames().add(profile);
-            aceConfig.setChangeSetRoot(new File("profiles" + File.separator + "users" + File.separator + username));
+            File userDir = new File("profiles" + File.separator + "users" + File.separator + username);
+            File changeSetRoot = new File(userDir, "changesets");
+            changeSetRoot.mkdirs();
+            aceConfig.setChangeSetRoot(changeSetRoot);
             aceConfig.setChangeSetWriterFileName(username + "." + UUID.randomUUID().toString() + ".jcs");
-            File profileFile = new File(profileDir, username + File.separator + username + ".ace");
+            
+            File profileFile = new File(userDir, username + ".ace");
             profileFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(profileFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(aceConfig);
             oos.close();
+
+            File startupFolder = new File(userDir, "startup");
+            startupFolder.mkdirs();
             
+            File shutdownFolder = new File(userDir, "shutdown");
+            shutdownFolder.mkdirs();
+         
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
