@@ -144,7 +144,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 	public static IntSet readIntSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int size = in.readInt();
 		if (size == Integer.MIN_VALUE) {
-			return null;
+			return new IntSet();
 		}
 		int[] set = new int[size];
         for (int i = 0; i < size; i++) {

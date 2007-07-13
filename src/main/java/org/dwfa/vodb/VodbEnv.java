@@ -45,6 +45,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
+import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -99,6 +100,7 @@ import org.dwfa.vodb.types.I_ProcessImageEntries;
 import org.dwfa.vodb.types.I_ProcessPathEntries;
 import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 import org.dwfa.vodb.types.I_ProcessTimeBranchEntries;
+import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
@@ -2616,5 +2618,9 @@ public class VodbEnv implements I_ImplementTermFactory {
     public int convertToThinVersion(String dateStr) throws java.text.ParseException {
         return ThinVersionHelper.convert(dateStr);
     }
+
+	public I_IntList newIntList() {
+		return new IntList();
+	}
 
 }

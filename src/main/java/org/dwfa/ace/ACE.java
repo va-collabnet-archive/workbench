@@ -94,6 +94,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
@@ -107,6 +108,8 @@ import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.ConceptPanel.LINK_TYPE;
+import org.dwfa.ace.list.TerminologyIntList;
+import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
@@ -132,6 +135,7 @@ import org.dwfa.svn.SvnPanel;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntList;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -1271,6 +1275,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         terminologyList.setBorder(BorderFactory.createTitledBorder(title));
         return terminologyList;
     }
+    private TerminologyIntList makeTermList(String title, I_IntList list) {
+    	TerminologyIntListModel termListModel = new TerminologyIntListModel((IntList) list);
+    	TerminologyIntList terminologyList = new TerminologyIntList(termListModel);
+        terminologyList.setBorder(BorderFactory.createTitledBorder(title));
+        return terminologyList;
+    }
 
     private JComponent makeStatusPrefPanel() {
         TerminologyListModel statusValuesModel = new TerminologyListModel();
@@ -1386,9 +1396,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         defaultsPanel.add(defaultStatusPanel);
     }
 
-    private JComponent makePopupConfigPanel(I_IntSet set, String borderLabel) {
+    private JComponent makePopupConfigPanel(I_IntList list, String borderLabel) {
 
-        TerminologyList popupList = makeTermList(borderLabel, set);
+    	TerminologyIntList popupList = makeTermList(borderLabel, list);
 
         JPanel popupPanel = new JPanel(new GridLayout(0, 1));
         popupPanel.add(new JScrollPane(popupList));
@@ -2135,6 +2145,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 				    cont = cont.getParent();
 				}
 			}
+			@SuppressWarnings("unused")
 			private void revalidateAllDescendants(Container cont) {
 				while (cont != null) {
 				    cont.validate();

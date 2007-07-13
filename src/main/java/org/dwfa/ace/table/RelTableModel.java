@@ -36,7 +36,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -433,16 +433,6 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         return false;
     }
 
-    private boolean allUncommitted(I_RelTuple rel) {
-        boolean allUncomitted = true;
-        for (I_RelTuple t : rel.getFixedPart().getTuples()) {
-            if (t.getVersion() != Integer.MAX_VALUE) {
-                allUncomitted = false;
-                continue;
-            }
-        }
-        return allUncomitted;
-    }
 
     public void setValueAt(Object value, int row, int col) {
         I_RelTuple rel = allTuples.get(row);
@@ -571,7 +561,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         @Override
         public int[] getPopupValues() {
-            return config.getEditStatusTypePopup().getSetValues();
+            return config.getEditStatusTypePopup().getListArray();
         }
 
         @Override
@@ -602,7 +592,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         @Override
         public int[] getPopupValues() {
-            return config.getEditRelRefinabiltyPopup().getSetValues();
+            return config.getEditRelRefinabiltyPopup().getListArray();
         }
 
         @Override
@@ -633,7 +623,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         @Override
         public int[] getPopupValues() {
-            return config.getEditRelCharacteristicPopup().getSetValues();
+            return config.getEditRelCharacteristicPopup().getListArray();
         }
 
         @Override
@@ -664,7 +654,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         @Override
         public int[] getPopupValues() {
-            return config.getEditRelTypePopup().getSetValues();
+            return config.getEditRelTypePopup().getListArray();
         }
 
         @Override
@@ -835,8 +825,8 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             }
         }
 
-        private void addSubmenuItems(JMenu menu, FieldToChange field, I_IntSet possibleValues) throws TerminologyException, IOException {
-            for (int id : possibleValues.getSetValues()) {
+        private void addSubmenuItems(JMenu menu, FieldToChange field, I_IntList possibleValues) throws TerminologyException, IOException {
+            for (int id : possibleValues.getListValues()) {
                 I_GetConceptData possibleValue = LocalVersionedTerminology.get().getConcept(id);
                 JMenuItem changeStatusItem = new JMenuItem(possibleValue.toString());
                 changeStatusItem.addActionListener(new ChangeFieldActionListener(possibleValue.getUids(),

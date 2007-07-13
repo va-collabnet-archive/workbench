@@ -77,11 +77,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_IntSet parentExpandedNodes = new IntSet();
     private I_IntSet roots = new IntSet();
     
-    private I_IntSet editRelTypePopup = new IntSet();
-    private I_IntSet editRelRefinabiltyPopup = new IntSet();
-    private I_IntSet editRelCharacteristicPopup = new IntSet();
-    private I_IntSet editDescTypePopup = new IntSet();
-    private I_IntSet editStatusTypePopup = new IntSet();
+    private I_IntList editRelTypePopup = new IntList();
+    private I_IntList editRelRefinabiltyPopup = new IntList();
+    private I_IntList editRelCharacteristicPopup = new IntList();
+    private I_IntList editDescTypePopup = new IntList();
+    private I_IntList editStatusTypePopup = new IntList();
 
     private I_IntSet statedViewTypes = new IntSet();
     private I_IntSet inferredViewTypes = new IntSet();
@@ -147,11 +147,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntSet.writeIntSet(out, parentExpandedNodes);
         IntSet.writeIntSet(out, roots);
         
-        IntSet.writeIntSet(out, editRelTypePopup);
-        IntSet.writeIntSet(out, editRelRefinabiltyPopup);
-        IntSet.writeIntSet(out, editRelCharacteristicPopup);
-        IntSet.writeIntSet(out, editDescTypePopup);
-        IntSet.writeIntSet(out, editStatusTypePopup);
+        IntList.writeIntList(out, editRelTypePopup);
+        IntList.writeIntList(out, editRelRefinabiltyPopup);
+        IntList.writeIntList(out, editRelCharacteristicPopup);
+        IntList.writeIntList(out, editDescTypePopup);
+        IntList.writeIntList(out, editStatusTypePopup);
 
         IntSet.writeIntSet(out, statedViewTypes);
         IntSet.writeIntSet(out, inferredViewTypes);
@@ -246,17 +246,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	roots = new IntSet();
             }
             if (objDataVersion >= 6) {
-                editRelTypePopup = IntSet.readIntSet(in);
-                editRelRefinabiltyPopup = IntSet.readIntSet(in);
-                editRelCharacteristicPopup = IntSet.readIntSet(in);
-                editDescTypePopup = IntSet.readIntSet(in);
-                editStatusTypePopup = IntSet.readIntSet(in);
+                editRelTypePopup = IntList.readIntList(in);
+                editRelRefinabiltyPopup = IntList.readIntList(in);
+                editRelCharacteristicPopup = IntList.readIntList(in);
+                editDescTypePopup = IntList.readIntList(in);
+                editStatusTypePopup = IntList.readIntList(in);
             } else {
-                editRelTypePopup = new IntSet();
-                editRelRefinabiltyPopup = new IntSet();
-                editRelCharacteristicPopup = new IntSet();
-                editDescTypePopup = new IntSet();
-                editStatusTypePopup = new IntSet();
+                editRelTypePopup = new IntList();
+                editRelRefinabiltyPopup = new IntList();
+                editRelCharacteristicPopup = new IntList();
+                editDescTypePopup = new IntList();
+                editStatusTypePopup = new IntList();
             }
             if (objDataVersion >= 7) {
                 statedViewTypes = IntSet.readIntSet(in);
@@ -323,8 +323,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } 
             if (objDataVersion >= 13) {
                 // Do nothing here, the change set readers and writers are now managed differently, and should be null... 
-            	Collection<I_ReadChangeSet> readers = (Collection<I_ReadChangeSet>) in.readObject();
-            	Collection<I_WriteChangeSet> writers = (Collection<I_WriteChangeSet>) in.readObject();
+            	@SuppressWarnings("unused")
+				Collection<I_ReadChangeSet> readers = (Collection<I_ReadChangeSet>) in.readObject();
+            	@SuppressWarnings("unused")
+				Collection<I_WriteChangeSet> writers = (Collection<I_WriteChangeSet>) in.readObject();
             }
             if (objDataVersion >= 14) {
         		in.readObject(); // repositoryUrlStr deprecated
@@ -669,7 +671,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditDescTypePopup()
 	 */
-	public I_IntSet getEditDescTypePopup() {
+	public I_IntList getEditDescTypePopup() {
 		return editDescTypePopup;
 	}
 
@@ -677,7 +679,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelCharacteristicPopup()
 	 */
-	public I_IntSet getEditRelCharacteristicPopup() {
+	public I_IntList getEditRelCharacteristicPopup() {
 		return editRelCharacteristicPopup;
 	}
 
@@ -685,7 +687,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelRefinabiltyPopup()
 	 */
-	public I_IntSet getEditRelRefinabiltyPopup() {
+	public I_IntList getEditRelRefinabiltyPopup() {
 		return editRelRefinabiltyPopup;
 	}
 
@@ -693,7 +695,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditRelTypePopup()
 	 */
-	public I_IntSet getEditRelTypePopup() {
+	public I_IntList getEditRelTypePopup() {
 		return editRelTypePopup;
 	}
 
@@ -701,7 +703,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditStatusTypePopup()
 	 */
-	public I_IntSet getEditStatusTypePopup() {
+	public I_IntList getEditStatusTypePopup() {
 		return editStatusTypePopup;
 	}
 
@@ -709,7 +711,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditDescTypePopup(org.dwfa.ace.api.IntSet)
 	 */
-	public void setEditDescTypePopup(I_IntSet editDescTypePopup) {
+	public void setEditDescTypePopup(I_IntList editDescTypePopup) {
 		this.editDescTypePopup = editDescTypePopup;
 	}
 
@@ -717,7 +719,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelCharacteristicPopup(org.dwfa.ace.api.IntSet)
 	 */
-	public void setEditRelCharacteristicPopup(I_IntSet editRelCharacteristicPopup) {
+	public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup) {
 		this.editRelCharacteristicPopup = editRelCharacteristicPopup;
 	}
 
@@ -725,7 +727,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelRefinabiltyPopup(org.dwfa.ace.api.IntSet)
 	 */
-	public void setEditRelRefinabiltyPopup(I_IntSet editRelRefinabiltyPopup) {
+	public void setEditRelRefinabiltyPopup(I_IntList editRelRefinabiltyPopup) {
 		this.editRelRefinabiltyPopup = editRelRefinabiltyPopup;
 	}
 
@@ -733,7 +735,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelTypePopup(org.dwfa.ace.api.IntSet)
 	 */
-	public void setEditRelTypePopup(I_IntSet editRelTypePopup) {
+	public void setEditRelTypePopup(I_IntList editRelTypePopup) {
 		this.editRelTypePopup = editRelTypePopup;
 	}
 
@@ -741,7 +743,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditStatusTypePopup(org.dwfa.ace.api.IntSet)
 	 */
-	public void setEditStatusTypePopup(I_IntSet editStatusTypePopup) {
+	public void setEditStatusTypePopup(I_IntList editStatusTypePopup) {
 		this.editStatusTypePopup = editStatusTypePopup;
 	}
 

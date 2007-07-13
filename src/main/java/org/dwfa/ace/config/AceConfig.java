@@ -55,6 +55,7 @@ import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
@@ -377,7 +378,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			af.addEditingPath(pos.getPath());
 			break;
 		}
-		IntSet statusPopupTypes = new IntSet();
+		IntList statusPopupTypes = new IntList();
 		statusPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
 		statusPopupTypes
@@ -431,7 +432,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 				.getNativeId());
 		af.setEditStatusTypePopup(statusPopupTypes);
 
-		IntSet descPopupTypes = new IntSet();
+		IntList descPopupTypes = new IntList();
 		descPopupTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 						.getUids()).getNativeId());
@@ -453,7 +454,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 				.getNativeId());
 		af.setEditDescTypePopup(descPopupTypes);
 
-		IntSet relCharacteristic = new IntSet();
+		IntList relCharacteristic = new IntList();
 		relCharacteristic.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids())
 				.getNativeId());
@@ -471,7 +472,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 						.getUids()).getNativeId());
 		af.setEditRelCharacteristicPopup(relCharacteristic);
 
-		IntSet relRefinabilty = new IntSet();
+		IntList relRefinabilty = new IntList();
 		relRefinabilty.add(AceConfig.getVodb()
 				.getId(
 						ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY
@@ -484,7 +485,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 				.getNativeId());
 		af.setEditRelRefinabiltyPopup(relRefinabilty);
 
-		IntSet relTypes = new IntSet();
+		IntList relTypes = new IntList();
 		relTypes.add(AceConfig.getVodb().getId(
 				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
 				.getNativeId());

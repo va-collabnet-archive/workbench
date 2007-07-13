@@ -355,7 +355,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 		@Override
 		public int[] getPopupValues() {
-			return config.getEditDescTypePopup().getSetValues();
+			return config.getEditDescTypePopup().getListArray();
 		}
 
 		@Override
@@ -385,7 +385,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 		@Override
 		public int[] getPopupValues() {
-			return config.getEditStatusTypePopup().getSetValues();
+			return config.getEditStatusTypePopup().getListArray();
 		}
 
 		@Override

@@ -12,82 +12,99 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.swing.AbstractListModel;
+import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;
 
 public class IntList implements ListDataListener, I_IntList {
 	private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
-	
+
 	private List<Integer> listValues = new ArrayList<Integer>(2);
-	
+
 	public IntList(int[] values) {
 		super();
-		for (int i: values) {
+		for (int i : values) {
 			this.listValues.add(i);
 		}
 	}
+
 	public IntList() {
 		super();
 	}
 
-	
-	public static void writeIntList(ObjectOutputStream out, IntList list) throws IOException {
+	public static void writeIntList(ObjectOutputStream out, I_IntList list)
+			throws IOException {
 		if (list == null) {
 			out.writeInt(Integer.MIN_VALUE);
 			return;
 		}
 		out.writeInt(list.size());
-        for (int i: list.listValues) {
-        	try {
+		for (int i : list.getListValues()) {
+			try {
 				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);
 				throw newEx;
 			}
-        }
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public static IntList readIntList(ObjectInputStream in) throws IOException, ClassNotFoundException {
+	public static IntList readIntList(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
 		int size = in.readInt();
 		if (size == Integer.MIN_VALUE) {
 			return new IntList();
 		}
 		int[] list = new int[size];
-        for (int i = 0; i < size; i++) {
-        	try {
-        		list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+		for (int i = 0; i < size; i++) {
+			try {
+				list[i] = AceConfig.getVodb().uuidToNative(
+						(List<UUID>) in.readObject());
 			} catch (TerminologyException e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);
 				throw newEx;
-			} 
-        }
-        IntList returnSet = new IntList(list);
-        return returnSet;
+			}
+		}
+		IntList returnSet = new IntList(list);
+		return returnSet;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#contentsChanged(javax.swing.event.ListDataEvent)
 	 */
 	public void contentsChanged(ListDataEvent e) {
 		handleChange(e);
-		for (ListDataListener l: listeners) {
+		for (ListDataListener l : listeners) {
 			l.contentsChanged(e);
 		}
 	}
 
 	private void handleChange(ListDataEvent e) {
-		AbstractListModel model = (AbstractListModel) e.getSource();
+		if (e.getSource() == this) {
+			return;
+		}
+		ListModel model = (ListModel) e.getSource();
+		if (TerminologyIntListModel.class.isAssignableFrom(e.getSource()
+				.getClass())) {
+			TerminologyIntListModel intListModel = (TerminologyIntListModel) e
+					.getSource();
+			if (intListModel.getElements() == this) {
+				return;
+			}
+		}
 		clear();
 		for (int i = 0; i < model.getSize(); i++) {
 			I_GetConceptData cb = (I_GetConceptData) model.getElementAt(i);
@@ -95,180 +112,293 @@ public class IntList implements ListDataListener, I_IntList {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#intervalAdded(javax.swing.event.ListDataEvent)
 	 */
 	public void intervalAdded(ListDataEvent e) {
 		handleChange(e);
-		for (ListDataListener l: listeners) {
+		for (ListDataListener l : listeners) {
 			l.intervalAdded(e);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#intervalRemoved(javax.swing.event.ListDataEvent)
 	 */
 	public void intervalRemoved(ListDataEvent e) {
 		handleChange(e);
-		for (ListDataListener l: listeners) {
+		for (ListDataListener l : listeners) {
 			l.intervalRemoved(e);
 		}
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#addListDataListener(javax.swing.event.ListDataListener)
 	 */
 	public boolean addListDataListener(ListDataListener o) {
 		return listeners.add(o);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#removeListDataListener(javax.swing.event.ListDataListener)
 	 */
 	public boolean removeListDataListener(ListDataListener o) {
 		return listeners.remove(o);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#add(int, java.lang.Integer)
 	 */
 	public void add(int index, Integer element) {
 		listValues.add(index, element);
+		handleChange(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index -1, listValues.size()));
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#add(java.lang.Integer)
 	 */
 	public boolean add(Integer o) {
-		return listValues.add(o);
+		boolean returnValue = listValues.add(o);
+		intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, listValues.size() -1, listValues.size()));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#addAll(java.util.Collection)
 	 */
 	public boolean addAll(Collection<? extends Integer> c) {
-		return listValues.addAll(c);
+		boolean returnValue =  listValues.addAll(c);
+		intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, listValues.size()));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#addAll(int, java.util.Collection)
 	 */
 	public boolean addAll(int index, Collection<? extends Integer> c) {
-		return listValues.addAll(index, c);
+		boolean returnValue =  listValues.addAll(index, c);
+		intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, listValues.size()));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#clear()
 	 */
 	public void clear() {
+		int oldSize = listValues.size();
 		listValues.clear();
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize));
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#contains(java.lang.Object)
 	 */
 	public boolean contains(Object o) {
 		return listValues.contains(o);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#containsAll(java.util.Collection)
 	 */
 	public boolean containsAll(Collection<?> c) {
 		return listValues.containsAll(c);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#get(int)
 	 */
 	public Integer get(int index) {
 		return listValues.get(index);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#indexOf(java.lang.Object)
 	 */
 	public int indexOf(Object o) {
 		return listValues.indexOf(o);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#isEmpty()
 	 */
 	public boolean isEmpty() {
 		return listValues.isEmpty();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#iterator()
 	 */
 	public Iterator<Integer> iterator() {
 		return listValues.iterator();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#lastIndexOf(java.lang.Object)
 	 */
 	public int lastIndexOf(Object o) {
 		return listValues.lastIndexOf(o);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#listIterator()
 	 */
 	public ListIterator<Integer> listIterator() {
 		return listValues.listIterator();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#listIterator(int)
 	 */
 	public ListIterator<Integer> listIterator(int index) {
 		return listValues.listIterator(index);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#remove(int)
 	 */
 	public Integer remove(int index) {
-		return listValues.remove(index);
+		int oldSize = listValues.size();
+		Integer returnValue = listValues.remove(index);
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, index, oldSize));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#remove(java.lang.Object)
 	 */
 	public boolean remove(Object o) {
-		return listValues.remove(o);
+		int oldSize = listValues.size();
+		boolean returnValue = listValues.remove(o);
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#removeAll(java.util.Collection)
 	 */
 	public boolean removeAll(Collection<?> c) {
-		return listValues.removeAll(c);
+		int oldSize = listValues.size();
+		boolean returnValue = listValues.removeAll(c);
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#retainAll(java.util.Collection)
 	 */
 	public boolean retainAll(Collection<?> c) {
-		return listValues.retainAll(c);
+		int oldSize = listValues.size();
+		boolean returnValue = listValues.retainAll(c);
+		intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize));
+		return returnValue;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#set(int, java.lang.Integer)
 	 */
 	public Integer set(int index, Integer element) {
-		return listValues.set(index, element);
+		Integer old = listValues.set(index, element);
+		contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index));
+		return old;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#size()
 	 */
 	public int size() {
 		return listValues.size();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#subList(int, int)
 	 */
 	public List<Integer> subList(int fromIndex, int toIndex) {
 		return listValues.subList(fromIndex, toIndex);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#toArray()
 	 */
 	public Object[] toArray() {
 		return listValues.toArray();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#toArray(T[])
 	 */
 	public <T> T[] toArray(T[] a) {
 		return listValues.toArray(a);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.vodb.types.I_IntList#getListValues()
 	 */
 	public List<Integer> getListValues() {
 		return listValues;
+	}
+
+	public int[] getListArray() {
+		int[] listArray = new int[listValues.size()];
+		for (int i = 0; i < listArray.length; i++) {
+			listArray[i] = listValues.get(i);
+		}
+		return listArray;
 	}
 
 }

@@ -51,7 +51,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 		@Override
 		public int[] getPopupValues() {
-			return config.getEditStatusTypePopup().getSetValues();
+			return config.getEditStatusTypePopup().getListArray();
 		}
 
 		@Override
