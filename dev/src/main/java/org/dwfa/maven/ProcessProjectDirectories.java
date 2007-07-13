@@ -50,7 +50,7 @@ public class ProcessProjectDirectories extends AbstractMojo {
                 addFileMatches(child, filePattern, matches);
             }
         } else {
-            Matcher m = filePattern.matcher(root.getCanonicalPath());
+            Matcher m = filePattern.matcher(root.getCanonicalPath().replace('/', File.separatorChar));
             if (m.find()) {
                 matches.add(root);
             }
@@ -136,11 +136,11 @@ public class ProcessProjectDirectories extends AbstractMojo {
                                 fileAsString = r.execute(fileAsString);
                             }
 
-                            Reader substuted = new StringReader(fileAsString);
-                            read = substuted.read(cbuf);
+                            Reader substituted = new StringReader(fileAsString);
+                            read = substituted.read(cbuf);
                             while (read > 0) {
                                 fw.write(cbuf, 0, read);
-                                read = substuted.read(cbuf);
+                                read = substituted.read(cbuf);
                             }
                             fw.close();
                         } else {
