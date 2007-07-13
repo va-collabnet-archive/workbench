@@ -50,7 +50,7 @@ public class ProcessProjectDirectories extends AbstractMojo {
                 addFileMatches(child, filePattern, matches);
             }
         } else {
-            Matcher m = filePattern.matcher(root.getCanonicalPath().replace('/', File.separatorChar));
+            Matcher m = filePattern.matcher(root.getCanonicalPath().replace('\\', '/'));
             if (m.find()) {
                 matches.add(root);
             }
