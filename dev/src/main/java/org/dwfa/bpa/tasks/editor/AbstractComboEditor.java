@@ -10,7 +10,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyEditor;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javax.swing.JComboBox;
 
@@ -66,18 +65,16 @@ public abstract class AbstractComboEditor implements PropertyEditor, ItemListene
 	 * @return true or false
 	 * @see java.beans.PropertyEditor#getValue()
 	 */
-	public Level getValue() {
-		return (Level) editor.getSelectedItem();
+	public Object getValue() {
+		return editor.getSelectedItem();
 	}
 
 	/**
-	 * Must be a <code>Level</code> representing logging level for the logger.
 	 * 
 	 * @see java.beans.PropertyEditor#setValue(java.lang.Object)
 	 */
 	public void setValue(Object value) {
-		this.editor.setSelectedItem((Level) value);
-		// this.editor.setSelectedItem(Level.parse((String) value));
+		this.editor.setSelectedItem(value);
 		this.firePropertyChange();
 	}
 
@@ -103,7 +100,7 @@ public abstract class AbstractComboEditor implements PropertyEditor, ItemListene
 	 * @see java.beans.PropertyEditor#getJavaInitializationString()
 	 */
 	public String getJavaInitializationString() {
-		return "Level.parse(" + this.getValue() + ")";
+		return this.getValue().toString();
 	}
 
 	/**
@@ -117,7 +114,7 @@ public abstract class AbstractComboEditor implements PropertyEditor, ItemListene
 	 * @see java.beans.PropertyEditor#setAsText(java.lang.String)
 	 */
 	public void setAsText(String text) throws IllegalArgumentException {
-		this.setValue(text);
+		throw new IllegalArgumentException("String: " + text);
 	}
 
 	/**
