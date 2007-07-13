@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.ImageIcon;
@@ -80,6 +81,15 @@ public class AceFrame extends ComponentFrame {
         doWindowActivation();
         getQuitList().add(cdePanel);
         this.addWindowListener(new AceWindowActionListener());
+        
+        File configFile = ((AceFrameConfig) frameConfig).getMasterConfig().getConfigFile();
+        File startupFolder = new File(configFile.getParentFile(), "startup");
+        if (startupFolder.exists()) {
+        	AceLog.getAppLog().info("Startup folder exists");
+        } else {
+        	AceLog.getAppLog().info("NO startup folder exists");
+        }
+        
 	}
     private void doWindowActivation() {
         try {

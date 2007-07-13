@@ -176,6 +176,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 				aceFrames = (List<I_ConfigAceFrame>) in.readObject();
+				for (I_ConfigAceFrame icaf: aceFrames) {
+					AceFrameConfig afc = (AceFrameConfig) icaf;
+					afc.setMasterConfig(this);
+				}
 			}
 			if (objDataVersion >= 2) {
 				loggerRiverConfigFile = (String) in.readObject();

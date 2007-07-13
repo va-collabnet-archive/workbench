@@ -92,6 +92,8 @@ public class AceRunner {
             int successCount = 0;
             for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
                 if (ace.isActive()) {
+                	AceFrameConfig afc = (AceFrameConfig) ace;
+                	afc.setMasterConfig(AceConfig.config);
                     SvnPrompter prompter = new SvnPrompter();
                     boolean login = true;
                     while (login) {
