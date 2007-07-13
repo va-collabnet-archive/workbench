@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.queue;
+package org.dwfa.ace.task.address;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -18,8 +18,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/queue", type = BeanType.TASK_BEAN) })
-public class AddAllProfilesToVisibleQueues extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ace/address", type = BeanType.TASK_BEAN) })
+public class AddAllProfilesToAddressList extends AbstractTask {
 
     /**
      *
@@ -64,8 +64,8 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
                 	}
                     return false;
                 }})) {
-                if (configFrame.getQueueAddressesToShow().contains(profile.getName()) == false) {
-                    configFrame.getQueueAddressesToShow().add(profile.getName());
+                if (configFrame.getAddressesList().contains(profile.getName()) == false) {
+                    configFrame.getAddressesList().add(profile.getName());
                 }
 
             }

@@ -51,7 +51,8 @@ public class PutCurrentProfileInProperty extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(WorkerAttachmentKeys.ACE_FRAME_CONFIG.getAttachmentKey());
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) worker
+			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             process.setProperty(profilePropName, profile);
             return Condition.CONTINUE;
             

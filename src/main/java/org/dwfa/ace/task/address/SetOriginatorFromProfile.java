@@ -1,7 +1,5 @@
-package org.dwfa.ace.task.queue;
+package org.dwfa.ace.task.address;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,8 +16,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/queue", type = BeanType.TASK_BEAN) })
-public class AddAllProfilesToVisibleQueues extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ace/address", type = BeanType.TASK_BEAN) })
+public class SetOriginatorFromProfile extends AbstractTask {
 
     /**
      *
@@ -28,16 +26,14 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-     }
+    }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            //
         } else {
             throw new IOException(
                     "Can't handle dataversion: " + objDataVersion);
@@ -54,22 +50,9 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
         try {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            File profiles = new File("profiles/users");
-            for (File profile: profiles.listFiles(new FileFilter() {
 
-                public boolean accept(File f) {
-                	if (f.isDirectory() && (f.isHidden() == false)) {
-                		File queueConfig = new File(f, "queue" + File.separator + "queue.config");
-                		return queueConfig.exists();
-                	}
-                    return false;
-                }})) {
-                if (configFrame.getQueueAddressesToShow().contains(profile.getName()) == false) {
-                    configFrame.getQueueAddressesToShow().add(profile.getName());
-                }
-
-            }
-
+            process.setOriginator(configFrame.getUsername());
+            
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -83,5 +66,4 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
-
 }

@@ -1,25 +1,31 @@
-package org.dwfa.ace.task.queue;
+package org.dwfa.ace.task.address;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import net.jini.core.entry.Entry;
+import net.jini.core.lookup.ServiceID;
+import net.jini.core.lookup.ServiceItem;
+import net.jini.core.lookup.ServiceTemplate;
+import net.jini.lookup.ServiceItemFilter;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/queue", type = BeanType.TASK_BEAN) })
-public class AddAllProfilesToVisibleQueues extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ace/address", type = BeanType.TASK_BEAN) })
+public class AddAllVisibleAddressesToAddressList extends AbstractTask {
 
     /**
      *
@@ -54,25 +60,31 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
         try {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            File profiles = new File("profiles/users");
-            for (File profile: profiles.listFiles(new FileFilter() {
 
-                public boolean accept(File f) {
-                	if (f.isDirectory() && (f.isHidden() == false)) {
-                		File queueConfig = new File(f, "queue" + File.separator + "queue.config");
-                		return queueConfig.exists();
-                	}
-                    return false;
-                }})) {
-                if (configFrame.getQueueAddressesToShow().contains(profile.getName()) == false) {
-                    configFrame.getQueueAddressesToShow().add(profile.getName());
-                }
-
+            ServiceID serviceID = null;
+            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Entry[] attrSetTemplates = null;
+            ServiceTemplate template = new ServiceTemplate(serviceID,
+                    serviceTypes,
+                    attrSetTemplates);
+        
+            ServiceItemFilter filter = worker.getServiceProxyFilter();
+            ServiceItem[] services = worker.lookup(template, 1, 500, filter, 1000 * 15);
+            if (services != null) {
+            	for (ServiceItem service: services) {
+            		if (service.attributeSets != null) {
+            			for (Entry e: service.attributeSets) {
+            				if (ElectronicAddress.class.isAssignableFrom(e.getClass())) {
+            					ElectronicAddress address = (ElectronicAddress) e;
+            					configFrame.getAddressesList().add(address.address);
+            				}
+            			}
+            		}
+            	}
             }
-
             return Condition.CONTINUE;
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
+        } catch (Exception ex) {
+        	throw new TaskFailedException(ex);
         }
     }
 

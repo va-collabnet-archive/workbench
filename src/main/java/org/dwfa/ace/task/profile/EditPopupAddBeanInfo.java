@@ -23,9 +23,9 @@ public class EditPopupAddBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor type =
                 new PropertyDescriptor("type", getBeanDescriptor().getBeanClass());
             type.setBound(true);
-            type.setPropertyEditorClass(EditDefaultTypeEditor.class);
+            type.setPropertyEditorClass(EditPopupTypeEditor.class);
             type.setDisplayName("<html><font color='green'>type:");
-            type.setShortDescription("The type to add the concept to..");
+            type.setShortDescription("The popup type to add the concept to..");
 
             PropertyDescriptor profilePropName =
                 new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
