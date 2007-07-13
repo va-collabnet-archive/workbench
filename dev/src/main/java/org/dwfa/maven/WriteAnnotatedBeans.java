@@ -187,7 +187,6 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 			}
 		} else {
 			getLog().info("Not writing. Not an allowed goal.");
-			
 		}
  	}
 
