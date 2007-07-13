@@ -142,34 +142,43 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 
 					String dependencyPath = MojoUtil.dependencyToPath(
 							localRepository, d);
-					//getLog().info("writing annotated beans for: " + dependencyPath);
-					JarFile jf = new JarFile(dependencyPath);
-					Enumeration<JarEntry> jarEnum = jf.entries();
-					while (jarEnum.hasMoreElements()) {
-						JarEntry je = jarEnum.nextElement();
-						if (je.getName().endsWith(".class")) {
-							String className = je.getName().replace('/', '.');
-							classNameNoDotClass = className.substring(0,
-									className.length() - 6);
-							Class<?> c = libLoader.loadClass(classNameNoDotClass);
-							Annotation a = c.getAnnotation(beanListClass);
-							if (c.getAnnotation(beanListClass) != null) {
-								BeanList bl = (BeanList) Proxy.newProxyInstance(
-										getClass().getClassLoader(),
-										new Class[] { BeanList.class },
-										new GenericInvocationHandler(a));
-								for (Spec s : bl.specs()) {
-									if (s.type().equals(BeanType.DATA_BEAN)) {
-										writeDataBean(c, s);
-									} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
-										writeGenericBean(c, s);
-									} else if (s.type().equals(BeanType.TASK_BEAN)) {
-										writeTaskBean(c, s);
+					File dependencyFile = new File(dependencyPath);
+					if (dependencyFile.exists()) {
+						//getLog().info("writing annotated beans for: " + dependencyPath);
+						JarFile jf = new JarFile(dependencyPath);
+						Enumeration<JarEntry> jarEnum = jf.entries();
+						while (jarEnum.hasMoreElements()) {
+							JarEntry je = jarEnum.nextElement();
+							if (je.getName().endsWith(".class")) {
+								String className = je.getName().replace('/', '.');
+								classNameNoDotClass = className.substring(0,
+										className.length() - 6);
+								Class<?> c = libLoader.loadClass(classNameNoDotClass);
+								Annotation a = c.getAnnotation(beanListClass);
+								if (c.getAnnotation(beanListClass) != null) {
+									BeanList bl = (BeanList) Proxy.newProxyInstance(
+											getClass().getClassLoader(),
+											new Class[] { BeanList.class },
+											new GenericInvocationHandler(a));
+									for (Spec s : bl.specs()) {
+										if (s.type().equals(BeanType.DATA_BEAN)) {
+											writeDataBean(c, s);
+										} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
+											writeGenericBean(c, s);
+										} else if (s.type().equals(BeanType.TASK_BEAN)) {
+											writeTaskBean(c, s);
+										}
 									}
 								}
 							}
-						}
+						}						
+					} else {
+						getLog().info(
+								"Warning. Dependency file does not exist: "
+										+ dependencyPath);
 					}
+
+
 
 				}
 			} catch (Throwable e) {
