@@ -90,6 +90,7 @@ import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
 import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -941,6 +942,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptPanels.add(c1Panel);
         c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs);
         conceptPanels.add(c2Panel);
+        conceptTabs.addComponentListener(new ResizePalettesListener());
         conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "Tree Linked");
         conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "Search Linked");
 
@@ -1260,14 +1262,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private TerminologyList makeTermList(String title, I_IntSet set) {
-        TerminologyListModel browseDownRelModel = new TerminologyListModel();
+        TerminologyListModel termListModel = new TerminologyListModel();
         for (int id : set.getSetValues()) {
-            browseDownRelModel.addElement(ConceptBean.get(id));
+            termListModel.addElement(ConceptBean.get(id));
         }
-        browseDownRelModel.addListDataListener(set);
-        TerminologyList browseDownRelList = new TerminologyList(browseDownRelModel);
-        browseDownRelList.setBorder(BorderFactory.createTitledBorder(title));
-        return browseDownRelList;
+        termListModel.addListDataListener(set);
+        TerminologyList terminologyList = new TerminologyList(termListModel);
+        terminologyList.setBorder(BorderFactory.createTitledBorder(title));
+        return terminologyList;
     }
 
     private JComponent makeStatusPrefPanel() {
@@ -1323,13 +1325,20 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TermComponentLabel defaultStatus = new TermComponentLabel(aceFrameConfig);
         defaultStatus.setTermComponent(aceFrameConfig.getDefaultStatus());
+        aceFrameConfig.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setTermComponent",
+        		I_AmTermComponent.class,
+                defaultStatus));
         defaultStatus.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setDefaultStatus",
                                                                                           I_GetConceptData.class,
                                                                                           aceFrameConfig));
+        
         wrapAndAdd(defaultsPanel, defaultStatus, "Default status: ");
 
         TermComponentLabel defaultDescType = new TermComponentLabel(aceFrameConfig);
         defaultDescType.setTermComponent(aceFrameConfig.getDefaultDescriptionType());
+        aceFrameConfig.addPropertyChangeListener("defaultDescriptionType", new PropertyListenerGlue("setTermComponent",
+        		I_AmTermComponent.class,
+        		defaultDescType));
         defaultDescType.addPropertyChangeListener("defaultDescriptionType",
                                                   new PropertyListenerGlue("setDefaultDescriptionType",
                                                                            I_GetConceptData.class, aceFrameConfig));
@@ -1337,6 +1346,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TermComponentLabel defaultRelType = new TermComponentLabel(aceFrameConfig);
         defaultRelType.setTermComponent(aceFrameConfig.getDefaultRelationshipType());
+        aceFrameConfig.addPropertyChangeListener("defaultRelationshipType", new PropertyListenerGlue("setTermComponent",
+        		I_AmTermComponent.class,
+        		defaultRelType));
         defaultRelType.addPropertyChangeListener("defaultRelationshipType",
                                                  new PropertyListenerGlue("setDefaultRelationshipType",
                                                                           I_GetConceptData.class, aceFrameConfig));
@@ -1344,6 +1356,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TermComponentLabel defaultRelCharacteristicType = new TermComponentLabel(aceFrameConfig);
         defaultRelCharacteristicType.setTermComponent(aceFrameConfig.getDefaultRelationshipCharacteristic());
+        aceFrameConfig.addPropertyChangeListener("defaultRelationshipCharacteristic", new PropertyListenerGlue("setTermComponent",
+        		I_AmTermComponent.class,
+        		defaultRelCharacteristicType));
         defaultRelCharacteristicType
                 .addPropertyChangeListener("defaultRelationshipCharacteristic",
                                            new PropertyListenerGlue("setDefaultRelationshipCharacteristic",
@@ -1352,6 +1367,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TermComponentLabel defaultRelRefinability = new TermComponentLabel(aceFrameConfig);
         defaultRelRefinability.setTermComponent(aceFrameConfig.getDefaultRelationshipRefinability());
+        aceFrameConfig.addPropertyChangeListener("defaultRelationshipRefinability", new PropertyListenerGlue("setTermComponent",
+        		I_AmTermComponent.class,
+        		defaultRelRefinability));
         defaultRelRefinability.addPropertyChangeListener("defaultRelationshipRefinability",
                                                          new PropertyListenerGlue("setDefaultRelationshipRefinability",
                                                                                   I_GetConceptData.class,
@@ -2098,13 +2116,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 		    public void run() {
 		        if (queuePalette != null) {
-		            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+		            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation() + 6,
 		                                 conceptTabs.getHeight() + 4);
                     revalidateAllParents(queuePalette);
                     //revalidateAllDescendants(queuePalette);
 		        }
 		        if (processPalette != null) {
-		            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+		            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation() + 6,
 		                                   conceptTabs.getHeight() + 4);
                     revalidateAllParents(processPalette);
                     //revalidateAllDescendants(processPalette);

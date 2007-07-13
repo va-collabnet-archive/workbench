@@ -790,7 +790,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultDescriptionType(org.dwfa.vodb.types.ConceptBean)
 	 */
 	public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType) {
+		Object old = this.defaultDescriptionType;
 		this.defaultDescriptionType = defaultDescriptionType;
+		changeSupport.firePropertyChange("defaultDescriptionType", old, defaultDescriptionType);
+
 	}
 
 
@@ -807,7 +810,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 */
 	public void setDefaultRelationshipCharacteristic(
 			I_GetConceptData defaultRelationshipCharacteristic) {
+		Object old = this.defaultRelationshipCharacteristic;
 		this.defaultRelationshipCharacteristic = defaultRelationshipCharacteristic;
+		changeSupport.firePropertyChange("defaultRelationshipCharacteristic", old, defaultRelationshipCharacteristic);
 	}
 
 
@@ -824,7 +829,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 */
 	public void setDefaultRelationshipRefinability(
 			I_GetConceptData defaultRelationshipRefinability) {
+		Object old = this.defaultRelationshipRefinability;
 		this.defaultRelationshipRefinability = defaultRelationshipRefinability;
+		changeSupport.firePropertyChange("defaultRelationshipRefinability", old, defaultRelationshipRefinability);
 	}
 
 
@@ -840,7 +847,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipType(org.dwfa.vodb.types.ConceptBean)
 	 */
 	public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
+		Object old = this.defaultRelationshipType;
 		this.defaultRelationshipType = defaultRelationshipType;
+		changeSupport.firePropertyChange("defaultRelationshipType", old, defaultRelationshipType);
 	}
 
 
@@ -856,7 +865,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultStatus(org.dwfa.vodb.types.ConceptBean)
 	 */
 	public void setDefaultStatus(I_GetConceptData defaultStatus) {
+		Object old = this.defaultStatus;
 		this.defaultStatus = defaultStatus;
+		changeSupport.firePropertyChange("defaultStatus", old, defaultStatus);
 	}
 
 
