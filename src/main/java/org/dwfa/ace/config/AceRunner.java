@@ -34,6 +34,8 @@ public class AceRunner {
     private LifeCycle lc;
 
     protected Configuration config;
+    
+    private static boolean firstStartup = true;
 
     public AceRunner(final String[] args, final LifeCycle lc) {
         try {
@@ -105,7 +107,9 @@ public class AceRunner {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     try {
-                                        AceFrame af = new AceFrame(args, lc, ace);
+                                    	boolean startup = firstStartup;
+                                        firstStartup = false;
+                                        AceFrame af = new AceFrame(args, lc, ace, startup);
                                         af.setVisible(true);
                                     } catch (Exception e) {
                                         AceLog.getAppLog().alertAndLogException(e);
@@ -128,6 +132,9 @@ public class AceRunner {
 
                 }
             }
+     			// Execute startup processes here...
+     		
+
             if (successCount == 0) {
                 JOptionPane.showMessageDialog(null,
                                               "No frames where opened. Now exiting.",

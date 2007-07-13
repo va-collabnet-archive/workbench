@@ -298,7 +298,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 				if (ace.isActive()) {
 					AceFrame af = new AceFrame(
 							new String[] { aceRiverConfigFile.getAbsolutePath() },
-							null, ace);
+							null, ace, false);
 					af.setVisible(true);
 				}
 			}
