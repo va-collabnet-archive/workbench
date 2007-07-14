@@ -90,50 +90,56 @@ public class AceFrame extends ComponentFrame {
 		if (executeStartupProcesses) {
 			File configFile = ((AceFrameConfig) frameConfig).getMasterConfig()
 					.getConfigFile();
-			File startupFolder = new File(configFile.getParentFile(), "startup");
-			if (startupFolder.exists()) {
-				AceLog.getAppLog().info("Startup folder exists");
-				File[] startupFiles = startupFolder
-						.listFiles(new FilenameFilter() {
-
-							public boolean accept(File dir, String name) {
-								return name.endsWith(".bp");
-							}
-						});
-				if (startupFiles != null) {
-					for (int i = 0; i < startupFiles.length; i++) {
-						try {
-							AceLog.getAppLog().info(
-									"Executing startup business process: "
-											+ startupFiles[i]);
-							FileInputStream fis = new FileInputStream(
-									startupFiles[i]);
-							BufferedInputStream bis = new BufferedInputStream(
-									fis);
-							ObjectInputStream ois = new ObjectInputStream(bis);
-							I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-									.readObject();
-							worker.execute(process);
-							AceLog.getAppLog().info(
-									"Finished startup business process: "
-											+ startupFiles[i]);
-						} catch (Throwable e1) {
-							AceLog.getAppLog().alertAndLog(
-									Level.SEVERE,
-									e1.getMessage() + " thrown by "
-											+ startupFiles[i], e1);
-						}
-					}
-				} else {
-					AceLog.getAppLog().info(
-							"No startup processes found. Folder exists: "
-									+ startupFolder.exists());
-				}
-			} else {
-				AceLog.getAppLog().info("NO startup folder exists");
-			}
+			File startupFolder = new File(configFile.getParentFile().getParentFile(), "startup");
+			executeStartupProcesses(worker, startupFolder);
+			startupFolder = new File(configFile.getParentFile(), "startup");
+			executeStartupProcesses(worker, startupFolder);
 		}
 
+	}
+
+	private void executeStartupProcesses(MasterWorker worker, File startupFolder) {
+		if (startupFolder.exists()) {
+			AceLog.getAppLog().info("Startup folder exists: " + startupFolder);
+			File[] startupFiles = startupFolder
+					.listFiles(new FilenameFilter() {
+
+						public boolean accept(File dir, String name) {
+							return name.endsWith(".bp");
+						}
+					});
+			if (startupFiles != null) {
+				for (int i = 0; i < startupFiles.length; i++) {
+					try {
+						AceLog.getAppLog().info(
+								"Executing startup business process: "
+										+ startupFiles[i]);
+						FileInputStream fis = new FileInputStream(
+								startupFiles[i]);
+						BufferedInputStream bis = new BufferedInputStream(
+								fis);
+						ObjectInputStream ois = new ObjectInputStream(bis);
+						I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+								.readObject();
+						worker.execute(process);
+						AceLog.getAppLog().info(
+								"Finished startup business process: "
+										+ startupFiles[i]);
+					} catch (Throwable e1) {
+						AceLog.getAppLog().alertAndLog(
+								Level.SEVERE,
+								e1.getMessage() + " thrown by "
+										+ startupFiles[i], e1);
+					}
+				}
+			} else {
+				AceLog.getAppLog().info(
+						"No startup processes found. Folder exists: "
+								+ startupFolder.exists());
+			}
+		} else {
+			AceLog.getAppLog().info("NO startup folder exists: " + startupFolder);
+		}
 	}
 
 	private void doWindowActivation() {
