@@ -1033,6 +1033,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JToggleButton showSignpostPanelToggle;
 
+	private static boolean runShutdownProcesses = true;
+
     private void makeProcessPalette() throws Exception {
         JLayeredPane layers = getRootPane().getLayeredPane();
         processPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
@@ -2086,6 +2088,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public boolean quit() {
+    	 if (uncommitted.size() > 0) {
+    		 JOptionPane.showMessageDialog(this, "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
+    		 return false;
+    	 }
+    	
+    	
         int option = JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
                                                    JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
@@ -2096,6 +2104,56 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 return false;
             }
         }
+        
+        if (runShutdownProcesses) {
+        	runShutdownProcesses = false;
+			File configFile = aceFrameConfig.getMasterConfig()
+					.getConfigFile();
+			File shutdownFolder = new File(configFile.getParentFile(), "shutdown");
+			if (shutdownFolder.exists()) {
+				AceLog.getAppLog().info("Shutdown folder exists");
+				File[] startupFiles = shutdownFolder
+						.listFiles(new FilenameFilter() {
+
+							public boolean accept(File dir, String name) {
+								return name.endsWith(".bp");
+							}
+						});
+				if (startupFiles != null) {
+					for (int i = 0; i < startupFiles.length; i++) {
+						try {
+							AceLog.getAppLog().info(
+									"Executing shutdown business process: "
+											+ startupFiles[i]);
+							FileInputStream fis = new FileInputStream(
+									startupFiles[i]);
+							BufferedInputStream bis = new BufferedInputStream(
+									fis);
+							ObjectInputStream ois = new ObjectInputStream(bis);
+							I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+									.readObject();
+							aceFrameConfig.getWorker().execute(process);
+							AceLog.getAppLog().info(
+									"Finished shutdown business process: "
+											+ startupFiles[i]);
+						} catch (Throwable e1) {
+							AceLog.getAppLog().alertAndLog(
+									Level.SEVERE,
+									e1.getMessage() + " thrown by "
+											+ startupFiles[i], e1);
+						}
+					}
+				} else {
+					AceLog.getAppLog().info(
+							"No shutdown processes found. Folder exists: "
+									+ shutdownFolder.exists());
+				}
+			} else {
+				AceLog.getAppLog().info("NO shutdown folder exists");
+			}
+		
+        }
+        
         return true;
     }
     public JPanel getSignpostPanel() {
