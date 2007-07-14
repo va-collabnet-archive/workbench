@@ -1412,11 +1412,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         historyPalette = new CdePalette(new BorderLayout(), new LeftPalettePoint());
         JTabbedPane tabs = new JTabbedPane();
 
-        TerminologyList viewerList = new TerminologyList(viewerHistoryTableModel);
+        TerminologyList viewerList = new TerminologyList(viewerHistoryTableModel, false);
         tabs.addTab("viewer", new JScrollPane(viewerList));
-        TerminologyList commitList = new TerminologyList(commitHistoryTableModel);
+        TerminologyList commitList = new TerminologyList(commitHistoryTableModel, false);
         tabs.addTab("uncommitted", new JScrollPane(commitList));
-        TerminologyList importList = new TerminologyList(importHistoryTableModel);
+        TerminologyList importList = new TerminologyList(importHistoryTableModel, false);
         tabs.addTab("imported", new JScrollPane(importList));
         historyPalette.add(tabs, BorderLayout.CENTER);
         historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());

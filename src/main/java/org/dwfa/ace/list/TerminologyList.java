@@ -43,33 +43,42 @@ public class TerminologyList extends JList {
 
 	public TerminologyList() {
 		super(new TerminologyListModel());
-		init();
+		init(true);
 	}
 	public TerminologyList(TerminologyListModel dataModel) {
 		super(dataModel);
-		init();
+		init(true);
 	}
 
-	private void init() {
+	public TerminologyList(boolean allowDelete) {
+		super(new TerminologyListModel());
+		init(allowDelete);
+	}
+	public TerminologyList(TerminologyListModel dataModel, boolean allowDelete) {
+		super(dataModel);
+		init(allowDelete);
+	}
+
+	private void init(boolean allowDelete) {
 		setTransferHandler(new TerminologyTransferHandler());
 		setDragEnabled(true);
-		DeleteAction delete = new DeleteAction();
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), delete.getValue(Action.NAME));
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-        		delete.getValue(Action.NAME));
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), delete.getValue(Action.NAME));
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-        		delete.getValue(Action.NAME));
+		if (allowDelete) {
+			DeleteAction delete = new DeleteAction();
+	        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+	                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), delete.getValue(Action.NAME));
+	        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+	        		delete.getValue(Action.NAME));
+	        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+	                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), delete.getValue(Action.NAME));
+	        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+	        		delete.getValue(Action.NAME));
 
- 		ActionMap map = this.getActionMap();
-		map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
-		map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
-		map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
-		map.put(delete.getValue(Action.NAME), delete);
-		
+	 		ActionMap map = this.getActionMap();
+			map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+			map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
+			map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
+			map.put(delete.getValue(Action.NAME), delete);
+		}
 	}
-
 
 }
