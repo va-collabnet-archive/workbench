@@ -172,7 +172,9 @@ public class LookupJiniAndLocal implements I_LookupServices {
 		for (Entry tmplEntry: tmpl.attributeSetTemplates) {
 			boolean found = false;
 			for (Entry serviceEntry: serviceItem.attributeSets) {
-				logger.info("comparing: " + tmplEntry + " and " + serviceEntry);
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("comparing: " + tmplEntry + " and " + serviceEntry);
+				}
 				if (matches(tmplEntry, serviceEntry)) {
 					found = true;
 					break;
