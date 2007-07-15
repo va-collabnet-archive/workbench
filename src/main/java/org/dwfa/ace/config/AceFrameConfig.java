@@ -39,6 +39,7 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -376,6 +377,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public AceFrameConfig(AceConfig masterConfig) {
 		super();
 		this.masterConfig = masterConfig;
+        addListeners();
+	}
+
+	public AceFrameConfig() {
+		super();
         addListeners();
 	}
 
@@ -952,6 +958,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void setWorker(MasterWorker worker) {
 		Object old = this.worker;
 		this.worker = worker;
+		this.worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), this);
 		this.changeSupport.firePropertyChange("worker", old, worker);
 	}
 

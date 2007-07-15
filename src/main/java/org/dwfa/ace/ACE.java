@@ -391,7 +391,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }
+            setInitialSvnPosition();
             if (showSubversionButton.isSelected()) {
+            	subversionPalette.setVisible(true);
                 getRootPane().getLayeredPane().moveToFront(subversionPalette);
                 deselectOthers(showSubversionButton);
             }
@@ -715,6 +717,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public void setup(I_ConfigAceFrame aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
+        menuWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
         this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
         this.aceFrameConfig.addPropertyChangeListener(this);
         try {
@@ -1124,28 +1127,35 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (subversionPalette == null) {
             JLayeredPane layers = getRootPane().getLayeredPane();
             subversionPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
-            JTabbedPane tabs = new JTabbedPane();
+            JTabbedPane svnTabs = new JTabbedPane();
+            AceLog.getAppLog().info("Subversion entries: " + aceFrameConfig.getSubversionMap().keySet());
             for (String key : aceFrameConfig.getSubversionMap().keySet()) {
                 SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
-                tabs.addTab("change sets", svnTable);
+                svnTabs.addTab(key, svnTable);
             }
 
             layers.add(subversionPalette, JLayeredPane.PALETTE_LAYER);
-            subversionPalette.add(tabs, BorderLayout.CENTER);
+            subversionPalette.add(svnTabs, BorderLayout.CENTER);
             subversionPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
-            int width = 650;
-            int height = 550;
-            Rectangle topBounds = topPanel.getBounds();
-            subversionPalette.setSize(width, height);
-
-            subversionPalette.setLocation(new Point(topBounds.x + topBounds.width, topBounds.y + topBounds.height + 1));
-            subversionPalette.setOpaque(true);
-            subversionPalette.doLayout();
-            addComponentListener(subversionPalette);
-            subversionPalette.setVisible(true);
+            subversionPalette.setVisible(false);
         }
     }
+    boolean svnPositionSet = false;
+	private void setInitialSvnPosition() {
+		if (svnPositionSet == false) {
+			svnPositionSet = true;
+			int width = 650;
+			int height = 550;
+			Rectangle topBounds = topPanel.getBounds();
+			subversionPalette.setSize(width, height);
+
+			subversionPalette.setLocation(new Point(topBounds.x + topBounds.width, topBounds.y + topBounds.height + 1));
+			subversionPalette.setOpaque(true);
+			subversionPalette.doLayout();
+			addComponentListener(subversionPalette);
+		}
+	}
 
     private void makeConfigPalette() throws Exception {
         JLayeredPane layers = getRootPane().getLayeredPane();

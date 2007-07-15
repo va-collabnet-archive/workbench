@@ -82,11 +82,11 @@ public class AceFrame extends ComponentFrame {
 		setTitle("User: " + frameConfig.getUsername());
 		setContentPane(cdePanel);
 		setBounds(frameConfig.getBounds());
-		MasterWorker worker = new MasterWorker(config);
-		cdePanel.getAceFrameConfig().setWorker(worker);
 		doWindowActivation();
 		getQuitList().add(cdePanel);
 		this.addWindowListener(new AceWindowActionListener());
+		MasterWorker worker = new MasterWorker(config);
+		cdePanel.getAceFrameConfig().setWorker(worker);
 		if (executeStartupProcesses) {
 			File configFile = ((AceFrameConfig) frameConfig).getMasterConfig()
 					.getConfigFile();

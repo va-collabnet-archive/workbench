@@ -2583,16 +2583,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	public I_ConfigAceFrame newAceFrameConfig() throws TerminologyException, IOException {
-		if (AceConfig.config == null) {
-			try {
-				AceConfig.config = new AceConfig();
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
-		}
-		AceFrameConfig frameConfig = new AceFrameConfig(AceConfig.config);
-		AceConfig.config.aceFrames.add(frameConfig);
-		return frameConfig;
+		return new AceFrameConfig();
 	}
 
 	I_ConfigAceFrame activeAceFrameConfig;
