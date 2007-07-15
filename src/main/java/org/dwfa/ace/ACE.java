@@ -418,6 +418,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
                     .getHeight() + 4);
             queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected());
+            SwingUtilities.invokeLater(new Runnable() {
+
+				public void run() {
+		            queueViewer.requestFocusOnEntry();
+				}
+            	
+            });
         }
 
     }
