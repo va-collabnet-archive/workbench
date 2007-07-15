@@ -7,6 +7,7 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class AddSubversionEntryBeanInfo extends SimpleBeanInfo {
     
@@ -41,8 +42,15 @@ public class AddSubversionEntryBeanInfo extends SimpleBeanInfo {
             keyName.setDisplayName("<html><font color='green'>profile key:");
             keyName.setShortDescription("The key for the subversion entry.");
 
+            PropertyDescriptor profilePropName =
+                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+            profilePropName.setBound(true);
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to write to disk.");
+
             PropertyDescriptor rv[] =
-                { prompt, keyName, repoUrl, workingCopy };
+                { prompt, keyName, repoUrl, workingCopy, profilePropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

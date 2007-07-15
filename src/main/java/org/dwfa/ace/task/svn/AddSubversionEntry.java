@@ -17,6 +17,7 @@ import javax.swing.SpringLayout;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.gui.SpringUtilities;
 import org.dwfa.bpa.process.Condition;
@@ -36,12 +37,13 @@ public class AddSubversionEntry extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     
     private String prompt = "enter data for new subversion repository: ";
     private String keyName = "repoKey";
     private String repoUrl = "https://amt-edit-bundle.au-ct.org/svn/amt-edit-bundle/trunk/dev/src/main/profiles/users";
     private String workingCopy = "profiles/users";
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -49,16 +51,22 @@ public class AddSubversionEntry extends AbstractTask {
         out.writeObject(keyName);
         out.writeObject(repoUrl);
         out.writeObject(workingCopy);
+        out.writeObject(profilePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion <= dataVersion) {
             prompt = (String) in.readObject();
             keyName = (String) in.readObject();
             repoUrl = (String) in.readObject();
             workingCopy = (String) in.readObject();
+            if (objDataVersion >= 2) {
+            	profilePropName = (String) in.readObject();
+            } else {
+            	profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -75,8 +83,8 @@ public class AddSubversionEntry extends AbstractTask {
             throws TaskFailedException {
         try {
             addUserInfo(process);
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process
+                .readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
             SubversionData svd = config.getSubversionMap().get(keyName);
             if (svd == null) {
                 svd = new SubversionData(repoUrl, workingCopy);
@@ -240,5 +248,13 @@ public class AddSubversionEntry extends AbstractTask {
     public void setWorkingCopy(String workingCopy) {
         this.workingCopy = workingCopy;
     }
+
+	public String getProfilePropName() {
+		return profilePropName;
+	}
+
+	public void setProfilePropName(String profilePropName) {
+		this.profilePropName = profilePropName;
+	}
 
  }
