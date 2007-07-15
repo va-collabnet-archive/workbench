@@ -145,17 +145,17 @@ public class LaunchAssignmentProcess extends AbstractTask {
         I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
         .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         
-        worker.getLogger().info("originator is: " + configFrame.getUsername());
+  //      worker.getLogger().info("originator is: " + configFrame.getUsername());
  	
 		process.setProperty(assigneeAddrPropName, asignee);
 		process.setProperty(alternateAddrPropName, alternate);
 		
 		LoadSetLaunchProcessFromURL launcher = new LoadSetLaunchProcessFromURL();
-		launcher.setProcessName("Possible Duplicate Review");
+		launcher.setProcessName("Duplicate Review");
 		launcher.setOriginator(configFrame.getUsername());
 		launcher.setProcessSubject(concept.toString());
 		launcher.setProcessURLString(processURLString);
-		worker.getLogger().info("processURLString: " + processURLString);
+//		worker.getLogger().info("processURLString: " + processURLString);
 		launcher.evaluate(process, worker);
 	}
 
