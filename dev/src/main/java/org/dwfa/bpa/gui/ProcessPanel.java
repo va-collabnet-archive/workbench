@@ -847,18 +847,38 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         } else if (evt.getPropertyName() == "destination") {
 
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    try {
-                        layoutComponents();
-                    } catch (PropertyVetoException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (Exception ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-                }
-            });
+        	if (lastLayoutDoer != null) {
+        		lastLayoutDoer.setStopped(true);
+        	}
+        	lastLayoutDoer = new DoLayout();
+            SwingUtilities.invokeLater(lastLayoutDoer);
         }
+    }
+    
+    private DoLayout lastLayoutDoer;
+    private class DoLayout implements Runnable {
+    	private boolean stopped = false;
+
+		public void run() {
+			if (stopped) {
+				return;
+			}
+            try {
+                layoutComponents();
+            } catch (PropertyVetoException ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+		}
+
+		public boolean isStopped() {
+			return stopped;
+		}
+
+		public void setStopped(boolean stopped) {
+			this.stopped = stopped;
+		}
+    	
     }
 }
