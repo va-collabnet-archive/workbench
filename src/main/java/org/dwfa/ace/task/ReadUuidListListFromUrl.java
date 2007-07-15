@@ -76,13 +76,14 @@ public class ReadUuidListListFromUrl extends AbstractTask {
              
             String uuidLineStr;
  		
- 			worker.getLogger().info("file is: " + dupPotFileName); 			
+ //			worker.getLogger().info("file is: " + dupPotFileName); 			
             
              BufferedReader br = new BufferedReader(new FileReader(dupPotFileName));
              
              while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
             	 List<UUID> uuidList = new ArrayList<UUID>();
             	 for (String uuidStr: uuidLineStr.split("\t")){
+         			 worker.getLogger().info("uuidStrs: " + uuidStr); 	
             		 UUID uuid = UUID.fromString(uuidStr);
             		 uuidList.add(uuid);
             	 }

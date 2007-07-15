@@ -1,10 +1,15 @@
 package org.dwfa.ace.task.address;
 
 import java.beans.BeanDescriptor;
+import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 public class AddAllVisibleAddressesToAddressListBeanInfo extends SimpleBeanInfo {
 
+    public PropertyDescriptor[] getPropertyDescriptors() {
+        PropertyDescriptor rv[] = { };
+       return rv;
+}
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */

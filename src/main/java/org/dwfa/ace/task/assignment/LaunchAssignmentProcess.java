@@ -12,9 +12,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -110,7 +112,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
             	worker.getLogger().info("reviewerOne: " + reviewerOne);
             	String reviewerTwo = assigees.nextAdr(worker);
               	worker.getLogger().info("revireviewerTwoewerOne: " + reviewerTwo);
-              	
+                
                	launchAssignment(process, worker, processUrlStr, reviewerOne, reviewerTwo, temporaryListUuid);
                	launchAssignment(process, worker, processUrlStr, reviewerTwo, reviewerOne, temporaryListUuid);
  
@@ -140,12 +142,17 @@ public class LaunchAssignmentProcess extends AbstractTask {
 			TaskFailedException, PropertyVetoException, TerminologyException, IOException {
 		
 		I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(uuid);
-		
+        I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
+        .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        
+        worker.getLogger().info("originator is: " + configFrame.getUsername());
+ 	
 		process.setProperty(assigneeAddrPropName, asignee);
 		process.setProperty(alternateAddrPropName, alternate);
 		
 		LoadSetLaunchProcessFromURL launcher = new LoadSetLaunchProcessFromURL();
-		launcher.setProcessName("Review for possible dup");
+		launcher.setProcessName("Possible Duplicate Review");
+		launcher.setOriginator(configFrame.getUsername());
 		launcher.setProcessSubject(concept.toString());
 		launcher.setProcessURLString(processURLString);
 		worker.getLogger().info("processURLString: " + processURLString);
