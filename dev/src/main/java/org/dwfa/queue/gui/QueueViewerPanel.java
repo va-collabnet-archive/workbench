@@ -339,12 +339,17 @@ public class QueueViewerPanel extends JPanel {
 
             if (qAdaptor == null) {
                 // nothing to do...
+            	if (logger.isLoggable(Level.FINE)) {
+            		logger.fine("Refresh, but qAdaptor is null");
+            	}
             } else {
                 try {
+                	if (logger.isLoggable(Level.FINE)) {
+                		logger.fine("Starting refresh for qAdaptor");
+                	}
                     updateQueueModelAndDisplay(qAdaptor.queue);
-
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+                    logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
                 }
             }
         }
@@ -377,29 +382,38 @@ public class QueueViewerPanel extends JPanel {
                 process = null;
             } else {
                 try {
-                    int firstSelectedRow = sorter.modelIndex(lsm.getMinSelectionIndex());
-                    tableOfQueueEntriesModel.updateQueueData();
-                    I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(firstSelectedRow);
-                    processEntryID = processMeta.getEntryID();
-                    try {
-                        process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
-                        ProcessPanel processPanel = new ProcessPanel(process, worker);
-                        int dividerLoc = queueContentsSplitPane.getDividerLocation();
-                        queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
-                        queueContentsSplitPane.setDividerLocation(dividerLoc);
-                        execute.setText("<html><font color='#006400'>execute");
-                        execute.setEnabled(true);
-                    } catch (NoMatchingEntryException ex) {
-                        System.out.println(" NoMatchingEntry: " + ex);
+                	if (lsm.getMinSelectionIndex() < sorter.getRowCount()) {
+                        int firstSelectedRow = sorter.modelIndex(lsm.getMinSelectionIndex());
+                        tableOfQueueEntriesModel.updateQueueData();
+                        I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(firstSelectedRow);
+                        processEntryID = processMeta.getEntryID();
+                        try {
+                            process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
+                            ProcessPanel processPanel = new ProcessPanel(process, worker);
+                            int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                            queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
+                            queueContentsSplitPane.setDividerLocation(dividerLoc);
+                            execute.setText("<html><font color='#006400'>execute");
+                            execute.setEnabled(true);
+                        } catch (NoMatchingEntryException ex) {
+                            logger.info(" NoMatchingEntry: " + ex);
+                            lsm.clearSelection();
+                            int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                            queueContentsSplitPane.setBottomComponent(new JLabel("No matching entry"));
+                            queueContentsSplitPane.setDividerLocation(dividerLoc);
+                            execute.setText("execute");
+                            execute.setEnabled(false);
+                        }
+                	} else {
                         lsm.clearSelection();
                         int dividerLoc = queueContentsSplitPane.getDividerLocation();
-                        queueContentsSplitPane.setBottomComponent(new JLabel("No matching entry"));
+                        queueContentsSplitPane.setBottomComponent(new JLabel("No selected entry"));
                         queueContentsSplitPane.setDividerLocation(dividerLoc);
                         execute.setText("execute");
                         execute.setEnabled(false);
-                    }
+                	}
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
                     int dividerLoc = queueContentsSplitPane.getDividerLocation();
                     queueContentsSplitPane.setBottomComponent(new JLabel(ex.getMessage()));
                     queueContentsSplitPane.setDividerLocation(dividerLoc);
@@ -699,17 +713,22 @@ public class QueueViewerPanel extends JPanel {
                     } else {
                         int selectedRow = tableOfQueueEntries.getSelectedRow();
                         EntryID selectedEntry = null;
-                        if (selectedRow >= 0) {
+                        if (selectedRow >= 0 && selectedRow < tableOfQueueEntries.getRowCount()) {
                             selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(selectedRow, 6);
                         }
                         tableOfQueueEntriesModel.updateQueueData();
                         if (selectedEntry != null) {
+                        	boolean entryFound = false;
                             for (int row = 0; row < tableOfQueueEntries.getRowCount(); row++) {
                                 EntryID entry = (EntryID) tableOfQueueEntries.getModel().getValueAt(row, 6);
                                 if (entry.equals(selectedEntry)) {
                                     tableOfQueueEntries.getSelectionModel().addSelectionInterval(row, row);
+                                    entryFound = true;
                                     break;
                                 }
+                            }
+                            if (entryFound == false) {
+                                tableOfQueueEntries.getSelectionModel().setSelectionInterval(0, 0);
                             }
                         } else {
                             tableOfQueueEntries.getSelectionModel().setSelectionInterval(0, 0);

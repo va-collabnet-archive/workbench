@@ -205,7 +205,7 @@ public class TransactionParticipantAggregator implements
             logger.fine("Starting commit for " + id);
         }
 		ServerTransaction st = new ServerTransaction(mgr, id);
-		List partsList = this.transactionMap.remove(st);
+		List<I_TransactionPart> partsList = this.transactionMap.remove(st);
 		if (partsList == null) {
 			throw new UnknownTransactionException(
 					"Not contained in transactionMap");
@@ -214,8 +214,7 @@ public class TransactionParticipantAggregator implements
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Committing " + partsList.size() + " parts.");
         }
-		for (Iterator setItr = partsList.iterator(); setItr.hasNext();) {
-			I_TransactionPart part = (I_TransactionPart) setItr.next();
+		for (I_TransactionPart part: partsList) {
 			if (commitDate == null) {
                 if (logger.isLoggable(Level.FINER)) {
                     logger.finer("getting commitDate for: " + id);
@@ -257,18 +256,29 @@ public class TransactionParticipantAggregator implements
             logger.fine("Starting abort for " + id);
         }
 		ServerTransaction st = new ServerTransaction(mgr, id);
-		List partsList = this.transactionMap.remove(st);
+		List<I_TransactionPart>  partsList = this.transactionMap.remove(st);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Aborting " + partsList.size() + " parts.");
+        }
 		if (partsList == null) {
 			throw new UnknownTransactionException(
 					"Not contained in transactionMap");
 		}
-		for (Iterator i = partsList.iterator(); i.hasNext();) {
-			I_TransactionPart part = (I_TransactionPart) i.next();
+		for (I_TransactionPart part: partsList) {
 			part.abort(mgr, id);
 		}
         if (logger.isLoggable(Level.FINEST)) {
             logger.fine("Finished abort for " + id);
         }
+		for (Iterator<ActionListener> itr = this.listeners.iterator(); itr.hasNext();) {
+			ActionEvent event = new ActionEvent(this, 0,
+					"Transaction aborted");
+			ActionListener listener = itr.next();
+            if (logger.isLoggable(Level.FINER)) {
+                logger.finer("Notifying: " + listener);
+            }
+			listener.actionPerformed(event);
+		}
 	}
 
 	/**
