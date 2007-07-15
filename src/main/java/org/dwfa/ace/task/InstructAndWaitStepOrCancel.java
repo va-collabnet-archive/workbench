@@ -162,6 +162,7 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
 						cont.validate();
 						cont = cont.getParent();
 					}
+					stepButton.requestFocusInWindow();
 				}
 			});
 			synchronized (this) {

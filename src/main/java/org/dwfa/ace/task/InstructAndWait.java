@@ -99,6 +99,8 @@ public class InstructAndWait extends AbstractTask {
 	final JPanel workflowPanel = config.getWorkflowPanel();
 			SwingUtilities.invokeAndWait(new Runnable() {
 
+				private JButton stepButton;
+
 				public void run() {
 					Component[] components = workflowPanel.getComponents();
 					for (int i = 0; i < components.length; i++) {
@@ -120,7 +122,7 @@ public class InstructAndWait extends AbstractTask {
 					c.gridx++;
 					workflowPanel.add(new JLabel("  "), c);
 					c.gridx++;
-					JButton stepButton = new JButton(new ImageIcon(InstructAndWait.class
+					stepButton = new JButton(new ImageIcon(InstructAndWait.class
 							.getResource("/32x32/plain/media_step_forward.png")));
 					workflowPanel.add(stepButton, c);
 					stepButton.addActionListener(new StepActionListener());
@@ -132,6 +134,7 @@ public class InstructAndWait extends AbstractTask {
 						cont.validate();
 						cont = cont.getParent();
 					}
+					stepButton.requestFocusInWindow();
 				}
 			});
 			synchronized (this) {
