@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +27,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -33,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -84,6 +87,19 @@ public class QueueViewerPanel extends JPanel {
 
     private ServiceItemFilter queuefilter;
 
+    public class ExecuteAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent evt) {
+			executeActionListener.actionPerformed(evt);
+			
+		}
+
+    }
     private class ExecuteProcessActionListener implements ActionListener {
         Configuration config;
 
@@ -192,6 +208,9 @@ public class QueueViewerPanel extends JPanel {
                                     logger.log(Level.WARNING, e.toString(), e);
                                 }
                             }
+                            ListSelectionModel lsm = tableOfQueueEntries.getSelectionModel();
+                            lsm.setSelectionInterval(0, 0);
+                            execute.requestFocusInWindow();
                         }
                     });
                 }
@@ -445,6 +464,8 @@ public class QueueViewerPanel extends JPanel {
 
     JTable tableOfQueueEntries;
 
+	private ExecuteProcessActionListener executeActionListener;
+
     public QueueViewerPanel(Configuration jiniConfig, I_Work worker) throws Exception {
         this(jiniConfig, worker, null);
     }
@@ -473,7 +494,8 @@ public class QueueViewerPanel extends JPanel {
         c.gridy = 0;
         this.add(this.splitPane, c);
         this.execute.setEnabled(false);
-        this.execute.addActionListener(new ExecuteProcessActionListener(jiniConfig, UuidFactory.generate(), worker));
+        this.executeActionListener = new ExecuteProcessActionListener(jiniConfig, UuidFactory.generate(), worker);
+        this.execute.addActionListener(executeActionListener);
         JPanel statusPanel = makeStatusPanel(this.statusMessage, refresh, execute);
         c.weighty = 0;
         c.gridy = 1;
@@ -497,8 +519,6 @@ public class QueueViewerPanel extends JPanel {
     }
 
     GetQueuesAsWorker getQueuesAction = new GetQueuesAsWorker();
-
-    private TableSorter tableOfQueueEntriesSorter;
 
     private TableSorter tableOfQueuesSortingTable;
 
@@ -651,6 +671,16 @@ public class QueueViewerPanel extends JPanel {
                         tableOfQueueEntriesModel = new QueueTableModel(queue);
                         tableOfQueueEntriesSortingTable = new TableSorter(tableOfQueueEntriesModel);
                         tableOfQueueEntries = new JTable(tableOfQueueEntriesSortingTable);
+                        
+                        tableOfQueueEntries.getInputMap()
+                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                                "executeTask");
+                        tableOfQueueEntries.getInputMap()
+                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                                "executeTask");
+                        tableOfQueueEntries.getActionMap().put("executeTask", new ExecuteAction());
+
+                        
                         tableOfQueueEntriesSortingTable.setTableHeader(tableOfQueueEntries.getTableHeader());
 
                         // Set up tool tips for column headers.
@@ -681,7 +711,10 @@ public class QueueViewerPanel extends JPanel {
                                     break;
                                 }
                             }
+                        } else {
+                            tableOfQueueEntries.getSelectionModel().setSelectionInterval(0, 0);
                         }
+                        tableOfQueueEntries.requestFocusInWindow();
                     }
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
