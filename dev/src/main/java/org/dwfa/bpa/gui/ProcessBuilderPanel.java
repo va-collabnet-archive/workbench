@@ -432,15 +432,17 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
                         SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(process
                                 .getExecutionRecords());
                         Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
-                        StringBuffer buff = new StringBuffer();
-                        while (recordItr.hasNext()) {
-                            ExecutionRecord rec = recordItr
-                                    .next();
-                            buff.append("\n");
-                            buff.append(rec.toString());
+                        if (logger.isLoggable(Level.FINE)) {
+                            StringBuffer buff = new StringBuffer();
+                            while (recordItr.hasNext()) {
+                                ExecutionRecord rec = recordItr
+                                        .next();
+                                buff.append("\n");
+                                buff.append(rec.toString());
+                            }
+                            logger.fine(buff.toString());
                         }
-                        logger.info(buff.toString());
-                        exceptionMessage = "";
+                         exceptionMessage = "";
                     } catch (Throwable e1) {
                         logger.log(Level.WARNING, e1.toString(), e1);
                         exceptionMessage = e1.toString();

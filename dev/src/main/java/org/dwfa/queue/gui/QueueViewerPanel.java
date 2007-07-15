@@ -173,16 +173,18 @@ public class QueueViewerPanel extends JPanel {
                             I_EncodeBusinessProcess processToExecute = tableOfQueueEntriesModel.getQueue()
                                     .take(processMeta.getEntryID(), worker.getActiveTransaction());
                             worker.execute(processToExecute);
-                            SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(processToExecute
-                                    .getExecutionRecords());
-                            Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
-                            StringBuffer buff = new StringBuffer();
-                            while (recordItr.hasNext()) {
-                                ExecutionRecord rec = recordItr.next();
-                                buff.append("\n");
-                                buff.append(rec.toString());
+                            if (logger.isLoggable(Level.FINE)) {
+                                SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(processToExecute
+                                        .getExecutionRecords());
+                                Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
+                                StringBuffer buff = new StringBuffer();
+                                while (recordItr.hasNext()) {
+                                    ExecutionRecord rec = recordItr.next();
+                                    buff.append("\n");
+                                    buff.append(rec.toString());
+                                }
+                                logger.fine(buff.toString());
                             }
-                            logger.info(buff.toString());
                             exceptionMessage = "";
                         } catch (Throwable e1) {
                             logger.log(Level.WARNING, e1.toString(), e1);
@@ -743,6 +745,18 @@ public class QueueViewerPanel extends JPanel {
 
         });
 
+    }
+    
+    public void requestFocusOnEntry() {
+    	SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
+		    	if (tableOfQueueEntries != null) {
+		            tableOfQueueEntries.requestFocusInWindow();
+		    	}
+			}
+    		
+    	});
     }
 
 }
