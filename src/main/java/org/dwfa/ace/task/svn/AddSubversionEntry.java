@@ -18,7 +18,6 @@ import javax.swing.SpringLayout;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.gui.SpringUtilities;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
