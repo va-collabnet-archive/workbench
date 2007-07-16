@@ -64,7 +64,8 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+    @SuppressWarnings("unchecked")
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
             ArrayList<Collection<UUID>> temporaryList =

@@ -28,7 +28,7 @@ public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
                 new PropertyDescriptor("potDupUuidListPropName", ReadUuidListListFromUrl.class);
             potDupUuidListPropName.setBound(true);
             potDupUuidListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            potDupUuidListPropName.setDisplayName("<html><font color='green'>Uuid List url:");
+            potDupUuidListPropName.setDisplayName("<html><font color='green'>Uuid List prop:");
             potDupUuidListPropName.setShortDescription("Uuid list.");
             
             PropertyDescriptor dupPotFileName =

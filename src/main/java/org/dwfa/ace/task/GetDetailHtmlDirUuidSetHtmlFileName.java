@@ -58,7 +58,8 @@ public class GetDetailHtmlDirUuidSetHtmlFileName extends AbstractTask {
         super();
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+    @SuppressWarnings("unchecked")
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {    	
 			List<UUID> potDupUuidList = (List<UUID>) process.readProperty(potUuidListPropName);
