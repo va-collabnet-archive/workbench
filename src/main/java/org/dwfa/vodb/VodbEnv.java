@@ -23,14 +23,15 @@ import java.util.regex.Pattern;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -1168,6 +1169,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 			timer.stop();
 		}
 	}
+	
+	/*
+	 * For issues upgrading to lucene 2.x, see this link:
+	 * http://www.nabble.com/Lucene-in-Action-examples-complie-problem-tf2418478.html#a6743189
+	 */
 
 	public void searchLucene(I_TrackContinuation tracker, String query,
 			Collection<LuceneMatch> matches, CountDownLatch latch,
@@ -1191,7 +1197,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 		updater.setProgressInfo("Starting lucene query...");
 		long startTime = System.currentTimeMillis();
-		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
+		Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
 		updater.setProgressInfo("Query complete in "
 				+ Long.toString(System.currentTimeMillis() - startTime)
 				+ " ms.");
@@ -1199,7 +1205,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 		for (int i = 0; i < hits.length(); i++) {
 			Document doc = hits.doc(i);
 			float score = hits.score(i);
-			logger.info("Hit: " + doc + " Score: " + score);
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("Hit: " + doc + " Score: " + score);
+			}
 			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, score,
 					matches, root, config, VodbEnv.this));
 		}
@@ -1219,13 +1227,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 			Stopwatch timer = new Stopwatch();
 			timer.start();
 			luceneDir.mkdirs();
-			Directory dir = FSDirectory.getDirectory(luceneDir, true);
-			IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(),
+			IndexWriter writer = new IndexWriter(luceneDir, new StandardAnalyzer(),
 					true);
 			writer.setUseCompoundFile(true);
-			writer.mergeFactor = 10000;
-			writer.maxMergeDocs = Integer.MAX_VALUE;
-			writer.minMergeDocs = 1000;
+			writer.setMergeFactor(10000);
+			writer.setMaxMergeDocs(Integer.MAX_VALUE);
+			writer.setMaxBufferedDocs(1000);
 			Cursor descCursor = getDescDb().openCursor(null, null);
 			DatabaseEntry foundKey = new DatabaseEntry();
 			DatabaseEntry foundData = new DatabaseEntry();
@@ -1235,15 +1242,18 @@ public class VodbEnv implements I_ImplementTermFactory {
 				ThinDescVersioned descV = (ThinDescVersioned) descBinding
 						.entryToObject(foundData);
 				Document doc = new Document();
-				doc.add(Field.Keyword("dnid", Integer.toString(descV
-						.getDescId())));
-				doc.add(Field.Keyword("cnid", Integer.toString(descV
-						.getConceptId())));
+				doc.add(new Field("dnid", Integer.toString(descV
+						.getDescId()), Field.Store.YES,   
+						Field.Index.UN_TOKENIZED));
+				doc.add(new Field("cnid", Integer.toString(descV
+						.getConceptId()), Field.Store.YES,   
+						Field.Index.UN_TOKENIZED));
 				String lastDesc = null;
 				for (I_DescriptionTuple tuple : descV.getTuples()) {
 					if (lastDesc == null
 							|| lastDesc.equals(tuple.getText()) == false) {
-						doc.add(Field.UnStored("desc", tuple.getText()));
+						doc.add(new Field("desc", tuple.getText(), Field.Store.NO,   
+								Field.Index.TOKENIZED));
 					}
 
 				}
@@ -1791,6 +1801,37 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public void writeDescription(I_DescriptionVersioned desc)
 			throws DatabaseException {
+		try {
+			IndexReader reader = IndexReader.open(luceneDir);
+			reader.deleteDocuments(new Term("dnid", Integer.toString(desc
+					.getDescId())));
+			reader.close();
+			IndexWriter writer = new IndexWriter(luceneDir, new StandardAnalyzer(),
+					false);
+			Document doc = new Document();
+			doc.add(new Field("dnid", Integer.toString(desc
+					.getDescId()), Field.Store.YES,   
+					Field.Index.UN_TOKENIZED));
+			doc.add(new Field("cnid", Integer.toString(desc
+					.getConceptId()), Field.Store.YES,   
+					Field.Index.UN_TOKENIZED));
+			String lastDesc = null;
+			for (I_DescriptionTuple tuple : desc.getTuples()) {
+				if (lastDesc == null
+						|| lastDesc.equals(tuple.getText()) == false) {
+					logger.info("Adding to index. dnid:  "  + desc.getDescId() + " desc: " + tuple.getText());
+					doc.add(new Field("desc", tuple.getText(), Field.Store.NO,   
+							Field.Index.TOKENIZED));
+				}
+
+			}
+			writer.addDocument(doc);
+			writer.close();
+		} catch (CorruptIndexException e) {
+			throw new DatabaseException(e);
+		} catch (IOException e) {
+			throw new DatabaseException(e);
+		}
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(desc.getDescId(), key);
@@ -2448,15 +2489,16 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private void writeTolicitIndex(String word, String type) throws IOException {
 		if (licitIndexWriter == null) {
-			Directory dir = FSDirectory.getDirectory(licitWordsDir, true);
-			licitIndexWriter = new IndexWriter(dir, new StandardAnalyzer(),
+			licitIndexWriter = new IndexWriter(licitWordsDir, new StandardAnalyzer(),
 					true);
 			licitIndexWriter.setUseCompoundFile(true);
-			licitIndexWriter.mergeFactor = 10000;
+			licitIndexWriter.setMergeFactor(10000);
 		}
 		Document doc = new Document();
-		doc.add(Field.Keyword("type", type));
-		doc.add(Field.UnStored("word", word));
+		doc.add(new Field("type", type, Field.Store.YES,   
+				Field.Index.UN_TOKENIZED));
+		doc.add(new Field("word", word, Field.Store.NO,   
+				Field.Index.TOKENIZED));
 		licitIndexWriter.addDocument(doc);
 	}
 
@@ -2485,7 +2527,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 			luceneLicitSearcher = new IndexSearcher(licitWordsDir
 					.getAbsolutePath());
 		}
-		Query q = QueryParser.parse(query, "word", new StandardAnalyzer());
+		Query q = new QueryParser("word", new StandardAnalyzer()).parse(query);
 		return luceneLicitSearcher.search(q);
 	}
 
@@ -2506,7 +2548,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		if (luceneSearcher == null) {
 			luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
 		}
-		Query q = QueryParser.parse(query, "desc", new StandardAnalyzer());
+		Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
 		return luceneSearcher.search(q);
 	}
 
