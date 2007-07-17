@@ -28,6 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.util.id.Type5UuidFactory;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/path", type = BeanType.TASK_BEAN) })
 public class NewEditPathForUser extends AbstractTask {
@@ -81,13 +82,18 @@ public class NewEditPathForUser extends AbstractTask {
             String username = (String) process.readProperty(userPropName);
             I_TermFactory tf = LocalVersionedTerminology.get();
             I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
-            I_GetConceptData newPathConcept = tf.newConcept(UUID.randomUUID(), false, activeProfile);
+            
+            UUID type5ConceptId = Type5UuidFactory.get(parentPathTermEntry.ids[0], username);
 
-            tf.newDescription(UUID.randomUUID(), newPathConcept, "en", username + " development editing path",
+            I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId, false, activeProfile);
+
+            String descText = username + " development editing path";
+            tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0], descText), newPathConcept, "en", descText,
                     ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(),
                     activeProfile);
             
-            tf.newDescription(UUID.randomUUID(), newPathConcept, "en", username + " dev path",
+            descText = username + " dev path";
+            tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0], descText), newPathConcept, "en", descText,
                     ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);
             
             I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
@@ -95,7 +101,9 @@ public class NewEditPathForUser extends AbstractTask {
             I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
             I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
             I_GetConceptData relStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            tf.newRelationship(UUID.randomUUID(), newPathConcept, relType, relDestination, relCharacteristic, relRefinability, relStatus, 0, activeProfile);
+            
+            UUID relId = Type5UuidFactory.get(parentPathTermEntry.ids[0], "relid");
+            tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability, relStatus, 0, activeProfile);
             
             tf.commit();
             
