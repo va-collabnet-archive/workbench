@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Hits;
@@ -303,7 +304,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 									&& (word.equals("substance") == false)
 									&& (word.equals("Substance") == false)) {
 								FuzzyQuery wq = new FuzzyQuery(new Term("desc", word));
-								apiQuery.add(wq, true, false);
+								apiQuery.add(wq, BooleanClause.Occur.MUST);
 							}
 						}
 					}
@@ -638,7 +639,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 									&& (word.equals("substance") == false)
 									&& (word.equals("Substance") == false)) {
 								FuzzyQuery wq = new FuzzyQuery(new Term("desc", word));
-								apiQuery.add(wq, true, false);
+								apiQuery.add(wq, BooleanClause.Occur.MUST);
 							}
 						}
 					}

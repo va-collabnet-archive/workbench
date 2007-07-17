@@ -8,8 +8,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -44,35 +42,38 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 		public Indexer() throws IOException {
 			super();
 			luceneDir.mkdirs();
-			Directory dir = FSDirectory.getDirectory(luceneDir, true);
 			
 			switch (indexType) {
 			case Standard:
 			case Fuzzy:
-				writer = new IndexWriter(dir, new StandardAnalyzer(), true);
+				writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
 				break;
 			case Snowball:
-				writer = new IndexWriter(dir, new StandardAnalyzer(), true);
+				writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
 				break;
 			}
 		
 			writer.setUseCompoundFile(true);
-			writer.mergeFactor = 10000;
+			writer.setMergeFactor(10000);
 		}
 
 		public void processDescription(I_DescriptionVersioned desc) throws Exception {
 			Document doc = new Document();
-			doc.add(Field.Keyword("dnid", Integer.toString(desc
-					.getDescId())));
-			doc.add(Field.Keyword("cnid", Integer.toString(desc
-					.getConceptId())));
-			doc.add(Field.Keyword("tnid", Integer.toString(desc
-					.getFirstTuple().getTypeId())));
+			doc.add(new Field("dnid", Integer.toString(desc
+					.getDescId()), Field.Store.YES,   
+					Field.Index.UN_TOKENIZED));
+			doc.add(new Field("cnid", Integer.toString(desc
+					.getConceptId()), Field.Store.YES,   
+					Field.Index.UN_TOKENIZED));
+			doc.add(new Field("tnid", Integer.toString(desc
+					.getFirstTuple().getTypeId()), Field.Store.YES,   
+					Field.Index.UN_TOKENIZED));
 			String lastDesc = null;
 			for (I_DescriptionTuple tuple : desc.getTuples()) {
 				if (lastDesc == null
 						|| lastDesc.equals(tuple.getText()) == false) {
-					doc.add(Field.UnStored("desc", tuple.getText()));
+					doc.add(new Field("desc", tuple.getText(), Field.Store.NO,   
+							Field.Index.TOKENIZED));
 				}
 
 			}
