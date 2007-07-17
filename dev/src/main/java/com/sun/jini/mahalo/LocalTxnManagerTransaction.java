@@ -617,6 +617,9 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 						try {
 							if (job.isCompleted(Long.MAX_VALUE)) {
 								result = (Integer) job.computeResult();
+								if (result == ABORTED) {
+									transactionsLogger.info("aborted (job.computeResult)");
+								}
 								if (result.intValue() == ABORTED
 										&& job instanceof LocalPrepareAndCommitJob) {
 									LocalPrepareAndCommitJob pj = (LocalPrepareAndCommitJob) job;
@@ -625,11 +628,14 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 								}
 							}
 						} catch (JobNotStartedException jnse) {
+							transactionsLogger.info("no participants voted");
 							// no participants voted, so do nothing
 							result = new Integer(NOTCHANGED);
 						} catch (ResultNotReadyException rnre) {
+							transactionsLogger.info("aborted secondary to ResultNotReadyException");
 							// consider aborted
 						} catch (JobException je) {
+							transactionsLogger.info("aborted secondary to JobException");
 							// consider aborted
 						}
 					}
@@ -639,7 +645,7 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 				// an abort or commit in progress.
 
 				if (getState() == ABORTED)
-					throw new CannotCommitException("transaction ABORTED");
+					throw new CannotCommitException("transaction ABORTED X");
 
 				// If a CommitJob is already in progress
 				// (the state is COMMITTED) cause a fall
