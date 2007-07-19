@@ -21,5 +21,7 @@ public interface I_ConfigAceDb {
     public String getChangeSetWriterFileName();
 
     public void setChangeSetWriterFileName(String changeSetWriterFileName);
+    
+    public File getProfileFile();
 
 }

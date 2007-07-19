@@ -31,27 +31,35 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private String profileDir = "profiles/users";
 
     private String template = "config/queue.config";
 
     private String usernamePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
+    
+    private String queueFolderName = "queue";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profileDir);
         out.writeObject(template);
         out.writeObject(usernamePropName);
+        out.writeObject(queueFolderName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion <= dataVersion) {
             profileDir = (String) in.readObject();
             template = (String) in.readObject();
             usernamePropName = (String) in.readObject();
+            if (objDataVersion >= 2) {
+            	queueFolderName = (String) in.readObject();
+            } else {
+            	queueFolderName = "queue";
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -66,8 +74,9 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
             String username = (String) process.readProperty(usernamePropName);
             String configTemplate = FileIO.readerToString(new FileReader(template));
             configTemplate = configTemplate.replace("username", username);
+            configTemplate = configTemplate.replace("directory", "not_used");
             
-            File outputFile = new File(profileDir, username + File.separatorChar + "queue" + 
+            File outputFile = new File(profileDir, username + File.separatorChar + queueFolderName + 
                                        File.separatorChar + "queue.config");
             outputFile.getParentFile().mkdirs();
             FileWriter fw = new FileWriter(outputFile);
@@ -124,4 +133,12 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
     public void setTemplate(String template) {
         this.template = template;
     }
+
+	public String getQueueFolderName() {
+		return queueFolderName;
+	}
+
+	public void setQueueFolderName(String queueFolderName) {
+		this.queueFolderName = queueFolderName;
+	}
 }

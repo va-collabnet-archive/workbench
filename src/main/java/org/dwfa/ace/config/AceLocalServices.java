@@ -23,13 +23,13 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
 		add(CoreServices.CO_TransactionAggregator);
 		//add(CoreServices.CO_Timer);
 
-		add(CoreServices.CO_AgingQueue);
-		add(CoreServices.CO_Archival);
-		add(CoreServices.CO_ComputeQueue);
-		add(CoreServices.CO_LauncherQueue);
-		add(CoreServices.CO_OutboxQueue);
-		add(CoreServices.CO_SyncQueue);
-		add(CoreServices.CO_Inbox);
+		//add(CoreServices.CO_AgingQueue);
+		//add(CoreServices.CO_Archival);
+		//add(CoreServices.CO_ComputeQueue);
+		//add(CoreServices.CO_LauncherQueue);
+		//add(CoreServices.CO_OutboxQueue);
+		//add(CoreServices.CO_SyncQueue);
+		//add(CoreServices.CO_Inbox);
         add(CoreServices.CO_MultiQueueStarter);
 		
 		//add(CO_queue_kp_user2_editor_Inbox);

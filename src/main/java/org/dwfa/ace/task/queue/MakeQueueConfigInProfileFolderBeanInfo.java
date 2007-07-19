@@ -18,7 +18,14 @@ public class MakeQueueConfigInProfileFolderBeanInfo extends SimpleBeanInfo {
             profileDir.setBound(true);
             profileDir.setPropertyEditorClass(JTextFieldEditorOneLine.class);
             profileDir.setDisplayName("<html><font color='green'>profile dir:");
-            profileDir.setShortDescription("The directory to write the queue config file to.");
+            profileDir.setShortDescription("The profile directory to write the queue config file to.");
+
+            PropertyDescriptor queueFolderName =
+                new PropertyDescriptor("queueFolderName", getBeanDescriptor().getBeanClass());
+            queueFolderName.setBound(true);
+            queueFolderName.setPropertyEditorClass(JTextFieldEditorOneLine.class);
+            queueFolderName.setDisplayName("<html><font color='green'>queue dir:");
+            queueFolderName.setShortDescription("The directory name for the queue inside the user's profile dir.");
 
             PropertyDescriptor usernamePropName =
                 new PropertyDescriptor("usernamePropName", getBeanDescriptor().getBeanClass());
@@ -30,12 +37,12 @@ public class MakeQueueConfigInProfileFolderBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor template =
                 new PropertyDescriptor("template", getBeanDescriptor().getBeanClass());
             template.setBound(true);
-            template.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            template.setPropertyEditorClass(JTextFieldEditorOneLine.class);
             template.setDisplayName("<html><font color='green'>template file:");
             template.setShortDescription("The template that the queue.config file will be based upon.");
 
             PropertyDescriptor rv[] =
-                { profileDir, usernamePropName, template };
+                { profileDir, queueFolderName, usernamePropName, template };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

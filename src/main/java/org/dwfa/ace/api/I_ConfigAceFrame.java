@@ -250,5 +250,7 @@ public interface I_ConfigAceFrame {
     public void setSignpostToggleEnabled(boolean enabled);
     
     public void setSignpostToggleIcon(ImageIcon icon);
+    
+    public I_ConfigAceDb getDbConfig();
 
 }
