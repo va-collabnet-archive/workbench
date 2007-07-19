@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UniversalIdList implements Serializable {
 
@@ -16,7 +16,7 @@ public class UniversalIdList implements Serializable {
 	
 	private static final int dataVersion = 1;
 
-	private List<UniversalAceIdentification> uncommittedIds = new ArrayList<UniversalAceIdentification>();
+	private Set<UniversalAceIdentification> uncommittedIds = new HashSet<UniversalAceIdentification>();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -33,18 +33,14 @@ public class UniversalIdList implements Serializable {
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == dataVersion) {
-			uncommittedIds = (List<UniversalAceIdentification>) in.readObject();
+			uncommittedIds = (Set<UniversalAceIdentification>) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
 
 	}
 
-	public List<UniversalAceIdentification> getUncommittedIds() {
+	public Set<UniversalAceIdentification> getUncommittedIds() {
 		return uncommittedIds;
-	}
-
-	public void setUncommittedIds(List<UniversalAceIdentification> uncommittedIds) {
-		this.uncommittedIds = uncommittedIds;
 	}
 }
