@@ -175,7 +175,8 @@ public class AceRunner {
     
     private void processFile(File file, LifeCycle lc) throws Exception {
         if (file.isDirectory() == false) {
-            if (file.getName().equalsIgnoreCase("queue.config")) {
+            if (file.getName().equalsIgnoreCase("queue.config") &&
+            		QueueServer.started(file) == false) {
             	AceLog.getAppLog().info("Found user queue: " + file.getCanonicalPath());
                 new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             }
