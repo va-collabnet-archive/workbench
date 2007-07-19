@@ -13,7 +13,7 @@ public class OpenAllInboxesBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(AddAllProfilesToVisibleQueues.class);
+        BeanDescriptor bd = new BeanDescriptor(OpenAllInboxes.class);
         bd.setDisplayName("<html><font color='green'><center>Open All Inboxes");
         return bd;
     }
