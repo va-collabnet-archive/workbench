@@ -8,7 +8,7 @@ import java.beans.SimpleBeanInfo;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
- * Bean info to NewAttachmentListFromChosenFile class.
+ * Bean info to ChooseFile class.
  * @author Christine Hill
  *
  */

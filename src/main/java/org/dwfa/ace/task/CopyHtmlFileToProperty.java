@@ -17,7 +17,7 @@ import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN)})
 /**
  * Copy the contents of an html file to a property
  * @author Susan Castillo

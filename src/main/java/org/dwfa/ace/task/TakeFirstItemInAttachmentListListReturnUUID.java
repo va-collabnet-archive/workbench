@@ -24,7 +24,7 @@ import org.dwfa.util.bean.Spec;
 * @author Susan Castillo
 *
 */
-@BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
 
 public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
@@ -35,14 +35,14 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String listNamePropName = ProcessAttachmentKeys.DUP_UUID_L2.getAttachmentKey();
+    private String listListNamePropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
 
-    private String uuidListPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
+    private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(listNamePropName);
+        out.writeObject(listListNamePropName);
         out.writeObject(uuidListPropName);
     }
 
@@ -50,7 +50,7 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	listNamePropName = (String) in.readObject();
+        	listListNamePropName = (String) in.readObject();
             uuidListPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -69,7 +69,7 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
             throws TaskFailedException {
         try {
             ArrayList<Collection<UUID>> temporaryList =
-                (ArrayList<Collection<UUID>>) process.readProperty(listNamePropName);
+                (ArrayList<Collection<UUID>>) process.readProperty(listListNamePropName);
 
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
@@ -107,12 +107,12 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 		this.uuidListPropName = uuidListPropName;
 	}
 
-	public String getListNamePropName() {
-		return listNamePropName;
+	public String getListListNamePropName() {
+		return listListNamePropName;
 	}
 
-	public void setListNamePropName(String listNamePropName) {
-		this.listNamePropName = listNamePropName;
+	public void setListListNamePropName(String listNamePropName) {
+		this.listListNamePropName = listNamePropName;
 	}
 
 }

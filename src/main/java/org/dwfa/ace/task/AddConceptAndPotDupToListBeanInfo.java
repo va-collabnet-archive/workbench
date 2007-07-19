@@ -37,7 +37,7 @@ public class AddConceptAndPotDupToListBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInAttachmentListListReturnUUID.class);
+        BeanDescriptor bd = new BeanDescriptor(AddConceptAndPotDupToList.class);
         bd.setDisplayName("<html><font color='green'><center>Add Concept and<br>Pot Dup<br>to List");
         return bd;
     }

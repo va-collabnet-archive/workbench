@@ -27,7 +27,7 @@ import org.dwfa.util.bean.Spec;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
 
 public class ReadUuidListListFromUrl extends AbstractTask {
 
@@ -38,24 +38,24 @@ public class ReadUuidListListFromUrl extends AbstractTask {
 
     private static final int dataVersion = 2;
 
-    private String potDupUuidListPropName = ProcessAttachmentKeys.DUP_UUID_L2.getAttachmentKey();
-    private String dupPotFileName = ProcessAttachmentKeys.POT_DUP_FILENAME.getAttachmentKey();
+    private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
+    private String uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(potDupUuidListPropName);
-        out.writeObject(dupPotFileName);
+        out.writeObject(uuidListListPropName);
+        out.writeObject(uuidFileNamePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
-        	potDupUuidListPropName = (String) in.readObject();
+        	uuidListListPropName = (String) in.readObject();
         	if (objDataVersion >= 2){
-        		dupPotFileName = (String) in.readObject();
+        		uuidFileNamePropName = (String) in.readObject();
         	} else {
-        		dupPotFileName = "luceneDups/dupPotMatchResults/dwfaDups.txt";
+        		uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
         	}
         } else {
             throw new IOException(
@@ -72,13 +72,13 @@ public class ReadUuidListListFromUrl extends AbstractTask {
                                 throws TaskFailedException {
         try {
         	            
-             List<List<UUID>> potDupUuidListOfLists = new ArrayList<List<UUID>>();
+             List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
              
             String uuidLineStr;
  		
- //			worker.getLogger().info("file is: " + dupPotFileName); 			
-            
-             BufferedReader br = new BufferedReader(new FileReader(dupPotFileName));
+ //			worker.getLogger().info("file is: " + uuidFileName); 			
+            String uuidFileName = (String) process.readProperty(uuidFileNamePropName);
+             BufferedReader br = new BufferedReader(new FileReader(uuidFileName));
              
              while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
             	 List<UUID> uuidList = new ArrayList<UUID>();
@@ -87,11 +87,11 @@ public class ReadUuidListListFromUrl extends AbstractTask {
             		 UUID uuid = UUID.fromString(uuidStr);
             		 uuidList.add(uuid);
             	 }
-            	 potDupUuidListOfLists.add(uuidList);
+            	 uuidListOfLists.add(uuidList);
              } // end while 
              
 
-            process.setProperty(this.potDupUuidListPropName, potDupUuidListOfLists);
+            process.setProperty(this.uuidListListPropName, uuidListOfLists);
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -117,20 +117,20 @@ public class ReadUuidListListFromUrl extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public String getPotDupUuidListPropName() {
-		return potDupUuidListPropName;
+	public String getUuidListListPropName() {
+		return uuidListListPropName;
 	}
 
-	public void setPotDupUuidListPropName(String potDupUuidList) {
-		this.potDupUuidListPropName = potDupUuidList;
+	public void setUuidListListPropName(String potDupUuidList) {
+		this.uuidListListPropName = potDupUuidList;
 	}
 
-	public String getDupPotFileName() {
-		return dupPotFileName;
+	public String getUuidFileNamePropName() {
+		return uuidFileNamePropName;
 	}
 
-	public void setDupPotFileName(String dupPotFileName) {
-		this.dupPotFileName = dupPotFileName;
+	public void setUuidFileNamePropName(String dupPotFileName) {
+		this.uuidFileNamePropName = dupPotFileName;
 	}
 
  

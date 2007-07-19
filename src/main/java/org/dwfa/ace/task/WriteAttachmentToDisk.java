@@ -18,7 +18,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN)})
 /**
  * Write an attachment to disk
  * @author Susan Castillo

@@ -23,12 +23,12 @@ public class TakeFirstItemInAttachmentListListReturnUUIDBeanInfo extends SimpleB
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor listNamePropName =
-                new PropertyDescriptor("listNamePropName", TakeFirstItemInAttachmentListListReturnUUID.class);
-            listNamePropName.setBound(true);
-            listNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            listNamePropName.setDisplayName("<html><font color='green'>Name list of lists:");
-            listNamePropName.setShortDescription("Name of list of lists.");
+            PropertyDescriptor listListNamePropName =
+                new PropertyDescriptor("listListNamePropName", TakeFirstItemInAttachmentListListReturnUUID.class);
+            listListNamePropName.setBound(true);
+            listListNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            listListNamePropName.setDisplayName("<html><font color='green'>Name list of lists:");
+            listListNamePropName.setShortDescription("Name of list of lists.");
 
             PropertyDescriptor uuidListPropName =
                 new PropertyDescriptor("uuidListPropName", TakeFirstItemInAttachmentListListReturnUUID.class);
@@ -37,7 +37,7 @@ public class TakeFirstItemInAttachmentListListReturnUUIDBeanInfo extends SimpleB
             uuidListPropName.setDisplayName("<html><font color='green'>Concept UUID:");
             uuidListPropName.setShortDescription("Concept UUID.");
 
-            PropertyDescriptor rv[] = { listNamePropName, uuidListPropName };
+            PropertyDescriptor rv[] = { listListNamePropName, uuidListPropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

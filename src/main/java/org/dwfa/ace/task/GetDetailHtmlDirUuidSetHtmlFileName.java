@@ -18,7 +18,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN)})
 /**
  * Get the potential duplicate detail Html file directory, and potential dup uuid from properties and set detail uuid file name property
  * @author Susan Castillo
@@ -31,13 +31,13 @@ public class GetDetailHtmlDirUuidSetHtmlFileName extends AbstractTask {
     private static final int dataVersion = 1;
     
     private String detailHtmlFileNameProp = ProcessAttachmentKeys.DETAIL_HTML_FILE.getAttachmentKey();
- 	private String potUuidListPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
+ 	private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
 	private String htmlDirPropName = ProcessAttachmentKeys.DETAIL_HTML_DIR.getAttachmentKey();
 	
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(detailHtmlFileNameProp);
-        out.writeObject(potUuidListPropName);
+        out.writeObject(uuidListPropName);
         out.writeObject(htmlDirPropName);
  
      }
@@ -47,7 +47,7 @@ public class GetDetailHtmlDirUuidSetHtmlFileName extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
           	detailHtmlFileNameProp = (String) in.readObject();
-          	potUuidListPropName = (String) in.readObject();
+          	uuidListPropName = (String) in.readObject();
           	htmlDirPropName = (String) in.readObject();
          } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -62,7 +62,7 @@ public class GetDetailHtmlDirUuidSetHtmlFileName extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {    	
-			List<UUID> potDupUuidList = (List<UUID>) process.readProperty(potUuidListPropName);
+			List<UUID> potDupUuidList = (List<UUID>) process.readProperty(uuidListPropName);
 			UUID firstUuid = potDupUuidList.get(0);
 			worker.getLogger().info("potDupUuidList uuid is: " + potDupUuidList);
 			
@@ -115,12 +115,12 @@ public class GetDetailHtmlDirUuidSetHtmlFileName extends AbstractTask {
 		this.htmlDirPropName = htmlDirPropName;
 	}
 
-	public String getPotUuidListPropName() {
-		return potUuidListPropName;
+	public String getUuidListPropName() {
+		return uuidListPropName;
 	}
 
-	public void setPotUuidListPropName(String potUuidListPropName) {
-		this.potUuidListPropName = potUuidListPropName;
+	public void setUuidListPropName(String potUuidListPropName) {
+		this.uuidListPropName = potUuidListPropName;
 	}
 
 

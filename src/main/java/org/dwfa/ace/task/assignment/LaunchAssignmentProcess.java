@@ -34,7 +34,7 @@ import org.dwfa.util.bean.Spec;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/dups", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
 
 public class LaunchAssignmentProcess extends AbstractTask {
 
@@ -63,7 +63,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
     private static final int dataVersion = 1;
     
     private String selectedAddressesPropName = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();
-    private String conceptUuidPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
+    private String conceptUuidPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
     private String processFileNamePropName = ProcessAttachmentKeys.PROCESS_FILENAME.getAttachmentKey();
     private String assigneeAddrPropName = ProcessAttachmentKeys.ASSIGNEE.getAttachmentKey();
     private String alternateAddrPropName = ProcessAttachmentKeys.ALT_ASSIGNEE.getAttachmentKey();
@@ -114,7 +114,8 @@ public class LaunchAssignmentProcess extends AbstractTask {
             	String reviewerOne = assigees.nextAdr(worker);
             	worker.getLogger().info("reviewerOne: " + reviewerOne);
             	String reviewerTwo = assigees.nextAdr(worker);
-              	worker.getLogger().info("revireviewerTwoewerOne: " + reviewerTwo);
+              	worker.getLogger().info("reviewerTwo: " + reviewerTwo);
+              	worker.getLogger().info("processFileNameStr: " + processFileNameStr);
                 
                	launchAssignment(process, worker, processFileNameStr, reviewerOne, reviewerTwo, temporaryListUuid);
                	launchAssignment(process, worker, processFileNameStr, reviewerTwo, reviewerOne, temporaryListUuid);
@@ -152,13 +153,14 @@ public class LaunchAssignmentProcess extends AbstractTask {
  	
 		process.setProperty(assigneeAddrPropName, asignee);
 		process.setProperty(alternateAddrPropName, alternate);
-        File processFile = new File(processFileNameStr);	
         
 		LoadSetLaunchProcessFromURL launcher = new LoadSetLaunchProcessFromURL();
-//		launcher.setProcessName("Duplicate Review");
+
 		launcher.setOriginator(configFrame.getUsername());
 		launcher.setProcessSubject(concept.toString());
-		launcher.setProcessURLString(processFile.toURL().toExternalForm());
+
+		launcher.setProcessURLString(new File (processFileNameStr).toURL().toExternalForm());
+
 //		worker.getLogger().info("processURLString: " + processURLString);
 		launcher.evaluate(process, worker);
 	}

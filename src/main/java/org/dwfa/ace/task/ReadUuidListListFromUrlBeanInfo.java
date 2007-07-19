@@ -24,21 +24,22 @@ public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor potDupUuidListPropName =
-                new PropertyDescriptor("potDupUuidListPropName", ReadUuidListListFromUrl.class);
-            potDupUuidListPropName.setBound(true);
-            potDupUuidListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            potDupUuidListPropName.setDisplayName("<html><font color='green'>Uuid List prop:");
-            potDupUuidListPropName.setShortDescription("Uuid list.");
+            PropertyDescriptor uuidListListPropName =
+                //new PropertyDescriptor("luceneDups/dupPotMatchResults/dwfaDups.txt", ReadUuidListListFromUrl.class);
+            	new PropertyDescriptor("uuidListListPropName", ReadUuidListListFromUrl.class);
+            uuidListListPropName.setBound(true);
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setShortDescription("Uuid list.");
             
-            PropertyDescriptor dupPotFileName =
-                new PropertyDescriptor("dupPotFileName", ReadUuidListListFromUrl.class);
-            dupPotFileName.setBound(true);
-            dupPotFileName.setPropertyEditorClass(JTextFieldEditor.class);
-            dupPotFileName.setDisplayName("<html><font color='green'>Dup File Name:");
-            dupPotFileName.setShortDescription("File Name.");
+            PropertyDescriptor uuidFileNamePropName =
+                new PropertyDescriptor("uuidFileNamePropName", ReadUuidListListFromUrl.class);
+            uuidFileNamePropName.setBound(true);
+            uuidFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidFileNamePropName.setDisplayName("<html><font color='green'>UUID File Name:");
+            uuidFileNamePropName.setShortDescription("File Name");
 
-            PropertyDescriptor rv[] = { potDupUuidListPropName, dupPotFileName };
+            PropertyDescriptor rv[] = { uuidListListPropName, uuidFileNamePropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

@@ -24,7 +24,7 @@ import org.dwfa.util.bean.Spec;
 * @author Susan Castillo
 *
 */
-@BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
 
 public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
 
@@ -34,12 +34,10 @@ public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-
- //   private String conceptKey = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     
-    private String uuidListPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
+    private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
     
-    private String potDupUuidPropName = ProcessAttachmentKeys.POT_DUP_UUID.getAttachmentKey();
+    private String potDupUuidPropName = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {

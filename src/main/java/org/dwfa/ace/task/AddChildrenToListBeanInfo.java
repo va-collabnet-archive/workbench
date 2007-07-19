@@ -21,7 +21,7 @@ public class AddChildrenToListBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(ConceptListEmpty.class);
+        BeanDescriptor bd = new BeanDescriptor(AddChildrenToList.class);
         bd.setDisplayName("<html><font color='green'><center>Add Children<br>to List");
         return bd;
     }
