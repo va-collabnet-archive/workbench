@@ -2,6 +2,7 @@ package org.dwfa.ace.task.assignment;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -63,7 +64,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
     
     private String selectedAddressesPropName = ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey();
     private String conceptUuidPropName = ProcessAttachmentKeys.DUP_UUID_LIST.getAttachmentKey();
-    private String processUrlStr = "file:someFile";
+    private String processFileNamePropName = ProcessAttachmentKeys.PROCESS_FILENAME.getAttachmentKey();
     private String assigneeAddrPropName = ProcessAttachmentKeys.ASSIGNEE.getAttachmentKey();
     private String alternateAddrPropName = ProcessAttachmentKeys.ALT_ASSIGNEE.getAttachmentKey();
     
@@ -71,7 +72,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
         out.writeInt(dataVersion);
         out.writeObject(selectedAddressesPropName);
         out.writeObject(conceptUuidPropName);
-        out.writeObject(processUrlStr);
+        out.writeObject(processFileNamePropName);
         out.writeObject(assigneeAddrPropName);
         out.writeObject(alternateAddrPropName);
     }
@@ -82,7 +83,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
         if (objDataVersion == dataVersion) {
         	selectedAddressesPropName = (String) in.readObject();
         	conceptUuidPropName = (String) in.readObject();
-        	processUrlStr = (String) in.readObject();
+        	processFileNamePropName = (String) in.readObject();
         	assigneeAddrPropName = (String) in.readObject();
         	alternateAddrPropName = (String) in.readObject();
         } else {
@@ -102,8 +103,10 @@ public class LaunchAssignmentProcess extends AbstractTask {
             List<String> selectedAdr = (List<String>) process.readProperty(selectedAddressesPropName);
             List<UUID> temporaryListUuid = (List<UUID>) process.readProperty(conceptUuidPropName);
             
-            CircularQueue assigees = new CircularQueue(selectedAdr, worker);
+            String processFileNameStr = (String) process.readProperty(processFileNamePropName);
             
+            CircularQueue assigees = new CircularQueue(selectedAdr, worker);
+
          	worker.getLogger().info("selectedAdr.size: " + selectedAdr.size());   
          	worker.getLogger().info("selectedAdr.size: " + selectedAdr);        
             
@@ -113,8 +116,8 @@ public class LaunchAssignmentProcess extends AbstractTask {
             	String reviewerTwo = assigees.nextAdr(worker);
               	worker.getLogger().info("revireviewerTwoewerOne: " + reviewerTwo);
                 
-               	launchAssignment(process, worker, processUrlStr, reviewerOne, reviewerTwo, temporaryListUuid);
-               	launchAssignment(process, worker, processUrlStr, reviewerTwo, reviewerOne, temporaryListUuid);
+               	launchAssignment(process, worker, processFileNameStr, reviewerOne, reviewerTwo, temporaryListUuid);
+               	launchAssignment(process, worker, processFileNameStr, reviewerTwo, reviewerOne, temporaryListUuid);
  
             return Condition.CONTINUE;
             
@@ -137,7 +140,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
 		}
     }
 
-	private void launchAssignment(I_EncodeBusinessProcess process, I_Work worker, String processURLString, 
+	private void launchAssignment(I_EncodeBusinessProcess process, I_Work worker, String processFileNameStr, 
 			String asignee, String alternate, List<UUID> uuid) throws IntrospectionException, IllegalAccessException, InvocationTargetException, 
 			TaskFailedException, PropertyVetoException, TerminologyException, IOException {
 		
@@ -149,12 +152,13 @@ public class LaunchAssignmentProcess extends AbstractTask {
  	
 		process.setProperty(assigneeAddrPropName, asignee);
 		process.setProperty(alternateAddrPropName, alternate);
-		
+        File processFile = new File(processFileNameStr);	
+        
 		LoadSetLaunchProcessFromURL launcher = new LoadSetLaunchProcessFromURL();
-		launcher.setProcessName("Duplicate Review");
+//		launcher.setProcessName("Duplicate Review");
 		launcher.setOriginator(configFrame.getUsername());
 		launcher.setProcessSubject(concept.toString());
-		launcher.setProcessURLString(processURLString);
+		launcher.setProcessURLString(processFile.toURL().toExternalForm());
 //		worker.getLogger().info("processURLString: " + processURLString);
 		launcher.evaluate(process, worker);
 	}
@@ -183,12 +187,12 @@ public class LaunchAssignmentProcess extends AbstractTask {
 		this.conceptUuidPropName = conceptUuidPropName;
 	}
 
-	public String getProcessUrlStr() {
-		return processUrlStr;
+	public String getProcessFileNamePropName() {
+		return processFileNamePropName;
 	}
 
-	public void setProcessUrlStr(String processURLPropName) {
-		this.processUrlStr = processURLPropName;
+	public void setProcessFileNamePropName(String processURLPropName) {
+		this.processFileNamePropName = processURLPropName;
 	}
 
 	public String getAlternateAddrPropName() {

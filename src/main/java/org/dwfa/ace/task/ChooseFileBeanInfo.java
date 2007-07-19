@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info to NewAttachmentListFromChosenFile class.
@@ -27,7 +27,7 @@ public class ChooseFileBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor fileKey =
                 new PropertyDescriptor("fileKey", ChooseFile.class);
             fileKey.setBound(true);
-            fileKey.setPropertyEditorClass(JTextFieldEditor.class);
+            fileKey.setPropertyEditorClass(PropertyNameLabelEditor.class);
             fileKey.setDisplayName("<html><font color='green'>Name of file key:");
             fileKey.setShortDescription("Name of file key.");
 
