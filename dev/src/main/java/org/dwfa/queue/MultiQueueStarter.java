@@ -2,6 +2,7 @@ package org.dwfa.queue;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.logging.Logger;
 
 import net.jini.config.Configuration;
@@ -10,6 +11,8 @@ import net.jini.config.ConfigurationProvider;
 import com.sun.jini.start.LifeCycle;
 
 public class MultiQueueStarter {
+	
+	private static HashSet<String> startedQueues = new HashSet<String>();
     
     public MultiQueueStarter(String[] args, LifeCycle lc) throws Exception {
         getLogger().info(
@@ -18,16 +21,20 @@ public class MultiQueueStarter {
                                  + Arrays.asList(args) + "\n\n******************\n");
         Configuration config = ConfigurationProvider.getInstance(args, getClass()
                          .getClassLoader());
-        File directory = (File) config.getEntry(this.getClass().getName(),
-                                                     "directory", File.class, new File("queue"));
+        File[] directories = (File[]) config.getEntry(this.getClass().getName(),
+                                                     "directory", File[].class, new File[] {new File("queue") });
 
-        processFile(directory, lc);
+        for (File dir: directories) {
+            processFile(dir, lc);
+        }
         
     }
 
     private void processFile(File file, LifeCycle lc) throws Exception {
         if (file.isDirectory() == false) {
-            if (file.getName().equalsIgnoreCase("queue.config")) {
+            if (file.getName().equalsIgnoreCase("queue.config") && 
+            		(startedQueues.contains(file.toURL().toExternalForm()))) {
+            		startedQueues.add(file.toURL().toExternalForm());
                 getLogger().info("Found queue: " + file.getCanonicalPath());
                 new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             }
