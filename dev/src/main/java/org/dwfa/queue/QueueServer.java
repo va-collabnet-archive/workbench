@@ -6,11 +6,14 @@
 package org.dwfa.queue;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -42,7 +45,13 @@ import com.sun.jini.start.LifeCycle;
 public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> implements I_QueueProcesses,
         ServerProxyTrust, ProxyAccessor {
 
-    /** The server proxy, for use by getProxyVerifier */
+	private static HashSet<String> startedQueues = new HashSet<String>();
+	
+	public static boolean started(File f) throws MalformedURLException {
+		return startedQueues.contains(f.toURL().toExternalForm());
+	}
+
+	/** The server proxy, for use by getProxyVerifier */
     protected I_QueueProcesses serverProxy;
     protected static Logger logger = Logger.getLogger(QueueServer.class
             .getName());
@@ -55,6 +64,8 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     @SuppressWarnings("unchecked")
     public QueueServer(String[] args, LifeCycle lc) throws Exception {
         super(args, lc);
+        File file = new File(args[0]);
+   		startedQueues.add(file.toURL().toExternalForm());
         QueueWorkerSpec[] workerSpecs = (QueueWorkerSpec[]) this.config
                 .getEntry(this.getClass().getName(), "workerSpecs",
                         QueueWorkerSpec[].class);

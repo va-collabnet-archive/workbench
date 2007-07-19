@@ -2,7 +2,6 @@ package org.dwfa.queue;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.logging.Logger;
 
 import net.jini.config.Configuration;
@@ -12,7 +11,6 @@ import com.sun.jini.start.LifeCycle;
 
 public class MultiQueueStarter {
 	
-	private static HashSet<String> startedQueues = new HashSet<String>();
     
     public MultiQueueStarter(String[] args, LifeCycle lc) throws Exception {
         getLogger().info(
@@ -33,9 +31,8 @@ public class MultiQueueStarter {
     private void processFile(File file, LifeCycle lc) throws Exception {
         if (file.isDirectory() == false) {
             if (file.getName().equalsIgnoreCase("queue.config") && 
-            		(startedQueues.contains(file.toURL().toExternalForm()))) {
-            		startedQueues.add(file.toURL().toExternalForm());
-                getLogger().info("Found queue: " + file.getCanonicalPath());
+            		(QueueServer.started(file) == false)) {
+                 getLogger().info("Found queue: " + file.getCanonicalPath());
                 new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             }
         } else {
