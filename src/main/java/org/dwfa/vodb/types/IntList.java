@@ -20,6 +20,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.list.TerminologyIntListModel;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;
@@ -58,9 +60,17 @@ public class IntList implements ListDataListener, I_IntList {
 		}
 	}
 
+	public static IntList readIntListIgnoreMapErrors(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		return readIntList(in, true);
+	}
+	public static IntList readIntListStrict(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		return readIntList(in, true);
+	}
+
 	@SuppressWarnings("unchecked")
-	public static IntList readIntList(ObjectInputStream in) throws IOException,
+	private static IntList readIntList(ObjectInputStream in, boolean ignoreMappingErrors) throws IOException,
 			ClassNotFoundException {
+		int unmappedIds = 0;
 		int size = in.readInt();
 		if (size == Integer.MIN_VALUE) {
 			return new IntList();
@@ -68,14 +78,37 @@ public class IntList implements ListDataListener, I_IntList {
 		int[] list = new int[size];
 		for (int i = 0; i < size; i++) {
 			try {
-				list[i] = AceConfig.getVodb().uuidToNative(
-						(List<UUID>) in.readObject());
+        		if (ignoreMappingErrors) {
+            		try {
+            			list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+					} catch (NoMappingException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+						unmappedIds++;
+						list[i] = Integer.MAX_VALUE;
+					}
+        			
+        		} else {
+        			list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+        		}
 			} catch (TerminologyException e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);
 				throw newEx;
 			}
 		}
+	       if (unmappedIds > 0) {
+	        	int[] listMinusUnmapped = new int[size - unmappedIds];
+	        	int i = 0;
+	        	for (int j = 0; j < listMinusUnmapped.length; j++) {
+	        		listMinusUnmapped[j] = list[i];
+	        		while (listMinusUnmapped[j] == Integer.MAX_VALUE) {
+	        			i++;
+	        			listMinusUnmapped[j] = list[i];
+	        		}
+	        		i++;
+	        	}
+	        	list = listMinusUnmapped;
+	        }
 		IntList returnSet = new IntList(list);
 		return returnSet;
 	}

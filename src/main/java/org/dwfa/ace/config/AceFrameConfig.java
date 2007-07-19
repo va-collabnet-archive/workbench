@@ -224,10 +224,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             this.changeSupport = new PropertyChangeSupport(this);
             active = in.readBoolean();
             frameName = (String) in.readObject();
-            sourceRelTypes = IntSet.readIntSet(in);
-            destRelTypes = IntSet.readIntSet(in);
-            allowedStatus = IntSet.readIntSet(in);
-            descTypes = IntSet.readIntSet(in);
+            sourceRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
+            destRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
+            allowedStatus = IntSet.readIntSetIgnoreMapErrors(in);
+            descTypes = IntSet.readIntSetIgnoreMapErrors(in);
             viewPositions = Position.readPositionSet(in);
             bounds = (Rectangle) in.readObject();
             if (objDataVersion >= 3) {
@@ -236,23 +236,23 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	editingPathSet = new HashSet<I_Path>();
             }
             if (objDataVersion >= 4) {
-            	childrenExpandedNodes = IntSet.readIntSet(in);
-            	parentExpandedNodes = IntSet.readIntSet(in);
+            	childrenExpandedNodes = IntSet.readIntSetIgnoreMapErrors(in);
+            	parentExpandedNodes = IntSet.readIntSetIgnoreMapErrors(in);
             } else {
                 childrenExpandedNodes = new IntSet();
                 parentExpandedNodes = new IntSet();
             }
             if (objDataVersion >= 5) {
-            	roots = IntSet.readIntSet(in);
+            	roots = IntSet.readIntSetIgnoreMapErrors(in);
             } else {
             	roots = new IntSet();
             }
             if (objDataVersion >= 6) {
-                editRelTypePopup = IntList.readIntList(in);
-                editRelRefinabiltyPopup = IntList.readIntList(in);
-                editRelCharacteristicPopup = IntList.readIntList(in);
-                editDescTypePopup = IntList.readIntList(in);
-                editStatusTypePopup = IntList.readIntList(in);
+                editRelTypePopup = IntList.readIntListIgnoreMapErrors(in);
+                editRelRefinabiltyPopup = IntList.readIntListIgnoreMapErrors(in);
+                editRelCharacteristicPopup = IntList.readIntListIgnoreMapErrors(in);
+                editDescTypePopup = IntList.readIntListIgnoreMapErrors(in);
+                editStatusTypePopup = IntList.readIntListIgnoreMapErrors(in);
             } else {
                 editRelTypePopup = new IntList();
                 editRelRefinabiltyPopup = new IntList();
@@ -261,8 +261,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 editStatusTypePopup = new IntList();
             }
             if (objDataVersion >= 7) {
-                statedViewTypes = IntSet.readIntSet(in);
-                inferredViewTypes = IntSet.readIntSet(in);
+                statedViewTypes = IntSet.readIntSetIgnoreMapErrors(in);
+                inferredViewTypes = IntSet.readIntSetIgnoreMapErrors(in);
             } else {
             	statedViewTypes = new IntSet();
             	inferredViewTypes = new IntSet();
@@ -293,14 +293,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 				}
            }
             if (objDataVersion >= 9) {
-            	treeDescPreferenceList = IntList.readIntList(in);
+            	treeDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
             } else {
             	treeDescPreferenceList = new IntList();
             }
             if (objDataVersion >= 10) {
-            	tableDescPreferenceList = IntList.readIntList(in);
-            	shortLabelDescPreferenceList = IntList.readIntList(in);
-            	longLabelDescPreferenceList = IntList.readIntList(in);
+            	tableDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
+            	shortLabelDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
+            	longLabelDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
             } else {
             	tableDescPreferenceList = new IntList();
             	shortLabelDescPreferenceList = new IntList();

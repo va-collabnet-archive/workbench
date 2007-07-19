@@ -16,6 +16,8 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.NoMappingException;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -139,9 +141,16 @@ public class IntSet implements ListDataListener, I_IntSet {
 			}
         }
 	}
-
+	public static IntSet readIntSetIgnoreMapErrors(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		return readIntSet(in, true);
+	}
+	public static IntSet readIntSetStrict(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		return readIntSet(in, false);
+	}
+	
 	@SuppressWarnings("unchecked")
-	public static IntSet readIntSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
+	private static IntSet readIntSet(ObjectInputStream in, boolean ignore) throws IOException, ClassNotFoundException {
+		int unmappedIds = 0;
 		int size = in.readInt();
 		if (size == Integer.MIN_VALUE) {
 			return new IntSet();
@@ -149,13 +158,38 @@ public class IntSet implements ListDataListener, I_IntSet {
 		int[] set = new int[size];
         for (int i = 0; i < size; i++) {
         	try {
-        		set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+        		if (ignore) {
+            		try {
+						set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+					} catch (NoMappingException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+						unmappedIds++;
+						set[i] = Integer.MAX_VALUE;
+					}
+        			
+        		} else {
+            		set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+        		}
 			} catch (Exception e) {
 				IOException newEx = new IOException();
 				newEx.initCause(e);
 				throw newEx;
 			} 
         }
+        if (unmappedIds > 0) {
+        	int[] setMinusUnmapped = new int[size - unmappedIds];
+        	int i = 0;
+        	for (int j = 0; j < setMinusUnmapped.length; j++) {
+        		setMinusUnmapped[j] = set[i];
+        		while (setMinusUnmapped[j] == Integer.MAX_VALUE) {
+        			i++;
+        			setMinusUnmapped[j] = set[i];
+        		}
+        		i++;
+        	}
+        	set = setMinusUnmapped;
+        }
+
         IntSet returnSet = new IntSet(set);
         return returnSet;
 	}
