@@ -6,9 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -55,9 +53,7 @@ public class OpenAllInboxes extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            File directory = configFrame.getDbConfig().getProfileFile().getParentFile();
+            File directory = new File("profiles/users");
 
             if (directory.listFiles() != null) {
                 for (File dir: directory.listFiles()) {
@@ -77,8 +73,12 @@ public class OpenAllInboxes extends AbstractTask {
         if (file.isDirectory() == false) {
             if (file.getName().equalsIgnoreCase("queue.config") &&
             		(file.getParentFile().getName().equals("inbox"))) {
-            	AceLog.getAppLog().info("Found user queue: " + file.getCanonicalPath());
-                new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+            	AceLog.getAppLog().info("Found user queue: " + file.toURL().toExternalForm());
+            	if (QueueServer.started(file)) {
+                	AceLog.getAppLog().info("User queue already started: " + file.toURL().toExternalForm());
+            	} else {
+                    new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+            	}
             }
         } else {
             for (File f: file.listFiles()) {
