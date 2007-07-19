@@ -35,7 +35,7 @@ import com.sun.jini.thread.WakeupManager;
  * @see net.jini.core.transaction.Transaction
  * @see net.jini.core.transaction.server.TransactionParticipant
  */
-public class LocalCommitJob extends Job implements TransactionConstants {
+public class LocalCommitJob extends LocalJob implements TransactionConstants {
     ServerTransaction tr;
     ClientLog log;
     LocalParticipantHandle[] handles;

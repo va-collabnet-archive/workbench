@@ -73,7 +73,16 @@ import com.sun.jini.start.LifeCycle;
 
 public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         ActionListener {
-    public static class MatchEntryID implements FileFilter {
+	
+	private static Set<ObjectServerCore<I_DescribeObject>> openServers = new HashSet<ObjectServerCore<I_DescribeObject>>();
+
+	public static void refreshServers() {
+		for (ObjectServerCore<I_DescribeObject> server: openServers) {
+			server.initEntryMetaInfo();
+		}
+	}
+	
+	public static class MatchEntryID implements FileFilter {
         EntryID entryID;
 
         /**
@@ -212,6 +221,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     @SuppressWarnings("unchecked")
     public ObjectServerCore(String[] args, LifeCycle lc) throws Exception {
         super();
+        openServers.add((ObjectServerCore<I_DescribeObject>) this);
         getLogger().info(
                 "\n*******************\n\n"
                         + "Starting service with config file: "
@@ -770,7 +780,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     /**
      * 
      */
-    protected void initEntryMetaInfo() {
+    protected synchronized void initEntryMetaInfo() {
         this.objectInfoSortedSet = Collections
                 .synchronizedSortedSet(new TreeSet<T>(this.nativeComparator));
         File[] files = this.directory.listFiles(new FileFilter() {

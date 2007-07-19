@@ -22,7 +22,7 @@ import com.sun.jini.thread.WakeupManager;
  */
 public class LocalParticipantTask extends RetryTask {
     LocalParticipantHandle handle;
-    Job myjob;
+    LocalJob myjob;
     private static final Logger operationsLogger = 
         TxnManagerImpl.operationsLogger;
 	
@@ -39,7 +39,7 @@ public class LocalParticipantTask extends RetryTask {
      *               this task interacts.
      */
     public LocalParticipantTask(TaskManager manager, WakeupManager wm,
-				Job myjob, LocalParticipantHandle handle) {
+    		LocalJob myjob, LocalParticipantHandle handle) {
 	super(manager, wm);
 	this.myjob = myjob;
 	this.handle = handle;

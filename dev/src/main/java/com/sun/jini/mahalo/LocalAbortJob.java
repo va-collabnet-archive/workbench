@@ -36,7 +36,7 @@ import com.sun.jini.thread.WakeupManager;
  * @see net.jini.core.transaction.server.TransactionParticipant
  *
  */
-public class LocalAbortJob extends Job implements TransactionConstants {
+public class LocalAbortJob extends LocalJob implements TransactionConstants {
     ServerTransaction tr;
     ClientLog log;
     LocalParticipantHandle[] handles;

@@ -150,7 +150,7 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 	/**
 	 * @serial
 	 */
-	private Job job;
+	private LocalJob job;
 
 	/**
 	 * @serial
@@ -618,7 +618,7 @@ class LocalTxnManagerTransaction implements TransactionConstants,
 							if (job.isCompleted(Long.MAX_VALUE)) {
 								result = (Integer) job.computeResult();
 								if (result == ABORTED) {
-									transactionsLogger.info("aborted (job.computeResult)");
+									transactionsLogger.info("aborted (job.computeResult): " + job);
 								}
 								if (result.intValue() == ABORTED
 										&& job instanceof LocalPrepareAndCommitJob) {
