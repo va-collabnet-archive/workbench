@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.log.HtmlHandler;
+import org.dwfa.queue.ObjectServerCore;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.Status;
@@ -266,6 +267,8 @@ public class SvnPanel extends JPanel {
 			SvnLog.alertAndLog(e);
 		}
 		SvnLog.info("finished cleanup");
+		ObjectServerCore.refreshServers();
+		SvnLog.info("refreshed Object Servers");
 	}
 	public static void commit(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("Starting Commit");
@@ -309,6 +312,8 @@ public class SvnPanel extends JPanel {
 			SvnLog.alertAndLog(e);
 		}
 		SvnLog.info("finished purge");
+		ObjectServerCore.refreshServers();
+		SvnLog.info("refreshed Object Servers");
 	}
 	public static void update(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting update");
@@ -320,6 +325,8 @@ public class SvnPanel extends JPanel {
 			SvnLog.alertAndLog(e);
 		}
 		SvnLog.info("finished update");
+		ObjectServerCore.refreshServers();
+		SvnLog.info("refreshed Object Servers");
 	}
 	public static void checkout(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting get");
@@ -332,6 +339,8 @@ public class SvnPanel extends JPanel {
 			SvnLog.alertAndLog(e);
 		}
 		SvnLog.info("finished get");
+		ObjectServerCore.refreshServers();
+		SvnLog.info("refreshed Object Servers");
 	}
 	private static void handleAuthentication(SvnPrompter authenticator) {
 		Svn.getSvnClient().password("");

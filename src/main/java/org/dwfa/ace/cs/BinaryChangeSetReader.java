@@ -38,6 +38,7 @@ import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
+import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
@@ -107,6 +108,10 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
 					ACE.addImported(commitAceBean((UniversalAceBean) obj, nextCommit,
 							values));
+				} else if (UniversalIdList.class.isAssignableFrom(obj.getClass())) {
+					AceLog.getEditLog().fine("Read UniversalIdList... " + obj);
+					commitIdList((UniversalIdList) obj, nextCommit,
+							values);
 				} else if (UniversalAcePath.class.isAssignableFrom(obj
 						.getClass())) {
 					pathCount++;
@@ -214,6 +219,71 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			ConceptBean localBean = ConceptBean.get(bean.getId().getUIDs());
 			localBean.flush();
 			return localBean;
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		} catch (TerminologyException e) {
+			throw new ToIoException(e);
+		}
+	}
+	private void commitIdList(UniversalIdList list, long time,
+			Set<TimePathId> values) throws IOException, ClassNotFoundException {
+		try {
+			if (time == Long.MAX_VALUE) {
+				throw new IOException("commit time = Long.MAX_VALUE");
+			}
+			// Do all the commiting...
+			for (UniversalAceIdentification id : list.getUncommittedIds()) {
+				AceLog.getEditLog().fine("commitUncommittedIds: " + id);
+				ThinIdVersioned tid = null;
+				for (UniversalAceIdentificationPart part : id.getVersions()) {
+					I_Path path = AceConfig.getVodb().getPath(
+							AceConfig.getVodb().uuidToNative(part.getPathId()));
+					if (tid == null) {
+						try {
+							int nid = getNid(id.getUIDs());
+							AceLog.getEditLog().fine(
+									"Uncommitted id already exists: \n" + id);
+							tid = (ThinIdVersioned) AceConfig.getVodb().getId(nid);
+							AceLog.getEditLog().fine(
+									"found ThinIdVersioned: " + tid);
+						} catch (NoMappingException ex) {
+							/*
+							 * Generate on the ARCHITECTONIC_BRANCH for now, it will
+							 * get overwritten when the id is written to the
+							 * database, with the proper branch and version values.
+							 */
+							int nid = AceConfig.getVodb()
+									.uuidToNativeWithGeneration(id.getUIDs(),
+											Integer.MAX_VALUE, path,
+											ThinVersionHelper.convert(time));
+							tid = new ThinIdVersioned(nid, id.getVersions().size());
+							AceLog.getEditLog().fine(
+									"created ThinIdVersioned: " + tid);
+						}
+					}
+					ThinIdPart newPart = new ThinIdPart();
+					newPart.setIdStatus(getNid(part.getIdStatus()));
+					newPart.setPathId(AceConfig.getVodb().uuidToNative(
+							part.getPathId()));
+					newPart.setSource(getNid(part.getSource()));
+					newPart.setSourceId(part.getSourceId());
+					if (part.getTime() == Long.MAX_VALUE) {
+						newPart.setVersion(ThinVersionHelper.convert(time));
+					} else {
+						newPart.setVersion(ThinVersionHelper
+								.convert(part.getTime()));
+					}
+					values.add(new TimePathId(newPart.getVersion(), newPart
+							.getPathId()));
+					tid.addVersion(newPart);
+					AceLog.getEditLog().fine(" add version: " + newPart);
+				}
+				/*
+				 * The ARCHITECTONIC_BRANCH will be overridden here with the proper
+				 * branch and version values here...
+				 */
+				AceConfig.getVodb().writeId(tid);
+			}
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		} catch (TerminologyException e) {

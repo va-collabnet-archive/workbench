@@ -94,6 +94,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -122,6 +123,7 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeCellRenderer;
 import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.ace.tree.TreeMouseListener;
+import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.gui.ProcessMenuActionListener;
@@ -132,6 +134,7 @@ import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -144,7 +147,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
 
     private static List<I_Transact> imported = new ArrayList<I_Transact>();
-
+    
+ 
     public static void addImported(I_Transact to) {
         imported.add(to);
         if (aceConfig != null) {
@@ -209,6 +213,25 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         int version = ThinVersionHelper.convert(now.getTime());
         AceLog.getEditLog().info("Starting commit: " + version + " (" + now.getTime() + ")");
 
+        UniversalIdList uncommittedIds = new UniversalIdList();
+
+        for (I_Transact cb : uncommitted) {
+        	if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
+        		I_GetConceptData igcd = (I_GetConceptData) cb;
+        		for (int nid : igcd.getUncommittedIds().getSetValues()) {
+        			I_IdVersioned idv = AceConfig.getVodb().getId(nid);
+        			try {
+						uncommittedIds.getUncommittedIds().add(idv.getUniversal());
+					} catch (TerminologyException e) {
+						throw new ToIoException(e);
+					}
+        		}
+        	}
+         }
+        for (I_WriteChangeSet writer : csWriters) {
+            writer.writeChanges(uncommittedIds, ThinVersionHelper.convert(version));
+        }
+        
         for (I_Transact cb : uncommitted) {
             for (I_WriteChangeSet writer : csWriters) {
                 writer.writeChanges(cb, ThinVersionHelper.convert(version));
