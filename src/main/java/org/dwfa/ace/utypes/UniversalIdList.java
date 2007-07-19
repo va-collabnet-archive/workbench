@@ -7,7 +7,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UniversalIdList implements Serializable {
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.TimePathId;
+
+public class UniversalIdList implements Serializable, I_Transact {
 
 	/**
 	 * 
@@ -42,5 +45,13 @@ public class UniversalIdList implements Serializable {
 
 	public Set<UniversalAceIdentification> getUncommittedIds() {
 		return uncommittedIds;
+	}
+
+	public void abort() throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public void commit(int version, Set<TimePathId> values) throws IOException {
+		throw new UnsupportedOperationException();
 	}
 }
