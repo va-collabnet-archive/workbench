@@ -905,4 +905,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         this.changeSetWriterFileName = changeSetWriterFileName;
     }
 
+	public File getProfileFile() {
+		return configFile;
+	}
+
 }

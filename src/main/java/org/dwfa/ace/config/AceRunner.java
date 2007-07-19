@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.fd.FileDialogUtil;
+import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.SvnPrompter;
 
 import com.sun.jini.start.LifeCycle;
@@ -142,6 +143,16 @@ public class AceRunner {
                                               JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
             }
+            File directory = AceConfig.config.getConfigFile().getParentFile();
+            if (AceConfig.config.getConfigFile().equals("profiles")) {
+            	directory = AceConfig.config.getConfigFile();
+            }
+            
+            if (directory.listFiles() != null) {
+                for (File dir: directory.listFiles()) {
+                    processFile(dir, lc);
+                }
+            }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             System.exit(0);
@@ -161,4 +172,18 @@ public class AceRunner {
             }
         }
     }
+    
+    private void processFile(File file, LifeCycle lc) throws Exception {
+        if (file.isDirectory() == false) {
+            if (file.getName().equalsIgnoreCase("queue.config")) {
+            	AceLog.getAppLog().info("Found user queue: " + file.getCanonicalPath());
+                new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+            }
+        } else {
+            for (File f: file.listFiles()) {
+                processFile(f, lc);
+            }
+        }
+    }
+
 }

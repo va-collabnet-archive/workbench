@@ -28,6 +28,7 @@ import net.jini.core.lookup.ServiceItem;
 import net.jini.lookup.ServiceItemFilter;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -1331,4 +1332,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.setSignpostToggleIcon(icon);
         
     }
+
+
+	public I_ConfigAceDb getDbConfig() {
+		return getMasterConfig();
+	}
 }
