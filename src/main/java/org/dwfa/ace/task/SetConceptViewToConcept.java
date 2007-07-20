@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -78,6 +77,9 @@ public class SetConceptViewToConcept extends AbstractTask {
 			} else if (Collection.class.isAssignableFrom(obj.getClass())) {
 				Collection<UUID> uuids = (Collection<UUID>) obj;
 				termComponent = LocalVersionedTerminology.get().getConcept(uuids);
+			} else if (UUID.class.isAssignableFrom(obj.getClass())) {
+				UUID uuid = (UUID) obj;
+				termComponent = LocalVersionedTerminology.get().getConcept(new UUID[] { uuid });
 			} else {
 				throw new TaskFailedException("Don't know how to handle type: " + obj.getClass());
 			}
