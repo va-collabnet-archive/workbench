@@ -7,6 +7,7 @@ import java.util.Collection;
 import javax.swing.JList;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -17,7 +18,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/listview", type = BeanType.TASK_BEAN) })
-public class ConceptListEmpty extends AbstractTask {
+public class ConceptListClear extends AbstractTask {
 
 	private static final long serialVersionUID = 1;
 
@@ -47,10 +48,9 @@ public class ConceptListEmpty extends AbstractTask {
 		I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 		JList conceptList = config.getBatchConceptList();
-		if (conceptList.getModel().getSize() == 0) {
-			return Condition.TRUE;
-		}
-		return Condition.FALSE;
+		I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+		model.clear();
+		return Condition.CONTINUE;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class ConceptListEmpty extends AbstractTask {
 	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
 	 */
 	public Collection<Condition> getConditions() {
-		return CONDITIONAL_TEST_CONDITIONS;
+		return CONTINUE_CONDITION;
 	}
 
 	/**
