@@ -144,9 +144,6 @@ public class AceRunner {
                 System.exit(0);
             }
             File directory = AceConfig.config.getConfigFile().getParentFile();
-            if (AceConfig.config.getConfigFile().equals("profiles")) {
-            	directory = AceConfig.config.getConfigFile();
-            }
             
             if (directory.listFiles() != null) {
                 for (File dir: directory.listFiles()) {
@@ -181,9 +178,14 @@ public class AceRunner {
                 new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             }
         } else {
-            for (File f: file.listFiles()) {
-                processFile(f, lc);
-            }
+        	String fileName = file.getName();
+        	if (fileName.equals("queues-maven")) {
+        		// ignore these queue directories.
+        	} else {
+                for (File f: file.listFiles()) {
+                    processFile(f, lc);
+                }
+        	}
         }
     }
 
