@@ -6,15 +6,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -58,6 +62,7 @@ public class SetConceptViewToConcept extends AbstractTask {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
@@ -66,7 +71,17 @@ public class SetConceptViewToConcept extends AbstractTask {
 			config.selectConceptViewer(hostIndex);
 			I_HostConceptPlugins viewer = config.getConceptViewer(hostIndex);
 			viewer.unlink();
-			viewer.setTermComponent((I_AmTermComponent) process.readProperty(propName));
+			Object obj = process.readProperty(propName);
+			I_AmTermComponent termComponent = null;
+			if (I_AmTermComponent.class.isAssignableFrom(obj.getClass())) {
+				termComponent = (I_AmTermComponent) obj;
+			} else if (Collection.class.isAssignableFrom(obj.getClass())) {
+				Collection<UUID> uuids = (Collection<UUID>) obj;
+				termComponent = LocalVersionedTerminology.get().getConcept(uuids);
+			} else {
+				throw new TaskFailedException("Don't know how to handle type: " + obj.getClass());
+			}
+			viewer.setTermComponent(termComponent);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);
@@ -75,6 +90,10 @@ public class SetConceptViewToConcept extends AbstractTask {
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException(e);
 		} catch (IntrospectionException e) {
+			throw new TaskFailedException(e);
+		} catch (TerminologyException e) {
+			throw new TaskFailedException(e);
+		} catch (IOException e) {
 			throw new TaskFailedException(e);
 		}
 	}
