@@ -97,7 +97,8 @@ public class LaunchAssignmentProcess extends AbstractTask {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+    @SuppressWarnings("unchecked")
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
         try {
             List<String> selectedAdr = (List<String>) process.readProperty(selectedAddressesPropName);
