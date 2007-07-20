@@ -72,6 +72,9 @@ public class MoveToDestination extends AbstractTask {
                attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem service = worker.lookup(template, filter);
+            if (service == null) {
+            	throw new TaskFailedException("No queue with the specified address could be found: " + process.getDestination());
+            }
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             q.write(process, worker.getActiveTransaction());
         } catch (Exception e) {
