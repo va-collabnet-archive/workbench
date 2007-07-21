@@ -26,7 +26,7 @@ import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.IdTableModel;
 import org.dwfa.ace.table.IdTableRenderer;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.IdTableModel.ID_FIELD;
 import org.dwfa.ace.table.IdTableModel.StringWithIdTuple;
 import org.dwfa.bpa.util.TableSorter;

@@ -47,6 +47,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.svn.SvnPrompter;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
@@ -59,7 +61,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 20;
+    private static final int dataVersion = 21;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -128,6 +130,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private boolean showAllQueues = false;
     private SortedSetModel<String> queueAddressesToShow = new SortedSetModel<String>();
     
+    //21
+    
+	private I_GetConceptData defaultImageType;
+	private I_IntList editImageTypePopup;
+
+	//transient
     private transient MasterWorker worker;
     private transient String statusMessage;
     private transient boolean commitEnabled = false;
@@ -211,6 +219,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 20
         out.writeBoolean(showAllQueues);
         out.writeObject(queueAddressesToShow);
+        
+        //21
+		try {
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));
+		} catch (DatabaseException e) {
+			IOException newEx = new IOException();
+			newEx.initCause(e);
+			throw newEx;
+		}
+		IntList.writeIntList(out, editImageTypePopup);
+                
    }
 
 
@@ -367,6 +386,22 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 showAllQueues = false;
                 queueAddressesToShow = new SortedSetModel<String>();
                 queueAddressesToShow.add(username);
+            }
+            if (objDataVersion >= 21) {
+            	try {
+					defaultImageType = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+				} catch (TerminologyException e) {
+					throw new ToIoException(e);
+				}
+            	editImageTypePopup = IntList.readIntListIgnoreMapErrors(in);
+            } else {
+            	try {
+					defaultImageType = AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
+				} catch (TerminologyException e) {
+					throw new ToIoException(e);
+				}
+            	editImageTypePopup = new IntList();
+            	editImageTypePopup.add(defaultImageType.getConceptId());
             }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -1336,5 +1371,27 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	public I_ConfigAceDb getDbConfig() {
 		return getMasterConfig();
+	}
+
+
+	public I_GetConceptData getDefaultImageType() {
+		return defaultImageType;
+	}
+
+
+	public I_IntList getEditImageTypePopup() {
+		return editImageTypePopup;
+	}
+
+
+	public void setDefaultImageType(I_GetConceptData defaultImageType) {
+		Object old = this.defaultImageType;
+		this.defaultImageType = defaultImageType;
+		changeSupport.firePropertyChange("defaultImageType", old, defaultImageType);
+	}
+
+
+	public void setEditImageTypePopup(I_IntList editImageTypePopup) {
+		this.editImageTypePopup = editImageTypePopup;
 	}
 }

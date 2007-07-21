@@ -12,10 +12,12 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
+import javax.swing.JTable;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -244,12 +246,12 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	}
 	private IMAGE_FIELD[] columns;
 	private SmallProgressPanel progress = new SmallProgressPanel();
-	private I_HostConceptPlugins host;
-	private List<I_ImageTuple> allImageTuples;
-	private ArrayList<I_ImageVersioned> allImages;
+	I_HostConceptPlugins host;
+	List<I_ImageTuple> allImageTuples;
+	ArrayList<I_ImageVersioned> allImages;
 
 	private boolean showHistory;
-	private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+	Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 	private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 	private TableChangedSwingWorker tableChangeWorker;
 	private ReferencedConceptsSwingWorker refConWorker;
@@ -460,6 +462,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return false;
+	}
+	public ImagePopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
+		return new ImagePopupListener(table, config, this);
 	}
 
 }

@@ -32,7 +32,7 @@ public class AddDescription extends AddComponent {
 		desc.addVersion(descPart);
 		boolean capStatus = false;
 		String lang = "en";
-		int status = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = config.getDefaultStatus().getConceptId();
 		int typeId = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
 		String text = "New Description";
 		for (I_Path p: termContainer.getConfig().getEditingPathSet()) {

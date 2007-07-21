@@ -1,8 +1,5 @@
 package org.dwfa.ace.table;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -15,13 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -31,16 +24,16 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class ConceptTableModel extends AbstractTableModel implements
+public class ConceptAttributeTableModel extends AbstractTableModel implements
 		PropertyChangeListener {
+	
+    enum FieldToChange { DEFINED, STATUS};
+
 	public static class ConceptStatusFieldEditor extends AbstractPopupFieldEditor {
 
 		private static final long serialVersionUID = 1L;
@@ -76,7 +69,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private List<I_ConceptAttributeTuple> allTuples;
+	List<I_ConceptAttributeTuple> allTuples;
 
 	private TableChangedSwingWorker tableChangeWorker;
 
@@ -84,7 +77,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 	private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
-	private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+	Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 
 	public class ReferencedConceptsSwingWorker extends
 			SwingWorker<Map<Integer, ConceptBean>> {
@@ -249,9 +242,9 @@ public class ConceptTableModel extends AbstractTableModel implements
 
 	private SmallProgressPanel progress;
 
-	private I_HostConceptPlugins host;
+	I_HostConceptPlugins host;
 
-	public ConceptTableModel(CONCEPT_FIELD[] columns, I_HostConceptPlugins host) {
+	public ConceptAttributeTableModel(CONCEPT_FIELD[] columns, I_HostConceptPlugins host) {
 		super();
 		this.columns = columns;
 		this.host = host;
@@ -347,11 +340,14 @@ public class ConceptTableModel extends AbstractTableModel implements
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		/*
-        if (getConceptTuple(row).getVersion() != Integer.MAX_VALUE) {
-        	return false;
-        }
-        */
+        try {
+			if (getConceptTuple(row).getVersion() != Integer.MAX_VALUE) {
+				return false;
+			}
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+			return false;
+		}
         switch (columns[col]) {
         case CON_ID:
         	return false;
@@ -489,115 +485,7 @@ public class ConceptTableModel extends AbstractTableModel implements
 		return allTuples.size();
 	}
 
-	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
-		return new PopupListener(table, config);
-	}
-
-	public class PopupListener extends MouseAdapter {
-		private class ChangeActionListener implements ActionListener {
-
-			public ChangeActionListener() {
-				super();
-			}
-
-			public void actionPerformed(ActionEvent e) {
-				for (I_Path p : config.getEditingPathSet()) {
-					I_ConceptAttributePart newPart = selectedObject.getTuple()
-							.duplicatePart();
-					newPart.setPathId(p.getConceptId());
-					newPart.setVersion(Integer.MAX_VALUE);
-					selectedObject.getTuple().getConVersioned().getVersions().add(
-							newPart);
-				}
-				ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getConId()));
-				allTuples = null;
-				ConceptTableModel.this.fireTableDataChanged();
-			}
-		}
-
-		private class RetireActionListener implements ActionListener {
-
-			public RetireActionListener() {
-				super();
-			}
-
-			public void actionPerformed(ActionEvent e) {
-				try {
-					for (I_Path p : config.getEditingPathSet()) {
-						I_ConceptAttributePart newPart = selectedObject.getTuple()
-								.duplicatePart();
-						newPart.setPathId(p.getConceptId());
-						newPart.setVersion(Integer.MAX_VALUE);
-						newPart.setConceptStatus(AceConfig.getVodb()
-								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-										.getUids()));
-						getReferencedConcepts().put(newPart.getConceptStatus(), 
-								ConceptBean.get(newPart.getConceptStatus()));
-						selectedObject.getTuple().getConVersioned()
-								.getVersions().add(newPart);
-					}
-					ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getConId()));
-					allTuples = null;
-					ConceptTableModel.this.fireTableDataChanged();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-		}
-
-		JPopupMenu popup;
-
-		JTable table;
-
-		ActionListener retire;
-
-		ActionListener change;
-
-		StringWithConceptTuple selectedObject;
-
-		I_ConfigAceFrame config;
-
-		public PopupListener(JTable table, I_ConfigAceFrame config) {
-			super();
-			this.table = table;
-			this.config = config;
-			retire = new RetireActionListener();
-			change = new ChangeActionListener();
-		}
-
-		private void makePopup(MouseEvent e) {
-			popup = new JPopupMenu();
-			JMenuItem noActionItem = new JMenuItem("");
-			popup.add(noActionItem);
-			int column = table.columnAtPoint(e.getPoint());
-			int row = table.rowAtPoint(e.getPoint());
-			selectedObject = (StringWithConceptTuple) table
-					.getValueAt(row, column);
-			JMenuItem changeItem = new JMenuItem("Change");
-			popup.add(changeItem);
-			changeItem.addActionListener(change);
-			JMenuItem retireItem = new JMenuItem("Retire");
-			popup.add(retireItem);
-			retireItem.addActionListener(retire);
-		}
-
-		public void mousePressed(MouseEvent e) {
-			maybeShowPopup(e);
-		}
-
-		public void mouseReleased(MouseEvent e) {
-			maybeShowPopup(e);
-		}
-
-		private void maybeShowPopup(MouseEvent e) {
-			if (e.isPopupTrigger()) {
-				if (config.getEditingPathSet().size() > 0) {
-					makePopup(e);
-					popup.show(e.getComponent(), e.getX(), e.getY());
-				} else {
-		            JOptionPane.showMessageDialog(table.getTopLevelAncestor(), "You must select at least one path to edit on...");
-				}
-			}
-		}
+	public AttributePopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
+		return new AttributePopupListener(table, config, this);
 	}
 }

@@ -124,6 +124,8 @@ public class ImagePlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(imageTableModel);
 		imageTable = new JTableWithDragImage(sortingTable);
+		imageTable.addMouseListener(imageTableModel.makePopupListener(
+				imageTable, host.getConfig()));
 		imageTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortingTable.setTableHeader(imageTable.getTableHeader());
 

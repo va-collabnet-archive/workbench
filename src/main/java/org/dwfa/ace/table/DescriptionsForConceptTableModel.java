@@ -1,9 +1,5 @@
 package org.dwfa.ace.table;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -15,12 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -29,18 +21,15 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		implements PropertyChangeListener {
 
-	private List<I_DescriptionTuple> allTuples;
+	List<I_DescriptionTuple> allTuples;
 
 	public class ReferencedConceptsSwingWorker extends
 			SwingWorker<Map<Integer, ConceptBean>> {
@@ -189,9 +178,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 
 	private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
-	private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+	Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 
-	private I_HostConceptPlugins host;
+	I_HostConceptPlugins host;
 	
 	public DescriptionsForConceptTableModel(DESC_FIELD[] columns,
 			I_HostConceptPlugins host) {
@@ -274,116 +263,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 	public Map<Integer, ConceptBean> getReferencedConcepts() {
 		return referencedConcepts;
 	}
-	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
-		return new PopupListener(table, config);
-	}
-
-	public class PopupListener extends MouseAdapter {
-		private class ChangeActionListener implements ActionListener {
-
-			public ChangeActionListener() {
-				super();
-			}
-
-			public void actionPerformed(ActionEvent e) {
-				for (I_Path p : config.getEditingPathSet()) {
-					I_DescriptionPart newPart = selectedObject.getTuple()
-							.duplicatePart();
-					newPart.setPathId(p.getConceptId());
-					newPart.setVersion(Integer.MAX_VALUE);
-					selectedObject.getTuple().getDescVersioned().getVersions().add(
-							newPart);
-				}
-				ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getConceptId()));
-				allTuples = null;
-				DescriptionsForConceptTableModel.this.fireTableDataChanged();
-			}
-		}
-
-		private class RetireActionListener implements ActionListener {
-
-			public RetireActionListener() {
-				super();
-			}
-
-			public void actionPerformed(ActionEvent e) {
-				try {
-					for (I_Path p : config.getEditingPathSet()) {
-						I_DescriptionPart newPart = selectedObject.getTuple()
-								.duplicatePart();
-						newPart.setPathId(p.getConceptId());
-						newPart.setVersion(Integer.MAX_VALUE);
-						newPart.setStatusId(AceConfig.getVodb()
-								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-										.getUids()));
-						selectedObject.getTuple().getDescVersioned()
-								.getVersions().add(newPart);
-					}
-					ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getConceptId()));
-					allTuples = null;
-					DescriptionsForConceptTableModel.this.fireTableDataChanged();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-		}
-
-		JPopupMenu popup;
-
-		JTable table;
-
-		ActionListener retire;
-
-		ActionListener change;
-
-		StringWithDescTuple selectedObject;
-
-		I_ConfigAceFrame config;
-
-		public PopupListener(JTable table, I_ConfigAceFrame config) {
-			super();
-			this.table = table;
-			this.config = config;
-			retire = new RetireActionListener();
-			change = new ChangeActionListener();
-		}
-
-		private void makePopup(MouseEvent e) {
-			popup = new JPopupMenu();
-			JMenuItem noActionItem = new JMenuItem("");
-			popup.add(noActionItem);
-			int column = table.columnAtPoint(e.getPoint());
-			int row = table.rowAtPoint(e.getPoint());
-			selectedObject = (StringWithDescTuple) table
-					.getValueAt(row, column);
-			JMenuItem changeItem = new JMenuItem("Change: "
-					+ selectedObject.getTuple().getText());
-			popup.add(changeItem);
-			changeItem.addActionListener(change);
-			JMenuItem retireItem = new JMenuItem("Retire: "
-					+ selectedObject.getTuple().getText());
-			popup.add(retireItem);
-			retireItem.addActionListener(retire);
-		}
-
-		public void mousePressed(MouseEvent e) {
-			maybeShowPopup(e);
-		}
-
-		public void mouseReleased(MouseEvent e) {
-			maybeShowPopup(e);
-		}
-
-		private void maybeShowPopup(MouseEvent e) {
-			if (e.isPopupTrigger()) {
-				if (config.getEditingPathSet().size() > 0) {
-					makePopup(e);
-					popup.show(e.getComponent(), e.getX(), e.getY());
-				} else {
-		            JOptionPane.showMessageDialog(table.getTopLevelAncestor(), "You must select at least one path to edit on...");
-				}
-			}
-		}
+	public DescPopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
+		return new DescPopupListener(table, config, this);
 	}
 
 	@Override

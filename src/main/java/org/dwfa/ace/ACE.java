@@ -1367,6 +1367,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 .getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
         tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditDescTypePopup(),
                                                                       "Description types for popup:")));
+        tabs.addTab("image type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditImageTypePopup(),
+        																"Image types for popup:")));
         tabs.addTab("status", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditStatusTypePopup(),
                                                                    "Status values for popup:")));
         return tabs;
@@ -1380,19 +1382,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         aceFrameConfig.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setTermComponent",
         		I_AmTermComponent.class,
                 defaultStatus));
-        defaultStatus.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setDefaultStatus",
+        defaultStatus.addTermChangeListener(new PropertyListenerGlue("setDefaultStatus",
                                                                                           I_GetConceptData.class,
                                                                                           aceFrameConfig));
         
         wrapAndAdd(defaultsPanel, defaultStatus, "Default status: ");
+
+        TermComponentLabel defaultImageType = new TermComponentLabel(aceFrameConfig);
+        defaultImageType.setTermComponent(aceFrameConfig.getDefaultImageType());
+        aceFrameConfig.addPropertyChangeListener("defaultImageType", new PropertyListenerGlue("setTermComponent",
+        		I_AmTermComponent.class,
+        		defaultImageType));
+        defaultImageType.addTermChangeListener(new PropertyListenerGlue("setDefaultImageType",
+                                                                           I_GetConceptData.class, aceFrameConfig));
+        wrapAndAdd(defaultsPanel, defaultImageType, "Default image type: ");
 
         TermComponentLabel defaultDescType = new TermComponentLabel(aceFrameConfig);
         defaultDescType.setTermComponent(aceFrameConfig.getDefaultDescriptionType());
         aceFrameConfig.addPropertyChangeListener("defaultDescriptionType", new PropertyListenerGlue("setTermComponent",
         		I_AmTermComponent.class,
         		defaultDescType));
-        defaultDescType.addPropertyChangeListener("defaultDescriptionType",
-                                                  new PropertyListenerGlue("setDefaultDescriptionType",
+        defaultDescType.addTermChangeListener(new PropertyListenerGlue("setDefaultDescriptionType",
                                                                            I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultDescType, "Default description type: ");
 
@@ -1401,8 +1411,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         aceFrameConfig.addPropertyChangeListener("defaultRelationshipType", new PropertyListenerGlue("setTermComponent",
         		I_AmTermComponent.class,
         		defaultRelType));
-        defaultRelType.addPropertyChangeListener("defaultRelationshipType",
-                                                 new PropertyListenerGlue("setDefaultRelationshipType",
+        defaultRelType.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipType",
                                                                           I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelType, "Default relationship type: ");
 
@@ -1412,8 +1421,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         		I_AmTermComponent.class,
         		defaultRelCharacteristicType));
         defaultRelCharacteristicType
-                .addPropertyChangeListener("defaultRelationshipCharacteristic",
-                                           new PropertyListenerGlue("setDefaultRelationshipCharacteristic",
+                .addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipCharacteristic",
                                                                     I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelCharacteristicType, "Default relationship characteristic: ");
 
@@ -1422,8 +1430,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         aceFrameConfig.addPropertyChangeListener("defaultRelationshipRefinability", new PropertyListenerGlue("setTermComponent",
         		I_AmTermComponent.class,
         		defaultRelRefinability));
-        defaultRelRefinability.addPropertyChangeListener("defaultRelationshipRefinability",
-                                                         new PropertyListenerGlue("setDefaultRelationshipRefinability",
+        defaultRelRefinability.addTermChangeListener(new PropertyListenerGlue("setDefaultRelationshipRefinability",
                                                                                   I_GetConceptData.class,
                                                                                   aceFrameConfig));
         wrapAndAdd(defaultsPanel, defaultRelRefinability, "Default relationship refinability: ");

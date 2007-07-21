@@ -6,8 +6,6 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.config.AceConfig;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinConPart;
 
@@ -26,7 +24,7 @@ public class AddConceptPart extends AddComponent {
 			part.setVersion(Integer.MAX_VALUE);
 			part.setPathId(p.getConceptId());
 			part.setDefined(false);
-			part.setConceptStatus(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+			part.setConceptStatus(config.getDefaultStatus().getConceptId());
 			cb.getConceptAttributes().getVersions().add(part);
 		}
 		ACE.addUncommitted(cb);

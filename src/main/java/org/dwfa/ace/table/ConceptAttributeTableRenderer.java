@@ -9,13 +9,13 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.TableColumn;
 import javax.swing.text.View;
 
-import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 
 
-public class ConceptTableRenderer extends AceTableRenderer {
+public class ConceptAttributeTableRenderer extends AceTableRenderer {
 
 
-	public ConceptTableRenderer() {
+	public ConceptAttributeTableRenderer() {
 		super();
 		setVerticalAlignment(TOP);
 	}

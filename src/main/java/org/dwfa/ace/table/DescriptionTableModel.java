@@ -106,6 +106,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		return "null pref desc: " + cb.getInitialText();
 	}
 
+
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		try {
 			if (rowIndex >= getRowCount()) {

@@ -31,7 +31,7 @@ public class AddRelationship extends AddComponent {
 				1);
 		ThinRelPart relPart = new ThinRelPart();
 		rel.addVersion(relPart);
-		int status = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		int status = config.getDefaultStatus().getConceptId();
 		for (I_Path p: termContainer.getConfig().getEditingPathSet()) {
 			relPart.setVersion(Integer.MAX_VALUE);
 			relPart.setPathId(p.getConceptId());

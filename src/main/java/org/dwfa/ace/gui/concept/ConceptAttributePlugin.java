@@ -22,19 +22,19 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.table.ConceptTableModel;
-import org.dwfa.ace.table.ConceptTableRenderer;
+import org.dwfa.ace.table.ConceptAttributeTableModel;
+import org.dwfa.ace.table.ConceptAttributeTableRenderer;
 import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.ConceptTableModel.CONCEPT_FIELD;
-import org.dwfa.ace.table.ConceptTableModel.StringWithConceptTuple;
+import org.dwfa.ace.table.ConceptAttributeTableModel.CONCEPT_FIELD;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.bpa.util.TableSorter;
 
 public class ConceptAttributePlugin extends AbstractPlugin {
 
 	private I_HostConceptPlugins host;
 	private JPanel conceptAttributes;
-	private ConceptTableModel conceptTableModel;
+	private ConceptAttributeTableModel conceptTableModel;
 	private JTableWithDragImage conceptTable;
 	public ConceptAttributePlugin() {
 		super(true);
@@ -66,7 +66,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
 		if (conceptAttributes == null) {
-			conceptAttributes = getConceptPanel(host);
+			conceptAttributes = getConceptAttributesPanel(host);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 			host.addPropertyChangeListener("commit", this);
 			this.host = host;
@@ -85,8 +85,8 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		}
 		return fields.toArray(new CONCEPT_FIELD[fields.size()]);
 	}
-	private JPanel getConceptPanel(I_HostConceptPlugins host) {
-		conceptTableModel = new ConceptTableModel(getConceptColumns(host),
+	private JPanel getConceptAttributesPanel(I_HostConceptPlugins host) {
+		conceptTableModel = new ConceptAttributeTableModel(getConceptColumns(host),
 				host);
 		JPanel conceptPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -158,7 +158,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		c.weighty = 1.0;
 		c.gridheight = 6;
 
-		ConceptTableRenderer renderer = new ConceptTableRenderer();
+		ConceptAttributeTableRenderer renderer = new ConceptAttributeTableRenderer();
 		conceptTable.setDefaultRenderer(StringWithConceptTuple.class, renderer);
 		JComboBox comboBox = new JComboBox() {
 			/**
@@ -185,7 +185,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 				comboBox));
 
 		conceptTable.getColumn(CONCEPT_FIELD.STATUS).setCellEditor(
-				new ConceptTableModel.ConceptStatusFieldEditor(host.getConfig()));
+				new ConceptAttributeTableModel.ConceptStatusFieldEditor(host.getConfig()));
 
 		conceptTable.setDefaultRenderer(String.class, renderer);
 		conceptTable.setDefaultRenderer(Boolean.class, renderer);

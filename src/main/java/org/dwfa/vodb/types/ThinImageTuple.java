@@ -67,5 +67,11 @@ public class ThinImageTuple implements I_ImageTuple {
 	public int getConceptId() {
 		return core.getConceptId();
 	}
+	public I_ImagePart duplicatePart() {
+		return new ThinImagePart(this.part);
+	}
+	public I_ImageVersioned getVersioned() {
+		return core;
+	}
 
 }

@@ -658,6 +658,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			uncommittedDescriptions = null;
 			uncommittedSourceRels = null;
 			uncommittedImages = null;
+			destRels = null;
 
 			if (uncommittedIds != null) {
 				boolean delete = true;
@@ -979,8 +980,6 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		if (uncommittedSourceRels != null) {
 			for (I_RelVersioned rel : uncommittedSourceRels) {
-				ConceptBean destBean = ConceptBean.get(rel.getC2Id());
-				destBean.flushDestRels();
 				for (I_RelPart p : rel.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						return true;

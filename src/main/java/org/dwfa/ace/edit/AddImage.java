@@ -59,13 +59,11 @@ public class AddImage extends AddComponent {
 			List<I_ImagePart> parts = new ArrayList<I_ImagePart>(1);
 			for (I_Path p : termContainer.getConfig().getEditingPathSet()) {
 				ThinImagePart imagePart = new ThinImagePart();
-				imagePart.setStatusId(LocalVersionedTerminology.get()
-						.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+				imagePart.setStatusId(config.getDefaultStatus().getConceptId());
 				imagePart.setPathId(p.getConceptId());
 				imagePart.setVersion(Integer.MAX_VALUE);
 				imagePart.setTextDescription("");
-				imagePart.setTypeId(LocalVersionedTerminology.get()
-						.uuidToNative(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids()));
+				imagePart.setTypeId(config.getDefaultImageType().getConceptId());
 				parts.add(imagePart);
 			}
 

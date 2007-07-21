@@ -39,6 +39,14 @@ public class ThinImagePart implements I_ImagePart {
 	public ThinImagePart() {
 		
 	}
+	public ThinImagePart(I_ImagePart another) {
+		super();
+		this.pathId = another.getPathId();
+		this.version = another.getVersion();
+		this.statusId = another.getStatusId();
+		this.textDescription = another.getTextDescription();
+		this.typeId = another.getTypeId();
+	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#setPathId(int)
 	 */

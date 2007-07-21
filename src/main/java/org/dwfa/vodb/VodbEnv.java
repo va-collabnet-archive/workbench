@@ -2109,8 +2109,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 						+ ") defined: " + defined);
 		ConceptBean newBean = ConceptBean.get(nid);
 		newBean.setPrimordial(true);
-		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-				.getUids());
+		int status = aceFrameConfig.getDefaultStatus().getConceptId();
 		ThinConVersioned conceptAttributes = new ThinConVersioned(nid,
 				aceFrameConfig.getEditingPathSet().size());
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -2143,8 +2142,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), aceFrameConfig.getEditingPathSet().size());
 		boolean capStatus = false;
-		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-				.getUids());
+		int status = aceFrameConfig.getDefaultStatus().getConceptId();
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 			ThinDescPart descPart = new ThinDescPart();
 			descPart.setVersion(Integer.MAX_VALUE);
@@ -2188,8 +2186,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), aceFrameConfig.getHierarchySelection()
 				.getConceptId(), 1);
-		int status = uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-				.getUids());
+		int status = aceFrameConfig.getDefaultStatus().getConceptId();
 		for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 			ThinRelPart relPart = new ThinRelPart();
 			relPart.setVersion(Integer.MAX_VALUE);
