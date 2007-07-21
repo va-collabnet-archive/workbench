@@ -183,6 +183,9 @@ public class CreateFailsafe extends AbstractTask {
 		   attrSetTemplates);
 		ServiceItemFilter filter = null;
 		ServiceItem service = worker.lookup(template, filter);
+		if (service == null) {
+			throw new ConfigurationException("Unable to fine an aging queue");
+		}
 		ServiceID agingQueueServiceID = service.serviceID;
 		I_QueueProcesses q = (I_QueueProcesses) service.service;
          

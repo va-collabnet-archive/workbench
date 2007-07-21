@@ -258,7 +258,7 @@ public class LocalPrepareAndCommitJob extends LocalJob implements TransactionCon
      * @see com.sun.jini.mahalo.Job
      */
     Object computeResult() throws JobException {
-        if (operationsLogger.isLoggable(Level.FINE)) {
+        if (operationsLogger.isLoggable(Level.INFO)) {
             operationsLogger.entering(PrepareAndCommitJob.class.getName(), 
 	        "computeResult");
 	}
@@ -276,7 +276,7 @@ public class LocalPrepareAndCommitJob extends LocalJob implements TransactionCon
 	prepstate = ((Integer)results[0]).intValue();
 
         Integer result = new Integer(prepstate);
-        if (operationsLogger.isLoggable(Level.FINE)) {
+        if (operationsLogger.isLoggable(Level.INFO)) {
             operationsLogger.exiting(PrepareAndCommitJob.class.getName(), 
 	        "computeResult", result);
 	}

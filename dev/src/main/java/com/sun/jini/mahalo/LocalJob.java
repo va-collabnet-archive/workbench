@@ -154,8 +154,8 @@ public abstract class LocalJob {
 	TaskManager.Task[] tmp = createTasks();
 
 	if (tmp != null) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST,
+            if (logger.isLoggable(Level.INFO)) {
+                logger.log(Level.INFO,
                     "Job:scheduleTasks with {0} tasks",
                     new Integer(tmp.length));
             }
@@ -173,8 +173,8 @@ public abstract class LocalJob {
 		synchronized(tasks) {
 		    tasks.put(tmp[i],new Integer(i));
 		    pool.add(tmp[i]);
-                    if (logger.isLoggable(Level.FINEST)) {
-                        logger.log(Level.FINEST,
+                    if (logger.isLoggable(Level.INFO)) {
+                        logger.log(Level.INFO,
                             "Job:scheduleTasks added {0} to thread pool",
                             tmp[i]);
                     }
@@ -193,8 +193,8 @@ public abstract class LocalJob {
 	    return;
 
 	try {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST,
+            if (logger.isLoggable(Level.INFO)) {
+                logger.log(Level.INFO,
                     "Job:awaitPending waiting for {0} items",
                     new Integer(pending));
             }
@@ -202,8 +202,8 @@ public abstract class LocalJob {
 	    if (waitFor == Long.MAX_VALUE) {
 		while (pending > 0) {
 		    wait();
-                    if (logger.isLoggable(Level.FINEST)) {
-                        logger.log(Level.FINEST,
+                    if (logger.isLoggable(Level.INFO)) {
+                        logger.log(Level.INFO,
                             "Job:awaitPending awoken");
                     }
 		}
@@ -228,8 +228,8 @@ public abstract class LocalJob {
         pending = num;
 
 	if (pending <= 0) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST,
+            if (logger.isLoggable(Level.INFO)) {
+                logger.log(Level.INFO,
                     "Job:setPending notifying, pending = {0}",
 		    new Integer(pending));
             }
@@ -241,8 +241,8 @@ public abstract class LocalJob {
 	pending--;
 
 	if (pending <= 0) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST,
+            if (logger.isLoggable(Level.INFO)) {
+                logger.log(Level.INFO,
                     "Job:decrementPending notifying, pending = {0}",
 		    new Integer(pending));
             }
@@ -293,8 +293,8 @@ public abstract class LocalJob {
 
 	synchronized(results) {
 	    if (results[position.intValue()] == null) {
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(Level.FINEST,
+                if (logger.isLoggable(Level.INFO)) {
+                    logger.log(Level.INFO,
                         "Job:reportDone who = {0}, param = {1}",
 		        new Object[] { who, param});
                 }

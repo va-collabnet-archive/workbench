@@ -201,8 +201,8 @@ public class TransactionParticipantAggregator implements
 	 */
 	public synchronized void commit(TransactionManager mgr, long id)
 			throws UnknownTransactionException, RemoteException {
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Starting commit for " + id);
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Starting commit for " + id);
         }
 		ServerTransaction st = new ServerTransaction(mgr, id);
 		List<I_TransactionPart> partsList = this.transactionMap.remove(st);
@@ -211,36 +211,36 @@ public class TransactionParticipantAggregator implements
 					"Not contained in transactionMap");
 		}
 		Date commitDate = null;
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Committing " + partsList.size() + " parts.");
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Committing " + partsList.size() + " parts.");
         }
 		for (I_TransactionPart part: partsList) {
 			if (commitDate == null) {
-                if (logger.isLoggable(Level.FINER)) {
-                    logger.finer("getting commitDate for: " + id);
+                if (logger.isLoggable(Level.INFO)) {
+                    logger.info("getting commitDate for: " + id);
                 }
                 commitDate = new Date();
-                if (logger.isLoggable(Level.FINER)) {
-                    logger.finer("getting commitDate for: " + id + " is: " + commitDate);
+                if (logger.isLoggable(Level.INFO)) {
+                    logger.info("getting commitDate for: " + id + " is: " + commitDate);
                 }
 			}
-            if (logger.isLoggable(Level.FINER)) {
-                logger.finer("commiting part: " + part);
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info("commiting part: " + part);
             }
 			part.commit(mgr, id, commitDate);
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("committed part: " + part);
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info("committed part: " + part);
             }
 		}
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Finished commit for " + id);
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Finished commit for " + id);
         }
 		for (Iterator<ActionListener> itr = this.listeners.iterator(); itr.hasNext();) {
 			ActionEvent event = new ActionEvent(this, 0,
 					"Transaction committed");
 			ActionListener listener = itr.next();
-            if (logger.isLoggable(Level.FINER)) {
-                logger.finer("Notifying: " + listener);
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info("Notifying: " + listener);
             }
 			listener.actionPerformed(event);
 		}
@@ -252,13 +252,13 @@ public class TransactionParticipantAggregator implements
 	 */
 	public synchronized void abort(TransactionManager mgr, long id)
 			throws UnknownTransactionException, RemoteException {
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Starting abort for " + id);
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Starting abort for " + id);
         }
 		ServerTransaction st = new ServerTransaction(mgr, id);
 		List<I_TransactionPart>  partsList = this.transactionMap.remove(st);
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Aborting " + partsList.size() + " parts.");
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Aborting " + partsList.size() + " parts.");
         }
 		if (partsList == null) {
 			throw new UnknownTransactionException(
@@ -267,15 +267,15 @@ public class TransactionParticipantAggregator implements
 		for (I_TransactionPart part: partsList) {
 			part.abort(mgr, id);
 		}
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.fine("Finished abort for " + id);
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Finished abort for " + id);
         }
 		for (Iterator<ActionListener> itr = this.listeners.iterator(); itr.hasNext();) {
 			ActionEvent event = new ActionEvent(this, 0,
 					"Transaction aborted");
 			ActionListener listener = itr.next();
-            if (logger.isLoggable(Level.FINER)) {
-                logger.finer("Notifying: " + listener);
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info("Notifying: " + listener);
             }
 			listener.actionPerformed(event);
 		}
