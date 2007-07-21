@@ -189,7 +189,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 					new I_ConceptualizeUniversally[] { STATUS }),
 		USER_INFO("user info",
 			new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-			USER_NAME("user info",
+			USER_NAME("user name",
 					new I_ConceptualizeUniversally[] { USER_INFO }),
 			USER_INBOX("user inbox",
 					new I_ConceptualizeUniversally[] { USER_INFO }),
