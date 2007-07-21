@@ -77,6 +77,9 @@ public class EditPopupClear extends AbstractTask {
 			case DESC_TYPE:
 				profile.getEditDescTypePopup().clear();
 				break;
+			case IMG_TYPE:
+				profile.getEditImageTypePopup().clear();
+				break;
 			default:
 				throw new TaskFailedException("Can't handle type: " + type);
 			}

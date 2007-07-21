@@ -97,6 +97,8 @@ public interface I_ConfigAceFrame {
 	public void setRoots(I_IntSet roots);
 
 	public I_IntList getEditDescTypePopup();
+	
+	public I_IntList getEditImageTypePopup();
 
 	public I_IntList getEditRelCharacteristicPopup();
 
@@ -107,6 +109,8 @@ public interface I_ConfigAceFrame {
 	public I_IntList getEditStatusTypePopup();
 
 	public void setEditDescTypePopup(I_IntList editDescTypePopup);
+
+	public void setEditImageTypePopup(I_IntList editImageTypePopup);
 
 	public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup);
 
@@ -124,9 +128,13 @@ public interface I_ConfigAceFrame {
 
 	public void setStatedViewTypes(I_IntSet statedViewTypes);
 
+	public I_GetConceptData getDefaultImageType();
+	
 	public I_GetConceptData getDefaultDescriptionType();
 
 	public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType);
+
+	public void setDefaultImageType(I_GetConceptData defaultImageType);
 
 	public I_GetConceptData getDefaultRelationshipCharacteristic();
 

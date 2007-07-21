@@ -88,6 +88,9 @@ public class EditPopupAdd extends AbstractTask {
 			case DESC_TYPE:
 				profile.getEditDescTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
 				break;
+			case IMG_TYPE:
+				profile.getEditImageTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+				break;
 			default:
 				throw new TaskFailedException("Can't handle type: " + type);
 			}

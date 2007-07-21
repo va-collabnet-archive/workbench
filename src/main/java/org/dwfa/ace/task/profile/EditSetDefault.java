@@ -88,6 +88,9 @@ public class EditSetDefault extends AbstractTask {
 			case DESC_TYPE:
 				profile.setDefaultDescriptionType(termFactory.getConcept(defaultConcept.ids));
 				break;
+			case IMG_TYPE:
+				profile.setDefaultImageType(termFactory.getConcept(defaultConcept.ids));
+				break;
 			default:
 				throw new TaskFailedException("Can't handle type: " + type);
 			}

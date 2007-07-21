@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -24,6 +25,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -95,7 +97,20 @@ public class NewEditPathForUser extends AbstractTask {
             descText = username + " dev path";
             tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0], descText), newPathConcept, "en", descText,
                     ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);
+
+            try {
+                descText = username;
+                tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0], descText +"username"), newPathConcept, "en", descText,
+                        ArchitectonicAuxiliary.Concept.USER_NAME.localize(), activeProfile);
+                
+                descText = username;
+                tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0], descText +"inbox"), newPathConcept, "en", descText,
+                        ArchitectonicAuxiliary.Concept.USER_INBOX.localize(), activeProfile);
+            } catch (NoMappingException ex) {
+            	worker.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+            }
             
+
             I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
             I_GetConceptData relDestination = tf.getConcept(parentPathTermEntry.ids);
             I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());

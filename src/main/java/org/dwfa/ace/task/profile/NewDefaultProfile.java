@@ -160,6 +160,11 @@ public class NewDefaultProfile extends AbstractTask {
         descPopupTypes.add(tf.uuidToNative(Concept.XHTML_DEF.getUids()));
         activeConfig.setEditDescTypePopup(descPopupTypes);
 
+        I_IntList imagePopupTypes = tf.newIntList();
+        imagePopupTypes.add(tf.uuidToNative(Concept.AUXILLARY_IMAGE.getUids()));
+        imagePopupTypes.add(tf.uuidToNative(Concept.VIEWER_IMAGE.getUids()));
+        activeConfig.setEditImageTypePopup(imagePopupTypes);
+
         I_IntList relCharacteristic = tf.newIntList();
         relCharacteristic.add(tf.uuidToNative(Concept.STATED_RELATIONSHIP.getUids()));
         relCharacteristic.add(tf.uuidToNative(Concept.INFERRED_RELATIONSHIP.getUids()));
@@ -245,6 +250,8 @@ public class NewDefaultProfile extends AbstractTask {
         activeConfig.setStatedViewTypes(statedViewTypes);
 
         activeConfig.setDefaultDescriptionType(tf.getConcept(Concept.SYNONYM_DESCRIPTION_TYPE.getUids()));
+        activeConfig.setDefaultImageType(tf.getConcept(Concept.AUXILLARY_IMAGE.getUids()));
+
         activeConfig.setDefaultRelationshipCharacteristic(tf.getConcept(Concept.STATED_RELATIONSHIP.getUids()));
         activeConfig.setDefaultRelationshipRefinability(tf.getConcept(Concept.OPTIONAL_REFINABILITY.getUids()));
         activeConfig.setDefaultRelationshipType(tf.getConcept(Concept.IS_A_REL.getUids()));

@@ -20,4 +20,8 @@ public interface I_ImageTuple {
 
 	public abstract int getConceptId();
 
+	public abstract I_ImageVersioned getVersioned();
+
+	public abstract I_ImagePart duplicatePart();
+
 }
