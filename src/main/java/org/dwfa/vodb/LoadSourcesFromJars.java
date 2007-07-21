@@ -59,7 +59,7 @@ public class LoadSourcesFromJars {
 		((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
 		//AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
 		printElapsedTime();
-		((VodbEnv) LocalVersionedTerminology.get()).close();
+		//((VodbEnv) LocalVersionedTerminology.get()).close();
 		//printElapsedTime();
 	}
 
