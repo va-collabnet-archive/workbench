@@ -141,7 +141,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 		try {
 
 			lowerProgressMessage = "Processing change set";
-			
+			AceLog.getEditLog().info("Importing change set: " + csFile.getAbsolutePath());
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(csFile));
 			Class readerClass = (Class) ois.readObject();
 			ois.close();

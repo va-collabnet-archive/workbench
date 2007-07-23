@@ -17,6 +17,26 @@ public class LuceneMatch implements Comparable<LuceneMatch>{
 		return score;
 	}
 	public int compareTo(LuceneMatch o) {
-		return Float.compare(this.score, o.score);
+		if (this.score.equals(o.score) == false) {
+			return Float.compare(this.score, o.score);
+		}
+		if (this.desc.getFirstTuple().getText().equals(o.desc.getFirstTuple().getText()) == false) {
+			return this.desc.getFirstTuple().getText().compareTo(o.desc.getFirstTuple().getText());
+		}
+		return this.desc.toString().compareTo(o.desc.toString());
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if (LuceneMatch.class.isAssignableFrom(obj.getClass())) {
+			LuceneMatch another = (LuceneMatch) obj;
+			return desc.getDescId() == another.desc.getDescId();
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		return desc.getDescId();
+	}
+	
+	
 }

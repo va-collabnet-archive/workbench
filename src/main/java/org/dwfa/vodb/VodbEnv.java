@@ -20,6 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import net.jini.space.MatchSet;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -1361,6 +1363,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 				LuceneMatch match = new LuceneMatch(descV, score);
 				if (root == null) {
 					matches.add(match);
+					if (logger.isLoggable(Level.FINE)) {
+						logger.fine("processing match: " + descV + " new match size: " + matches.size());
+					}
 				} else {
 					ConceptBean descConcept = ConceptBean.get(descV
 							.getConceptId());
@@ -1819,7 +1824,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 			for (I_DescriptionTuple tuple : desc.getTuples()) {
 				if (lastDesc == null
 						|| lastDesc.equals(tuple.getText()) == false) {
-					logger.info("Adding to index. dnid:  "  + desc.getDescId() + " desc: " + tuple.getText());
+					if (logger.isLoggable(Level.FINE)) {
+						logger.fine("Adding to index. dnid:  "  + desc.getDescId() + " desc: " + tuple.getText());
+					}
 					doc.add(new Field("desc", tuple.getText(), Field.Store.NO,   
 							Field.Index.TOKENIZED));
 				}
