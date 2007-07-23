@@ -55,19 +55,21 @@ public class AddAllProfilesToAddressList extends AbstractTask {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             File profiles = new File("profiles/users");
-            for (File profile: profiles.listFiles(new FileFilter() {
+            if (profiles.exists()) {
+                for (File profile: profiles.listFiles(new FileFilter() {
 
-                public boolean accept(File f) {
-                	if (f.isDirectory() && (f.isHidden() == false)) {
-                		File queueConfig = new File(f, "queue" + File.separator + "queue.config");
-                		return queueConfig.exists();
-                	}
-                    return false;
-                }})) {
-                if (configFrame.getAddressesList().contains(profile.getName()) == false) {
-                    configFrame.getAddressesList().add(profile.getName());
+                    public boolean accept(File f) {
+                    	if (f.isDirectory() && (f.isHidden() == false)) {
+                    		File queueConfig = new File(f, "queue" + File.separator + "queue.config");
+                    		return queueConfig.exists();
+                    	}
+                        return false;
+                    }})) {
+                    if (configFrame.getAddressesList().contains(profile.getName()) == false) {
+                        configFrame.getAddressesList().add(profile.getName());
+                    }
+
                 }
-
             }
 
             return Condition.CONTINUE;
