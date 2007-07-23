@@ -108,7 +108,7 @@ public class GenerateScripts extends AbstractMojo {
 			        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
 				} else if (name.equalsIgnoreCase("startAce")) {
 			        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
-			        startAllScript(jars, "ace", "start-ace-local.config", "1400m", "1400m", "Ace Bundle");
+			        startAllScript(jars, "startAceNoNet", "start-ace-local.config", "1400m", "1400m", "Ace Bundle");
 				}
 			}
 		}
