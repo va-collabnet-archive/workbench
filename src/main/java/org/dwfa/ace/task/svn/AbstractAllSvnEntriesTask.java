@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
@@ -49,6 +50,9 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            if (worker.getLogger().isLoggable(Level.INFO)) {
+            	worker.getLogger().info("java.library.path: " + System.getProperty("java.library.path"));
+            }
             for (SubversionData svd: config.getSubversionMap().values()) {
                 doSvnTask(config, svd);  
             }
