@@ -500,7 +500,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						.getEditLog()
 						.alertAndLog(
 								Level.SEVERE,
-								"Mapping exception. Ignoring component, and continuing import.",
+								"Mapping exception. Ignoring component, and continuing import.\n" +
+								rel,
 								e);
 			}
 
