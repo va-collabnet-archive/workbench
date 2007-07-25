@@ -22,7 +22,9 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
+import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPrompter;
+import org.tigris.subversion.javahl.Revision;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -54,6 +56,32 @@ public class AceRunner {
                                     "\n*******************\n\n" + "Starting service with config file args: " + argsStr
                                             + "\n\n******************\n");
             config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
+            
+            String[] svnCheckoutOnStart = (String[]) config.getEntry(this.getClass().getName(), "svnCheckoutOnStart", String[].class,
+                    new String[]{ });
+            if (svnCheckoutOnStart != null) {
+            	for (String svnSpec: svnCheckoutOnStart) {
+        			AceLog.getAppLog().info("Got svn spec: " + svnSpec);
+            		String[] specParts = new String[] {
+            				svnSpec.substring(0, svnSpec.lastIndexOf("|")),
+            				svnSpec.substring(svnSpec.lastIndexOf("|") + 1)
+            		};
+            		int server = 0;
+            		int local = 1;
+            		specParts[local] = specParts[local].replace('/', File.separatorChar);
+            		if (new File(specParts[local]).exists()) {
+            			//already checked out
+            			AceLog.getAppLog().info(specParts[server] + " already checked out to: " + specParts[local]);
+            		} else {
+            			// do the checkout...
+            			AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
+            			Svn.getSvnClient()
+        				.checkout(specParts[server],
+        						specParts[local], Revision.HEAD, true);
+            		}
+            	}
+            }
+            
             File aceConfigFile = (File) config.getEntry(this.getClass().getName(), "aceConfigFile", File.class,
                                                         new File("src/main/config/config.ace"));
 

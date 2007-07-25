@@ -11,14 +11,34 @@ import org.tigris.subversion.javahl.NotifyInformation;
 import org.tigris.subversion.javahl.NotifyStatus;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.SVNClient;
+import org.tigris.subversion.javahl.SVNClientInterface;
+import org.tmatesoft.svn.core.javahl.SVNClientImpl;
 
 public class Svn {
+	
+	enum SvnImpl {NATIVE, SVN_KIT};
+	
+	private static SvnImpl impl = SvnImpl.SVN_KIT;
+	
+	private static SVNClientInterface client;
 
-	private static SVNClient client;
-
-	public static SVNClient getSvnClient() {
+	public static SVNClientInterface getSvnClient() {
 		if (client == null) {
-			client = new SVNClient();
+			switch (impl) {
+			case NATIVE:
+				client = new SVNClient();
+				AceLog.getAppLog().info("Created native svn client: " + client);
+				break;
+				
+			case SVN_KIT:
+				client = SVNClientImpl.newInstance();
+				AceLog.getAppLog().info("Created Svnkit pure java svn client: " + client);
+				break;
+
+			default:
+				throw new RuntimeException("Can't handle svn impl type: " + impl);
+			}
+			client.setPrompt(new SvnPrompter());
 			// The SVNClient needs an implementation of Notify before
 			// successfully executing any other methods.
 			client.notification2(new Notify2() {
