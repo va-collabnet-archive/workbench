@@ -552,7 +552,7 @@ public class QueueViewerPanel extends JPanel {
         public Object run() throws Exception {
             ServiceTemplate template = new ServiceTemplate(null, new Class[] { I_QueueProcesses.class }, null);
 
-            ServiceItem[] services = worker.lookup(template, 1, 50, queuefilter, 1000 * 5);
+            ServiceItem[] services = worker.lookup(template, 1, 50, queuefilter, 500);
 
             if (logger.isLoggable(Level.FINE)) {
                 logger.info("Found " + services.length + " matching I_QueueProcesses services...");
