@@ -59,9 +59,13 @@ public class Configuration {
         } else {
             buff.append("   private static host = ConfigUtil.getHostAddress();\n");        	
         }
+        buff.append("   private static jiniPort = org.dwfa.jini.ConfigUtil.getJiniPort();\n");        	
+        buff.append("   private static jiniPortUrlPart = org.dwfa.jini.ConfigUtil.getJiniPortUrlPart();\n");        	
+
+        
         buff.append('\n');
-        buff.append("   private static jskCodebase = ConfigUtil.concat(new String[] { \"http://\", host, \":8081/\", VHelp.addDlVersion(\"jsk-dl\")});\n");
-        buff.append("   private static jskMdURL = ConfigUtil.concat(new String[] { \"httpmd://\", host, \":8081/\",  VHelp.addDlVersion(\"jsk-dl\"), \";sha=0\"});\n");
+        buff.append("   private static jskCodebase = ConfigUtil.concat(new String[] { \"http://\", host, jiniPortUrlPart, VHelp.addDlVersion(\"jsk-dl\")});\n");
+        buff.append("   private static jskMdURL = ConfigUtil.concat(new String[] { \"httpmd://\", host, jiniPortUrlPart,  VHelp.addDlVersion(\"jsk-dl\"), \";sha=0\"});\n");
         buff.append("   private static jskCodebaseMd = HttpmdUtil.computeDigestCodebase(\"lib-dl\", jskMdURL);\n\n");
         for (ServiceConfigOption option: options) {
             if (option.isEnabled()) {

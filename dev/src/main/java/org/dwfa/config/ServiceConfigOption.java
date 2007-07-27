@@ -100,7 +100,7 @@ public class ServiceConfigOption {
                 if (secure) {
                     StringBuffer urlBuff = new StringBuffer();
                     urlBuff.append("private static "+ this.getPrefix() + "_URL = ");
-                    urlBuff.append("ConfigUtil.concat(new String[] {\"httpmd://\", host, \"");
+                    urlBuff.append("ConfigUtil.concat(new String[] {\"httpmd://\", host, ");
                     urlBuff.append(this.codebase);
                     urlBuff.append(";sha=0\"});");
                     stringList.add(urlBuff.toString());
@@ -120,7 +120,7 @@ public class ServiceConfigOption {
                 } else {
                     StringBuffer urlBuff = new StringBuffer();
                     urlBuff.append("private static "+ this.getPrefix() + "_URL = ");
-                    urlBuff.append("ConfigUtil.concat(new String[] {\"http://\", host, \"");
+                    urlBuff.append("ConfigUtil.concat(new String[] {\"http://\", host, ");
                     urlBuff.append(this.codebase);
                     urlBuff.append("\"});");
                     stringList.add(urlBuff.toString());
@@ -144,12 +144,21 @@ public class ServiceConfigOption {
         StringBuffer argBuff = new StringBuffer();
         argBuff.append("new String[] { ");
         for (int i = 0; i < localArgs.length; i++) {
-            argBuff.append("\"" + localArgs[i]);
-            if (i == localArgs.length - 1) {
-                argBuff.append("\" ");
-            } else {
-                argBuff.append("\", ");
-            }
+        	if (localArgs[i].equals("jiniPort")) {
+                argBuff.append(localArgs[i]);
+                if (i == localArgs.length - 1) {
+                    argBuff.append(" ");
+                } else {
+                    argBuff.append(", ");
+                }
+        	} else {
+                argBuff.append("\"" + localArgs[i]);
+                if (i == localArgs.length - 1) {
+                    argBuff.append("\" ");
+                } else {
+                    argBuff.append("\", ");
+                }
+        	}
         }
         argBuff.append("}");
         stringList.add("private static "+ this.getPrefix() + "_Args = " + argBuff.toString() + ";");

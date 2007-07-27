@@ -89,7 +89,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String AGING_QUEUE = "Aging Queue";
     public static String AGING_QUEUE_PROP = "org.dwfa.AGING_QUEUE";
     public static ServiceConfigOption CO_AgingQueue = new ServiceConfigOption(AGING_QUEUE, "config${/}queueAging.policy", "config${/}queueAgingSecure.policy", AGING_QUEUE_PROP,
-            "Publishes an Aging Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes an Aging Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueAging.config" }, 
             new String[] { "config${/}queueAgingSecure.config" }, 
@@ -167,8 +167,8 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             "Must be turned on to allow Jini services to run on this machine. ",
             true, "", null, "VHelp.addLibVersion(\"tools\")",
             "com.sun.jini.tool.ClassServer",
-            new String[] { "-port", "8081", "-dir", "lib-dl", "-verbose", }, 
-            new String[] { "-port", "8081", "-dir", "lib-dl", "-verbose", }, 
+            new String[] { "-port", "jiniPort", "-dir", "lib-dl", "-verbose", }, 
+            new String[] { "-port", "jiniPort", "-dir", "lib-dl", "-verbose", }, 
             false, false, false, 
             "");
     
@@ -176,7 +176,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             JINI_SERVICE_BROWSER, "config${/}browser.policy", "config${/}browserSecure.policy",
             JINI_SERVICE_BROWSER_PROP,
             "Optional component to allow browsing Jini services on the network. ",
-            false, ":8081/\", VHelp.addDlVersion(\"browser-dl\"), \"", "lib",
+            false, "jiniPortUrlPart, VHelp.addDlVersion(\"browser-dl\"), \"", "lib",
             "VHelp.addLibVersion(\"browser\")" + 
             "+ \"${path.separator}\" + VHelp.addLibVersion(\"macadaptor\")",
             "org.dwfa.servicebrowser.BrowserAdaptor",
@@ -204,7 +204,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             SERVICE_REGISTRAR, "config${/}reggie.policy", "config${/}reggieSecure.policy", 
             SERVICE_REGISTRAR_PROP,
             "There must be at least one on the network, or you can't discover services. ",
-            true, ":8081/\", VHelp.addDlVersion(\"reggie-dl\"), \"", "lib", "VHelp.addLibVersion(\"reggie\")",
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"reggie-dl\"), \"", "lib", "VHelp.addLibVersion(\"reggie\")",
             "com.sun.jini.reggie.TransientRegistrarImpl",
             new String[] { "config${/}reggie.config" }, 
             new String[] { "config${/}reggieSecure.config" }, 
@@ -214,7 +214,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             TRANSACTION_MANAGER, "config${/}transactionManager.policy", 
             "config${/}transactionManagerSecure.policy", TRANSACTION_MANAGER_PROP,
             "There must be at least one on the network, or you run services that use transactions. ",
-            true, ":8081/\", VHelp.addDlVersion(\"mahalo-dl\"), \"", "lib", "VHelp.addLibVersion(\"mahalo\")",
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"mahalo-dl\"), \"", "lib", "VHelp.addLibVersion(\"mahalo\")",
             "com.sun.jini.mahalo.TransientMahaloImpl",
             new String[] { "config${/}transactionManager.config" }, 
             new String[] { "config${/}transactionManagerSecure.config" }, 
@@ -224,7 +224,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             JAVA_SPACE, "config${/}transient-outrigger.policy", "config${/}transient-outriggerSecure.policy",
             JAVA_SPACE_PROP,
             "There must be at least one on the network to support generic workers and grid-based workflow. ",
-            true, ":8081/\", VHelp.addDlVersion(\"outrigger-dl\"), \"", "lib",
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"outrigger-dl\"), \"", "lib",
             "VHelp.addLibVersion(\"outrigger\")",
             "com.sun.jini.outrigger.TransientOutriggerImpl",
             new String[] { "config${/}transient-outrigger.config" },
@@ -274,7 +274,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             TUNNEL_SERVICE, "config${/}tunnel.policy", "config${/}tunnelSecure.policy", 
             TUNNEL_SERVICE_PROP,
             "Allows services on one lookup group to tunnel to another lookup service via a URL. ",
-            false, ":8081/\", VHelp.addDlVersion(\"tunnel-dl\"), \"\"), \"", "lib", dwaPath,
+            false, "jiniPortUrlPart, VHelp.addDlVersion(\"tunnel-dl\"), \"\"), \"", "lib", dwaPath,
             "org.dwfa.tunnel.TunnelService",
             new String[] { "config${/}tunnelService.config" },
             new String[] { "config${/}tunnelServiceSecure.config" },
@@ -282,7 +282,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     
     public static ServiceConfigOption CO_Inbox = new ServiceConfigOption(INBOX_QUEUE, "config${/}queueInbox.policy", 
             "config${/}queueInboxSecure.policy", INBOX_QUEUE_PROP,
-            "Publishes an Inbox Queue for business processes. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes an Inbox Queue for business processes. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             dwaPath,
             "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueInbox.config" }, 
@@ -294,7 +294,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     
     
     public static ServiceConfigOption CO_OutboxQueue = new ServiceConfigOption(OUTBOX_QUEUE, "config${/}queueOutbox.policy", "config${/}queueOutboxSecure.policy", OUTBOX_QUEUE_PROP,
-            "Publishes an OutBox Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes an OutBox Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueOutbox.config" }, 
             new String[] { "config${/}queueOutboxSecure.config" }, 
@@ -308,7 +308,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption CO_ComputeQueue = new ServiceConfigOption(
             COMPUTE_QUEUE, "config${/}queueCompute.policy", "config${/}queueComputeSecure.policy", COMPUTE_QUEUE_PROP,
             "Publishes a Compute Queue (does not support user interaction) for workflow. ",
-            true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib", 
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", 
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueCompute.config" },
             new String[] { "config${/}queueComputeSecure.config" },
@@ -318,7 +318,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption CO_LauncherQueue = new ServiceConfigOption(
             LAUNCHER_QUEUE, "config${/}queueLauncher.policy", "config${/}queueLauncherSecure.policy", LAUNCHER_QUEUE_PROP,
             "<html>Publishes queue from which processes can be launched, but they will remain in the queue for subsequent launches<br><font color='blue'>(take operations are actually read operations). ",
-            true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib", 
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", 
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueLauncher.config" },
             new String[] { "config${/}queueLauncherSecure.config" },
@@ -328,7 +328,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String SYNC_QUEUE = "Sync Queue";
     public static String SYNC_QUEUE_PROP = "org.dwfa.SYNC_QUEUE";
     public static ServiceConfigOption CO_SyncQueue = new ServiceConfigOption(SYNC_QUEUE, "config${/}queueSync.policy", "config${/}queueSyncSecure.policy", SYNC_QUEUE_PROP,
-            "Publishes a Synchronization Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes a Synchronization Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueSync.config" }, 
             new String[] { "config${/}queueSyncSecure.config" }, 
@@ -342,7 +342,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             "config${/}queueWebSecure.policy", 
             WEB_QUEUE_PROP,
             "Publishes a Web Queue for workflow. ", true, 
-            ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueWeb.config" }, 
             new String[] { "config${/}queueWebSecure.config" }, 
@@ -352,7 +352,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption CO_LogManagerService = new ServiceConfigOption(
             LOG_SERVICE, "config${/}logManagerService.policy", "config${/}logSecure.policy", LOG_SERVICE_PROP,
             "Makes the logs from the local JVM available on the network. ",
-            true, ":8081/\", VHelp.addDlVersion(\"log-dl\"), \"", "lib", dwaPath,
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"log-dl\"), \"", "lib", dwaPath,
             "org.dwfa.log.LogManagerService",
             new String[] { "config${/}logManagerService.config" },
             new String[] { "config${/}logManagerServiceSecure.config" },
@@ -364,7 +364,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             "config${/}assignmentAuthorityVerhoeffSecure.policy", SEQUENCE_AUTHORITY_VERHOEFF_PROP,
             "Provides an identifier generation service for network use. ",
             true,
-            ":8081/\", VHelp.addDlVersion(\"assignmentAuthority-dl\"), \"", "lib",
+            "jiniPortUrlPart, VHelp.addDlVersion(\"assignmentAuthority-dl\"), \"", "lib",
             dwaPath,
             "org.dwfa.aa.AssignmentAuthorityService",
             new String[] { "config${/}assignmentAuthorityLongVerhoeff.config" },
@@ -376,7 +376,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             "config${/}assignmentAuthorityOidUuidSecure.policy", OID_UUID_AUTHORITY_PROP,
             "Provides an identifier generation service for network use. ",
             true,
-            ":8081/\", VHelp.addDlVersion(\"assignmentAuthority-dl\"), \"", "lib",
+            "jiniPortUrlPart, VHelp.addDlVersion(\"assignmentAuthority-dl\"), \"", "lib",
             dwaPath,
             "org.dwfa.aa.AssignmentAuthorityService",
             new String[] { "config${/}assignmentAuthorityOidUuid.config" },
@@ -387,7 +387,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
             UUID_AUTHORITY, "config${/}assignmentAuthorityUuid.policy", 
             "config${/}assignmentAuthorityUuidSecure.policy", UUID_AUTHORITY_PROP,
             "Provides an identifier generation service for network use. ",
-            true, ":8081/\", VHelp.addDlVersion(\"assignmentAuthority-dl\"), \"", "lib", dwaPath,
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"assignmentAuthority-dl\"), \"", "lib", dwaPath,
             "org.dwfa.aa.AssignmentAuthorityService",
             new String[] { "config${/}assignmentAuthorityUuid.config" },
             new String[] { "config${/}assignmentAuthorityUuidSecure.config" },
@@ -415,7 +415,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String ARCHIVAL_QUEUE = "Archival Queue";
     public static String ARCHIVAL_QUEUE_PROP = "org.dwfa.ARCHIVAL";
     public static ServiceConfigOption CO_Archival = new ServiceConfigOption(ARCHIVAL_QUEUE, "config${/}queueArchival.policy", "config${/}queueArchivalSecure.policy", ARCHIVAL_QUEUE_PROP,
-            "Publishes an Archival Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes an Archival Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             dwaPath, "org.dwfa.queue.QueueServer",
             new String[] { "config${/}queueArchival.config" }, 
             new String[] { "config${/}queueArchivalSecure.config" }, 

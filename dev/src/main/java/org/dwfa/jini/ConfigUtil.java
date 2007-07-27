@@ -22,6 +22,17 @@ public class ConfigUtil {
 		ConfigUtil.uniqueJvmGroup = uniqueJvmGroup;
 	}
 	
+	public static String getJiniPort() {
+		if (System.getProperties().get("org.dwfa.jiniport") != null) {
+			return (String) System.getProperties().get("org.dwfa.jiniport");
+		}
+		return "8081";
+	}
+	
+	public static String getJiniPortUrlPart() {
+		return ":" + getJiniPort() + "/";
+	}
+	
 	public static void main(String[] args) {
 		try {
 			System.out.println("getHostIPAddress(): " + InetAddress.getLocalHost().getHostAddress());
