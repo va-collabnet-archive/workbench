@@ -138,7 +138,8 @@ public class GenerateScripts extends AbstractMojo {
 			fw.write("-Djava.security.auth.login.config=config\\dwa.login ");
 			fw.write("-Djavax.net.ssl.trustStore=prebuiltkeys\\truststore ");
 			fw.write("-Djava.protocol.handler.pkgs=net.jini.url  ");
-             fw.write("-Djava.library.path=lib ");
+            fw.write("-Djava.library.path=lib ");
+ 			fw.write("-Dorg.dwfa.jiniport=8080 ");
 			fw.write("-cp ");
 			for (File f : Arrays.asList(jars)) {
 				fw.write(libDir + "\\" + f.getName() + ";");
@@ -171,6 +172,7 @@ public class GenerateScripts extends AbstractMojo {
 			fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
 			fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
 			fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
+			fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
 			fw.write("     -cp ");
 			for (File f : Arrays.asList(jars)) {
 				fw.write(libDir + "/" + f.getName() + ":");
@@ -205,6 +207,7 @@ public class GenerateScripts extends AbstractMojo {
 				fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
 				fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
 				fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
+				fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
 				fw.write("     -cp ");
 				for (File f : Arrays.asList(jars)) {
 					fw.write(libDir + "/" + f.getName() + ":");
