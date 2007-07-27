@@ -104,7 +104,7 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
     	   public static ServiceConfigOption configInbox(String queueName) {
     		   ServiceConfigOption sco = new ServiceConfigOption(CoreServices.INBOX_QUEUE + queueName, "config${/}" + queueName + ".policy", 
             "config${/}" + queueName + "Secure.policy", CoreServices.INBOX_QUEUE_PROP + queueName,
-            "Publishes an Inbox Queue for business processes. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes an Inbox Queue for business processes. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             CoreServices.dwaPath,
             "org.dwfa.queue.QueueServer",
             new String[] { "config${/}" + queueName + ".config" }, 
@@ -121,7 +121,7 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption configOutbox(String queueName) {
     	   ServiceConfigOption sco = new ServiceConfigOption(CoreServices.OUTBOX_QUEUE + queueName, "config${/}" + queueName + ".policy", "config${/}" + queueName + "Secure.policy", 
     			CoreServices.OUTBOX_QUEUE_PROP + queueName,
-                "Publishes an OutBox Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+                "Publishes an OutBox Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
                 CoreServices.dwaPath, "org.dwfa.queue.QueueServer",
                 new String[] { "config${/}" + queueName + ".config" }, 
                 new String[] { "config${/}" + queueName + "Secure.config" }, 

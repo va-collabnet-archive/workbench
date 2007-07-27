@@ -103,7 +103,7 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
     	   public static ServiceConfigOption configInbox(String queueName) {
     		   ServiceConfigOption sco = new ServiceConfigOption(CoreServices.INBOX_QUEUE + queueName, "config${/}" + queueName + ".policy", 
             "config${/}" + queueName + "Secure.policy", CoreServices.INBOX_QUEUE_PROP + queueName,
-            "Publishes an Inbox Queue for business processes. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+            "Publishes an Inbox Queue for business processes. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
             CoreServices.dwaPath,
             "org.dwfa.queue.QueueServer",
             new String[] { "config${/}" + queueName + ".config" }, 
@@ -120,7 +120,7 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption configOutbox(String queueName) {
     	   ServiceConfigOption sco = new ServiceConfigOption(CoreServices.OUTBOX_QUEUE + queueName, "config${/}" + queueName + ".policy", "config${/}" + queueName + "Secure.policy", 
     			CoreServices.OUTBOX_QUEUE_PROP + queueName,
-                "Publishes an OutBox Queue for workflow. ", true, ":8081/\", VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
+                "Publishes an OutBox Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib",
                 CoreServices.dwaPath, "org.dwfa.queue.QueueServer",
                 new String[] { "config${/}" + queueName + ".config" }, 
                 new String[] { "config${/}" + queueName + "Secure.config" }, 
@@ -138,7 +138,7 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
     		LOCAL_TRANSACTION_MANAGER, "config${/}transactionManager.policy", 
             "config${/}transactionManagerSecure.policy", LOCAL_TRANSACTION_MANAGER_PROP,
             "There must be at least one on the network, or you run services that use transactions. ",
-            true, ":8081/\", VHelp.addDlVersion(\"mahalo-dl\"), \"", "lib", "VHelp.addLibVersion(\"mahalo\")",
+            true, "jiniPortUrlPart, VHelp.addDlVersion(\"mahalo-dl\"), \"", "lib", "VHelp.addLibVersion(\"mahalo\")",
             "com.sun.jini.mahalo.LocalTransactionManager",
             new String[] { "config${/}transactionManager.config" }, 
             new String[] { "config${/}transactionManagerSecure.config" }, 
