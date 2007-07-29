@@ -703,7 +703,21 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		af.setDefaultRelationshipRefinability(ConceptBean
 				.get(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
 						.getUids()));
+		
+		af.setDefaultImageType(ConceptBean
+				.get(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
+						.getUids()));
 
+		IntList imageTypes = new IntList();
+		imageTypes.add(AceConfig.getVodb().getId(
+				ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids())
+				.getNativeId());
+		imageTypes.add(AceConfig.getVodb().getId(
+				ArchitectonicAuxiliary.Concept.VIEWER_IMAGE
+						.getUids()).getNativeId());
+		af.setEditImageTypePopup(imageTypes);
+
+		
 		if (config.getUsername() == null) {
 			config.setChangeSetWriterFileName("nullUser."
 					+ UUID.randomUUID().toString() + ".jcs");

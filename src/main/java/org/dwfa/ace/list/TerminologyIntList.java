@@ -29,7 +29,7 @@ public class TerminologyIntList extends JList {
 		public void actionPerformed(ActionEvent e) {
 			int selectedIndex = getSelectedIndex();
 			if (selectedIndex >= 0) {
-				TerminologyListModel tm = (TerminologyListModel) getModel();
+				TerminologyIntListModel tm = (TerminologyIntListModel) getModel();
 				tm.removeElement(selectedIndex);
 			}
 		}

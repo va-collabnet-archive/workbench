@@ -28,6 +28,8 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.list.TerminologyIntList;
+import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
@@ -110,6 +112,10 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 		} else if (TerminologyList.class.isAssignableFrom(c.getClass())) {
 			TerminologyList list = (TerminologyList) c;
+			return new ConceptTransferable((I_GetConceptData) list
+					.getSelectedValue());
+		} else if (TerminologyIntList.class.isAssignableFrom(c.getClass())) {
+			TerminologyIntList list = (TerminologyIntList) c;
 			return new ConceptTransferable((I_GetConceptData) list
 					.getSelectedValue());
 		} else if (JTable.class.isAssignableFrom(c.getClass())) {
@@ -279,6 +285,27 @@ public class TerminologyTransferHandler extends TransferHandler {
 			}
 		}
 
+		if (TerminologyIntList.class.isAssignableFrom(comp.getClass())) {
+			TerminologyIntList tl = (TerminologyIntList) comp;
+			TerminologyIntListModel model = (TerminologyIntListModel) tl.getModel();
+			try {
+				Object obj = t.getTransferData(conceptBeanFlavor);
+				ConceptBean cb;
+				if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
+					ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
+					cb = cbt.getCoreBean();
+				} else {
+					cb = (ConceptBean) obj;
+				}
+				model.addElement(cb);
+				return true;
+			} catch (UnsupportedFlavorException e) {
+				AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+			} catch (IOException e) {
+				AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
+		}
+
 		if (JTable.class.isAssignableFrom(comp.getClass())) {
 			JTable table = (JTable) comp;
 			Point mouseLoc = table.getMousePosition();
@@ -392,6 +419,13 @@ public class TerminologyTransferHandler extends TransferHandler {
 			}
 		}
 		if (TerminologyList.class.isAssignableFrom(comp.getClass())) {
+			for (DataFlavor f : transferFlavors) {
+				if (f.equals(conceptBeanFlavor)) {
+					return true;
+				}
+			}
+		}
+		if (TerminologyIntList.class.isAssignableFrom(comp.getClass())) {
 			for (DataFlavor f : transferFlavors) {
 				if (f.equals(conceptBeanFlavor)) {
 					return true;

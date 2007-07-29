@@ -130,6 +130,9 @@ public class TermLabelMaker {
 		
 		String labelHtml = labelBuff.toString();
 		String toolTipHtml = toolTipBuff.toString();
+		if (desc == null) {
+			
+		}
 		LabelForTuple ldt = new LabelForDescriptionTuple(desc, showLongForm, showStatus);
 		return makeLabel(ldt, labelHtml, toolTipHtml);		
 	}

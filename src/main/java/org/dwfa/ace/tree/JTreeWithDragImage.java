@@ -118,6 +118,9 @@ public class JTreeWithDragImage extends JTree {
 
 			I_DescriptionTuple desc = obj.getDescTuple(config
 					.getTreeDescPreferenceList(), config);
+			if (desc == null) {
+				desc = obj.getDescriptions().get(0).getFirstTuple();
+			}
 			JLabel dragLabel = TermLabelMaker.newLabel(desc, false, false).getLabel();
 			dragLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 			Image dragImage = createImage(dragLabel.getWidth(), dragLabel

@@ -222,8 +222,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         //21
 		try {
-			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));
+			if (defaultImageType == null) {
+				defaultImageType = AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
+			}
+			out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));				
 		} catch (DatabaseException e) {
+			IOException newEx = new IOException();
+			newEx.initCause(e);
+			throw newEx;
+		} catch (TerminologyException e) {
 			IOException newEx = new IOException();
 			newEx.initCause(e);
 			throw newEx;

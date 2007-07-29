@@ -50,7 +50,7 @@ public class TerminologyIntListModel implements I_ModelTerminologyList {
 	public I_GetConceptData removeElement(int index) {
 		int id = elements.remove(index);
 		try {
-			return LocalVersionedTerminology.get().getConcept(elements.get(id));
+			return LocalVersionedTerminology.get().getConcept(id);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {

@@ -1,17 +1,22 @@
 package org.dwfa.ace.config;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
@@ -29,6 +34,25 @@ import org.tigris.subversion.javahl.Revision;
 import com.sun.jini.start.LifeCycle;
 
 public class AceRunner {
+	
+	private class CheckIpAddressForChanges implements ActionListener {
+
+		public void actionPerformed(ActionEvent arg0) {
+            try {
+				InetAddress currentLocalHost = InetAddress.getLocalHost();
+				if (currentLocalHost.equals(startupLocalHost)) {
+					// all ok
+				} else {
+					JOptionPane.showMessageDialog(null, "<html>Your ip address (" + currentLocalHost.toString() + 
+							") <br> has changed since startup (" + startupLocalHost.toString() + 
+							") <br> please restart your application.");
+				}
+			} catch (UnknownHostException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		}
+		
+	}
 
     @SuppressWarnings("unused")
     private String[] args;
@@ -37,8 +61,15 @@ public class AceRunner {
     private LifeCycle lc;
 
     protected Configuration config;
+
+	private InetAddress startupLocalHost;
     
     private static boolean firstStartup = true;
+    
+    CheckIpAddressForChanges ipChangeListener = new CheckIpAddressForChanges();
+
+	@SuppressWarnings("unused")
+	private Timer ipChangeTimer;
 
     public AceRunner(final String[] args, final LifeCycle lc) {
         try {
@@ -55,6 +86,9 @@ public class AceRunner {
             AceLog.getAppLog().info(
                                     "\n*******************\n\n" + "Starting service with config file args: " + argsStr
                                             + "\n\n******************\n");
+            startupLocalHost = InetAddress.getLocalHost();
+            ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
+            ipChangeTimer.start();
             config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
             
             String[] svnCheckoutOnStart = (String[]) config.getEntry(this.getClass().getName(), "svnCheckoutOnStart", String[].class,
