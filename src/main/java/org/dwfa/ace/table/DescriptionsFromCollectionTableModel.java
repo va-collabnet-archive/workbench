@@ -48,9 +48,11 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	public void setLuceneMatches(Collection<LuceneMatch> matches) {
 		descriptionList = new ArrayList<ThinDescVersioned>(matches.size());
 		scoreList = new ArrayList<Float>(matches.size());
-		for (LuceneMatch m: matches) {
-			descriptionList.add(m.getDesc());
-			scoreList.add(m.getScore());
+		synchronized (matches) {
+			for (LuceneMatch m: matches) {
+				descriptionList.add(m.getDesc());
+				scoreList.add(m.getScore());
+			}
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

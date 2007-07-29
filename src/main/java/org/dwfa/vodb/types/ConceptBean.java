@@ -414,8 +414,10 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (images == null) {
 			try {
 				images = AceConfig.getVodb().getImages(conceptId);
-				AceLog.getAppLog().info(
-						"Retrieved images: " + images + " for: " + conceptId);
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					AceLog.getAppLog().fine(
+							"Retrieved images: " + images + " for: " + conceptId);
+				}
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
@@ -454,7 +456,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 */
 	public void commit(int version, Set<TimePathId> values) throws IOException {
 		// handle the parts first...
-		AceLog.getEditLog().info("Starting commit for ConceptBean: " + this);
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine("Starting commit for ConceptBean: " + this);
+		}
 		StringBuffer buff = null;
 		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
 			buff = new StringBuffer();
@@ -601,7 +605,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
-		AceLog.getAppLog().info("Finished commit for ConceptBean: " + this);
+		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+			AceLog.getAppLog().fine("Finished commit for ConceptBean: " + this);
+		}
 		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
 			AceLog.getEditLog().fine(buff.toString());
 		}

@@ -9,7 +9,11 @@ public class CompareConceptBeanInitialText implements Comparator<I_GetConceptDat
 
 	public int compare(I_GetConceptData cb1, I_GetConceptData cb2) {
 		try {
-			return cb1.getInitialText().compareTo(cb2.getInitialText());
+			int comparison = cb1.getInitialText().compareTo(cb2.getInitialText());
+			if (comparison == 0) {
+				comparison = cb1.getConceptId() - cb2.getConceptId();
+			}
+			return comparison;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

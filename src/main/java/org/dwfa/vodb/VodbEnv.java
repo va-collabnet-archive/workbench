@@ -2143,9 +2143,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 				.getUids());
 		int descId = uuidToNativeWithGeneration(newDescriptionId, idSource,
 				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
-		AceLog.getEditLog().info(
-				"Creating new description: " + newDescriptionId + " (" + descId
-						+ "): " + text);
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(
+					"Creating new description: " + newDescriptionId + " (" + descId
+							+ "): " + text);
+		}
 		ThinDescVersioned desc = new ThinDescVersioned(descId, concept
 				.getConceptId(), aceFrameConfig.getEditingPathSet().size());
 		boolean capStatus = false;
@@ -2186,10 +2188,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 				.getUids());
 		int relId = uuidToNativeWithGeneration(newRelUid, idSource,
 				aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
-		AceLog.getEditLog().info(
-				"Creating new relationship 1: " + newRelUid + " (" + relId
-						+ ") from " + concept.getUids() + " to "
-						+ aceFrameConfig.getHierarchySelection().getUids());
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(
+					"Creating new relationship 1: " + newRelUid + " (" + relId
+							+ ") from " + concept.getUids() + " to "
+							+ aceFrameConfig.getHierarchySelection().getUids());
+		}
 		ThinRelVersioned rel = new ThinRelVersioned(relId, concept
 				.getConceptId(), aceFrameConfig.getHierarchySelection()
 				.getConceptId(), 1);
