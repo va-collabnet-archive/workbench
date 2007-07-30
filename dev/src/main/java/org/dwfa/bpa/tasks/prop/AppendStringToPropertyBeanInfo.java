@@ -13,14 +13,14 @@ public class AppendStringToPropertyBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
             PropertyDescriptor valueTextPropertyName =
-                new PropertyDescriptor("valueText", TestPropertyEqualsText.class);
+                new PropertyDescriptor("valueText", getBeanDescriptor().getBeanClass());
             valueTextPropertyName.setBound(true);
             valueTextPropertyName.setPropertyEditorClass(JTextFieldEditorOneLine.class);
             valueTextPropertyName.setDisplayName("<html><font color='blue'>Append value:");
             valueTextPropertyName.setShortDescription("Text to append. ");
             
             PropertyDescriptor stringPropName =
-                new PropertyDescriptor("stringPropName", TestPropertyEqualsText.class);
+                new PropertyDescriptor("stringPropName", getBeanDescriptor().getBeanClass());
             stringPropName.setBound(true);
             stringPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             stringPropName.setDisplayName("<html><font color='blue'>property:");
