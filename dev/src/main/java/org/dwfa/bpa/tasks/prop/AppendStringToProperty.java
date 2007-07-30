@@ -13,55 +13,56 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-/**
- * Copy an object from one process property to another. 
- * @author kec
- *
- */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/copy tasks", type = BeanType.TASK_BEAN)})
-public class CopyLocalProperty extends AbstractTask {
+{ @Spec(directory = "tasks/processes/string tasks", type = BeanType.TASK_BEAN)})
 
-    private String originalPropName = "";
-    private String copyPropName = "";
+public class AppendStringToProperty extends AbstractTask {
+
+    private String stringPropName = "";
+
+    private String valueText = "";
+
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(originalPropName);
-        out.writeObject(copyPropName);
-     }
+        out.writeObject(stringPropName);
+        out.writeObject(valueText);
+    }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-            originalPropName = (String) in.readObject();
-            copyPropName = (String) in.readObject();
+            stringPropName = (String) in.readObject();
+            valueText = (String) in.readObject();
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-    public CopyLocalProperty() {
+
+    public AppendStringToProperty() {
         super();
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            process.setProperty(copyPropName, process.readProperty(originalPropName));
+        	String origStr = (String) process.readProperty(stringPropName);
+        	String newStr = origStr + valueText;
+        	process.setProperty(stringPropName, newStr);
+            return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
-        return Condition.CONTINUE;
     }
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        //Nothing to do...
+        // Nothing to do...
     }
 
     public Collection<Condition> getConditions() {
@@ -69,36 +70,38 @@ public class CopyLocalProperty extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] { };
+        return new int[] {};
     }
-
 
     /**
      * @return Returns the localPropName.
      */
-    public String getLocalPropName() {
-        return originalPropName;
+    public String getStringPropName() {
+        return stringPropName;
     }
 
     /**
-     * @param localPropName The localPropName to set.
+     * @param localPropName
+     *            The localPropName to set.
      */
-    public void setLocalPropName(String localPropName) {
-        this.originalPropName = localPropName;
+    public void setStringPropName(String localPropName) {
+        this.stringPropName = localPropName;
     }
 
     /**
-     * @return Returns the remotePropName.
+     * @return Returns the valueText.
      */
-    public String getCopyPropName() {
-        return copyPropName;
+    public String getValueText() {
+        return valueText;
     }
 
     /**
-     * @param remotePropName The remotePropName to set.
+     * @param valueText
+     *            The valueText to set.
      */
-    public void setCopyPropName(String remotePropName) {
-        this.copyPropName = remotePropName;
+    public void setValueText(String remotePropName) {
+        this.valueText = remotePropName;
     }
+
 
 }
