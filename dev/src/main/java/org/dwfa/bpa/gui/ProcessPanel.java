@@ -130,6 +130,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 
                 public boolean accept(File dir, String name) {
                     return name.endsWith(".bean") || name.endsWith(".xml") ||
+                   	name.toLowerCase().endsWith(".bp") ||
                    	name.toLowerCase().endsWith(".png") ||
                    	name.toLowerCase().endsWith(".jpg") ||
                     name.toLowerCase().endsWith(".jpeg") ||
@@ -153,6 +154,23 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                                 attachmentName.length() - 4);
                         addAttachment(obj, attachmentName);
                         layoutComponents();
+                    } else if (f.getFile().toLowerCase().endsWith(".bp")) {
+                        FileInputStream fis = new FileInputStream(processFile);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        ObjectInputStream ois = new ObjectInputStream(bis);
+                        Object obj = ois.readObject();
+                        obj = new MarshalledObject<Object>(obj);
+                        if (logger.isLoggable(Level.FINE)) {
+                            logger.fine("Read object: "
+                                    + obj.getClass().toString());
+                        }
+                        ois.close();
+                        attachmentName = f.getFile();
+                        attachmentName = attachmentName.substring(0,
+                                attachmentName.length() - 5);
+                        addAttachment(obj, attachmentName);
+                        layoutComponents();
+
                     } else if (f.getFile().toLowerCase().endsWith(".bean")) {
                         FileInputStream fis = new FileInputStream(processFile);
                         BufferedInputStream bis = new BufferedInputStream(fis);

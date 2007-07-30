@@ -10,7 +10,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class LoadSetLaunchProcessFromURLBeanInfo  extends SimpleBeanInfo {
 
@@ -22,20 +22,20 @@ public class LoadSetLaunchProcessFromURLBeanInfo  extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
            BeanDescriptor bd = new BeanDescriptor(LoadSetLaunchProcessFromURL.class);
-           bd.setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From URL");
+           bd.setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From Property");
         return bd;
     }
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
-            PropertyDescriptor message =
-                new PropertyDescriptor("processURLString", LoadSetLaunchProcessFromURL.class);
-            message.setBound(true);
-            message.setPropertyEditorClass(JTextFieldEditor.class);
-            message.setDisplayName("process URL");
-            message.setShortDescription("A URL from which a process is downloaded, then executed.");
+            PropertyDescriptor processPropName =
+                new PropertyDescriptor("processPropName", LoadSetLaunchProcessFromURL.class);
+            processPropName.setBound(true);
+            processPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            processPropName.setDisplayName("process property");
+            processPropName.setShortDescription("A process property that contains a marshalled process. It is unmarshalled, then executed.");
 
             PropertyDescriptor rv[] =
-                {message};
+                {processPropName};
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
