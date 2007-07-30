@@ -53,8 +53,8 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
             throws TaskFailedException {
         try {
             // Load process...
-        	MarshalledObject<I_EncodeBusinessProcess> marshalledProcess = (MarshalledObject<I_EncodeBusinessProcess>) process.readAttachement(processPropName);
-            I_EncodeBusinessProcess processToLaunch = marshalledProcess.get();
+        	MarshalledObject marshalledProcess = (MarshalledObject) process.readAttachement(processPropName);
+            I_EncodeBusinessProcess processToLaunch = (I_EncodeBusinessProcess) marshalledProcess.get();
              
             if (processSubject != null) {
             	processToLaunch.setSubject(processSubject);

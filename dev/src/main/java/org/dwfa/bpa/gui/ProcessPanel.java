@@ -120,7 +120,8 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
-        public void actionPerformed(ActionEvent e) {
+        @SuppressWarnings("unchecked")
+		public void actionPerformed(ActionEvent e) {
             // Create a file dialog box to prompt for a new file to display
             FileDialog f = new FileDialog((Frame) getTopLevelAncestor(),
                     "Add Attachment", FileDialog.LOAD);
@@ -159,7 +160,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                         BufferedInputStream bis = new BufferedInputStream(fis);
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         Object obj = ois.readObject();
-                        obj = new MarshalledObject<Object>(obj);
+                        obj = new MarshalledObject(obj);
                         if (logger.isLoggable(Level.FINE)) {
                             logger.fine("Read object: "
                                     + obj.getClass().toString());
