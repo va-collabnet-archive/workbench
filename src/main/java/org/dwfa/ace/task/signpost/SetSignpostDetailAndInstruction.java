@@ -84,7 +84,7 @@ public class SetSignpostDetailAndInstruction extends AbstractTask {
                     c.weightx = 1.0;
                     c.weighty = 1.0;
                     c.anchor = GridBagConstraints.NORTHWEST;
-                    JTabbedPane tabs = new JTabbedPane(JTabbedPane.LEFT);
+                    JTabbedPane tabs = new JTabbedPane();
                     tabs.addTab("instruction", new JScrollPane(new JLabel(instructionHtmlStr)));
                     tabs.addTab("detail", new JScrollPane(new JLabel(detailHtmlStr)));
                     signpostPanel.add(tabs, c);
