@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class LoadSetLaunchProcessFromAttachmentBeanInfo extends SimpleBeanInfo {
 
@@ -22,7 +22,7 @@ public class LoadSetLaunchProcessFromAttachmentBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor processPropName =
                 new PropertyDescriptor("processPropName", getBeanDescriptor().getBeanClass());
             processPropName.setBound(true);
-            processPropName.setPropertyEditorClass(JTextFieldEditor.class);
+            processPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             processPropName.setDisplayName("process prop");
             processPropName.setShortDescription("A property containing a process which is loaded, set, then launched.");
 

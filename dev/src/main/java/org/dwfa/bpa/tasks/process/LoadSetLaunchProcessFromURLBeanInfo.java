@@ -22,13 +22,13 @@ public class LoadSetLaunchProcessFromURLBeanInfo  extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
            BeanDescriptor bd = new BeanDescriptor(LoadSetLaunchProcessFromURL.class);
-           bd.setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From Property");
+           bd.setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From URL");
         return bd;
     }
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
             PropertyDescriptor processURLString =
-                new PropertyDescriptor("processURLString", LoadSetLaunchProcessFromURL.class);
+                new PropertyDescriptor("processURLString", getBeanDescriptor().getBeanClass());
             processURLString.setBound(true);
             processURLString.setPropertyEditorClass(JTextFieldEditor.class);
             processURLString.setDisplayName("process URL");
