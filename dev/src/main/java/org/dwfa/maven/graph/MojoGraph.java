@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import javax.imageio.ImageIO;
 
@@ -38,7 +37,7 @@ import org.apache.maven.plugin.MojoFailureException;
 * @goal buildgraph
 */
 public class MojoGraph extends AbstractMojo{
-	List<double[]> coords = new ArrayList<double[]>();	
+	List<float[]> coords = new ArrayList<float[]>();	
 	/*
 	 * Buffered image to draw graphic to
 	 */
@@ -117,7 +116,7 @@ public class MojoGraph extends AbstractMojo{
 	  /*
 	   * Set axis increment labels font
 	   */
-	  Font font = new Font(Font.SERIF,Font.PLAIN, 10 );
+	  Font font = new Font("Serif",Font.PLAIN, 10 );
 	  g2d.setFont(font);
 	  
 	  /*
@@ -141,7 +140,7 @@ public class MojoGraph extends AbstractMojo{
 	  }
   }//End method createGraphAxis
   
-  private void plotData(Graphics2D g2d, Color color, List<double[]> coordsList ){
+  private void plotData(Graphics2D g2d, Color color, List<float[]> coordsList ){
 	  /*
 	   * Create line graph data 
 	   */
@@ -187,7 +186,7 @@ public class MojoGraph extends AbstractMojo{
 	  /*
 	   * Label X and Y axis titles
 	   */
-	  Font font = new Font(Font.SERIF,Font.BOLD, 20 );
+	  Font font = new Font("Serif",Font.BOLD, 20 );
 	  String xAxisLabel = "X-axis label" ;
 	  String yAxislabel = "Y-axis Label";
 	  
@@ -204,11 +203,11 @@ public class MojoGraph extends AbstractMojo{
   }//End method labelAxis
   
   private void translateData(){
-	  coords.add(new double[]{150, 345});
-	  coords.add(new double[]{250, 255});
-	  coords.add(new double[]{350, 280});
-	  coords.add(new double[]{450, 312});
-	  coords.add(new double[]{550, 250});
+	  coords.add(new float[]{150, 345});
+	  coords.add(new float[]{250, 255});
+	  coords.add(new float[]{350, 280});
+	  coords.add(new float[]{450, 312});
+	  coords.add(new float[]{550, 250});
   }
   
   
