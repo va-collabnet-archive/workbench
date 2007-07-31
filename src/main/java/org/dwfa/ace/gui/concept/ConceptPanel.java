@@ -17,8 +17,10 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -72,10 +74,6 @@ import com.sleepycat.je.DatabaseException;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		PropertyChangeListener {
-
-	public enum LINK_TYPE {
-		UNLINKED, SEARCH_LINK, TREE_LINK, LIST_LINK
-	};
 
 	private class LabelListener implements PropertyChangeListener {
 
@@ -178,6 +176,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 							conceptAttributePlugin, descPlugin, srcRelPlugin,
 							destRelPlugin, lineagePlugin, imagePlugin,
 							conflictPlugin }));
+	
+	private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, I_PluginToConceptPanel>();
 
 	public ImageIcon tabIcon;
 
@@ -462,18 +462,28 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;
 					toggleBar.add(pluginButton, c);
-					AceLog.getAppLog().info("adding component plugin: " + f.getName());
+					AceLog.getAppLog().info(
+							"adding component plugin: " + f.getName());
 				} else {
 					JButton pluginButton = new JButton(bp.getName());
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;
 					toggleBar.add(pluginButton, c);
-					AceLog.getAppLog().info("adding component plugin: " + f.getName());
+					AceLog.getAppLog().info(
+							"adding component plugin: " + f.getName());
 				}
 			}
 		}
-
+		pluginMap.put(TOGGLES.ID, idPlugin);
+		pluginMap.put(TOGGLES.ATTRIBUTES, conceptAttributePlugin);
+		pluginMap.put(TOGGLES.DESCRIPTIONS, descPlugin);
+		pluginMap.put(TOGGLES.SOURCE_RELS, srcRelPlugin);
+		pluginMap.put(TOGGLES.DEST_RELS, destRelPlugin);
+		pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
+		pluginMap.put(TOGGLES.IMAGE, imagePlugin);
+		pluginMap.put(TOGGLES.CONFLICT, conflictPlugin);
+		
 		return toggleBar;
 	}
 
@@ -497,53 +507,62 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				// Set concept bean
 				// Set config
 
-				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
-						getConfig());
-				bp.writeAttachment(
-						ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), label
-								.getTermComponent());
-				worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
-						.name(), ConceptPanel.this);
- 	            Runnable r = new Runnable() {
-	                private String exceptionMessage;
+				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG
+						.name(), getConfig());
+				bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA
+						.name(), label.getTermComponent());
+				worker.writeAttachment(
+						WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
+						ConceptPanel.this);
+				Runnable r = new Runnable() {
+					private String exceptionMessage;
 
 					public void run() {
-	                    I_EncodeBusinessProcess process = bp;
-	                    try {
-	                    	worker.getLogger().info("Worker: " + worker.getWorkerDesc() + 
-	                        		" (" + worker.getId() + ") executing process: " + 
-	                        		process.getName());
-	                        worker.execute(process);
-	                        SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(process
-	                                .getExecutionRecords());
-	                        Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
-	                        StringBuffer buff = new StringBuffer();
-	                        while (recordItr.hasNext()) {
-	                            ExecutionRecord rec = recordItr
-	                                    .next();
-	                            buff.append("\n");
-	                            buff.append(rec.toString());
-	                        }
-	                        worker.getLogger().info(buff.toString());
-	                        exceptionMessage = "";
-	                    } catch (Throwable e1) {
-	                    	worker.getLogger().log(Level.WARNING, e1.toString(), e1);
-	                        exceptionMessage = e1.toString();
-	                    }
-	                    SwingUtilities.invokeLater(new Runnable() {
-	                        public void run() {
-	                        	getConfig().setStatusMessage("<html><font color='#006400'>execute");
-	                            if (exceptionMessage.equals("")) {
-	                            	getConfig().setStatusMessage("<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
-	                            } else {
-	                            	getConfig().setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>" + exceptionMessage);
-	                            }
-	                        }
-	                    });
-	                }
+						I_EncodeBusinessProcess process = bp;
+						try {
+							worker.getLogger().info(
+									"Worker: " + worker.getWorkerDesc() + " ("
+											+ worker.getId()
+											+ ") executing process: "
+											+ process.getName());
+							worker.execute(process);
+							SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
+									process.getExecutionRecords());
+							Iterator<ExecutionRecord> recordItr = sortedRecords
+									.iterator();
+							StringBuffer buff = new StringBuffer();
+							while (recordItr.hasNext()) {
+								ExecutionRecord rec = recordItr.next();
+								buff.append("\n");
+								buff.append(rec.toString());
+							}
+							worker.getLogger().info(buff.toString());
+							exceptionMessage = "";
+						} catch (Throwable e1) {
+							worker.getLogger().log(Level.WARNING,
+									e1.toString(), e1);
+							exceptionMessage = e1.toString();
+						}
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								getConfig().setStatusMessage(
+										"<html><font color='#006400'>execute");
+								if (exceptionMessage.equals("")) {
+									getConfig().setStatusMessage(
+											"<html>Execution of <font color='blue'>"
+													+ bp.getName()
+													+ "</font> complete.");
+								} else {
+									getConfig().setStatusMessage(
+											"<html><font color='blue'>Process complete: <font color='red'>"
+													+ exceptionMessage);
+								}
+							}
+						});
+					}
 
-	            };
-	            new Thread(r).start();
+				};
+				new Thread(r).start();
 			} catch (Exception e1) {
 				getConfig().setStatusMessage("Exception during execution.");
 				AceLog.getAppLog().alertAndLogException(e1);
@@ -620,7 +639,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	private TermComponentTreeSelectionListener treeListener;
+
 	private TermComponentListSelectionListener listListener;
+
 	private JList linkedList;
 
 	public void changeLinkListener(LINK_TYPE type) {
@@ -686,7 +707,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return ace.getAceFrameConfig().getHierarchySelection();
 	}
 
-
 	public LogWithAlerts getEditLog() {
 		return AceLog.getEditLog();
 	}
@@ -703,11 +723,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		changeLinkListener(LINK_TYPE.UNLINKED);
 	}
 
-	public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException {
+	public I_GetConceptData getConcept(Collection<UUID> ids)
+			throws TerminologyException, IOException {
 		return ConceptBean.get(ids);
 	}
 
-	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException {
+	public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException,
+			IOException {
 		return ConceptBean.get(Arrays.asList(ids));
 	}
 
@@ -721,5 +743,40 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public void addUncommitted(I_GetConceptData concept) {
 		ACE.addUncommitted((I_Transact) concept);
+	}
+
+	public void setAllTogglesToState(boolean state) {
+		for (I_PluginToConceptPanel plugin : plugins) {
+			for (JComponent component : plugin.getToggleBarComponents()) {
+				if (JToggleButton.class.isAssignableFrom(component.getClass())) {
+					JToggleButton toggle = (JToggleButton) component;
+					if (toggle.isSelected() == state) {
+						// nothing to do...
+					} else {
+						toggle.doClick();
+					}
+				}
+			}
+		}
+
+	}
+
+	public void setLinkType(LINK_TYPE link) {
+		changeLinkListener(link);
+	}
+
+	public void setToggleState(TOGGLES toggle, boolean state) {
+		I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+		for (JComponent component : plugin.getToggleBarComponents()) {
+			if (JToggleButton.class.isAssignableFrom(component.getClass())) {
+				JToggleButton toggleButton = (JToggleButton) component;
+				if (toggleButton.isSelected() == state) {
+					// nothing to do...
+				} else {
+					toggleButton.doClick();
+				}
+			}
+		}
+
 	}
 }
