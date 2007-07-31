@@ -6,10 +6,9 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
-public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
-    
+public class AddRootToProfileFromPropertyBeanInfo extends SimpleBeanInfo {
+
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
@@ -21,15 +20,15 @@ public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("The property that contains the profile to modify.");
 
-            PropertyDescriptor rootEntry =
-                new PropertyDescriptor("rootEntry", getBeanDescriptor().getBeanClass());
-            rootEntry.setBound(true);
-            rootEntry.setPropertyEditorClass(QueueTypeEditor.class);
-            rootEntry.setDisplayName("<html><font color='green'>root:");
-            rootEntry.setShortDescription("The concept to add to the profile as a root.");
+            PropertyDescriptor rootPropName =
+                new PropertyDescriptor("rootPropName", getBeanDescriptor().getBeanClass());
+            rootPropName.setBound(true);
+            rootPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            rootPropName.setDisplayName("<html><font color='green'>root:");
+            rootPropName.setShortDescription("The property that contains the concept to add to the profile as a root.");
 
             PropertyDescriptor rv[] =
-                { profilePropName, rootEntry };
+                { profilePropName, rootPropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
@@ -39,8 +38,9 @@ public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(AddRootToProfile.class);
-        bd.setDisplayName("<html><font color='green'><center>add root<br>to profile");
+        BeanDescriptor bd = new BeanDescriptor(AddRootToProfileFromProperty.class);
+        bd.setDisplayName("<html><font color='green'><center>add root<br>to profile<br>from property");
         return bd;
     }
+
 }
