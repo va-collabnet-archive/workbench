@@ -49,4 +49,16 @@ public class ConceptDescriptor {
     public String getDescription() {
         return description;
     }
+    
+    public String toString() {
+    	return description + " (" + uuid + ")";
+    }
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 }

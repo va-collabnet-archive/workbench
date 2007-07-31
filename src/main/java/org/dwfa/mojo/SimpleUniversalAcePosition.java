@@ -1,27 +1,27 @@
 package org.dwfa.mojo;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class SimpleUniversalAcePath {
+public class SimpleUniversalAcePosition {
 	
 	private static SimpleDateFormat dateParser = new SimpleDateFormat();
-	private String uuidStr;
+	private ConceptDescriptor pathConcept;
 	private String timeStr;
 	
-	public SimpleUniversalAcePath(String uuidStr, String timeStr) {
+	public SimpleUniversalAcePosition(ConceptDescriptor pathConcept, String timeStr) {
 		super();
-		this.uuidStr = uuidStr;
+		this.pathConcept = pathConcept;
 		this.timeStr = timeStr;
 	}
 	
-	public SimpleUniversalAcePath() {
+	public SimpleUniversalAcePosition() {
 		super();
 	}
 	public String getTimeStr() {
@@ -29,12 +29,6 @@ public class SimpleUniversalAcePath {
 	}
 	public void setTimeStr(String timeStr) {
 		this.timeStr = timeStr;
-	}
-	public String getUuidStr() {
-		return uuidStr;
-	}
-	public void setUuidStr(String uuidStr) {
-		this.uuidStr = uuidStr;
 	}
 	
 	public int getTime() throws ParseException {
@@ -45,10 +39,16 @@ public class SimpleUniversalAcePath {
 		return ThinVersionHelper.convert(date.getTime());
 	}
 
-	public Collection<UUID> getPathId() {
-		Collection<UUID> list = new ArrayList<UUID>();
-		list.add(UUID.fromString(uuidStr));
-		return list;
+	public Collection<UUID> getPathId() throws IOException, Exception {
+		return pathConcept.getVerifiedConcept().getUids();
+	}
+
+	public ConceptDescriptor getPathConcept() {
+		return pathConcept;
+	}
+
+	public void setPathConcept(ConceptDescriptor pathConcept) {
+		this.pathConcept = pathConcept;
 	}
 
 }

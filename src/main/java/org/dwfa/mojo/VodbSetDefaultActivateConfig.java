@@ -1,6 +1,7 @@
 package org.dwfa.mojo;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -9,6 +10,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
+import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -20,10 +22,17 @@ import org.dwfa.tapi.TerminologyException;
  */
 public class VodbSetDefaultActivateConfig extends AbstractMojo {
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        try {
-            I_TermFactory tf = LocalVersionedTerminology.get();
-            I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null);
+	public void execute() throws MojoExecutionException, MojoFailureException {
+       try {
+    	   try {
+               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+                   return;
+               }
+           } catch (NoSuchAlgorithmException e) {
+               throw new MojoExecutionException(e.getLocalizedMessage(), e);
+           } 
+           I_TermFactory tf = LocalVersionedTerminology.get();
+           I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null);
 
             tf.setActiveAceFrameConfig(activeConfig);
         } catch (IOException e) {
