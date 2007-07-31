@@ -20,9 +20,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -32,33 +30,20 @@ import javax.swing.JOptionPane;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.DocumentAuxiliary;
-import org.dwfa.cement.HL7;
-import org.dwfa.cement.QueueType;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.log.HtmlHandler;
 import org.dwfa.log.LogViewerFrame;
 import org.dwfa.svn.SvnPrompter;
-import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.VodbEnv;
-import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.IntList;
-import org.dwfa.vodb.types.IntSet;
-import org.dwfa.vodb.types.Path;
-import org.dwfa.vodb.types.Position;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -370,354 +355,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		config.setUsername(prompter.getUsername());
 		config.setPassword(prompter.getPassword());
 
-		AceFrameConfig af = new AceFrameConfig(config);
-        af.setUsername(prompter.getUsername());
-        af.setPassword(prompter.getPassword());
-		Set<I_Position> positions = new HashSet<I_Position>();
-		for (I_Path p : Path.makeTestSnomedPaths(AceConfig.getVodb())) {
-			positions.add(new Position(Integer.MAX_VALUE, p));
-		}
-		af.setViewPositions(positions);
-		for (I_Position pos : positions) {
-			af.addEditingPath(pos.getPath());
-			break;
-		}
-		IntList statusPopupTypes = new IntList();
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
-		statusPopupTypes
-				.add(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-						.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids())
-				.getNativeId());
-		statusPopupTypes
-				.add(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
-						.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.CONSTANT.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.INACTIVE.getUids())
-				.getNativeId());
-		statusPopupTypes
-				.add(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.RETIRED.getUids())
-						.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.DUPLICATE.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.OUTDATED.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.AMBIGUOUS.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids())
-				.getNativeId());
-		statusPopupTypes
-				.add(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
-						.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.INAPPROPRIATE.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids())
-				.getNativeId());
-		statusPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
-				.getNativeId());
-		af.setEditStatusTypePopup(statusPopupTypes);
+		I_ConfigAceFrame profile = NewDefaultProfile.newProfile(prompter.getUsername(), prompter.getPassword(), 
+				"admin", "visit.bend");
+		config.aceFrames.add(profile);
 
-		IntList descPopupTypes = new IntList();
-		descPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descPopupTypes.add(AceConfig.getVodb()
-				.getId(
-						ArchitectonicAuxiliary.Concept.ENTRY_DESCRIPTION_TYPE
-								.getUids()).getNativeId());
-		descPopupTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.XHTML_DEF.getUids())
-				.getNativeId());
-		af.setEditDescTypePopup(descPopupTypes);
-
-		IntList relCharacteristic = new IntList();
-		relCharacteristic.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids())
-				.getNativeId());
-		relCharacteristic.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids())
-				.getNativeId());
-		relCharacteristic.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC
-						.getUids()).getNativeId());
-		relCharacteristic.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC
-						.getUids()).getNativeId());
-		relCharacteristic.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC
-						.getUids()).getNativeId());
-		af.setEditRelCharacteristicPopup(relCharacteristic);
-
-		IntList relRefinabilty = new IntList();
-		relRefinabilty.add(AceConfig.getVodb()
-				.getId(
-						ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY
-								.getUids()).getNativeId());
-		relRefinabilty.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids())
-				.getNativeId());
-		relRefinabilty.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids())
-				.getNativeId());
-		af.setEditRelRefinabiltyPopup(relRefinabilty);
-
-		IntList relTypes = new IntList();
-		relTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-				.getNativeId());
-
-		if (AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids()) != null) {
-			relTypes.add(AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids()).getNativeId());
-		}
-		af.setEditRelTypePopup(relTypes);
-
-		IntSet roots = new IntSet();
-		roots.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
-						.getUids()).getNativeId());
-		roots.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.STATUS
-						.getUids()).getNativeId());
-		roots.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		addIfNotNull(roots, SNOMED.Concept.ROOT);
-		addIfNotNull(roots, DocumentAuxiliary.Concept.DOCUMENT_AUXILIARY);
-		addIfNotNull(roots, RefsetAuxiliary.Concept.REFSET_AUXILIARY);
-		addIfNotNull(roots, HL7.Concept.HL7);
-		addIfNotNull(roots, QueueType.Concept.QUEUE_TYPE);
-		af.setRoots(roots);
-
-		IntSet allowedStatus = new IntSet();
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
-		allowedStatus
-				.add(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-						.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids())
-				.getNativeId());
-		allowedStatus
-				.add(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.LIMITED.getUids())
-						.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
-				.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.CONFLICTING.getUids())
-				.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.CONSTANT.getUids())
-				.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())
-				.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DESC_STYLE_ERROR.getUids())
-				.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DUPLICATE.getUids())
-				.getNativeId());
-		allowedStatus.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_REL_ERROR.getUids())
-				.getNativeId());
-		af.setAllowedStatus(allowedStatus);
-
-		IntSet destRelTypes = new IntSet();
-		destRelTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-				.getNativeId());
-		if (AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids()) != null) {
-			destRelTypes.add(AceConfig.getVodb().getId(SNOMED.Concept.IS_A.getUids())
-					.getNativeId());
-		}
-		
-		af.setDestRelTypes(destRelTypes);
-
-		IntSet sourceRelTypes = new IntSet();
-		af.setSourceRelTypes(sourceRelTypes);
-
-		IntSet descTypes = new IntSet();
-		descTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
-						.getUids()).getNativeId());
-		descTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids())
-				.getNativeId());
-		descTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.XHTML_DEF.getUids())
-				.getNativeId());
-		af.setDescTypes(descTypes);
-
-		IntSet inferredViewTypes = new IntSet();
-		inferredViewTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids())
-				.getNativeId());
-		af.setInferredViewTypes(inferredViewTypes);
-
-		IntSet statedViewTypes = new IntSet();
-		statedViewTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids())
-				.getNativeId());
-		statedViewTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-						.getUids()).getNativeId());
-		statedViewTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC
-						.getUids()).getNativeId());
-		statedViewTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC
-						.getUids()).getNativeId());
-		statedViewTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC
-						.getUids()).getNativeId());
-		af.setStatedViewTypes(statedViewTypes);
-
-		af.setDefaultDescriptionType(ConceptBean.get(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
-						.getUids()).getNativeId()));
-		af.setDefaultRelationshipCharacteristic(ConceptBean.get(AceConfig.getVodb()
-				.getId(
-						ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
-								.getUids()).getNativeId()));
-		af.setDefaultRelationshipRefinability(ConceptBean.get(AceConfig.getVodb()
-				.getId(
-						ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
-								.getUids()).getNativeId()));
-		af.setDefaultRelationshipType(ConceptBean.get(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-				.getNativeId()));
-		af
-				.setDefaultStatus(ConceptBean.get(AceConfig.getVodb().getId(
-						ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
-						.getNativeId()));
-
-		af
-				.getTreeDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-		af
-				.getTreeDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-
-		af
-				.getShortLabelDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-		af
-				.getShortLabelDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-
-		af
-				.getLongLabelDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-		af
-				.getLongLabelDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-
-		af
-				.getTableDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-		af
-				.getTableDescPreferenceList()
-				.add(
-						AceConfig.getVodb()
-								.getId(
-										ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-												.getUids()).getNativeId());
-
-		af.setDefaultStatus(ConceptBean
-				.get(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-		af
-				.setDefaultDescriptionType(ConceptBean
-						.get(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-								.getUids()));
-
-		af.setDefaultRelationshipType(ConceptBean
-				.get(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-		af.setDefaultRelationshipCharacteristic(ConceptBean
-				.get(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-						.getUids()));
-		af.setDefaultRelationshipRefinability(ConceptBean
-				.get(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
-						.getUids()));
-		
-		af.setDefaultImageType(ConceptBean
-				.get(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
-						.getUids()));
-
-		IntList imageTypes = new IntList();
-		imageTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids())
-				.getNativeId());
-		imageTypes.add(AceConfig.getVodb().getId(
-				ArchitectonicAuxiliary.Concept.VIEWER_IMAGE
-						.getUids()).getNativeId());
-		af.setEditImageTypePopup(imageTypes);
-
-		
 		if (config.getUsername() == null) {
 			config.setChangeSetWriterFileName("nullUser."
 					+ UUID.randomUUID().toString() + ".jcs");
@@ -728,7 +369,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         config.changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + config.getUsername());
         config.addChangeSetWriters();
 
-		config.aceFrames.add(af);
+ 
 		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -742,12 +383,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                                                                   new File(changeSetRoot, 
                                                                            "." + getChangeSetWriterFileName())));
     }
-
-	private static void addIfNotNull(IntSet roots, I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
-		if (AceConfig.getVodb().getId(concept.getUids()) != null) {
-			roots.add(AceConfig.getVodb().getId(concept.getUids()).getNativeId());
-		}
-	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		changeSupport.addPropertyChangeListener(listener);
