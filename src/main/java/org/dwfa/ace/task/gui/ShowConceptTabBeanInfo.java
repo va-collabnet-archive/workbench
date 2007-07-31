@@ -29,7 +29,7 @@ public class ShowConceptTabBeanInfo extends SimpleBeanInfo {
             index.setPropertyEditorClass(IncrementEditor.class);
             index.setDisplayName("<html><font color='green'>Concept tab:");
             index.setShortDescription("Index of tab to switch to. ");
-            PropertyDescriptor rv[] = {  };
+            PropertyDescriptor rv[] = { index };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
