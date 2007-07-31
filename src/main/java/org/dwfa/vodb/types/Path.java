@@ -154,11 +154,6 @@ public class Path implements I_Transact, Serializable, I_Path {
 						.getUids()), snomed20050131Origins);
 		basePaths.add(snomed20050131);
 
-		Path icd10Am = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.ICD_10_AM
-						.getUids()), origins);
-		basePaths.add(icd10Am);
-
 		return basePaths;
 
 	}
