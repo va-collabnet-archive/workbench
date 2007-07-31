@@ -326,6 +326,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 				// print out rootChild description here...
 				boolean needToWriteRootChild = true;
 				boolean needToWriteDetailHtml = false;
+				boolean rootChildStatusNotChanged = true;
 				notDupSet.add(rootChild.getUids());
 				
 //				getLog().info("Checking for dups on: " + rootChild.toString());				
@@ -397,6 +398,11 @@ public class VodbFindDuplicates extends AbstractMojo {
 								if (descTypeSet.contains(potDup.getFirstTuple().getTypeId())) {
 									
 									I_GetConceptData potDupConcept = termFactory.getConcept(potDup.getConceptId());
+									if (rootChildStatusNotChanged) {
+										rootChildStatusNotChanged = false;
+										setStatusToCurrentUnreviewed(allowedStatus, positions, rootChild);
+									}
+									setStatusToCurrentUnreviewed(allowedStatus, positions, potDupConcept);
 								
 									//create new relationship w/ relationship type is potential 
 									//duplicate and the concept status is flagged as Current
@@ -490,6 +496,18 @@ public class VodbFindDuplicates extends AbstractMojo {
 		} 
 	}
 
+	private List<I_ConceptAttributeTuple> setStatusToCurrentUnreviewed(I_IntSet allowedStatus, Set<I_Position> positions, I_GetConceptData potDupConcept) throws IOException, TerminologyException {
+		List<I_ConceptAttributeTuple> attributeTuples = potDupConcept.getConceptAttributeTuples(allowedStatus, positions);
+		for (I_Position pos: positions) {
+			I_ConceptAttributePart attributePart = attributeTuples.get(0).duplicatePart();
+			attributePart.setConceptStatus(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+			attributePart.setVersion(Integer.MAX_VALUE);
+			attributePart.setPathId(pos.getPath().getConceptId());
+			potDupConcept.getConceptAttributes().addVersion(attributePart);
+		}
+		return attributeTuples;
+	}
+
 
 	private boolean seeIfDupRelExists(Collection<I_RelVersioned> rels, I_GetConceptData destConcept) {
 		
@@ -532,7 +550,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 		htmlReportDetailWriter.append("<tr>");
 		htmlReportDetailWriter.append("<td colspan=2 >");
 		htmlReportDetailWriter.append(rootChild.toString() + "&nbsp;&nbsp;&nbsp;&nbsp; ");
-		htmlReportDetailWriter.append("<a href=\"" +".." + File.separator + htmlReportFile.getName() +"\">All Pot Dups</a>");
+		//htmlReportDetailWriter.append("<a href=\"" +".." + File.separator + htmlReportFile.getName() +"\">All Pot Dups</a>");
 		htmlReportDetailWriter.append("</td>\n");
 		htmlReportDetailWriter.append("<td align=right>");
 		htmlReportDetailWriter.append(Integer.toString(rootChild.getConceptId()) );
