@@ -10,7 +10,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
+import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 public class LoadSetLaunchProcessFromURLBeanInfo  extends SimpleBeanInfo {
 
@@ -27,15 +27,15 @@ public class LoadSetLaunchProcessFromURLBeanInfo  extends SimpleBeanInfo {
     }
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
-            PropertyDescriptor processPropName =
-                new PropertyDescriptor("processPropName", LoadSetLaunchProcessFromURL.class);
-            processPropName.setBound(true);
-            processPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            processPropName.setDisplayName("process property");
-            processPropName.setShortDescription("A process property that contains a marshalled process. It is unmarshalled, then executed.");
+            PropertyDescriptor processURLString =
+                new PropertyDescriptor("processURLString", LoadSetLaunchProcessFromURL.class);
+            processURLString.setBound(true);
+            processURLString.setPropertyEditorClass(JTextFieldEditor.class);
+            processURLString.setDisplayName("process URL");
+            processURLString.setShortDescription("A URL from which a process is loaded.");
 
             PropertyDescriptor rv[] =
-                {processPropName};
+                {processURLString};
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
