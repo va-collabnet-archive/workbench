@@ -31,7 +31,6 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -411,15 +410,16 @@ public class VodbFindDuplicates extends AbstractMojo {
 											 isPotDupRelType, potDupConcept, charAdditional,
 											 notRefinable, currentStatus, 0, termFactory.getActiveAceFrameConfig());
 									
-									//change concept status to be flagged as potential duplicate							
-									Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
+									
+									/*
 									//integer.max-value is uncommitted
 									Set<I_Position> positionsForEdit = new HashSet<I_Position>();
 									
 									for (I_Path editPath: termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
 										positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
 									}
-									
+									//change concept status to be flagged as potential duplicate							
+									Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
 									for (I_Path editPath: termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
 										List<I_ConceptAttributeTuple>  tuples = rootChild.getConceptAttributeTuples(
 												null, positionsForEdit);
@@ -436,7 +436,9 @@ public class VodbFindDuplicates extends AbstractMojo {
 									for (I_ConceptAttributePart p: partsToAdd) {
 										rootChild.getConceptAttributes().addVersion(p);
 									}
+									*/
 									LocalVersionedTerminology.get().addUncommitted(rootChild);
+									LocalVersionedTerminology.get().addUncommitted(potDupConcept);
 					
 									//writing search UUIDs to file for assignment
 									if (needToWriteRootChild) {
