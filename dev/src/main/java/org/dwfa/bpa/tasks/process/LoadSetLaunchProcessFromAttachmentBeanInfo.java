@@ -19,15 +19,15 @@ public class LoadSetLaunchProcessFromAttachmentBeanInfo extends SimpleBeanInfo {
     }
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
-            PropertyDescriptor message =
-                new PropertyDescriptor("processURLString", getBeanDescriptor().getBeanClass());
-            message.setBound(true);
-            message.setPropertyEditorClass(JTextFieldEditor.class);
-            message.setDisplayName("process URL");
-            message.setShortDescription("A URL from which a process is downloaded, then executed.");
+            PropertyDescriptor processPropName =
+                new PropertyDescriptor("processPropName", getBeanDescriptor().getBeanClass());
+            processPropName.setBound(true);
+            processPropName.setPropertyEditorClass(JTextFieldEditor.class);
+            processPropName.setDisplayName("process prop");
+            processPropName.setShortDescription("A property containing a process which is loaded, set, then launched.");
 
             PropertyDescriptor rv[] =
-                {message};
+                {processPropName};
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
