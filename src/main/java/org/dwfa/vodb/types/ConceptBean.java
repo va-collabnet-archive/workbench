@@ -600,6 +600,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						buff.append("\n  Committing: " + idv);
 					}
 				}
+            id = null;
 			}
 			setPrimordial(false);
 		} catch (DatabaseException e) {
