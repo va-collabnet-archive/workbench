@@ -34,8 +34,8 @@ public class GetDetailHtmlDirUuidSetHtmlFileNameBeanInfo extends SimpleBeanInfo 
                 new PropertyDescriptor("uuidListPropName", GetDetailHtmlDirUuidSetHtmlFileName.class);
             uuidListPropName.setBound(true);
             uuidListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListPropName.setDisplayName("<html><font color='green'>Uuid of Dup");
-            uuidListPropName.setShortDescription("Uuid of Pot Dup");
+            uuidListPropName.setDisplayName("<html><font color='green'>Uuid List of Concept");
+            uuidListPropName.setShortDescription("Uuid of Concept");
                  	
             PropertyDescriptor htmlDirPropName =
                 new PropertyDescriptor("htmlDirPropName", GetDetailHtmlDirUuidSetHtmlFileName.class);
@@ -55,7 +55,7 @@ public class GetDetailHtmlDirUuidSetHtmlFileNameBeanInfo extends SimpleBeanInfo 
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetDetailHtmlDirUuidSetHtmlFileName.class);
-        bd.setDisplayName("<html><font color='green'><center>Get Detail Pot Dup <br>Html Dir, Uuid <br> Set Html Detail File Name");
+        bd.setDisplayName("<html><font color='green'><center>Get Detail <br>Html Dir and Uuid <br> Set Html Detail File Name");
         return bd;
     }
 

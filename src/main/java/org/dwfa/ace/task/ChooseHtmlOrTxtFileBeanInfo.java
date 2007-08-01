@@ -30,8 +30,15 @@ public class ChooseHtmlOrTxtFileBeanInfo extends SimpleBeanInfo {
             instructionFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             instructionFileNamePropName.setDisplayName("<html><font color='green'>Instruction File:");
             instructionFileNamePropName.setShortDescription("Instruction File");
+            
+            PropertyDescriptor directoryPropName =
+                new PropertyDescriptor("directoryPropName", getBeanDescriptor().getBeanClass());
+            directoryPropName.setBound(true);
+            directoryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            directoryPropName.setDisplayName("<html><font color='green'>Instruction File:");
+            directoryPropName.setShortDescription("Instruction File");
 
-            PropertyDescriptor rv[] = { instructionFileNamePropName };
+            PropertyDescriptor rv[] = { instructionFileNamePropName, directoryPropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

@@ -22,7 +22,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
-* Opens a file dialog and displays only .txt or html files for selection.
+* Opens a file dialog and displays only .txt or html files for selection and sets the directory property based
+* on the location of the file selected.
 * @author Susan Castillo
 *
 */
@@ -36,19 +37,17 @@ public class ChooseHtmlOrTxtFile extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    /**
-     * The business process file path and name.
-     */
-    private String defaultDir = "processes/assignmentProcesses";
+    private String defaultDir = "luceneDups/dupPotMatchResults";
 
     /**
      * The key used by file attachment.
      */
     private String instructionFileNamePropName = ProcessAttachmentKeys.INSTRUCTION_FILENAME.getAttachmentKey();
+    private String directoryPropName = ProcessAttachmentKeys.DETAIL_HTML_DIR.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(defaultDir);
+        out.writeObject(directoryPropName);
         out.writeObject(instructionFileNamePropName);
     }
 
@@ -56,7 +55,7 @@ public class ChooseHtmlOrTxtFile extends AbstractTask {
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            defaultDir = (String) in.readObject();
+        	directoryPropName = (String) in.readObject();
             instructionFileNamePropName = (String) in.readObject();
         } else {
             throw new IOException(
@@ -86,12 +85,16 @@ public class ChooseHtmlOrTxtFile extends AbstractTask {
             }
 
             File selectedFile = new File(dialog.getDirectory(), dialog.getFile());
-
+            String selectedDir = dialog.getDirectory() + "details" +File.separator;
+            
+            worker.getLogger().info("Directory is: " + selectedDir);
+            
             if (worker.getLogger().isLoggable(Level.INFO)) {
                 worker.getLogger().info(("Selected file: " + selectedFile));
             }
 
             process.setProperty(this.instructionFileNamePropName, selectedFile.getAbsoluteFile().toString());
+            process.setProperty(directoryPropName, selectedDir);
 
              return Condition.ITEM_COMPLETE;
         } catch (IllegalArgumentException e) {
@@ -113,19 +116,28 @@ public class ChooseHtmlOrTxtFile extends AbstractTask {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
 
-    public String getDefaultDir() {
-        return defaultDir;
-    }
+	public String getDefaultDir() {
+		return defaultDir;
+	}
 
-    public void setDefaultDir(String fileName) {
-        this.defaultDir = fileName;
-    }
+	public void setDefaultDir(String defaultDir) {
+		this.defaultDir = defaultDir;
+	}
 
-    public String getInstructionFileNamePropName() {
-        return instructionFileNamePropName;
-    }
+	public String getDirectoryPropName() {
+		return directoryPropName;
+	}
 
-    public void setInstructionFileNamePropName(String fileKey) {
-        this.instructionFileNamePropName = fileKey;
-    }
+	public void setDirectoryPropName(String directoryPropName) {
+		this.directoryPropName = directoryPropName;
+	}
+
+	public String getInstructionFileNamePropName() {
+		return instructionFileNamePropName;
+	}
+
+	public void setInstructionFileNamePropName(String instructionFileNamePropName) {
+		this.instructionFileNamePropName = instructionFileNamePropName;
+	}
+
 }

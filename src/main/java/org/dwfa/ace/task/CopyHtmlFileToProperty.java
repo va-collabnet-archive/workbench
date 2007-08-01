@@ -1,5 +1,6 @@
 package org.dwfa.ace.task;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -59,10 +60,14 @@ public class CopyHtmlFileToProperty extends AbstractTask {
 
 			String detailHtmlFileName = (String) process.readProperty(detailHtmlFileNameProp);			
 //			worker.getLogger().info("html file is: " + detailHtmlFileName);
-			String dataString = FileIO.readerToString(new FileReader(detailHtmlFileName));
-//			worker.getLogger().info("data String is: "+dataString);
-			process.setProperty(htmlDataPropName, dataString);
-			
+			if(new File(detailHtmlFileName).exists()) {
+				String dataString = FileIO.readerToString(new FileReader(detailHtmlFileName));
+//				worker.getLogger().info("data String is: "+dataString);
+				process.setProperty(htmlDataPropName, dataString);
+			} else {
+				process.setProperty(htmlDataPropName, " ");
+			}
+						
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
