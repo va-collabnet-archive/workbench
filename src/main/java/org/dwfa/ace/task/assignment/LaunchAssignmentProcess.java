@@ -160,7 +160,7 @@ public class LaunchAssignmentProcess extends AbstractTask {
 		launcher.setOriginator(configFrame.getUsername());
 		launcher.setProcessSubject(concept.toString());
 
-		launcher.setProcessURLString(new File (processFileNameStr).toURL().toExternalForm());
+		launcher.setProcessURLString(new File (processFileNameStr).toURI().toURL().toExternalForm());
 
 //		worker.getLogger().info("processURLString: " + processURLString);
 		launcher.evaluate(process, worker);

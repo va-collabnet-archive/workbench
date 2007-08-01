@@ -73,9 +73,9 @@ public class OpenAllInboxes extends AbstractTask {
         if (file.isDirectory() == false) {
             if (file.getName().equalsIgnoreCase("queue.config") &&
             		(file.getParentFile().getName().equals("inbox"))) {
-            	AceLog.getAppLog().info("Found user queue: " + file.toURL().toExternalForm());
+            	AceLog.getAppLog().info("Found user queue: " + file.toURI().toURL().toExternalForm());
             	if (QueueServer.started(file)) {
-                	AceLog.getAppLog().info("User queue already started: " + file.toURL().toExternalForm());
+                	AceLog.getAppLog().info("User queue already started: " + file.toURI().toURL().toExternalForm());
             	} else {
                     new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             	}

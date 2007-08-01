@@ -74,9 +74,9 @@ public class OpenQueuesInFolder extends AbstractTask {
     private void processFile(File file, LifeCycle lc) throws Exception {
         if (file.isDirectory() == false) {
             if (file.getName().equalsIgnoreCase("queue.config")) {
-            	AceLog.getAppLog().info("Found queue: " + file.toURL().toExternalForm());
+            	AceLog.getAppLog().info("Found queue: " + file.toURI().toURL().toExternalForm());
             	if (QueueServer.started(file)) {
-                	AceLog.getAppLog().info("Queue already started: " + file.toURL().toExternalForm());
+                	AceLog.getAppLog().info("Queue already started: " + file.toURI().toURL().toExternalForm());
             	} else {
                     new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             	}

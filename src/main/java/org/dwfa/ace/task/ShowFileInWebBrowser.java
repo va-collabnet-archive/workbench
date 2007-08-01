@@ -65,7 +65,7 @@ public class ShowFileInWebBrowser extends AbstractTask {
 			String test1 = (String) process.readProperty(detailHtmlFileNameProp);
 			worker.getLogger().info("test1: " + test1);
 			File htmlFile = new File((String) process.readProperty(detailHtmlFileNameProp));
-			URL fileUrl = htmlFile.toURL();
+			URL fileUrl = htmlFile.toURI().toURL();
 			
 			worker.getLogger().info("URL: " + fileUrl.toString());
 	      	PlatformWebBrowser.openURL(fileUrl);
