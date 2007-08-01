@@ -10,24 +10,18 @@ import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 public class ChangeConceptStatusBeanInfo extends SimpleBeanInfo {
 
-    /**
-     * 
-     */
-    public ChangeConceptStatusBeanInfo() {
-        super();
-     }
-
+ 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
             PropertyDescriptor newStatus =
-                new PropertyDescriptor("newStatus", ChangeConceptStatus.class);
+                new PropertyDescriptor("newStatus", getBeanDescriptor().getBeanClass());
             newStatus.setBound(true);
             newStatus.setPropertyEditorClass(QueueTypeEditor.class);
             newStatus.setDisplayName("New status:");
             newStatus.setShortDescription("The new status value for the concept.");
 
             PropertyDescriptor activeConceptPropName =
-                new PropertyDescriptor("activeConceptPropName", ChangeConceptStatus.class);
+                new PropertyDescriptor("activeConceptPropName", getBeanDescriptor().getBeanClass());
             activeConceptPropName.setBound(true);
             activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");

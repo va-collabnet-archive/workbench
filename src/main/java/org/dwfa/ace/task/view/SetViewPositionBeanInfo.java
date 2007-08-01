@@ -48,7 +48,7 @@ public class SetViewPositionBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetViewPosition.class);
-        bd.setDisplayName("<html><font color='green'><center>set view position");
+        bd.setDisplayName("<html><font color='green'><center>add view position");
         return bd;
     }
 }

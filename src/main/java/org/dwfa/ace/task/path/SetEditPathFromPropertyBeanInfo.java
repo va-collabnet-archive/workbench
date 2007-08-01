@@ -39,7 +39,7 @@ public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetEditPathFromProperty.class);
-        bd.setDisplayName("<html><font color='green'><center>set edit path<br>from property");
+        bd.setDisplayName("<html><font color='green'><center>add edit path<br>from property");
         return bd;
     }
 }

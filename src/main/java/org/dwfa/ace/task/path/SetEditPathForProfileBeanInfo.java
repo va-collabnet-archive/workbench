@@ -40,7 +40,7 @@ public class SetEditPathForProfileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetEditPathForProfile.class);
-        bd.setDisplayName("<html><font color='green'><center>set edit path<br>for profile");
+        bd.setDisplayName("<html><font color='green'><center>add edit path<br>to profile");
         return bd;
     }
 }

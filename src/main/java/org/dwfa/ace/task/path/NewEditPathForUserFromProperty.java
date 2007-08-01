@@ -105,7 +105,6 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
             profile.getViewPositionSet().clear();
             profile.addViewPosition(tf.newPosition(editPath, Integer.MAX_VALUE));
             tf.commit();
-            profile.getEditingPathSet().clear();
 
          } catch (Exception e) {
             throw new TaskFailedException(e);

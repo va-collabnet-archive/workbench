@@ -144,5 +144,7 @@ public interface I_TermFactory {
 
 	public I_IntList newIntList();
 
+   public I_IdVersioned getId(int nid) throws IOException;
+
 
 }

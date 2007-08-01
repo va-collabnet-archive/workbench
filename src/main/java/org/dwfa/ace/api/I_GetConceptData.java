@@ -19,8 +19,11 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus,
 			Set<I_Position> positions) throws IOException;
 
-	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions) throws IOException;
+   public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
+         I_IntSet allowedTypes, Set<I_Position> positions) throws IOException;
+
+   public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
+         I_IntSet allowedTypes, Set<I_Position> positions) throws IOException;
 
 	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted)
