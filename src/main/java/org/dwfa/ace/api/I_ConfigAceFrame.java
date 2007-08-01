@@ -207,6 +207,9 @@ public interface I_ConfigAceFrame {
 	public JList getBatchConceptList();
 	
 	public I_HostConceptPlugins getConceptViewer(int index);
+	
+	public I_HostConceptPlugins getListConceptViewer();
+	
 	public void selectConceptViewer(int hostIndex);
 	
 	
