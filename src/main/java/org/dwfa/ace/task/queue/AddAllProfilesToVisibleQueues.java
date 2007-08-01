@@ -59,7 +59,7 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
 
                 public boolean accept(File f) {
                 	if (f.isDirectory() && (f.isHidden() == false)) {
-                		File queueConfig = new File(f, "queue" + File.separator + "queue.config");
+                		File queueConfig = new File(f, "inbox" + File.separator + "queue.config");
                 		return queueConfig.exists();
                 	}
                     return false;

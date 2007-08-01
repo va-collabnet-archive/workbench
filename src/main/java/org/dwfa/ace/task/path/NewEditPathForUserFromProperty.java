@@ -32,7 +32,6 @@ import org.dwfa.util.bean.Spec;
 import org.dwfa.util.id.Type5UuidFactory;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/path", type = BeanType.TASK_BEAN) })
-
 public class NewEditPathForUserFromProperty extends AbstractTask {
 
 	/**
@@ -43,7 +42,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
 	private static final int dataVersion = 1;
 
 	private String parentPathPropertyName = ProcessAttachmentKeys.PARENT_PATH
-	.getAttachmentKey();
+			.getAttachmentKey();
 
 	private String userPropName = ProcessAttachmentKeys.USERNAME
 			.getAttachmentKey();
@@ -87,97 +86,105 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
 			String username = (String) process.readProperty(userPropName);
 			I_TermFactory tf = LocalVersionedTerminology.get();
 			I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
-			I_GetConceptData parentPathConcept = AceTaskUtil.getConceptFromProperty(process, parentPathPropertyName);
-			TermEntry parentPathTermEntry = new TermEntry(parentPathConcept.getUids());
+			Set<I_Path> savedEditingPaths = new HashSet<I_Path>(activeProfile
+					.getEditingPathSet());
+			try {
+				activeProfile
+				.getEditingPathSet().clear();
+				activeProfile.getEditingPathSet().add(tf.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+				I_GetConceptData parentPathConcept = AceTaskUtil
+						.getConceptFromProperty(process, parentPathPropertyName);
+				TermEntry parentPathTermEntry = new TermEntry(parentPathConcept
+						.getUids());
 
-			UUID type5ConceptId = Type5UuidFactory.get(
-					parentPathTermEntry.ids[0], username);
+				UUID type5ConceptId = Type5UuidFactory.get(
+						parentPathTermEntry.ids[0], username);
 
-			I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId,
-					false, activeProfile);
+				I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId,
+						false, activeProfile);
 
-			String descText = username + " development editing path";
-			tf
-					.newDescription(
-							Type5UuidFactory.get(parentPathTermEntry.ids[0],
-									descText),
-							newPathConcept,
-							"en",
-							descText,
-							ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-									.localize(), activeProfile);
+				String descText = username + " development editing path";
+				tf
+						.newDescription(
+								Type5UuidFactory.get(
+										parentPathTermEntry.ids[0], descText),
+								newPathConcept,
+								"en",
+								descText,
+								ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+										.localize(), activeProfile);
 
-			descText = username + " dev path";
-			tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0],
-					descText), newPathConcept, "en", descText,
-					ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-							.localize(), activeProfile);
+				descText = username + " dev path";
+				tf
+						.newDescription(
+								Type5UuidFactory.get(
+										parentPathTermEntry.ids[0], descText),
+								newPathConcept,
+								"en",
+								descText,
+								ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
+										.localize(), activeProfile);
 
-			descText = username;
-			tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0],
-					descText + "username"), newPathConcept, "en", descText,
-					ArchitectonicAuxiliary.Concept.USER_NAME.localize(),
-					activeProfile);
+				descText = username;
+				tf.newDescription(Type5UuidFactory.get(
+						parentPathTermEntry.ids[0], descText + "username"),
+						newPathConcept, "en", descText,
+						ArchitectonicAuxiliary.Concept.USER_NAME.localize(),
+						activeProfile);
 
-			descText = username;
-			tf.newDescription(Type5UuidFactory.get(parentPathTermEntry.ids[0],
-					descText + "inbox"), newPathConcept, "en", descText,
-					ArchitectonicAuxiliary.Concept.USER_INBOX.localize(),
-					activeProfile);
+				descText = username;
+				tf.newDescription(Type5UuidFactory.get(
+						parentPathTermEntry.ids[0], descText + "inbox"),
+						newPathConcept, "en", descText,
+						ArchitectonicAuxiliary.Concept.USER_INBOX.localize(),
+						activeProfile);
 
-			I_GetConceptData relType = tf
-					.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-							.getUids());
-			I_GetConceptData relDestination = tf
-					.getConcept(parentPathTermEntry.ids);
-			I_GetConceptData relCharacteristic = tf
-					.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-							.getUids());
-			I_GetConceptData relRefinability = tf
-					.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-							.getUids());
-			I_GetConceptData relStatus = tf
-					.getConcept(ArchitectonicAuxiliary.Concept.CURRENT
-							.getUids());
+				I_GetConceptData relType = tf
+						.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
+								.getUids());
+				I_GetConceptData relDestination = tf
+						.getConcept(parentPathTermEntry.ids);
+				I_GetConceptData relCharacteristic = tf
+						.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
+								.getUids());
+				I_GetConceptData relRefinability = tf
+						.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
+								.getUids());
+				I_GetConceptData relStatus = tf
+						.getConcept(ArchitectonicAuxiliary.Concept.CURRENT
+								.getUids());
 
-			UUID relId = Type5UuidFactory.get(parentPathTermEntry.ids[0],
-					"relid");
-			tf.newRelationship(relId, newPathConcept, relType, relDestination,
-					relCharacteristic, relRefinability, relStatus, 0,
-					activeProfile);
+				UUID relId = Type5UuidFactory.get(parentPathTermEntry.ids[0],
+						"relid");
+				tf.newRelationship(relId, newPathConcept, relType,
+						relDestination, relCharacteristic, relRefinability,
+						relStatus, 0, activeProfile);
 
-			tf.commit();
+				tf.commit();
 
-			Set<I_Position> origins = new HashSet<I_Position>();
+				Set<I_Position> origins = new HashSet<I_Position>();
 
-			I_Path parentPath = tf.getPath(parentPathTermEntry.ids);
-			origins.add(tf.newPosition(parentPath, tf
-					.convertToThinVersion(originTime)));
+				I_Path parentPath = tf.getPath(parentPathTermEntry.ids);
+				origins.add(tf.newPosition(parentPath, tf
+						.convertToThinVersion(originTime)));
 
-			I_Path editPath = tf.newPath(origins, newPathConcept);
-			I_ConfigAceFrame profile = (I_ConfigAceFrame) process
-					.readProperty(profilePropName);
-			profile.getEditingPathSet().clear();
-			profile.addEditingPath(editPath);
-			profile.getViewPositionSet().clear();
-			profile
-					.addViewPosition(tf
-							.newPosition(editPath, Integer.MAX_VALUE));
-			tf.commit();
+				I_Path editPath = tf.newPath(origins, newPathConcept);
+				I_ConfigAceFrame profile = (I_ConfigAceFrame) process
+						.readProperty(profilePropName);
+				profile.getEditingPathSet().clear();
+				profile.addEditingPath(editPath);
+				profile.getViewPositionSet().clear();
+				profile.addViewPosition(tf.newPosition(editPath,
+						Integer.MAX_VALUE));
+				tf.commit();
+				profile.getEditingPathSet().clear();
 
+			} catch (Exception e) {
+				throw new TaskFailedException(e);
+			}
+			activeProfile.getEditingPathSet().clear();
+			activeProfile.getEditingPathSet().addAll(savedEditingPaths);
 			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} catch (TerminologyException e) {
-			throw new TaskFailedException(e);
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
