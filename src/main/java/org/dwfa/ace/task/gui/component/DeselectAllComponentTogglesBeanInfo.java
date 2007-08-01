@@ -5,7 +5,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.ace.task.gui.ShowConceptTab;
 import org.dwfa.bpa.tasks.editor.IncrementEditor;
 
 public class DeselectAllComponentTogglesBeanInfo extends SimpleBeanInfo {
@@ -14,7 +13,7 @@ public class DeselectAllComponentTogglesBeanInfo extends SimpleBeanInfo {
 
         try {
             PropertyDescriptor index =
-                new PropertyDescriptor("index", ShowConceptTab.class);
+                new PropertyDescriptor("index", getBeanDescriptor().getBeanClass());
             index.setBound(true);
             index.setPropertyEditorClass(IncrementEditor.class);
             index.setDisplayName("<html><font color='green'>Concept tab:");
@@ -29,7 +28,7 @@ public class DeselectAllComponentTogglesBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(ShowConceptTab.class);
+        BeanDescriptor bd = new BeanDescriptor(DeselectAllComponentToggles.class);
         bd.setDisplayName("<html><font color='green'><center>Deselect all toggles<br>"
                 + "for concept tab");
         return bd;
