@@ -1,10 +1,8 @@
 package org.dwfa.ace.task.path;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +22,6 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;

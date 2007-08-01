@@ -153,7 +153,7 @@ public class LaunchBatchGenAssignmentProcess extends AbstractTask {
 		launcher.setProcessName("Generate "+sizeOfList +" Assignments");
 		launcher.setProcessSubject(assignProcessNameStr);
 
-		launcher.setProcessURLString(new File (processFileNameStr).toURL().toExternalForm());
+		launcher.setProcessURLString(new File (processFileNameStr).toURI().toURL().toExternalForm());
 		launcher.setDestination(assignee);
 
 //		worker.getLogger().info("processURLString: " + processURLString);
