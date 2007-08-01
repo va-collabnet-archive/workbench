@@ -93,6 +93,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		super();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		String classNameNoDotClass = "";
         /*

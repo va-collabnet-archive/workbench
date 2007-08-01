@@ -64,7 +64,7 @@ public class MojoUtil {
 			throws IOException {
 		List<URL> libs = new ArrayList<URL>(artifacts.size());
 		for (Artifact a : artifacts) {
-			libs.add(a.getFile().toURL());
+			libs.add(a.getFile().toURI().toURL());
 		}
 		System.out.println("URLClassLoader(List<Artifact>) libs: " + libs);
 		return new URLClassLoader(libs.toArray(new URL[libs.size()]));
@@ -76,7 +76,7 @@ public class MojoUtil {
 		for (Dependency d : dependencies) {
 			String dependencyPath = MojoUtil.dependencyToPath(localRepository,
 					d);
-			libs.add(new File(dependencyPath).toURL());
+			libs.add(new File(dependencyPath).toURI().toURL());
 		}
 		return libs;
 	}
@@ -90,7 +90,7 @@ public class MojoUtil {
 			List<Dependency> dependencies, String localRepository,
 			String classesDir) throws IOException {
 		List<URL> libs = addDependencies(dependencies, localRepository);
-		libs.add(new File(classesDir).toURL());
+		libs.add(new File(classesDir).toURI().toURL());
 		// System.out.println("URLClassLoader libs: " + libs);
 		return new URLClassLoader(libs.toArray(new URL[libs.size()]));
 	}

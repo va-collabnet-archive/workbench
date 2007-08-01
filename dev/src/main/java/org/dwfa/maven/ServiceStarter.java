@@ -53,6 +53,7 @@ public class ServiceStarter extends AbstractDependencyFilterMojo {
 	
 	private String[] allowedGoals = new String[] { "run-app", "org.dwfa:dwfa-mojo:run-app", "dwfa-mojo:run-app" };
 
+	@SuppressWarnings("unchecked")
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
 			if (getProject() == null) {
