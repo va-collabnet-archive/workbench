@@ -66,7 +66,7 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
                 String userDir = System.getProperty("user.dir");
                 File startFile = new File(userDir + "/site/index.html");
 
-                PlatformWebBrowser.openURL(startFile.toURL());
+                PlatformWebBrowser.openURL(startFile.toURI().toURL());
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
