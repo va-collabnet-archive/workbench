@@ -94,6 +94,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -2267,6 +2268,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 				}
 			}
 		});
+	}
+
+	public I_HostConceptPlugins getListConceptViewer() {
+		return conceptListEditor.getConceptPanel();
 	}
 
 }

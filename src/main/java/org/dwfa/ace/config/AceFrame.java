@@ -24,6 +24,7 @@ import net.jini.config.ConfigurationException;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.ComponentFrame;
@@ -293,6 +294,10 @@ public class AceFrame extends ComponentFrame {
 
 	public void setSignpostToggleIcon(ImageIcon icon) {
 		getCdePanel().setSignpostToggleIcon(icon);
+	}
+
+	public I_HostConceptPlugins getListConceptViewer() {
+		return getCdePanel().getListConceptViewer();
 	}
 
 }

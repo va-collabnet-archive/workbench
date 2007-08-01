@@ -103,7 +103,7 @@ public class CollectionEditorContainer extends JPanel {
 	private JToggleButton showProcessBuilder;
 	private JSplitPane listSplit;
 	private ACE ace;
-	private ConceptPanel cp;
+	private ConceptPanel conceptPanel;
     private ShowComponentActionListener showComponentActionListener;
 
 	public I_ConfigAceFrame getConfig() {
@@ -114,11 +114,11 @@ public class CollectionEditorContainer extends JPanel {
 		super(new GridBagLayout());
 		this.ace = ace;
 		this.processBuilder = descListProcessBuilderPanel;
-		cp = new ConceptPanel(ace,
+		conceptPanel = new ConceptPanel(ace,
 				LINK_TYPE.LIST_LINK, true);
-		cp.setLinkedList(list);
-		cp.changeLinkListener(LINK_TYPE.LIST_LINK);
-		conceptPanelScroller = new JScrollPane(cp);
+		conceptPanel.setLinkedList(list);
+		conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
+		conceptPanelScroller = new JScrollPane(conceptPanel);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
@@ -249,7 +249,7 @@ public class CollectionEditorContainer extends JPanel {
 						getConfig());
 				bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), concept);
 				worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
-						.name(), cp);
+						.name(), conceptPanel);
  	            Runnable r = new Runnable() {
 	                public void run() {
 	                    I_EncodeBusinessProcess process = bp;
@@ -277,9 +277,9 @@ public class CollectionEditorContainer extends JPanel {
 	                    SwingUtilities.invokeLater(new Runnable() {
 	                        public void run() {
 	                        	getConfig().setStatusMessage("<html><font color='#006400'>execute");
-	                        	I_GetConceptData conceptInPanel = (I_GetConceptData) cp.getTermComponent();
-	                        	cp.setTermComponent(null);
-	                        	cp.setTermComponent(conceptInPanel);
+	                        	I_GetConceptData conceptInPanel = (I_GetConceptData) conceptPanel.getTermComponent();
+	                        	conceptPanel.setTermComponent(null);
+	                        	conceptPanel.setTermComponent(conceptInPanel);
 	                            if (exceptionMessage.equals("")) {
 	                            	getConfig().setStatusMessage("<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
 	        	                } else {
@@ -298,6 +298,8 @@ public class CollectionEditorContainer extends JPanel {
 		}
 
 	}
-
+	public ConceptPanel getConceptPanel() {
+		return conceptPanel;
+	}
 
 }

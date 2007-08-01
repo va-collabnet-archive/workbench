@@ -1401,4 +1401,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void setEditImageTypePopup(I_IntList editImageTypePopup) {
 		this.editImageTypePopup = editImageTypePopup;
 	}
+
+
+	public I_HostConceptPlugins getListConceptViewer() {
+		return aceFrame.getListConceptViewer();
+	}
 }
