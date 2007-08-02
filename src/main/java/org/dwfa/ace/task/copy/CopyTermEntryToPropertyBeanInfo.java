@@ -17,15 +17,15 @@ public class CopyTermEntryToPropertyBeanInfo extends SimpleBeanInfo {
                new PropertyDescriptor("termEntry", getBeanDescriptor().getBeanClass());
            termEntry.setBound(true);
            termEntry.setPropertyEditorClass(QueueTypeEditor.class);
-           termEntry.setDisplayName("New status:");
-           termEntry.setShortDescription("The new status value for the concept.");
+           termEntry.setDisplayName("concept:");
+           termEntry.setShortDescription("The concept to copy to the property.");
 
            PropertyDescriptor propertyName =
                new PropertyDescriptor("propertyName", getBeanDescriptor().getBeanClass());
            propertyName.setBound(true);
            propertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-           propertyName.setDisplayName("<html><font color='green'>term entry property:");
-           propertyName.setShortDescription("Name of the property to copy the term entry to. ");
+           propertyName.setDisplayName("<html><font color='green'>concept property:");
+           propertyName.setShortDescription("Name of the property to copy the concept to to. ");
 
            PropertyDescriptor rv[] =
                { termEntry, propertyName };

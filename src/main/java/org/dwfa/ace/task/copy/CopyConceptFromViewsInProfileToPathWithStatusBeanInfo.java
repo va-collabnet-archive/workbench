@@ -7,18 +7,18 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class CopyConceptFromPathToPathWithStatusBeanInfo extends SimpleBeanInfo {
+public class CopyConceptFromViewsInProfileToPathWithStatusBeanInfo extends SimpleBeanInfo {
 
    
    public PropertyDescriptor[] getPropertyDescriptors() {
        try {  
 
-          PropertyDescriptor fromPathPropName =
-             new PropertyDescriptor("fromPathPropName", getBeanDescriptor().getBeanClass());
-          fromPathPropName.setBound(true);
-          fromPathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-          fromPathPropName.setDisplayName("<html><font color='green'>from path:");
-          fromPathPropName.setShortDescription("Name of the property to copy the concept from. ");
+          PropertyDescriptor profilePropName =
+             new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+          profilePropName.setBound(true);
+          profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+          profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+          profilePropName.setShortDescription("Name of the property to hold the profile from which the view positions are derived. ");
 
          PropertyDescriptor toPathPropName =
             new PropertyDescriptor("toPathPropName", getBeanDescriptor().getBeanClass());
@@ -42,7 +42,7 @@ public class CopyConceptFromPathToPathWithStatusBeanInfo extends SimpleBeanInfo 
          statusPropName.setShortDescription("Name of the property holding the new concept status. ");
 
            PropertyDescriptor rv[] =
-               { fromPathPropName, toPathPropName, conceptPropName, statusPropName };
+               { profilePropName, toPathPropName, conceptPropName, statusPropName };
            return rv;
        } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -52,8 +52,8 @@ public class CopyConceptFromPathToPathWithStatusBeanInfo extends SimpleBeanInfo 
     * @see java.beans.BeanInfo#getBeanDescriptor()
     */
    public BeanDescriptor getBeanDescriptor() {
-       BeanDescriptor bd = new BeanDescriptor(CopyConceptFromPathToPathWithStatus.class);
-       bd.setDisplayName("<html><font color='green'><center>copy concept<br>to path<br>with status");
+       BeanDescriptor bd = new BeanDescriptor(CopyConceptFromViewsInProfileToPathWithStatus.class);
+       bd.setDisplayName("<html><font color='green'><center>copy concept to path<br>from views in profile<br>with status");
        return bd;
    }
 }

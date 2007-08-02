@@ -6,12 +6,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
@@ -27,7 +25,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/copy", type = BeanType.TASK_BEAN) })
-public class CopyConceptFromPathToPathWithStatus extends AbstractTask {
+public class CopyConceptFromViewsInProfileToPathWithStatus extends AbstractTask {
 
    /**
     * 
@@ -36,27 +34,27 @@ public class CopyConceptFromPathToPathWithStatus extends AbstractTask {
 
    private static final int dataVersion = 1;
    
-   private String fromPathPropName = ProcessAttachmentKeys.FROM_PATH_CONCEPT.getAttachmentKey();
    private String toPathPropName = ProcessAttachmentKeys.TO_PATH_CONCEPT.getAttachmentKey();
    private String conceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
    private String statusPropName = ProcessAttachmentKeys.NEW_STATUS.getAttachmentKey();
+   private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
-      out.writeObject(fromPathPropName);
       out.writeObject(toPathPropName);
       out.writeObject(conceptPropName);
       out.writeObject(statusPropName);
+      out.writeObject(profilePropName);
    }
 
    private void readObject(ObjectInputStream in) throws IOException,
          ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {
-         fromPathPropName = (String) in.readObject();
          toPathPropName = (String) in.readObject();
          conceptPropName = (String) in.readObject();
          statusPropName = (String) in.readObject();
+         profilePropName = (String) in.readObject();
       } else {
          throw new IOException("Can't handle dataversion: " + objDataVersion);
       }
@@ -73,13 +71,11 @@ public class CopyConceptFromPathToPathWithStatus extends AbstractTask {
          throws TaskFailedException {
       try {
          I_TermFactory tf = LocalVersionedTerminology.get();
-         I_Path fromPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(fromPathPropName)).getUids());
          I_Path toPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(toPathPropName)).getUids());
          I_GetConceptData concept = AceTaskUtil.getConceptFromObject(process.readProperty(conceptPropName));
          I_GetConceptData newStatus = AceTaskUtil.getConceptFromObject(process.readProperty(statusPropName));
-         Set<I_Position> fromSet = new HashSet<I_Position>();
-         fromSet.add(tf.newPosition(fromPath, Integer.MAX_VALUE));
-         CopyConceptFromPathToPath.copyFromPathToPath(tf, toPath, concept, fromSet, newStatus, null);
+         I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+         CopyConceptFromPathToPath.copyFromPathToPath(tf, toPath, concept, profile.getViewPositionSet(), newStatus, null);
          tf.addUncommitted(concept);
          tf.commit();
          
@@ -117,14 +113,6 @@ public class CopyConceptFromPathToPathWithStatus extends AbstractTask {
       this.conceptPropName = conceptPropName;
    }
 
-   public String getFromPathPropName() {
-      return fromPathPropName;
-   }
-
-   public void setFromPathPropName(String fromPathPropName) {
-      this.fromPathPropName = fromPathPropName;
-   }
-
    public String getToPathPropName() {
       return toPathPropName;
    }
@@ -139,6 +127,14 @@ public class CopyConceptFromPathToPathWithStatus extends AbstractTask {
 
    public void setStatusPropName(String statusPropName) {
       this.statusPropName = statusPropName;
+   }
+
+   public String getProfilePropName() {
+      return profilePropName;
+   }
+
+   public void setProfilePropName(String profilePropName) {
+      this.profilePropName = profilePropName;
    }
 
  }
