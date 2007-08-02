@@ -181,6 +181,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 				}
 			}
 			if (stopWork) {
+            fireTableDataChanged();
 				return;
 			}
 			try {

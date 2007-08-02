@@ -53,11 +53,11 @@ public class AttributePopupListener extends MouseAdapter {
 					sourceBean.getConceptAttributes().addVersion(newPart);
 				}
 				ACE.addUncommitted(sourceBean);
-				model.allTuples = null;
-				model.fireTableDataChanged();
 			} catch (IOException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
+         model.allTuples = null;
+         model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
 		}
 	}
 
@@ -105,12 +105,11 @@ public class AttributePopupListener extends MouseAdapter {
 							.add(newPart);
 				}
 				ACE.addUncommitted(sourceBean);
-				model.allTuples = null;
-				model.fireTableDataChanged();
-				model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
 			} catch (Exception ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
+         model.allTuples = null;
+         model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
 		}
 	}
 
