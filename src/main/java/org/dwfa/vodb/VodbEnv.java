@@ -1625,7 +1625,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		} else if (ids.size() == 1) {
 			return ids.iterator().next();
 		}
-		throw new TerminologyException("UIDs have multiple id records: " + ids);
+		throw new TerminologyException("UIDs have multiple id records: " + ids + " when getting for: " + uids);
 	}
 
 	public boolean hasId(List<UUID> uids) throws DatabaseException {

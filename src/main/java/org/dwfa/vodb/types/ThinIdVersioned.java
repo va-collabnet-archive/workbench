@@ -138,5 +138,28 @@ public class ThinIdVersioned implements I_IdVersioned {
 		}
 		return universal;
 	}
+   @Override
+   public boolean equals(Object obj) {
+      if (ThinIdVersioned.class.isAssignableFrom(obj.getClass())) {
+         ThinIdVersioned another = (ThinIdVersioned) obj;
+         if (this.nativeId != another.nativeId) {
+            return false;
+         }
+         if (this.versions.size() != another.versions.size()) {
+            return false;
+         }
+         for (I_IdPart part: versions) {
+            if (another.versions.contains(part) == false) {
+               return false;
+            }
+         }
+         return true;
+      }
+      return false;
+   }
+   @Override
+   public int hashCode() {
+      return nativeId;
+   }
 
 }
