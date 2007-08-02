@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -74,7 +75,7 @@ public class SetViewPositionFromProperty extends AbstractTask {
             throws TaskFailedException {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            I_GetConceptData viewPathConcept = (I_GetConceptData) process.readProperty(viewPathConceptPropName);
+            I_GetConceptData viewPathConcept = AceTaskUtil.getConceptFromProperty(process, viewPathConceptPropName);
 
             I_Path viewPath = LocalVersionedTerminology.get().getPath(viewPathConcept.getUids());
 
