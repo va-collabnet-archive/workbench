@@ -25,8 +25,8 @@ public class SetPropertyToTermEntryBeanInfo extends SimpleBeanInfo {
                 new PropertyDescriptor("termEntry", getBeanDescriptor().getBeanClass());
             termEntry.setBound(true);
             termEntry.setPropertyEditorClass(QueueTypeEditor.class);
-            termEntry.setDisplayName("<html><font color='green'>root:");
-            termEntry.setShortDescription("The concept to add to the profile as a root.");
+            termEntry.setDisplayName("<html><font color='green'>term:");
+            termEntry.setShortDescription("The concept to add to the property.");
 
             PropertyDescriptor rv[] =
                 { termPropName, termEntry };

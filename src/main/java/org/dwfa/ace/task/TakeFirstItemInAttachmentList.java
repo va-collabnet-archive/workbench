@@ -11,7 +11,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -77,7 +76,7 @@ public class TakeFirstItemInAttachmentList extends AbstractTask {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
 
-            I_GetConceptData concept = LocalVersionedTerminology.get().getConcept((Collection<UUID>) temporaryList.remove(0));
+            I_GetConceptData concept = AceTaskUtil.getConceptFromObject(temporaryList.remove(0));
 
             process.setProperty(this.conceptKey, concept);
             return Condition.CONTINUE;

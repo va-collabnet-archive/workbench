@@ -19,7 +19,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/profile", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/prop", type = BeanType.TASK_BEAN) })
 public class SetPropertyToTermEntry extends AbstractTask {
 
     /**
@@ -29,7 +29,7 @@ public class SetPropertyToTermEntry extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String termPropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+    private String termPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
     private TermEntry termEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
 
     private void writeObject(ObjectOutputStream out) throws IOException {
