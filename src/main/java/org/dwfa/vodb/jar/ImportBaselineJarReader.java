@@ -394,7 +394,7 @@ public class ImportBaselineJarReader implements ActionListener {
 			}
 			TupleInput input = new TupleInput(buffer);
 			I_ConceptAttributeVersioned jarCon = binding.entryToObject(input);
-			AceConfig.getVodb().writeConcept(jarCon);
+			AceConfig.getVodb().writeConceptAttributes(jarCon);
 			processed++;
 		}
 		dis.close();

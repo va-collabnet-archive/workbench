@@ -277,10 +277,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						newPart.setVersion(ThinVersionHelper.convert(part
 								.getTime()));
 					}
-					values.add(new TimePathId(newPart.getVersion(), newPart
-							.getPathId()));
-					tid.addVersion(newPart);
-					AceLog.getEditLog().fine(" add version: " + newPart);
+               if (tid.getVersions().contains(newPart)) {
+                  // Nothing changed...
+               } else {
+                  values.add(new TimePathId(newPart.getVersion(), newPart
+                        .getPathId()));
+                  tid.addVersion(newPart);
+                  AceLog.getEditLog().fine(" add version: " + newPart);
+               }
 				}
 				/*
 				 * The ARCHITECTONIC_BRANCH will be overridden here with the
@@ -313,19 +317,23 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			for (UniversalAceConceptAttributesPart part : attributes
 					.getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
-					changed = true;
 					ThinConPart newPart = new ThinConPart();
 					newPart.setPathId(getNid(part.getPathId()));
 					newPart.setConceptStatus(getNid(part.getConceptStatus()));
 					newPart.setDefined(part.isDefined());
 					newPart.setVersion(ThinVersionHelper.convert(time));
-					thinAttributes.addVersion(newPart);
-					values.add(new TimePathId(newPart.getVersion(), newPart
-							.getPathId()));
+               if (thinAttributes.getVersions().contains(newPart)) {
+                  changed = false;
+               } else {
+                  changed = true;
+                  thinAttributes.addVersion(newPart);
+                  values.add(new TimePathId(newPart.getVersion(), newPart
+                        .getPathId()));
+               }
 				}
 			}
 			if (changed) {
-				AceConfig.getVodb().writeConcept(thinAttributes);
+				AceConfig.getVodb().writeConceptAttributes(thinAttributes);
 				AceLog.getEditLog().fine(
 						"Importing changed attributes: \n" + thinAttributes);
 			}
@@ -370,7 +378,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				} else
 					throw e;
 			}
-			AceConfig.getVodb().writeConcept(thinAttributes);
+			AceConfig.getVodb().writeConceptAttributes(thinAttributes);
 			AceLog.getEditLog().fine(
 					"Importing attributes: \n" + thinAttributes);
 		}
@@ -385,16 +393,20 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			boolean changed = false;
 			for (UniversalAceImagePart part : image.getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
-					changed = true;
 					ThinImagePart newPart = new ThinImagePart();
 					newPart.setPathId(getNid(part.getPathId()));
 					newPart.setStatusId(getNid(part.getStatusId()));
 					newPart.setTextDescription(part.getTextDescription());
 					newPart.setTypeId(getNid(part.getTypeId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
-					thinImage.addVersion(newPart);
-					values.add(new TimePathId(newPart.getVersion(), newPart
-							.getPathId()));
+               if (thinImage.getVersions().contains(newPart)) {
+                  changed = false;
+               } else {
+                  changed = true;
+                  thinImage.addVersion(newPart);
+                  values.add(new TimePathId(newPart.getVersion(), newPart
+                        .getPathId()));
+               }
 				}
 			}
 			if (changed) {
@@ -518,7 +530,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				boolean changed = false;
 				for (UniversalAceRelationshipPart part : rel.getVersions()) {
 					if (part.getTime() == Long.MAX_VALUE) {
-						changed = true;
 						ThinRelPart newPart = new ThinRelPart();
 						newPart.setCharacteristicId(getNid(part
 								.getCharacteristicId()));
@@ -529,9 +540,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						newPart.setRelTypeId(getNid(part.getRelTypeId()));
 						newPart.setStatusId(getNid(part.getStatusId()));
 						newPart.setVersion(ThinVersionHelper.convert(time));
-						thinRel.addVersion(newPart);
-						values.add(new TimePathId(newPart.getVersion(), newPart
-								.getPathId()));
+                  if (thinRel.getVersions().contains(newPart)) {
+                     changed = false;
+                  } else {
+                     changed = true;
+                     thinRel.addVersion(newPart);
+                     values.add(new TimePathId(newPart.getVersion(), newPart
+                           .getPathId()));
+                  }
 					}
 				}
 				if (changed) {
@@ -558,7 +574,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			boolean changed = false;
 			for (UniversalAceDescriptionPart part : desc.getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
-					changed = true;
 					ThinDescPart newPart = new ThinDescPart();
 					newPart.setInitialCaseSignificant(part
 							.getInitialCaseSignificant());
@@ -568,9 +583,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setText(part.getText());
 					newPart.setTypeId(getNid(part.getTypeId()));
 					newPart.setVersion(ThinVersionHelper.convert(time));
-					values.add(new TimePathId(newPart.getVersion(), newPart
-							.getPathId()));
-					thinDesc.addVersion(newPart);
+               if (thinDesc.getVersions().contains(newPart)) {
+                  changed = false;
+               } else {
+                  changed = true;
+                  thinDesc.addVersion(newPart);
+                  values.add(new TimePathId(newPart.getVersion(), newPart
+                        .getPathId()));
+               }
 				}
 			}
 			if (changed) {
@@ -667,10 +687,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
 				}
-				values.add(new TimePathId(newPart.getVersion(), newPart
-						.getPathId()));
-				tid.addVersion(newPart);
-				AceLog.getEditLog().fine(" add version: " + newPart);
+            if (tid.getVersions().contains(newPart)) {
+               // already there
+            } else {
+               values.add(new TimePathId(newPart.getVersion(), newPart
+                     .getPathId()));
+               tid.addVersion(newPart);
+               AceLog.getEditLog().fine(" add version: " + newPart);
+            }
 			}
 			/*
 			 * The ARCHITECTONIC_BRANCH will be overridden here with the proper

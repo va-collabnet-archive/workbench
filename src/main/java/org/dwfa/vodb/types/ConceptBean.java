@@ -504,7 +504,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 					if (changed) {
-						AceConfig.getVodb().writeConcept(conceptAttributes);
+						AceConfig.getVodb().writeConceptAttributes(conceptAttributes);
 					}
 				}
 			}
@@ -558,7 +558,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 						}
 					}
 				}
-				AceConfig.getVodb().writeConcept(uncommittedConceptAttributes);
+				AceConfig.getVodb().writeConceptAttributes(uncommittedConceptAttributes);
 				uncommittedConceptAttributes = null;
 				conceptAttributes = null;
 			}

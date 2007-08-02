@@ -527,12 +527,12 @@ public class ImportUpdateJarReader implements ActionListener {
 				I_ConceptAttributeVersioned dbCon = AceConfig.getVodb().getConceptAttributes(jarCon
 						.getConId());
 				if (dbCon.merge(jarCon)) {
-					AceConfig.getVodb().writeConcept(dbCon);
+					AceConfig.getVodb().writeConceptAttributes(dbCon);
 					timePathSet.addAll(jarCon.getTimePathSet());
 				}
 				
 			} else {
-				AceConfig.getVodb().writeConcept(jarCon);
+				AceConfig.getVodb().writeConceptAttributes(jarCon);
 			}
 			processed++;
 		}

@@ -36,6 +36,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -1785,8 +1786,17 @@ public class VodbEnv implements I_ImplementTermFactory {
 		imageDb.put(null, imageKey, imageValue);
 	}
 
-	public void writeConcept(I_ConceptAttributeVersioned concept)
+	public void writeConceptAttributes(I_ConceptAttributeVersioned concept)
 			throws DatabaseException {
+      
+      int tupleCount = concept.getTuples().size();
+      HashSet<I_ConceptAttributeTuple> tupleSet = new HashSet<I_ConceptAttributeTuple>(concept.getTuples());
+      if (tupleCount != tupleSet.size()) {
+         logger.severe("Tuples: " + concept.getTuples());
+         logger.severe("Tuple set: " + tupleSet);
+         throw new RuntimeException("Tuple set != tuple count...");
+      }
+      
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(concept.getConId(), key);
