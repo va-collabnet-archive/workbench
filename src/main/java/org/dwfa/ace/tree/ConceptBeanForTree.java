@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -185,6 +186,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
 		return bean.isParentOf(child, allowedStatus, allowedTypes, positions, addUncommitted);
 	}
+
+   public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
+      return bean.getImageTuples(allowedStatus, allowedTypes, positions);
+   }
 	
 	/*
 

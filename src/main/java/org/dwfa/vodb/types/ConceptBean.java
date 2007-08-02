@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -184,7 +185,16 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return returnDescriptions;
 	}
 
-	/*
+	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
+      List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
+      for (I_ImageVersioned img : getImages()) {
+         img.addTuples(allowedStatus, allowedTypes, positions,
+               returnTuples);
+      }
+      return returnTuples;
+   }
+
+   /*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRelTuples(org.dwfa.ace.IntSet,
