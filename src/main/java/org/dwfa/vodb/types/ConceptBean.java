@@ -916,8 +916,12 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public I_DescriptionTuple getDescTuple(I_IntList prefOrder,
 			I_ConfigAceFrame config) throws IOException {
+      I_IntSet typeSet = new IntSet();
+      for (int nid: prefOrder.getListArray()) {
+         typeSet.add(nid);
+      }
 		Collection<I_DescriptionTuple> descriptions = getDescriptionTuples(
-				config.getAllowedStatus(), config.getDescTypes(), config
+				config.getAllowedStatus(), typeSet, config
 						.getViewPositionSet());
 		if (prefOrder == null) {
 			return descriptions.iterator().next();
