@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.conflict;
+package org.dwfa.ace.task.status;
 
 import java.beans.IntrospectionException;
 import java.io.IOException;
@@ -27,8 +27,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/conflict", type = BeanType.TASK_BEAN) })
-public class PutConflictsInListView extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ace/status", type = BeanType.TASK_BEAN) })
+public class PutConceptWithAllowedStatusInListView extends AbstractTask {
 
    /**
     * 
@@ -59,7 +59,7 @@ public class PutConflictsInListView extends AbstractTask {
 
    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
        try {
-          I_ConfigAceFrame profileForConflictDetection = (I_ConfigAceFrame) process.readProperty(profilePropName);
+          I_ConfigAceFrame profileForProcessing = (I_ConfigAceFrame) process.readProperty(profilePropName);
           SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                I_ConfigAceFrame activeProfile = (I_ConfigAceFrame) worker
@@ -69,14 +69,14 @@ public class PutConflictsInListView extends AbstractTask {
                model.clear();
             }});
           
-          ConflictIdentifier conflictIdentifier = new ConflictIdentifier(LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection);
-          LocalVersionedTerminology.get().iterateConcepts(conflictIdentifier);
+          StatusCounter statusCounter = new StatusCounter(LocalVersionedTerminology.get().newIntSet(), profileForProcessing, 1, null);
+          LocalVersionedTerminology.get().iterateConcepts(statusCounter);
           final List<I_GetConceptData> conflicts = new ArrayList<I_GetConceptData>();
           
-          for (int nid: conflictIdentifier.getConflictsNids().getSetValues()) {
+          for (int nid: statusCounter.getIdentifiedNids().getSetValues()) {
              conflicts.add(LocalVersionedTerminology.get().getConcept(nid));
           }
-          worker.getLogger().info("ConflictIdentifier results: " + conflictIdentifier);
+          worker.getLogger().info("StatusCounter results: " + statusCounter);
           SwingUtilities.invokeAndWait(new Runnable() {
              public void run() {
                 I_ConfigAceFrame activeProfile = (I_ConfigAceFrame) worker
@@ -87,7 +87,7 @@ public class PutConflictsInListView extends AbstractTask {
                    model.addElement(conflict);
                 }
              }});
-           worker.getLogger().info("Used profile: " + profileForConflictDetection);
+           worker.getLogger().info("Used profile: " + profileForProcessing);
            return Condition.CONTINUE;
            
        } catch (IllegalArgumentException e) {

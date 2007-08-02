@@ -28,7 +28,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/conflict", type = BeanType.TASK_BEAN) })
-public class PutConflictsInListView extends AbstractTask {
+public class PutCompletedConceptsWithConflictsInListView extends AbstractTask {
 
    /**
     * 
@@ -69,7 +69,8 @@ public class PutConflictsInListView extends AbstractTask {
                model.clear();
             }});
           
-          ConflictIdentifier conflictIdentifier = new ConflictIdentifier(LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection);
+          CompletedConceptConflictDetector conflictIdentifier = new CompletedConceptConflictDetector(LocalVersionedTerminology.get().newIntSet(), 
+                LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection);
           LocalVersionedTerminology.get().iterateConcepts(conflictIdentifier);
           final List<I_GetConceptData> conflicts = new ArrayList<I_GetConceptData>();
           

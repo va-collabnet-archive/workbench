@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.conflict;
+package org.dwfa.ace.task.status;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,9 +14,9 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConflictIdentifier implements I_ProcessConcepts {
+public class StatusCounter implements I_ProcessConcepts {
    
-   private I_IntSet conflictsNids;
+   private I_IntSet identifiedNids;
    
    private int conceptsProcessed = 0;
    private int conceptsProcessedWithNoTuples = 0;
@@ -28,19 +28,25 @@ public class ConflictIdentifier implements I_ProcessConcepts {
    I_ConfigAceFrame profileForConflictDetection;
    
    HashMap<Integer, Integer> statusCount = new HashMap<Integer, Integer>();
+   
+   Integer lowerBound;
+   Integer upperBound;
+   
 
-   public ConflictIdentifier(I_IntSet conflictsNids, I_ConfigAceFrame profileForConflictDetection) {
+   public StatusCounter(I_IntSet conflictsNids, I_ConfigAceFrame profileForConflictDetection, Integer lowerBound, Integer upperBound) {
       super();
-      this.conflictsNids = conflictsNids;
+      this.identifiedNids = conflictsNids;
       this.profileForConflictDetection = profileForConflictDetection;
+      this.lowerBound = lowerBound;
+      this.upperBound = upperBound;
    }
 
    public int getConceptsProcessed() {
       return conceptsProcessed;
    }
 
-   public I_IntSet getConflictsNids() {
-      return conflictsNids;
+   public I_IntSet getIdentifiedNids() {
+      return identifiedNids;
    }
 
    public void processConcept(I_GetConceptData concept) throws Exception {
@@ -54,6 +60,15 @@ public class ConflictIdentifier implements I_ProcessConcepts {
                profileForConflictDetection.getViewPositionSet());
       }
       int tupleListSize = attrTupels.size();
+         if (upperBound != null) {
+            if (tupleListSize >= lowerBound && tupleListSize <= upperBound) {
+               identifiedNids.add(concept.getConceptId());
+            }
+         } else {
+            if (tupleListSize >= lowerBound) {
+               identifiedNids.add(concept.getConceptId());
+            }
+         }
       if (tupleListSize > 1) {
          AceLog.getAppLog().info(concept.getInitialText() + " has multiple tuples: " + attrTupels);
       }
@@ -74,20 +89,16 @@ public class ConflictIdentifier implements I_ProcessConcepts {
          break;
       case 2:
          conceptsProcessedWithTwoTuples++;
-         conflictsNids.add(concept.getConceptId());
          break;
       case 3:
          conceptsProcessedWithThreeTuples++;
-         conflictsNids.add(concept.getConceptId());
          break;
       case 4:
          conceptsProcessedWithFourTuples++;
-         conflictsNids.add(concept.getConceptId());
          break;
 
       default:
-         conflictsNids.add(concept.getConceptId());
-         break;
+          break;
       }
    }
    
@@ -126,7 +137,7 @@ public class ConflictIdentifier implements I_ProcessConcepts {
          }
       }
       
-      return "conceptsProcessed: " + conceptsProcessed + " conflicts: " + conflictsNids.getSetValues().length + 
+      return "conceptsProcessed: " + conceptsProcessed + " conflicts: " + identifiedNids.getSetValues().length + 
       " conceptsProcessedWithNoTuples: " + conceptsProcessedWithNoTuples  + 
       " conceptsProcessedWithOneTuple: " + conceptsProcessedWithOneTuple  + 
       " conceptsProcessedWithTwoTuples: " + conceptsProcessedWithTwoTuples  + 
@@ -135,3 +146,4 @@ public class ConflictIdentifier implements I_ProcessConcepts {
    }
 
 }
+

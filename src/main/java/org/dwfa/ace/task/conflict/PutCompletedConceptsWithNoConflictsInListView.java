@@ -28,7 +28,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/conflict", type = BeanType.TASK_BEAN) })
-public class PutConflictsInListView extends AbstractTask {
+public class PutCompletedConceptsWithNoConflictsInListView extends AbstractTask {
 
    /**
     * 
@@ -69,21 +69,22 @@ public class PutConflictsInListView extends AbstractTask {
                model.clear();
             }});
           
-          ConflictIdentifier conflictIdentifier = new ConflictIdentifier(LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection);
+          CompletedConceptConflictDetector conflictIdentifier = new CompletedConceptConflictDetector(LocalVersionedTerminology.get().newIntSet(), 
+                LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection);
           LocalVersionedTerminology.get().iterateConcepts(conflictIdentifier);
-          final List<I_GetConceptData> conflicts = new ArrayList<I_GetConceptData>();
+          final List<I_GetConceptData> noConflicts = new ArrayList<I_GetConceptData>();
           
-          for (int nid: conflictIdentifier.getConflictsNids().getSetValues()) {
-             conflicts.add(LocalVersionedTerminology.get().getConcept(nid));
+          for (int nid: conflictIdentifier.getNoConflictNids().getSetValues()) {
+             noConflicts.add(LocalVersionedTerminology.get().getConcept(nid));
           }
-          worker.getLogger().info("ConflictIdentifier results: " + conflictIdentifier);
+          worker.getLogger().info("CompletedConceptConflictDetector results: " + conflictIdentifier);
           SwingUtilities.invokeAndWait(new Runnable() {
              public void run() {
                 I_ConfigAceFrame activeProfile = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
                 JList conceptList = activeProfile.getBatchConceptList();
                 I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-                for (I_GetConceptData conflict: conflicts) {
+                for (I_GetConceptData conflict: noConflicts) {
                    model.addElement(conflict);
                 }
              }});

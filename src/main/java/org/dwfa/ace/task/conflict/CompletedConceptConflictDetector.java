@@ -14,9 +14,10 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConflictIdentifier implements I_ProcessConcepts {
+public class CompletedConceptConflictDetector implements I_ProcessConcepts {
    
    private I_IntSet conflictsNids;
+   private I_IntSet noConflictNids;
    
    private int conceptsProcessed = 0;
    private int conceptsProcessedWithNoTuples = 0;
@@ -29,9 +30,11 @@ public class ConflictIdentifier implements I_ProcessConcepts {
    
    HashMap<Integer, Integer> statusCount = new HashMap<Integer, Integer>();
 
-   public ConflictIdentifier(I_IntSet conflictsNids, I_ConfigAceFrame profileForConflictDetection) {
+   public CompletedConceptConflictDetector(I_IntSet conflictsNids, I_IntSet noConflictNids,
+         I_ConfigAceFrame profileForConflictDetection) {
       super();
       this.conflictsNids = conflictsNids;
+      this.noConflictNids = noConflictNids;
       this.profileForConflictDetection = profileForConflictDetection;
    }
 
@@ -65,6 +68,16 @@ public class ConflictIdentifier implements I_ProcessConcepts {
              statusCount.put(tuple.getConceptStatus(), 1);
          }
       }
+      
+      if (attrTupels.size() > 1) {
+         boolean conflict = true;
+         if (conflict) {
+            conflictsNids.add(concept.getConceptId());
+         } else {
+            noConflictNids.add(concept.getConceptId());
+         }
+      }
+      
       switch (attrTupels.size()) {
       case 0:
          conceptsProcessedWithNoTuples++;
@@ -74,20 +87,15 @@ public class ConflictIdentifier implements I_ProcessConcepts {
          break;
       case 2:
          conceptsProcessedWithTwoTuples++;
-         conflictsNids.add(concept.getConceptId());
          break;
       case 3:
          conceptsProcessedWithThreeTuples++;
-         conflictsNids.add(concept.getConceptId());
          break;
       case 4:
          conceptsProcessedWithFourTuples++;
-         conflictsNids.add(concept.getConceptId());
          break;
-
       default:
-         conflictsNids.add(concept.getConceptId());
-         break;
+          break;
       }
    }
    
@@ -132,6 +140,10 @@ public class ConflictIdentifier implements I_ProcessConcepts {
       " conceptsProcessedWithTwoTuples: " + conceptsProcessedWithTwoTuples  + 
       " conceptsProcessedWithThreeTuples: " + conceptsProcessedWithThreeTuples  + 
       " conceptsProcessedWithFourTuples: " + conceptsProcessedWithFourTuples + buff.toString();
+   }
+
+   public I_IntSet getNoConflictNids() {
+      return noConflictNids;
    }
 
 }
