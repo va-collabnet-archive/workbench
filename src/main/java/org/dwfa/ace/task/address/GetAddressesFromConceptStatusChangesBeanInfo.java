@@ -11,6 +11,13 @@ public class GetAddressesFromConceptStatusChangesBeanInfo extends SimpleBeanInfo
 
    public PropertyDescriptor[] getPropertyDescriptors() {
       try {
+         PropertyDescriptor pathListListPropName = new PropertyDescriptor("pathListListPropName", getBeanDescriptor()
+               .getBeanClass());
+         pathListListPropName.setBound(true);
+         pathListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+         pathListListPropName.setDisplayName("<html><font color='green'>Path list lists prop:");
+         pathListListPropName.setShortDescription("Enter the property name to hold the list of UUID lists that are represent a list of paths.");
+
          PropertyDescriptor activeConceptPropName = new PropertyDescriptor("activeConceptPropName", getBeanDescriptor()
                .getBeanClass());
          activeConceptPropName.setBound(true);
@@ -32,7 +39,7 @@ public class GetAddressesFromConceptStatusChangesBeanInfo extends SimpleBeanInfo
          addressListPropName.setDisplayName("<html><font color='green'>address list prop:");
          addressListPropName.setShortDescription("Enter the property name to hold the generated address list.");
 
-         PropertyDescriptor rv[] = { activeConceptPropName, profilePropName, addressListPropName };
+         PropertyDescriptor rv[] = { activeConceptPropName, profilePropName, addressListPropName, pathListListPropName };
          return rv;
       } catch (IntrospectionException e) {
          throw new Error(e.toString());
@@ -44,7 +51,7 @@ public class GetAddressesFromConceptStatusChangesBeanInfo extends SimpleBeanInfo
     */
    public BeanDescriptor getBeanDescriptor() {
       BeanDescriptor bd = new BeanDescriptor(GetAddressesFromConceptStatusChanges.class);
-      bd.setDisplayName("<html><font color='green'><center>get addresses<br>from status changes");
+      bd.setDisplayName("<html><font color='green'><center>get addresses<br>and paths<br>from status changes");
       return bd;
    }
 
