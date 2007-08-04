@@ -815,7 +815,7 @@ public class TaskPanel extends JPanel implements I_DoDragAndDrop,
             String userDir = System.getProperty("user.dir");
             File startFile = new File(userDir + moduleLoc);
 
-            PlatformWebBrowser.openURL(startFile.toURL());
+            PlatformWebBrowser.openURL(startFile.toURI().toURL());
         } catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
