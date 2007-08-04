@@ -203,11 +203,13 @@ public class NewDefaultProfile extends AbstractTask {
         I_IntSet allowedStatus = tf.newIntSet();
         allowedStatus.add(tf.uuidToNative(Concept.ACTIVE.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.ADJUDICATED.getUids()));
-        allowedStatus.add(tf.uuidToNative(Concept.CONCEPT_RETIRED.getUids()));
+        addIfNotNull(allowedStatus, Concept.ADJUDICATED_AND_PROCESSED, tf);
+        addIfNotNull(allowedStatus, Concept.CONCEPT_RETIRED, tf);
         allowedStatus.add(tf.uuidToNative(Concept.CURRENT.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.DO_NOT_EDIT_INTERNAL_USE.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.DUAL_REVIEWED.getUids()));
+        addIfNotNull(allowedStatus, Concept.DUAL_REVIEWED_AND_PROCESSED, tf);
         allowedStatus.add(tf.uuidToNative(Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.FLAGGED_FOR_REVIEW.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.FLAGGED_POTENTIAL_DESC_STYLE_ERROR.getUids()));
@@ -216,12 +218,12 @@ public class NewDefaultProfile extends AbstractTask {
         allowedStatus.add(tf.uuidToNative(Concept.CURRENT_TEMP_INTERNAL_USE.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.CURRENT_UNREVIEWED.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.FLAGGED_FOR_DUAL_REVIEW.getUids()));
-        allowedStatus.add(tf.uuidToNative(Concept.FLAGGED_FOR_DUAL_REVIEW.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.INTERNAL_USE_ONLY.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.LIMITED.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.PENDING_MOVE.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.PROCESSED.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.RESOLVED_IN_DUAL.getUids()));
+        addIfNotNull(allowedStatus, Concept.RESOLVED_IN_DUAL_AND_PROCESSED, tf);
         allowedStatus.add(tf.uuidToNative(Concept.CONFLICTING.getUids()));
         allowedStatus.add(tf.uuidToNative(Concept.CONSTANT.getUids()));
         activeConfig.setAllowedStatus(allowedStatus);
