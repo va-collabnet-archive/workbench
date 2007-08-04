@@ -706,7 +706,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                             "Click to specify sorting; Control-Click to specify secondary sorting");
             attachmentTable.addMouseListener(new AttachmentPopupListener());
             JScrollPane scroller = new JScrollPane(attachmentTable);
-            scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            //scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             scroller.setPreferredSize(new Dimension(500, 100));
             scroller.setMinimumSize(new Dimension(500, 100));
             c.gridx = 0;
