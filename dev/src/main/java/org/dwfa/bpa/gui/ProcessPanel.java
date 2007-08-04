@@ -14,7 +14,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -29,10 +28,8 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.MarshalledObject;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +47,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
@@ -65,7 +63,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.TableSorter;
-import org.dwfa.tapi.NoMappingException;
 import org.dwfa.util.io.FileIO;
 
 /**
@@ -116,6 +113,9 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
     private TableSorter executionSortingTable;
 
     private JButton addEmptyAttachmentKey;
+
+   private JSplitPane headerProcessSplit;
+   
     private class AddAttachmentActionListener implements ActionListener {
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -471,20 +471,11 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
     }
 
     /**
-     * @throws IntrospectionException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     * @throws QueryException
-     * @throws PropertyVetoException
-     * @throws InvalidComponentException
-     * @throws ValidationException
-     * @throws IdentifierIsNotNativeException
-     * @throws NoMappingException
-     * @throws RemoteException
-     * @throws NoSuchMethodException
-     * @throws SecurityException
      * 
+     * @param process
+     * @param worker
+     * @throws PropertyVetoException
+     * @throws Exception
      */
     public ProcessPanel(I_EncodeBusinessProcess process, I_Work worker)
             throws PropertyVetoException, Exception {
@@ -515,9 +506,9 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         menuItem = new JMenuItem("Remove");
         menuItem.addActionListener(popupListener);
         this.attachmentPopup.add(menuItem);
-        addEmptyAttachmentKey = new JButton("Add Key");
+        addEmptyAttachmentKey = new JButton("   Add Key    ");
+        addAttachment =         new JButton("Add Attachment");
         addEmptyAttachmentKey.addActionListener(new AddEmptyAttachmentActionListener());
-        addAttachment = new JButton("Add Attachment");
         addAttachment.addActionListener(new AddAttachmentActionListener());
         process.addPropertyChangeListener(this);
         layoutComponents();
@@ -529,7 +520,22 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
      * @throws Exception
      */
     private void layoutComponents() throws PropertyVetoException, Exception {
-        this.removeAll();
+       if (headerProcessSplit == null) {
+          this.setLayout(new GridLayout(1, 1));
+          headerProcessSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+          headerProcessSplit.setOneTouchExpandable(true);
+          this.add(headerProcessSplit);
+       }
+        setTopPanel();
+        setBottomPanel();
+        this.revalidate();
+        this.repaint();
+
+    }
+
+   private void setTopPanel() throws NoSuchMethodException, ClassNotFoundException {
+      JPanel topPanel = new JPanel(new GridBagLayout());
+        headerProcessSplit.setTopComponent(topPanel);
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -540,19 +546,19 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.gridy = 0;
 
         c.fill = GridBagConstraints.HORIZONTAL;
-        this.add(new JLabel("priority: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("priority: ", JLabel.RIGHT), c);
         c.gridx++;
 
         JComboBox priorityComboBox = new JComboBox(Priority.values);
         priorityComboBox.setSelectedItem(process.getPriority());
         priorityComboBox.addActionListener(new UpdatePriorityActionListener());
-        this.add(priorityComboBox, c);
+        topPanel.add(priorityComboBox, c);
         c.gridx++;
-        this.add(new JLabel("     process id: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("     process id: ", JLabel.RIGHT), c);
         c.gridx++;
         JLabel pidLabel = new JLabel(process.getProcessID().toString());
         c.gridwidth = 2;
-        this.add(pidLabel, c);
+        topPanel.add(pidLabel, c);
         
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -562,11 +568,11 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.gridx = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = 1;
-        this.add(new JLabel("process name: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("process name: ", JLabel.RIGHT), c);
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
-        JTextArea textField = new JTextArea(1, 45);
-        textField.setLineWrap(true);
+        JTextArea textField = new JTextArea(1, 1024);
+        textField.setLineWrap(false);
         textField.setText(process.getName());
         textField.setBorder(BorderFactory.createLoweredBevelBorder());
         textField.getDocument().addDocumentListener(
@@ -575,70 +581,86 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                         textField));
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
-        c.gridwidth = 4;
-        this.add(textField, c);
+        c.gridwidth = 6;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        topPanel.add(textField, c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
         c.gridwidth = 1;
         c.gridy++;
 
         c.gridx = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
-        this.add(new JLabel("subject: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("subject: ", JLabel.RIGHT), c);
         c.fill = GridBagConstraints.NONE;
 
         c.gridx++;
-        textField = new JTextArea(1, 45);
+        textField = new JTextArea(1, 1024);
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
-        textField.setLineWrap(true);
+        textField.setLineWrap(false);
         textField.setText(process.getSubject());
         textField.setBorder(BorderFactory.createLoweredBevelBorder());
         textField.getDocument().addDocumentListener(
                 new UpdateFieldDocumentListener(process.getClass().getMethod(
                         "setSubject", new Class[] { String.class }), process,
                         textField));
-        c.gridwidth = 4;
-        this.add(textField, c);
+        c.gridwidth = 6;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        topPanel.add(textField, c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
         c.gridwidth = 1;
         c.gridy++;
         // ------------
         c.gridx = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
-        this.add(new JLabel("originator: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("originator: ", JLabel.RIGHT), c);
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
-        textField = new JTextArea(1, 45);
+        textField = new JTextArea(1, 1024);
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
-        textField.setLineWrap(true);
+        textField.setLineWrap(false);
         textField.setText(process.getOriginator());
         textField.setBorder(BorderFactory.createLoweredBevelBorder());
         textField.getDocument().addDocumentListener(
                 new UpdateFieldDocumentListener(process.getClass().getMethod(
                         "setOriginator", new Class[] { String.class }),
                         process, textField));
-        c.gridwidth = 4;
-        this.add(textField, c);
+        c.gridwidth = 6;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        topPanel.add(textField, c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
         c.gridwidth = 1;
         c.gridy++;
         // ------------
         c.gridx = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
-        this.add(new JLabel("destination: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("destination: ", JLabel.RIGHT), c);
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
         // c.weightx = 0.5;
         textField = new JTextArea(1, 45);
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
-        textField.setLineWrap(true);
+        textField.setLineWrap(false);
         textField.setText(process.getDestination());
         textField.setBorder(BorderFactory.createLoweredBevelBorder());
         textField.getDocument().addDocumentListener(
                 new UpdateFieldDocumentListener(process.getClass().getMethod(
                         "setDestination", new Class[] { String.class }),
                         process, textField));
-        c.gridwidth = 4;
-        this.add(textField, c);
+        c.gridwidth = 6;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        topPanel.add(textField, c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
         c.gridwidth = 1;
         c.gridy++;
 
@@ -646,25 +668,25 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.gridx = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
         //this.add(new JLabel("attachments: ", JLabel.RIGHT), c);
-        this.add(viewAttachments, c);
+        topPanel.add(viewAttachments, c);
         
         c.gridx++;
-        this.add(new JLabel(new Integer(process.getAttachmentKeys().size())
+        topPanel.add(new JLabel(new Integer(process.getAttachmentKeys().size())
                 .toString(), JLabel.LEFT), c);
         c.gridx++;
         c.weightx = 0;
-        this.add(new JLabel(), c);
+        topPanel.add(new JLabel(), c);
         c.anchor = GridBagConstraints.EAST;
 
         c.fill = GridBagConstraints.NONE;
                c.gridx++;
         addEmptyAttachmentKey.setVisible(viewAttachments.isSelected());
-       this.add(addEmptyAttachmentKey, c);
+        topPanel.add(addEmptyAttachmentKey, c);
 
        c.gridx++;
         addAttachment.setVisible(viewAttachments.isSelected());
-        this.add(addAttachment, c);
         c.anchor = GridBagConstraints.WEST;
+        topPanel.add(addAttachment, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
        c.gridy++;
@@ -684,12 +706,15 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                             "Click to specify sorting; Control-Click to specify secondary sorting");
             attachmentTable.addMouseListener(new AttachmentPopupListener());
             JScrollPane scroller = new JScrollPane(attachmentTable);
+            scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             scroller.setPreferredSize(new Dimension(500, 100));
+            scroller.setMinimumSize(new Dimension(500, 100));
             c.gridx = 0;
-            c.gridwidth = 5;
-            c.weightx = 0.0;
+            c.gridwidth = 7;
+            c.weightx = 1.0;
             c.fill = GridBagConstraints.HORIZONTAL;
-            this.add(scroller, c);
+            topPanel.add(scroller, c);
+            c.weightx = 0.0;
             c.gridy++;
         }
         // ---------- view line
@@ -697,16 +722,16 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.gridwidth = 1;
         c.gridx = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
-        this.add(new JLabel("view: ", JLabel.RIGHT), c);
+        topPanel.add(new JLabel("view: ", JLabel.RIGHT), c);
         c.gridx++;
-        this.add(viewCombo, c);
+        topPanel.add(viewCombo, c);
 
         JLabel label = new JLabel("            current task id: ", JLabel.RIGHT);
         c.gridx++;
 
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.EAST;
-        this.add(label, c);
+        topPanel.add(label, c);
 
         TaskIdPanel idLabel = new TaskIdPanel(process.getCurrentTaskId(),
                 process);
@@ -716,17 +741,13 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.gridx = c.gridx + c.gridwidth;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.WEST;
-        this.add(idLabel, c);
+        topPanel.add(idLabel, c);
         c.gridy++;
+   }
 
-        // ------------ Process/History/Message pane...
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridy++;
-        c.gridx = 0;
-        c.gridwidth = 6;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.BOTH;
+   private void setBottomPanel() throws PropertyVetoException, Exception {
+      // ------------ Process/History/Message pane...
+
         String viewString = (String) this.viewCombo.getSelectedItem();
         if (viewString.equals(VIEW_HISTORY)) {
             ExecutionRecordTableModel tableModel = new ExecutionRecordTableModel(
@@ -746,7 +767,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
             intermediary.add(sp);
             intermediary.setBorder(BorderFactory
                     .createTitledBorder("Execution History:"));
-            this.add(intermediary, c);
+            headerProcessSplit.setBottomComponent(intermediary);
         } else if (viewString.equals(VIEW_TASKS)) {
             ProcessDiagramPanel processDiagram = new ProcessDiagramPanel(
                     this.process, worker);
@@ -755,7 +776,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
             intermediary.add(sp);
             intermediary.setBorder(BorderFactory
                     .createTitledBorder("Process Diagram:"));
-            this.add(intermediary, c);
+            headerProcessSplit.setBottomComponent(intermediary);
             Iterator<ActionListener> listenerItr = this.taskAddedListeners
                     .iterator();
             while (listenerItr.hasNext()) {
@@ -775,14 +796,10 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
             JPanel intermediary = new JPanel(new GridLayout(1, 1));
             intermediary.add(sp);
             intermediary
-                    .setBorder(BorderFactory.createTitledBorder("Message:"));
-            this.add(intermediary, c);
-
-        }
-        this.revalidate();
-        this.repaint();
-
-    }
+            .setBorder(BorderFactory.createTitledBorder("Message:"));
+            headerProcessSplit.setBottomComponent(intermediary);
+         }
+   }
 
     public class TextfieldKeyAdaptor extends KeyAdapter {
         JTextArea textArea;

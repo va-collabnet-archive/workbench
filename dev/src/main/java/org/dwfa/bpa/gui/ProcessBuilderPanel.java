@@ -789,7 +789,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
             throws PropertyVetoException, Exception {
         this.processPanel = new ProcessPanel(process, this.worker);
         int dividerLocation = this.splitPane.getDividerLocation();
-        this.splitPane.setRightComponent(new JScrollPane(this.processPanel));
+        this.splitPane.setRightComponent(this.processPanel);
         this.splitPane.setDividerLocation(dividerLocation);
         // this.statusMessage.setText("<html><font color='blue'>Set process to:
         // " + process.getName());
