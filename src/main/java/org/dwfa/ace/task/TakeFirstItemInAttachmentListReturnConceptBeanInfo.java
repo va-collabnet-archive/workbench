@@ -48,7 +48,7 @@ public class TakeFirstItemInAttachmentListReturnConceptBeanInfo extends SimpleBe
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInAttachmentListReturnConcept.class);
-        bd.setDisplayName("<html><font color='green'><center>Take 1st Item<br>In Attachment List<br> Return Concept");
+        bd.setDisplayName("<html><font color='green'><center>DON'T USE<br>Take 1st Item<br>In Attachment List<br> Return Concept");
         return bd;
     }
 

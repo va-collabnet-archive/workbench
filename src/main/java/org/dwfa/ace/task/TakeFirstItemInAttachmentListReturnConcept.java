@@ -6,12 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -73,19 +69,7 @@ public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
             throws TaskFailedException {
         try {
             
-            List<UUID> temporaryListUuid = (List<UUID>) process.readProperty(uuidListPropName);
-            
-            if (worker.getLogger().isLoggable(Level.FINE)) {
-                worker.getLogger().fine(("Removing first item in attachment list."));
-            }
-        
-          //  worker.getLogger().info("uuidListPropName: " + uuidListPropName);
-          // worker.getLogger().info("temporaryListUuid: " + temporaryListUuid);
-            
-            I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(temporaryListUuid);
-            
-			//worker.getLogger().info("concept" + concept);
-
+            I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, uuidListPropName);
             process.setProperty(this.conceptPropName, concept);
             
             return Condition.CONTINUE;
