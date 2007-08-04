@@ -15,7 +15,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/ace/db", type = BeanType.TASK_BEAN)})
 public class Commit extends AbstractTask {
 
     private static final long serialVersionUID = 1;

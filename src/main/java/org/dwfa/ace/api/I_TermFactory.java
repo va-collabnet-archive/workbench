@@ -146,5 +146,7 @@ public interface I_TermFactory {
 
    public I_IdVersioned getId(int nid) throws IOException;
 
+   public void cancel();
+
 
 }
