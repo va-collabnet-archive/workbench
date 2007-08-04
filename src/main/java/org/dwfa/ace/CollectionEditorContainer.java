@@ -48,7 +48,7 @@ public class CollectionEditorContainer extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			if (showComponentView.isSelected()) {
 				showProcessBuilder.setSelected(false);
-				listSplit.setBottomComponent(conceptPanelScroller);
+				listSplit.setBottomComponent(conceptPanel);
 				if (lastDividerLocation > 0) {
 					listSplit.setDividerLocation(lastDividerLocation);
 				} else {
@@ -97,7 +97,6 @@ public class CollectionEditorContainer extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JComponent conceptPanelScroller;
 	private JComponent processBuilder;
 	private JToggleButton showComponentView;
 	private JToggleButton showProcessBuilder;
@@ -118,7 +117,6 @@ public class CollectionEditorContainer extends JPanel {
 				LINK_TYPE.LIST_LINK, true);
 		conceptPanel.setLinkedList(list);
 		conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
-		conceptPanelScroller = new JScrollPane(conceptPanel);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
@@ -140,7 +138,7 @@ public class CollectionEditorContainer extends JPanel {
 		listSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		listSplit.setOneTouchExpandable(true);
 		listSplit.setTopComponent(new JScrollPane(list));
-		listSplit.setBottomComponent(conceptPanelScroller);
+		listSplit.setBottomComponent(conceptPanel);
 		listSplit.setDividerLocation(3000);
 		return listSplit;
 	}

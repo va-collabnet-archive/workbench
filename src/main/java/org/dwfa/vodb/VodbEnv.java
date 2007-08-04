@@ -2607,10 +2607,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return newPath;
 	}
 
-	public void commit() throws Exception {
-		ACE.commit();
-		
-	}
+   public void commit() throws Exception {
+      ACE.commit();
+   }
+
+   public void cancel() throws IOException {
+      ACE.abort();
+   }
 
 	public void addChangeSetWriter(I_WriteChangeSet csw) {
 		ACE.getCsWriters().add(csw);
