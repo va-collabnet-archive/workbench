@@ -30,7 +30,8 @@ public interface I_DescriptionVersioned {
 	public I_DescriptionTuple getLastTuple();
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples);
+			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
+         boolean addUncommitted);
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
