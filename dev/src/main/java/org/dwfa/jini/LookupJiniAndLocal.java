@@ -162,6 +162,9 @@ public class LookupJiniAndLocal implements I_LookupServices {
 		if (this.sdm != null) {
          if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
             matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter))));
+            if (matches.size() > 0) {
+               return matches.get(0);
+            }
          } else {
             return this.sdm.lookup(tmpl, filter);
          }
@@ -180,6 +183,12 @@ public class LookupJiniAndLocal implements I_LookupServices {
 			return matches.get(0);
 		}
 		if (this.sdm != null) {
+         if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
+            matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter))));
+            if (matches.size() > 0) {
+               return matches.get(0);
+            }
+         }
 			return this.sdm.lookup(tmpl, filter, waitDur);
 		}
 		return null;
