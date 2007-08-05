@@ -152,7 +152,8 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#addTuples(org.dwfa.ace.IntSet, org.dwfa.ace.IntSet, java.util.Set, java.util.List)
 	 */
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positions, List<I_DescriptionTuple> matchingTuples) {
+			Set<I_Position> positions, List<I_DescriptionTuple> matchingTuples,
+         boolean addUncommitted) {
 		Set<I_DescriptionPart> uncommittedParts = new HashSet<I_DescriptionPart>();
 		if (positions == null) {
 			List<I_DescriptionPart> addedParts = new ArrayList<I_DescriptionPart>();
@@ -271,9 +272,11 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 				}
 			}
 		}
-		for (I_DescriptionPart p: uncommittedParts) {
-			matchingTuples.add(new ThinDescTuple(this, p));
-		}
+      if (addUncommitted) {
+         for (I_DescriptionPart p: uncommittedParts) {
+            matchingTuples.add(new ThinDescTuple(this, p));
+         }
+      }
 	}
 
 	/* (non-Javadoc)

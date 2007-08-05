@@ -180,7 +180,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
 		for (I_DescriptionVersioned desc : getDescriptions()) {
 			desc.addTuples(allowedStatus, allowedTypes, positionSet,
-					returnDescriptions);
+					returnDescriptions, true);
 		}
 		return returnDescriptions;
 	}

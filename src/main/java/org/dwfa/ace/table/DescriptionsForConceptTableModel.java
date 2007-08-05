@@ -206,10 +206,10 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 			return selectedTuples;
 		}
 		for (I_DescriptionVersioned desc: cb.getDescriptions()) {
-			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples);
+			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
 		}
 		for (I_DescriptionVersioned desc: cb.getUncommittedDescriptions()) {
-			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples);
+			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
 		}
 		return selectedTuples;
 	}

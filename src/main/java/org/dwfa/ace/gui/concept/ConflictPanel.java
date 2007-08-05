@@ -413,9 +413,9 @@ public class ConflictPanel extends JPanel implements ActionListener {
                      AceLog.getEditLog().fine("  processing desc: " + desc.getDescId() + " " + desc);
                   }
 						List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-						desc.addTuples(config.getAllowedStatus(), null, positions, tuples);
+						desc.addTuples(config.getAllowedStatus(), null, positions, tuples, false);
 						if (descsForResolution.containsKey(desc.getDescId())) {
-							//Already there, need to make sure status is active. 
+							//Already there, need to make sure tuple is equivalent. 
 							if (tuples.size() == 0) {
 								// Not there, need to add
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
@@ -424,8 +424,46 @@ public class ConflictPanel extends JPanel implements ActionListener {
 								addDescPart(descsForResolution, editPath, desc);							
 							} else {
 								//already there with active status...
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   desc already there with active status...");
+                        I_DescriptionTuple descTuple = descsForResolution.get(desc.getDescId());
+                        I_DescriptionPart possiblePart = descTuple.duplicatePart();
+                        I_IntSet allowedStatus = null; 
+                        I_IntSet allowedTypes = null;
+                         boolean addUncommitted = true;
+                        ArrayList<I_DescriptionTuple> currentParts = new ArrayList<I_DescriptionTuple>();
+                        desc.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
+                        boolean newData = true;
+                        for (I_DescriptionTuple currentPart: currentParts) {
+                           if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                              newData = false;
+                              break;
+                           }
+                        }
+                        if (newData) {
+                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                              AceLog.getEditLog().fine("   desc already there, but needs updated part...");
+                           }
+                           possiblePart.setVersion(Integer.MAX_VALUE);
+                           boolean containsPart = false;
+                           for (I_DescriptionPart currentPart: desc.getVersions()) {
+                              if (possiblePart.hasNewData(currentPart)) {
+                                 containsPart = true;
+                                 break;
+                              }
+                           } 
+                           if (containsPart) {
+                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                                 AceLog.getEditLog().fine("   uncommitted updated part already exists...");
+                              }
+                           } else {
+                              desc.getVersions().add(possiblePart);
+                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                                 AceLog.getEditLog().fine("   adding uncommitted part...");
+                              }
+                           }
+                        } else {
+                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                              AceLog.getEditLog().fine("   desc already there, and needs no update...");
+                           }
                         }
 							}
 						} else {
@@ -469,7 +507,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
                         I_IntSet allowedTypes = null;
                          boolean addUncommitted = true;
                         ArrayList<I_RelTuple> currentParts = new ArrayList<I_RelTuple>();
-                           rel.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
+                        rel.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
                         boolean newData = true;
                         for (I_RelTuple currentPart: currentParts) {
                            if (possiblePart.hasNewData(currentPart.getPart()) == false) {
