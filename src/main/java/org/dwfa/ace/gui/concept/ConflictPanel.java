@@ -33,6 +33,7 @@ import javax.swing.ScrollPaneConstants;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_ImplementActiveLabel;
+import org.dwfa.ace.LabelForConceptAttributeTuple;
 import org.dwfa.ace.LabelForDescriptionTuple;
 import org.dwfa.ace.LabelForRelationshipTuple;
 import org.dwfa.ace.LabelForTuple;
@@ -375,7 +376,8 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
 			try {
 				HashMap<Integer, I_DescriptionTuple> descsForResolution = new HashMap<Integer, I_DescriptionTuple>();
-				HashMap<Integer, I_RelTuple> relsForResolution = new HashMap<Integer, I_RelTuple>();
+            HashMap<Integer, I_RelTuple> relsForResolution = new HashMap<Integer, I_RelTuple>();
+            HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution = new HashMap<Integer, I_ConceptAttributeTuple>();
 				for (I_ImplementActiveLabel l : resolutionLabels) {
 					if (LabelForDescriptionTuple.class.isAssignableFrom(l
 							.getClass())) {
@@ -385,29 +387,57 @@ public class ConflictPanel extends JPanel implements ActionListener {
 							.isAssignableFrom(l.getClass())) {
 						LabelForRelationshipTuple lrt = (LabelForRelationshipTuple) l;
 						relsForResolution.put(lrt.getRel().getRelId(), lrt.getRel());
-					}
+					} else if (LabelForConceptAttributeTuple.class
+                     .isAssignableFrom(l.getClass())) {
+                  LabelForConceptAttributeTuple lcat = (LabelForConceptAttributeTuple) l;
+                  attributesForResolution.put(lcat.getConAttr().getConId(), lcat.getConAttr());
+               } else {
+                  throw new UnsupportedOperationException(l.getClass().getName());
+               }
 				}
-
+				if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("descsForResolution: " + descsForResolution);
+               AceLog.getEditLog().fine("relsForResolution: " + relsForResolution);
+               AceLog.getEditLog().fine("attributesForResolution: " + attributesForResolution);
+            }
 				for (I_Path editPath: config.getEditingPathSet()) {
 					Set<I_Position> positions = new HashSet<I_Position>();
 					positions.add(new Position(Integer.MAX_VALUE, editPath));
 					
 					for (I_DescriptionVersioned desc : cb.getDescriptions()) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("processing desc: " + desc);
+                  }
 						List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
 						desc.addTuples(config.getAllowedStatus(), null, positions, tuples);
 						if (descsForResolution.containsKey(desc.getDescId())) {
 							//Already there, need to make sure status is active. 
 							if (tuples.size() == 0) {
 								// Not there, need to add
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("not there, need to add...");
+                        }
 								addDescPart(descsForResolution, editPath, desc);							
 							} else {
 								//already there with active status...
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("already there with active status...");
+                        }
 							}
 						} else {
 							// Not there, need to make sure status is inactive. 
+                     if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                        AceLog.getEditLog().fine("Not there, need to make sure status is inactive...");
+                     }
 							if (tuples.size() == 0) {
 								// not there, no action needed. 
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("not there, no action needed...");
+                        }
 							} else {
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("retireDescPart...");
+                        }
 								retireDescPart(editPath, desc);							
 							}
 						}						
@@ -420,15 +450,30 @@ public class ConflictPanel extends JPanel implements ActionListener {
 							//Already there, need to make sure status is active. 
 							if (tuples.size() == 0) {
 								// Not there, need to add
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("not there, need to add...");
+                        }
 								addRelPart(relsForResolution, editPath, rel);							
 							} else {
 								//already there with active status...
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("already there with active status...");
+                        }
 							}
 						} else {
 							// Not there, need to make sure status is inactive. 
+                     if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                        AceLog.getEditLog().fine("Not there, need to make sure status is inactive...");
+                     }
 							if (tuples.size() == 0) {
 								// not there, no action needed. 
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("not there, no action needed...");
+                        }
 							} else {
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("retireRelPart...");
+                        }
 								retireRelPart(editPath, rel);							
 							}
 						}
