@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
@@ -24,14 +25,21 @@ public class ChooseFileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor fileKey =
-                new PropertyDescriptor("fileKey", ChooseFile.class);
-            fileKey.setBound(true);
-            fileKey.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            fileKey.setDisplayName("<html><font color='green'>Name of file key:");
-            fileKey.setShortDescription("Name of file key.");
+           PropertyDescriptor fileKey =
+              new PropertyDescriptor("fileKey", getBeanDescriptor().getBeanClass());
+          fileKey.setBound(true);
+          fileKey.setPropertyEditorClass(PropertyNameLabelEditor.class);
+          fileKey.setDisplayName("<html><font color='green'>Name of file key:");
+          fileKey.setShortDescription("Name of file key.");
 
-            PropertyDescriptor rv[] = { fileKey };
+          PropertyDescriptor loadMode =
+             new PropertyDescriptor("loadMode", getBeanDescriptor().getBeanClass());
+          loadMode.setBound(true);
+          loadMode.setPropertyEditorClass(CheckboxEditor.class);
+          loadMode.setDisplayName("<html><font color='green'>Load:");
+          loadMode.setShortDescription("Select if loading a file, deselect if saving a file.");
+
+            PropertyDescriptor rv[] = { fileKey, loadMode };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
