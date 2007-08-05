@@ -1656,7 +1656,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		
 	}
 
-   String[] standardMessageAttachments = new String[] { "MESSAGE", "HTML_INSTRUCTION", "HTML_DETAIL", "SIGNPOST_HTML" };
+    private static String[] standardMessageAttachments = new String[] { "MESSAGE", "HTML_INSTRUCTION", "HTML_DETAIL", "SIGNPOST_HTML" };
 	public I_RenderMessage getMessageRenderer() {
       if (renderer == null) {
          for (String key: standardMessageAttachments) {
