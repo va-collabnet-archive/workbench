@@ -173,7 +173,8 @@ public class CreateFailsafe extends AbstractTask {
      * @throws PrivilegedActionException 
      * @throws ConfigurationException 
 	 */
-	protected void createFailsafe(I_EncodeBusinessProcess process, I_EncodeBusinessProcess removingProcess, I_ContainData failsafeIdContainer,
+	@SuppressWarnings("unchecked")
+   protected void createFailsafe(I_EncodeBusinessProcess process, I_EncodeBusinessProcess removingProcess, I_ContainData failsafeIdContainer,
             I_Work worker) throws IOException, PropertyVetoException, RemoteException, TransactionException, LeaseDeniedException, InterruptedException, PrivilegedActionException, ConfigurationException {
 		ServiceID serviceID = null;
 		Class[] serviceTypes = new Class[] { I_QueueProcesses.class };

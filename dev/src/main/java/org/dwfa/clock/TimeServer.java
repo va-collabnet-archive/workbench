@@ -134,7 +134,8 @@ public class TimeServer implements I_KeepIncrementalTime, ServerProxyTrust, Prox
      * @throws Exception
      *             if a problem occurs
      */
-    protected void init() throws Exception {
+    @SuppressWarnings("unchecked")
+   protected void init() throws Exception {
         LoginContext loginContext = (LoginContext) config
                 .getEntry(this.getClass().getName(), "loginContext",
                         LoginContext.class, null);

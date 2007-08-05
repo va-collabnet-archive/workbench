@@ -48,7 +48,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
 	private static HashSet<String> startedQueues = new HashSet<String>();
 	
 	public static boolean started(File f) throws MalformedURLException {
-		return startedQueues.contains(f.toURL().toExternalForm());
+		return startedQueues.contains(f.toURI().toURL().toExternalForm());
 	}
 
 	/** The server proxy, for use by getProxyVerifier */
@@ -65,7 +65,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     public QueueServer(String[] args, LifeCycle lc) throws Exception {
         super(args, lc);
         File file = new File(args[0]);
-   		startedQueues.add(file.toURL().toExternalForm());
+   		startedQueues.add(file.toURI().toURL().toExternalForm());
         QueueWorkerSpec[] workerSpecs = (QueueWorkerSpec[]) this.config
                 .getEntry(this.getClass().getName(), "workerSpecs",
                         QueueWorkerSpec[].class);

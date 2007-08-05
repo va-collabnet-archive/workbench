@@ -96,7 +96,8 @@ public class RegistrationLandlordBean implements Landlord {
 		}
 	}
 
-	private void init() throws LoginException, PrivilegedActionException, RemoteException, ConfigurationException  {
+	@SuppressWarnings("unchecked")
+   private void init() throws LoginException, PrivilegedActionException, RemoteException, ConfigurationException  {
 		LoginContext loginContext = (LoginContext) config
 				.getEntry(this.getClass().getName(), "loginContext",
 						LoginContext.class, null);

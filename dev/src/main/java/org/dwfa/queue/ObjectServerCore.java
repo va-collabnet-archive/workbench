@@ -267,7 +267,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @throws Exception
      *             if a problem occurs
      */
-    protected void init() throws Exception {
+    @SuppressWarnings("unchecked")
+   protected void init() throws Exception {
         if (JiniManager.isLocalOnly()) {
         	List<Entry> entryList = new ArrayList<Entry>();
             Entry[] entries = (Entry[]) this.config.getEntry(this.getClass()

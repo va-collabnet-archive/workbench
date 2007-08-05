@@ -69,7 +69,8 @@ public class ProxyDoAsSubjectFactory {
                throw e.getCause();
             }
         }
-        private Object invokeAsSubject(final Method method,
+        @SuppressWarnings("unchecked")
+      private Object invokeAsSubject(final Method method,
                 final Object[] args) throws Throwable {
             return Subject.doAs(worker.getLoginContext().getSubject(), new PrivilegedExceptionAction() {
                 public Object run() throws Exception {

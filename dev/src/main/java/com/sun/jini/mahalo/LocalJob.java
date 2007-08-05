@@ -150,7 +150,8 @@ public abstract class LocalJob {
     /**
      * Schedules tasks for execution
      */
-    public void scheduleTasks() {
+    @SuppressWarnings("unchecked")
+   public void scheduleTasks() {
 	TaskManager.Task[] tmp = createTasks();
 
 	if (tmp != null) {

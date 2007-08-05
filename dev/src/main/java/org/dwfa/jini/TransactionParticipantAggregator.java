@@ -83,7 +83,8 @@ public class TransactionParticipantAggregator implements
 
 	}
 
-	private void init() throws Exception {
+	@SuppressWarnings("unchecked")
+   private void init() throws Exception {
 		LoginContext loginContext = (LoginContext) config
 				.getEntry(this.getClass().getName(), "loginContext",
 						LoginContext.class, null);

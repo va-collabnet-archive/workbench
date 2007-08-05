@@ -139,7 +139,8 @@ public abstract class Worker implements I_Work {
 	 * @throws IOException
 	 * @throws PrivilegedActionException
 	 */
-	public Worker(Configuration config, UUID id, String desc)
+	@SuppressWarnings("unchecked")
+   public Worker(Configuration config, UUID id, String desc)
 			throws ConfigurationException, LoginException, IOException,
 			PrivilegedActionException {
 		super();
@@ -636,7 +637,8 @@ public abstract class Worker implements I_Work {
 		return new ProxyPreparerFilter(this.getProxyPreparer(), null);
 	}
 
-	public Object doAsPrivileged(PrivilegedExceptionAction action,
+	@SuppressWarnings("unchecked")
+   public Object doAsPrivileged(PrivilegedExceptionAction action,
 			AccessControlContext acc) throws PrivilegedActionException {
 		if (this.loginContext != null) {
 			logger.finest("Doing privileged action with loginContext: "
@@ -653,7 +655,8 @@ public abstract class Worker implements I_Work {
 		}
 	}
 
-	public Object doAsPrivileged(PrivilegedAction action,
+	@SuppressWarnings("unchecked")
+   public Object doAsPrivileged(PrivilegedAction action,
 			AccessControlContext acc) {
 		if (this.loginContext != null) {
 			logger.finest("Doing privileged action with loginContext: "
