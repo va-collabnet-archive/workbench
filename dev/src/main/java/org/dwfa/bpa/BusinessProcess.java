@@ -47,6 +47,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.dwfa.bpa.gui.SimpleMessageRenderer;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_ContainData;
 import org.dwfa.bpa.process.I_DefineTask;
@@ -1655,7 +1656,15 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		
 	}
 
+   String[] standardMessageAttachments = new String[] { "MESSAGE", "HTML_INSTRUCTION", "HTML_DETAIL", "SIGNPOST_HTML" };
 	public I_RenderMessage getMessageRenderer() {
+      if (renderer == null) {
+         for (String key: standardMessageAttachments) {
+            if (attachments.containsKey(key) && attachments.get(key) != null) {
+               return new SimpleMessageRenderer((String) attachments.get(key));
+            }
+         }
+      }
 		return this.renderer;
 	}
 }
