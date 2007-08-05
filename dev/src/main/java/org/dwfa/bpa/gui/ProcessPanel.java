@@ -41,7 +41,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -260,6 +259,9 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                         attachmentSortingTable.modelIndex(attachmentTable.getSelectedRow()),
                         ProcessAttachmentTableModel.NAME);
                 Object object = process.readAttachement(key);
+                if (logger.isLoggable(Level.INFO)) {
+                   logger.info("Opening attachment: " + key + " value: " + object.toString());
+               }
                 open(object);
             } else if (command.equals("save as...")) {
                 saveAs();
@@ -355,13 +357,8 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                             + process.getName(), "Attachment", new JLabel(new ImageIcon(imageBytes)));
                	
                 } else {
-                    JEditorPane textPane = new JEditorPane();
-                    textPane.setContentType("text/html");
-                    textPane.setText(object.toString());
-                    textPane.setEditable(false);
                     new FrameWithOpenFramesListener("Attached Object: "
-                            + process.getName(), "Attachment", new JScrollPane(
-                            textPane));
+                            + process.getName(), "Attachment", new JScrollPane(new JLabel(object.toString())));
 
                 }
             } catch (Exception e) {
