@@ -31,6 +31,8 @@ public interface I_IdTuple {
 
 	public abstract I_IdVersioned getIdVersioned();
 
-	public abstract I_IdPart duplicatePart();
+   public abstract I_IdPart duplicatePart();
+
+   public abstract I_IdPart getPart();
 
 }

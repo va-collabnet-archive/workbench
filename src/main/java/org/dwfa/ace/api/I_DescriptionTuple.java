@@ -34,7 +34,9 @@ public interface I_DescriptionTuple {
 
 	public abstract void setVersion(int version);
 
-	public abstract I_DescriptionPart duplicatePart();
+   public abstract I_DescriptionPart duplicatePart();
+
+   public abstract I_DescriptionPart getPart();
 
 	public abstract I_DescriptionVersioned getDescVersioned();
 

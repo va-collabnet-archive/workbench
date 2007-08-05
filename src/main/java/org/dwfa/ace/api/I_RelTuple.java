@@ -32,7 +32,9 @@ public interface I_RelTuple {
 
 	public abstract void setGroup(Integer group);
 
-	public abstract I_RelPart duplicatePart();
+   public abstract I_RelPart duplicatePart();
+
+   public abstract I_RelPart getPart();
 
 	public abstract I_RelVersioned getRelVersioned();
 

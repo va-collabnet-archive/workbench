@@ -21,6 +21,8 @@ public interface I_ConceptAttributeTuple {
 
 	public abstract I_ConceptAttributeVersioned getConVersioned();
 
-	public abstract I_ConceptAttributePart duplicatePart();
+   public abstract I_ConceptAttributePart duplicatePart();
+
+   public abstract I_ConceptAttributePart getPart();
 
 }
