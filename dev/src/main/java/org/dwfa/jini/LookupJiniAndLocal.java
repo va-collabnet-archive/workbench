@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,8 +23,11 @@ import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceTemplate;
 import net.jini.entry.AbstractEntry;
+import net.jini.lookup.LookupCache;
 import net.jini.lookup.ServiceDiscoveryManager;
 import net.jini.lookup.ServiceItemFilter;
+
+import org.dwfa.bpa.process.I_QueueProcesses;
 
 /**
  * @author kec
@@ -38,13 +43,74 @@ public class LookupJiniAndLocal implements I_LookupServices {
 
 	ServiceDiscoveryManager sdm;
 
+   private LookupCache queueCache;
+
 	/**
+	 * @throws RemoteException 
 	 * 
 	 */
-	public LookupJiniAndLocal(ServiceDiscoveryManager sdm) {
+	public LookupJiniAndLocal(ServiceDiscoveryManager sdm) throws RemoteException {
 		super();
 		this.sdm = sdm;
+      ServiceTemplate tmpl = new ServiceTemplate(null,
+            new Class[] { I_QueueProcesses.class }, null);
+      ServiceItemFilter filter = null;
+      ServiceListModel serviceListener = new ServiceListModel();
+      this.queueCache = sdm.createLookupCache(tmpl, filter,
+            serviceListener);
+
 	}
+   
+   public ServiceItem lookupQueue(ServiceItemFilter filter) {
+      return this.queueCache.lookup(filter);
+   }
+   public ServiceItem[] lookupQueue(ServiceItemFilter filter, int max) {
+      return this.queueCache.lookup(filter, max);
+   }
+   
+   private static class TemplateFilter implements ServiceItemFilter {
+      ServiceTemplate tmpl;
+      ServiceItemFilter filter;
+      
+      public TemplateFilter(ServiceTemplate tmpl, ServiceItemFilter filter) {
+         super();
+         this.tmpl = tmpl;
+         this.filter = filter;
+      }
+
+      @SuppressWarnings("unchecked")
+      public boolean check(ServiceItem item) {
+         if (tmpl.serviceID != null) {
+            if (tmpl.serviceID.equals(item.serviceID)) {
+               return true;
+            }
+         }
+         if (tmpl.serviceTypes != null) {
+            for (Class serviceClass: tmpl.serviceTypes) {
+               if (serviceClass.isAssignableFrom(item.service.getClass()) == false) {
+                  return false;
+               }
+            }
+         }
+         if (tmpl.attributeSetTemplates != null) {
+            Set<Entry> entrySet = new HashSet<Entry>(Arrays.asList(tmpl.attributeSetTemplates));
+            if (item.attributeSets == null) {
+               return false;
+            } else {
+               for (Entry e: item.attributeSets) {
+                  if (entrySet.contains(e) == false) {
+                     return false;
+                  }
+               }
+            }
+         }
+         if (filter != null) {
+            return filter.check(item);
+         }
+         return true;
+      }
+      
+   }
 
 	/**
 	 * @see com.informatics.jini.I_LookupServices#lookup(net.jini.core.lookup.ServiceTemplate,
@@ -55,8 +121,12 @@ public class LookupJiniAndLocal implements I_LookupServices {
 			throws InterruptedException, RemoteException {
 		Collection<ServiceItem> matches = this.lookupLocal(tmpl, filter);
 		if (this.sdm != null) {
-			matches.addAll(Arrays.asList(this.sdm.lookup(tmpl, minMatches,
-					maxMatches - matches.size(), filter, waitDur)));
+         if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
+            matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter), maxMatches - matches.size())));
+         } else {
+            matches.addAll(Arrays.asList(this.sdm.lookup(tmpl, minMatches,
+                  maxMatches - matches.size(), filter, waitDur)));
+         }
 		}
 		return (ServiceItem[]) matches.toArray(new ServiceItem[matches.size()]);
 	}
@@ -69,9 +139,13 @@ public class LookupJiniAndLocal implements I_LookupServices {
 			ServiceItemFilter filter) {
 		Collection<ServiceItem> matches = this.lookupLocal(tmpl, filter);
 		if (this.sdm != null) {
-			ServiceItem[] jiniMatches = this.sdm.lookup(tmpl, maxMatches
-					- matches.size(), filter);
-			matches.addAll(Arrays.asList(jiniMatches));
+         if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
+            matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter), maxMatches - matches.size())));
+         } else {
+            ServiceItem[] jiniMatches = this.sdm.lookup(tmpl, maxMatches
+                  - matches.size(), filter);
+            matches.addAll(Arrays.asList(jiniMatches));
+         }
 		}
 		return (ServiceItem[]) matches.toArray(new ServiceItem[matches.size()]);
 	}
@@ -86,7 +160,11 @@ public class LookupJiniAndLocal implements I_LookupServices {
 			return matches.get(0);
 		}
 		if (this.sdm != null) {
-			return this.sdm.lookup(tmpl, filter);
+         if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
+            matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter))));
+         } else {
+            return this.sdm.lookup(tmpl, filter);
+         }
 		}
 		return null;
 	}

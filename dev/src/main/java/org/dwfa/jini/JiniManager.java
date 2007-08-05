@@ -37,6 +37,8 @@ public class JiniManager implements I_LookupServices {
 	public static Logger logger = Logger.getLogger(JiniManager.class.getName());
 
 	private static boolean localOnly = false;
+   
+   private static boolean lookupInCache = true;
 
 	private static JiniManager singelton;
 
@@ -154,7 +156,7 @@ public class JiniManager implements I_LookupServices {
 	public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
 			int maxMatches, ServiceItemFilter filter, long waitDur,
 			boolean lookupLocal) throws InterruptedException, RemoteException {
-		if (lookupLocal || localOnly) {
+		if (lookupLocal || localOnly || lookupInCache) {
 			return jiniAndLocal.lookup(tmpl, minMatches, maxMatches, filter,
 					waitDur);
 		} else {
@@ -175,7 +177,7 @@ public class JiniManager implements I_LookupServices {
 
 	public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches,
 			ServiceItemFilter filter, boolean lookupLocal) {
-		if (lookupLocal || localOnly) {
+		if (lookupLocal || localOnly  || lookupInCache) {
 			return jiniAndLocal.lookup(tmpl, maxMatches, filter);
 		}
 		return this.sdm.lookup(tmpl, maxMatches, filter);
@@ -192,7 +194,7 @@ public class JiniManager implements I_LookupServices {
 
 	public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
 			boolean lookupLocal) {
-		if (lookupLocal || localOnly) {
+		if (lookupLocal || localOnly  || lookupInCache) {
 			return jiniAndLocal.lookup(tmpl, filter);
 		}
 		return sdm.lookup(tmpl, filter);
@@ -214,7 +216,7 @@ public class JiniManager implements I_LookupServices {
 	public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
 			long waitDur, boolean lookupLocal) throws InterruptedException,
 			RemoteException {
-		if (lookupLocal || localOnly) {
+		if (lookupLocal || localOnly  || lookupInCache) {
 			return jiniAndLocal.lookup(tmpl, filter, waitDur);
 		}
 		return this.sdm.lookup(tmpl, filter, waitDur);
