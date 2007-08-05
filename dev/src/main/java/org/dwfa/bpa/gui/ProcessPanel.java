@@ -260,7 +260,11 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
                         ProcessAttachmentTableModel.NAME);
                 Object object = process.readAttachement(key);
                 if (logger.isLoggable(Level.INFO)) {
-                   logger.info("Opening attachment: " + key + " value: " + object.toString());
+                    if (object != null) {
+                        logger.info("Opening attachment: " + key + " value: " + object.toString());
+                    } else {
+                        logger.info("Opening attachment: " + key + " value: " + null);
+                    }
                }
                 open(object);
             } else if (command.equals("save as...")) {
@@ -568,7 +572,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         topPanel.add(new JLabel("process name: ", JLabel.RIGHT), c);
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
-        JTextArea textField = new JTextArea(1, 1024);
+        JTextArea textField = new JTextArea(1, 50);
         textField.setLineWrap(false);
         textField.setText(process.getName());
         textField.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -593,7 +597,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.fill = GridBagConstraints.NONE;
 
         c.gridx++;
-        textField = new JTextArea(1, 1024);
+        textField = new JTextArea(1, 50);
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
         textField.setLineWrap(false);
@@ -617,7 +621,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         topPanel.add(new JLabel("originator: ", JLabel.RIGHT), c);
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
-        textField = new JTextArea(1, 1024);
+        textField = new JTextArea(1, 50);
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
         textField.setLineWrap(false);
@@ -642,7 +646,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
         // c.weightx = 0.5;
-        textField = new JTextArea(1, 45);
+        textField = new JTextArea(1, 50);
         textField.addKeyListener(new TextfieldKeyAdaptor(textField));
         textField.addFocusListener(new SelectAllFocusAdapter(textField));
         textField.setLineWrap(false);
