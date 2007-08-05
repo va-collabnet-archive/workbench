@@ -401,12 +401,15 @@ public class ConflictPanel extends JPanel implements ActionListener {
                AceLog.getEditLog().fine("attributesForResolution: " + attributesForResolution);
             }
 				for (I_Path editPath: config.getEditingPathSet()) {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("processing editPath: " + editPath);
+               }
 					Set<I_Position> positions = new HashSet<I_Position>();
 					positions.add(new Position(Integer.MAX_VALUE, editPath));
 					
 					for (I_DescriptionVersioned desc : cb.getDescriptions()) {
                   if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                     AceLog.getEditLog().fine("processing desc: " + desc);
+                     AceLog.getEditLog().fine("  processing desc: " + desc.getDescId() + " " + desc);
                   }
 						List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
 						desc.addTuples(config.getAllowedStatus(), null, positions, tuples);
@@ -415,28 +418,28 @@ public class ConflictPanel extends JPanel implements ActionListener {
 							if (tuples.size() == 0) {
 								// Not there, need to add
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("not there, need to add...");
+                           AceLog.getEditLog().fine("   desc not there, need to add...");
                         }
 								addDescPart(descsForResolution, editPath, desc);							
 							} else {
 								//already there with active status...
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("already there with active status...");
+                           AceLog.getEditLog().fine("   desc already there with active status...");
                         }
 							}
 						} else {
 							// Not there, need to make sure status is inactive. 
                      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("Not there, need to make sure status is inactive...");
+                        AceLog.getEditLog().fine("   desc not there, need to make sure status is inactive...");
                      }
 							if (tuples.size() == 0) {
 								// not there, no action needed. 
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("not there, no action needed...");
+                           AceLog.getEditLog().fine("   desc not there, no action needed...");
                         }
 							} else {
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("retireDescPart...");
+                           AceLog.getEditLog().fine("   retireDescPart...");
                         }
 								retireDescPart(editPath, desc);							
 							}
@@ -444,6 +447,9 @@ public class ConflictPanel extends JPanel implements ActionListener {
 					}
 					
 					for (I_RelVersioned rel: cb.getSourceRels()) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("  processing rel: " + rel.getRelId() + " " + rel);
+                  }
 						List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 						rel.addTuples(config.getAllowedStatus(), null, positions, tuples, true);
 						if (relsForResolution.containsKey(rel.getRelId())) {
@@ -451,28 +457,28 @@ public class ConflictPanel extends JPanel implements ActionListener {
 							if (tuples.size() == 0) {
 								// Not there, need to add
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("not there, need to add...");
+                           AceLog.getEditLog().fine("   rel not there, need to add...");
                         }
 								addRelPart(relsForResolution, editPath, rel);							
 							} else {
 								//already there with active status...
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("already there with active status...");
+                           AceLog.getEditLog().fine("   rel already there with active status...");
                         }
 							}
 						} else {
 							// Not there, need to make sure status is inactive. 
                      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("Not there, need to make sure status is inactive...");
+                        AceLog.getEditLog().fine("   rel not there, need to make sure status is inactive...");
                      }
 							if (tuples.size() == 0) {
 								// not there, no action needed. 
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("not there, no action needed...");
+                           AceLog.getEditLog().fine("   rel not there, no action needed...");
                         }
 							} else {
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("retireRelPart...");
+                           AceLog.getEditLog().fine("   retireRelPart...");
                         }
 								retireRelPart(editPath, rel);							
 							}
