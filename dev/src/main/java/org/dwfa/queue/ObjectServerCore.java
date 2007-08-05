@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -58,7 +57,6 @@ import net.jini.jeri.BasicILFactory;
 import net.jini.jeri.BasicJeriExporter;
 import net.jini.jeri.tcp.TcpServerEndpoint;
 import net.jini.lookup.JoinManager;
-import net.jini.lookup.entry.Name;
 
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_DescribeObject;
@@ -851,6 +849,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         Entry[] moreEntries = getFixedServiceEntries();
         joinManager.addAttributes(moreEntries);
 
+        /*
         Boolean publishLocalProxy = (Boolean) this.config.getEntry(this
                 .getClass().getName(), "publishLocalProxy", Boolean.class,
                 new Boolean(false));
@@ -877,6 +876,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
             LookupJiniAndLocal.addToLocalServices(serviceItem);
 
         }
+        */
     }
 
     /**

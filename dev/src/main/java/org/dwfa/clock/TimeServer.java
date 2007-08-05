@@ -11,9 +11,7 @@ import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ListIterator;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +25,6 @@ import net.jini.config.ConfigurationProvider;
 import net.jini.config.NoSuchEntryException;
 import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
 import net.jini.discovery.DiscoveryManagement;
 import net.jini.discovery.LookupDiscovery;
 import net.jini.export.Exporter;
@@ -36,11 +33,8 @@ import net.jini.jeri.BasicILFactory;
 import net.jini.jeri.BasicJeriExporter;
 import net.jini.jeri.tcp.TcpServerEndpoint;
 import net.jini.lookup.JoinManager;
-import net.jini.lookup.entry.Name;
 import net.jini.security.TrustVerifier;
 import net.jini.security.proxytrust.ServerProxyTrust;
-
-import org.dwfa.jini.LookupJiniAndLocal;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -196,7 +190,7 @@ public class TimeServer implements I_KeepIncrementalTime, ServerProxyTrust, Prox
         /* Get the join manager, for joining lookup services */
         joinManager = new JoinManager(smartProxy, entries, getServiceID(),
                 discoveryManager, null /* leaseMgr */, config);
-
+        /*
          Boolean publishLocalProxy = (Boolean) this.config.getEntry(this
                 .getClass().getName(), "publishLocalProxy", Boolean.class,
                 new Boolean(false));
@@ -222,7 +216,8 @@ public class TimeServer implements I_KeepIncrementalTime, ServerProxyTrust, Prox
             LookupJiniAndLocal.addToLocalServices(serviceItem);
 
         }
-    }
+            */
+   }
 
     /** The server proxy, for use by getProxyVerifier */
     protected I_KeepIncrementalTime serverProxy;
