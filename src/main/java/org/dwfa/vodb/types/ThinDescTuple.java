@@ -6,56 +6,56 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 
 public class ThinDescTuple implements I_DescriptionTuple {
 	I_DescriptionVersioned fixedPart;
-	I_DescriptionPart variablePart;
+	I_DescriptionPart part;
 	transient Integer hash;
 	
 	
 	public ThinDescTuple(I_DescriptionVersioned fixedPart, I_DescriptionPart variablePart) {
 		super();
 		this.fixedPart = fixedPart;
-		this.variablePart = variablePart;
+		this.part = variablePart;
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getPathId()
 	 */
 	public int getPathId() {
-		return variablePart.getPathId();
+		return part.getPathId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getInitialCaseSignificant()
 	 */
 	public boolean getInitialCaseSignificant() {
-		return variablePart.getInitialCaseSignificant();
+		return part.getInitialCaseSignificant();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getLang()
 	 */
 	public String getLang() {
-		return variablePart.getLang();
+		return part.getLang();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getStatusId()
 	 */
 	public int getStatusId() {
-		return variablePart.getStatusId();
+		return part.getStatusId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getText()
 	 */
 	public String getText() {
-		return variablePart.getText();
+		return part.getText();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getTypeId()
 	 */
 	public int getTypeId() {
-		return variablePart.getTypeId();
+		return part.getTypeId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getVersion()
 	 */
 	public int getVersion() {
-		return variablePart.getVersion();
+		return part.getVersion();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getConceptId()
@@ -73,49 +73,49 @@ public class ThinDescTuple implements I_DescriptionTuple {
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setInitialCaseSignificant(boolean)
 	 */
 	public void setInitialCaseSignificant(boolean capStatus) {
-		variablePart.setInitialCaseSignificant(capStatus);
+		part.setInitialCaseSignificant(capStatus);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setLang(java.lang.String)
 	 */
 	public void setLang(String lang) {
-		variablePart.setLang(lang);
+		part.setLang(lang);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setPathId(int)
 	 */
 	public void setPathId(int pathId) {
-		variablePart.setPathId(pathId);
+		part.setPathId(pathId);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setStatusId(int)
 	 */
 	public void setStatusId(int status) {
-		variablePart.setStatusId(status);
+		part.setStatusId(status);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setText(java.lang.String)
 	 */
 	public void setText(String text) {
-		variablePart.setText(text);
+		part.setText(text);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setTypeId(int)
 	 */
 	public void setTypeId(int typeInt) {
-		variablePart.setTypeId(typeInt);
+		part.setTypeId(typeInt);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#setVersion(int)
 	 */
 	public void setVersion(int version) {
-		variablePart.setVersion(version);
+		part.setVersion(version);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#duplicatePart()
 	 */
 	public I_DescriptionPart duplicatePart() {
-		return variablePart.duplicate();
+		return part.duplicate();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#getDescVersioned()
@@ -127,14 +127,17 @@ public class ThinDescTuple implements I_DescriptionTuple {
 	public boolean equals(Object obj) {
 		ThinDescTuple another = (ThinDescTuple) obj;
 		return fixedPart.equals(another.fixedPart) &&
-			variablePart.equals(another.variablePart);
+			part.equals(another.part);
 	}
 	@Override
 	public int hashCode() {
 		if (hash == null) {
 			hash = HashFunction.hashCode(new int[] {fixedPart.hashCode(), 
-					variablePart.hashCode()});
+					part.hashCode()});
 		}
 		return hash;
 	}
+   public I_DescriptionPart getPart() {
+      return part;
+   }
 }

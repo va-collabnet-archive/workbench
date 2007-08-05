@@ -43,6 +43,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
@@ -453,7 +454,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 						List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 						rel.addTuples(config.getAllowedStatus(), null, positions, tuples, true);
 						if (relsForResolution.containsKey(rel.getRelId())) {
-							//Already there, need to make sure status is active. 
+							//Rel already there, need to make sure tuple is equivalent. 
 							if (tuples.size() == 0) {
 								// Not there, need to add
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
@@ -462,8 +463,46 @@ public class ConflictPanel extends JPanel implements ActionListener {
 								addRelPart(relsForResolution, editPath, rel);							
 							} else {
 								//already there with active status...
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   rel already there with active status...");
+                        I_RelTuple resolutionTuple = relsForResolution.get(rel.getRelId());
+                        I_RelPart possiblePart = resolutionTuple.duplicatePart();
+                        I_IntSet allowedStatus = null; 
+                        I_IntSet allowedTypes = null;
+                         boolean addUncommitted = true;
+                        ArrayList<I_RelTuple> currentParts = new ArrayList<I_RelTuple>();
+                           rel.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
+                        boolean newData = true;
+                        for (I_RelTuple currentPart: currentParts) {
+                           if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                              newData = false;
+                              break;
+                           }
+                        }
+                        if (newData) {
+                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                              AceLog.getEditLog().fine("   rel already there, but needs updated part...");
+                           }
+                           possiblePart.setVersion(Integer.MAX_VALUE);
+                           boolean containsPart = false;
+                           for (I_RelPart currentPart: rel.getVersions()) {
+                              if (possiblePart.hasNewData(currentPart)) {
+                                 containsPart = true;
+                                 break;
+                              }
+                           } 
+                           if (containsPart) {
+                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                                 AceLog.getEditLog().fine("   uncommitted updated part already exists...");
+                              }
+                           } else {
+                              rel.getVersions().add(possiblePart);
+                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                                 AceLog.getEditLog().fine("   adding uncommitted part...");
+                              }
+                           }
+                        } else {
+                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                              AceLog.getEditLog().fine("   rel already there, and needs no update...");
+                           }
                         }
 							}
 						} else {

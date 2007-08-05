@@ -6,12 +6,12 @@ import org.dwfa.ace.api.I_RelVersioned;
 
 public class ThinRelTuple implements I_RelTuple {
 	I_RelVersioned fixedPart;
-	I_RelPart variablePart;
+	I_RelPart part;
 	transient Integer hash;
 	public ThinRelTuple(I_RelVersioned fixedPart, I_RelPart variablePart) {
 		super();
 		this.fixedPart = fixedPart;
-		this.variablePart = variablePart;
+		this.part = variablePart;
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getC1Id()
@@ -35,84 +35,84 @@ public class ThinRelTuple implements I_RelTuple {
 	 * @see org.dwfa.vodb.types.I_RelTuple#getPathId()
 	 */
 	public int getPathId() {
-		return variablePart.getPathId();
+		return part.getPathId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getCharacteristicId()
 	 */
 	public int getCharacteristicId() {
-		return variablePart.getCharacteristicId();
+		return part.getCharacteristicId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getGroup()
 	 */
 	public int getGroup() {
-		return variablePart.getGroup();
+		return part.getGroup();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getRefinabilityId()
 	 */
 	public int getRefinabilityId() {
-		return variablePart.getRefinabilityId();
+		return part.getRefinabilityId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getRelTypeId()
 	 */
 	public int getRelTypeId() {
-		return variablePart.getRelTypeId();
+		return part.getRelTypeId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getStatusId()
 	 */
 	public int getStatusId() {
-		return variablePart.getStatusId();
+		return part.getStatusId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getVersion()
 	 */
 	public int getVersion() {
-		return variablePart.getVersion();
+		return part.getVersion();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#setRelTypeId(java.lang.Integer)
 	 */
 	public void setRelTypeId(Integer typeId) {
-		variablePart.setRelTypeId(typeId);
+		part.setRelTypeId(typeId);
 		
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#setStatusId(java.lang.Integer)
 	 */
 	public void setStatusId(Integer statusId) {
-		variablePart.setStatusId(statusId);
+		part.setStatusId(statusId);
 		
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#setCharacteristicId(java.lang.Integer)
 	 */
 	public void setCharacteristicId(Integer characteristicId) {
-		variablePart.setCharacteristicId(characteristicId);
+		part.setCharacteristicId(characteristicId);
 		
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#setRefinabilityId(java.lang.Integer)
 	 */
 	public void setRefinabilityId(Integer refinabilityId) {
-		variablePart.setRefinabilityId(refinabilityId);
+		part.setRefinabilityId(refinabilityId);
 		
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#setGroup(java.lang.Integer)
 	 */
 	public void setGroup(Integer group) {
-		variablePart.setGroup(group);
+		part.setGroup(group);
 		
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#duplicatePart()
 	 */
 	public I_RelPart duplicatePart() {
-		return variablePart.duplicate();
+		return part.duplicate();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelTuple#getRelVersioned()
@@ -124,13 +124,13 @@ public class ThinRelTuple implements I_RelTuple {
 	public boolean equals(Object obj) {
 		ThinRelTuple another = (ThinRelTuple) obj;
 		return fixedPart.equals(another.fixedPart) &&
-			variablePart.equals(another.variablePart);
+			part.equals(another.part);
 	}
 	@Override
 	public int hashCode() {
 		if (hash == null) {
 			hash = HashFunction.hashCode(new int[] {fixedPart.hashCode(), 
-					variablePart.hashCode()});
+					part.hashCode()});
 		}
 		return hash;
 	}
@@ -140,5 +140,8 @@ public class ThinRelTuple implements I_RelTuple {
 	public I_RelVersioned getFixedPart() {
 		return fixedPart;
 	}
+   public I_RelPart getPart() {
+      return part;
+   }
 
 }

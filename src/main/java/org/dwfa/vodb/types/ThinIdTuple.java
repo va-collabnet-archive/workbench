@@ -101,5 +101,8 @@ public class ThinIdTuple implements I_IdTuple {
 		newPart.setSourceId(getSourceId());
 		return newPart;
 	}
+   public I_IdPart getPart() {
+      return part;
+   }
 
 }

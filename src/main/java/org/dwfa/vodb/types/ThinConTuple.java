@@ -127,4 +127,8 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
       return "ThinConTuple id: " + getConId() + " status: " + getConceptStatus() + " defined: " + isDefined()
             + " path: " + getPathId() + " version: " + getVersion();
    }
+
+   public I_ConceptAttributePart getPart() {
+      return part;
+   }
 }
