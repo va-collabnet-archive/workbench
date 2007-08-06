@@ -38,7 +38,9 @@ import org.dwfa.ace.LabelForDescriptionTuple;
 import org.dwfa.ace.LabelForRelationshipTuple;
 import org.dwfa.ace.LabelForTuple;
 import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -54,6 +56,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Position;
+import org.dwfa.vodb.types.ThinConPart;
 
 public class ConflictPanel extends JPanel implements ActionListener {
 
@@ -373,8 +376,6 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
 	private void implementResolution() {
 		if (config.getEditingPathSet().size() > 0) {
-			// do something useful;
-
 			try {
 				HashMap<Integer, I_DescriptionTuple> descsForResolution = new HashMap<Integer, I_DescriptionTuple>();
             HashMap<Integer, I_RelTuple> relsForResolution = new HashMap<Integer, I_RelTuple>();
@@ -407,8 +408,86 @@ public class ConflictPanel extends JPanel implements ActionListener {
                }
 					Set<I_Position> positions = new HashSet<I_Position>();
 					positions.add(new Position(Integer.MAX_VALUE, editPath));
-					
-					for (I_DescriptionVersioned desc : cb.getDescriptions()) {
+					List<I_ConceptAttributeVersioned> attributeList = new ArrayList<I_ConceptAttributeVersioned>();
+               attributeList.add(cb.getConceptAttributes());
+               
+               
+               for (I_ConceptAttributeVersioned attributes : attributeList) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("  processing attributes: " + cb.getConceptAttributes().getConId() + " " + cb.getConceptAttributes());
+                  }
+                  List<I_ConceptAttributeTuple> tuples = new ArrayList<I_ConceptAttributeTuple>();
+                  attributes.addTuples(config.getAllowedStatus(), positions, tuples);
+                  if (attributesForResolution.containsKey(cb.getConceptAttributes().getConId())) {
+                     //Already there, need to make sure tuple is equivalent. 
+                     if (tuples.size() == 0) {
+                        // Not there, need to add
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("   attr not there, need to add...");
+                        }
+                        addAttrPart(attributesForResolution, editPath, attributes);                     
+                     } else {
+                        //already there with active status...
+                        I_ConceptAttributeTuple attrTuple = attributesForResolution.get(attributes.getConId());
+                        I_ConceptAttributePart possiblePart = attrTuple.duplicatePart();
+                        I_IntSet allowedStatus = null; 
+                        ArrayList<I_ConceptAttributeTuple> currentParts = new ArrayList<I_ConceptAttributeTuple>();
+                        attributes.addTuples(allowedStatus, positions, currentParts);
+                        boolean newData = true;
+                        for (I_ConceptAttributeTuple currentPart: currentParts) {
+                           if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                              newData = false;
+                              break;
+                           }
+                        }
+                        if (newData) {
+                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                              AceLog.getEditLog().fine("   attr already there, but needs updated part...");
+                           }
+                           possiblePart.setVersion(Integer.MAX_VALUE);
+                           boolean containsPart = false;
+                           for (I_ConceptAttributePart currentPart: attributes.getVersions()) {
+                              if (possiblePart.hasNewData(currentPart)) {
+                                 containsPart = true;
+                                 break;
+                              }
+                           } 
+                           if (containsPart) {
+                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                                 AceLog.getEditLog().fine("   uncommitted updated part already exists...");
+                              }
+                           } else {
+                              attributes.getVersions().add(possiblePart);
+                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                                 AceLog.getEditLog().fine("   adding uncommitted part...");
+                              }
+                           }
+                        } else {
+                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                              AceLog.getEditLog().fine("   attr already there, and needs no update...");
+                           }
+                        }
+                     }
+                  } else {
+                     // Not there, need to make sure status is inactive. 
+                     if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                        AceLog.getEditLog().fine("   desc not there, need to make sure status is inactive...");
+                     }
+                     if (tuples.size() == 0) {
+                        // not there, no action needed. 
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("   desc not there, no action needed...");
+                        }
+                     } else {
+                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                           AceLog.getEditLog().fine("   retireDescPart...");
+                        }
+                        retireAttrPart(editPath, attributes);                    
+                     }
+                  }                 
+               }
+
+               for (I_DescriptionVersioned desc : cb.getDescriptions()) {
                   if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                      AceLog.getEditLog().fine("  processing desc: " + desc.getDescId() + " " + desc);
                   }
@@ -572,12 +651,28 @@ public class ConflictPanel extends JPanel implements ActionListener {
 		}
 	}
 
+   private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, I_Path editPath, I_ConceptAttributeVersioned attr) {
+      I_ConceptAttributePart newPart = attrsForResolution.get(attr.getConId()).duplicatePart();
+      newPart.setVersion(Integer.MAX_VALUE);
+      newPart.setPathId(editPath.getConceptId());
+      attr.addVersion(newPart);
+   }
+
 	private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, I_Path editPath, I_DescriptionVersioned desc) {
 		I_DescriptionPart newPart = descsForResolution.get(desc.getDescId()).duplicatePart();
 		newPart.setVersion(Integer.MAX_VALUE);
 		newPart.setPathId(editPath.getConceptId());
 		desc.addVersion(newPart);
 	}
+
+   private void retireAttrPart(I_Path editPath, I_ConceptAttributeVersioned attr) throws IOException, TerminologyException {
+      I_ConceptAttributePart newPart = new ThinConPart();
+      newPart.setVersion(Integer.MAX_VALUE);
+      newPart.setDefined(false);
+      newPart.setConceptStatus(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+      newPart.setPathId(editPath.getConceptId());
+      attr.addVersion(newPart);
+   }
 
 	private void retireDescPart(I_Path editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
 		I_DescriptionPart newPart = desc.getLastTuple().duplicatePart();
