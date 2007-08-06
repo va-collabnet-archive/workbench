@@ -166,20 +166,23 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 							&& (!allowedStatus
 									.contains(part.getConceptStatus()))) {
 						if (possible != null) {
-							I_Position rejectedStatusPosition = new Position(part
-									.getVersion(), position.getPath()
-									.getMatchingPath(part.getPathId()));
-							I_Path possiblePath = position.getPath()
-									.getMatchingPath(possible.getPathId());
-							I_Position possibleStatusPosition = new Position(
-									possible.getVersion(), possiblePath);
-							if (position
-									.isSubsequentOrEqualTo(rejectedStatusPosition)) {
-								if (rejectedStatusPosition
-										.isSubsequentOrEqualTo(possibleStatusPosition)) {
-									possible = null;
-								}
-							}
+                     I_Path matchingPartPath = position.getPath()
+                     .getMatchingPath(possible.getPathId());
+                     if (matchingPartPath != null) {
+                        I_Position rejectedStatusPosition = new Position(part
+                              .getVersion(), matchingPartPath);
+                        I_Path possiblePath = position.getPath()
+                              .getMatchingPath(possible.getPathId());
+                        I_Position possibleStatusPosition = new Position(
+                              possible.getVersion(), possiblePath);
+                        if (position
+                              .isSubsequentOrEqualTo(rejectedStatusPosition)) {
+                           if (rejectedStatusPosition
+                                 .isSubsequentOrEqualTo(possibleStatusPosition)) {
+                              possible = null;
+                           }
+                        }
+                     }
 						}
 						rejectedParts.add((ThinConPart) part);
 						continue;
