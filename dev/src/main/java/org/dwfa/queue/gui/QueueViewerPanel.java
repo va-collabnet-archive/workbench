@@ -313,8 +313,11 @@ public class QueueViewerPanel extends JPanel {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent arg0) {
-            QueueAdaptor qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(),
-                                                                                      0);
+           QueueAdaptor qAdaptor = null;
+           if (tableOfQueues.getSelectedRow() >= 0) {
+              qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(),
+                    0);
+           }
             //System.out.println(" Transaction committed. Performing queue refresh. ");
 
             if (qAdaptor == null) {
@@ -336,8 +339,11 @@ public class QueueViewerPanel extends JPanel {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent arg0) {
-            QueueAdaptor qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(),
-                                                                                       0);
+           QueueAdaptor qAdaptor = null;
+           if (tableOfQueues.getSelectedRow() >= 0) {
+              qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(),
+                    0);
+           }
 
             if (qAdaptor == null) {
                 // nothing to do...
