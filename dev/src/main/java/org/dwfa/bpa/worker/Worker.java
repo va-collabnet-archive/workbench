@@ -263,9 +263,11 @@ public abstract class Worker implements I_Work {
 				condition = executeProcess(process);
 			}
 			executing = false;
+         this.setActiveTransaction(null);
 			return condition;
 		} catch (TaskFailedException ex) {
 			executing = false;
+         this.setActiveTransaction(null);
 			throw ex;
 		}
 	}
@@ -306,6 +308,7 @@ public abstract class Worker implements I_Work {
 			}
 			return condition;
 		} catch (Exception e) {
+         this.setActiveTransaction(null);
 			throw new TaskFailedException(e);
 		}
 	}

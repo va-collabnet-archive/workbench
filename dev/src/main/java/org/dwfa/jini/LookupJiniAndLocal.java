@@ -10,11 +10,12 @@ import java.lang.reflect.Modifier;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -122,13 +123,21 @@ public class LookupJiniAndLocal implements I_LookupServices {
 
    }
 
+   public class ServiceItemComparator implements Comparator<ServiceItem> {
+
+      public int compare(ServiceItem s1, ServiceItem s2) {
+         return s1.serviceID.toString().compareTo(s2.serviceID.toString());
+      }
+      
+   }
    /**
     * @see com.informatics.jini.I_LookupServices#lookup(net.jini.core.lookup.ServiceTemplate,
     *      int, int, net.jini.lookup.ServiceItemFilter, long)
     */
    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
          long waitDur) throws InterruptedException, RemoteException {
-      Collection<ServiceItem> matches = this.lookupLocal(tmpl, filter);
+      TreeSet<ServiceItem> matches = new TreeSet<ServiceItem>(new ServiceItemComparator());
+      matches.addAll(this.lookupLocal(tmpl, filter));
       if (this.sdm != null) {
          if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
             matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter), maxMatches
@@ -146,8 +155,9 @@ public class LookupJiniAndLocal implements I_LookupServices {
     *      int, net.jini.lookup.ServiceItemFilter)
     */
    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches, ServiceItemFilter filter) {
-      Collection<ServiceItem> matches = this.lookupLocal(tmpl, filter);
-      if (this.sdm != null) {
+      TreeSet<ServiceItem> matches = new TreeSet<ServiceItem>(new ServiceItemComparator());
+      matches.addAll(this.lookupLocal(tmpl, filter));
+       if (this.sdm != null) {
          if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
             matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter), maxMatches
                   - matches.size())));
@@ -164,15 +174,16 @@ public class LookupJiniAndLocal implements I_LookupServices {
     *      net.jini.lookup.ServiceItemFilter)
     */
    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter) {
-      List<ServiceItem> matches = this.lookupLocal(tmpl, filter);
-      if (matches.size() > 0) {
-         return matches.get(0);
+      TreeSet<ServiceItem> matches = new TreeSet<ServiceItem>(new ServiceItemComparator());
+      matches.addAll(this.lookupLocal(tmpl, filter));
+       if (matches.size() > 0) {
+         return matches.first();
       }
       if (this.sdm != null) {
          if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
             matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter))));
             if (matches.size() > 0) {
-               return matches.get(0);
+               return matches.first();
             }
          } else {
             return this.sdm.lookup(tmpl, filter);
@@ -187,16 +198,17 @@ public class LookupJiniAndLocal implements I_LookupServices {
     */
    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, long waitDur) throws InterruptedException,
          RemoteException {
-      List<ServiceItem> matches = this.lookupLocal(tmpl, filter);
-      if (matches.size() > 0) {
-         return matches.get(0);
+      TreeSet<ServiceItem> matches = new TreeSet<ServiceItem>(new ServiceItemComparator());
+      matches.addAll(this.lookupLocal(tmpl, filter));
+       if (matches.size() > 0) {
+         return matches.first();
       }
       if (this.sdm != null) {
          if (I_QueueProcesses.class.isAssignableFrom(tmpl.serviceTypes[0])) {
             logger.info("Looking up in queue cache");
             matches.addAll(Arrays.asList(this.queueCache.lookup(new TemplateFilter(tmpl, filter))));
             if (matches.size() > 0) {
-               return matches.get(0);
+               return matches.first();
             }
          }
          logger.info("Looking up in sdm");
