@@ -101,6 +101,15 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
 			implementResolution();
+         if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+            AceLog.getEditLog().info(" conflict resolution commit skipped since shift key down. ");
+         } else {
+            try {
+               ACE.commit();
+            } catch (IOException e1) {
+               AceLog.getEditLog().alertAndLogException(e1);
+            }
+         }
 		}
 
 	}
@@ -401,255 +410,285 @@ public class ConflictPanel extends JPanel implements ActionListener {
                AceLog.getEditLog().fine("descsForResolution: " + descsForResolution);
                AceLog.getEditLog().fine("relsForResolution: " + relsForResolution);
                AceLog.getEditLog().fine("attributesForResolution: " + attributesForResolution);
+               AceLog.getEditLog().fine("edit path set: " + config.getEditingPathSet());
+               AceLog.getEditLog().fine("view position set: " + config.getViewPositionSet());
             }
 				for (I_Path editPath: config.getEditingPathSet()) {
-               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                  AceLog.getEditLog().fine("processing editPath: " + editPath);
-               }
-					Set<I_Position> positions = new HashSet<I_Position>();
-					positions.add(new Position(Integer.MAX_VALUE, editPath));
-					List<I_ConceptAttributeVersioned> attributeList = new ArrayList<I_ConceptAttributeVersioned>();
-               attributeList.add(cb.getConceptAttributes());
-               
-               
-               for (I_ConceptAttributeVersioned attributes : attributeList) {
-                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                     AceLog.getEditLog().fine("  processing attributes: " + cb.getConceptAttributes().getConId() + " " + cb.getConceptAttributes());
-                  }
-                  List<I_ConceptAttributeTuple> tuples = new ArrayList<I_ConceptAttributeTuple>();
-                  attributes.addTuples(config.getAllowedStatus(), positions, tuples);
-                  if (attributesForResolution.containsKey(cb.getConceptAttributes().getConId())) {
-                     //Already there, need to make sure tuple is equivalent. 
-                     if (tuples.size() == 0) {
-                        // Not there, need to add
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   attr not there, need to add...");
-                        }
-                        addAttrPart(attributesForResolution, editPath, attributes);                     
-                     } else {
-                        //already there with active status...
-                        I_ConceptAttributeTuple attrTuple = attributesForResolution.get(attributes.getConId());
-                        I_ConceptAttributePart possiblePart = attrTuple.duplicatePart();
-                        I_IntSet allowedStatus = null; 
-                        ArrayList<I_ConceptAttributeTuple> currentParts = new ArrayList<I_ConceptAttributeTuple>();
-                        attributes.addTuples(allowedStatus, positions, currentParts);
-                        boolean newData = true;
-                        for (I_ConceptAttributeTuple currentPart: currentParts) {
-                           if (possiblePart.hasNewData(currentPart.getPart()) == false) {
-                              newData = false;
-                              break;
-                           }
-                        }
-                        if (newData) {
-                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                              AceLog.getEditLog().fine("   attr already there, but needs updated part...");
-                           }
-                           possiblePart.setVersion(Integer.MAX_VALUE);
-                           boolean containsPart = false;
-                           for (I_ConceptAttributePart currentPart: attributes.getVersions()) {
-                              if (possiblePart.hasNewData(currentPart)) {
-                                 containsPart = true;
-                                 break;
-                              }
-                           } 
-                           if (containsPart) {
-                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                                 AceLog.getEditLog().fine("   uncommitted updated part already exists...");
-                              }
-                           } else {
-                              attributes.getVersions().add(possiblePart);
-                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                                 AceLog.getEditLog().fine("   adding uncommitted part...");
-                              }
-                           }
-                        } else {
-                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                              AceLog.getEditLog().fine("   attr already there, and needs no update...");
-                           }
-                        }
-                     }
-                  } else {
-                     // Not there, need to make sure status is inactive. 
-                     if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("   desc not there, need to make sure status is inactive...");
-                     }
-                     if (tuples.size() == 0) {
-                        // not there, no action needed. 
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   desc not there, no action needed...");
-                        }
-                     } else {
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   retireDescPart...");
-                        }
-                        retireAttrPart(editPath, attributes);                    
-                     }
-                  }                 
-               }
-
-               for (I_DescriptionVersioned desc : cb.getDescriptions()) {
-                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                     AceLog.getEditLog().fine("  processing desc: " + desc.getDescId() + " " + desc);
-                  }
-						List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-						desc.addTuples(config.getAllowedStatus(), null, positions, tuples, false);
-						if (descsForResolution.containsKey(desc.getDescId())) {
-							//Already there, need to make sure tuple is equivalent. 
-							if (tuples.size() == 0) {
-								// Not there, need to add
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   desc not there, need to add...");
-                        }
-								addDescPart(descsForResolution, editPath, desc);							
-							} else {
-								//already there with active status...
-                        I_DescriptionTuple descTuple = descsForResolution.get(desc.getDescId());
-                        I_DescriptionPart possiblePart = descTuple.duplicatePart();
-                        I_IntSet allowedStatus = null; 
-                        I_IntSet allowedTypes = null;
-                         boolean addUncommitted = true;
-                        ArrayList<I_DescriptionTuple> currentParts = new ArrayList<I_DescriptionTuple>();
-                        desc.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
-                        boolean newData = true;
-                        for (I_DescriptionTuple currentPart: currentParts) {
-                           if (possiblePart.hasNewData(currentPart.getPart()) == false) {
-                              newData = false;
-                              break;
-                           }
-                        }
-                        if (newData) {
-                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                              AceLog.getEditLog().fine("   desc already there, but needs updated part...");
-                           }
-                           possiblePart.setVersion(Integer.MAX_VALUE);
-                           boolean containsPart = false;
-                           for (I_DescriptionPart currentPart: desc.getVersions()) {
-                              if (possiblePart.hasNewData(currentPart)) {
-                                 containsPart = true;
-                                 break;
-                              }
-                           } 
-                           if (containsPart) {
-                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                                 AceLog.getEditLog().fine("   uncommitted updated part already exists...");
-                              }
-                           } else {
-                              desc.getVersions().add(possiblePart);
-                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                                 AceLog.getEditLog().fine("   adding uncommitted part...");
-                              }
-                           }
-                        } else {
-                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                              AceLog.getEditLog().fine("   desc already there, and needs no update...");
-                           }
-                        }
-							}
-						} else {
-							// Not there, need to make sure status is inactive. 
-                     if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("   desc not there, need to make sure status is inactive...");
-                     }
-							if (tuples.size() == 0) {
-								// not there, no action needed. 
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   desc not there, no action needed...");
-                        }
-							} else {
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   retireDescPart...");
-                        }
-								retireDescPart(editPath, desc);							
-							}
-						}						
-					}
-					
-					for (I_RelVersioned rel: cb.getSourceRels()) {
-                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                     AceLog.getEditLog().fine("  processing rel: " + rel.getRelId() + " " + rel);
-                  }
-						List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-						rel.addTuples(config.getAllowedStatus(), null, positions, tuples, true);
-						if (relsForResolution.containsKey(rel.getRelId())) {
-							//Rel already there, need to make sure tuple is equivalent. 
-							if (tuples.size() == 0) {
-								// Not there, need to add
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   rel not there, need to add...");
-                        }
-								addRelPart(relsForResolution, editPath, rel);							
-							} else {
-								//already there with active status...
-                        I_RelTuple resolutionTuple = relsForResolution.get(rel.getRelId());
-                        I_RelPart possiblePart = resolutionTuple.duplicatePart();
-                        I_IntSet allowedStatus = null; 
-                        I_IntSet allowedTypes = null;
-                         boolean addUncommitted = true;
-                        ArrayList<I_RelTuple> currentParts = new ArrayList<I_RelTuple>();
-                        rel.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
-                        boolean newData = true;
-                        for (I_RelTuple currentPart: currentParts) {
-                           if (possiblePart.hasNewData(currentPart.getPart()) == false) {
-                              newData = false;
-                              break;
-                           }
-                        }
-                        if (newData) {
-                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                              AceLog.getEditLog().fine("   rel already there, but needs updated part...");
-                           }
-                           possiblePart.setVersion(Integer.MAX_VALUE);
-                           boolean containsPart = false;
-                           for (I_RelPart currentPart: rel.getVersions()) {
-                              if (possiblePart.hasNewData(currentPart)) {
-                                 containsPart = true;
-                                 break;
-                              }
-                           } 
-                           if (containsPart) {
-                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                                 AceLog.getEditLog().fine("   uncommitted updated part already exists...");
-                              }
-                           } else {
-                              rel.getVersions().add(possiblePart);
-                              if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                                 AceLog.getEditLog().fine("   adding uncommitted part...");
-                              }
-                           }
-                        } else {
-                           if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                              AceLog.getEditLog().fine("   rel already there, and needs no update...");
-                           }
-                        }
-							}
-						} else {
-							// Not there, need to make sure status is inactive. 
-                     if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("   rel not there, need to make sure status is inactive...");
-                     }
-							if (tuples.size() == 0) {
-								// not there, no action needed. 
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   rel not there, no action needed...");
-                        }
-							} else {
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                           AceLog.getEditLog().fine("   retireRelPart...");
-                        }
-								retireRelPart(editPath, rel);							
-							}
-						}
-					}
+               processPathForImplementation(descsForResolution, relsForResolution, attributesForResolution, editPath);
 				}
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 			ACE.addUncommitted(cb);
+         
 		} else {
 			JOptionPane.showMessageDialog(this,
 					"You must select at least one path to edit on...");
 		}
 	}
+
+   private void processPathForImplementation(HashMap<Integer, I_DescriptionTuple> descsForResolution, HashMap<Integer, I_RelTuple> relsForResolution, HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution, I_Path editPath) throws IOException, TerminologyException {
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine("processing editPath: " + editPath);
+      }
+      Set<I_Position> positions = new HashSet<I_Position>();
+      positions.add(new Position(Integer.MAX_VALUE, editPath));
+      List<I_ConceptAttributeVersioned> attributeList = new ArrayList<I_ConceptAttributeVersioned>();
+      attributeList.add(cb.getConceptAttributes());
+      
+      
+      for (I_ConceptAttributeVersioned attributes : attributeList) {
+         processAttributesForImplementation(attributesForResolution, editPath, positions, attributes);                 
+      }
+
+      for (I_DescriptionVersioned desc : cb.getDescriptions()) {
+         processDescriptionsForImplementation(descsForResolution, editPath, positions, desc);						
+      }
+      
+      for (I_RelVersioned rel: cb.getSourceRels()) {
+         processRelsForResolution(relsForResolution, editPath, positions, rel);
+      }
+   }
+
+   private void processRelsForResolution(HashMap<Integer, I_RelTuple> relsForResolution, I_Path editPath, Set<I_Position> positions, I_RelVersioned rel) throws IOException, TerminologyException {
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine("  processing rel: " + rel.getRelId() + " " + rel);
+      }
+      List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
+      rel.addTuples(config.getAllowedStatus(), null, positions, tuples, false);
+      if (relsForResolution.containsKey(rel.getRelId())) {
+      	//Rel already there, need to make sure tuple is equivalent. 
+      	if (tuples.size() == 0) {
+      		// Not there, need to add
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   rel not there, need to add...");
+            }
+      		addRelPart(relsForResolution, editPath, rel);							
+      	} else {
+      		//already there with active status...
+            I_RelTuple resolutionTuple = relsForResolution.get(rel.getRelId());
+            I_RelPart possiblePart = resolutionTuple.duplicatePart();
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   possiblePart: " + possiblePart);
+            }
+            I_IntSet allowedStatus = null; 
+            I_IntSet allowedTypes = null;
+             boolean addUncommitted = true;
+            ArrayList<I_RelTuple> currentParts = new ArrayList<I_RelTuple>();
+            rel.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
+            boolean newData = true;
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   current parts: " + currentParts);
+            }
+            for (I_RelTuple currentPart: currentParts) {
+               if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                  newData = false;
+                  break;
+               }
+            }
+            if (newData) {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("   rel already there, but needs updated part...");
+               }
+               possiblePart.setVersion(Integer.MAX_VALUE);
+               boolean containsPart = false;
+               for (I_RelTuple currentPart: currentParts) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   comparing parts: \n" + 
+                           "      " + currentPart.getPart() + 
+                           "\n      " + possiblePart );
+                  }
+                  if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                     containsPart = true;
+                     break;
+                  }
+               } 
+               if (containsPart) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   uncommitted updated part already exists...");
+                  }
+               } else {
+                  rel.getVersions().add(possiblePart);
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   adding uncommitted part...");
+                  }
+               }
+            } else {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("   rel part already there, and needs no update...");
+               }
+            }
+      	}
+      } else {
+      	// Not there, need to make sure status is inactive. 
+         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            AceLog.getEditLog().fine("   rel not there, need to make sure status is inactive...");
+         }
+      	if (tuples.size() == 0) {
+      		// not there, no action needed. 
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   rel not there, no action needed...");
+            }
+      	} else {
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   retireRelPart...");
+            }
+      		retireRelPart(editPath, rel);							
+      	}
+      }
+   }
+
+   private void processDescriptionsForImplementation(HashMap<Integer, I_DescriptionTuple> descsForResolution, I_Path editPath, Set<I_Position> positions, I_DescriptionVersioned desc) throws IOException, TerminologyException {
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine("  processing desc: " + desc.getDescId() + " " + desc);
+      }
+      List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+      desc.addTuples(config.getAllowedStatus(), null, positions, tuples, false);
+      if (descsForResolution.containsKey(desc.getDescId())) {
+      	//Already there, need to make sure tuple is equivalent. 
+      	if (tuples.size() == 0) {
+      		// Not there, need to add
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   desc not there, need to add...");
+            }
+      		addDescPart(descsForResolution, editPath, desc);							
+      	} else {
+      		//already there with active status...
+            I_DescriptionTuple descTuple = descsForResolution.get(desc.getDescId());
+            I_DescriptionPart possiblePart = descTuple.duplicatePart();
+            I_IntSet allowedStatus = null; 
+            I_IntSet allowedTypes = null;
+             boolean addUncommitted = true;
+            ArrayList<I_DescriptionTuple> currentParts = new ArrayList<I_DescriptionTuple>();
+            desc.addTuples(allowedStatus, allowedTypes, positions, currentParts, addUncommitted);
+            boolean newData = true;
+            for (I_DescriptionTuple currentPart: currentParts) {
+               if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                  newData = false;
+                  break;
+               }
+            }
+            if (newData) {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("   desc already there, but needs updated part...");
+               }
+               possiblePart.setVersion(Integer.MAX_VALUE);
+               boolean containsPart = false;
+               for (I_DescriptionPart currentPart: desc.getVersions()) {
+                  if (possiblePart.hasNewData(currentPart)) {
+                     containsPart = true;
+                     break;
+                  }
+               } 
+               if (containsPart) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   uncommitted updated part already exists...");
+                  }
+               } else {
+                  desc.getVersions().add(possiblePart);
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   adding uncommitted part...");
+                  }
+               }
+            } else {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("   desc already there, and needs no update...");
+               }
+            }
+      	}
+      } else {
+      	// Not there, need to make sure status is inactive. 
+         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            AceLog.getEditLog().fine("   desc not there, need to make sure status is inactive...");
+         }
+      	if (tuples.size() == 0) {
+      		// not there, no action needed. 
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   desc not there, no action needed...");
+            }
+      	} else {
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   retireDescPart...");
+            }
+      		retireDescPart(editPath, desc);							
+      	}
+      }
+   }
+
+   private void processAttributesForImplementation(HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution, I_Path editPath, Set<I_Position> positions, I_ConceptAttributeVersioned attributes) throws IOException, TerminologyException {
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine("  processing attributes: " + cb.getConceptAttributes().getConId() + " " + cb.getConceptAttributes());
+      }
+      List<I_ConceptAttributeTuple> tuples = new ArrayList<I_ConceptAttributeTuple>();
+      attributes.addTuples(config.getAllowedStatus(), positions, tuples);
+      if (attributesForResolution.containsKey(cb.getConceptAttributes().getConId())) {
+         //Already there, need to make sure tuple is equivalent. 
+         if (tuples.size() == 0) {
+            // Not there, need to add
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   attr not there, need to add...");
+            }
+            addAttrPart(attributesForResolution, editPath, attributes);                     
+         } else {
+            //already there with active status...
+            I_ConceptAttributeTuple attrTuple = attributesForResolution.get(attributes.getConId());
+            I_ConceptAttributePart possiblePart = attrTuple.duplicatePart();
+            I_IntSet allowedStatus = null; 
+            ArrayList<I_ConceptAttributeTuple> currentParts = new ArrayList<I_ConceptAttributeTuple>();
+            attributes.addTuples(allowedStatus, positions, currentParts);
+            boolean newData = true;
+            for (I_ConceptAttributeTuple currentPart: currentParts) {
+               if (possiblePart.hasNewData(currentPart.getPart()) == false) {
+                  newData = false;
+                  break;
+               }
+            }
+            if (newData) {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("   attr already there, but needs updated part...");
+               }
+               possiblePart.setVersion(Integer.MAX_VALUE);
+               boolean containsPart = false;
+               for (I_ConceptAttributePart currentPart: attributes.getVersions()) {
+                  if (possiblePart.hasNewData(currentPart)) {
+                     containsPart = true;
+                     break;
+                  }
+               } 
+               if (containsPart) {
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   uncommitted updated part already exists...");
+                  }
+               } else {
+                  attributes.getVersions().add(possiblePart);
+                  if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                     AceLog.getEditLog().fine("   adding uncommitted part...");
+                  }
+               }
+            } else {
+               if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                  AceLog.getEditLog().fine("   attr already there, and needs no update...");
+               }
+            }
+         }
+      } else {
+         // Not there, need to make sure status is inactive. 
+         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            AceLog.getEditLog().fine("   desc not there, need to make sure status is inactive...");
+         }
+         if (tuples.size() == 0) {
+            // not there, no action needed. 
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   desc not there, no action needed...");
+            }
+         } else {
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+               AceLog.getEditLog().fine("   retireDescPart...");
+            }
+            retireAttrPart(editPath, attributes);                    
+         }
+      }
+   }
 
    private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, I_Path editPath, I_ConceptAttributeVersioned attr) {
       I_ConceptAttributePart newPart = attrsForResolution.get(attr.getConId()).duplicatePart();

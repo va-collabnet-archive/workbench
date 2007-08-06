@@ -1284,6 +1284,8 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private IndexWriter licitIndexWriter;
 
+   private boolean debugWrites = false;
+
 	private static class CheckAndProcessRegexMatch implements Runnable {
 		Pattern p;
 
@@ -1807,6 +1809,14 @@ public class VodbEnv implements I_ImplementTermFactory {
 	public void writeRel(I_RelVersioned rel) throws DatabaseException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
+      if (debugWrites ) {
+         HashSet<I_RelPart> partSet = new HashSet<I_RelPart>(rel.getVersions());
+         if (partSet.size() != rel.getVersions().size()) {
+            throw new DatabaseException("Redundant parts: " + rel.getVersions());
+         } else {
+            logger.info("rel parts same size: " + rel.getVersions().size());
+         }
+      }
 		intBinder.objectToEntry(rel.getRelId(), key);
 		relBinding.objectToEntry(rel, value);
 		relDb.put(null, key, value);

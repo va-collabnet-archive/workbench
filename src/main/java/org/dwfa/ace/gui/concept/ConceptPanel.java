@@ -108,6 +108,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 
 	}
+   
+   private class UncommittedChangeListener implements PropertyChangeListener {
+
+      public void propertyChange(PropertyChangeEvent arg0) {
+         setTermComponent(getTermComponent());
+      }
+      
+   }
 
 	private class ToggleHistoryChangeActionListener implements ActionListener {
 
@@ -323,6 +331,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			ClassNotFoundException {
 		super(new GridBagLayout());
 		this.ace = ace;
+      ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
 		historyChangeActionListener = new ToggleHistoryChangeActionListener();
 		this.ace.getAceFrameConfig().addPropertyChangeListener(this);

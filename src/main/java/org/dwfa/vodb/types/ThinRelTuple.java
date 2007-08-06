@@ -143,5 +143,18 @@ public class ThinRelTuple implements I_RelTuple {
    public I_RelPart getPart() {
       return part;
    }
+   @Override
+   public String toString() {
+      StringBuffer buff = new StringBuffer();
+            buff.append("ThinRelTuple: relId: ");
+      buff.append(getRelId());
+      buff.append(" c1id: ");
+      buff.append(getC1Id());
+      buff.append(" c2id: ");
+      buff.append(getC2Id());
+      buff.append(" ");
+     buff.append(part.toString());
+      return buff.toString();
+   }
 
 }

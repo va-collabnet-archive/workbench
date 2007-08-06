@@ -302,8 +302,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 									}
 								}
 							} else {
-								if (position.getDepth(part.getPathId()) < position
-										.getDepth(possible.getPathId())) {
+                        int depth1 = position.getDepth(part.getPathId());
+                        int depth2 = position.getDepth(possible.getPathId());
+								if (depth1 < depth2) {
 									if (!addedParts.contains(part)) {
 										possible = new ThinRelTuple(this, part);
 										addedParts.add(part);

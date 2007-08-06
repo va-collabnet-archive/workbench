@@ -127,16 +127,31 @@ public class RelPopupListener extends MouseAdapter {
 								+ field);
 					}
 
-					model.referencedConcepts.put(newPart.getStatusId(),
-							ConceptBean.get(newPart.getStatusId()));
-					sourceBean.getSourceRel(
-							selectedObject.getTuple().getRelId()).addVersion(
-							newPart);
-					destBean.getDestRel(selectedObject.getTuple().getRelId())
-							.addVersion(newPart);
+               model.referencedConcepts.put(newPart.getStatusId(),
+                     ConceptBean.get(newPart.getStatusId()));
+               model.referencedConcepts.put(newPart.getCharacteristicId(),
+                     ConceptBean.get(newPart.getCharacteristicId()));
+               model.referencedConcepts.put(newPart.getRefinabilityId(),
+                     ConceptBean.get(newPart.getRefinabilityId()));
+               model.referencedConcepts.put(newPart.getRelTypeId(),
+                     ConceptBean.get(newPart.getRelTypeId()));
 
-					selectedObject.getTuple().getRelVersioned().getVersions()
-							.add(newPart);
+               I_RelVersioned srcRel = sourceBean.getSourceRel(
+                     selectedObject.getTuple().getRelId());
+               I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
+
+               srcRel.addVersion(newPart);
+               if (srcRel != destRel) {
+                  destRel.addVersion(newPart);
+               } else {
+                  AceLog.getEditLog().info("Suppressed duplicate addition of new rel part");
+               }
+               if (srcRel != selectedObject.getTuple().getRelVersioned()) {
+                  selectedObject.getTuple().getRelVersioned().getVersions()
+                  .add(newPart);
+               } else {
+                  AceLog.getEditLog().info("Suppressed duplicate addition of new rel part 2");
+               }
 				}
 				ACE.addUncommitted(sourceBean);
 				ACE.addUncommitted(destBean);
