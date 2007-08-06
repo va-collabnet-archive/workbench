@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
+import javax.swing.SwingUtilities;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
@@ -222,7 +223,7 @@ public class TransactionParticipantAggregator implements
                 }
                 commitDate = new Date();
                 if (logger.isLoggable(Level.INFO)) {
-                    logger.info("getting commitDate for: " + id + " is: " + commitDate);
+                    logger.info("commitDate for: " + id + " is: " + commitDate);
                 }
 			}
             if (logger.isLoggable(Level.INFO)) {
@@ -236,7 +237,17 @@ public class TransactionParticipantAggregator implements
         if (logger.isLoggable(Level.INFO)) {
             logger.info("Finished commit for " + id);
         }
-		for (Iterator<ActionListener> itr = this.listeners.iterator(); itr.hasNext();) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+         public void run() {
+            notifyOfCommit();
+         }
+           
+        });
+	}
+
+   private void notifyOfCommit() {
+      for (Iterator<ActionListener> itr = this.listeners.iterator(); itr.hasNext();) {
 			ActionEvent event = new ActionEvent(this, 0,
 					"Transaction committed");
 			ActionListener listener = itr.next();
@@ -245,7 +256,7 @@ public class TransactionParticipantAggregator implements
             }
 			listener.actionPerformed(event);
 		}
-	}
+   }
 
 	/**
 	 * @see net.jini.core.transaction.server.TransactionParticipant#abort(net.jini.core.transaction.server.TransactionManager,

@@ -263,11 +263,11 @@ public abstract class Worker implements I_Work {
 				condition = executeProcess(process);
 			}
 			executing = false;
-         this.setActiveTransaction(null);
 			return condition;
 		} catch (TaskFailedException ex) {
 			executing = false;
          this.setActiveTransaction(null);
+         this.nextTransaction = null;
 			throw ex;
 		}
 	}
@@ -291,12 +291,13 @@ public abstract class Worker implements I_Work {
 		}
 		try {
 			if (condition.equals(Condition.WAIT_FOR_WEB_FORM) == false) {
+            if (logger.isLoggable(Level.INFO)) {
+               logger.info(this.getWorkerDesc() + "; process: "
+                     + process.getName() + " (" + process.getProcessID()
+                     + ") " + " Committing transaction: " + this.activeTransaction
+                     + " condition: " + condition);
+            }
 				this.commitTransactionIfActive();
-				if (logger.isLoggable(Level.INFO)) {
-					logger.info(this.getWorkerDesc() + "; process: "
-							+ process.getName() + " (" + process.getProcessID()
-							+ ") " + " Committing transaction: " + condition);
-				}
 			} else {
 				this.webTransaction = this.activeTransaction;
 				this.setActiveTransaction(null);
@@ -307,8 +308,15 @@ public abstract class Worker implements I_Work {
 				}
 			}
 			return condition;
+      } catch (CannotCommitException e) {
+         logger.severe("Cannot commit: " + this.activeTransaction);
+      
+         this.setActiveTransaction(null);
+         this.nextTransaction = null;
+         throw new TaskFailedException(e);
 		} catch (Exception e) {
          this.setActiveTransaction(null);
+         this.nextTransaction = null;
 			throw new TaskFailedException(e);
 		}
 	}
@@ -414,6 +422,7 @@ public abstract class Worker implements I_Work {
 
 	public void discardActiveTransaction() {
 		this.setActiveTransaction(null);
+      this.nextTransaction = null;
 	}
 
 	public void setActiveTransaction(Transaction t) {
