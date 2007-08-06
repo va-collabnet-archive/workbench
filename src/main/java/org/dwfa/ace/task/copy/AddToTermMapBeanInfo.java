@@ -18,20 +18,20 @@ public class AddToTermMapBeanInfo extends SimpleBeanInfo {
           valueTermEntry.setBound(true);
           valueTermEntry.setPropertyEditorClass(QueueTypeEditor.class);
           valueTermEntry.setDisplayName("concept value:");
-          valueTermEntry.setShortDescription("The value for the map.");
+          valueTermEntry.setShortDescription("<html><font color='green'>The value for the map.");
 
          PropertyDescriptor keyTermEntry =
             new PropertyDescriptor("keyTermEntry", getBeanDescriptor().getBeanClass());
         keyTermEntry.setBound(true);
         keyTermEntry.setPropertyEditorClass(QueueTypeEditor.class);
         keyTermEntry.setDisplayName("concept key:");
-        keyTermEntry.setShortDescription("The key for the map.");
+        keyTermEntry.setShortDescription("<html><font color='green'>The key for the map.");
 
            PropertyDescriptor mapPropName =
                new PropertyDescriptor("mapPropName", getBeanDescriptor().getBeanClass());
            mapPropName.setBound(true);
            mapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-           mapPropName.setDisplayName("<html><font color='green'>concept property:");
+           mapPropName.setDisplayName("<html><font color='green'>map property:");
            mapPropName.setShortDescription("Name of the property to copy the concept to to. ");
 
            PropertyDescriptor rv[] =
