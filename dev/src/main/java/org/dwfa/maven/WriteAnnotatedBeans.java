@@ -70,9 +70,9 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
    private String localRepository;
 
    /**
-    * @parameter "
+    * @parameter 
     */
-   private boolean throwWriteBeansExceptions = true;
+   private boolean throwWriteBeansExceptions = false;
 
 	/**
 	 * @parameter
