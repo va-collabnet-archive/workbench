@@ -14,8 +14,10 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -23,6 +25,8 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -35,19 +39,30 @@ public class PutCompletedConceptsWithConflictsInListView extends AbstractTask {
     */
    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
+   private static final int dataVersion = 2;
 
    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+   private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DUAL_REVIEWED.getUids());
+   private TermEntry retiredTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids());
 
    private void writeObject(ObjectOutputStream out) throws IOException {
        out.writeInt(dataVersion);
        out.writeObject(profilePropName);
+       out.writeObject(statusTermEntry);
+       out.writeObject(retiredTermEntry);
    }
 
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
        int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
+       if (objDataVersion <= dataVersion) {
            profilePropName = (String) in.readObject();
+           if (objDataVersion >= 2) {
+              statusTermEntry = (TermEntry) in.readObject();
+              retiredTermEntry = (TermEntry) in.readObject();
+           } else {
+              statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DUAL_REVIEWED.getUids());
+              retiredTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids());
+           }
        } else {
            throw new IOException("Can't handle dataversion: " + objDataVersion);
        }
@@ -69,8 +84,12 @@ public class PutCompletedConceptsWithConflictsInListView extends AbstractTask {
                model.clear();
             }});
           
+          I_IntSet completionStatusNids = LocalVersionedTerminology.get().newIntSet();
+          completionStatusNids.add(AceTaskUtil.getConceptFromObject(statusTermEntry).getConceptId());
+          completionStatusNids.add(AceTaskUtil.getConceptFromObject(retiredTermEntry).getConceptId());
+          
           CompletedConceptConflictDetector conflictIdentifier = new CompletedConceptConflictDetector(LocalVersionedTerminology.get().newIntSet(), 
-                LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection);
+                LocalVersionedTerminology.get().newIntSet(), profileForConflictDetection, completionStatusNids);
           LocalVersionedTerminology.get().iterateConcepts(conflictIdentifier);
           final List<I_GetConceptData> conflicts = new ArrayList<I_GetConceptData>();
           
@@ -118,5 +137,21 @@ public class PutCompletedConceptsWithConflictsInListView extends AbstractTask {
 
    public void setProfilePropName(String profilePropName) {
        this.profilePropName = profilePropName;
+   }
+
+   public TermEntry getRetiredTermEntry() {
+      return retiredTermEntry;
+   }
+
+   public void setRetiredTermEntry(TermEntry retiredTermEntry) {
+      this.retiredTermEntry = retiredTermEntry;
+   }
+
+   public TermEntry getStatusTermEntry() {
+      return statusTermEntry;
+   }
+
+   public void setStatusTermEntry(TermEntry statusTermEntry) {
+      this.statusTermEntry = statusTermEntry;
    }
 }

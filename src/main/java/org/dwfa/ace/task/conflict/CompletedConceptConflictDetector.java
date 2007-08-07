@@ -42,12 +42,16 @@ public class CompletedConceptConflictDetector implements I_ProcessConcepts {
 
    HashMap<Integer, Integer> statusCount = new HashMap<Integer, Integer>();
 
+   private I_IntSet completionStatusNids;
+
    public CompletedConceptConflictDetector(I_IntSet conflictsNids, I_IntSet noConflictNids,
-                                           I_ConfigAceFrame profileForConflictDetection) {
+                                           I_ConfigAceFrame profileForConflictDetection, 
+                                           I_IntSet completionStatusNids) {
       super();
       this.conflictsNids = conflictsNids;
       this.noConflictNids = noConflictNids;
       this.profileForConflictDetection = profileForConflictDetection;
+      this.completionStatusNids = completionStatusNids;
    }
 
    public int getConceptsProcessed() {
@@ -64,7 +68,7 @@ public class CompletedConceptConflictDetector implements I_ProcessConcepts {
       if (profileForConflictDetection == null) {
          attrTupels = concept.getConceptAttributeTuples(null, null);
       } else {
-         attrTupels = concept.getConceptAttributeTuples(profileForConflictDetection.getAllowedStatus(),
+         attrTupels = concept.getConceptAttributeTuples(completionStatusNids,
                profileForConflictDetection.getViewPositionSet());
       }
       int tupleListSize = attrTupels.size();
