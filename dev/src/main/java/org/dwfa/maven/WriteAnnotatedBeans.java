@@ -63,11 +63,16 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 	 */
 	private List<Dependency> dependencies;
 
-	/**
-	 * @parameter expression="${settings.localRepository}"
-	 * @required
-	 */
-	private String localRepository;
+   /**
+    * @parameter expression="${settings.localRepository}"
+    * @required
+    */
+   private String localRepository;
+
+   /**
+    * @parameter "
+    */
+   private boolean throwWriteBeansExceptions = true;
 
 	/**
 	 * @parameter
@@ -196,8 +201,12 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		try {
 			String suffix = ".task";
 			writeBean(c, spec, rootDir, suffix);
-		} catch (Exception e) {
-			throw new MojoExecutionException("Problem writing bean: " + spec, e);
+		} catch (Throwable e) {
+         if (throwWriteBeansExceptions) {
+            throw new MojoExecutionException("Problem writing bean: " + spec, e);
+         } else {
+            e.printStackTrace();
+         }
 		}
 	}
 
