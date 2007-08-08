@@ -71,18 +71,7 @@ public class SetConceptViewToConcept extends AbstractTask {
 			I_HostConceptPlugins viewer = config.getConceptViewer(hostIndex);
 			viewer.unlink();
 			Object obj = process.readProperty(propName);
-			I_AmTermComponent termComponent = null;
-			if (I_AmTermComponent.class.isAssignableFrom(obj.getClass())) {
-				termComponent = (I_AmTermComponent) obj;
-			} else if (Collection.class.isAssignableFrom(obj.getClass())) {
-				Collection<UUID> uuids = (Collection<UUID>) obj;
-				termComponent = LocalVersionedTerminology.get().getConcept(uuids);
-			} else if (UUID.class.isAssignableFrom(obj.getClass())) {
-				UUID uuid = (UUID) obj;
-				termComponent = LocalVersionedTerminology.get().getConcept(new UUID[] { uuid });
-			} else {
-				throw new TaskFailedException("Don't know how to handle type: " + obj.getClass());
-			}
+			I_AmTermComponent termComponent = AceTaskUtil.getConceptFromObject(obj);
 			viewer.setTermComponent(termComponent);
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
