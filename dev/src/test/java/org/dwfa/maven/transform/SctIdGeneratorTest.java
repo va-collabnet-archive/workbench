@@ -3,7 +3,6 @@ package org.dwfa.maven.transform;
 import junit.framework.TestCase;
 
 public class SctIdGeneratorTest extends TestCase {
-   SctIdGenerator generator = new SctIdGenerator();
 
    
    //Concept table
@@ -19,13 +18,13 @@ public class SctIdGeneratorTest extends TestCase {
    
    public void testGenerate() {
       try {
-         String generatedId = generator.generate(0, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT);
+         SctIdGenerator.generate(0, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT);
          fail("Generator should have thrown an error");
       } catch (Exception e) {
             // expected exception at 0 index;
       }
       try {
-         assertEquals("1011000036106", generator.generate(1, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
+         assertEquals("1011000036106", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
          
       
       } catch (Exception e) {
@@ -36,21 +35,21 @@ public class SctIdGeneratorTest extends TestCase {
 
    public void testVerhoeffCheck() {
       // From http://en.wikipedia.org/wiki/Verhoeff_algorithm#Example
-      assertEquals(true, generator.verhoeffCheck("1428570"));
-      assertEquals(false, generator.verhoeffCheck("1428571"));
-      assertEquals(false, generator.verhoeffCheck("1428572"));
-      assertEquals(false, generator.verhoeffCheck("1428573"));
-      assertEquals(false, generator.verhoeffCheck("1428574"));
-      assertEquals(false, generator.verhoeffCheck("1428575"));
-      assertEquals(false, generator.verhoeffCheck("1428576"));
-      assertEquals(false, generator.verhoeffCheck("1428577"));
-      assertEquals(false, generator.verhoeffCheck("1428578"));
-      assertEquals(false, generator.verhoeffCheck("1428579"));
+      assertEquals(true, SctIdGenerator.verhoeffCheck("1428570"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428571"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428572"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428573"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428574"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428575"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428576"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428577"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428578"));
+      assertEquals(false, SctIdGenerator.verhoeffCheck("1428579"));
    }
 
    public void testVerhoeffCompute() {
       // From http://en.wikipedia.org/wiki/Verhoeff_algorithm#Example
-      assertEquals(0, generator.verhoeffCompute("142857"));
+      assertEquals(0, SctIdGenerator.verhoeffCompute("142857"));
    }
 
 }
