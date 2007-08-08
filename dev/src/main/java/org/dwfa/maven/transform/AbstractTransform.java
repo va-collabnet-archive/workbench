@@ -1,5 +1,7 @@
 package org.dwfa.maven.transform;
 
+import java.io.IOException;
+
 import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.Transform;
 
@@ -7,7 +9,10 @@ public abstract class AbstractTransform implements I_ReadAndTransform {
 
 	private String name;
 
-	private String lastTransform;
+	public void cleanup(Transform transformer) throws Exception {
+      
+   }
+   private String lastTransform;
 
 	private int columnId = -1;
 
@@ -40,13 +45,13 @@ public abstract class AbstractTransform implements I_ReadAndTransform {
 		this.columnId = columnId;
 	}
 
-	public final void setup(Transform transformer) {
+	public final void setup(Transform transformer) throws IOException {
 		if (columnId == -1) {
 			columnId = transformer.getNextColumnId();
 		}
 		setupImpl(transformer);
 	}
-	public abstract void setupImpl(Transform transformer);
+	public abstract void setupImpl(Transform transformer) throws IOException;
 
 
 }

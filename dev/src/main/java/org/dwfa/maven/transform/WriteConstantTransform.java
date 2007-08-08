@@ -1,7 +1,6 @@
 package org.dwfa.maven.transform;
 
 import org.dwfa.maven.Transform;
-import org.dwfa.maven.transform.*;
 
 /**
  * Transforms ingredient field into a Snomed FSD.

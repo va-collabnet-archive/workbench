@@ -9,8 +9,8 @@ import org.dwfa.maven.Transform;
 public class UuidToNative extends AbstractTransform implements
 		I_ReadAndTransform {
 
-	private Map uuidToNativeMap;
-	private Map nativeToUuidMap;
+	private Map<UUID, Integer> uuidToNativeMap;
+	private Map<Integer, UUID> nativeToUuidMap;
 
 	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();

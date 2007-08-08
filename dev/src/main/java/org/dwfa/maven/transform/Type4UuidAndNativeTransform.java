@@ -14,10 +14,10 @@ public class Type4UuidAndNativeTransform extends AbstractTransform implements I_
 	 */
 	private String source;
 
-	private Map uuidToNativeMap;
-	private Map nativeToUuidMap;
-	private Map sourceToUuidMap;
-	private Map uuidToSourceMap;
+   private Map<UUID, Integer> uuidToNativeMap;
+   private Map<Integer, UUID> nativeToUuidMap;
+   private Map<String, UUID> sourceToUuidMap;
+   private Map<UUID, String> uuidToSourceMap;
 	
 	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();
@@ -37,8 +37,8 @@ public class Type4UuidAndNativeTransform extends AbstractTransform implements I_
 			}
 			uuidToNativeMap.put(sourceUuid, nativeId);
 			nativeToUuidMap.put(nativeId, sourceUuid);
-			sourceToUuidMap.put(input, nativeId);
-			uuidToSourceMap.put(nativeId, input);
+			sourceToUuidMap.put(input.toString(), sourceUuid);
+			uuidToSourceMap.put(sourceUuid, input.toString());
 		}
 		return setLastTransform(uuidToNativeMap.get(sourceUuid).toString());
 	}

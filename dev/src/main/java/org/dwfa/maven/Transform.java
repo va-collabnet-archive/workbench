@@ -79,16 +79,31 @@ public class Transform extends AbstractMojo {
     * @readonly
     */
     private List sourceRoots;
+    
+    /**
+     * @parameter default-value="${project.build.directory}"
+     * @required
+     * @readonly
+     */
+     private File buildDirectory;
+    
+   /**
+    * Location of the source directory.
+    * 
+    * @parameter expression="${project.build.sourceDirectory}"
+    * @required
+    */
+   private File sourceDirectory;
 
     private boolean includeHeader = false;
 
 
-    private Map uuidToNativeMap;
+    private Map<UUID, Integer> uuidToNativeMap;
 
-    private Map nativeToUuidMap;
+    private Map<Integer, UUID> nativeToUuidMap;
 
-    private Map sourceToUuidMapMap = new HashMap();
-    private Map uuidToSourceMapMap = new HashMap();
+    private Map<String, Map<String, UUID>> sourceToUuidMapMap = new HashMap<String, Map<String, UUID>>();
+    private Map<String, Map<UUID, String>> uuidToSourceMapMap = new HashMap<String, Map<UUID, String>>();
 
 
     private int nextColumnId = 0;
@@ -155,14 +170,14 @@ public class Transform extends AbstractMojo {
                     }
                     for (InputFileSpec spec : outSpec.getInputSpecs()) {
                         nextColumnId = 0;
-                        Map columnTransformerMap = new HashMap();
+                        Map<Integer, Set<I_ReadAndTransform>> columnTransformerMap = new HashMap<Integer, Set<I_ReadAndTransform>>();
                         getLog().info("Now processing file spec:\n\n" + spec);
 
                         for (I_ReadAndTransform t : spec.getColumnSpecs()) {
                             t.setup(this);
-                            Set transformerSet = (Set) columnTransformerMap.get((Integer) t.getColumnId());
+                            Set<I_ReadAndTransform> transformerSet = (Set<I_ReadAndTransform>) columnTransformerMap.get((Integer) t.getColumnId());
                             if (transformerSet == null) {
-                                transformerSet = new HashSet();
+                                transformerSet = new HashSet<I_ReadAndTransform>();
                                 columnTransformerMap.put((Integer) t.getColumnId(), transformerSet);
                             }
                             transformerSet.add(t);
@@ -205,7 +220,8 @@ public class Transform extends AbstractMojo {
                                         /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
                                             getLog().info("Transform for column: " + currentColumn + " is: " + t);
                                         }*/
-                                        String result = t.transform(st.sval);
+                                        @SuppressWarnings("unused")
+                                       String result = t.transform(st.sval);
                                         /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
                                             getLog().info("Transform: " + t + " result: " + result);
                                         }*/
@@ -243,6 +259,11 @@ public class Transform extends AbstractMojo {
                     }
                     for (I_TransformAndWrite tw: outSpec.getWriters()) {
                         tw.close();
+                    }
+                    for (InputFileSpec ifs: outSpec.getInputSpecs()) {
+                       for (I_ReadAndTransform t : ifs.getColumnSpecs()) {
+                          t.cleanup(this);
+                      }
                     }
                 }
 
@@ -330,7 +351,7 @@ public class Transform extends AbstractMojo {
         return f;
     }
 
-    public Map getUuidToNativeMap() {
+    public Map<UUID, Integer> getUuidToNativeMap() {
         if (uuidToNativeMap == null) {
             setupUuidMaps();
         }
@@ -338,8 +359,8 @@ public class Transform extends AbstractMojo {
     }
 
     private void setupUuidMaps() {
-        uuidToNativeMap = new HashMap();
-        nativeToUuidMap = new HashMap();
+        uuidToNativeMap = new HashMap<UUID, Integer>();
+        nativeToUuidMap = new HashMap<Integer, UUID>();
         for (PrimordialId pid: PrimordialId.values()) {
             for (UUID uid: pid.getUids()) {
                 uuidToNativeMap.put(uid, pid.getNativeId(Integer.MIN_VALUE));
@@ -348,24 +369,24 @@ public class Transform extends AbstractMojo {
         }
     }
 
-    public Map getNativeToUuidMap() {
+    public Map<Integer, UUID> getNativeToUuidMap() {
         if (nativeToUuidMap == null) {
             setupUuidMaps();
         }
         return nativeToUuidMap;
     }
 
-    public Map getSourceToUuidMap(String source) {
+    public Map<String, UUID> getSourceToUuidMap(String source) {
         if (sourceToUuidMapMap.get(source) == null) {
-            sourceToUuidMapMap.put(source, new HashMap());
+            sourceToUuidMapMap.put(source, new HashMap<String, UUID>());
         }
-        return (Map) sourceToUuidMapMap.get(source);
+        return sourceToUuidMapMap.get(source);
     }
-    public Map getUuidToSourceMap(String source) {
+    public Map<UUID, String> getUuidToSourceMap(String source) {
         if (uuidToSourceMapMap.get(source) == null) {
-            uuidToSourceMapMap.put(source, new HashMap());
+            uuidToSourceMapMap.put(source, new HashMap<UUID, String>());
         }
-        return (Map) uuidToSourceMapMap.get(source);
+        return uuidToSourceMapMap.get(source);
     }
 
     private void skipLine(StreamTokenizer st) throws IOException {
@@ -410,5 +431,13 @@ public class Transform extends AbstractMojo {
         this.outputColumnDelimiter = outputColumnDelimiter;
         this.sourceRoots = sourceRoots;
     }
+
+   public File getBuildDirectory() {
+      return buildDirectory;
+   }
+
+   public File getSourceDirectory() {
+      return sourceDirectory;
+   }
 
 }

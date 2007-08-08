@@ -253,7 +253,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		if (beanClass.isEnum()) {
 			Method m = beanClass.getMethod("valueOf",
 					new Class[] { String.class });
-			obj = m.invoke(null, s.constructArgs());
+			obj = m.invoke(null, (Object[]) s.constructArgs());
 		} else {
 			if (s.constructArgs().length == 0) {
 				Constructor beanConstructor = beanClass
@@ -262,7 +262,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 			} else {
 				Constructor beanConstructor = beanClass
 						.getConstructor(new Class[] { String.class });
-				obj = beanConstructor.newInstance(s.constructArgs());
+				obj = beanConstructor.newInstance((Object[]) s.constructArgs());
 			}
 		}
 
@@ -285,7 +285,8 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		oos.close();
 	}
 
-	private void writeProcessBean(BeanSpec spec) throws MojoExecutionException {
+	@SuppressWarnings("unused")
+   private void writeProcessBean(BeanSpec spec) throws MojoExecutionException {
 		try {
 			File rootDir = new File(this.outputDirectory, "processes");
 			rootDir.mkdirs();

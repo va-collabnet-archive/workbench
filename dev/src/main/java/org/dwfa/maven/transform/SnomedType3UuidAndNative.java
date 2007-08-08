@@ -9,10 +9,10 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 public class SnomedType3UuidAndNative extends AbstractTransform implements I_ReadAndTransform {
 
-	private Map uuidToNativeMap;
-	private Map nativeToUuidMap;
-	private Map sourceToUuidMap;
-	private Map uuidToSourceMap;
+	private Map<UUID, Integer> uuidToNativeMap;
+	private Map<Integer, UUID> nativeToUuidMap;
+	private Map<String, UUID> sourceToUuidMap;
+	private Map<UUID, String> uuidToSourceMap;
 	
 	public void setupImpl(Transform transformer) {
 		uuidToNativeMap = transformer.getUuidToNativeMap();

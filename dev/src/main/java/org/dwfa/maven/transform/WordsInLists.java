@@ -19,18 +19,18 @@ public class WordsInLists extends ProcessWords {
 
 	private String[] wordListFiles;
 	
-	private Map processed;
+	private Map<String, Boolean> processed;
 	
 	private List sourceRoots;
 	
 	
 	
-	protected Set listWords = new HashSet();
+	protected Set<String> listWords = new HashSet<String>();
 	
 	
 	public void init(Writer w, Transform transform) throws Exception {
 		this.sourceRoots = transform.getSourceRoots();
-		processed = new HashMap(wordListFiles.length);
+		processed = new HashMap<String, Boolean>(wordListFiles.length);
 		for (String s: wordListFiles) {
 			processed.put(s, false);
 		}

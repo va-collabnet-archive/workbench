@@ -1,7 +1,7 @@
 package org.dwfa.maven.transform;
 
-import org.dwfa.maven.transform.*;
-import org.dwfa.maven.*;
+import org.dwfa.maven.I_ReadAndTransform;
+import org.dwfa.maven.Transform;
 
 public class IdentityTransform extends AbstractTransform implements I_ReadAndTransform {
 

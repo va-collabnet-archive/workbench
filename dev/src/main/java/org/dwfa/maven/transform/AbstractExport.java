@@ -1,10 +1,8 @@
 package org.dwfa.maven.transform;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -23,8 +21,7 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 	protected Writer w;
 	private I_ReadAndTransform statusTransform;
 	private String statusTransformName;
-	private Map uuidToNativeMap;
-	private Set activeSet = new HashSet();
+	private Set<Integer> activeSet = new HashSet<Integer>();
 
 	/**
 	 * @parameter

@@ -16,8 +16,8 @@ public abstract class ProcessWords extends AbstractExport {
 	
 	protected I_ReadAndTransform[] transformers;
 	
-	private Set words = new TreeSet();
-	private HashMap counts = new HashMap();
+	private Set<String> words = new TreeSet<String>();
+	private HashMap<String, Integer> counts = new HashMap<String, Integer>();
 
 
 	public void writeColumns(Writer w) throws IOException {

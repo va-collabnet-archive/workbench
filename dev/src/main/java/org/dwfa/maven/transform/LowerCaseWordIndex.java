@@ -52,9 +52,9 @@ public class LowerCaseWordIndex extends AbstractExport {
 	}
 
 
-	public void writeRec() throws IOException {
+   public void writeRec() throws IOException {
 		
-		HashSet words = new HashSet();
+		HashSet<String> words = new HashSet<String>();
 		for (int i = 0; i < transformers.length; i++) {
 			String stringField = transformers[i].getLastTransform();
 			StringTokenizer st=new StringTokenizer(stringField, StringToWord.WORD_DELIMITERS);
