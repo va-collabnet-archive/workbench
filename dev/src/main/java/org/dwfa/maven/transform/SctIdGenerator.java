@@ -70,10 +70,10 @@ public class SctIdGenerator {
       }
    }
 
-   public static String generate(long sequence, PROJECT project, NAMESPACE namespace, TYPE type) throws Exception {
+   public static String generate(long sequence, PROJECT project, NAMESPACE namespace, TYPE type)  {
       
       if (sequence <= 0) {
-         throw new Exception("sequence must be > 0");
+         throw new RuntimeException("sequence must be > 0");
       }
       
       String mergedid =  Long.toString(sequence) + project.digits + namespace.digits + type.digits;
