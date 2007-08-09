@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
@@ -21,7 +23,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public class UuidSnomedMap implements Map<UUID, Long> {
 
-   private long maxSequence = 1;
+   private long maxSequence = 0;
 
    private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
    
@@ -86,12 +88,13 @@ public class UuidSnomedMap implements Map<UUID, Long> {
       return uuidSnomedMap.get(key);
    }
 
+   private static long MAX_SCT_ID = 999999999999999999L;
    public Long getWithGeneration(UUID key, TYPE type) {
       Long returnValue = get(key);
       if (returnValue == null) {
-         returnValue = Long.parseLong(SctIdGenerator.generate(maxSequence++, project, namespace, type));
-         if (returnValue > Integer.MAX_VALUE) {
-            throw new RuntimeException("SCT ID exceeds Integer.MAX_VALUE: " + returnValue);
+         returnValue = Long.parseLong(SctIdGenerator.generate(++maxSequence, project, namespace, type));
+         if (returnValue > MAX_SCT_ID) {
+            throw new RuntimeException("SCT ID exceeds max allowed (" + MAX_SCT_ID + "): " + returnValue);
          }
          put(key, returnValue);
       }
@@ -146,7 +149,8 @@ public class UuidSnomedMap implements Map<UUID, Long> {
       BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
       Map<Long, List<UUID>> snomedUuidMap = this.getSnomedUuidListMap();
-      for (Long sctId : snomedUuidMap.keySet()) {
+      SortedSet<Long> sortedKeys = new TreeSet<Long>(snomedUuidMap.keySet());
+      for (Long sctId : sortedKeys) {
          List<UUID> idList = snomedUuidMap.get(sctId);
          for (int i = 0; i < idList.size(); i++) {
             UUID id = idList.get(i);
@@ -160,6 +164,7 @@ public class UuidSnomedMap implements Map<UUID, Long> {
          bw.append("\n");
       }
       bw.close();
+      System.out.println(" maxSequence on write: " + maxSequence);
    }
 
    public static UuidSnomedMap read(File f) throws IOException {
@@ -170,6 +175,7 @@ public class UuidSnomedMap implements Map<UUID, Long> {
    public static UuidSnomedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
       UuidSnomedMap map = new UuidSnomedMap(project, namespace);
       readData(f, map);
+      System.out.println(" maxSequence on read: " + map.maxSequence);
       return map;
    }
 
