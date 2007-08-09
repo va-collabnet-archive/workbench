@@ -67,8 +67,10 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
    }
    
    public void cleanup(Transform transformer) throws Exception {
+      System.out.println("Writing map to file: " + writableMapFile);
       if (writableMapFile != null) {
          map.write(writableMapFile);
+         map = null;
       }
    }
 

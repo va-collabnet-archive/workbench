@@ -21,7 +21,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public class UuidSnomedMap implements Map<UUID, Long> {
 
-   private long maxSctId = 1;
+   private long maxSequence = 1;
 
    private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
    
@@ -89,8 +89,11 @@ public class UuidSnomedMap implements Map<UUID, Long> {
    public Long getWithGeneration(UUID key, TYPE type) {
       Long returnValue = get(key);
       if (returnValue == null) {
-         returnValue = Long.parseLong(SctIdGenerator.generate(maxSctId++, project, namespace, type));
-         uuidSnomedMap.put(key, returnValue);
+         returnValue = Long.parseLong(SctIdGenerator.generate(maxSequence++, project, namespace, type));
+         if (returnValue > Integer.MAX_VALUE) {
+            throw new RuntimeException("SCT ID exceeds Integer.MAX_VALUE: " + returnValue);
+         }
+         put(key, returnValue);
       }
       return returnValue;
    }
@@ -106,15 +109,19 @@ public class UuidSnomedMap implements Map<UUID, Long> {
    public Set<UUID> keySet() {
       return uuidSnomedMap.keySet();
    }
-
+   private static long getSequence(Long sctId) {
+      String sctIdStr = sctId.toString();
+      String sequence = sctIdStr.substring(0, sctIdStr.length() - "011000036106".length());
+      return Long.parseLong(sequence);
+   }
    public Long put(UUID key, Long sctId) {
-      maxSctId = Math.max(maxSctId, sctId);
+      maxSequence = Math.max(maxSequence, getSequence(sctId));
       return uuidSnomedMap.put(key, sctId);
    }
 
    public void putAll(Map<? extends UUID, ? extends Long> map) {
       for (Entry<? extends UUID, ? extends Long> entry : map.entrySet()) {
-         maxSctId = Math.max(maxSctId, entry.getValue());
+         maxSequence = Math.max(maxSequence, entry.getValue());
          put(entry.getKey(), entry.getValue());
       }
    }
@@ -131,8 +138,8 @@ public class UuidSnomedMap implements Map<UUID, Long> {
       return uuidSnomedMap.values();
    }
 
-   public long getMaxSctId() {
-      return maxSctId;
+   public long getMaxSequence() {
+      return maxSequence;
    }
    
    public void write(File f) throws IOException {
