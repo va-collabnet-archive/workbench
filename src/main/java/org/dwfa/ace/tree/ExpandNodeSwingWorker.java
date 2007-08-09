@@ -228,7 +228,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	DefaultMutableTreeNode node;
 
-	Comparator<I_GetConceptData> conceptBeanComparator;
+	Comparator<I_GetConceptDataForTree> conceptBeanComparator;
 
 	Boolean continueWork = true;
 
@@ -380,23 +380,23 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	private static class NodeComparator implements
 			Comparator<DefaultMutableTreeNode> {
-		Comparator<I_GetConceptData> comparator;
+		Comparator<I_GetConceptDataForTree> comparator;
 
-		public NodeComparator(Comparator<I_GetConceptData> comparator) {
+		public NodeComparator(Comparator<I_GetConceptDataForTree> comparator) {
 			super();
 			this.comparator = comparator;
 		}
 
 		public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
-			return comparator.compare((I_GetConceptData) o1.getUserObject(),
-					(I_GetConceptData) o2.getUserObject());
+			return comparator.compare((I_GetConceptDataForTree) o1.getUserObject(),
+					(I_GetConceptDataForTree) o2.getUserObject());
 		}
 
 	}
 
 	public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree,
 			DefaultMutableTreeNode node,
-			Comparator<I_GetConceptData> conceptBeanComparator, ACE acePanel) {
+			Comparator<I_GetConceptDataForTree> conceptBeanComparator, ACE acePanel) {
 		super();
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("ExpandNodeSwingWorker " + workerId + " starting.");

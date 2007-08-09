@@ -93,6 +93,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdVersioned;
@@ -1581,7 +1582,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     protected void treeValueChanged(TreeSelectionEvent evt) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
-        String s = evt.isAddedPath() ? "Selected " + node : "";
+        String nodeStr = getNodeString(node);
+        String s = evt.isAddedPath() ? "Selected " + nodeStr : "";
         aceFrameConfig.setStatusMessage(s);
         if (node != null) {
             ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
@@ -1590,6 +1592,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             aceFrameConfig.setHierarchySelection(null);
         }
     }
+
+   private String getNodeString(DefaultMutableTreeNode node) {
+      String nodeStr = node.toString();
+        if ((node.getUserObject() != null) && 
+              (I_GetConceptData.class.isAssignableFrom(node.getUserObject().getClass()))) {
+           I_GetConceptData concept = (I_GetConceptData) node.getUserObject();
+           try {
+           I_DescriptionTuple desc = concept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+           if (desc != null) {
+              nodeStr = desc.getText();
+           } else {
+              AceLog.getAppLog().info(" descTuple is null: " + concept.toString());
+              nodeStr = concept.getInitialText();
+           }
+           } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+         }
+           
+        }
+      return nodeStr;
+   }
 
     protected void treeTreeCollapsed(TreeExpansionEvent evt) {
         I_GetConceptDataForTree userObject = handleCollapse(evt);
@@ -1602,6 +1625,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         TreeIdPath idPath = new TreeIdPath(evt.getPath());
         stopWorkersOnPath(idPath, "stopping for collapse");
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        String nodeStr = getNodeString(node);
         node.removeAllChildren();
         I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
 
@@ -1617,7 +1641,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         model.nodeStructureChanged(node);
         model.setAsksAllowsChildren(true);
 
-        aceFrameConfig.setStatusMessage("Collapsed " + node);
+        aceFrameConfig.setStatusMessage("Collapsed " + nodeStr);
         return userObject;
     }
 
@@ -1670,15 +1694,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     protected void treeTreeExpanded(TreeExpansionEvent evt) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        String nodeStr = getNodeString(node);
         TreeIdPath idPath = new TreeIdPath(evt.getPath());
         synchronized (expansionWorkers) {
             stopWorkersOnPath(idPath, "stopping before expansion");
             I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
             if (userObject != null) {
                 aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
-                aceFrameConfig.setStatusMessage("Expanding " + node + "...");
+                aceFrameConfig.setStatusMessage("Expanding " + nodeStr + "...");
                 ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
-                                                                         node, new CompareConceptBeanInitialText(),
+                                                                         node, new CompareConceptBeansForTree(aceFrameConfig),
                                                                          this);
                 treeExpandThread.execute(worker);
                 expansionWorkers.put(idPath, worker);

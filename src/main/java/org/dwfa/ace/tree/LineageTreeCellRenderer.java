@@ -19,6 +19,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -80,9 +81,9 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
 		this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		try {
 			if (node.getUserObject() != null) {
-				if (ConceptBean.class.isAssignableFrom(node
+				if (I_GetConceptData.class.isAssignableFrom(node
 						.getUserObject().getClass())) {
-					ConceptBean cb = (ConceptBean) node
+               I_GetConceptData cb = (I_GetConceptData) node
 							.getUserObject();
 					I_DescriptionTuple tdt = cb.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
 					if (tdt != null) {
@@ -101,8 +102,6 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
 							this.setIcon(multiParentOpen);
 						}
 					}
-					this.setText(node.getUserObject().toString());
-
 				} else {
 					this.setText(node.getUserObject().toString());
 				}

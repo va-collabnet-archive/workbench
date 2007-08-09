@@ -40,6 +40,7 @@ public class AceListRenderer extends DefaultListCellRenderer {
                if (desc != null) {
                   renderComponent.setText(desc.getText());
                } else {
+                  AceLog.getAppLog().info(" descTuple is null: " + concept.toString());
                   renderComponent.setText(concept.getInitialText());
                }
             } catch (IOException e) {
