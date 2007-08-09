@@ -1032,7 +1032,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private Component getConceptListEditor() throws DatabaseException, IOException, ClassNotFoundException {
         if (conceptListEditor == null) {
-            batchConceptList = new TerminologyList();
+            batchConceptList = new TerminologyList(aceFrameConfig);
             conceptListEditor = new CollectionEditorContainer(batchConceptList, this, descListProcessBuilderPanel);
         }
         return conceptListEditor;
@@ -1247,7 +1247,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             descTypeTableModel.addElement(ConceptBean.get(id));
         }
         descTypeTableModel.addListDataListener(aceFrameConfig.getDescTypes());
-        TerminologyList descList = new TerminologyList(descTypeTableModel);
+        TerminologyList descList = new TerminologyList(descTypeTableModel, aceFrameConfig);
         descList.setBorder(BorderFactory.createTitledBorder("Description types: "));
 
         JPanel descPrefPanel = new JPanel(new GridLayout(0, 1));
@@ -1258,7 +1258,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
         }
         shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getShortLabelDescPreferenceList());
-        TerminologyList shortLabelOrderList = new TerminologyList(shortLabelPrefOrderTableModel);
+        TerminologyList shortLabelOrderList = new TerminologyList(shortLabelPrefOrderTableModel, aceFrameConfig);
 
         shortLabelOrderList.setBorder(BorderFactory.createTitledBorder("Short Label preference order: "));
         descPrefPanel.add(new JScrollPane(shortLabelOrderList));
@@ -1268,7 +1268,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
         }
         longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getLongLabelDescPreferenceList());
-        TerminologyList longLabelOrderList = new TerminologyList(longLabelPrefOrderTableModel);
+        TerminologyList longLabelOrderList = new TerminologyList(longLabelPrefOrderTableModel, aceFrameConfig);
 
         longLabelOrderList.setBorder(BorderFactory.createTitledBorder("Long label preference order: "));
         descPrefPanel.add(new JScrollPane(longLabelOrderList));
@@ -1278,7 +1278,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
         }
         treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig.getTreeDescPreferenceList());
-        TerminologyList treePrefOrderList = new TerminologyList(treeDescPrefOrderTableModel);
+        TerminologyList treePrefOrderList = new TerminologyList(treeDescPrefOrderTableModel, aceFrameConfig);
 
         treePrefOrderList.setBorder(BorderFactory.createTitledBorder("Tree preference order: "));
         descPrefPanel.add(new JScrollPane(treePrefOrderList));
@@ -1288,7 +1288,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             descPrefOrderTableModel.addElement(ConceptBean.get(id));
         }
         descPrefOrderTableModel.addListDataListener(aceFrameConfig.getTableDescPreferenceList());
-        TerminologyList prefOrderList = new TerminologyList(descPrefOrderTableModel);
+        TerminologyList prefOrderList = new TerminologyList(descPrefOrderTableModel, aceFrameConfig);
 
         prefOrderList.setBorder(BorderFactory.createTitledBorder("Table preference order: "));
         descPrefPanel.add(new JScrollPane(prefOrderList));
@@ -1314,13 +1314,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             termListModel.addElement(ConceptBean.get(id));
         }
         termListModel.addListDataListener(set);
-        TerminologyList terminologyList = new TerminologyList(termListModel);
+        TerminologyList terminologyList = new TerminologyList(termListModel, aceFrameConfig);
         terminologyList.setBorder(BorderFactory.createTitledBorder(title));
         return terminologyList;
     }
     private TerminologyIntList makeTermList(String title, I_IntList list) {
     	TerminologyIntListModel termListModel = new TerminologyIntListModel((IntList) list);
-    	TerminologyIntList terminologyList = new TerminologyIntList(termListModel);
+    	TerminologyIntList terminologyList = new TerminologyIntList(termListModel, aceFrameConfig);
         terminologyList.setBorder(BorderFactory.createTitledBorder(title));
         return terminologyList;
     }
@@ -1331,7 +1331,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             statusValuesModel.addElement(ConceptBean.get(id));
         }
         statusValuesModel.addListDataListener(aceFrameConfig.getAllowedStatus());
-        TerminologyList statusList = new TerminologyList(statusValuesModel);
+        TerminologyList statusList = new TerminologyList(statusValuesModel, aceFrameConfig);
         statusList.setBorder(BorderFactory.createTitledBorder("Status values for display:"));
         return statusList;
     }
@@ -1342,7 +1342,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             rootModel.addElement(ConceptBean.get(id));
         }
         rootModel.addListDataListener(aceFrameConfig.getRoots());
-        TerminologyList statusList = new TerminologyList(rootModel);
+        TerminologyList statusList = new TerminologyList(rootModel, aceFrameConfig);
         statusList.setBorder(BorderFactory.createTitledBorder("Hierarchy roots:"));
         return statusList;
     }
@@ -1460,11 +1460,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         historyPalette = new CdePalette(new BorderLayout(), new LeftPalettePoint());
         JTabbedPane tabs = new JTabbedPane();
 
-        TerminologyList viewerList = new TerminologyList(viewerHistoryTableModel, false);
+        TerminologyList viewerList = new TerminologyList(viewerHistoryTableModel, false, aceFrameConfig);
         tabs.addTab("viewer", new JScrollPane(viewerList));
-        TerminologyList commitList = new TerminologyList(commitHistoryTableModel, false);
+        TerminologyList commitList = new TerminologyList(commitHistoryTableModel, false, aceFrameConfig);
         tabs.addTab("uncommitted", new JScrollPane(commitList));
-        TerminologyList importList = new TerminologyList(importHistoryTableModel, false);
+        TerminologyList importList = new TerminologyList(importHistoryTableModel, false, aceFrameConfig);
         tabs.addTab("imported", new JScrollPane(importList));
         historyPalette.add(tabs, BorderLayout.CENTER);
         historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());

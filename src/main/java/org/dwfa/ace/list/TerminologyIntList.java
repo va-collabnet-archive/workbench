@@ -11,6 +11,7 @@ import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 
 public class TerminologyIntList extends JList {
@@ -41,12 +42,13 @@ public class TerminologyIntList extends JList {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public TerminologyIntList(TerminologyIntListModel dataModel) {
+	public TerminologyIntList(TerminologyIntListModel dataModel, I_ConfigAceFrame config) {
 		super(dataModel);
-		init();
+		init(config);
 	}
 
-	private void init() {
+	private void init(I_ConfigAceFrame config) {
+      setCellRenderer(new AceListRenderer(config));
 		setTransferHandler(new TerminologyTransferHandler());
 		setDragEnabled(true);
 		DeleteAction delete = new DeleteAction();

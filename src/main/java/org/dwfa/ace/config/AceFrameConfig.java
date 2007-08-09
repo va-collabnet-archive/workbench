@@ -47,6 +47,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.svn.SvnPrompter;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
@@ -341,7 +342,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	try {
             		List<UUID> uuidList = (List<UUID>) in.readObject();
             		if (uuidList != null) {
-                		hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
+                     try {
+                        hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
+                     } catch (NoMappingException e) {
+                        AceLog.getAppLog().info("No mapping for hierarchySelection: " + uuidList);
+                     }
             		}
 				} catch (Exception e) {
 					IOException newEx = new IOException();

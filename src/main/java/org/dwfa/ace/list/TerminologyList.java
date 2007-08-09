@@ -11,6 +11,7 @@ import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 
 public class TerminologyList extends JList {
@@ -41,25 +42,25 @@ public class TerminologyList extends JList {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public TerminologyList() {
+	public TerminologyList(I_ConfigAceFrame config) {
 		super(new TerminologyListModel());
-		init(true);
+		init(true, config);
 	}
-	public TerminologyList(TerminologyListModel dataModel) {
+	public TerminologyList(TerminologyListModel dataModel, I_ConfigAceFrame config) {
 		super(dataModel);
-		init(true);
+		init(true, config);
 	}
 
-	public TerminologyList(boolean allowDelete) {
+	public TerminologyList(boolean allowDelete, I_ConfigAceFrame config) {
 		super(new TerminologyListModel());
-		init(allowDelete);
+		init(allowDelete, config);
 	}
-	public TerminologyList(TerminologyListModel dataModel, boolean allowDelete) {
+	public TerminologyList(TerminologyListModel dataModel, boolean allowDelete, I_ConfigAceFrame config) {
 		super(dataModel);
-		init(allowDelete);
+		init(allowDelete, config);
 	}
 
-	private void init(boolean allowDelete) {
+	private void init(boolean allowDelete, I_ConfigAceFrame config) {
 		setTransferHandler(new TerminologyTransferHandler());
 		setDragEnabled(true);
 		if (allowDelete) {
