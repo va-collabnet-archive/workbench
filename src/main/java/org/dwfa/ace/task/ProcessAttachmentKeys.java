@@ -1,6 +1,11 @@
 package org.dwfa.ace.task;
 
 public enum ProcessAttachmentKeys {
+    /**
+     * When a plugin process is executed from the concept panel, 
+     * the concept contained within that panel is written to the process
+     * panel using this property name. 
+     */
     I_GET_CONCEPT_DATA,
     ACTIVE_CONCEPT, NEW_STATUS, REL_TYPE,
     DEFAULT_CONCEPT_LIST, REL_PARENT, DEFAULT_FILE, WORKING_PROFILE, USERNAME, PASSWORD, ADMIN_USERNAME, ADMIN_PASSWORD,
