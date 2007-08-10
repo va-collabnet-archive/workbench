@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.WindowConstants;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
@@ -142,6 +143,10 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
      */
     public String[] getArgs() {
         return args;
+    }
+    
+    public boolean okToClose() {
+       return getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE; 
     }
 
 

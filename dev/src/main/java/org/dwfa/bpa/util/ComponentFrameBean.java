@@ -437,7 +437,16 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     }
 
     public void windowClosing(WindowEvent e) {
-        if (this.frame.getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE) {
+       System.out.println("ComponentFrameBean: windowClosing()");
+       boolean okToClose = false;
+       if (ComponentFrame.class.isAssignableFrom(this.frame.getClass())) {
+          ComponentFrame cf = (ComponentFrame) this.frame;
+          okToClose = cf.okToClose();
+       } else {
+          okToClose = (this.frame.getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE);
+       }
+       
+        if (okToClose) {
             OpenFrames.removeFrameListener(this);
             OpenFrames.removeFrame(this.frame);
         }
