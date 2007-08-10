@@ -21,7 +21,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/transaction", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/flow tasks", type = BeanType.TASK_BEAN)})
 public class AbortWorkflowTransaction extends AbstractTask {
 
    private static final long serialVersionUID = 1;
