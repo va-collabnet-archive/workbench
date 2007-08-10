@@ -3,12 +3,9 @@ package org.dwfa.bpa.tasks.transaction;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
-import java.security.PrivilegedActionException;
 import java.util.Collection;
 
-import net.jini.core.lease.LeaseDeniedException;
 import net.jini.core.transaction.CannotAbortException;
-import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.UnknownTransactionException;
 
 import org.dwfa.bpa.process.Condition;
@@ -49,17 +46,8 @@ public class AbortWorkflowTransaction extends AbstractTask {
    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
          throws TaskFailedException {
       try {
-         Transaction t = worker.getActiveTransaction();
-         t.abort();
-      } catch (LeaseDeniedException e) {
-         throw new TaskFailedException(e);
+         worker.abortActiveTransaction();
       } catch (RemoteException e) {
-         throw new TaskFailedException(e);
-      } catch (IOException e) {
-         throw new TaskFailedException(e);
-      } catch (InterruptedException e) {
-         throw new TaskFailedException(e);
-      } catch (PrivilegedActionException e) {
          throw new TaskFailedException(e);
       } catch (UnknownTransactionException e) {
          throw new TaskFailedException(e);

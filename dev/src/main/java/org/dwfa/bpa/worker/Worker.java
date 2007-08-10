@@ -374,6 +374,7 @@ public abstract class Worker implements I_Work {
 		this.setActiveTransaction(null);
 		if (this.nextTransaction != null) {
 			this.nextTransaction.abort();
+         this.nextTransaction = null;
 		}
 	}
 

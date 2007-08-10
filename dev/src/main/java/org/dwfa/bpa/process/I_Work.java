@@ -31,8 +31,10 @@ import net.jini.core.lease.LeaseDeniedException;
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceTemplate;
+import net.jini.core.transaction.CannotAbortException;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
+import net.jini.core.transaction.UnknownTransactionException;
 import net.jini.lease.LeaseListener;
 import net.jini.lease.LeaseRenewalManager;
 import net.jini.lookup.JoinManager;
@@ -85,6 +87,8 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
     public Transaction getNextTransaction() throws LeaseDeniedException,
             RemoteException, IOException, InterruptedException;
 
+    public void abortActiveTransaction() throws UnknownTransactionException,
+      CannotAbortException, RemoteException;
     /**
      * Commits the active transaction, and makes the next transaction (if any)
      * the active transaction.
