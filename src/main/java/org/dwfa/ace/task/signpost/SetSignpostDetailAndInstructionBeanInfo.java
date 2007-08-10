@@ -15,14 +15,14 @@ public class SetSignpostDetailAndInstructionBeanInfo extends SimpleBeanInfo {
                 new PropertyDescriptor("instructionHtmlPropName", getBeanDescriptor().getBeanClass());
             instructionHtmlPropName.setBound(true);
             instructionHtmlPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            instructionHtmlPropName.setDisplayName("<html><font color='green'>Set signpost instruction html");
+            instructionHtmlPropName.setDisplayName("<html><font color='green'>instruction html");
             instructionHtmlPropName.setShortDescription("Set the signpost instruction html to value contained in this property.");
 
             PropertyDescriptor detailHtmlPropName =
                 new PropertyDescriptor("detailHtmlPropName", getBeanDescriptor().getBeanClass());
             detailHtmlPropName.setBound(true);
             detailHtmlPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            detailHtmlPropName.setDisplayName("<html><font color='green'>Set signpost detail html");
+            detailHtmlPropName.setDisplayName("<html><font color='green'>detail html");
             detailHtmlPropName.setShortDescription("Set the signpost detail html to value contained in this property.");
 
             PropertyDescriptor rv[] = { detailHtmlPropName, instructionHtmlPropName };
