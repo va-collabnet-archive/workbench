@@ -91,11 +91,18 @@ public class InstructAndWait extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
+      this.done = false;
+      I_ConfigAceFrame config = (I_ConfigAceFrame) worker
+      .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
+            .name());
+      boolean builderVisible = config.isBuilderToggleVisible();
+      config.setBuilderToggleVisible(false);
+      boolean progressPanelVisible = config.isProgressToggleVisible();
+      config.setProgressToggleVisible(false);
+      boolean subversionButtonVisible = config.isBuilderToggleVisible();
+      config.setSubversionToggleVisible(false);
 		try {
-			this.done = false;
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-					.name());
+         
 	final JPanel workflowPanel = config.getWorkflowPanel();
 			SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -161,7 +168,9 @@ public class InstructAndWait extends AbstractTask {
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException(e);
 		}
-
+      config.setBuilderToggleVisible(builderVisible);
+      config.setProgressToggleVisible(progressPanelVisible);
+      config.setSubversionToggleVisible(subversionButtonVisible);
 		return Condition.CONTINUE;
 	}
 

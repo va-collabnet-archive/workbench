@@ -263,5 +263,32 @@ public interface I_ConfigAceFrame {
     public void setSignpostToggleIcon(ImageIcon icon);
     
     public I_ConfigAceDb getDbConfig();
+    
+    public void setPreferencesToggleVisible(boolean visible);
+    public boolean isPreferencesToggleVisible();
+
+    public void setSubversionToggleVisible(boolean visible);
+    public boolean isSubversionToggleVisible();
+
+    public void setBuilderToggleVisible(boolean visible);
+    public boolean isBuilderToggleVisible();
+
+    public void setInboxToggleVisible(boolean visible);
+    public boolean isInboxToggleVisible();
+
+    public void setProgressToggleVisible(boolean visible);
+    public boolean isProgressToggleVisible();
+
+    public void setComponentToggleVisible(boolean visible);
+    public boolean isComponentToggleVisible();
+
+    public void setHierarchyToggleVisible(boolean visible);
+    public boolean isHierarchyToggleVisible();
+
+    public void setAddressToggleVisible(boolean visible);
+    public boolean isAddressToggleVisible();
+
+    public void setHistoryToggleVisible(boolean visible);
+    public boolean isHistoryToggleVisible();
 
 }
