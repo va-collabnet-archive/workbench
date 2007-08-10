@@ -265,7 +265,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private static void fireCommit() {
        SwingUtilities.invokeLater(new Runnable() {
-
          public void run() {
             if (getAceConfig() != null) {
                for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
@@ -1825,6 +1824,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(showSubversionButton, c);
         showSubversionButton.addActionListener(new SubversionPaletteActionListener());
         showSubversionButton.setToolTipText("Show Subversion panel...");
+        showSubversionButton.setVisible(false);
         c.gridx++;
         showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
         preferencesActionListener = new PreferencesPaletteActionListener();
@@ -2303,5 +2303,95 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 	public I_HostConceptPlugins getListConceptViewer() {
 		return conceptListEditor.getConceptPanel();
 	}
+   public boolean isAddressToggleVisible() {
+      return showAddressesButton.isVisible();
+   }
+   public boolean isBuilderToggleVisible() {
+      return showProcessBuilder.isVisible();
+   }
+   public boolean isComponentToggleVisible() {
+      return showComponentButton.isVisible();
+   }
+   public boolean isHierarchyToggleVisible() {
+      return showTreeButton.isVisible();
+   }
+   public boolean isHistoryToggleVisible() {
+      return showHistoryButton.isVisible();
+   }
+   public boolean isInboxToggleVisible() {
+      return showQueuesButton.isVisible();
+   }
+   public boolean isPreferencesToggleVisible() {
+      return showPreferencesButton.isVisible();
+   }
+   public boolean isProgressToggleVisible() {
+      return treeProgress.isVisible();
+   }
+   public boolean isSubversionToggleVisible() {
+      return showSubversionButton.isVisible();
+   }
+   public void setAddressToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showAddressesButton.setVisible(visible);
+         }
+      });
+   }
+   public void setBuilderToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showProcessBuilder.setVisible(visible);
+         }
+      });
+    }
+   public void setComponentToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showComponentButton.setVisible(visible);
+         }
+      });
+   }
+   public void setHierarchyToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showTreeButton.setVisible(visible);
+         }
+      });
+   }
+   public void setHistoryToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showHistoryButton.setVisible(visible);
+         }
+      });
+   }
+   public void setInboxToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showQueuesButton.setVisible(visible);
+         }
+      });
+   }
+   public void setPreferencesToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showPreferencesButton.setVisible(visible);
+         }
+      });
+   }
+   public void setProgressToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            treeProgress.setVisible(visible);
+         }
+      });
+   }
+   public void setSubversionToggleVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            showSubversionButton.setVisible(visible);
+         }
+      });
+   }
 
 }

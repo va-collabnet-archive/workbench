@@ -1411,4 +1411,60 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public I_HostConceptPlugins getListConceptViewer() {
 		return aceFrame.getListConceptViewer();
 	}
+
+
+   public boolean isAddressToggleVisible() {
+      return aceFrame.getCdePanel().isAddressToggleVisible();
+   }
+   public boolean isBuilderToggleVisible() {
+      return aceFrame.getCdePanel().isBuilderToggleVisible();
+   }
+   public boolean isComponentToggleVisible() {
+      return aceFrame.getCdePanel().isComponentToggleVisible();
+   }
+   public boolean isHierarchyToggleVisible() {
+      return aceFrame.getCdePanel().isHierarchyToggleVisible();
+   }
+   public boolean isHistoryToggleVisible() {
+      return aceFrame.getCdePanel().isHistoryToggleVisible();
+   }
+   public boolean isInboxToggleVisible() {
+      return aceFrame.getCdePanel().isInboxToggleVisible();
+   }
+   public boolean isPreferencesToggleVisible() {
+      return aceFrame.getCdePanel().isPreferencesToggleVisible();
+   }
+   public boolean isProgressToggleVisible() {
+      return aceFrame.getCdePanel().isProgressToggleVisible();
+   }
+   public boolean isSubversionToggleVisible() {
+      return aceFrame.getCdePanel().isSubversionToggleVisible();
+   }
+   public void setAddressToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setAddressToggleVisible(visible);
+   }
+   public void setBuilderToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setBuilderToggleVisible(visible);
+    }
+   public void setComponentToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setComponentToggleVisible(visible);
+   }
+   public void setHierarchyToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
+   }
+   public void setHistoryToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setHistoryToggleVisible(visible);
+   }
+   public void setInboxToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setInboxToggleVisible(visible);
+   }
+   public void setPreferencesToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
+   }
+   public void setProgressToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setProgressToggleVisible(visible);
+   }
+   public void setSubversionToggleVisible(boolean visible) {
+      aceFrame.getCdePanel().setSubversionToggleVisible(visible);
+   }
 }
