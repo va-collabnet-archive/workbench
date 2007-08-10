@@ -264,12 +264,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private static void fireCommit() {
-        if (getAceConfig() != null) {
-            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-                frameConfig.fireCommit();
-                frameConfig.setCommitEnabled(false);
-            }
-        }
+       SwingUtilities.invokeLater(new Runnable() {
+
+         public void run() {
+            if (getAceConfig() != null) {
+               for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                   frameConfig.fireCommit();
+                   frameConfig.setCommitEnabled(false);
+               }
+           }
+         }
+       });
     }
 
     /*

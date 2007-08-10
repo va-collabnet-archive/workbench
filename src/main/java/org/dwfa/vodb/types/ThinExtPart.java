@@ -33,4 +33,17 @@ public class ThinExtPart {
       this.extension = extension;
    }
 
+   @Override
+   public boolean equals(Object obj) {
+      ThinExtPart another = (ThinExtPart) obj;
+      return ((pathId == another.pathId) &&
+            (version == another.version) &&
+            (status == another.status) &&
+            (extension.equals(another.extension)));
+   }
+   @Override
+   public int hashCode() {
+      return HashFunction.hashCode(new int[] {pathId, version, status});
+   }
+
 }
