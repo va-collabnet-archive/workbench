@@ -338,6 +338,7 @@ public class AceFrame extends ComponentFrame {
          }
       }
       if (cfb.quit()) {
+         this.setVisible(false);
          System.exit(0);
       }
       return false;
