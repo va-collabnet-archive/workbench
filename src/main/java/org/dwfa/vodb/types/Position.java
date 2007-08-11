@@ -16,6 +16,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
@@ -218,7 +219,15 @@ public class Position implements Serializable, I_Position {
 		int size = in.readInt();
 		Set<I_Position> positions = new HashSet<I_Position>(size);
 		for (int i = 0; i < size; i++) {
-			positions.add(readPosition(in));
+         try {
+            positions.add(readPosition(in));
+         } catch (IOException ex) {
+            if (NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            } else {
+               throw ex;
+            }
+         }
 		}
 		return positions;
 	}
