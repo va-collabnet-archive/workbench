@@ -449,6 +449,8 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
         if (okToClose) {
             OpenFrames.removeFrameListener(this);
             OpenFrames.removeFrame(this.frame);
+            this.frame.setVisible(false);
+            this.frame.dispose();
         }
     }
 
@@ -523,4 +525,8 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     public List<I_DoQuitActions> getQuitList() {
         return quitList;
     }
+
+   public JMenuItem getQuitMI() {
+      return quitMI;
+   }
 }

@@ -162,4 +162,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     public List<I_DoQuitActions> getQuitList() {
         return cfb.getQuitList();
     }
+   public JMenuItem getQuitMI() {
+      return cfb.getQuitMI();
+   }
 }
