@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.rmi.MarshalledObject;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
@@ -17,6 +18,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.jini.config.ConfigurationException;
@@ -36,6 +38,7 @@ import com.sun.jini.start.LifeCycle;
 public class AceFrame extends ComponentFrame {
 
 	private ACE cdePanel;
+   private AceFrameConfig frameConfig;
 
 	private class AceWindowActionListener implements WindowListener {
 
@@ -77,10 +80,10 @@ public class AceFrame extends ComponentFrame {
 	public AceFrame(String[] args, LifeCycle lc, I_ConfigAceFrame frameConfig,
 			boolean executeStartupProcesses) throws Exception {
 		super(args, lc);
+      this.frameConfig = (AceFrameConfig) frameConfig;
+      setTitle(getFrameName());
 		((AceFrameConfig) frameConfig).setAceFrame(this);
 		getCdePanel().setup(frameConfig);
-		setName(frameConfig.getFrameName());
-		setTitle("User: " + frameConfig.getUsername());
 		setContentPane(cdePanel);
 		setBounds(frameConfig.getBounds());
 		doWindowActivation();
@@ -96,7 +99,6 @@ public class AceFrame extends ComponentFrame {
 			startupFolder = new File(configFile.getParentFile(), "startup");
 			executeStartupProcesses(worker, startupFolder);
 		}
-
 	}
 
 	private void executeStartupProcesses(MasterWorker worker, File startupFolder) {
@@ -186,11 +188,15 @@ public class AceFrame extends ComponentFrame {
 
 	public class NewAceFrame implements ActionListener {
 
-		public void actionPerformed(ActionEvent e) {
+		@SuppressWarnings("unchecked")
+      public void actionPerformed(ActionEvent e) {
 			try {
-				AceFrame newFrame = new AceFrame(getArgs(), getLc(), cdePanel
-						.getAceFrameConfig(), false);
-				newFrame.setTitle(getNextFrameName());
+            MarshalledObject marshalledFrame = new MarshalledObject(cdePanel
+                  .getAceFrameConfig());
+            AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
+            newFrameConfig.setMasterConfig((AceConfig) cdePanel.getAceFrameConfig().getDbConfig());
+            newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
+				AceFrame newFrame = new AceFrame(getArgs(), getLc(), newFrameConfig, false);
 				newFrame.setVisible(true);
 			} catch (Exception e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
@@ -206,15 +212,34 @@ public class AceFrame extends ComponentFrame {
 		return newWindow;
 	}
 
-	public String getNextFrameName() throws ConfigurationException {
-		String title = (String) config.getEntry(this.getClass().getName(),
-				"frameName", String.class, "Ace Viewer");
-		if (count > 0) {
-			return title + " " + count++;
-		}
-		count++;
-		return title;
-	}
+   public String getNextFrameName() throws ConfigurationException {
+      String title = (String) config.getEntry(this.getClass().getName(),
+            "frameName", String.class, "Ace Viewer");
+      if (frameConfig != null) {
+         if (count > 0) {
+            title = "User: " + this.frameConfig.getUsername() + "; Window "+ count;
+         } else {
+            title = "User: " + this.frameConfig.getUsername();
+         }
+         count++;
+      }
+      return title;
+   }
+
+   public String getFrameName()  {
+      String title = "Ace Editor";
+         if (count > 0) {
+            title = "User: " + this.frameConfig.getUsername() + "; Window "+ count;
+         } else {
+            title = "User: " + this.frameConfig.getUsername();
+         }
+         if (title.equals(this.getTitle())) {
+            // no increment, redundant call
+         } else {
+            count++;
+         }
+      return title;
+   }
 
 	public ACE getCdePanel() {
 		if (cdePanel == null) {
@@ -299,5 +324,26 @@ public class AceFrame extends ComponentFrame {
 	public I_HostConceptPlugins getListConceptViewer() {
 		return getCdePanel().getListConceptViewer();
 	}
+
+   @Override
+   public boolean okToClose() {
+      if (frameConfig.getMasterConfig().aceFrames.size() > 1) {
+         if (frameConfig.getMasterConfig().aceFrames.contains(this.frameConfig)) {
+            frameConfig.getMasterConfig().aceFrames.remove(this.frameConfig);
+            getQuitList().remove(cdePanel);
+            return true;
+         } else {
+            JOptionPane.showMessageDialog(this, "<html>Cannot close. <br>Ace config is missing the window profile. ");
+            return false;
+         }
+      }
+      if (cfb.quit()) {
+         System.exit(0);
+      }
+      return false;
+      
+   }
+   
+   
 
 }

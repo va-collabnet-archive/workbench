@@ -174,9 +174,12 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             if (objDataVersion >= 5) {
                 changeSetRoot = (File) in.readObject();
                 changeSetWriterFileName = (String) in.readObject();
+                if (changeSetWriterFileName.contains("#") == false) {
+                   changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
+                }
             } else {
                 changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + username);
-                changeSetWriterFileName = username + "." + UUID.randomUUID().toString() + ".jcs";
+                changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
             }
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);

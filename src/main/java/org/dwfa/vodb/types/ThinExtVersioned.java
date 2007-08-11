@@ -3,6 +3,15 @@ package org.dwfa.vodb.types;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @todo add version to vodb
+ * @todo add imported change set info to vodb
+ * @todo have change sets automatically increment as size increases over a certain size. 
+ * @todo add extension ability
+ * 
+ * @author kec
+ *
+ */
 public class ThinExtVersioned {
    private int refsetId;
    private int memberId;

@@ -1921,6 +1921,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showSignpostPanelToggle.addActionListener(bottomPanelActionListener);
         bottomPanel.add(showSignpostPanelToggle, c);
         c.gridx++;
+        bottomPanel.add(new JLabel("  "), c);
+        c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
         bottomPanel.add(statusLabel, c);

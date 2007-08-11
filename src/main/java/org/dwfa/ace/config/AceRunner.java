@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
@@ -91,6 +92,11 @@ public class AceRunner {
             ipChangeTimer.start();
             config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
             
+            String lookAndFeelClassName = (String) config.getEntry(this.getClass().getName(), "lookAndFeelClassName", String.class,
+                  UIManager.getSystemLookAndFeelClassName());
+
+            UIManager.setLookAndFeel(lookAndFeelClassName);
+                        
             String[] svnCheckoutOnStart = (String[]) config.getEntry(this.getClass().getName(), "svnCheckoutOnStart", String[].class,
                     new String[]{ });
             if (svnCheckoutOnStart != null) {
@@ -155,14 +161,19 @@ public class AceRunner {
             ACE.setAceConfig(AceConfig.config);
             AceConfig.config.addChangeSetWriters();
             int successCount = 0;
+            int frameCount = 0;
+            SvnPrompter prompter = new SvnPrompter();
             for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
+               frameCount++;
                 if (ace.isActive()) {
                 	AceFrameConfig afc = (AceFrameConfig) ace;
                 	afc.setMasterConfig(AceConfig.config);
-                    SvnPrompter prompter = new SvnPrompter();
                     boolean login = true;
                     while (login) {
-                        prompter.prompt("Please authenticate for: " + ace.getFrameName(), ace.getUsername());
+                       if (ace.getUsername().equals(prompter.getUsername()) == false || 
+                             ace.getPassword().equals(prompter.getPassword()) == false) {
+                          prompter.prompt("Please authenticate for: " + ace.getFrameName(), ace.getUsername());
+                       }
                         if (ace.getUsername().equals(prompter.getUsername())
                                 && ace.getPassword().equals(prompter.getPassword())) {
                             login = false;
