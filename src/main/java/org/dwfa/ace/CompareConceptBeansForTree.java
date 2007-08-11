@@ -17,7 +17,10 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
 
    public int compare(I_GetConceptDataForTree cb1, I_GetConceptDataForTree cb2) {
       try {
-         int comparison = cb1.getDescTuple(aceConfig).getText().compareTo(cb2.getDescTuple(aceConfig).getText());
+         int comparison = cb1.getDescTuple(aceConfig).getText().toLowerCase().compareTo(cb2.getDescTuple(aceConfig).getText().toLowerCase());
+         if (comparison == 0) {
+            comparison = cb1.getDescTuple(aceConfig).getText().compareTo(cb2.getDescTuple(aceConfig).getText());
+         }
          if (comparison == 0) {
             comparison = cb1.getConceptId() - cb2.getConceptId();
          }
