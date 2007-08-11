@@ -64,6 +64,8 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.gui.button.Button24x24;
+import org.dwfa.gui.toggle.Toggle24x24;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.ConceptBean;
@@ -416,7 +418,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			}
 			plugin.addShowComponentListener(l);
 		}
-		inferredButton = new JToggleButton(new ImageIcon(ACE.class
+		inferredButton = new Toggle24x24(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/yinyang.png")));
 		inferredButton.setSelected(false);
 		inferredButton
@@ -428,14 +430,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						+ "inferred forms (yang).");
 		toggleBar.add(inferredButton, c);
 		c.gridx++;
-		usePrefButton = new JToggleButton(new ImageIcon(ACE.class
+		usePrefButton = new Toggle24x24(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/component_preferences.png")));
 		usePrefButton.setSelected(false);
 		historyChangeActionListener = new ToggleHistoryChangeActionListener();
 		usePrefButton.addActionListener(historyChangeActionListener);
 		toggleBar.add(usePrefButton, c);
 		c.gridx++;
-		historyButton = new JToggleButton(new ImageIcon(ACE.class
+		historyButton = new Toggle24x24(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/history.png")));
 		historyButton.setSelected(false);
 		historyButton.addActionListener(historyChangeActionListener);
@@ -466,7 +468,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
 				if (iconBytes != null) {
 					ImageIcon icon = new ImageIcon(iconBytes);
-					JButton pluginButton = new JButton(icon);
+					JButton pluginButton = new Button24x24(icon);
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;
@@ -474,7 +476,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					AceLog.getAppLog().info(
 							"adding component plugin: " + f.getName());
 				} else {
-					JButton pluginButton = new JButton(bp.getName());
+					JButton pluginButton = new Button24x24(bp.getName());
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;

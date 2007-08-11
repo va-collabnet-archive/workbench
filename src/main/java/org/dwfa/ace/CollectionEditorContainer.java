@@ -38,6 +38,8 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.gui.button.Button32x32;
+import org.dwfa.gui.toggle.Toggle32x32;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -152,13 +154,13 @@ public class CollectionEditorContainer extends JPanel {
 		c.weighty = 0;
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
-		showComponentView = new JToggleButton(new ImageIcon(
+		showComponentView = new Toggle32x32(new ImageIcon(
 				ACE.class.getResource("/32x32/plain/component.png")));
         showComponentActionListener = new ShowComponentActionListener();
 		showComponentView.addActionListener(showComponentActionListener);
 		listEditorTopPanel.add(showComponentView, c);
 		c.gridx++;
-		showProcessBuilder = new JToggleButton(new ImageIcon(
+		showProcessBuilder = new Toggle32x32(new ImageIcon(
 				ACE.class.getResource("/32x32/plain/cube_molecule.png")));
 		listEditorTopPanel.add(showProcessBuilder, c);
 		showProcessBuilder.addActionListener(new ShowProcessBuilderActionListener());
@@ -191,14 +193,14 @@ public class CollectionEditorContainer extends JPanel {
 				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
 				if (iconBytes != null) {
 					ImageIcon icon = new ImageIcon(iconBytes);
-					JButton pluginButton = new JButton(icon);
+					JButton pluginButton = new Button32x32(icon);
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;
 					listEditorTopPanel.add(pluginButton, c);
 					AceLog.getAppLog().info("adding collection plugin: " + f.getName());
 				} else {
-					JButton pluginButton = new JButton(bp.getName());
+					JButton pluginButton = new Button32x32(bp.getName());
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
 					c.gridx++;
@@ -209,7 +211,7 @@ public class CollectionEditorContainer extends JPanel {
 		}
 
 		
-		listEditorTopPanel.add(new JToggleButton(new ImageIcon(ACE.class
+		listEditorTopPanel.add(new Toggle32x32(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/branch_delete.png"))), c);
 		return listEditorTopPanel;
 

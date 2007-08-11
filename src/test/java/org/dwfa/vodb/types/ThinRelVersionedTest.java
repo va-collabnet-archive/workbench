@@ -177,11 +177,14 @@ public class ThinRelVersionedTest extends TestCase {
       int path2 = 5;
       
       int type0 = 6;
+      @SuppressWarnings("unused")
       int type1 = 7;
+      @SuppressWarnings("unused")
       int type2 = 8;
       
       int time0 = 9;
       int time1 = 10;
+      @SuppressWarnings("unused")
       int time2 = 11;
       
       int stat0 = 12;
