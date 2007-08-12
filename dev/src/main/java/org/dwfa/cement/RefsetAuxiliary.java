@@ -25,7 +25,10 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 	public enum Concept implements I_ConceptualizeUniversally {
 		REFSET_AUXILIARY("Refset Auxiliary Concept"),
 			REFSET_TYPE("refset type", REFSET_AUXILIARY),
-				INT_EXTENSION("int extensions", REFSET_TYPE),
+            BOOLEAN_EXTENSION("boolean extensions", REFSET_TYPE),
+            INT_EXTENSION("int extensions", REFSET_TYPE),
+            CONCEPT_EXTENSION("concept extensions", REFSET_TYPE),
+            LANGUAGE_EXTENSION("language extensions", REFSET_TYPE),
 			REFSET_PURPOSE("refset purpose", REFSET_AUXILIARY),
 				RELATIONSHIP_ORDER("relationship order", REFSET_PURPOSE),
 			REFSET_RELATIONSHIP(new String[] { "refset relationship" }, 
