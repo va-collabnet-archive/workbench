@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.UUID;
 
 import javax.swing.JList;
 
@@ -70,8 +69,7 @@ public class AddConceptAndPotDupToList extends AbstractTask {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			
-			UUID conceptUid = (UUID) process.readProperty(conceptUuidStrPropName);
-			I_GetConceptData conceptWithPotDup = LocalVersionedTerminology.get().getConcept(new UUID[]{conceptUid});
+			I_GetConceptData conceptWithPotDup = AceTaskUtil.getConceptFromProperty(process, conceptUuidStrPropName);
 			
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
