@@ -26,8 +26,11 @@ public interface I_ConceptAttributeVersioned {
 
 	public Set<TimePathId> getTimePathSet();
 
-	public void addTuples(I_IntSet allowedStatus,
-			Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples);
+   public void addTuples(I_IntSet allowedStatus,
+         Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples);
+
+   public void addTuples(I_IntSet allowedStatus,
+         Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted);
 
 	public I_ConceptualizeLocally getLocalFixedConcept();
 	

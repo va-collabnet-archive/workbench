@@ -1,23 +1,18 @@
 package org.dwfa.ace.task.conflict;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.conflict.detector.ConflictDetector;
 import org.dwfa.tapi.TerminologyException;
 
 public class CompletedConceptConflictDetector implements I_ProcessConcepts {
@@ -85,7 +80,7 @@ public class CompletedConceptConflictDetector implements I_ProcessConcepts {
       }
 
       if (attrTupels.size() > 1) {
-         if (conflict(concept)) {
+         if (ConflictDetector.conflict(concept, profileForConflictDetection)) {
             conflictsNids.add(concept.getConceptId());
          } else {
             noConflictNids.add(concept.getConceptId());
@@ -113,128 +108,6 @@ public class CompletedConceptConflictDetector implements I_ProcessConcepts {
       }
    }
 
-   public class AttrTupleConflictComparator implements Comparator<I_ConceptAttributeTuple> {
-      public int compare(I_ConceptAttributeTuple t1, I_ConceptAttributeTuple t2) {
-         if (t1.getConceptStatus() != t2.getConceptStatus()) {
-            return t1.getConceptStatus() - t2.getConceptStatus();
-         }
-         if (t1.isDefined() != t2.isDefined()) {
-            if (t1.isDefined()) {
-               return -1;
-            } else {
-               return +1;
-            }
-         }
-         return 0;
-      }
-   }
-
-   public class DescriptionTupleConflictComparator implements Comparator<I_DescriptionTuple> {
-
-      public int compare(I_DescriptionTuple t1, I_DescriptionTuple t2) {
-         if (t1.getStatusId() != t2.getStatusId()) {
-            return t1.getStatusId() - t2.getStatusId();
-         }
-         if (t1.getConceptId() != t2.getConceptId()) {
-            return t1.getConceptId() - t2.getConceptId();
-         }
-         if (t1.getInitialCaseSignificant() != t2.getInitialCaseSignificant()) {
-            if (t1.getInitialCaseSignificant()) {
-               return -1;
-            } else {
-               return +1;
-            }
-         }
-         if (t1.getLang().equals(t2.getLang()) == false) {
-            return t1.getLang().compareTo(t2.getLang());
-         }
-         if (t1.getText().equals(t2.getText()) == false) {
-            return t1.getText().compareTo(t2.getText());
-         }
-         if (t1.getTypeId() != t2.getTypeId()) {
-            return t1.getTypeId() - t2.getTypeId();
-         }
-         return 0;
-      }
-   }
-
-   public class RelTupleConflictComparator implements Comparator<I_RelTuple> {
-
-      public int compare(I_RelTuple t1, I_RelTuple t2) {
-         if (t1.getStatusId() != t2.getStatusId()) {
-            return t1.getStatusId() - t2.getStatusId();
-         }
-         if (t1.getC1Id() != t2.getC1Id()) {
-            return t1.getC1Id() - t2.getC1Id();
-         }
-         if (t1.getC2Id() != t2.getC2Id()) {
-            return t1.getC2Id() - t2.getC2Id();
-         }
-         if (t1.getCharacteristicId() != t2.getCharacteristicId()) {
-            return t1.getCharacteristicId() - t2.getCharacteristicId();
-         }
-         if (t1.getGroup() != t2.getGroup()) {
-            return t1.getGroup() - t2.getGroup();
-         }
-         if (t1.getRefinabilityId() != t2.getRefinabilityId()) {
-            return t1.getRefinabilityId() - t2.getRefinabilityId();
-         }
-         if (t1.getRelTypeId() != t2.getRelTypeId()) {
-            return t1.getRelTypeId() - t2.getRelTypeId();
-         }
-         return 0;
-      }
-   }
-
-   /**
-    * @todo implement conflict for images.
-    * @param concept
-    * @return
-    * @throws IOException
-    */
-   public boolean conflict(I_GetConceptData concept) throws IOException {
-      Set<I_ConceptAttributeTuple> attributeTuples = null;
-      Set<I_DescriptionTuple> descTuples = null;
-      Set<I_RelTuple> relTuples = null;
-      for (I_Position viewPos : profileForConflictDetection.getViewPositionSet()) {
-         Set<I_Position> viewPositionSet = new HashSet<I_Position>();
-         viewPositionSet.add(viewPos);
-         if (attributeTuples == null) {
-            attributeTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
-            attributeTuples.addAll(concept.getConceptAttributeTuples(null, viewPositionSet));
-         } else {
-            for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(null, viewPositionSet)) {
-               if (attributeTuples.contains(tuple) == false) {
-                  return true;
-               }
-            }
-         }
-
-         if (descTuples == null) {
-            descTuples = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
-            descTuples.addAll(concept.getDescriptionTuples(null, null, viewPositionSet));
-         } else {
-            for (I_DescriptionTuple tuple : concept.getDescriptionTuples(null, null, viewPositionSet)) {
-               if (descTuples.contains(tuple) == false) {
-                  return true;
-               }
-            }
-         }
-
-         if (relTuples == null) {
-            relTuples = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
-            relTuples.addAll(concept.getSourceRelTuples(null, null, viewPositionSet, false));
-         } else {
-            for (I_RelTuple tuple : concept.getSourceRelTuples(null, null, viewPositionSet, false)) {
-               if (relTuples.contains(tuple) == false) {
-                  return true;
-               }
-            }
-         }
-      }
-
-      return false;
-   }
 
    public String toString() {
       StringBuffer buff = new StringBuffer();
