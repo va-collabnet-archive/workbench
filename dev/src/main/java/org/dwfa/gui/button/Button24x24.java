@@ -1,6 +1,7 @@
 package org.dwfa.gui.button;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -14,7 +15,10 @@ public class Button24x24 extends JButton {
    private static final long serialVersionUID = 1L;
 
    protected int getPixels() {
-      return 28;
+      return 36;
+   }
+   protected Dimension getPixelDim() {
+      return new Dimension(getPixels(), getPixels());
    }
    private static void setSize(JButton button, int pixels) {
       Dimension size = new Dimension(pixels, pixels);
@@ -41,6 +45,47 @@ public class Button24x24 extends JButton {
    public Button24x24(String arg0) {
       super(arg0);
       setSize(this, getPixels());
+   }
+   @Override
+   public void resize(Dimension arg0) {
+      super.resize(getPixelDim());
+   }
+
+   @Override
+   public void resize(int arg0, int arg1) {
+      super.resize(getPixels(), getPixels());
+   }
+
+   @Override
+   public void setBounds(int x, int y, int width, int height) {
+       super.setBounds(x, y, getPixels(), getPixels());
+   }
+
+   @Override
+   public void setBounds(Rectangle r) {
+      super.setBounds(new Rectangle(r.x, r.y, getPixels(), getPixels()));
+   }
+
+   @Override
+   public void setSize(Dimension arg0) {
+      super.setSize(getPixelDim());
+   }
+
+   @Override
+   public void setSize(int arg0, int arg1) {
+      super.setSize(getPixels(), getPixels());
+   }
+   @Override
+   public void setMaximumSize(Dimension arg0) {
+      super.setMaximumSize(getPixelDim());
+   }
+   @Override
+   public void setMinimumSize(Dimension arg0) {
+      super.setMinimumSize(getPixelDim());
+   }
+   @Override
+   public void setPreferredSize(Dimension arg0) {
+      super.setPreferredSize(getPixelDim());
    }
 
 }

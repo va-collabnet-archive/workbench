@@ -102,7 +102,7 @@ public class TaskInfo implements Serializable {
 				}
 			}
 		}
-		throw new NoBranchForConditionException();
+		throw new NoBranchForConditionException(" Condition: " + condition + " taskId: " + getTask().getId() + " " + getTask().getName());
 	}
 
 	/**
