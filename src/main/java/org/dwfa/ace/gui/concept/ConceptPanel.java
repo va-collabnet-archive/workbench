@@ -65,7 +65,6 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.gui.button.Button24x24;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.ConceptBean;
@@ -476,14 +475,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
 				if (iconBytes != null) {
 					ImageIcon icon = new ImageIcon(iconBytes);
-					JButton pluginButton = new Button24x24(icon);
+					JButton pluginButton = new JButton(icon);
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
 					rightTogglePane.add(pluginButton, c);
 					AceLog.getAppLog().info(
 							"adding component plugin: " + f.getName());
 				} else {
-					JButton pluginButton = new Button24x24(bp.getName());
+					JButton pluginButton = new JButton(bp.getName());
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
                rightTogglePane.add(pluginButton, c);
