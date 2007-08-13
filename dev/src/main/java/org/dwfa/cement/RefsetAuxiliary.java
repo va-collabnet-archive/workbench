@@ -29,6 +29,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             INT_EXTENSION("int extensions", REFSET_TYPE),
             CONCEPT_EXTENSION("concept extensions", REFSET_TYPE),
             LANGUAGE_EXTENSION("language extensions", REFSET_TYPE),
+            SCOPED_LANGUAGE_EXTENSION("scoped language extensions", REFSET_TYPE),
 			REFSET_PURPOSE("refset purpose", REFSET_AUXILIARY),
 				RELATIONSHIP_ORDER("relationship order", REFSET_PURPOSE),
 			REFSET_RELATIONSHIP(new String[] { "refset relationship" }, 
