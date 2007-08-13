@@ -2,14 +2,17 @@ package org.dwfa.vodb.types;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
@@ -21,6 +24,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
@@ -28,7 +32,7 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 
 import com.sleepycat.je.DatabaseException;
 
-public class Path implements I_Transact, Serializable, I_Path {
+public class Path implements I_Transact, I_Path {
 	/**
 	 * 
 	 */
@@ -314,4 +318,70 @@ public class Path implements I_Transact, Serializable, I_Path {
 		}
 	}
 
+   public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {
+      try {
+         out.writeObject(AceConfig.getVodb().nativeToUuid(p.getConceptId()));
+      } catch (DatabaseException e) {
+         IOException newEx = new IOException();
+         newEx.initCause(e);
+         throw newEx;
+      }
+      out.writeInt(p.getOrigins().size());
+      for (I_Position origin: p.getOrigins()) {
+         Position.writePosition(out, origin);
+      }
+   }
+
+   @SuppressWarnings("unchecked")
+   public static I_Path readPath(ObjectInputStream in) throws IOException, ClassNotFoundException  {
+      int pathId;
+      try {
+         pathId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+      } catch (TerminologyException e) {
+         IOException newEx = new IOException();
+         newEx.initCause(e);
+         throw newEx;
+      }
+      int size = in.readInt();
+      List<I_Position> origins = new ArrayList<I_Position>(size);
+      for (int i = 0; i < size; i++) {
+         origins.add(Position.readPosition(in));
+        }
+        return new Path(pathId, origins);
+   }
+
+   public static Set<I_Path> readPathSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int size = in.readInt();
+      Set<I_Path> positions = new HashSet<I_Path>(size);
+      for (int i = 0; i < size; i++) {
+         try {
+            positions.add(readPath(in));
+         } catch (IOException ex) {
+            if (NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            } else {
+               throw ex;
+            }
+         }
+      }
+      return positions;
+   }
+   
+   public static void writePathSet(ObjectOutputStream out, Set<I_Path> viewPositions) throws IOException {
+      out.writeInt(viewPositions.size());
+      for (I_Path p: viewPositions) {
+         writePath(out, p);
+      }
+   }
+   public String toString() {
+      StringBuffer buff = new StringBuffer();
+      ConceptBean cb = ConceptBean.get(getConceptId());
+      try {
+         buff.append(cb.getInitialText());
+      } catch (IOException e) {
+         buff.append(e.getMessage());
+         AceLog.getAppLog().alertAndLogException(e);
+      }
+      return buff.toString();      
+   }
 }

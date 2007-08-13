@@ -1,12 +1,10 @@
 package org.dwfa.vodb.types;
 
-import com.sleepycat.je.DatabaseEntry;
 
-public class ThinExtPart {
+public abstract class ThinExtPart {
    private int pathId;
    private int version;
    private int status;
-   private DatabaseEntry extension;
    
    public int getStatus() {
       return status;
@@ -26,20 +24,13 @@ public class ThinExtPart {
    public void setVersion(int version) {
       this.version = version;
    }
-   public DatabaseEntry getExtension() {
-      return extension;
-   }
-   public void setExtension(DatabaseEntry extension) {
-      this.extension = extension;
-   }
 
    @Override
    public boolean equals(Object obj) {
       ThinExtPart another = (ThinExtPart) obj;
       return ((pathId == another.pathId) &&
             (version == another.version) &&
-            (status == another.status) &&
-            (extension.equals(another.extension)));
+            (status == another.status));
    }
    @Override
    public int hashCode() {

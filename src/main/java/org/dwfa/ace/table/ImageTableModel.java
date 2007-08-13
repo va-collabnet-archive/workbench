@@ -38,9 +38,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	public enum IMAGE_FIELD {
 		IMAGE_ID("iid", 5, 100, 100), CON_ID("cid", 5, 100, 100), 
 		DESC("Description", 5, 200, 1000), IMAGE("image", 5, 200, 1000), 
-		STATUS("status", 5, 50, 50), FORMAT("format", 5, 30, 30),
+		STATUS("status", 5, 50, 150), FORMAT("format", 5, 30, 30),
 		TYPE("type", 5, 85, 85), VERSION("version", 5, 140, 140), 
-		BRANCH("pathId", 5, 90, 150);
+		BRANCH("path", 5, 90, 150);
 
 		private String columnName;
 		private int min;

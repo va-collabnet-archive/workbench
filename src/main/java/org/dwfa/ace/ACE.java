@@ -51,6 +51,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -143,6 +144,7 @@ import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
@@ -1215,21 +1217,22 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JLayeredPane layers = getRootPane().getLayeredPane();
         preferencesPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Path",
-                    new SelectPathAndPositionPanel(false, "for view", aceFrameConfig,
-                                                   new PropertySetListenerGlue("removeViewPosition", "addViewPosition",
-                                                                               "replaceViewPosition",
-                                                                               "getViewPositionSet", I_Position.class,
-                                                                               aceFrameConfig)));
         tabs.addTab("View", makeViewConfig());
         tabs.addTab("Edit", makeEditConfig());
+        tabs.addTab("Path",
+              new SelectPathAndPositionPanel(false, "for view", aceFrameConfig,
+                                             new PropertySetListenerGlue("removeViewPosition", "addViewPosition",
+                                                                         "replaceViewPosition",
+                                                                         "getViewPositionSet", I_Position.class,
+                                                                         aceFrameConfig)));
         tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
+        tabs.addTab("RefSet", makeRefsetConfig());
 
         layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
         preferencesPalette.add(tabs, BorderLayout.CENTER);
         preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
-        int width = 500;
+        int width = 600;
         int height = 550;
         preferencesPalette.setSize(width, height);
 
@@ -1377,6 +1380,40 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("roots", makeRootPrefPanel());
         return tabs;
+    }
+    private JTabbedPane makeRefsetConfig() throws Exception {
+       JTabbedPane tabs = new JTabbedPane();
+       tabs.addTab("Concepts", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
+       tabs.addTab("Descriptions", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
+       tabs.addTab("Source Relationships",
+                   new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
+       tabs.addTab("Destination Relationships", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
+       tabs.addTab("Images", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledImageExtTypes())));
+       return tabs;
+   }
+    
+    private JPanel makeRefsetCheckboxPane(Set<EXT_TYPE> enabledTypes) {
+       JPanel checkBoxPane = new JPanel(new GridBagLayout());
+       GridBagConstraints c = new GridBagConstraints();
+       c.anchor = GridBagConstraints.WEST;
+       c.gridx = 0;
+       c.gridy = 0;
+       c.fill = GridBagConstraints.HORIZONTAL;
+       c.weightx = 1;
+       c.weighty = 0;
+       for (EXT_TYPE type: EXT_TYPE.values()) {
+          JCheckBox box = new JCheckBox(type.getInterfaceName());
+          box.setSelected(enabledTypes.contains(type));
+          checkBoxPane.add(box, c);
+          c.gridy++;
+       }
+       c.fill = GridBagConstraints.BOTH;
+       c.weightx = 1;
+       c.weighty = 1;
+       checkBoxPane.add(new JPanel(), c);
+       
+       
+       return checkBoxPane;
     }
 
     private JTabbedPane makeEditConfig() throws Exception {

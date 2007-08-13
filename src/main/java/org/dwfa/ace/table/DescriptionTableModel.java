@@ -33,8 +33,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public enum DESC_FIELD { SCORE("score", 5, 100, 100),
 		DESC_ID("did", 5, 100, 100), CON_ID("cid", 5, 100, 100), TEXT("text",
 				5, 300, 2000), LANG("lang", 5, 30, 30), CASE_FIXED("case", 5,
-				35, 35), STATUS("status", 5, 50, 50), TYPE("type", 5, 85, 85), VERSION(
-				"version", 5, 140, 140), BRANCH("pathId", 5, 90, 150);
+				35, 35), STATUS("status", 5, 50, 150), TYPE("type", 5, 85, 150), VERSION(
+				"version", 5, 140, 140), BRANCH("path", 5, 90, 150);
 
 		private String columnName;
 

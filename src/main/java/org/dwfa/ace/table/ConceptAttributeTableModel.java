@@ -202,9 +202,9 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 	}
 
 	public enum CONCEPT_FIELD {
-		CON_ID("cid", 5, 100, 100), STATUS("status", 5, 50, 50), DEFINED(
+		CON_ID("cid", 5, 100, 100), STATUS("status", 5, 50, 150), DEFINED(
 				"defined", 5, 85, 1550), VERSION("version", 5, 140, 140), BRANCH(
-				"pathId", 5, 90, 150);
+				"path", 5, 90, 150);
 
 		private String columnName;
 

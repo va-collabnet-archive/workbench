@@ -28,7 +28,10 @@ public class IntSet implements ListDataListener, I_IntSet {
 	
 	public IntSet(int[] values) {
 		super();
-		this.setValues = values;
+		this.setValues = new int[0];
+		for (int i: values) {
+		   addNoIntervalAdded(i);
+      }
 	}
 	public IntSet() {
 		super();
@@ -189,7 +192,7 @@ public class IntSet implements ListDataListener, I_IntSet {
         	}
         	set = setMinusUnmapped;
         }
-
+        Arrays.sort(set);
         IntSet returnSet = new IntSet(set);
         return returnSet;
 	}

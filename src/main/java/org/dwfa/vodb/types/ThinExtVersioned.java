@@ -4,19 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @todo add version to vodb
- * @todo add imported change set info to vodb
+ * @todo add version to vodb -> added as getProperty...
+ * @todo add imported change set info to vodb, need to set theProperty...
+ * 
  * @todo have change sets automatically increment as size increases over a certain size. 
+ * Added increment to change set file name format. 
  * @todo add extension ability
  * 
  * @author kec
  *
  */
 public class ThinExtVersioned {
+   
    private int refsetId;
    private int memberId;
    private int componentId;
-   private int typeId;
+   private int typeId; //Use an enumeration when reading/writing, and convert it to the corresponding concept nid...
    private List<ThinExtPart> versions ;
    
    public ThinExtVersioned(int refsetId, int memberId, int componentId, int typeId) {
@@ -44,7 +47,7 @@ public class ThinExtVersioned {
       return typeId;
    }
 
-   public List<ThinExtPart> getVersions() {
+   public List<? extends ThinExtPart> getVersions() {
       return versions;
    }
 
@@ -63,6 +66,10 @@ public class ThinExtVersioned {
    @Override
    public int hashCode() {
       return HashFunction.hashCode(new int[] {refsetId, memberId, componentId, typeId });
+   }
+
+   public void addVersion(ThinExtPart part) {
+      versions.add(part);
    }
 
 }

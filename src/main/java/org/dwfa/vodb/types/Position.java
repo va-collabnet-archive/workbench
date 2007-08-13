@@ -3,7 +3,6 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,13 +21,10 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 
 import com.sleepycat.je.DatabaseException;
 
-public class Position implements Serializable, I_Position {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	int version;
-	I_Path path;
+public class Position implements I_Position {
+
+   private int version;
+	private I_Path path;
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_Position#getPath()
@@ -46,6 +42,9 @@ public class Position implements Serializable, I_Position {
 
 	public Position(int version, I_Path path) {
 		super();
+      if (path == null) {
+         throw new IllegalArgumentException("path cannot be null");
+      }
 		this.version = version;
 		this.path = path;
 	}
@@ -211,7 +210,7 @@ public class Position implements Serializable, I_Position {
 		for (int i = 0; i < size; i++) {
 			origins.add(readPosition(in));
         }
-		Path p = new Path(pathConceptId, origins);
+		  Path p = new Path(pathConceptId, origins);
         return new Position(version, p);
 	}
 

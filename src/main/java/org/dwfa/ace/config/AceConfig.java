@@ -534,6 +534,18 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         if (configFile == null) {
             throw new IOException("configFile is null. Please set before saving. ");
         } 
+        File changeSetFile = new File(getChangeSetRoot(), getChangeSetWriterFileName());
+        if (changeSetFile.exists()) {
+           int maxSize = 512000;
+           if (changeSetFile.length() > maxSize) {
+              String[] nameParts = getChangeSetWriterFileName().split("#");
+              int sequence = Integer.parseInt(nameParts[1]);
+              sequence++;
+              setChangeSetWriterFileName(nameParts[0] + '#' + sequence + "#" + nameParts[2]);
+              AceLog.getAppLog().info("change set exceeds " + maxSize + 
+                    " bytes. Incrementing file to: " + getChangeSetWriterFileName());
+           }
+        }
         FileOutputStream fos = new FileOutputStream(configFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);

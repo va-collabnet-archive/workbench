@@ -39,7 +39,13 @@ public class TermLabelMaker {
 		labelBuff.append("<font face='Dialog' size='3'>");
 		labelBuff.append(text);
 		labelBuff.append(" &nbsp;</font>");
-		toolTipBuff.append("<html>");
+      labelBuff.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
+      if (statusBean != null) {
+         labelBuff.append(statusBean.getInitialText());
+      }
+      labelBuff.append("</font>&nbsp;");
+
+      toolTipBuff.append("<html>");
 		StringBuffer writeBuff = labelBuff;
 		if (showLongForm) {
 			writeBuff = labelBuff;
@@ -56,11 +62,6 @@ public class TermLabelMaker {
 				writeBuff.append("<br>");
 			}
 		}
-		writeBuff.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
-		if (statusBean != null) {
-			writeBuff.append(statusBean.getInitialText());
-		}
-		writeBuff.append("</font>&nbsp;");
 		
 		String labelHtml = labelBuff.toString();
 		String toolTipHtml = toolTipBuff.toString();

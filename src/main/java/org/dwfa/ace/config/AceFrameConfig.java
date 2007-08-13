@@ -50,9 +50,11 @@ import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
+import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 
 import com.sleepycat.je.DatabaseException;
@@ -62,7 +64,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 21;
+    private static final int dataVersion = 22;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -135,6 +137,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
 	private I_GetConceptData defaultImageType;
 	private I_IntList editImageTypePopup;
+   
+   //22
+   private Set<EXT_TYPE> enabledConceptExtTypes = new HashSet<EXT_TYPE>();
+   private Set<EXT_TYPE> enabledDescExtTypes = new HashSet<EXT_TYPE>();
+   private Set<EXT_TYPE> enabledRelExtTypes = new HashSet<EXT_TYPE>();
+   private Set<EXT_TYPE> enabledImageExtTypes = new HashSet<EXT_TYPE>();
 
 	//transient
     private transient MasterWorker worker;
@@ -153,7 +161,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntSet.writeIntSet(out, descTypes);
         Position.writePositionSet(out, viewPositions);
         out.writeObject(bounds);
-        out.writeObject(editingPathSet);
+        Path.writePathSet(out, editingPathSet);
         IntSet.writeIntSet(out, childrenExpandedNodes);
         IntSet.writeIntSet(out, parentExpandedNodes);
         IntSet.writeIntSet(out, roots);
@@ -237,6 +245,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 			throw newEx;
 		}
 		IntList.writeIntList(out, editImageTypePopup);
+      
+      //22
+      out.writeObject(enabledConceptExtTypes);
+      out.writeObject(enabledDescExtTypes);
+      out.writeObject(enabledRelExtTypes);
+      out.writeObject(enabledImageExtTypes);
+     
                 
    }
 
@@ -258,7 +273,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             viewPositions = Position.readPositionSet(in);
             bounds = (Rectangle) in.readObject();
             if (objDataVersion >= 3) {
-            	editingPathSet = (Set<I_Path>) in.readObject();
+            	editingPathSet = Path.readPathSet(in);
             } else {
             	editingPathSet = new HashSet<I_Path>();
             }
@@ -415,6 +430,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	editImageTypePopup = new IntList();
             	editImageTypePopup.add(defaultImageType.getConceptId());
             }
+            if (objDataVersion >= 22) {
+               enabledConceptExtTypes = (Set<EXT_TYPE>) in.readObject();
+               enabledDescExtTypes = (Set<EXT_TYPE>) in.readObject();
+               enabledRelExtTypes = (Set<EXT_TYPE>) in.readObject();
+               enabledImageExtTypes = (Set<EXT_TYPE>) in.readObject();
+            } else {
+               enabledConceptExtTypes = new HashSet<EXT_TYPE>();
+               enabledDescExtTypes = new HashSet<EXT_TYPE>();
+               enabledRelExtTypes = new HashSet<EXT_TYPE>();
+               enabledImageExtTypes = new HashSet<EXT_TYPE>();
+           }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -1466,5 +1492,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    }
    public void setSubversionToggleVisible(boolean visible) {
       aceFrame.getCdePanel().setSubversionToggleVisible(visible);
+   }
+
+
+   public Set<EXT_TYPE> getEnabledConceptExtTypes() {
+      return enabledConceptExtTypes;
+   }
+
+
+   public Set<EXT_TYPE> getEnabledDescExtTypes() {
+      return enabledDescExtTypes;
+   }
+
+
+   public Set<EXT_TYPE> getEnabledImageExtTypes() {
+      return enabledImageExtTypes;
+   }
+
+
+   public Set<EXT_TYPE> getEnabledRelExtTypes() {
+      return enabledRelExtTypes;
    }
 }

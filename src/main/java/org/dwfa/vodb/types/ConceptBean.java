@@ -159,14 +159,21 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 * @see org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet,
 	 *      java.util.Set)
 	 */
-	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, Set<I_Position> positionSet)
-			throws IOException {
-		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-		getConceptAttributes().addTuples(allowedStatus, positionSet,
-				returnTuples);
-		return returnTuples;
-	}
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
+         I_IntSet allowedStatus, Set<I_Position> positionSet)
+         throws IOException {
+      return getConceptAttributeTuples(
+            allowedStatus, positionSet, true);
+   }
+
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
+         I_IntSet allowedStatus, Set<I_Position> positionSet, boolean addUncommitted)
+         throws IOException {
+      List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
+      getConceptAttributes().addTuples(allowedStatus, positionSet,
+            returnTuples, addUncommitted);
+      return returnTuples;
+   }
 
 	/*
 	 * (non-Javadoc)
@@ -177,14 +184,21 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public List<I_DescriptionTuple> getDescriptionTuples(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positionSet) throws IOException {
-		List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
-		for (I_DescriptionVersioned desc : getDescriptions()) {
-			desc.addTuples(allowedStatus, allowedTypes, positionSet,
-					returnDescriptions, true);
-		}
-		return returnDescriptions;
+		return getDescriptionTuples(
+            allowedStatus, allowedTypes,
+            positionSet, true);
 	}
 
+   public List<I_DescriptionTuple> getDescriptionTuples(
+         I_IntSet allowedStatus, I_IntSet allowedTypes,
+         Set<I_Position> positionSet, boolean addUncommitted) throws IOException {
+      List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
+      for (I_DescriptionVersioned desc : getDescriptions()) {
+         desc.addTuples(allowedStatus, allowedTypes, positionSet,
+               returnDescriptions, addUncommitted);
+      }
+      return returnDescriptions;
+   }
 	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
       List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
       for (I_ImageVersioned img : getImages()) {
@@ -839,67 +853,17 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config)
 			throws IOException {
-		Set<I_DescriptionTuple> commonTuples = null;
-		for (I_Position p : config.getViewPositionSet()) {
-			Set<I_Position> positionSet = new HashSet<I_Position>();
-			positionSet.add(p);
-			List<I_DescriptionTuple> tuplesForPosition = getDescriptionTuples(
-					config.getAllowedStatus(), null, positionSet);
-			if (commonTuples == null) {
-				commonTuples = new HashSet<I_DescriptionTuple>();
-				commonTuples.addAll(tuplesForPosition);
-			} else {
-				commonTuples.retainAll(tuplesForPosition);
-			}
-		}
-		if (commonTuples == null) {
-			commonTuples = new HashSet<I_DescriptionTuple>();
-		}
-		return commonTuples;
+      return ConceptBeanConflictHelper.getCommonDescTuples(this, config);
 	}
 
 	public Set<I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config)
 			throws IOException {
-		Set<I_RelTuple> commonTuples = null;
-		for (I_Position p : config.getViewPositionSet()) {
-			Set<I_Position> positionSet = new HashSet<I_Position>();
-			positionSet.add(p);
-			List<I_RelTuple> tuplesForPosition = getSourceRelTuples(config
-					.getAllowedStatus(), null, positionSet, false);
-			if (commonTuples == null) {
-				commonTuples = new HashSet<I_RelTuple>();
-				commonTuples.addAll(tuplesForPosition);
-			} else {
-				commonTuples.retainAll(tuplesForPosition);
-			}
-		}
-		if (commonTuples == null) {
-			commonTuples = new HashSet<I_RelTuple>();
-		}
-		return commonTuples;
+      return ConceptBeanConflictHelper.getCommonRelTuples(this, config);
 	}
 
-	public Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(
-			I_ConfigAceFrame config) throws IOException {
-		Set<I_ConceptAttributeTuple> commonTuples = null;
-		for (I_Position p : config.getViewPositionSet()) {
-			Set<I_Position> positionSet = new HashSet<I_Position>();
-			positionSet.add(p);
-			List<I_ConceptAttributeTuple> tuplesForPosition = getConceptAttributeTuples(
-					config.getAllowedStatus(), positionSet);
-			if (commonTuples == null) {
-				commonTuples = new HashSet<I_ConceptAttributeTuple>();
-				commonTuples.addAll(tuplesForPosition);
-			} else {
-				commonTuples.retainAll(tuplesForPosition);
-			}
-		}
-		if (commonTuples == null) {
-			commonTuples = new HashSet<I_ConceptAttributeTuple>();
-		}
-		return commonTuples;
-	}
-
+   public Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(I_ConfigAceFrame config) throws IOException {
+      return ConceptBeanConflictHelper.getCommonConceptAttributeTuples(this, config);
+   }
 	public I_IdVersioned getId() throws IOException {
 		if (id == null) {
 			id = AceConfig.getVodb().getId(conceptId);

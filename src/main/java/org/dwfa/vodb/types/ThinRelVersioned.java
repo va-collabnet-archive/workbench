@@ -322,17 +322,20 @@ public class ThinRelVersioned implements I_RelVersioned {
 							.getVersion(), possiblePath);
 					boolean addPart = true;
 					for (I_RelPart reject : rejectedParts) {
-						I_Position rejectedStatusPosition = new Position(reject
-								.getVersion(), position.getPath()
-								.getMatchingPath(reject.getPathId()));
-						if (rejectedStatusPosition.getPath() != null
-								&& rejectedStatusPosition
-										.isSubsequentOrEqualTo(possibleStatusPosition)
-								&& position
-										.isSubsequentOrEqualTo(rejectedStatusPosition)) {
-							addPart = false;
-							continue;
-						}
+                  int version = reject.getVersion();
+                  I_Path matchingPath = position.getPath()
+                  .getMatchingPath(reject.getPathId());
+                  if (matchingPath != null) {
+                     I_Position rejectedStatusPosition = new Position(version, matchingPath);
+                     if (rejectedStatusPosition.getPath() != null
+                           && rejectedStatusPosition
+                                 .isSubsequentOrEqualTo(possibleStatusPosition)
+                           && position
+                                 .isSubsequentOrEqualTo(rejectedStatusPosition)) {
+                        addPart = false;
+                        continue;
+                     }
+                  }
 					}
 					if (addPart) {
 						returnRels.add(possible);
