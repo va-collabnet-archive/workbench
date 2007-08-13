@@ -409,6 +409,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.NONE;
+      c.weightx = 0;
+      c.weighty = 0;
       
       JPanel leftTogglePane = new JPanel(new GridLayout(1,0));
       toggleBar.add(leftTogglePane, c);
@@ -461,7 +463,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		});
 		if (plugins != null) {
 			c.weightx = 0.0;
-			c.weightx = 0.0;
+			c.weighty = 0.0;
 			c.fill = GridBagConstraints.NONE;
          c.gridx++;
          toggleBar.add(rightTogglePane, c);

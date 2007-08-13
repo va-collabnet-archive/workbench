@@ -135,10 +135,6 @@ import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.gui.button.Button24x24;
-import org.dwfa.gui.toggle.Toggle24x24;
-import org.dwfa.gui.toggle.Toggle32x32;
-import org.dwfa.gui.toggle.Toggle48x48;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
@@ -962,7 +958,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private static void addActionButton(ActionListener actionListener, String resource, String tooltipText,
         JPanel topPanel, GridBagConstraints c) {
-        JButton newProcess = new Button24x24(new ImageIcon(ACE.class.getResource(resource)));
+        JButton newProcess = new JButton(new ImageIcon(ACE.class.getResource(resource)));
         newProcess.setToolTipText(tooltipText);
         newProcess.addActionListener(actionListener);
         topPanel.add(newProcess, c);
@@ -974,13 +970,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JToggleButton newProcess;
           switch (size) {
           case 24:
-             newProcess = new Toggle24x24(new ImageIcon(ACE.class.getResource(resource)));
+             newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
              break;
           case 32:
-             newProcess = new Toggle32x32(new ImageIcon(ACE.class.getResource(resource)));
+             newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
              break;
           case 48:
-             newProcess = new Toggle48x48(new ImageIcon(ACE.class.getResource(resource)));
+             newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
              break;
          default:
             newProcess = new JToggleButton(new ImageIcon(ACE.class.getResource(resource)));
@@ -1776,13 +1772,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
         c.gridy = 0;
-        showHistoryButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/history2.png")));
+        showHistoryButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/history2.png")));
         showHistoryButton.setToolTipText("history of user commits and concepts viewed");
         hpal = new HistoryPaletteActionListener();
         showHistoryButton.addActionListener(hpal);
         topPanel.add(showHistoryButton, c);
         c.gridx++;
-        showAddressesButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/address_book3.png")));
+        showAddressesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/address_book3.png")));
         showAddressesButton.setToolTipText("address book of project participants");
         apal = new AddressPaletteActionListener();
         showAddressesButton.addActionListener(apal);
@@ -1794,13 +1790,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0;
-        showTreeButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/text_tree.png")));
+        showTreeButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/text_tree.png")));
         showTreeButton.setToolTipText("Show the hierarchy view of the terminology content.");
         showTreeButton.setSelected(true);
         showTreeButton.addActionListener(resizeListener);
         topPanel.add(showTreeButton, c);
         c.gridx++;
-        showComponentButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/components.png")));
+        showComponentButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/components.png")));
         showComponentButton.setToolTipText("Show the component view of the terminology content.");
         showComponentButton.setSelected(true);
         showComponentButton.addActionListener(resizeListener);
@@ -1840,14 +1836,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
                 if (iconBytes != null) {
                     ImageIcon icon = new ImageIcon(iconBytes);
-                    JButton pluginButton = new Button24x24(icon);
+                    JButton pluginButton = new JButton(icon);
                     pluginButton.setToolTipText(bp.getSubject());
                     pluginButton.addActionListener(new PluginListener(f));
                     c.gridx++;
                     topPanel.add(pluginButton, c);
                     AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
                 } else {
-                    JButton pluginButton = new Button24x24(bp.getName());
+                    JButton pluginButton = new JButton(bp.getName());
                     pluginButton.setToolTipText(bp.getSubject());
                     pluginButton.addActionListener(new PluginListener(f));
                     c.gridx++;
@@ -1861,27 +1857,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(new JLabel("   "), c);
         c.gridx++;
 
-        showQueuesButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/inbox.png")));
+        showQueuesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/inbox.png")));
         topPanel.add(showQueuesButton, c);
         showQueuesActionListener = new QueuesPaletteActionListener();
         showQueuesButton.addActionListener(showQueuesActionListener);
         showQueuesButton.setToolTipText("Show the queue viewer...");
         c.gridx++;
 
-        showProcessBuilder = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
+        showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
         topPanel.add(showProcessBuilder, c);
         showProcessBuilderActionListener = new ProcessPaletteActionListener();
         showProcessBuilder.addActionListener(showProcessBuilderActionListener);
         showProcessBuilder.setToolTipText("Show the process builder...");
         c.gridx++;
 
-        showSubversionButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/svn.png")));
+        showSubversionButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/svn.png")));
         topPanel.add(showSubversionButton, c);
         showSubversionButton.addActionListener(new SubversionPaletteActionListener());
         showSubversionButton.setToolTipText("Show Subversion panel...");
         showSubversionButton.setVisible(false);
         c.gridx++;
-        showPreferencesButton = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
+        showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
         preferencesActionListener = new PreferencesPaletteActionListener();
         showPreferencesButton.addActionListener(preferencesActionListener);
         topPanel.add(showPreferencesButton, c);
@@ -1967,11 +1963,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
         c.gridy = 0;
-        showSearchToggle = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/find.png")));
+        showSearchToggle = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/find.png")));
         showSearchToggle.addActionListener(bottomPanelActionListener);
         bottomPanel.add(showSearchToggle, c);
         c.gridx++;
-        showSignpostPanelToggle = new Toggle32x32(new ImageIcon(ACE.class
+        showSignpostPanelToggle = new JToggleButton(new ImageIcon(ACE.class
                 .getResource("/32x32/plain/signpost.png")));
         showSignpostPanelToggle.addActionListener(bottomPanelActionListener);
         bottomPanel.add(showSignpostPanelToggle, c);
