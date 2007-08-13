@@ -3,6 +3,7 @@ package org.dwfa.ace.gui.concept;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +66,6 @@ import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button24x24;
-import org.dwfa.gui.toggle.Toggle24x24;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.ConceptBean;
@@ -409,16 +409,20 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.NONE;
+      
+      JPanel leftTogglePane = new JPanel(new GridLayout(1,0));
+      toggleBar.add(leftTogglePane, c);
+      
+      JPanel rightTogglePane = new JPanel(new GridLayout(1,0));
 
 		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
 		for (I_PluginToConceptPanel plugin : plugins) {
 			for (JComponent component : plugin.getToggleBarComponents()) {
-				toggleBar.add(component, c);
-				c.gridx++;
+            leftTogglePane.add(component);
 			}
 			plugin.addShowComponentListener(l);
 		}
-		inferredButton = new Toggle24x24(new ImageIcon(ACE.class
+		inferredButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/yinyang.png")));
 		inferredButton.setSelected(false);
 		inferredButton
@@ -428,21 +432,21 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						+ "can be boiled and eventually turn into steam (yang).<p> <p>"
 						+ "Stated forms (yin) can be classified and turned into<br>"
 						+ "inferred forms (yang).");
-		toggleBar.add(inferredButton, c);
-		c.gridx++;
-		usePrefButton = new Toggle24x24(new ImageIcon(ACE.class
+      leftTogglePane.add(inferredButton);
+		usePrefButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/component_preferences.png")));
 		usePrefButton.setSelected(false);
 		historyChangeActionListener = new ToggleHistoryChangeActionListener();
 		usePrefButton.addActionListener(historyChangeActionListener);
-		toggleBar.add(usePrefButton, c);
-		c.gridx++;
-		historyButton = new Toggle24x24(new ImageIcon(ACE.class
+      leftTogglePane.add(usePrefButton);
+
+		historyButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/history.png")));
 		historyButton.setSelected(false);
 		historyButton.addActionListener(historyChangeActionListener);
-		toggleBar.add(historyButton, c);
-		c.gridx++;
+      leftTogglePane.add(historyButton);
+
+      c.gridx++;
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		toggleBar.add(new JPanel(), c);
@@ -459,6 +463,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			c.weightx = 0.0;
 			c.weightx = 0.0;
 			c.fill = GridBagConstraints.NONE;
+         c.gridx++;
+         toggleBar.add(rightTogglePane, c);
 			for (File f : plugins) {
 				FileInputStream fis = new FileInputStream(f);
 				BufferedInputStream bis = new BufferedInputStream(fis);
@@ -471,16 +477,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					JButton pluginButton = new Button24x24(icon);
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
-					c.gridx++;
-					toggleBar.add(pluginButton, c);
+					rightTogglePane.add(pluginButton, c);
 					AceLog.getAppLog().info(
 							"adding component plugin: " + f.getName());
 				} else {
 					JButton pluginButton = new Button24x24(bp.getName());
 					pluginButton.setToolTipText(bp.getSubject());
 					pluginButton.addActionListener(new PluginListener(f));
-					c.gridx++;
-					toggleBar.add(pluginButton, c);
+               rightTogglePane.add(pluginButton, c);
 					AceLog.getAppLog().info(
 							"adding component plugin: " + f.getName());
 				}
