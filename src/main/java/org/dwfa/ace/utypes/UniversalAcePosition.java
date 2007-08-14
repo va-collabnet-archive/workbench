@@ -21,11 +21,11 @@ public class UniversalAcePosition implements Serializable {
 		super();
 	}
 
-	public UniversalAcePosition(Collection<UUID> pathId, long version) {
-		super();
-		this.pathId = pathId;
-		this.time = version;
-	}
+   public UniversalAcePosition(Collection<UUID> pathId, long time) {
+      super();
+      this.pathId = pathId;
+      this.time = time;
+   }
 
 	public Collection<UUID> getPathId() {
 		return pathId;

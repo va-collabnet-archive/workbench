@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.data.SortedSetModel;
@@ -291,4 +292,6 @@ public interface I_ConfigAceFrame {
     public void setHistoryToggleVisible(boolean visible);
     public boolean isHistoryToggleVisible();
 
+    public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible);
+    public boolean isToggleVisible(TOGGLES toggle);
 }

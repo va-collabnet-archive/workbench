@@ -16,6 +16,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -309,6 +310,19 @@ public class NewDefaultProfile extends AbstractTask {
         Set<I_Position> viewSet = new HashSet<I_Position>();
         viewSet.add(viewPosition);
         activeConfig.setViewPositions(viewSet);
+        
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.ID, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.ATTRIBUTES, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.DESCRIPTIONS, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.SOURCE_RELS, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.DEST_RELS, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.LINEAGE, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.IMAGE, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.CONFLICT, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED, false);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.PREFERENCES, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.HISTORY, true);
+        activeConfig.setTogglesInComponentPanelVisible(TOGGLES.REFSETS, false);
 
         return activeConfig;
     }
