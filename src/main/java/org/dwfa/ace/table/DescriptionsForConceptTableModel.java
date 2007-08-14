@@ -194,7 +194,11 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		I_IntSet allowedTypes = null;
 		Set<I_Position> positions = null;
 		if (host.getUsePrefs()) {
-			allowedTypes = host.getConfig().getDescTypes();
+         if (host.getConfig().getDescTypes().getSetValues().length == 0) {
+            allowedTypes = null;
+         } else {
+            allowedTypes = host.getConfig().getDescTypes();
+         }
 			positions = host.getConfig().getViewPositionSet();
 		}
 		if (host.getShowHistory()) {

@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -331,7 +333,15 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			return null;
 		}
 		if (allTuples == null) {
-			allTuples = cb.getConceptAttributes().getTuples();
+         allTuples = new ArrayList<I_ConceptAttributeTuple>();
+         Set<I_Position> positions = null;
+         if (host.getUsePrefs()) {
+            positions = host.getConfig().getViewPositionSet();
+         }
+         if (host.getShowHistory()) {
+            positions = null;
+          }
+			cb.getConceptAttributes().addTuples(null, positions, allTuples);
 		}
 		return allTuples.get(rowIndex);
 	}
