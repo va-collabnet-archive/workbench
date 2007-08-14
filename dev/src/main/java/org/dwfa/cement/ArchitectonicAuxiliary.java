@@ -104,8 +104,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
       				new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
                   EXTERNAL_REFERENCE("external reference",
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                  DESIGNATION("designation",
-                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
       			FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID, 
       					new String[] {"fully specified"},
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
