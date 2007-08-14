@@ -343,7 +343,10 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
           }
 			cb.getConceptAttributes().addTuples(null, positions, allTuples);
 		}
-		return allTuples.get(rowIndex);
+      if (rowIndex < allTuples.size()) {
+         return allTuples.get(rowIndex);
+      }
+		return null;
 	}
 
 	public String getColumnName(int col) {
