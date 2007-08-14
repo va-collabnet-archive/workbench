@@ -104,6 +104,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.config.AceConfig;
@@ -148,7 +149,40 @@ import com.sleepycat.je.DatabaseException;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
-    private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
+    public class SetRefsetInToggleVisible implements ActionListener {
+
+       EXT_TYPE type;
+       TOGGLES t;
+       
+      public SetRefsetInToggleVisible(EXT_TYPE type, TOGGLES t) {
+         super();
+         this.type = type;
+         this.t = t;
+      }
+
+      public void actionPerformed(ActionEvent evt) {
+         JToggleButton button = (JToggleButton) evt.getSource();
+         aceFrameConfig.setRefsetInToggleVisible(type, t, button.isSelected());
+
+      }
+
+   }
+
+   public class SetToggleVisibleListener implements ActionListener {
+       TOGGLES t;
+       
+      public SetToggleVisibleListener(TOGGLES t) {
+         super();
+         this.t = t;
+      }
+
+      public void actionPerformed(ActionEvent evt) {
+         JToggleButton button = (JToggleButton) evt.getSource();
+         aceFrameConfig.setTogglesInComponentPanelVisible(t, button.isSelected());
+      }
+   }
+
+   private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
 
     private static List<I_Transact> imported = new ArrayList<I_Transact>();
     
@@ -1223,6 +1257,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                                                          aceFrameConfig)));
         tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
         tabs.addTab("RefSet", makeRefsetConfig());
+        tabs.addTab("Component Panel", makeComponentConfig());
 
         layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
         preferencesPalette.add(tabs, BorderLayout.CENTER);
@@ -1379,16 +1414,45 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
     private JTabbedPane makeRefsetConfig() throws Exception {
        JTabbedPane tabs = new JTabbedPane();
-       tabs.addTab("Concepts", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
-       tabs.addTab("Descriptions", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
+       tabs.addTab("Concept Attributes", new JScrollPane(makeRefsetCheckboxPane(TOGGLES.ATTRIBUTES)));
+       tabs.addTab("Descriptions", new JScrollPane(makeRefsetCheckboxPane(TOGGLES.DESCRIPTIONS)));
        tabs.addTab("Source Relationships",
-                   new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
-       tabs.addTab("Destination Relationships", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledConceptExtTypes())));
-       tabs.addTab("Images", new JScrollPane(makeRefsetCheckboxPane(aceFrameConfig.getEnabledImageExtTypes())));
+                   new JScrollPane(makeRefsetCheckboxPane(TOGGLES.SOURCE_RELS)));
+       tabs.addTab("Destination Relationships", new JScrollPane(makeRefsetCheckboxPane(TOGGLES.DEST_RELS)));
+       tabs.addTab("Images", new JScrollPane(makeRefsetCheckboxPane(TOGGLES.IMAGE)));
        return tabs;
    }
     
-    private JPanel makeRefsetCheckboxPane(Set<EXT_TYPE> enabledTypes) {
+    private JScrollPane makeComponentConfig () throws Exception {
+       return new JScrollPane(makeComponentToggleCheckboxPane());
+    }
+    
+    private JPanel makeComponentToggleCheckboxPane() {
+       JPanel checkBoxPane = new JPanel(new GridBagLayout());
+       GridBagConstraints c = new GridBagConstraints();
+       c.anchor = GridBagConstraints.WEST;
+       c.gridx = 0;
+       c.gridy = 0;
+       c.fill = GridBagConstraints.HORIZONTAL;
+       c.weightx = 1;
+       c.weighty = 0;
+       for (TOGGLES t: TOGGLES.values()) {
+          JCheckBox box = new JCheckBox(t.name());
+          box.setSelected(aceFrameConfig.isToggleVisible(t));
+          box.addActionListener(new SetToggleVisibleListener(t));
+          checkBoxPane.add(box, c);
+          c.gridy++;
+       }
+       c.fill = GridBagConstraints.BOTH;
+       c.weightx = 1;
+       c.weighty = 1;
+       checkBoxPane.add(new JPanel(), c);
+       
+       
+       return checkBoxPane;
+   }
+
+   private JPanel makeRefsetCheckboxPane(TOGGLES t) {
        JPanel checkBoxPane = new JPanel(new GridBagLayout());
        GridBagConstraints c = new GridBagConstraints();
        c.anchor = GridBagConstraints.WEST;
@@ -1399,7 +1463,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
        c.weighty = 0;
        for (EXT_TYPE type: EXT_TYPE.values()) {
           JCheckBox box = new JCheckBox(type.getInterfaceName());
-          box.setSelected(enabledTypes.contains(type));
+          box.setSelected(aceFrameConfig.isRefsetInToggleVisible(type, t));
+          box.addActionListener(new SetRefsetInToggleVisible(type, t));
           checkBoxPane.add(box, c);
           c.gridy++;
        }

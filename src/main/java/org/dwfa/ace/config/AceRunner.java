@@ -116,9 +116,13 @@ public class AceRunner {
                         JOptionPane.YES_NO_OPTION);
 
                   if (n == JOptionPane.YES_OPTION) {
-                     // do the checkout...
-                     AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
-                     Svn.getSvnClient().checkout(specParts[server], specParts[local], Revision.HEAD, true);
+                     try {
+                        // do the checkout...
+                        AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
+                        Svn.getSvnClient().checkout(specParts[server], specParts[local], Revision.HEAD, true);
+                     } catch (Exception e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                     }
                   }
                }
             }

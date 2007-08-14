@@ -37,6 +37,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
@@ -64,7 +65,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 22;
+    private static final int dataVersion = 24;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -144,6 +145,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    private Set<EXT_TYPE> enabledRelExtTypes = new HashSet<EXT_TYPE>();
    private Set<EXT_TYPE> enabledImageExtTypes = new HashSet<EXT_TYPE>();
 
+   //23
+   private Set<TOGGLES> visibleComponentToggles = new HashSet<TOGGLES>();
+   //24
+   private Set<String> visibleRefsets = new HashSet<String>();
 	//transient
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -252,7 +257,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
       out.writeObject(enabledRelExtTypes);
       out.writeObject(enabledImageExtTypes);
      
-                
+      //23
+      out.writeObject(visibleComponentToggles);
+      //24
+      out.writeObject(visibleRefsets);
+               
    }
 
 
@@ -440,6 +449,28 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                enabledDescExtTypes = new HashSet<EXT_TYPE>();
                enabledRelExtTypes = new HashSet<EXT_TYPE>();
                enabledImageExtTypes = new HashSet<EXT_TYPE>();
+           }
+            if (objDataVersion >= 23) {
+               visibleComponentToggles = (Set<TOGGLES>) in.readObject();
+           } else {
+              visibleComponentToggles = new HashSet<TOGGLES>();
+              setTogglesInComponentPanelVisible(TOGGLES.ID, true);
+              setTogglesInComponentPanelVisible(TOGGLES.ATTRIBUTES, true);
+              setTogglesInComponentPanelVisible(TOGGLES.DESCRIPTIONS, true);
+              setTogglesInComponentPanelVisible(TOGGLES.SOURCE_RELS, true);
+              setTogglesInComponentPanelVisible(TOGGLES.DEST_RELS, true);
+              setTogglesInComponentPanelVisible(TOGGLES.LINEAGE, true);
+              setTogglesInComponentPanelVisible(TOGGLES.IMAGE, true);
+              setTogglesInComponentPanelVisible(TOGGLES.CONFLICT, true);
+              setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED, false);
+              setTogglesInComponentPanelVisible(TOGGLES.PREFERENCES, true);
+              setTogglesInComponentPanelVisible(TOGGLES.HISTORY, true);
+              setTogglesInComponentPanelVisible(TOGGLES.REFSETS, false);
+           }
+            if (objDataVersion >= 24) {
+                visibleRefsets = (Set<String>) in.readObject();
+           } else {
+              visibleRefsets = new HashSet<String>();
            }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -1512,5 +1543,28 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
    public Set<EXT_TYPE> getEnabledRelExtTypes() {
       return enabledRelExtTypes;
+   }
+
+   public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible) {
+      if (visible) {
+         visibleComponentToggles.add(toggle);
+      } else {
+         visibleComponentToggles.remove(toggle);
+      }
+      changeSupport.firePropertyChange("visibleComponentToggles", null, visibleComponentToggles);
+   }
+   public boolean isToggleVisible(TOGGLES toggle) {
+      return visibleComponentToggles.contains(toggle);
+   }
+   public void setRefsetInToggleVisible(EXT_TYPE refsetType, TOGGLES toggle, boolean visible) {
+      if (visible) {
+         visibleRefsets.add(refsetType.name() + toggle.toString());
+      } else {
+         visibleRefsets.remove(refsetType.name() + toggle.toString());
+      }
+      changeSupport.firePropertyChange("visibleRefsets", null, visibleRefsets);
+   }
+   public boolean isRefsetInToggleVisible(EXT_TYPE refsetType, TOGGLES toggle) {
+      return visibleRefsets.contains(refsetType.name() + toggle.toString());
    }
 }

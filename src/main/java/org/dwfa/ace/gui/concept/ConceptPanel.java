@@ -1,9 +1,9 @@
 package org.dwfa.ace.gui.concept;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,6 +58,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -131,6 +132,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			}
 		}
 	}
+   
+   private class UpdateTogglesPropertyChangeListener implements PropertyChangeListener {
+      public void propertyChange(PropertyChangeEvent arg0) {
+         SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+               updateToggles();
+            }
+ 
+         });
+       }
+   }
 
 	private TermComponentLabel label;
 
@@ -332,6 +345,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			ClassNotFoundException {
 		super(new GridBagLayout());
 		this.ace = ace;
+      this.ace.getAceFrameConfig().addPropertyChangeListener("visibleComponentToggles", new UpdateTogglesPropertyChangeListener());
       ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
 		historyChangeActionListener = new ToggleHistoryChangeActionListener();
@@ -411,14 +425,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
       c.weightx = 0;
       c.weighty = 0;
       
-      JPanel leftTogglePane = new JPanel(new GridLayout(1,0));
+      JPanel leftTogglePane = new JPanel(new FlowLayout());
       toggleBar.add(leftTogglePane, c);
       
-      JPanel rightTogglePane = new JPanel(new GridLayout(1,0));
+      JPanel rightTogglePane = new JPanel(new FlowLayout());
 
 		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
 		for (I_PluginToConceptPanel plugin : plugins) {
 			for (JComponent component : plugin.getToggleBarComponents()) {
+            
             leftTogglePane.add(component);
 			}
 			plugin.addShowComponentListener(l);
@@ -499,9 +514,46 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
 		pluginMap.put(TOGGLES.IMAGE, imagePlugin);
 		pluginMap.put(TOGGLES.CONFLICT, conflictPlugin);
+
+      updateToggles();
+      
 		
 		return toggleBar;
 	}
+
+   private void updateToggles() {
+      for (TOGGLES t: TOGGLES.values()) {
+         boolean visible = ((AceFrameConfig) ace.getAceFrameConfig()).isToggleVisible(t);
+         if (pluginMap.get(t) != null) {
+            I_PluginToConceptPanel plugin = pluginMap.get(t);
+            for (JComponent toggleComponent: plugin.getToggleBarComponents()) {
+               toggleComponent.setVisible(visible);
+               toggleComponent.setEnabled(visible);
+            }
+         } else {
+            switch (t) {
+            case HISTORY:
+               historyButton.setVisible(visible);
+               historyButton.setEnabled(visible);
+               break;
+            case PREFERENCES:
+               usePrefButton.setVisible(visible);
+               usePrefButton.setEnabled(visible);
+               break;
+            case REFSETS:
+               
+               break;
+            case STATED_INFERRED:
+               inferredButton.setVisible(visible);
+               inferredButton.setEnabled(visible);
+               break;
+
+            default:
+               break;
+            }
+         }
+      }
+   }
 
 	private class PluginListener implements ActionListener {
 		File pluginProcessFile;

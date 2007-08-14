@@ -7,6 +7,7 @@ import org.dwfa.vodb.types.ThinExtPartBoolean;
 import org.dwfa.vodb.types.ThinExtPartConcept;
 import org.dwfa.vodb.types.ThinExtPartInteger;
 import org.dwfa.vodb.types.ThinExtPartLanguage;
+import org.dwfa.vodb.types.ThinExtPartScopedLanguage;
 import org.dwfa.vodb.types.ThinExtVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -15,7 +16,8 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ThinExtBinder extends TupleBinding {
    public static enum EXT_TYPE {
-      BOOLEAN(1, "boolean"), CONCEPT(2, "concept"), INTEGER(3, "integer"), LANGUAGE(4, "language");
+      BOOLEAN(1, "boolean"), CONCEPT(2, "concept"), INTEGER(3, "integer"), LANGUAGE(4, "language"), 
+      SCOPED_LANGUAGE(5, "scoped language");
 
       private int id;
       private String interfaceName;
@@ -39,6 +41,8 @@ public class ThinExtBinder extends TupleBinding {
             return INTEGER;
          case 4:
             return LANGUAGE;
+         case 5:
+            return SCOPED_LANGUAGE;
 
          default:
             throw new RuntimeException("Can't convert to EXT_TYPE: " + id);
@@ -81,6 +85,9 @@ public class ThinExtBinder extends TupleBinding {
             break;
          case LANGUAGE:
             typeId = RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid();
+            break;
+         case SCOPED_LANGUAGE:
+            typeId = RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid();
             break;
 
          default:
@@ -130,6 +137,21 @@ public class ThinExtBinder extends TupleBinding {
             part.setVersion(ti.readInt());
             part.setAcceptabilityId(ti.readInt());
             part.setCorrectnessId(ti.readInt());
+            part.setDegreeOfSynonymyId(ti.readInt());
+            versioned.addVersion(part);
+         }
+         break;
+      case SCOPED_LANGUAGE:
+         for (int x = 0; x < partCount; x++) {
+            ThinExtPartScopedLanguage part = new ThinExtPartScopedLanguage();
+            part.setPathId(ti.readInt());
+            part.setVersion(ti.readInt());
+            part.setAcceptabilityId(ti.readInt());
+            part.setCorrectnessId(ti.readInt());
+            part.setDegreeOfSynonymyId(ti.readInt());
+            part.setScopeId(ti.readInt());
+            part.setTagId(ti.readInt());
+            part.setPriority(ti.readInt());
             versioned.addVersion(part);
          }
          break;
@@ -160,6 +182,8 @@ public class ThinExtBinder extends TupleBinding {
                extType = EXT_TYPE.INTEGER;
             } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid()) {
                extType = EXT_TYPE.LANGUAGE;
+            } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid()) {
+               extType = EXT_TYPE.LANGUAGE;
             }
          } catch (Exception e) {
             throw new RuntimeException(e);
@@ -174,6 +198,8 @@ public class ThinExtBinder extends TupleBinding {
             extType = EXT_TYPE.INTEGER;
          } else if (ThinExtPartLanguage.class.isAssignableFrom(firstPart.getClass())) {
             extType = EXT_TYPE.LANGUAGE;
+         } else if (ThinExtPartScopedLanguage.class.isAssignableFrom(firstPart.getClass())) {
+            extType = EXT_TYPE.SCOPED_LANGUAGE;
          }
       }
       to.writeInt(extType.getId());
@@ -212,6 +238,19 @@ public class ThinExtBinder extends TupleBinding {
             to.writeInt(part.getAcceptabilityId());
             to.writeInt(part.getCorrectnessId());
             to.writeInt(part.getDegreeOfSynonymyId());
+         }
+         break;
+      case SCOPED_LANGUAGE:
+         List<ThinExtPartScopedLanguage> scopedLangParts = (List<ThinExtPartScopedLanguage>) versioned.getVersions();
+         for (ThinExtPartScopedLanguage part : scopedLangParts) {
+            to.writeInt(part.getPathId());
+            to.writeInt(part.getVersion());
+            to.writeInt(part.getAcceptabilityId());
+            to.writeInt(part.getCorrectnessId());
+            to.writeInt(part.getDegreeOfSynonymyId());
+            to.writeInt(part.getScopeId());
+            to.writeInt(part.getTagId());
+            to.writeInt(part.getPriority());
          }
          break;
       default:
