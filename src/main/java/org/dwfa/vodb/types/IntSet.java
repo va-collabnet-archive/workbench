@@ -37,6 +37,21 @@ public class IntSet implements ListDataListener, I_IntSet {
 		super();
 		this.setValues = new int[0];
 	}
+   
+   public String toString() {
+      StringBuffer buf = new StringBuffer();
+      buf.append("[");
+      for (int i: setValues) {
+         try {
+            buf.append(ConceptBean.get(i).getInitialText());
+         } catch (IOException e) {
+            buf.append(i);
+         }
+         buf.append(", ");
+      }
+      buf.append("]");
+      return buf.toString();
+   }
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.api.I_IntSet#contains(int)
