@@ -846,6 +846,24 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
                }
             }
          }         
+      } else {
+         switch (toggle) {
+         case HISTORY:
+            historyButton.doClick();
+            break;
+         case PREFERENCES:
+            usePrefButton.doClick();
+            break;
+         case REFSETS:
+            
+            break;
+         case STATED_INFERRED:
+            inferredButton.doClick();
+            break;
+
+         default:
+            throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
+         }
       }
 
 	}
