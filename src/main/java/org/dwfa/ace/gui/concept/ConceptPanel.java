@@ -835,16 +835,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public void setToggleState(TOGGLES toggle, boolean state) {
 		I_PluginToConceptPanel plugin = pluginMap.get(toggle);
-		for (JComponent component : plugin.getToggleBarComponents()) {
-			if (JToggleButton.class.isAssignableFrom(component.getClass())) {
-				JToggleButton toggleButton = (JToggleButton) component;
-				if (toggleButton.isSelected() == state) {
-					// nothing to do...
-				} else {
-					toggleButton.doClick();
-				}
-			}
-		}
+      if (plugin != null) {
+         for (JComponent component : plugin.getToggleBarComponents()) {
+            if (JToggleButton.class.isAssignableFrom(component.getClass())) {
+               JToggleButton toggleButton = (JToggleButton) component;
+               if (toggleButton.isSelected() == state) {
+                  // nothing to do...
+               } else {
+                  toggleButton.doClick();
+               }
+            }
+         }         
+      }
 
 	}
 }
