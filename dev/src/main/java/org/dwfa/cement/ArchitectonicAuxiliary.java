@@ -510,7 +510,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()))
 			return 3;
 			
-		return -1;
+		return 0;
 	}
 	
 	/**
@@ -535,6 +535,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	public static int getSnomedDescriptionStatusId(Collection<UUID> uuids){
 		if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))       
 			return 0;
+      else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
+         return 0;
 		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
 			return 1;
 		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
@@ -592,9 +594,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	 * @throws RemoteException
 	 */
 	public static int getSnomedConceptStatusId(Collection<UUID> uuids){
-		if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))
-			return 0;
-		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
+      if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))
+         return 0;
+      else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
+         return 0;
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
 			return 1;
 		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
 			return 2;
