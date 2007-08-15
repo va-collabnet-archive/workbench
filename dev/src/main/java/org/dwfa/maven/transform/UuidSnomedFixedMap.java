@@ -19,25 +19,14 @@ import java.util.UUID;
 
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
-import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
-public class UuidSnomedMap implements Map<UUID, Long> {
-
-   private long maxSequence = 0;
+public class UuidSnomedFixedMap implements Map<UUID, Long> {
 
    private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
    
    private List<Map<UUID, Long>> fixedMaps = new ArrayList<Map<UUID,Long>>();
    
-   private PROJECT project = null;
-   private NAMESPACE namespace = null;
-   
-   private UuidSnomedMap(PROJECT project, NAMESPACE namespace) {
-      super();
-      this.project = project;
-      this.namespace = namespace;
-   }
-   private UuidSnomedMap() {
+   private UuidSnomedFixedMap() {
       super();
    }
 
@@ -88,19 +77,6 @@ public class UuidSnomedMap implements Map<UUID, Long> {
       return uuidSnomedMap.get(key);
    }
 
-   private static long MAX_SCT_ID = 999999999999999999L;
-   public Long getWithGeneration(UUID key, TYPE type) {
-      Long returnValue = get(key);
-      if (returnValue == null) {
-         returnValue = Long.parseLong(SctIdGenerator.generate(++maxSequence, project, namespace, type));
-         if (returnValue > MAX_SCT_ID) {
-            throw new RuntimeException("SCT ID exceeds max allowed (" + MAX_SCT_ID + "): " + returnValue);
-         }
-         put(key, returnValue);
-      }
-      return returnValue;
-   }
-
    public int hashCode() {
       return uuidSnomedMap.hashCode();
    }
@@ -112,20 +88,14 @@ public class UuidSnomedMap implements Map<UUID, Long> {
    public Set<UUID> keySet() {
       return uuidSnomedMap.keySet();
    }
-   private static long getSequence(Long sctId) {
-      String sctIdStr = sctId.toString();
-      String sequence = sctIdStr.substring(0, sctIdStr.length() - "011000036106".length());
-      return Long.parseLong(sequence);
-   }
+
    public Long put(UUID key, Long sctId) {
-      maxSequence = Math.max(maxSequence, getSequence(sctId));
       return uuidSnomedMap.put(key, sctId);
    }
 
    public void putAll(Map<? extends UUID, ? extends Long> map) {
       for (Entry<? extends UUID, ? extends Long> entry : map.entrySet()) {
-         maxSequence = Math.max(maxSequence, entry.getValue());
-         put(entry.getKey(), entry.getValue());
+          put(entry.getKey(), entry.getValue());
       }
    }
 
@@ -139,10 +109,6 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 
    public Collection<Long> values() {
       return uuidSnomedMap.values();
-   }
-
-   public long getMaxSequence() {
-      return maxSequence;
    }
    
    public void write(File f) throws IOException {
@@ -164,22 +130,20 @@ public class UuidSnomedMap implements Map<UUID, Long> {
          bw.append("\n");
       }
       bw.close();
-      System.out.println(" maxSequence on write: " + maxSequence);
    }
 
-   public static UuidSnomedMap read(File f) throws IOException {
-      UuidSnomedMap map = new UuidSnomedMap();
+   public static UuidSnomedFixedMap read(File f) throws IOException {
+      UuidSnomedFixedMap map = new UuidSnomedFixedMap();
       readData(f, map);
       return map;
    }
-   public static UuidSnomedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
-      UuidSnomedMap map = new UuidSnomedMap(project, namespace);
+   public static UuidSnomedFixedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
+      UuidSnomedFixedMap map = new UuidSnomedFixedMap();
       readData(f, map);
-      System.out.println(" maxSequence on read: " + map.maxSequence);
       return map;
    }
 
-   private static void readData(File f, UuidSnomedMap map) throws FileNotFoundException, IOException {
+   private static void readData(File f, UuidSnomedFixedMap map) throws FileNotFoundException, IOException {
       System.out.println("Reading map file: " + f.getAbsolutePath());
       BufferedReader br = new BufferedReader(new FileReader(f));
 

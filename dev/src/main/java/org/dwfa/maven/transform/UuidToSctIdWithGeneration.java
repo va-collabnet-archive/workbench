@@ -54,7 +54,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
             }
             
          })) {
-            UuidSnomedMap fixedMap = UuidSnomedMap.read(fixedMapFile);
+            UuidSnomedFixedMap fixedMap = UuidSnomedFixedMap.read(fixedMapFile);
             for (TYPE type: TYPE.values()) {
                mapMap.get(type).addFixedMap(fixedMap);
             }
