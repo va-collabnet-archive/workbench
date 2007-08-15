@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -485,6 +486,133 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	}
 	
 	/**
+	 * Values
+	 * <li>0 Unspecified This may be assigned as either a Preferred Term or
+	 * Synonym by a I_Describe Subset for a language, dialect or realm.
+	 * <li>1 Preferred This is the Preferred Term for the associated I_Concept.
+	 * <li>2 Synonym This is a Synonym for the associated I_Concept.
+	 * <li>3 FullySpecifiedName This is the FullySpecifiedName for the
+	 * associated I_Concept.
+	 * 
+	 * @param uuids
+	 * @return int value representing the enumerated type
+	 * @throws IdentifierIsNotNativeException
+	 * @throws QueryException
+	 * @throws RemoteException
+	 */
+	public static int getSnomedDescriptionTypeId(Collection<UUID> uuids){
+		if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids()))
+			return 0;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()))
+			return 1;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()))
+			return 2;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()))
+			return 3;
+			
+		return -1;
+	}
+	
+	/**
+	 * Values
+	 * <li>0 CURRENT.
+	 * <li>1 NONCURRENT.
+	 * <li>2 DUPLICATE.
+	 * <li>3 OUTDATED.
+	 * <li>5 ERRONEOUS.
+	 * <li>6 LIMITED.
+	 * <li>7 INAPPROPRIATE.
+	 * <li>8 CONCEPTNONCURRENT
+	 * <li>10 MOVEDELSEWHERE
+	 * <li>11 PENDINGMOVE
+	 * 
+	 * @param uuids
+	 * @return int value representing the enumerated type
+	 * @throws IdentifierIsNotNativeException
+	 * @throws QueryException
+	 * @throws RemoteException
+	 */
+	public static int getSnomedDescriptionStatusId(Collection<UUID> uuids){
+		if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))       
+			return 0;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
+			return 1;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
+			return 2;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.OUTDATED.getUids()))
+			return 3;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids()))
+			return 5;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LIMITED.getUids()))
+			return 6;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.INAPPROPRIATE.getUids()))
+			return 7;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids()))
+			return 8;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids()))
+			return 10;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()))
+			return 11;
+		
+		return -1;
+	}
+	
+	private static boolean containsUuidElement(Collection<UUID> parentUuids, Collection<UUID> childUuids){
+		
+		Iterator parentIt = parentUuids.iterator();
+		Iterator childIt = childUuids.iterator();
+		
+		while(parentIt.hasNext()){
+			parentIt.next();
+			while(childIt.hasNext()){
+				if(parentUuids.contains(childIt.next())){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Values
+	 * <li>0 CURRENT.
+	 * <li>1 RETIRED.
+	 * <li>2 DUPLICATE.
+	 * <li>3 OUTDATED.
+	 * <li>4 AMBIGUOS
+	 * <li>5 ERRONEOUS.
+	 * <li>10 MOVEDELSEWHERE
+	 * <li>11 PENDINGMOVE
+	 * 
+	 * @param uuids
+	 * @return int value representing the enumerated type
+	 * @throws IdentifierIsNotNativeException
+	 * @throws QueryException
+	 * @throws RemoteException
+	 */
+	public static int getSnomedConceptStatusId(Collection<UUID> uuids){
+		if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))
+			return 0;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
+			return 1;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
+			return 2;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.OUTDATED.getUids()))
+			return 3;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.AMBIGUOUS.getUids()))
+			return 4;
+		else if(uuids.contains(ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids()))
+			return 5;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids())) 
+			return 10;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())) 
+			return 11;
+		
+		return -1;
+	}
+	
+	/**
 	 * Values:
 	 * <li>0 Defining This relationship represents a defining characteristic of
 	 * the sourceId concept. Hierarchical relationships (e.g. ÒISAÓ and
@@ -525,7 +653,19 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 		return ArchitectonicAuxiliary.Concept.CHARACTERISTIC_TYPE;
 	}
 	
-
+	public static int getSnomedCharacteristicTypeId(Collection<UUID> uuids){
+		if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()))
+			return 0;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC.getUids()))
+			return 1;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids()))
+			return 2;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC.getUids()))
+			return 3;
+		
+		return -1;
+	}
+	
 	/**
 	 * An indication of whether it is possible to refine the target concept when
 	 * this I_Relate is used as a template for clinical data entry.
@@ -552,6 +692,17 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 			return ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY;
 		}
 		return ArchitectonicAuxiliary.Concept.RELATIONSHIP_REFINABILITY;
+	}
+	
+	public static int getSnomedRefinabilityTypeId(Collection<UUID> uuids){
+		if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()))
+			return 0;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()))
+			return 1;
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids()))
+			return 2;
+		
+		return -1;
 	}
 	
 	   /**
@@ -627,7 +778,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         }
         throw new IllegalArgumentException("Unknown status code: " + statusCode);
     }
-
+    
     public static void main(String[] args) throws Exception {
     	try {
     		File directory = new File(args[0]);
