@@ -1567,8 +1567,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
             }
 
         } else if (protocol.equals("file")) {
-            BufferedInputStream bis = new BufferedInputStream(
-                    new FileInputStream(locator.getFile()));
+            BufferedInputStream bis = new BufferedInputStream(locator.openStream());
             ObjectInputStream ois = new ObjectInputStream(bis);
             try {
                 return ois.readObject();
