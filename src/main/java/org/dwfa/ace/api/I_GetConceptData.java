@@ -65,7 +65,11 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
 	public I_IdVersioned getId() throws IOException;
 
-	public I_DescriptionTuple getDescTuple(I_IntList treeDescPreferenceList, I_ConfigAceFrame config) throws IOException;
+   public I_DescriptionTuple getDescTuple(I_IntList treeDescPreferenceList, 
+         I_IntSet allowedStatus, 
+         Set<I_Position> positions) throws IOException;
+
+   public I_DescriptionTuple getDescTuple(I_IntList treeDescPreferenceList, I_ConfigAceFrame config) throws IOException;
 
 	public I_IntSet getUncommittedIds();
 	
