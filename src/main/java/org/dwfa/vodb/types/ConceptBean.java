@@ -880,13 +880,16 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public I_DescriptionTuple getDescTuple(I_IntList prefOrder,
 			I_ConfigAceFrame config) throws IOException {
+      return getDescTuple(prefOrder, config);
+	}
+
+   public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_IntSet allowedStatus, 
+         Set<I_Position> positionSet) throws IOException {
       I_IntSet typeSet = new IntSet();
       for (int nid: prefOrder.getListArray()) {
          typeSet.add(nid);
       }
-		Collection<I_DescriptionTuple> descriptions = getDescriptionTuples(
-				config.getAllowedStatus(), typeSet, config
-						.getViewPositionSet());
+		Collection<I_DescriptionTuple> descriptions = getDescriptionTuples(allowedStatus, typeSet, positionSet);
 		if (prefOrder == null) {
 			return descriptions.iterator().next();
 		} else {
@@ -899,7 +902,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		}
 		return null;
-	}
+   }
 
 	public boolean isUncommitted() throws IOException {
 		// handle the parts first...

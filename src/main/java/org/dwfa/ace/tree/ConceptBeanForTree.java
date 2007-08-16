@@ -190,6 +190,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
       return bean.getImageTuples(allowedStatus, allowedTypes, positions);
    }
+
+   public I_DescriptionTuple getDescTuple(I_IntList arg0, I_IntSet arg1, Set<I_Position> arg2) throws IOException {
+      return bean.getDescTuple(arg0, arg1, arg2);
+   }
 	
 	/*
 
