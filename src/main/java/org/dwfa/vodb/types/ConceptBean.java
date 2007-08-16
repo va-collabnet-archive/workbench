@@ -880,7 +880,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public I_DescriptionTuple getDescTuple(I_IntList prefOrder,
 			I_ConfigAceFrame config) throws IOException {
-      return getDescTuple(prefOrder, config);
+      return getDescTuple(prefOrder, config.getAllowedStatus(), config.getViewPositionSet());
 	}
 
    public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_IntSet allowedStatus, 
