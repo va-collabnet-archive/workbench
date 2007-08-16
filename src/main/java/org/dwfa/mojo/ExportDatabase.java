@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +16,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
@@ -165,13 +164,7 @@ public class ExportDatabase extends AbstractMojo{
 			 
 //			 I_IntSet allowedTypes = termFactory.newIntSet();
 //			 allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
-			 
-			 List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(allowedStatus, null, positions);
-			 
-			 List<I_ConceptAttributeTuple> attributeTuples = concept.getConceptAttributeTuples(allowedStatus, positions);
-			 
-			 Iterator<I_DescriptionTuple> descTuplesIt = descriptionTuples.iterator();
-			 Iterator<I_ConceptAttributeTuple> attribTuplesIt = attributeTuples.iterator();
+			 			 
 			 
 //			 if(!attribTuplesIt.hasNext() || !descTuplesIt.hasNext()){
 //				 conceptsUnmatched++;
@@ -181,47 +174,50 @@ public class ExportDatabase extends AbstractMojo{
 //				 }
 //				 descTuplesIt = descriptionTuples.iterator();
 //			 }
-			 
+          
+          I_IntList fsOrder = LocalVersionedTerminology.get().newIntList();
+          
+          fsOrder.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
+          fsOrder.add(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.localize().getNid());
+          fsOrder.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
+          fsOrder.add(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid());
+          
+			 I_DescriptionTuple descForConceptFile = concept.getDescTuple(fsOrder, allowedStatus, positions);
 			 StringBuilder stringBuilder = new StringBuilder("");
-			 while(attribTuplesIt.hasNext()){
+			 for (I_ConceptAttributeTuple attribTup: concept.getConceptAttributeTuples(allowedStatus, positions)){
 				 conceptsMatched++;
-				 I_ConceptAttributeTuple attribTup = attribTuplesIt.next();		 
-				 while(descTuplesIt.hasNext()){
-					 I_DescriptionTuple descTup = descTuplesIt.next();
-				 
-					 //Snomed core
-					 //ConceptId
-					 createRecord(stringBuilder, concept.getUids().get(0));
-					 
-					 //Concept status
-					 createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedConceptStatusId( LocalVersionedTerminology.get().getConcept(attribTup.getConceptStatus()).getUids() ));
-					 
-					 //Fully specified name
-					 createRecord(stringBuilder, descTup.getText());
-					 //createRecord(stringBuilder, descriptionTuples.get(0).getText() );
-					 
-					 
-					 //CTV3ID...We ignore this for now.
-					 createRecord(stringBuilder, "");
-					 
-					 //SNOMEDID...We ignore this for now.
-					 createRecord(stringBuilder, concept.getUids().get(0));
-					 
-					 //IsPrimative value
-					 createRecord(stringBuilder, attribTup.isDefined() ? 0:1);
-					 					
-					 //AMT added
-					 //Concept UUID
-					 createRecord(stringBuilder, concept.getUids().get(0));
-					 
-					 //ConceptStatusId
-					 createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(attribTup.getConceptStatus()).getUids().get(0) );
-		
-					 //Effective time
-					 createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper.convert(attribTup.getVersion()))));
-					 //End record
-					 createRecord(stringBuilder, System.getProperty( "line.separator" ));
-				 }//End while loop			 
+             //Snomed core
+             //ConceptId
+             createRecord(stringBuilder, concept.getUids().get(0));
+             
+             //Concept status
+             createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedConceptStatusId( LocalVersionedTerminology.get().getConcept(attribTup.getConceptStatus()).getUids() ));
+             
+             //Fully specified name
+             createRecord(stringBuilder, descForConceptFile.getText());
+             //createRecord(stringBuilder, descriptionTuples.get(0).getText() );
+             
+             
+             //CTV3ID... We ignore this for now.
+             createRecord(stringBuilder, "null");
+             
+             //SNOMED 3 ID... We ignore this for now.
+             createRecord(stringBuilder,"null");
+             
+             //IsPrimative value
+             createRecord(stringBuilder, attribTup.isDefined() ? 0:1);
+                           
+             //AMT added
+             //Concept UUID
+             createRecord(stringBuilder, concept.getUids().get(0));
+             
+             //ConceptStatusId
+             createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(attribTup.getConceptStatus()).getUids().get(0) );
+   
+             //Effective time
+             createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper.convert(attribTup.getVersion()))));
+             //End record
+             createRecord(stringBuilder, System.getProperty( "line.separator" ));
 			 }// End while loop
 			 conceptUuidDistributionDetails.add(stringBuilder.toString());
 		 }//End method getUuidBasedConceptDetaiils
