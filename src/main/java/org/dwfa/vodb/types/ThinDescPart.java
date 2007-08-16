@@ -1,5 +1,7 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
+
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 
@@ -109,25 +111,33 @@ public class ThinDescPart implements I_DescriptionPart {
 	public void setVersion(int version) {
 		this.version = version;
 	}
-	public String toString() {
-		StringBuffer buff = new StringBuffer();
-		buff.append("ThinDescPart pathId: ");
-		buff.append(pathId);
-		buff.append(" version: ");
-		buff.append(version);
-		buff.append(" statusId: ");
-		buff.append(statusId);
-		buff.append(" text: ");
-		buff.append(text);
-		buff.append(" typeId: ");
-		buff.append(typeId);
-		buff.append(" init case sig: ");
-		buff.append(initialCaseSignificant);
-		buff.append(" lang: ");
-		buff.append(lang);
-		
-		return buff.toString();
-	}
+   public String toString() {
+      StringBuffer buff = new StringBuffer();
+      buff.append("ThinDescPart pathId: ");
+      buff.append(nidToString(pathId));
+      buff.append(" version: ");
+      buff.append(version);
+      buff.append(" statusId: ");
+      buff.append(nidToString(statusId));
+      buff.append(" text: ");
+      buff.append(text);
+      buff.append(" typeId: ");
+      buff.append(nidToString(typeId));
+      buff.append(" init case sig: ");
+      buff.append(initialCaseSignificant);
+      buff.append(" lang: ");
+      buff.append(lang);
+      
+      return buff.toString();
+   }
+   
+   private String nidToString(int nid)  {
+      try {
+         return ConceptBean.get(nid).getInitialText();
+      } catch (IOException e) {
+         return Integer.toString(nid);
+      }
+   }
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionPart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)

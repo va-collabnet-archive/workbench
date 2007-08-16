@@ -764,7 +764,12 @@ public class VodbEnv implements I_ImplementTermFactory {
       } catch (DatabaseException e) {
          throw new ToIoException(e);
       }
-      throw new IOException("Description: " + descId + " not found.");
+      
+      try {
+         throw new IOException("Description: " + descId + " " + getUids(descId)  + " not found.");
+      } catch (TerminologyException e) {
+         throw new ToIoException(e);
+      }
    }
 
    public String getProperty(String key) throws DatabaseException {
