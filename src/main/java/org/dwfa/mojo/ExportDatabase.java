@@ -81,7 +81,23 @@ public class ExportDatabase extends AbstractMojo{
 		private ArrayList<String> relationshipUuidDistributionDetails = new ArrayList<String>();
 		private ArrayList<String> descriptionUuidDistributionDetails = new ArrayList<String>();
 		
+		private int totalConcepts = 0;
+		private int conceptsMatched = 0;
+		private int conceptsUnmatched = 0;
+		private ArrayList<String> unmatchedConcepts = new ArrayList<String>();
 		
+		public ArrayList<String> getUnmatchedConcepts(){
+			return unmatchedConcepts;
+		}
+		public int getTotals(){
+			return totalConcepts;
+		}
+		public int getmatched(){
+			return conceptsMatched;
+		}
+		public int getUnmatched(){
+			return conceptsUnmatched;
+		}
 		
 		
 		public ArrayList<String> getConceptDistDetails(){
@@ -117,14 +133,17 @@ public class ExportDatabase extends AbstractMojo{
 			allowedStatus.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 			allowedStatus.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()));
 			
-			I_IntSet allowedTypes = termFactory.newIntSet();
-			allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+//			I_IntSet allowedTypes = termFactory.newIntSet();
+//			allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 			
+			totalConcepts++;
 			/*
 			 * Get concept details
 			 */
 			getUuidBasedConceptDetails(concept,allowedStatus, null);
 						
+			
+			
 			/*
 			 * Get relationship details 
 			 */
@@ -144,18 +163,28 @@ public class ExportDatabase extends AbstractMojo{
 
 		 private void getUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus, Set<I_Position> positions) throws IOException, TerminologyException{
 			 
-			 I_IntSet allowedTypes = termFactory.newIntSet();
-			 allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+//			 I_IntSet allowedTypes = termFactory.newIntSet();
+//			 allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 			 
-			 List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(allowedStatus, allowedTypes, positions);
+			 List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(allowedStatus, null, positions);
 			 
-			 List<I_ConceptAttributeTuple> attributeTuples = concept.getConceptAttributeTuples(null, positions);
+			 List<I_ConceptAttributeTuple> attributeTuples = concept.getConceptAttributeTuples(allowedStatus, positions);
 			 
 			 Iterator<I_DescriptionTuple> descTuplesIt = descriptionTuples.iterator();
 			 Iterator<I_ConceptAttributeTuple> attribTuplesIt = attributeTuples.iterator();
 			 
+//			 if(!attribTuplesIt.hasNext() || !descTuplesIt.hasNext()){
+//				 conceptsUnmatched++;
+//				 while(descTuplesIt.hasNext()){
+//					 I_DescriptionTuple descTup = descTuplesIt.next();
+//				 unmatchedConcepts.add(descTup.getText());
+//				 }
+//				 descTuplesIt = descriptionTuples.iterator();
+//			 }
+			 
 			 StringBuilder stringBuilder = new StringBuilder("");
 			 while(attribTuplesIt.hasNext()){
+				 conceptsMatched++;
 				 I_ConceptAttributeTuple attribTup = attribTuplesIt.next();		 
 				 while(descTuplesIt.hasNext()){
 					 I_DescriptionTuple descTup = descTuplesIt.next();
@@ -169,6 +198,8 @@ public class ExportDatabase extends AbstractMojo{
 					 
 					 //Fully specified name
 					 createRecord(stringBuilder, descTup.getText());
+					 //createRecord(stringBuilder, descriptionTuples.get(0).getText() );
+					 
 					 
 					 //CTV3ID...We ignore this for now.
 					 createRecord(stringBuilder, "");
@@ -337,10 +368,23 @@ public class ExportDatabase extends AbstractMojo{
 			 prepareConceptData pcd = new prepareConceptData();
 			 termFactory.iterateConcepts(pcd);
 
+//			    getLog().info("---------------------------------------");
+//				getLog().info("--- total concepts == " + pcd.getTotals() +"  ---");
+//				getLog().info("--- matched concepts == "+ pcd.getmatched() +"  ---");
+//				getLog().info("--- unmatched concepts == "+ pcd.getUnmatched() +"  ---");
+//				ArrayList<String> unmatched = pcd.getUnmatchedConcepts();
+//				Iterator it = unmatched.iterator();
+//				while(it.hasNext()){
+//					String s = (String)it.next();
+//					getLog().info("--- "+s+"  ---");
+//				}
+//				getLog().info("---------------------------------------");
+			 
 			 File conceptFile = new File(outputDirectory + conceptDataFileName);
 			 File relationshipFile = new File(outputDirectory + relationshipsDataFileName);
 			 File descriptionFile = new File(outputDirectory + descriptionsDataFileName);
-							 
+			
+			 			 
 			 writeToFile(conceptFile, pcd.getConceptDistDetails());
 			 writeToFile(relationshipFile, pcd.getRelationshipDistDetails());
 			 writeToFile(descriptionFile, pcd.getDescriptionDistDetails());
