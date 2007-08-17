@@ -164,8 +164,5 @@ public abstract class ProcessSnomed extends ProcessSources {
 	protected Object getCharacteristic(StreamTokenizer st) {
 		return new Integer(st.sval);
 	}
-	protected boolean parseBoolean(StreamTokenizer st) {
-		return Integer.parseInt(st.sval) == 1;
-	}
 
 }

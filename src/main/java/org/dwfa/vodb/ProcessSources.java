@@ -527,7 +527,15 @@ public abstract class ProcessSources  {
 						+ " Parsed descriptions: " + descriptions);
 	}
 
-	protected abstract boolean parseBoolean(StreamTokenizer st);
+	private boolean parseBoolean(StreamTokenizer st) {
+    if (st.sval.equals("1")) {
+       return true;
+    }
+    if (st.sval.toLowerCase().startsWith("t")) {
+       return true;
+    }
+    return false;
+   }
 
 	protected abstract Object getStatus(StreamTokenizer st);
 

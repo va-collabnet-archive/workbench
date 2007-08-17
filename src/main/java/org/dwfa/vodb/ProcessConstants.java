@@ -149,8 +149,4 @@ public abstract class ProcessConstants extends ProcessSources {
 		return UUID.fromString(st.sval);
 	}
 
-	protected boolean parseBoolean(StreamTokenizer st) {
-		return new Boolean(st.sval);
-	}
-
 }
