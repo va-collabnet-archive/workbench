@@ -493,8 +493,6 @@ public class ExportDatabase extends AbstractMojo {
          writeToFile(relationshipFile, pcd.getRelationshipDistDetails());
          writeToFile(descriptionFile, pcd.getDescriptionDistDetails());
 
-         termFactory.iterateConcepts(pcd);
-
          errorWriter.close();
 
       } catch (Exception e) {
