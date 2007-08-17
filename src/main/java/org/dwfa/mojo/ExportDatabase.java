@@ -288,6 +288,10 @@ public class ExportDatabase extends AbstractMojo {
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getRelId()).getUids()
                            .get(0));
 
+                     // Concept status
+                     createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedConceptStatusId(LocalVersionedTerminology
+                           .get().getConcept(part.getStatusId()).getUids()));
+
                      // Concept Id 1 UUID
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC1Id()).getUids().get(0));
 
@@ -299,8 +303,13 @@ public class ExportDatabase extends AbstractMojo {
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC2Id()).getUids().get(0));
 
                      // (Characteristict Type integer)
-                     createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(LocalVersionedTerminology
-                           .get().getConcept(part.getCharacteristicId()).getUids()));
+                     int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(LocalVersionedTerminology
+                           .get().getConcept(part.getCharacteristicId()).getUids());
+                     if (snomedCharacter == -1) {
+                        errorWriter.append("\nNo characteristic mapping for: " + LocalVersionedTerminology
+                           .get().getConcept(part.getCharacteristicId()));
+                     }
+                     createRecord(stringBuilder, snomedCharacter);
 
                      // Refinability integer
                      createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(LocalVersionedTerminology
