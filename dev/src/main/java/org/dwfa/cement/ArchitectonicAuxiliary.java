@@ -660,7 +660,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	public static int getSnomedCharacteristicTypeId(Collection<UUID> uuids){
 		if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()))
 			return 0;
-		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC.getUids()))
+		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()))
+         return 0;
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC.getUids()))
 			return 1;
 		else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids()))
 			return 2;
