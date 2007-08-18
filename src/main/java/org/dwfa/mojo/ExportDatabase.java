@@ -5,9 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +30,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
  *  *
@@ -63,6 +60,14 @@ public class ExportDatabase extends AbstractMojo {
    private String dateFormat;
 
    /**
+    * Version from which to derive date. 
+    * 
+    * @parameter expression="${project.version}"
+    */
+   private String version;
+   
+   private String releaseDate;
+   /**
     * Location of the directory to output data files to.
     * 
     * @parameter expression="${project.build.directory}"
@@ -73,21 +78,21 @@ public class ExportDatabase extends AbstractMojo {
    /**
     * File name for concept table data output file
     * 
-    * @parameter expression="concepts_amt_standalone_r0_1_20070817.txt"
+    * @parameter expression="concepts.txt"
     */
    private String conceptDataFileName;
 
    /**
     * File name for relationship table data output file
     * 
-    * @parameter expression="relationships_amt_standalone_r0_1_20070817.txt"
+    * @parameter expression="relationships.txt"
     */
    private String relationshipsDataFileName;
 
    /**
     * File name for description table data output file
     * 
-    * @parameter expression="descriptions_amt_standalone_r0_1_20070817.txt"
+    * @parameter expression="descriptions.txt"
     */
    private String descriptionsDataFileName;
    
@@ -212,7 +217,8 @@ public class ExportDatabase extends AbstractMojo {
          // }
 
          I_IntList fsOrder = LocalVersionedTerminology.get().newIntList();
-
+         
+ 
          fsOrder.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
          fsOrder.add(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.localize().getNid());
          fsOrder.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
@@ -257,8 +263,9 @@ public class ExportDatabase extends AbstractMojo {
                      .getUids().get(0));
 
                // Effective time
-               createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
-                     .convert(attribTup.getVersion()))));
+               //createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper.convert(attribTup.getVersion()))));
+               //TODO Make the records compute dates from multiple versions...
+               createRecord(stringBuilder, releaseDate);
                // End record
                createRecord(stringBuilder, System.getProperty("line.separator"));
             }// End while loop
@@ -346,9 +353,11 @@ public class ExportDatabase extends AbstractMojo {
                            .get(0));
 
                      // Effective Time
-                     createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
-                           .convert(part.getVersion()))));
+                     //createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
+                     //      .convert(part.getVersion()))));
 
+                     //TODO Make the records compute dates from multiple versions...
+                     createRecord(stringBuilder, releaseDate);
                      createRecord(stringBuilder, System.getProperty("line.separator"));
 
                      relationshipUuidDistributionDetails.add(stringBuilder.toString());
@@ -419,8 +428,10 @@ public class ExportDatabase extends AbstractMojo {
                      createRecord(stringBuilder, concept.getUids().get(0));
 
                      // Effective time
-                     createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
-                           .convert(part.getVersion()))));
+                     //createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
+                     //      .convert(part.getVersion()))));
+                     //TODO Make the records compute dates from multiple versions...
+                     createRecord(stringBuilder, releaseDate);
 
                      // End record
                      createRecord(stringBuilder, System.getProperty("line.separator"));
@@ -451,6 +462,7 @@ public class ExportDatabase extends AbstractMojo {
 
    public void execute() throws MojoExecutionException, MojoFailureException {
       try {
+         releaseDate = version.split("-")[0] + " 00:00:00";
          
          I_TermFactory termFactory = LocalVersionedTerminology.get();
          HashSet<I_Position> positions = new HashSet<I_Position>(positionsForExport.length);
