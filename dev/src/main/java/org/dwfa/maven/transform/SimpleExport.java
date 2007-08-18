@@ -7,9 +7,9 @@ import org.dwfa.maven.I_ReadAndTransform;
 
 public class SimpleExport extends AbstractExport {
 
-	private String[] columns;
+	protected String[] columns;
 	
-	private I_ReadAndTransform[] transformers;
+	protected I_ReadAndTransform[] transformers;
 	
 	public void addTransformToSubclass(I_ReadAndTransform t) {
 		if (transformers == null) {
