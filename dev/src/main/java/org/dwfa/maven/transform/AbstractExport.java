@@ -22,6 +22,7 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 	private I_ReadAndTransform statusTransform;
 	private String statusTransformName;
 	private Set<Integer> activeSet = new HashSet<Integer>();
+   private String fileName;
 
 	/**
 	 * @parameter
@@ -73,7 +74,6 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 		return b.toString();
 	}
 
-	private String fileName;
 
 	public AbstractExport() {
 		super();
