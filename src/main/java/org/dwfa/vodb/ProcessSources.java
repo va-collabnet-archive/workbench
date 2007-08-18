@@ -241,6 +241,7 @@ public abstract class ProcessSources  {
 	}
 	private void processAceFormatRelationships(Reader r, Date releaseDate) throws IOException, Exception {
 		// RELATIONSHIPID
+      // STATUSID
 		// CONCEPTID1
 		// RELATIONSHIPTYPE
 		// CONCEPTID2

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -16,6 +17,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.vodb.bind.ThinConVersionedBinding;
@@ -201,14 +203,16 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 			Object conceptTwoID, Object characteristic, Object refinability,
 			int group, Object pathId) throws Exception {
 		int version = ThinVersionHelper.convert(releaseDate.getTime());
-		ThinRelPart rel = new ThinRelPart();
-		rel.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
-		rel.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
-		rel.setStatusId(map.getIntId((Collection<UUID>) statusId, aceAuxPath, version));
-		rel.setCharacteristicId(map.getIntId((UUID) characteristic, aceAuxPath, version));
-		rel.setGroup(group);
-		rel.setRefinabilityId(map.getIntId((UUID) refinability, aceAuxPath, version));
-		rel.setRelTypeId(map.getIntId((UUID) relationshipTypeConceptID, aceAuxPath, version));
+		ThinRelPart part = new ThinRelPart();
+      int c1id = map.getIntId((Collection<UUID>) conceptOneID, aceAuxPath, version);
+      int c2id = map.getIntId((Collection<UUID>) conceptTwoID, aceAuxPath, version);
+		part.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
+		part.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
+		part.setStatusId(map.getIntId((Collection<UUID>) statusId, aceAuxPath, version));
+		part.setCharacteristicId(map.getIntId((UUID) characteristic, aceAuxPath, version));
+		part.setGroup(group);
+		part.setRefinabilityId(map.getIntId((UUID) refinability, aceAuxPath, version));
+		part.setRelTypeId(map.getIntId((UUID) relationshipTypeConceptID, aceAuxPath, version));
 
 		DatabaseEntry key = new DatabaseEntry(); 
 		intBinder.objectToEntry(map.getIntId((UUID) relID, aceAuxPath, version), key);
@@ -216,13 +220,24 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		I_RelVersioned vrel;
 		if (vodb.getRelDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			 vrel = (I_RelVersioned) relBinder.entryToObject(value);
+          if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
+             // rel ok
+          } else {
+             // log for now, throw exception later
+            AceLog.getEditLog().log(Level.SEVERE, "Duplicate rels with different c1 and c2 for: " + relID);
+            vrel = new ThinRelVersioned(map.getIntId(UUID.randomUUID(), aceAuxPath, version),
+                  map.getIntId((UUID) conceptOneID, aceAuxPath, version),
+                  map.getIntId((UUID) conceptTwoID, aceAuxPath, version),
+                  1);
+             
+          }
 		} else {
 			vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version),
 					map.getIntId((UUID) conceptOneID, aceAuxPath, version),
 					map.getIntId((UUID) conceptTwoID, aceAuxPath, version),
 					1);
 		}
-		if (vrel.addVersionNoRedundancyCheck(rel)) {
+		if (vrel.addVersionNoRedundancyCheck(part)) {
 			value = new DatabaseEntry(); 
 			relBinder.objectToEntry(vrel, value);
 			vodb.getRelDb().put(null, key, value);
