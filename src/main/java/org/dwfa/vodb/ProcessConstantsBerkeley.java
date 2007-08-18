@@ -206,6 +206,13 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 		ThinRelPart part = new ThinRelPart();
       int c1id = map.getIntId((UUID) conceptOneID, aceAuxPath, version);
       int c2id = map.getIntId((UUID) conceptTwoID, aceAuxPath, version);
+      if (c1id == c2id) {
+         // log for now, throw exception later
+         AceLog.getEditLog().log(Level.SEVERE, "*RECURSION* Rel points a concept to itself: " + relID + 
+               " c one id: " + conceptOneID + 
+               " c two id: " + conceptTwoID);
+         
+      }
 		part.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
 		part.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		part.setStatusId(map.getIntId((Collection<UUID>) statusId, aceAuxPath, version));
