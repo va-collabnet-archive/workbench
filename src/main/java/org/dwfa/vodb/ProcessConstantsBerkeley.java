@@ -204,8 +204,8 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 			int group, Object pathId) throws Exception {
 		int version = ThinVersionHelper.convert(releaseDate.getTime());
 		ThinRelPart part = new ThinRelPart();
-      int c1id = map.getIntId((Collection<UUID>) conceptOneID, aceAuxPath, version);
-      int c2id = map.getIntId((Collection<UUID>) conceptTwoID, aceAuxPath, version);
+      int c1id = map.getIntId((UUID) conceptOneID, aceAuxPath, version);
+      int c2id = map.getIntId((UUID) conceptTwoID, aceAuxPath, version);
 		part.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
 		part.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		part.setStatusId(map.getIntId((Collection<UUID>) statusId, aceAuxPath, version));
