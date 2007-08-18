@@ -1075,16 +1075,31 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
-		Set parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
+		return isParentWithDepthCutoff(child, allowedStatus, allowedTypes, positions, addUncommitted, 0);
+	}
+
+   private boolean isParentWithDepthCutoff(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes, 
+         Set<I_Position> positions, boolean addUncommitted, int depth) throws IOException {
+      Set parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
+      if (depth == 18) {
+         AceLog.getAppLog().log(Level.SEVERE, "near to isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
+      }
+      if (depth == 19) {
+         AceLog.getAppLog().log(Level.SEVERE, "nearer to isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
+      }
+      if (depth == 20) {
+         AceLog.getAppLog().log(Level.SEVERE, "isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
+         return false;
+      }
 		if (parents.contains(this)) {
 			return true;
 		}
 		for (I_GetConceptData childParent: child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted)) {
-			if (this.isParentOf(childParent, allowedStatus, allowedTypes, positions, addUncommitted)) {
+			if (this.isParentWithDepthCutoff(childParent, allowedStatus, allowedTypes, positions, addUncommitted, depth + 1)) {
 				return true;
 			}
 		}
 		return false;
-	}
+   }
 
 }
