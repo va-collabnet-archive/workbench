@@ -194,8 +194,7 @@ public class Transform extends AbstractMojo {
                         StreamTokenizer st = new StreamTokenizer(br);
                         st.resetSyntax();
                         st.wordChars('\u001F', '\u00FF');
-                        st.whitespaceChars(spec.getInputColumnDelimiter(), spec
-                                .getInputColumnDelimiter());
+                        st.ordinaryChar(spec.getInputColumnDelimiter());
                         st.eolIsSignificant(true);
                         if (spec.skipFirstLine()) {
                             skipLine(st);
@@ -220,15 +219,24 @@ public class Transform extends AbstractMojo {
                                         /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
                                             getLog().info("Transform for column: " + currentColumn + " is: " + t);
                                         }*/
-                                        @SuppressWarnings("unused")
-                                       String result = t.transform(st.sval);
+                                        if (tokenType == spec.getInputColumnDelimiter().charValue()) {
+                                           t.transform(null);
+                                        } else {
+                                           t.transform(st.sval);
+                                        }
                                         /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
                                             getLog().info("Transform: " + t + " result: " + result);
                                         }*/
                                     }
                                 }
-                                // CR or LF
                                 tokenType = st.nextToken();
+                                if (spec.getInputColumnDelimiter().charValue() == tokenType) {
+                                   // CR or LF
+                                   tokenType = st.nextToken();
+                                   if (spec.getInputColumnDelimiter().charValue() == tokenType) {
+                                      st.pushBack();
+                                   }
+                                } 
                                 currentColumn++;
                             }
 
