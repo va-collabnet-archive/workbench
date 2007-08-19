@@ -100,6 +100,7 @@ public interface I_TermFactory {
 	public I_ReadChangeSet newBinaryChangeSetReader(File changeSetFile) throws IOException;
 	
 	public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception;
+   public void loadFromDirectory(File dataDir) throws Exception;
 	/**
 	 * 
 	 * @param args

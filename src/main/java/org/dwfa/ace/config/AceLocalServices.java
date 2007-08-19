@@ -137,8 +137,8 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption CO_LocalTransactionManager = new ServiceConfigOption(
     		LOCAL_TRANSACTION_MANAGER, "config${/}transactionManager.policy", 
             "config${/}transactionManagerSecure.policy", LOCAL_TRANSACTION_MANAGER_PROP,
-            "There must be at least one on the network, or you run services that use transactions. ",
-            true, "jiniPortUrlPart, VHelp.addDlVersion(\"mahalo-dl\"), \"", "lib", "VHelp.addLibVersion(\"mahalo\")",
+            "Starts a local transaction manager. ",
+            true, "", null, CoreServices.dwaPath,
             "com.sun.jini.mahalo.LocalTransactionManager",
             new String[] { "config${/}transactionManager.config" }, 
             new String[] { "config${/}transactionManagerSecure.config" }, 
