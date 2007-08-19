@@ -118,7 +118,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         	argsStr = Arrays.asList(args).toString();
         }
 		logger.info("\n*******************\n\n" + 
-				"Starting service with config file args: " + argsStr +
+            "Starting " + this.getClass().getSimpleName() + " with config file: " + argsStr +
 				"\n\n******************\n");
         config = ConfigurationProvider.getInstance(args, getClass()
                 .getClassLoader());
