@@ -77,7 +77,7 @@ public class BrowserAdaptor extends Browser implements I_InitComponentMenus {
         this.args = args;
         this.lc = lc;
 		logger.info("\n*******************\n\n"
-				+ "Starting service with config file: " + Arrays.asList(args)
+				+ "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args)
 				+ "\n\n******************\n");
 		Configuration config = ConfigurationProvider.getInstance(args,
 				getClass().getClassLoader());

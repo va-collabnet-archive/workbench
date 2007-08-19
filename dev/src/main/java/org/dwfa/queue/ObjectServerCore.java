@@ -224,7 +224,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         openServers.add((ObjectServerCore<I_DescribeObject>) this);
         getLogger().info(
                 "\n*******************\n\n"
-                        + "Starting service with config file: "
+                        + "Starting " + this.getClass().getSimpleName() + " with config file: "
                         + Arrays.asList(args) + "\n\n******************\n");
         this.config = ConfigurationProvider.getInstance(args, getClass()
                 .getClassLoader());

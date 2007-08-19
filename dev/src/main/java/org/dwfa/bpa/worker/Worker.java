@@ -218,8 +218,8 @@ public abstract class Worker implements I_Work {
 				.getName(), "tranDurLong", Long.class);
 		this.transactionDuration = tranDurLong.longValue();
 
-		logger.info("making jiniManager");
 		if (JiniManager.isLocalOnly()) {
+         logger.info("making local only jiniManager");
 			this.jiniManager = JiniManager.getLocalOnlyJiniManager();
 
 		} else {

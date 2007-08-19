@@ -78,7 +78,8 @@ public class LogManagerService implements I_ManageLogs {
      * 
      */
     public LogManagerService(String[] args, LifeCycle lc) throws Exception {
-        logger.info("\n*******************\n\n" + "Starting service with config file: " + Arrays.asList(args)
+        logger.info("\n*******************\n\n" + 
+             "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args)
                 + "\n\n******************\n");
         this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;

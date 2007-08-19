@@ -78,7 +78,7 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
     public LogViewerPanel(String[] args, LifeCycle lc) throws Exception {
         super(new GridLayout(1, 1));
 		logger.info("\n*******************\n\n" + 
-				"Starting service with config file: " + Arrays.asList(args) +
+            "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args) +
 				"\n\n******************\n");
         this.config = ConfigurationProvider.getInstance(args, getClass()
                 .getClassLoader());

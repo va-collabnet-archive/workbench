@@ -81,7 +81,7 @@ public class TimeServer implements I_KeepIncrementalTime, ServerProxyTrust, Prox
 	public TimeServer(String[] args, LifeCycle lc) throws Exception {
 		super();
 		logger.info("\n*******************\n\n"
-				+ "Starting service with config file: " + Arrays.asList(args)
+				+ "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args)
 				+ "\n\n******************\n");
 		this.config = ConfigurationProvider.getInstance(args, getClass()
 				.getClassLoader());

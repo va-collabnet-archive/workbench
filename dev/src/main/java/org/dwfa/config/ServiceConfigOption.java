@@ -132,9 +132,9 @@ public class ServiceConfigOption {
                 }
         } else {
                 if (secure) {
-                    stringList.add("private static "+ this.getPrefix() + "_Codebase = jskCodebaseMd;");
+                    stringList.add("private static "+ this.getPrefix() + "_Codebase = \"\";");
                 } else {
-                    stringList.add("private static "+ this.getPrefix() + "_Codebase = jskCodebase;");
+                    stringList.add("private static "+ this.getPrefix() + "_Codebase = \"\";");
                 }
         }
          stringList.add("private static "+ this.getPrefix() + "_Policy = \"" + localPolicy + "\";");

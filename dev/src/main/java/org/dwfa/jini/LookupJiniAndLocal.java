@@ -54,16 +54,9 @@ public class LookupJiniAndLocal implements I_LookupServices {
       ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { I_QueueProcesses.class }, null);
       ServiceItemFilter filter = null;
       ServiceListModel serviceListener = new ServiceListModel();
-      this.queueCache = sdm.createLookupCache(tmpl, filter, serviceListener);
-
-   }
-
-   public ServiceItem lookupQueue(ServiceItemFilter filter) {
-      return this.queueCache.lookup(filter);
-   }
-
-   public ServiceItem[] lookupQueue(ServiceItemFilter filter, int max) {
-      return this.queueCache.lookup(filter, max);
+      if (sdm != null) {
+         this.queueCache = sdm.createLookupCache(tmpl, filter, serviceListener);
+      }
    }
 
    private static class TemplateFilter implements ServiceItemFilter {
