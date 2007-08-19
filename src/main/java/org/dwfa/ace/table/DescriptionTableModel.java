@@ -16,6 +16,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -177,6 +178,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	}
 
 	public boolean isCellEditable(int row, int col) {
+      if (ACE.editMode == false) {
+         return false;
+      }
 		try {
 			if (getDescription(row).getVersion() == Integer.MAX_VALUE) {
 				if (AceLog.getAppLog().isLoggable(Level.FINER)) {

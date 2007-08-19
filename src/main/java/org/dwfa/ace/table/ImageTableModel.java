@@ -16,6 +16,7 @@ import javax.swing.JTable;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
@@ -433,6 +434,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	}
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
+      if (ACE.editMode == false) {
+         return false;
+      }
 		try {
 			I_ImageTuple image = getImage(rowIndex);
 			if (image.getVersion() == Integer.MAX_VALUE) {

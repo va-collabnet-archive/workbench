@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
@@ -122,10 +123,19 @@ public class DescriptionPlugin extends AbstractPlugin {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		c.gridheight = 2;
-		JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/row_add_after.png")));
-		descPanel.add(rowAddAfter, c);
-		rowAddAfter.addActionListener(new AddDescription(host, host.getConfig()));
+      
+      if (ACE.editMode) {
+         JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
+               .getResource("/24x24/plain/row_add_after.png")));
+         descPanel.add(rowAddAfter, c);
+         rowAddAfter.addActionListener(new AddDescription(host, host.getConfig()));
+      } else {
+         JPanel filler = new JPanel();
+         filler.setMaximumSize(new Dimension(40, 32));
+         filler.setMinimumSize(new Dimension(40, 32));
+         filler.setPreferredSize(new Dimension(40, 32));
+         descPanel.add(filler, c);
+      }
 
 		c.gridheight = 1;
 		c.gridx++;
@@ -133,8 +143,12 @@ public class DescriptionPlugin extends AbstractPlugin {
 		descTable = new JTableWithDragImage(sortingTable);
 		descTable.setDragEnabled(true);
 		descTable.setTransferHandler(new TerminologyTransferHandler());
-		descTable.addMouseListener(descTableModel.makePopupListener(descTable,
-				host.getConfig()));
+      
+      if (ACE.editMode) {
+         descTable.addMouseListener(descTableModel.makePopupListener(descTable,
+               host.getConfig()));
+      }
+
 		descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortingTable.setTableHeader(descTable.getTableHeader());
 
@@ -198,16 +212,18 @@ public class DescriptionPlugin extends AbstractPlugin {
 		};
 		comboBox.addItem(new Boolean(true));
 		comboBox.addItem(new Boolean(false));
-		descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
-				comboBox));
+      if (ACE.editMode) {
+         descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
+               comboBox));
 
-		descTable.setDefaultEditor(StringWithDescTuple.class,
-				new DescriptionTableModel.DescTextFieldEditor());
-		descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
-		descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
-				new DescriptionTableModel.DescTypeFieldEditor(host.getConfig()));
-		descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
-				new DescriptionTableModel.DescStatusFieldEditor(host.getConfig()));
+         descTable.setDefaultEditor(StringWithDescTuple.class,
+               new DescriptionTableModel.DescTextFieldEditor());
+         descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
+         descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
+               new DescriptionTableModel.DescTypeFieldEditor(host.getConfig()));
+         descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
+               new DescriptionTableModel.DescStatusFieldEditor(host.getConfig()));
+      }
 
 		descTable.setDefaultRenderer(Number.class, renderer);
 		descTable.setDefaultRenderer(String.class, renderer);

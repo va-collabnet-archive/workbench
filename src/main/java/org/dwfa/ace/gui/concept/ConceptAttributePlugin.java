@@ -128,8 +128,10 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(conceptTableModel);
 		conceptTable = new JTableWithDragImage(sortingTable);
-		conceptTable.addMouseListener(conceptTableModel.makePopupListener(
-				conceptTable, host.getConfig()));
+      if (ACE.editMode) {
+         conceptTable.addMouseListener(conceptTableModel.makePopupListener(
+               conceptTable, host.getConfig()));
+      }
 
 		conceptTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortingTable.setTableHeader(conceptTable.getTableHeader());

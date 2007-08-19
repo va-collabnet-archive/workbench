@@ -157,12 +157,14 @@ public class CollectionEditorContainer extends JPanel {
 		showComponentView = new Toggle32x32(new ImageIcon(
 				ACE.class.getResource("/32x32/plain/component.png")));
         showComponentActionListener = new ShowComponentActionListener();
+      showComponentView.setVisible(ACE.editMode);
 		showComponentView.addActionListener(showComponentActionListener);
 		listEditorTopPanel.add(showComponentView, c);
 		c.gridx++;
 		showProcessBuilder = new Toggle32x32(new ImageIcon(
 				ACE.class.getResource("/32x32/plain/cube_molecule.png")));
 		listEditorTopPanel.add(showProcessBuilder, c);
+      showProcessBuilder.setVisible(ACE.editMode);
 		showProcessBuilder.addActionListener(new ShowProcessBuilderActionListener());
 		c.gridx++;
 		c.weightx = 1.0;

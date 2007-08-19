@@ -19,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_DoConceptDrop;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.SmallProgressPanel;
@@ -375,6 +376,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     }
 
     public boolean isCellEditable(int row, int col) {
+       if (ACE.editMode == false) {
+          return false;
+       }
         if (row >= allTuples.size()) {
             return false;
         }

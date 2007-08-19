@@ -117,16 +117,15 @@ public abstract class ProcessSources  {
 			processSnomedFormatConcepts(r, releaseDate);
 			break;
 		case ACE:
-			processAceFormatConcepts(r, releaseDate);
+			processAceFormatConcepts(r);
 			break;
 
 		default:
 			throw new Exception("Unsupported format: " + format);
 		}
 	}
-	private void processAceFormatConcepts(Reader r, Date releaseDate) throws IOException, Exception {
-		// CONCEPTID CONCEPTSTATUS FULLYSPECIFIEDNAME CTV3ID SNOMEDID
-		// ISPRIMITIVE
+	private void processAceFormatConcepts(Reader r) throws IOException, Exception {
+
 		long start = System.currentTimeMillis();
 
 		StreamTokenizer st = new StreamTokenizer(r);
@@ -232,14 +231,14 @@ public abstract class ProcessSources  {
 			processSnomedFormatRelationships(r, releaseDate);
 			break;
 		case ACE:
-			processAceFormatRelationships(r, releaseDate);
+			processAceFormatRelationships(r);
 			break;
 
 		default:
 			throw new Exception("Unsupported format: " + format);
 		}
 	}
-	private void processAceFormatRelationships(Reader r, Date releaseDate) throws IOException, Exception {
+	private void processAceFormatRelationships(Reader r) throws IOException, Exception {
 		// RELATIONSHIPID
       // STATUSID
 		// CONCEPTID1
@@ -373,9 +372,14 @@ public abstract class ProcessSources  {
 
 	protected abstract Object getId(StreamTokenizer st);
 	
-	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+   SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 	protected Date getDate(StreamTokenizer st) throws ParseException {
-		return formatter.parse(st.sval);
+      if (st.sval.contains("-")) {
+         return formatter.parse(st.sval);
+      } else {
+         return formatter2.parse(st.sval);
+      }
 	}
 
 	protected void readDescriptions(Reader r,
@@ -385,7 +389,7 @@ public abstract class ProcessSources  {
 			processSnomedFormatDescriptions(r, releaseDate);
 			break;
 		case ACE:
-			processAceFormatDescriptions(r, releaseDate);
+			processAceFormatDescriptions(r);
 			break;
 
 		default:
@@ -393,7 +397,7 @@ public abstract class ProcessSources  {
 		}
 	}
 
-	private void processAceFormatDescriptions(Reader r, Date releaseDate) throws IOException, Exception {
+	private void processAceFormatDescriptions(Reader r) throws IOException, Exception {
 		// DESCRIPTIONID
 		// DESCRIPTIONSTATUS
 		// CONCEPTID

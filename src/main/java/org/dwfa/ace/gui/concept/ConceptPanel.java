@@ -192,12 +192,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
 
-	private List<I_PluginToConceptPanel> plugins = new ArrayList<I_PluginToConceptPanel>(
-			Arrays
-					.asList(new I_PluginToConceptPanel[] { idPlugin,
-							conceptAttributePlugin, descPlugin, srcRelPlugin,
-							destRelPlugin, lineagePlugin, imagePlugin,
-							conflictPlugin }));
+	private List<I_PluginToConceptPanel> plugins;
 	
 	private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, I_PluginToConceptPanel>();
 
@@ -346,6 +341,21 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		super(new GridBagLayout());
 		this.ace = ace;
       this.ace.getAceFrameConfig().addPropertyChangeListener("visibleComponentToggles", new UpdateTogglesPropertyChangeListener());
+      if (ACE.editMode) {
+         plugins = new ArrayList<I_PluginToConceptPanel>(
+               Arrays
+                     .asList(new I_PluginToConceptPanel[] { idPlugin,
+                           conceptAttributePlugin, descPlugin, srcRelPlugin,
+                           destRelPlugin, lineagePlugin, imagePlugin,
+                           conflictPlugin }));
+      } else {
+         plugins = new ArrayList<I_PluginToConceptPanel>(
+               Arrays
+                     .asList(new I_PluginToConceptPanel[] { idPlugin,
+                           conceptAttributePlugin, descPlugin, srcRelPlugin,
+                           destRelPlugin, lineagePlugin, 
+                           }));     
+      }
       ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
 		historyChangeActionListener = new ToggleHistoryChangeActionListener();
@@ -451,7 +461,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
       leftTogglePane.add(inferredButton);
 		usePrefButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/component_preferences.png")));
-		usePrefButton.setSelected(false);
+      usePrefButton.setSelected(false);
+      usePrefButton.setVisible(ACE.editMode);
 		historyChangeActionListener = new ToggleHistoryChangeActionListener();
 		usePrefButton.addActionListener(historyChangeActionListener);
       leftTogglePane.add(usePrefButton);

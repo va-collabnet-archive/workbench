@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -354,6 +355,9 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 	}
 
 	public boolean isCellEditable(int row, int col) {
+      if (ACE.editMode == false) {
+         return false;
+      }
         try {
 			if (getConceptTuple(row).getVersion() != Integer.MAX_VALUE) {
 				return false;

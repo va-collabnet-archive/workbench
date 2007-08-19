@@ -2,9 +2,11 @@ package org.dwfa.vodb;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,6 +78,45 @@ public abstract class ProcessConstants extends ProcessSources {
 	public static enum FORMAT {
 		SNOMED, ACE
 	};
+
+   public void executeFromDir(File dataDir) throws Exception {
+      FORMAT format = FORMAT.ACE;
+      File[] dataFiles = dataDir.listFiles(new FileFilter() {
+         public boolean accept(File f) {
+            return f.getName().endsWith(".txt");
+         }});
+      for (File dataFile: dataFiles) {
+            getLog().info(dataFile.getName());
+            if (dataFile.getName().contains("concepts")) {
+               Reader isr = new BufferedReader(new FileReader(dataFile));
+               readConcepts(isr, null, format);
+               isr.close();
+            } else if (dataFile.getName().contains("descriptions")) {
+               Reader isr = new BufferedReader(new FileReader(dataFile));
+               readDescriptions(isr, null, format);
+               isr.close();
+            } else if (dataFile.getName().contains("relationships")) {
+               Reader isr = new BufferedReader(new FileReader(dataFile));
+               readRelationships(isr, null, format);
+               isr.close();
+            } else if (dataFile.getName().contains("illicit_words")) {
+               getLog().info(
+                     "Found illicit_words jar entry: " + dataFile.getName());
+               Reader isr = new BufferedReader(new FileReader(dataFile));
+               readIllicitWords(isr);
+            } else if (dataFile.getName().contains("licit_words")) {
+               getLog().info(
+                     "Found licit_words jar entry: " + dataFile.getName());
+               Reader isr = new BufferedReader(new FileReader(dataFile));
+               readLicitWords(isr);
+            } else {
+               getLog().info(
+                     "Don't know what to do with file: "
+                           + dataFile.getName());
+            }
+      }
+      cleanup(null);
+   }
 
 	public void execute(JarFile constantJar, String dataDir, FORMAT format)
 			throws Exception {

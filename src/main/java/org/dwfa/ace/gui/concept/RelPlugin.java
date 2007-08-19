@@ -16,6 +16,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddRelationship;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -36,6 +37,9 @@ public abstract class RelPlugin extends AbstractPlugin {
 
 	protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText,
 			boolean enableEdit) {
+      if (ACE.editMode == false) {
+         enableEdit = false;
+      }
 		JPanel relPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		JLabel srcRelLabel = new JLabel(labelText);
@@ -103,8 +107,10 @@ public abstract class RelPlugin extends AbstractPlugin {
 		}
 
 		setupEditors(host);
-		relTable.addMouseListener(model
-				.makePopupListener(relTable, host.getConfig()));
+      if (ACE.editMode) {
+         relTable.addMouseListener(model
+               .makePopupListener(relTable, host.getConfig()));
+      }
 		// Set up tool tips for column headers.
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;

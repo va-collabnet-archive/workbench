@@ -2348,7 +2348,11 @@ public class VodbEnv implements I_ImplementTermFactory {
    }
 
    public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
-      LoadSourcesFromJars.loadFromSingleJar(jarFile, dataPrefix);
+      LoadBdb.loadFromSingleJar(jarFile, dataPrefix);
+   }
+
+   public void loadFromDirectory(File dataDir) throws Exception {
+      LoadBdb.loadFromDirectory(dataDir);
    }
 
    /**
@@ -2358,7 +2362,7 @@ public class VodbEnv implements I_ImplementTermFactory {
     * @deprecated use loadFromSingleJar
     */
    public void loadFromMultipleJars(String[] args) throws Exception {
-      LoadSourcesFromJars.main(args);
+      LoadBdb.main(args);
    }
 
    private static class ProcessorWrapper implements I_ProcessDescriptionEntries, I_ProcessConceptAttributeEntries,

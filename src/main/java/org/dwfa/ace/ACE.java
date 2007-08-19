@@ -688,6 +688,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JPanel treeProgress;
 
     private static AceConfig aceConfig;
+    
+    public static boolean editMode = true;
 
     private JMenu fileMenu = new JMenu("File");
 
@@ -961,33 +963,35 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void addFileMenu(JMenuBar menuBar) throws LoginException, ConfigurationException, IOException,
             PrivilegedActionException, SecurityException, IntrospectionException, InvocationTargetException,
             IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
-        JMenuItem menuItem = null;
-        menuItem = new JMenuItem("Export Baseline Jar...");
-        menuItem.addActionListener(new WriteJar(aceConfig));
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-        menuItem = new JMenuItem("Import Java Changeset...");
-        menuItem.addActionListener(new ImportJavaChangeset(config));
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-        menuItem = new JMenuItem("Import Changeset Jar...");
-        menuItem.addActionListener(new ImportChangesetJar(config));
-        fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Import Baseline Jar...");
-        menuItem.addActionListener(new ImportBaselineJar(config));
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-        menuItem = new JMenuItem("Change Password...");
-        menuItem.addActionListener(new ChangeFramePassword(this));
-        fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Save Profile");
-        menuItem.addActionListener(new SaveProfile());
-        fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Save Profile As...");
-        menuItem.addActionListener(new SaveProfileAs());
-        fileMenu.add(menuItem);
+       if (editMode) {
+          JMenuItem menuItem = null;
+          menuItem = new JMenuItem("Export Baseline Jar...");
+          menuItem.addActionListener(new WriteJar(aceConfig));
+          fileMenu.add(menuItem);
+          fileMenu.addSeparator();
+          menuItem = new JMenuItem("Import Java Changeset...");
+          menuItem.addActionListener(new ImportJavaChangeset(config));
+          fileMenu.add(menuItem);
+          fileMenu.addSeparator();
+          menuItem = new JMenuItem("Import Changeset Jar...");
+          menuItem.addActionListener(new ImportChangesetJar(config));
+          fileMenu.add(menuItem);
+          menuItem = new JMenuItem("Import Baseline Jar...");
+          menuItem.addActionListener(new ImportBaselineJar(config));
+          fileMenu.add(menuItem);
+          fileMenu.addSeparator();
+          menuItem = new JMenuItem("Change Password...");
+          menuItem.addActionListener(new ChangeFramePassword(this));
+          fileMenu.add(menuItem);
+          menuItem = new JMenuItem("Save Profile");
+          menuItem.addActionListener(new SaveProfile());
+          fileMenu.add(menuItem);
+          menuItem = new JMenuItem("Save Profile As...");
+          menuItem.addActionListener(new SaveProfileAs());
+          fileMenu.add(menuItem);
 
-        menuBar.add(fileMenu);
+          menuBar.add(fileMenu);
+       }
     }
 
     private static void addActionButton(ActionListener actionListener, String resource, String tooltipText,
@@ -1046,7 +1050,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptPanels.add(c3panel);
         conceptTabs.addTab("Empty 2", null, c4panel, "Unlinked 2");
         // conceptTabs.addTab("Description List", getDescListEditor());
-        conceptTabs.addTab("List", getConceptListEditor());
+        if (editMode) {
+           conceptTabs.addTab("List", getConceptListEditor());
+        }
 
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
@@ -1583,10 +1589,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TerminologyList viewerList = new TerminologyList(viewerHistoryTableModel, false, aceFrameConfig);
         tabs.addTab("viewer", new JScrollPane(viewerList));
-        TerminologyList commitList = new TerminologyList(commitHistoryTableModel, false, aceFrameConfig);
-        tabs.addTab("uncommitted", new JScrollPane(commitList));
-        TerminologyList importList = new TerminologyList(importHistoryTableModel, false, aceFrameConfig);
-        tabs.addTab("imported", new JScrollPane(importList));
+        if (editMode) {
+           TerminologyList commitList = new TerminologyList(commitHistoryTableModel, false, aceFrameConfig);
+           tabs.addTab("uncommitted", new JScrollPane(commitList));
+           TerminologyList importList = new TerminologyList(importHistoryTableModel, false, aceFrameConfig);
+           tabs.addTab("imported", new JScrollPane(importList));
+        }
         historyPalette.add(tabs, BorderLayout.CENTER);
         historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
         layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
@@ -1847,6 +1855,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showAddressesButton.setToolTipText("address book of project participants");
         apal = new AddressPaletteActionListener();
         showAddressesButton.addActionListener(apal);
+        showAddressesButton.setVisible(editMode);
         topPanel.add(showAddressesButton, c);
         c.gridx++;
 
@@ -1927,6 +1936,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showQueuesActionListener = new QueuesPaletteActionListener();
         showQueuesButton.addActionListener(showQueuesActionListener);
         showQueuesButton.setToolTipText("Show the queue viewer...");
+        showQueuesButton.setVisible(editMode);
         c.gridx++;
 
         showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
@@ -1934,6 +1944,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showProcessBuilderActionListener = new ProcessPaletteActionListener();
         showProcessBuilder.addActionListener(showProcessBuilderActionListener);
         showProcessBuilder.setToolTipText("Show the process builder...");
+        showProcessBuilder.setVisible(editMode);
         c.gridx++;
 
         showSubversionButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/svn.png")));
@@ -1947,6 +1958,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showPreferencesButton.addActionListener(preferencesActionListener);
         topPanel.add(showPreferencesButton, c);
         showPreferencesButton.setToolTipText("Show preferences panel...");
+        showPreferencesButton.setVisible(editMode);
         c.gridx++;
 
         return topPanel;
@@ -2035,6 +2047,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showSignpostPanelToggle = new JToggleButton(new ImageIcon(ACE.class
                 .getResource("/32x32/plain/signpost.png")));
         showSignpostPanelToggle.addActionListener(bottomPanelActionListener);
+        showSignpostPanelToggle.setVisible(true);
         bottomPanel.add(showSignpostPanelToggle, c);
         c.gridx++;
         bottomPanel.add(new JLabel("  "), c);
@@ -2049,10 +2062,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         cancelButton.setEnabled(false);
         cancelButton.addActionListener(new Abort());
         bottomPanel.add(cancelButton, c);
+        cancelButton.setVisible(editMode);
         c.gridx++;
         commitButton = new JButton("commit");
         commitButton.setEnabled(false);
         commitButton.addActionListener(new Commit());
+        commitButton.setVisible(editMode);
         bottomPanel.add(commitButton, c);
         c.gridx++;
         bottomPanel.add(new JLabel("   "), c);

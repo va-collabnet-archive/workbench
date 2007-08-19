@@ -1,5 +1,6 @@
 package org.dwfa.vodb;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.jar.JarFile;
@@ -11,7 +12,7 @@ import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.vodb.ProcessConstants.FORMAT;
 import org.dwfa.vodb.types.Path;
 
-public class LoadSourcesFromJars {
+public class LoadBdb {
 	private static Stopwatch timer;
 	
 	private static void printElapsedTime() {
@@ -24,6 +25,45 @@ public class LoadSourcesFromJars {
 		AceLog.getAppLog().info(end.toString());
 	}
 
+   public static void loadFromDirectory(File dataDir) throws Exception {
+      ProcessConstantsBerkeley loadConstants = null;
+      timer = new Stopwatch();
+      timer.start();
+      loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
+      AceLog.getAppLog().info("Starting to process " + dataDir);
+      loadConstants.executeFromDir(dataDir);
+      Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
+      AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
+      AceLog.getAppLog().info("Finished loading " + dataDir + ". Elapsed time: "
+            + timer.getElapsedTime());
+      printElapsedTime();
+      AceLog.getAppLog().info("Creating concept->desc map.");
+      ((VodbEnv) LocalVersionedTerminology.get()).getConceptDescMap();
+      //Update the history records for the relationships...
+      printElapsedTime();
+
+      //monitor.setProgressInfoUpper("Starting c1RelMap.");
+      ((VodbEnv) LocalVersionedTerminology.get()).createC1RelMap();
+      printElapsedTime();
+      //monitor.setProgressInfoUpper("Starting c2RelMap.");
+      ((VodbEnv) LocalVersionedTerminology.get()).createC2RelMap();
+      printElapsedTime();
+      //monitor.setProgressInfoUpper("Starting createIdMaps.");
+      ((VodbEnv) LocalVersionedTerminology.get()).createIdMaps();
+      printElapsedTime();
+      //monitor.setProgressInfoUpper("Starting createConceptImageMap.");
+      ((VodbEnv) LocalVersionedTerminology.get()).createConceptImageMap();
+      //monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
+      ((VodbEnv) LocalVersionedTerminology.get()).populateTimeBranchDb();
+      printElapsedTime();
+      //AceConfig.monitor.setProgressInfoUpper("Starting makeLuceneIndex().");
+      ((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
+      //AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
+      printElapsedTime();
+      //((VodbEnv) LocalVersionedTerminology.get()).close();
+      //printElapsedTime();
+      
+   }
 	public static void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
 		ProcessConstantsBerkeley loadConstants = null;
 		timer = new Stopwatch();

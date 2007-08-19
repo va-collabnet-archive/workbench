@@ -85,7 +85,7 @@ public class AceRunner {
             argsStr = Arrays.asList(args).toString();
          }
          AceLog.getAppLog().info(
-               "\n*******************\n\n" + "Starting service with config file args: " + argsStr
+               "\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: " + argsStr
                      + "\n\n******************\n");
          startupLocalHost = InetAddress.getLocalHost();
          ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
