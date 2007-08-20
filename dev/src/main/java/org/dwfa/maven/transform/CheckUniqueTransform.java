@@ -13,7 +13,7 @@ import org.dwfa.maven.Transform;
 
 public class CheckUniqueTransform extends AbstractTransform {
    
-   static File dupFile = new File("target/dups.txt");
+   static File dupFile = new File("target/dups.oos");
    Set<String> keys = new HashSet<String>();
    boolean duplicatesFound = false;
    static Set<String> dups;
@@ -47,7 +47,7 @@ public class CheckUniqueTransform extends AbstractTransform {
    public void cleanup(Transform transformer) throws Exception {
       super.cleanup(transformer);
       if (duplicatesFound) {
-         transformer.getLog().info(this.getName() + " FOUND DUPLICATES. *** Please view the output file for details.");
+         transformer.getLog().info(this.getName() + " FOUND DUPLICATES. *** Please view the output file for details. " + dups.size());
          transformer.getLog().info(this.getName() + " Dups: " + dups);
          ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dupFile));
          oos.writeObject(dups);
