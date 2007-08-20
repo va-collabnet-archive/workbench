@@ -6,11 +6,10 @@ import java.util.Set;
 
 import org.dwfa.maven.Transform;
 
-public class CheckUniqueTransform extends AbstractTransform {
+public class CheckPreviouslyUniqueTransform extends AbstractTransform {
    
-   Set<String> keys = new HashSet<String>();
-   boolean duplicatesFound = false;
    static Set<String> dups;
+   boolean duplicatesFound = false;
 
    @Override
    public void setupImpl(Transform transformer) throws IOException {
@@ -20,12 +19,9 @@ public class CheckUniqueTransform extends AbstractTransform {
    }
 
    public String transform(String input) throws Exception {
-      if (keys.contains(input) || dups.contains(input)) {
-         duplicatesFound = true;
-         dups.add(input);
+      if (dups.contains(input)) {
          return  setLastTransform("Duplicate: " + input);
       } else {
-         keys.add(input);
          return  setLastTransform(input);
       }
    }
@@ -35,7 +31,6 @@ public class CheckUniqueTransform extends AbstractTransform {
       super.cleanup(transformer);
       if (duplicatesFound) {
          transformer.getLog().info(this.getName() + " FOUND DUPLICATES. *** Please view the output file for details.");
-         transformer.getLog().info(this.getName() + " Dups: " + dups);
       } else {
          transformer.getLog().info(this.getName() + " found no duplicates.");
       }
