@@ -3,7 +3,7 @@ package org.dwfa.maven;
 import java.io.IOException;
 
 public interface I_ReadAndTransform {
-	public void setup(Transform transformer) throws IOException;
+	public void setup(Transform transformer) throws IOException, ClassNotFoundException;
    public void cleanup(Transform transformer) throws Exception;
 	public String transform(String input) throws Exception;
 	public I_ReadAndTransform getChainedTransform();

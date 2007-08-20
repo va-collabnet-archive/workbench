@@ -1,6 +1,8 @@
 package org.dwfa.maven.transform;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,10 +13,21 @@ public class CheckPreviouslyUniqueTransform extends AbstractTransform {
    static Set<String> dups;
    boolean duplicatesFound = false;
 
+   @SuppressWarnings("unchecked")
    @Override
-   public void setupImpl(Transform transformer) throws IOException {
+   public void setupImpl(Transform transformer) throws IOException, ClassNotFoundException {
       if (dups == null) {
-         dups = new HashSet<String>();
+         if (CheckUniqueTransform.dupFile.exists()) {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CheckUniqueTransform.dupFile));
+            dups = (Set<String>) ois.readObject();
+            ois.close();
+            transformer.getLog().info(" Existing dups set. Size: " + dups.size());
+         } else {
+            dups = new HashSet<String>();
+            transformer.getLog().info(" Creating new dups set. ");
+         }
+      } else {
+         transformer.getLog().info(" Dup set exists with size: " + dups.size());
       }
    }
 

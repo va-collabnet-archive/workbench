@@ -45,13 +45,13 @@ public abstract class AbstractTransform implements I_ReadAndTransform {
 		this.columnId = columnId;
 	}
 
-	public final void setup(Transform transformer) throws IOException {
+	public final void setup(Transform transformer) throws IOException, ClassNotFoundException {
 		if (columnId == -1) {
 			columnId = transformer.getNextColumnId();
 		}
 		setupImpl(transformer);
 	}
-	public abstract void setupImpl(Transform transformer) throws IOException;
+	public abstract void setupImpl(Transform transformer) throws IOException, ClassNotFoundException;
 
 
 }
