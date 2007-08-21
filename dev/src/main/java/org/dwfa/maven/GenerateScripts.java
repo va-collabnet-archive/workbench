@@ -95,21 +95,23 @@ public class GenerateScripts extends AbstractMojo {
 		 * System.out.println("lib: " + f); } }
 		 */
 		if (scriptNames == null) {
-	        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle");
-	        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
-	        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
-	        startAllScript(jars, "ace", "start-ace-local.config", "1400m", "1400m", "Ace Bundle");
+	        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle", true, false);
+	        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false);
+	        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle", true, false);
+	        startAllScript(jars, "ace", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false);
 			configureScript(jars);
 		} else {
 			for (String name: scriptNames) {
 				if (name.equalsIgnoreCase("startCore")) {
-			        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle");
+			        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle", true, false);
 				} else if (name.equalsIgnoreCase("startJehri")) {
-			        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle");
+			        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false);
 				} else if (name.equalsIgnoreCase("startAce")) {
-			        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle");
-			        startAllScript(jars, "startAceNoNet", "start-ace-local.config", "1400m", "1400m", "Ace Bundle");
-				}
+			        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle", true, false);
+                 startAllScript(jars, "startAceNoNet", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false);
+				} else if (name.equalsIgnoreCase("amtViewer")) {
+                 startAllScript(jars, "amtViewer", "start-ace.config", "1400m", "1400m", "AMT Viewer", false, true);
+            }
 			}
 		}
 	}
@@ -119,7 +121,7 @@ public class GenerateScripts extends AbstractMojo {
 	 * @throws MojoExecutionException
 	 */
 	private void startAllScript(File[] jars, String scriptName, String startFileName,
-			String startHeap, String maxHeap, String xdocName) throws MojoExecutionException {
+			String startHeap, String maxHeap, String xdocName, boolean jiniSecurity, boolean bundledJre) throws MojoExecutionException {
 		File windowScript = new File(outputDirectory + fileSep
 				+ scriptOutputDir + fileSep + scriptName + ".bat");
 
@@ -128,18 +130,23 @@ public class GenerateScripts extends AbstractMojo {
 			FileWriter fw = new FileWriter(windowScript);
 			// fw.write("export
 			// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
-			fw.write("java ");
+         if (bundledJre) {
+            fw.write("jre\\bin\\java ");
+         } else {
+            fw.write("java ");
+         }
 			fw.write("-Xms" + startHeap + " ");
 			fw.write("-Xmx" + maxHeap + " ");
-			fw.write("-Djava.security.manager=  ");
-			fw.write("-Djava.util.logging.config.file=config\\logging.properties ");
-			fw.write("-Djava.security.policy=config\\dwa.policy ");
-			fw.write("-Djava.security.properties=config\\dynamic-policy.security-properties ");
-			fw.write("-Djava.security.auth.login.config=config\\dwa.login ");
-			fw.write("-Djavax.net.ssl.trustStore=prebuiltkeys\\truststore ");
-			fw.write("-Djava.protocol.handler.pkgs=net.jini.url  ");
-            fw.write("-Djava.library.path=lib ");
- 			fw.write("-Dorg.dwfa.jiniport=8080 ");
+         if (jiniSecurity) {
+            fw.write("-Djava.security.manager=  ");
+            fw.write("-Djava.util.logging.config.file=config\\logging.properties ");
+            fw.write("-Djava.security.policy=config\\dwa.policy ");
+            fw.write("-Djava.security.properties=config\\dynamic-policy.security-properties ");
+            fw.write("-Djava.security.auth.login.config=config\\dwa.login ");
+            fw.write("-Djavax.net.ssl.trustStore=prebuiltkeys\\truststore ");
+            fw.write("-Djava.protocol.handler.pkgs=net.jini.url  ");
+            fw.write("-Dorg.dwfa.jiniport=8080 ");
+         }
 			fw.write("-cp ");
 			for (File f : Arrays.asList(jars)) {
 				fw.write(libDir + "\\" + f.getName() + ";");
@@ -162,17 +169,19 @@ public class GenerateScripts extends AbstractMojo {
 			fw.write("java \\\n");
 			fw.write("     -Xms" + startHeap + "  \\\n");
 			fw.write("     -Xmx" + maxHeap + " \\\n");
-			fw.write("     -Djava.security.manager=  \\\n");
 			fw.write("     -Xdock:name=\"" + xdocName + "\"  \\\n");
              fw.write("     -Xdock:icon=config/icon/bundle.gif  \\\n");
 			fw.write("     -Dapple.laf.useScreenMenuBar=true \\\n");
-			fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
-			fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
-			fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
-			fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
-			fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
-			fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
-			fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
+         if (jiniSecurity) {
+            fw.write("     -Djava.security.manager=  \\\n");
+            fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
+            fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
+            fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
+            fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
+            fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
+            fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
+            fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
+         }
 			fw.write("     -cp ");
 			for (File f : Arrays.asList(jars)) {
 				fw.write(libDir + "/" + f.getName() + ":");
@@ -198,16 +207,23 @@ public class GenerateScripts extends AbstractMojo {
 				// fw.write("export
 				// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
 				fw.write("java \\\n");
+            if (bundledJre) {
+               fw.write("jre/bin/java \\\n");
+            } else {
+               fw.write("java \\\n");
+            }
 				fw.write("     -Xms" + startHeap + "  \\\n");
 				fw.write("     -Xmx" + maxHeap + " \\\n");
-				fw.write("     -Djava.security.manager=  \\\n");
-				fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
-				fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
-				fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
-				fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
-				fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
-				fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
-				fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
+            if (jiniSecurity) {
+               fw.write("     -Djava.security.manager=  \\\n");
+               fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
+               fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
+               fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
+               fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
+               fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
+               fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
+               fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
+            }
 				fw.write("     -cp ");
 				for (File f : Arrays.asList(jars)) {
 					fw.write(libDir + "/" + f.getName() + ":");
