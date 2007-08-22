@@ -58,8 +58,8 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     public static Rectangle getDefaultFrameSize() {
     	Toolkit tk = Toolkit.getDefaultToolkit();
     	Dimension screenSize = tk.getScreenSize();
-    	if (screenSize.width <= 1400) {
-    		return new Rectangle(0, 0, screenSize.width, screenSize.height - 22);
+    	if (screenSize.width < 1400) {
+    		return new Rectangle(0, 0, screenSize.width - 10, screenSize.height - 40);
     	}
 		return new Rectangle(0, 0, 1400, 1028);
     }
