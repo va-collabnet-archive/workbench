@@ -1,5 +1,6 @@
 package org.dwfa.ace.config;
 
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -85,7 +86,11 @@ public class AceFrame extends ComponentFrame {
 		((AceFrameConfig) frameConfig).setAceFrame(this);
 		getCdePanel().setup(frameConfig);
 		setContentPane(cdePanel);
-		setBounds(frameConfig.getBounds());
+      Rectangle defaultBounds = getDefaultFrameSize();
+      Rectangle bounds = frameConfig.getBounds();
+      bounds.width = Math.min(bounds.width, defaultBounds.width);
+      bounds.height = Math.min(bounds.height, defaultBounds.height);
+		setBounds(bounds);
 		doWindowActivation();
 		getQuitList().add(cdePanel);
 		this.addWindowListener(new AceWindowActionListener());
