@@ -71,11 +71,13 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 			toggleButton = new JToggleButton(getImageIcon());
 			toggleButton.setSelected(selectedByDefault);
 			toggleButton.addActionListener(new ToggleActionListener());
+         toggleButton.setToolTipText(getToolTipText());
 		}
 		return toggleButton;
 	}
 	
 	protected abstract ImageIcon getImageIcon();
+   protected abstract String getToolTipText();
 	boolean selectedByDefault;
 	
 }

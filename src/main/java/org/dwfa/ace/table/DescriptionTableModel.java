@@ -33,8 +33,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 	public enum DESC_FIELD { SCORE("score", 5, 100, 100),
 		DESC_ID("did", 5, 100, 100), CON_ID("cid", 5, 100, 100), TEXT("text",
-				5, 300, 2000), LANG("lang", 5, 30, 30), CASE_FIXED("case", 5,
-				35, 35), STATUS("status", 5, 50, 150), TYPE("type", 5, 85, 150), VERSION(
+				5, 300, 2000), LANG("lang", 5, 35, 55), CASE_FIXED("case", 5,
+				35, 55), STATUS("status", 5, 50, 150), TYPE("type", 5, 85, 150), VERSION(
 				"version", 5, 140, 140), BRANCH("path", 5, 90, 150);
 
 		private String columnName;
@@ -123,46 +123,46 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				return getScore(rowIndex);
 			case DESC_ID:
 				return new StringWithDescTuple(Integer.toString(desc
-						.getDescId()), desc);
+						.getDescId()), desc, false);
 			case CON_ID:
 				return new StringWithDescTuple(Integer.toString(desc
-						.getConceptId()), desc);
+						.getConceptId()), desc, false);
 			case TEXT:
 				if (BasicHTML.isHTMLString(desc.getText())) {
-					return new StringWithDescTuple(desc.getText(), desc);
+					return new StringWithDescTuple(desc.getText(), desc, true);
 				} else {
-					return new StringWithDescTuple("<html>" + desc.getText(),
-							desc);
+					return new StringWithDescTuple(desc.getText(),
+							desc, true);
 				}
 			case LANG:
-				return new StringWithDescTuple(desc.getLang(), desc);
+				return new StringWithDescTuple(desc.getLang(), desc, false);
 			case CASE_FIXED:
 				return new StringWithDescTuple(Boolean.toString(desc
-						.getInitialCaseSignificant()), desc);
+						.getInitialCaseSignificant()), desc, false);
 			case STATUS:
 				if (getReferencedConcepts().containsKey(desc.getStatusId())) {
-					return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc);
+					return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc, false);
 				}
 				return new StringWithDescTuple(Integer.toString(desc
-						.getStatusId()), desc);
+						.getStatusId()), desc, false);
 			case TYPE:
 				if (getReferencedConcepts().containsKey(desc.getTypeId())) {
-					return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc);
+					return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc, false);
 				}
 				return new StringWithDescTuple(Integer.toString(desc
-						.getTypeId()), desc);
+						.getTypeId()), desc, false);
 			case VERSION:
 				if (desc.getVersion() == Integer.MAX_VALUE) {
-					return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc);
+					return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false);
 				}
 				return new StringWithDescTuple(ThinVersionHelper.format(desc
-						.getVersion()), desc);
+						.getVersion()), desc, false);
 			case BRANCH:
 				if (getReferencedConcepts().containsKey(desc.getPathId())) {
-					return new StringWithDescTuple(getPrefText(desc.getPathId()), desc);
+					return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false);
 				}
 				return new StringWithDescTuple(Integer.toString(desc
-						.getPathId()), desc);
+						.getPathId()), desc, false);
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -275,10 +275,12 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 		I_DescriptionTuple tuple;
 
-		public StringWithDescTuple(String cellText, I_DescriptionTuple tuple) {
+      boolean wrapLines;
+		public StringWithDescTuple(String cellText, I_DescriptionTuple tuple, boolean wrapLines) {
 			super();
 			this.cellText = cellText;
 			this.tuple = tuple;
+         this.wrapLines = wrapLines;
 		}
 
 		public String getCellText() {
@@ -297,6 +299,14 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			StringWithDescTuple another = (StringWithDescTuple) o;
 			return cellText.compareTo(another.cellText);
 		}
+
+      public boolean getWrapLines() {
+         return wrapLines;
+      }
+
+      public void setWrapLines(boolean wrapLines) {
+         this.wrapLines = wrapLines;
+      }
 	}
 
 	public static class DescTextFieldEditor extends DefaultCellEditor {

@@ -574,6 +574,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (showTreeButton.isSelected()) {
+                               if (dividerLocation < 200) {
+                                  dividerLocation = 200;
+                               }
                                 termTreeConceptSplit.setDividerLocation(dividerLocation);
                             } else {
                                 termTreeConceptSplit.setDividerLocation(0);
@@ -593,7 +596,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             } else if (e.getSource() == showTreeButton) {
                 if (showTreeButton.isSelected()) {
                     if (showComponentButton.isSelected()) {
-                        termTreeConceptSplit.setDividerLocation(dividerLocation);
+                       if (dividerLocation < 200) {
+                          dividerLocation = 200;
+                       }
+                       termTreeConceptSplit.setDividerLocation(dividerLocation);
                     } else {
                         termTreeConceptSplit.setDividerLocation(3000);
                     }
@@ -1846,7 +1852,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx = 0;
         c.gridy = 0;
         showHistoryButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/history2.png")));
-        showHistoryButton.setToolTipText("history of user commits and concepts viewed");
+        if (editMode) {
+           showHistoryButton.setToolTipText("history of user commits and concepts viewed");
+        } else {
+           showHistoryButton.setToolTipText("history of concepts viewed");
+        }
         hpal = new HistoryPaletteActionListener();
         showHistoryButton.addActionListener(hpal);
         topPanel.add(showHistoryButton, c);
@@ -2299,22 +2309,25 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public boolean quit() {
-    	 if (uncommitted.size() > 0) {
-    		 JOptionPane.showMessageDialog(this, "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
-    		 return false;
-    	 }
-    	
-    	
-        int option = JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
-                                                   JOptionPane.YES_NO_OPTION);
-        if (option == JOptionPane.YES_OPTION) {
-            try {
-                AceConfig.config.save();
-            } catch (IOException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-                return false;
-            }
-        }
+       
+       if (editMode) {
+          if (uncommitted.size() > 0) {
+             JOptionPane.showMessageDialog(this, "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
+             return false;
+          }
+         
+         
+           int option = JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
+                                                      JOptionPane.YES_NO_OPTION);
+           if (option == JOptionPane.YES_OPTION) {
+               try {
+                   AceConfig.config.save();
+               } catch (IOException e) {
+                   AceLog.getAppLog().alertAndLogException(e);
+                   return false;
+               }
+           }
+       }
         
         if (runShutdownProcesses) {
         	runShutdownProcesses = false;

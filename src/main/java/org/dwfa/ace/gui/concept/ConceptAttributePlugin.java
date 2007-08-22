@@ -199,5 +199,9 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		c.gridx = 0;
 		return conceptPanel;
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide primitive/defind and status value for this concept";
+   }
 
 }

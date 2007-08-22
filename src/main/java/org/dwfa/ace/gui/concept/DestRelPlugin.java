@@ -76,4 +76,9 @@ public class DestRelPlugin extends RelPlugin {
 			destRelTableModel.propertyChange(evt);
 		}
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide destination relationshipts for this concept";
+   }
+
 }

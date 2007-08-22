@@ -145,10 +145,12 @@ public class SearchPanel extends JPanel {
 		gbc.weightx = 0;
 		regexRadio = new JRadioButton("regex");
 		regexRadio.setSelected(false);
+      regexRadio.setVisible(false);
 		add(regexRadio, gbc);
 		gbc.gridy++;
 		luceneRadio = new JRadioButton("lucene");
 		luceneRadio.setSelected(true);
+      luceneRadio.setVisible(false);
 		add(luceneRadio, gbc);
 		
 		ButtonGroup bg = new ButtonGroup();
@@ -165,6 +167,7 @@ public class SearchPanel extends JPanel {
 		gbc.gridheight = 2;
 		searchSetting = new JButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
+      searchSetting.setVisible(false);
 		gbc.gridx++;
 		add(searchSetting, gbc);
 
@@ -172,12 +175,14 @@ public class SearchPanel extends JPanel {
 		searchButton = new JButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/find.png")));
 		searchButton.addActionListener(getActionMap().get("search"));
+      searchButton.setToolTipText("perform a search");
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		add(searchButton, gbc);
 
 		stopButton = new JButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/stop.png")));
 		stopButton.setVisible(false);
+      stopButton.setToolTipText("stop the current search");
 		// stopButton.setBorder(BorderFactory.createLineBorder(Color.red));
 		add(stopButton, gbc);
 		gbc.anchor = GridBagConstraints.WEST;
@@ -248,8 +253,8 @@ public class SearchPanel extends JPanel {
 		stopButton.setVisible(show);
 		progressInfo.setVisible(show);
 		progressBar.setVisible(show);
-		regexRadio.setVisible(!show);
-		searchSetting.setVisible(!show);
+		//regexRadio.setVisible(!show);
+		//searchSetting.setVisible(!show);
 	}
 
 	private void startSearch() {

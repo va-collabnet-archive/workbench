@@ -222,5 +222,9 @@ public class LineagePlugin extends AbstractPlugin {
 		}
 		return lineage;
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide the lineage of this concept";
+   }
 
 }

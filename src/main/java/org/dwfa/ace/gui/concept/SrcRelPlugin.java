@@ -74,4 +74,9 @@ public class SrcRelPlugin extends RelPlugin {
 			srcRelTableModel.propertyChange(evt);			
 		}
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide source relationships for this concept";
+   }
+
 }

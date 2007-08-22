@@ -218,15 +218,19 @@ public class DescriptionPlugin extends AbstractPlugin {
 
          descTable.setDefaultEditor(StringWithDescTuple.class,
                new DescriptionTableModel.DescTextFieldEditor());
-         descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
          descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
                new DescriptionTableModel.DescTypeFieldEditor(host.getConfig()));
          descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
                new DescriptionTableModel.DescStatusFieldEditor(host.getConfig()));
       }
 
+      descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
 		descTable.setDefaultRenderer(Number.class, renderer);
 		descTable.setDefaultRenderer(String.class, renderer);
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide descriptions for this concept";
+   }
 
 }

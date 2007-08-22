@@ -165,5 +165,9 @@ public class ImagePlugin extends AbstractPlugin {
 		c.gridx = 0;
 		return imagePanel;
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide images associated with this concept";
+   }
 
 }

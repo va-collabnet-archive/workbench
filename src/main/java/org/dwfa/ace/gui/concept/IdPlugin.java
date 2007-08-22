@@ -202,4 +202,10 @@ public class IdPlugin extends AbstractPlugin {
 		return idPanel;
 	}
 
+
+   @Override
+   protected String getToolTipText() {
+      return "show/hide identifiers for this concept";
+   }
+
 }

@@ -46,5 +46,9 @@ public class ConflictPlugin extends AbstractPlugin {
 		}
 		
 	}
+   @Override
+   protected String getToolTipText() {
+      return "show/hide the conflict view for this concept";
+   }
 
 }

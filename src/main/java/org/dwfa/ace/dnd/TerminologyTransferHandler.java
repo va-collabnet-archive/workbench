@@ -443,7 +443,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 			return true;
 		}
 		if (JTreeWithDragImage.class.isAssignableFrom(comp.getClass())) {
-			return true;
+			return false;
 		}
 		try {
 			if ((comp.getClass().getMethod("setText",
