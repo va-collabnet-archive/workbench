@@ -110,7 +110,7 @@ public class GenerateScripts extends AbstractMojo {
 			        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle", true, false);
                  startAllScript(jars, "startAceNoNet", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false);
 				} else if (name.equalsIgnoreCase("amtViewer")) {
-                 startAllScript(jars, "amtViewer", "start-ace.config", "1400m", "1400m", "AMT Viewer", false, true);
+                 startAllScript(jars, "amtViewer", "start-ace.config", "1400m", "1400m", "AMT Viewer", true, true);
             }
 			}
 		}
