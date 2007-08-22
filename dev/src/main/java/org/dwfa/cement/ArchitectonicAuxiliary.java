@@ -210,8 +210,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                            new I_ConceptualizeUniversally[] { REASSIGNED }),
                      RESOLVED_IN_DUAL_AND_REASSIGNED("resolved in dual and reassigned",
                            new I_ConceptualizeUniversally[] { REASSIGNED }),
-                     ADJUDICATED_AND_REASSIGNED("adjudicated and reassigned",
-                           new I_ConceptualizeUniversally[] { REASSIGNED }),
 					PROCESSED("processed",
 							new I_ConceptualizeUniversally[] { ACTIVE }),
                      DUAL_REVIEWED_AND_PROCESSED("dual reviewed and processed",
