@@ -59,7 +59,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     	Toolkit tk = Toolkit.getDefaultToolkit();
     	Dimension screenSize = tk.getScreenSize();
     	if (screenSize.width < 1400) {
-    		return new Rectangle(0, 0, screenSize.width - 10, screenSize.height - 40);
+    		return new Rectangle(0, 0, screenSize.width - 50, screenSize.height - 50);
     	}
 		return new Rectangle(0, 0, 1400, 1028);
     }
