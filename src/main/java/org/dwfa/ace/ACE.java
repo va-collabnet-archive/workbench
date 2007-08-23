@@ -163,9 +163,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       public void actionPerformed(ActionEvent evt) {
          JToggleButton button = (JToggleButton) evt.getSource();
          aceFrameConfig.setRefsetInToggleVisible(type, t, button.isSelected());
-
       }
-
    }
 
    public class SetToggleVisibleListener implements ActionListener {
@@ -408,6 +406,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     //AceLog.getAppLog().info("showing bottom panel");
                     if (lastLocation == 0) {
                         lastLocation = upperLowerSplit.getHeight() - 200;
+                    }
+                    if (upperLowerSplit.getHeight() - lastLocation < 50) {
+                       lastLocation = upperLowerSplit.getHeight() - 200;
                     }
                     upperLowerSplit.setDividerLocation(lastLocation);
                     hidden = false;
