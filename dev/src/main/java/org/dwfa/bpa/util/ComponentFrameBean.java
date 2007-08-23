@@ -296,7 +296,11 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
         // Options/Prefs menu item is provided on Mac OS X.. only make it on
         // other platforms.
         if (!MAC_OS_X) {
-            mainMenuBar.add(bundleMenu = new JMenu("Bundle"));
+           String menuName = "Bundle";
+           if (System.getProperty("org.dwfa.AppMenuName") != null && System.getProperty("org.dwfa.AppMenuName").length() > 3) {
+              menuName = AboutBox.removeQuotes(System.getProperty("org.dwfa.AppMenuName"));
+           }
+            mainMenuBar.add(bundleMenu = new JMenu(menuName));
             bundleMenu.addSeparator();
             bundleMenu.add(aboutMI = new JMenuItem("About..."));
             aboutMI.addActionListener(this);
