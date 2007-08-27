@@ -114,9 +114,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
    }
 
-   private class ToggleHistoryChangeActionListener implements ActionListener {
+   private class FixedToggleChangeActionListener implements ActionListener, PropertyChangeListener {
 
       public void actionPerformed(ActionEvent e) {
+         perform();
+      }
+
+      private void perform() {
          firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(), historyButton.isSelected());
          try {
             contentScroller.setViewportView(getContentPane());
@@ -124,6 +128,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                   "Database Exception: " + e1.getLocalizedMessage(), e1);
          }
+      }
+
+      public void propertyChange(PropertyChangeEvent arg0) {
+         perform();
       }
    }
 
@@ -168,7 +176,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
    private AbstractPlugin srcRelPlugin = new SrcRelPlugin();
 
-   private DestRelPlugin destRelPlugin = new DestRelPlugin();
+   private RelPlugin destRelPlugin = new DestRelPlugin();
 
    private IdPlugin idPlugin = new IdPlugin();
 
@@ -190,9 +198,11 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
    private JToggleButton inferredButton;
 
-   private ToggleHistoryChangeActionListener historyChangeActionListener;
+   private FixedToggleChangeActionListener fixedToggleChangeActionListener;
 
    private PropertyChangeListener labelListener = new LabelListener();
+
+   private JToggleButton refsetToggleButton;
 
    /**
     * 
@@ -320,13 +330,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
          ClassNotFoundException {
       this(ace, link, conceptTabs, false);
    }
-   
+
    public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, boolean enableListLink)
          throws DatabaseException, IOException, ClassNotFoundException {
       super(new GridBagLayout());
       this.ace = ace;
-      this.ace.getAceFrameConfig().addPropertyChangeListener("visibleComponentToggles",
-            new UpdateTogglesPropertyChangeListener());
+      UpdateTogglesPropertyChangeListener updateListener = new UpdateTogglesPropertyChangeListener();
+      this.ace.getAceFrameConfig().addPropertyChangeListener("visibleComponentToggles", updateListener);
       if (ACE.editMode) {
          plugins = new ArrayList<I_PluginToConceptPanel>(Arrays.asList(new I_PluginToConceptPanel[] { idPlugin,
                conceptAttributePlugin, descPlugin, srcRelPlugin, destRelPlugin, lineagePlugin, imagePlugin,
@@ -337,7 +347,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
       }
       ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
       label = new TermComponentLabel(this.ace.getAceFrameConfig());
-      historyChangeActionListener = new ToggleHistoryChangeActionListener();
+      fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
+      this.ace.getAceFrameConfig().addPropertyChangeListener("visibleRefsets", fixedToggleChangeActionListener);
       this.ace.getAceFrameConfig().addPropertyChangeListener(this);
       this.conceptTabs = conceptTabs;
       GridBagConstraints c = new GridBagConstraints();
@@ -425,6 +436,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
          }
          plugin.addShowComponentListener(l);
       }
+      fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
+
       inferredButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/yinyang.png")));
       inferredButton.setSelected(false);
       inferredButton.setVisible(false);
@@ -434,17 +447,24 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             + "can be boiled and eventually turn into steam (yang).<p> <p>"
             + "Stated forms (yin) can be classified and turned into<br>" + "inferred forms (yang).");
       leftTogglePane.add(inferredButton);
+
+      refsetToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip.png")));
+      refsetToggleButton.setSelected(false);
+      refsetToggleButton.setVisible(ACE.editMode);
+      refsetToggleButton.setToolTipText("show hide refset entries of types selected in the preferences");
+      refsetToggleButton.addActionListener(fixedToggleChangeActionListener);
+      leftTogglePane.add(refsetToggleButton);
+
       usePrefButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/component_preferences.png")));
       usePrefButton.setSelected(false);
       usePrefButton.setVisible(ACE.editMode);
       usePrefButton.setToolTipText("use preferences to filter views");
-      historyChangeActionListener = new ToggleHistoryChangeActionListener();
-      usePrefButton.addActionListener(historyChangeActionListener);
+      usePrefButton.addActionListener(fixedToggleChangeActionListener);
       leftTogglePane.add(usePrefButton);
 
       historyButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
       historyButton.setSelected(false);
-      historyButton.addActionListener(historyChangeActionListener);
+      historyButton.addActionListener(fixedToggleChangeActionListener);
       historyButton.setToolTipText("show/hide the history records");
       leftTogglePane.add(historyButton);
 
@@ -525,7 +545,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                }
                break;
             case REFSETS:
-
+               refsetToggleButton.setVisible(visible);
+               refsetToggleButton.setEnabled(visible);
                break;
             case STATED_INFERRED:
                if (ACE.editMode) {
@@ -716,7 +737,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
    public void propertyChange(PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals("viewPositions")) {
-         historyChangeActionListener.actionPerformed(null);
+         fixedToggleChangeActionListener.actionPerformed(null);
       } else if (evt.getPropertyName().equals("commit")) {
          if (label.getTermComponent() != null) {
             ConceptBean cb = (ConceptBean) label.getTermComponent();
@@ -784,58 +805,84 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
       ACE.addUncommitted((I_Transact) concept);
    }
 
-   public void setAllTogglesToState(boolean state) {
-      for (I_PluginToConceptPanel plugin : plugins) {
-         for (JComponent component : plugin.getToggleBarComponents()) {
-            if (JToggleButton.class.isAssignableFrom(component.getClass())) {
-               JToggleButton toggle = (JToggleButton) component;
-               if (toggle.isSelected() == state) {
-                  // nothing to do...
-               } else {
-                  toggle.doClick();
+   public void setAllTogglesToState(final boolean state) {
+      SwingUtilities.invokeLater(new Runnable() {
+
+         public void run() {
+            for (I_PluginToConceptPanel plugin : plugins) {
+               for (JComponent component : plugin.getToggleBarComponents()) {
+                  if (JToggleButton.class.isAssignableFrom(component.getClass())) {
+                     JToggleButton toggle = (JToggleButton) component;
+                     if (toggle.isSelected() == state) {
+                        // nothing to do...
+                     } else {
+                        toggle.doClick();
+                     }
+                  }
                }
             }
          }
-      }
-
+      });
    }
 
    public void setLinkType(LINK_TYPE link) {
       changeLinkListener(link);
    }
 
-   public void setToggleState(TOGGLES toggle, boolean state) {
-      I_PluginToConceptPanel plugin = pluginMap.get(toggle);
-      if (plugin != null) {
-         for (JComponent component : plugin.getToggleBarComponents()) {
-            if (JToggleButton.class.isAssignableFrom(component.getClass())) {
-               JToggleButton toggleButton = (JToggleButton) component;
-               if (toggleButton.isSelected() == state) {
-                  // nothing to do...
-               } else {
-                  toggleButton.doClick();
+   public void setToggleState(final TOGGLES toggle, final boolean state) {
+      SwingUtilities.invokeLater(new Runnable() {
+
+         public void run() {
+            I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+            if (plugin != null) {
+               for (JComponent component : plugin.getToggleBarComponents()) {
+                  if (JToggleButton.class.isAssignableFrom(component.getClass())) {
+                     JToggleButton toggleButton = (JToggleButton) component;
+                     if (toggleButton.isSelected() == state) {
+                        // nothing to do...
+                     } else {
+                        toggleButton.doClick();
+                     }
+                  }
+               }
+            } else {
+               switch (toggle) {
+               case HISTORY:
+                  if (historyButton.isSelected() == state) {
+                     // nothing to do...
+                  } else {
+                     historyButton.doClick();
+                  }
+                  break;
+               case PREFERENCES:
+                  if (usePrefButton.isSelected() == state) {
+                     // nothing to do...
+                  } else {
+                     usePrefButton.doClick();
+                  }
+                  break;
+               case REFSETS:
+                  if (refsetToggleButton.isSelected() == state) {
+                     // nothing to do...
+                  } else {
+                     refsetToggleButton.doClick();
+                  }
+                  break;
+               case STATED_INFERRED:
+                  if (inferredButton.isSelected() == state) {
+                     // nothing to do...
+                  } else {
+                     inferredButton.doClick();
+                  }
+                  break;
+
+               default:
+                  throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
                }
             }
          }
-      } else {
-         switch (toggle) {
-         case HISTORY:
-            historyButton.doClick();
-            break;
-         case PREFERENCES:
-            usePrefButton.doClick();
-            break;
-         case REFSETS:
 
-            break;
-         case STATED_INFERRED:
-            inferredButton.doClick();
-            break;
-
-         default:
-            throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
-         }
-      }
+      });
 
    }
 
@@ -857,5 +904,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
    public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) {
       return 10;
+   }
+
+   public boolean getShowRefsets() {
+      return refsetToggleButton.isSelected();
    }
 }
