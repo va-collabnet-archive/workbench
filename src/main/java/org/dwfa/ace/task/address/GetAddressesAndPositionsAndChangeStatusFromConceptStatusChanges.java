@@ -108,6 +108,7 @@ public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges  ex
             I_ConceptAttributePart part = t.duplicatePart();
             part.setConceptStatus(newStatus.getConceptId());
             part.setVersion(Integer.MAX_VALUE);
+            t.getConVersioned().addVersion(part);
             LocalVersionedTerminology.get().addUncommitted(concept);
          }
          ArrayList<String> addressList = new ArrayList<String>();
