@@ -28,6 +28,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             BOOLEAN_EXTENSION("boolean extensions", REFSET_TYPE),
             INT_EXTENSION("int extensions", REFSET_TYPE),
             CONCEPT_EXTENSION("concept extensions", REFSET_TYPE),
+            MEASUREMENT_EXTENSION("measurement extensions", REFSET_TYPE),
             LANGUAGE_EXTENSION("language extensions", REFSET_TYPE),
             SCOPED_LANGUAGE_EXTENSION("scoped language extensions", REFSET_TYPE),
 			REFSET_PURPOSE("refset purpose", REFSET_AUXILIARY),
