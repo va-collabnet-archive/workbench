@@ -296,4 +296,6 @@ public interface I_ConfigAceFrame {
     public boolean isToggleVisible(TOGGLES toggle);
     
     public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle);
+    
+    public void setCommitAbortButtonsVisible(boolean visible);
 }
