@@ -3,12 +3,13 @@ package org.dwfa.vodb.bind;
 import java.util.List;
 
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.vodb.types.ThinExtPartBoolean;
-import org.dwfa.vodb.types.ThinExtPartConcept;
-import org.dwfa.vodb.types.ThinExtPartInteger;
-import org.dwfa.vodb.types.ThinExtPartLanguage;
-import org.dwfa.vodb.types.ThinExtPartScopedLanguage;
-import org.dwfa.vodb.types.ThinExtVersioned;
+import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
+import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartInteger;
+import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
+import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
+import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
+import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
@@ -16,7 +17,8 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ThinExtBinder extends TupleBinding {
    public static enum EXT_TYPE {
-      BOOLEAN(1, "boolean"), CONCEPT(2, "concept"), INTEGER(3, "integer"), LANGUAGE(4, "language"), 
+      BOOLEAN(1, "boolean"), CONCEPT(2, "concept"), INTEGER(3, "integer"), 
+      MEASUREMENT(6, "measurement"), LANGUAGE(4, "language"), 
       SCOPED_LANGUAGE(5, "scoped language");
 
       private int id;
@@ -43,6 +45,8 @@ public class ThinExtBinder extends TupleBinding {
             return LANGUAGE;
          case 5:
             return SCOPED_LANGUAGE;
+         case 6:
+           return MEASUREMENT; 
 
          default:
             throw new RuntimeException("Can't convert to EXT_TYPE: " + id);
@@ -66,75 +70,67 @@ public class ThinExtBinder extends TupleBinding {
       this.fixedOnly = fixedOnly;
    }
 
-   public ThinExtVersioned entryToObject(TupleInput ti) {
+   public ThinExtByRefVersioned entryToObject(TupleInput ti) {
       int refsetId = ti.readInt();
       int memberId = ti.readInt();
       int componentId = ti.readInt();
       EXT_TYPE type = EXT_TYPE.fromId(ti.readInt());
-      int typeId;
-      try {
-         switch (type) {
-         case BOOLEAN:
-            typeId = RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.localize().getNid();
-            break;
-         case CONCEPT:
-            typeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
-            break;
-         case INTEGER:
-            typeId = RefsetAuxiliary.Concept.INT_EXTENSION.localize().getNid();
-            break;
-         case LANGUAGE:
-            typeId = RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid();
-            break;
-         case SCOPED_LANGUAGE:
-            typeId = RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid();
-            break;
-
-         default:
-            throw new RuntimeException("Can't convert to type: " + type);
-         }
-      } catch (Exception e) {
-         throw new RuntimeException(e);
-      }
+      int typeId = getExtensionType(type);
 
       int partCount = ti.readInt();
-      ThinExtVersioned versioned = new ThinExtVersioned(refsetId, memberId, componentId, typeId, partCount);
+      ThinExtByRefVersioned versioned = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
       if (fixedOnly) {
          return versioned;
       }
       switch (type) {
       case BOOLEAN:
          for (int x = 0; x < partCount; x++) {
-            ThinExtPartBoolean part = new ThinExtPartBoolean();
+            ThinExtByRefPartBoolean part = new ThinExtByRefPartBoolean();
             part.setPathId(ti.readInt());
             part.setVersion(ti.readInt());
+            part.setStatus(ti.readInt());
             part.setValue(ti.readBoolean());
             versioned.addVersion(part);
          }
          break;
       case CONCEPT:
          for (int x = 0; x < partCount; x++) {
-            ThinExtPartConcept part = new ThinExtPartConcept();
+            ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
             part.setPathId(ti.readInt());
             part.setVersion(ti.readInt());
+            part.setStatus(ti.readInt());
             part.setConceptId(ti.readInt());
             versioned.addVersion(part);
          }
          break;
-      case INTEGER:
+      case MEASUREMENT:
          for (int x = 0; x < partCount; x++) {
-            ThinExtPartInteger part = new ThinExtPartInteger();
+            ThinExtByRefPartMeasurement part = new ThinExtByRefPartMeasurement();
             part.setPathId(ti.readInt());
             part.setVersion(ti.readInt());
+            part.setStatus(ti.readInt());
+            part.setUnitsOfMeasureId(ti.readInt());
+            part.setMeasurementValue(ti.readDouble());
+            versioned.addVersion(part);
+         }
+         break;
+         
+      case INTEGER:
+         for (int x = 0; x < partCount; x++) {
+            ThinExtByRefPartInteger part = new ThinExtByRefPartInteger();
+            part.setPathId(ti.readInt());
+            part.setVersion(ti.readInt());
+            part.setStatus(ti.readInt());
             part.setValue(ti.readInt());
             versioned.addVersion(part);
          }
          break;
       case LANGUAGE:
          for (int x = 0; x < partCount; x++) {
-            ThinExtPartLanguage part = new ThinExtPartLanguage();
+            ThinExtByRefPartLanguage part = new ThinExtByRefPartLanguage();
             part.setPathId(ti.readInt());
             part.setVersion(ti.readInt());
+            part.setStatus(ti.readInt());
             part.setAcceptabilityId(ti.readInt());
             part.setCorrectnessId(ti.readInt());
             part.setDegreeOfSynonymyId(ti.readInt());
@@ -143,9 +139,10 @@ public class ThinExtBinder extends TupleBinding {
          break;
       case SCOPED_LANGUAGE:
          for (int x = 0; x < partCount; x++) {
-            ThinExtPartScopedLanguage part = new ThinExtPartScopedLanguage();
+            ThinExtByRefPartLanguageScoped part = new ThinExtByRefPartLanguageScoped();
             part.setPathId(ti.readInt());
             part.setVersion(ti.readInt());
+            part.setStatus(ti.readInt());
             part.setAcceptabilityId(ti.readInt());
             part.setCorrectnessId(ti.readInt());
             part.setDegreeOfSynonymyId(ti.readInt());
@@ -161,13 +158,36 @@ public class ThinExtBinder extends TupleBinding {
       return versioned;
    }
 
+   public static int getExtensionType(EXT_TYPE type) {
+      try {
+         switch (type) {
+         case BOOLEAN:
+            return RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.localize().getNid();
+          case CONCEPT:
+            return RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
+         case INTEGER:
+            return RefsetAuxiliary.Concept.INT_EXTENSION.localize().getNid();
+         case LANGUAGE:
+            return RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid();
+         case SCOPED_LANGUAGE:
+            return RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid();
+         case MEASUREMENT:
+            return RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.localize().getNid();
+         default:
+            throw new RuntimeException("Can't convert to type: " + type);
+         }
+      } catch (Exception e) {
+         throw new RuntimeException(e);
+      }
+   }
+
    /*
     * private int refsetId; private int memberId; private int componentId;
     * private int typeId;
     */
    @SuppressWarnings("unchecked")
    public void objectToEntry(Object obj, TupleOutput to) {
-      ThinExtVersioned versioned = (ThinExtVersioned) obj;
+      ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) obj;
       to.writeInt(versioned.getRefsetId());
       to.writeInt(versioned.getMemberId());
       to.writeInt(versioned.getComponentId());
@@ -183,23 +203,27 @@ public class ThinExtBinder extends TupleBinding {
             } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid()) {
                extType = EXT_TYPE.LANGUAGE;
             } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid()) {
-               extType = EXT_TYPE.LANGUAGE;
+               extType = EXT_TYPE.SCOPED_LANGUAGE;
+            }else if (versioned.getTypeId() == RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.localize().getNid()) {
+               extType = EXT_TYPE.MEASUREMENT;
             }
          } catch (Exception e) {
             throw new RuntimeException(e);
          }
       } else {
          Object firstPart = versioned.getVersions().get(0);
-         if (ThinExtPartBoolean.class.isAssignableFrom(firstPart.getClass())) {
+         if (ThinExtByRefPartBoolean.class.equals(firstPart.getClass())) {
             extType = EXT_TYPE.BOOLEAN;
-         } else if (ThinExtPartConcept.class.isAssignableFrom(firstPart.getClass())) {
+         } else if (ThinExtByRefPartConcept.class.equals(firstPart.getClass())) {
             extType = EXT_TYPE.CONCEPT;
-         } else if (ThinExtPartInteger.class.isAssignableFrom(firstPart.getClass())) {
+         } else if (ThinExtByRefPartInteger.class.equals(firstPart.getClass())) {
             extType = EXT_TYPE.INTEGER;
-         } else if (ThinExtPartLanguage.class.isAssignableFrom(firstPart.getClass())) {
+         } else if (ThinExtByRefPartLanguage.class.equals(firstPart.getClass())) {
             extType = EXT_TYPE.LANGUAGE;
-         } else if (ThinExtPartScopedLanguage.class.isAssignableFrom(firstPart.getClass())) {
+         } else if (ThinExtByRefPartLanguageScoped.class.equals(firstPart.getClass())) {
             extType = EXT_TYPE.SCOPED_LANGUAGE;
+         } else if (ThinExtByRefPartMeasurement.class.equals(firstPart.getClass())) {
+            extType = EXT_TYPE.MEASUREMENT;
          }
       }
       to.writeInt(extType.getId());
@@ -207,44 +231,60 @@ public class ThinExtBinder extends TupleBinding {
       to.writeInt(versioned.getVersions().size());
       switch (extType) {
       case BOOLEAN:
-         List<ThinExtPartBoolean> booleanParts = (List<ThinExtPartBoolean>) versioned.getVersions();
-         for (ThinExtPartBoolean part : booleanParts) {
+         List<ThinExtByRefPartBoolean> booleanParts = (List<ThinExtByRefPartBoolean>) versioned.getVersions();
+         for (ThinExtByRefPartBoolean part : booleanParts) {
             to.writeInt(part.getPathId());
             to.writeInt(part.getVersion());
+            to.writeInt(part.getStatus());
             to.writeBoolean(part.getValue());
          }
          break;
       case CONCEPT:
-         List<ThinExtPartConcept> conceptParts = (List<ThinExtPartConcept>) versioned.getVersions();
-         for (ThinExtPartConcept part : conceptParts) {
+         List<ThinExtByRefPartConcept> conceptParts = (List<ThinExtByRefPartConcept>) versioned.getVersions();
+         for (ThinExtByRefPartConcept part : conceptParts) {
             to.writeInt(part.getPathId());
             to.writeInt(part.getVersion());
+            to.writeInt(part.getStatus());
             to.writeInt(part.getConceptId());
          }
          break;
-      case INTEGER:
-         List<ThinExtPartInteger> intParts = (List<ThinExtPartInteger>) versioned.getVersions();
-         for (ThinExtPartInteger part : intParts) {
+      case MEASUREMENT:
+         List<ThinExtByRefPartMeasurement> measurementParts = (List<ThinExtByRefPartMeasurement>) versioned.getVersions();
+         for (ThinExtByRefPartMeasurement part : measurementParts) {
             to.writeInt(part.getPathId());
             to.writeInt(part.getVersion());
+            to.writeInt(part.getStatus());
+            to.writeInt(part.getUnitsOfMeasureId());
+            to.writeDouble(part.getMeasurementValue());
+         }
+         break;
+         
+      case INTEGER:
+         List<ThinExtByRefPartInteger> intParts = (List<ThinExtByRefPartInteger>) versioned.getVersions();
+         for (ThinExtByRefPartInteger part : intParts) {
+            to.writeInt(part.getPathId());
+            to.writeInt(part.getVersion());
+            to.writeInt(part.getStatus());
             to.writeInt(part.getValue());
          }
          break;
       case LANGUAGE:
-         List<ThinExtPartLanguage> langParts = (List<ThinExtPartLanguage>) versioned.getVersions();
-         for (ThinExtPartLanguage part : langParts) {
+         List<ThinExtByRefPartLanguage> langParts = (List<ThinExtByRefPartLanguage>) versioned.getVersions();
+         for (ThinExtByRefPartLanguage part : langParts) {
             to.writeInt(part.getPathId());
             to.writeInt(part.getVersion());
+            to.writeInt(part.getStatus());
             to.writeInt(part.getAcceptabilityId());
             to.writeInt(part.getCorrectnessId());
             to.writeInt(part.getDegreeOfSynonymyId());
          }
          break;
       case SCOPED_LANGUAGE:
-         List<ThinExtPartScopedLanguage> scopedLangParts = (List<ThinExtPartScopedLanguage>) versioned.getVersions();
-         for (ThinExtPartScopedLanguage part : scopedLangParts) {
+         List<ThinExtByRefPartLanguageScoped> scopedLangParts = (List<ThinExtByRefPartLanguageScoped>) versioned.getVersions();
+         for (ThinExtByRefPartLanguageScoped part : scopedLangParts) {
             to.writeInt(part.getPathId());
             to.writeInt(part.getVersion());
+            to.writeInt(part.getStatus());
             to.writeInt(part.getAcceptabilityId());
             to.writeInt(part.getCorrectnessId());
             to.writeInt(part.getDegreeOfSynonymyId());

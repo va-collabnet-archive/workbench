@@ -50,5 +50,9 @@ public class ConflictPlugin extends AbstractPlugin {
    protected String getToolTipText() {
       return "show/hide the conflict view for this concept";
    }
+   @Override
+   protected int getComponentId() {
+      return Integer.MIN_VALUE;
+   }
 
 }

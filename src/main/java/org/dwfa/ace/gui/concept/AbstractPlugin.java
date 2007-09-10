@@ -14,12 +14,36 @@ import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JToggleButton;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.log.AceLog;
 
-public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener {
+public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
 
-	private class ToggleActionListener implements ActionListener {
+   public void valueChanged(ListSelectionEvent arg0) {
+      for (I_HoldRefsetData l: refSetListeners) {
+         try {
+            l.setComponentId(getComponentId());
+         } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+         }
+      }
+      
+   }
+   protected abstract int getComponentId();
+   
+   Set<I_HoldRefsetData> refSetListeners = new HashSet<I_HoldRefsetData>();
+	public void addRefsetListener(I_HoldRefsetData listener) {
+      refSetListeners.add(listener);
+   }
+
+   public void clearRefsetListeners() {
+      refSetListeners.clear();
+   }
+   
+   private class ToggleActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			try {
 				update();

@@ -1,7 +1,12 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 
-public abstract class ThinExtPart {
+import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
+import org.dwfa.tapi.TerminologyException;
+
+
+public abstract class ThinExtByRefPart {
    private int pathId;
    private int version;
    private int status;
@@ -27,7 +32,7 @@ public abstract class ThinExtPart {
 
    @Override
    public boolean equals(Object obj) {
-      ThinExtPart another = (ThinExtPart) obj;
+      ThinExtByRefPart another = (ThinExtByRefPart) obj;
       return ((pathId == another.pathId) &&
             (version == another.version) &&
             (status == another.status));
@@ -36,5 +41,7 @@ public abstract class ThinExtPart {
    public int hashCode() {
       return HashFunction.hashCode(new int[] {pathId, version, status});
    }
+   
+   public abstract UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
 
 }

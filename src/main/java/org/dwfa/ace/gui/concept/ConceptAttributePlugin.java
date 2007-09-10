@@ -7,7 +7,9 @@ import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -22,13 +24,16 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.table.ConceptAttributeTableModel;
 import org.dwfa.ace.table.ConceptAttributeTableRenderer;
 import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ConceptAttributeTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
+import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ConceptAttributePlugin extends AbstractPlugin {
 
@@ -36,6 +41,8 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 	private JPanel conceptAttributes;
 	private ConceptAttributeTableModel conceptTableModel;
 	private JTableWithDragImage conceptTable;
+   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+
 	public ConceptAttributePlugin() {
 		super(true);
 	}
@@ -49,7 +56,12 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+
+         if (RefsetUtil.refSetsChanged(host, TOGGLES.ATTRIBUTES, this, visibleExtensions)) {
+            createPluginComponent(host);
+         }
+
+         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			CONCEPT_FIELD[] columnEnums = getConceptColumns(host);
 			conceptTableModel.setColumns(getConceptColumns(host));
 			for (int i = 0; i < conceptTableModel.getColumnCount(); i++) {
@@ -65,16 +77,20 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
-		if (conceptAttributes == null) {
-			conceptAttributes = getConceptAttributesPanel(host);
-			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-			host.addPropertyChangeListener("commit", this);
-			this.host = host;
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-			conceptTableModel.propertyChange(evt);
+		if (conceptAttributes == null || RefsetUtil.refSetsChanged(host, TOGGLES.ATTRIBUTES, this, visibleExtensions)) {
+         createPluginComponent(host);
 		}
 		return conceptAttributes;
 	}
+
+   private void createPluginComponent(I_HostConceptPlugins host) {
+      conceptAttributes = getConceptAttributesPanel(host);
+      host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+      host.addPropertyChangeListener("commit", this);
+      this.host = host;
+      PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+      conceptTableModel.propertyChange(evt);
+   }
 	private CONCEPT_FIELD[] getConceptColumns(I_HostConceptPlugins host) {
 		List<CONCEPT_FIELD> fields = new ArrayList<CONCEPT_FIELD>();
 		fields.add(CONCEPT_FIELD.DEFINED);
@@ -128,6 +144,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(conceptTableModel);
 		conceptTable = new JTableWithDragImage(sortingTable);
+      conceptTable.getSelectionModel().addListSelectionListener(this);
       if (ACE.editMode) {
          conceptTable.addMouseListener(conceptTableModel.makePopupListener(
                conceptTable, host.getConfig()));
@@ -192,16 +209,31 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		conceptTable.setDefaultRenderer(String.class, renderer);
 		conceptTable.setDefaultRenderer(Boolean.class, renderer);
 		conceptPanel.add(conceptTable, c);
+      
+      c.weightx = 0.0;
+      c.weighty = 0.0;
+      c.gridy = c.gridy + c.gridheight;
+      c.gridheight = 1;
+      c.gridx = 0;
+      c.gridwidth = 2;
+      visibleExtensions.clear();
+      RefsetUtil.addRefsetTables(host, this, TOGGLES.ATTRIBUTES, c, visibleExtensions, conceptPanel);
 		conceptPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory
 				.createLineBorder(Color.GRAY)));
-		c.gridheight = 1;
-		c.gridx = 0;
 		return conceptPanel;
 	}
    @Override
    protected String getToolTipText() {
       return "show/hide primitive/defind and status value for this concept";
+   }
+   @Override
+   protected int getComponentId() {
+      if (conceptTable.getSelectedRow() < 0) {
+         return Integer.MIN_VALUE;
+      }
+      StringWithConceptTuple swct = (StringWithConceptTuple) conceptTable.getValueAt(conceptTable.getSelectedRow(), 0);
+      return swct.getTuple().getConId();
    }
 
 }

@@ -1,0 +1,56 @@
+package org.dwfa.vodb.types;
+
+import java.io.IOException;
+
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPartLanguage;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPartMeasurement;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.bind.ThinVersionHelper;
+
+public class ThinExtByRefPartMeasurement extends ThinExtByRefPart {
+   private int unitsOfMeasureId;
+   private double measurementValue;
+
+   public int getUnitsOfMeasureId() {
+      return unitsOfMeasureId;
+   }
+
+   public void setUnitsOfMeasureId(int conceptId) {
+      this.unitsOfMeasureId = conceptId;
+   }
+   @Override
+   public boolean equals(Object obj) {
+      if (super.equals(obj)) {
+         if (ThinExtByRefPartMeasurement.class.isAssignableFrom(obj.getClass())) {
+            ThinExtByRefPartMeasurement another = (ThinExtByRefPartMeasurement) obj;
+            return unitsOfMeasureId == another.unitsOfMeasureId && 
+               measurementValue == another.measurementValue;
+         }
+      }
+      return false;
+   }
+
+   public double getMeasurementValue() {
+      return measurementValue;
+   }
+
+   public void setMeasurementValue(double measurementValue) {
+      this.measurementValue = measurementValue;
+   }
+   
+   @Override
+   public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
+      I_TermFactory tf = LocalVersionedTerminology.get();
+      UniversalAceExtByRefPartMeasurement universalPart = new UniversalAceExtByRefPartMeasurement();
+      universalPart.setMeasurementValue(getMeasurementValue());
+      universalPart.setUnitsOfMeasureUids(tf.getUids(getUnitsOfMeasureId()));
+      universalPart.setPathUid(tf.getUids(getPathId()));
+      universalPart.setStatusUid(tf.getUids(getStatus()));
+      universalPart.setTime(ThinVersionHelper.convert(getVersion()));
+      return universalPart;
+   }
+
+}

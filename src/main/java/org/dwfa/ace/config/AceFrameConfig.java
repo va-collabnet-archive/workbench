@@ -31,6 +31,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -41,6 +42,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -65,7 +67,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 24;
+    private static final int dataVersion = 25;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -149,6 +151,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    private Set<TOGGLES> visibleComponentToggles = new HashSet<TOGGLES>();
    //24
    private Set<String> visibleRefsets = new HashSet<String>();
+   
+   //25 private
+   private Map<TOGGLES, RefsetPreferences> refsetPreferencesMap;
+   
 	//transient
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -261,6 +267,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
       out.writeObject(visibleComponentToggles);
       //24
       out.writeObject(visibleRefsets);
+      
+      //25
+      out.writeObject(refsetPreferencesMap);
                
    }
 
@@ -472,6 +481,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
            } else {
               visibleRefsets = new HashSet<String>();
            }
+            if (objDataVersion >= 25) {
+               refsetPreferencesMap = (Map<TOGGLES, RefsetPreferences>) in.readObject();
+          } else {
+             refsetPreferencesMap = new HashMap<TOGGLES, RefsetPreferences>();
+             for (TOGGLES toggle: TOGGLES.values()) {
+                try {
+                  refsetPreferencesMap.put(toggle, new RefsetPreferences());
+               } catch (TerminologyException e) {
+                  throw new ToIoException(e);
+               }
+             }
+          }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -1566,5 +1587,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    }
    public boolean isRefsetInToggleVisible(EXT_TYPE refsetType, TOGGLES toggle) {
       return visibleRefsets.contains(refsetType.name() + toggle.toString());
+   }
+
+   public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) {
+      return refsetPreferencesMap.get(toggle);
    }
 }

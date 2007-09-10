@@ -6,7 +6,9 @@ import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -20,13 +22,17 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.table.ImageTableModel;
 import org.dwfa.ace.table.ImageTableRenderer;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ImageTableModel.IMAGE_FIELD;
 import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
+import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
+import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ImagePlugin extends AbstractPlugin {
 
@@ -34,6 +40,8 @@ public class ImagePlugin extends AbstractPlugin {
 	private I_HostConceptPlugins host;
 	private ImageTableModel imageTableModel;
 	private JTableWithDragImage imageTable;
+   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+
 
 	public ImagePlugin() {
 		super(false);
@@ -47,7 +55,12 @@ public class ImagePlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+
+         if (RefsetUtil.refSetsChanged(host, TOGGLES.IMAGE, this, visibleExtensions)) {
+            createPluginComponent(host);
+         }
+
+         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			IMAGE_FIELD[] columnEnums = getImageColumns(host);
 			imageTableModel.setColumns(getImageColumns(host));
 			for (int i = 0; i < imageTableModel.getColumnCount(); i++) {
@@ -63,18 +76,22 @@ public class ImagePlugin extends AbstractPlugin {
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
-		if (imagePanel == null) {
-			this.host = host;
-			imageTableModel = new ImageTableModel(host,
-					getImageColumns(host), host.getShowHistory());
-			imagePanel = getImagePanel(host);
-			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-			host.addPropertyChangeListener("commit", this);
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-			imageTableModel.propertyChange(evt);
+		if (imagePanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.IMAGE, this, visibleExtensions)) {
+			createPluginComponent(host);
 		}
 		return imagePanel;
 	}
+
+   private void createPluginComponent(I_HostConceptPlugins host) {
+      this.host = host;
+      imageTableModel = new ImageTableModel(host,
+      		getImageColumns(host), host.getShowHistory());
+      imagePanel = getImagePanel(host);
+      host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+      host.addPropertyChangeListener("commit", this);
+      PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+      imageTableModel.propertyChange(evt);
+   }
 
 	private IMAGE_FIELD[] getImageColumns(I_HostConceptPlugins host) {
 		List<IMAGE_FIELD> fields = new ArrayList<IMAGE_FIELD>();
@@ -124,6 +141,7 @@ public class ImagePlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(imageTableModel);
 		imageTable = new JTableWithDragImage(sortingTable);
+      imageTable.getSelectionModel().addListSelectionListener(this);
 		imageTable.addMouseListener(imageTableModel.makePopupListener(
 				imageTable, host.getConfig()));
 		imageTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -157,17 +175,33 @@ public class ImagePlugin extends AbstractPlugin {
 		imageTable.setDefaultRenderer(ImageWithImageTuple.class,
 				new ImageTableRenderer());
 		imagePanel.add(imageTable, c);
-		imagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
+
+      c.weightx = 0.0;
+      c.weighty = 0.0;
+      c.gridy = c.gridy + c.gridheight;
+      c.gridheight = 1;
+      c.gridx = 0;
+      c.gridwidth = 2;
+      visibleExtensions.clear();
+      RefsetUtil.addRefsetTables(host, this, TOGGLES.IMAGE, c, visibleExtensions, imagePanel);
+      
+      imagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory
 				.createLineBorder(Color.GRAY)));
 
-		c.gridheight = 1;
-		c.gridx = 0;
 		return imagePanel;
 	}
    @Override
    protected String getToolTipText() {
       return "show/hide images associated with this concept";
+   }
+   @Override
+   protected int getComponentId() {
+      if (imageTable.getSelectedRow() < 0) {
+         return Integer.MIN_VALUE;
+      }
+      StringWithImageTuple swit = (StringWithImageTuple) imageTable.getValueAt(imageTable.getSelectedRow(), 0);
+      return swit.getTuple().getImageId();
    }
 
 }

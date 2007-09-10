@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -11,8 +12,11 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
+import org.dwfa.ace.table.refset.RefsetUtil;
 
 public class SrcRelPlugin extends RelPlugin {
 
@@ -23,19 +27,28 @@ public class SrcRelPlugin extends RelPlugin {
 	private SrcRelTableModel srcRelTableModel;
 	I_HostConceptPlugins host;
 
+   TOGGLES toggleType = TOGGLES.SOURCE_RELS;
+
 	public JPanel getComponent(I_HostConceptPlugins host) {
-		if (pluginPanel == null) {
-			srcRelTableModel = new SrcRelTableModel(host,
-					getSrcRelColumns(host.getShowHistory()));
-			pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true);
-			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-			host.addPropertyChangeListener("commit", this);
-			this.host = host;
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-			srcRelTableModel.propertyChange(evt);
-		}
+      if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
+         createPluginComponent(host);
+      }
 		return pluginPanel;
 	}
+
+   private void createPluginComponent(I_HostConceptPlugins host) {
+      if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+         AceLog.getAppLog().fine("creating src rel plugin component...");
+      }
+      srcRelTableModel = new SrcRelTableModel(host,
+      		getSrcRelColumns(host.getShowHistory()));
+      pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true, toggleType);
+      host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+      host.addPropertyChangeListener("commit", this);
+      this.host = host;
+      PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+      srcRelTableModel.propertyChange(evt);
+   }
 
 	private REL_FIELD[] getSrcRelColumns(boolean showHistory) {
 		List<REL_FIELD> fields = new ArrayList<REL_FIELD>();
@@ -59,7 +72,12 @@ public class SrcRelPlugin extends RelPlugin {
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+
+         if (RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
+            createPluginComponent(host);
+         }
+
+         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			REL_FIELD[] columnEnums = getSrcRelColumns(host.getShowHistory());
 			srcRelTableModel.setColumns(getSrcRelColumns(host.getShowHistory()));
 			for (int i = 0; i < srcRelTableModel.getColumnCount(); i++) {

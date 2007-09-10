@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 
 public interface I_PluginToConceptPanel {
@@ -13,5 +14,8 @@ public interface I_PluginToConceptPanel {
 	public void addShowComponentListener(ActionListener l);
 	public void removeShowComponentListener(ActionListener l);
 	public boolean showComponent();
+   
+   public void clearRefsetListeners();
+   public void addRefsetListener(I_HoldRefsetData listener);
 
 }

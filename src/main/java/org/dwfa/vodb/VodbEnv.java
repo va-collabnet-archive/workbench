@@ -97,6 +97,7 @@ import org.dwfa.vodb.bind.UuidBinding;
 import org.dwfa.vodb.jar.PathCollector;
 import org.dwfa.vodb.jar.TimePathCollector;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
 import org.dwfa.vodb.types.I_ProcessIdEntries;
@@ -112,8 +113,8 @@ import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinExtPart;
-import org.dwfa.vodb.types.ThinExtVersioned;
+import org.dwfa.vodb.types.ThinExtByRefPart;
+import org.dwfa.vodb.types.ThinExtByRefVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinImageVersioned;
@@ -821,12 +822,12 @@ public class VodbEnv implements I_ImplementTermFactory {
       throw new DatabaseException("Rel: " + relId + " not found.");
    }
 
-   public ThinExtVersioned getExtension(int memberId) throws DatabaseException {
+   public ThinExtByRefVersioned getExtension(int memberId) throws DatabaseException {
       DatabaseEntry extKey = new DatabaseEntry();
       DatabaseEntry extValue = new DatabaseEntry();
       intBinder.objectToEntry(memberId, extKey);
       if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-         return (ThinExtVersioned) extBinder.entryToObject(extValue);
+         return (ThinExtByRefVersioned) extBinder.entryToObject(extValue);
       }
       throw new DatabaseException("Ext: " + memberId + " not found.");
    }
@@ -941,7 +942,7 @@ public class VodbEnv implements I_ImplementTermFactory {
       return matches;
    }
    
-   public List<ThinExtVersioned> getExtensionsForComponent(int componentId) throws DatabaseException {
+   public List<ExtensionByReferenceBean> getExtensionsForComponent(int componentId) throws DatabaseException {
       Stopwatch timer = null;
       if (logger.isLoggable(Level.FINE)) {
          logger.fine("Getting extensions from componentId for: " + componentId);
@@ -955,11 +956,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 
       SecondaryCursor mySecCursor = getComponentToExtMap().openSecondaryCursor(null, null);
       OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
-      List<ThinExtVersioned> matches = new ArrayList<ThinExtVersioned>();
+      List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
       while (retVal == OperationStatus.SUCCESS) {
-         ThinExtVersioned extFromComponentId = (ThinExtVersioned) extBinder.entryToObject(foundData);
+         ThinExtByRefVersioned extFromComponentId = (ThinExtByRefVersioned) extBinder.entryToObject(foundData);
          if (extFromComponentId.getComponentId() == componentId) {
-            matches.add(extFromComponentId);
+            matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
          } else {
             break;
          }
@@ -973,7 +974,7 @@ public class VodbEnv implements I_ImplementTermFactory {
       return matches;
    }
    
-   public List<ThinExtVersioned> getExtensionsForRefset(int refsetId) throws DatabaseException {
+   public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
       Stopwatch timer = null;
       if (logger.isLoggable(Level.FINE)) {
          logger.fine("Getting extensions from refsetId for: " + refsetId);
@@ -987,11 +988,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 
       SecondaryCursor mySecCursor = getRefsetToExtMap().openSecondaryCursor(null, null);
       OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
-      List<ThinExtVersioned> matches = new ArrayList<ThinExtVersioned>();
+      List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
       while (retVal == OperationStatus.SUCCESS) {
-         ThinExtVersioned extFromComponentId = (ThinExtVersioned) extBinder.entryToObject(foundData);
+         ThinExtByRefVersioned extFromComponentId = (ThinExtByRefVersioned) extBinder.entryToObject(foundData);
          if (extFromComponentId.getComponentId() == refsetId) {
-            matches.add(extFromComponentId);
+            matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
          } else {
             break;
          }
@@ -1429,7 +1430,11 @@ public class VodbEnv implements I_ImplementTermFactory {
                      matches.add(descV);
                   }
                } catch (IOException e) {
-                  AceLog.getAppLog().alertAndLogException(e);
+                  if (ACE.editMode) {
+                     AceLog.getAppLog().alertAndLogException(e);
+                  } else {
+                     AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+                  }
                }
             }
          }
@@ -1901,11 +1906,11 @@ public class VodbEnv implements I_ImplementTermFactory {
       relDb.put(null, key, value);
    }
 
-   public void writeExt(ThinExtVersioned ext) throws DatabaseException {
+   public void writeExt(ThinExtByRefVersioned ext) throws DatabaseException {
       DatabaseEntry key = new DatabaseEntry();
       DatabaseEntry value = new DatabaseEntry();
       if (debugWrites) {
-         HashSet<ThinExtPart> partSet = new HashSet<ThinExtPart>(ext.getVersions());
+         HashSet<ThinExtByRefPart> partSet = new HashSet<ThinExtByRefPart>(ext.getVersions());
          if (partSet.size() != ext.getVersions().size()) {
             throw new DatabaseException("Redundant parts: " + ext.getVersions());
          } else {

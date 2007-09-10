@@ -227,4 +227,9 @@ public class LineagePlugin extends AbstractPlugin {
       return "show/hide the lineage of this concept";
    }
 
+   @Override
+   protected int getComponentId() {
+      return Integer.MIN_VALUE;
+   }
+
 }

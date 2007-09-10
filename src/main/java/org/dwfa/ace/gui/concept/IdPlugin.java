@@ -128,6 +128,7 @@ public class IdPlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(idTableModel);
 		idTable = new JTableWithDragImage(sortingTable);
+      idTable.getSelectionModel().addListSelectionListener(this);
 		/*
 		idTable.addMouseListener(idTableModel.makePopupListener(idTable,
 				host.getConfig()));
@@ -206,6 +207,10 @@ public class IdPlugin extends AbstractPlugin {
    @Override
    protected String getToolTipText() {
       return "show/hide identifiers for this concept";
+   }
+   @Override
+   protected int getComponentId() {
+      return Integer.MIN_VALUE;
    }
 
 }

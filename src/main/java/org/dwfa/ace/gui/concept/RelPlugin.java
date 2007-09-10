@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -16,7 +18,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddRelationship;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -24,7 +26,9 @@ import org.dwfa.ace.table.RelTableModel;
 import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 
 public abstract class RelPlugin extends AbstractPlugin {
@@ -32,11 +36,12 @@ public abstract class RelPlugin extends AbstractPlugin {
 	public RelPlugin(boolean selectedByDefault) {
 		super(selectedByDefault);
 	}
-
+   
+   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
 	private JTableWithDragImage relTable;
 
 	protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText,
-			boolean enableEdit) {
+			boolean enableEdit, TOGGLES toggle) {
       if (ACE.editMode == false) {
          enableEdit = false;
       }
@@ -91,6 +96,7 @@ public abstract class RelPlugin extends AbstractPlugin {
 
 		TableSorter relSortingTable = new TableSorter(model);
 		relTable = new JTableWithDragImage(relSortingTable);
+      relTable.getSelectionModel().addListSelectionListener(this);
 		relSortingTable.setTableHeader(relTable.getTableHeader());
 		relSortingTable
 				.getTableHeader()
@@ -123,11 +129,20 @@ public abstract class RelPlugin extends AbstractPlugin {
 		relTable.setDefaultRenderer(StringWithRelTuple.class,
 				new RelationshipTableRenderer());
 		relPanel.add(relTable, c);
+      c.weightx = 0.0;
+      c.weighty = 0.0;
+      c.gridy = c.gridy + c.gridheight;
+      c.gridheight = 1;
+      c.gridx = 0;
+      c.gridwidth = 2;
+      visibleExtensions.clear();
+      RefsetUtil.addRefsetTables(host, this, toggle, c, visibleExtensions, relPanel);
 		relPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory
 				.createLineBorder(Color.GRAY)));
 		return relPanel;
 	}
+
 
 	protected void setupEditors(I_HostConceptPlugins host) {
 		relTable.setDragEnabled(true);
@@ -148,4 +163,14 @@ public abstract class RelPlugin extends AbstractPlugin {
 		return relTable;
 	}
 
+
+   @Override
+   protected int getComponentId() {
+      if (relTable.getSelectedRow() < 0) {
+         return Integer.MIN_VALUE;
+      }
+      StringWithRelTuple swrt = (StringWithRelTuple) relTable.getValueAt(relTable.getSelectedRow(), 0);
+      return swrt.getTuple().getRelId();
+   }
+ 
 }

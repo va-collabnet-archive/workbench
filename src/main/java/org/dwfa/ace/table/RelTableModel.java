@@ -228,7 +228,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     public enum REL_FIELD {
         REL_ID("rid", 5, 100, 100), SOURCE_ID("origin", 5, 300, 1000), REL_TYPE("type", 5, 120, 500), DEST_ID(
                 "destination", 5, 300, 1000), GROUP("group", 5, 36, 46), REFINABILITY("refinability", 5, 80, 180), CHARACTERISTIC(
-                "char", 5, 70, 70), STATUS("status", 5, 50, 150), VERSION("version", 5, 140, 140), BRANCH("path", 5,
+                "char", 5, 70, 70), STATUS("status", 5, 50, 250), VERSION("version", 5, 140, 140), BRANCH("path", 5,
                 90, 180);
 
         private String columnName;

@@ -44,1062 +44,1025 @@ import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.je.DatabaseException;
 
-public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
-		I_Transact {
-	private static WeakHashMap<ConceptBean, WeakReference<ConceptBean>> cbeans = new WeakHashMap<ConceptBean, WeakReference<ConceptBean>>();
+public class ConceptBean implements I_AmTermComponent, I_GetConceptData, I_Transact {
+   private static WeakHashMap<ConceptBean, WeakReference<ConceptBean>> cbeans = new WeakHashMap<ConceptBean, WeakReference<ConceptBean>>();
 
-	public static ConceptBean get(int conceptId) {
-		ConceptBean cb = new ConceptBean(conceptId);
-		WeakReference<ConceptBean> ref = cbeans.get(cb);
-		if (ref != null) {
-			cb = ref.get();
-		} else {
-			synchronized (cbeans) {
-				ref = cbeans.get(cb);
-				if (ref == null) {
-					cbeans.put(cb, new WeakReference<ConceptBean>(cb));
-				} else {
-					cb = ref.get();
-				}
-			}
-		}
-		return cb;
-	}
-
-	public static ConceptBean get(UUID uid) throws TerminologyException,
-			IOException {
-		return get(AceConfig.getVodb().uuidToNative(uid));
-	}
-
-	public static ConceptBean get(Collection<UUID> uids)
-			throws TerminologyException, IOException {
-		return get(AceConfig.getVodb().uuidToNative(uids));
-	}
-
-	private int conceptId;
-
-	private static int dataVersion = 1;
-	
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		throw new IOException("This class is deliberately not serializable...");
-	}
-
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			//
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-		throw new IOException("This class is deliberately not serializable...");
-	}
-
-
-	private I_IdVersioned id;
-
-	private I_ConceptAttributeVersioned conceptAttributes;
-
-	private List<I_DescriptionVersioned> descriptions;
-
-	private List<I_RelVersioned> sourceRels;
-
-	private List<I_RelVersioned> destRels;
-
-	private List<I_ImageVersioned> images;
-
-	private List<I_ImageVersioned> uncommittedImages;
-
-	private List<I_RelVersioned> uncommittedSourceRels;
-
-	private List<I_DescriptionVersioned> uncommittedDescriptions;
-
-	private I_ConceptAttributeVersioned uncommittedConceptAttributes;
-
-	private I_IntSet uncommittedIds;
-
-	private List<UUID> uids;
-
-	private boolean primordial = false;
-
-	private ConceptBean(int conceptId) {
-		super();
-		this.conceptId = conceptId;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getConcept()
-	 */
-	public I_ConceptAttributeVersioned getConceptAttributes()
-			throws IOException {
-		if (isPrimordial()) {
-			return uncommittedConceptAttributes;
-		}
-		if (conceptAttributes == null) {
-				conceptAttributes = AceConfig.getVodb().getConceptAttributes(conceptId);
-		}
-		return conceptAttributes;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getConceptId()
-	 */
-	public int getConceptId() {
-		return conceptId;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet,
-	 *      java.util.Set)
-	 */
-   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-         I_IntSet allowedStatus, Set<I_Position> positionSet)
-         throws IOException {
-      return getConceptAttributeTuples(
-            allowedStatus, positionSet, true);
+   public static ConceptBean get(int conceptId) {
+      ConceptBean cb = new ConceptBean(conceptId);
+      WeakReference<ConceptBean> ref = cbeans.get(cb);
+      if (ref != null) {
+         cb = ref.get();
+      } else {
+         synchronized (cbeans) {
+            ref = cbeans.get(cb);
+            if (ref == null) {
+               cbeans.put(cb, new WeakReference<ConceptBean>(cb));
+            } else {
+               cb = ref.get();
+            }
+         }
+      }
+      return cb;
    }
 
-   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-         I_IntSet allowedStatus, Set<I_Position> positionSet, boolean addUncommitted)
+   public static ConceptBean get(UUID uid) throws TerminologyException, IOException {
+      return get(AceConfig.getVodb().uuidToNative(uid));
+   }
+
+   public static ConceptBean get(Collection<UUID> uids) throws TerminologyException, IOException {
+      return get(AceConfig.getVodb().uuidToNative(uids));
+   }
+
+   private int conceptId;
+
+   private static int dataVersion = 1;
+
+   private void writeObject(ObjectOutputStream out) throws IOException {
+      out.writeInt(dataVersion);
+      throw new IOException("This class is deliberately not serializable...");
+   }
+
+   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int objDataVersion = in.readInt();
+      if (objDataVersion == dataVersion) {
+         //
+      } else {
+         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      }
+      throw new IOException("This class is deliberately not serializable...");
+   }
+
+   private I_IdVersioned id;
+
+   private I_ConceptAttributeVersioned conceptAttributes;
+
+   private List<I_DescriptionVersioned> descriptions;
+
+   private List<I_RelVersioned> sourceRels;
+
+   private List<I_RelVersioned> destRels;
+
+   private List<I_ImageVersioned> images;
+
+   private List<I_ImageVersioned> uncommittedImages;
+
+   private List<I_RelVersioned> uncommittedSourceRels;
+
+   private List<I_DescriptionVersioned> uncommittedDescriptions;
+
+   private I_ConceptAttributeVersioned uncommittedConceptAttributes;
+
+   private I_IntSet uncommittedIds;
+
+   private List<UUID> uids;
+
+   private boolean primordial = false;
+
+   private ConceptBean(int conceptId) {
+      super();
+      this.conceptId = conceptId;
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getConcept()
+    */
+   public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
+      if (isPrimordial()) {
+         return uncommittedConceptAttributes;
+      }
+      if (conceptAttributes == null) {
+         conceptAttributes = AceConfig.getVodb().getConceptAttributes(conceptId);
+      }
+      return conceptAttributes;
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getConceptId()
+    */
+   public int getConceptId() {
+      return conceptId;
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet,
+    *      java.util.Set)
+    */
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet)
          throws IOException {
+      return getConceptAttributeTuples(allowedStatus, positionSet, true);
+   }
+
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+         boolean addUncommitted) throws IOException {
       List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-      getConceptAttributes().addTuples(allowedStatus, positionSet,
-            returnTuples, addUncommitted);
+      getConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted);
       return returnTuples;
    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptionTuples(org.dwfa.ace.IntSet,
-	 *      org.dwfa.ace.IntSet, java.util.Set)
-	 */
-	public List<I_DescriptionTuple> getDescriptionTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet) throws IOException {
-		return getDescriptionTuples(
-            allowedStatus, allowedTypes,
-            positionSet, true);
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptionTuples(org.dwfa.ace.IntSet,
+    *      org.dwfa.ace.IntSet, java.util.Set)
+    */
+   public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+         Set<I_Position> positionSet) throws IOException {
+      return getDescriptionTuples(allowedStatus, allowedTypes, positionSet, true);
+   }
 
-   public List<I_DescriptionTuple> getDescriptionTuples(
-         I_IntSet allowedStatus, I_IntSet allowedTypes,
+   public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
          Set<I_Position> positionSet, boolean addUncommitted) throws IOException {
       List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
       for (I_DescriptionVersioned desc : getDescriptions()) {
-         desc.addTuples(allowedStatus, allowedTypes, positionSet,
-               returnDescriptions, addUncommitted);
+         desc.addTuples(allowedStatus, allowedTypes, positionSet, returnDescriptions, addUncommitted);
       }
       return returnDescriptions;
    }
-	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
+
+   public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions)
+         throws IOException {
       List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
       for (I_ImageVersioned img : getImages()) {
-         img.addTuples(allowedStatus, allowedTypes, positions,
-               returnTuples);
+         img.addTuples(allowedStatus, allowedTypes, positions, returnTuples);
       }
       return returnTuples;
    }
 
    /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRelTuples(org.dwfa.ace.IntSet,
-	 *      org.dwfa.ace.IntSet, java.util.Set)
-	 */
-	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positionSet,
-			boolean addUncommitted) throws IOException {
-		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-		for (I_RelVersioned rel : getSourceRels()) {
-			rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels,
-					addUncommitted);
-		}
-		return returnRels;
-	}
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRelTuples(org.dwfa.ace.IntSet,
+    *      org.dwfa.ace.IntSet, java.util.Set)
+    */
+   public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+         Set<I_Position> positionSet, boolean addUncommitted) throws IOException {
+      List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+      for (I_RelVersioned rel : getSourceRels()) {
+         rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels, addUncommitted);
+      }
+      return returnRels;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getDestRelTuples(org.dwfa.ace.IntSet,
-	 *      org.dwfa.ace.IntSet, java.util.Set)
-	 */
-	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-		for (I_RelVersioned rel : getDestRels()) {
-			/*
-			 * if ((conceptId == -2147444184) && (rel.getC1Id() == -2147326003)) {
-			 * AceLog.getLog().info("getSourceRelTuples for SNOMED CT Concept"); }
-			 */
-			rel.addTuples(allowedStatus, allowedTypes, positions, returnRels,
-					addUncommitted);
-		}
-		return returnRels;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getDestRelTuples(org.dwfa.ace.IntSet,
+    *      org.dwfa.ace.IntSet, java.util.Set)
+    */
+   public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+         boolean addUncommitted) throws IOException {
+      List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+      for (I_RelVersioned rel : getDestRels()) {
+         /*
+          * if ((conceptId == -2147444184) && (rel.getC1Id() == -2147326003)) {
+          * AceLog.getLog().info("getSourceRelTuples for SNOMED CT Concept"); }
+          */
+         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
+      }
+      return returnRels;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptions()
-	 */
-	public List<I_DescriptionVersioned> getDescriptions() throws IOException {
-		if (isPrimordial()) {
-			return new ArrayList<I_DescriptionVersioned>();
-		}
-		if (descriptions == null) {
-			try {
-				descriptions = AceConfig.getVodb().getDescriptions(conceptId);
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
-		}
-		return descriptions;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptions()
+    */
+   public List<I_DescriptionVersioned> getDescriptions() throws IOException {
+      if (isPrimordial()) {
+         return new ArrayList<I_DescriptionVersioned>();
+      }
+      if (descriptions == null) {
+         try {
+            descriptions = AceConfig.getVodb().getDescriptions(conceptId);
+         } catch (DatabaseException e) {
+            throw new ToIoException(e);
+         }
+      }
+      return descriptions;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getDestRels()
-	 */
-	public List<I_RelVersioned> getDestRels() throws IOException {
-		if (destRels == null) {
-			try {
-				destRels = AceConfig.getVodb().getDestRels(conceptId);
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
-		}
-		return destRels;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getDestRels()
+    */
+   public List<I_RelVersioned> getDestRels() throws IOException {
+      if (destRels == null) {
+         try {
+            destRels = AceConfig.getVodb().getDestRels(conceptId);
+         } catch (DatabaseException e) {
+            throw new ToIoException(e);
+         }
+      }
+      return destRels;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRels()
-	 */
-	public List<I_RelVersioned> getSourceRels() throws IOException {
-		if (isPrimordial()) {
-			return new ArrayList<I_RelVersioned>();
-		}
-		if (sourceRels == null) {
-			try {
-				sourceRels = AceConfig.getVodb().getSrcRels(conceptId);
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
-		}
-		return sourceRels;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRels()
+    */
+   public List<I_RelVersioned> getSourceRels() throws IOException {
+      if (isPrimordial()) {
+         return new ArrayList<I_RelVersioned>();
+      }
+      if (sourceRels == null) {
+         try {
+            sourceRels = AceConfig.getVodb().getSrcRels(conceptId);
+         } catch (DatabaseException e) {
+            throw new ToIoException(e);
+         }
+      }
+      return sourceRels;
+   }
 
-	public String toString() {
-		try {
-			return getInitialText();
-		} catch (IOException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-			return ex.toString();
-		}
-	}
+   public String toString() {
+      try {
+         return getInitialText();
+      } catch (IOException ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+         return ex.toString();
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getInitialText()
-	 */
-	public String getInitialText() throws IOException {
-		try {
-			List<I_DescriptionVersioned> localDesc = getDescriptions();
-			I_DescriptionVersioned tdv = localDesc.get(0);
-			List<I_DescriptionPart> versions = tdv.getVersions();
-			I_DescriptionPart first = versions.get(0);
-			return first.getText();
-		} catch (IndexOutOfBoundsException e) {
-			try {
-				List<I_DescriptionVersioned> localDesc = getUncommittedDescriptions();
-				I_DescriptionVersioned tdv = localDesc.get(0);
-				List<I_DescriptionPart> versions = tdv.getVersions();
-				I_DescriptionPart first = versions.get(0);
-				return first.getText();
-			} catch (IndexOutOfBoundsException e2) {
-				return "No desc for: " + conceptId;
-			}
-		}
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getInitialText()
+    */
+   public String getInitialText() throws IOException {
+      try {
+         if ((AceConfig.config != null) && (AceConfig.config.aceFrames.get(0) != null)) {
+            I_DescriptionTuple tuple = this.getDescTuple(AceConfig.config.aceFrames.get(0)
+                  .getShortLabelDescPreferenceList(), AceConfig.config.getAceFrames().get(0));
+            if (tuple != null) {
+               return tuple.getText();
+            }
+         }
+         return getText();
+     } catch (IndexOutOfBoundsException e) {
+         try {
+            return getText();
+         } catch (IndexOutOfBoundsException e2) {
+            return "No desc for: " + conceptId;
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#isLeaf(org.dwfa.ace.config.AceFrameConfig)
-	 */
-	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
-			throws IOException {
-		try {
-			if (aceConfig != null) {
-				if (hasDestRelTuples(aceConfig.getAllowedStatus(), aceConfig
-						.getDestRelTypes(), aceConfig.getViewPositionSet(),
-						addUncommitted)) {
-					return false;
-				}
-				if (hasSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig
-						.getSourceRelTypes(), aceConfig.getViewPositionSet(),
-						addUncommitted)) {
-					return false;
-				}
-			} else {
-				if (destRels != null) {
-					if (destRels.size() > 0) {
-						return false;
-					}
-				} else {
-					if (AceConfig.getVodb().hasDestRels(conceptId)) {
-						return false;
-					}
-				}
-				if (sourceRels != null) {
-					if (sourceRels.size() > 0) {
-						return false;
-					}
-				} else {
-					if (AceConfig.getVodb().hasSrcRels(conceptId)) {
-						return false;
-					}
-				}
-			}
-			return true;
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-	}
+   private String getText() {
+      List<I_DescriptionVersioned> localDesc = getUncommittedDescriptions();
+      I_DescriptionVersioned tdv = localDesc.get(0);
+      List<I_DescriptionPart> versions = tdv.getVersions();
+      I_DescriptionPart first = versions.get(0);
+      return first.getText();
+   }
 
-	private boolean hasDestRelTuples(I_IntSet allowedStatus,
-			I_IntSet destRelTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		if (destRelTypes.getSetValues().length > 0) {
-			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-			if (destRels != null) {
-				for (I_RelVersioned rel : destRels) {
-					rel.addTuples(allowedStatus, destRelTypes, positions,
-							returnRels, addUncommitted);
-					if (returnRels.size() > 0) {
-						return true;
-					}
-				}
-			} else {
-				try {
-					return AceConfig.getVodb().hasDestRelTuple(conceptId,
-							allowedStatus, destRelTypes, positions);
-				} catch (DatabaseException e) {
-					throw new ToIoException(e);
-				}
-			}
-		}
-		return false;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#isLeaf(org.dwfa.ace.config.AceFrameConfig)
+    */
+   public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException {
+      try {
+         if (aceConfig != null) {
+            if (hasDestRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(), aceConfig
+                  .getViewPositionSet(), addUncommitted)) {
+               return false;
+            }
+            if (hasSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getSourceRelTypes(), aceConfig
+                  .getViewPositionSet(), addUncommitted)) {
+               return false;
+            }
+         } else {
+            if (destRels != null) {
+               if (destRels.size() > 0) {
+                  return false;
+               }
+            } else {
+               if (AceConfig.getVodb().hasDestRels(conceptId)) {
+                  return false;
+               }
+            }
+            if (sourceRels != null) {
+               if (sourceRels.size() > 0) {
+                  return false;
+               }
+            } else {
+               if (AceConfig.getVodb().hasSrcRels(conceptId)) {
+                  return false;
+               }
+            }
+         }
+         return true;
+      } catch (DatabaseException e) {
+         throw new ToIoException(e);
+      }
+   }
 
-	private boolean hasSourceRelTuples(I_IntSet allowedStatus,
-			I_IntSet sourceRelTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		if (sourceRelTypes.getSetValues().length > 0) {
-			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-			if (sourceRels != null) {
-				for (I_RelVersioned rel : sourceRels) {
-					rel.addTuples(allowedStatus, sourceRelTypes, positions,
-							returnRels, addUncommitted);
-					if (returnRels.size() > 0) {
-						return true;
-					}
-				}
-			} else {
-				try {
-					return AceConfig.getVodb().hasSrcRelTuple(conceptId,
-							allowedStatus, sourceRelTypes, positions);
-				} catch (DatabaseException e) {
-					throw new ToIoException(e);
-				}
-			}
-		}
-		return false;
-	}
+   private boolean hasDestRelTuples(I_IntSet allowedStatus, I_IntSet destRelTypes, Set<I_Position> positions,
+         boolean addUncommitted) throws IOException {
+      if (destRelTypes.getSetValues().length > 0) {
+         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+         if (destRels != null) {
+            for (I_RelVersioned rel : destRels) {
+               rel.addTuples(allowedStatus, destRelTypes, positions, returnRels, addUncommitted);
+               if (returnRels.size() > 0) {
+                  return true;
+               }
+            }
+         } else {
+            try {
+               return AceConfig.getVodb().hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
+            } catch (DatabaseException e) {
+               throw new ToIoException(e);
+            }
+         }
+      }
+      return false;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getImages()
-	 */
-	public List<I_ImageVersioned> getImages() throws IOException {
-		if (images == null) {
-			try {
-				images = AceConfig.getVodb().getImages(conceptId);
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine(
-							"Retrieved images: " + images + " for: " + conceptId);
-				}
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
-		}
-		return images;
-	}
+   private boolean hasSourceRelTuples(I_IntSet allowedStatus, I_IntSet sourceRelTypes, Set<I_Position> positions,
+         boolean addUncommitted) throws IOException {
+      if (sourceRelTypes.getSetValues().length > 0) {
+         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+         if (sourceRels != null) {
+            for (I_RelVersioned rel : sourceRels) {
+               rel.addTuples(allowedStatus, sourceRelTypes, positions, returnRels, addUncommitted);
+               if (returnRels.size() > 0) {
+                  return true;
+               }
+            }
+         } else {
+            try {
+               return AceConfig.getVodb().hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
+            } catch (DatabaseException e) {
+               throw new ToIoException(e);
+            }
+         }
+      }
+      return false;
+   }
 
-	public List<I_ImageVersioned> getUncommittedImages() {
-		if (uncommittedImages == null) {
-			uncommittedImages = new ArrayList<I_ImageVersioned>();
-		}
-		return uncommittedImages;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getImages()
+    */
+   public List<I_ImageVersioned> getImages() throws IOException {
+      if (images == null) {
+         try {
+            images = AceConfig.getVodb().getImages(conceptId);
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+               AceLog.getAppLog().fine("Retrieved images: " + images + " for: " + conceptId);
+            }
+         } catch (DatabaseException e) {
+            throw new ToIoException(e);
+         }
+      }
+      return images;
+   }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (ConceptBean.class.isAssignableFrom(obj.getClass())) {
-			ConceptBean another = (ConceptBean) obj;
-			return conceptId == another.conceptId;
-		}
-		return false;
-	}
+   public List<I_ImageVersioned> getUncommittedImages() {
+      if (uncommittedImages == null) {
+         uncommittedImages = new ArrayList<I_ImageVersioned>();
+      }
+      return uncommittedImages;
+   }
 
-	@Override
-	public int hashCode() {
-		return conceptId;
-	}
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
+      if (ConceptBean.class.isAssignableFrom(obj.getClass())) {
+         ConceptBean another = (ConceptBean) obj;
+         return conceptId == another.conceptId;
+      }
+      return false;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_Transact#commit(int, java.util.Set)
-	 */
-	public void commit(int version, Set<TimePathId> values) throws IOException {
-		// handle the parts first...
-		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-			AceLog.getEditLog().fine("Starting commit for ConceptBean: " + this);
-		}
-		StringBuffer buff = null;
-		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-			buff = new StringBuffer();
-		}
-		try {
-			if (images != null) {
-				for (I_ImageVersioned image : images) {
-					boolean changed = false;
-					for (I_ImagePart p : image.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-							changed = true;
-							if (buff != null) {
-								buff.append("\n  Committing: " + p);
-							}
-						}
-					}
-					if (changed) {
-						AceConfig.getVodb().writeImage(image);
-					}
-				}
-			}
-			if (conceptAttributes != null) {
-				for (I_ConceptAttributePart p : conceptAttributes.getVersions()) {
-					boolean changed = false;
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						p.setVersion(version);
-						values.add(new TimePathId(version, p.getPathId()));
-						changed = true;
-						if (buff != null) {
-							buff.append("\n  Committing: " + p);
-						}
-					}
-					if (changed) {
-						AceConfig.getVodb().writeConceptAttributes(conceptAttributes);
-					}
-				}
-			}
-			if (descriptions != null) {
-				for (I_DescriptionVersioned desc : descriptions) {
-					boolean changed = false;
-					for (I_DescriptionPart p : desc.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-							changed = true;
-							if (buff != null) {
-								buff.append("\n  Committing: " + p);
-							}
-						}
-					}
-					if (changed) {
-						AceConfig.getVodb().writeDescription(desc);
-					}
-				}
-			}
-			if (sourceRels != null) {
-				flushDestRelsOnTargetBeans(version, values);
-			}
-			destRels = null;
+   @Override
+   public int hashCode() {
+      return conceptId;
+   }
 
-			if (uncommittedImages != null) {
-				for (I_ImageVersioned image : uncommittedImages) {
-					for (I_ImagePart p : image.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-						}
-					}
-					AceConfig.getVodb().writeImage(image);
-					if (buff != null) {
-						buff.append("\n  Committing: " + image);
-					}
-				}
-				uncommittedImages = null;
-				images = null;
-			}
-			if (uncommittedConceptAttributes != null) {
-				for (I_ConceptAttributePart p : uncommittedConceptAttributes
-						.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						p.setVersion(version);
-						values.add(new TimePathId(version, p.getPathId()));
-						if (buff != null) {
-							buff.append("\n  Committing: " + p);
-						}
-					}
-				}
-				AceConfig.getVodb().writeConceptAttributes(uncommittedConceptAttributes);
-				uncommittedConceptAttributes = null;
-				conceptAttributes = null;
-			}
-			if (uncommittedDescriptions != null) {
-				for (I_DescriptionVersioned desc : uncommittedDescriptions) {
-					for (I_DescriptionPart p : desc.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-						}
-					}
-					AceConfig.getVodb().writeDescription(desc);
-					if (buff != null) {
-						buff.append("\n  Committing: " + desc);
-					}
-				}
-				uncommittedDescriptions = null;
-				descriptions = null;
-			}
-			if (uncommittedSourceRels != null) {
-				for (I_RelVersioned rel : uncommittedSourceRels) {
-					ConceptBean destBean = ConceptBean.get(rel.getC2Id());
-					destBean.flushDestRels();
-					for (I_RelPart p : rel.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-						}
-					}
-					AceConfig.getVodb().writeRel(rel);
-					if (buff != null) {
-						buff.append("\n  Committing: " + rel);
-					}
-				}
-				uncommittedSourceRels = null;
-				sourceRels = null;
-			}
-			if (uncommittedIds != null) {
-				for (int id : uncommittedIds.getSetValues()) {
-					I_IdVersioned idv = AceConfig.getVodb().getId(id);
-					for (I_IdPart p : idv.getVersions()) {
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							p.setVersion(version);
-							values.add(new TimePathId(version, p.getPathId()));
-						}
-					}
-					AceConfig.getVodb().writeId(idv);
-					if (buff != null) {
-						buff.append("\n  Committing: " + idv);
-					}
-				}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_Transact#commit(int, java.util.Set)
+    */
+   public void commit(int version, Set<TimePathId> values) throws IOException {
+      // handle the parts first...
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine("Starting commit for ConceptBean: " + this);
+      }
+      StringBuffer buff = null;
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         buff = new StringBuffer();
+      }
+      try {
+         if (images != null) {
+            for (I_ImageVersioned image : images) {
+               boolean changed = false;
+               for (I_ImagePart p : image.getVersions()) {
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     p.setVersion(version);
+                     values.add(new TimePathId(version, p.getPathId()));
+                     changed = true;
+                     if (buff != null) {
+                        buff.append("\n  Committing: " + p);
+                     }
+                  }
+               }
+               if (changed) {
+                  AceConfig.getVodb().writeImage(image);
+               }
+            }
+         }
+         if (conceptAttributes != null) {
+            for (I_ConceptAttributePart p : conceptAttributes.getVersions()) {
+               boolean changed = false;
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  p.setVersion(version);
+                  values.add(new TimePathId(version, p.getPathId()));
+                  changed = true;
+                  if (buff != null) {
+                     buff.append("\n  Committing: " + p);
+                  }
+               }
+               if (changed) {
+                  AceConfig.getVodb().writeConceptAttributes(conceptAttributes);
+               }
+            }
+         }
+         if (descriptions != null) {
+            for (I_DescriptionVersioned desc : descriptions) {
+               boolean changed = false;
+               for (I_DescriptionPart p : desc.getVersions()) {
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     p.setVersion(version);
+                     values.add(new TimePathId(version, p.getPathId()));
+                     changed = true;
+                     if (buff != null) {
+                        buff.append("\n  Committing: " + p);
+                     }
+                  }
+               }
+               if (changed) {
+                  AceConfig.getVodb().writeDescription(desc);
+               }
+            }
+         }
+         if (sourceRels != null) {
+            flushDestRelsOnTargetBeans(version, values);
+         }
+         destRels = null;
+
+         if (uncommittedImages != null) {
+            for (I_ImageVersioned image : uncommittedImages) {
+               for (I_ImagePart p : image.getVersions()) {
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     p.setVersion(version);
+                     values.add(new TimePathId(version, p.getPathId()));
+                  }
+               }
+               AceConfig.getVodb().writeImage(image);
+               if (buff != null) {
+                  buff.append("\n  Committing: " + image);
+               }
+            }
+            uncommittedImages = null;
+            images = null;
+         }
+         if (uncommittedConceptAttributes != null) {
+            for (I_ConceptAttributePart p : uncommittedConceptAttributes.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  p.setVersion(version);
+                  values.add(new TimePathId(version, p.getPathId()));
+                  if (buff != null) {
+                     buff.append("\n  Committing: " + p);
+                  }
+               }
+            }
+            AceConfig.getVodb().writeConceptAttributes(uncommittedConceptAttributes);
+            uncommittedConceptAttributes = null;
+            conceptAttributes = null;
+         }
+         if (uncommittedDescriptions != null) {
+            for (I_DescriptionVersioned desc : uncommittedDescriptions) {
+               for (I_DescriptionPart p : desc.getVersions()) {
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     p.setVersion(version);
+                     values.add(new TimePathId(version, p.getPathId()));
+                  }
+               }
+               AceConfig.getVodb().writeDescription(desc);
+               if (buff != null) {
+                  buff.append("\n  Committing: " + desc);
+               }
+            }
+            uncommittedDescriptions = null;
+            descriptions = null;
+         }
+         if (uncommittedSourceRels != null) {
+            for (I_RelVersioned rel : uncommittedSourceRels) {
+               ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+               destBean.flushDestRels();
+               for (I_RelPart p : rel.getVersions()) {
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     p.setVersion(version);
+                     values.add(new TimePathId(version, p.getPathId()));
+                  }
+               }
+               AceConfig.getVodb().writeRel(rel);
+               if (buff != null) {
+                  buff.append("\n  Committing: " + rel);
+               }
+            }
+            uncommittedSourceRels = null;
+            sourceRels = null;
+         }
+         if (uncommittedIds != null) {
+            for (int id : uncommittedIds.getSetValues()) {
+               I_IdVersioned idv = AceConfig.getVodb().getId(id);
+               for (I_IdPart p : idv.getVersions()) {
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     p.setVersion(version);
+                     values.add(new TimePathId(version, p.getPathId()));
+                  }
+               }
+               AceConfig.getVodb().writeId(idv);
+               if (buff != null) {
+                  buff.append("\n  Committing: " + idv);
+               }
+            }
             id = null;
-			}
-			setPrimordial(false);
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("Finished commit for ConceptBean: " + this);
-		}
-		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-			AceLog.getEditLog().fine(buff.toString());
-		}
-	}
+         }
+         setPrimordial(false);
+      } catch (DatabaseException e) {
+         throw new ToIoException(e);
+      }
+      if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+         AceLog.getAppLog().fine("Finished commit for ConceptBean: " + this);
+      }
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine(buff.toString());
+      }
+   }
 
-	private void flushDestRelsOnTargetBeans(int version, Set<TimePathId> values)
-			throws DatabaseException, IOException {
-		for (I_RelVersioned rel : getSourceRels()) {
-			boolean changed = false;
-			for (I_RelPart p : rel.getVersions()) {
-				if (p.getVersion() == Integer.MAX_VALUE) {
-					ConceptBean destBean = ConceptBean.get(rel.getC2Id());
-					destBean.flushDestRels();
-					p.setVersion(version);
-					values.add(new TimePathId(version, p.getPathId()));
-					changed = true;
-				}
-			}
-			if (changed) {
-				AceConfig.getVodb().writeRel(rel);
-			}
-		}
-	}
+   private void flushDestRelsOnTargetBeans(int version, Set<TimePathId> values) throws DatabaseException, IOException {
+      for (I_RelVersioned rel : getSourceRels()) {
+         boolean changed = false;
+         for (I_RelPart p : rel.getVersions()) {
+            if (p.getVersion() == Integer.MAX_VALUE) {
+               ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+               destBean.flushDestRels();
+               p.setVersion(version);
+               values.add(new TimePathId(version, p.getPathId()));
+               changed = true;
+            }
+         }
+         if (changed) {
+            AceConfig.getVodb().writeRel(rel);
+         }
+      }
+   }
 
-	private void flushDestRelsOnTargetBeans() throws DatabaseException,
-			IOException {
-		for (I_RelVersioned rel : getSourceRels()) {
-			ConceptBean destBean = ConceptBean.get(rel.getC2Id());
-			destBean.flushDestRels();
-		}
-	}
+   private void flushDestRelsOnTargetBeans() throws DatabaseException, IOException {
+      for (I_RelVersioned rel : getSourceRels()) {
+         ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+         destBean.flushDestRels();
+      }
+   }
 
-	public void flush() throws DatabaseException, IOException {
-		conceptAttributes = null;
-		uncommittedConceptAttributes = null;
-		descriptions = null;
-		uncommittedDescriptions = null;
-		sourceRels = null;
-		uncommittedSourceRels = null;
-		images = null;
-		uncommittedImages = null;
-		flushDestRelsOnTargetBeans();
-	}
+   public void flush() throws DatabaseException, IOException {
+      conceptAttributes = null;
+      uncommittedConceptAttributes = null;
+      descriptions = null;
+      uncommittedDescriptions = null;
+      sourceRels = null;
+      uncommittedSourceRels = null;
+      images = null;
+      uncommittedImages = null;
+      flushDestRelsOnTargetBeans();
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_Transact#abort()
-	 */
-	public void abort() throws IOException {
-		// remove uncommitted brand new components...
-		try {
-			uncommittedConceptAttributes = null;
-			uncommittedDescriptions = null;
-			uncommittedSourceRels = null;
-			uncommittedImages = null;
-			destRels = null;
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_Transact#abort()
+    */
+   public void abort() throws IOException {
+      // remove uncommitted brand new components...
+      try {
+         uncommittedConceptAttributes = null;
+         uncommittedDescriptions = null;
+         uncommittedSourceRels = null;
+         uncommittedImages = null;
+         destRels = null;
 
-			if (uncommittedIds != null) {
-				boolean delete = true;
-				for (int id : uncommittedIds.getSetValues()) {
-					I_IdVersioned idv = AceConfig.getVodb().getId(id);
-					for (ListIterator<I_IdPart> itr = idv.getVersions()
-							.listIterator(); itr.hasNext();) {
-						I_IdPart p = itr.next();
-						if (p.getVersion() == Integer.MAX_VALUE) {
-							itr.remove();
-						} else {
-							delete = false;
-						}
-					}
-					if (delete) {
-						AceConfig.getVodb().deleteId(idv);
-					} else {
-						AceConfig.getVodb().writeId(idv);
-					}
-				}
-				uncommittedIds = null;
-			}
+         if (uncommittedIds != null) {
+            boolean delete = true;
+            for (int id : uncommittedIds.getSetValues()) {
+               I_IdVersioned idv = AceConfig.getVodb().getId(id);
+               for (ListIterator<I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
+                  I_IdPart p = itr.next();
+                  if (p.getVersion() == Integer.MAX_VALUE) {
+                     itr.remove();
+                  } else {
+                     delete = false;
+                  }
+               }
+               if (delete) {
+                  AceConfig.getVodb().deleteId(idv);
+               } else {
+                  AceConfig.getVodb().writeId(idv);
+               }
+            }
+            uncommittedIds = null;
+         }
 
-			// remove uncommitted parts...
-			if (conceptAttributes != null) {
-				for (ListIterator<I_ConceptAttributePart> partItr = conceptAttributes
-						.getVersions().listIterator(); partItr.hasNext();) {
-					I_ConceptAttributePart part = partItr.next();
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						partItr.remove();
-					}
-				}
-			}
-			if (descriptions != null) {
-				for (I_DescriptionVersioned desc : descriptions) {
-					for (ListIterator<I_DescriptionPart> partItr = desc
-							.getVersions().listIterator(); partItr.hasNext();) {
-						I_DescriptionPart part = partItr.next();
-						if (part.getVersion() == Integer.MAX_VALUE) {
-							partItr.remove();
-						}
-					}
-				}
-			}
+         // remove uncommitted parts...
+         if (conceptAttributes != null) {
+            for (ListIterator<I_ConceptAttributePart> partItr = conceptAttributes.getVersions().listIterator(); partItr
+                  .hasNext();) {
+               I_ConceptAttributePart part = partItr.next();
+               if (part.getVersion() == Integer.MAX_VALUE) {
+                  partItr.remove();
+               }
+            }
+         }
+         if (descriptions != null) {
+            for (I_DescriptionVersioned desc : descriptions) {
+               for (ListIterator<I_DescriptionPart> partItr = desc.getVersions().listIterator(); partItr.hasNext();) {
+                  I_DescriptionPart part = partItr.next();
+                  if (part.getVersion() == Integer.MAX_VALUE) {
+                     partItr.remove();
+                  }
+               }
+            }
+         }
 
-			if (sourceRels != null) {
-				for (I_RelVersioned srcRel : sourceRels) {
-					for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
-							.listIterator(); partItr.hasNext();) {
-						I_RelPart part = partItr.next();
-						if (part.getVersion() == Integer.MAX_VALUE) {
-							partItr.remove();
-						}
-					}
-				}
-			}
+         if (sourceRels != null) {
+            for (I_RelVersioned srcRel : sourceRels) {
+               for (ListIterator<I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
+                  I_RelPart part = partItr.next();
+                  if (part.getVersion() == Integer.MAX_VALUE) {
+                     partItr.remove();
+                  }
+               }
+            }
+         }
 
-			if (images != null) {
-				for (I_ImageVersioned img : images) {
-					for (ListIterator<I_ImagePart> partItr = img.getVersions()
-							.listIterator(); partItr.hasNext();) {
-						I_ImagePart part = partItr.next();
-						if (part.getVersion() == Integer.MAX_VALUE) {
-							partItr.remove();
-						}
-					}
-				}
-			}
+         if (images != null) {
+            for (I_ImageVersioned img : images) {
+               for (ListIterator<I_ImagePart> partItr = img.getVersions().listIterator(); partItr.hasNext();) {
+                  I_ImagePart part = partItr.next();
+                  if (part.getVersion() == Integer.MAX_VALUE) {
+                     partItr.remove();
+                  }
+               }
+            }
+         }
 
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-	}
+      } catch (DatabaseException e) {
+         throw new ToIoException(e);
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_GetConceptData#getUid()
-	 */
-	public List<UUID> getUids() throws IOException {
-		if (uids == null) {
-			try {
-				uids = AceConfig.getVodb().nativeToUuid(conceptId);
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			}
-		}
-		return uids;
-	}
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.dwfa.vodb.types.I_GetConceptData#getUid()
+    */
+   public List<UUID> getUids() throws IOException {
+      if (uids == null) {
+         try {
+            uids = AceConfig.getVodb().nativeToUuid(conceptId);
+         } catch (DatabaseException e) {
+            throw new ToIoException(e);
+         }
+      }
+      return uids;
+   }
 
-	public static void writeConceptBeanList(ObjectOutputStream out,
-			List<ConceptBean> list) throws IOException {
-		out.writeInt(list.size());
-		for (I_GetConceptData cb : list) {
-			try {
-				out.writeObject(cb.getUids());
-			} catch (IOException e) {
-				IOException newEx = new IOException();
-				newEx.initCause(e);
-				throw newEx;
-			}
-		}
-	}
+   public static void writeConceptBeanList(ObjectOutputStream out, List<ConceptBean> list) throws IOException {
+      out.writeInt(list.size());
+      for (I_GetConceptData cb : list) {
+         try {
+            out.writeObject(cb.getUids());
+         } catch (IOException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+         }
+      }
+   }
 
-	public static List<ConceptBean> readConceptBeanList(ObjectInputStream in)
-			throws IOException, ClassNotFoundException {
-		int size = in.readInt();
-		List<ConceptBean> beanList = new ArrayList<ConceptBean>(size);
-		for (int i = 0; i < size; i++) {
-			try {
-				beanList.add(ConceptBean.get((UUID) in.readObject()));
-			} catch (TerminologyException e) {
-				IOException newEx = new IOException();
-				newEx.initCause(e);
-				throw newEx;
-			}
-		}
-		return beanList;
-	}
+   public static List<ConceptBean> readConceptBeanList(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int size = in.readInt();
+      List<ConceptBean> beanList = new ArrayList<ConceptBean>(size);
+      for (int i = 0; i < size; i++) {
+         try {
+            beanList.add(ConceptBean.get((UUID) in.readObject()));
+         } catch (TerminologyException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+         }
+      }
+      return beanList;
+   }
 
-	public I_ConceptAttributeVersioned getUncommittedConceptAttributes() {
-		return uncommittedConceptAttributes;
-	}
+   public I_ConceptAttributeVersioned getUncommittedConceptAttributes() {
+      return uncommittedConceptAttributes;
+   }
 
-	public void setUncommittedConceptAttributes(
-			I_ConceptAttributeVersioned uncommittedConcept) {
-		this.uncommittedConceptAttributes = uncommittedConcept;
-	}
+   public void setUncommittedConceptAttributes(I_ConceptAttributeVersioned uncommittedConcept) {
+      this.uncommittedConceptAttributes = uncommittedConcept;
+   }
 
-	public List<I_DescriptionVersioned> getUncommittedDescriptions() {
-		if (uncommittedDescriptions == null) {
-			uncommittedDescriptions = new ArrayList<I_DescriptionVersioned>();
-		}
-		return uncommittedDescriptions;
-	}
+   public List<I_DescriptionVersioned> getUncommittedDescriptions() {
+      if (uncommittedDescriptions == null) {
+         uncommittedDescriptions = new ArrayList<I_DescriptionVersioned>();
+      }
+      return uncommittedDescriptions;
+   }
 
-	public List<I_RelVersioned> getUncommittedSourceRels() {
-		if (uncommittedSourceRels == null) {
-			uncommittedSourceRels = new ArrayList<I_RelVersioned>();
-		}
-		return uncommittedSourceRels;
-	}
+   public List<I_RelVersioned> getUncommittedSourceRels() {
+      if (uncommittedSourceRels == null) {
+         uncommittedSourceRels = new ArrayList<I_RelVersioned>();
+      }
+      return uncommittedSourceRels;
+   }
 
-	public I_RelVersioned getSourceRel(int id) throws IOException {
-		for (I_RelVersioned r : getSourceRels()) {
-			if (r.getRelId() == id) {
-				return r;
-			}
-		}
-		return null;
-	}
+   public I_RelVersioned getSourceRel(int id) throws IOException {
+      for (I_RelVersioned r : getSourceRels()) {
+         if (r.getRelId() == id) {
+            return r;
+         }
+      }
+      return null;
+   }
 
-	public I_RelVersioned getDestRel(int id) throws IOException {
-		for (I_RelVersioned r : getDestRels()) {
-			if (r.getRelId() == id) {
-				return r;
-			}
-		}
-		return null;
-	}
+   public I_RelVersioned getDestRel(int id) throws IOException {
+      for (I_RelVersioned r : getDestRels()) {
+         if (r.getRelId() == id) {
+            return r;
+         }
+      }
+      return null;
+   }
 
-	public Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config)
-			throws IOException {
+   public Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException {
       return ConceptBeanConflictHelper.getCommonDescTuples(this, config);
-	}
+   }
 
-	public Set<I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config)
-			throws IOException {
+   public Set<I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException {
       return ConceptBeanConflictHelper.getCommonRelTuples(this, config);
-	}
+   }
 
    public Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(I_ConfigAceFrame config) throws IOException {
       return ConceptBeanConflictHelper.getCommonConceptAttributeTuples(this, config);
    }
-	public I_IdVersioned getId() throws IOException {
-		if (id == null) {
-			id = AceConfig.getVodb().getId(conceptId);
-		}
-		return id;
-	}
 
-	public I_IntSet getUncommittedIds() {
-		if (uncommittedIds == null) {
-			uncommittedIds = new IntSet();
-		}
-		return uncommittedIds;
-	}
-
-	public I_DescriptionTuple getDescTuple(I_IntList prefOrder,
-			I_ConfigAceFrame config) throws IOException {
-      return getDescTuple(prefOrder, config.getAllowedStatus(), config.getViewPositionSet());
-	}
-
-   public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_IntSet allowedStatus, 
-         Set<I_Position> positionSet) throws IOException {
-      I_IntSet typeSet = new IntSet();
-      for (int nid: prefOrder.getListArray()) {
-         typeSet.add(nid);
+   public I_IdVersioned getId() throws IOException {
+      if (id == null) {
+         id = AceConfig.getVodb().getId(conceptId);
       }
-		Collection<I_DescriptionTuple> descriptions = getDescriptionTuples(allowedStatus, typeSet, positionSet);
-		if (prefOrder == null) {
-			return descriptions.iterator().next();
-		} else {
-			for (int typeId : prefOrder.getListValues()) {
-				for (I_DescriptionTuple d : descriptions) {
-					if (d.getTypeId() == typeId) {
-						return d;
-					}
-				}
-			}
-		}
-		return null;
+      return id;
    }
 
-	public boolean isUncommitted() throws IOException {
-		// handle the parts first...
-		if (images != null) {
-			for (I_ImageVersioned image : images) {
-				for (I_ImagePart p : image.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		if (conceptAttributes != null) {
-			for (I_ConceptAttributePart p : conceptAttributes.getVersions()) {
-				if (p.getVersion() == Integer.MAX_VALUE) {
-					return true;
-				}
-			}
-		}
-		if (descriptions != null) {
-			for (I_DescriptionVersioned desc : descriptions) {
-				for (I_DescriptionPart p : desc.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		if (sourceRels != null) {
-			for (I_RelVersioned rel : sourceRels) {
-				for (I_RelPart p : rel.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		if (uncommittedImages != null) {
-			for (I_ImageVersioned image : uncommittedImages) {
-				for (I_ImagePart p : image.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		if (uncommittedConceptAttributes != null) {
-			for (I_ConceptAttributePart p : uncommittedConceptAttributes
-					.getVersions()) {
-				if (p.getVersion() == Integer.MAX_VALUE) {
-					return true;
-				}
-			}
-		}
-		if (uncommittedDescriptions != null) {
-			for (I_DescriptionVersioned desc : uncommittedDescriptions) {
-				for (I_DescriptionPart p : desc.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		if (uncommittedSourceRels != null) {
-			for (I_RelVersioned rel : uncommittedSourceRels) {
-				for (I_RelPart p : rel.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		if (uncommittedIds != null) {
-			for (int id : uncommittedIds.getSetValues()) {
-				I_IdVersioned idv;
-				idv = AceConfig.getVodb().getId(id);
-				for (I_IdPart p : idv.getVersions()) {
-					if (p.getVersion() == Integer.MAX_VALUE) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
+   public I_IntSet getUncommittedIds() {
+      if (uncommittedIds == null) {
+         uncommittedIds = new IntSet();
+      }
+      return uncommittedIds;
+   }
 
-	private void flushDestRels() {
-		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-			AceLog.getEditLog().fine("Flushing destination rels for: " + this);
-		}
-		this.destRels = null;
-	}
+   public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
+      return getDescTuple(prefOrder, config.getAllowedStatus(), config.getViewPositionSet());
+   }
 
-	public boolean isPrimordial() {
-		return primordial;
-	}
+   public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_IntSet allowedStatus, Set<I_Position> positionSet)
+         throws IOException {
+      I_IntSet typeSet = new IntSet();
+      for (int nid : prefOrder.getListArray()) {
+         typeSet.add(nid);
+      }
+      Collection<I_DescriptionTuple> descriptions = getDescriptionTuples(allowedStatus, typeSet, positionSet);
+      if (prefOrder == null) {
+         return descriptions.iterator().next();
+      } else {
+         for (int typeId : prefOrder.getListValues()) {
+            for (I_DescriptionTuple d : descriptions) {
+               if (d.getTypeId() == typeId) {
+                  return d;
+               }
+            }
+         }
+      }
+      return null;
+   }
 
-	public void setPrimordial(boolean primordial) {
-		this.primordial = primordial;
-	}
+   public boolean isUncommitted() throws IOException {
+      // handle the parts first...
+      if (images != null) {
+         for (I_ImageVersioned image : images) {
+            for (I_ImagePart p : image.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      if (conceptAttributes != null) {
+         for (I_ConceptAttributePart p : conceptAttributes.getVersions()) {
+            if (p.getVersion() == Integer.MAX_VALUE) {
+               return true;
+            }
+         }
+      }
+      if (descriptions != null) {
+         for (I_DescriptionVersioned desc : descriptions) {
+            for (I_DescriptionPart p : desc.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      if (sourceRels != null) {
+         for (I_RelVersioned rel : sourceRels) {
+            for (I_RelPart p : rel.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      if (uncommittedImages != null) {
+         for (I_ImageVersioned image : uncommittedImages) {
+            for (I_ImagePart p : image.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      if (uncommittedConceptAttributes != null) {
+         for (I_ConceptAttributePart p : uncommittedConceptAttributes.getVersions()) {
+            if (p.getVersion() == Integer.MAX_VALUE) {
+               return true;
+            }
+         }
+      }
+      if (uncommittedDescriptions != null) {
+         for (I_DescriptionVersioned desc : uncommittedDescriptions) {
+            for (I_DescriptionPart p : desc.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      if (uncommittedSourceRels != null) {
+         for (I_RelVersioned rel : uncommittedSourceRels) {
+            for (I_RelPart p : rel.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      if (uncommittedIds != null) {
+         for (int id : uncommittedIds.getSetValues()) {
+            I_IdVersioned idv;
+            idv = AceConfig.getVodb().getId(id);
+            for (I_IdPart p : idv.getVersions()) {
+               if (p.getVersion() == Integer.MAX_VALUE) {
+                  return true;
+               }
+            }
+         }
+      }
+      return false;
+   }
 
-	public UniversalAceBean getUniversalAceBean() throws IOException,
-			TerminologyException {
-		UniversalAceBean uab = new UniversalAceBean();
+   private void flushDestRels() {
+      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+         AceLog.getEditLog().fine("Flushing destination rels for: " + this);
+      }
+      this.destRels = null;
+   }
 
-		uab.setId(getId().getUniversal());
+   public boolean isPrimordial() {
+      return primordial;
+   }
 
-		if (conceptAttributes != null) {
-			uab.setConceptAttributes(conceptAttributes.getUniversal());
-		}
+   public void setPrimordial(boolean primordial) {
+      this.primordial = primordial;
+   }
 
-		for (I_DescriptionVersioned desc : getDescriptions()) {
-			uab.getDescriptions().add(desc.getUniversal());
-		}
+   public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
+      UniversalAceBean uab = new UniversalAceBean();
 
-		for (I_RelVersioned rel : getSourceRels()) {
-			uab.getSourceRels().add(rel.getUniversal());
-		}
+      uab.setId(getId().getUniversal());
 
-		for (I_ImageVersioned image : getImages()) {
-			uab.getImages().add(image.getUniversal());
-		}
+      if (conceptAttributes != null) {
+         uab.setConceptAttributes(conceptAttributes.getUniversal());
+      }
 
-		if (uncommittedConceptAttributes != null) {
-			uab.setUncommittedConceptAttributes(uncommittedConceptAttributes
-					.getUniversal());
-		}
+      for (I_DescriptionVersioned desc : getDescriptions()) {
+         uab.getDescriptions().add(desc.getUniversal());
+      }
 
-		for (I_DescriptionVersioned desc : getUncommittedDescriptions()) {
-			uab.getUncommittedDescriptions().add(desc.getUniversal());
-		}
+      for (I_RelVersioned rel : getSourceRels()) {
+         uab.getSourceRels().add(rel.getUniversal());
+      }
 
-		for (I_RelVersioned rel : getUncommittedSourceRels()) {
-			uab.getUncommittedSourceRels().add(rel.getUniversal());
-		}
+      for (I_ImageVersioned image : getImages()) {
+         uab.getImages().add(image.getUniversal());
+      }
 
-		for (I_ImageVersioned image : getUncommittedImages()) {
-			uab.getUncommittedImages().add(image.getUniversal());
-		}
+      if (uncommittedConceptAttributes != null) {
+         uab.setUncommittedConceptAttributes(uncommittedConceptAttributes.getUniversal());
+      }
 
-		for (int nid : getUncommittedIds().getSetValues()) {
-			I_IdVersioned idv = AceConfig.getVodb().getId(nid);
-			uab.getUncommittedIds().add(idv.getUniversal());
-		}
-		return uab;
-	}
+      for (I_DescriptionVersioned desc : getUncommittedDescriptions()) {
+         uab.getUncommittedDescriptions().add(desc.getUniversal());
+      }
 
-	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
-		for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes,
-				positions, addUncommitted)) {
-			returnValues.add(ConceptBean.get(rel.getC1Id()));
-		}
-		return returnValues;
-	}
+      for (I_RelVersioned rel : getUncommittedSourceRels()) {
+         uab.getUncommittedSourceRels().add(rel.getUniversal());
+      }
 
-	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
-		for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes,
-				positions, addUncommitted)) {
-			returnValues.add(ConceptBean.get(rel.getC2Id()));
-		}
-		return returnValues;
-	}
+      for (I_ImageVersioned image : getUncommittedImages()) {
+         uab.getUncommittedImages().add(image.getUniversal());
+      }
 
-	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		return isParentWithDepthCutoff(child, allowedStatus, allowedTypes, positions, addUncommitted, 0);
-	}
+      for (int nid : getUncommittedIds().getSetValues()) {
+         I_IdVersioned idv = AceConfig.getVodb().getId(nid);
+         uab.getUncommittedIds().add(idv.getUniversal());
+      }
+      return uab;
+   }
 
-   private boolean isParentWithDepthCutoff(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes, 
+   public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
+         Set<I_Position> positions, boolean addUncommitted) throws IOException {
+      Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+      for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted)) {
+         returnValues.add(ConceptBean.get(rel.getC1Id()));
+      }
+      return returnValues;
+   }
+
+   public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
+         Set<I_Position> positions, boolean addUncommitted) throws IOException {
+      Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+      for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted)) {
+         returnValues.add(ConceptBean.get(rel.getC2Id()));
+      }
+      return returnValues;
+   }
+
+   public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+         Set<I_Position> positions, boolean addUncommitted) throws IOException {
+      return isParentWithDepthCutoff(child, allowedStatus, allowedTypes, positions, addUncommitted, 0);
+   }
+
+   private boolean isParentWithDepthCutoff(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
          Set<I_Position> positions, boolean addUncommitted, int depth) throws IOException {
       Set parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
       if (depth == 18) {
-         AceLog.getAppLog().log(Level.SEVERE, "near to isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
+         AceLog.getAppLog().log(Level.SEVERE,
+               "near to isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
       }
       if (depth == 19) {
-         AceLog.getAppLog().log(Level.SEVERE, "nearer to isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
+         AceLog.getAppLog().log(Level.SEVERE,
+               "nearer to isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
       }
       if (depth == 20) {
          AceLog.getAppLog().log(Level.SEVERE, "isParentOf depth cuttoff for: \nparent: " + this + "\nchild: " + child);
          return false;
       }
-		if (parents.contains(this)) {
-			return true;
-		}
-		for (I_GetConceptData childParent: child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted)) {
-			if (this.isParentWithDepthCutoff(childParent, allowedStatus, allowedTypes, positions, addUncommitted, depth + 1)) {
-				return true;
-			}
-		}
-		return false;
+      if (parents.contains(this)) {
+         return true;
+      }
+      for (I_GetConceptData childParent : child.getSourceRelTargets(allowedStatus, allowedTypes, positions,
+            addUncommitted)) {
+         if (this.isParentWithDepthCutoff(childParent, allowedStatus, allowedTypes, positions, addUncommitted,
+               depth + 1)) {
+            return true;
+         }
+      }
+      return false;
    }
 
 }

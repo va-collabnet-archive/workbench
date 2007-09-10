@@ -14,25 +14,25 @@ import java.util.List;
  * @author kec
  *
  */
-public class ThinExtVersioned {
+public class ThinExtByRefVersioned {
    
    private int refsetId;
    private int memberId;
    private int componentId;
    private int typeId; //Use an enumeration when reading/writing, and convert it to the corresponding concept nid...
-   private List<ThinExtPart> versions ;
+   private List<ThinExtByRefPart> versions ;
    
-   public ThinExtVersioned(int refsetId, int memberId, int componentId, int typeId) {
+   public ThinExtByRefVersioned(int refsetId, int memberId, int componentId, int typeId) {
       this(refsetId, memberId, componentId, typeId, 1);
    }
    
-   public ThinExtVersioned(int refsetId, int memberId, int componentId, int typeId, int partCount) {
+   public ThinExtByRefVersioned(int refsetId, int memberId, int componentId, int typeId, int partCount) {
       super();
       this.refsetId = refsetId;
       this.memberId = memberId;
       this.componentId = componentId;
       this.typeId = typeId;
-      this.versions = new ArrayList<ThinExtPart>(partCount);
+      this.versions = new ArrayList<ThinExtByRefPart>(partCount);
    }
    
    public int getMemberId() {
@@ -47,7 +47,7 @@ public class ThinExtVersioned {
       return typeId;
    }
 
-   public List<? extends ThinExtPart> getVersions() {
+   public List<? extends ThinExtByRefPart> getVersions() {
       return versions;
    }
 
@@ -56,7 +56,7 @@ public class ThinExtVersioned {
    }
    @Override
    public boolean equals(Object obj) {
-      ThinExtVersioned another = (ThinExtVersioned) obj;
+      ThinExtByRefVersioned another = (ThinExtByRefVersioned) obj;
       return ((refsetId == another.refsetId) &&
             (memberId == another.memberId) &&
             (componentId == another.componentId) &&
@@ -68,7 +68,7 @@ public class ThinExtVersioned {
       return HashFunction.hashCode(new int[] {refsetId, memberId, componentId, typeId });
    }
 
-   public void addVersion(ThinExtPart part) {
+   public void addVersion(ThinExtByRefPart part) {
       versions.add(part);
    }
 

@@ -208,7 +208,7 @@ public class IdTableModel extends AbstractTableModel implements
 	}
 
 	public enum ID_FIELD {
-		LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 150), EXT_ID(
+		LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 250), EXT_ID(
 				"external id", 5, 85, 1550), VERSION("version", 5, 140, 140), BRANCH(
 				"path", 5, 90, 150);
 

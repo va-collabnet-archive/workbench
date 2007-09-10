@@ -7,7 +7,9 @@ import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -23,15 +25,19 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddDescription;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsForConceptTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
+import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class DescriptionPlugin extends AbstractPlugin {
 
@@ -39,6 +45,8 @@ public class DescriptionPlugin extends AbstractPlugin {
 	private I_HostConceptPlugins host;
 	private DescriptionsForConceptTableModel descTableModel;
 	private JTableWithDragImage descTable;
+   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+
 
 	public DescriptionPlugin() {
 		super(true);
@@ -52,7 +60,12 @@ public class DescriptionPlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+
+         if (RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this, visibleExtensions)) {
+            createPluginComponent(host);
+         } 
+
+         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
 			DESC_FIELD[] columnEnums = getDescColumns(host);
 			descTableModel.setColumns(columnEnums);
 			for (int i = 0; i < descTableModel.getColumnCount(); i++) {
@@ -69,16 +82,20 @@ public class DescriptionPlugin extends AbstractPlugin {
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
-		if (descPanel == null) {
-			this.host = host;
-			descPanel = getDescPanel(host);
-			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-			host.addPropertyChangeListener("commit", this);
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-			descTableModel.propertyChange(evt);
+		if (descPanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this, visibleExtensions)) {
+			createPluginComponent(host);
 		}
 		return descPanel;
 	}
+
+   private void createPluginComponent(I_HostConceptPlugins host) {
+      this.host = host;
+      descPanel = getDescPanel(host);
+      host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+      host.addPropertyChangeListener("commit", this);
+      PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+      descTableModel.propertyChange(evt);
+   }
 
 	private DESC_FIELD[] getDescColumns(I_HostConceptPlugins host) {
 		List<DESC_FIELD> fields = new ArrayList<DESC_FIELD>();
@@ -141,6 +158,7 @@ public class DescriptionPlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(descTableModel);
 		descTable = new JTableWithDragImage(sortingTable);
+      descTable.getSelectionModel().addListSelectionListener(this);
 		descTable.setDragEnabled(true);
 		descTable.setTransferHandler(new TerminologyTransferHandler());
       
@@ -179,12 +197,20 @@ public class DescriptionPlugin extends AbstractPlugin {
 
 		setupEditorsAndRenderers(host);
 		descPanel.add(descTable, c);
-		descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
+
+      c.weightx = 0.0;
+      c.weighty = 0.0;
+      c.gridy = c.gridy + c.gridheight;
+      c.gridheight = 1;
+      c.gridx = 0;
+      c.gridwidth = 2;
+      visibleExtensions.clear();
+      RefsetUtil.addRefsetTables(host, this, TOGGLES.DESCRIPTIONS, c, visibleExtensions, descPanel);
+
+      descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory
 				.createLineBorder(Color.GRAY)));
 
-		c.gridheight = 1;
-		c.gridx = 0;
 		return descPanel;
 	}
 
@@ -231,6 +257,15 @@ public class DescriptionPlugin extends AbstractPlugin {
    @Override
    protected String getToolTipText() {
       return "show/hide descriptions for this concept";
+   }
+   
+   @Override
+   protected int getComponentId() {
+      if (descTable.getSelectedRow() < 0) {
+         return Integer.MIN_VALUE;
+      }
+      StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(descTable.getSelectedRow(), 0);
+      return swdt.getTuple().getDescId();
    }
 
 }

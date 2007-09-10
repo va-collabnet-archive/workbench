@@ -7,10 +7,12 @@ import java.util.Collections;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import javax.swing.Timer;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.config.AceConfig;
@@ -246,7 +248,11 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		} catch (InterruptedException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (ExecutionException e) {
-			AceLog.getAppLog().alertAndLogException(e);
+         if (ACE.editMode) {
+            AceLog.getAppLog().alertAndLogException(e);
+         } else {
+            AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+         }
 		}
 		searchPanel.removeStopActionListener(stopListener);
 		searchPanel.setShowProgress(false);
