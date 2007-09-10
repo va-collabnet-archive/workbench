@@ -23,24 +23,24 @@ import org.dwfa.util.id.Type3UuidFactory;
 public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
 	public enum Concept implements I_ConceptualizeUniversally {
-		REFSET_AUXILIARY("Refset Auxiliary Concept"),
-			REFSET_TYPE("refset type", REFSET_AUXILIARY),
-            BOOLEAN_EXTENSION("boolean extensions", REFSET_TYPE),
-            INT_EXTENSION("int extensions", REFSET_TYPE),
-            CONCEPT_EXTENSION("concept extensions", REFSET_TYPE),
-            MEASUREMENT_EXTENSION("measurement extensions", REFSET_TYPE),
-            LANGUAGE_EXTENSION("language extensions", REFSET_TYPE),
-            SCOPED_LANGUAGE_EXTENSION("scoped language extensions", REFSET_TYPE),
-			REFSET_PURPOSE("refset purpose", REFSET_AUXILIARY),
-				RELATIONSHIP_ORDER("relationship order", REFSET_PURPOSE),
-			REFSET_RELATIONSHIP(new String[] { "refset relationship" }, 
+		REFSET_AUXILIARY(new String[] { "Refset Auxiliary Concept", "Refset Auxiliary Concept"}),
+			REFSET_TYPE(new String[] { "refset type", "refset type"}, REFSET_AUXILIARY),
+            BOOLEAN_EXTENSION(new String[] { "boolean extension by reference", "boolean extensions"}, REFSET_TYPE),
+            INT_EXTENSION(new String[] { "int extension by reference", "int extensions"}, REFSET_TYPE),
+            CONCEPT_EXTENSION(new String[] { "concept extension by reference", "concept extensions"}, REFSET_TYPE),
+            MEASUREMENT_EXTENSION(new String[] { "measurement extension by reference", "measurement extensions"}, REFSET_TYPE),
+            LANGUAGE_EXTENSION(new String[] { "language extension by reference", "language extensions"}, REFSET_TYPE),
+            SCOPED_LANGUAGE_EXTENSION(new String[] { "scoped language extension by reference", "scoped language extensions"}, REFSET_TYPE),
+			REFSET_PURPOSE(new String[] { "refset purpose", "refset purpose"}, REFSET_AUXILIARY),
+				RELATIONSHIP_ORDER(new String[] { "relationship order", "relationship order"}, REFSET_PURPOSE),
+			REFSET_RELATIONSHIP(new String[] { "refset relationship", "refset relationship" }, 
 					new I_ConceptualizeUniversally [] { 
 						ArchitectonicAuxiliary.Concept.RELATIONSHIP, 
 						REFSET_AUXILIARY}),
-				REFSET_TYPE_REL("refset type rel", REFSET_RELATIONSHIP),
-				REFSET_PURPOSE_REL("refest purpose rel", REFSET_RELATIONSHIP),
-			REFSET_IDENTITY("refset identity", REFSET_AUXILIARY),
-				DOCUMENT_SECTION_ORDER(new String[] { "document section order",
+				REFSET_TYPE_REL(new String[] { "refset type rel", "refset type rel"}, REFSET_RELATIONSHIP),
+				REFSET_PURPOSE_REL(new String[] { "refest purpose rel", "refest purpose rel"}, REFSET_RELATIONSHIP),
+			REFSET_IDENTITY(new String[] { "refset identity", "refset identity"}, REFSET_AUXILIARY),
+				DOCUMENT_SECTION_ORDER(new String[] { "document section order","document section order",
 													  "ORG_DWFA_DOC_SECTION_ORDER"}, 
 						new I_ConceptualizeUniversally [] { REFSET_IDENTITY,
 						RELATIONSHIP_ORDER, INT_EXTENSION}, 
@@ -57,12 +57,12 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		
 		private UniversalFixedDescription[] descriptions;
 		
-		private Concept(String descriptionString) {
-			this(new String[] { descriptionString }, new I_ConceptualizeUniversally[] { });
-		}
-		private Concept(String descriptionString, I_ConceptualizeUniversally parent) {
-			this(new String[] { descriptionString }, new I_ConceptualizeUniversally[] {parent});
-		}
+      private Concept(String[] descriptions) {
+         this(descriptions, new I_ConceptualizeUniversally[] { });
+      }
+      private Concept(String[] descriptions, I_ConceptualizeUniversally parent) {
+         this(descriptions, new I_ConceptualizeUniversally[] {parent});
+      }
 		private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
 			this.conceptUids.add(Type3UuidFactory.fromEnum(this)); 
 			try {
@@ -166,7 +166,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		}
 	}	
 	private static I_ConceptualizeUniversally[] descTypeOrder = { 
-		ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE,
+      ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE,
+      ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE,
 		ArchitectonicAuxiliary.Concept.EXTENSION_TABLE};
 	/* (non-Javadoc)
 	 * @see org.dwfa.cement.I_AddToMemoryTermServer#addToMemoryTermServer(org.dwfa.cement.MemoryTermServer)

@@ -55,7 +55,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
 	public enum Concept implements I_ConceptualizeUniversally {
 		
-		ARCHITECTONIC_ROOT_CONCEPT(new String[] {"Architectonic Concept", getArchitectonicText()},
+		ARCHITECTONIC_ROOT_CONCEPT("Architectonic Concept", getArchitectonicText(),
 			new I_ConceptualizeUniversally[] { }),
 		IMAGE_TYPE("image type",
 				new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
@@ -106,13 +106,13 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                   EXTERNAL_REFERENCE("external reference",
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
       			FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID, 
-      					new String[] {"fully specified"},
+      					new String[] {"fully specified"}, null,
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
       			SYNONYM_DESCRIPTION_TYPE("synonym",
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
       			UNSPECIFIED_DESCRIPTION_TYPE("unspecified",
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-      			PREFERRED_DESCRIPTION_TYPE("preferred",
+      			PREFERRED_DESCRIPTION_TYPE(PrimordialId.PREFERED_TERM_ID, new String[] {"preferred"}, null,
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE,  ACCEPTABILITY}),
       			ENTRY_DESCRIPTION_TYPE("entry term",
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
@@ -122,15 +122,15 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
       			XHTML_FULLY_SPECIFIED_DESC_TYPE("xhtml fully specified",
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-      			XHTML_DEF(PrimordialId.XHTML_DEF_ID, new String[] {"xhtml def"},
+      			XHTML_DEF(PrimordialId.XHTML_DEF_ID, new String[] {"xhtml def"}, null,
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-      			EXTENSION_TABLE(PrimordialId.XHTML_DEF_ID, new String[] {"extension table"},
+      			EXTENSION_TABLE(PrimordialId.XHTML_DEF_ID, new String[] {"extension table"}, null,
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
       			CHANGE_COMMENT("change comment",
       					new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 		RELATIONSHIP("relationship",
 				new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-			IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is-a rel (terminology constant)"},
+			IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is-a rel (terminology constant)"}, null,
 					new I_ConceptualizeUniversally[] { RELATIONSHIP }),
 			DUP_REL_TYPE("dup rel type (terminology constant)",
 					new I_ConceptualizeUniversally[] { RELATIONSHIP }),
@@ -162,7 +162,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 		CHARACTERISTIC_TYPE("charactersitic type",
 				new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
 			DEFINING_CHARACTERISTIC(PrimordialId.DEFINING_CHARACTERISTIC_ID, 
-					new String[] {"defining"},
+					new String[] {"defining"}, null,
 					new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
 				STATED_RELATIONSHIP("stated",
 						new I_ConceptualizeUniversally[] { DEFINING_CHARACTERISTIC }),
@@ -176,7 +176,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 					new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
 		RELATIONSHIP_REFINABILITY("relationship refinability",
 				new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-			NOT_REFINABLE(PrimordialId.NOT_REFINABLE_ID, new String[] {"not refinable"},
+			NOT_REFINABLE(PrimordialId.NOT_REFINABLE_ID, new String[] {"not refinable"}, null,
 					new I_ConceptualizeUniversally[] { RELATIONSHIP_REFINABILITY }),
 			OPTIONAL_REFINABILITY("optional",
 					new I_ConceptualizeUniversally[] { RELATIONSHIP_REFINABILITY }),
@@ -192,7 +192,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 							new I_ConceptualizeUniversally[] { ACTIVE }),
 					LIMITED("limited",
 							new I_ConceptualizeUniversally[] { ACTIVE }),
-					CURRENT(PrimordialId.CURRENT_ID, new String[] { "current" },
+					CURRENT(PrimordialId.CURRENT_ID, new String[] { "current" }, null,
 									new I_ConceptualizeUniversally[] { ACTIVE }),
 					FLAGGED_FOR_REVIEW("flagged",
 							new I_ConceptualizeUniversally[] { ACTIVE }),
@@ -282,7 +282,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 								new I_ConceptualizeUniversally[] { SNOMED_CORE }),
 						SNOMED_20050131("SNOMED 2005-01-31",
 								new I_ConceptualizeUniversally[] { SNOMED_CORE }),
-				ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"ACE Auxiliary"},
+				ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"ACE Auxiliary"}, null,
 						new I_ConceptualizeUniversally[] { PATH }),
 		TEST("test",
 				new I_ConceptualizeUniversally[] { PATH }),
@@ -296,7 +296,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 				new I_ConceptualizeUniversally[] { ID_SOURCE }),
 		SNOMED_T3_UUID("SNOMED Type 3 UUID",
 				new I_ConceptualizeUniversally[] { ID_SOURCE }),
-		UNSPECIFIED_UUID(PrimordialId.ACE_AUX_ENCODING_ID, new String[] {"generated UUID"},
+		UNSPECIFIED_UUID(PrimordialId.ACE_AUX_ENCODING_ID, new String[] {"generated UUID"}, null,
 				new I_ConceptualizeUniversally[] { ID_SOURCE });
 		;
 		private Collection<UUID> conceptUids = new ArrayList<UUID>();
@@ -309,22 +309,25 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 		
 		private static PrimordialId[] descTypeOrder;
 		
-		private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
-			this(new String[] {descriptionString}, parents);
-		}
+      private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
+         this(new String[] {descriptionString}, null, parents);
+      }
+      private Concept(String descriptionString, String defString, I_ConceptualizeUniversally[] parents) {
+         this(new String[] {descriptionString}, defString, parents);
+      }
 		// PrimordialId
-		private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
+		private Concept(String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
 			this.conceptUids.add(Type3UuidFactory.fromEnum(this)); 
-			init(descriptionStrings, parents);
+			init(descriptionStrings, defString, parents);
 		}
-		private Concept(PrimordialId id, String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
+		private Concept(PrimordialId id, String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
 			this.conceptUids = id.getUids();
-			init(descriptionStrings, parents);
+			init(descriptionStrings, defString, parents);
 		}
-		private void init(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
+		private void init(String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
 			try {
 				this.rels = makeRels(this, parents);
-				this.descriptions = makeDescriptions(this, descriptionStrings);
+				this.descriptions = makeDescriptions(this, descriptionStrings, defString);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -345,13 +348,24 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 			return rels;
 		}
 
-		public UniversalFixedDescription[] makeDescriptions(I_ConceptualizeUniversally source, String[] descriptionStrings) throws Exception {
+		public UniversalFixedDescription[] makeDescriptions(I_ConceptualizeUniversally source, String[] descriptionStrings, String defString) throws Exception {
+         if (descriptionStrings.length == 1) {
+            String[] newDescriptionArray = new String[2];
+            newDescriptionArray[0] = descriptionStrings[0];
+            newDescriptionArray[1] = descriptionStrings[0];
+            descriptionStrings = newDescriptionArray;
+         }
 			if (descTypeOrder == null) {
 				descTypeOrder = new PrimordialId[] { 
 						PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID, 
-						PrimordialId.XHTML_DEF_ID };
+						PrimordialId.PREFERED_TERM_ID };
 			}
-			UniversalFixedDescription[] descriptions = new UniversalFixedDescription[descriptionStrings.length];
+         UniversalFixedDescription[] descriptions;
+         if (defString == null) {
+            descriptions = new UniversalFixedDescription[descriptionStrings.length];
+         } else {
+            descriptions = new UniversalFixedDescription[descriptionStrings.length + 1];
+         }
 			int i = 0;
 			boolean initialCapSig = true;
 			String langCode = "en";
@@ -365,6 +379,13 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 				}
 				i++;
 			}
+         if (defString != null) {
+            descriptions[i] = new UniversalFixedDescription(Type3UuidFactory.forDesc(source.getUids(), PrimordialId.XHTML_DEF_ID.getUids(), defString),
+                  PrimordialId.CURRENT_ID.getUids(), 
+                  source.getUids(),
+                  initialCapSig, PrimordialId.XHTML_DEF_ID.getUids(), defString,
+                  langCode);
+         }
 			return descriptions;
 		}
 
