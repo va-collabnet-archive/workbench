@@ -294,4 +294,6 @@ public interface I_ConfigAceFrame {
 
     public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible);
     public boolean isToggleVisible(TOGGLES toggle);
+    
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle);
 }
