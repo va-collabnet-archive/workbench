@@ -2563,4 +2563,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       });
    }
 
+   public void setCommitAbortButtonsVisible(final boolean visible) {
+      SwingUtilities.invokeLater(new Runnable() {
+         public void run() {
+            commitButton.setVisible(visible);
+            cancelButton.setVisible(visible);
+         }
+      });
+   }
+
 }

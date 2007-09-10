@@ -1592,4 +1592,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) {
       return refsetPreferencesMap.get(toggle);
    }
+
+
+   public void setCommitAbortButtonsVisible(boolean visible) {
+      aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
+      
+   }
 }
