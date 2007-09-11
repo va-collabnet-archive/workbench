@@ -3,13 +3,13 @@
   <groupId>org.dwfa</groupId>
   <artifactId>vodb</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <name>Versioned Object Database</name>
   <url>http://www.informatics.com</url>
   <scm>
-    <connection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/tags/vodb-1.0</connection>
-    <developerConnection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/tags/vodb-1.0</developerConnection>
-    <url>https://vodb.aceworkspace.net/source/browse/vodb/tags/vodb-1.0</url>
+    <connection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</connection>
+    <developerConnection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</developerConnection>
+    <url>https://vodb.aceworkspace.net/source/browse/vodb/trunk/dev/</url>
   </scm>
   <dependencies>
     <dependency>
