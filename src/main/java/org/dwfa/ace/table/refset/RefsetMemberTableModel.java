@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
@@ -32,6 +33,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.table.I_CellTextWithTuple;
+import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
@@ -122,7 +124,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    private static REFSET_FIELDS[] booleanRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
    // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
          REFSET_FIELDS.BOOLEAN_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-                                                            // REFSET_FIELDS.BRANCH
+   // REFSET_FIELDS.BRANCH
    };
 
    private static REFSET_FIELDS[] conceptRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
@@ -132,7 +134,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    private static REFSET_FIELDS[] conceptRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
    // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
          REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-                                                         // REFSET_FIELDS.BRANCH
+   // REFSET_FIELDS.BRANCH
    };
 
    private static REFSET_FIELDS[] measurementRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
@@ -143,7 +145,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    private static REFSET_FIELDS[] measurementRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
    // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
          REFSET_FIELDS.MEASUREMENT_VALUE, REFSET_FIELDS.MEASUREMENT_UNITS_ID, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-                                                                                                      // REFSET_FIELDS.BRANCH
+   // REFSET_FIELDS.BRANCH
    };
 
    private static REFSET_FIELDS[] integerRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
@@ -153,7 +155,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    private static REFSET_FIELDS[] integerRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
    // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
          REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-                                                            // REFSET_FIELDS.BRANCH
+   // REFSET_FIELDS.BRANCH
    };
 
    private static REFSET_FIELDS[] languageRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
@@ -176,7 +178,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
          // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
          REFSET_FIELDS.ACCEPTABILITY, REFSET_FIELDS.CORRECTNESS, REFSET_FIELDS.DEGREE_OF_SYNONYMY, REFSET_FIELDS.TAG,
          REFSET_FIELDS.SCOPE, REFSET_FIELDS.PRIORITY, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-                                                                              // REFSET_FIELDS.BRANCH
+   // REFSET_FIELDS.BRANCH
    };
 
    public static REFSET_FIELDS[] getRefsetColumns(I_HostConceptPlugins host, EXT_TYPE type) {
@@ -342,7 +344,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                return -1;
             }
             conceptsToFetch.add(ebrBean.getExtension().getRefsetId());
-             for (ThinExtByRefPart part : ebrBean.getExtension().getVersions()) {
+            for (ThinExtByRefPart part : ebrBean.getExtension().getVersions()) {
                if (getExtPartClass().equals(part.getClass()) == false) {
                   break;
                }
@@ -451,10 +453,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
       }
    }
 
-   public RefsetMemberTableModel(I_HostConceptPlugins host, 
-         REFSET_FIELDS[] columns, 
-         EXT_TYPE refsetType,
-         I_HostConceptPlugins.TOGGLES toggle) {
+   public RefsetMemberTableModel(I_HostConceptPlugins host, REFSET_FIELDS[] columns, EXT_TYPE refsetType,
+                                 I_HostConceptPlugins.TOGGLES toggle) {
       super();
       this.columns = columns;
       this.host = host;
@@ -478,11 +478,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    public String getColumnName(int col) {
       return columns[col].getColumnName();
    }
-
-   public Class<?> getColumnClass(int c) {
-      return StringWithExtTuple.class;
-   }
-
+ 
    public void propertyChange(PropertyChangeEvent arg0) {
       allTuples = null;
       allExtensions = null;
@@ -553,34 +549,37 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             // Boolean extension
          case BOOLEAN_VALUE:
-            return new StringWithExtTuple(Boolean.toString(((ThinExtByRefPartBoolean) tuple.getPart()).getValue()), tuple);
+            return new StringWithExtTuple(Boolean.toString(((ThinExtByRefPartBoolean) tuple.getPart()).getValue()),
+                  tuple);
             // Concept extension
          case CONCEPT_ID:
             if (referencedConcepts.containsKey(((ThinExtByRefPartConcept) tuple.getPart()).getConceptId())) {
-               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartConcept) tuple.getPart()).getConceptId()), tuple);
+               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartConcept) tuple.getPart()).getConceptId()),
+                     tuple);
             }
             return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartConcept) tuple.getPart()).getConceptId()),
                   tuple);
 
             // Integer extension
          case INTEGER_VALUE:
-            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartInteger) tuple.getPart()).getValue()), tuple);
+            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartInteger) tuple.getPart()).getValue()),
+                  tuple);
 
             // Language extension
          case ACCEPTABILITY:
             if (referencedConcepts.containsKey(((ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId())) {
-               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId()),
-                     tuple);
+               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguage) tuple.getPart())
+                     .getAcceptabilityId()), tuple);
             }
-            return new StringWithExtTuple(Integer
-                  .toString(((ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId()), tuple);
+            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguage) tuple.getPart())
+                  .getAcceptabilityId()), tuple);
          case CORRECTNESS:
             if (referencedConcepts.containsKey(((ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId())) {
-               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId()),
-                     tuple);
+               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguage) tuple.getPart())
+                     .getCorrectnessId()), tuple);
             }
-            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId()),
-                  tuple);
+            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguage) tuple.getPart())
+                  .getCorrectnessId()), tuple);
          case DEGREE_OF_SYNONYMY:
             if (referencedConcepts.containsKey(((ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId())) {
                return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguage) tuple.getPart())
@@ -592,21 +591,21 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             // Scoped language extension
          case TAG:
             if (referencedConcepts.containsKey(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId())) {
-               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()),
-                     tuple);
+               return new StringWithExtTuple(
+                     getPrefText(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()), tuple);
             }
-            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()),
-                  tuple);
+            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguageScoped) tuple.getPart())
+                  .getTagId()), tuple);
          case SCOPE:
             if (referencedConcepts.containsKey(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId())) {
-               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId()),
-                     tuple);
+               return new StringWithExtTuple(getPrefText(((ThinExtByRefPartLanguageScoped) tuple.getPart())
+                     .getScopeId()), tuple);
             }
-            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId()),
-                  tuple);
+            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguageScoped) tuple.getPart())
+                  .getScopeId()), tuple);
          case PRIORITY:
-            return new StringWithExtTuple(
-                  Integer.toString(((ThinExtByRefPartLanguageScoped) tuple.getPart()).getPriority()), tuple);
+            return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartLanguageScoped) tuple.getPart())
+                  .getPriority()), tuple);
          case MEASUREMENT_UNITS_ID:
             if (referencedConcepts.containsKey(((ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId())) {
                return new StringWithExtTuple(getPrefText(((ThinExtByRefPartMeasurement) tuple.getPart())
@@ -680,8 +679,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
          int memberId = LocalVersionedTerminology.get().uuidToNativeWithGeneration(UUID.randomUUID(),
                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
                host.getConfig().getEditingPathSet(), Integer.MAX_VALUE);
-         ThinExtByRefVersioned extension = new ThinExtByRefVersioned(refsetId, memberId, tableComponentId, ThinExtBinder
-               .getExtensionType(refsetType));
+         ThinExtByRefVersioned extension = new ThinExtByRefVersioned(refsetId, memberId, tableComponentId,
+               ThinExtBinder.getExtensionType(refsetType));
          switch (refsetType) {
          case BOOLEAN:
             for (I_Path editPath : host.getConfig().getEditingPathSet()) {
@@ -698,7 +697,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                ThinExtByRefPartConcept conceptPart = new ThinExtByRefPartConcept();
                conceptPart.setPathId(editPath.getConceptId());
                conceptPart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
-               conceptPart.setConceptId(preferences.getConceptPreferences().getDefaultForConceptRefset().getConceptId());
+               conceptPart
+                     .setConceptId(preferences.getConceptPreferences().getDefaultForConceptRefset().getConceptId());
                conceptPart.setVersion(Integer.MAX_VALUE);
                extension.addVersion(conceptPart);
             }
@@ -718,8 +718,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                ThinExtByRefPartMeasurement measurementPart = new ThinExtByRefPartMeasurement();
                measurementPart.setPathId(editPath.getConceptId());
                measurementPart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
-               measurementPart.setUnitsOfMeasureId(preferences.getMeasurementPreferences().getDefaultUnitsOfMeasureForMeasurementRefset().getConceptId());
-               measurementPart.setMeasurementValue(preferences.getMeasurementPreferences().getDefaultMeasurementValueForMeasurementRefset());
+               measurementPart.setUnitsOfMeasureId(preferences.getMeasurementPreferences()
+                     .getDefaultUnitsOfMeasureForMeasurementRefset().getConceptId());
+               measurementPart.setMeasurementValue(preferences.getMeasurementPreferences()
+                     .getDefaultMeasurementValueForMeasurementRefset());
                measurementPart.setVersion(Integer.MAX_VALUE);
                extension.addVersion(measurementPart);
             }
@@ -729,9 +731,12 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                ThinExtByRefPartLanguage laguagePart = new ThinExtByRefPartLanguage();
                laguagePart.setPathId(editPath.getConceptId());
                laguagePart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
-               laguagePart.setAcceptabilityId(preferences.getLanguagePreferences().getDefaultAcceptabilityForLanguageRefset().getConceptId());
-               laguagePart.setCorrectnessId(preferences.getLanguagePreferences().getDefaultCorrectnessForLanguageRefset().getConceptId());
-               laguagePart.setDegreeOfSynonymyId(preferences.getLanguagePreferences().getDefaultDegreeOfSynonymyForLanguageRefset().getConceptId());
+               laguagePart.setAcceptabilityId(preferences.getLanguagePreferences()
+                     .getDefaultAcceptabilityForLanguageRefset().getConceptId());
+               laguagePart.setCorrectnessId(preferences.getLanguagePreferences()
+                     .getDefaultCorrectnessForLanguageRefset().getConceptId());
+               laguagePart.setDegreeOfSynonymyId(preferences.getLanguagePreferences()
+                     .getDefaultDegreeOfSynonymyForLanguageRefset().getConceptId());
                laguagePart.setVersion(Integer.MAX_VALUE);
                extension.addVersion(laguagePart);
             }
@@ -741,12 +746,18 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                ThinExtByRefPartLanguageScoped scopedLaguagePart = new ThinExtByRefPartLanguageScoped();
                scopedLaguagePart.setPathId(editPath.getConceptId());
                scopedLaguagePart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
-               scopedLaguagePart.setAcceptabilityId(preferences.getLanguageScopedPreferences().getDefaultAcceptabilityForLanguageRefset().getConceptId());
-               scopedLaguagePart.setCorrectnessId(preferences.getLanguageScopedPreferences().getDefaultCorrectnessForLanguageRefset().getConceptId());
-               scopedLaguagePart.setDegreeOfSynonymyId(preferences.getLanguageScopedPreferences().getDefaultDegreeOfSynonymyForLanguageRefset().getConceptId());
-               scopedLaguagePart.setScopeId(preferences.getLanguageScopedPreferences().getDefaultScopeForScopedLanguageRefset().getConceptId());
-               scopedLaguagePart.setTagId(preferences.getLanguageScopedPreferences().getDefaultTagForScopedLanguageRefset().getConceptId());
-               scopedLaguagePart.setPriority(preferences.getLanguageScopedPreferences().getDefaultPriorityForScopedLanguageRefset());
+               scopedLaguagePart.setAcceptabilityId(preferences.getLanguageScopedPreferences()
+                     .getDefaultAcceptabilityForLanguageRefset().getConceptId());
+               scopedLaguagePart.setCorrectnessId(preferences.getLanguageScopedPreferences()
+                     .getDefaultCorrectnessForLanguageRefset().getConceptId());
+               scopedLaguagePart.setDegreeOfSynonymyId(preferences.getLanguageScopedPreferences()
+                     .getDefaultDegreeOfSynonymyForLanguageRefset().getConceptId());
+               scopedLaguagePart.setScopeId(preferences.getLanguageScopedPreferences()
+                     .getDefaultScopeForScopedLanguageRefset().getConceptId());
+               scopedLaguagePart.setTagId(preferences.getLanguageScopedPreferences()
+                     .getDefaultTagForScopedLanguageRefset().getConceptId());
+               scopedLaguagePart.setPriority(preferences.getLanguageScopedPreferences()
+                     .getDefaultPriorityForScopedLanguageRefset());
                scopedLaguagePart.setVersion(Integer.MAX_VALUE);
                extension.addVersion(scopedLaguagePart);
             }
@@ -765,4 +776,134 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
          AceLog.getAppLog().alertAndLogException(e);
       }
    }
+
+   public boolean isCellEditable(int row, int col) {
+      if (ACE.editMode == false) {
+         return false;
+      }
+      if (allTuples.get(row).getVersion() == Integer.MAX_VALUE) {
+         if (AceLog.getAppLog().isLoggable(Level.FINER)) {
+            AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
+         }
+         return true;
+      }
+      return false;
+   }
+
+   public void setValueAt(Object value, int row, int col) {
+      ThinExtByRefTuple extTuple = allTuples.get(row);
+      if (extTuple.getVersion() == Integer.MAX_VALUE) {
+         switch (columns[col]) {
+         case REFSET_ID:
+            Integer refsetId = (Integer) value;
+            extTuple.getCore().setRefsetId(refsetId);
+            referencedConcepts.put(refsetId, ConceptBean.get(refsetId));
+            break;
+         case MEMBER_ID:
+            break;
+         case COMPONENT_ID:
+            break;
+         case STATUS:
+            Integer statusId = (Integer) value;
+            extTuple.setStatus(statusId);
+            referencedConcepts.put(statusId, ConceptBean.get(statusId));
+         case VERSION:
+            break;
+         case BRANCH:
+            break;
+         case BOOLEAN_VALUE:
+            Boolean booleanValue = (Boolean) value;
+            ((ThinExtByRefPartBoolean) extTuple.getPart()).setValue(booleanValue);
+            break;
+         case CONCEPT_ID:
+            Integer conceptId = (Integer) value;
+            ((ThinExtByRefPartConcept) extTuple.getPart()).setConceptId(conceptId);
+            referencedConcepts.put(conceptId, ConceptBean.get(conceptId));
+            break;
+         case INTEGER_VALUE:
+            Integer intValue = (Integer) value;
+            ((ThinExtByRefPartInteger) extTuple.getPart()).setValue(intValue);
+            break;
+         case ACCEPTABILITY:
+            Integer acceptabilityId = (Integer) value;
+            ((ThinExtByRefPartLanguage) extTuple.getPart()).setAcceptabilityId(acceptabilityId);
+            referencedConcepts.put(acceptabilityId, ConceptBean.get(acceptabilityId));
+            break;
+         case CORRECTNESS:
+            Integer correctnessId = (Integer) value;
+            ((ThinExtByRefPartLanguage) extTuple.getPart()).setCorrectnessId(correctnessId);
+            referencedConcepts.put(correctnessId, ConceptBean.get(correctnessId));
+            break;
+         case DEGREE_OF_SYNONYMY:
+            Integer dosId = (Integer) value;
+            ((ThinExtByRefPartLanguage) extTuple.getPart()).setDegreeOfSynonymyId(dosId);
+            referencedConcepts.put(dosId, ConceptBean.get(dosId));
+            break;
+         case TAG:
+            Integer tagId = (Integer) value;
+            ((ThinExtByRefPartLanguageScoped) extTuple.getPart()).setTagId(tagId);
+            referencedConcepts.put(tagId, ConceptBean.get(tagId));
+            break;
+         case SCOPE:
+            Integer scopeId = (Integer) value;
+            ((ThinExtByRefPartLanguageScoped) extTuple.getPart()).setScopeId(scopeId);
+            referencedConcepts.put(scopeId, ConceptBean.get(scopeId));
+            break;
+         case PRIORITY:
+            Integer priority = (Integer) value;
+            ((ThinExtByRefPartLanguageScoped) extTuple.getPart()).setPriority(priority);
+            break;
+         case MEASUREMENT_UNITS_ID:
+            Integer unitsId = (Integer) value;
+            ((ThinExtByRefPartMeasurement) extTuple.getPart()).setUnitsOfMeasureId(unitsId);
+            referencedConcepts.put(unitsId, ConceptBean.get(unitsId));
+            break;
+         case MEASUREMENT_VALUE:
+            Double measurementValue = (Double) value;
+            ((ThinExtByRefPartMeasurement) extTuple.getPart()).setMeasurementValue(measurementValue);
+            break;
+         }
+         fireTableDataChanged();
+      }
+   }
+   public Class<?> getColumnClass(int c) {
+      switch (columns[c]) {
+      case REFSET_ID:
+         return Number.class;
+      case MEMBER_ID:
+         return Number.class;
+      case COMPONENT_ID:
+         return Number.class;
+      case STATUS:
+         return Number.class;
+      case VERSION:
+         return Number.class;
+      case BRANCH:
+         return Number.class;
+      case BOOLEAN_VALUE:
+         return Boolean.class;
+      case CONCEPT_ID:
+         return Number.class;
+      case INTEGER_VALUE:
+         return Integer.class;
+      case ACCEPTABILITY:
+         return Number.class;
+      case CORRECTNESS:
+         return Number.class;
+      case DEGREE_OF_SYNONYMY:
+         return Number.class;
+      case TAG:
+         return Number.class;
+      case SCOPE:
+         return Number.class;
+      case PRIORITY:
+         return Integer.class;
+      case MEASUREMENT_UNITS_ID:
+         return Number.class;
+      case MEASUREMENT_VALUE:
+         return Double.class;
+      }
+      return String.class;
+   }
+
 }

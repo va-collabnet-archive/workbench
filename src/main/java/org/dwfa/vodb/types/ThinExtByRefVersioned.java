@@ -72,4 +72,12 @@ public class ThinExtByRefVersioned {
       versions.add(part);
    }
 
+   public void setRefsetId(int refsetId) {
+      this.refsetId = refsetId;
+   }
+
+   public void setTypeId(int typeId) {
+      this.typeId = typeId;
+   }
+
 }
