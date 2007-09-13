@@ -78,6 +78,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
     * @parameter 
     */
    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta" };
+   private String[] forbiddenRoots = { "org.dwfa.cement" };
 
 	/**
 	 * @parameter
@@ -166,6 +167,13 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
                         for (String allowedRoot: allowedRoots) {
                            if (className.startsWith(allowedRoot)) {
                               allowed = true;
+                              for (String forbidden: forbiddenRoots) {
+                                 if (className.startsWith(forbidden)) {
+                                    getLog().info("forbidden: " + je.getName());
+                                    allowed = false;
+                                    break;
+                                 }
+                              }
                               //getLog().info("allowed: " + je.getName());
                               break;
                            }
