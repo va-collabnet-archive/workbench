@@ -150,7 +150,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 							localRepository, d);
 					File dependencyFile = new File(dependencyPath);
 					if (dependencyFile.exists()) {
-						//getLog().info("writing annotated beans for: " + dependencyPath);
+						getLog().info("writing annotated beans for: " + dependencyPath);
 						JarFile jf = new JarFile(dependencyPath);
 						Enumeration<JarEntry> jarEnum = jf.entries();
 						while (jarEnum.hasMoreElements()) {
