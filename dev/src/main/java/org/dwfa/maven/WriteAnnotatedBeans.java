@@ -74,6 +74,11 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
     */
    private boolean throwWriteBeansExceptions = false;
 
+   /**
+    * @parameter 
+    */
+   private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta" };
+
 	/**
 	 * @parameter
 	 * @required
@@ -156,27 +161,35 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 						while (jarEnum.hasMoreElements()) {
 							JarEntry je = jarEnum.nextElement();
 							if (je.getName().endsWith(".class")) {
-								String className = je.getName().replace('/', '.');
-								classNameNoDotClass = className.substring(0,
-										className.length() - 6);
-								Class<?> c = libLoader.loadClass(classNameNoDotClass);
-								Annotation a = c.getAnnotation(beanListClass);
-								if (c.getAnnotation(beanListClass) != null) {
-									BeanList bl = (BeanList) Proxy.newProxyInstance(
-											getClass().getClassLoader(),
-											new Class[] { BeanList.class },
-											new GenericInvocationHandler(a));
-									for (Spec s : bl.specs()) {
-										if (s.type().equals(BeanType.DATA_BEAN)) {
-											writeDataBean(c, s);
-										} else if (s.type().equals(BeanType.GENERIC_BEAN)) {
-											writeGenericBean(c, s);
-										} else if (s.type().equals(BeanType.TASK_BEAN)) {
-											writeTaskBean(c, s);
-										}
-									}
-								}
-							}
+                        boolean allowed = false;
+                        for (String allowedRoot: allowedRoots) {
+                           if (je.getName().startsWith(allowedRoot)) {
+                              allowed = true;
+                              break;
+                           }
+                        }
+                        if (allowed) {
+                           String className = je.getName().replace('/', '.');
+                           classNameNoDotClass = className.substring(0,
+                                 className.length() - 6);
+                           Class<?> c = libLoader.loadClass(classNameNoDotClass);
+                           Annotation a = c.getAnnotation(beanListClass);
+                           if (c.getAnnotation(beanListClass) != null) {
+                              BeanList bl = (BeanList) Proxy.newProxyInstance(
+                                    getClass().getClassLoader(),
+                                    new Class[] { BeanList.class },
+                                    new GenericInvocationHandler(a));
+                              for (Spec s : bl.specs()) {
+                                 if (s.type().equals(BeanType.DATA_BEAN)) {
+                                    writeDataBean(c, s);
+                                 } else if (s.type().equals(BeanType.GENERIC_BEAN)) {
+                                    writeGenericBean(c, s);
+                                 } else if (s.type().equals(BeanType.TASK_BEAN)) {
+                                    writeTaskBean(c, s);
+                                 }
+                              }
+                           }
+                        }                        }
 						}						
 					} else {
 						getLog().info(
