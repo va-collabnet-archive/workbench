@@ -161,20 +161,22 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 						while (jarEnum.hasMoreElements()) {
 							JarEntry je = jarEnum.nextElement();
 							if (je.getName().endsWith(".class")) {
+                        String className = je.getName().replace('/', '.');
                         boolean allowed = false;
                         for (String allowedRoot: allowedRoots) {
-                           if (je.getName().startsWith(allowedRoot)) {
+                           if (className.startsWith(allowedRoot)) {
                               allowed = true;
+                              //getLog().info("allowed: " + je.getName());
                               break;
                            }
                         }
                         if (allowed) {
-                           String className = je.getName().replace('/', '.');
                            classNameNoDotClass = className.substring(0,
                                  className.length() - 6);
                            Class<?> c = libLoader.loadClass(classNameNoDotClass);
                            Annotation a = c.getAnnotation(beanListClass);
                            if (c.getAnnotation(beanListClass) != null) {
+                              //getLog().info("Writing annotation for: " + c.getCanonicalName());
                               BeanList bl = (BeanList) Proxy.newProxyInstance(
                                     getClass().getClassLoader(),
                                     new Class[] { BeanList.class },
