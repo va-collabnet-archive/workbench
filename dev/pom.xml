@@ -10,7 +10,7 @@
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
   <name>Core Distributed Workflow Architecture Components</name>
-  <url>http://www.informatics.com</url>
+  <url>http://mgr.cubit.aceworkspace.net:8081/dwfa/core/</url>
   <issueManagement>
     <system>Scarab</system>
     <url>https://core.aceworkspace.net/servlets/Scarab</url>
@@ -20,7 +20,20 @@
     <developerConnection>scm:svn:https://core.aceworkspace.net/svn/core/trunk/dev</developerConnection>
     <url>https://core.aceworkspace.net/source/browse/core/trunk/dev/</url>
   </scm>
-  <dependencies>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>aceworkspace.net</id>
+            <name>aceworkspace.net</name>
+            <url>file:///ciweb/webapps/maven2</url>
+            <layout>default</layout>
+        </repository>
+        <site>
+            <id>aceworkspace.net</id>
+            <url>file:///ciweb/webapps/dwfa/core</url>
+        </site>
+    </distributionManagement>
+    <dependencies>
       <dependency>
           <groupId>org.dwfa.jini</groupId>
           <artifactId>mahalo</artifactId>
