@@ -124,7 +124,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   XHTML_DEF(PrimordialId.XHTML_DEF_ID, new String[] {"xhtml def"}, null,
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                  EXTENSION_TABLE(PrimordialId.XHTML_DEF_ID, new String[] {"extension table"}, null,
+                  EXTENSION_TABLE(PrimordialId.EXTENSION_TABLE_ID, new String[] {"extension table"}, null,
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   CHANGE_COMMENT("change comment",
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),

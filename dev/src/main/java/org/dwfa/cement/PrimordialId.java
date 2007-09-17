@@ -16,7 +16,8 @@ public enum PrimordialId {
 	IS_A_REL_ID(7, UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66")),
 	DEFINING_CHARACTERISTIC_ID(8, UUID.fromString("a4c6bf72-8fb6-11db-b606-0800200c9a66")),
 	NOT_REFINABLE_ID(9, UUID.fromString("e4cde443-8fb6-11db-b606-0800200c9a66")),
-   PREFERED_TERM_ID(10, UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44"));
+   PREFERED_TERM_ID(10, UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44")),
+   EXTENSION_TABLE_ID(11, UUID.fromString("0cbed8ca-650d-11dc-8314-0800200c9a66"));
 
 	private int sequenceRelativeId;
 	private Collection<UUID> uids;
