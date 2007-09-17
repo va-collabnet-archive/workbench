@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.font.TextAttribute;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
@@ -15,25 +14,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.AttributedString;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import java.util.logging.SimpleFormatter;
 
 import javax.imageio.ImageIO;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-
-import sun.java2d.loops.DrawLine;
 
 /**
 *
@@ -46,10 +36,10 @@ import sun.java2d.loops.DrawLine;
 * <br>
 * <br>
 * @see <code>org.apache.maven.plugin.AbstractMojo</code>
-* @author PeterVawser 
-* @goal buildgraph
+* @author Peter Vawser 
+* 
 */
-public class MojoGraph extends AbstractMojo{
+public class MojoGraph {
 	private List<float[]> coords = new ArrayList<float[]>();	
 	private HashMap<String, double[][]> dataSource;
 	
@@ -147,16 +137,7 @@ public class MojoGraph extends AbstractMojo{
 	public void setDataSource(HashMap<String, double[][]> dataMap){
 		dataSource = dataMap;
 	}
-  
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			MojoGraph mg = new MojoGraph();
-			mg.createGraph();
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
-    
+      
 	public void createGraph()throws MojoExecutionException{
 	  
 		  /*
