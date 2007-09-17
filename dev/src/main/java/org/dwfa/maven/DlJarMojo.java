@@ -18,7 +18,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import com.sun.jini.tool.ClassDep;
 
 /**
- * Goal which writes the classnames to include in a <service>-dl.jar file.
+ * Goal which writes the classnames to include in a &lt;service&gt;-dl.jar file.
  * 
  * @goal class-dep
  * @requiresDependencyResolution compile
