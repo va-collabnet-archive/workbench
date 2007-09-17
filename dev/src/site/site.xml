@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="foundation">
+<project name="dwfa-mojo">
   <bannerLeft>
     <src>images/module.jpg</src>
   </bannerLeft>
@@ -16,10 +16,13 @@
       <item name="Apache" href="http://www.apache.org/" />
       <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
     </links>
+    
     <menu name="Module">
       <item name="Module Home" href="index.html"/>
       <item name="Parent Module: DWFA Master" href="../index.html"/>
+      <item name="Goals" href="plugin-info.html"/>
     </menu>
+    
     ${reports}
    </body>
 </project>
