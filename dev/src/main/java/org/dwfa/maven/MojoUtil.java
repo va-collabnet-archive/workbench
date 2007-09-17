@@ -105,7 +105,9 @@ public class MojoUtil {
 				// don't add
 			} else if (d.getScope().equals("runtime-directory")) {
 				// don't add
-			} else {
+			} else if (d.getScope().equals("system")) {
+            // don't add
+         } else {
 				dependencyWithoutProvided.add(d);
 			}
 		}

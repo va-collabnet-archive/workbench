@@ -91,10 +91,12 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 			char[] cbuf = new char[1024];
 			byte[] bbuf = new byte[1024];
 			for (Dependency d : dependencies) {
-				if (d.getScope().equals("provided")) {
-					continue;
-				}
-
+            if (d.getScope().equals("provided")) {
+               continue;
+            }
+            if (d.getScope().equals("system")) {
+               continue;
+            }
 				if (d.getScope().equals("runtime-directory")) {
 					continue;
 				}

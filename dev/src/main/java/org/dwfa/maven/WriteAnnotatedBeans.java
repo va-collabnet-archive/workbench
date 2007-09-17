@@ -152,6 +152,10 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 						continue;
 					} 
 
+               if (d.getScope().equals("system")) {
+                  continue;
+               }
+
 					String dependencyPath = MojoUtil.dependencyToPath(
 							localRepository, d);
 					File dependencyFile = new File(dependencyPath);
