@@ -5,12 +5,18 @@
   <packaging>jar</packaging>
   <version>1.1-SNAPSHOT</version>
   <name>ACE API</name>
-  <url>http://www.informatics.com</url>
+  <url>http://mgr.cubit.aceworkspace.net:8081/dwfa/ace-api</url>
   <scm>
     <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</connection>
     <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</developerConnection>
     <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
   </scm>
+  <distributionManagement>
+    <site>
+      <id>aceworkspace.net</id>
+      <url>file:///ciweb/webapps/dwfa/ace-api</url>
+    </site>
+  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
