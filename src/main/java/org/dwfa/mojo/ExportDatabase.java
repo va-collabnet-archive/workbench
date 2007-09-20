@@ -119,6 +119,23 @@ public class ExportDatabase extends AbstractMojo {
     */
    private ConceptDescriptor[] statusValuesForExport;
 
+   /**
+    * Set of allowed roots of which all concepts must be 
+    * subtypes of to be exported
+    * 
+    * @parameter
+    * @required
+    */
+   private ConceptDescriptor[] allowedRoots;
+
+   /**
+    * The set of relationship types used to compute the subtype relationship
+    * 
+    * @parameter
+    * @required
+    */   
+   private ConceptDescriptor[] relTypesToAllowedRoot;
+   
    private class PrepareConceptData implements I_ProcessConcepts {
       I_TermFactory termFactory;
 
@@ -141,13 +158,19 @@ public class ExportDatabase extends AbstractMojo {
       private I_IntSet allowedStatus;
       
       private Writer errorWriter;
+
+	  private Set<I_GetConceptData> allowedRootsSet;
+
+	  private I_IntSet relTypesToAllowedRootIntSet;
       
-      public PrepareConceptData(Set<I_Position> positions, I_IntSet allowedStatus, Writer errorWriter) {
+      public PrepareConceptData(Set<I_Position> positions, I_IntSet allowedStatus, Set<I_GetConceptData> allowedRootsSet, I_IntSet relTypesToAllowedRootIntSet, Writer errorWriter) {
          super();
          termFactory = LocalVersionedTerminology.get();
          this.positions = positions;
          this.allowedStatus = allowedStatus;
          this.errorWriter = errorWriter;
+         this.allowedRootsSet = allowedRootsSet;
+         this.relTypesToAllowedRootIntSet = relTypesToAllowedRootIntSet;
       }
 
       public ArrayList<String> getUnmatchedConcepts() {
@@ -184,17 +207,27 @@ public class ExportDatabase extends AbstractMojo {
          // allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 
          totalConcepts++;
-         /*
-          * Get concept details
-          */
-         if (getUuidBasedConceptDetails(concept, allowedStatus)) {
-            getUuidBasedRelDetails(concept, allowedStatus, null);
-            /*
-             * Get Description details
-             */
-            getUuidBasedDescriptionDetails(concept, allowedStatus, null);
+         
+         boolean allowedRoot = false;
+         for (I_GetConceptData root : allowedRootsSet) {
+			if (root.isParentOf(concept, allowedStatus, relTypesToAllowedRootIntSet, positions, false)) {
+				allowedRoot = true;
+				break;
+			}
+		 }
+         
+         if (allowedRoot) {
+	         /*
+	          * Get concept details
+	          */
+	         if (getUuidBasedConceptDetails(concept, allowedStatus)) {
+	            getUuidBasedRelDetails(concept, allowedStatus, null);
+	            /*
+	             * Get Description details
+	             */
+	            getUuidBasedDescriptionDetails(concept, allowedStatus, null);
+	         }
          }
-
 
       }// End method processConcept
 
@@ -476,7 +509,18 @@ public class ExportDatabase extends AbstractMojo {
             statusValues.add(statusConcept.getConceptId());
             statusValueList.add(statusConcept);
          }
-         System.out.println(" processing concepts for positions: " + positions + " with status: " + statusValueList);
+         I_IntSet relTypeIntSet = termFactory.newIntSet();
+         List<I_GetConceptData> relTypes = new ArrayList<I_GetConceptData>();
+         for (ConceptDescriptor relType: relTypesToAllowedRoot) {
+            I_GetConceptData relTypeConcept = relType.getVerifiedConcept();
+            relTypeIntSet.add(relTypeConcept.getConceptId());
+            relTypes.add(relTypeConcept);
+         }
+         Set<I_GetConceptData> rootSet = new HashSet<I_GetConceptData>();
+         for (ConceptDescriptor root: relTypesToAllowedRoot) {
+            rootSet.add(root.getVerifiedConcept());
+         }
+         getLog().info(" processing concepts for positions: " + positions + " with status: " + statusValueList + ", rel types:" + relTypes + ", roots:" + rootSet);
 
          // getLog().info("---------------------------------------");
          // getLog().info("--- total concepts == " + pcd.getTotals() +" ---");
@@ -497,8 +541,7 @@ public class ExportDatabase extends AbstractMojo {
          File relationshipFile = new File(outputDirectory + relationshipsDataFileName);
          File descriptionFile = new File(outputDirectory + descriptionsDataFileName);
 
-         
-         PrepareConceptData pcd = new PrepareConceptData(positions, statusValues, errorWriter);
+         PrepareConceptData pcd = new PrepareConceptData(positions, statusValues, rootSet, relTypeIntSet, errorWriter);
          termFactory.iterateConcepts(pcd);
 
          writeToFile(conceptFile, pcd.getConceptDistDetails());
@@ -528,5 +571,21 @@ public class ExportDatabase extends AbstractMojo {
    public void setStatusValuesForExport(ConceptDescriptor[] statusValuesForExport) {
       this.statusValuesForExport = statusValuesForExport;
    }
+
+public ConceptDescriptor[] getAllowedRoots() {
+	return allowedRoots;
+}
+
+public void setAllowedRoots(ConceptDescriptor[] allowedRoots) {
+	this.allowedRoots = allowedRoots;
+}
+
+public ConceptDescriptor[] getRelTypesToAllowedRoot() {
+	return relTypesToAllowedRoot;
+}
+
+public void setRelTypesToAllowedRoot(ConceptDescriptor[] relTypesToAllowedRoot) {
+	this.relTypesToAllowedRoot = relTypesToAllowedRoot;
+}
 
 }// End class ExportDatabase
