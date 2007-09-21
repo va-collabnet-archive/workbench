@@ -20,7 +20,6 @@
     <menu name="Module">
       <item name="Module Home" href="index.html"/>
       <item name="Parent Module: DWFA Master" href="../index.html"/>
-      <item name="Goals" href="plugin-info.html"/>
     </menu>
     
     ${reports}
