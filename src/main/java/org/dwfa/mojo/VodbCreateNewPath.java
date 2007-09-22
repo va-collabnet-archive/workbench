@@ -35,7 +35,6 @@ public class VodbCreateNewPath extends AbstractMojo {
      * Path origins
      * 
      * @parameter
-     * @required
      */
 	SimpleUniversalAcePosition[] origins;
 
@@ -84,11 +83,13 @@ public class VodbCreateNewPath extends AbstractMojo {
            } 
             I_TermFactory tf = LocalVersionedTerminology.get();
             I_ConfigAceFrame activeConfig = tf.getActiveAceFrameConfig();
-
-            Set<I_Position> pathOrigins = new HashSet<I_Position>(origins.length);
-            for (SimpleUniversalAcePosition pos : origins) {
-                I_Path originPath = tf.getPath(pos.getPathId());
-                pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
+            Set<I_Position> pathOrigins = null;
+            if (origins != null) {
+               pathOrigins = new HashSet<I_Position>(origins.length);
+               for (SimpleUniversalAcePosition pos : origins) {
+                   I_Path originPath = tf.getPath(pos.getPathId());
+                   pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
+               }
             }
 
             I_GetConceptData parent = pathParent.getVerifiedConcept();

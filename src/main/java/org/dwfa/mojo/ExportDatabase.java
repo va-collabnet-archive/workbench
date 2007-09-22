@@ -150,6 +150,10 @@ public class ExportDatabase extends AbstractMojo {
       private int conceptsMatched = 0;
 
       private int conceptsUnmatched = 0;
+      
+      private int conceptsSuppressed = 0;
+      
+      private int maxSuppressed = Integer.MAX_VALUE;
 
       private ArrayList<String> unmatchedConcepts = new ArrayList<String>();
       
@@ -202,6 +206,10 @@ public class ExportDatabase extends AbstractMojo {
       }
 
       public void processConcept(I_GetConceptData concept) throws Exception {
+         
+         if (conceptsSuppressed > maxSuppressed) {
+            return;
+         }
 
          // I_IntSet allowedTypes = termFactory.newIntSet();
          // allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
@@ -210,7 +218,7 @@ public class ExportDatabase extends AbstractMojo {
          
          boolean allowedRoot = false;
          for (I_GetConceptData root : allowedRootsSet) {
-			if (root.isParentOf(concept, allowedStatus, relTypesToAllowedRootIntSet, positions, false)) {
+			if (root.isParentOf(concept, allowedStatus, relTypesToAllowedRootIntSet, positions, false) || root.equals(concept)) {
 				allowedRoot = true;
 				break;
 			}
@@ -227,6 +235,9 @@ public class ExportDatabase extends AbstractMojo {
 	             */
 	            getUuidBasedDescriptionDetails(concept, allowedStatus, null);
 	         }
+         } else {
+            conceptsSuppressed++;
+            getLog().info("Suppressing: " + concept);
          }
 
       }// End method processConcept
@@ -263,8 +274,12 @@ public class ExportDatabase extends AbstractMojo {
             return false;
          } else {
             StringBuilder stringBuilder = new StringBuilder("");
-            for (I_ConceptAttributeTuple attribTup : concept.getConceptAttributeTuples(allowedStatus, positions)) {
-               conceptsMatched++;
+            List<I_ConceptAttributeTuple> matches = concept.getConceptAttributeTuples(allowedStatus, positions);
+            if (matches == null || matches.size() == 0) {
+               return false;
+            }
+            conceptsMatched++;
+            for (I_ConceptAttributeTuple attribTup : matches) {
                // Snomed core
                // ConceptId
                createRecord(stringBuilder, concept.getUids().get(0));
@@ -476,6 +491,14 @@ public class ExportDatabase extends AbstractMojo {
          }
       }// End method getUuidBasedDescriptionDetails
 
+      public int getConceptsSuppressed() {
+         return conceptsSuppressed;
+      }
+
+      public void setConceptsSuppressed(int conceptsSuppressed) {
+         this.conceptsSuppressed = conceptsSuppressed;
+      }
+
    }// End class CheckConceptStatus
 
    private void createRecord(StringBuilder stringBuilder, Object fieldData) {
@@ -517,7 +540,7 @@ public class ExportDatabase extends AbstractMojo {
             relTypes.add(relTypeConcept);
          }
          Set<I_GetConceptData> rootSet = new HashSet<I_GetConceptData>();
-         for (ConceptDescriptor root: relTypesToAllowedRoot) {
+         for (ConceptDescriptor root: allowedRoots) {
             rootSet.add(root.getVerifiedConcept());
          }
          getLog().info(" processing concepts for positions: " + positions + " with status: " + statusValueList + ", rel types:" + relTypes + ", roots:" + rootSet);
