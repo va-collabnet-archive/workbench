@@ -751,7 +751,7 @@ public class VodbEnv implements I_ImplementTermFactory {
       } catch (DatabaseException e) {
          throw new ToIoException(e);
       }
-      throw new ToIoException(new DatabaseException("Concept: " + conceptId + " not found."));
+      throw new ToIoException(new DatabaseException("Concept attributes for: " + ConceptBean.get(conceptId) + " not found."));
    }
 
    public I_DescriptionVersioned getDescription(int descId) throws IOException {
@@ -1981,7 +1981,7 @@ public class VodbEnv implements I_ImplementTermFactory {
          }
          return (I_Path) pathBinder.entryToObject(pathValue);
       }
-      throw new DatabaseException("Path: " + nativeId + " not found.");
+      throw new DatabaseException("Path: " + ConceptBean.get(nativeId).toString() + " not found.");
    }
 
    public boolean hasPath(int nativeId) throws DatabaseException {

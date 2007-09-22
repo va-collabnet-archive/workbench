@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
-import org.dwfa.ace.utypes.UniversalAceExtByRefPartLanguage;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartMeasurement;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -51,6 +50,21 @@ public class ThinExtByRefPartMeasurement extends ThinExtByRefPart {
       universalPart.setStatusUid(tf.getUids(getStatus()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
+   }
+
+   @Override
+   public ThinExtByRefPart duplicatePart() {
+      return new ThinExtByRefPartMeasurement(this);
+   }
+
+   public ThinExtByRefPartMeasurement(ThinExtByRefPartMeasurement another) {
+      super(another);
+      this.unitsOfMeasureId = another.unitsOfMeasureId;
+      this.measurementValue = another.measurementValue;
+   }
+
+   public ThinExtByRefPartMeasurement() {
+      super();
    }
 
 }

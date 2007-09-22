@@ -44,4 +44,16 @@ public abstract class ThinExtByRefPart {
    
    public abstract UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
 
+   public abstract ThinExtByRefPart duplicatePart();
+   
+   public ThinExtByRefPart(ThinExtByRefPart another) {
+      super();
+      this.pathId = another.pathId;
+      this.version = another.version;
+      this.status = another.status;
+   }
+   public ThinExtByRefPart() {
+      super();
+   }
+   
 }

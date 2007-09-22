@@ -39,7 +39,9 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.je.DatabaseException;
@@ -306,7 +308,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData, I_Trans
             }
          }
          return getText();
-     } catch (IndexOutOfBoundsException e) {
+      } catch (IndexOutOfBoundsException e) {
          try {
             return getText();
          } catch (IndexOutOfBoundsException e2) {
@@ -315,8 +317,35 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData, I_Trans
       }
    }
 
+   private int fsDescNid = Integer.MIN_VALUE;
+
+   private int fsXmlDescNid = Integer.MIN_VALUE;
+
    private String getText() {
+
       List<I_DescriptionVersioned> localDesc = getUncommittedDescriptions();
+      if (localDesc.size() == 0) {
+         try {
+            if (fsDescNid == Integer.MIN_VALUE) {
+               fsDescNid = LocalFixedTerminology.getStore().getNid(
+                     ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.getUids());
+               fsDescNid = LocalFixedTerminology.getStore().getNid(
+                     ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            }
+            I_DescriptionVersioned desc = getDescriptions().get(0);
+            for (I_DescriptionVersioned d : getDescriptions()) {
+               for (I_DescriptionPart part : d.getVersions()) {
+                  if ((part.getTypeId() == fsDescNid) || (part.getTypeId() == fsXmlDescNid)) {
+                     return part.getText();
+                  }
+               }
+            }
+
+            return desc.getVersions().get(0).getText();
+         } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
+      }
       I_DescriptionVersioned tdv = localDesc.get(0);
       List<I_DescriptionPart> versions = tdv.getVersions();
       I_DescriptionPart first = versions.get(0);

@@ -9,6 +9,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.vodb.ProcessConstants.FORMAT;
 import org.dwfa.vodb.types.Path;
 
@@ -33,7 +34,11 @@ public class LoadBdb {
       AceLog.getAppLog().info("Starting to process " + dataDir);
       loadConstants.executeFromDir(dataDir);
       Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
-      AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
+      try {
+         AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
+      } catch (NoMappingException e) {
+         AceLog.getAppLog().info(e.getLocalizedMessage());
+      }
       AceLog.getAppLog().info("Finished loading " + dataDir + ". Elapsed time: "
             + timer.getElapsedTime());
       printElapsedTime();

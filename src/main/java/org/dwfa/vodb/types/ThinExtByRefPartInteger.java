@@ -41,4 +41,18 @@ public class ThinExtByRefPartInteger extends ThinExtByRefPart {
       return universalPart;
    }
 
+   @Override
+   public ThinExtByRefPart duplicatePart() {
+      return new ThinExtByRefPartInteger(this);
+   }
+
+   public ThinExtByRefPartInteger(ThinExtByRefPartInteger another) {
+      super(another);
+      this.value = another.value;
+   }
+
+   public ThinExtByRefPartInteger() {
+      super();
+   }
+
 }

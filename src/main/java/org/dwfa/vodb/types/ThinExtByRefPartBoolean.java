@@ -42,4 +42,18 @@ public class ThinExtByRefPartBoolean extends ThinExtByRefPart {
       return booleanPart;
    }
 
+   @Override
+   public ThinExtByRefPart duplicatePart() {
+      return new ThinExtByRefPartBoolean(this);
+   }
+
+   public ThinExtByRefPartBoolean() {
+      super();
+   }
+
+   public ThinExtByRefPartBoolean(ThinExtByRefPartBoolean another) {
+      super(another);
+      this.value = another.value;
+   }
+
 }

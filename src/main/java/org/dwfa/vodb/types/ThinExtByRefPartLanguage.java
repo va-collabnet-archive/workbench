@@ -57,5 +57,18 @@ public class ThinExtByRefPartLanguage extends ThinExtByRefPart {
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
    }
+   @Override
+   public ThinExtByRefPart duplicatePart() {
+      return new ThinExtByRefPartLanguage(this);
+   }
+   public ThinExtByRefPartLanguage(ThinExtByRefPartLanguage another) {
+      super(another);
+      this.acceptabilityId = another.acceptabilityId;
+      this.correctnessId = another.correctnessId;
+      this.degreeOfSynonymyId = another.degreeOfSynonymyId;
+   }
+   public ThinExtByRefPartLanguage() {
+      super();
+   }
 
 }

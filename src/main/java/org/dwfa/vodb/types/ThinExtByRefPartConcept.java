@@ -12,6 +12,17 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 public class ThinExtByRefPartConcept extends ThinExtByRefPart {
    private int conceptId;
 
+   public ThinExtByRefPartConcept(ThinExtByRefPartConcept another) {
+      super(another);
+      this.conceptId = another.conceptId;
+   }
+   
+
+   public ThinExtByRefPartConcept() {
+      super();
+   }
+
+
    public int getConceptId() {
       return conceptId;
    }
@@ -39,6 +50,11 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart {
       universalPart.setStatusUid(tf.getUids(getStatus()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
+   }
+
+   @Override
+   public ThinExtByRefPart duplicatePart() {
+      return new ThinExtByRefPartConcept(this);
    }
 
 }

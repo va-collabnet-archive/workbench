@@ -14,6 +14,17 @@ public class ThinExtByRefPartLanguageScoped extends ThinExtByRefPartLanguage {
    private int priority;
    private int tagId;
    
+   public ThinExtByRefPartLanguageScoped() {
+      super();
+   }
+   
+   public ThinExtByRefPartLanguageScoped(ThinExtByRefPartLanguageScoped another) {
+      super(another);
+      this.scopeId = another.scopeId;
+      this.priority = another.priority;
+      this.tagId = another.tagId;
+   }
+   
    public int getPriority() {
       return priority;
    }
@@ -59,6 +70,11 @@ public class ThinExtByRefPartLanguageScoped extends ThinExtByRefPartLanguage {
       universalPart.setStatusUid(tf.getUids(getStatus()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
+   }
+
+   @Override
+   public ThinExtByRefPart duplicatePart() {
+      return new ThinExtByRefPartLanguageScoped(this);
    }
 
 }

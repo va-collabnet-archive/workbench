@@ -16,11 +16,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_HoldRefsetData;
@@ -33,7 +35,6 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.table.I_CellTextWithTuple;
-import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
@@ -61,7 +62,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    private static final long serialVersionUID = 1L;
 
    public enum REFSET_FIELDS {
-      // Add extensions
+      // All extensions
       REFSET_ID("refset", 5, 75, 1000), MEMBER_ID("member id", 5, 100, 100), COMPONENT_ID("component id", 5, 100, 100), STATUS(
             "status", 5, 50, 250), VERSION("version", 5, 140, 140), BRANCH("path", 5, 90, 180),
 
@@ -463,6 +464,25 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
       this.host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
    }
 
+   public I_RefsetDefaults getRefsetPreferences() throws Exception {
+      switch (refsetType) {
+      case BOOLEAN:
+         return host.getConfig().getRefsetPreferencesForToggle(toggle).getBooleanPreferences();
+      case CONCEPT:
+         return host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences();
+      case INTEGER:
+         return host.getConfig().getRefsetPreferencesForToggle(toggle).getIntegerPreferences();
+      case LANGUAGE:
+         return host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences();
+      case SCOPED_LANGUAGE:
+         return host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences();
+      case MEASUREMENT:
+         return host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences();
+      default:
+         throw new Exception("Can't handle refset type: " + refsetType);
+      }
+   }
+
    public SmallProgressPanel getProgress() {
       return progress;
    }
@@ -478,7 +498,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    public String getColumnName(int col) {
       return columns[col].getColumnName();
    }
- 
+
    public void propertyChange(PropertyChangeEvent arg0) {
       allTuples = null;
       allExtensions = null;
@@ -636,6 +656,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
    }
 
    public REFSET_FIELDS[] getColumns() {
+      return columns;
+   }
+
+   public REFSET_FIELDS[] getFieldsForPopup() {
       return columns;
    }
 
@@ -866,6 +890,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
          fireTableDataChanged();
       }
    }
+
    public Class<?> getColumnClass(int c) {
       switch (columns[c]) {
       case REFSET_ID:
@@ -904,6 +929,31 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
          return Double.class;
       }
       return String.class;
+   }
+
+   public RefsetPopupListener makePopupListener(JTable table, I_ConfigAceFrame config) throws Exception {
+      return new RefsetPopupListener(table, config, this.getRefsetPreferences(), this);
+   }
+
+   public List<REFSET_FIELDS> getPopupFields() {
+      ArrayList<REFSET_FIELDS> returnValues = new ArrayList<REFSET_FIELDS>();
+      for (REFSET_FIELDS f : columns) {
+         switch (f) {
+         case MEMBER_ID:
+         case COMPONENT_ID:
+         case INTEGER_VALUE:
+         case BRANCH:
+         case BOOLEAN_VALUE:
+         case MEASUREMENT_VALUE:
+         case PRIORITY:
+            break;
+
+         default:
+            returnValues.add(f);
+         }
+      }
+
+      return returnValues;
    }
 
 }
