@@ -343,7 +343,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData, I_Trans
 
             return desc.getVersions().get(0).getText();
          } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
+            AceLog.getAppLog().nonModalAlertAndLogException(ex);
          }
       }
       I_DescriptionVersioned tdv = localDesc.get(0);

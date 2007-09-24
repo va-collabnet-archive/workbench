@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.swing.AbstractListModel;
 import javax.swing.event.ListDataEvent;
@@ -16,6 +17,7 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 
@@ -180,7 +182,11 @@ public class IntSet implements ListDataListener, I_IntSet {
             		try {
 						set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
 					} catch (NoMappingException e) {
-						AceLog.getAppLog().alertAndLogException(e);
+                  if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                     AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+                  } else {
+                     AceLog.getAppLog().info(e.getLocalizedMessage());
+                  }
 						unmappedIds++;
 						set[i] = Integer.MAX_VALUE;
 					}

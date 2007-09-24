@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
@@ -489,7 +490,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 try {
                   refsetPreferencesMap.put(toggle, new RefsetPreferences());
                } catch (TerminologyException e) {
-                  throw new ToIoException(e);
+                  if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                     AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+                  } else {
+                     AceLog.getAppLog().info("Missing terms to initialize refests: " + 26);
+                  }
                }
              }
           }

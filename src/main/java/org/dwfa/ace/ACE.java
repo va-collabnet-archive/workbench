@@ -91,6 +91,7 @@ import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
 import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
@@ -2217,6 +2218,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    public static void setAceConfig(AceConfig aceConfig) {
       if (ACE.aceConfig == null) {
          ACE.aceConfig = aceConfig;
+         AceEditor.setAceFrames(aceConfig.aceFrames);
       } else {
          throw new UnsupportedOperationException("Ace.aceConfig is already set");
       }
