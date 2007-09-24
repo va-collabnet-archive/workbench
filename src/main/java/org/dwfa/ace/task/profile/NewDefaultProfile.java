@@ -243,13 +243,13 @@ public class NewDefaultProfile extends AbstractTask {
       activeConfig.setSourceRelTypes(sourceRelTypes);
 
       I_IntSet descTypes = tf.newIntSet();
-      descTypes.add(tf.uuidToNative(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
-      descTypes.add(tf.uuidToNative(Concept.PREFERRED_DESCRIPTION_TYPE.getUids()));
-      descTypes.add(tf.uuidToNative(Concept.SYNONYM_DESCRIPTION_TYPE.getUids()));
-      descTypes.add(tf.uuidToNative(Concept.DESCRIPTION_TYPE.getUids()));
-      descTypes.add(tf.uuidToNative(Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.getUids()));
-      descTypes.add(tf.uuidToNative(Concept.XHTML_PREFERRED_DESC_TYPE.getUids()));
-      descTypes.add(tf.uuidToNative(Concept.XHTML_DEF.getUids()));
+      addIfNotNull(allowedStatus, Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE, tf);
+      addIfNotNull(allowedStatus, Concept.PREFERRED_DESCRIPTION_TYPE, tf);
+      addIfNotNull(allowedStatus, Concept.SYNONYM_DESCRIPTION_TYPE, tf);
+      addIfNotNull(allowedStatus, Concept.DESCRIPTION_TYPE, tf);
+      addIfNotNull(allowedStatus, Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE, tf);
+      addIfNotNull(allowedStatus, Concept.XHTML_PREFERRED_DESC_TYPE, tf);
+      addIfNotNull(allowedStatus, Concept.XHTML_DEF, tf);
       activeConfig.setDescTypes(descTypes);
 
       I_IntSet inferredViewTypes = tf.newIntSet();

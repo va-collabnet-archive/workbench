@@ -1,16 +1,15 @@
 package org.dwfa.ace.log;
 
-import org.dwfa.util.LogWithAlerts;
 
 public class AceLog {
 
-	private static LogWithAlerts appLog = new LogWithAlerts(AceLog.class.getName() + ".app");
-	private static LogWithAlerts editLog = new LogWithAlerts(AceLog.class.getName() + ".edit");
+	private static AceLogWithAlerts appLog = new AceLogWithAlerts(AceLog.class.getName() + ".app");
+	private static AceLogWithAlerts editLog = new AceLogWithAlerts(AceLog.class.getName() + ".edit");
 	
-	public static LogWithAlerts getAppLog() {
+	public static AceLogWithAlerts getAppLog() {
 		return appLog;
 	}
-	public static LogWithAlerts getEditLog() {
+	public static AceLogWithAlerts getEditLog() {
 		return editLog;
 	}
 
