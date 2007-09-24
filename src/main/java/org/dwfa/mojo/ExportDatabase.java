@@ -30,9 +30,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.types.ConceptBean;
 
 /**
- *  *
+ * *
  * <h1>ExportDatabase</h1>
  * <br>
  * <p>
@@ -60,13 +61,14 @@ public class ExportDatabase extends AbstractMojo {
    private String dateFormat;
 
    /**
-    * Version from which to derive date. 
+    * Version from which to derive date.
     * 
     * @parameter expression="${project.version}"
     */
    private String version;
-   
+
    private String releaseDate;
+
    /**
     * Location of the directory to output data files to.
     * 
@@ -95,13 +97,22 @@ public class ExportDatabase extends AbstractMojo {
     * @parameter expression="descriptions.txt"
     */
    private String descriptionsDataFileName;
-   
+
    /**
     * File name for description table data output file
     * 
     * @parameter expression="errorLog.txt"
     */
    private String errorLogFileName;
+
+   /**
+    * The set of specifications used to determine if a concept should be exported.
+    * 
+    * @parameter
+    * @required
+    */
+   private ExportSpecification[] specs;
+
    
    /**
     * Positions to export data.
@@ -119,25 +130,8 @@ public class ExportDatabase extends AbstractMojo {
     */
    private ConceptDescriptor[] statusValuesForExport;
 
-   /**
-    * Set of allowed roots of which all concepts must be 
-    * subtypes of to be exported
-    * 
-    * @parameter
-    * @required
-    */
-   private ConceptDescriptor[] allowedRoots;
-
-   /**
-    * The set of relationship types used to compute the subtype relationship
-    * 
-    * @parameter
-    * @required
-    */   
-   private ConceptDescriptor[] relTypesToAllowedRoot;
-   
-   private class PrepareConceptData implements I_ProcessConcepts {
-      I_TermFactory termFactory;
+   private class ExportIterator implements I_ProcessConcepts {
+      private I_TermFactory termFactory;
 
       private ArrayList<String> conceptUuidDistributionDetails = new ArrayList<String>();
 
@@ -150,31 +144,26 @@ public class ExportDatabase extends AbstractMojo {
       private int conceptsMatched = 0;
 
       private int conceptsUnmatched = 0;
-      
+
       private int conceptsSuppressed = 0;
-      
+
       private int maxSuppressed = Integer.MAX_VALUE;
 
       private ArrayList<String> unmatchedConcepts = new ArrayList<String>();
-      
+
+      private Writer errorWriter;
+
       private Set<I_Position> positions;
       
       private I_IntSet allowedStatus;
-      
-      private Writer errorWriter;
 
-	  private Set<I_GetConceptData> allowedRootsSet;
 
-	  private I_IntSet relTypesToAllowedRootIntSet;
-      
-      public PrepareConceptData(Set<I_Position> positions, I_IntSet allowedStatus, Set<I_GetConceptData> allowedRootsSet, I_IntSet relTypesToAllowedRootIntSet, Writer errorWriter) {
+      public ExportIterator(Writer errorWriter, Set<I_Position> positions, I_IntSet allowedStatus) {
          super();
          termFactory = LocalVersionedTerminology.get();
+         this.errorWriter = errorWriter;
          this.positions = positions;
          this.allowedStatus = allowedStatus;
-         this.errorWriter = errorWriter;
-         this.allowedRootsSet = allowedRootsSet;
-         this.relTypesToAllowedRootIntSet = relTypesToAllowedRootIntSet;
       }
 
       public ArrayList<String> getUnmatchedConcepts() {
@@ -206,7 +195,7 @@ public class ExportDatabase extends AbstractMojo {
       }
 
       public void processConcept(I_GetConceptData concept) throws Exception {
-         
+
          if (conceptsSuppressed > maxSuppressed) {
             return;
          }
@@ -215,26 +204,19 @@ public class ExportDatabase extends AbstractMojo {
          // allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 
          totalConcepts++;
-         
-         boolean allowedRoot = false;
-         for (I_GetConceptData root : allowedRootsSet) {
-			if (root.isParentOf(concept, allowedStatus, relTypesToAllowedRootIntSet, positions, false) || root.equals(concept)) {
-				allowedRoot = true;
-				break;
-			}
-		 }
-         
-         if (allowedRoot) {
-	         /*
-	          * Get concept details
-	          */
-	         if (getUuidBasedConceptDetails(concept, allowedStatus)) {
-	            getUuidBasedRelDetails(concept, allowedStatus, null);
-	            /*
-	             * Get Description details
-	             */
-	            getUuidBasedDescriptionDetails(concept, allowedStatus, null);
-	         }
+
+ 
+         if (isExportable(concept)) {
+            /*
+             * Get concept details
+             */
+            if (getUuidBasedConceptDetails(concept, allowedStatus)) {
+               getUuidBasedRelDetails(concept, allowedStatus, null);
+               /*
+                * Get Description details
+                */
+               getUuidBasedDescriptionDetails(concept, allowedStatus, null);
+            }
          } else {
             conceptsSuppressed++;
             getLog().info("Suppressing: " + concept);
@@ -242,27 +224,24 @@ public class ExportDatabase extends AbstractMojo {
 
       }// End method processConcept
 
+      private boolean isExportable(I_GetConceptData concept) throws Exception {
+         for (ExportSpecification spec : specs) {
+            if (spec.test(concept)) {
+               return true;
+            }
+         }
+         return false;
+      }
+
       public String toString() {
          return "prepareConceptData";
       }
 
-      private boolean getUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) throws IOException, TerminologyException {
-
-         // I_IntSet allowedTypes = termFactory.newIntSet();
-         // allowedTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
-
-         // if(!attribTuplesIt.hasNext() || !descTuplesIt.hasNext()){
-         // conceptsUnmatched++;
-         // while(descTuplesIt.hasNext()){
-         // I_DescriptionTuple descTup = descTuplesIt.next();
-         // unmatchedConcepts.add(descTup.getText());
-         // }
-         // descTuplesIt = descriptionTuples.iterator();
-         // }
+      private boolean getUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) throws IOException,
+            TerminologyException {
 
          I_IntList fsOrder = LocalVersionedTerminology.get().newIntList();
-         
- 
+
          fsOrder.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
          fsOrder.add(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.localize().getNid());
          fsOrder.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
@@ -311,8 +290,10 @@ public class ExportDatabase extends AbstractMojo {
                      .getUids().get(0));
 
                // Effective time
-               //createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper.convert(attribTup.getVersion()))));
-               //TODO Make the records compute dates from multiple versions...
+               // createRecord(stringBuilder, new
+               // SimpleDateFormat(dateFormat).format(new
+               // Date(ThinVersionHelper.convert(attribTup.getVersion()))));
+               // TODO Make the records compute dates from multiple versions...
                createRecord(stringBuilder, releaseDate);
                // End record
                createRecord(stringBuilder, System.getProperty("line.separator"));
@@ -322,16 +303,20 @@ public class ExportDatabase extends AbstractMojo {
          return true;
       }
 
-      private void getUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus,
-            I_IntSet allowedTypes) throws IOException, TerminologyException {
+      private void getUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes)
+            throws Exception {
 
-         for (I_RelVersioned rel: concept.getSourceRels()) {
-            for (I_RelPart part: rel.getVersions()) {
+         for (I_RelVersioned rel : concept.getSourceRels()) {
+            for (I_RelPart part : rel.getVersions()) {
                I_Path path = termFactory.getPath(termFactory.getUids(part.getPathId()));
                I_Position partPos = termFactory.newPosition(path, part.getVersion());
-               if (allowedStatus.contains(part.getStatusId())) {
+               if (allowedStatus.contains(part.getStatusId()) && 
+                     isExportable(ConceptBean.get(rel.getC2Id())) &&
+                     isExportable(ConceptBean.get(part.getCharacteristicId())) &&
+                     isExportable(ConceptBean.get(part.getRefinabilityId())) &&
+                     isExportable(ConceptBean.get(part.getRelTypeId()))) {
                   boolean positionOk = false;
-                  for (I_Position exportPos: positions) {
+                  for (I_Position exportPos : positions) {
                      if (exportPos.isSubsequentOrEqualTo(partPos)) {
                         positionOk = true;
                         break;
@@ -344,31 +329,36 @@ public class ExportDatabase extends AbstractMojo {
                            .get(0));
 
                      // Concept status
-                     createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedConceptStatusId(LocalVersionedTerminology
-                           .get().getConcept(part.getStatusId()).getUids()));
+                     createRecord(stringBuilder, ArchitectonicAuxiliary
+                           .getSnomedConceptStatusId(LocalVersionedTerminology.get().getConcept(part.getStatusId())
+                                 .getUids()));
 
                      // Concept Id 1 UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC1Id()).getUids().get(0));
-
-                     // Relationship type UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getRelTypeId()).getUids()
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC1Id()).getUids()
                            .get(0));
 
+                     // Relationship type UUID
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getRelTypeId())
+                           .getUids().get(0));
+
                      // Concept Id 2 UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC2Id()).getUids().get(0));
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC2Id()).getUids()
+                           .get(0));
 
                      // (Characteristict Type integer)
-                     int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(LocalVersionedTerminology
-                           .get().getConcept(part.getCharacteristicId()).getUids());
+                     int snomedCharacter = ArchitectonicAuxiliary
+                           .getSnomedCharacteristicTypeId(LocalVersionedTerminology.get().getConcept(
+                                 part.getCharacteristicId()).getUids());
                      if (snomedCharacter == -1) {
-                        errorWriter.append("\nNo characteristic mapping for: " + LocalVersionedTerminology
-                           .get().getConcept(part.getCharacteristicId()));
+                        errorWriter.append("\nNo characteristic mapping for: "
+                              + LocalVersionedTerminology.get().getConcept(part.getCharacteristicId()));
                      }
                      createRecord(stringBuilder, snomedCharacter);
 
                      // Refinability integer
-                     createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(LocalVersionedTerminology
-                           .get().getConcept(part.getRefinabilityId()).getUids()));
+                     createRecord(stringBuilder, ArchitectonicAuxiliary
+                           .getSnomedRefinabilityTypeId(LocalVersionedTerminology.get().getConcept(
+                                 part.getRefinabilityId()).getUids()));
 
                      // Relationship Group
                      createRecord(stringBuilder, part.getGroup());
@@ -379,14 +369,16 @@ public class ExportDatabase extends AbstractMojo {
                            .get(0));
 
                      // Concept1 UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC1Id()).getUids().get(0));
-
-                     // Relationship type UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getRelTypeId()).getUids()
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC1Id()).getUids()
                            .get(0));
 
+                     // Relationship type UUID
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getRelTypeId())
+                           .getUids().get(0));
+
                      // Concept2 UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC2Id()).getUids().get(0));
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getC2Id()).getUids()
+                           .get(0));
 
                      // Characteristic Type UUID
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getCharacteristicId())
@@ -397,14 +389,17 @@ public class ExportDatabase extends AbstractMojo {
                            .getUids().get(0));
 
                      // Relationship status UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getStatusId()).getUids()
-                           .get(0));
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getStatusId())
+                           .getUids().get(0));
 
                      // Effective Time
-                     //createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
-                     //      .convert(part.getVersion()))));
+                     // createRecord(stringBuilder, new
+                     // SimpleDateFormat(dateFormat).format(new
+                     // Date(ThinVersionHelper
+                     // .convert(part.getVersion()))));
 
-                     //TODO Make the records compute dates from multiple versions...
+                     // TODO Make the records compute dates from multiple
+                     // versions...
                      createRecord(stringBuilder, releaseDate);
                      createRecord(stringBuilder, System.getProperty("line.separator"));
 
@@ -416,14 +411,15 @@ public class ExportDatabase extends AbstractMojo {
       }// End method getUuidBasedRelDetails
 
       private void getUuidBasedDescriptionDetails(I_GetConceptData concept, I_IntSet allowedStatus,
-            I_IntSet allowedTypes) throws IOException, TerminologyException {
-         for (I_DescriptionVersioned desc: concept.getDescriptions()) {
-            for (I_DescriptionPart part: desc.getVersions()) {
+            I_IntSet allowedTypes) throws Exception {
+         for (I_DescriptionVersioned desc : concept.getDescriptions()) {
+            for (I_DescriptionPart part : desc.getVersions()) {
                I_Path path = termFactory.getPath(termFactory.getUids(part.getPathId()));
                I_Position partPos = termFactory.newPosition(path, part.getVersion());
-               if (allowedStatus.contains(part.getStatusId())) {
+               if (allowedStatus.contains(part.getStatusId()) &&
+                     isExportable(ConceptBean.get(part.getTypeId()))) {
                   boolean positionOk = false;
-                  for (I_Position exportPos: positions) {
+                  for (I_Position exportPos : positions) {
                      if (exportPos.isSubsequentOrEqualTo(partPos)) {
                         positionOk = true;
                         break;
@@ -437,8 +433,9 @@ public class ExportDatabase extends AbstractMojo {
                            .get(0));
 
                      // Description Status
-                     createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedDescriptionStatusId(LocalVersionedTerminology
-                           .get().getConcept(part.getStatusId()).getUids()));
+                     createRecord(stringBuilder, ArchitectonicAuxiliary
+                           .getSnomedDescriptionStatusId(LocalVersionedTerminology.get().getConcept(part.getStatusId())
+                                 .getUids()));
 
                      // ConceptId
                      createRecord(stringBuilder, concept.getUids().get(0));
@@ -453,8 +450,9 @@ public class ExportDatabase extends AbstractMojo {
                      createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
 
                      // Description Type
-                     createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedDescriptionTypeId(LocalVersionedTerminology
-                           .get().getConcept(part.getTypeId()).getUids()));
+                     createRecord(stringBuilder, ArchitectonicAuxiliary
+                           .getSnomedDescriptionTypeId(LocalVersionedTerminology.get().getConcept(part.getTypeId())
+                                 .getUids()));
 
                      // Language code
                      createRecord(stringBuilder, part.getLang());
@@ -465,8 +463,8 @@ public class ExportDatabase extends AbstractMojo {
                            .get(0));
 
                      // Description status UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getStatusId()).getUids()
-                           .get(0));
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getStatusId())
+                           .getUids().get(0));
 
                      // Description type UUID
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getTypeId()).getUids()
@@ -476,9 +474,12 @@ public class ExportDatabase extends AbstractMojo {
                      createRecord(stringBuilder, concept.getUids().get(0));
 
                      // Effective time
-                     //createRecord(stringBuilder, new SimpleDateFormat(dateFormat).format(new Date(ThinVersionHelper
-                     //      .convert(part.getVersion()))));
-                     //TODO Make the records compute dates from multiple versions...
+                     // createRecord(stringBuilder, new
+                     // SimpleDateFormat(dateFormat).format(new
+                     // Date(ThinVersionHelper
+                     // .convert(part.getVersion()))));
+                     // TODO Make the records compute dates from multiple
+                     // versions...
                      createRecord(stringBuilder, releaseDate);
 
                      // End record
@@ -519,6 +520,7 @@ public class ExportDatabase extends AbstractMojo {
    public void execute() throws MojoExecutionException, MojoFailureException {
       try {
          releaseDate = version.split("-")[0] + " 00:00:00";
+
          
          I_TermFactory termFactory = LocalVersionedTerminology.get();
          HashSet<I_Position> positions = new HashSet<I_Position>(positionsForExport.length);
@@ -532,18 +534,7 @@ public class ExportDatabase extends AbstractMojo {
             statusValues.add(statusConcept.getConceptId());
             statusValueList.add(statusConcept);
          }
-         I_IntSet relTypeIntSet = termFactory.newIntSet();
-         List<I_GetConceptData> relTypes = new ArrayList<I_GetConceptData>();
-         for (ConceptDescriptor relType: relTypesToAllowedRoot) {
-            I_GetConceptData relTypeConcept = relType.getVerifiedConcept();
-            relTypeIntSet.add(relTypeConcept.getConceptId());
-            relTypes.add(relTypeConcept);
-         }
-         Set<I_GetConceptData> rootSet = new HashSet<I_GetConceptData>();
-         for (ConceptDescriptor root: allowedRoots) {
-            rootSet.add(root.getVerifiedConcept());
-         }
-         getLog().info(" processing concepts for positions: " + positions + " with status: " + statusValueList + ", rel types:" + relTypes + ", roots:" + rootSet);
+         getLog().info(" processing concepts for positions: " + positions + " with status: " + statusValueList);
 
          // getLog().info("---------------------------------------");
          // getLog().info("--- total concepts == " + pcd.getTotals() +" ---");
@@ -557,19 +548,19 @@ public class ExportDatabase extends AbstractMojo {
          // getLog().info("--- "+s+" ---");
          // }
          // getLog().info("---------------------------------------");
-         
+
          Writer errorWriter = new BufferedWriter(new FileWriter(outputDirectory + errorLogFileName));
 
          File conceptFile = new File(outputDirectory + conceptDataFileName);
          File relationshipFile = new File(outputDirectory + relationshipsDataFileName);
          File descriptionFile = new File(outputDirectory + descriptionsDataFileName);
 
-         PrepareConceptData pcd = new PrepareConceptData(positions, statusValues, rootSet, relTypeIntSet, errorWriter);
-         termFactory.iterateConcepts(pcd);
+         ExportIterator expItr = new ExportIterator(errorWriter, positions, statusValues);
+         LocalVersionedTerminology.get().iterateConcepts(expItr);
 
-         writeToFile(conceptFile, pcd.getConceptDistDetails());
-         writeToFile(relationshipFile, pcd.getRelationshipDistDetails());
-         writeToFile(descriptionFile, pcd.getDescriptionDistDetails());
+         writeToFile(conceptFile, expItr.getConceptDistDetails());
+         writeToFile(relationshipFile, expItr.getRelationshipDistDetails());
+         writeToFile(descriptionFile, expItr.getDescriptionDistDetails());
 
          errorWriter.close();
 
@@ -578,37 +569,4 @@ public class ExportDatabase extends AbstractMojo {
       }
 
    }// End method execute
-
-   public PositionDescriptor[] getPositionsForExport() {
-      return positionsForExport;
-   }
-
-   public void setPositionsForExport(PositionDescriptor[] positionsForExport) {
-      this.positionsForExport = positionsForExport;
-   }
-
-   public ConceptDescriptor[] getStatusValuesForExport() {
-      return statusValuesForExport;
-   }
-
-   public void setStatusValuesForExport(ConceptDescriptor[] statusValuesForExport) {
-      this.statusValuesForExport = statusValuesForExport;
-   }
-
-public ConceptDescriptor[] getAllowedRoots() {
-	return allowedRoots;
-}
-
-public void setAllowedRoots(ConceptDescriptor[] allowedRoots) {
-	this.allowedRoots = allowedRoots;
-}
-
-public ConceptDescriptor[] getRelTypesToAllowedRoot() {
-	return relTypesToAllowedRoot;
-}
-
-public void setRelTypesToAllowedRoot(ConceptDescriptor[] relTypesToAllowedRoot) {
-	this.relTypesToAllowedRoot = relTypesToAllowedRoot;
-}
-
 }// End class ExportDatabase
