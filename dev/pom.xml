@@ -15,6 +15,19 @@
     <system>Scarab</system>
     <url>https://dwfa-mojo.aceworkspace.net/servlets/Scarab</url>
   </issueManagement>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>aceworkspace.net</id>
+      <name>aceworkspace.net</name>
+      <url>file:///ciweb/webapps/maven2</url>
+      <layout>default</layout>
+    </repository>
+    <site>
+      <id>aceworkspace.net</id>
+      <url>file:///ciweb/webapps/dwfa/dwfa-mojo</url>
+    </site>
+  </distributionManagement>
   <scm>
     <connection>scm:svn:https://dwfa-mojo.aceworkspace.net/svn/dwfa-mojo/trunk/dev</connection>
     <developerConnection>scm:svn:https://dwfa-mojo.aceworkspace.net/svn/dwfa-mojo/trunk/dev</developerConnection>
