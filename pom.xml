@@ -12,6 +12,13 @@
     <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
   </scm>
   <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>aceworkspace.net</id>
+      <name>aceworkspace.net</name>
+      <url>file:///ciweb/webapps/maven2</url>
+      <layout>default</layout>
+    </repository>
     <site>
       <id>aceworkspace.net</id>
       <url>file:///ciweb/webapps/dwfa/ace-api</url>
@@ -27,12 +34,12 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>foundation</artifactId>
-      <version>2.0.4-SNAPSHOT</version>
+      <version>2.0.5</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>core</artifactId>
-      <version>2.0.2-SNAPSHOT</version>
+      <version>2.0.2</version>
     </dependency>
     <dependency>
       <groupId>net.jini</groupId>
