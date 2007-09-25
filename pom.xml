@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>vodb</artifactId>
@@ -6,6 +8,19 @@
   <version>1.1-SNAPSHOT</version>
   <name>Versioned Object Database</name>
   <url>http://www.informatics.com</url>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>aceworkspace.net</id>
+      <name>aceworkspace.net</name>
+      <url>file:///ciweb/webapps/maven2</url>
+      <layout>default</layout>
+    </repository>
+    <site>
+      <id>aceworkspace.net</id>
+      <url>file:///ciweb/webapps/dwfa/vodb</url>
+    </site>
+  </distributionManagement>
   <scm>
     <connection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</connection>
     <developerConnection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</developerConnection>
@@ -31,22 +46,22 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>icons</artifactId>
-      <version>1.0</version>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>foundation</artifactId>
-      <version>2.0.4-SNAPSHOT</version>
+      <version>2.0.5</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>core</artifactId>
-      <version>2.0.1</version>
+      <version>2.0.2</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>ace-api</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
