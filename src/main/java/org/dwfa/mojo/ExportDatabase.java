@@ -67,6 +67,12 @@ public class ExportDatabase extends AbstractMojo {
     */
    private String version;
 
+   /**
+    * Date format to use in output files
+    * 
+    * @parameter
+    * @required
+    */
    private String releaseDate;
 
    /**
@@ -519,8 +525,6 @@ public class ExportDatabase extends AbstractMojo {
 
    public void execute() throws MojoExecutionException, MojoFailureException {
       try {
-         releaseDate = version.split("-")[0] + " 00:00:00";
-
          
          I_TermFactory termFactory = LocalVersionedTerminology.get();
          HashSet<I_Position> positions = new HashSet<I_Position>(positionsForExport.length);
