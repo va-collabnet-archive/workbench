@@ -17,6 +17,10 @@ import org.dwfa.util.LogWithAlerts;
 
 public interface I_TermFactory {
 
+    public String getProperty(String key) throws IOException;
+    public void setProperty(String key, String value) throws IOException;
+
+
 	public I_GetConceptData newConcept(UUID newConceptId, boolean defined, 
 			I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 	
