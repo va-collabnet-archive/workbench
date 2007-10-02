@@ -65,7 +65,12 @@ public class ExtensionByReferenceBean implements I_Transact {
    private static HashSet<ExtensionByReferenceBean> newExtensions = new HashSet<ExtensionByReferenceBean>();
 
    public static ExtensionByReferenceBean makeNew(int memberId, ThinExtByRefVersioned extension) {
-      ExtensionByReferenceBean ebrBean = make(memberId, extension);
+       ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
+       WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+       if (ref != null) {
+          throw new RuntimeException("ExtensionByReferenceBean already exists for: " + memberId);
+       }
+      ebrBean = make(memberId, extension);
       newExtensions.add(ebrBean);
       return ebrBean;
    }
@@ -127,7 +132,7 @@ public class ExtensionByReferenceBean implements I_Transact {
 
    public void commit(int version, Set<TimePathId> values) throws IOException {
       if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-         AceLog.getEditLog().fine("Starting commit for ExtensionByReferenceBean: " + this);
+         AceLog.getEditLog().fine("Starting commit for ExtensionByReferenceBean: " + this.memberId);
       }
       StringBuffer buff = null;
       if (AceLog.getEditLog().isLoggable(Level.FINE)) {
@@ -142,7 +147,7 @@ public class ExtensionByReferenceBean implements I_Transact {
                   values.add(new TimePathId(version, p.getPathId()));
                   changed = true;
                   if (buff != null) {
-                     buff.append("\n  Committing: " + p);
+                     buff.append("\n  Committing member: " + extension.getMemberId() + " for component: " + extension.getComponentId() + " part:" + p);
                   }
                }
                if (changed) {
@@ -176,13 +181,31 @@ public class ExtensionByReferenceBean implements I_Transact {
    public UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException {
       I_TermFactory tf = LocalVersionedTerminology.get();
       UniversalAceExtByRefBean uEbrBean = new UniversalAceExtByRefBean(
-            tf.getUids(extension.getRefsetId()), 
-            tf.getUids(extension.getMemberId()), 
-            tf.getUids(extension.getComponentId()), 
-            tf.getUids(extension.getTypeId()));
-      for (ThinExtByRefPart part: extension.getVersions()) {
+            tf.getUids(getExtension().getRefsetId()), 
+            tf.getUids(getExtension().getMemberId()), 
+            tf.getUids(getExtension().getComponentId()), 
+            tf.getUids(getExtension().getTypeId()));
+      for (ThinExtByRefPart part: getExtension().getVersions()) {
          uEbrBean.getVersions().add(part.getUniversalPart());
       }
       return uEbrBean;
    }
+   
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
+      if (ExtensionByReferenceBean.class.isAssignableFrom(obj.getClass())) {
+          ExtensionByReferenceBean another = (ExtensionByReferenceBean) obj;
+         return memberId == another.memberId;
+      }
+      return false;
+   }
+
+   @Override
+   public int hashCode() {
+      return memberId;
+   }
+
 }

@@ -41,7 +41,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		DESC("Description", 5, 200, 1000), IMAGE("image", 5, 200, 1000), 
 		STATUS("status", 5, 50, 250), FORMAT("format", 5, 30, 30),
 		TYPE("type", 5, 85, 85), VERSION("version", 5, 140, 140), 
-		BRANCH("path", 5, 90, 150);
+		PATH("path", 5, 90, 150);
 
 		private String columnName;
 		private int min;
@@ -368,7 +368,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 					return new StringWithImageTuple(ThinVersionHelper.uncommittedHtml(), image);
 				}
 				return new StringWithImageTuple(ThinVersionHelper.format(image.getVersion()), image);
-			case BRANCH:
+			case PATH:
 				if (getReferencedConcepts().containsKey(image.getPathId())) {
 					return new StringWithImageTuple(getPrefText(image.getPathId()), image);
 				}
@@ -457,7 +457,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 					return true;
 				case VERSION:
 					return false;
-				case BRANCH:
+				case PATH:
 					return false;
 				}
 			}

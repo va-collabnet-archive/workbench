@@ -209,7 +209,7 @@ public class IdTableModel extends AbstractTableModel implements
 
 	public enum ID_FIELD {
 		LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 250), EXT_ID(
-				"external id", 5, 85, 1550), VERSION("version", 5, 140, 140), BRANCH(
+				"external id", 5, 85, 1550), VERSION("version", 5, 140, 140), PATH(
 				"path", 5, 90, 150);
 
 		private String columnName;
@@ -361,7 +361,7 @@ public class IdTableModel extends AbstractTableModel implements
 				
 				return new StringWithIdTuple(ThinVersionHelper.format(idTuple
 						.getVersion()), idTuple);
-			case BRANCH:
+			case PATH:
 				if (getReferencedConcepts().containsKey(idTuple.getPathId())) {
 					return new StringWithIdTuple(getPrefText(idTuple.getPathId()), idTuple);
 				}
@@ -384,7 +384,7 @@ public class IdTableModel extends AbstractTableModel implements
 			return StringWithIdTuple.class;
 		case VERSION:
 			return Number.class;
-		case BRANCH:
+		case PATH:
 			return StringWithIdTuple.class;
 		}
 		return String.class;

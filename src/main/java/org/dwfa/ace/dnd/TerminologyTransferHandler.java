@@ -154,7 +154,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 							.getStatusId()));
 				case REL_ID:
 				case VERSION:
-				case BRANCH:
+				case PATH:
 				case GROUP:
 				default:
 					throw new UnsupportedOperationException("Can't convert "
@@ -191,7 +191,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 						return new DescriptionTransferable(desc);
 					case DESC_ID:
 					case VERSION:
-					case BRANCH:
+					case PATH:
 					default:
 						throw new UnsupportedOperationException(
 								"Can't convert " + columnDesc

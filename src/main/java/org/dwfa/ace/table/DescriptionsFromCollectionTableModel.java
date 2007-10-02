@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.vodb.types.ConceptBean;
@@ -70,6 +71,18 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 
 	@Override
 	public Map<Integer, ConceptBean> getReferencedConcepts() {
-		return new HashMap<Integer, ConceptBean>();
+        Map<Integer, ConceptBean> referencedConcept = new HashMap<Integer, ConceptBean>();
+        List<ThinDescVersioned> descriptionListCopy;
+        synchronized (descriptionList) {
+            descriptionListCopy = new ArrayList<ThinDescVersioned>(descriptionList);
+        }
+        for (ThinDescVersioned desc: descriptionListCopy) {
+            for (I_DescriptionPart part: desc.getVersions()) {
+                referencedConcept.put(part.getTypeId(), ConceptBean.get(part.getTypeId()));
+            }
+            
+        }
+        
+		return referencedConcept;
 	}
 }

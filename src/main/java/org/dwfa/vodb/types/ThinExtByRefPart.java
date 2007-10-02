@@ -56,4 +56,7 @@ public abstract class ThinExtByRefPart {
       super();
    }
    
+   public String toString() {
+       return this.getClass().getSimpleName() + " pathId: " + pathId + " version: " + version + " status: " + status;
+   }
 }

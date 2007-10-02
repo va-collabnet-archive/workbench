@@ -214,7 +214,7 @@ public class SearchPanel extends JPanel {
 		gbc.gridheight = 1;
 
 		model = new DescriptionsFromCollectionTableModel(
-				new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.TEXT }, config);
+				new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.TEXT, DESC_FIELD.TYPE }, config);
 		sortingTable = new TableSorter(model);
 		descTable = new JTableWithDragImage(sortingTable);
 		descTable.setDragEnabled(true);

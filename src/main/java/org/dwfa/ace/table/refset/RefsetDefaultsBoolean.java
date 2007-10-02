@@ -50,7 +50,9 @@ public class RefsetDefaultsBoolean extends RefsetDefaults implements I_RefsetDef
    }
 
    public void setDefaultForBooleanRefset(boolean defaultForBooleanRefset) {
+      Object oldValue = this.defaultForBooleanRefset;
       this.defaultForBooleanRefset = defaultForBooleanRefset;
+      pcs.firePropertyChange("defaultForBooleanRefset", oldValue, defaultForBooleanRefset);
    }
 
 }

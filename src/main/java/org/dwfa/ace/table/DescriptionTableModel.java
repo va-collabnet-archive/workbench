@@ -34,8 +34,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public enum DESC_FIELD { SCORE("score", 5, 100, 100),
 		DESC_ID("did", 5, 100, 100), CON_ID("cid", 5, 100, 100), TEXT("text",
 				5, 300, 2000), LANG("lang", 5, 35, 55), CASE_FIXED("case", 5,
-				35, 55), STATUS("status", 5, 50, 250), TYPE("type", 5, 85, 150), VERSION(
-				"version", 5, 140, 140), BRANCH("path", 5, 90, 150);
+				35, 55), STATUS("status", 5, 50, 250), TYPE("type", 5, 85, 450), VERSION(
+				"version", 5, 140, 140), PATH("path", 5, 90, 150);
 
 		private String columnName;
 
@@ -157,7 +157,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				}
 				return new StringWithDescTuple(ThinVersionHelper.format(desc
 						.getVersion()), desc, false);
-			case BRANCH:
+			case PATH:
 				if (getReferencedConcepts().containsKey(desc.getPathId())) {
 					return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false);
 				}
@@ -226,7 +226,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 					break;
 				case VERSION:
 					break;
-				case BRANCH:
+				case PATH:
 					break;
 				}
 				fireTableDataChanged();
@@ -256,7 +256,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			return Number.class;
 		case VERSION:
 			return Number.class;
-		case BRANCH:
+		case PATH:
 
 		}
 		return String.class;

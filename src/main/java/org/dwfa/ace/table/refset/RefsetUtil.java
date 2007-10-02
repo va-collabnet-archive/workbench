@@ -7,8 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.table.TableColumn;
@@ -20,198 +22,310 @@ import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.RelationshipTableRenderer;
-import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.table.refset.RefsetMemberTableModel.ConceptFieldEditor;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
+import org.dwfa.vodb.types.IntList;
 
 public class RefsetUtil {
 
-   public static void addRefsetTables(I_HostConceptPlugins host, I_PluginToConceptPanel plugin, TOGGLES toggle, 
-         GridBagConstraints c, Set<EXT_TYPE> visibleExtensions,
-         JPanel panel) {
-      plugin.clearRefsetListeners();
-      if (host.getShowRefsets()) {
-         for (EXT_TYPE extType: EXT_TYPE.values()) {
-            if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
-               c.gridy++;
-               RefsetMemberTableModel refsetModel;
-               switch (extType) {
-               case BOOLEAN:
-                  refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host, extType),
-                        extType, toggle);
-                  break;
-               case CONCEPT:
-                  refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host, extType),
-                        extType, toggle);
-                  break;
-               case INTEGER:
-                  refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host, extType),
-                        extType, toggle);
-                  break;
-               case LANGUAGE:
-                  refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host, extType),
-                        extType, toggle);
-                  break;
-               case SCOPED_LANGUAGE:
-                  refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host, extType),
-                        extType, toggle);
-                  break;
-               case MEASUREMENT:
-                  refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host, extType),
-                        extType, toggle);
-                  break;
+    public static void addRefsetTables(I_HostConceptPlugins host, I_PluginToConceptPanel plugin, TOGGLES toggle,
+        GridBagConstraints c, Set<EXT_TYPE> visibleExtensions, JPanel panel) {
+        plugin.clearRefsetListeners();
+        if (host.getShowRefsets()) {
+            for (EXT_TYPE extType : EXT_TYPE.values()) {
+                if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
+                    c.gridy++;
+                    RefsetMemberTableModel refsetModel;
+                    switch (extType) {
+                    case BOOLEAN:
+                        refsetModel = new RefsetMemberTableModel(
+                                                                 host,
+                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
+                                                                 extType, toggle);
+                        break;
+                    case CONCEPT:
+                        refsetModel = new RefsetMemberTableModel(
+                                                                 host,
+                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
+                                                                 extType, toggle);
+                        break;
+                    case INTEGER:
+                        refsetModel = new RefsetMemberTableModel(
+                                                                 host,
+                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
+                                                                 extType, toggle);
+                        break;
+                    case LANGUAGE:
+                        refsetModel = new RefsetMemberTableModel(
+                                                                 host,
+                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
+                                                                 extType, toggle);
+                        break;
+                    case SCOPED_LANGUAGE:
+                        refsetModel = new RefsetMemberTableModel(
+                                                                 host,
+                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
+                                                                 extType, toggle);
+                        break;
+                    case MEASUREMENT:
+                        refsetModel = new RefsetMemberTableModel(
+                                                                 host,
+                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
+                                                                 extType, toggle);
+                        break;
 
-               default:
-                  refsetModel = null;
-                  AceLog.getAppLog().alertAndLogException(new Exception("Can't handle extType: " + extType));
-                  break;
-               }
-               if (refsetModel != null) {
-                  plugin.addRefsetListener(refsetModel);
-                  c.gridy++;
-                  panel.add(getExtensionPanel(extType, refsetModel), c);
-                  visibleExtensions.add(extType);
-               } else {
-                  AceLog.getAppLog().info("refset model is null");
-               }
+                    default:
+                        refsetModel = null;
+                        AceLog.getAppLog().alertAndLogException(new Exception("Can't handle extType: " + extType));
+                        break;
+                    }
+                    if (refsetModel != null) {
+                        plugin.addRefsetListener(refsetModel);
+                        c.gridy++;
+                        try {
+                            panel.add(getExtensionPanel(extType, refsetModel, host, toggle), c);
+                        } catch (Exception e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                        visibleExtensions.add(extType);
+                    } else {
+                        AceLog.getAppLog().info("refset model is null");
+                    }
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   
+    private static JPanel getExtensionPanel(EXT_TYPE extType, RefsetMemberTableModel refsetModel,
+        I_HostConceptPlugins host, TOGGLES toggle) throws Exception {
+        JPanel relPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        JLabel srcRelLabel = new JLabel("     " + extType.getInterfaceName() + " extensions");
+        srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
+        c.anchor = GridBagConstraints.WEST;
+        c.gridwidth = 2;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.NONE;
+        relPanel.add(srcRelLabel, c);
 
-   private static JPanel getExtensionPanel(EXT_TYPE extType, RefsetMemberTableModel refsetModel) {
-      JPanel relPanel = new JPanel(new GridBagLayout());
-      GridBagConstraints c = new GridBagConstraints();
-      JLabel srcRelLabel = new JLabel("     " + extType.getInterfaceName() + " extensions");
-      srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
-      c.anchor = GridBagConstraints.WEST;
-      c.gridwidth = 2;
-      c.gridx = 0;
-      c.gridy = 0;
-      c.fill = GridBagConstraints.NONE;
-      relPanel.add(srcRelLabel, c);
+        SmallProgressPanel progress = new SmallProgressPanel();
+        progress.setVisible(false);
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.SOUTHEAST;
+        c.gridx++;
+        relPanel.add(progress, c);
+        refsetModel.setProgress(progress);
+        progress.setActive(false);
+        progress.setProgressInfo("");
 
-      SmallProgressPanel progress = new SmallProgressPanel();
-      progress.setVisible(false);
-      c.gridwidth = 1;
-      c.anchor = GridBagConstraints.SOUTHEAST;
-      c.gridx++;
-      relPanel.add(progress, c);
-      refsetModel.setProgress(progress);
-      progress.setActive(false);
-      progress.setProgressInfo("");
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
 
-      c.anchor = GridBagConstraints.WEST;
-      c.gridx = 0;
+        c.gridwidth = 1;
+        c.gridy++;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.gridheight = 2;
+        if (ACE.editMode) {
+            JButton rowAddAfter = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_add.png")));
+            relPanel.add(rowAddAfter, c);
+            rowAddAfter.setEnabled(false);
+            refsetModel.setAddButton(rowAddAfter);
+        } else {
+            JPanel filler = new JPanel();
+            filler.setMaximumSize(new Dimension(40, 32));
+            filler.setMinimumSize(new Dimension(40, 32));
+            filler.setPreferredSize(new Dimension(40, 32));
+            relPanel.add(filler, c);
 
-      c.gridwidth = 1;
-      c.gridy++;
-      c.fill = GridBagConstraints.NONE;
-      c.weightx = 0.0;
-      c.weighty = 0.0;
-      c.gridheight = 2;
-      if (ACE.editMode) {
-         JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-               .getResource("/24x24/plain/paperclip_add.png")));
-         relPanel.add(rowAddAfter, c);
-         rowAddAfter.setEnabled(false);
-         refsetModel.setAddButton(rowAddAfter);
-         //rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
-         //rowAddAfter.setTransferHandler(new TerminologyTransferHandler());
-      } else {
-         JPanel filler = new JPanel();
-         filler.setMaximumSize(new Dimension(40, 32));
-         filler.setMinimumSize(new Dimension(40, 32));
-         filler.setPreferredSize(new Dimension(40, 32));
-         relPanel.add(filler, c);
-         
-      }
-      c.gridheight = 1;
-      c.gridx++;
-      c.gridwidth = 1;
+        }
+        c.gridheight = 1;
+        c.gridx++;
+        c.gridwidth = 1;
 
-      TableSorter relSortingTable = new TableSorter(refsetModel);
-      JTableWithDragImage extTable = new JTableWithDragImage(relSortingTable);
-      relSortingTable.setTableHeader(extTable.getTableHeader());
-      relSortingTable
-            .getTableHeader()
-            .setToolTipText(
-                  "Click to specify sorting; Control-Click to specify secondary sorting");
-      REFSET_FIELDS[] columnEnums = refsetModel.getColumns();
-      for (int i = 0; i < extTable.getColumnCount(); i++) {
-         TableColumn column = extTable.getColumnModel().getColumn(i);
-         REFSET_FIELDS columnDesc = columnEnums[i];
-         column.setIdentifier(columnDesc);
-         column.setPreferredWidth(columnDesc.getPref());
-         column.setMaxWidth(columnDesc.getMax());
-         column.setMinWidth(columnDesc.getMin());
-      }
+        TableSorter refsetSortingTable = new TableSorter(refsetModel);
+        JTableWithDragImage extTable = new JTableWithDragImage(refsetSortingTable);
+        refsetSortingTable.setTableHeader(extTable.getTableHeader());
+        refsetSortingTable.getTableHeader()
+                .setToolTipText("Click to specify sorting; Control-Click to specify secondary sorting");
+        REFSET_FIELDS[] columnEnums = refsetModel.getColumns();
+        for (int i = 0; i < extTable.getColumnCount(); i++) {
+            TableColumn column = extTable.getColumnModel().getColumn(i);
+            REFSET_FIELDS columnDesc = columnEnums[i];
+            column.setIdentifier(columnDesc);
+            column.setPreferredWidth(columnDesc.getPref());
+            column.setMaxWidth(columnDesc.getMax());
+            column.setMinWidth(columnDesc.getMin());
+        }
 
-      //setupEditors(host);
-      if (ACE.editMode) {
-         //extTable.addMouseListener(model
-         //      .makePopupListener(extTable, host.getConfig()));
-      }
-      // Set up tool tips for column headers.
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.weightx = 1.0;
-      relPanel.add(extTable.getTableHeader(), c);
-      c.gridy++;
-      c.fill = GridBagConstraints.BOTH;
-      c.weightx = 1.0;
-      c.weighty = 0.0;
-      c.gridheight = 5;
-      extTable.setDefaultRenderer(StringWithRelTuple.class,
-            new RelationshipTableRenderer());
-      relPanel.add(extTable, c);
-      c.weightx = 0.0;
-      c.weighty = 0.0;
-      c.gridy = c.gridy + c.gridheight;
-      c.gridheight = 1;
-      c.gridx = 0;
-      c.gridwidth = 2;
+        // setupEditors(host);
+        if (ACE.editMode) {
+            extTable.addMouseListener(refsetModel.makePopupListener(extTable, host.getConfig()));
+        }
+        // Set up tool tips for column headers.
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        relPanel.add(extTable.getTableHeader(), c);
+        c.gridy++;
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 0.0;
+        c.gridheight = 5;
+        extTable.setDefaultRenderer(StringWithExtTuple.class, new ExtTableRenderer());
+        extTable.setDefaultRenderer(Number.class, new ExtTableRenderer());
+        extTable.setDefaultRenderer(Boolean.class, new ExtTableRenderer());
+        extTable.setDefaultRenderer(Integer.class, new ExtTableRenderer());
+        extTable.setDefaultRenderer(Double.class, new ExtTableRenderer());
+        extTable.setDefaultRenderer(String.class, new ExtTableRenderer());
 
-      AceLog.getAppLog().info("Added table for: " + extType);
-      return relPanel;
-   }
 
-   static HashSet<I_PluginToConceptPanel> historyState = new HashSet<I_PluginToConceptPanel>();
-   
-   public static boolean refSetsChanged(I_HostConceptPlugins host, TOGGLES toggle, I_PluginToConceptPanel plugin, Set<EXT_TYPE> visibleExtensions) {
-      if (host.getShowRefsets()) {
-         if (historyState.contains(plugin) == host.getShowHistory()) {
-         } else {
-            if (host.getShowHistory()) {
-               historyState.add(plugin);
+ 
+        switch (extType) {
+        case BOOLEAN:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getBooleanPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getBooleanPreferences().getStatusPopupIds());
+            JComboBox comboBox = new JComboBox() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public void setSelectedItem(Object anObject) {
+                    Boolean value = null;
+                    if (Boolean.class.isAssignableFrom(anObject.getClass())) {
+                        value = (Boolean) anObject;
+                    } else if (StringWithExtTuple.class
+                            .isAssignableFrom(anObject.getClass())) {
+                        I_CellTextWithTuple swt = (I_CellTextWithTuple) anObject;
+                        value = Boolean.parseBoolean(swt.getCellText());
+                    }
+                    super.setSelectedItem(value);
+                }
+            };
+            comboBox.addItem(new Boolean(true));
+            comboBox.addItem(new Boolean(false));
+            extTable.getColumn(REFSET_FIELDS.BOOLEAN_VALUE).setCellEditor(new DefaultCellEditor(
+                    comboBox));
+            break;
+        case CONCEPT:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds());
+
+            break;
+        case INTEGER:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getStatusPopupIds());
+            break;
+
+        case MEASUREMENT:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.MEASUREMENT_UNITS_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getUnitsOfMeasurePopupIds());
+            break;
+        case LANGUAGE:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.ACCEPTABILITY, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getAcceptabilityPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CORRECTNESS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getCorrectnessPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.DEGREE_OF_SYNONYMY, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getDegreeOfSynonymyPopupIds());
+
+            break;
+        case SCOPED_LANGUAGE:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.ACCEPTABILITY, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getAcceptabilityPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CORRECTNESS, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getCorrectnessPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.DEGREE_OF_SYNONYMY, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getDegreeOfSynonymyPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.TAG, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getTagPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.SCOPE, 
+                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds());
+            break;
+
+        default:
+            throw new RuntimeException("Can't handle extension type: " + extType);
+        }
+        relPanel.add(extTable, c);
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.gridy = c.gridy + c.gridheight;
+        c.gridheight = 1;
+        c.gridx = 0;
+        c.gridwidth = 2;
+
+        AceLog.getAppLog().info("Added table for: " + extType);
+        return relPanel;
+    }
+
+    private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable, REFSET_FIELDS comboField, IntList comboIntList) {
+        ConceptFieldEditor conceptCombo = 
+            new RefsetMemberTableModel.ConceptFieldEditor(host.getConfig(),
+                                                          comboIntList,
+                                                          comboField);
+        extTable.getColumn(comboField).setCellEditor(conceptCombo);
+    }
+
+    static HashSet<I_PluginToConceptPanel> historyState = new HashSet<I_PluginToConceptPanel>();
+
+    public static boolean refSetsChanged(I_HostConceptPlugins host, TOGGLES toggle, I_PluginToConceptPanel plugin,
+        Set<EXT_TYPE> visibleExtensions) {
+        if (host.getShowRefsets()) {
+            if (historyState.contains(plugin) == host.getShowHistory()) {
             } else {
-               historyState.remove(plugin);
+                if (host.getShowHistory()) {
+                    historyState.add(plugin);
+                } else {
+                    historyState.remove(plugin);
+                }
+
+                return true;
             }
-            
-            return true;
-         }
-         
-         Set<EXT_TYPE> newVisibleSet = new HashSet<EXT_TYPE>();
-         for (EXT_TYPE extType: EXT_TYPE.values()) {
-            if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
-               newVisibleSet.add(extType);
+
+            Set<EXT_TYPE> newVisibleSet = new HashSet<EXT_TYPE>();
+            for (EXT_TYPE extType : EXT_TYPE.values()) {
+                if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
+                    newVisibleSet.add(extType);
+                }
             }
-         }
-         if (newVisibleSet.containsAll(visibleExtensions) && visibleExtensions.containsAll(newVisibleSet)) {
-            // visible extensions did not change...
-         } else {
-           return true;
-         }
-      } else {
-         if (visibleExtensions.size() != 0) {
-           return true;
-         }
-      }
-      return false;
-   }
+            if (newVisibleSet.containsAll(visibleExtensions) && visibleExtensions.containsAll(newVisibleSet)) {
+                // visible extensions did not change...
+            } else {
+                return true;
+            }
+        } else {
+            if (visibleExtensions.size() != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

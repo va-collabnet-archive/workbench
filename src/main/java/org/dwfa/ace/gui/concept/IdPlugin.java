@@ -84,7 +84,7 @@ public class IdPlugin extends AbstractPlugin {
 		fields.add(ID_FIELD.STATUS);
 		if (host.getShowHistory()) {
 			fields.add(ID_FIELD.VERSION);
-			fields.add(ID_FIELD.BRANCH);
+			fields.add(ID_FIELD.PATH);
 		}
 		return fields.toArray(new ID_FIELD[fields.size()]);
 	}

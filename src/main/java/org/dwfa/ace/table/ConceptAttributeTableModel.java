@@ -206,7 +206,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 
 	public enum CONCEPT_FIELD {
 		CON_ID("cid", 5, 100, 100), STATUS("status", 5, 50, 250), DEFINED(
-				"defined", 5, 85, 1550), VERSION("version", 5, 140, 140), BRANCH(
+				"defined", 5, 85, 1550), VERSION("version", 5, 140, 140), PATH(
 				"path", 5, 90, 150);
 
 		private String columnName;
@@ -304,7 +304,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 				}
 				return new StringWithConceptTuple(ThinVersionHelper.format(conTuple
 						.getVersion()), conTuple);
-			case BRANCH:
+			case PATH:
 				if (getReferencedConcepts().containsKey(conTuple.getPathId())) {
 					return new StringWithConceptTuple(getPrefText(conTuple.getPathId()), conTuple);
 				}
@@ -375,7 +375,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
         	return true;
         case VERSION:
         	return false;
-        case BRANCH:
+        case PATH:
         	return false;
         }
 		return false;
@@ -397,7 +397,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 				break;
 			case VERSION:
 				break;
-			case BRANCH:
+			case PATH:
 				break;
 			}
 			fireTableCellUpdated(row, col);
@@ -436,7 +436,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			return StringWithConceptTuple.class;
 		case VERSION:
 			return StringWithConceptTuple.class;
-		case BRANCH:
+		case PATH:
 			return StringWithConceptTuple.class;
 		}
 		return StringWithConceptTuple.class;

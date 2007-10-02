@@ -1,5 +1,6 @@
 package org.dwfa.ace.table.refset;
 
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,12 +25,15 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
    private IntList refsetPopupIds = new IntList();
    private IntList statusPopupIds = new IntList();
    
+   protected transient PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+   
+   
    /**
     * 
     */
    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
+   private static final int dataVersion = 2;
 
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
@@ -50,7 +54,7 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
       } else {
          throw new IOException("Can't handle dataversion: " + objDataVersion);
       }
-
+      pcs = new PropertyChangeSupport(this);
    }
 
    @SuppressWarnings("unchecked")
@@ -80,7 +84,9 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
 
 
    public void setDefaultRefset(I_GetConceptData defaultRefset) {
+      Object oldValue = this.defaultRefset;
       this.defaultRefset = defaultRefset;
+      pcs.firePropertyChange("defaultRefset", oldValue, defaultRefset);
    }
 
 
@@ -90,7 +96,9 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
 
 
    public void setDefaultStatusForRefset(I_GetConceptData defaultStatusForRefset) {
+      Object oldValue = this.defaultStatusForRefset;
       this.defaultStatusForRefset = defaultStatusForRefset;
+      pcs.firePropertyChange("defaultStatusForRefset", oldValue, defaultStatusForRefset);
    }
 
 

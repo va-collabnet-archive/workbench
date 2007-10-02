@@ -2,6 +2,9 @@ package org.dwfa.vodb.types;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+
+import org.dwfa.ace.log.AceLog;
 
 /**
  * @todo add version to vodb -> added as getProperty...
@@ -69,6 +72,9 @@ public class ThinExtByRefVersioned {
    }
 
    public void addVersion(ThinExtByRefPart part) {
+       if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+           AceLog.getEditLog().fine("Adding part: " + part + " to member: " + memberId);
+       }
       versions.add(part);
    }
 
@@ -79,5 +85,4 @@ public class ThinExtByRefVersioned {
    public void setTypeId(int typeId) {
       this.typeId = typeId;
    }
-
 }

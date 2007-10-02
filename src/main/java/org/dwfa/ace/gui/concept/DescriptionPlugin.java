@@ -106,7 +106,7 @@ public class DescriptionPlugin extends AbstractPlugin {
 		fields.add(DESC_FIELD.STATUS);
 		if (host.getShowHistory()) {
 			fields.add(DESC_FIELD.VERSION);
-			fields.add(DESC_FIELD.BRANCH);
+			fields.add(DESC_FIELD.PATH);
 		}
 		return fields.toArray(new DESC_FIELD[fields.size()]);
 	}

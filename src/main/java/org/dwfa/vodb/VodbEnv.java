@@ -773,23 +773,31 @@ public class VodbEnv implements I_ImplementTermFactory {
       }
    }
 
-   public String getProperty(String key) throws DatabaseException {
+   public String getProperty(String key) throws IOException {
       DatabaseEntry propKey = new DatabaseEntry();
       DatabaseEntry propValue = new DatabaseEntry();
 
       stringBinder.objectToEntry(key, propKey);
-      if (metaInfoDb.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-         return (String) stringBinder.entryToObject(propValue);
-      }
+      try {
+        if (metaInfoDb.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+             return (String) stringBinder.entryToObject(propValue);
+          }
+    } catch (DatabaseException e) {
+        throw new ToIoException(e);
+    }
       return null;
    }
 
-   public void setProperty(String key, String value) throws DatabaseException {
+   public void setProperty(String key, String value) throws IOException {
       DatabaseEntry propKey = new DatabaseEntry();
       DatabaseEntry propValue = new DatabaseEntry();
       stringBinder.objectToEntry(key, propKey);
       stringBinder.objectToEntry(value, propValue);
-      metaInfoDb.put(null, propKey, propValue);
+      try {
+        metaInfoDb.put(null, propKey, propValue);
+    } catch (DatabaseException e) {
+        throw new ToIoException(e);
+    }
    }
 
    public boolean hasDescription(int descId) throws DatabaseException {

@@ -97,7 +97,7 @@ public class ConceptAttributePlugin extends AbstractPlugin {
 		fields.add(CONCEPT_FIELD.STATUS);
 		if (host.getShowHistory()) {
 			fields.add(CONCEPT_FIELD.VERSION);
-			fields.add(CONCEPT_FIELD.BRANCH);
+			fields.add(CONCEPT_FIELD.PATH);
 		}
 		return fields.toArray(new CONCEPT_FIELD[fields.size()]);
 	}

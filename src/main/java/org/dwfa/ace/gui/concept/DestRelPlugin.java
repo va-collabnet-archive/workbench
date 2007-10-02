@@ -61,7 +61,7 @@ public class DestRelPlugin extends RelPlugin {
       fields.add(REL_FIELD.STATUS);
       if (showHistory) {
          fields.add(REL_FIELD.VERSION);
-         fields.add(REL_FIELD.BRANCH);
+         fields.add(REL_FIELD.PATH);
       }
       return fields.toArray(new REL_FIELD[fields.size()]);
    }

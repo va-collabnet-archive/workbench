@@ -101,7 +101,7 @@ public class ImagePlugin extends AbstractPlugin {
 		fields.add(IMAGE_FIELD.STATUS);
 		if (host.getShowHistory()) {
 			fields.add(IMAGE_FIELD.VERSION);
-			fields.add(IMAGE_FIELD.BRANCH);
+			fields.add(IMAGE_FIELD.PATH);
 		}
 		return fields.toArray(new IMAGE_FIELD[fields.size()]);
 	}
