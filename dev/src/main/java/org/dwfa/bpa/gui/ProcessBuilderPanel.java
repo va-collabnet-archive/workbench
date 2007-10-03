@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.MarshalledObject;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -309,6 +310,10 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
                   ObjectInputStream ois = new ObjectInputStream(bis);
                   Object obj = ois.readObject();
                   logger.info("Read object: " + obj.getClass().toString());
+                  if (MarshalledObject.class.isAssignableFrom(obj.getClass())) {
+                      MarshalledObject mo = (MarshalledObject) obj;
+                      obj = mo.get();
+                  }
                   I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) obj;
                   ois.close();
                   setProcess(process);
