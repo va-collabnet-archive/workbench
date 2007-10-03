@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -82,8 +83,23 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 				Set<String> processSet = new HashSet<String>(
 						dependenciesToProcess.size());
 				for (DependencySpec ds : dependenciesToProcess) {
+					/*
+					 * Check added to see if the version of the dependecy to be process has been specified.
+					 * If not, we look for a matching dependecy in the dependecies list for the POM and use the version specified there.
+					 * This is to cater for the automated resolution of SNAPSHOT versions by maven.
+					 */
+					if(ds.getVersion()==null){
+						for (Dependency d : dependencies) {
+							if(d.getGroupId().equalsIgnoreCase(ds.getGroupId()) &&
+							   d.getArtifactId().equalsIgnoreCase(ds.artifactId) ){
+								System.out.println("Setting version to >>> "+ d.getVersion());
+								ds.setVersion(d.getVersion());
+							}
+						}
+					}
+						
 					processSet.add(ds.getGroupId() + ds.getArtifactId()
-							+ ds.getVersion());
+							+ ds.getVersion());				
 				}
 				getLog().info("Here are the dependencies...");
 
