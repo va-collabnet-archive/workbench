@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
@@ -24,6 +26,10 @@ public class MojoUtil {
 
 	private static final String fileSep = System.getProperty("file.separator",
 			"/");
+    
+    // example snapshot pattern 2.0.2-20070925.004307-16
+    private static Pattern snapshotPattern = Pattern.compile("[-]{1}[0-9]{8}\\.[0-9]{6}\\-[0-9]{1,3}$");
+    //private static Pattern snapshotPattern = Pattern.compile(".*[0-9]{1,3}$");
 
 	public static String dependencyToPath(String localRepository, Dependency dep) {
 		StringBuffer buff = new StringBuffer();
@@ -41,6 +47,28 @@ public class MojoUtil {
 		buff.append(".jar");
 		return buff.toString();
 	}
+
+    public static String artifactToPath(String localRepository, Artifact artifact) {
+        StringBuffer buff = new StringBuffer();
+        buff.append(localRepository);
+        buff.append(fileSep);
+        buff.append(artifact.getGroupId().replace('.', fileSep.charAt(0)));
+        buff.append(fileSep);
+        buff.append(artifact.getArtifactId());
+        buff.append(fileSep);
+        Matcher snapshotMatcher = snapshotPattern.matcher(artifact.getVersion());
+        if (snapshotMatcher.find()) {
+            buff.append(snapshotMatcher.replaceAll("-SNAPSHOT"));
+        } else {
+            buff.append(artifact.getVersion());
+        }
+        buff.append(fileSep);
+        buff.append(artifact.getArtifactId());
+        buff.append("-");
+        buff.append(artifact.getVersion());
+        buff.append(".jar");
+        return buff.toString();
+    }
 
 	/**
 	 * @param cpBuff

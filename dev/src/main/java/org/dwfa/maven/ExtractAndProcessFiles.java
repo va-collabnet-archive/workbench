@@ -13,13 +13,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -48,8 +49,22 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 	 * @parameter expression="${project.dependencies}"
 	 * @required
 	 */
-	private List<Dependency> dependencies;
+	//private List<Dependency> dependencies;
 
+    /**
+     * The dependency artifacts of this project, for resolving
+     * 
+     * @pathOf(..)@ expressions. These are of type
+     *              org.apache.maven.artifact.Artifact, and are keyed by
+     *              groupId:artifactId, using
+     *              org.apache.maven.artifact.ArtifactUtils.versionlessKey(..)
+     *              for consistent formatting.
+     * 
+     * @parameter expression="${project.artifacts}"
+     * @required
+     * @readonly
+     */
+    private Set<Artifact> artifacts;
 	/**
 	 * @parameter expression="${settings.localRepository}"
 	 * @required
@@ -90,7 +105,7 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 			List<RegexReplace> replacers = null;
 			char[] cbuf = new char[1024];
 			byte[] bbuf = new byte[1024];
-			for (Dependency d : dependencies) {
+			for (Artifact d : artifacts) {
             if (d.getScope().equals("provided")) {
                continue;
             }
@@ -101,8 +116,7 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 					continue;
 				}
 
-				String dependencyPath = MojoUtil.dependencyToPath(
-						localRepository, d);
+				String dependencyPath = MojoUtil.artifactToPath(localRepository, d);
 				File dependencyFile = new File(dependencyPath);
 				if (dependencyFile.exists()) {
 					try {

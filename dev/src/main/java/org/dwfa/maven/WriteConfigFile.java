@@ -9,10 +9,7 @@ package org.dwfa.maven;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
-import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -38,18 +35,6 @@ public class WriteConfigFile extends AbstractMojo {
      */
     ConfigSpec[] specs;
 
-    /**
-     * @parameter expression="${project.dependencies}"
-     * @required
-     */
-    private List<Dependency> dependencies;
-    
-    /**
-     * @parameter expression="${settings.localRepository}"
-     * @required
-     */
-    private String localRepository;
-
     public WriteConfigFile() {
         super();
     }
@@ -59,9 +44,7 @@ public class WriteConfigFile extends AbstractMojo {
         for (int i = 0; i < specs.length; i++) {
             System.out.println(specs[i]);
             try {
-                URLClassLoader libLoader = MojoUtil.getProjectClassLoaderWithoutProvided(
-                		dependencies, localRepository, this.outputDirectory + "/classes/");
-                Class specClass = libLoader.loadClass(specs[i].getClassName());
+                Class specClass = this.getClass().getClassLoader().loadClass(specs[i].getClassName());
                 Constructor specConstructor = specClass.getConstructor(new Class[] {});
                 Object obj = specConstructor.newInstance(new Object[] {});
                 Method m = specClass.getMethod(specs[i].getMethodName(), new Class[] {File.class});
