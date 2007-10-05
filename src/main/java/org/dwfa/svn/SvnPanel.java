@@ -277,11 +277,9 @@ public class SvnPanel extends JPanel {
 			Status[] status = Svn.getSvnClient().status(svd.getWorkingCopyStr(), false, false, false);
 			String commitMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), "commit message: ", true);
 			for (Status s: status) {
-				if (s.isManaged() == false) {
-					if (s.getPath().toLowerCase().endsWith(".jcs")) {
-						Svn.getSvnClient().add(s.getPath(), false);
-						SvnLog.info("Adding: " + s.getPath());
-					}
+				if (s.isManaged() == false && s.isIgnored() == false) {
+                    Svn.getSvnClient().add(s.getPath(), true);
+                    SvnLog.info("Adding: " + s.getPath());
 				}
 			}
 			

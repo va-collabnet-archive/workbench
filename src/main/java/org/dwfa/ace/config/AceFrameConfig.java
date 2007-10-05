@@ -154,7 +154,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    private Set<String> visibleRefsets = new HashSet<String>();
    
    //25 private
-   private Map<TOGGLES, RefsetPreferences> refsetPreferencesMap;
+   private Map<TOGGLES, RefsetPreferences> refsetPreferencesMap = setupRefsetPreferences();
    
 	//transient
     private transient MasterWorker worker;
@@ -485,18 +485,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 25) {
                refsetPreferencesMap = (Map<TOGGLES, RefsetPreferences>) in.readObject();
           } else {
-             refsetPreferencesMap = new HashMap<TOGGLES, RefsetPreferences>();
-             for (TOGGLES toggle: TOGGLES.values()) {
-                try {
-                  refsetPreferencesMap.put(toggle, new RefsetPreferences());
-               } catch (TerminologyException e) {
-                  if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                     AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
-                  } else {
-                     AceLog.getAppLog().info("Missing terms to initialize refests: " + 26);
-                  }
-               }
-             }
+              refsetPreferencesMap = setupRefsetPreferences();
           }
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
@@ -505,13 +494,30 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
 
-	public AceFrameConfig(AceConfig masterConfig) {
+    private static HashMap<TOGGLES, RefsetPreferences> setupRefsetPreferences() throws IOException {
+        HashMap<TOGGLES, RefsetPreferences> map = new HashMap<TOGGLES, RefsetPreferences>();
+         for (TOGGLES toggle: TOGGLES.values()) {
+            try {
+                map.put(toggle, new RefsetPreferences());
+           } catch (TerminologyException e) {
+              if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                 AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+              } else {
+                 AceLog.getAppLog().info("Missing terms to initialize refests: " + 26);
+              }
+           }
+         }
+         return map;
+    }
+
+
+	public AceFrameConfig(AceConfig masterConfig) throws IOException {
 		super();
 		this.masterConfig = masterConfig;
         addListeners();
 	}
 
-	public AceFrameConfig() {
+	public AceFrameConfig() throws IOException {
 		super();
         addListeners();
 	}

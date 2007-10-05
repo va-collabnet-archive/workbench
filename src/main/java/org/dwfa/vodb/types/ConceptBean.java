@@ -35,13 +35,13 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.je.DatabaseException;
@@ -327,9 +327,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData, I_Trans
       if (localDesc.size() == 0) {
          try {
             if (fsDescNid == Integer.MIN_VALUE) {
-               fsDescNid = LocalFixedTerminology.getStore().getNid(
+               fsDescNid = LocalVersionedTerminology.get().uuidToNative(
                      ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.getUids());
-               fsDescNid = LocalFixedTerminology.getStore().getNid(
+               fsDescNid = LocalVersionedTerminology.get().uuidToNative(
                      ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             }
             I_DescriptionVersioned desc = getDescriptions().get(0);

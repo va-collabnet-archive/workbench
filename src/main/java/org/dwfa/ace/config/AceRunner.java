@@ -11,7 +11,10 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -24,12 +27,17 @@ import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.cs.ImportAllChangeSets;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPrompter;
+import org.dwfa.vodb.VodbEnv;
 import org.tigris.subversion.javahl.Revision;
 
 import com.sun.jini.start.LifeCycle;
@@ -107,7 +115,8 @@ public class AceRunner {
                int server = 0;
                int local = 1;
                specParts[local] = specParts[local].replace('/', File.separatorChar);
-               if (new File(specParts[local]).exists()) {
+               File checkoutLocation = new File(specParts[local]);
+               if (checkoutLocation.exists()) {
                   // already checked out
                   AceLog.getAppLog().info(specParts[server] + " already checked out to: " + specParts[local]);
                } else {
@@ -120,12 +129,47 @@ public class AceRunner {
                         // do the checkout...
                         AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
                         Svn.getSvnClient().checkout(specParts[server], specParts[local], Revision.HEAD, true);
+                        
+                        // import any change sets that may be downloaded from svn...
+                        File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
+                        "target/berkeley-db"));
+                        Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
+                        
+                        VodbEnv stealthVodb = new VodbEnv(true);
+                        AceConfig.stealthVodb = stealthVodb;
+                        LocalVersionedTerminology.setStealthfactory(stealthVodb);
+                        stealthVodb.setup(dbFolder, false, cacheSize);
+                        
+                        List<File> changeSetFiles = new ArrayList<File>();
+                        ImportAllChangeSets.addAllChangeSetFiles(checkoutLocation, changeSetFiles);
+                        
+                        TreeSet<I_ReadChangeSet> readerSet = ImportAllChangeSets.getSortedReaderSet();
+                        
+                        for (File csf : changeSetFiles) {
+                            BinaryChangeSetReader csr = new BinaryChangeSetReader();
+                            csr.setChangeSetFile(csf);
+                            csr.setVodb(stealthVodb);
+                            readerSet.add(csr);
+                            AceLog.getAppLog().info("Adding reader: " + csf.getAbsolutePath());
+                        }
+
+                        while (readerSet.size() > 0) {
+                            ImportAllChangeSets.readNext(readerSet);
+                        }
+                        stealthVodb.close();
+                        AceConfig.stealthVodb = null;
+                        LocalVersionedTerminology.setStealthfactory(null);
+                        
                      } catch (Exception e) {
+                         AceConfig.stealthVodb = null;
+                         LocalVersionedTerminology.setStealthfactory(null);
                         AceLog.getAppLog().alertAndLogException(e);
                      }
                   }
                }
             }
+            
+            
          }
 
          File aceConfigFile = (File) config.getEntry(this.getClass().getName(), "aceConfigFile", File.class, new File(

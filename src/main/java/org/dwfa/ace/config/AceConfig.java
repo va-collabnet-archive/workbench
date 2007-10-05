@@ -498,7 +498,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		this.changeSupport.firePropertyChange("username", old, username);
 	}
 
+    public static VodbEnv stealthVodb;
 	public static VodbEnv getVodb() {
+        if (stealthVodb != null) {
+            return stealthVodb;
+        }
 		return (VodbEnv) LocalVersionedTerminology.get();
 	}
 

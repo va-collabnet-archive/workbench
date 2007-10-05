@@ -17,7 +17,6 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 

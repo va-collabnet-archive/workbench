@@ -218,6 +218,10 @@ public class VodbEnv implements I_ImplementTermFactory {
    public VodbEnv() {
       LocalVersionedTerminology.set(this);
    }
+   
+   public VodbEnv(boolean stealth) {
+       
+   }
 
    private class StartupListener implements AWTEventListener {
 
@@ -280,7 +284,9 @@ public class VodbEnv implements I_ImplementTermFactory {
          }
 
          this.readOnly = readOnly;
-         LocalFixedTerminology.setStore(new VodbFixedServer(this));
+         if (this != LocalVersionedTerminology.getStealthfactory()) {
+             LocalFixedTerminology.setStore(new VodbFixedServer(this));
+         }
          envHome.mkdirs();
          luceneDir = new File(envHome, "lucene");
          licitWordsDir = new File(envHome, "lucene-licit");
