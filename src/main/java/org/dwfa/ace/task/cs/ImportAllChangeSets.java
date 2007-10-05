@@ -61,26 +61,7 @@ public class ImportAllChangeSets extends AbstractTask {
 			File rootFile = new File(rootDirStr);
 			List<File> changeSetFiles = new ArrayList<File>();
 			addAllChangeSetFiles(rootFile, changeSetFiles);
-			TreeSet<I_ReadChangeSet> readerSet = new TreeSet<I_ReadChangeSet>(new Comparator<I_ReadChangeSet>() {
-
-				public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
-					try {
-						if (r1.nextCommitTime() == r2.nextCommitTime()) {
-							return 0;
-						}
-						if (r1.nextCommitTime() > r2.nextCommitTime()) {
-							return 1;
-						}
-						return -1;
-					} catch (IOException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					} catch (ClassNotFoundException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					}
-					return -1;
-				}
-				
-			});
+			TreeSet<I_ReadChangeSet> readerSet = getSortedReaderSet();
 			for (File csf : changeSetFiles) {
 				I_ReadChangeSet csr = LocalVersionedTerminology.get()
 						.newBinaryChangeSetReader(csf);
@@ -98,8 +79,32 @@ public class ImportAllChangeSets extends AbstractTask {
 			throw new TaskFailedException(e);
 		}
 	}
+
+    public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
+        TreeSet<I_ReadChangeSet> readerSet = new TreeSet<I_ReadChangeSet>(new Comparator<I_ReadChangeSet>() {
+
+        	public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
+        		try {
+        			if (r1.nextCommitTime() == r2.nextCommitTime()) {
+        				return 0;
+        			}
+        			if (r1.nextCommitTime() > r2.nextCommitTime()) {
+        				return 1;
+        			}
+        			return -1;
+        		} catch (IOException e) {
+        			AceLog.getAppLog().alertAndLogException(e);
+        		} catch (ClassNotFoundException e) {
+        			AceLog.getAppLog().alertAndLogException(e);
+        		}
+        		return -1;
+        	}
+        	
+        });
+        return readerSet;
+    }
 	
-	private void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
+	public static void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
 		if (readerSet.size() == 0) {
 			return;
 		}
@@ -124,7 +129,7 @@ public class ImportAllChangeSets extends AbstractTask {
 		
 	}
 
-	private void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles) {
+	public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles) {
 		File[] children = rootFile.listFiles(new FileFilter() {
 
 			public boolean accept(File child) {
