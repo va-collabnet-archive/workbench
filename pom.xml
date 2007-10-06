@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.tmatesoft</groupId>
       <artifactId>svnkit</artifactId>
-      <version>1.1.2</version>
+      <version>1.1.4.3248</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa.jini</groupId>
