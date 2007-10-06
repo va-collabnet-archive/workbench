@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
@@ -243,11 +244,17 @@ public class SvnPanel extends JPanel {
 			SvnLog.fine("working copy LastDateTextUpdate: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastDateTextUpdate());
 		}
 	}
-	public static void status(SubversionData svd, SvnPrompter authenticator) {
-		SvnLog.info("starting status");
+	public static Status[] status(SubversionData svd, SvnPrompter authenticator) {
+        Status[] status = null;
+        String workingCopy = svd.getWorkingCopyStr();
+        if (workingCopy.endsWith("/") == false) {
+            workingCopy = workingCopy + "/";
+        }
+		SvnLog.info("starting status for working copy: " + workingCopy + 
+                    ", absolute file:" +new File(workingCopy).getAbsoluteFile());
 		try {
 			handleAuthentication(authenticator);
-			Status[] status = Svn.getSvnClient().status(svd.getWorkingCopyStr(), false, false, false);
+			status = Svn.getSvnClient().status(workingCopy, true, false, false);
 			for (Status s: status) {
 				SvnLog.info("Managed: " + s.isManaged() + " status: " + s.getTextStatusDescription() + " " + s.getPath());	
 			}
@@ -255,7 +262,8 @@ public class SvnPanel extends JPanel {
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
-		SvnLog.info("finished status");
+		SvnLog.info("finished status for working copy: " + workingCopy);
+        return status;
 	}
 	public static void cleanup(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("starting cleanup");
@@ -274,18 +282,31 @@ public class SvnPanel extends JPanel {
 		SvnLog.info("Starting Commit");
 		try {
 			
-			Status[] status = Svn.getSvnClient().status(svd.getWorkingCopyStr(), false, false, false);
-			String commitMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), "commit message: ", true);
+			Status[] status = status(svd, authenticator);
+            
+            int newFiles = 0;
+            int deletedFiles = 0;
+            int modifiedFiles = 0;
 			for (Status s: status) {
 				if (s.isManaged() == false && s.isIgnored() == false) {
                     Svn.getSvnClient().add(s.getPath(), true);
                     SvnLog.info("Adding: " + s.getPath());
-				}
+                    newFiles++;
+				} else {
+                    SvnLog.info("Not adding: " + s.getPath());
+                }
 			}
+            
+            if (newFiles + deletedFiles + modifiedFiles > 0) {
+                String defalutMessage = "new: " + newFiles + " deleted: " + deletedFiles + 
+                    " modified: " + modifiedFiles;
+                String commitMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), "commit message: ", 
+                                                                 defalutMessage, true);
+                handleAuthentication(authenticator);
+                Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, true);
+                logDetails(svd);
+            }
 			
-			handleAuthentication(authenticator);
-			Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, true);
-			logDetails(svd);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}

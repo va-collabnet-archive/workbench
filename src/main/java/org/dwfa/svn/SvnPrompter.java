@@ -139,12 +139,15 @@ public class SvnPrompter implements PromptUserPassword3 {
 	}
 
 	public String askQuestion(String realm, String question, boolean showAnswer) {
-		if (showAnswer == false) {
-			return askQuestion(realm, question, showAnswer, false);
-		}
-		return (String) JOptionPane.showInputDialog(parentContainer, question, realm,
-				JOptionPane.PLAIN_MESSAGE, null, null, "");
+		return askQuestion(realm, question, "", showAnswer);
 	}
+    public String askQuestion(String realm, String question, String defaultAnswer, boolean showAnswer) {
+        if (showAnswer == false) {
+            return askQuestion(realm, question, showAnswer, false);
+        }
+        return (String) JOptionPane.showInputDialog(parentContainer, question, realm,
+                JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
+    }
 
 	public boolean askYesNo(String realm, String question, boolean yesIsDefault) {
 		int initialValue = JOptionPane.NO_OPTION;
