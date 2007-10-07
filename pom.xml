@@ -116,7 +116,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>2.4-SNAPSHOT</version>
         <configuration>
           <goalPrefix>plugin</goalPrefix>
           <outputDirectory>${project.build.directory}/generated-site/xdoc/plugins</outputDirectory>
