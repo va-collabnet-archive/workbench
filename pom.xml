@@ -8,6 +8,8 @@
   <version>1.2-SNAPSHOT</version>
   <name>Versioned Object Database</name>
   <url>http://www.informatics.com</url>
+  <inceptionYear>2005</inceptionYear>
+  <description>ACE editor toolkit and version-oriented database</description>
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
