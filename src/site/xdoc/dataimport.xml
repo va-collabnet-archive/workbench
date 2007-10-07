@@ -1,0 +1,29 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>Data Import</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Data Import">
+       <p>Eclipse provides a generally available integrated development environment for developing java components. 
+       <a href="http://maven.apache.org/plugins/maven-eclipse-plugin/overview.html">The Maven Eclipse Plugin</a> provides a means to 
+       generate an Eclipse project file from a Maven project.</p>
+       <p>The DWFA modules include an entry for the Maven Eclipse Plugin in each of their <code>pom.xml</code> files.
+       If you would like to use Eclipse to extend the DWFA environment by adding your own tasks, please follow these steps:</p>
+       <ol>
+         <li>concepts.txt</li>
+         <li>descriptions.txt</li>
+         <li>relationships.txt</li>
+         <li>illicit_words.txt</li>
+         <li>licit_words.txt</li>
+         <li>need to add: ids.txt</li>
+       </ol>
+
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

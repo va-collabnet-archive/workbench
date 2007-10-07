@@ -1,4 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.dwfa</groupId>
+    <artifactId>dwfa-pom</artifactId>
+    <version>2.0</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>term-mojo</artifactId>
@@ -11,6 +16,22 @@
     <developerConnection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</developerConnection>
     <url>https://term-mojo.aceworkspace.net/source/browse/term-mojo/trunk/dev/</url>
   </scm>
+  <organization>
+    <name>Informatics, Inc.</name>
+    <url>http://www.informatics.com</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <inceptionYear>2006</inceptionYear>
+  <description>This project provides a set of maven goals that are used to
+    transform terminology data in 
+  preperation for importing into standard file formats used by the ACE version-orented database, and by other applications. 
+  </description>
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
@@ -92,6 +113,15 @@
           <target>1.5</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>2.4-SNAPSHOT</version>
+        <configuration>
+          <goalPrefix>plugin</goalPrefix>
+          <outputDirectory>${project.build.directory}/generated-site/xdoc/plugins</outputDirectory>
+        </configuration>
+      </plugin>      
       <plugin>
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>

@@ -35,7 +35,7 @@ import org.dwfa.vodb.types.ConceptBean;
 /**
  * *
  * <h1>ExportDatabase</h1>
- * <br>
+ * <br/>
  * <p>
  * The <code>ExportDatabase</code> class Exports database tables to flat
  * files.
@@ -44,8 +44,6 @@ import org.dwfa.vodb.types.ConceptBean;
  * </p>
  * 
  * 
- * <br>
- * <br>
  * 
  * @see <code>org.apache.maven.plugin.AbstractMojo</code>
  * @author PeterVawser

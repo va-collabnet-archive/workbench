@@ -17,6 +17,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
+ * Flag a concept to demonstrate how to change make changes to components...
  * 
  * @goal vodb-example-change
  * 
@@ -25,10 +26,19 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
  */
 public class VodbExampleChange extends AbstractMojo {
 
-	/**
-	 * Flag a concept to demonstrate how to change make changes to components...
-	 */
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Location of the directory to output data files to.
+     * KEC: I added this field, because the maven plugin plugin would 
+     * crash unless there was at least one commented field. This field is
+     * not actually used by the plugin. 
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    @SuppressWarnings("unused")
+    private String outputDirectory;
+
+ 	public void execute() throws MojoExecutionException, MojoFailureException {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		try {
 			I_GetConceptData architectonicRoot = termFactory

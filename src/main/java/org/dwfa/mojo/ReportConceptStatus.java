@@ -13,9 +13,7 @@ import java.util.Vector;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -31,12 +29,12 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 /**
 *
 * <h1>ReportConceptStatus</h1>
-* <br>
+* <br/>
 * <p>The <code>ReportConceptStatus</code> class queries the database to get details of concept status changes over time.</p>
 * <p>This data is then used by an instance of the <code>MojoGraph</code> class to create a graphical representation</p>
 * <p>of the details for use in a maven generated site.</p>
-* <br>
-* <br>
+* <br/>
+* <br/>
 * @see <code>org.apache.maven.plugin.AbstractMojo</code>
 * @see <code>org.dwfa.maven.graph.mojoGraph</code>
 * @author PeterVawser 
@@ -44,7 +42,19 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 */
 public class ReportConceptStatus extends AbstractMojo{
 	
-	private class CheckConceptStatus implements I_ProcessConcepts{
+    /**
+     * Location of the directory to output data files to.
+     * KEC: I added this field, because the maven plugin plugin would 
+     * crash unless there was at least one commented field. This field is
+     * not actually used by the plugin. 
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    @SuppressWarnings("unused")
+    private String outputDirectory;
+
+    private class CheckConceptStatus implements I_ProcessConcepts{
 		I_TermFactory termFactory;
 		private int currentCount =0;
 		private int retiredCount =0;
