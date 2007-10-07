@@ -17,10 +17,26 @@
       <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
     </links>
     
-    <menu name="Module">
-      <item name="Module Home" href="index.html"/>
+    <menu name="DWFA mojo">
+      <item name="DWFA mojo Home" href="index.html"/>
       <item name="Parent Module: DWFA Master" href="../index.html"/>
-      <item name="Goals" href="plugin-info.html"/>
+    </menu>
+    <menu name="Goals">
+      <item name="class-dep" href="plugins/class-dep-mojo.html"/>
+      <item name="execute-main" href="plugins/execute-main-mojo.html"/>
+      <item name="export-beans" href="plugins/export-beans-mojo.html"/>
+      <item name="export-cement" href="plugins/export-cement-mojo.html"/>
+      <item name="generate-scripts" href="plugins/generate-scripts-mojo.html"/>
+      <item name="join" href="plugins/join-mojo.html"/>
+      <item name="process-config" href="plugins/process-config-mojo.html"/>
+      <item name="process-project-dirs" href="plugins/process-project-dirs-mojo.html"/>
+      <item name="run-app" href="plugins/run-app-mojo.html"/>
+      <item name="run-derby" href="plugins/run-derby-mojo.html"/>
+      <item name="transform" href="plugins/transform-mojo.html"/>
+      <item name="write-annotated-beans-dep" href="plugins/write-annotated-beans-mojo.html"/>
+      <item name="write-beans" href="plugins/write-beans-mojo.html"/>
+      <item name="write-config-dep" href="plugins/write-config-mojo.html"/>
+      <item name="write-directories" href="plugins/write-directories-mojo.html"/>
     </menu>
     
     ${reports}

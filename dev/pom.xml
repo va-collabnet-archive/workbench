@@ -10,6 +10,11 @@
   <artifactId>dwfa-mojo</artifactId>
   <packaging>maven-plugin</packaging>
   <name>DWFA mojo</name>
+  <inceptionYear>2004</inceptionYear>
+  <description>Maven plugins helpful in building DWFA projects with maven. 
+    Some example inculde custom processing of configuration files using maven pom files, 
+    and customizaiton of workflow bundles.
+  </description>
   <url>http://www.informatics.com</url>
   <issueManagement>
     <system>Scarab</system>
@@ -104,6 +109,32 @@
       <scope>compile</scope>
     </dependency>
    </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <configuration>
+          <goalPrefix>plugin</goalPrefix>
+          <outputDirectory>${project.build.directory}/generated-site/xdoc/plugins</outputDirectory>
+        </configuration>
+      </plugin>      
+      <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <workspace>/eclipse/workspace</workspace>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
   	<profile>
   		<id>add-tools-on-windows</id>
