@@ -484,6 +484,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
            }
             if (objDataVersion >= 25) {
                refsetPreferencesMap = (Map<TOGGLES, RefsetPreferences>) in.readObject();
+               if (refsetPreferencesMap == null) {
+                   refsetPreferencesMap = setupRefsetPreferences();
+               }
           } else {
               refsetPreferencesMap = setupRefsetPreferences();
           }
@@ -1601,6 +1604,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    }
 
    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) {
+       if (refsetPreferencesMap == null) {
+           try {
+            refsetPreferencesMap = setupRefsetPreferences();
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+       }
       return refsetPreferencesMap.get(toggle);
    }
 

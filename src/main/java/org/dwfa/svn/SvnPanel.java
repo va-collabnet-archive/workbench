@@ -288,7 +288,15 @@ public class SvnPanel extends JPanel {
             int deletedFiles = 0;
             int modifiedFiles = 0;
 			for (Status s: status) {
-				if (s.isManaged() == false && s.isIgnored() == false) {
+                if (s.isManaged()) {
+                    if (s.getTextStatusDescription().equalsIgnoreCase("missing") ) {
+                        Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", true);
+                        SvnLog.info("Removing: " + s.getPath());
+                        deletedFiles++;
+                    } else if (s.getTextStatusDescription().equalsIgnoreCase("modified") ) {
+                        modifiedFiles++;
+                    }
+                } else if (s.isIgnored() == false) {
                     Svn.getSvnClient().add(s.getPath(), true);
                     SvnLog.info("Adding: " + s.getPath());
                     newFiles++;

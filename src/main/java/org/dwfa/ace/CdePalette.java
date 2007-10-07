@@ -27,26 +27,30 @@ public class CdePalette extends JPanel implements ComponentListener {
 		
 		public PaletteMover(Point currentLocation, Point endLocation, boolean selected) {
 			super();
-			this.currentLocation = currentLocation;
-			this.endLocation = endLocation;
-			t = new Timer(delay, this);
-			t.start();	
-			JLayeredPane layers = getRootPane().getLayeredPane();
-			layers.add(ghostPanel, JLayeredPane.PALETTE_LAYER);
-			ghostPanel.setBounds(getBounds());
-			ghostPanel.setVisible(selected);
-			getRootPane().getLayeredPane().moveToFront(ghostPanel);
-			setVisible(false);
-			setLocation(endLocation);
+            if (getRootPane() != null) {
+                this.currentLocation = currentLocation;
+                this.endLocation = endLocation;
+                t = new Timer(delay, this);
+                t.start();  
+                JLayeredPane layers = getRootPane().getLayeredPane();
+                layers.add(ghostPanel, JLayeredPane.PALETTE_LAYER);
+                ghostPanel.setBounds(getBounds());
+                ghostPanel.setVisible(selected);
+                getRootPane().getLayeredPane().moveToFront(ghostPanel);
+                setVisible(false);
+                setLocation(endLocation);
+            }
 
 		}
 
 		public void stop() {
-			t.stop();
-			t.removeActionListener(this);
-			setLocation(endLocation);
-			setVisible(true);
-			removeGhost();
+            if (t != null) {
+                t.stop();
+                t.removeActionListener(this);
+                setLocation(endLocation);
+                setVisible(true);
+                removeGhost();
+            }
 		}
 
 
