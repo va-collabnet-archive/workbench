@@ -140,9 +140,11 @@ public class ServiceListModel implements ServiceDiscoveryListener, ListModel {
 			ListDataEvent lde = null;
 			synchronized (ServiceListModel.this.services) {
 				int index = ServiceListModel.this.services.indexOf(preService);
-				ServiceListModel.this.services.set(index, postService);
-				lde = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED,
-						index, index);
+                if (index != -1) {
+                    ServiceListModel.this.services.set(index, postService);
+                    lde = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED,
+                            index, index);
+                }
 			}
 			synchronized (ServiceListModel.this.listeners) {
 				for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr
