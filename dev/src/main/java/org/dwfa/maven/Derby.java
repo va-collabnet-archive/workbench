@@ -144,6 +144,7 @@ public class Derby extends AbstractMojo {
                 fw.close();
                 System.getProperties().setProperty("derby.infolog.append", "true");
                 System.getProperties().setProperty("derby.stream.error.file", dbErrLog.getCanonicalPath());
+                System.setProperty("derby.system.home", "./target");                
                 Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 
                 Connection conn = DriverManager.getConnection("jdbc:derby:directory:" + dbDir.getCanonicalPath() +
