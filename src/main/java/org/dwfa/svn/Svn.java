@@ -2,6 +2,8 @@ package org.dwfa.svn;
 
 
 
+import java.util.logging.Level;
+
 import org.dwfa.ace.log.AceLog;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.NodeKind;
@@ -43,21 +45,57 @@ public class Svn {
 			// successfully executing any other methods.
 			client.notification2(new Notify2() {
 				public void onNotify(NotifyInformation info) {
-					SvnLog.info("svn onNotify: " + " path: " + info.getPath()
-							+ "\n" + " kind: "
-							+ NodeKind.getNodeKindName(info.getKind()) + " "
-							+ " content state: "
-							+ NotifyStatus.statusNames[info.getContentState()]
-							+ " " + " prop state: "
-							+ NotifyStatus.statusNames[info.getPropState()]
-							+ " \n" + " err msg: " + info.getErrMsg() + " "
-							+ " mime : " + info.getMimeType() + " "
-							+ " revision: " + info.getRevision() + " \n"
-							+ " lock: " + info.getLock() + " "
-							+ " lock state: " + info.getLockState() + " "
-							+ " action: "
-							+ NotifyAction.actionNames[info.getAction()]);
+                    try {
+                        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                            String path = info.getPath();
+                            String nodeKindName = NodeKind.getNodeKindName(info.getKind());
+                            String contentStateName = convertStatus(info.getContentState());
+                            String propertyStateName = convertStatus(info.getPropState());
+                            String errorMsg = info.getErrMsg();
+                            String mimeType = info.getMimeType();
+                            String revision = Long.toString(info.getRevision());
+                            String lock = toString(info.getLock());
+                            String lockState = Integer.toString(info.getLockState());
+                            String action = convertAction(info.getAction());
+                            
+                            SvnLog.info("svn onNotify: " + " path: " + path
+                                    + "\n" + " kind: "
+                                    + nodeKindName + " "
+                                    + " content state: "
+                                    + contentStateName
+                                    + " prop state: "
+                                    + propertyStateName
+                                    + " \n" + " err msg: " + errorMsg + " "
+                                    + " mime : " + mimeType + " "
+                                    + " revision: " + revision + " \n"
+                                    + " lock: " + lock + " "
+                                    + " lock state: " + lockState + " "
+                                    + " action: "
+                                    + action);
+                        }
+                    } catch (Throwable t) {
+                        AceLog.getAppLog().alertAndLogException(t);
+                    }
 				}
+
+                private String toString(Object obj) {
+                    if (obj == null) {
+                        return "null";
+                    }
+                    return obj.toString();
+                }
+                private String convertAction(int infoAction) {
+                     if (infoAction >= 0 && infoAction < NotifyAction.actionNames.length) {
+                        return NotifyAction.actionNames[infoAction];
+                    }
+                    return Integer.toString(infoAction);
+                }
+                private String convertStatus(int infoState) {
+                    if (infoState >= 0 && infoState < NotifyStatus.statusNames.length) {
+                        return NotifyStatus.statusNames[infoState];
+                    }
+                    return Integer.toString(infoState);
+                }
 			});
 		}
 		return client;

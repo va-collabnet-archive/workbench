@@ -2409,6 +2409,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         if (editMode) {
             if (uncommitted.size() > 0) {
+                AceLog.getAppLog().info("Uncommitted: " + uncommitted);
+                if (aceConfig != null) {
+                    for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                        frameConfig.setCommitEnabled(true);
+                    }
+                }
+
                 JOptionPane
                         .showMessageDialog(this,
                                            "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
