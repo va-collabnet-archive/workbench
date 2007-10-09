@@ -3,13 +3,13 @@
   <groupId>org.dwfa</groupId>
   <artifactId>ace-api</artifactId>
   <packaging>jar</packaging>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <name>ACE API</name>
   <url>http://mgr.cubit.aceworkspace.net:8081/dwfa/ace-api</url>
   <scm>
-    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</connection>
-    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</developerConnection>
-    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
+    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/tags/ace-api-1.2</connection>
+    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/tags/ace-api-1.2</developerConnection>
+    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/tags/ace-api-1.2</url>
   </scm>
   <distributionManagement>
     <repository>
