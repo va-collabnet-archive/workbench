@@ -237,6 +237,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
         return 0;
     }
+    
+    private static boolean writeChangeSets = true;
+    
+    public static void resumeChangeSetWriters() {
+        writeChangeSets = true;
+    }
+
+    public static void suspendChangeSetWriters() {
+        writeChangeSets = false;
+    }
+
 
     /*
      * 
@@ -244,9 +255,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static void commit() throws IOException {
         Date now = new Date();
         Set<TimePathId> values = new HashSet<TimePathId>();
-        for (I_WriteChangeSet writer : csWriters) {
-            AceLog.getEditLog().info("Opening writer: " + writer.toString());
-            writer.open();
+        if (writeChangeSets) {
+            for (I_WriteChangeSet writer : csWriters) {
+                AceLog.getEditLog().info("Opening writer: " + writer.toString());
+                writer.open();
+            }
         }
         int version = ThinVersionHelper.convert(now.getTime());
         AceLog.getEditLog().info("Starting commit: " + version + " (" + now.getTime() + ")");
@@ -266,25 +279,32 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
         }
-        for (I_WriteChangeSet writer : csWriters) {
-            writer.writeChanges(uncommittedIds, ThinVersionHelper.convert(version));
-        }
-
-        for (I_Transact cb : uncommitted) {
+        if (writeChangeSets) {
             for (I_WriteChangeSet writer : csWriters) {
-                writer.writeChanges(cb, ThinVersionHelper.convert(version));
+                writer.writeChanges(uncommittedIds, ThinVersionHelper.convert(version));
             }
-            cb.commit(version, values);
+
+            for (I_Transact cb : uncommitted) {
+                for (I_WriteChangeSet writer : csWriters) {
+                    writer.writeChanges(cb, ThinVersionHelper.convert(version));
+                }
+            }
         }
+        
         try {
+            for (I_Transact cb : uncommitted) {
+                cb.commit(version, values);
+            }
             AceConfig.getVodb().addTimeBranchValues(values);
             AceConfig.getVodb().sync();
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }
-        for (I_WriteChangeSet writer : csWriters) {
-            AceLog.getEditLog().info("Committing writer: " + writer.toString());
-            writer.commit();
+        if (writeChangeSets) {
+            for (I_WriteChangeSet writer : csWriters) {
+                AceLog.getEditLog().info("Committing writer: " + writer.toString());
+                writer.commit();
+            }
         }
         uncommitted.clear();
         fireCommit();
@@ -2660,5 +2680,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         });
     }
+
 
 }

@@ -2727,4 +2727,14 @@ public class VodbEnv implements I_ImplementTermFactory {
       return new IntList();
    }
 
+public void resumeChangeSetWriters() {
+   ACE.resumeChangeSetWriters();
+    
+}
+
+public void suspendChangeSetWriters() {
+    ACE.suspendChangeSetWriters();
+    
+}
+
 }
