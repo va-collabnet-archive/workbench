@@ -13,7 +13,8 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.maven.MojoUtil;
 
 /**
- * 
+ * Read a binary change set, and apply the results of that change set to the
+ * open database. 
  * @goal bcs-read
  * 
  * @phase process-resources
