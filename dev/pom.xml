@@ -162,8 +162,8 @@
         </dependency>
       </dependencies>
     </profile>
-    <!--
     <profile>
+      <id>genweb</id>
       <activation>
         <property>
           <name>webgengoals</name>
@@ -183,6 +183,5 @@
         </plugins>
       </build>
     </profile>
-    -->
   </profiles>
 </project>
