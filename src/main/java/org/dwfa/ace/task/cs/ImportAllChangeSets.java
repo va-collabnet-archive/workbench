@@ -57,6 +57,8 @@ public class ImportAllChangeSets extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
+        
+        LocalVersionedTerminology.get().suspendChangeSetWriters();
 		try {
 			File rootFile = new File(rootDirStr);
 			List<File> changeSetFiles = new ArrayList<File>();
@@ -71,13 +73,18 @@ public class ImportAllChangeSets extends AbstractTask {
 			while (readerSet.size() > 0) {
 				readNext(readerSet);
 			}
-
-			return Condition.CONTINUE;
+			
+            LocalVersionedTerminology.get().commit();
+            
 		} catch (IOException e) {
 			throw new TaskFailedException(e);
 		} catch (ClassNotFoundException e) {
 			throw new TaskFailedException(e);
-		}
+		} catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+        LocalVersionedTerminology.get().resumeChangeSetWriters();
+        return Condition.CONTINUE;
 	}
 
     public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
