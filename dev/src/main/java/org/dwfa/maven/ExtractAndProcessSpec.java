@@ -10,7 +10,8 @@ public class ExtractAndProcessSpec {
 		private String replacementStr = null;
 		
 		private NULL_ACTION nullAction = NULL_ACTION.MAKE_UUID;
-		
+        
+ 		
 		public SubstutionSpec() {
 			super();
 		}
@@ -62,7 +63,9 @@ public class ExtractAndProcessSpec {
     
     private boolean executable = false;
 
-	public ExtractAndProcessSpec() {
+    private boolean saveBeanForQueue = false;
+
+    public ExtractAndProcessSpec() {
 		super();
 	}
 
@@ -125,5 +128,14 @@ public class ExtractAndProcessSpec {
     public void setExecutable(boolean executable) {
         this.executable = executable;
     }
+    
+    public boolean getSaveBeanForQueue() {
+        return saveBeanForQueue;
+    }
+    
+    public void setSaveBeanForQueue(boolean saveBeanForQueue) {
+        this.saveBeanForQueue = saveBeanForQueue;
+    }
+
 	
 }

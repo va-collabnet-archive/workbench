@@ -1,12 +1,19 @@
 package org.dwfa.maven;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.rmi.MarshalledObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +24,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.maven.ExtractAndProcessSpec.SubstutionSpec;
 import org.dwfa.util.io.FileIO;
 
@@ -144,7 +152,28 @@ public class ProcessProjectDirectories extends AbstractMojo {
                             }
                             fw.close();
                         } else {
-                            if (f.equals(destFile) == false) {
+                            if (spec.getSaveBeanForQueue()) {
+                                FileInputStream fis = new FileInputStream(f);
+                                BufferedInputStream bis = new BufferedInputStream(fis);
+                                ObjectInputStream ois = new ObjectInputStream(bis);
+                                Object obj = ois.readObject();
+                                getLog().info("Read object: " + obj.getClass().toString());
+                                if (MarshalledObject.class.isAssignableFrom(obj.getClass())) {
+                                    MarshalledObject mo = (MarshalledObject) obj;
+                                    obj = mo.get();
+                                }
+                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) obj;
+                                ois.close();
+
+                                
+                                destFile = new File(destFile.getParentFile(), process.getProcessID() + "." + UUID.randomUUID() + ".bp");
+                                FileOutputStream fos = new FileOutputStream(destFile);
+                                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                                oos.writeObject(process);
+                                oos.close();
+
+                            } else if (f.equals(destFile) == false) {
                                 FileIO.copyFile(f, destFile);
                             }
                         }
