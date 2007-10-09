@@ -121,10 +121,10 @@
       </plugin>
     </plugins>
   </build>
-  <!--
   <profiles>
     <profile>
-      <activation>
+    <id>genweb</id>
+    <activation>
         <property>
           <name>webgengoals</name>
           <value>true</value>
@@ -144,5 +144,4 @@
       </build>
     </profile>
   </profiles>
-  -->
 </project>
