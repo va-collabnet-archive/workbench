@@ -162,6 +162,7 @@
         </dependency>
       </dependencies>
     </profile>
+    <!--
     <profile>
       <activation>
         <property>
@@ -182,5 +183,6 @@
         </plugins>
       </build>
     </profile>
+    -->
   </profiles>
 </project>
