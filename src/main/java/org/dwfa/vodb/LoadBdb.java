@@ -3,6 +3,8 @@ package org.dwfa.vodb;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -114,27 +116,34 @@ public class LoadBdb {
 		timer.start();
 		loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
+        
+        Set<String> argSet = new HashSet<String>(Arrays.asList(args));
+        argSet.remove(args[0]);
+        String processed = null;
+        
         for (String arg: args) {
             if (arg.contains("cement")) {
+                processed = arg;
                 AceLog.getAppLog().info("Processing constants in: " + arg);
                 loadConstants.execute(new JarFile(arg), "org/jehri/cement/", FORMAT.SNOMED);
                 break;
             }
         }
+        argSet.remove(processed);
 		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
 		AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
 		int[] releaseDates = loadConstants.getReleaseDates();
-		if (args.length > 2) {
-			ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
-					(VodbEnv) LocalVersionedTerminology.get(), loadConstants.getConstantToIntMap(),
-					releaseDates[0]);
-			AceLog.getAppLog().info("Starting to process SNOMED.");
-			loadSnomed.execute(new JarFile(args[2]));
-			AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: "
-					+ timer.getElapsedTime());
-		}
+        for (String arg: argSet) {
+            ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
+                                                                        (VodbEnv) LocalVersionedTerminology.get(), loadConstants.getConstantToIntMap(),
+                                                                        releaseDates[0]);
+                                                                AceLog.getAppLog().info("Starting to process SNOMED.");
+                                                                loadSnomed.execute(new JarFile(arg));
+                                                                AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: "
+                                                                        + timer.getElapsedTime());
+        }
 	}
 
 }
