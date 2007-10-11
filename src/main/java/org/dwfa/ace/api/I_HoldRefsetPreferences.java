@@ -6,6 +6,7 @@ import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguage;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguageScoped;
 import org.dwfa.ace.refset.I_RefsetDefaultsMeasurement;
+import org.dwfa.ace.refset.I_RefsetDefaultsString;
 
 public interface I_HoldRefsetPreferences {
    public I_RefsetDefaultsBoolean getBooleanPreferences();
@@ -14,4 +15,5 @@ public interface I_HoldRefsetPreferences {
    public I_RefsetDefaultsMeasurement getMeasurementPreferences();
    public I_RefsetDefaultsLanguage getLanguagePreferences();
    public I_RefsetDefaultsLanguageScoped getLanguageScopedPreferences();
+   public I_RefsetDefaultsString getStringPreferences();
 }
