@@ -188,6 +188,8 @@ public class JTableWithDragImage extends JTable {
             case MEASUREMENT_UNITS_ID:
                 return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartMeasurement) swextt.getTuple()
                         .getPart()).getUnitsOfMeasureId()));
+            case STRING_VALUE:
+                return new StringSelection(swextt.getCellText()); 
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }

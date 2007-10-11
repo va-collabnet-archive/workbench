@@ -55,11 +55,74 @@ import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
 import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
+import org.dwfa.vodb.types.ThinExtByRefPartString;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
+
+    public static class StringFieldEditor extends DefaultCellEditor {
+
+        private static final long serialVersionUID = 1L;
+        private JComboBox combo;
+        
+        I_ConfigAceFrame config;
+
+        REFSET_FIELDS field;
+
+        public StringFieldEditor(I_ConfigAceFrame config, String[] items, REFSET_FIELDS field) {
+            super(new JComboBox());
+            this.field = field;
+            combo = new JComboBox(items);
+            combo.setMaximumRowCount(20);
+            this.config = config;
+             editorComponent = combo;
+
+            delegate = new EditorDelegate() {
+                private static final long serialVersionUID = 1L;
+
+                public void setValue(Object value) {
+                        combo.setSelectedItem(getSelectedItem(value));
+                }
+
+                public Object getCellEditorValue() {
+                    return ((ConceptBean) combo.getSelectedItem()).getConceptId();
+                }
+            };
+            combo.addActionListener(delegate);
+        }
+
+         
+        public Component getTableCellEditorComponent(JTable table,
+                Object value, boolean isSelected, int row, int column) {
+            return super.getTableCellEditorComponent(table, value, isSelected,
+                    row, column);
+        }
+
+        public String getSelectedItem(Object value) {
+            StringWithExtTuple swet = (StringWithExtTuple) value;
+
+            switch (field) {
+            case STRING_VALUE:
+                return ((ThinExtByRefPartString) swet.getTuple().getPart()).getStringValue();
+            default:
+                throw new UnsupportedOperationException("Can't do string combobox on " + field);
+
+            }
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject evt) {
+            if (evt instanceof MouseEvent) {
+                int clickCount;
+                // For double-click activation
+                clickCount = 2;
+                return ((MouseEvent) evt).getClickCount() >= clickCount;
+            }
+            return true;
+        }
+    }
 
     public static class ConceptFieldEditor extends DefaultCellEditor {
 
@@ -68,9 +131,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         
         I_ConfigAceFrame config;
 
-        IntList popupIds;
-
         REFSET_FIELDS field;
+        private IntList popupIds;
 
         public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, REFSET_FIELDS field) {
             super(new JComboBox());
@@ -180,6 +242,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
         // Boolean extension
         BOOLEAN_VALUE("boolean value", 5, 100, 500),
+        
+        // String extension
+        STRING_VALUE("string value", 75, 250, 1000),
 
         // Concept extension
         CONCEPT_ID("concept", 5, 300, 1000),
@@ -238,6 +303,15 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
             REFSET_FIELDS.BOOLEAN_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
     // REFSET_FIELDS.BRANCH
+    };
+
+    private static REFSET_FIELDS[] stringRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+                REFSET_FIELDS.STRING_VALUE, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+
+    private static REFSET_FIELDS[] stringRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+                REFSET_FIELDS.STRING_VALUE, REFSET_FIELDS.STATUS, //REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH 
     };
 
     private static REFSET_FIELDS[] conceptRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
@@ -302,6 +376,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             switch (type) {
             case BOOLEAN:
                 return booleanRefsetFields;
+            case STRING:
+                return stringRefsetFields;
             case CONCEPT:
                 return conceptRefsetFields;
             case INTEGER:
@@ -319,6 +395,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             switch (type) {
             case BOOLEAN:
                 return booleanRefsetFieldsNoHistory;
+            case STRING:
+                return stringRefsetFieldsNoHistory;
             case CONCEPT:
                 return conceptRefsetFieldsNoHistory;
             case INTEGER:
@@ -365,6 +443,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         switch (refsetType) {
         case BOOLEAN:
             return ThinExtByRefPartBoolean.class;
+        case STRING:
+            return ThinExtByRefPartString.class;
         case CONCEPT:
             return ThinExtByRefPartConcept.class;
         case INTEGER:
@@ -467,6 +547,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     if (ThinExtByRefPartBoolean.class.equals(part.getClass())) {
                         conceptsToFetch.add(part.getStatus());
                         conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartString.class.equals(part.getClass())) {
+                        conceptsToFetch.add(part.getStatus());
+                        conceptsToFetch.add(part.getPathId());
                     } else if (ThinExtByRefPartConcept.class.equals(part.getClass())) {
                         ThinExtByRefPartConcept conceptPart = (ThinExtByRefPartConcept) part;
                         conceptsToFetch.add(conceptPart.getConceptId());
@@ -554,6 +637,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         switch (refsetType) {
         case BOOLEAN:
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getBooleanPreferences();
+        case STRING:
+            return host.getConfig().getRefsetPreferencesForToggle(toggle).getStringPreferences();
         case CONCEPT:
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences();
         case INTEGER:
@@ -659,6 +744,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 // Boolean extension
             case BOOLEAN_VALUE:
                 return new StringWithExtTuple(Boolean.toString(((ThinExtByRefPartBoolean) tuple.getPart()).getValue()),
+                                              tuple);
+                // String extension
+            case STRING_VALUE:
+                return new StringWithExtTuple(((ThinExtByRefPartString) tuple.getPart()).getStringValue(),
                                               tuple);
                 // Concept extension
             case CONCEPT_ID:
@@ -772,6 +861,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case BOOLEAN:
                 refsetDefaults = preferences.getBooleanPreferences();
                 break;
+            case STRING:
+                refsetDefaults = preferences.getStringPreferences();
+                break;
             case CONCEPT:
                 refsetDefaults = preferences.getConceptPreferences();
                 break;
@@ -806,6 +898,16 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     booleanPart.setValue(preferences.getBooleanPreferences().getDefaultForBooleanRefset());
                     booleanPart.setVersion(Integer.MAX_VALUE);
                     extension.addVersion(booleanPart);
+                }
+                break;
+            case STRING:
+                for (I_Path editPath : host.getConfig().getEditingPathSet()) {
+                    ThinExtByRefPartString stringPart = new ThinExtByRefPartString();
+                    stringPart.setPathId(editPath.getConceptId());
+                    stringPart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                    stringPart.setStringValue(preferences.getStringPreferences().getDefaultForStringRefset());
+                    stringPart.setVersion(Integer.MAX_VALUE);
+                    extension.addVersion(stringPart);
                 }
                 break;
             case CONCEPT:
@@ -936,6 +1038,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 Boolean booleanValue = (Boolean) value;
                 ((ThinExtByRefPartBoolean) extTuple.getPart()).setValue(booleanValue);
                 break;
+            case STRING_VALUE:
+                String stringValue = (String) value;
+                ((ThinExtByRefPartString) extTuple.getPart()).setStringValue(stringValue);
+                break;
             case CONCEPT_ID:
                 Integer conceptId = (Integer) value;
                 ((ThinExtByRefPartConcept) extTuple.getPart()).setConceptId(conceptId);
@@ -1004,6 +1110,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             return Number.class;
         case BOOLEAN_VALUE:
             return Boolean.class;
+        case STRING_VALUE:
+            return String.class;
         case CONCEPT_ID:
             return Number.class;
         case INTEGER_VALUE:

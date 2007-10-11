@@ -35,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -486,27 +487,42 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
          c.fill = GridBagConstraints.NONE;
          c.gridx++;
          toggleBar.add(rightTogglePane, c);
+         boolean exceptions = false;
+         StringBuffer exceptionMessage = new StringBuffer();
+         exceptionMessage.append("<html>Exception(s) reading the following plugin(s): <p><p>");
          for (File f : plugins) {
-            FileInputStream fis = new FileInputStream(f);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            BusinessProcess bp = (BusinessProcess) ois.readObject();
-            ois.close();
-            byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
-            if (iconBytes != null) {
-               ImageIcon icon = new ImageIcon(iconBytes);
-               JButton pluginButton = new JButton(icon);
-               pluginButton.setToolTipText(bp.getSubject());
-               pluginButton.addActionListener(new PluginListener(f));
-               rightTogglePane.add(pluginButton, c);
-               AceLog.getAppLog().info("adding component plugin: " + f.getName());
-            } else {
-               JButton pluginButton = new JButton(bp.getName());
-               pluginButton.setToolTipText(bp.getSubject());
-               pluginButton.addActionListener(new PluginListener(f));
-               rightTogglePane.add(pluginButton, c);
-               AceLog.getAppLog().info("adding component plugin: " + f.getName());
+            AceLog.getAppLog().info("Reading plugin: " + f.getAbsolutePath());
+            try {
+                FileInputStream fis = new FileInputStream(f);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                ObjectInputStream ois = new ObjectInputStream(bis);
+                BusinessProcess bp = (BusinessProcess) ois.readObject();
+                ois.close();
+                byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
+                if (iconBytes != null) {
+                   ImageIcon icon = new ImageIcon(iconBytes);
+                   JButton pluginButton = new JButton(icon);
+                   pluginButton.setToolTipText(bp.getSubject());
+                   pluginButton.addActionListener(new PluginListener(f));
+                   rightTogglePane.add(pluginButton, c);
+                   AceLog.getAppLog().info("adding component plugin: " + f.getName());
+                } else {
+                   JButton pluginButton = new JButton(bp.getName());
+                   pluginButton.setToolTipText(bp.getSubject());
+                   pluginButton.addActionListener(new PluginListener(f));
+                   rightTogglePane.add(pluginButton, c);
+                   AceLog.getAppLog().info("adding component plugin: " + f.getName());
+                }
+            } catch (Throwable e) {
+                exceptions = true;
+                exceptionMessage.append("Exception reading: " + f.getAbsolutePath() + "<p>");
+                AceLog.getAppLog().log(Level.SEVERE, "Exception reading: " + f.getAbsolutePath(), e);
             }
+         }
+         
+         if (exceptions) {
+             exceptionMessage.append("<p>Please see the log file for more details.");
+             JOptionPane.showMessageDialog(this, exceptionMessage.toString());
          }
       }
       pluginMap.put(TOGGLES.ID, idPlugin);

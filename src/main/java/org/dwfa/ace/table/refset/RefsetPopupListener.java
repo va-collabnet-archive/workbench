@@ -122,6 +122,7 @@ public class RefsetPopupListener extends MouseAdapter {
                case PRIORITY:
                case BOOLEAN_VALUE:
                case MEASUREMENT_VALUE:
+               case STRING_VALUE:
                default:
                   throw new Exception("Don't know how to handle: " + field);
                }
@@ -184,6 +185,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 case BOOLEAN_VALUE:
                 case MEASUREMENT_VALUE:
                 case MEASUREMENT_UNITS_ID:
+                case STRING_VALUE:
                 default:
                    throw new Exception("Don't know how to handle: " + field);
                 }
@@ -242,6 +244,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 case BOOLEAN_VALUE:
                 case INTEGER_VALUE:
                 case MEASUREMENT_UNITS_ID:
+                case STRING_VALUE:
                 default:
                    throw new Exception("Don't know how to handle: " + field);
                 }
@@ -302,6 +305,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 case MEASUREMENT_VALUE:
                 case INTEGER_VALUE:
                 case MEASUREMENT_UNITS_ID:
+                case STRING_VALUE:
                 default:
                    throw new Exception("Don't know how to handle: " + field);
                 }
@@ -401,6 +405,9 @@ public class RefsetPopupListener extends MouseAdapter {
                         break;
                     case BOOLEAN_VALUE:
                         addSubmenuObjects(changeMenu, field, ((RefsetDefaultsBoolean)preferences).getBooleanPopupItems());
+                        break;
+                    case STRING_VALUE:
+                        addSubmenuObjects(changeMenu, field, ((RefsetDefaultsString)preferences).getStringPopupItems().toArray());
                         break;
                     case MEASUREMENT_VALUE:
                         addSubmenuObjects(changeMenu, field, ((RefsetDefaultsMeasurement)preferences).getMeasurementValuePopupItems());

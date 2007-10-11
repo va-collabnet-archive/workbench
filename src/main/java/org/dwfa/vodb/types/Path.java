@@ -24,6 +24,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
@@ -94,9 +95,9 @@ public class Path implements I_Transact, I_Path {
 	public static List<I_Path> makeBasePaths(VodbEnv vodb)
 			throws DatabaseException, ParseException, TerminologyException,
 			IOException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		List<I_Path> basePaths = new ArrayList<I_Path>();
+        
 		Path aceRelease = new Path(
 				vodb
 						.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
@@ -106,105 +107,25 @@ public class Path implements I_Transact, I_Path {
 		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
 		List<I_Position> origins = new ArrayList<I_Position>(1);
 		origins.add(latestAceRelease);
+        
 		
-		Path tgaPath = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.TGA_DATA.getUids()), origins);
-		basePaths.add(tgaPath);
-		Path amtPath = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.AMT_SOURCE_DATA.getUids()), origins);
-		basePaths.add(amtPath);
-
-		Path snomedCore = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE
-						.getUids()), origins);
-		basePaths.add(snomedCore);
-
-		Date releaseDate = dateFormat.parse("2006-07-31");
-
-		Position snomed20060731Pos = new Position(ThinVersionHelper
-				.convert(releaseDate.getTime()), snomedCore);
-		List<I_Position> snomed20060731Origins = new ArrayList<I_Position>(1);
-		snomed20060731Origins.add(snomed20060731Pos);
-		Path snomed20060731 = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20060731
-						.getUids()), snomed20060731Origins);
-		basePaths.add(snomed20060731);
-
-		releaseDate = dateFormat.parse("2006-01-31");
-		Position snomed20060131Pos = new Position(ThinVersionHelper
-				.convert(releaseDate.getTime()), snomedCore);
-		List<I_Position> snomed20060131Origins = new ArrayList<I_Position>(1);
-		snomed20060131Origins.add(snomed20060131Pos);
-		Path snomed20060131 = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20060131
-						.getUids()), snomed20060131Origins);
-		basePaths.add(snomed20060131);
-
-		releaseDate = dateFormat.parse("2005-07-31");
-		Position snomed20050731Pos = new Position(ThinVersionHelper
-				.convert(releaseDate.getTime()), snomedCore);
-		List<I_Position> snomed20050731Origins = new ArrayList<I_Position>(1);
-		snomed20050731Origins.add(snomed20050731Pos);
-		Path snomed20050731 = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20050731
-						.getUids()), snomed20050731Origins);
-		basePaths.add(snomed20050731);
-
-		releaseDate = dateFormat.parse("2005-01-31");
-		Position snomed20050131Pos = new Position(ThinVersionHelper
-				.convert(releaseDate.getTime()), snomedCore);
-		List<I_Position> snomed20050131Origins = new ArrayList<I_Position>(1);
-		snomed20050131Origins.add(snomed20050131Pos);
-		Path snomed20050131 = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20050131
-						.getUids()), snomed20050131Origins);
-		basePaths.add(snomed20050131);
+        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.TGA_DATA);
+        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.AMT_SOURCE_DATA);
+        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.SNOMED_CORE);
 
 		return basePaths;
 
 	}
 
-	public static List<I_Path> makeTestSnomedPaths(VodbEnv vodb)
-			throws DatabaseException, ParseException, TerminologyException,
-			IOException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		List<I_Position> origins = new ArrayList<I_Position>(1);
+    private static void addIfFound(VodbEnv vodb, List<I_Path> basePaths, List<I_Position> origins, Concept pathConcept) throws TerminologyException, IOException {
+        try {
+            Path path = new Path(vodb.uuidToNative(pathConcept.getUids()), origins);
+            basePaths.add(path);
+        } catch (NoMappingException ex) {
+            AceLog.getAppLog().info("Exception processing: "  + pathConcept.name() + ": " + ex.toString());
+        }
+    }
 
-		List<I_Path> basePaths = new ArrayList<I_Path>();
-		Path aceRelease = new Path(
-				vodb
-						.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-								.getUids()), null);
-		//basePaths.add(aceRelease);
-		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
-		origins.add(latestAceRelease);
-
-		Path snomedCore = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE
-						.getUids()), origins);
-
-		Date releaseDate = dateFormat.parse("2006-07-31");
-
-		Position snomed20060731Pos = new Position(ThinVersionHelper
-				.convert(releaseDate.getTime()), snomedCore);
-		List<I_Position> snomed20060731Origins = new ArrayList<I_Position>(1);
-		snomed20060731Origins.add(snomed20060731Pos);
-		Path snomed20060731 = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20060731
-						.getUids()), snomed20060731Origins);
-		basePaths.add(snomed20060731);
-
-		releaseDate = dateFormat.parse("2005-01-31");
-		Position snomed20050131Pos = new Position(ThinVersionHelper
-				.convert(releaseDate.getTime()), snomedCore);
-		List<I_Position> snomed20050131Origins = new ArrayList<I_Position>(1);
-		snomed20050131Origins.add(snomed20050131Pos);
-		Path snomed20050131 = new Path(vodb
-				.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_20050131
-						.getUids()), snomed20050131Origins);
-		basePaths.add(snomed20050131);
-
-		return basePaths;
-
-	}
 
 	public static void main(String[] args) {
 		try {

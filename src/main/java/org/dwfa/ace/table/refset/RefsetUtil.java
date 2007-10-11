@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -26,6 +27,7 @@ import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.ConceptFieldEditor;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
+import org.dwfa.ace.table.refset.RefsetMemberTableModel.StringFieldEditor;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.IntList;
@@ -40,61 +42,18 @@ public class RefsetUtil {
                 if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
                     c.gridy++;
                     RefsetMemberTableModel refsetModel;
-                    switch (extType) {
-                    case BOOLEAN:
-                        refsetModel = new RefsetMemberTableModel(
-                                                                 host,
-                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
-                                                                 extType, toggle);
-                        break;
-                    case CONCEPT:
-                        refsetModel = new RefsetMemberTableModel(
-                                                                 host,
-                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
-                                                                 extType, toggle);
-                        break;
-                    case INTEGER:
-                        refsetModel = new RefsetMemberTableModel(
-                                                                 host,
-                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
-                                                                 extType, toggle);
-                        break;
-                    case LANGUAGE:
-                        refsetModel = new RefsetMemberTableModel(
-                                                                 host,
-                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
-                                                                 extType, toggle);
-                        break;
-                    case SCOPED_LANGUAGE:
-                        refsetModel = new RefsetMemberTableModel(
-                                                                 host,
-                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
-                                                                 extType, toggle);
-                        break;
-                    case MEASUREMENT:
-                        refsetModel = new RefsetMemberTableModel(
-                                                                 host,
-                                                                 RefsetMemberTableModel.getRefsetColumns(host, extType),
-                                                                 extType, toggle);
-                        break;
+                    refsetModel = new RefsetMemberTableModel(host, RefsetMemberTableModel.getRefsetColumns(host,
+                                                                                                           extType),
+                                                             extType, toggle);
 
-                    default:
-                        refsetModel = null;
-                        AceLog.getAppLog().alertAndLogException(new Exception("Can't handle extType: " + extType));
-                        break;
+                    plugin.addRefsetListener(refsetModel);
+                    c.gridy++;
+                    try {
+                        panel.add(getExtensionPanel(extType, refsetModel, host, toggle), c);
+                    } catch (Exception e) {
+                        AceLog.getAppLog().alertAndLogException(e);
                     }
-                    if (refsetModel != null) {
-                        plugin.addRefsetListener(refsetModel);
-                        c.gridy++;
-                        try {
-                            panel.add(getExtensionPanel(extType, refsetModel, host, toggle), c);
-                        } catch (Exception e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        }
-                        visibleExtensions.add(extType);
-                    } else {
-                        AceLog.getAppLog().info("refset model is null");
-                    }
+                    visibleExtensions.add(extType);
                 }
             }
         }
@@ -184,14 +143,12 @@ public class RefsetUtil {
         extTable.setDefaultRenderer(Double.class, new ExtTableRenderer());
         extTable.setDefaultRenderer(String.class, new ExtTableRenderer());
 
-
- 
         switch (extType) {
         case BOOLEAN:
-            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getBooleanPreferences().getRefsetPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getBooleanPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getBooleanPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getBooleanPreferences().getStatusPopupIds());
             JComboBox comboBox = new JComboBox() {
                 /**
                  * 
@@ -203,8 +160,7 @@ public class RefsetUtil {
                     Boolean value = null;
                     if (Boolean.class.isAssignableFrom(anObject.getClass())) {
                         value = (Boolean) anObject;
-                    } else if (StringWithExtTuple.class
-                            .isAssignableFrom(anObject.getClass())) {
+                    } else if (StringWithExtTuple.class.isAssignableFrom(anObject.getClass())) {
                         I_CellTextWithTuple swt = (I_CellTextWithTuple) anObject;
                         value = Boolean.parseBoolean(swt.getCellText());
                     }
@@ -213,61 +169,69 @@ public class RefsetUtil {
             };
             comboBox.addItem(new Boolean(true));
             comboBox.addItem(new Boolean(false));
-            extTable.getColumn(REFSET_FIELDS.BOOLEAN_VALUE).setCellEditor(new DefaultCellEditor(
-                    comboBox));
+            extTable.getColumn(REFSET_FIELDS.BOOLEAN_VALUE).setCellEditor(new DefaultCellEditor(comboBox));
             break;
+        case STRING: 
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getStringPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getStringPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STRING_VALUE, host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getStringPreferences().getStringPopupItems());
+            break;
+
         case CONCEPT:
-            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences().getRefsetPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences().getStatusPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds());
 
             break;
         case INTEGER:
-            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getRefsetPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getStatusPopupIds());
             break;
 
         case MEASUREMENT:
-            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getRefsetPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getStatusPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.MEASUREMENT_UNITS_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getUnitsOfMeasurePopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.MEASUREMENT_UNITS_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getUnitsOfMeasurePopupIds());
             break;
         case LANGUAGE:
-            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getRefsetPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getStatusPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.ACCEPTABILITY, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getAcceptabilityPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.CORRECTNESS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getCorrectnessPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.DEGREE_OF_SYNONYMY, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getDegreeOfSynonymyPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.ACCEPTABILITY, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getAcceptabilityPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CORRECTNESS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getCorrectnessPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.DEGREE_OF_SYNONYMY, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getDegreeOfSynonymyPopupIds());
 
             break;
         case SCOPED_LANGUAGE:
-            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getRefsetPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STATUS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getStatusPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.ACCEPTABILITY, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getAcceptabilityPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.CORRECTNESS, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getCorrectnessPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.DEGREE_OF_SYNONYMY, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getDegreeOfSynonymyPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.TAG, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getTagPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.SCOPE, 
-                             (IntList) host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.ACCEPTABILITY, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getAcceptabilityPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CORRECTNESS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getCorrectnessPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.DEGREE_OF_SYNONYMY, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getDegreeOfSynonymyPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.TAG, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getTagPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.SCOPE, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds());
             break;
 
         default:
@@ -285,11 +249,16 @@ public class RefsetUtil {
         return relPanel;
     }
 
-    private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable, REFSET_FIELDS comboField, IntList comboIntList) {
-        ConceptFieldEditor conceptCombo = 
-            new RefsetMemberTableModel.ConceptFieldEditor(host.getConfig(),
-                                                          comboIntList,
-                                                          comboField);
+    private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable,
+        REFSET_FIELDS comboField, IntList comboIntList) {
+        ConceptFieldEditor conceptCombo = new RefsetMemberTableModel.ConceptFieldEditor(host.getConfig(), comboIntList,
+                                                                                        comboField);
+        extTable.getColumn(comboField).setCellEditor(conceptCombo);
+    }
+    private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable,
+        REFSET_FIELDS comboField, List<String> items) {
+        StringFieldEditor conceptCombo = new RefsetMemberTableModel.StringFieldEditor(host.getConfig(), items.toArray(new String[items.size()]),
+                                                                                        comboField);
         extTable.getColumn(comboField).setCellEditor(conceptCombo);
     }
 
