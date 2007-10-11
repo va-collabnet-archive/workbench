@@ -114,7 +114,13 @@ public class LoadBdb {
 		timer.start();
 		loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
-		loadConstants.execute(new JarFile(args[1]), "org/jehri/cement/", FORMAT.SNOMED);
+        for (String arg: args) {
+            if (arg.contains("cement")) {
+                AceLog.getAppLog().info("Processing constants in: " + arg);
+                loadConstants.execute(new JarFile(arg), "org/jehri/cement/", FORMAT.SNOMED);
+                break;
+            }
+        }
 		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
