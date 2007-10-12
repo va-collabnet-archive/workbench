@@ -30,7 +30,7 @@ public class LoadSources {
 			if (args.length > 2) {
 				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(),
 						loadConstants.getConstantToIntMap(), releaseDates[0]);
-				AceLog.getAppLog().info("Starting to process SNOMED.");
+				AceLog.getAppLog().info("Starting to process SNOMED: " + args[2]);
 				loadSnomed.execute(new File(args[2]));
 				AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());
 			} 

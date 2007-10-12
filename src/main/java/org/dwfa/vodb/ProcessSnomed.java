@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -115,9 +117,16 @@ public abstract class ProcessSnomed extends ProcessSources {
 		iterateRelationships(oldRelSet);
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Enumeration<JarEntry> jarEnum = snomedJar.entries();
-		while (jarEnum.hasMoreElements()) {
-			JarEntry je = jarEnum.nextElement();
+        SortedSet<String> entryStringSet = new TreeSet<String>();
+        Enumeration<JarEntry> jarEnum = snomedJar.entries();
+        while (jarEnum.hasMoreElements()) {
+            JarEntry je = jarEnum.nextElement();
+            entryStringSet.add(je.getName());
+        }
+        
+        
+		for (String entryName: entryStringSet) {
+			JarEntry je = snomedJar.getJarEntry(entryName);
 			if (je.getName().startsWith("org/snomed/") &&
 					je.getName().endsWith(".txt")) {
 				int startIndex = "org/snomed/".length();
