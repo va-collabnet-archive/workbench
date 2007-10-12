@@ -35,6 +35,9 @@ import org.dwfa.util.bean.Spec;
 /**
  * Goal which writes tasks as java beans for the builder application.
  * 
+ * PLEASE USE THE export-beans goal instead...
+ * @deprecated
+ * 
  * @goal write-annotated-beans
  * @requiresDependencyResolution compile
  */
