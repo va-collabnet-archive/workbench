@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -117,7 +118,13 @@ public abstract class ProcessSnomed extends ProcessSources {
 		iterateRelationships(oldRelSet);
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SortedSet<String> entryStringSet = new TreeSet<String>();
+        SortedSet<String> entryStringSet = new TreeSet<String>(new Comparator<String>() {
+
+            public int compare(String o1, String o2) {
+                 return -o1.compareTo(o2);
+            }
+            
+        });
         Enumeration<JarEntry> jarEnum = snomedJar.entries();
         while (jarEnum.hasMoreElements()) {
             JarEntry je = jarEnum.nextElement();
