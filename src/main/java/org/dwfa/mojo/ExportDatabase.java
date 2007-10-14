@@ -84,6 +84,13 @@ public class ExportDatabase extends AbstractMojo {
    /**
     * File name for concept table data output file
     * 
+    * @parameter expression="ids.txt"
+    */
+   private String idsDataFileName;
+
+   /**
+    * File name for concept table data output file
+    * 
     * @parameter expression="concepts.txt"
     */
    private String conceptDataFileName;
@@ -525,6 +532,14 @@ public class ExportDatabase extends AbstractMojo {
       try {
          
          I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+	   System.out.println("Exporting identifiers");
+	   File idsFile = new File(outputDirectory + idsDataFileName);
+	   BufferedWriter writer = new BufferedWriter(new FileWriter(idsFile));
+
+	   termFactory.iterateIds(new IdIterator(writer));
+	   writer.close();
+	     
          HashSet<I_Position> positions = new HashSet<I_Position>(positionsForExport.length);
          for (PositionDescriptor pd: positionsForExport) {
             positions.add(pd.getPosition());
@@ -563,6 +578,7 @@ public class ExportDatabase extends AbstractMojo {
          writeToFile(conceptFile, expItr.getConceptDistDetails());
          writeToFile(relationshipFile, expItr.getRelationshipDistDetails());
          writeToFile(descriptionFile, expItr.getDescriptionDistDetails());
+
 
          errorWriter.close();
 
