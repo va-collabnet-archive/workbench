@@ -49,6 +49,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 				REFSET_TYPE_REL(new String[] { "refset type rel", "refset type rel"}, REFSET_RELATIONSHIP),
 				REFSET_PURPOSE_REL(new String[] { "refest purpose rel", "refest purpose rel"}, REFSET_RELATIONSHIP),
 			REFSET_IDENTITY(new String[] { "refset identity", "refset"}, REFSET_AUXILIARY),
+            
                 PATHOLOGY_INCLUSION_SPEC(new String[] { "pathology inclusion specification","pathology inclusion specification",
                     "ORG_DWFA_PATHOLOGY_INCLUSION_SPEC"}, 
                     new I_ConceptualizeUniversally [] { REFSET_IDENTITY,
@@ -57,6 +58,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                         ArchitectonicAuxiliary.Concept.IS_A_REL,
                         REFSET_PURPOSE_REL, REFSET_TYPE_REL
                     }),
+                    
                 DISCHARGE_INCLUSION_SPEC(new String[] { "discharge inclusion specification","discharge inclusion specification",
                     "ORG_DWFA_DISCHARGE_INCLUSION_SPEC"}, 
                     new I_ConceptualizeUniversally [] { REFSET_IDENTITY,
@@ -65,6 +67,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                         ArchitectonicAuxiliary.Concept.IS_A_REL,
                         REFSET_PURPOSE_REL, REFSET_TYPE_REL
                     }),
+                    
                 ALLERGY_RXN_INCLUSION_SPEC(new String[] { "allergy & adverse reaction inclusion specification",
                         "allergy & adverse reaction inclusion specification",
                     "ORG_DWFA_ALLERGY_RXN_INCLUSION_SPEC"}, 
