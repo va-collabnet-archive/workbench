@@ -36,7 +36,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                 INCLUDE_INDIVIDUAL(new String[] { "include concept no children", "individual include"}, INCLUSION_SPECIFICATION_TYPE),
                 INCLUDE_LINEAGE(new String[] { "include concept with children", "lineage include"}, INCLUSION_SPECIFICATION_TYPE),
                 EXCLUDE_INDIVIDUAL(new String[] { "exclude concept", "exclude individual"}, INCLUSION_SPECIFICATION_TYPE),
-                EXCLUDE_LINEAGE(new String[] { "exclude concept and children", "lineage exclude"}, INCLUSION_SPECIFICATION_TYPE),
+                EXCLUDE_LINEAGE(new String[] { "exclude concept and children", "exclude lineage"}, INCLUSION_SPECIFICATION_TYPE),
 			REFSET_PURPOSE(new String[] { "refset purpose", "refset purpose"}, REFSET_AUXILIARY),
                 RELATIONSHIP_ORDER(new String[] { "relationship order", "relationship order"}, REFSET_PURPOSE),
                 ANNOTATION_ORDER(new String[] { "annotation", "annotation"}, REFSET_PURPOSE),
