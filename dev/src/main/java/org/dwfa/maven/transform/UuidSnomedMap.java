@@ -16,19 +16,24 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public class UuidSnomedMap implements Map<UUID, Long> {
 
+   private static Calendar now = Calendar.getInstance();
+   private boolean modified = false;
+
    private long maxSequence = 0;
 
    private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
    
    private List<Map<UUID, Long>> fixedMaps = new ArrayList<Map<UUID,Long>>();
-   
+   private Map<Long, String> effectiveDateOfSctId = new HashMap<Long,String>();
+
    private PROJECT project = null;
    private NAMESPACE namespace = null;
    
@@ -92,6 +97,7 @@ public class UuidSnomedMap implements Map<UUID, Long> {
    public Long getWithGeneration(UUID key, TYPE type) {
       Long returnValue = get(key);
       if (returnValue == null) {
+	   modified = true;
          returnValue = Long.parseLong(SctIdGenerator.generate(++maxSequence, project, namespace, type));
          if (returnValue > MAX_SCT_ID) {
             throw new RuntimeException("SCT ID exceeds max allowed (" + MAX_SCT_ID + "): " + returnValue);
@@ -146,25 +152,33 @@ public class UuidSnomedMap implements Map<UUID, Long> {
    }
    
    public void write(File f) throws IOException {
-      BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+      if (modified) {
+	      BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
-      Map<Long, List<UUID>> snomedUuidMap = this.getSnomedUuidListMap();
-      SortedSet<Long> sortedKeys = new TreeSet<Long>(snomedUuidMap.keySet());
-      for (Long sctId : sortedKeys) {
-         List<UUID> idList = snomedUuidMap.get(sctId);
-         for (int i = 0; i < idList.size(); i++) {
-            UUID id = idList.get(i);
-            bw.append(id.toString());
-            if (i < idList.size() - 1) {
-               bw.append("\t");
-            }
-         }
-         bw.append("\n");
-         bw.append(sctId.toString());
-         bw.append("\n");
-      }
-      bw.close();
-      System.out.println(" maxSequence on write: " + maxSequence);
+      	Map<Long, List<UUID>> snomedUuidMap = this.getSnomedUuidListMap();
+	      SortedSet<Long> sortedKeys = new TreeSet<Long>(snomedUuidMap.keySet());
+      	for (Long sctId : sortedKeys) {
+	         List<UUID> idList = snomedUuidMap.get(sctId);
+      	   for (int i = 0; i < idList.size(); i++) {
+	            UUID id = idList.get(i);
+      	      bw.append(id.toString());
+	            if (i < idList.size() - 1) {
+      	         bw.append("\t");
+	            }
+      	   }
+	         bw.append("\n");
+      	   bw.append(sctId.toString());
+		// Add an effective data to the sct after writing it,
+		// separated from the sctId with a tab
+		   bw.append("\t");
+		   bw.append(effectiveDateOfSctId.get(sctId));
+	         bw.append("\n");
+      	}
+	      bw.close();
+      	System.out.println(" maxSequence on write: " + maxSequence);
+	} else {
+		System.out.println(" Map was not modified, no write required to: " + f.getName());
+	}
    }
 
    public static UuidSnomedMap read(File f) throws IOException {
@@ -186,15 +200,54 @@ public class UuidSnomedMap implements Map<UUID, Long> {
       String uuidLineStr;
       String sctIdLineStr;
 
+	
+
       while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
          sctIdLineStr = br.readLine();
-         Long sctId = Long.parseLong(sctIdLineStr);
+	   String[] parts = sctIdLineStr.split("\t");
+	   String sctIdPart = parts[0];
+	   String effectiveDatePart = "";
+         boolean update = false;
+	   if (parts.length<2) {
+		   effectiveDatePart = parts[1];	
+	   } else {
+               effectiveDatePart = getCurrentEffectiveDate();
+               update = true;
+	   }	  
+         Long sctId = Long.parseLong(sctIdPart);
+         map.putEffectiveDate(sctId,effectiveDatePart,update);
          for (String uuidStr : uuidLineStr.split("\t")) {
             UUID uuid = UUID.fromString(uuidStr);
             map.put(uuid, sctId);
          }
       } // end while
       br.close();
+   }
+
+   public void putEffectiveDate(Long sctId, String date, boolean update) {
+	effectiveDateOfSctId.put(sctId,date);
+	modified = update;
+   }
+
+   public String getEffectiveDate(Long sctId) {
+	return effectiveDateOfSctId.get(sctId);
+   }
+   
+   public static String getCurrentEffectiveDate() {
+	 int month = now.get(Calendar.MONTH);
+       month++;
+       Integer date = now.get(Calendar.DATE);
+       String m = new Integer(month).toString();
+       String d = date.toString();
+	 if (month<10) {
+         m = "0"+m;
+	 }
+       if (date<10) {
+         d = "0"+d;
+       }
+	
+       return now.get(Calendar.YEAR)+"-"+m+"-"+d+ " 00:00:00";
+	   
    }
 
 }
