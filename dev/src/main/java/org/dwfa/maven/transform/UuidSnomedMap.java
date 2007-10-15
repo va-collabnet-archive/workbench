@@ -208,9 +208,9 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 	   String sctIdPart = parts[0];
 	   String effectiveDatePart = "";
          boolean update = false;
-	   if (parts.length<2) {
+	   if (parts.length>1) {
 		   effectiveDatePart = parts[1];	
-	   } else {
+	   } else if (parts.length==1) {
                effectiveDatePart = getCurrentEffectiveDate();
                update = true;
 	   }	  
