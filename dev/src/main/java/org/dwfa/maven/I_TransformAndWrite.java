@@ -5,6 +5,8 @@ import java.io.Writer;
 
 
 public interface I_TransformAndWrite {
+	public static String WINDOWS_LINE_TERMINATOR = "\r\n"; 
+	
 	public String getOutputEncoding();
 	public String getFileName();
 	public void init(Writer w, Transform t) throws Exception;

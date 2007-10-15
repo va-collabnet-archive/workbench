@@ -24,7 +24,7 @@ public abstract class ProcessWords extends AbstractExport {
 		w.write("WORD");
 		w.write(getOutputColumnDelimiter());
 		w.write("COUNT");
-		w.write("\n");
+		w.write(WINDOWS_LINE_TERMINATOR);
 
 	}
 
@@ -69,7 +69,7 @@ public abstract class ProcessWords extends AbstractExport {
 			w.write(word.toString());
 			w.write(getOutputColumnDelimiter());
 			w.write(counts.get(word).toString());
-			w.write("\n");
+			w.write(WINDOWS_LINE_TERMINATOR);
 		}
 	}
 

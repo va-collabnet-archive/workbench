@@ -31,7 +31,7 @@ public class SimpleExport extends AbstractExport {
 			}
 			w.append(transformers[i].getLastTransform());
 		}
-		w.append('\n');
+		w.append(WINDOWS_LINE_TERMINATOR);
 	}
 
 	public String[] getColumns() {
@@ -49,7 +49,7 @@ public class SimpleExport extends AbstractExport {
 			}
 			w.append(columns[i]);
 		}
-		w.append('\n');
+		w.append(WINDOWS_LINE_TERMINATOR);
 	}
 
 	public void close() throws IOException {

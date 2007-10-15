@@ -19,7 +19,7 @@ public class SimpleExportNullIsEmpty extends SimpleExport {
             w.append(transformers[i].getLastTransform());
          }
       }
-      w.append('\n');
+      w.append(WINDOWS_LINE_TERMINATOR);
    }
 
 

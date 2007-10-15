@@ -30,7 +30,7 @@ public class LowerCaseWordIndex extends AbstractExport {
 			w.write(column);
 			
 		}
-		w.write("\n");
+		w.write(WINDOWS_LINE_TERMINATOR);
 
 	}
 
@@ -72,7 +72,7 @@ public class LowerCaseWordIndex extends AbstractExport {
 			w.append(conceptIdTransformer.getLastTransform());
 			w.append(getOutputColumnDelimiter());
 			w.append(word.toString());
-			w.append('\n');
+			w.append(WINDOWS_LINE_TERMINATOR);
 		}
 
 	}
