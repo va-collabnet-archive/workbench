@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -41,6 +42,7 @@ import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.ace.utypes.UniversalIdList;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
@@ -238,15 +240,28 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
         }
     }
 
-    private void commitAceEbr(UniversalAceExtByRefBean bean, long time, Set<TimePathId> values)
-            throws IOException, ClassNotFoundException {
+    private void commitAceEbr(UniversalAceExtByRefBean bean, long time, Set<TimePathId> values) throws IOException,
+            ClassNotFoundException {
         try {
             if (time == Long.MAX_VALUE) {
                 throw new IOException("commit time = Long.MAX_VALUE");
             }
+            if (getVodb() == null) {
+                throw new IOException("getVodb() returns null");
+            }
             // Do all the commiting...
-            int memberId = getVodb().getId(bean.getMemberUid()).getNativeId();
-            
+            Collection<UUID> memberUid = bean.getMemberUid();
+            I_IdVersioned id = getVodb().getId(memberUid);
+            int memberId = Integer.MIN_VALUE;
+            if (id == null) {
+                I_Path path = getVodb()
+                        .getPath(getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+                memberId = getVodb().uuidToNativeWithGeneration(memberUid, Integer.MAX_VALUE, path,
+                                                                ThinVersionHelper.convert(time));
+            } else {
+                memberId = id.getNativeId();
+            }
+
             ThinExtByRefVersioned extension;
             if (getVodb().hasExtension(memberId)) {
                 extension = getVodb().getExtension(memberId);
@@ -257,26 +272,25 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 int partCount = bean.getVersions().size();
                 extension = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
             }
-                        
-                
-                boolean changed = false;
-                for (UniversalAceExtByRefPart part : bean.getVersions()) {
-                    if (part.getTime() == Long.MAX_VALUE) {
-                        ThinExtByRefPart newPart = ThinExtByRefVersioned.makePart(part);
-                        newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (extension.getVersions().contains(newPart)) {
-                            changed = false;
-                        } else {
-                            changed = true;
-                            extension.addVersion(newPart);
-                            values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
-                        }
+
+            boolean changed = false;
+            for (UniversalAceExtByRefPart part : bean.getVersions()) {
+                if (part.getTime() == Long.MAX_VALUE) {
+                    ThinExtByRefPart newPart = ThinExtByRefVersioned.makePart(part);
+                    newPart.setVersion(ThinVersionHelper.convert(time));
+                    if (extension.getVersions().contains(newPart)) {
+                        changed = false;
+                    } else {
+                        changed = true;
+                        extension.addVersion(newPart);
+                        values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
                     }
                 }
-                if (changed) {
-                    getVodb().writeExt(extension);
-                    AceLog.getEditLog().fine("Importing changed extension: \n" + extension);
-                }
+            }
+            if (changed) {
+                getVodb().writeExt(extension);
+                AceLog.getEditLog().fine("Importing changed extension: \n" + extension);
+            }
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         } catch (TerminologyException e) {

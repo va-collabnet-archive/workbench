@@ -2,6 +2,7 @@ package org.dwfa.vodb.bind;
 
 import java.util.List;
 
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
@@ -175,19 +176,19 @@ public class ThinExtBinder extends TupleBinding {
       try {
          switch (type) {
          case BOOLEAN:
-            return RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.localize().getNid();
+            return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids());
          case STRING:
-             return RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid();
+             return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids());
           case CONCEPT:
-            return RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
+            return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
          case INTEGER:
-            return RefsetAuxiliary.Concept.INT_EXTENSION.localize().getNid();
+            return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
          case LANGUAGE:
-            return RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid();
+            return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
          case SCOPED_LANGUAGE:
-            return RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid();
+            return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
          case MEASUREMENT:
-            return RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.localize().getNid();
+            return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
          default:
             throw new RuntimeException("Can't convert to type: " + type);
          }
@@ -209,19 +210,19 @@ public class ThinExtBinder extends TupleBinding {
       EXT_TYPE extType = EXT_TYPE.BOOLEAN;
       if (versioned.getVersions() == null || versioned.getVersions().size() == 0) {
          try {
-             if (versioned.getTypeId() == RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.localize().getNid()) {
+             if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids())) {
                  extType = EXT_TYPE.BOOLEAN;
-              } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid()) {
+              } else if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids())) {
                   extType = EXT_TYPE.STRING;
-              } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid()) {
+              } else if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids())) {
                extType = EXT_TYPE.CONCEPT;
-            } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.INT_EXTENSION.localize().getNid()) {
+            } else if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids())) {
                extType = EXT_TYPE.INTEGER;
-            } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.localize().getNid()) {
+            } else if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids())) {
                extType = EXT_TYPE.LANGUAGE;
-            } else if (versioned.getTypeId() == RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.localize().getNid()) {
+            } else if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids())) {
                extType = EXT_TYPE.SCOPED_LANGUAGE;
-            }else if (versioned.getTypeId() == RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.localize().getNid()) {
+            }else if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids())) {
                extType = EXT_TYPE.MEASUREMENT;
             }
          } catch (Exception e) {
