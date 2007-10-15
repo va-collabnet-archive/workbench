@@ -468,6 +468,9 @@ public class ExportDatabase extends AbstractMojo {
                      // Language code
                      createRecord(stringBuilder, part.getLang());
 
+                     // Language code for UUID
+                     createRecord(stringBuilder, part.getLang());
+
                      // AMT added
                      // Description UUID
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(desc.getDescId()).getUids()
