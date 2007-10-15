@@ -145,6 +145,7 @@ import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntList;
 
 import com.sleepycat.je.DatabaseException;
@@ -271,6 +272,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 I_GetConceptData igcd = (I_GetConceptData) cb;
                 for (int nid : igcd.getUncommittedIds().getSetValues()) {
                     I_IdVersioned idv = AceConfig.getVodb().getId(nid);
+                    try {
+                        uncommittedIds.getUncommittedIds().add(idv.getUniversal());
+                    } catch (TerminologyException e) {
+                        throw new ToIoException(e);
+                    }
+                }
+            } else if (ExtensionByReferenceBean.class.isAssignableFrom(cb.getClass())) {
+                ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
+                if (ebrBean.isFirstCommit()) {
+                    I_IdVersioned idv = AceConfig.getVodb().getId(ebrBean.getMemberId());
                     try {
                         uncommittedIds.getUncommittedIds().add(idv.getUniversal());
                     } catch (TerminologyException e) {
@@ -1581,28 +1592,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return checkBoxPane;
     }
 
-    private JPanel makeRefsetCheckboxPane(TOGGLES t) {
-        JPanel checkBoxPane = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.WEST;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 1;
-        c.weighty = 0;
-        for (EXT_TYPE type : EXT_TYPE.values()) {
-            JCheckBox box = new JCheckBox(type.getInterfaceName());
-            box.setSelected(aceFrameConfig.isRefsetInToggleVisible(type, t));
-            box.addActionListener(new SetRefsetInToggleVisible(type, t));
-            checkBoxPane.add(box, c);
-            c.gridy++;
-        }
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1;
-        c.weighty = 1;
-        checkBoxPane.add(new JPanel(), c);
-        return checkBoxPane;
-    }
 
     private JTabbedPane makeEditConfig() throws Exception {
         JTabbedPane tabs = new JTabbedPane();

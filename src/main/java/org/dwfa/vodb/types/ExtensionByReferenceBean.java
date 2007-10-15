@@ -27,185 +27,199 @@ import com.sleepycat.je.DatabaseException;
 
 public class ExtensionByReferenceBean implements I_Transact {
 
-   private static WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>> ebrBeans = new WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>>();
+    private static WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>> ebrBeans = new WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>>();
 
-   private ExtensionByReferenceBean(int memberId) {
-      super();
-      this.memberId = memberId;
-   }
+    private ExtensionByReferenceBean(int memberId) {
+        super();
+        this.memberId = memberId;
+    }
 
-   public static ExtensionByReferenceBean get(int memberId) {
-      ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
-      WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
-      if (ref != null) {
-         ebrBean = ref.get();
-      } else {
-         synchronized (ebrBeans) {
-            ref = ebrBeans.get(ebrBean);
-            if (ref == null) {
-               ebrBeans.put(ebrBean, new WeakReference<ExtensionByReferenceBean>(ebrBean));
-            } else {
-               ebrBean = ref.get();
+    public static ExtensionByReferenceBean get(int memberId) {
+        ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
+        WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        if (ref != null) {
+            ebrBean = ref.get();
+        } else {
+            synchronized (ebrBeans) {
+                ref = ebrBeans.get(ebrBean);
+                if (ref == null) {
+                    ebrBeans.put(ebrBean, new WeakReference<ExtensionByReferenceBean>(ebrBean));
+                } else {
+                    ebrBean = ref.get();
+                }
             }
-         }
-      }
-      return ebrBean;
-   }
+        }
+        return ebrBean;
+    }
 
-   public static ExtensionByReferenceBean make(UUID uid, ThinExtByRefVersioned extension) throws TerminologyException,
-         IOException {
-      return make(AceConfig.getVodb().uuidToNative(uid), extension);
-   }
+    public static ExtensionByReferenceBean make(UUID uid, ThinExtByRefVersioned extension) throws TerminologyException,
+            IOException {
+        return make(AceConfig.getVodb().uuidToNative(uid), extension);
+    }
 
-   public static ExtensionByReferenceBean makeNew(UUID uid, ThinExtByRefVersioned extension)
-         throws TerminologyException, IOException {
-      return makeNew(AceConfig.getVodb().uuidToNative(uid), extension);
-   }
+    public static ExtensionByReferenceBean makeNew(UUID uid, ThinExtByRefVersioned extension)
+            throws TerminologyException, IOException {
+        return makeNew(AceConfig.getVodb().uuidToNative(uid), extension);
+    }
 
-   private static HashSet<ExtensionByReferenceBean> newExtensions = new HashSet<ExtensionByReferenceBean>();
+    private static HashSet<ExtensionByReferenceBean> newExtensions = new HashSet<ExtensionByReferenceBean>();
 
-   public static ExtensionByReferenceBean makeNew(int memberId, ThinExtByRefVersioned extension) {
-       ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
-       WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
-       if (ref != null) {
-          throw new RuntimeException("ExtensionByReferenceBean already exists for: " + memberId);
-       }
-      ebrBean = make(memberId, extension);
-      newExtensions.add(ebrBean);
-      return ebrBean;
-   }
+    public static ExtensionByReferenceBean makeNew(int memberId, ThinExtByRefVersioned extension) {
+        ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
+        ebrBean.firstCommit = true;
+        WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        if (ref != null) {
+            throw new RuntimeException("ExtensionByReferenceBean already exists for: " + memberId);
+        }
+        ebrBean = make(memberId, extension);
+        newExtensions.add(ebrBean);
+        return ebrBean;
+    }
 
-   public static ExtensionByReferenceBean make(int memberId, ThinExtByRefVersioned extension) {
-      ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
-      WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
-      if (ref != null) {
-         return ref.get();
-      }
-      ebrBean = get(memberId);
-      ebrBean.extension = extension;
-      return ebrBean;
-   }
+    public static ExtensionByReferenceBean make(int memberId, ThinExtByRefVersioned extension) {
+        ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
+        WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        if (ref != null) {
+            return ref.get();
+        }
+        ebrBean = get(memberId);
+        ebrBean.extension = extension;
+        return ebrBean;
+    }
 
-   public static ExtensionByReferenceBean get(UUID uid) throws TerminologyException, IOException {
-      return get(AceConfig.getVodb().uuidToNative(uid));
-   }
+    public static ExtensionByReferenceBean get(UUID uid) throws TerminologyException, IOException {
+        return get(AceConfig.getVodb().uuidToNative(uid));
+    }
 
-   public static ExtensionByReferenceBean get(Collection<UUID> uids) throws TerminologyException, IOException {
-      return get(AceConfig.getVodb().uuidToNative(uids));
-   }
+    public static ExtensionByReferenceBean get(Collection<UUID> uids) throws TerminologyException, IOException {
+        return get(AceConfig.getVodb().uuidToNative(uids));
+    }
 
-   public static Collection<ExtensionByReferenceBean> getNewExtensions(int componentId) {
-      List<ExtensionByReferenceBean> returnValues = new ArrayList<ExtensionByReferenceBean>();
-      for (ExtensionByReferenceBean newEbr : newExtensions) {
-         if (newEbr.extension.getComponentId() == componentId) {
-            returnValues.add(newEbr);
-         }
-      }
-      return returnValues;
-   }
-
-   private int memberId;
-
-   private ThinExtByRefVersioned extension;
-
-   private static int dataVersion = 1;
-
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      throw new IOException("This class is deliberately not serializable...");
-   }
-
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
-         //
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
-      throw new IOException("This class is deliberately not serializable...");
-   }
-
-   public void abort() throws IOException {
-      extension = null;
-      newExtensions.remove(this);
-   }
-
-   public void commit(int version, Set<TimePathId> values) throws IOException {
-      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-         AceLog.getEditLog().fine("Starting commit for ExtensionByReferenceBean: " + this.memberId);
-      }
-      StringBuffer buff = null;
-      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-         buff = new StringBuffer();
-      }
-      try {
-         if (extension != null) {
-            for (ThinExtByRefPart p : extension.getVersions()) {
-               boolean changed = false;
-               if (p.getVersion() == Integer.MAX_VALUE) {
-                  p.setVersion(version);
-                  values.add(new TimePathId(version, p.getPathId()));
-                  changed = true;
-                  if (buff != null) {
-                     buff.append("\n  Committing member: " + extension.getMemberId() + " for component: " + extension.getComponentId() + " part:" + p);
-                  }
-               }
-               if (changed) {
-                  AceConfig.getVodb().writeExt(extension);
-               }
+    public static Collection<ExtensionByReferenceBean> getNewExtensions(int componentId) {
+        List<ExtensionByReferenceBean> returnValues = new ArrayList<ExtensionByReferenceBean>();
+        for (ExtensionByReferenceBean newEbr : newExtensions) {
+            if (newEbr.extension.getComponentId() == componentId) {
+                returnValues.add(newEbr);
             }
-         }
-      } catch (DatabaseException e) {
-         throw new ToIoException(e);
-      }
-      if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-         AceLog.getAppLog().fine("Finished commit for ExtensionByReferenceBean: " + this);
-      }
-      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-         AceLog.getEditLog().fine(buff.toString());
-      }
-      newExtensions.remove(this);
-   }
+        }
+        return returnValues;
+    }
 
-   public ThinExtByRefVersioned getExtension() throws IOException {
-      if (extension == null) {
-         try {
-            extension = AceConfig.getVodb().getExtension(memberId);
-         } catch (DatabaseException e) {
+    private int memberId;
+
+    private boolean firstCommit = false;
+
+    private ThinExtByRefVersioned extension;
+
+    private static int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        throw new IOException("This class is deliberately not serializable...");
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            //
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+        throw new IOException("This class is deliberately not serializable...");
+    }
+
+    public void abort() throws IOException {
+        extension = null;
+        newExtensions.remove(this);
+        if (firstCommit) {
+            ebrBeans.remove(this);
+        }
+    }
+
+    public void commit(int version, Set<TimePathId> values) throws IOException {
+        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            AceLog.getEditLog().fine("Starting commit for ExtensionByReferenceBean: " + this.memberId);
+        }
+        StringBuffer buff = null;
+        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            buff = new StringBuffer();
+        }
+        try {
+            if (extension != null) {
+                for (ThinExtByRefPart p : extension.getVersions()) {
+                    boolean changed = false;
+                    if (p.getVersion() == Integer.MAX_VALUE) {
+                        p.setVersion(version);
+                        values.add(new TimePathId(version, p.getPathId()));
+                        changed = true;
+                        if (buff != null) {
+                            buff.append("\n  Committing member: " + extension.getMemberId() + " for component: "
+                                    + extension.getComponentId() + " part:" + p);
+                        }
+                    }
+                    if (changed) {
+                        AceConfig.getVodb().writeExt(extension);
+                    }
+                }
+            }
+        } catch (DatabaseException e) {
             throw new ToIoException(e);
-         }
-      }
-      return extension;
-   }
+        }
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("Finished commit for ExtensionByReferenceBean: " + this);
+        }
+        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            AceLog.getEditLog().fine(buff.toString());
+        }
+        newExtensions.remove(this);
+        firstCommit = false;
+    }
 
-   public UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException {
-      I_TermFactory tf = LocalVersionedTerminology.get();
-      UniversalAceExtByRefBean uEbrBean = new UniversalAceExtByRefBean(
-            tf.getUids(getExtension().getRefsetId()), 
-            tf.getUids(getExtension().getMemberId()), 
-            tf.getUids(getExtension().getComponentId()), 
-            tf.getUids(getExtension().getTypeId()));
-      for (ThinExtByRefPart part: getExtension().getVersions()) {
-         uEbrBean.getVersions().add(part.getUniversalPart());
-      }
-      return uEbrBean;
-   }
-   
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-      if (ExtensionByReferenceBean.class.isAssignableFrom(obj.getClass())) {
-          ExtensionByReferenceBean another = (ExtensionByReferenceBean) obj;
-         return memberId == another.memberId;
-      }
-      return false;
-   }
+    public ThinExtByRefVersioned getExtension() throws IOException {
+        if (extension == null) {
+            try {
+                extension = AceConfig.getVodb().getExtension(memberId);
+            } catch (DatabaseException e) {
+                throw new ToIoException(e);
+            }
+        }
+        return extension;
+    }
 
-   @Override
-   public int hashCode() {
-      return memberId;
-   }
+    public UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException {
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        UniversalAceExtByRefBean uEbrBean = new UniversalAceExtByRefBean(tf.getUids(getExtension().getRefsetId()), tf
+                .getUids(getExtension().getMemberId()), tf.getUids(getExtension().getComponentId()), tf
+                .getUids(getExtension().getTypeId()));
+        for (ThinExtByRefPart part : getExtension().getVersions()) {
+            uEbrBean.getVersions().add(part.getUniversalPart());
+        }
+        return uEbrBean;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (ExtensionByReferenceBean.class.isAssignableFrom(obj.getClass())) {
+            ExtensionByReferenceBean another = (ExtensionByReferenceBean) obj;
+            return memberId == another.memberId;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return memberId;
+    }
+
+    public boolean isFirstCommit() {
+        return firstCommit;
+    }
+
+    public int getMemberId() {
+        return memberId;
+    }
 
 }

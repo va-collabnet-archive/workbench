@@ -580,6 +580,13 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         conceptsToFetch.add(part.getStatus());
                         conceptsToFetch.add(part.getPathId());
                     }
+                    if (stopWork) {
+                        return -1;
+                    }
+                    if (allTuples == null) {
+                        AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
+                        return -1;
+                    }
                     allTuples.add(new ThinExtByRefTuple(ebrBean.getExtension(), part));
                 }
             }
@@ -671,6 +678,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     }
 
     public void propertyChange(PropertyChangeEvent arg0) {
+        if (tableChangeWorker != null) {
+            tableChangeWorker.stopWork = true;
+        }
         allTuples = null;
         allExtensions = null;
         if (getProgress() != null) {
@@ -887,6 +897,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     .uuidToNativeWithGeneration(UUID.randomUUID(),
                                                 ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
                                                 host.getConfig().getEditingPathSet(), Integer.MAX_VALUE);
+            
+            
             ThinExtByRefVersioned extension = new ThinExtByRefVersioned(refsetId, memberId, tableComponentId,
                                                                         ThinExtBinder.getExtensionType(refsetType));
             switch (refsetType) {

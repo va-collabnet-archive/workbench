@@ -845,6 +845,16 @@ public class VodbEnv implements I_ImplementTermFactory {
       }
       throw new DatabaseException("Ext: " + memberId + " not found.");
    }
+   
+   public boolean hasExtension(int memberId) throws DatabaseException {
+       DatabaseEntry extKey = new DatabaseEntry();
+       DatabaseEntry extValue = new DatabaseEntry();
+       intBinder.objectToEntry(memberId, extKey);
+       if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+          return true;
+       }
+       return false;
+   }
 
    public boolean hasConcept(int conceptId) throws DatabaseException {
       DatabaseEntry conceptKey = new DatabaseEntry();
