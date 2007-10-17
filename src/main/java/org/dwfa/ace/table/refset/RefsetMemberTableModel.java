@@ -59,6 +59,8 @@ import org.dwfa.vodb.types.ThinExtByRefPartString;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
+import apple.awt.IntegerNIORaster;
+
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
 
@@ -695,6 +697,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         this.tableComponentId = componentId;
         if (ACE.editMode) {
             this.addButton.setEnabled(this.tableComponentId != Integer.MIN_VALUE);
+        }
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            if (componentId == Integer.MIN_VALUE) {
+                AceLog.getAppLog().fine("Set component id to NULL for " + refsetType + " in " + toggle);
+            } else {
+                AceLog.getAppLog().fine("Set component id to: " + componentId  + 
+                                        " for " + refsetType + " in " + toggle);
+            }
         }
         propertyChange(null);
     }

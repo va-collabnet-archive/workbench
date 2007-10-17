@@ -91,7 +91,7 @@ public class ThinExtByRefVersioned {
 
     public void addVersion(ThinExtByRefPart part) {
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-            AceLog.getEditLog().fine("Adding part: " + part + " to member: " + memberId);
+            AceLog.getEditLog().fine("Adding part: " + part + " to member: " + memberId + " for component: " + componentId);
         }
         versions.add(part);
     }

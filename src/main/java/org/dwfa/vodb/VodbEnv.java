@@ -981,18 +981,23 @@ public class VodbEnv implements I_ImplementTermFactory {
       SecondaryCursor mySecCursor = getComponentToExtMap().openSecondaryCursor(null, null);
       OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
       List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
+      int count = 0;
+      int rejected = 0;
       while (retVal == OperationStatus.SUCCESS) {
          ThinExtByRefVersioned extFromComponentId = (ThinExtByRefVersioned) extBinder.entryToObject(foundData);
          if (extFromComponentId.getComponentId() == componentId) {
+             count++;
             matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
          } else {
+             rejected++;
             break;
          }
          retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
       }
       mySecCursor.close();
       if (logger.isLoggable(Level.FINE)) {
-         logger.fine("Extensions fetched for: " + componentId + " elapsed time: " + timer.getElapsedTime() / 1000
+         logger.fine(count + " extensions fetched, " + rejected + " extensions rejected " +
+                "for: " + componentId + " elapsed time: " + timer.getElapsedTime() / 1000
                + " secs");
       }
       return matches;
@@ -1015,7 +1020,7 @@ public class VodbEnv implements I_ImplementTermFactory {
       List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
       while (retVal == OperationStatus.SUCCESS) {
          ThinExtByRefVersioned extFromComponentId = (ThinExtByRefVersioned) extBinder.entryToObject(foundData);
-         if (extFromComponentId.getComponentId() == refsetId) {
+         if (extFromComponentId.getRefsetId() == refsetId) {
             matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
          } else {
             break;
@@ -1934,6 +1939,12 @@ public class VodbEnv implements I_ImplementTermFactory {
       DatabaseEntry key = new DatabaseEntry();
       DatabaseEntry value = new DatabaseEntry();
       if (debugWrites) {
+          if (componentToExtMap == null) {
+              throw new DatabaseException("componentToExtMap is not initialized. ");
+          }
+          if (refsetToExtMap == null) {
+              throw new DatabaseException("refsetToExtMap is not initialized. ");
+          }
          HashSet<ThinExtByRefPart> partSet = new HashSet<ThinExtByRefPart>(ext.getVersions());
          if (partSet.size() != ext.getVersions().size()) {
             throw new DatabaseException("Redundant parts: " + ext.getVersions());
@@ -1944,6 +1955,43 @@ public class VodbEnv implements I_ImplementTermFactory {
       intBinder.objectToEntry(ext.getMemberId(), key);
       extBinder.objectToEntry(ext, value);
       extensionDb.put(null, key, value);
+      
+      if (debugWrites) {
+          ThinExtByRefVersioned ext2 = getExtension(ext.getMemberId());
+          if (ext2.equals(ext)) {
+              logger.fine("write/read test succeeded");
+          } else {
+              throw new DatabaseException("written and read are not equal: " + ext + " " + ext2);
+          }
+         boolean foundByComponent = false;
+          for (ExtensionByReferenceBean extBean: getExtensionsForComponent(ext.getComponentId())) {
+              try {
+                if (ext2.equals(extBean.getExtension())) {
+                      foundByComponent = true;
+                      logger.fine("write/read for component test succeeded");
+                      break;
+                  }
+            } catch (IOException e) {
+                throw new DatabaseException(e);
+            }
+          }
+          boolean foundByRefset = false;
+          for (ExtensionByReferenceBean extBean: getExtensionsForRefset((ext.getRefsetId()))) {
+              try {
+                if (ext2.equals(extBean.getExtension())) {
+                    foundByRefset = true;
+                      logger.fine("write/read for refset test succeeded");
+                      break;
+                  }
+            } catch (IOException e) {
+                throw new DatabaseException(e);
+            }
+          }
+          if (foundByComponent == false || foundByRefset == false) {
+              throw new DatabaseException("Can't find extension by componentId: " + foundByComponent + 
+                                          " by refset: " + foundByRefset);
+          }
+      }
    }
 
 

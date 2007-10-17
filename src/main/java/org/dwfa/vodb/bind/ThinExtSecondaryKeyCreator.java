@@ -1,5 +1,8 @@
 package org.dwfa.vodb.bind;
 
+import java.util.logging.Level;
+
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -11,88 +14,97 @@ import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.SecondaryKeyCreator;
 
 public class ThinExtSecondaryKeyCreator implements SecondaryKeyCreator {
-   public enum KEY_TYPE { REFSET_ID, COMPONENT_ID };
+    public enum KEY_TYPE {
+        REFSET_ID, COMPONENT_ID
+    };
 
-   private static ThinExtBinder fixedOnlyBinder = new ThinExtBinder(true);
-   
-   private static TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
-   
-   private KEY_TYPE keyType;
+    private static ThinExtBinder fixedOnlyBinder = new ThinExtBinder(true);
 
-   public static class MemberAndSecondaryId {
-      int memberId;
-      int secondaryId;
-      public MemberAndSecondaryId() {
-         super();
-      }
-      
-      public MemberAndSecondaryId(int secondaryId, int memberId) {
-         super();
-         this.memberId = memberId;
-         this.secondaryId = secondaryId;
-      }
-      public int getSecondaryId() {
-         return secondaryId;
-      }
-      public void setSecondaryId(int c1Id) {
-         this.secondaryId = c1Id;
-      }
-      public int getMemberId() {
-         return memberId;
-      }
-      public void setMemberId(int relId) {
-         this.memberId = relId;
-      }
-   }
-   public static class MemberAndSecondaryIdBinding extends TupleBinding {
+    private static TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
-      public MemberAndSecondaryId entryToObject(TupleInput ti) {
-         return new MemberAndSecondaryId(ti.readInt(),ti.readInt());
-      }
+    private KEY_TYPE keyType;
 
-      public void objectToEntry(Object obj, TupleOutput to) {
-         MemberAndSecondaryId id = (MemberAndSecondaryId) obj;
-         to.writeInt(id.getSecondaryId());
-         to.writeInt(id.getMemberId());
-      }
+    public static class MemberAndSecondaryId {
+        int memberId;
 
-   }
-   
-   MemberAndSecondaryId memberAndSecondaryId = new MemberAndSecondaryId();
-   MemberAndSecondaryIdBinding relAndC1IdBinding = new MemberAndSecondaryIdBinding();
+        int secondaryId;
 
-   public ThinExtSecondaryKeyCreator(KEY_TYPE keyType) {
-      super();
-      this.keyType = keyType;
-   }
+        public MemberAndSecondaryId() {
+            super();
+        }
 
-   public boolean createSecondaryKey(SecondaryDatabase secDb,
-         DatabaseEntry keyEntry,
-         DatabaseEntry dataEntry,
-         DatabaseEntry resultEntry) throws DatabaseException {
-      ThinExtByRefVersioned core = (ThinExtByRefVersioned) fixedOnlyBinder.entryToObject(dataEntry);
-      switch (keyType) {
-     case REFSET_ID:
-        intBinder.objectToEntry(core.getRefsetId(), resultEntry);
-         break;
-     case COMPONENT_ID:
-        intBinder.objectToEntry(core.getComponentId(), resultEntry);
-        break;
+        public MemberAndSecondaryId(int secondaryId, int memberId) {
+            super();
+            this.memberId = memberId;
+            this.secondaryId = secondaryId;
+        }
 
-      default:
-        throw new RuntimeException("Can't handle keytype:" + keyType);
-      }
-      intBinder.objectToEntry(core.getMemberId(), resultEntry);      
-      return true;
-   }
-   public synchronized boolean createSecondaryKey(int memberId, 
-         int c1id,
-         DatabaseEntry resultEntry)
-      throws DatabaseException {
-   memberAndSecondaryId.setSecondaryId(c1id);
-   memberAndSecondaryId.setMemberId(memberId);
-   relAndC1IdBinding.objectToEntry(memberAndSecondaryId, resultEntry);
-   return true;
-}
+        public int getSecondaryId() {
+            return secondaryId;
+        }
+
+        public void setSecondaryId(int c1Id) {
+            this.secondaryId = c1Id;
+        }
+
+        public int getMemberId() {
+            return memberId;
+        }
+
+        public void setMemberId(int relId) {
+            this.memberId = relId;
+        }
+    }
+
+    public static class MemberAndSecondaryIdBinding extends TupleBinding {
+
+        public MemberAndSecondaryId entryToObject(TupleInput ti) {
+            return new MemberAndSecondaryId(ti.readInt(), ti.readInt());
+        }
+
+        public void objectToEntry(Object obj, TupleOutput to) {
+            MemberAndSecondaryId id = (MemberAndSecondaryId) obj;
+            to.writeInt(id.getSecondaryId());
+            to.writeInt(id.getMemberId());
+        }
+
+    }
+
+    MemberAndSecondaryId memberAndSecondaryId = new MemberAndSecondaryId();
+
+    MemberAndSecondaryIdBinding memberAndSecondaryIdBinding = new MemberAndSecondaryIdBinding();
+
+    public ThinExtSecondaryKeyCreator(KEY_TYPE keyType) {
+        super();
+        this.keyType = keyType;
+    }
+
+    public boolean createSecondaryKey(SecondaryDatabase secDb, DatabaseEntry keyEntry, DatabaseEntry dataEntry,
+        DatabaseEntry resultEntry) throws DatabaseException {
+        ThinExtByRefVersioned core = (ThinExtByRefVersioned) fixedOnlyBinder.entryToObject(dataEntry);
+        
+        
+        switch (keyType) {
+        case REFSET_ID:
+            return createSecondaryKey(core.getMemberId(), core.getRefsetId(), resultEntry);
+        case COMPONENT_ID:
+            return createSecondaryKey(core.getMemberId(), core.getComponentId(), resultEntry);
+
+        default:
+            throw new RuntimeException("Can't handle keytype:" + keyType);
+        }
+    }
+
+    public synchronized boolean createSecondaryKey(int memberId, int secondaryId, DatabaseEntry resultEntry)
+            throws DatabaseException {
+
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("Creating secondary key (2) for " + keyType + " m: " + memberId + " s: " + secondaryId);
+        }
+        memberAndSecondaryId.setSecondaryId(secondaryId);
+        memberAndSecondaryId.setMemberId(memberId);
+        memberAndSecondaryIdBinding.objectToEntry(memberAndSecondaryId, resultEntry);
+        return true;
+    }
 
 }
