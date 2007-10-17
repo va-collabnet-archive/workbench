@@ -80,16 +80,8 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
       return acceptabilityPopupIds;
    }
 
-   public void setAcceptabilityPopupIds(I_IntList acceptabilityPopupIds) {
-      this.acceptabilityPopupIds = acceptabilityPopupIds;
-   }
-
    public I_IntList getCorrectnessPopupIds() {
       return correctnessPopupIds;
-   }
-
-   public void setCorrectnessPopupIds(I_IntList correctnessPopupIds) {
-      this.correctnessPopupIds = correctnessPopupIds;
    }
 
    public I_GetConceptData getDefaultAcceptabilityForLanguageRefset() {
@@ -97,7 +89,9 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
    }
 
    public void setDefaultAcceptabilityForLanguageRefset(I_GetConceptData defaultAcceptabilityForLanguageRefset) {
+      Object oldValue = this.defaultAcceptabilityForLanguageRefset;
       this.defaultAcceptabilityForLanguageRefset = defaultAcceptabilityForLanguageRefset;
+      pcs.firePropertyChange("defaultAcceptabilityForLanguageRefset", oldValue, defaultAcceptabilityForLanguageRefset);
    }
 
    public I_GetConceptData getDefaultCorrectnessForLanguageRefset() {
@@ -105,7 +99,9 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
    }
 
    public void setDefaultCorrectnessForLanguageRefset(I_GetConceptData defaultCorrectnessForLanguageRefset) {
+      Object oldValue = this.defaultCorrectnessForLanguageRefset;
       this.defaultCorrectnessForLanguageRefset = defaultCorrectnessForLanguageRefset;
+      pcs.firePropertyChange("defaultCorrectnessForLanguageRefset", oldValue, defaultCorrectnessForLanguageRefset);
    }
 
    public I_GetConceptData getDefaultDegreeOfSynonymyForLanguageRefset() {
@@ -113,15 +109,13 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
    }
 
    public void setDefaultDegreeOfSynonymyForLanguageRefset(I_GetConceptData defaultDegreeOfSynonymyForLanguageRefset) {
+      Object oldValue = this.defaultDegreeOfSynonymyForLanguageRefset;
       this.defaultDegreeOfSynonymyForLanguageRefset = defaultDegreeOfSynonymyForLanguageRefset;
+      pcs.firePropertyChange("defaultDegreeOfSynonymyForLanguageRefset", oldValue, defaultDegreeOfSynonymyForLanguageRefset);
    }
 
    public I_IntList getDegreeOfSynonymyPopupIds() {
       return degreeOfSynonymyPopupIds;
-   }
-
-   public void setDegreeOfSynonymyPopupIds(I_IntList degreeOfSynonymyPopupIds) {
-      this.degreeOfSynonymyPopupIds = degreeOfSynonymyPopupIds;
    }
 
 }

@@ -120,7 +120,11 @@ import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.SearchPanel;
-import org.dwfa.ace.table.refset.RefsetDefaultsBoolean;
+import org.dwfa.ace.table.refset.RefsetDefaults;
+import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
+import org.dwfa.ace.table.refset.RefsetDefaultsLanguage;
+import org.dwfa.ace.table.refset.RefsetDefaultsLanguageScoped;
+import org.dwfa.ace.table.refset.RefsetDefaultsMeasurement;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
@@ -238,9 +242,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
         return 0;
     }
-    
+
     private static boolean writeChangeSets = true;
-    
+
     public static void resumeChangeSetWriters() {
         writeChangeSets = true;
     }
@@ -248,7 +252,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static void suspendChangeSetWriters() {
         writeChangeSets = false;
     }
-
 
     /*
      * 
@@ -301,7 +304,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
         }
-        
+
         try {
             for (I_Transact cb : uncommitted) {
                 cb.commit(version, values);
@@ -1510,56 +1513,70 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.weightx = 1;
         c.weighty = 1;
         defaultsPane.add(editDefaultsTabs, c);
-        
-        
+
         switch (type) {
         case BOOLEAN:
-            RefsetDefaultsBoolean booleanDefaults = (RefsetDefaultsBoolean) aceFrameConfig
-                    .getRefsetPreferencesForToggle(toggle).getBooleanPreferences();
-            
-            //Default refset
-            JPanel refsetsDefault = new JPanel(new GridLayout(0, 1));
-            TermComponentLabel defaultRefset = new TermComponentLabel(aceFrameConfig);
-            defaultRefset.setTermComponent(booleanDefaults.getDefaultRefset());
-            // Problem here with listeners...
-            aceFrameConfig.addPropertyChangeListener("defaultRefset", new PropertyListenerGlue("setTermComponent",
-                                                                                               I_AmTermComponent.class,
-                                                                                               defaultRefset));
-            defaultRefset.addTermChangeListener(new PropertyListenerGlue("setDefaultRefset", I_GetConceptData.class,
-                                                                         booleanDefaults));
-
-            wrapAndAdd(refsetsDefault, defaultRefset, "Default refset: ");
-            
-            
-            //Status
-            TermComponentLabel defaultStatus = new TermComponentLabel(aceFrameConfig);
-            defaultStatus.setTermComponent(booleanDefaults.getDefaultStatusForRefset());
-            // Problem here with listeners...
-            aceFrameConfig.addPropertyChangeListener("defaultStatus", new PropertyListenerGlue("setTermComponent",
-                                                                                               I_AmTermComponent.class,
-                                                                                               defaultStatus));
-            defaultStatus.addTermChangeListener(new PropertyListenerGlue("setDefaultStatus", I_GetConceptData.class,
-                                                                         defaultStatus));
-
-            wrapAndAdd(refsetsDefault, defaultStatus, "Default status: ");
-            
-            editDefaultsTabs.addTab("defaults", refsetsDefault);
-
-            
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getBooleanPreferences(), type);
             break;
         case CONCEPT:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getConceptPreferences(), type);
+            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                    .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds(),
+                                                                                          "Concept types for popup:")));
 
             break;
         case INTEGER:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getIntegerPreferences(), type);
 
             break;
         case LANGUAGE:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguagePreferences(), type);
+            editDefaultsTabs.addTab("acceptability types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                                .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getAcceptabilityPopupIds(),
+                                                                                                 "Acceptability types for popup:")));
+            editDefaultsTabs.addTab("correctness types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                              .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getCorrectnessPopupIds(),
+                                                                                               "Correctness types for popup:")));
+            editDefaultsTabs.addTab("degree of synonymy types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                              .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getDegreeOfSynonymyPopupIds(),
+                                                                                               "Degree of synonymy for popup:")));
 
             break;
         case MEASUREMENT:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getMeasurementPreferences(), type);
+            editDefaultsTabs.addTab("units of measure types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                                     .getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getUnitsOfMeasurePopupIds(),
+                                                                                                      "Units of measure for popup:")));
 
             break;
         case SCOPED_LANGUAGE:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguageScopedPreferences(), type);
+
+            editDefaultsTabs.addTab("acceptability types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                                .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getAcceptabilityPopupIds(),
+                                                                                                 "Acceptability types for popup:")));
+            editDefaultsTabs.addTab("correctness types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                              .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getCorrectnessPopupIds(),
+                                                                                               "Correctness types for popup:")));
+            editDefaultsTabs.addTab("degree of synonymy types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                              .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getDegreeOfSynonymyPopupIds(),
+                                                                                               "Degree of synonymy for popup:")));
+            editDefaultsTabs.addTab("scope types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                                     .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds(),
+                                                                                                      "Scope types for popup:")));
+            editDefaultsTabs.addTab("tag types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                                                                                                     .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getTagPopupIds(),
+                                                                                                      "Tags for popup:")));
+            break;
+        case STRING:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getStringPreferences(), type);
 
             break;
         default:
@@ -1567,6 +1584,111 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
         return defaultsPane;
+    }
+
+    private void addDefaults(JTabbedPane editDefaultsTabs, RefsetDefaults defaults, EXT_TYPE type) {
+        // Start with defaults for all refsets...
+
+        // Default refset
+        JPanel refsetsDefault = new JPanel(new GridLayout(0, 1));
+
+        TermComponentLabel defaultRefset = new TermComponentLabel(aceFrameConfig);
+        defaultRefset.setTermComponent(defaults.getDefaultRefset());
+        gluePreferenceLabel(defaults, "defaultRefset", defaultRefset);
+        wrapAndAdd(refsetsDefault, defaultRefset, "Default refset: ");
+
+        // Status
+        TermComponentLabel defaultStatus = new TermComponentLabel(aceFrameConfig);
+        defaultStatus.setTermComponent(defaults.getDefaultStatusForRefset());
+        gluePreferenceLabel(defaults, "defaultStatus", defaultStatus);
+        wrapAndAdd(refsetsDefault, defaultStatus, "Default status: ");
+
+        switch (type) {
+        case BOOLEAN:
+            // @todo
+            break;
+        case CONCEPT:
+            TermComponentLabel defaultForConceptRefset = new TermComponentLabel(aceFrameConfig);
+            defaultForConceptRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
+            gluePreferenceLabel(defaults, "defaultForConceptRefset", defaultForConceptRefset);
+            wrapAndAdd(refsetsDefault, defaultForConceptRefset, "Default concept: ");
+            break;
+        case INTEGER:
+            // @todo
+            break;
+        case SCOPED_LANGUAGE:
+            TermComponentLabel defaultScopeForScopedLanguageRefset = new TermComponentLabel(aceFrameConfig);
+            defaultScopeForScopedLanguageRefset.setTermComponent(((RefsetDefaultsLanguageScoped) defaults)
+                    .getDefaultScopeForScopedLanguageRefset());
+            gluePreferenceLabel(defaults, "defaultScopeForScopedLanguageRefset", defaultScopeForScopedLanguageRefset);
+            wrapAndAdd(refsetsDefault, defaultScopeForScopedLanguageRefset, "Default scope: ");
+
+            TermComponentLabel defaultTagForScopedLanguageRefset = new TermComponentLabel(aceFrameConfig);
+            defaultTagForScopedLanguageRefset.setTermComponent(((RefsetDefaultsLanguageScoped) defaults)
+                    .getDefaultTagForScopedLanguageRefset());
+            gluePreferenceLabel(defaults, "defaultTagForScopedLanguageRefset", defaultTagForScopedLanguageRefset);
+            wrapAndAdd(refsetsDefault, defaultTagForScopedLanguageRefset, "Default tag: ");
+            // @todo priority
+
+        case LANGUAGE:
+            TermComponentLabel defaultAcceptabilityForLanguageRefset = new TermComponentLabel(aceFrameConfig);
+            defaultAcceptabilityForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults)
+                    .getDefaultAcceptabilityForLanguageRefset());
+            gluePreferenceLabel(defaults, "defaultAcceptabilityForLanguageRefset",
+                                defaultAcceptabilityForLanguageRefset);
+            wrapAndAdd(refsetsDefault, defaultAcceptabilityForLanguageRefset, "Default acceptability: ");
+
+            TermComponentLabel defaultCorrectnessForLanguageRefset = new TermComponentLabel(aceFrameConfig);
+            defaultCorrectnessForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults)
+                    .getDefaultCorrectnessForLanguageRefset());
+            gluePreferenceLabel(defaults, "defaultCorrectnessForLanguageRefset", defaultCorrectnessForLanguageRefset);
+            wrapAndAdd(refsetsDefault, defaultCorrectnessForLanguageRefset, "Default correctness: ");
+
+            TermComponentLabel defaultDegreeOfSynonymyForLanguageRefset = new TermComponentLabel(aceFrameConfig);
+            defaultDegreeOfSynonymyForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults)
+                    .getDefaultDegreeOfSynonymyForLanguageRefset());
+            gluePreferenceLabel(defaults, "defaultDegreeOfSynonymyForLanguageRefset",
+                                defaultDegreeOfSynonymyForLanguageRefset);
+            wrapAndAdd(refsetsDefault, defaultDegreeOfSynonymyForLanguageRefset, "Default degree of synonomy: ");
+
+            break;
+        case MEASUREMENT:
+
+            // @todo measurement
+
+            TermComponentLabel defaultUnitsOfMeasureForMeasurementRefset = new TermComponentLabel(aceFrameConfig);
+            defaultUnitsOfMeasureForMeasurementRefset.setTermComponent(((RefsetDefaultsMeasurement) defaults)
+                    .getDefaultUnitsOfMeasureForMeasurementRefset());
+            gluePreferenceLabel(defaults, "defaultTagForScopedLanguageRefset",
+                                defaultUnitsOfMeasureForMeasurementRefset);
+            wrapAndAdd(refsetsDefault, defaultUnitsOfMeasureForMeasurementRefset, "Default units of measure: ");
+
+            break;
+
+        case STRING:
+            // @todo string
+            break;
+        default:
+            break;
+        }
+        editDefaultsTabs.addTab("defaults", refsetsDefault);
+
+        // add standard popups...
+        editDefaultsTabs.addTab("refset types", new JScrollPane(makePopupConfigPanel(defaults.getRefsetPopupIds(),
+                                                                                     "Refset types for popup:")));
+
+        editDefaultsTabs.addTab("status types", new JScrollPane(makePopupConfigPanel(defaults.getStatusPopupIds(),
+                                                                                     "Status for popup:")));
+
+    }
+
+    private void gluePreferenceLabel(RefsetDefaults defaults, String propertyName, TermComponentLabel labelToGlue) {
+        defaults
+                .addPropertyChangeListener(propertyName, new PropertyListenerGlue("setTermComponent",
+                                                                                  I_AmTermComponent.class, labelToGlue));
+
+        labelToGlue.addPropertyChangeListener("termComponent", new PropertyListenerGlue("set"
+                + propertyName.toUpperCase().charAt(0) + propertyName.substring(1), I_GetConceptData.class, defaults));
     }
 
     private JPanel makeComponentToggleCheckboxPane() {
@@ -1591,7 +1713,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         checkBoxPane.add(new JPanel(), c);
         return checkBoxPane;
     }
-
 
     private JTabbedPane makeEditConfig() throws Exception {
         JTabbedPane tabs = new JTabbedPane();
@@ -2669,6 +2790,5 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         });
     }
-
 
 }

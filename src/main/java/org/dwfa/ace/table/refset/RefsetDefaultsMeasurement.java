@@ -64,7 +64,9 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_Refse
    }
 
    public void setDefaultMeasurementValueForMeasurementRefset(double defaultMeasurementValueForMeasurementRefset) {
+      Object oldValue = this.defaultMeasurementValueForMeasurementRefset;
       this.defaultMeasurementValueForMeasurementRefset = defaultMeasurementValueForMeasurementRefset;
+      pcs.firePropertyChange("defaultTagForScopedLanguageRefset", oldValue, defaultMeasurementValueForMeasurementRefset);
    }
 
    public I_GetConceptData getDefaultUnitsOfMeasureForMeasurementRefset() {
@@ -72,7 +74,9 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_Refse
    }
 
    public void setDefaultUnitsOfMeasureForMeasurementRefset(I_GetConceptData defaultUnitsOfMeasureForMeasurementRefset) {
+      Object oldValue = this.defaultUnitsOfMeasureForMeasurementRefset;
       this.defaultUnitsOfMeasureForMeasurementRefset = defaultUnitsOfMeasureForMeasurementRefset;
+      pcs.firePropertyChange("defaultUnitsOfMeasureForMeasurementRefset", oldValue, defaultUnitsOfMeasureForMeasurementRefset);
    }
 
    public Double[] getMeasurementValuePopupItems() {
@@ -80,7 +84,9 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_Refse
    }
 
    public void setMeasurementValuePopupItems(Double[] measurementValuePopupItems) {
+      Object oldValue = this.measurementValuePopupItems;
       this.measurementValuePopupItems = measurementValuePopupItems;
+      pcs.firePropertyChange("measurementValuePopupItems", oldValue, measurementValuePopupItems);
    }
 
    public I_IntList getUnitsOfMeasurePopupIds() {

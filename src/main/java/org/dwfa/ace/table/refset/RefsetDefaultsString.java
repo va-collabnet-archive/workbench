@@ -53,11 +53,19 @@ public class RefsetDefaultsString extends RefsetDefaults implements I_RefsetDefa
     }
 
     public void setDefaultForStringRefset(String defaultForStringRefset) {
+        Object oldValue = this.defaultForStringRefset;
         this.defaultForStringRefset = defaultForStringRefset;
+        pcs.firePropertyChange("defaultForStringRefset", oldValue, defaultForStringRefset);
     }
 
     public List<String> getStringPopupItems() {
         return stringPopupItems;
+    }
+
+    public void setStringPopupItems(List<String> stringPopupItems) {
+        Object oldValue = this.stringPopupItems;
+        this.stringPopupItems = stringPopupItems;
+        pcs.firePropertyChange("stringPopupItems", oldValue, stringPopupItems);
     }
 
  }

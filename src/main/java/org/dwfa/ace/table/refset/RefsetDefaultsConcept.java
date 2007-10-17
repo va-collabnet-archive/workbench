@@ -54,7 +54,9 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements I_RefsetDef
    }
 
    public void setDefaultForConceptRefset(I_GetConceptData defaultForConceptRefset) {
+      Object oldValue = this.defaultForConceptRefset;
       this.defaultForConceptRefset = defaultForConceptRefset;
+      pcs.firePropertyChange("defaultForConceptRefset", oldValue, defaultForConceptRefset);
    }
 
    public I_IntList getConceptPopupIds() {

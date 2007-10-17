@@ -49,7 +49,9 @@ public class RefsetDefaultsInteger extends RefsetDefaults implements I_RefsetDef
    }
 
    public void setDefaultForIntegerRefset(Integer defaultForIntegerRefset) {
+      Object oldValue = this.defaultForIntegerRefset;
       this.defaultForIntegerRefset = defaultForIntegerRefset;
+      pcs.firePropertyChange("defaultForIntegerRefset", oldValue, defaultForIntegerRefset);
    }
 
    public Integer[] getIntegerPopupItems() {

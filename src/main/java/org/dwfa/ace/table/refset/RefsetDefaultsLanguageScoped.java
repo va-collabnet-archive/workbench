@@ -74,7 +74,9 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
    }
 
    public void setDefaultPriorityForScopedLanguageRefset(int defaultPriorityForScopedLanguageRefset) {
+      Object oldValue = this.defaultPriorityForScopedLanguageRefset;
       this.defaultPriorityForScopedLanguageRefset = defaultPriorityForScopedLanguageRefset;
+      pcs.firePropertyChange("defaultPriorityForScopedLanguageRefset", oldValue, defaultPriorityForScopedLanguageRefset);
    }
 
    public I_GetConceptData getDefaultScopeForScopedLanguageRefset() {
@@ -82,7 +84,9 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
    }
 
    public void setDefaultScopeForScopedLanguageRefset(I_GetConceptData defaultScopeForScopedLanguageRefset) {
+      Object oldValue = this.defaultScopeForScopedLanguageRefset;
       this.defaultScopeForScopedLanguageRefset = defaultScopeForScopedLanguageRefset;
+      pcs.firePropertyChange("defaultScopeForScopedLanguageRefset", oldValue, defaultScopeForScopedLanguageRefset);
    }
 
    public I_GetConceptData getDefaultTagForScopedLanguageRefset() {
@@ -90,7 +94,9 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
    }
 
    public void setDefaultTagForScopedLanguageRefset(I_GetConceptData defaultTagForScopedLanguageRefset) {
+      Object oldValue = this.defaultTagForScopedLanguageRefset;
       this.defaultTagForScopedLanguageRefset = defaultTagForScopedLanguageRefset;
+      pcs.firePropertyChange("defaultTagForScopedLanguageRefset", oldValue, defaultTagForScopedLanguageRefset);
    }
 
    public Integer[] getPriorityPopupItems() {
@@ -98,23 +104,17 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
    }
 
    public void setPriorityPopupItems(Integer[] priorityPopupItems) {
+      Object oldValue = this.priorityPopupItems;
       this.priorityPopupItems = priorityPopupItems;
+      pcs.firePropertyChange("priorityPopupItems", oldValue, priorityPopupItems);
    }
 
    public I_IntList getScopePopupIds() {
       return scopePopupIds;
    }
 
-   public void setScopePopupIds(I_IntList scopePopupIds) {
-      this.scopePopupIds = scopePopupIds;
-   }
-
    public I_IntList getTagPopupIds() {
       return tagPopupIds;
-   }
-
-   public void setTagPopupIds(I_IntList tagPopupIds) {
-      this.tagPopupIds = tagPopupIds;
    }
 
 }
