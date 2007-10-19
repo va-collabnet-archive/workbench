@@ -89,7 +89,7 @@ public class IdsMojo extends AbstractMojo {
 		
 		try {
 		outputFile.getParentFile().mkdirs();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,append));
 		writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
 		writer.newLine();
 		UuidSnomedMap map = UuidSnomedMap.read(snomedMappingFile);

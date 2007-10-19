@@ -167,7 +167,7 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 	            }
       	   }
 	         bw.append("\n");
-      	   bw.append(sctId.toString());
+      	         bw.append(sctId.toString());
 		// Add an effective data to the sct after writing it,
 		// separated from the sctId with a tab
 		   bw.append("\t");
