@@ -114,7 +114,7 @@ public class IdsMojo extends AbstractMojo {
 			line = reader.readLine();
 		}
 		
-
+		writer.close();
             } catch (IOException e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
