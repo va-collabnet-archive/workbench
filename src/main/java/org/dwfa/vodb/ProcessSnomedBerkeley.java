@@ -403,4 +403,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		vodb.optimizeLicitWords();
 	}
 
+    @Override
+    public void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid, Date statusDate, UUID pathUuid) {
+        throw new UnsupportedOperationException();
+    }
+
 }

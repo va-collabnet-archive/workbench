@@ -17,9 +17,9 @@ import java.util.jar.JarFile;
 
 import com.sleepycat.je.DatabaseException;
 
-public abstract class ProcessConstants extends ProcessSources {
+public abstract class ProcessAceFormatSources extends ProcessSources {
 
-	public ProcessConstants() throws DatabaseException {
+	public ProcessAceFormatSources() throws DatabaseException {
 		super(false);
 	}
 
@@ -36,14 +36,15 @@ public abstract class ProcessConstants extends ProcessSources {
 			Date releaseDate = dateFormat.parse(releaseDir.getName());
 
 			addReleaseDate(releaseDate);
+            
+            
 			for (File contentFile : releaseDir.listFiles(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
-					return name.endsWith(".txt");
+					return name.endsWith(".txt") && (name.equals("ids.txt") == false);
 				}
 			})) {
 				getLog().info("Content file: " + contentFile.getName());
-				FileReader fr;
-				fr = new FileReader(contentFile);
+				FileReader fr = new FileReader(contentFile);
 				BufferedReader br = new BufferedReader(fr);
 				if (contentFile.getName().startsWith("concepts")) {
 					readConcepts(br, releaseDate, FORMAT.SNOMED);
@@ -62,12 +63,20 @@ public abstract class ProcessConstants extends ProcessSources {
 					readLicitWords(br);
 				} else {
 					getLog().info(
-							"Don't know what to do with file: "
+							"(1) Don't know what to do with file: "
 									+ contentFile.getName());
 				}
 				br.close();
 			}
 		}
+          // Do the id file last...
+          File idFile = new File(constantDir, "ids.txt");
+          if (idFile.exists()) {
+              getLog().info("Id file: " + idFile.getName());
+              FileReader fr = new FileReader(idFile);
+              BufferedReader br = new BufferedReader(fr);
+              readIds(br);
+          }
 		cleanup(null);
 	}
 
@@ -83,7 +92,7 @@ public abstract class ProcessConstants extends ProcessSources {
       FORMAT format = FORMAT.ACE;
       File[] dataFiles = dataDir.listFiles(new FileFilter() {
          public boolean accept(File f) {
-            return f.getName().endsWith(".txt");
+            return f.getName().endsWith(".txt") && (f.getName().equals("ids.txt") == false);
          }});
       for (File dataFile: dataFiles) {
             getLog().info(dataFile.getName());
@@ -111,9 +120,17 @@ public abstract class ProcessConstants extends ProcessSources {
                readLicitWords(isr);
             } else {
                getLog().info(
-                     "Don't know what to do with file: "
+                     "(2) Don't know what to do with file: "
                            + dataFile.getName());
             }
+      }
+      // Do the id file last...
+      File idFile = new File(dataDir, "ids.txt");
+      if (idFile.exists()) {
+          getLog().info("Id file: " + idFile.getName());
+          FileReader fr = new FileReader(idFile);
+          BufferedReader br = new BufferedReader(fr);
+          readIds(br);
       }
       cleanup(null);
    }
@@ -171,6 +188,9 @@ public abstract class ProcessConstants extends ProcessSources {
 	}
 
 	protected Object getId(StreamTokenizer st) {
+        if (st.sval.length() != 36) {
+            return st.sval;
+        }
 		return UUID.fromString(st.sval);
 	}
 

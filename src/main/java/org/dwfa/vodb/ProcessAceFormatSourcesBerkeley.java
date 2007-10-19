@@ -2,6 +2,7 @@ package org.dwfa.vodb;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
@@ -42,7 +44,7 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 
-public class ProcessConstantsBerkeley extends ProcessConstants {
+public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
 	private class IdMapper {
 				
@@ -97,7 +99,7 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	
 	I_Path aceAuxPath;
 
-	public ProcessConstantsBerkeley(VodbEnv vodb) throws DatabaseException {
+	public ProcessAceFormatSourcesBerkeley(VodbEnv vodb) throws DatabaseException {
 		super();
 		map = new IdMapper();
 		this.vodb = vodb;
@@ -271,6 +273,24 @@ public class ProcessConstantsBerkeley extends ProcessConstants {
 	public void optimizeLicitWords() throws IOException {
 		vodb.optimizeLicitWords();
 	}
+
+    @Override
+    public void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid, Date statusDate, UUID pathUuid) throws Exception {
+        int intId = map.getIntId(Arrays.asList(new UUID[] {primaryUuid}), aceAuxPath, ThinVersionHelper.convert(statusDate.getTime()));
+        
+        ThinIdVersioned idv = ((VodbEnv)LocalVersionedTerminology.get()).getId(primaryUuid);
+        ThinIdPart idPart = new ThinIdPart();
+        idPart.setIdStatus(vodb.uuidToNative(statusUuid));
+        idPart.setPathId(vodb.uuidToNative(pathUuid));
+        idPart.setSource(vodb.uuidToNative(sourceSystemUuid));
+        idPart.setSourceId(sourceId);
+        idPart.setVersion(ThinVersionHelper.convert(statusDate.getTime()));
+        if (idv.getVersions().contains(idPart) == false) {
+            idv.addVersion(idPart);
+            vodb.writeId(idv);
+        }
+        
+    }
 
 
 }

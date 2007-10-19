@@ -21,7 +21,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.vodb.ProcessConstants.FORMAT;
+import org.dwfa.vodb.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 import org.dwfa.vodb.types.IntSet;
 

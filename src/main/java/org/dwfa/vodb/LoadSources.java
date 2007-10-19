@@ -15,12 +15,12 @@ public class LoadSources {
 	private static Stopwatch timer;
 	public static void main(String[] args) { 
 		LocalVersionedTerminology.set(new VodbEnv());
-		ProcessConstantsBerkeley loadConstants = null;
+		ProcessAceFormatSourcesBerkeley loadConstants = null;
 		try {
 			timer = new Stopwatch();
 			timer.start();
 			AceConfig.getVodb().setup(new File(args[0]), false, 600000000L);
-			loadConstants = new ProcessConstantsBerkeley(AceConfig.getVodb());
+			loadConstants = new ProcessAceFormatSourcesBerkeley(AceConfig.getVodb());
 			AceLog.getAppLog().info("Starting to process AceAuxillary.");
 			loadConstants.execute(new File(args[1]));
 			AceLog.getAppLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());

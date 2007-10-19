@@ -12,7 +12,7 @@ import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.NoMappingException;
-import org.dwfa.vodb.ProcessConstants.FORMAT;
+import org.dwfa.vodb.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.types.Path;
 
 public class LoadBdb {
@@ -29,10 +29,10 @@ public class LoadBdb {
 	}
 
    public static void loadFromDirectory(File dataDir) throws Exception {
-      ProcessConstantsBerkeley loadConstants = null;
+      ProcessAceFormatSourcesBerkeley loadConstants = null;
       timer = new Stopwatch();
       timer.start();
-      loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
+      loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
       AceLog.getAppLog().info("Starting to process " + dataDir);
       loadConstants.executeFromDir(dataDir);
       Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
@@ -72,10 +72,10 @@ public class LoadBdb {
       
    }
 	public static void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
-		ProcessConstantsBerkeley loadConstants = null;
+		ProcessAceFormatSourcesBerkeley loadConstants = null;
 		timer = new Stopwatch();
 		timer.start();
-		loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
+		loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Starting to process " + jarFile + ": " + dataPrefix);
 		loadConstants.execute(new JarFile(jarFile), dataPrefix, FORMAT.ACE);
 		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
@@ -111,10 +111,10 @@ public class LoadBdb {
 	}
 
 	public static void main(String[] args) throws Exception {
-		ProcessConstantsBerkeley loadConstants = null;
+		ProcessAceFormatSourcesBerkeley loadConstants = null;
 		timer = new Stopwatch();
 		timer.start();
-		loadConstants = new ProcessConstantsBerkeley((VodbEnv) LocalVersionedTerminology.get());
+		loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
         
         Set<String> argSet = new HashSet<String>(Arrays.asList(args));
