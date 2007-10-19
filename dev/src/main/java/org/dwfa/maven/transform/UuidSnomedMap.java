@@ -171,7 +171,11 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		// Add an effective data to the sct after writing it,
 		// separated from the sctId with a tab
 		   bw.append("\t");
-		   bw.append(effectiveDateOfSctId.get(sctId));
+		   String effectiveDate = effectiveDateOfSctId.get(sctId);
+               if (effectiveDate==null) {
+			effectiveDate = getCurrentEffectiveDate();
+               }
+		   bw.append(effectiveDate);
 	         bw.append("\n");
       	}
 	      bw.close();
