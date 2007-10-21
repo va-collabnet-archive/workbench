@@ -57,8 +57,19 @@ public class IdsMojo extends AbstractMojo {
 
     /**
      * @parameter
+     * @required
+     */
+    String path;
+
+    /**
+     * @parameter
      */
     boolean skipFirstLine = true;          
+
+    /**
+     * @parameter
+     */
+    boolean writeHeader = false;          
 
     /**
      * @parameter
@@ -90,8 +101,12 @@ public class IdsMojo extends AbstractMojo {
 		try {
 		outputFile.getParentFile().mkdirs();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,append));
-		writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
-		writer.newLine();
+
+		if (writeHeader) {
+			writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
+			writer.newLine();
+		}
+
 		UuidSnomedMap map = UuidSnomedMap.read(snomedMappingFile);
 		String source = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next().toString();			
 		BufferedReader reader = new BufferedReader(new FileReader(uuidsFile));
@@ -108,7 +123,7 @@ public class IdsMojo extends AbstractMojo {
 			Long sctid = map.get(UUID.fromString(uuid));
 			if (sctid!=null) {
 				String effective_date = map.getEffectiveDate(sctid);
-				writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date);
+				writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date + "\t" + path);
 				writer.newLine();
 			}
 			line = reader.readLine();
