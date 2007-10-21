@@ -59,8 +59,6 @@ import org.dwfa.vodb.types.ThinExtByRefPartString;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
-import apple.awt.IntegerNIORaster;
-
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
 
