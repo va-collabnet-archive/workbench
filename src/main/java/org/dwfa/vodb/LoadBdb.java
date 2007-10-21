@@ -37,7 +37,7 @@ public class LoadBdb {
       loadConstants.executeFromDir(dataDir);
       Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
       try {
-         AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
+         AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
       } catch (NoMappingException e) {
          AceLog.getAppLog().info(e.getLocalizedMessage());
       }
@@ -79,7 +79,7 @@ public class LoadBdb {
 		AceLog.getAppLog().info("Starting to process " + jarFile + ": " + dataPrefix);
 		loadConstants.execute(new JarFile(jarFile), dataPrefix, FORMAT.ACE);
 		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
-		AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
+		AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
 		AceLog.getAppLog().info("Finished loading " + jarFile + ". Elapsed time: "
 				+ timer.getElapsedTime());
 		printElapsedTime();
@@ -133,13 +133,13 @@ public class LoadBdb {
 		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
-		AddImage.addStockImage((VodbEnv) LocalVersionedTerminology.get());
+		AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
 		int[] releaseDates = loadConstants.getReleaseDates();
         for (String arg: argSet) {
             ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
                                                                         (VodbEnv) LocalVersionedTerminology.get(), loadConstants.getConstantToIntMap(),
                                                                         releaseDates[0]);
-                                                                AceLog.getAppLog().info("Starting to process SNOMED: " + arg);
+                                                                AceLog.getAppLog().info("(1) Starting to process SNOMED: " + arg);
                                                                 loadSnomed.execute(new JarFile(arg));
                                                                 AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: "
                                                                         + timer.getElapsedTime());

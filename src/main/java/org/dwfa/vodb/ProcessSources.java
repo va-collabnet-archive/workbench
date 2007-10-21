@@ -219,16 +219,17 @@ public abstract class ProcessSources {
                 }
 
                 UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next();
-                if (false) {
-                    tokenType = st.nextToken();
+                
+                tokenType = st.nextToken();
+                if ((tokenType != 13) && (tokenType != 10)) {
                     pathUuid = (UUID) getId(st);
+                    tokenType = st.nextToken();
                 }
 
                 writeId(primaryUuid, sourceSystemUuid, sourceId, statusUuid, statusDate, pathUuid);
                 ids++;
 
                 // CR or LF
-                tokenType = st.nextToken();
                 if (tokenType == 13) { // is CR
                     // LF
                     tokenType = st.nextToken();

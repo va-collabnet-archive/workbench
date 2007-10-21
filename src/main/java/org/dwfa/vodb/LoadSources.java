@@ -25,12 +25,12 @@ public class LoadSources {
 			loadConstants.execute(new File(args[1]));
 			AceLog.getAppLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
 			Path.writeBasePaths(AceConfig.getVodb());
-			AddImage.addStockImage(AceConfig.getVodb());
+			AddImage.addStockImages(AceConfig.getVodb());
 			int[] releaseDates = loadConstants.getReleaseDates();
 			if (args.length > 2) {
 				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(),
 						loadConstants.getConstantToIntMap(), releaseDates[0]);
-				AceLog.getAppLog().info("Starting to process SNOMED: " + args[2]);
+				AceLog.getAppLog().info("(2) Starting to process SNOMED: " + args[2]);
 				loadSnomed.execute(new File(args[2]));
 				AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());
 			} 

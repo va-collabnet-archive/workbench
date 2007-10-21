@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.activity.I_ShowActivity;
@@ -300,25 +301,27 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		
 		
 		text = new String(text.getBytes(), "UTF-8");
-		if (text.getBytes()[0] < 0) {
-			AceLog.getAppLog().info("********\n" + text + "\n length: " + text.length());
-			StringBuffer buff = new StringBuffer();
-			for (byte b: text.getBytes()) {
-				buff.append((int)b);
-				buff.append(' ');
-			}
-			AceLog.getAppLog().info("\n\nUTF 8:");
-			for (byte b: text.getBytes("UTF-8")) {
-				buff.append((int)b);
-				buff.append(' ');
-			}
-			AceLog.getAppLog().info("\n\nUTF 16:");
-			for (char c: text.toCharArray()) {
-				buff.append(c);
-				buff.append(' ');
-			}
-			AceLog.getAppLog().info(buff.toString());
-		}
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            if (text.getBytes()[0] < 0) {
+                AceLog.getAppLog().info("********\n" + text + "\n length: " + text.length());
+                StringBuffer buff = new StringBuffer();
+                for (byte b: text.getBytes()) {
+                    buff.append((int)b);
+                    buff.append(' ');
+                }
+                AceLog.getAppLog().fine("\n\nUTF 8:");
+                for (byte b: text.getBytes("UTF-8")) {
+                    buff.append((int)b);
+                    buff.append(' ');
+                }
+                AceLog.getAppLog().fine("\n\nUTF 16:");
+                for (char c: text.toCharArray()) {
+                    buff.append(c);
+                    buff.append(' ');
+                }
+                AceLog.getAppLog().fine(buff.toString());
+            }
+        }
 		ThinDescPart desc = new ThinDescPart();
 		desc.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
 		desc.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));

@@ -121,7 +121,7 @@ public abstract class ProcessSnomed extends ProcessSources {
         SortedSet<String> entryStringSet = new TreeSet<String>(new Comparator<String>() {
 
             public int compare(String o1, String o2) {
-                 return -o1.compareTo(o2);
+                 return o1.compareTo(o2);
             }
             
         });
@@ -131,6 +131,7 @@ public abstract class ProcessSnomed extends ProcessSources {
             entryStringSet.add(je.getName());
         }
         
+        getLog().info(" sorted process set: " + entryStringSet);
         
 		for (String entryName: entryStringSet) {
 			JarEntry je = snomedJar.getJarEntry(entryName);

@@ -68,7 +68,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 25;
+    private static final int dataVersion = 26;
     
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     
@@ -153,8 +153,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
    //24
    private Set<String> visibleRefsets = new HashSet<String>();
    
-   //25 private
+   //25
    private Map<TOGGLES, RefsetPreferences> refsetPreferencesMap = setupRefsetPreferences();
+   
+   //26
+    private I_IntList refsetsToShowInTaxonomy = new IntList();
    
 	//transient
     private transient MasterWorker worker;
@@ -271,6 +274,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
       
       //25
       out.writeObject(refsetPreferencesMap);
+      
+      //26
+      IntList.writeIntList(out, refsetsToShowInTaxonomy);
                
    }
 
@@ -490,6 +496,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
           } else {
               refsetPreferencesMap = setupRefsetPreferences();
           }
+
+            if (objDataVersion >= 26) {
+                refsetsToShowInTaxonomy = IntList.readIntListIgnoreMapErrors(in);
+           } else {
+               refsetsToShowInTaxonomy = new IntList();
+           }
+
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -1619,4 +1632,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
       aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
       
    }
+
+
+public Map<TOGGLES, RefsetPreferences> getRefsetPreferencesMap() {
+    return refsetPreferencesMap;
+}
 }
