@@ -213,7 +213,7 @@ public class CheckboxEditor implements PropertyEditor, ItemListener, I_NeedPrope
             targets = new Vector<PropertyChangeListener>(listeners);
         }
         // Tell our listeners that "everything" has changed.
-        PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value", null, null);
+        PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value", null, getValue());
 
         for (PropertyChangeListener l: targets) {
             l.propertyChange(evt);
