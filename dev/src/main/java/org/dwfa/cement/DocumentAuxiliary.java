@@ -482,10 +482,20 @@ public class DocumentAuxiliary implements I_AddToMemoryTermServer {
 	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents) throws Exception {
 		I_ConceptualizeUniversally[] relTypes = new I_ConceptualizeUniversally[parents.length];
 		Arrays.fill(relTypes, ArchitectonicAuxiliary.Concept.IS_A_REL);
-		return makeRels(source, parents, relTypes);
+		return makeRels(source, parents, relTypes, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC);
+	}
+	
+	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents, I_ConceptualizeUniversally characteristicType) throws Exception {
+		I_ConceptualizeUniversally[] relTypes = new I_ConceptualizeUniversally[parents.length];
+		Arrays.fill(relTypes, ArchitectonicAuxiliary.Concept.IS_A_REL);
+		return makeRels(source, parents, relTypes, characteristicType);
 	}
 
 	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents, I_ConceptualizeUniversally[] relTypes) throws Exception {
+		return makeRels(source, parents, relTypes, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC);
+	}
+	
+	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents, I_ConceptualizeUniversally[] relTypes, I_ConceptualizeUniversally characteristicType) throws Exception {
 		UniversalFixedRel[] rels = new UniversalFixedRel[parents.length];
 		int i = 0;
 		for (I_ConceptualizeUniversally p: parents) {
@@ -496,11 +506,12 @@ public class DocumentAuxiliary implements I_AddToMemoryTermServer {
 			rels[parentIndex] = new UniversalFixedRel(relUids, 
 					source.getUids(),
 					relTypes[parentIndex].getUids(), p.getUids(),
-					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids(),
+					characteristicType.getUids(),
 					ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids(), relGrp);
 		}
 		return rels;
 	}
+	
 	static List<I_ConceptualizeLocally> localDescTypeOrder;
 	public static List<I_ConceptualizeLocally> getDescTypeOrder() throws IOException, TerminologyException {
 		if (localDescTypeOrder == null) {
