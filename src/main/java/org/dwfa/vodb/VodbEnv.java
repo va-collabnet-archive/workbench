@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -794,6 +797,29 @@ public class VodbEnv implements I_ImplementTermFactory {
       return null;
    }
 
+   
+   public Map<String, String> getProperties() throws IOException {
+       try {
+           Cursor concCursor = metaInfoDb.openCursor(null, null);
+           DatabaseEntry foundKey = new DatabaseEntry();
+           DatabaseEntry foundData = new DatabaseEntry();
+           HashMap<String, String> propMap = new HashMap<String, String>();
+           while (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+              try {
+                  String key = (String) stringBinder.entryToObject(foundKey);
+                  String value = (String) stringBinder.entryToObject(foundData);
+                  propMap.put(key, value);
+              } catch (Exception e) {
+                 concCursor.close();
+                 throw new ToIoException(e);
+              }
+           }
+           concCursor.close();
+           return Collections.unmodifiableMap(propMap);
+       } catch (Exception e) {
+           throw new ToIoException(e);
+       }
+   }
    public void setProperty(String key, String value) throws IOException {
       DatabaseEntry propKey = new DatabaseEntry();
       DatabaseEntry propValue = new DatabaseEntry();
