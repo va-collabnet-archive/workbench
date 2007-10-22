@@ -4,7 +4,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -18,10 +23,28 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_ImageTuple;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ExtensionByReferenceBean;
+import org.dwfa.vodb.types.IntSet;
+import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
+import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartInteger;
+import org.dwfa.vodb.types.ThinExtByRefPartString;
+import org.dwfa.vodb.types.ThinExtByRefTuple;
+import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
-public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
+import com.sleepycat.je.DatabaseException;
+
+public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements PropertyChangeListener {
 
 	private static ImageIcon multiParentClosed = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/nav_up_green.png"));
@@ -35,7 +58,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 	private static ImageIcon multiParentRoot = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/pin_green.png"));
 
-	private I_ConfigAceFrame aceConfig;
+	private AceFrameConfig aceConfig;
 	
 	private boolean drawsFocusBorderAroundIcon = false;
 
@@ -53,20 +76,35 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
     
     private ConceptBean focusBean;
 
-	/**
+    private boolean showRefsetInfoInTaxonomy;
+    private boolean variableHeightTaxonomyView;
+    private boolean showViewerImagesInTaxonomy;
+    
+    private IntSet viewerImageTypes = new IntSet();
+    
+    private I_IntList refsetsToShow;
+
+    /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public TermTreeCellRenderer(I_ConfigAceFrame aceConfig) {
+	public TermTreeCellRenderer(I_ConfigAceFrame aceConfig) throws TerminologyException, IOException {
 		super();
-		this.aceConfig = aceConfig;
+		this.aceConfig = (AceFrameConfig) aceConfig;
+        showViewerImagesInTaxonomy = this.aceConfig.getShowViewerImagesInTaxonomy();
+        variableHeightTaxonomyView = this.aceConfig.getVariableHeightTaxonomyView();
+        showRefsetInfoInTaxonomy = this.aceConfig.getShowRefsetInfoInTaxonomy();
+        this.aceConfig.addPropertyChangeListener(this);
+        refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
 		setLeafIcon(null);
 		setClosedIcon(null);
 		setOpenIcon(null);
 		Object value = UIManager.get("Tree.drawDashedFocusIndicator");
 		drawDashedFocusIndicator = (value != null && ((Boolean)value).
 					    booleanValue());
+        ConceptBean viewerImageType = ConceptBean.get(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
+        viewerImageTypes.add(viewerImageType.getConceptId());
 	}
 
 	@Override
@@ -88,7 +126,128 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 					Rectangle iconRect = getIconRect(cb.getParentDepth());
 					I_DescriptionTuple tdt = cb.getDescTuple(aceConfig);
 					if (tdt != null) {
-						setText(cb.getDescTuple(aceConfig).getText());
+                        List<String> htmlPrefixes = new ArrayList<String>();
+                        List<String> htmlSuffixes = new ArrayList<String>();
+                        if (showViewerImagesInTaxonomy) {
+                            for (I_ImageTuple imageTuple: cb.getImageTuples(aceConfig.getAllowedStatus(),
+                                                                            viewerImageTypes, 
+                                                                            aceConfig.getViewPositionSet())) {
+                                htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "' align=center>");
+                            }
+                        }
+                        
+                        if (showRefsetInfoInTaxonomy) {
+                            try {
+                                List<ExtensionByReferenceBean> extensions = AceConfig.getVodb().getExtensionsForComponent(cb.getConceptId());
+                                for (int i: refsetsToShow.getListArray()) {
+                                    for (ExtensionByReferenceBean ext: extensions) {
+                                        if (ext.getExtension().getRefsetId() == i) {
+                                            ThinExtByRefVersioned ebr = ext.getExtension();
+                                            List<ThinExtByRefTuple> returnTuples = new ArrayList<ThinExtByRefTuple>();
+                                            switch (ThinExtBinder.getExtensionType(ebr)) {
+                                            case BOOLEAN:
+                                                ebr.addTuples(aceConfig.getAllowedStatus(),
+                                                              aceConfig.getViewPositionSet(), returnTuples,
+                                                          false);
+                                                for (ThinExtByRefTuple t:  returnTuples) {
+                                                    boolean extValue = ((ThinExtByRefPartBoolean)t.getPart()).getValue();
+                                                    
+                                                    try {
+                                                        ConceptBean booleanImageBean = ConceptBean.get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.getUids());
+                                                        if (extValue) {
+                                                            booleanImageBean = ConceptBean.get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.getUids());
+                                                        }
+                                                        for (I_ImageTuple imageTuple: booleanImageBean.getImageTuples(aceConfig.getAllowedStatus(),
+                                                                                                        viewerImageTypes, 
+                                                                                                        aceConfig.getViewPositionSet())) {
+                                                            htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "' align=center>");
+                                                        }
+                                                    } catch (TerminologyException e) {
+                                                        AceLog.getAppLog().alertAndLogException(e);
+                                                    }
+                                                }
+                                                break;
+                                            case CONCEPT:
+                                                ebr.addTuples(aceConfig.getAllowedStatus(),
+                                                              aceConfig.getViewPositionSet(), returnTuples,
+                                                          false);
+                                                for (ThinExtByRefTuple t:  returnTuples) {
+                                                    ConceptBean ebrCb = ConceptBean.get(((ThinExtByRefPartConcept)t.getPart()).getConceptId());
+                                                    for (I_ImageTuple imageTuple: ebrCb.getImageTuples(aceConfig.getAllowedStatus(),
+                                                                                                    viewerImageTypes, 
+                                                                                                    aceConfig.getViewPositionSet())) {
+                                                        htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "' align=center>");
+                                                    }
+                                                }
+                                                break;
+                                            case INTEGER:
+                                                ebr.addTuples(aceConfig.getAllowedStatus(),
+                                                              aceConfig.getViewPositionSet(), returnTuples,
+                                                          false);
+                                                for (ThinExtByRefTuple t:  returnTuples) {
+                                                    int extValue = ((ThinExtByRefPartInteger)t.getPart()).getValue();
+                                                    htmlPrefixes.add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
+                                                }
+                                                break;
+                                            case LANGUAGE:
+                                                break;
+                                            case MEASUREMENT:
+                                                break;
+                                            case SCOPED_LANGUAGE:
+                                                break;
+                                            case STRING:
+                                                ebr.addTuples(aceConfig.getAllowedStatus(),
+                                                              aceConfig.getViewPositionSet(), returnTuples,
+                                                          false);
+                                                for (ThinExtByRefTuple t:  returnTuples) {
+                                                    String strExt = ((ThinExtByRefPartString)t.getPart()).getStringValue();
+                                                    htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
+                                                }
+                                                break;
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                            } catch (DatabaseException e) {
+                                AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
+                            }
+                            
+                        }
+                        
+                        
+                        StringBuffer buff = new StringBuffer();
+                        if (htmlPrefixes.size() > 0 || htmlSuffixes.size() > 0) {
+                            buff.append("<html>");
+                            //add extra images example
+                            //<img src='ace:1c4214ec-147a-11db-ac5d-0800200c9a66'>
+                            for (String prefix: htmlPrefixes) {
+                                buff.append(prefix);
+                            }
+                            String text = cb.getDescTuple(aceConfig).getText();
+                            if (text.toLowerCase().startsWith("<html>")) {
+                                buff.append(text.substring(5));
+                            } else {
+                                buff.append(text);
+                            }
+                            if (htmlSuffixes.size() > 0) {
+                                buff.append("<br>");
+                            }
+                            for (String suffix: htmlSuffixes) {
+                                buff.append(suffix);
+                            }
+
+                        } else {
+                            buff.append(cb.getDescTuple(aceConfig).getText());                            
+                        }
+                        
+                        
+                        
+                        
+                        setText(buff.toString());
+                        
+                        
+                        
 					} else {
 						setText("null desc: " + cb.getInitialText());
 					}
@@ -246,5 +405,15 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer {
 	public void setFocusBean(ConceptBean focusBean) {
 		this.focusBean = focusBean;
 	}
+    
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
+            showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
+        } else if (evt.getPropertyName().equals("variableHeightTaxonomyView")) {
+            variableHeightTaxonomyView = aceConfig.getVariableHeightTaxonomyView();
+        } else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
+            showViewerImagesInTaxonomy = aceConfig.getShowViewerImagesInTaxonomy();
+        }
+    }
 
 }

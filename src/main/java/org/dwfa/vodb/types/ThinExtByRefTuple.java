@@ -52,4 +52,11 @@ public class ThinExtByRefTuple {
    public ThinExtByRefPart getPart() {
       return part;
    }
+   
+   @Override
+   public String toString() {
+       return "ThinExtByRefVersioned refsetId: " + core.getRefsetId() + " memberId: " + core.getMemberId() + 
+           " componentId: " + core.getComponentId() + " typeId: " + core.getTypeId() + " version: " + part;
+   }
+
 }

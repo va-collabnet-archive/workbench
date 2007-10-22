@@ -43,7 +43,12 @@ public class BdbImageConnection extends URLConnection {
 					image = AceConfig.getVodb().getImage(UUID.fromString(queryString));
 				}
 			} else {
-				image = AceConfig.getVodb().getImage(UUID.fromString(url.getQuery()));
+                String id = url.getQuery();
+                if (id.length() == 36) {
+                    image = AceConfig.getVodb().getImage(UUID.fromString(url.getQuery()));
+                } else {
+                    image = AceConfig.getVodb().getImage(Integer.parseInt(id));
+                }
 			}
 		} catch (DatabaseException e) {
 			IOException ex = new IOException();

@@ -2,9 +2,14 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -87,6 +92,12 @@ public class ThinExtByRefVersioned {
     @Override
     public int hashCode() {
         return HashFunction.hashCode(new int[] { refsetId, memberId, componentId, typeId });
+    }
+
+    @Override
+    public String toString() {
+        return "ThinExtByRefVersioned refsetId: " + refsetId + " memberId: " + memberId + 
+            " componentId: " + componentId + " typeId: " + typeId + " versions: " + versions;
     }
 
     public void addVersion(ThinExtByRefPart part) {
@@ -180,4 +191,139 @@ public class ThinExtByRefVersioned {
         thinPart.setStatus(vodb.uuidToNative(part.getStatusUid()));
         thinPart.setVersion(ThinVersionHelper.convert(part.getTime()));
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet,
+     *      org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
+     */
+    public void addTuples(I_IntSet allowedStatus,
+            Set<I_Position> positions, List<ThinExtByRefTuple> returnTuples,
+            boolean addUncommitted) {
+        Set<ThinExtByRefPart> uncommittedParts = new HashSet<ThinExtByRefPart>();
+        if (positions == null) {
+            List<ThinExtByRefPart> addedParts = new ArrayList<ThinExtByRefPart>();
+            Set<ThinExtByRefPart> rejectedParts = new HashSet<ThinExtByRefPart>();
+            for (ThinExtByRefPart part : versions) {
+                if (part.getVersion() == Integer.MAX_VALUE) {
+                    uncommittedParts.add(part);
+                } else {
+                    if ((allowedStatus != null)
+                            && (!allowedStatus.contains(part.getStatus()))) {
+                        rejectedParts.add(part);
+                        continue;
+                    }
+                    addedParts.add(part);
+                }
+            }
+            for (ThinExtByRefPart part : addedParts) {
+                boolean addPart = true;
+                for (ThinExtByRefPart reject : rejectedParts) {
+                    if ((part.getVersion() <= reject.getVersion())
+                            && (part.getPathId() == reject.getPathId())) {
+                        addPart = false;
+                        continue;
+                    }
+                }
+                if (addPart) {
+                    returnTuples.add(new ThinExtByRefTuple(this, part));
+                }
+            }
+        } else {
+
+            Set<ThinExtByRefPart> addedParts = new HashSet<ThinExtByRefPart>();
+            for (I_Position position : positions) {
+                Set<ThinExtByRefPart> rejectedParts = new HashSet<ThinExtByRefPart>();
+                ThinExtByRefTuple possible = null;
+                for (ThinExtByRefPart part : versions) {
+                    if (part.getVersion() == Integer.MAX_VALUE) {
+                        uncommittedParts.add(part);
+                        continue;
+                    } else if ((allowedStatus != null)
+                            && (!allowedStatus.contains(part.getStatus()))) {
+                        if (possible != null) {
+                            I_Position rejectedStatusPosition = new Position(
+                                    part.getVersion(), position.getPath()
+                                            .getMatchingPath(part.getPathId()));
+                            I_Path possiblePath = position.getPath()
+                                    .getMatchingPath(possible.getPathId());
+                            I_Position possibleStatusPosition = new Position(
+                                    possible.getVersion(), possiblePath);
+
+                            if (rejectedStatusPosition.getPath() != null
+                                    && rejectedStatusPosition
+                                            .isSubsequentOrEqualTo(possibleStatusPosition)
+                                    && position
+                                            .isSubsequentOrEqualTo(rejectedStatusPosition)) {
+                                possible = null;
+                            }
+                        }
+                        rejectedParts.add(part);
+                        continue;
+                    }
+                    if (position.isSubsequentOrEqualTo(part.getVersion(), part
+                            .getPathId())) {
+                        if (possible == null) {
+                            if (!addedParts.contains(part)) {
+                                possible = new ThinExtByRefTuple(this, part);
+                                addedParts.add(part);
+                            }
+                        } else {
+                            if (possible.getPathId() == part.getPathId()) {
+                                if (part.getVersion() > possible.getVersion()) {
+                                    if (!addedParts.contains(part)) {
+                                        possible = new ThinExtByRefTuple(this, part);
+                                        addedParts.add(part);
+                                    }
+                                }
+                            } else {
+                        int depth1 = position.getDepth(part.getPathId());
+                        int depth2 = position.getDepth(possible.getPathId());
+                                if (depth1 < depth2) {
+                                    if (!addedParts.contains(part)) {
+                                        possible = new ThinExtByRefTuple(this, part);
+                                        addedParts.add(part);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+                if (possible != null) {
+                    I_Path possiblePath = position.getPath().getMatchingPath(
+                            possible.getPathId());
+                    I_Position possibleStatusPosition = new Position(possible
+                            .getVersion(), possiblePath);
+                    boolean addPart = true;
+                    for (ThinExtByRefPart reject : rejectedParts) {
+                  int version = reject.getVersion();
+                  I_Path matchingPath = position.getPath()
+                  .getMatchingPath(reject.getPathId());
+                  if (matchingPath != null) {
+                     I_Position rejectedStatusPosition = new Position(version, matchingPath);
+                     if (rejectedStatusPosition.getPath() != null
+                           && rejectedStatusPosition
+                                 .isSubsequentOrEqualTo(possibleStatusPosition)
+                           && position
+                                 .isSubsequentOrEqualTo(rejectedStatusPosition)) {
+                        addPart = false;
+                        continue;
+                     }
+                  }
+                    }
+                    if (addPart) {
+                        returnTuples.add(possible);
+                    }
+                }
+            }
+        }
+        if (addUncommitted) {
+            for (ThinExtByRefPart p : uncommittedParts) {
+                returnTuples.add(new ThinExtByRefTuple(this, p));
+            }
+        }
+    }
+
 }

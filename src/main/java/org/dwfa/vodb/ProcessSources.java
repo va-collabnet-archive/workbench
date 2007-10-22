@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 

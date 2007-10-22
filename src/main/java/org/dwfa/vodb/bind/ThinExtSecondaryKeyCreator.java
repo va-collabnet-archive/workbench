@@ -20,8 +20,6 @@ public class ThinExtSecondaryKeyCreator implements SecondaryKeyCreator {
 
     private static ThinExtBinder fixedOnlyBinder = new ThinExtBinder(true);
 
-    private static TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
-
     private KEY_TYPE keyType;
 
     public static class MemberAndSecondaryId {

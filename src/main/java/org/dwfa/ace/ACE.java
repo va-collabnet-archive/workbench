@@ -140,6 +140,7 @@ import org.dwfa.bpa.gui.ProcessMenuActionListener;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
@@ -833,7 +834,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-    public void setup(I_ConfigAceFrame aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException {
+    public void setup(I_ConfigAceFrame aceFrameConfig) throws DatabaseException, IOException, ClassNotFoundException, TerminologyException {
         menuWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
         this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
         this.aceFrameConfig.addPropertyChangeListener(this);
@@ -1069,7 +1070,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
     }
 
-    private JComponent getContentPanel() throws DatabaseException, IOException, ClassNotFoundException {
+    private JComponent getContentPanel() throws DatabaseException, IOException, ClassNotFoundException, TerminologyException {
         termTree = getHierarchyPanel();
         /*
          * String htmlLabel = "<html><img src='" +
@@ -1348,6 +1349,21 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     }
 
+    private JComponent makeRefsetViewPanel() {
+        
+        TerminologyListModel refsetViewTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getRefsetsToShowInTaxonomy().getListValues()) {
+            refsetViewTableModel.addElement(ConceptBean.get(id));
+        }
+        refsetViewTableModel.addListDataListener(aceFrameConfig.getRefsetsToShowInTaxonomy());
+        TerminologyList refsetViewList = new TerminologyList(refsetViewTableModel, aceFrameConfig);
+
+        refsetViewList.setBorder(BorderFactory.createTitledBorder("Refsets to show in taxonomy view: "));
+        JPanel refsetViewPrefPanel = new JPanel(new GridLayout(0, 1));
+        refsetViewPrefPanel.add(new JScrollPane(refsetViewList));
+        
+        return refsetViewPrefPanel;
+    }
     private JComponent makeDescPrefPanel() {
 
         TerminologyListModel descTypeTableModel = new TerminologyListModel();
@@ -1404,9 +1420,21 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return descPrefPanel;
     }
 
-    private JComponent makeRelPrefPanel() {
-
+    private JComponent makeTaxonomyPrefPanel() {
         JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
+        
+        JPanel checkPanel = new JPanel(new GridLayout(0, 1));
+        
+        checkPanel.add(getCheckboxEditor("use inferred rels in taxonomy view", "showInferredInTaxonomy",
+                                         aceFrameConfig.getShowInferredInTaxonomy(), false));
+        checkPanel.add(getCheckboxEditor("allow variable height taxonomy view", "variableHeightTaxonomyView",
+                                         aceFrameConfig.getVariableHeightTaxonomyView(), false));
+        checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view", "showViewerImagesInTaxonomy",
+                                         aceFrameConfig.getShowViewerImagesInTaxonomy(), true));
+        checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
+                                         aceFrameConfig.getShowRefsetInfoInTaxonomy(), true));
+                
+        relPrefPanel.add(checkPanel);
         relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:", aceFrameConfig.getDestRelTypes())));
         relPrefPanel.add(new JScrollPane(makeTermList("child relationships:", aceFrameConfig.getSourceRelTypes())));
         relPrefPanel.add(new JScrollPane(makeTermList("stated view characteristic types:", aceFrameConfig
@@ -1414,6 +1442,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         relPrefPanel.add(new JScrollPane(makeTermList("inferred view characteristic types:", aceFrameConfig
                 .getInferredViewTypes())));
         return relPrefPanel;
+    }
+
+    private Component getCheckboxEditor(String label, String propertyName, boolean initialValue, boolean enabled) {
+        CheckboxEditor checkBoxEditor = new CheckboxEditor();
+        checkBoxEditor.getCustomEditor().setEnabled(enabled);
+        checkBoxEditor.setValue(initialValue);
+        
+        checkBoxEditor.setPropertyDisplayName(label);
+        aceFrameConfig.addPropertyChangeListener("show" + propertyName.toUpperCase().substring(0, 1) +
+                                                 propertyName.substring(1), 
+                                                 new PropertyListenerGlue("setValue", Object.class, 
+                                                                          checkBoxEditor));
+        checkBoxEditor.addPropertyChangeListener(new PropertyListenerGlue("set" + propertyName.toUpperCase().substring(0, 1) +
+                                                                          propertyName.substring(1), Boolean.class, 
+                                                                                   aceFrameConfig));
+        
+        return checkBoxEditor.getCustomEditor();
     }
 
     private TerminologyList makeTermList(String title, I_IntSet set) {
@@ -1459,9 +1504,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JTabbedPane makeViewConfig() throws Exception {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("descriptions", makeDescPrefPanel());
-        tabs.addTab("relationships", makeRelPrefPanel());
+        tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
         tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("roots", makeRootPrefPanel());
+        tabs.addTab("refset", makeRefsetViewPanel());
         return tabs;
     }
 
@@ -1858,7 +1904,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         addressPalette.setVisible(true);
     }
 
-    JComponent getHierarchyPanel() {
+    JComponent getHierarchyPanel() throws TerminologyException, IOException {
         if (tree != null) {
             for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
                 tree.removeTreeExpansionListener(tel);
@@ -2395,7 +2441,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
         } else if (evt.getPropertyName().equals("roots")) {
-            termTreeConceptSplit.setLeftComponent(getHierarchyPanel());
+            try {
+                termTreeConceptSplit.setLeftComponent(getHierarchyPanel());
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } 
         }
     }
 

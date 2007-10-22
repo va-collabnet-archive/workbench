@@ -276,7 +276,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     public void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid, Date statusDate, UUID pathUuid) throws Exception {
-        int intId = map.getIntId(Arrays.asList(new UUID[] {primaryUuid}), aceAuxPath, ThinVersionHelper.convert(statusDate.getTime()));
+        map.getIntId(Arrays.asList(new UUID[] {primaryUuid}), aceAuxPath, ThinVersionHelper.convert(statusDate.getTime()));
         
         ThinIdVersioned idv = ((VodbEnv)LocalVersionedTerminology.get()).getId(primaryUuid);
         ThinIdPart idPart = new ThinIdPart();

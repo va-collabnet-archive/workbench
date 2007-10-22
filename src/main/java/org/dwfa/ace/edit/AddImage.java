@@ -106,6 +106,23 @@ public class AddImage extends AddComponent {
                           RefsetAuxiliary.Concept.EXCLUDE_LINEAGE,
                           ArchitectonicAuxiliary.Concept.VIEWER_IMAGE, ".png", "/16x16/plain/delete2.png",
                           aceAuxPath);
+
+            addStockImage(vodb, "5b7f3f12-8034-11dc-8314-0800200c9a66", "icon for false",
+                          RefsetAuxiliary.Concept.BOOLEAN_CHECK_CROSS_ICONS_FALSE,
+                          ArchitectonicAuxiliary.Concept.VIEWER_IMAGE, ".png", "/16x16/plain/navigate_cross.png",
+                          aceAuxPath);
+            addStockImage(vodb, "5b7f3f13-8034-11dc-8314-0800200c9a66", "icon for true",
+                          RefsetAuxiliary.Concept.BOOLEAN_CHECK_CROSS_ICONS_TRUE,
+                          ArchitectonicAuxiliary.Concept.VIEWER_IMAGE, ".png", "/16x16/plain/navigate_check.png",
+                          aceAuxPath);
+            addStockImage(vodb, "5b7f3f14-8034-11dc-8314-0800200c9a66", "icon for false",
+                          RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE,
+                          ArchitectonicAuxiliary.Concept.VIEWER_IMAGE, ".png", "/16x16/plain/forbidden.png",
+                          aceAuxPath);
+            addStockImage(vodb, "5b7f3f15-8034-11dc-8314-0800200c9a66", "icon for true",
+                          RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE,
+                          ArchitectonicAuxiliary.Concept.VIEWER_IMAGE, ".png", "/16x16/plain/check.png",
+                          aceAuxPath);
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
         }        
