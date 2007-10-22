@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +21,15 @@ public interface I_TermFactory {
     public String getProperty(String key) throws IOException;
 
     public void setProperty(String key, String value) throws IOException;
+    
+    /**
+     * Return a map of all properties in the database. The returned map is unmodifiable. To 
+     * set properties, use the <code>setProperty</code> method.
+     * 
+     * @return an unmodifable map of the properties. 
+     * @throws IOException
+     */
+    public Map<String, String> getProperties() throws IOException;
 
     public I_GetConceptData newConcept(UUID newConceptId, boolean defined, I_ConfigAceFrame aceFrameConfig)
             throws TerminologyException, IOException;
