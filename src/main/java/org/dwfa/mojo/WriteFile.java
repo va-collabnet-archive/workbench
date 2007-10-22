@@ -67,8 +67,8 @@ public class WriteFile
     		   writeProperties( file, existingProps );
     	   }
     	   else{
-    		   File outputFile = new File( file, fileName );
-    		   writeProperties( outputFile, null );
+    		   file.createNewFile();
+    		   writeProperties( file, null );
     	   }//End if/else    	   
         
        }catch(Exception e){
