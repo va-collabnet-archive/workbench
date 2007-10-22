@@ -1,0 +1,138 @@
+package org.dwfa.mojo;
+
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
+/**
+ * Goal to create a propeties file dynamically.
+ * If a properties value, passed to this goal is TIMESTAMP,
+ * it will be replaced with a current timestamp, in long date format.
+ *
+ * @goal write-file
+ * 
+ * @phase process-sources
+ */
+public class WriteFile
+    extends AbstractMojo
+{
+	/**
+     * Map to pass property key and value pair to, for setting DB properties from a project.
+     *
+     * @parameter
+     */
+	private Map<String,String> propertyMap;  
+	
+	/**
+     * Location of the file.
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
+
+    /**
+     * File name
+     * 
+     * @parameter expression="default.txt"
+     * @required
+     */
+    private String fileName;
+    
+    public void execute()
+        throws MojoExecutionException
+    {
+       try{
+    	   File f = outputDirectory;
+
+    	   if ( !f.exists() )
+    	   {
+    		   f.mkdirs();
+    	   }
+        
+    	   File file = new File( f, fileName );
+    	
+    	   if(file.exists()){
+    		   HashMap<String, String> existingProps = readExistingFile( file );
+    		   writeProperties( file, existingProps );
+    	   }
+    	   else{
+    		   File outputFile = new File( file, fileName );
+    		   writeProperties( outputFile, null );
+    	   }//End if/else    	   
+        
+       }catch(Exception e){
+    	   throw new MojoExecutionException(e.getLocalizedMessage(), e);
+       }
+    }//End method execute
+    
+    private HashMap<String, String> readExistingFile( File file ){
+    	HashMap<String, String> currentProperties = new HashMap<String, String>();
+    	
+    	try{
+    		BufferedReader reader = new BufferedReader( new FileReader( file ) );
+    		String line = reader.readLine();
+    		
+    		while( line != null ){
+    			String [] tokens = line.split( "=" );
+    			currentProperties.put( tokens[0], tokens[1] );
+    			line = reader.readLine();
+    		}//End while loop
+		   
+    		reader.close();
+    		
+    	}catch(Exception e){
+    		return null;
+    	}
+    	
+		return currentProperties;
+    }//End method readExistingFile
+    
+    private void writeProperties(File outputFile, HashMap<String, String> existingProps) throws MojoExecutionException{
+
+       
+    	BufferedWriter writer = null;
+    	try{ 
+    		writer = new BufferedWriter( new FileWriter( outputFile ) );
+    		
+    		if(existingProps == null) existingProps = new HashMap<String, String>();
+    		
+    		if( propertyMap != null ){
+    			for( String key: propertyMap.keySet() ){
+    				
+    				String value = propertyMap.get( key );
+	        	
+    				if( value != null && value.equalsIgnoreCase("TIMESTAMP")){
+    					value = new Date().toString();
+    				}
+    				
+    				existingProps.put( key, value);
+    				
+    			}//End for loop	
+    		}//End if
+    		
+    		for( String key : existingProps.keySet() ){
+    			
+    			String value = existingProps.get( key );
+    			
+    			writer.append(key + "=" + value);
+				writer.newLine();
+    		}//End for loop
+    		
+    		
+    		writer.close();
+    	}catch(Exception e){
+    		throw new MojoExecutionException(e.getLocalizedMessage(), e);
+    	}
+    }//End method writeProperties
+}//End class writeFile
