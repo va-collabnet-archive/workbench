@@ -78,15 +78,7 @@ public class DBPropertyCreator extends AbstractMojo {
 		        	String line = reader.readLine();
 		    		while( line != null ){
 		    			String [] tokens = line.split("=");
-		    			/*
-		    			 * Split the key value as it may have project.property format
-		    			 */
-		    			String [] keyTokens = tokens[0].split(".");
-		    			if( keyTokens.length == 1 ){
-		    				termFact.setProperty(keyTokens[0], tokens[1]);
-		    			}else{
-		    				termFact.setProperty(keyTokens[1], tokens[1]);
-		    			}
+		    			termFact.setProperty(keyTokens[0], tokens[1]);
 		    			
 		    			line = reader.readLine();
 		    		}//End while loop
