@@ -264,6 +264,7 @@ public class VodbEnv implements I_ImplementTermFactory {
      */
     public void setup(File envHome, boolean readOnly, Long cacheSize) throws IOException {
         try {
+            long startTime = System.currentTimeMillis();
             this.envHome = envHome;
             if (VodbEnv.cacheSize == null) {
                 VodbEnv.cacheSize = cacheSize;
@@ -299,11 +300,14 @@ public class VodbEnv implements I_ImplementTermFactory {
             licitWordsDir = new File(envHome, "lucene-licit");
 
             EnvironmentConfig envConfig = new EnvironmentConfig();
-            if (cacheSize != null) {
-                envConfig.setCacheSize(cacheSize);
-                AceLog.getAppLog().info("Setting cache size to: " + cacheSize);
+            if (VodbEnv.cacheSize != null) {
+                envConfig.setCacheSize(VodbEnv.cacheSize);
+                AceLog.getAppLog().info("Setting cache size to: " + VodbEnv.cacheSize);
+                AceLog.getAppLog().info("Cache size is: " + envConfig.getCacheSize());
+                AceLog.getAppLog().info("Cache percent: " + envConfig.getCachePercent());
+                
+                activity.setProgressInfoLower("Setting cache size to: " + VodbEnv.cacheSize);
             }
-            activity.setProgressInfoLower("Setting cache size to: " + cacheSize);
 
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
@@ -392,10 +396,13 @@ public class VodbEnv implements I_ImplementTermFactory {
             AceLog.getAppLog().info("Cache size: " + envConfig.getCacheSize());
             AceLog.getAppLog().info("preloadRels: " + preloadRels);
             AceLog.getAppLog().info("preloadDescriptions: " + preloadDescriptions);
+            AceLog.getAppLog().info("je.maxMemory: " + env.getConfig().getConfigParam("je.maxMemory"));
 
             activity.setProgressInfoLower("complete");
             activity.complete();
             Toolkit.getDefaultToolkit().removeAWTEventListener(l);
+            long loadTime = System.currentTimeMillis() - startTime;
+            logger.info("### Load time: " + loadTime + " ms");
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }
