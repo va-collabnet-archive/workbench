@@ -35,6 +35,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		ActionListener {
 
 	private static int workerCount = 0;
+    
+    private static boolean logTimingInfo = false;
 
 	private int workerId = workerCount++;
 
@@ -329,9 +331,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		} catch (ExecutionException ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
+        long elapsedTime = System.currentTimeMillis() - expansionStart;
+        
 		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("ExpandNodeSwingWorker " + workerId + " finished.");
-		}
+			logger.fine("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
+		} else if (logTimingInfo) {
+            logger.info("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
+        }
+        
 		tree.workerFinished(this);
 	}
 
@@ -394,10 +401,13 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	}
 
+    private long expansionStart;
+    
 	public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree,
 			DefaultMutableTreeNode node,
 			Comparator<I_GetConceptDataForTree> conceptBeanComparator, ACE acePanel) {
 		super();
+        expansionStart = System.currentTimeMillis();
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("ExpandNodeSwingWorker " + workerId + " starting.");
 		}
@@ -478,5 +488,13 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			
 		});
 	}
+
+    public static boolean getLogTimingInfo() {
+        return logTimingInfo;
+    }
+
+    public static void setLogTimingInfo(boolean logTimingInfo) {
+        ExpandNodeSwingWorker.logTimingInfo = logTimingInfo;
+    }
 
 }

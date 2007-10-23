@@ -32,6 +32,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.cs.ImportAllChangeSets;
+import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
@@ -115,6 +116,9 @@ public class AceRunner {
                    
          Boolean logTimingInfo = (Boolean) config.getEntry(this.getClass().getName(), "logTimingInfo",
                                                                  Boolean.class, null);
+         if (logTimingInfo != null) {
+             ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
+         }
          AceLog.getAppLog().info("logTimingInfo " + logTimingInfo);
          
          Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
