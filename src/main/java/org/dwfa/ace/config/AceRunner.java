@@ -96,10 +96,37 @@ public class AceRunner {
                "\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: " + argsStr
                      + "\n\n******************\n");
          startupLocalHost = InetAddress.getLocalHost();
-         ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
-         ipChangeTimer.start();
+         
          config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
 
+         Boolean preloadRels = (Boolean) config.getEntry(this.getClass().getName(), "preloadRels",
+                                               Boolean.class, null);
+         AceLog.getAppLog().info("preloadRels " + preloadRels);
+         if (preloadRels != null) {
+             VodbEnv.setPreloadRels(preloadRels);
+         }
+         
+         Boolean preloadDescriptions = (Boolean) config.getEntry(this.getClass().getName(), "preloadDescriptions",
+                                                                 Boolean.class, null);
+         AceLog.getAppLog().info("preloadDescriptions " + preloadDescriptions);
+         if (preloadRels != null) {
+             VodbEnv.setPreloadDescriptions(preloadDescriptions);
+         }
+                   
+         Boolean logTimingInfo = (Boolean) config.getEntry(this.getClass().getName(), "logTimingInfo",
+                                                                 Boolean.class, null);
+         AceLog.getAppLog().info("logTimingInfo " + logTimingInfo);
+         
+         Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
+         AceLog.getAppLog().info("cacheSize " + cacheSize);
+         if (cacheSize != null) {
+             VodbEnv.setCacheSize(cacheSize);
+         }
+
+                   
+         ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
+         ipChangeTimer.start();
+ 
          String lookAndFeelClassName = (String) config.getEntry(this.getClass().getName(), "lookAndFeelClassName",
                String.class, UIManager.getSystemLookAndFeelClassName());
 
@@ -133,7 +160,6 @@ public class AceRunner {
                         // import any change sets that may be downloaded from svn...
                         File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
                         "target/berkeley-db"));
-                        Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
                         
                         VodbEnv stealthVodb = new VodbEnv(true);
                         AceConfig.stealthVodb = stealthVodb;
@@ -176,6 +202,9 @@ public class AceRunner {
                "src/main/config/config.ace"));
 
          if (aceConfigFile.exists()) {
+             
+             
+             
             File profileDir = new File("profiles" + File.separator + "users");
             if (profileDir.exists() == false) {
                profileDir = new File("profiles");
@@ -198,7 +227,6 @@ public class AceRunner {
          } else {
             File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
                   "target/berkeley-db"));
-            Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
             AceLog.getAppLog().info("Cache size in config file: " + cacheSize);
             AceConfig.config = new AceConfig(dbFolder);
             AceConfig.config.setConfigFile(aceConfigFile);
