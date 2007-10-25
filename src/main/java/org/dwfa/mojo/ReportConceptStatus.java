@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -8,12 +9,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -22,6 +23,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.maven.MojoUtil;
 import org.dwfa.maven.graph.MojoGraph;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
@@ -48,68 +50,99 @@ public class ReportConceptStatus extends AbstractMojo{
      * crash unless there was at least one commented field. This field is
      * not actually used by the plugin. 
      * 
-     * @parameter expression="${project.build.directory}"
+     * @parameter expression="${project.build.directory}/.."
      * @required
      */
     @SuppressWarnings("unused")
     private String outputDirectory;
 
+    /**
+     * Output file name
+     * 
+     * @parameter expression="conceptStatusReport"
+     * @required
+     */
+    private String fileName;
+    
+    
+    /**
+     * Status' to include in report
+     * 
+     * @parameter
+     * @required
+     */
+    private List<String> includedStatus;
+    
+    private HashMap<String, DataObject> mappedReportStatus = new HashMap<String, DataObject>();
+        
     private class CheckConceptStatus implements I_ProcessConcepts{
 		I_TermFactory termFactory;
-		private int currentCount =0;
-		private int retiredCount =0;
-		private int totalConcepts = 0;
+		I_IntSet statusTypeSet;
 		
+	
 		private HashMap<String, double[][]> statusMap = new HashMap<String, double[][]>();
-		private Vector currentStatusCounts ;
-		private Vector retiredStatusCounts ;
 		
 		private double [][] pointData = new double[60][2];
-		private double [][] curStatusData = new double[60][2];
-		private double [][] retStatusData = new double[60][2];
 		
 		public CheckConceptStatus() throws Exception {
             termFactory = LocalVersionedTerminology.get();
-            currentCount = 0;
-            retiredCount = 0;
+            statusTypeSet = termFactory.newIntSet();
+
             for (int i=0; i < 60; i++){
             	pointData[i][0] = 0;
             	pointData[i][1] = 0;
             }
            
-        }
-		
+            if(includedStatus != null && !includedStatus.isEmpty()){
+				for( String status : includedStatus ){
+					ArchitectonicAuxiliary.Concept archConcept = ArchitectonicAuxiliary.Concept.valueOf(status);
+					if(archConcept != null){
+						int tmpNativeStatus = termFactory.uuidToNative( archConcept.getUids() );
+												
+						mappedReportStatus.put(  status, new DataObject( tmpNativeStatus ) );
+						statusTypeSet.add( tmpNativeStatus );
+					}//End if
+				}//End for loop
+			}//End if
+            
+            if( mappedReportStatus.isEmpty() ){
+            	int tmpNativeStatus = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());	
+            	mappedReportStatus.put(  "CURRENT", new DataObject( tmpNativeStatus ) );
+				
+            	tmpNativeStatus = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());	
+				mappedReportStatus.put(  "RETIRED", new DataObject( tmpNativeStatus ) );
+			}//End if
+            
+        }//End constructor CheckConceptStatus
+				
 		public HashMap<String, double[][]> getStatusCounts(){
 			return statusMap;
 		}
 			
 		public void processConcept(I_GetConceptData concept) throws Exception{
-	
-			I_Path architectonicPath = termFactory.getPath(
-                    ArchitectonicAuxiliary.
-                    Concept.ARCHITECTONIC_BRANCH.
-                    getUids());
-
-			I_Position latestOnArchitectonicPath = termFactory.newPosition(
-                                architectonicPath,
-                                Integer.MAX_VALUE);
-			Set<I_Position> positionSet = new HashSet<I_Position>();
-			positionSet.add(latestOnArchitectonicPath);
+													
+//			I_Path architectonicPath = termFactory.getPath( 
+//                    ArchitectonicAuxiliary.
+//                    Concept.ARCHITECTONIC_BRANCH.
+//                    getUids());
+//
+//			I_Position latestOnArchitectonicPath = termFactory.newPosition(
+//                                architectonicPath,
+//                                Integer.MAX_VALUE);
+//			Set<I_Position> positionSet = new HashSet<I_Position>();
+//			positionSet.add(latestOnArchitectonicPath);
 			
-			//Get status 'CURRENT' concept
-			I_IntSet statusTypeSet = termFactory.newIntSet();
-			statusTypeSet.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-			statusTypeSet.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
-			
+			I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
+			Set<I_Position> positionSet = activeConfig.getViewPositionSet();
 			
 			List<I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet);
 			
-			Iterator it = statusTuples.iterator();
+			Iterator<I_ConceptAttributeTuple> it = statusTuples.iterator();
 			
 			int conceptStatus = 0;
 			int versionId = 0;
 			while (it.hasNext()){
-				I_ConceptAttributeTuple tuple = (I_ConceptAttributeTuple)it.next();
+				I_ConceptAttributeTuple tuple = it.next();
 				conceptStatus = tuple.getConceptStatus();
 				versionId = tuple.getVersion();
 			}
@@ -118,48 +151,54 @@ public class ReportConceptStatus extends AbstractMojo{
 			GregorianCalendar prevCheckDate = new GregorianCalendar();
 					
 			for(int i = 59; i > -1; i--){
-				checkDate = (GregorianCalendar)prevCheckDate.clone();
-				prevCheckDate.add(Calendar.DAY_OF_MONTH, -1);
-			
-				curStatusData[i][1] = checkDate.getTime().getTime();
-				retStatusData[i][1] = checkDate.getTime().getTime();
+				checkDate = ( GregorianCalendar )prevCheckDate.clone();
+				prevCheckDate.add( Calendar.DAY_OF_MONTH, -1 );
+							
+				long time = ThinVersionHelper.convert( versionId );
+				Date partDate = new Date( time );	
 				
-				int curentConceptCount = 0;	
-				int retiredConceptCount = 0;
+				/*
+				 * Set the time for each data object
+				 */
+				long axisTime = checkDate.getTime().getTime(); 
 				
-				long time = ThinVersionHelper.convert(versionId);
-				Date partDate = new Date(time);	
-				I_TermFactory tf = LocalVersionedTerminology.get();
-				
-				if (conceptStatus == tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())){
-												
-					if( partDate.before(checkDate.getTime()) ){
-						curentConceptCount++;
-					}									
-				}
-				if (conceptStatus == tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids())){
-					if( partDate.before(checkDate.getTime()) ){
-						retiredConceptCount++;
-					}
-				}
-				
-				curStatusData[i][0] += curentConceptCount;
-				retStatusData[i][0] += retiredConceptCount;
+				for( String key : mappedReportStatus.keySet() ){
+					DataObject dataObj = mappedReportStatus.get( key ); 
+					
+					dataObj.setDataTime(i, axisTime);
+				    
+					if( conceptStatus == dataObj.getNaitveStatus() ){
+						if( partDate.before( checkDate.getTime() ) ){
+							dataObj.incDataCount( i );
+						}//End if									
+					}//End if
+				}//End for loop
 			}//End For Loop
 			
-			statusMap.put("CURRENT", curStatusData);
-			statusMap.put("RETIRED", retStatusData);
-									
+			for( String key : mappedReportStatus.keySet() ){
+				DataObject dataObj = mappedReportStatus.get( key );
+				statusMap.put( key, dataObj.getData() );
+			}//End for loop						
 		 }//End method processConcept
+		
 		 public String toString() {
-		       return "conceptsProcessed: " + totalConcepts ;
+		       return "CheckConceptStatus";
 		    }
-
 		
 	}//End class CheckConceptStatus
-	
+	 
 	 public void execute() throws MojoExecutionException, MojoFailureException {
 		 try{
+			 
+			 try {
+	               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+	                   return;
+	               }
+	           } catch (NoSuchAlgorithmException e) {
+	               throw new MojoExecutionException(e.getLocalizedMessage(), e);
+	           } 
+			           
+	           
 			 I_TermFactory termFactory = LocalVersionedTerminology.get();
 			 CheckConceptStatus ccs = new CheckConceptStatus();
 			 termFactory.iterateConcepts(ccs);
@@ -169,6 +208,8 @@ public class ReportConceptStatus extends AbstractMojo{
 			 mg.setAxisLabels("Days","Number of Concepts");
 			 mg.setSiteTitle("Concept Status' Progression");
 			 mg.setSiteDesc("The progression of concept status' of a 60 day period are shown below in table and graph format.");
+			 mg.setOutputDir( outputDirectory );
+			 mg.setFileName( fileName );
 			 mg.createGraph();
 			 
 		 }catch(Exception e){
@@ -176,5 +217,33 @@ public class ReportConceptStatus extends AbstractMojo{
 		 }
 		 
 	 }//End method execute
+	 
+	 class DataObject extends Object{
+	    	private double[][] data = new double[60][2];
+	    	private int nativeStatus;
+	    	    	
+	    	public int getNaitveStatus(){
+	    		return nativeStatus;
+	    	}
+	    	
+	    	public void setDataTime(int arrayPos1, double timeValue ){
+	    		data[arrayPos1][1] = timeValue;
+	    	}
+	    	
+	    	public void incDataCount(int arrayPos){
+	    		data[arrayPos][0] ++;
+	    	}
+	    	
+	    	public double[][] getData(){
+	    		return data;
+	    	}
+	    	
+	    	public DataObject( int status){
+	    		nativeStatus = status;
+	    	}//End constructor
+	    	
+	    
+	    	
+	    }//End class DataObject
 	 
 }//End class ConceptStatusReportMojo
