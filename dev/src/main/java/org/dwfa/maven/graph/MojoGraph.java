@@ -89,11 +89,13 @@ public class MojoGraph {
 	 * Buffered image to draw graphic to
 	 */
 	BufferedImage bufferedImage = new BufferedImage(graphDisplayWidth, graphDisplayHeight, BufferedImage.TYPE_INT_RGB);
-	private String jpgExportPath = "..\\..\\ace\\dwfa-mojo\\dev\\src\\site\\resources\\images";//"C:\\_working\\ace\\dwfa-mojo\\dev\\src\\site\\resources\\images";
+	private String outputPath = ".";
+	private String fileName = "graphOutput";
+	private String jpgExportPath = "\\src\\site\\resources\\images\\";
 	private String exportFormat = "jpg";
-	private String jpgFileName = "\\graph.jpg";
-	private String xdocExportPath = "..\\..\\ace\\dwfa-mojo\\dev\\src\\site\\xdoc";//"C:\\_working\\ace\\dwfa-mojo\\dev\\src\\site\\xdoc";
-	private String xdocFileName = "\\progressgraph.xml";
+
+	private String xdocExportPath = "\\src\\site\\xdoc\\";
+
 	private DataType displayDataType = DataType.VALUEOVERVALUE;
 	
 	public enum DataType {VALUEOVERVALUE,VALUEOVERTIME };
@@ -137,7 +139,15 @@ public class MojoGraph {
 	public void setDataSource(HashMap<String, double[][]> dataMap){
 		dataSource = dataMap;
 	}
-      
+    
+	public void setOutputDir(String outputDir){
+		outputPath = outputDir;
+	}
+	
+	public void setFileName( String fileName ){
+		this.fileName = fileName;
+	}
+	
 	public void createGraph()throws MojoExecutionException{
 	  
 		  /*
@@ -174,10 +184,10 @@ public class MojoGraph {
   
 	
 	private void createLegend(Graphics2D g2d){
-		Iterator it = legendMap.keySet().iterator();
+		Iterator<String> it = legendMap.keySet().iterator();
 		int spacer = yOffset;
 		while(it.hasNext()){
-			String key = (String)it.next();
+			String key = it.next();
 			Color color = legendMap.get(key);
 			int lineXPoint = (xOffset + yAxisLength);
 			spacer +=20;
@@ -243,7 +253,7 @@ public class MojoGraph {
 			  
 			  switch (displayDataType){
 			  case VALUEOVERTIME:
-				  Iterator it = dataSource.keySet().iterator();
+				  Iterator<String> it = dataSource.keySet().iterator();
 				  while(it.hasNext()){
 					  double[][] pointData = dataSource.get(it.next());
 					  long val = (long)pointData[(i*yAxisIncrementValue)-1][1];
@@ -341,7 +351,7 @@ public class MojoGraph {
 		  float maxXPointDataValue = 0.0f;
 		  float maxYPointDataValue = 0.0f;
 		  if (dataSource != null){
-			  Iterator it = dataSource.keySet().iterator();
+			  Iterator<String> it = dataSource.keySet().iterator();
 			  
 			  //Determine the max x and y values
 			  while(it.hasNext()){			  
@@ -447,7 +457,13 @@ public class MojoGraph {
 	  
 	  public void exportGraph() throws MojoExecutionException{
 		  try{
-			  ImageIO.write(bufferedImage, exportFormat, new File(jpgExportPath + jpgFileName));
+			  File f = new File(outputPath + jpgExportPath);
+			  if(!f.exists()){
+				  f.mkdirs();
+			  }
+			  
+			  
+			  ImageIO.write(bufferedImage, exportFormat, new File(outputPath + jpgExportPath + fileName + ".jpg"));
 		  }
 		  catch(IOException e){
 			  throw new MojoExecutionException(e.getMessage(), e);
@@ -480,7 +496,13 @@ public class MojoGraph {
 		 xdocXML.append("</document>");
 		 
 		 try{
-			 File file = new File(xdocExportPath + xdocFileName);                      
+			 File f = new File(outputPath + xdocExportPath);
+			  if(!f.exists()){
+				  f.mkdirs();
+			  }
+			 
+			 
+			 File file = new File(outputPath + xdocExportPath + fileName + ".xml");                      
 			 FileWriter fileWriter = new FileWriter(file);
 			 fileWriter.write(xdocXML.toString());
 			 fileWriter.close();
