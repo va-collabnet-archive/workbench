@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -73,6 +74,14 @@ public class ReportConceptStatus extends AbstractMojo{
      */
     private List<String> includedStatus;
     
+    /**
+     * View path name, to source data from
+     * 
+     * @parameter
+     * @required
+     */
+    private String viewPath;
+    
     private HashMap<String, DataObject> mappedReportStatus = new HashMap<String, DataObject>();
         
     private class CheckConceptStatus implements I_ProcessConcepts{
@@ -133,7 +142,18 @@ public class ReportConceptStatus extends AbstractMojo{
 //			positionSet.add(latestOnArchitectonicPath);
 			
 			I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
-			Set<I_Position> positionSet = activeConfig.getViewPositionSet();
+			Set<I_Position> positionSet = new HashSet<I_Position>();
+			
+			if( viewPath != null ){
+				
+				positionSet.addAll( termFactory.getPath( ArchitectonicAuxiliary.Concept.valueOf( viewPath ).getUids() ).getOrigins() );
+				
+			}
+			else{
+				positionSet = activeConfig.getViewPositionSet();
+			}
+			
+			
 			
 			List<I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet);
 			
