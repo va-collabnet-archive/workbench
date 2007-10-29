@@ -24,8 +24,10 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
@@ -90,6 +92,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
     private Long nextCommit;
 
     private VodbEnv vodb;
+    
+    private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
 
     public BinaryChangeSetReader() {
         super();
@@ -112,23 +116,32 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 if (counter != null) {
                     counter.increment();
                 }
-                if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
-                    conceptCount++;
-                    AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
-                    ACE.addImported(commitAceBean((UniversalAceBean) obj, nextCommit, values));
-                } else if (UniversalIdList.class.isAssignableFrom(obj.getClass())) {
-                    AceLog.getEditLog().fine("Read UniversalIdList... " + obj);
-                    commitIdList((UniversalIdList) obj, nextCommit, values);
-                } else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
-                    pathCount++;
-                    AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
-                    commitAcePath((UniversalAcePath) obj, nextCommit);
-                } else if (UniversalAceExtByRefBean.class.isAssignableFrom(obj.getClass())) {
-                    pathCount++;
-                    AceLog.getEditLog().info("Read UniversalAceExtByRefBean... " + obj);
-                    commitAceEbr((UniversalAceExtByRefBean) obj, nextCommit, values);
-                } else {
-                    throw new IOException("Can't handle class: " + obj.getClass().getName());
+                boolean validated = true;
+                for (I_ValidateChangeSetChanges v: getValidators()) {
+                   if (v.validateChange((I_AmChangeSetObject) obj, getVodb()) == false) {
+                      validated = false;
+                      break;
+                   }
+                }
+                if (validated) {
+                   if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
+                      conceptCount++;
+                      AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
+                      ACE.addImported(commitAceBean((UniversalAceBean) obj, nextCommit, values));
+                  } else if (UniversalIdList.class.isAssignableFrom(obj.getClass())) {
+                      AceLog.getEditLog().fine("Read UniversalIdList... " + obj);
+                      commitIdList((UniversalIdList) obj, nextCommit, values);
+                  } else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
+                      pathCount++;
+                      AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
+                      commitAcePath((UniversalAcePath) obj, nextCommit);
+                  } else if (UniversalAceExtByRefBean.class.isAssignableFrom(obj.getClass())) {
+                      pathCount++;
+                      AceLog.getEditLog().info("Read UniversalAceExtByRefBean... " + obj);
+                      commitAceEbr((UniversalAceExtByRefBean) obj, nextCommit, values);
+                  } else {
+                      throw new IOException("Can't handle class: " + obj.getClass().getName());
+                  }
                 }
                 nextCommit = ois.readLong();
             } catch (EOFException ex) {
@@ -173,19 +186,34 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             }
         }
         if (initialized == false) {
-            FileInputStream fis = new FileInputStream(changeSetFile);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            ois = new ObjectInputStream(bis);
-            Class readerClass = (Class) ois.readObject();
-            if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
-                AceLog.getEditLog().fine(
-                                         "Now reading change set with BinaryChangeSetReader: "
-                                                 + changeSetFile.getAbsolutePath());
-            } else {
-                AceLog.getAppLog().warning(
-                                           "ReaderClass " + readerClass.getName()
-                                                   + " is not assignable from BinaryChangeSetReader...");
+           boolean validated = true;
+           for (I_ValidateChangeSetChanges v: getValidators()) {
+              try {
+               if (v.validateFile(changeSetFile, getVodb()) == false) {
+                    validated = false;
+                    break;
+                 }
+            } catch (TerminologyException e) {
+               throw new ToIoException(e);
             }
+           }
+           if (validated) {
+              FileInputStream fis = new FileInputStream(changeSetFile);
+              BufferedInputStream bis = new BufferedInputStream(fis);
+              ois = new ObjectInputStream(bis);
+              Class readerClass = (Class) ois.readObject();
+              if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
+                  AceLog.getEditLog().fine(
+                                           "Now reading change set with BinaryChangeSetReader: "
+                                                   + changeSetFile.getAbsolutePath());
+              } else {
+                  AceLog.getAppLog().warning(
+                                             "ReaderClass " + readerClass.getName()
+                                                     + " is not assignable from BinaryChangeSetReader...");
+              }
+           } else {
+              nextCommit = Long.MAX_VALUE;
+           }
             initialized = true;
         }
     }
@@ -723,5 +751,9 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
     public void setVodb(VodbEnv vodb) {
         this.vodb = vodb;
     }
+
+   public List<I_ValidateChangeSetChanges> getValidators() {
+      return validators;
+   }
 
 }

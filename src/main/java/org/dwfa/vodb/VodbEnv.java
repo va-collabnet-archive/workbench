@@ -2869,4 +2869,16 @@ public class VodbEnv implements I_ImplementTermFactory {
         VodbEnv.cacheSize = cacheSize;
     }
 
+   public I_ConceptAttributePart newConceptAttributePart() {
+      return new ThinConPart();
+   }
+
+   public I_DescriptionPart newDescriptionPart() {
+      return new ThinDescPart();
+   }
+
+   public I_RelPart newRelPart() {
+      return new ThinRelPart();
+   }
+
 }
