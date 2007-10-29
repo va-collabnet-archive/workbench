@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UniversalAceBean implements Serializable {
+public class UniversalAceBean implements I_AmChangeSetObject, Serializable {
 
 	/**
 	 * 

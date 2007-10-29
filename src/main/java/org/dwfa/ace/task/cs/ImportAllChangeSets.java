@@ -12,6 +12,7 @@ import java.util.TreeSet;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.api.cs.SimpleValidator;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -67,6 +68,7 @@ public class ImportAllChangeSets extends AbstractTask {
 			for (File csf : changeSetFiles) {
 				I_ReadChangeSet csr = LocalVersionedTerminology.get()
 						.newBinaryChangeSetReader(csf);
+            csr.getValidators().add(new SimpleValidator());
 				readerSet.add(csr);
 				worker.getLogger().info("Adding reader: " + csf.getAbsolutePath());
 			}

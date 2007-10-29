@@ -177,6 +177,11 @@ public interface I_TermFactory {
     public I_IntList newIntList();
 
     public I_IdVersioned getId(int nid) throws IOException;
+    
+    /**
+     * Delete any uncommitted changes. 
+     * @throws IOException
+     */
 
     public void cancel() throws IOException;
 
@@ -196,5 +201,21 @@ public interface I_TermFactory {
      *
      */
     public void resumeChangeSetWriters();
+
+    /**
+     * 
+     * @return a new description part with all content uninitialized. 
+     */
+    public I_DescriptionPart newDescriptionPart();
+    /**
+     * 
+     * @return a new concept attribute part with all content uninitialized. 
+     */
+    public I_ConceptAttributePart newConceptAttributePart();
+    /**
+     * 
+     * @return a new relationship part with all content uninitialized. 
+     */
+    public I_RelPart newRelPart();
 
 }

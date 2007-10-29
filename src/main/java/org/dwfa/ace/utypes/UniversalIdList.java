@@ -10,7 +10,7 @@ import java.util.Set;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.TimePathId;
 
-public class UniversalIdList implements Serializable, I_Transact {
+public class UniversalIdList implements Serializable, I_Transact, I_AmChangeSetObject {
 
 	/**
 	 * 

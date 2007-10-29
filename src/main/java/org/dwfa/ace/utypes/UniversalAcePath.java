@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-public class UniversalAcePath implements Serializable {
+public class UniversalAcePath implements Serializable, I_AmChangeSetObject {
 	
 	/**
 	 * 
