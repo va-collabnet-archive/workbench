@@ -13,6 +13,15 @@ import java.util.List;
  */
 public class CompareComponents {
 
+	public static boolean reject = true;
+	public static boolean compareToFlagged(int nid, int flagged) {
+		if (reject) {
+			return nid==flagged;
+		} else {
+			return nid!=flagged;
+		}
+	}
+	
     public static boolean attributeEqual(I_ConceptAttributeTuple tuple1,
             I_ConceptAttributeTuple tuple2) {
         if ((tuple1.getConceptStatus() != tuple2.getConceptStatus())
@@ -26,15 +35,17 @@ public class CompareComponents {
     public static boolean attributeEqual(
             I_ConceptAttributeTuple tuple1, I_ConceptAttributeTuple tuple2,
             int flaggedStatusId) {
-        if (tuple1.getConceptStatus() == flaggedStatusId) {
+        if (compareToFlagged(tuple1.getConceptStatus(),flaggedStatusId)) {
             return false;
-        } else if (tuple2.getConceptStatus() == flaggedStatusId) {
+        } else if (compareToFlagged(tuple2.getConceptStatus(),flaggedStatusId)) {
             return false;
         } else {
             return attributeEqual(tuple1, tuple2);
         }
     }
 
+    
+    
     public static boolean descriptionEqual(I_DescriptionTuple tuple1,
             I_DescriptionTuple tuple2) {
         if ((tuple1.getInitialCaseSignificant() != tuple2.getInitialCaseSignificant())
@@ -51,9 +62,9 @@ public class CompareComponents {
     public static boolean descriptionEqual(
             I_DescriptionTuple tuple1,
             I_DescriptionTuple tuple2, int flaggedStatusId) {
-        if (tuple1.getStatusId() == flaggedStatusId) {
+        if (compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
             return false;
-        } else if (tuple2.getStatusId() == flaggedStatusId) {
+        } else if (compareToFlagged(tuple2.getStatusId(),flaggedStatusId)) {
             return false;
         } else {
             return descriptionEqual(tuple1, tuple2);
@@ -75,9 +86,9 @@ public class CompareComponents {
 
     public static boolean relationshipEqual(I_RelTuple tuple1,
             I_RelTuple tuple2, int flaggedStatusId) {
-        if (tuple1.getStatusId() == flaggedStatusId) {
+        if (compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
             return false;
-        } else if (tuple2.getStatusId() == flaggedStatusId) {
+        } else if (compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
             return false;
         } else {
             return relationshipEqual(tuple1, tuple2);

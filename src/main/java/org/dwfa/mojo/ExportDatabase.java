@@ -538,6 +538,7 @@ public class ExportDatabase extends AbstractMojo {
 
 	   System.out.println("Exporting identifiers");
 	   File idsFile = new File(outputDirectory + idsDataFileName);
+	   idsFile.getParentFile().mkdirs();
 	   BufferedWriter writer = new BufferedWriter(new FileWriter(idsFile));
 
 	   termFactory.iterateIds(new IdIterator(writer));
