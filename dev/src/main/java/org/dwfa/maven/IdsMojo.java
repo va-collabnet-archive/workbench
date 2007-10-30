@@ -15,8 +15,10 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 import java.security.NoSuchAlgorithmException;
 
@@ -37,106 +39,130 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
  */
 public class IdsMojo extends AbstractMojo {
 
-    /**
-     * @parameter
-     * @required
-     */
-    File uuidsFile;
-    
-    /**
-     * @parameter
-     * @required
-     */
-    File snomedMappingFile;
+	/**
+	 * @parameter
+	 * @required
+	 */
+	File uuidsFile;
 
-    /**
-     * @parameter
-     * @required
-     */
-    File outputFile;          
+	/**
+	 * @parameter
+	 * @required
+	 */
+	File snomedMappingFile;
 
-    /**
-     * @parameter
-     * @required
-     */
-    String path;
+	/**
+	 * @parameter
+	 * @required
+	 */
+	File outputFile;          
 
-    /**
-     * @parameter
-     */
-    boolean skipFirstLine = true;          
+	/**
+	 * @parameter
+	 * @required
+	 */
+	String path;
 
-    /**
-     * @parameter
-     */
-    boolean writeHeader = false;          
+	/**
+	 * @parameter
+	 */
+	boolean skipFirstLine = true;          
 
-    /**
-     * @parameter
-     */
-    boolean append = false;          
+	/**
+	 * @parameter
+	 */
+	boolean writeHeader = false;          
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
+	/**
+	 * @parameter
+	 */
+	boolean append = false;          
 
-        // calculate the SHA-1 hashcode for this mojo based on input
-        Sha1HashCodeGenerator generator;
-        String hashCode = "";
-        try {
-            generator = new Sha1HashCodeGenerator();
-            generator.add(outputFile.getName());
-            generator.add(snomedMappingFile.getName());
-            generator.add(uuidsFile.getName());
-            hashCode = generator.getHashCode();
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println(e);
-        }
+	
+	/**
+	 * @parameter 
+	 */
+	File checkFile;
+	
+	
+	Set<UUID> allowedUuids = new HashSet<UUID>();
+	
+	public void execute() throws MojoExecutionException, MojoFailureException {
 
-        File goalFileDirectory = new File("target" + File.separator
-                + "completed-mojos");
-        File goalFile = new File(goalFileDirectory, hashCode);
-
-        // check to see if this goal has been executed previously
-        if(!goalFile.exists()) {
-		
+		// calculate the SHA-1 hashcode for this mojo based on input
+		Sha1HashCodeGenerator generator;
+		String hashCode = "";
 		try {
-		outputFile.getParentFile().mkdirs();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,append));
-
-		if (writeHeader) {
-			writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
-			writer.newLine();
+			generator = new Sha1HashCodeGenerator();
+			generator.add(outputFile.getName());
+			generator.add(snomedMappingFile.getName());
+			generator.add(uuidsFile.getName());
+			hashCode = generator.getHashCode();
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println(e);
 		}
 
-		UuidSnomedMap map = UuidSnomedMap.read(snomedMappingFile);
-		String source = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next().toString();			
-		BufferedReader reader = new BufferedReader(new FileReader(uuidsFile));
-		String line = reader.readLine();
+		File goalFileDirectory = new File("target" + File.separator
+				+ "completed-mojos");
+		File goalFile = new File(goalFileDirectory, hashCode);
 
-		if (skipFirstLine) {
-			line = reader.readLine();
-		}
+		// check to see if this goal has been executed previously
+		if(!goalFile.exists()) {
 
-		while (line!=null) {
-			String[] parts = line.split("\t");
-			String uuid = parts[0];			
-			String status = parts[1];
-			Long sctid = map.get(UUID.fromString(uuid));
-			if (sctid!=null) {
-				String effective_date = map.getEffectiveDate(sctid);
-				writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date + "\t" + path);
-				writer.newLine();
-			}
-			line = reader.readLine();
-		}
 		
-		writer.close();
-            } catch (IOException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
-        } else {
-            // skip execution as it has already been done previously
-            getLog().info("Skipping goal - executed previously.");
-        }
-    }
+			try {
+				
+				if (checkFile!=null) {
+					BufferedReader reader = new BufferedReader(new FileReader(checkFile));
+					String line = reader.readLine();
+					while ((line = reader.readLine())!=null) {					
+						allowedUuids.add(UUID.fromString(line.split("\t")[0]));
+					}
+					reader.close();
+				}
+				
+				outputFile.getParentFile().mkdirs();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,append));
+
+				if (writeHeader) {
+					writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
+					writer.newLine();
+				}
+
+				UuidSnomedMap map = UuidSnomedMap.read(snomedMappingFile);
+				String source = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next().toString();			
+				BufferedReader reader = new BufferedReader(new FileReader(uuidsFile));
+				String line = reader.readLine();
+
+				if (skipFirstLine) {
+					line = reader.readLine();
+				}
+
+				while (line!=null) {
+					String[] parts = line.split("\t");
+					String uuid = parts[0];			
+					String status = parts[1];
+					Long sctid = map.get(UUID.fromString(uuid));
+					if (sctid!=null) {
+						if (allowedUuids.contains(UUID.fromString(uuid))) {
+							String effective_date = map.getEffectiveDate(sctid);
+							writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date + "\t" + path);
+							writer.newLine();
+						} else {
+							System.out.println("UUID Not in release: " + uuid);
+						}
+					}
+					line = reader.readLine();
+				}
+
+				writer.close();
+			} catch (IOException e) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			}
+		} else {
+			// skip execution as it has already been done previously
+			getLog().info("Skipping goal - executed previously.");
+		}
+	}
 
 }
