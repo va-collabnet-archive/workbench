@@ -84,6 +84,10 @@ public class IdsMojo extends AbstractMojo {
 	 */
 	File checkFile;
 	
+	/**
+	 * @parameter 
+	 */
+	File reportFile;
 	
 	Set<UUID> allowedUuids = new HashSet<UUID>();
 	
@@ -122,7 +126,9 @@ public class IdsMojo extends AbstractMojo {
 				}
 				
 				outputFile.getParentFile().mkdirs();
+				reportFile.getParentFile().mkdirs();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,append));
+				BufferedWriter report = new BufferedWriter(new FileWriter(reportFile));
 
 				if (writeHeader) {
 					writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
@@ -149,13 +155,15 @@ public class IdsMojo extends AbstractMojo {
 							writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date + "\t" + path);
 							writer.newLine();
 						} else {
-							System.out.println("UUID Not in release: " + uuid);
+							report.write("UUID Not in release: " + uuid);
+							report.newLine();
 						}
 					}
 					line = reader.readLine();
 				}
 
 				writer.close();
+				report.close();
 			} catch (IOException e) {
 				throw new MojoExecutionException(e.getMessage(), e);
 			}
