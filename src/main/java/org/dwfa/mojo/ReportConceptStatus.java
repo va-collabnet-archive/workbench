@@ -144,7 +144,7 @@ public class ReportConceptStatus extends AbstractMojo{
 			I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
 			Set<I_Position> positionSet = new HashSet<I_Position>();
 			
-			if( viewPath != null ){
+			if( !viewPath.equalsIgnoreCase("DEFAULT") ){
 				
 				positionSet.addAll( termFactory.getPath( ArchitectonicAuxiliary.Concept.valueOf( viewPath ).getUids() ).getOrigins() );
 				
