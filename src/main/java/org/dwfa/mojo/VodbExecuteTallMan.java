@@ -75,34 +75,61 @@ public class VodbExecuteTallMan extends AbstractMojo {
     private File workflowOutputFile;
 
     /**
-     * Location to write details.
+     * Location to modified concepts report.
      *
      * @parameter
      * @required
      */
-    private File reportOutputFile;
+    private File modifiedConceptsOutputFile;
+
+    /**
+     * Location to unmodified concepts report.
+     * i.e. where the tall man word existed (ignoring capitilisation)
+     * but didn't need to be modified due to already containing correct capitilisation.
+     *
+     * @parameter
+     * @required
+     */
+    private File unmodifiedConceptsOutputFile;
+
+    /**
+     * Report on tall man words which weren't found at all in any concept's description.
+     *
+     * @parameter
+     * @required
+     */
+    private File unusedTallManWordsOutputFile;
 
     private HashSet<List<UUID>> modifiedUuids;
 
     private HashSet<String> modifiedDescriptions;
+
+    private HashSet<String> unmodifiedDescriptions;
+
+    private HashSet<String> foundTallManWords;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         BufferedReader in;
         try {
-
+            foundTallManWords = new HashSet<String>();
             modifiedUuids = new HashSet<List<UUID>>();
             modifiedDescriptions = new HashSet<String>();
+            unmodifiedDescriptions = new HashSet<String>();
 
             // initialise output directories/files
             workflowOutputFile.getParentFile().mkdirs();
-            reportOutputFile.getParentFile().mkdirs();
+            modifiedConceptsOutputFile.getParentFile().mkdirs();
 
             BufferedWriter workflowWriter = new BufferedWriter(
                     new FileWriter(workflowOutputFile));
-            BufferedWriter reportWriter = new BufferedWriter(
-                    new FileWriter(reportOutputFile));
+            BufferedWriter modifiedConceptsWriter = new BufferedWriter(
+                    new FileWriter(modifiedConceptsOutputFile));
+            BufferedWriter unmodifiedConceptsWriter = new BufferedWriter(
+                    new FileWriter(unmodifiedConceptsOutputFile));
+            BufferedWriter unusedTallManWordsWriter = new BufferedWriter(
+                    new FileWriter(unusedTallManWordsOutputFile));
 
             // read in tall man words from input file
             in = new BufferedReader(new FileReader(inputFile));
@@ -120,7 +147,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
             termFactory.iterateConcepts(tallManWriter);
 
             String message = "Tallman plugin modified "
-                            + tallManWriter.getNumberModifiedComponents()
+                            + tallManWriter.getNumberModifiedDescriptions()
                             + " descriptions.";
             getLog().info(message);
 
@@ -132,16 +159,41 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
             // write report of modified concepts for review
             for (String description : modifiedDescriptions) {
-                reportWriter.write(description);
-                reportWriter.newLine();
+                modifiedConceptsWriter.write(description);
+                modifiedConceptsWriter.newLine();
+            }
+
+            // write a report of tall man words that were NOT used
+            // to update any descriptions
+            HashSet<String> unusedTallManWords = new HashSet<String>();
+            for (String tallManWord : tallManWords) {
+                if (!foundTallManWords.contains(tallManWord)) {
+                    unusedTallManWords.add(tallManWord);
+                }
+            }
+            for (String word : unusedTallManWords) {
+                unusedTallManWordsWriter.write(word);
+                unusedTallManWordsWriter.newLine();
+            }
+
+            // write a report for descriptions which contained a
+            // tall man word (ignoring caps) but didn't need to be
+            // modified as were already correct
+            for (String word : unmodifiedDescriptions) {
+                unmodifiedConceptsWriter.write(word);
+                unmodifiedConceptsWriter.newLine();
             }
 
             // release IO resources
             in.close();
             workflowWriter.flush();
             workflowWriter.close();
-            reportWriter.flush();
-            reportWriter.close();
+            modifiedConceptsWriter.flush();
+            modifiedConceptsWriter.close();
+            unusedTallManWordsWriter.flush();
+            unusedTallManWordsWriter.close();
+            unmodifiedConceptsWriter.flush();
+            unmodifiedConceptsWriter.close();
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -152,7 +204,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
         private I_TermFactory termFactory;
         private I_GetConceptData viewingBranch;
         private I_GetConceptData editingBranch;
-        private int numberModifiedComponents;
+        private int numberModifiedDescriptions;
         private HashSet<String> tallManWords;
         private HashSet<I_GetConceptData> descriptionTypes;
 
@@ -165,7 +217,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
             for (ConceptDescriptor description : descriptionsToCheck) {
                 descriptionTypes.add(description.getVerifiedConcept());
             }
-            numberModifiedComponents = 0;
+            numberModifiedDescriptions = 0;
         }
 
         public void processConcept(I_GetConceptData concept) throws Exception {
@@ -223,9 +275,10 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
                     if (currentDescription.equals(updatedCurrentDescription)) {
                         // nothing changed
+                        unmodifiedDescriptions.add(currentDescription + "\t " + uuids);
                     } else {
                         // add to report
-                        numberModifiedComponents++;
+                        numberModifiedDescriptions++;
                         modifiedUuids.add(uuids);
 
                         // update the description with the tall man alternative
@@ -253,10 +306,13 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
             String result = stringToReplace;
             for (String tallManWord: tallManWords) {
-                result = replaceSingleTallManWord(tallManWord, stringToReplace);
+                result = replaceSingleTallManWord(tallManWord, result);
             }
 
-            modifiedDescriptions.add(stringToReplace + " CONVERTED TO: " + result + "\t " + currentUuid);
+            if (!result.equals(stringToReplace)) {
+                modifiedDescriptions.add(stringToReplace
+                        + " CONVERTED TO: " + result + "\t " + currentUuid);
+            }
             return result;
         }
 
@@ -286,23 +342,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
                 }
                 searchString = searchString + "[" + c + oppositeC + "]";
             }
-            return stringToReplace.replaceAll(searchString, tallmanWord);
-        }
 
-        /**
-         * Checks if a description contains a tall man word.
-         * @param tallManWords
-         * @param stringToCheck
-         * @return
-         */
-        public boolean descriptionContainsTallManWord(HashSet<String> tallManWords,
-                String stringToCheck) {
-            for (String word: tallManWords) {
-                if (stringToCheck.contains(word)) {
-                    return true;
-                }
-            }
-            return false;
+            return stringToReplace.replaceAll(searchString, tallmanWord);
         }
 
         /**
@@ -313,30 +354,31 @@ public class VodbExecuteTallMan extends AbstractMojo {
          */
         public boolean descriptionContainsTallManWordIgnoresCase(HashSet<String> tallManWords,
                 String stringToCheck) {
+            boolean result = false;
             stringToCheck = stringToCheck.toLowerCase();
             for (String word: tallManWords) {
-                word = word.toLowerCase();
-                if (stringToCheck.contains(word)) {
-                    return true;
+                if (stringToCheck.contains(word.toLowerCase())) {
+                    foundTallManWords.add(word);
+                    result = true;
                 }
             }
-            return false;
+            return result;
         }
 
         /**
-         * Gets the number of modified components.
+         * Gets the number of modified descriptions.
          * @return
          */
-        public int getNumberModifiedComponents() {
-            return numberModifiedComponents;
+        public int getNumberModifiedDescriptions() {
+            return numberModifiedDescriptions;
         }
 
         /**
-         * Sets the number of modified components.
-         * @param numberModifiedComponents
+         * Sets the number of modified descriptions.
+         * @param numberModifiedDescriptions
          */
-        public void setNumberModifiedComponents(int numberModifiedComponents) {
-            this.numberModifiedComponents = numberModifiedComponents;
+        public void setNumberModifiedDescriptions(int numberModifiedDescriptions) {
+            this.numberModifiedDescriptions = numberModifiedDescriptions;
         }
     }
 }
