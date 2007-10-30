@@ -491,7 +491,7 @@ public class MojoGraph {
 		 xdocXML.append(htmlTableData);
 		 xdocXML.append("</table>");
 		 xdocXML.append("</section>");
-		 xdocXML.append("<img src=\"images/graph.jpg\" alt=\"GRAPH\"/>");
+		 xdocXML.append("<img src=\"images/" + fileName + ".jpg\" alt=\"GRAPH\"/>");
 		 xdocXML.append("</body>");
 		 xdocXML.append("</document>");
 		 
