@@ -41,7 +41,7 @@ import org.dwfa.util.bean.Spec;
  * it can automatically manage the transitive dependencies, and they do not have to be declared 
  * in the project dependency section. However, the primary dependencies must be declared as part 
  * of the dwfa-mojo plugin entry so that the maven class loader can load the dependencies prior 
- * to efforts to export the beans. 
+ * to efforts to export the beans. </p>
  * 
  * @goal export-beans
  * @requiresDependencyResolution compile
