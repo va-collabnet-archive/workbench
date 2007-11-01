@@ -22,7 +22,8 @@
       <item name="Parent Module: DWFA Master" href="../index.html"/>
     </menu>
     <menu name="Developer Guides">
-      <item name="Data Import" href="dataimport.html"/>
+      <item name="Ace Format Data Import" href="dataimport.html"/>
+      <item name="SNOMED Format Data Import" href="snomed-dataimport.html"/>
     </menu>
     <menu name="Goals">
       <item name="bcs-open" href="plugins/bcs-open-mojo.html"/>

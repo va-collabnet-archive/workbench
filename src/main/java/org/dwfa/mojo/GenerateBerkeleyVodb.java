@@ -17,7 +17,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
 /**
- * Goal which touches a timestamp file.
+ * Import SNOMED format data files from a jar and load into an ACE Berkeley database. 
  * 
  * @goal berkley-vodb
  * 
@@ -49,6 +49,13 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 	private String localRepository;
 
 	/**
+    * A list of dependencies in the following order:
+    * <ol>
+    *    <li>Dependency containing the <a href='../dataimport.html'>ACE format</a> metadata necessary to import the SNOMED data. The data files 
+    *    are expected in the "org/jehri/cement/" directory inside the jar file</li>
+    *    <li>Dependency containing the SNOMED format data to import. The data files are expected in the "org/snomed/yyyy-MM-dd/" directory,
+    *    where the date is used to provide a status date for the relationship status (since SNOMED does not provide them)</li>
+    * </ol>
 	 * @parameter
 	 * @required
 	 */

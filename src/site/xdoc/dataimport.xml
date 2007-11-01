@@ -1,14 +1,16 @@
 <document>
   <properties>
     <author email="user@company.com">Keith Campbell</author>
-    <title>Data Import</title>
+    <title>ACE Format Data Import</title>
   </properties>
   <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
   <head> </head>
   <body>
     <!-- The body of the document contains a number of sections -->
-    <section name="Data Import">
-      <p>The ACE version-oriented database can import uuid-based data from tab-delimited text files.
+    <section name="ACE Format Data Import">
+      <p>The ACE version-oriented database can import uuid-based data from tab-delimited text files
+        using the <a href="plugins/berkley-vodb-dir-mojo.html">berkley-vodb-dir</a> goal.</p><p>
+          
         This article describes the required data formats. The following types of files can be
         imported. </p>
       <dl>

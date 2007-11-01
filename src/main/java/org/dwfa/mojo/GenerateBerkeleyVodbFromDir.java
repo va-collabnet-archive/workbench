@@ -9,7 +9,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
 /**
- * Goal which touches a timestamp file.
+ * Import <a href='../dataimport.html'>ACE format</a> data files from a directory and load into an ACE Berkeley database. 
  * 
  * @goal berkley-vodb-dir
  * 

@@ -1,0 +1,15 @@
+<document>
+    <properties>
+        <author email="user@company.com">Keith Campbell</author>
+        <title>SNOMED Format Data Import</title>
+    </properties>
+    <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+    <head> </head>
+    <body>
+        <!-- The body of the document contains a number of sections -->
+        <section name="SNOMED Format Data Import">
+            <p>The ACE version-oriented database can import SNOMED-based data from tab-delimited text files
+                using the <a href="plugins/berkley-vodb-mojo.html">berkley-vodb</a> goal.</p>            
+        </section>
+    </body>
+</document>
