@@ -16,7 +16,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.UuidPrefixesForType5;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
@@ -95,12 +94,12 @@ public class VodbCreateNewPath extends AbstractMojo {
             I_GetConceptData parent = pathParent.getVerifiedConcept();
             activeConfig.setHierarchySelection(parent);
             
-            UUID pathUUID = Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, pathFsDesc);
+            UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
 
             I_GetConceptData pathConcept = tf
                     .newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
             
-            UUID fsDescUuid = Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, 
+            UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
             		pathUUID.toString() + 
             		ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + 
             		pathFsDesc);
@@ -108,7 +107,7 @@ public class VodbCreateNewPath extends AbstractMojo {
             tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
                               ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
 
-            UUID prefDescUuid = Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, 
+            UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
             		pathUUID.toString() + 
             		ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + 
             		pathPrefDesc);
@@ -117,7 +116,7 @@ public class VodbCreateNewPath extends AbstractMojo {
                               ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
 
             
-            UUID relUuid = Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, 
+            UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
             		pathUUID.toString() + fsDescUuid + prefDescUuid);
 
             tf.newRelationship(relUuid, pathConcept, activeConfig);

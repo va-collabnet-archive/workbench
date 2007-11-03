@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.UuidPrefixesForType5;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
@@ -39,7 +38,7 @@ public class VodbSetViewPaths extends AbstractMojo {
             activeConfig.getViewPositionSet().clear();
             for (ConceptDescriptor path : viewPaths) {
             	if (path.getUuid() == null) {
-            		path.setUuid(Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, 
+            		path.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
             				path.getDescription()).toString());
             	}
                 I_Path viewPath = tf.getPath(path.getVerifiedConcept().getUids());

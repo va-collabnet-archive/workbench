@@ -10,7 +10,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.UuidPrefixesForType5;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -47,7 +46,7 @@ public class VodbSetEditPaths extends AbstractMojo {
             activeConfig.getEditingPathSet().clear();
             for (ConceptDescriptor pathConcept : editPaths) {
             	if (pathConcept.getUuid() == null) {
-            		pathConcept.setUuid(Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, 
+            		pathConcept.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
             				pathConcept.getDescription()).toString());
             	}
                 activeConfig.addEditingPath(tf.getPath(pathConcept.getVerifiedConcept().getUids()));
