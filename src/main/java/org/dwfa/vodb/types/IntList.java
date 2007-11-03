@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -82,7 +83,7 @@ public class IntList implements ListDataListener, I_IntList {
             		try {
             			list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
 					} catch (NoMappingException e) {
-						AceLog.getAppLog().alertAndLogException(e);
+                  AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
 						unmappedIds++;
 						list[i] = Integer.MAX_VALUE;
 					}
