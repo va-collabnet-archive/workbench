@@ -3,7 +3,7 @@ package org.dwfa.maven.transform;
 import org.dwfa.maven.Transform;
 
 /**
- * Transforms ingredient field into a Snomed FSD.
+ * Writes a constant string value
  *
  */
 

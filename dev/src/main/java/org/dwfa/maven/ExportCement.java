@@ -11,8 +11,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
- * Goal which executes derby sql commands to generate a database or perform
- * other such tasks.
+ * Export the standard CEMeNT (Common Enumerations and Metadata to Normalize Terminology) taxonomies in
+ * a standard SNOMED format (no branch ids or effective date for concepts or relationships).
  * 
  * @goal export-cement
  * @phase process-resources
