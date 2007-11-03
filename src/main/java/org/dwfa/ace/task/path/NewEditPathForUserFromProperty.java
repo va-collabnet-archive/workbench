@@ -16,7 +16,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.UuidPrefixesForType5;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -120,22 +119,22 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
    protected static I_GetConceptData createComponents(String username, I_TermFactory tf, I_ConfigAceFrame activeProfile, TermEntry parentPathTermEntry) throws NoSuchAlgorithmException, UnsupportedEncodingException, TerminologyException, IOException {
       String fsDescription = username + " development editing path";
       
-      UUID type5ConceptId = Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, fsDescription);
+      UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, fsDescription);
 
       I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId, false, activeProfile);
 
-      tf.newDescription(Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + fsDescription), newPathConcept, "en",
+      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + fsDescription), newPathConcept, "en",
             fsDescription, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeProfile);
 
       String prefDesc = username + " dev path";
       
-      tf.newDescription(Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + prefDesc), newPathConcept, "en",
+      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + prefDesc), newPathConcept, "en",
             prefDesc, ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);
 
-      tf.newDescription(Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username), newPathConcept,
+      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username), newPathConcept,
             "en", username, ArchitectonicAuxiliary.Concept.USER_NAME.localize(), activeProfile);
 
-      tf.newDescription(Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "inbox"), newPathConcept,
+      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "inbox"), newPathConcept,
             "en", username, ArchitectonicAuxiliary.Concept.USER_INBOX.localize(), activeProfile);
 
       I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
@@ -145,7 +144,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
       I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
       I_GetConceptData relStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
-      UUID relId = Type5UuidFactory.get(UuidPrefixesForType5.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "relid");
+      UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "relid");
       tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability,
             relStatus, 0, activeProfile);
       return newPathConcept;
