@@ -22,7 +22,7 @@ import org.dwfa.tapi.impl.UniversalFixedDescription;
 import org.dwfa.tapi.impl.UniversalFixedRel;
 import org.dwfa.util.id.Type3UuidFactory;
 
-public class SNOMEDExtension {
+public class SNOMEDExtension implements I_AddToMemoryTermServer {
 	
 	private static Set<UUID> snomedIdsUsed;
 	

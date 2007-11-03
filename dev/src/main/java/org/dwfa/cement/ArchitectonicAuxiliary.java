@@ -855,9 +855,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             File conceptFile = new File(directory, "concepts.txt");
             File descFile = new File(directory, "descriptions.txt");
             File relFile = new File(directory, "relationships.txt");
-               File rootsFile = new File(directory, "roots.txt");
-               File extTypeFile = new File(directory, "extensions.txt");
-               File altIdFile = new File(directory, "alt_ids.txt");
+            File rootsFile = new File(directory, "roots.txt");
+            File extTypeFile = new File(directory, "extensions.txt");
+            File altIdFile = new File(directory, "alt_ids.txt");
 
             MemoryTermServer mts = new MemoryTermServer();
             LocalFixedTerminology.setStore(mts);
@@ -883,23 +883,23 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                Writer altIdWriter = new FileWriter(altIdFile);
 
                Writer conceptWriter = new FileWriter(conceptFile);
-            mts.writeConcepts(conceptWriter, altIdWriter);
+            mts.writeConcepts(conceptWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
             conceptWriter.close();
 
             Writer descWriter = new FileWriter(descFile);
-            mts.writeDescriptions(descWriter, altIdWriter);
+            mts.writeDescriptions(descWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
             descWriter.close();
 
             Writer relWriter = new FileWriter(relFile);
-            mts.writeRelationships(relWriter, altIdWriter);
+            mts.writeRelationships(relWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
             relWriter.close();
 
             Writer rootsWriter = new FileWriter(rootsFile);
-            mts.writeRoots(rootsWriter);
+            mts.writeRoots(rootsWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
             rootsWriter.close();
 
             Writer extensionTypeWriter = new FileWriter(extTypeFile);
-            mts.writeExtensionTypes(extensionTypeWriter, altIdWriter);
+            mts.writeExtensionTypes(extensionTypeWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
             extensionTypeWriter.close();
 
             I_ConceptualizeLocally[] descTypeOrder = new I_ConceptualizeLocally[] {
@@ -910,7 +910,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 I_DescribeConceptLocally typeDesc = extensionType.getDescription(descTypePriorityList);
                 File extensionFile = new File(directory, typeDesc.getText() + ".txt");
                 Writer extensionWriter = new FileWriter(extensionFile);
-                mts.writeExtension(extensionType, extensionWriter, altIdWriter);
+                mts.writeExtension(extensionType, extensionWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
                 extensionWriter.close();
             }
 

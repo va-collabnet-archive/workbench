@@ -25,6 +25,11 @@ import org.dwfa.tapi.impl.UniversalFixedIntExtension;
 import org.dwfa.tapi.impl.UniversalFixedRel;
 import org.dwfa.util.id.Type3UuidFactory;
 
+/**
+ * A taxonomy for organization sections of clinical documentation. 
+ * @author kec
+ *
+ */
 public class DocumentAuxiliary implements I_AddToMemoryTermServer {
 
 	

@@ -23,6 +23,8 @@ import java.util.UUID;
 */
 public class Type5UuidFactory {
 
+   public static UUID PATH_ID_FROM_FS_DESC = UUID.fromString("5a2e7786-3e41-11dc-8314-0800200c9a66");
+
 	public static final String  encoding = "8859_1";
 
 		public static UUID get(UUID namespace, String name) throws NoSuchAlgorithmException, UnsupportedEncodingException {
