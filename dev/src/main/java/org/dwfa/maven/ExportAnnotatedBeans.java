@@ -57,7 +57,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     private File outputDirectory;
 
     /**
-     * Location of the build directory.
+     * Location of the source directory.
      * 
      * @parameter expression="${project.build.sourceDirectory}"
      * @required

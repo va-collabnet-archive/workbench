@@ -26,8 +26,10 @@
       <item name="execute-main" href="plugins/execute-main-mojo.html"/>
       <item name="export-beans" href="plugins/export-beans-mojo.html"/>
       <item name="export-cement" href="plugins/export-cement-mojo.html"/>
+      <item name="export-cement-taxonomy" href="plugins/export-cement-taxonomy-mojo.html"/>
       <item name="generate-scripts" href="plugins/generate-scripts-mojo.html"/>
       <item name="join" href="plugins/join-mojo.html"/>
+      <item name="opcs-to-ace" href="plugins/opcs-to-ace-mojo.html"/>
       <item name="process-config" href="plugins/process-config-mojo.html"/>
       <item name="process-project-dirs" href="plugins/process-project-dirs-mojo.html"/>
       <item name="run-app" href="plugins/run-app-mojo.html"/>
