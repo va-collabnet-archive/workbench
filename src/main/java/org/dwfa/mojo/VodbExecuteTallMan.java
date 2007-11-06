@@ -136,6 +136,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
             HashSet<String> tallManWords = new HashSet<String>();
             String currentLine = in.readLine();
             while (currentLine != null) {
+                currentLine = currentLine.replaceAll("\"", "");
+                currentLine = currentLine.trim();
                 tallManWords.add(currentLine);
                 currentLine = in.readLine();
             }
