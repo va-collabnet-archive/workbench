@@ -3,6 +3,7 @@ package org.dwfa.mojo;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +25,9 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.mojo.compare.CompareOperator;
+import org.dwfa.mojo.compare.Match;
+import org.dwfa.mojo.compare.MonitorComponents;
 
 /**
  * Goal which monitors two branches for changes. Agreed changes are copied
@@ -37,7 +41,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
  *
  * @requiresDependencyResolution compile
  */
-public class VodbCopyBranches extends AbstractMojo {
+public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts {
 
 	/**
 	 * Branch to which the compared branches will be copied to, if they
@@ -55,6 +59,13 @@ public class VodbCopyBranches extends AbstractMojo {
 	private ConceptDescriptor updatedStatus;
 
 	/**
+	 * The updated status of any copied concepts.
+	 * @parameter
+	 * @required
+	 */
+	private ConceptDescriptor updatedStatusOnNewPath;
+
+	/**
 	 * Branches which will be compared.
 	 * @parameter
 	 * @required
@@ -66,12 +77,6 @@ public class VodbCopyBranches extends AbstractMojo {
 	 * @parameter
 	 */
 	private ConceptDescriptor rejectedStatus = null;
-
-	/**
-	 * The flagged status that will be accepted
-	 * @parameter
-	 */
-	private ConceptDescriptor acceptedStatus = null;
 
 	/**
 	 * The html output file location.
@@ -97,217 +102,126 @@ public class VodbCopyBranches extends AbstractMojo {
 	 */
 	private String outputTextFileName = "conflict_uuids.txt";
 
+	/**
+	 * Compare Operator used to test if the concepts should be copied to the new path
+	 * @parameter
+	 * @required
+	 */
+	private CompareOperator compareOperator;
+
+	I_Path copyToPath;
+
+	int agreedChanges = 0;
+	int conflicts = 0;
+	int conceptCount = 0;
+	MonitorComponents componentMonitor = null; 
+	I_TermFactory termFactory = null;
+	BufferedWriter textWriter = null;
+	int updatedStatusId;
+	int updatedStatusOnNewPathId;
 	
-	private class MonitorComponents implements I_ProcessConcepts {
+	public void processConcept(I_GetConceptData concept) throws Exception {
 
-		List<I_Position> positions = new LinkedList<I_Position>();
-		I_Path copyToPath;
-		
-		BufferedWriter textWriter;
-		I_TermFactory termFactory;
-		int flaggedStatusId;
-		int conflicts;
-		int conceptCount;
-		int agreedChanges;
+		List<Match> matches = componentMonitor.checkConcept(concept);
 
-		public MonitorComponents() throws Exception {
-			termFactory = LocalVersionedTerminology.get();
-			conflicts = 0;
-			conceptCount = 0;
-			agreedChanges = 0;
-		}
-
-		public void processConcept(I_GetConceptData concept) throws Exception {
-
-			if (rejectedStatus != null) {
-				flaggedStatusId = termFactory.getConcept(
-						rejectedStatus.getVerifiedConcept().getUids()).
-						getConceptId();
-			}
-
-			int updatedStatusId = termFactory.getConcept(
-					updatedStatus.getVerifiedConcept().getUids()).getConceptId();
-
-			List<I_ConceptAttributeTuple> allConceptAttributeTuples = new LinkedList<I_ConceptAttributeTuple>();
-			List<I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
-			List<I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
-
-			List<I_DescriptionTuple> allDescriptionTuples = new LinkedList<I_DescriptionTuple>();
-			List<I_DescriptionTuple> descriptionTuples1 = new LinkedList<I_DescriptionTuple>();
-			List<I_DescriptionTuple> descriptionTuples2 = new LinkedList<I_DescriptionTuple>();
-
-			List<I_RelTuple> allRelationshipTuples = new LinkedList<I_RelTuple>();
-			List<I_RelTuple> relationshipTuples1  = new LinkedList<I_RelTuple>();
-			List<I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();
-
-			// get latest concept attributes/descriptions/relationships
-			boolean attributesMatch = true;
-			boolean descriptionsMatch = true;
-			boolean relationshipsMatch = true;
-
-
-			for (int i = 0; i < positions.size()-1; i++) {
-				Set<I_Position> firstPosition = new HashSet<I_Position>();
-				firstPosition.add(positions.get(0));
-				Set<I_Position> secondPosition = new HashSet<I_Position>();
-				secondPosition.add(positions.get(i+1));
-
-				conceptAttributeTuples1 =
-					concept.getConceptAttributeTuples(null, firstPosition);				
-				conceptAttributeTuples2 =
-					concept.getConceptAttributeTuples(null, secondPosition);
-				if (rejectedStatus != null) {
-					if (!CompareComponents.attributeListsEqual(
-							conceptAttributeTuples1, conceptAttributeTuples2,
-							flaggedStatusId)) {
-						attributesMatch = false;
-						break;
-					}
-				} else if (!CompareComponents.attributeListsEqual(
-						conceptAttributeTuples1, conceptAttributeTuples2)) {
-					attributesMatch = false;
-					break;
-				}
-				descriptionTuples1 = concept.getDescriptionTuples(null, null,
-						firstPosition);
-				descriptionTuples2 = concept.getDescriptionTuples(null, null,
-						secondPosition);
-				if (rejectedStatus != null) {
-					if (!CompareComponents.descriptionListsEqual(
-							descriptionTuples1, descriptionTuples2,
-							flaggedStatusId)) {
-						descriptionsMatch = false;
-						break;
-					}
-				} else if (!CompareComponents.descriptionListsEqual(
-						descriptionTuples1, descriptionTuples2)) {
-					descriptionsMatch = false;
-					break;
-				}
-
-				relationshipTuples1 = concept.getSourceRelTuples(null, null,
-						firstPosition, false);
-				relationshipTuples2 = concept.getSourceRelTuples(null, null,
-						secondPosition, false);
-				if (rejectedStatus != null) {
-					if (!CompareComponents.relationshipListsEqual(
-							relationshipTuples1, relationshipTuples2,
-							flaggedStatusId)) {
-						relationshipsMatch = false;
-						break;
-					}
-				} else if (!CompareComponents.relationshipListsEqual(
-						relationshipTuples1, relationshipTuples2)) {
-					relationshipsMatch = false;
-					break;
-				}
-
-				if (allConceptAttributeTuples.size()==0) {
-					allConceptAttributeTuples.addAll(conceptAttributeTuples1);
-					allDescriptionTuples.addAll(descriptionTuples1);
-					allRelationshipTuples.addAll(relationshipTuples1);
-				}
-			}
-
-			// check if the latest tuples are equal (excluding criteria)
-			if (descriptionsMatch && relationshipsMatch && attributesMatch) {
-				agreedChanges++;
-				// copy latest attributes to new path/version
-				for (I_ConceptAttributeTuple tuple:
-					allConceptAttributeTuples) {
-					I_ConceptAttributePart newPart = tuple.duplicatePart();
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setPathId(copyToPath.getConceptId());
-					newPart.setConceptStatus(updatedStatusId);
-					tuple.getConVersioned().addVersion(newPart);
-				}
-				// copy latest descriptions to new path/version
-				for (I_DescriptionTuple tuple: allDescriptionTuples) {
-					I_DescriptionPart newPart = tuple.duplicatePart();
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setPathId(copyToPath.getConceptId());
-					newPart.setStatusId(updatedStatusId);
-					tuple.getDescVersioned().addVersion(newPart);
-				}
-				// copy latest relationships to new path/version
-				for (I_RelTuple tuple: allRelationshipTuples) {
-					I_RelPart newPart = tuple.duplicatePart();
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setPathId(copyToPath.getConceptId());
-					newPart.setStatusId(updatedStatusId);
-					tuple.getRelVersioned().addVersion(newPart);
-				}
-			} else {
-				conflicts++;
-				if (textWriter == null) {
-					outputTextDirectory.mkdirs();
-					textWriter = new BufferedWriter(new BufferedWriter(
-							new FileWriter(outputTextDirectory + File.separator
-									+ outputTextFileName)));
-				}
-				textWriter.append(concept.getUids().toString());
-			}
-
-			conceptCount++;
-			termFactory.addUncommitted(concept);
+		// check if the latest tuples are equal (excluding criteria)
+		if (compareOperator.compare(matches)) {
+			agreedChanges++;
+			// copy latest attributes to new path/version
 			
+			Set<I_ConceptAttributeTuple> allConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
+			Set<I_DescriptionTuple> allDescriptionTuples = new HashSet<I_DescriptionTuple>();
+			Set<I_RelTuple> allRelationshipTuples = new HashSet<I_RelTuple>();
+			
+			Set<I_ConceptAttributeTuple> matchConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
+			Set<I_DescriptionTuple> matchDescriptionTuples = new HashSet<I_DescriptionTuple>();
+			Set<I_RelTuple> matchRelationshipTuples = new HashSet<I_RelTuple>();
+			
+			for (Match match: matches) {				
+				allConceptAttributeTuples.addAll(match.matchConceptAttributeTuples);
+				allDescriptionTuples.addAll(match.matchDescriptionTuples);
+				allRelationshipTuples.addAll(match.matchRelationshipTuples);
+				if (matchConceptAttributeTuples.size()==0) {
+					matchConceptAttributeTuples.addAll(match.matchConceptAttributeTuples);
+					matchDescriptionTuples.addAll(match.matchDescriptionTuples);
+					matchRelationshipTuples.addAll(match.matchRelationshipTuples);
+				}
+			}
+
+			for (I_ConceptAttributeTuple tuple: allConceptAttributeTuples) {
+				I_ConceptAttributePart newPart = tuple.duplicatePart();
+				newPart.setVersion(Integer.MAX_VALUE);
+				newPart.setConceptStatus(updatedStatusId);
+				tuple.getConVersioned().addVersion(newPart);
+			}
+			for (I_DescriptionTuple tuple: allDescriptionTuples) {
+				I_DescriptionPart newPart = tuple.duplicatePart();
+				newPart.setVersion(Integer.MAX_VALUE);
+				newPart.setStatusId(updatedStatusId);
+				newPart.setText(tuple.getText());
+				tuple.getDescVersioned().addVersion(newPart);
+			}
+			for (I_RelTuple tuple: allRelationshipTuples) {
+				I_RelPart newPart = tuple.duplicatePart();
+				newPart.setVersion(Integer.MAX_VALUE);
+				newPart.setStatusId(updatedStatusId);
+				tuple.getRelVersioned().addVersion(newPart);
+			}
+
+			for (I_ConceptAttributeTuple tuple: matchConceptAttributeTuples) {
+				I_ConceptAttributePart newPart = tuple.duplicatePart();
+				newPart.setVersion(Integer.MAX_VALUE);
+				newPart.setPathId(copyToPath.getConceptId());
+				newPart.setConceptStatus(updatedStatusOnNewPathId);
+				tuple.getConVersioned().addVersion(newPart);
+			}
+			// copy latest descriptions to new path/version
+			for (I_DescriptionTuple tuple: matchDescriptionTuples) {
+				I_DescriptionPart newPart = tuple.duplicatePart();
+				newPart.setVersion(Integer.MAX_VALUE);
+				newPart.setPathId(copyToPath.getConceptId());					
+				newPart.setStatusId(updatedStatusOnNewPathId);
+				newPart.setText(tuple.getText());
+				tuple.getDescVersioned().addVersion(newPart);
+			}
+			// copy latest relationships to new path/version
+			for (I_RelTuple tuple: matchRelationshipTuples) {
+				I_RelPart newPart = tuple.duplicatePart();
+				newPart.setVersion(Integer.MAX_VALUE);
+				newPart.setPathId(copyToPath.getConceptId());
+				newPart.setStatusId(updatedStatusOnNewPathId);
+				tuple.getRelVersioned().addVersion(newPart);
+			}
+			termFactory.addUncommitted(concept);
+
+		} else {
+			conflicts++;
+			if (textWriter == null) {
+				outputTextDirectory.mkdirs();
+				textWriter = new BufferedWriter(new BufferedWriter(
+						new FileWriter(outputTextDirectory + File.separator
+								+ outputTextFileName)));
+			}
+			textWriter.append(concept.getUids().toString());
 		}
 
-		public BufferedWriter getTextWriter() {
-			return textWriter;
-		}
-
-		public void setTextWriter(BufferedWriter textWriter) {
-			this.textWriter = textWriter;
-		}
-
-		public int getConflicts() {
-			return conflicts;
-		}
-
-		public void setConflicts(int conflicts) {
-			this.conflicts = conflicts;
-		}
-
-		public int getConceptCount() {
-			return conceptCount;
-		}
-
-		public void setConceptCount(int conceptCount) {
-			this.conceptCount = conceptCount;
-		}
-
-		public int getAgreedChanges() {
-			return agreedChanges;
-		}
-
-		public void setAgreedChanges(int agreedChanges) {
-			this.agreedChanges = agreedChanges;
-		}
-
-		public List<I_Position> getPositions() {
-			return positions;
-		}
-
-		public void setPositions(List<I_Position> positions) {
-			this.positions = positions;
-		}
-
-		public I_Path getCopyToPath() {
-			return copyToPath;
-		}
-
-		public void setCopyToPath(I_Path copyToPath) {
-			this.copyToPath = copyToPath;
-		}
+		conceptCount++;
 	}
 
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		componentMonitor = new MonitorComponents(rejectedStatus);
+		termFactory = LocalVersionedTerminology.get();
 		try {
 			CompareComponents.reject = false;
-			MonitorComponents componentMonitor = new MonitorComponents();
-			
+
+
+			updatedStatusId = termFactory.getConcept(
+					updatedStatus.getVerifiedConcept().getUids()).getConceptId();
+
+			updatedStatusOnNewPathId = termFactory.getConcept(
+					updatedStatusOnNewPath.getVerifiedConcept().getUids()).getConceptId();
+
 			I_Path architectonicPath = termFactory.getPath(
 					ArchitectonicAuxiliary.
 					Concept.ARCHITECTONIC_BRANCH.getUids());
@@ -316,27 +230,26 @@ public class VodbCopyBranches extends AbstractMojo {
 					Integer.MAX_VALUE);
 			Set<I_Position> origins = new HashSet<I_Position>();
 			origins.add(latestOnArchitectonicPath);
-			
+
 			// get the branch to copy to concept/path
 			I_GetConceptData copyToConcept =
 				branchToCopyTo.getVerifiedConcept();
-			componentMonitor.setCopyToPath(termFactory.newPath(origins, copyToConcept));
-			
+			copyToPath = termFactory.newPath(origins, copyToConcept);
+
 			// get all the positions for the branches to be compared
 			List<I_Position> positions = new LinkedList<I_Position>();
 			for (ConceptDescriptor branch : branchesToCompare) {
 				I_GetConceptData compareConcept = branch.getVerifiedConcept();
-				
+
 				I_Position comparePosition = termFactory.newPosition(
 						termFactory.newPath(origins, compareConcept),
 						Integer.MAX_VALUE);
 				positions.add(comparePosition);
 			}
 			componentMonitor.setPositions(positions);
-			
-			termFactory.iterateConcepts(componentMonitor);
-			//termFactory.commit();
-			if (componentMonitor.getConflicts() > 0) {
+			termFactory.iterateConcepts(this);
+
+			if (conflicts > 0) {
 				outputHtmlDirectory.mkdirs();
 				BufferedWriter htmlWriter = new BufferedWriter(
 						new BufferedWriter(new FileWriter(
@@ -344,19 +257,21 @@ public class VodbCopyBranches extends AbstractMojo {
 								+ File.separator
 								+ outputHtmlFileName)));
 				htmlWriter.append("Monitored "
-						+ componentMonitor.getConceptCount() + " components.");
+						+ conceptCount + " components.");
 				htmlWriter.append("<br>");
 				htmlWriter.append("Number of agreed changes: "
-						+ componentMonitor.getAgreedChanges());
+						+ agreedChanges);
 				htmlWriter.append("<br>");
 				htmlWriter.append("Number of conflicts: "
-						+ componentMonitor.getConflicts());
+						+ conflicts);
 
 				htmlWriter.close();
 			}
 
-			if (componentMonitor.getTextWriter() != null) {
-				componentMonitor.getTextWriter().close();
+			System.out.println("Finished copying\nFound " + conflicts + " conflicts\nCopied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
+			
+			if (textWriter != null) {
+				textWriter.close();
 			}
 
 		} catch (Exception e) {
