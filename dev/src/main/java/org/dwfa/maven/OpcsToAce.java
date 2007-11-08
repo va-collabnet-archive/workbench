@@ -19,7 +19,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * Convert an OPCS-4 file to a set of ACE formatted files.
+ * Convert an OPCS-4 file to a set of <a href='https://mgr.cubit.aceworkspace.net/apps/dwfa/ace-mojo/dataimport.html'>ACE formatted</a> files.
  * 
  * @goal opcs-to-ace
  * @phase process-resources
