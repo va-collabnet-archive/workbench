@@ -141,6 +141,28 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                       new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_198_DESC(new String[] {"read 198 desc (description type)", "read 198 desc"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                                
+                  READ_60_DESC(new String[] {"read 60 desc (description type)", "read 60 desc"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_30_DESC(new String[] {"read 30 desc (description type)", "read 30 desc"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_SYN_198_DESC(new String[] {"synonym read 198 description (description type)", "synonym read 198 description"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                                        
+                  READ_SYN_60_DESC(new String[] {"synonym read 60 description (description type)", "synonym read 60 description"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                                
+                  READ_SYN_30_DESC(new String[] {"synonym read 30 description (description type)", "synonym read 30 description"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_KEY_DESC(new String[] {"read key (description type)", "read key"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
                   FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
                           new String[] {"fully specified name (description type)", "fully specified name"}, null,
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),

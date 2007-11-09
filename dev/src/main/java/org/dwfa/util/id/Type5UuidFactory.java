@@ -29,6 +29,20 @@ public class Type5UuidFactory {
    public static UUID OPCS_DESC_ID = UUID.fromString("26854023-8bd0-11dc-8314-0800200c9a66");
    public static UUID OPCS_REL_ID = UUID.fromString("26854024-8bd0-11dc-8314-0800200c9a66");
    
+   public static UUID READV3_CONCEPT_ID = UUID.fromString("45419916-8ecd-11dc-8314-0800200c9a66");
+   public static UUID READV3_REL_ID = UUID.fromString("45419917-8ecd-11dc-8314-0800200c9a66");
+   public static UUID READV3_TERM30_DESC_ID = UUID.fromString("45419918-8ecd-11dc-8314-0800200c9a66");
+   public static UUID READV3_TERM60_DESC_ID = UUID.fromString("45419919-8ecd-11dc-8314-0800200c9a66");
+   public static UUID READV3_TERM198_DESC_ID = UUID.fromString("4541991a-8ecd-11dc-8314-0800200c9a66");
+    
+   
+   
+   
+
+
+   
+   
+   
 	public static final String  encoding = "8859_1";
 
 		public static UUID get(UUID namespace, String name) throws NoSuchAlgorithmException, UnsupportedEncodingException {
