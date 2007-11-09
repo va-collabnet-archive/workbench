@@ -266,7 +266,12 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                             new I_ConceptualizeUniversally[] { ACTIVE }),
                     PROMOTED("promoted",
                             new I_ConceptualizeUniversally[] { ACTIVE }),
-               REASSIGNED("reassigned",
+                            
+                    OPTIONAL("optional",
+                             new I_ConceptualizeUniversally[] { ACTIVE }),
+               
+                                    
+                            REASSIGNED("reassigned",
                      new I_ConceptualizeUniversally[] { ACTIVE }),
                      DUAL_REVIEWED_AND_REASSIGNED("dual reviewed and reassigned",
                            new I_ConceptualizeUniversally[] { REASSIGNED }),
@@ -321,6 +326,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     IMPLIED_RELATIONSHIP("implied",
                             new I_ConceptualizeUniversally[] { INACTIVE }),
                     MOVED_ELSEWHERE("moved elsewhere",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    EXTINCT("extinct",
                             new I_ConceptualizeUniversally[] { INACTIVE }),
             CONSTANT("constant",
                     new I_ConceptualizeUniversally[] { STATUS }),
