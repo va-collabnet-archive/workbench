@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_ProcessPaths;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
@@ -40,8 +42,9 @@ import org.dwfa.mojo.compare.MonitorComponents;
  * @goal vodb-copy-branches
  *
  * @requiresDependencyResolution compile
+ * @author Tore Fjellheim
  */
-public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts {
+public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts, I_ProcessPaths {
 
 	/**
 	 * Branch to which the compared branches will be copied to, if they
@@ -68,9 +71,14 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 	/**
 	 * Branches which will be compared.
 	 * @parameter
-	 * @required
 	 */
 	private ConceptDescriptor[] branchesToCompare;
+
+	/**
+	 * Branches which will be compared.
+	 * @parameter
+	 */
+	private ConceptDescriptor[] branchOrigins;
 
 	/**
 	 * The flagged status that will be rejected
@@ -119,7 +127,8 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 	BufferedWriter textWriter = null;
 	int updatedStatusId;
 	int updatedStatusOnNewPathId;
-	
+	List<I_GetConceptData> totalBranches = new LinkedList<I_GetConceptData>();
+
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
 		List<Match> matches = componentMonitor.checkConcept(concept);
@@ -128,15 +137,15 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 		if (compareOperator.compare(matches)) {
 			agreedChanges++;
 			// copy latest attributes to new path/version
-			
+
 			Set<I_ConceptAttributeTuple> allConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
 			Set<I_DescriptionTuple> allDescriptionTuples = new HashSet<I_DescriptionTuple>();
 			Set<I_RelTuple> allRelationshipTuples = new HashSet<I_RelTuple>();
-			
+
 			Set<I_ConceptAttributeTuple> matchConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
 			Set<I_DescriptionTuple> matchDescriptionTuples = new HashSet<I_DescriptionTuple>();
 			Set<I_RelTuple> matchRelationshipTuples = new HashSet<I_RelTuple>();
-			
+
 			for (Match match: matches) {				
 				allConceptAttributeTuples.addAll(match.matchConceptAttributeTuples);
 				allDescriptionTuples.addAll(match.matchDescriptionTuples);
@@ -215,6 +224,9 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 		try {
 			CompareComponents.reject = false;
 
+			if (branchOrigins != null) {
+				termFactory.iteratePaths(this);
+			}
 
 			updatedStatusId = termFactory.getConcept(
 					updatedStatus.getVerifiedConcept().getUids()).getConceptId();
@@ -238,8 +250,14 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 
 			// get all the positions for the branches to be compared
 			List<I_Position> positions = new LinkedList<I_Position>();
-			for (ConceptDescriptor branch : branchesToCompare) {
-				I_GetConceptData compareConcept = branch.getVerifiedConcept();
+			if (branchesToCompare!=null) {
+				for (ConceptDescriptor branch : branchesToCompare) {
+					I_GetConceptData compareConcept = branch.getVerifiedConcept();
+					totalBranches.add(compareConcept);
+				}
+			}
+
+			for (I_GetConceptData compareConcept : totalBranches) {
 
 				I_Position comparePosition = termFactory.newPosition(
 						termFactory.newPath(origins, compareConcept),
@@ -269,7 +287,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 			}
 
 			System.out.println("Finished copying\nFound " + conflicts + " conflicts\nCopied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
-			
+
 			if (textWriter != null) {
 				textWriter.close();
 			}
@@ -277,6 +295,29 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts 
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
+	}
+
+	List<I_Path> originBasedPath = new LinkedList<I_Path>();
+	public void processPath(I_Path path) throws Exception {
+
+		Iterator<I_Position> it = path.getOrigins().iterator();
+		while (it.hasNext()) {
+			I_Position pos = it.next();
+			int pathId = pos.getPath().getConceptId();
+			for (int i = 0; i < branchOrigins.length; i++) {
+				int originId = branchOrigins[i].getVerifiedConcept().getConceptId();				
+				if (pathId == originId) {
+					/*
+					 * This path needs to be checked because
+					 * it has a origin which is in the list of specified
+					 * origins
+					 * */
+					System.out.println("the path is: " + termFactory.getConcept(path.getConceptId()).getDescriptions().iterator().next().getTuples().iterator().next().getText());
+					totalBranches.add(termFactory.getConcept(path.getConceptId()));
+				}
+			}
+		}
+
 	}
 
 }

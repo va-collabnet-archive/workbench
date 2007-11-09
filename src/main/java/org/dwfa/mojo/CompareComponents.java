@@ -15,10 +15,10 @@ public class CompareComponents {
 
 	public static boolean reject = true;
 	public static boolean compareToFlagged(int nid, int flagged) {
-		if (reject) {
+		if (!reject) {
 			return nid==flagged;
 		} else {
-			return nid!=flagged;
+			return (!(nid==flagged));
 		}
 	}
 	

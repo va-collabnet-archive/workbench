@@ -49,6 +49,9 @@ public class MonitorComponents  {
 					getConceptId();
 		}
 
+		
+
+		
 		// get latest concept attributes/descriptions/relationships
 		boolean attributesMatch = true;
 		boolean descriptionsMatch = true;
@@ -66,6 +69,42 @@ public class MonitorComponents  {
 		
 		List<Match> matches = new ArrayList<Match>();
 
+		/*
+		 * If there is only one position here, then only compare the concept attributes
+		 * to the required status.  
+		 */
+		if (positions.size()==1) {
+			boolean ok = true;
+			Set<I_Position> firstPosition = new HashSet<I_Position>();
+			firstPosition.add(positions.get(0));
+			conceptAttributeTuples1 =
+				concept.getConceptAttributeTuples(null, firstPosition);
+			descriptionTuples1 = concept.getDescriptionTuples(null, null,
+					firstPosition);
+			relationshipTuples1 = concept.getSourceRelTuples(null, null,
+					firstPosition, false);
+			
+			for (I_ConceptAttributeTuple tuple: conceptAttributeTuples1) {
+				if (!CompareComponents.compareToFlagged(tuple.getConceptStatus(), flaggedStatusId)) {
+					ok = false;
+				}
+			}
+			for (I_DescriptionTuple tuple: descriptionTuples1) {
+				if (!CompareComponents.compareToFlagged(tuple.getStatusId(), flaggedStatusId)) {
+					ok = false;
+				}
+			}
+			for (I_RelTuple tuple: relationshipTuples1) {
+				if (!CompareComponents.compareToFlagged(tuple.getStatusId(), flaggedStatusId)) {
+					ok = false;
+				}
+			}
+			if (ok) {
+				Match match = new Match(positions.get(0),positions.get(0));
+				matches.add(match);
+			}
+		}
+		
 		for (int j = 0; j < positions.size()-1; j++) {
 			Set<I_Position> firstPosition = new HashSet<I_Position>();
 			firstPosition.add(positions.get(j));
@@ -75,7 +114,9 @@ public class MonitorComponents  {
 					firstPosition);
 			relationshipTuples1 = concept.getSourceRelTuples(null, null,
 					firstPosition, false);
+			
 
+			
 			for (int i = j; i < positions.size()-1; i++) {
 				Set<I_Position> secondPosition = new HashSet<I_Position>();
 				secondPosition.add(positions.get(i+1));
