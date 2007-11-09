@@ -17,11 +17,11 @@ public class DescriptionValidator extends SimpleValidator {
    @Override
    protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf) throws IOException, TerminologyException {
       /*
-       * The universal bean descriptions must be converted and compared with a thin descriptios from the term factory. 
+       * The universal bean descriptions must be converted and compared with a thin descriptios from the term factory.
        * This validator will return false if, for each description in the UniverasalAceBean:
        * 1. The concept ids are not equal
        * 2. One of the starting descriptions (descriptions whose time is not Long.MAX_VALUE)
-       * 3. The number of starting descriptions equals the number of descriptions 
+       * 3. The number of starting descriptions equals the number of descriptions
        */
       for (UniversalAceDescription desc : bean.getDescriptions()) {
          Set<I_DescriptionPart> startParts = new HashSet<I_DescriptionPart>();
@@ -39,16 +39,19 @@ public class DescriptionValidator extends SimpleValidator {
                  newPart.setText(part.getText());
                  newPart.setTypeId(tf.uuidToNative(part.getTypeId()));
                  newPart.setVersion(tf.convertToThinVersion(part.getTime()));
+
+                 startParts.add(newPart);
                  if (thinDesc.getVersions().contains(newPart) == false) {
                      return false; //test 2
-                 } 
+                 }
              }
          }
          if (startParts.size() != thinDesc.getVersions().size()) {
+            System.out.println("number of description parts is different");
             return false; // test 3
          }
       }
-      
+
       //passed all tests for all descriptions
       return true;
    }
