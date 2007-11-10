@@ -2,6 +2,14 @@ package org.dwfa.vodb.bind;
 
 import java.util.List;
 
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
@@ -74,7 +82,7 @@ public class ThinExtBinder extends TupleBinding {
         this.fixedOnly = fixedOnly;
     }
 
-    public ThinExtByRefVersioned entryToObject(TupleInput ti) {
+    public I_ThinExtByRefVersioned entryToObject(TupleInput ti) {
         int refsetId = ti.readInt();
         int memberId = ti.readInt();
         int componentId = ti.readInt();
@@ -82,7 +90,7 @@ public class ThinExtBinder extends TupleBinding {
         int typeId = getExtensionType(type);
 
         int partCount = ti.readInt();
-        ThinExtByRefVersioned versioned = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
+        I_ThinExtByRefVersioned versioned = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
         if (fixedOnly) {
             return versioned;
         }
@@ -203,7 +211,7 @@ public class ThinExtBinder extends TupleBinding {
      */
     @SuppressWarnings("unchecked")
     public void objectToEntry(Object obj, TupleOutput to) {
-        ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) obj;
+        I_ThinExtByRefVersioned versioned = (I_ThinExtByRefVersioned) obj;
         to.writeInt(versioned.getRefsetId());
         to.writeInt(versioned.getMemberId());
         to.writeInt(versioned.getComponentId());
@@ -215,7 +223,7 @@ public class ThinExtBinder extends TupleBinding {
         switch (extType) {
         case BOOLEAN:
             List<ThinExtByRefPartBoolean> booleanParts = (List<ThinExtByRefPartBoolean>) versioned.getVersions();
-            for (ThinExtByRefPartBoolean part : booleanParts) {
+            for (I_ThinExtByRefPartBoolean part : booleanParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -224,7 +232,7 @@ public class ThinExtBinder extends TupleBinding {
             break;
         case STRING:
             List<ThinExtByRefPartString> stringParts = (List<ThinExtByRefPartString>) versioned.getVersions();
-            for (ThinExtByRefPartString part : stringParts) {
+            for (I_ThinExtByRefPartString part : stringParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -233,7 +241,7 @@ public class ThinExtBinder extends TupleBinding {
             break;
         case CONCEPT:
             List<ThinExtByRefPartConcept> conceptParts = (List<ThinExtByRefPartConcept>) versioned.getVersions();
-            for (ThinExtByRefPartConcept part : conceptParts) {
+            for (I_ThinExtByRefPartConcept part : conceptParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -243,7 +251,7 @@ public class ThinExtBinder extends TupleBinding {
         case MEASUREMENT:
             List<ThinExtByRefPartMeasurement> measurementParts = (List<ThinExtByRefPartMeasurement>) versioned
                     .getVersions();
-            for (ThinExtByRefPartMeasurement part : measurementParts) {
+            for (I_ThinExtByRefPartMeasurement part : measurementParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -254,7 +262,7 @@ public class ThinExtBinder extends TupleBinding {
 
         case INTEGER:
             List<ThinExtByRefPartInteger> intParts = (List<ThinExtByRefPartInteger>) versioned.getVersions();
-            for (ThinExtByRefPartInteger part : intParts) {
+            for (I_ThinExtByRefPartInteger part : intParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -263,7 +271,7 @@ public class ThinExtBinder extends TupleBinding {
             break;
         case LANGUAGE:
             List<ThinExtByRefPartLanguage> langParts = (List<ThinExtByRefPartLanguage>) versioned.getVersions();
-            for (ThinExtByRefPartLanguage part : langParts) {
+            for (I_ThinExtByRefPartLanguage part : langParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -275,7 +283,7 @@ public class ThinExtBinder extends TupleBinding {
         case SCOPED_LANGUAGE:
             List<ThinExtByRefPartLanguageScoped> scopedLangParts = (List<ThinExtByRefPartLanguageScoped>) versioned
                     .getVersions();
-            for (ThinExtByRefPartLanguageScoped part : scopedLangParts) {
+            for (I_ThinExtByRefPartLanguageScoped part : scopedLangParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
@@ -292,7 +300,7 @@ public class ThinExtBinder extends TupleBinding {
         }
     }
 
-    public static EXT_TYPE getExtensionType(ThinExtByRefVersioned versioned) {
+    public static EXT_TYPE getExtensionType(I_ThinExtByRefVersioned versioned) {
         if (versioned.getVersions() == null || versioned.getVersions().size() == 0) {
             try {
                 if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(

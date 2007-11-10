@@ -10,6 +10,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalIdList;
@@ -92,7 +93,7 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
       } else if (UniversalIdList.class.isAssignableFrom(change.getClass())) {
          writeIds((UniversalIdList) change, time);
       } else if (ExtensionByReferenceBean.class.isAssignableFrom(change.getClass())) {
-         writeExtension((ExtensionByReferenceBean) change, time);
+         writeExtension((I_GetExtensionData) change, time);
       } else {
          throw new IOException("Can't handle class: " + change.getClass().getName());
       }
@@ -110,7 +111,7 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
       }
    }
 
-   private void writeExtension(ExtensionByReferenceBean ebrBean, long time) throws IOException {
+   private void writeExtension(I_GetExtensionData ebrBean, long time) throws IOException {
       try {
          UniversalAceExtByRefBean bean = ebrBean.getUniversalAceBean();
          tempOut.writeObject(bean);

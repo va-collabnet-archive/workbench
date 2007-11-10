@@ -17,6 +17,9 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
@@ -25,7 +28,7 @@ import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.je.DatabaseException;
 
-public class ExtensionByReferenceBean implements I_Transact {
+public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 
     private static WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>> ebrBeans = new WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>>();
 
@@ -52,19 +55,19 @@ public class ExtensionByReferenceBean implements I_Transact {
         return ebrBean;
     }
 
-    public static ExtensionByReferenceBean make(UUID uid, ThinExtByRefVersioned extension) throws TerminologyException,
+    public static I_GetExtensionData make(UUID uid, I_ThinExtByRefVersioned extension) throws TerminologyException,
             IOException {
         return make(AceConfig.getVodb().uuidToNative(uid), extension);
     }
 
-    public static ExtensionByReferenceBean makeNew(UUID uid, ThinExtByRefVersioned extension)
+    public static I_GetExtensionData makeNew(UUID uid, I_ThinExtByRefVersioned extension)
             throws TerminologyException, IOException {
         return makeNew(AceConfig.getVodb().uuidToNative(uid), extension);
     }
 
     private static HashSet<ExtensionByReferenceBean> newExtensions = new HashSet<ExtensionByReferenceBean>();
 
-    public static ExtensionByReferenceBean makeNew(int memberId, ThinExtByRefVersioned extension) {
+    public static ExtensionByReferenceBean makeNew(int memberId, I_ThinExtByRefVersioned extension) {
         ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
         ebrBean.firstCommit = true;
         WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
@@ -76,7 +79,7 @@ public class ExtensionByReferenceBean implements I_Transact {
         return ebrBean;
     }
 
-    public static ExtensionByReferenceBean make(int memberId, ThinExtByRefVersioned extension) {
+    public static ExtensionByReferenceBean make(int memberId, I_ThinExtByRefVersioned extension) {
         ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
         WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
         if (ref != null) {
@@ -87,18 +90,18 @@ public class ExtensionByReferenceBean implements I_Transact {
         return ebrBean;
     }
 
-    public static ExtensionByReferenceBean get(UUID uid) throws TerminologyException, IOException {
+    public static I_GetExtensionData get(UUID uid) throws TerminologyException, IOException {
         return get(AceConfig.getVodb().uuidToNative(uid));
     }
 
-    public static ExtensionByReferenceBean get(Collection<UUID> uids) throws TerminologyException, IOException {
+    public static I_GetExtensionData get(Collection<UUID> uids) throws TerminologyException, IOException {
         return get(AceConfig.getVodb().uuidToNative(uids));
     }
 
-    public static Collection<ExtensionByReferenceBean> getNewExtensions(int componentId) {
-        List<ExtensionByReferenceBean> returnValues = new ArrayList<ExtensionByReferenceBean>();
-        for (ExtensionByReferenceBean newEbr : newExtensions) {
-            if (newEbr.extension.getComponentId() == componentId) {
+    public static Collection<I_GetExtensionData> getNewExtensions(int componentId) throws IOException {
+        List<I_GetExtensionData> returnValues = new ArrayList<I_GetExtensionData>();
+        for (I_GetExtensionData newEbr : newExtensions) {
+            if (newEbr.getExtension().getComponentId() == componentId) {
                 returnValues.add(newEbr);
             }
         }
@@ -109,7 +112,7 @@ public class ExtensionByReferenceBean implements I_Transact {
 
     private boolean firstCommit = false;
 
-    private ThinExtByRefVersioned extension;
+    private I_ThinExtByRefVersioned extension;
 
     private static int dataVersion = 1;
 
@@ -146,7 +149,7 @@ public class ExtensionByReferenceBean implements I_Transact {
         }
         try {
             if (extension != null) {
-                for (ThinExtByRefPart p : extension.getVersions()) {
+                for (I_ThinExtByRefPart p : extension.getVersions()) {
                     boolean changed = false;
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
@@ -175,7 +178,10 @@ public class ExtensionByReferenceBean implements I_Transact {
         firstCommit = false;
     }
 
-    public ThinExtByRefVersioned getExtension() throws IOException {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_GetExtensionData#getExtension()
+    */
+   public I_ThinExtByRefVersioned getExtension() throws IOException {
         if (extension == null) {
             try {
                 extension = AceConfig.getVodb().getExtension(memberId);
@@ -186,12 +192,15 @@ public class ExtensionByReferenceBean implements I_Transact {
         return extension;
     }
 
-    public UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_GetExtensionData#getUniversalAceBean()
+    */
+   public UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException {
         I_TermFactory tf = LocalVersionedTerminology.get();
         UniversalAceExtByRefBean uEbrBean = new UniversalAceExtByRefBean(tf.getUids(getExtension().getRefsetId()), tf
                 .getUids(getExtension().getMemberId()), tf.getUids(getExtension().getComponentId()), tf
                 .getUids(getExtension().getTypeId()));
-        for (ThinExtByRefPart part : getExtension().getVersions()) {
+        for (I_ThinExtByRefPart part : getExtension().getVersions()) {
             uEbrBean.getVersions().add(part.getUniversalPart());
         }
         return uEbrBean;
@@ -218,7 +227,10 @@ public class ExtensionByReferenceBean implements I_Transact {
         return firstCommit;
     }
 
-    public int getMemberId() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_GetExtensionData#getMemberId()
+    */
+   public int getMemberId() {
         return memberId;
     }
 

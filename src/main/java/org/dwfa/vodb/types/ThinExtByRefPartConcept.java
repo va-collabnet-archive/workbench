@@ -4,12 +4,14 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartConcept;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class ThinExtByRefPartConcept extends ThinExtByRefPart {
+public class ThinExtByRefPartConcept extends ThinExtByRefPart implements I_ThinExtByRefPartConcept {
    private int conceptId;
 
    public ThinExtByRefPartConcept(ThinExtByRefPartConcept another) {
@@ -23,10 +25,16 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart {
    }
 
 
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#getConceptId()
+    */
    public int getConceptId() {
       return conceptId;
    }
 
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#setConceptId(int)
+    */
    public void setConceptId(int conceptId) {
       this.conceptId = conceptId;
    }
@@ -41,6 +49,9 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart {
       return false;
    }
    
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#getUniversalPart()
+    */
    @Override
    public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
       I_TermFactory tf = LocalVersionedTerminology.get();
@@ -53,7 +64,7 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart {
    }
 
    @Override
-   public ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicatePart() {
       return new ThinExtByRefPartConcept(this);
    }
 

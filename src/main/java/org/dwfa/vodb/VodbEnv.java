@@ -69,6 +69,16 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
@@ -116,7 +126,13 @@ import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
-import org.dwfa.vodb.types.ThinExtByRefPart;
+import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
+import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartInteger;
+import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
+import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
+import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
+import org.dwfa.vodb.types.ThinExtByRefPartString;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
@@ -882,12 +898,12 @@ public class VodbEnv implements I_ImplementTermFactory {
         throw new DatabaseException("Rel: " + relId + " not found.");
     }
 
-    public ThinExtByRefVersioned getExtension(int memberId) throws DatabaseException {
+    public I_ThinExtByRefVersioned getExtension(int memberId) throws DatabaseException {
         DatabaseEntry extKey = new DatabaseEntry();
         DatabaseEntry extValue = new DatabaseEntry();
         intBinder.objectToEntry(memberId, extKey);
         if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-            return (ThinExtByRefVersioned) extBinder.entryToObject(extValue);
+            return (I_ThinExtByRefVersioned) extBinder.entryToObject(extValue);
         }
         throw new DatabaseException("Ext: " + memberId + " not found.");
     }
@@ -1012,7 +1028,8 @@ public class VodbEnv implements I_ImplementTermFactory {
         return matches;
     }
 
-    public List<ExtensionByReferenceBean> getExtensionsForComponent(int componentId) throws DatabaseException {
+    public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException {
+       try {
         Stopwatch timer = null;
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Getting extensions from componentId for: " + componentId);
@@ -1026,11 +1043,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 
         SecondaryCursor mySecCursor = getComponentToExtMap().openSecondaryCursor(null, null);
         OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
-        List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
+        List<I_GetExtensionData> matches = new ArrayList<I_GetExtensionData>();
         int count = 0;
         int rejected = 0;
         while (retVal == OperationStatus.SUCCESS) {
-            ThinExtByRefVersioned extFromComponentId = (ThinExtByRefVersioned) extBinder.entryToObject(foundData);
+            I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
             if (extFromComponentId.getComponentId() == componentId) {
                 count++;
                 matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
@@ -1046,6 +1063,9 @@ public class VodbEnv implements I_ImplementTermFactory {
                     + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
         }
         return matches;
+       } catch (DatabaseException ex) {
+          throw new ToIoException(ex);
+       }
     }
 
     public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
@@ -1064,7 +1084,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
         List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
         while (retVal == OperationStatus.SUCCESS) {
-            ThinExtByRefVersioned extFromComponentId = (ThinExtByRefVersioned) extBinder.entryToObject(foundData);
+            I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
             if (extFromComponentId.getRefsetId() == refsetId) {
                 matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
             } else {
@@ -1978,7 +1998,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         relDb.put(null, key, value);
     }
 
-    public void writeExt(ThinExtByRefVersioned ext) throws DatabaseException {
+    public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException, IOException {
         DatabaseEntry key = new DatabaseEntry();
         DatabaseEntry value = new DatabaseEntry();
         if (debugWrites) {
@@ -1988,7 +2008,7 @@ public class VodbEnv implements I_ImplementTermFactory {
             if (refsetToExtMap == null) {
                 throw new DatabaseException("refsetToExtMap is not initialized. ");
             }
-            HashSet<ThinExtByRefPart> partSet = new HashSet<ThinExtByRefPart>(ext.getVersions());
+            HashSet<I_ThinExtByRefPart> partSet = new HashSet<I_ThinExtByRefPart>(ext.getVersions());
             if (partSet.size() != ext.getVersions().size()) {
                 throw new DatabaseException("Redundant parts: " + ext.getVersions());
             } else {
@@ -2000,14 +2020,14 @@ public class VodbEnv implements I_ImplementTermFactory {
         extensionDb.put(null, key, value);
 
         if (debugWrites) {
-            ThinExtByRefVersioned ext2 = getExtension(ext.getMemberId());
+            I_ThinExtByRefVersioned ext2 = getExtension(ext.getMemberId());
             if (ext2.equals(ext)) {
                 logger.fine("write/read test succeeded");
             } else {
                 throw new DatabaseException("written and read are not equal: " + ext + " " + ext2);
             }
             boolean foundByComponent = false;
-            for (ExtensionByReferenceBean extBean : getExtensionsForComponent(ext.getComponentId())) {
+            for (I_GetExtensionData extBean : getExtensionsForComponent(ext.getComponentId())) {
                 try {
                     if (ext2.equals(extBean.getExtension())) {
                         foundByComponent = true;
@@ -2019,7 +2039,7 @@ public class VodbEnv implements I_ImplementTermFactory {
                 }
             }
             boolean foundByRefset = false;
-            for (ExtensionByReferenceBean extBean : getExtensionsForRefset((ext.getRefsetId()))) {
+            for (I_GetExtensionData extBean : getExtensionsForRefset((ext.getRefsetId()))) {
                 try {
                     if (ext2.equals(extBean.getExtension())) {
                         foundByRefset = true;
@@ -2879,6 +2899,38 @@ public class VodbEnv implements I_ImplementTermFactory {
 
    public I_RelPart newRelPart() {
       return new ThinRelPart();
+   }
+
+   public I_ThinExtByRefPartBoolean newBooleanExtensionPart() {
+      return new ThinExtByRefPartBoolean();
+   }
+
+   public I_ThinExtByRefPartConcept newConceptExtensionPart() {
+      return new ThinExtByRefPartConcept();
+   }
+
+   public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId) {
+      return new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
+   }
+
+   public I_ThinExtByRefPartInteger newIntegerExtensionPart() {
+      return new ThinExtByRefPartInteger();
+   }
+
+   public I_ThinExtByRefPartLanguage newLanguageExtensionPart() {
+      return new ThinExtByRefPartLanguage();
+   }
+
+   public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart() {
+      return new ThinExtByRefPartLanguageScoped();
+   }
+
+   public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart() {
+      return new ThinExtByRefPartMeasurement();
+   }
+
+   public I_ThinExtByRefPartString newStringExtensionPart() {
+      return new ThinExtByRefPartString();
    }
 
 }

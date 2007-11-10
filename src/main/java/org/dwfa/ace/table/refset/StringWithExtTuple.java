@@ -1,14 +1,14 @@
 package org.dwfa.ace.table.refset;
 
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.table.I_CellTextWithTuple;
-import org.dwfa.vodb.types.ThinExtByRefTuple;
 
 public class StringWithExtTuple implements Comparable, I_CellTextWithTuple {
     String cellText;
 
-    ThinExtByRefTuple tuple;
+    I_ThinExtByRefTuple tuple;
 
-    public StringWithExtTuple(String cellText, ThinExtByRefTuple tuple) {
+    public StringWithExtTuple(String cellText, I_ThinExtByRefTuple tuple) {
        super();
        this.cellText = cellText;
        this.tuple = tuple;
@@ -18,7 +18,7 @@ public class StringWithExtTuple implements Comparable, I_CellTextWithTuple {
        return cellText;
     }
 
-    public ThinExtByRefTuple getTuple() {
+    public I_ThinExtByRefTuple getTuple() {
        return tuple;
     }
 

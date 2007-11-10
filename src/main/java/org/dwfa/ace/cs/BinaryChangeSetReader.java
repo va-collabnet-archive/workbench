@@ -25,6 +25,7 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
@@ -290,7 +291,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 memberId = id.getNativeId();
             }
 
-            ThinExtByRefVersioned extension;
+            I_ThinExtByRefVersioned extension;
             if (getVodb().hasExtension(memberId)) {
                 extension = getVodb().getExtension(memberId);
             } else {

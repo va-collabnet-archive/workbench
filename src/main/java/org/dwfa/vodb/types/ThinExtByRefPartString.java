@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartString;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class ThinExtByRefPartString extends ThinExtByRefPart {
+public class ThinExtByRefPartString extends ThinExtByRefPart implements I_ThinExtByRefPartString {
     private String stringValue;
 
     
@@ -24,7 +25,10 @@ public class ThinExtByRefPartString extends ThinExtByRefPart {
        return false;
     }
 
-    @Override
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartString#getUniversalPart()
+    */
+   @Override
     public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
        I_TermFactory tf = LocalVersionedTerminology.get();
        UniversalAceExtByRefPartString stringPart = new UniversalAceExtByRefPartString();
@@ -35,7 +39,10 @@ public class ThinExtByRefPartString extends ThinExtByRefPart {
        return stringPart;
     }
 
-    @Override
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartString#duplicatePart()
+    */
+   @Override
     public ThinExtByRefPartString duplicatePart() {
        return new ThinExtByRefPartString(this);
     }
@@ -49,11 +56,17 @@ public class ThinExtByRefPartString extends ThinExtByRefPart {
        this.stringValue = another.stringValue;
     }
 
-    public String getStringValue() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartString#getStringValue()
+    */
+   public String getStringValue() {
         return stringValue;
     }
 
-    public void setStringValue(String stringValue) {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartString#setStringValue(java.lang.String)
+    */
+   public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
 

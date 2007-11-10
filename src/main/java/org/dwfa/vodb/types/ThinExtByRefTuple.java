@@ -1,55 +1,104 @@
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
 import java.util.List;
 
-public class ThinExtByRefTuple {
-   ThinExtByRefPart part;
-   ThinExtByRefVersioned core;
-   public ThinExtByRefTuple(ThinExtByRefVersioned core, ThinExtByRefPart part) {
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
+import org.dwfa.tapi.TerminologyException;
+
+public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
+   I_ThinExtByRefPart part;
+   I_ThinExtByRefVersioned core;
+   public ThinExtByRefTuple(I_ThinExtByRefVersioned core, I_ThinExtByRefPart part) {
       super();
       this.part = part;
       this.core = core;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getPathId()
+    */
    public int getPathId() {
       return part.getPathId();
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getStatus()
+    */
    public int getStatus() {
       return part.getStatus();
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersion()
+    */
    public int getVersion() {
       return part.getVersion();
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setPathId(int)
+    */
    public void setPathId(int pathId) {
       part.setPathId(pathId);
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setStatus(int)
+    */
    public void setStatus(int idStatus) {
       part.setStatus(idStatus);
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setVersion(int)
+    */
    public void setVersion(int version) {
       part.setVersion(version);
    }
-   public void addVersion(ThinExtByRefPart part) {
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#addVersion(org.dwfa.vodb.types.ThinExtByRefPart)
+    */
+   public void addVersion(I_ThinExtByRefPart part) {
       core.addVersion(part);
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getComponentId()
+    */
    public int getComponentId() {
       return core.getComponentId();
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getMemberId()
+    */
    public int getMemberId() {
       return core.getMemberId();
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getRefsetId()
+    */
    public int getRefsetId() {
       return core.getRefsetId();
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getTypeId()
+    */
    public int getTypeId() {
       return core.getTypeId();
    }
-   public List<? extends ThinExtByRefPart> getVersions() {
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersions()
+    */
+   public List<? extends I_ThinExtByRefPart> getVersions() {
       return core.getVersions();
    }
-   public ThinExtByRefVersioned getCore() {
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getCore()
+    */
+   public I_ThinExtByRefVersioned getCore() {
       return core;
    }
-   public ThinExtByRefPart getPart() {
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getPart()
+    */
+   public I_ThinExtByRefPart getPart() {
       return part;
    }
    
@@ -57,6 +106,12 @@ public class ThinExtByRefTuple {
    public String toString() {
        return "ThinExtByRefVersioned refsetId: " + core.getRefsetId() + " memberId: " + core.getMemberId() + 
            " componentId: " + core.getComponentId() + " typeId: " + core.getTypeId() + " version: " + part;
+   }
+   public I_ThinExtByRefPart duplicatePart() {
+      return part.duplicatePart();
+   }
+   public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
+      return part.getUniversalPart();
    }
 
 }

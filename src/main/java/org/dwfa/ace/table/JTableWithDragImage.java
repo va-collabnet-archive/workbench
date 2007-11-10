@@ -31,6 +31,10 @@ import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
 import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
@@ -51,10 +55,6 @@ import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinExtByRefPartConcept;
-import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
-import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
-import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -162,31 +162,31 @@ public class JTableWithDragImage extends JTable {
             case BOOLEAN_VALUE:
                 return new StringSelection(swextt.getCellText());
             case CONCEPT_ID:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartConcept) swextt.getTuple().getPart())
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConcept) swextt.getTuple().getPart())
                         .getConceptId()));
             case INTEGER_VALUE:
                 return new StringSelection(swextt.getCellText());
             case ACCEPTABILITY:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartLanguage) swextt.getTuple().getPart())
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
                         .getAcceptabilityId()));
             case CORRECTNESS:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartLanguage) swextt.getTuple().getPart())
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
                         .getCorrectnessId()));
             case DEGREE_OF_SYNONYMY:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartLanguage) swextt.getTuple().getPart())
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
                         .getDegreeOfSynonymyId()));
             case TAG:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartLanguageScoped) swextt.getTuple()
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple()
                         .getPart()).getTagId()));
             case SCOPE:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartLanguageScoped) swextt.getTuple()
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple()
                         .getPart()).getScopeId()));
             case PRIORITY:
                 return new StringSelection(swextt.getCellText());
             case MEASUREMENT_VALUE:
                 return new StringSelection(swextt.getCellText());
             case MEASUREMENT_UNITS_ID:
-                return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartMeasurement) swextt.getTuple()
+                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartMeasurement) swextt.getTuple()
                         .getPart()).getUnitsOfMeasureId()));
             case STRING_VALUE:
                 return new StringSelection(swextt.getCellText()); 

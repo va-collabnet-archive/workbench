@@ -4,31 +4,51 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartLanguage;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class ThinExtByRefPartLanguage extends ThinExtByRefPart {
+public class ThinExtByRefPartLanguage extends ThinExtByRefPart implements I_ThinExtByRefPartLanguage {
    private int acceptabilityId;
    private int correctnessId;
    private int degreeOfSynonymyId;
    
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#getAcceptabilityId()
+    */
    public int getAcceptabilityId() {
       return acceptabilityId;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#setAcceptabilityId(int)
+    */
    public void setAcceptabilityId(int acceptabilityId) {
       this.acceptabilityId = acceptabilityId;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#getCorrectnessId()
+    */
    public int getCorrectnessId() {
       return correctnessId;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#setCorrectnessId(int)
+    */
    public void setCorrectnessId(int correctnessId) {
       this.correctnessId = correctnessId;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#getDegreeOfSynonymyId()
+    */
    public int getDegreeOfSynonymyId() {
       return degreeOfSynonymyId;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#setDegreeOfSynonymyId(int)
+    */
    public void setDegreeOfSynonymyId(int degreeOfSynonymyId) {
       this.degreeOfSynonymyId = degreeOfSynonymyId;
    }
@@ -45,6 +65,9 @@ public class ThinExtByRefPartLanguage extends ThinExtByRefPart {
       return false;
    }
    
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#getUniversalPart()
+    */
    @Override
    public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
       I_TermFactory tf = LocalVersionedTerminology.get();
@@ -57,8 +80,11 @@ public class ThinExtByRefPartLanguage extends ThinExtByRefPart {
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
    }
+   /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#duplicatePart()
+    */
    @Override
-   public ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicatePart() {
       return new ThinExtByRefPartLanguage(this);
    }
    public ThinExtByRefPartLanguage(ThinExtByRefPartLanguage another) {

@@ -10,6 +10,9 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -35,7 +38,7 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
  * @author kec
  * 
  */
-public class ThinExtByRefVersioned {
+public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     private int refsetId;
 
@@ -46,7 +49,7 @@ public class ThinExtByRefVersioned {
     private int typeId; // Use an enumeration when reading/writing, and convert
                         // it to the corresponding concept nid...
 
-    private List<ThinExtByRefPart> versions;
+    private List<I_ThinExtByRefPart> versions;
 
     public ThinExtByRefVersioned(int refsetId, int memberId, int componentId, int typeId) {
         this(refsetId, memberId, componentId, typeId, 1);
@@ -58,26 +61,41 @@ public class ThinExtByRefVersioned {
         this.memberId = memberId;
         this.componentId = componentId;
         this.typeId = typeId;
-        this.versions = new ArrayList<ThinExtByRefPart>(partCount);
+        this.versions = new ArrayList<I_ThinExtByRefPart>(partCount);
     }
 
-    public int getMemberId() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getMemberId()
+    */
+   public int getMemberId() {
         return memberId;
     }
 
-    public int getComponentId() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getComponentId()
+    */
+   public int getComponentId() {
         return componentId;
     }
 
-    public int getTypeId() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getTypeId()
+    */
+   public int getTypeId() {
         return typeId;
     }
 
-    public List<? extends ThinExtByRefPart> getVersions() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getVersions()
+    */
+   public List<? extends I_ThinExtByRefPart> getVersions() {
         return versions;
     }
 
-    public int getRefsetId() {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getRefsetId()
+    */
+   public int getRefsetId() {
         return refsetId;
     }
 
@@ -100,18 +118,27 @@ public class ThinExtByRefVersioned {
             " componentId: " + componentId + " typeId: " + typeId + " versions: " + versions;
     }
 
-    public void addVersion(ThinExtByRefPart part) {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#addVersion(org.dwfa.vodb.types.ThinExtByRefPart)
+    */
+   public void addVersion(I_ThinExtByRefPart part) {
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine("Adding part: " + part + " to member: " + memberId + " for component: " + componentId);
         }
         versions.add(part);
     }
 
-    public void setRefsetId(int refsetId) {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#setRefsetId(int)
+    */
+   public void setRefsetId(int refsetId) {
         this.refsetId = refsetId;
     }
 
-    public void setTypeId(int typeId) {
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#setTypeId(int)
+    */
+   public void setTypeId(int typeId) {
         this.typeId = typeId;
     }
 
@@ -186,7 +213,7 @@ public class ThinExtByRefVersioned {
         }
     }
 
-    private static void setStandardFields(UniversalAceExtByRefPart part, VodbEnv vodb, ThinExtByRefPart thinPart) throws TerminologyException, IOException {
+    private static void setStandardFields(UniversalAceExtByRefPart part, VodbEnv vodb, I_ThinExtByRefPart thinPart) throws TerminologyException, IOException {
         thinPart.setPathId(vodb.uuidToNative(part.getPathUid()));
         thinPart.setStatus(vodb.uuidToNative(part.getStatusUid()));
         thinPart.setVersion(ThinVersionHelper.convert(part.getTime()));
@@ -198,14 +225,17 @@ public class ThinExtByRefVersioned {
      * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet,
      *      org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
      */
-    public void addTuples(I_IntSet allowedStatus,
-            Set<I_Position> positions, List<ThinExtByRefTuple> returnTuples,
+    /* (non-Javadoc)
+    * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#addTuples(org.dwfa.ace.api.I_IntSet, java.util.Set, java.util.List, boolean)
+    */
+   public void addTuples(I_IntSet allowedStatus,
+            Set<I_Position> positions, List<I_ThinExtByRefTuple> returnTuples,
             boolean addUncommitted) {
-        Set<ThinExtByRefPart> uncommittedParts = new HashSet<ThinExtByRefPart>();
+        Set<I_ThinExtByRefPart> uncommittedParts = new HashSet<I_ThinExtByRefPart>();
         if (positions == null) {
-            List<ThinExtByRefPart> addedParts = new ArrayList<ThinExtByRefPart>();
-            Set<ThinExtByRefPart> rejectedParts = new HashSet<ThinExtByRefPart>();
-            for (ThinExtByRefPart part : versions) {
+            List<I_ThinExtByRefPart> addedParts = new ArrayList<I_ThinExtByRefPart>();
+            Set<I_ThinExtByRefPart> rejectedParts = new HashSet<I_ThinExtByRefPart>();
+            for (I_ThinExtByRefPart part : versions) {
                 if (part.getVersion() == Integer.MAX_VALUE) {
                     uncommittedParts.add(part);
                 } else {
@@ -217,9 +247,9 @@ public class ThinExtByRefVersioned {
                     addedParts.add(part);
                 }
             }
-            for (ThinExtByRefPart part : addedParts) {
+            for (I_ThinExtByRefPart part : addedParts) {
                 boolean addPart = true;
-                for (ThinExtByRefPart reject : rejectedParts) {
+                for (I_ThinExtByRefPart reject : rejectedParts) {
                     if ((part.getVersion() <= reject.getVersion())
                             && (part.getPathId() == reject.getPathId())) {
                         addPart = false;
@@ -232,11 +262,11 @@ public class ThinExtByRefVersioned {
             }
         } else {
 
-            Set<ThinExtByRefPart> addedParts = new HashSet<ThinExtByRefPart>();
+            Set<I_ThinExtByRefPart> addedParts = new HashSet<I_ThinExtByRefPart>();
             for (I_Position position : positions) {
-                Set<ThinExtByRefPart> rejectedParts = new HashSet<ThinExtByRefPart>();
+                Set<I_ThinExtByRefPart> rejectedParts = new HashSet<I_ThinExtByRefPart>();
                 ThinExtByRefTuple possible = null;
-                for (ThinExtByRefPart part : versions) {
+                for (I_ThinExtByRefPart part : versions) {
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         uncommittedParts.add(part);
                         continue;
@@ -297,7 +327,7 @@ public class ThinExtByRefVersioned {
                     I_Position possibleStatusPosition = new Position(possible
                             .getVersion(), possiblePath);
                     boolean addPart = true;
-                    for (ThinExtByRefPart reject : rejectedParts) {
+                    for (I_ThinExtByRefPart reject : rejectedParts) {
                   int version = reject.getVersion();
                   I_Path matchingPath = position.getPath()
                   .getMatchingPath(reject.getPathId());
@@ -320,7 +350,7 @@ public class ThinExtByRefVersioned {
             }
         }
         if (addUncommitted) {
-            for (ThinExtByRefPart p : uncommittedParts) {
+            for (I_ThinExtByRefPart p : uncommittedParts) {
                 returnTuples.add(new ThinExtByRefTuple(this, p));
             }
         }

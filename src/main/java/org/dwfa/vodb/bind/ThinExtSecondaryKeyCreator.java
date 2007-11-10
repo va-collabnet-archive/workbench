@@ -2,8 +2,8 @@ package org.dwfa.vodb.bind;
 
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
@@ -79,7 +79,7 @@ public class ThinExtSecondaryKeyCreator implements SecondaryKeyCreator {
 
     public boolean createSecondaryKey(SecondaryDatabase secDb, DatabaseEntry keyEntry, DatabaseEntry dataEntry,
         DatabaseEntry resultEntry) throws DatabaseException {
-        ThinExtByRefVersioned core = (ThinExtByRefVersioned) fixedOnlyBinder.entryToObject(dataEntry);
+        I_ThinExtByRefVersioned core = (I_ThinExtByRefVersioned) fixedOnlyBinder.entryToObject(dataEntry);
         
         
         switch (keyType) {

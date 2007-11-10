@@ -20,6 +20,13 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
@@ -27,13 +34,6 @@ import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
-import org.dwfa.vodb.types.ThinExtByRefPart;
-import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
-import org.dwfa.vodb.types.ThinExtByRefPartConcept;
-import org.dwfa.vodb.types.ThinExtByRefPartInteger;
-import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
-import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
-import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 
 public class RefsetPopupListener extends MouseAdapter {
 
@@ -49,7 +49,7 @@ public class RefsetPopupListener extends MouseAdapter {
          try {
              if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
                  for (I_Path p : config.getEditingPathSet()) {
-                     ThinExtByRefPart newPart = selectedObject.getTuple().getPart().duplicatePart();
+                     I_ThinExtByRefPart newPart = selectedObject.getTuple().getPart().duplicatePart();
                      newPart.setPathId(p.getConceptId());
                      newPart.setVersion(Integer.MAX_VALUE);
                      setProperStatus(newPart);
@@ -81,7 +81,7 @@ public class RefsetPopupListener extends MouseAdapter {
       public void actionPerformed(ActionEvent e) {
          try {
             for (I_Path p : config.getEditingPathSet()) {
-                ThinExtByRefPart newPart; 
+                I_ThinExtByRefPart newPart; 
                 if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
                     newPart = selectedObject.getTuple().getPart().duplicatePart();                    
                 } else {
@@ -97,25 +97,25 @@ public class RefsetPopupListener extends MouseAdapter {
                   model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
                   break;
                case CONCEPT_ID:
-                  ((ThinExtByRefPartConcept) newPart).setConceptId((AceConfig.getVodb().uuidToNative(ids)));
+                  ((I_ThinExtByRefPartConcept) newPart).setConceptId((AceConfig.getVodb().uuidToNative(ids)));
                   break;
                case ACCEPTABILITY:
-                  ((ThinExtByRefPartLanguage) newPart).setAcceptabilityId((AceConfig.getVodb().uuidToNative(ids)));
+                  ((I_ThinExtByRefPartLanguage) newPart).setAcceptabilityId((AceConfig.getVodb().uuidToNative(ids)));
                   break;
                case CORRECTNESS:
-                  ((ThinExtByRefPartLanguage) newPart).setCorrectnessId((AceConfig.getVodb().uuidToNative(ids)));
+                  ((I_ThinExtByRefPartLanguage) newPart).setCorrectnessId((AceConfig.getVodb().uuidToNative(ids)));
                   break;
                case DEGREE_OF_SYNONYMY:
-                  ((ThinExtByRefPartLanguage) newPart).setDegreeOfSynonymyId((AceConfig.getVodb().uuidToNative(ids)));
+                  ((I_ThinExtByRefPartLanguage) newPart).setDegreeOfSynonymyId((AceConfig.getVodb().uuidToNative(ids)));
                   break;
                case TAG:
-                  ((ThinExtByRefPartLanguageScoped) newPart).setTagId((AceConfig.getVodb().uuidToNative(ids)));
+                  ((I_ThinExtByRefPartLanguageScoped) newPart).setTagId((AceConfig.getVodb().uuidToNative(ids)));
                   break;
                case SCOPE:
-                  ((ThinExtByRefPartLanguageScoped) newPart).setScopeId((AceConfig.getVodb().uuidToNative(ids)));
+                  ((I_ThinExtByRefPartLanguageScoped) newPart).setScopeId((AceConfig.getVodb().uuidToNative(ids)));
                   break;
                case MEASUREMENT_UNITS_ID:
-                   ((ThinExtByRefPartMeasurement) newPart).setUnitsOfMeasureId((AceConfig.getVodb().uuidToNative(ids)));
+                   ((I_ThinExtByRefPartMeasurement) newPart).setUnitsOfMeasureId((AceConfig.getVodb().uuidToNative(ids)));
                    break;
 
                case INTEGER_VALUE:
@@ -158,7 +158,7 @@ public class RefsetPopupListener extends MouseAdapter {
        public void actionPerformed(ActionEvent e) {
           try {
              for (I_Path p : config.getEditingPathSet()) {
-                 ThinExtByRefPart newPart; 
+                 I_ThinExtByRefPart newPart; 
                  if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
                      newPart = selectedObject.getTuple().getPart().duplicatePart();                    
                  } else {
@@ -170,10 +170,10 @@ public class RefsetPopupListener extends MouseAdapter {
                 setProperStatus(newPart);
                 switch (field) {
                 case INTEGER_VALUE:
-                    ((ThinExtByRefPartInteger) newPart).setValue(value);
+                    ((I_ThinExtByRefPartInteger) newPart).setValue(value);
                    break;
                 case PRIORITY:
-                    ((ThinExtByRefPartLanguageScoped) newPart).setPriority(value);
+                    ((I_ThinExtByRefPartLanguageScoped) newPart).setPriority(value);
                     break;
                 case CONCEPT_ID:
                 case ACCEPTABILITY:
@@ -218,7 +218,7 @@ public class RefsetPopupListener extends MouseAdapter {
        public void actionPerformed(ActionEvent e) {
           try {
              for (I_Path p : config.getEditingPathSet()) {
-                 ThinExtByRefPart newPart; 
+                 I_ThinExtByRefPart newPart; 
                  if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
                      newPart = selectedObject.getTuple().getPart().duplicatePart();                    
                  } else {
@@ -230,7 +230,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 setProperStatus(newPart);
                 switch (field) {
                 case MEASUREMENT_VALUE:
-                    ((ThinExtByRefPartMeasurement) newPart).setMeasurementValue(value);
+                    ((I_ThinExtByRefPartMeasurement) newPart).setMeasurementValue(value);
                    break;
 
                 case PRIORITY:
@@ -279,7 +279,7 @@ public class RefsetPopupListener extends MouseAdapter {
        public void actionPerformed(ActionEvent e) {
           try {
              for (I_Path p : config.getEditingPathSet()) {
-                 ThinExtByRefPart newPart; 
+                 I_ThinExtByRefPart newPart; 
                  if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
                      newPart = selectedObject.getTuple().getPart().duplicatePart();                    
                  } else {
@@ -291,7 +291,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 setProperStatus(newPart);
                 switch (field) {
                 case BOOLEAN_VALUE:
-                    ((ThinExtByRefPartBoolean) newPart).setValue(value);
+                    ((I_ThinExtByRefPartBoolean) newPart).setValue(value);
                    break;
 
                 case PRIORITY:
@@ -426,7 +426,7 @@ public class RefsetPopupListener extends MouseAdapter {
          AceLog.getAppLog().alertAndLogException(e1);
       }
    }
-   private void setProperStatus(ThinExtByRefPart newPart) throws Exception {
+   private void setProperStatus(I_ThinExtByRefPart newPart) throws Exception {
       newPart.setStatus(preferences.getDefaultStatusForRefset().getConceptId());
    }
 
