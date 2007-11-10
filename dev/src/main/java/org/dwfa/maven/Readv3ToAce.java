@@ -87,7 +87,7 @@ public class Readv3ToAce extends AbstractMojo {
 					new FileReader(new File(readv3dir, "Concept.v3")));
 
 			BufferedReader relationshipFileReader = new BufferedReader(
-					new FileReader(new File(readv3dir, "V3Hier.v3")));
+					new FileReader(new File(readv3dir, "V3hier.v3")));
 
 			Writer concepts = new BufferedWriter(new FileWriter(new File(
 					aceDir, "concepts.txt")));
