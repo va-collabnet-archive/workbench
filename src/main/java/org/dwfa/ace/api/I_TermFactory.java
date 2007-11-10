@@ -12,6 +12,15 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -217,5 +226,17 @@ public interface I_TermFactory {
      * @return a new relationship part with all content uninitialized. 
      */
     public I_RelPart newRelPart();
+    
+    public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
+    
+    public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
+    
+    public I_ThinExtByRefPartBoolean newBooleanExtensionPart();
+    public I_ThinExtByRefPartConcept newConceptExtensionPart();
+    public I_ThinExtByRefPartInteger newIntegerExtensionPart();
+    public I_ThinExtByRefPartLanguage newLanguageExtensionPart();
+    public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
+    public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart();
+    public I_ThinExtByRefPartString newStringExtensionPart();
 
 }
