@@ -84,7 +84,13 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 	 * The flagged status that will be rejected
 	 * @parameter
 	 */
-	private ConceptDescriptor rejectedStatus = null;
+	private ConceptDescriptor[] acceptedStatus = null;
+
+	/**
+	 * The flagged status that will be rejected
+	 * @parameter
+	 */
+	private ConceptDescriptor[] rejectedStatus = null;
 
 	/**
 	 * The html output file location.
@@ -122,15 +128,22 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 	int agreedChanges = 0;
 	int conflicts = 0;
 	int conceptCount = 0;
+	int descriptionCount = 0;
+	int relationshipCount = 0;
+	int removedDescriptionCount = 0;
+	int removedRelationshipCount = 0;
+	
 	MonitorComponents componentMonitor = null; 
 	I_TermFactory termFactory = null;
 	BufferedWriter textWriter = null;
 	int updatedStatusId;
 	int updatedStatusOnNewPathId;
 	List<I_GetConceptData> totalBranches = new LinkedList<I_GetConceptData>();
+	List<Integer> rejectedStatusIds = new LinkedList<Integer>();
+	List<Integer> acceptedStatusIds = new LinkedList<Integer>();
 
 	public void processConcept(I_GetConceptData concept) throws Exception {
-
+		boolean changed = false;
 		List<Match> matches = componentMonitor.checkConcept(concept);
 
 		// check if the latest tuples are equal (excluding criteria)
@@ -179,29 +192,53 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 
 			for (I_ConceptAttributeTuple tuple: matchConceptAttributeTuples) {
 				I_ConceptAttributePart newPart = tuple.duplicatePart();
-				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setPathId(copyToPath.getConceptId());
-				newPart.setConceptStatus(updatedStatusOnNewPathId);
-				tuple.getConVersioned().addVersion(newPart);
+				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPart.getConceptStatus())))
+						&& 
+						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPart.getConceptStatus())))) {
+					changed = true;
+					newPart.setVersion(Integer.MAX_VALUE);
+					newPart.setPathId(copyToPath.getConceptId());
+					newPart.setConceptStatus(updatedStatusOnNewPathId);
+					tuple.getConVersioned().addVersion(newPart);
+				}
 			}
 			// copy latest descriptions to new path/version
 			for (I_DescriptionTuple tuple: matchDescriptionTuples) {
 				I_DescriptionPart newPart = tuple.duplicatePart();
-				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setPathId(copyToPath.getConceptId());					
-				newPart.setStatusId(updatedStatusOnNewPathId);
-				newPart.setText(tuple.getText());
-				tuple.getDescVersioned().addVersion(newPart);
+				descriptionCount++;
+				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPart.getStatusId())))
+						&& 
+						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPart.getStatusId())))) {
+					changed = true;
+					newPart.setVersion(Integer.MAX_VALUE);
+					newPart.setPathId(copyToPath.getConceptId());					
+					newPart.setStatusId(updatedStatusOnNewPathId);
+					newPart.setText(tuple.getText());
+					tuple.getDescVersioned().addVersion(newPart);
+				} else {
+					System.out.println("rejected description: " + tuple.getText());
+					removedDescriptionCount++;
+				}
 			}
 			// copy latest relationships to new path/version
 			for (I_RelTuple tuple: matchRelationshipTuples) {
 				I_RelPart newPart = tuple.duplicatePart();
-				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setPathId(copyToPath.getConceptId());
-				newPart.setStatusId(updatedStatusOnNewPathId);
-				tuple.getRelVersioned().addVersion(newPart);
+				relationshipCount++;
+				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPart.getStatusId())))
+						&& 
+						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPart.getStatusId())))) {
+					changed = true;
+					newPart.setVersion(Integer.MAX_VALUE);
+					newPart.setPathId(copyToPath.getConceptId());
+					newPart.setStatusId(updatedStatusOnNewPathId);
+					tuple.getRelVersioned().addVersion(newPart);
+				} else {
+					removedRelationshipCount++;
+				}
 			}
-			termFactory.addUncommitted(concept);
+			if (changed) {
+				termFactory.addUncommitted(concept);
+			}
 
 		} else {
 			conflicts++;
@@ -219,13 +256,26 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		componentMonitor = new MonitorComponents(rejectedStatus);
+		componentMonitor = new MonitorComponents();
 		termFactory = LocalVersionedTerminology.get();
 		try {
 			CompareComponents.reject = false;
 
 			if (branchOrigins != null) {
 				termFactory.iteratePaths(this);
+			}
+
+			if (rejectedStatus!=null) {
+				for (ConceptDescriptor rejectedstatus : rejectedStatus) {
+					rejectedStatusIds.add(termFactory.getConcept(
+							rejectedstatus.getVerifiedConcept().getUids()).getConceptId());
+				}
+			}
+			if (acceptedStatus!=null) {
+				for (ConceptDescriptor acceptedstatus : acceptedStatus) {
+					acceptedStatusIds.add(termFactory.getConcept(
+							acceptedstatus.getVerifiedConcept().getUids()).getConceptId());
+				}
 			}
 
 			updatedStatusId = termFactory.getConcept(
@@ -286,7 +336,11 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 				htmlWriter.close();
 			}
 
-			System.out.println("Finished copying\nFound " + conflicts + " conflicts\nCopied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
+			System.out.println("Finished copying\nFound " + conflicts + " concepts with differences");
+			System.out.println("Copied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
+			System.out.println("Copied " + (descriptionCount-removedDescriptionCount) + " descriptions out of a total of " +descriptionCount+ "");
+			System.out.println("Copied " + (relationshipCount-removedRelationshipCount) + " relationships out of a total of " +relationshipCount+ "");
+			
 
 			if (textWriter != null) {
 				textWriter.close();

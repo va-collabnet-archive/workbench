@@ -35,9 +35,9 @@ public class CompareComponents {
     public static boolean attributeEqual(
             I_ConceptAttributeTuple tuple1, I_ConceptAttributeTuple tuple2,
             int flaggedStatusId) {
-        if (compareToFlagged(tuple1.getConceptStatus(),flaggedStatusId)) {
+        if (!compareToFlagged(tuple1.getConceptStatus(),flaggedStatusId)) {
             return false;
-        } else if (compareToFlagged(tuple2.getConceptStatus(),flaggedStatusId)) {
+        } else if (!compareToFlagged(tuple2.getConceptStatus(),flaggedStatusId)) {
             return false;
         } else {
             return attributeEqual(tuple1, tuple2);
@@ -62,9 +62,9 @@ public class CompareComponents {
     public static boolean descriptionEqual(
             I_DescriptionTuple tuple1,
             I_DescriptionTuple tuple2, int flaggedStatusId) {
-        if (compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
+        if (!compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
             return false;
-        } else if (compareToFlagged(tuple2.getStatusId(),flaggedStatusId)) {
+        } else if (!compareToFlagged(tuple2.getStatusId(),flaggedStatusId)) {
             return false;
         } else {
             return descriptionEqual(tuple1, tuple2);
@@ -86,9 +86,9 @@ public class CompareComponents {
 
     public static boolean relationshipEqual(I_RelTuple tuple1,
             I_RelTuple tuple2, int flaggedStatusId) {
-        if (compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
+        if (!compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
             return false;
-        } else if (compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
+        } else if (!compareToFlagged(tuple1.getStatusId(),flaggedStatusId)) {
             return false;
         } else {
             return relationshipEqual(tuple1, tuple2);
@@ -117,6 +117,7 @@ public class CompareComponents {
             List<I_DescriptionTuple> descriptionList2,
             int flaggedStatusId) {
         if (descriptionList1.size() != descriptionList2.size()) {
+        	System.out.println("list different size");
             return false;
         } else {
             for (int i = 0; i < descriptionList1.size(); i++) {

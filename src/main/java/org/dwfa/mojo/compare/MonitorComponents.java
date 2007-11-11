@@ -27,37 +27,20 @@ import org.dwfa.mojo.ConceptDescriptor;
 public class MonitorComponents  {
 
 	List<I_Position> positions = new LinkedList<I_Position>();
-	ConceptDescriptor rejectedStatus;
 	I_TermFactory termFactory;
-	int flaggedStatusId;
 
-	public MonitorComponents(ConceptDescriptor rejectedStatus) {
-		termFactory = LocalVersionedTerminology.get();
-		this.rejectedStatus = rejectedStatus;
-	}
-	
 	public MonitorComponents() {
 		termFactory = LocalVersionedTerminology.get();
-		this.rejectedStatus = rejectedStatus;
 	}
-	
+
 	public List<Match> checkConcept(I_GetConceptData concept) throws Exception {
 
-		if (rejectedStatus != null) {
-			flaggedStatusId = termFactory.getConcept(
-					rejectedStatus.getVerifiedConcept().getUids()).
-					getConceptId();
-		}
-
-		
-
-		
 		// get latest concept attributes/descriptions/relationships
 		boolean attributesMatch = true;
 		boolean descriptionsMatch = true;
 		boolean relationshipsMatch = true;
 
-		
+
 		List<I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
 		List<I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
 
@@ -66,7 +49,7 @@ public class MonitorComponents  {
 
 		List<I_RelTuple> relationshipTuples1  = new LinkedList<I_RelTuple>();
 		List<I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();
-		
+
 		List<Match> matches = new ArrayList<Match>();
 
 		/*
@@ -83,28 +66,13 @@ public class MonitorComponents  {
 					firstPosition);
 			relationshipTuples1 = concept.getSourceRelTuples(null, null,
 					firstPosition, false);
-			
-			for (I_ConceptAttributeTuple tuple: conceptAttributeTuples1) {
-				if (!CompareComponents.compareToFlagged(tuple.getConceptStatus(), flaggedStatusId)) {
-					ok = false;
-				}
-			}
-			for (I_DescriptionTuple tuple: descriptionTuples1) {
-				if (!CompareComponents.compareToFlagged(tuple.getStatusId(), flaggedStatusId)) {
-					ok = false;
-				}
-			}
-			for (I_RelTuple tuple: relationshipTuples1) {
-				if (!CompareComponents.compareToFlagged(tuple.getStatusId(), flaggedStatusId)) {
-					ok = false;
-				}
-			}
+
 			if (ok) {
 				Match match = new Match(positions.get(0),positions.get(0));
 				matches.add(match);
 			}
 		}
-		
+
 		for (int j = 0; j < positions.size()-1; j++) {
 			Set<I_Position> firstPosition = new HashSet<I_Position>();
 			firstPosition.add(positions.get(j));
@@ -114,9 +82,9 @@ public class MonitorComponents  {
 					firstPosition);
 			relationshipTuples1 = concept.getSourceRelTuples(null, null,
 					firstPosition, false);
-			
 
-			
+
+
 			for (int i = j; i < positions.size()-1; i++) {
 				Set<I_Position> secondPosition = new HashSet<I_Position>();
 				secondPosition.add(positions.get(i+1));
@@ -128,45 +96,22 @@ public class MonitorComponents  {
 				relationshipTuples2 = concept.getSourceRelTuples(null, null,
 						secondPosition, false);
 
-				if (rejectedStatus != null) {
-					if (!CompareComponents.attributeListsEqual(
-							conceptAttributeTuples1, conceptAttributeTuples2,
-							flaggedStatusId)) {
-						attributesMatch = false;
-						break;
-					}
-				} else if (!CompareComponents.attributeListsEqual(
+				if (!CompareComponents.attributeListsEqual(
 						conceptAttributeTuples1, conceptAttributeTuples2)) {
 					attributesMatch = false;
 					break;
 				}
-				if (rejectedStatus != null) {
-					if (!CompareComponents.descriptionListsEqual(
-							descriptionTuples1, descriptionTuples2,
-							flaggedStatusId)) {
-						descriptionsMatch = false;
-						break;
-					}
-				} else if (!CompareComponents.descriptionListsEqual(
+				if (!CompareComponents.descriptionListsEqual(
 						descriptionTuples1, descriptionTuples2)) {
 					descriptionsMatch = false;
 					break;
 				}
 
-				if (rejectedStatus != null) {
-					if (!CompareComponents.relationshipListsEqual(
-							relationshipTuples1, relationshipTuples2,
-							flaggedStatusId)) {
-						relationshipsMatch = false;
-						break;
-					}
-				} else if (!CompareComponents.relationshipListsEqual(
+				if (!CompareComponents.relationshipListsEqual(
 						relationshipTuples1, relationshipTuples2)) {
 					relationshipsMatch = false;
 					break;
 				}
-
-
 
 				if (descriptionsMatch && relationshipsMatch && attributesMatch) {
 					Match match = new Match(positions.get(j),positions.get(i+1));
@@ -174,18 +119,14 @@ public class MonitorComponents  {
 					match.matchConceptAttributeTuples.addAll(conceptAttributeTuples1);
 					match.matchDescriptionTuples.addAll(descriptionTuples1);
 					match.matchRelationshipTuples.addAll(relationshipTuples1);
-					match.matchConceptAttributeTuples.addAll(conceptAttributeTuples2);
-					match.matchDescriptionTuples.addAll(descriptionTuples2);
-					match.matchRelationshipTuples.addAll(relationshipTuples2);
-					
 				}
 
 			}
-			
+
 		}
 		return matches;
 	}
-	
+
 
 	public List<I_Position> getPositions() {
 		return positions;
