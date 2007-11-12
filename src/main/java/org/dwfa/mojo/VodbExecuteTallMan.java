@@ -154,9 +154,11 @@ public class VodbExecuteTallMan extends AbstractMojo {
             getLog().info(message);
 
             // write uuids of modified concepts to workflow file
-            for (List<UUID> uuid : modifiedUuids) {
-                workflowWriter.write(uuid.toString());
-                workflowWriter.newLine();
+            for (List<UUID> uuidList : modifiedUuids) {
+                for (UUID uuid : uuidList) {
+                    workflowWriter.write(uuid.toString());
+                    workflowWriter.newLine();
+                }
             }
 
             // write report of modified concepts for review
