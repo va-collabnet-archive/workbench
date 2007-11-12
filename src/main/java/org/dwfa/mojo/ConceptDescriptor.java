@@ -35,7 +35,11 @@ public class ConceptDescriptor {
             for (I_DescriptionTuple tuple: descriptionTuples) {
                 if (description.toLowerCase().trim().equals(
                         tuple.getText().toLowerCase().trim())) {
+
+                	System.out.println("Description '" + tuple.getText() + "' matched '" + description + "'");
                     return concept;
+                } else {
+                	System.out.println("Description '" + tuple.getText() + "' does not match expected '" + description + "'");
                 }
             }
         } catch (Exception e) {
