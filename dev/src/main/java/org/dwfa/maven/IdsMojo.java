@@ -81,6 +81,7 @@ public class IdsMojo extends AbstractMojo {
 	
 	/**
 	 * @parameter 
+	 * @required
 	 */
 	File checkFile;
 	
