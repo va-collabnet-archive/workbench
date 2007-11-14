@@ -148,7 +148,6 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 
 		// check if the latest tuples are equal (excluding criteria)
 		if (compareOperator.compare(matches)) {
-			agreedChanges++;
 			// copy latest attributes to new path/version
 
 			Set<I_ConceptAttributeTuple> allConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
@@ -237,11 +236,13 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 				}
 			}
 			if (changed) {
+				agreedChanges++;
 				termFactory.addUncommitted(concept);
+			} else {
+				conflicts++;
 			}
 
 		} else {
-			conflicts++;
 			if (textWriter == null) {
 				outputTextDirectory.mkdirs();
 				textWriter = new BufferedWriter(new BufferedWriter(
