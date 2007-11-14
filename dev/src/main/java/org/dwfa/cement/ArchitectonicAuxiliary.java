@@ -402,9 +402,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             	if (descriptionStrings.length==1) {
             		if (descriptionStrings[0].indexOf("(")!=-1) {
             			String[] newDescriptionStrings = new String[2];
-                		newDescriptionStrings[0] = descriptionStrings[0];
-                		newDescriptionStrings[1] = descriptionStrings[0].substring(0,descriptionStrings[0].indexOf("("));
-            			descriptionStrings = newDescriptionStrings;
+                		newDescriptionStrings[0] = descriptionStrings[0].trim();
+                		newDescriptionStrings[1] = descriptionStrings[0].substring(0,descriptionStrings[0].indexOf("(")).trim();
+            			descriptionStrings = newDescriptionStrings;            			
             		}
             	}
             	
