@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.regex.*;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -328,26 +329,47 @@ public class VodbExecuteTallMan extends AbstractMojo {
          */
         public String replaceSingleTallManWord(String tallmanWord, String stringToReplace) {
 
-            // need create a search string which includes both the upper and
-            // lower case of each character in the tall man word (regular expression
-            // matching)
-            String searchString = "";
+            // create a search string
+            String searchString = "(\\b)";
+
             for (int x = 0; x < tallmanWord.length(); x++) {
                 char c = tallmanWord.charAt(x);
 
-                // convert to opposite case (i.e. if the current character is
-                // upper case, convert to lower case. if lower case, conver to
-                // upper case.
-                char oppositeC = '.';
-                if (c <= 'Z') {
-                    oppositeC = (char)(c + 32);
-                } else {
-                    oppositeC = (char)(c - 32);
+                // create group for first character so we can reference this later
+                if (x == 0) {
+                    searchString = searchString + "(";
                 }
-                searchString = searchString + "[" + c + oppositeC + "]";
-            }
 
-            return stringToReplace.replaceAll(searchString, tallmanWord);
+                searchString = searchString + c;
+
+                // end group for first character
+                if (x == 0) {
+                    searchString = searchString + ")";
+                }
+            }
+            searchString = searchString + "(\\b)";
+
+            // compile with case insensitive so that all combinations of case will be matched
+            Pattern pattern = Pattern.compile(searchString, Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(stringToReplace);
+
+            StringBuffer result = new StringBuffer();
+            while (matcher.find()) {
+
+                char c = matcher.group(2).charAt(0);
+
+                if (Character.isUpperCase(c)) {
+                    // need to conserve upper case in replacement string
+                    tallmanWord = c + tallmanWord.substring(1, tallmanWord.length());
+                }
+
+                // replace the match with the tall man word, but include the
+                // word boundary we found (otherwise it would drop spaces, brackets etc)
+                matcher.appendReplacement(result, matcher.group(1) + tallmanWord + matcher.group(3));
+            }
+            matcher.appendTail(result);
+
+            return result.toString();
         }
 
         /**
