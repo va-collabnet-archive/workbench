@@ -332,10 +332,13 @@ public class MojoGraph {
 		  
 		  // Create attributed string to enable underlined title
 		  AttributedString as = new AttributedString(graphTitle);
-		  as.addAttribute(TextAttribute.SIZE, 24);
+		  as.addAttribute(TextAttribute.SIZE, 24.0f);
 		  as.addAttribute(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
 		  as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_GRAY);
-		  g2d.drawString(as.getIterator(), ((yAxisLength)/2) - ((font.getSize2D()/2) * (graphTitle.length()/2)) + xOffset , (yOffset/2) );
+          float x = ((yAxisLength)/2) - ((font.getSize2D()/2) * (graphTitle.length()/2)) + xOffset;
+          float y = yOffset/2;
+
+		  g2d.drawString(as.getIterator(), x, y);
 		  		  
 		  // Label x axis
 		  g2d.drawString(xAxisLabel, ((xOffset + yAxisLength)/2) - ((font.getSize2D()/2) * (xAxisLabel.length()/2)) , (yOffset + xAxisLength + 50) );
