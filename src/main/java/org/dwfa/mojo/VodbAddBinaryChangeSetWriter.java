@@ -24,19 +24,32 @@ import org.dwfa.tapi.TerminologyException;
 public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 
     /**
-     * Name for the binary change set.
-     * @parameter
-     */
-	   private String changeSetFileName = "maven."
-			+ UUID.randomUUID().toString() + ".jcs";
+	 * Name for the binary change set.
+	 * 
+	 * @parameter
+	 */
+	private String changeSetFileName = "maven." + UUID.randomUUID().toString()
+			+ ".jcs";
 
-	    /**
-	     * Name for the temporary binary change set.
-	     * @parameter
-	     */
-	   private String changeSetTempFileName = changeSetFileName + ".temp";
+	/**
+	 * Indicates whether a timestamp should be added to the name of the changeset file
+	 * 
+	 * @parameter
+	 */
+	private boolean addTimestampToFileName = false;
+
+	/**
+	 * Name for the temporary binary change set.
+	 * 
+	 * @parameter
+	 */
+	private String changeSetTempFileName = changeSetFileName + ".temp";
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (addTimestampToFileName) {
+			changeSetFileName = changeSetFileName.replaceAll(".jcs", "." + System.currentTimeMillis() + ".jcs");
+		}
+		
 		try {
             try {
                 if (MojoUtil.alreadyRun(getLog(), changeSetFileName)) {

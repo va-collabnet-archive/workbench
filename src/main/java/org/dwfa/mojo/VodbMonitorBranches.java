@@ -133,14 +133,14 @@ public class VodbMonitorBranches extends AbstractMojo {
             // get the branch to copy to concept/path
             I_GetConceptData copyToConcept =
                                         branchToCopyTo.getVerifiedConcept();
-            I_Path copyToPath = termFactory.newPath(origins, copyToConcept);
+            I_Path copyToPath = termFactory.getPath(copyToConcept.getUids());
 
             // get all the positions for the branches to be compared
             List<I_Position> positions = new LinkedList<I_Position>();
             for (ConceptDescriptor branch : branchesToCompare) {
                 I_GetConceptData compareConcept = branch.getVerifiedConcept();
                 I_Position comparePosition = termFactory.newPosition(
-                        termFactory.newPath(origins, compareConcept),
+                        termFactory.getPath(compareConcept.getUids()),
                         Integer.MAX_VALUE);
                 positions.add(comparePosition);
             }

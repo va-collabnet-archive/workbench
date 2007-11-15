@@ -84,12 +84,11 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             origins.add(originPosition);
 
             // get the copy-to concept/path
-            I_Path copyToPath = termFactory.newPath(origins,
-                    branchToCopyToConcept);
+            I_Path copyToPath = termFactory.getPath(branchToCopyToConcept.getUids());
 
             // get concept/path/position of the branch being copied
-            I_Path oldPath = termFactory.newPath(origins,
-                        branchToCopyConcept);
+            I_Path oldPath = termFactory.getPath(branchToCopyConcept.getUids());
+            
             I_Position oldPosition = termFactory.newPosition(oldPath,
                     Integer.MAX_VALUE);
             Set<I_Position> positions = new HashSet<I_Position>();

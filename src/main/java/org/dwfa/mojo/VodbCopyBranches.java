@@ -3,28 +3,27 @@ package org.dwfa.mojo;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_ProcessPaths;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.I_ProcessPaths;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.compare.CompareOperator;
@@ -297,7 +296,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 			// get the branch to copy to concept/path
 			I_GetConceptData copyToConcept =
 				branchToCopyTo.getVerifiedConcept();
-			copyToPath = termFactory.newPath(origins, copyToConcept);
+			copyToPath = termFactory.getPath(copyToConcept.getUids());
 
 			// get all the positions for the branches to be compared
 			List<I_Position> positions = new LinkedList<I_Position>();
@@ -311,7 +310,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 			for (I_GetConceptData compareConcept : totalBranches) {
 
 				I_Position comparePosition = termFactory.newPosition(
-						termFactory.newPath(origins, compareConcept),
+						termFactory.getPath(compareConcept.getUids()),
 						Integer.MAX_VALUE);
 				positions.add(comparePosition);
 			}

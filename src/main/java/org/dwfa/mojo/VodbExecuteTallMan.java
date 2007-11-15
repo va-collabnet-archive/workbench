@@ -251,12 +251,11 @@ public class VodbExecuteTallMan extends AbstractMojo {
             origins.add(originPosition);
 
             // get the copy-to concept/path
-            I_Path copyToPath = termFactory.newPath(origins,
-                    editingBranch);
+            I_Path copyToPath = termFactory.getPath(editingBranch.getUids());
 
             // get concept/path/position of the branch being copied
-            I_Path oldPath = termFactory.newPath(origins,
-                        viewingBranch);
+            I_Path oldPath = termFactory.getPath(viewingBranch.getUids());
+            
             I_Position oldPosition = termFactory.newPosition(oldPath,
                     Integer.MAX_VALUE);
             Set<I_Position> positionsToCheck = new HashSet<I_Position>();

@@ -110,8 +110,7 @@ public class VodbCheckChildCount extends AbstractMojo {
                 for (ConceptDescriptor branch : branches) {
                     I_GetConceptData currentConcept =
                         branch.getVerifiedConcept();
-                    I_Path currentPath = termFactory.newPath(origins,
-                            currentConcept);
+                    I_Path currentPath = termFactory.getPath(currentConcept.getUids());
                     I_Position currentPosition = termFactory.newPosition(
                             currentPath, Integer.MAX_VALUE);
                     branchPositions.add(currentPosition);
