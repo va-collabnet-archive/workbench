@@ -91,10 +91,13 @@ public class MojoGraph {
 	BufferedImage bufferedImage = new BufferedImage(graphDisplayWidth, graphDisplayHeight, BufferedImage.TYPE_INT_RGB);
 	private String outputPath = ".";
 	private String fileName = "graphOutput";
-	private String jpgExportPath = "\\src\\site\\resources\\images\\";
+	private String jpgExportPath = File.separator + "src" + File.separator + 
+                                    "site" + File.separator + "resources" + 
+                                    File.separator + "images" + File.separator;
 	private String exportFormat = "jpg";
 
-	private String xdocExportPath = "\\src\\site\\xdoc\\";
+	private String xdocExportPath = File.separator + "src" + File.separator + "site" + 
+                                    File.separator + "xdoc" + File.separator;
 
 	private DataType displayDataType = DataType.VALUEOVERVALUE;
 	
