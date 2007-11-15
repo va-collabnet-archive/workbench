@@ -301,7 +301,6 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         // get latest concept attributes
                         List<I_ConceptAttributeTuple> conceptAttributeTuples =
                             concept.getConceptAttributeTuples(null, positionsToCheck);
-                        int count = 0;
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute: conceptAttributeTuples) {
                             I_ConceptAttributePart newAttributePart = attribute.duplicatePart();
@@ -309,9 +308,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                             newAttributePart.setVersion(Integer.MAX_VALUE);
                             newAttributePart.setPathId(copyToPath.getConceptId());
                             concept.getConceptAttributes().addVersion(newAttributePart);
-                            count++;
                         }
-                        System.out.println("number of mod concepts:= " + count);
                     }
                 }
             }
