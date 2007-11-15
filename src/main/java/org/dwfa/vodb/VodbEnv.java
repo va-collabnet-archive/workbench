@@ -2933,4 +2933,8 @@ public class VodbEnv implements I_ImplementTermFactory {
       return new ThinExtByRefPartString();
    }
 
+public Set<I_Transact> getUncommitted() {
+    return ACE.getUncommitted();
+}
+
 }

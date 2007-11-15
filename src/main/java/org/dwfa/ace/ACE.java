@@ -32,6 +32,7 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2839,6 +2840,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 cancelButton.setVisible(visible);
             }
         });
+    }
+
+    public static Set<I_Transact> getUncommitted() {
+        return Collections.unmodifiableSet(uncommitted);
     }
 
 }

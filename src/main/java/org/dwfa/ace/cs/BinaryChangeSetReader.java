@@ -263,8 +263,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             localBean.flush();
             return localBean;
         } catch (DatabaseException e) {
+            AceLog.getEditLog().severe("Error committing bean in change set: " + changeSetFile +
+                                       "\nUniversalAceBean:  \n" + bean);
             throw new ToIoException(e);
         } catch (TerminologyException e) {
+            AceLog.getEditLog().severe("Error committing bean in change set: " + changeSetFile +
+                                       "\nUniversalAceBean:  \n" + bean);
             throw new ToIoException(e);
         }
     }
