@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -60,6 +61,15 @@ public class ImportAllChangeSets extends AbstractTask {
 			throws TaskFailedException {
         
         LocalVersionedTerminology.get().suspendChangeSetWriters();
+        
+		importAllChangeSets(worker.getLogger());
+		
+        LocalVersionedTerminology.get().resumeChangeSetWriters();
+        
+        return Condition.CONTINUE;
+	}
+
+	public void importAllChangeSets(Logger logger) throws TaskFailedException {
 		try {
 			File rootFile = new File(rootDirStr);
 			List<File> changeSetFiles = new ArrayList<File>();
@@ -70,7 +80,8 @@ public class ImportAllChangeSets extends AbstractTask {
 						.newBinaryChangeSetReader(csf);
             csr.getValidators().add(new SimpleValidator());
 				readerSet.add(csr);
-				worker.getLogger().info("Adding reader: " + csf.getAbsolutePath());
+				
+				logger.info("Adding reader: " + csf.getAbsolutePath());
 			}
 			while (readerSet.size() > 0) {
 				readNext(readerSet);
@@ -85,8 +96,6 @@ public class ImportAllChangeSets extends AbstractTask {
 		} catch (Exception e) {
             throw new TaskFailedException(e);
         }
-        LocalVersionedTerminology.get().resumeChangeSetWriters();
-        return Condition.CONTINUE;
 	}
 
     public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
