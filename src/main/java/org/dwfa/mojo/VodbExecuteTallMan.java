@@ -14,6 +14,8 @@ import java.util.regex.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -293,10 +295,27 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         newPart.setVersion(Integer.MAX_VALUE);
                         newPart.setPathId(copyToPath.getConceptId());
                         tuple.getDescVersioned().addVersion(newPart);
-                        termFactory.addUncommitted(concept);
+                        //termFactory.addUncommitted(concept);
+
+                        // update the current concept with
+                        // get latest concept attributes
+                        List<I_ConceptAttributeTuple> conceptAttributeTuples =
+                            concept.getConceptAttributeTuples(null, positionsToCheck);
+                        int count = 0;
+                        // copy latest attributes and set status to unreviewed
+                        for (I_ConceptAttributeTuple attribute: conceptAttributeTuples) {
+                            I_ConceptAttributePart newAttributePart = attribute.duplicatePart();
+                            newAttributePart.setConceptStatus(currentUnreviewedId);
+                            newAttributePart.setVersion(Integer.MAX_VALUE);
+                            newAttributePart.setPathId(copyToPath.getConceptId());
+                            concept.getConceptAttributes().addVersion(newAttributePart);
+                            count++;
+                        }
+                        System.out.println("number of mod concepts:= " + count);
                     }
                 }
             }
+            termFactory.addUncommitted(concept);
         }
 
         /**
