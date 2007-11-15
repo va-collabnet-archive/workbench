@@ -119,6 +119,11 @@ public interface I_TermFactory {
     public void forget(I_RelVersioned rel);
 
     public void addUncommitted(I_GetConceptData concept);
+    /**
+     * 
+     * @return An unmodifiable set of uncommitted items. 
+     */
+    public Set<I_Transact> getUncommitted();
 
     public void commit() throws Exception;
 
