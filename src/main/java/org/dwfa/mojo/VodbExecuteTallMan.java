@@ -308,10 +308,10 @@ public class VodbExecuteTallMan extends AbstractMojo {
                             newAttributePart.setPathId(copyToPath.getConceptId());
                             concept.getConceptAttributes().addVersion(newAttributePart);
                         }
+                        termFactory.addUncommitted(concept);
                     }
                 }
             }
-            termFactory.addUncommitted(concept);
         }
 
         /**
