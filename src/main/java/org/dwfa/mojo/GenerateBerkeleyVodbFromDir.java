@@ -27,7 +27,7 @@ public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
     */
    File dataDirectory;
 
-   private String[] allowedGoals = new String[] { "install" };
+   private String[] allowedGoals = new String[] { "install","deploy" };
 
    /**
     * The maven session

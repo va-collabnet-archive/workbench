@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -534,6 +535,10 @@ public class ExportDatabase extends AbstractMojo {
    public void execute() throws MojoExecutionException, MojoFailureException {
       try {
          
+    	  if (MojoUtil.alreadyRun(getLog(), outputDirectory + conceptDataFileName + descriptionsDataFileName + relationshipsDataFileName)) {
+              return;
+           }
+    	  
          I_TermFactory termFactory = LocalVersionedTerminology.get();
 
 	   System.out.println("Exporting identifiers");

@@ -66,7 +66,7 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 	 */
 	private String dataLocationInJar;
 
-	private String[] allowedGoals = new String[] { "install" };
+	private String[] allowedGoals = new String[] { "install","deploy" };
 
 	/**
 	 * The maven session
