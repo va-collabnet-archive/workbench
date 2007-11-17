@@ -305,6 +305,11 @@ public class FileIO {
         return null;
     }
     
+    /**
+     * Returns a String of the relative directory of a file, relative to the <code>user.dir</code> System property. 
+     * @param f the file to get the relative directory of. 
+     * @return a String of the relative directory. 
+     */
     public static String getRelativePath(File f) {
         File startupDir = new File(System.getProperty("user.dir"));
         String startupDirString = startupDir.getAbsolutePath();
@@ -321,7 +326,7 @@ public class FileIO {
         }
         StringBuffer relativePath = new StringBuffer();
         for (int i = 0; i < depth; i++) {
-            relativePath.append("../");
+            relativePath.append(".." + File.separator);
         }
         relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
         return relativePath.toString();
