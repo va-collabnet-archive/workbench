@@ -304,5 +304,27 @@ public class FileIO {
         }
         return null;
     }
+    
+    public static String getRelativePath(File f) {
+        File startupDir = new File(System.getProperty("user.dir"));
+        String startupDirString = startupDir.getAbsolutePath();
+        String fileAbsolutePath = f.getAbsolutePath();
+        if (fileAbsolutePath.contains(startupDirString)) {
+            return fileAbsolutePath.substring(startupDirString.length() + 1);
+        }
+        
+        int depth = 1;
+        File parent = startupDir.getParentFile();
+        while (fileAbsolutePath.contains(parent.getAbsolutePath()) == false) {
+            depth++;
+            parent = parent.getParentFile();
+        }
+        StringBuffer relativePath = new StringBuffer();
+        for (int i = 0; i < depth; i++) {
+            relativePath.append("../");
+        }
+        relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
+        return relativePath.toString();
+    }
 
 }
