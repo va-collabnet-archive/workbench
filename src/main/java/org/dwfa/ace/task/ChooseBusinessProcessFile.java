@@ -20,6 +20,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.util.io.FileIO;
 
 /**
  * Opens a file dialog and displays only .bp files for selection.
@@ -91,7 +92,7 @@ public class ChooseBusinessProcessFile extends AbstractTask {
                 worker.getLogger().info(("Selected file: " + selectedFile));
             }
 
-            process.setProperty(this.processFileNamePropName, selectedFile.getAbsoluteFile().toString());
+            process.setProperty(this.processFileNamePropName, FileIO.getRelativePath(selectedFile));
 
              return Condition.ITEM_COMPLETE;
         } catch (IllegalArgumentException e) {
