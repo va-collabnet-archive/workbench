@@ -42,12 +42,10 @@ public class RelationshipValidator extends SimpleValidator {
         List<I_RelVersioned> databaseRelationships = concept.getSourceRels();
         List<UniversalAceRelationship> beanRelationships = bean.getSourceRels();
 
-        // TODO remove is-a potential dup from list of
-        // database relationships (as these aren't included in the bean's relationships)
-        /*if (databaseRelationships.size() != beanRelationships.size()) {
+        if (databaseRelationships.size() != beanRelationships.size()) {
             System.out.println("number of relationships different");
             return false; // test 1
-        } */
+        }
 
         for (UniversalAceRelationship beanRelationship : beanRelationships) {
 
