@@ -48,7 +48,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	/**
 	 * Location of the queue file to use.
 	 * 
-	 * @parameter expression="${project.build.directory}\..\dev\src\main\profiles\users\keith.dev\inbox"
+	 * @parameter expression="${project.build.directory}\\..\\dev\\src\\main\\profiles\\users\\keith.dev\\inbox"
 	 * @required
 	 */
 	private File queueDirectory;
@@ -115,7 +115,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		                                                   getClass().getClassLoader());
 		    		
 		    		 System.out.println(">>>>>>>>>>>>>>>>> configuration created <<<<<<<<<<<<<<<<<<<<<<<");
-		    		MojoWorker mw = new MojoWorker(configuration,UUID.randomUUID() ,"whatisthis", "abc" );
+		    		MojoWorker mw = new MojoWorker(configuration,UUID.randomUUID() ,"whatisthis", "keith.dev" );
 //		    		MojoWorker mw = new MojoWorker(config.getWorker().getJiniConfig(),UUID.randomUUID() ,"whatisthis" );
 		    		System.out.println(">>>>>>>>>>>>>>>>> worker created <<<<<<<<<<<<<<<<<<<<<<<");
 //		    		ReadUuidListListFromUrl readUuid = new ReadUuidListListFromUrl();
