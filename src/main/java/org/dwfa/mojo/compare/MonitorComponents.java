@@ -33,7 +33,7 @@ public class MonitorComponents  {
 		termFactory = LocalVersionedTerminology.get();
 	}
 
-	public List<Match> checkConcept(I_GetConceptData concept) throws Exception {
+	public List<Match> checkConcept(I_GetConceptData concept, List<Integer> acceptedStatusIds) throws Exception {
 
 		// get latest concept attributes/descriptions/relationships
 		boolean attributesMatch = true;
@@ -84,8 +84,8 @@ public class MonitorComponents  {
 					firstPosition, false);
 
 
-
 			for (int i = j; i < positions.size()-1; i++) {
+
 				Set<I_Position> secondPosition = new HashSet<I_Position>();
 				secondPosition.add(positions.get(i+1));
 
@@ -96,29 +96,62 @@ public class MonitorComponents  {
 				relationshipTuples2 = concept.getSourceRelTuples(null, null,
 						secondPosition, false);
 
+
 				if (!CompareComponents.attributeListsEqual(
 						conceptAttributeTuples1, conceptAttributeTuples2)) {
 					attributesMatch = false;
-					break;
+				} else {
+
+					/*
+					 * There is a match, but is the status correct??
+					 * */
+					attributesMatch = false;
+					for (int tuple = 0; tuple < conceptAttributeTuples1.size();tuple++) {
+						if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(conceptAttributeTuples1.get(tuple).getConceptStatus())))) {
+							attributesMatch = true;
+						}
+					}					
 				}
 				if (!CompareComponents.descriptionListsEqual(
 						descriptionTuples1, descriptionTuples2)) {
 					descriptionsMatch = false;
-					break;
+				} else {
+					/*
+					 * There is a match, but is the status correct??
+					 * */
+					descriptionsMatch = false;
+					for (int tuple = 0; tuple < descriptionTuples1.size();tuple++) {
+						if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(descriptionTuples1.get(tuple).getStatusId())))) {
+							descriptionsMatch = true;
+						}
+					}
 				}
 
 				if (!CompareComponents.relationshipListsEqual(
 						relationshipTuples1, relationshipTuples2)) {
 					relationshipsMatch = false;
-					break;
+				} else {
+					/*
+					 * There is a match, but is the status correct??
+					 * */
+					relationshipsMatch = false;
+					if (relationshipTuples1.size()==0) {
+						relationshipsMatch = true;
+					}
+					for (int tuple = 0; tuple < relationshipTuples1.size();tuple++) {
+						if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(relationshipTuples1.get(tuple).getStatusId())))) {
+							relationshipsMatch = true;
+						}
+					}
 				}
+				
 
-				if (descriptionsMatch && relationshipsMatch && attributesMatch) {
+				if (descriptionsMatch && relationshipsMatch && attributesMatch) {					
 					Match match = new Match(positions.get(j),positions.get(i+1));
-					matches.add(match);
 					match.matchConceptAttributeTuples.addAll(conceptAttributeTuples1);
 					match.matchDescriptionTuples.addAll(descriptionTuples1);
 					match.matchRelationshipTuples.addAll(relationshipTuples1);
+					matches.add(match);
 				}
 
 			}

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,6 +24,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessPaths;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -131,7 +133,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 	int relationshipCount = 0;
 	int removedDescriptionCount = 0;
 	int removedRelationshipCount = 0;
-	
+
 	MonitorComponents componentMonitor = null; 
 	I_TermFactory termFactory = null;
 	BufferedWriter textWriter = null;
@@ -143,99 +145,92 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 
 	public void processConcept(I_GetConceptData concept) throws Exception {
 		boolean changed = false;
-		List<Match> matches = componentMonitor.checkConcept(concept);
+		List<Match> matches = componentMonitor.checkConcept(concept, acceptedStatusIds);
 
 		// check if the latest tuples are equal (excluding criteria)
 		if (compareOperator.compare(matches)) {
 			// copy latest attributes to new path/version
 
-			Set<I_ConceptAttributeTuple> allConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
-			Set<I_DescriptionTuple> allDescriptionTuples = new HashSet<I_DescriptionTuple>();
-			Set<I_RelTuple> allRelationshipTuples = new HashSet<I_RelTuple>();
-
 			Set<I_ConceptAttributeTuple> matchConceptAttributeTuples = new HashSet<I_ConceptAttributeTuple>();
 			Set<I_DescriptionTuple> matchDescriptionTuples = new HashSet<I_DescriptionTuple>();
 			Set<I_RelTuple> matchRelationshipTuples = new HashSet<I_RelTuple>();
 
-			for (Match match: matches) {				
-				allConceptAttributeTuples.addAll(match.matchConceptAttributeTuples);
-				allDescriptionTuples.addAll(match.matchDescriptionTuples);
-				allRelationshipTuples.addAll(match.matchRelationshipTuples);
-				if (matchConceptAttributeTuples.size()==0) {
-					matchConceptAttributeTuples.addAll(match.matchConceptAttributeTuples);
-					matchDescriptionTuples.addAll(match.matchDescriptionTuples);
-					matchRelationshipTuples.addAll(match.matchRelationshipTuples);
-				}
-			}
-
-			for (I_ConceptAttributeTuple tuple: allConceptAttributeTuples) {
-				I_ConceptAttributePart newPart = tuple.duplicatePart();
-				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setConceptStatus(updatedStatusId);
-				tuple.getConVersioned().addVersion(newPart);
-			}
-			for (I_DescriptionTuple tuple: allDescriptionTuples) {
-				I_DescriptionPart newPart = tuple.duplicatePart();
-				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setStatusId(updatedStatusId);
-				newPart.setText(tuple.getText());
-				tuple.getDescVersioned().addVersion(newPart);
-			}
-			for (I_RelTuple tuple: allRelationshipTuples) {
-				I_RelPart newPart = tuple.duplicatePart();
-				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setStatusId(updatedStatusId);
-				tuple.getRelVersioned().addVersion(newPart);
-			}
+			Match match = matches.get(0);				
+			matchConceptAttributeTuples.addAll(match.matchConceptAttributeTuples);
+			matchDescriptionTuples.addAll(match.matchDescriptionTuples);
+			matchRelationshipTuples.addAll(match.matchRelationshipTuples);
 
 			for (I_ConceptAttributeTuple tuple: matchConceptAttributeTuples) {
-				I_ConceptAttributePart newPart = tuple.duplicatePart();
-				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPart.getConceptStatus())))
+				I_ConceptAttributePart newPartOnNewPath = tuple.duplicatePart();
+				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPartOnNewPath.getConceptStatus())))
 						&& 
-						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPart.getConceptStatus())))) {
+						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPartOnNewPath.getConceptStatus())))) {
 					changed = true;
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setPathId(copyToPath.getConceptId());
-					newPart.setConceptStatus(updatedStatusOnNewPathId);
-					tuple.getConVersioned().addVersion(newPart);
+					newPartOnNewPath.setVersion(Integer.MAX_VALUE);
+					newPartOnNewPath.setPathId(copyToPath.getConceptId());
+					newPartOnNewPath.setConceptStatus(updatedStatusOnNewPathId);
+					tuple.getConVersioned().addVersion(newPartOnNewPath);
+
+
+					for (ConceptDescriptor cd : branchOrigins) {
+						I_ConceptAttributePart newPart = tuple.duplicatePart();
+						newPart.setVersion(Integer.MAX_VALUE);
+						newPart.setPathId(cd.getVerifiedConcept().getConceptId());
+						newPart.setConceptStatus(updatedStatusId);
+						tuple.getConVersioned().addVersion(newPart);
+					}					
 				}
 			}
 			// copy latest descriptions to new path/version
 			for (I_DescriptionTuple tuple: matchDescriptionTuples) {
-				I_DescriptionPart newPart = tuple.duplicatePart();
+				I_DescriptionPart newPartOnNewPath = tuple.duplicatePart();
 				descriptionCount++;
-				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPart.getStatusId())))
+				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPartOnNewPath.getStatusId())))
 						&& 
-						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPart.getStatusId())))) {
+						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPartOnNewPath.getStatusId())))) {
 					changed = true;
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setPathId(copyToPath.getConceptId());					
-					newPart.setStatusId(updatedStatusOnNewPathId);
-					newPart.setText(tuple.getText());
-					tuple.getDescVersioned().addVersion(newPart);
+					newPartOnNewPath.setVersion(Integer.MAX_VALUE);
+					newPartOnNewPath.setPathId(copyToPath.getConceptId());					
+					newPartOnNewPath.setStatusId(updatedStatusOnNewPathId);
+					newPartOnNewPath.setText(tuple.getText());
+					tuple.getDescVersioned().addVersion(newPartOnNewPath);
+					for (ConceptDescriptor cd : branchOrigins) {
+						I_DescriptionPart newPart = tuple.duplicatePart();
+						newPart.setVersion(Integer.MAX_VALUE);
+						newPart.setPathId(cd.getVerifiedConcept().getConceptId());
+						newPart.setStatusId(updatedStatusId);
+						tuple.getDescVersioned().addVersion(newPart);
+					}
 				} else {
-					System.out.println("rejected description: " + tuple.getText());
+					//System.out.println("rejected description: " + tuple.getText());
 					removedDescriptionCount++;
 				}
 			}
 			// copy latest relationships to new path/version
 			for (I_RelTuple tuple: matchRelationshipTuples) {
-				I_RelPart newPart = tuple.duplicatePart();
+				I_RelPart newPartOnNewPath = tuple.duplicatePart();
 				relationshipCount++;
-				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPart.getStatusId())))
+				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPartOnNewPath.getStatusId())))
 						&& 
-						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPart.getStatusId())))) {
+						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPartOnNewPath.getStatusId())))) {
 					changed = true;
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setPathId(copyToPath.getConceptId());
-					newPart.setStatusId(updatedStatusOnNewPathId);
-					tuple.getRelVersioned().addVersion(newPart);
+					newPartOnNewPath.setVersion(Integer.MAX_VALUE);
+					newPartOnNewPath.setPathId(copyToPath.getConceptId());
+					newPartOnNewPath.setStatusId(updatedStatusOnNewPathId);					
+					tuple.getRelVersioned().addVersion(newPartOnNewPath);
+					for (ConceptDescriptor cd : branchOrigins) {
+						I_RelPart newPart = tuple.duplicatePart();
+						newPart.setVersion(Integer.MAX_VALUE);
+						newPart.setPathId(cd.getVerifiedConcept().getConceptId());
+						newPart.setStatusId(updatedStatusId);
+						tuple.getRelVersioned().addVersion(newPart);
+					}	
 				} else {
 					removedRelationshipCount++;
 				}
 			}
 			if (changed) {
-				agreedChanges++;
+				agreedChanges++;				
 				termFactory.addUncommitted(concept);
 			} else {
 				conflicts++;
@@ -249,6 +244,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 								+ outputTextFileName)));
 			}
 			textWriter.append(concept.getUids().toString());
+			conflicts++;
 		}
 
 		conceptCount++;
@@ -259,8 +255,8 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 		componentMonitor = new MonitorComponents();
 		termFactory = LocalVersionedTerminology.get();
 		try {
-			CompareComponents.reject = false;
 
+			CompareComponents.reject = false;
 			if (branchOrigins != null) {
 				termFactory.iteratePaths(this);
 			}
@@ -277,6 +273,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 							acceptedstatus.getVerifiedConcept().getUids()).getConceptId());
 				}
 			}
+
 
 			updatedStatusId = termFactory.getConcept(
 					updatedStatus.getVerifiedConcept().getUids()).getConceptId();
@@ -340,7 +337,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 			System.out.println("Copied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
 			System.out.println("Copied " + (descriptionCount-removedDescriptionCount) + " descriptions out of a total of " +descriptionCount+ "");
 			System.out.println("Copied " + (relationshipCount-removedRelationshipCount) + " relationships out of a total of " +relationshipCount+ "");
-			
+
 
 			if (textWriter != null) {
 				textWriter.close();
@@ -351,22 +348,33 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 		}
 	}
 
-	List<I_Path> originBasedPath = new LinkedList<I_Path>();
 	public void processPath(I_Path path) throws Exception {
+		Set<I_Position> allOrigins = new HashSet<I_Position>();		
+		List<I_Position> origins = new LinkedList<I_Position>();
+		origins.addAll(path.getOrigins());
+		int size = 0;
+		while (origins.size()!=size) {
+			I_Position origin = origins.get(size);
+			allOrigins.add(origin);
+			size++;
 
-		Iterator<I_Position> it = path.getOrigins().iterator();
+			List<I_Position> childOrigins = origin.getPath().getOrigins();
+			origins.addAll(childOrigins);
+		}
+
+		Iterator<I_Position> it = allOrigins.iterator();
+
 		while (it.hasNext()) {
 			I_Position pos = it.next();
 			int pathId = pos.getPath().getConceptId();
 			for (int i = 0; i < branchOrigins.length; i++) {
-				int originId = branchOrigins[i].getVerifiedConcept().getConceptId();				
+				int originId = branchOrigins[i].getVerifiedConcept().getConceptId();
 				if (pathId == originId) {
 					/*
 					 * This path needs to be checked because
 					 * it has a origin which is in the list of specified
 					 * origins
 					 * */
-					System.out.println("the path is: " + termFactory.getConcept(path.getConceptId()).getDescriptions().iterator().next().getTuples().iterator().next().getText());
 					totalBranches.add(termFactory.getConcept(path.getConceptId()));
 				}
 			}

@@ -26,7 +26,6 @@ public class CompareComponents {
             I_ConceptAttributeTuple tuple2) {
         if ((tuple1.getConceptStatus() != tuple2.getConceptStatus())
               || (tuple1.isDefined() != tuple2.isDefined())) {
-            System.out.println("Found non-matching concept tuples");
             return false;
         }
         return true;
@@ -53,7 +52,6 @@ public class CompareComponents {
                   (tuple1.getStatusId() != tuple2.getStatusId()) ||
                   (!tuple1.getText().equals(tuple2.getText())) ||
                   (tuple1.getTypeId() != tuple2.getTypeId())) {
-                System.out.println("Found non-matching desc tuples");
                 return false;
         }
         return true;
@@ -78,7 +76,6 @@ public class CompareComponents {
               (tuple1.getRefinabilityId() != tuple2.getRefinabilityId()) ||
               (tuple1.getRelTypeId() != tuple2.getRelTypeId()) ||
               (tuple1.getStatusId() != tuple2.getStatusId())) {
-            System.out.println("Found non matching rel tuples");
             return false;
         }
         return true;
