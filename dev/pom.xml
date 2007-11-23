@@ -23,11 +23,9 @@
   </issueManagement>
   <distributionManagement>
     <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>aceworkspace.net</id>
-      <name>aceworkspace.net</name>
-      <url>file:///ciweb/webapps/maven2</url>
-      <layout>default</layout>
+      <id>file-for-pbl</id>
+      <name></name>
+      <url>file://maven2</url>
     </repository>
     <site>
       <id>aceworkspace.net</id>
@@ -67,6 +65,19 @@
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>
           <workspace>/eclipse/workspace</workspace>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.dwfa</groupId>
+        <artifactId>pbl-mojo</artifactId>
+        <configuration>
+          <cubitProject>cubitci</cubitProject>
+          <siteRoot>foundation</siteRoot>
+          <pluginsInMetadata>
+            <plugin>dwfa-mojo</plugin>
+            <plugin>term-mojo</plugin>
+            <plugin>pbl-mojo</plugin>
+          </pluginsInMetadata>
         </configuration>
       </plugin>
     </plugins>
