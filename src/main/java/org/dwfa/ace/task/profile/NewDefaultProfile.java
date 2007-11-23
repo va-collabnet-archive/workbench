@@ -224,6 +224,7 @@ public class NewDefaultProfile extends AbstractTask {
       allowedStatus.add(tf.uuidToNative(Concept.PENDING_MOVE.getUids()));
       allowedStatus.add(tf.uuidToNative(Concept.PROCESSED.getUids()));
       allowedStatus.add(tf.uuidToNative(Concept.RESOLVED_IN_DUAL.getUids()));
+      allowedStatus.add(tf.uuidToNative(Concept.PROMOTED.getUids()));
       addIfNotNull(allowedStatus, Concept.RESOLVED_IN_DUAL_AND_PROCESSED, tf);
       addIfNotNull(allowedStatus, Concept.CONFLICTING, tf);
       addIfNotNull(allowedStatus, Concept.CONSTANT, tf);
