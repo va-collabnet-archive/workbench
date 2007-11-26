@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -18,6 +19,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.status.SetStatusUtil;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -123,30 +125,38 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
 
       I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId, false, activeProfile);
 
-      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + fsDescription), newPathConcept, "en",
+      I_GetConceptData statusConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.INTERNAL_USE_ONLY.getUids());
+      
+      SetStatusUtil.setStatusOfConceptInfo(statusConcept,newPathConcept.getConceptAttributes().getTuples());
+      
+      I_DescriptionVersioned idv = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + fsDescription), newPathConcept, "en",
             fsDescription, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeProfile);
+      SetStatusUtil.setStatusOfDescriptionInfo(statusConcept,idv.getTuples());
 
       String prefDesc = username + " dev path";
       
-      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + prefDesc), newPathConcept, "en",
-            prefDesc, ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);
-
-      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username), newPathConcept,
+      idv = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + prefDesc), newPathConcept, "en",
+            prefDesc, ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);      
+      SetStatusUtil.setStatusOfDescriptionInfo(statusConcept,idv.getTuples());
+      
+      idv = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username), newPathConcept,
             "en", username, ArchitectonicAuxiliary.Concept.USER_NAME.localize(), activeProfile);
+      SetStatusUtil.setStatusOfDescriptionInfo(statusConcept,idv.getTuples());
 
-      tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "inbox"), newPathConcept,
+      idv = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "inbox"), newPathConcept,
             "en", username, ArchitectonicAuxiliary.Concept.USER_INBOX.localize(), activeProfile);
+      SetStatusUtil.setStatusOfDescriptionInfo(statusConcept,idv.getTuples());
 
       I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
       I_GetConceptData relDestination = tf.getConcept(parentPathTermEntry.ids);
       I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
             .getUids());
       I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-      I_GetConceptData relStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-
+      //I_GetConceptData relStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+      
       UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parentPathTermEntry.ids[0] + username + "relid");
       tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability,
-            relStatus, 0, activeProfile);
+            statusConcept, 0, activeProfile);
       return newPathConcept;
    }
 
