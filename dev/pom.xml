@@ -29,7 +29,7 @@
     </repository>
     <site>
       <id>aceworkspace.net</id>
-      <url>file:///ciweb/webapps/dwfa/foundation</url>
+      <url>file:///ciweb/webapps/foundation/site</url>
     </site>
   </distributionManagement>
   <scm>
