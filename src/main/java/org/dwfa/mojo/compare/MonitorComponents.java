@@ -66,13 +66,14 @@ public class MonitorComponents  {
 			relationshipTuples1 = concept.getSourceRelTuples(null, null,
 					firstPosition, false);
 
-		
+				
 			/*
 			 * Is the status correct??
 			 * */
 			attributesMatch = false;
 			for (int tuple = 0; tuple < conceptAttributeTuples1.size();tuple++) {
 				if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(conceptAttributeTuples1.get(tuple).getConceptStatus())))) {
+					
 					attributesMatch = true;
 				}
 			}					
