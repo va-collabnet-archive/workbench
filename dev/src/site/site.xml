@@ -19,7 +19,7 @@
     
     <menu name="DWFA mojo">
       <item name="DWFA mojo Home" href="index.html"/>
-      <item name="Parent Module: DWFA Master" href="../index.html"/>
+      <item name="Parent Module: DWFA Master" href="../../dwfa/site/index.html"/>
     </menu>
     <menu name="Goals">
       <item name="class-dep" href="plugins/class-dep-mojo.html"/>
