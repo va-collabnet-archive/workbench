@@ -5,7 +5,7 @@
   <packaging>jar</packaging>
   <version>1.4-SNAPSHOT</version>
   <name>Versioned Object Database</name>
-  <url>http://www.informatics.com</url>
+  <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/vodb/site</url>
   <inceptionYear>2005</inceptionYear>
   <description>ACE editor toolkit and version-oriented database</description>
   <distributionManagement>
@@ -18,7 +18,7 @@
     </repository>
     <site>
       <id>aceworkspace.net</id>
-      <url>file:///ciweb/webapps/dwfa/vodb</url>
+      <url>file:///ciweb/webapps/vodb/site</url>
     </site>
   </distributionManagement>
   <scm>
@@ -186,6 +186,15 @@
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>
           <workspace>/eclipse/workspace</workspace>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.dwfa</groupId>
+        <artifactId>pbl-mojo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <cubitProject>cubitci</cubitProject>
+          <siteRoot>vodb</siteRoot>
         </configuration>
       </plugin>
     </plugins>
