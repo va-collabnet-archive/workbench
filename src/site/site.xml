@@ -19,7 +19,7 @@
     
     <menu name="ACE Mojo Module">
       <item name="ACE Mojo Home" href="index.html"/>
-      <item name="Parent Module: DWFA Master" href="../index.html"/>
+      <item name="Parent Module: DWFA Master" href="../../dwfa/site/index.html"/>
     </menu>
     <menu name="Developer Guides">
       <item name="Ace Format Data Import" href="dataimport.html"/>
