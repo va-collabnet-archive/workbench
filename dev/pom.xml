@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.dwfa</groupId>
@@ -12,11 +13,10 @@
   <packaging>maven-plugin</packaging>
   <name>DWFA mojo</name>
   <inceptionYear>2004</inceptionYear>
-  <description>Maven plugins helpful in building DWFA projects with maven. 
-    Some example inclulde custom processing of configuration files using maven pom files, 
-    and customizaiton of workflow bundles.
-  </description>
-  <url>http://www.informatics.com</url>
+  <description>Maven plugins helpful in building DWFA projects with maven. Some example inclulde
+    custom processing of configuration files using maven pom files, and customizaiton of workflow
+    bundles. </description>
+  <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/dwfa-mojo/site</url>
   <issueManagement>
     <system>Scarab</system>
     <url>https://dwfa-mojo.aceworkspace.net/servlets/Scarab</url>
@@ -31,7 +31,7 @@
     </repository>
     <site>
       <id>aceworkspace.net</id>
-      <url>file:///ciweb/webapps/dwfa/dwfa-mojo</url>
+      <url>file:///ciweb/webapps/dwfa-mojo/site</url>
     </site>
   </distributionManagement>
   <scm>
@@ -115,7 +115,7 @@
       <version>2.0-alpha-4</version>
       <scope>compile</scope>
     </dependency>
-   </dependencies>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
@@ -125,33 +125,42 @@
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
-      </plugin>     
+      </plugin>
       <plugin>
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>
           <workspace>/eclipse/workspace</workspace>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.dwfa</groupId>
+        <artifactId>pbl-mojo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <cubitProject>cubitci</cubitProject>
+          <siteRoot>dwfa-mojo</siteRoot>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
-  	<profile>
-  		<id>add-tools-on-windows</id>
-  		<activation>
-  			<os>
-  				<family>windows</family>
-  			</os>
-  		</activation>
-  		<dependencies>
-			<dependency>
-  				<groupId>sun.jdk</groupId>
-  				<artifactId>tools</artifactId>
-  				<version>any</version>
-  				<scope>system</scope>
- 				<systemPath>${java.home}\..\lib\tools.jar</systemPath>
-  			</dependency>
-  		</dependencies>
-  	</profile>
+    <profile>
+      <id>add-tools-on-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>sun.jdk</groupId>
+          <artifactId>tools</artifactId>
+          <version>any</version>
+          <scope>system</scope>
+          <systemPath>${java.home}\..\lib\tools.jar</systemPath>
+        </dependency>
+      </dependencies>
+    </profile>
     <profile>
       <id>add-tools-on-linux</id>
       <activation>
@@ -186,7 +195,7 @@
               <goalPrefix>plugin</goalPrefix>
               <outputDirectory>${project.build.directory}/generated-site/xdoc/plugins</outputDirectory>
             </configuration>
-          </plugin>      
+          </plugin>
         </plugins>
       </build>
     </profile>

@@ -10,7 +10,7 @@
   </bannerRight>
   <body>
     <links>
-      <item name="DWFA Master" href="../index.html"/>
+      <item name="DWFA Master" href="../../dwfa/site/index.html"/>
       <item name="Informatics, Inc." href="http://www.informatics.com/"/>
       <item name="Jini" href="http://www.jini.org/" />
       <item name="Apache" href="http://www.apache.org/" />
