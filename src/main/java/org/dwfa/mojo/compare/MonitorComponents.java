@@ -57,7 +57,6 @@ public class MonitorComponents  {
 		 * to the required status.  
 		 */
 		if (positions.size()==1) {
-			boolean ok = true;
 			Set<I_Position> firstPosition = new HashSet<I_Position>();
 			firstPosition.add(positions.get(0));
 			conceptAttributeTuples1 =
@@ -67,11 +66,42 @@ public class MonitorComponents  {
 			relationshipTuples1 = concept.getSourceRelTuples(null, null,
 					firstPosition, false);
 
-			if (ok) {
+		
+			/*
+			 * Is the status correct??
+			 * */
+			attributesMatch = false;
+			for (int tuple = 0; tuple < conceptAttributeTuples1.size();tuple++) {
+				if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(conceptAttributeTuples1.get(tuple).getConceptStatus())))) {
+					attributesMatch = true;
+				}
+			}					
+			descriptionsMatch = false;
+			for (int tuple = 0; tuple < descriptionTuples1.size();tuple++) {
+				if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(descriptionTuples1.get(tuple).getStatusId())))) {
+					descriptionsMatch = true;
+				}
+			}
+			relationshipsMatch = false;
+			if (relationshipTuples1.size()==0) {
+				relationshipsMatch = true;
+			}
+			for (int tuple = 0; tuple < relationshipTuples1.size();tuple++) {
+				if ((acceptedStatusIds.size()==0 || (acceptedStatusIds.size()!=0 && acceptedStatusIds.contains(relationshipTuples1.get(tuple).getStatusId())))) {
+					relationshipsMatch = true;
+				}
+			}
+			
+			if (attributesMatch && descriptionsMatch && relationshipsMatch) {
 				Match match = new Match(positions.get(0),positions.get(0));
+				match.matchConceptAttributeTuples.addAll(conceptAttributeTuples1);
+				match.matchDescriptionTuples.addAll(descriptionTuples1);
+				match.matchRelationshipTuples.addAll(relationshipTuples1);
 				matches.add(match);
 			}
 		}
+
+
 
 		for (int j = 0; j < positions.size()-1; j++) {
 			Set<I_Position> firstPosition = new HashSet<I_Position>();
@@ -144,7 +174,7 @@ public class MonitorComponents  {
 						}
 					}
 				}
-				
+
 
 				if (descriptionsMatch && relationshipsMatch && attributesMatch) {					
 					Match match = new Match(positions.get(j),positions.get(i+1));

@@ -124,6 +124,15 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 	 */
 	private CompareOperator compareOperator;
 
+	/**
+	 * If this parameter is set, then the system will only check one position at a time, rather than comparing
+	 * paths for differences. This is useful if the only requirement is to check if one path has a particular status
+	 * set for a concept
+	 * @parameter
+	 */
+	private boolean checkSinglePath = false;
+	
+	
 	I_Path copyToPath;
 
 	int agreedChanges = 0;
@@ -146,7 +155,6 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 	public void processConcept(I_GetConceptData concept) throws Exception {
 		boolean changed = false;
 		List<Match> matches = componentMonitor.checkConcept(concept, acceptedStatusIds);
-
 		// check if the latest tuples are equal (excluding criteria)
 		if (compareOperator.compare(matches)) {
 			// copy latest attributes to new path/version
@@ -162,6 +170,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 
 			for (I_ConceptAttributeTuple tuple: matchConceptAttributeTuples) {
 				I_ConceptAttributePart newPartOnNewPath = tuple.duplicatePart();
+								
 				if ((rejectedStatus==null || (rejectedStatus!=null && !rejectedStatusIds.contains(newPartOnNewPath.getConceptStatus())))
 						&& 
 						(acceptedStatus==null || (acceptedStatus!=null && acceptedStatusIds.contains(newPartOnNewPath.getConceptStatus())))) {
@@ -311,8 +320,43 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 						Integer.MAX_VALUE);
 				positions.add(comparePosition);
 			}
-			componentMonitor.setPositions(positions);
-			termFactory.iterateConcepts(this);
+			/*
+			 * Compare concepts against all  positions 
+			 * */
+			if (!checkSinglePath) {
+				componentMonitor.setPositions(positions);
+				termFactory.iterateConcepts(this);
+
+				System.out.println("Finished copying\nFound " + conflicts + " concepts with differences");
+				System.out.println("Copied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
+				System.out.println("Copied " + (descriptionCount-removedDescriptionCount) + " descriptions out of a total of " +descriptionCount+ "");
+				System.out.println("Copied " + (relationshipCount-removedRelationshipCount) + " relationships out of a total of " +relationshipCount+ "");
+
+			}
+			
+			/*
+			 * do one and one
+			 * */
+			if (checkSinglePath) {
+				for (int i = 0; i < positions.size(); i++) {
+					List<I_Position> pos = new LinkedList<I_Position>();
+					pos.add(positions.get(i));
+					componentMonitor.setPositions(pos);
+					conceptCount = 0;
+					descriptionCount = 0;
+					relationshipCount = 0;
+					removedDescriptionCount = 0;
+					removedRelationshipCount = 0;
+					agreedChanges = 0;
+					
+					termFactory.iterateConcepts(this);
+					System.out.println("For PATH: " + termFactory.getConcept(positions.get(i).getPath().getConceptId()));
+					System.out.println("Copied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
+					System.out.println("Copied " + (descriptionCount-removedDescriptionCount) + " descriptions out of a total of " +descriptionCount+ "");
+					System.out.println("Copied " + (relationshipCount-removedRelationshipCount) + " relationships out of a total of " +relationshipCount+ "");
+
+				}
+			}
 
 			if (conflicts > 0) {
 				outputHtmlDirectory.mkdirs();
@@ -333,10 +377,6 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
 				htmlWriter.close();
 			}
 
-			System.out.println("Finished copying\nFound " + conflicts + " concepts with differences");
-			System.out.println("Copied " + agreedChanges + " concepts out of a total of " +conceptCount+ "");
-			System.out.println("Copied " + (descriptionCount-removedDescriptionCount) + " descriptions out of a total of " +descriptionCount+ "");
-			System.out.println("Copied " + (relationshipCount-removedRelationshipCount) + " relationships out of a total of " +relationshipCount+ "");
 
 
 			if (textWriter != null) {
