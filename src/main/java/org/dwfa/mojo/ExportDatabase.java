@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -266,18 +267,14 @@ public class ExportDatabase extends AbstractMojo {
             return false;
          } else {
             StringBuilder stringBuilder = new StringBuilder("");
-            List<I_ConceptAttributeTuple> matches = concept.getConceptAttributeTuples(allowedStatus, positions);
-            if (matches == null || matches.size() == 0) {
                
-				List<I_ConceptAttributeTuple> firstMatches = concept.getConceptAttributeTuples(null, positions);
-
-				matches = new LinkedList<I_ConceptAttributeTuple>();
-				for (int i = 0; i < firstMatches.size();i++) {
-					if (allowedStatus.contains(firstMatches.get(i).getConceptStatus())) {
-						matches.add(firstMatches.get(i));
-					}
+			List<I_ConceptAttributeTuple> firstMatches = concept.getConceptAttributeTuples(null, positions);
+			List<I_ConceptAttributeTuple> matches = new LinkedList<I_ConceptAttributeTuple>();
+			for (int i = 0; i < firstMatches.size();i++) {
+				if (allowedStatus.contains(firstMatches.get(i).getConceptStatus())) {
+					matches.add(firstMatches.get(i));
 				}
-            }
+			}
             
             if (matches == null || matches.size() == 0) {
                return false;
@@ -331,23 +328,16 @@ public class ExportDatabase extends AbstractMojo {
       private void getUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes)
             throws Exception {
 
-         for (I_RelVersioned rel : concept.getSourceRels()) {
-            for (I_RelPart part : rel.getVersions()) {
-               I_Path path = termFactory.getPath(termFactory.getUids(part.getPathId()));
-               I_Position partPos = termFactory.newPosition(path, part.getVersion());
+    	 List<I_RelTuple> tuples = concept.getSourceRelTuples(null, null, positions, false);
+    	 for (I_RelTuple tuple : tuples) {
+    		 I_RelPart part = tuple.getPart();
+             I_RelVersioned rel = tuple.getRelVersioned();
                if (allowedStatus.contains(part.getStatusId()) && 
                      isExportable(ConceptBean.get(rel.getC2Id())) &&
                      isExportable(ConceptBean.get(part.getCharacteristicId())) &&
                      isExportable(ConceptBean.get(part.getRefinabilityId())) &&
                      isExportable(ConceptBean.get(part.getRelTypeId()))) {
-                  boolean positionOk = false;
-                  for (I_Position exportPos : positions) {
-                     if (exportPos.isSubsequentOrEqualTo(partPos)) {
-                        positionOk = true;
-                        break;
-                     }
-                  }
-                  if (positionOk) {
+            	   
                      StringBuilder stringBuilder = new StringBuilder();
                      // Relationship ID
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(rel.getRelId()).getUids()
@@ -429,32 +419,24 @@ public class ExportDatabase extends AbstractMojo {
                      createRecord(stringBuilder, System.getProperty("line.separator"));
 
                      relationshipUuidDistributionDetails.add(stringBuilder.toString());
-                  }
-               }
             }
          }
       }// End method getUuidBasedRelDetails
 
       private void getUuidBasedDescriptionDetails(I_GetConceptData concept, I_IntSet allowedStatus,
             I_IntSet allowedTypes) throws Exception {
-         for (I_DescriptionVersioned desc : concept.getDescriptions()) {
-            for (I_DescriptionPart part : desc.getVersions()) {
-               I_Path path = termFactory.getPath(termFactory.getUids(part.getPathId()));
-               I_Position partPos = termFactory.newPosition(path, part.getVersion());
+
+       	 List<I_DescriptionTuple> tuples = concept.getDescriptionTuples(null, null, positions);    	  
+            for (I_DescriptionTuple tuple : tuples) {
+               I_DescriptionPart part = tuple.getPart();
                if (allowedStatus.contains(part.getStatusId()) &&
                      isExportable(ConceptBean.get(part.getTypeId()))) {
-                  boolean positionOk = false;
-                  for (I_Position exportPos : positions) {
-                     if (exportPos.isSubsequentOrEqualTo(partPos)) {
-                        positionOk = true;
-                        break;
-                     }
-                  }
-                  if (positionOk) {
+
+            	   
                      StringBuilder stringBuilder = new StringBuilder("");
                      // Snomed core
                      // Description Id
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(desc.getDescId()).getUids()
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(tuple.getDescVersioned().getDescId()).getUids()
                            .get(0));
 
                      // Description Status
@@ -487,8 +469,8 @@ public class ExportDatabase extends AbstractMojo {
 
                      // AMT added
                      // Description UUID
-                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(desc.getDescId()).getUids()
-                           .get(0));
+                     createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(tuple.getDescVersioned().getDescId()).getUids()
+                             .get(0));
 
                      // Description status UUID
                      createRecord(stringBuilder, LocalVersionedTerminology.get().getConcept(part.getStatusId())
@@ -515,9 +497,7 @@ public class ExportDatabase extends AbstractMojo {
 
                      descriptionUuidDistributionDetails.add(stringBuilder.toString());
                   }
-               }
             }
-         }
       }// End method getUuidBasedDescriptionDetails
 
       public int getConceptsSuppressed() {
