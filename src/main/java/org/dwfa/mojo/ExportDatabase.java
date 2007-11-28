@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -266,6 +267,18 @@ public class ExportDatabase extends AbstractMojo {
          } else {
             StringBuilder stringBuilder = new StringBuilder("");
             List<I_ConceptAttributeTuple> matches = concept.getConceptAttributeTuples(allowedStatus, positions);
+            if (matches == null || matches.size() == 0) {
+               
+				List<I_ConceptAttributeTuple> firstMatches = concept.getConceptAttributeTuples(null, positions);
+
+				matches = new LinkedList<I_ConceptAttributeTuple>();
+				for (int i = 0; i < firstMatches.size();i++) {
+					if (allowedStatus.contains(firstMatches.get(i).getConceptStatus())) {
+						matches.add(firstMatches.get(i));
+					}
+				}
+            }
+            
             if (matches == null || matches.size() == 0) {
                return false;
             }
