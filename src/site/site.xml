@@ -45,6 +45,7 @@
       <item name="vodb-copy-latest" href="plugins/vodb-copy-latest-mojo.html"/>
       <item name="vodb-count" href="plugins/vodb-count-mojo.html"/>
       <item name="vodb-create-new-path" href="plugins/vodb-create-new-path-mojo.html"/>
+      <item name="vodb-create-paths-from-base" href="plugins/vodb-create-paths-from-base-mojo.html"/>
       <item name="vodb-example-change" href="plugins/vodb-example-change-mojo.html"/>
       <item name="vodb-find-duplicates" href="plugins/vodb-find-duplicates-mojo.html"/>
       <item name="vodb-find-orphans" href="plugins/vodb-find-orphans-mojo.html"/>
