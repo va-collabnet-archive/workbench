@@ -35,7 +35,10 @@ public class Type5UuidFactory {
    public static UUID READV3_TERM60_DESC_ID = UUID.fromString("45419919-8ecd-11dc-8314-0800200c9a66");
    public static UUID READV3_TERM198_DESC_ID = UUID.fromString("4541991a-8ecd-11dc-8314-0800200c9a66");
     
-   
+   /* ICD 10AM UUIDS Added by NCCH */
+   public static UUID ICD10AM_CONCEPT_ID = UUID.fromString("fc5b4274-98a2-11dc-b260-b51f56d89593");
+   public static UUID ICD10AM_DESC_ID = UUID.fromString("fc5b4275-98a2-11dc-b260-b51f56d89593");
+   public static UUID ICD10AM_REL_ID = UUID.fromString("fc5b4276-98a2-11dc-b260-b51f56d89593");
    
    
 
