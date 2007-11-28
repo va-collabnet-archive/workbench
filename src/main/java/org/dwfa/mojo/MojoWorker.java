@@ -46,7 +46,7 @@ import org.dwfa.bpa.worker.Worker;
  * @author kec
  *
  */
-public class MojoWorker extends Worker implements /*I_GetWorkFromQueue,*/ Runnable {
+public class MojoWorker extends   Worker implements /*I_GetWorkFromQueue,*/ Runnable {
 
     private I_QueueProcesses queue;
     private Thread workerThread;
@@ -67,18 +67,18 @@ public class MojoWorker extends Worker implements /*I_GetWorkFromQueue,*/ Runnab
      * @throws LoginException 
      * @throws IOException 
      */
-    public MojoWorker(Configuration config, UUID id, String desc, String destination/*, I_SelectProcesses selector*/) 
+    public MojoWorker(Configuration config, UUID id, String desc /*String destination*//*, I_SelectProcesses selector*/) 
     throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
         super(config, id, desc);
         
-        process = new BusinessProcess(){
+        process = new BusinessProcess("failsafe", Condition.PROCESS_COMPLETE, false){
 	    	public Object readProperty(String propertyLabel)
 	        throws IntrospectionException, IllegalAccessException,
 	        InvocationTargetException {
 	    			return readAttachement(propertyLabel);
 	    	}
         };
-        process.setDestination(destination);
+        
         
         //        this.selector = selector;
     }
@@ -183,17 +183,22 @@ public class MojoWorker extends Worker implements /*I_GetWorkFromQueue,*/ Runnab
     
     public void setProcessProperty(String propName, Object propValue) throws TaskFailedException {
     	try{
-//    	  process.setProperty(propName, propValue);
+    	  process.setProperty(propName, propValue);
     	  process.writeAttachment(propName, propValue);
+    	  
+    	  process.setDestination("keith.dev");
+    	  
+    	 
+    	  
     	} catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        } /*catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+//            throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
+//            throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
-        }*/
+        }
     }
     
     public void addTask(I_DefineTask task, int position) throws TaskFailedException{
