@@ -18,6 +18,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
    
    private static Map<TYPE, UuidSnomedMap> mapMap;
    private static Map<TYPE, File> fileMap;
+   private File sourceDirectory = null;
    
    public void setupImpl(Transform transformer) throws IOException {
       // Nothing to setup
@@ -25,7 +26,9 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
       //[INFO]  buildDirectory: /au-ct/ace/amt-release/target
       File idGeneratedDir = new File(new File(buildDirectory, "generated-resources"), "sct-uuid-maps");
       
-      File sourceDirectory = transformer.getSourceDirectory();
+      if (sourceDirectory==null) {
+    	  sourceDirectory = transformer.getSourceDirectory();
+      }
        //[INFO]  sourceDirectory: /au-ct/ace/amt-release/src/main/java
       if (mapMap == null) {
          mapMap = new HashMap<TYPE, UuidSnomedMap>();
