@@ -18,8 +18,8 @@
     <url>http://www.informatics.com</url>
   </organization>
   <issueManagement>
-    <system>Scarab</system>
-    <url>https://foundation.aceworkspace.net/servlets/Scarab</url>
+    <system>Issue Tracker</system>
+    <url>https://dwfa.aceworkspace.net/servlets/tracking</url>
   </issueManagement>
   <distributionManagement>
     <repository>
