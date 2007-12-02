@@ -27,8 +27,14 @@ public class AddRelationship extends AddComponent {
     	int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 		int relId = AceConfig.getVodb().uuidToNativeWithGeneration(newRelUid, idSource,
 				config.getEditingPathSet(), Integer.MAX_VALUE);
-		ThinRelVersioned rel = new ThinRelVersioned(relId, cb.getConceptId(), config.getHierarchySelection().getConceptId(),
-				1);
+		int parentId = Integer.MAX_VALUE;
+		
+		if (config.getHierarchySelection() != null) {
+			parentId = config.getHierarchySelection().getConceptId();
+		} else {
+			parentId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid();
+		}
+		ThinRelVersioned rel = new ThinRelVersioned(relId, cb.getConceptId(), parentId, 1);
 		ThinRelPart relPart = new ThinRelPart();
 		rel.addVersion(relPart);
 		int status = config.getDefaultStatus().getConceptId();
