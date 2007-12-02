@@ -1,0 +1,19 @@
+<document>
+    <properties>
+        <author email="user@company.com">Keith Campbell</author>
+        <title>ACE Format Concnept Refset Import</title>
+    </properties>
+    <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+    <head> </head>
+    <body>
+        <!-- The body of the document contains a number of sections -->
+        <section name="ACE Format Concept Refset Import">
+            
+            <dl>
+                
+            </dl>
+            
+            <!-- Within sections, any XHTML can be used -->
+        </section>
+    </body>
+</document>
