@@ -21,7 +21,9 @@
         <li><a href="ids.html">Identifiers</a></li>
         <li><a href="licit-words.html">Licit Words</a></li>
         <li><a href="illicit-words.html">Illicit Words</a></li>
+        <li><a href="boolean-refset.html">Boolean RefSet</a></li>
         <li><a href="concept-refset.html">Concept RefSet</a></li>
+        <li><a href="concept-integer-refset.html">Concept-Integer RefSet</a></li>
       </ul>
       
       <!-- Within sections, any XHTML can be used -->

@@ -1,17 +1,17 @@
 <document>
     <properties>
         <author email="user@company.com">Keith Campbell</author>
-        <title>ACE Format Concept Refset Import</title>
+        <title>ACE Format Concept-Integer Refset Import</title>
     </properties>
     <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
     <head> </head>
     <body>
         <!-- The body of the document contains a number of sections -->
-        <section name="ACE Format Concept Refset Import">
+        <section name="ACE Format Concept-Integer Refset Import">
             
             
             <dl>
-                <dt><p>concept.refset</p></dt>
+                <dt><p>conint.refset</p></dt>
                 <dd>An optional file containing all the boolean refsets the terminology database, and their
                     status and version information. <table>
                         <tr>
@@ -77,6 +77,15 @@
                                 <p> The UUID is represented in its canonical form, consisting of 32 hexadecimal
                                     digits, displayed in 5 groups separated by hyphens, for a total of 36 characters.
                                     For example: 550e8400-e29b-41d4-a716-446655440000</p>
+                            </td>
+                        </tr>
+ 
+                        <tr>
+                            <td>
+                                <p>integer extension value</p>
+                            </td>
+                            <td>
+                                <p>An integer represented as a string</p>
                             </td>
                         </tr>
                         
