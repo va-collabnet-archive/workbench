@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -88,6 +89,10 @@ public class LaunchBatchGenAssignmentProcess extends AbstractTask {
                                 throws TaskFailedException {
         try {
         	//list string returned from GetSelectedAddresses need only the 1st address in the list
+        	worker.getLogger().info("Ready to read property: " + batchGenAssigneePropName);
+        	worker.getLogger().info("attachment keys: " + process.getAttachmentKeys());
+        	
+        	
         	List<String> selectedAdr = (List<String>) process.readProperty(batchGenAssigneePropName);
         	String assigneeStr = selectedAdr.get(0);
             ArrayList<Collection<UUID>> temporaryListList =
