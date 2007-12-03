@@ -4,10 +4,10 @@
         <artifactId>dwfa-pom</artifactId>
         <version>2.0</version>
     </parent>
-    <version>2.0.7-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
     <artifactId>core</artifactId>
+    <version>2.0.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/core/site/</url>
