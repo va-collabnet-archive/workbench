@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>term-mojo</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <packaging>maven-plugin</packaging>
   <name>ACE mojo</name>
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/</url>
@@ -25,9 +25,9 @@
     </site>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</connection>
-    <developerConnection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</developerConnection>
-    <url>https://term-mojo.aceworkspace.net/source/browse/term-mojo/trunk/dev/</url>
+    <connection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/tags/term-mojo-1.5</connection>
+    <developerConnection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/tags/term-mojo-1.5</developerConnection>
+    <url>https://term-mojo.aceworkspace.net/source/browse/term-mojo/tags/term-mojo-1.5</url>
   </scm>
   <organization>
     <name>Informatics, Inc.</name>
