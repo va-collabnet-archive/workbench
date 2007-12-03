@@ -4,11 +4,10 @@
     <artifactId>dwfa-pom</artifactId>
     <version>2.0</version>
   </parent>
-
-  <version>2.0.11-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>foundation</artifactId>
+  <version>2.0.11-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Dwfa foundation module</name>
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html/</url>
@@ -70,7 +69,7 @@
       <plugin>
         <groupId>org.dwfa</groupId>
         <artifactId>pbl-mojo</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1</version>
         <configuration>
           <cubitProject>cubitci</cubitProject>
           <siteRoot>foundation</siteRoot>
