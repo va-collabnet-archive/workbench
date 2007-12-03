@@ -22,10 +22,20 @@
   </issueManagement>
   <distributionManagement>
     <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>aceworkspace.net</id>
+      <name>aceworkspace.net</name>
+      <url>file:///ciweb/webapps/maven2</url>
+      <layout>default</layout>
+    </repository>
+    <!-- 
+      <repository>
       <id>file-for-pbl</id>
       <name />
       <url>file://maven2</url>
-    </repository>
+      </repository>
+      
+        -->
     <site>
       <id>aceworkspace.net</id>
       <url>file:///ciweb/webapps/foundation/site</url>
