@@ -1,17 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>ace-api</artifactId>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4</version>
   <packaging>jar</packaging>
   <name>ACE API</name>
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-api/site</url>
   <scm>
-    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</connection>
-    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</developerConnection>
-    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
+    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/tags/ace-api-1.4</connection>
+    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/tags/ace-api-1.4</developerConnection>
+    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/tags/ace-api-1.4</url>
   </scm>
   <distributionManagement>
     <repository>
