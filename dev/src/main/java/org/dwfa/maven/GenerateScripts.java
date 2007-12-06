@@ -206,7 +206,6 @@ public class GenerateScripts extends AbstractMojo {
 				fw = new FileWriter(linuxScript);
 				// fw.write("export
 				// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
-				fw.write("java \\\n");
             if (bundledJre) {
                fw.write("jre/bin/java \\\n");
             } else {
