@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -18,7 +17,6 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
@@ -31,7 +29,7 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
 *
-* <h1>ReportConceptStatus</h1>
+* ReportConceptStatus
 * <br/>
 * <p>The <code>ReportConceptStatus</code> class queries the database to get details of concept status changes over time.</p>
 * <p>This data is then used by an instance of the <code>MojoGraph</code> class to create a graphical representation</p>

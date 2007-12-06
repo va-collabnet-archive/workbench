@@ -24,37 +24,7 @@
     <menu name="Developer Guides">
       <item name="Ace Format Data Import" href="dataimport.html"/>
       <item name="SNOMED Format Data Import" href="snomed-dataimport.html"/>
-    </menu>
-    <menu name="Goals">
-      <item name="bcs-open" href="plugins/bcs-open-mojo.html"/>
-      <item name="bcs-read" href="plugins/bcs-read-mojo.html"/>
-      <item name="berkley-vodb-dir" href="plugins/berkley-vodb-dir-mojo.html"/>
-      <item name="berkley-vodb" href="plugins/berkley-vodb-mojo.html"/>
-      <item name="cs-close" href="plugins/cs-close-mojo.html"/>
-      <item name="derby-snomed" href="plugins/derby-snomed-mojo.html"/>
-      <item name="exportdata" href="plugins/exportdata-mojo.html"/>
-      <item name="merge-snomed" href="plugins/merge-snomed-mojo.html"/>
-      <item name="openbase-snomed" href="plugins/openbase-snomed-mojo.html"/>
-      <item name="reportstatus" href="plugins/reportstatus-mojo.html"/>
-      <item name="update-from-repository" href="plugins/update-from-repository-mojo.html"/>
-      <item name="vodb-add-change-set-writer" href="plugins/vodb-add-change-set-writer-mojo.html"/>
-      <item name="vodb-check-child-count" href="plugins/vodb-check-child-count-mojo.html"/>
-      <item name="vodb-checkpoint" href="plugins/vodb-checkpoint-mojo.html"/>
-      <item name="vodb-close" href="plugins/vodb-close-mojo.html"/>
-      <item name="vodb-commit" href="plugins/vodb-commit-mojo.html"/>
-      <item name="vodb-copy-latest" href="plugins/vodb-copy-latest-mojo.html"/>
-      <item name="vodb-count" href="plugins/vodb-count-mojo.html"/>
-      <item name="vodb-create-new-path" href="plugins/vodb-create-new-path-mojo.html"/>
-      <item name="vodb-create-paths-from-base" href="plugins/vodb-create-paths-from-base-mojo.html"/>
-      <item name="vodb-example-change" href="plugins/vodb-example-change-mojo.html"/>
-      <item name="vodb-find-duplicates" href="plugins/vodb-find-duplicates-mojo.html"/>
-      <item name="vodb-find-orphans" href="plugins/vodb-find-orphans-mojo.html"/>
-      <item name="vodb-import-jcs" href="plugins/vodb-import-jcs-mojo.html"/>
-      <item name="vodb-monitor-branches" href="plugins/vodb-monitor-branches-mojo.html"/>
-      <item name="vodb-open" href="plugins/vodb-open-mojo.html"/>
-      <item name="vodb-set-default-config" href="plugins/vodb-set-default-config-mojo.html"/>
-      <item name="vodb-set-edit-paths" href="plugins/vodb-set-edit-paths-mojo.html"/>
-      <item name="vodb-set-view-paths" href="plugins/vodb-set-view-paths-mojo.html"/>
+      <item name="Plugin Goals" href="plugin-info.html"/>
     </menu>
     ${reports}
    </body>

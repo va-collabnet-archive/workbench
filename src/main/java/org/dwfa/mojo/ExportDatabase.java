@@ -37,7 +37,7 @@ import org.dwfa.vodb.types.ConceptBean;
 
 /**
  * *
- * <h1>ExportDatabase</h1>
+ * ExportDatabase
  * <br/>
  * <p>
  * The <code>ExportDatabase</code> class Exports database tables to flat
