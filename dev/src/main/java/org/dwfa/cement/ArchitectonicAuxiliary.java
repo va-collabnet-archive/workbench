@@ -222,11 +222,13 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             DEFINING_CHARACTERISTIC(PrimordialId.DEFINING_CHARACTERISTIC_ID,
                     new String[] {"defining (characteristic type)"}, null,
                     new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
-                STATED_RELATIONSHIP("stated (defining characteristic type)",
+                STATED_RELATIONSHIP(PrimordialId.STATED_CHARACTERISTIC_ID,
+                		new String[] {"stated (defining characteristic type)"}, null,
                         new I_ConceptualizeUniversally[] { DEFINING_CHARACTERISTIC }),
                 INFERRED_RELATIONSHIP("inferred (defining characteristic type)",
                         new I_ConceptualizeUniversally[] { DEFINING_CHARACTERISTIC }),
-            QUALIFIER_CHARACTERISTIC("qualifier (characteristic type)",
+            QUALIFIER_CHARACTERISTIC(PrimordialId.INFERRED_CHARACTERISTIC_ID,
+            		new String[] {"qualifier (characteristic type)"}, null,
                     new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
             HISTORICAL_CHARACTERISTIC("historical (characteristic type)",
                     new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
@@ -424,7 +426,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                         PrimordialId.IS_A_REL_ID.getUids(), p.getUids()),
                         source.getUids(),
                         PrimordialId.IS_A_REL_ID.getUids(), p.getUids(),
-                        PrimordialId.DEFINING_CHARACTERISTIC_ID.getUids(),
+                        PrimordialId.STATED_CHARACTERISTIC_ID.getUids(),
                         PrimordialId.NOT_REFINABLE_ID.getUids(), relGrp);
             }
             return rels;
