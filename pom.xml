@@ -46,7 +46,7 @@
   preperation for importing into standard file formats used by the ACE version-orented database, and by other applications. 
   </description>
   <dependencies>
-    <dependency>
+     <dependency>
       <version>2.0.6</version>
       <groupId>org.dwfa</groupId>
       <artifactId>dwfa-mojo</artifactId>
@@ -69,12 +69,12 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>vodb</artifactId>
-      <version>1.4</version>
+      <version>1.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>ace-api</artifactId>
-      <version>1.4</version>
+      <version>1.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
