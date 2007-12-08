@@ -3,6 +3,7 @@ package org.dwfa.ace.api;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.tapi.TerminologyException;
 
 public interface I_ConfigAceFrame {
 
@@ -295,7 +297,7 @@ public interface I_ConfigAceFrame {
     public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible);
     public boolean isToggleVisible(TOGGLES toggle);
     
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle);
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException;
     
     public void setCommitAbortButtonsVisible(boolean visible);
 }
