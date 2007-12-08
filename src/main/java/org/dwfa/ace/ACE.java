@@ -1527,7 +1527,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return tabs;
     }
 
-    private JTabbedPane makeRefsetDefaults(TOGGLES toggle) {
+    private JTabbedPane makeRefsetDefaults(TOGGLES toggle) throws TerminologyException, IOException {
         JTabbedPane tabs = new JTabbedPane();
         // tabs.addTab("enabled ref set types" , new
         // JScrollPane(makeRefsetCheckboxPane(toggle)));
@@ -1541,7 +1541,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return new JScrollPane(makeComponentToggleCheckboxPane());
     }
 
-    private JPanel makeRefsetDefaultsPanel(TOGGLES toggle, EXT_TYPE type) {
+    private JPanel makeRefsetDefaultsPanel(TOGGLES toggle, EXT_TYPE type) throws TerminologyException, IOException {
         JPanel defaultsPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -1571,6 +1571,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     .getConceptPreferences(), type);
             editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
                     .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds(),
+                                                                                          "Concept types for popup:")));
+
+            break;
+        case CON_INT:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getConIntPreferences(), type);
+            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
+                    .getRefsetPreferencesForToggle(toggle).getConIntPreferences().getConceptPopupIds(),
                                                                                           "Concept types for popup:")));
 
             break;
@@ -1659,6 +1667,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             defaultForConceptRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
             gluePreferenceLabel(defaults, "defaultForConceptRefset", defaultForConceptRefset);
             wrapAndAdd(refsetsDefault, defaultForConceptRefset, "Default concept: ");
+            break;
+        case CON_INT:
+            TermComponentLabel defaultForConIntRefset = new TermComponentLabel(aceFrameConfig);
+            defaultForConIntRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
+            gluePreferenceLabel(defaults, "defaultForConIntRefset", defaultForConIntRefset);
+            wrapAndAdd(refsetsDefault, defaultForConIntRefset, "Default concept: ");
             break;
         case INTEGER:
             // @todo

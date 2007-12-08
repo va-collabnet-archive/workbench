@@ -25,6 +25,7 @@ import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMEDExtension;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.vodb.bind.ThinConVersionedBinding;
@@ -285,8 +286,14 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 
 	private int getNativeCharacteristicType(Integer characteristicId) throws IOException, TerminologyException {
 		I_ConceptualizeUniversally characteristic = ArchitectonicAuxiliary.getSnomedCharacteristicType((Integer) characteristicId);
-		int characteristicNativeId = vodb.uuidToNative(characteristic.getUids());
-		return characteristicNativeId;
+		int characteristicNativeId;
+		try {
+			characteristicNativeId = vodb.uuidToNative(characteristic.getUids());
+			return characteristicNativeId;
+		} catch (NoMappingException e) {
+			AceLog.getAppLog().severe("Can't find characteristic: " + characteristic);
+			throw e;
+		}
 	}
 
 	private int getNativeRefinability(Integer refinabilityId) throws IOException, TerminologyException {

@@ -73,6 +73,7 @@ import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -128,6 +129,7 @@ import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
@@ -2935,6 +2937,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 public Set<I_Transact> getUncommitted() {
     return ACE.getUncommitted();
+}
+
+public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart() {
+	return new ThinExtByRefPartConceptInt();
 }
 
 }

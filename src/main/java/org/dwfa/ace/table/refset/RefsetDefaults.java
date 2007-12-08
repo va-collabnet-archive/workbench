@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
@@ -67,6 +68,12 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
         Collection<UUID> uids = (Collection<UUID>) in.readObject();
         try {
             return ConceptBean.get(uids);
+        } catch (NoMappingException e) {
+            try {
+				return ConceptBean.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+			} catch (TerminologyException e1) {
+	            throw new ToIoException(e1);
+			}
         } catch (TerminologyException e) {
             throw new ToIoException(e);
         }

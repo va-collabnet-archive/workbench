@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -14,6 +15,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
@@ -26,9 +28,20 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ThinExtBinder extends TupleBinding {
+	private static int BOOLEAN_ID = 1;
+	private static int CONCEPT_ID = 2;
+	private static int INTEGER_ID = 3;
+	private static int MEASUREMENT_ID = 4;
+	private static int LANGUAGE_ID = 5;
+	private static int SCOPED_LANGUAGE_ID = 6;
+	private static int STRING_ID = 7;
+	private static int CON_INT_ID = 8;
+	
     public static enum EXT_TYPE {
-        BOOLEAN(1, "boolean"), CONCEPT(2, "concept"), INTEGER(3, "integer"), MEASUREMENT(6, "measurement"), LANGUAGE(4,
-                "language"), SCOPED_LANGUAGE(5, "scoped language"), STRING(7, "string");
+        BOOLEAN(BOOLEAN_ID, "boolean"), CONCEPT(CONCEPT_ID, "concept"), CON_INT(CON_INT_ID, "con int"),
+        STRING(STRING_ID, "string"), INTEGER(INTEGER_ID, "integer"), 
+        MEASUREMENT(MEASUREMENT_ID, "measurement"), LANGUAGE(LANGUAGE_ID,
+                "language"), SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language");
 
         private int enumId;
 
@@ -59,6 +72,8 @@ public class ThinExtBinder extends TupleBinding {
                 return MEASUREMENT;
             case 7:
                 return STRING;
+            case 8:
+            	return CON_INT;
 
             default:
                 throw new RuntimeException("Can't convert to EXT_TYPE: " + id);
@@ -122,6 +137,17 @@ public class ThinExtBinder extends TupleBinding {
                 part.setVersion(ti.readInt());
                 part.setStatus(ti.readInt());
                 part.setConceptId(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+        case CON_INT:
+            for (int x = 0; x < partCount; x++) {
+                ThinExtByRefPartConceptInt part = new ThinExtByRefPartConceptInt();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatus(ti.readInt());
+                part.setConceptId(ti.readInt());
+                part.setIntValue(ti.readInt());
                 versioned.addVersion(part);
             }
             break;
@@ -191,6 +217,8 @@ public class ThinExtBinder extends TupleBinding {
                 return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
             case INTEGER:
                 return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
+            case CON_INT:
+                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
             case LANGUAGE:
                 return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
             case SCOPED_LANGUAGE:
@@ -246,6 +274,16 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatus());
                 to.writeInt(part.getConceptId());
+            }
+            break;
+        case CON_INT:
+            List<ThinExtByRefPartConceptInt> conceptIntParts = (List<ThinExtByRefPartConceptInt>) versioned.getVersions();
+            for (I_ThinExtByRefPartConceptInt part : conceptIntParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatus());
+                to.writeInt(part.getConceptId());
+                to.writeInt(part.getIntValue());
             }
             break;
         case MEASUREMENT:
@@ -314,6 +352,9 @@ public class ThinExtBinder extends TupleBinding {
                         .uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids())) {
                     return EXT_TYPE.CONCEPT;
                 } else if (versioned.getTypeId() == AceConfig.getVodb()
+                        .uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids())) {
+                    return EXT_TYPE.CON_INT;
+                } else if (versioned.getTypeId() == AceConfig.getVodb()
                         .uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids())) {
                     return EXT_TYPE.INTEGER;
                 } else if (versioned.getTypeId() == AceConfig.getVodb()
@@ -337,6 +378,8 @@ public class ThinExtBinder extends TupleBinding {
                 return EXT_TYPE.STRING;
             } else if (ThinExtByRefPartConcept.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CONCEPT;
+            } else if (ThinExtByRefPartConceptInt.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CON_INT;
             } else if (ThinExtByRefPartInteger.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.INTEGER;
             } else if (ThinExtByRefPartLanguage.class.equals(firstPart.getClass())) {

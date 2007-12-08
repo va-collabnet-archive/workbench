@@ -40,6 +40,7 @@ import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -61,6 +62,7 @@ import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
@@ -325,14 +327,24 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     };
 
     private static REFSET_FIELDS[] conceptRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
-    // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
-            REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+                REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
 
     private static REFSET_FIELDS[] conceptRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
-    // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
-            REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-    // REFSET_FIELDS.BRANCH
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+                REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+        // REFSET_FIELDS.BRANCH
     };
+
+   private static REFSET_FIELDS[] conIntRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+                    REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+
+   private static REFSET_FIELDS[] conIntRefsetFieldsNoHistory = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+                    REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+            // REFSET_FIELDS.BRANCH
+            };
 
     private static REFSET_FIELDS[] measurementRefsetFields = new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
             // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
@@ -390,6 +402,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 return stringRefsetFields;
             case CONCEPT:
                 return conceptRefsetFields;
+            case CON_INT:
+            	return conIntRefsetFields;
             case INTEGER:
                 return integerRefsetFields;
             case LANGUAGE:
@@ -409,6 +423,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 return stringRefsetFieldsNoHistory;
             case CONCEPT:
                 return conceptRefsetFieldsNoHistory;
+            case CON_INT:
+            	return conIntRefsetFieldsNoHistory;
             case INTEGER:
                 return integerRefsetFieldsNoHistory;
             case LANGUAGE:
@@ -457,6 +473,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             return ThinExtByRefPartString.class;
         case CONCEPT:
             return ThinExtByRefPartConcept.class;
+        case CON_INT:
+        	return ThinExtByRefPartConceptInt.class;
         case INTEGER:
             return ThinExtByRefPartInteger.class;
         case LANGUAGE:
@@ -565,6 +583,11 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         conceptsToFetch.add(conceptPart.getConceptId());
                         conceptsToFetch.add(part.getStatus());
                         conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartConceptInt.class.equals(part.getClass())) {
+                        I_ThinExtByRefPartConceptInt conceptPart = (I_ThinExtByRefPartConceptInt) part;
+                        conceptsToFetch.add(conceptPart.getConceptId());
+                        conceptsToFetch.add(part.getStatus());
+                        conceptsToFetch.add(part.getPathId());
                     } else if (ThinExtByRefPartMeasurement.class.equals(part.getClass())) {
                         I_ThinExtByRefPartMeasurement conceptPart = (I_ThinExtByRefPartMeasurement) part;
                         conceptsToFetch.add(conceptPart.getUnitsOfMeasureId());
@@ -658,6 +681,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getStringPreferences();
         case CONCEPT:
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getConceptPreferences();
+        case CON_INT:
+        	return host.getConfig().getRefsetPreferencesForToggle(toggle).getConIntPreferences();
         case INTEGER:
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getIntegerPreferences();
         case LANGUAGE:
@@ -788,8 +813,13 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
                 // Integer extension
             case INTEGER_VALUE:
-                return new StringWithExtTuple(Integer.toString(((I_ThinExtByRefPartInteger) tuple.getPart()).getValue()),
-                                              tuple);
+            	if (ThinExtByRefPartConceptInt.class.isAssignableFrom(tuple.getPart().getClass())) {
+                    return new StringWithExtTuple(Integer.toString(((ThinExtByRefPartConceptInt) tuple.getPart()).getIntValue()),
+                            tuple);
+            	} else {
+                    return new StringWithExtTuple(Integer.toString(((I_ThinExtByRefPartInteger) tuple.getPart()).getValue()),
+                            tuple);
+            	}
 
                 // Language extension
             case ACCEPTABILITY:
@@ -895,6 +925,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case CONCEPT:
                 refsetDefaults = preferences.getConceptPreferences();
                 break;
+            case CON_INT:
+                refsetDefaults = preferences.getConIntPreferences();
+                break;
             case INTEGER:
                 refsetDefaults = preferences.getIntegerPreferences();
                 break;
@@ -947,6 +980,18 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     conceptPart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
                     conceptPart.setConceptId(preferences.getConceptPreferences().getDefaultForConceptRefset()
                             .getConceptId());
+                    conceptPart.setVersion(Integer.MAX_VALUE);
+                    extension.addVersion(conceptPart);
+                }
+                break;
+            case CON_INT:
+                for (I_Path editPath : host.getConfig().getEditingPathSet()) {
+                    ThinExtByRefPartConceptInt conceptPart = new ThinExtByRefPartConceptInt();
+                    conceptPart.setPathId(editPath.getConceptId());
+                    conceptPart.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                    conceptPart.setConceptId(preferences.getConIntPreferences().getDefaultForConceptRefset()
+                            .getConceptId());
+                    conceptPart.setIntValue(preferences.getConIntPreferences().getDefaultForIntegerValue());
                     conceptPart.setVersion(Integer.MAX_VALUE);
                     extension.addVersion(conceptPart);
                 }
@@ -1079,7 +1124,11 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 break;
             case INTEGER_VALUE:
                 Integer intValue = (Integer) value;
-                ((I_ThinExtByRefPartInteger) extTuple.getPart()).setValue(intValue);
+                if (I_ThinExtByRefPartConceptInt.class.isAssignableFrom(extTuple.getPart().getClass())) {
+                    ((I_ThinExtByRefPartConceptInt) extTuple.getPart()).setIntValue(intValue);
+                } else {
+                    ((I_ThinExtByRefPartInteger) extTuple.getPart()).setValue(intValue);
+                }
                 break;
             case ACCEPTABILITY:
                 Integer acceptabilityId = (Integer) value;

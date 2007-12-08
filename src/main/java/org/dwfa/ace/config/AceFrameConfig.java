@@ -1733,7 +1733,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         if (refsetPreferencesMap == null) {
             try {
                 refsetPreferencesMap = setupRefsetPreferences();
@@ -1741,9 +1741,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-        return refsetPreferencesMap.get(toggle);
+        RefsetPreferences pref = refsetPreferencesMap.get(toggle);
+        if (pref == null) {
+        	pref = new RefsetPreferences();
+        	refsetPreferencesMap.put(toggle, pref);
+        }
+        return pref;
     }
-
+    
     public void setCommitAbortButtonsVisible(boolean visible) {
         aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
 

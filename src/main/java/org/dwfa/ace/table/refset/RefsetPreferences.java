@@ -8,6 +8,7 @@ import java.io.Serializable;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
+import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
 import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
 import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguage;
@@ -15,6 +16,7 @@ import org.dwfa.ace.refset.I_RefsetDefaultsLanguageScoped;
 import org.dwfa.ace.refset.I_RefsetDefaultsMeasurement;
 import org.dwfa.ace.refset.I_RefsetDefaultsString;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 
 public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable {
 
@@ -23,7 +25,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private I_RefsetDefaultsBoolean booleanPreferences = new RefsetDefaultsBoolean();
 
@@ -38,6 +40,9 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
     private I_RefsetDefaultsMeasurement measurementPreferences = new RefsetDefaultsMeasurement();
 
     private I_RefsetDefaultsString stringPreferences = new RefsetDefaultsString();
+    
+    private I_RefsetDefaultsConInt conIntPreferences = new RefsetDefaultsConInt();
+
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -47,18 +52,28 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(languagePreferences);
         out.writeObject(languageScopedPreferences);
         out.writeObject(measurementPreferences);
+        out.writeObject(conIntPreferences);
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion <= dataVersion) {
             booleanPreferences = (I_RefsetDefaultsBoolean) in.readObject();
             conceptPreferences = (I_RefsetDefaultsConcept) in.readObject();
             integerPreferences = (I_RefsetDefaultsInteger) in.readObject();
             languagePreferences = (I_RefsetDefaultsLanguage) in.readObject();
             languageScopedPreferences = (I_RefsetDefaultsLanguageScoped) in.readObject();
             measurementPreferences = (I_RefsetDefaultsMeasurement) in.readObject();
+            if (objDataVersion > 1) {
+            	conIntPreferences = (I_RefsetDefaultsConInt) in.readObject();
+            } else {
+            	try {
+					conIntPreferences = new RefsetDefaultsConInt();
+				} catch (TerminologyException e) {
+					throw new ToIoException(e);
+				}
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -103,5 +118,9 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         }
         return stringPreferences;
     }
+
+	public I_RefsetDefaultsConInt getConIntPreferences() {
+		return conIntPreferences;
+	}
 
 }

@@ -189,6 +189,15 @@ public class RefsetUtil {
                     .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds());
 
             break;
+        case CON_INT:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getConIntPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getConIntPreferences().getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, (IntList) host.getConfig()
+                    .getRefsetPreferencesForToggle(toggle).getConIntPreferences().getConceptPopupIds());
+
+            break;
         case INTEGER:
             setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
                     .getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getRefsetPopupIds());
