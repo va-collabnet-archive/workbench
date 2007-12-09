@@ -149,7 +149,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
 
       I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
       I_GetConceptData relDestination = tf.getConcept(parentPathTermEntry.ids);
-      I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
+      I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
             .getUids());
       I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
       //I_GetConceptData relStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());

@@ -40,7 +40,7 @@ public class CreateRelationship extends AbstractTask {
     private String relParentPropName = ProcessAttachmentKeys.REL_PARENT.getAttachmentKey();
     
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-    private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+    private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
     private TermEntry relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
     private TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 

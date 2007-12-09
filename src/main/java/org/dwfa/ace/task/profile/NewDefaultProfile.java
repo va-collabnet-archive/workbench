@@ -305,7 +305,7 @@ public class NewDefaultProfile extends AbstractTask {
       activeConfig.setDefaultDescriptionType(tf.getConcept(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 
       activeConfig.setDefaultRelationshipType(tf.getConcept(Concept.IS_A_REL.getUids()));
-      activeConfig.setDefaultRelationshipCharacteristic(tf.getConcept(Concept.DEFINING_CHARACTERISTIC.getUids()));
+      activeConfig.setDefaultRelationshipCharacteristic(tf.getConcept(Concept.STATED_RELATIONSHIP.getUids()));
       activeConfig.setDefaultRelationshipRefinability(tf.getConcept(Concept.OPTIONAL_REFINABILITY.getUids()));
 
       try {
