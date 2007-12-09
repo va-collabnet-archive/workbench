@@ -69,16 +69,6 @@
                         
                         <tr>
                             <td>
-                                <p>boolean extension value</p>
-                            </td>
-                            <td>
-                                <p>A boolean value that represents the capitalization status of the term. The value
-                                    is represented by a string "f" or "false" for <code>false</code> or "t" or "true" for <code>true</code>.</p>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
                                 <p>effective date</p>
                             </td>
                             <td>
@@ -110,6 +100,16 @@
                                     For example: 550e8400-e29b-41d4-a716-446655440000</p>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <p>boolean extension value</p>
+                            </td>
+                            <td>
+                                <p>A boolean value that represents the capitalization status of the term. The value
+                                    is represented by a string "f" or "false" for <code>false</code> or "t" or "true" for <code>true</code>.</p>
+                            </td>
+                        </tr>
+                        
                         
                     </table>
                 </dd>

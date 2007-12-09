@@ -69,28 +69,6 @@
                         
                         <tr>
                             <td>
-                                <p>concept extension value</p>
-                            </td>
-                            <td>
-                                <p>The <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier"
-                                    >Universally Unique Identifier</a> of the concept referenced by this extension. </p>
-                                <p> The UUID is represented in its canonical form, consisting of 32 hexadecimal
-                                    digits, displayed in 5 groups separated by hyphens, for a total of 36 characters.
-                                    For example: 550e8400-e29b-41d4-a716-446655440000</p>
-                            </td>
-                        </tr>
- 
-                        <tr>
-                            <td>
-                                <p>integer extension value</p>
-                            </td>
-                            <td>
-                                <p>An integer represented as a string</p>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
                                 <p>effective date</p>
                             </td>
                             <td>
@@ -122,6 +100,28 @@
                                     For example: 550e8400-e29b-41d4-a716-446655440000</p>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <p>concept extension value</p>
+                            </td>
+                            <td>
+                                <p>The <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier"
+                                    >Universally Unique Identifier</a> of the concept referenced by this extension. </p>
+                                <p> The UUID is represented in its canonical form, consisting of 32 hexadecimal
+                                    digits, displayed in 5 groups separated by hyphens, for a total of 36 characters.
+                                    For example: 550e8400-e29b-41d4-a716-446655440000</p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <p>integer extension value</p>
+                            </td>
+                            <td>
+                                <p>An integer represented as a string</p>
+                            </td>
+                        </tr>
+                        
                         
                     </table>
                 </dd>
