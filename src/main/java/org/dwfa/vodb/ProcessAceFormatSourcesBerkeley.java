@@ -1,6 +1,8 @@
 package org.dwfa.vodb;
 
 import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,19 +21,25 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.vodb.bind.ThinConVersionedBinding;
 import org.dwfa.vodb.bind.ThinDescVersionedBinding;
+import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinIdVersionedBinding;
 import org.dwfa.vodb.bind.ThinRelVersionedBinding;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
+import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
+import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
@@ -213,6 +221,9 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
          AceLog.getEditLog().log(Level.SEVERE, "*RECURSION* Rel points a concept to itself: " + relID + 
                " c one id: " + conceptOneID + 
                " c two id: " + conceptTwoID);
+         throw new Exception("*RECURSION* Rel points a concept to itself: " + relID + 
+                 " c one id: " + conceptOneID + 
+                 " c two id: " + conceptTwoID);
          
       }
 		part.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
@@ -291,6 +302,102 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         }
         
     }
+	protected void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+
+	    
+		
+		st.nextToken();
+		boolean booleanValue = st.sval.toLowerCase().startsWith("t");
+
+		
+		int version = ThinVersionHelper.convert(statusDate.getTime());
+	    int refsetId = map.getIntId((UUID) refsetUuid, aceAuxPath, version);
+	    int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+	    int statusId = map.getIntId((UUID) statusUuid, aceAuxPath, version);
+	    int componentId = map.getIntId((UUID) componentUuid, aceAuxPath, version);
+	    int pathId = map.getIntId((UUID) pathUuid, aceAuxPath, version);
+	    int typeId = ThinExtBinder.getExtensionType(EXT_TYPE.BOOLEAN);
+
+		VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
+		I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+		if (tf.hasExtension(memberId)) {
+			ext = tf.getExtension(memberId);
+		} 
+		ThinExtByRefPartBoolean part = new ThinExtByRefPartBoolean();
+		part.setPathId(pathId);
+		part.setStatus(statusId);
+		part.setValue(booleanValue);
+		part.setVersion(version);
+		ext.addVersion(part);
+
+	}
+
+	@Override
+	protected void readConIntMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)
+			throws Exception {
+		st.nextToken();
+		UUID conceptUuid = (UUID) getId(st);
+		st.nextToken();
+		int intValue = Integer.parseInt(st.sval);
+
+		
+		int version = ThinVersionHelper.convert(statusDate.getTime());
+	    int refsetId = map.getIntId((UUID) refsetUuid, aceAuxPath, version);
+	    int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+	    int statusId = map.getIntId((UUID) statusUuid, aceAuxPath, version);
+	    int componentId = map.getIntId((UUID) componentUuid, aceAuxPath, version);
+	    int pathId = map.getIntId((UUID) pathUuid, aceAuxPath, version);
+	    int typeId = ThinExtBinder.getExtensionType(EXT_TYPE.BOOLEAN);
+	    int conceptId =  map.getIntId((UUID) conceptUuid, aceAuxPath, version);
+
+		VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
+		I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+		if (tf.hasExtension(memberId)) {
+			ext = tf.getExtension(memberId);
+		} 
+		ThinExtByRefPartConceptInt part = new ThinExtByRefPartConceptInt();
+		part.setPathId(pathId);
+		part.setStatus(statusId);
+		part.setConceptId(conceptId);
+		part.setIntValue(intValue);
+		part.setVersion(version);
+		ext.addVersion(part);
+		
+	}
+
+	@Override
+	protected void readConceptMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)
+			throws Exception {
+		st.nextToken();
+		UUID conceptUuid = (UUID) getId(st);
+
+		
+		int version = ThinVersionHelper.convert(statusDate.getTime());
+	    int refsetId = map.getIntId((UUID) refsetUuid, aceAuxPath, version);
+	    int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+	    int statusId = map.getIntId((UUID) statusUuid, aceAuxPath, version);
+	    int componentId = map.getIntId((UUID) componentUuid, aceAuxPath, version);
+	    int pathId = map.getIntId((UUID) pathUuid, aceAuxPath, version);
+	    int typeId = ThinExtBinder.getExtensionType(EXT_TYPE.BOOLEAN);
+	    int conceptId =  map.getIntId((UUID) conceptUuid, aceAuxPath, version);
+
+		VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
+		I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+		if (tf.hasExtension(memberId)) {
+			ext = tf.getExtension(memberId);
+		} 
+		ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
+		part.setPathId(pathId);
+		part.setStatus(statusId);
+		part.setConceptId(conceptId);
+		part.setVersion(version);
+		ext.addVersion(part);
+
+	}
+		
 
 
 }

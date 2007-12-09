@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -18,6 +20,21 @@ import java.util.jar.JarFile;
 import com.sleepycat.je.DatabaseException;
 
 public abstract class ProcessAceFormatSources extends ProcessSources {
+
+	private enum REFSET_FILES {
+		BOOLEAN("boolean.refset"), CONCEPT("concept.refset"), CONINT(
+				"conint.refset");
+
+		private String fileName;
+
+		REFSET_FILES(String fileName) {
+			this.fileName = fileName;
+		}
+
+		private File getFile(File rootDir) {
+			return new File(rootDir, fileName);
+		}
+	};
 
 	public ProcessAceFormatSources() throws DatabaseException {
 		super(false);
@@ -36,11 +53,11 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 			Date releaseDate = dateFormat.parse(releaseDir.getName());
 
 			addReleaseDate(releaseDate);
-            
-            
+
 			for (File contentFile : releaseDir.listFiles(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
-					return name.endsWith(".txt") && (name.equals("ids.txt") == false);
+					return name.endsWith(".txt")
+							&& (name.equals("ids.txt") == false);
 				}
 			})) {
 				getLog().info("Content file: " + contentFile.getName());
@@ -69,14 +86,14 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 				br.close();
 			}
 		}
-          // Do the id file last...
-          File idFile = new File(constantDir, "ids.txt");
-          if (idFile.exists()) {
-              getLog().info("Id file: " + idFile.getName());
-              FileReader fr = new FileReader(idFile);
-              BufferedReader br = new BufferedReader(fr);
-              readIds(br);
-          }
+		// Do the id file last...
+		File idFile = new File(constantDir, "ids.txt");
+		if (idFile.exists()) {
+			getLog().info("Id file: " + idFile.getName());
+			FileReader fr = new FileReader(idFile);
+			BufferedReader br = new BufferedReader(fr);
+			readIds(br);
+		}
 		cleanup(null);
 	}
 
@@ -88,52 +105,144 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 		SNOMED, ACE
 	};
 
-   public void executeFromDir(File dataDir) throws Exception {
-      FORMAT format = FORMAT.ACE;
-      File[] dataFiles = dataDir.listFiles(new FileFilter() {
-         public boolean accept(File f) {
-            return f.getName().endsWith(".txt") && (f.getName().equals("ids.txt") == false);
-         }});
-      for (File dataFile: dataFiles) {
-            getLog().info(dataFile.getName());
-            if (dataFile.getName().contains("concepts")) {
-               Reader isr = new BufferedReader(new FileReader(dataFile));
-               readConcepts(isr, null, format);
-               isr.close();
-            } else if (dataFile.getName().contains("descriptions")) {
-               Reader isr = new BufferedReader(new FileReader(dataFile));
-               readDescriptions(isr, null, format);
-               isr.close();
-            } else if (dataFile.getName().contains("relationships")) {
-               Reader isr = new BufferedReader(new FileReader(dataFile));
-               readRelationships(isr, null, format);
-               isr.close();
-            } else if (dataFile.getName().contains("illicit_words")) {
-               getLog().info(
-                     "Found illicit_words jar entry: " + dataFile.getName());
-               Reader isr = new BufferedReader(new FileReader(dataFile));
-               readIllicitWords(isr);
-            } else if (dataFile.getName().contains("licit_words")) {
-               getLog().info(
-                     "Found licit_words jar entry: " + dataFile.getName());
-               Reader isr = new BufferedReader(new FileReader(dataFile));
-               readLicitWords(isr);
-            } else {
-               getLog().info(
-                     "(2) Don't know what to do with file: "
-                           + dataFile.getName());
-            }
-      }
-      // Do the id file last...
-      File idFile = new File(dataDir, "ids.txt");
-      if (idFile.exists()) {
-          getLog().info("Id file: " + idFile.getName());
-          FileReader fr = new FileReader(idFile);
-          BufferedReader br = new BufferedReader(fr);
-          readIds(br);
-      }
-      cleanup(null);
-   }
+	public void executeFromDir(File dataDir) throws Exception {
+		FORMAT format = FORMAT.ACE;
+		File[] dataFiles = dataDir.listFiles(new FileFilter() {
+			public boolean accept(File f) {
+				return f.getName().endsWith(".txt")
+						&& (f.getName().equals("ids.txt") == false);
+			}
+		});
+		for (File dataFile : dataFiles) {
+			getLog().info(dataFile.getName());
+			if (dataFile.getName().contains("concepts")) {
+				Reader isr = new BufferedReader(new FileReader(dataFile));
+				readConcepts(isr, null, format);
+				isr.close();
+			} else if (dataFile.getName().contains("descriptions")) {
+				Reader isr = new BufferedReader(new FileReader(dataFile));
+				readDescriptions(isr, null, format);
+				isr.close();
+			} else if (dataFile.getName().contains("relationships")) {
+				Reader isr = new BufferedReader(new FileReader(dataFile));
+				readRelationships(isr, null, format);
+				isr.close();
+			} else if (dataFile.getName().contains("illicit_words")) {
+				getLog().info(
+						"Found illicit_words jar entry: " + dataFile.getName());
+				Reader isr = new BufferedReader(new FileReader(dataFile));
+				readIllicitWords(isr);
+			} else if (dataFile.getName().contains("licit_words")) {
+				getLog().info(
+						"Found licit_words jar entry: " + dataFile.getName());
+				Reader isr = new BufferedReader(new FileReader(dataFile));
+				readLicitWords(isr);
+			} else {
+				getLog().info(
+						"(2) Don't know what to do with file: "
+								+ dataFile.getName());
+			}
+		}
+
+		for (REFSET_FILES rf : REFSET_FILES.values()) {
+			if (rf.getFile(dataDir).exists()) {
+				getLog().info("Refset file: " + rf);
+				FileReader fr = new FileReader(rf.getFile(dataDir));
+				BufferedReader br = new BufferedReader(fr);
+				readRefset(br, rf);
+				br.close();
+			}
+		}
+
+		// Do the id file last...
+		File idFile = new File(dataDir, "ids.txt");
+		if (idFile.exists()) {
+			getLog().info("Id file: " + idFile.getName());
+			FileReader fr = new FileReader(idFile);
+			BufferedReader br = new BufferedReader(fr);
+			readIds(br);
+		}
+		cleanup(null);
+	}
+
+	private void readRefset(Reader r, REFSET_FILES rf) throws IOException,
+			Exception {
+
+		long start = System.currentTimeMillis();
+
+		StreamTokenizer st = new StreamTokenizer(r);
+		st.resetSyntax();
+		st.wordChars('\u001F', '\u00FF');
+		st.whitespaceChars('\t', '\t');
+		st.eolIsSignificant(true);
+		int members = 0;
+
+		skipLineOne(st);
+		int tokenType = st.nextToken();
+		while (tokenType != StreamTokenizer.TT_EOF) {
+			UUID refsetUuid = (UUID) getId(st);
+			tokenType = st.nextToken();
+			UUID memberUuid = (UUID) getId(st);
+			tokenType = st.nextToken();
+			UUID statusUuid = (UUID) getId(st);
+			tokenType = st.nextToken();
+			UUID componentUuid = (UUID) getId(st);
+			tokenType = st.nextToken();
+			Date statusDate = getDate(st);
+			
+			tokenType = st.nextToken();
+			UUID pathUuid = (UUID) getId(st);
+			
+			finishMemberRead(rf, st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+
+			members++;
+			
+			tokenType = st.nextToken();
+
+			// CR or LF
+			if (tokenType == 13) { // is CR
+				// LF
+				tokenType = st.nextToken();
+			}
+
+			// Beginning of loop
+			tokenType = st.nextToken();
+			while (tokenType == 10) {
+				tokenType = st.nextToken();
+			}
+
+		}
+		getLog().info(
+				"Process time: " + (System.currentTimeMillis() - start)
+						+ " Parsed members: " + members);
+	}
+
+	private void finishMemberRead(REFSET_FILES rf, StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+		switch (rf) {
+		case BOOLEAN:
+			readBooleanMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			break;
+		case CONCEPT:
+			readConceptMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			break;
+		case CONINT:
+			readConIntMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			break;
+		default:
+			throw new IOException("Can't handle refset type: " + rf);
+		}
+		
+	}
+
+	protected abstract void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception; 
+
+	protected abstract void readConceptMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)throws IOException, ParseException, DatabaseException, Exception; 
+
+	protected abstract void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception;
 
 	public void execute(JarFile constantJar, String dataDir, FORMAT format)
 			throws Exception {
@@ -188,9 +297,9 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	}
 
 	protected Object getId(StreamTokenizer st) {
-        if (st.sval.length() != 36) {
-            return st.sval;
-        }
+		if (st.sval.length() != 36) {
+			return st.sval;
+		}
 		return UUID.fromString(st.sval);
 	}
 

@@ -619,7 +619,7 @@ public abstract class ProcessSources {
 
     protected abstract Object getCharacteristic(StreamTokenizer st);
 
-    private void skipLineOne(StreamTokenizer st) throws IOException {
+    protected void skipLineOne(StreamTokenizer st) throws IOException {
         if (skipFirstLine) {
             int tokenType = st.nextToken();
             while (tokenType != StreamTokenizer.TT_EOL) {
