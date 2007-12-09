@@ -168,7 +168,7 @@ public class OpcsToAce extends AbstractMojo {
       relationships.append("\t");
       relationships.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, parentId).toString());
       relationships.append("\t");
-      relationships.append(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids().iterator().next().toString());
+      relationships.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids().iterator().next().toString());
       relationships.append("\t");
       relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids().iterator().next().toString());
       relationships.append("\t");

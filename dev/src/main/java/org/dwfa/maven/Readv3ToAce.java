@@ -488,7 +488,7 @@ public class Readv3ToAce extends AbstractMojo {
 				Type5UuidFactory.OPCS_CONCEPT_ID, parentId).toString());
 		relationships.append("\t");
 		relationships
-				.append(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
+				.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
 						.getUids().iterator().next().toString());
 		relationships.append("\t");
 		relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
