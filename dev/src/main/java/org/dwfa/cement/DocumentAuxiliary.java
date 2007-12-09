@@ -487,7 +487,7 @@ public class DocumentAuxiliary implements I_AddToMemoryTermServer {
 	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents) throws Exception {
 		I_ConceptualizeUniversally[] relTypes = new I_ConceptualizeUniversally[parents.length];
 		Arrays.fill(relTypes, ArchitectonicAuxiliary.Concept.IS_A_REL);
-		return makeRels(source, parents, relTypes, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC);
+		return makeRels(source, parents, relTypes, ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP);
 	}
 	
 	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents, I_ConceptualizeUniversally characteristicType) throws Exception {
@@ -497,7 +497,7 @@ public class DocumentAuxiliary implements I_AddToMemoryTermServer {
 	}
 
 	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents, I_ConceptualizeUniversally[] relTypes) throws Exception {
-		return makeRels(source, parents, relTypes, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC);
+		return makeRels(source, parents, relTypes, ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP);
 	}
 	
 	public static UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents, I_ConceptualizeUniversally[] relTypes, I_ConceptualizeUniversally characteristicType) throws Exception {
