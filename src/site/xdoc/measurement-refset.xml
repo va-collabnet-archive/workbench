@@ -1,17 +1,17 @@
 <document>
     <properties>
         <author email="user@company.com">Keith Campbell</author>
-        <title>ACE Format Double Concept Refset Import</title>
+        <title>ACE Format Measurement Refset Import</title>
     </properties>
     <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
     <head> </head>
     <body>
         <!-- The body of the document contains a number of sections -->
-        <section name="ACE Format Double Concept Refset Import">
+        <section name="ACE Format Measurement Refset Import">
             
             
             <dl>
-                <dt><p>double-concept.refset</p></dt>
+                <dt><p>measurement.refset</p></dt>
                 <dd>An optional file containing all the double concept refsets the terminology database, and their
                     status and version information. <table>
                         <tr>
@@ -102,7 +102,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <p>Double precision floating point number extension value</p>
+                                <p>Double precision floating point number representing the measurement extension value</p>
                             </td>
                             <td>
                                 <p>A double precision floating point number represented as a string</p>
@@ -111,7 +111,7 @@
                         
                         <tr>
                             <td>
-                                <p>concept extension value</p>
+                                <p>units of measure concept extension value</p>
                             </td>
                             <td>
                                 <p>The <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier"
