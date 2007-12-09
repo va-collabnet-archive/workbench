@@ -40,9 +40,19 @@ public class VodbOpen  extends AbstractMojo {
 	 */
 	Long cacheSize = 600000000L;
 
+	/**
+	 * Use existing if it is already open
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	boolean useExistingDb = false;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
+			if (useExistingDb && LocalVersionedTerminology.get()!=null) {
+				return;
+			}
             try {
                 if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath())) {
                     return;
