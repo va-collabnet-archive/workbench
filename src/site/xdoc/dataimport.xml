@@ -24,6 +24,9 @@
         <li><a href="boolean-refset.html">Boolean RefSet</a></li>
         <li><a href="concept-refset.html">Concept RefSet</a></li>
         <li><a href="concept-integer-refset.html">Concept-Integer RefSet</a></li>
+        <li><a href="double-concept-refset.html">Double-Concept RefSet</a></li>
+        <li><a href="integer-refset.html">Integer RefSet</a></li>
+        <li><a href="language-refset.html">Language RefSet</a></li>
       </ul>
       
       <!-- Within sections, any XHTML can be used -->

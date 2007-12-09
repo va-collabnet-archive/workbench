@@ -1,18 +1,18 @@
 <document>
     <properties>
         <author email="user@company.com">Keith Campbell</author>
-        <title>ACE Format Boolean Refset Import</title>
+        <title>ACE Format Integer Refset Import</title>
     </properties>
     <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
     <head> </head>
     <body>
         <!-- The body of the document contains a number of sections -->
-        <section name="ACE Format Boolean Refset Import">
+        <section name="ACE Format Integer Refset Import">
             
             
             <dl>
-                <dt><p>boolean.refset</p></dt>
-                <dd>An optional file containing all the boolean refsets the terminology database, and their
+                <dt><p>integer.refset</p></dt>
+                <dd>An optional file containing all the integer refsets the terminology database, and their
                     status and version information. <table>
                         <tr>
                             <th>Column Name</th>
@@ -100,13 +100,13 @@
                                     For example: 550e8400-e29b-41d4-a716-446655440000</p>
                             </td>
                         </tr>
+                        
                         <tr>
                             <td>
-                                <p>boolean extension value</p>
+                                <p>integer extension value</p>
                             </td>
                             <td>
-                                <p>A boolean value that extends a component. The value
-                                    is represented by a string "f" or "false" for <code>false</code> or "t" or "true" for <code>true</code>.</p>
+                                <p>An integer represented as a string</p>
                             </td>
                         </tr>
                         
@@ -114,6 +114,7 @@
                     </table>
                 </dd>
             </dl>
+            
             
             <!-- Within sections, any XHTML can be used -->
         </section>

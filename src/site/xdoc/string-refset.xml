@@ -1,18 +1,18 @@
 <document>
     <properties>
         <author email="user@company.com">Keith Campbell</author>
-        <title>ACE Format Boolean Refset Import</title>
+        <title>ACE Format String Refset Import</title>
     </properties>
     <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
     <head> </head>
     <body>
         <!-- The body of the document contains a number of sections -->
-        <section name="ACE Format Boolean Refset Import">
+        <section name="ACE Format String Refset Import">
             
             
             <dl>
-                <dt><p>boolean.refset</p></dt>
-                <dd>An optional file containing all the boolean refsets the terminology database, and their
+                <dt><p>string.refset</p></dt>
+                <dd>An optional file containing all the string refsets the terminology database, and their
                     status and version information. <table>
                         <tr>
                             <th>Column Name</th>
@@ -102,11 +102,10 @@
                         </tr>
                         <tr>
                             <td>
-                                <p>boolean extension value</p>
+                                <p>string extension value</p>
                             </td>
                             <td>
-                                <p>A boolean value that extends a component. The value
-                                    is represented by a string "f" or "false" for <code>false</code> or "t" or "true" for <code>true</code>.</p>
+                                <p>A string value that extends a component.</p>
                             </td>
                         </tr>
                         
