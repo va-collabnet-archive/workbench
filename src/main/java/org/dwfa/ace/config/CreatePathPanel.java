@@ -176,7 +176,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	relPart.setVersion(Integer.MAX_VALUE);
         	relPart.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
         	relPart.setRelTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-        	relPart.setCharacteristicId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()));
+        	relPart.setCharacteristicId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()));
         	relPart.setRefinabilityId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()));
         	relPart.setGroup(0);
         	relV.addVersion(relPart);
