@@ -23,7 +23,8 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
 	private enum REFSET_FILES {
 		BOOLEAN("boolean.refset"), CONCEPT("concept.refset"), CONINT(
-				"conint.refset");
+				"conint.refset"), MEASUREMENT("measurement.refset"), INTEGER("integer.refset"), 
+				LANGUAGE("language.refset");
 
 		private String fileName;
 
@@ -229,6 +230,15 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 		case CONINT:
 			readConIntMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
 			break;
+		case INTEGER:
+			readIntegerMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			break;
+		case LANGUAGE:
+			readLanguageMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			break;
+		case MEASUREMENT:
+			readMeasurementMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			break;
 		default:
 			throw new IOException("Can't handle refset type: " + rf);
 		}
@@ -318,5 +328,17 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	protected Object getCharacteristic(StreamTokenizer st) {
 		return UUID.fromString(st.sval);
 	}
+
+	protected abstract void readMeasurementMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid,
+			Date statusDate, UUID pathUuid) throws Exception;
+
+	protected abstract void readIntegerMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid,
+			Date statusDate, UUID pathUuid) throws Exception;
+
+	protected abstract void readLanguageMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid,
+			Date statusDate, UUID pathUuid) throws Exception;
 
 }

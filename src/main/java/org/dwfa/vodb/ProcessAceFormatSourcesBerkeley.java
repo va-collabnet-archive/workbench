@@ -2,7 +2,6 @@ package org.dwfa.vodb;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +39,9 @@ import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
+import org.dwfa.vodb.types.ThinExtByRefPartInteger;
+import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
+import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
@@ -398,6 +400,111 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
 	}
 		
+	@Override
+	protected void readMeasurementMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)
+			throws Exception {
+		st.nextToken();
+		double doubleVal = Double.parseDouble(st.sval);
+		st.nextToken();
+		UUID conceptUuid = (UUID) getId(st);
+
+		
+		int version = ThinVersionHelper.convert(statusDate.getTime());
+	    int refsetId = map.getIntId((UUID) refsetUuid, aceAuxPath, version);
+	    int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+	    int statusId = map.getIntId((UUID) statusUuid, aceAuxPath, version);
+	    int componentId = map.getIntId((UUID) componentUuid, aceAuxPath, version);
+	    int pathId = map.getIntId((UUID) pathUuid, aceAuxPath, version);
+	    int typeId = ThinExtBinder.getExtensionType(EXT_TYPE.BOOLEAN);
+	    int conceptId =  map.getIntId((UUID) conceptUuid, aceAuxPath, version);
+
+		VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
+		I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+		if (tf.hasExtension(memberId)) {
+			ext = tf.getExtension(memberId);
+		} 
+		ThinExtByRefPartMeasurement part = new ThinExtByRefPartMeasurement();
+		part.setPathId(pathId);
+		part.setStatus(statusId);
+		part.setMeasurementValue(doubleVal);
+		part.setUnitsOfMeasureId(conceptId);
+		part.setVersion(version);
+		ext.addVersion(part);
+
+	}
+		
+
+	@Override
+	protected void readIntegerMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)
+			throws Exception {
+		st.nextToken();
+		int intValue = Integer.parseInt(st.sval);
+
+		
+		int version = ThinVersionHelper.convert(statusDate.getTime());
+	    int refsetId = map.getIntId((UUID) refsetUuid, aceAuxPath, version);
+	    int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+	    int statusId = map.getIntId((UUID) statusUuid, aceAuxPath, version);
+	    int componentId = map.getIntId((UUID) componentUuid, aceAuxPath, version);
+	    int pathId = map.getIntId((UUID) pathUuid, aceAuxPath, version);
+	    int typeId = ThinExtBinder.getExtensionType(EXT_TYPE.BOOLEAN);
+
+		VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
+		I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+		if (tf.hasExtension(memberId)) {
+			ext = tf.getExtension(memberId);
+		} 
+		ThinExtByRefPartInteger part = new ThinExtByRefPartInteger();
+		part.setPathId(pathId);
+		part.setStatus(statusId);
+		part.setValue(intValue);
+		part.setVersion(version);
+		ext.addVersion(part);
+
+	}
+		
+	@Override
+	protected void readLanguageMember(StreamTokenizer st, UUID refsetUuid,
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)
+			throws Exception {
+		st.nextToken();
+		UUID acceptabilityUuid = (UUID) getId(st);
+
+		st.nextToken();
+		UUID correctnessUuid = (UUID) getId(st);
+
+		st.nextToken();
+		UUID synonymyUuid = (UUID) getId(st);
+
+		
+		int version = ThinVersionHelper.convert(statusDate.getTime());
+	    int refsetId = map.getIntId((UUID) refsetUuid, aceAuxPath, version);
+	    int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+	    int statusId = map.getIntId((UUID) statusUuid, aceAuxPath, version);
+	    int componentId = map.getIntId((UUID) componentUuid, aceAuxPath, version);
+	    int pathId = map.getIntId((UUID) pathUuid, aceAuxPath, version);
+	    int typeId = ThinExtBinder.getExtensionType(EXT_TYPE.BOOLEAN);
+	    int acceptabilityId =  map.getIntId((UUID) acceptabilityUuid, aceAuxPath, version);
+	    int correctnessId =  map.getIntId((UUID) correctnessUuid, aceAuxPath, version);
+	    int synonymyId =  map.getIntId((UUID) synonymyUuid, aceAuxPath, version);
+
+		VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
+		I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+		if (tf.hasExtension(memberId)) {
+			ext = tf.getExtension(memberId);
+		} 
+		ThinExtByRefPartLanguage part = new ThinExtByRefPartLanguage();
+		part.setPathId(pathId);
+		part.setStatus(statusId);
+		part.setAcceptabilityId(acceptabilityId);
+		part.setCorrectnessId(correctnessId);
+		part.setDegreeOfSynonymyId(synonymyId);
+		part.setVersion(version);
+		ext.addVersion(part);
+
+	}
 
 
 }
