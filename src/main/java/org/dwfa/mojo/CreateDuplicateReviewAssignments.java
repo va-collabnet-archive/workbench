@@ -60,7 +60,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	/**
 	 * Location of the input file to use.
 	 * 
-	 * @parameter expression="${project.build.directory}"
+	 * @parameter expression="${project.build.directory}\\..\\src"
 	 * @required
 	 */
 	private File inputDirectory;
@@ -68,7 +68,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	/**
 	 * Location of the queue file to use.
 	 * 
-	 * @parameter expression="C:\\_working\\au-ct\\amt-edit-bundle-branch\\0.2-Development\\dev\\src\\main\\profiles\\users\\tore.dev\\inbox\\queue.config"
+	 * @parameter expression="${project.build.directory}\\..\\src\\main\\profiles\\users\\tore.dev\\inbox\\queue.config"
 	 * @required
 	 */
 	private File queueDirectory;
@@ -102,9 +102,12 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	 */
 	private String businessProcessToAssign;
 	
+	private String pathSeparator = System.getProperty("path.separator"); 
+	
 	private int listListSize = 250;
 //	private String processFileStr = "dup_check_processes/assignmentGenFromUuidList_InProperty.bp";
-	private String processFileStr = "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp";
+//	private String processFileStr = "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp";
+	private String processFileStr = inputDirectory.getPath() + pathSeparator + "dupReviewAssignment.bp";
 	
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
