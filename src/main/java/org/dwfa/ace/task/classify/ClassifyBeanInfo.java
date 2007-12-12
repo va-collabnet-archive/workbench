@@ -6,6 +6,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
+import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 public class ClassifyBeanInfo extends SimpleBeanInfo {
     
@@ -18,7 +19,14 @@ public class ClassifyBeanInfo extends SimpleBeanInfo {
             factoryClass.setDisplayName("<html><font color='green'>Factory class:");
             factoryClass.setShortDescription("Enter the factory class to be called.");
 
-            PropertyDescriptor rv[] = { factoryClass };
+            PropertyDescriptor classifyRoot =
+                new PropertyDescriptor("classifyRoot", Classify.class);
+            classifyRoot.setBound(true);
+            classifyRoot.setPropertyEditorClass(QueueTypeEditor.class);
+            classifyRoot.setDisplayName("<html><font color='green'>Classification Root Concept:");
+            classifyRoot.setShortDescription("Define the root Concept for classification.");
+
+            PropertyDescriptor rv[] = { factoryClass, classifyRoot };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
