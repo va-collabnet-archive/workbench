@@ -85,7 +85,7 @@ import com.sun.jini.thread.WakeupManager;
  * Modified to only operate "locally"...
  * 
  */
-class LocalTransactionManager implements TxnManager,
+public class LocalTransactionManager implements TxnManager,
 		LeaseExpirationMgr.Expirer, LogRecovery, TxnSettler,
 		com.sun.jini.constants.TimeConstants, LocalLandlord, ServerProxyTrust
 		 {
@@ -219,7 +219,7 @@ class LocalTransactionManager implements TxnManager,
 	 * @param lc
 	 *            <code>LifeCycle</code> reference used for callback
 	 */
-	LocalTransactionManager(String[] args, LifeCycle lc) throws Exception {
+	public LocalTransactionManager(String[] args, LifeCycle lc) throws Exception {
         JiniManager.setLocalOnly(true);
 		if (operationsLogger.isLoggable(Level.FINER)) {
 			operationsLogger.entering(this.getClass().getName(),

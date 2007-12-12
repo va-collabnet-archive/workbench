@@ -68,7 +68,7 @@ public class TransactionParticipantAggregator implements
 	private LifeCycle lifeCycle = null;
 
 
-	protected TransactionParticipantAggregator(String[] args, LifeCycle lc)
+	public TransactionParticipantAggregator(String[] args, LifeCycle lc)
 			throws Exception {
 		logger.info("\n*******************\n\n" 
             + "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args) +
