@@ -53,11 +53,11 @@ public class Classify extends AbstractTask {
      */
     private TermEntry classifyRoot = new TermEntry(Type3UuidFactory.SNOMED_ROOT_UUID);
 
-    private I_SnorocketFactory snorocketFactory = null;
+    private transient I_SnorocketFactory snorocketFactory = null;
 
-    private I_TermFactory termFactory;
+    private transient I_TermFactory termFactory;
 
-    private int isaId; 
+    private transient int isaId; 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -65,15 +65,13 @@ public class Classify extends AbstractTask {
         out.writeObject(classifyRoot);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-    ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             factoryClass = (String) in.readObject();
             classifyRoot = (TermEntry) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
@@ -83,8 +81,6 @@ public class Classify extends AbstractTask {
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker)
     throws TaskFailedException {
-        worker.getLogger().info("classify stub");       // TODO delete
-        
         try {
             snorocketFactory = (I_SnorocketFactory) Class.forName(factoryClass).newInstance();
         } catch (InstantiationException e) {
@@ -127,7 +123,8 @@ public class Classify extends AbstractTask {
 
             worker.getLogger().info("get results");
 
-            final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+//            final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+            final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
             final I_GetConceptData relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
             final I_GetConceptData relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             
@@ -135,10 +132,17 @@ public class Classify extends AbstractTask {
             worker.getLogger().info("Inferred UUIDs are " + relCharacteristic.getUids());
             worker.getLogger().info("Inferred concept is " + relCharacteristic);
 
-            if (false)
+            // TODO
+            // mark all existing inferred rels as not current
+            //  - need to find all current inferred rels and add a new part
+            // only add "interesting" inferred rels
+            //  - done in SnorocketFactory
+            // preserve grouping
+            //  - should also be done in SnorocketFactory
+            
             snorocketFactory.getResults(new I_SnorocketFactory.I_Callback() {
                 public void addRelationship(int c1, int rel, int c2, int relGroup) {
-                    worker.getLogger().info("*** " + c1 + " " + rel + " " + c2 + " " + relGroup);
+//                    worker.getLogger().info("*** " + c1 + " " + rel + " " + c2 + " " + relGroup);
 
                     try {
                         final UUID newRelUid = UUID.randomUUID();
@@ -154,12 +158,7 @@ public class Classify extends AbstractTask {
                     }
                 }
             });
-            
-            // FIXME probably don't want to commit if there were errors
-//            termFactory.commit();
 
-            worker.getLogger().info("committed");
-            
 //            // GET CHILDREN
 //            I_IntSet relTypes = termFactory.newIntSet();
 //            relTypes.add(termFactory.uuidToNative(Type3UuidFactory.SNOMED_ISA_REL_UUID));
@@ -188,6 +187,8 @@ public class Classify extends AbstractTask {
         } catch (Exception e) {
             handleException(e);
         }
+        
+        snorocketFactory = null;
 
         return Condition.CONTINUE;
     }
@@ -252,6 +253,7 @@ public class Classify extends AbstractTask {
 //    }
 
     private void handleException(Exception e) throws TaskFailedException {
+        snorocketFactory = null;
         throw new TaskFailedException(e);
     }
 
