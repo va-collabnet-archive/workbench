@@ -1,10 +1,12 @@
 package org.dwfa.mojo;
 
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyVetoException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.assignment.LaunchBatchGenAssignmentProcess;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.queue.OpenQueuesInFolder;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.Condition;
@@ -44,8 +47,10 @@ import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.jini.JiniManager;
 import org.dwfa.jini.LookupJiniAndLocal;
 import org.dwfa.jini.TermEntry;
-import org.dwfa.queue.bpa.worker.HeadlessQueueWorker;
+import org.dwfa.jini.TransactionParticipantAggregator;
 import org.dwfa.tapi.TerminologyException;
+
+import com.sun.jini.mahalo.LocalTransactionManager;
 
 
 
@@ -60,7 +65,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	/**
 	 * Location of the input file to use.
 	 * 
-	 * @parameter expression="${project.build.directory}\\..\\src"
+	 * @parameter expression="${project.build.directory}"
 	 * @required
 	 */
 	private File inputDirectory;
@@ -73,7 +78,6 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	 */
 	private File queueDirectory;
 	
-//	@parameter expression="${project.build.directory}\\..\\src\\main\\profiles\\users\\tore.dev\\inbox\\queue.config"
 	
 	/**
 	 * Name of file to read uuids from
@@ -102,12 +106,9 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 	 */
 	private String businessProcessToAssign;
 	
-	private String pathSeparator = System.getProperty("path.separator"); 
-	
 	private int listListSize = 250;
 //	private String processFileStr = "dup_check_processes/assignmentGenFromUuidList_InProperty.bp";
-//	private String processFileStr = "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp";
-	private String processFileStr = inputDirectory.getPath() + pathSeparator + "dupReviewAssignment.bp";
+	private String processFileStr = "src/main/bp/TA assignment processes/dupReviewAssignment.bp";
 	
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -117,6 +118,9 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		System.out.println("queueDirectory >>" + queueDirectory.getAbsolutePath());
 		try{		
 			if(inputDirectory.exists()){
+
+				TransactionParticipantAggregator tpa = new TransactionParticipantAggregator(new String[] { "src/main/config/transactionAggregator.config"}, null);
+				LocalTransactionManager ltm = new LocalTransactionManager(new String[] { "src/main/config/transactionManager.config"}, null);
 				File inputFile = new File(inputDirectory, fileName);
 				System.out.println(">>>>>>>>>>>>>>>>> input dir exists <<<<<<<<<<<<<<<<<<<<<<<");
 				System.out.println("inputFile >>" + fileName);
@@ -131,28 +135,17 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		    		System.out.println(">>>>>>>>>>>>>>>>> config created <<<<<<<<<<<<<<<<<<<<<<<");
 		    		
 		    		
-//		    		queueDirectory = new File("target/myConfig.config");
-//		    		queueDirectory.getParentFile().mkdirs();
-//		    		FileWriter fw = new FileWriter(queueDirectory);
-//		    		fw.append(" import java.security.Permission;");
-//		    		fw.append(" import java.net.SocketPermission;");
-//		    		fw.append(" import net.jini.security.BasicProxyPreparer;");
-//		    		
-//		    		fw.append(" org.dwfa.queue.QueueServer {");
-//		    		fw.append("    private groups = new String[] { org.dwfa.jini.ConfigUtil.getUniqueJvmGroup() };");
-//		    		//fw.append("    entries = new Entry[] { org.dwfa.jini.TermEntry.getInboxQueueType(), new Name(\"keith.dev\"), new ElectronicAddress(\"keith.dev\")};");
-//		    		fw.append("    discoveryManager = new LookupDiscovery(groups, this);");
-//		    		fw.append(" }");
-//		    		
-//		    		fw.append(" org.dwfa.mojo.MojoWorker {	tranDurLong = new Long(300000); ");
-//		    		fw.append("    groups = org.dwfa.queue.QueueServer.groups; ");
-//		    		fw.append("    serviceDiscovery = new net.jini.lookup.ServiceDiscoveryManager(new net.jini.discovery.LookupDiscovery(groups, this), null, this);");
-//		    		fw.append("    preparer = new BasicProxyPreparer(false,  new Permission[] {new SocketPermission(\"*:1024-\", \"connect\") });");
-//		    		fw.append(" }");
-//		    		fw.close();
+		    		queueDirectory = new File("target/myConfig.config");
+		    		queueDirectory.getParentFile().mkdirs();
+		    		FileWriter fw = new FileWriter(queueDirectory);
+		    		fw.append(" org.dwfa.mojo.MojoWorker {	tranDurLong = new Long(300000); ");
+		    		fw.append("    serviceDiscovery = new net.jini.lookup.ServiceDiscoveryManager(new net.jini.discovery.LookupDiscovery(groups, this), null, this);");
+		    		fw.append("    groups = org.dwfa.queue.QueueServer.groups; ");
+		    		fw.append(" }");
+		    		fw.close();
 		    		
 		    		
-//		    		queueDirectory = new File("C:\\_working\\au-ct\\amt-edit-bundle-branches\\branches\\0.2-Development\\dev\\src\\main\\profiles\\users\\keith.dev\\inbox\\queue.config");
+//		    		queueDirectory = new File("C:\\_working\\au-ct\\amt-edit-bundle-branches\\branches\\0.2-Development\\dev\\src\\main\\profiles\\users\\tore.dev\\inbox\\queue.config");
 		    		String[] entries = new String[]{ queueDirectory.getAbsolutePath() };
 		    	    
 		    		
@@ -163,16 +156,15 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		                                                   getClass().getClassLoader());
 		    		 
 		    		 Configuration workerConfiguration = 
-		                 ConfigurationProvider.getInstance(new String[] { queueDirectory.getAbsolutePath() },	                		 
+		                 ConfigurationProvider.getInstance(new String[] { "myConfig.config" },	                		 
 		                                                   getClass().getClassLoader());
 		    		 
 		    		
 		    		getLog().info(">>>>>>>>>>>>>>>>> configuration created <<<<<<<<<<<<<<<<<<<<<<<");
+		    		MojoWorker mw = new MojoWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker" );
 		    		
-//		    		MojoWorker mw = new MojoWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker" );
-		    		HeadlessQueueWorker mw = new HeadlessQueueWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker",null );
-		    			
-		    		mw.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+		    		I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile("tore.dev", "tore.dev", "tore.dev", "tore.dev");
+		    		mw.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame);
 		    		mw.getLogger().setLevel(Level.FINE);
 		    		getLog().info(">>>>>>>>>>>>>>>>> worker created <<<<<<<<<<<<<<<<<<<<<<<");
 
@@ -240,9 +232,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		log1task.setMessage("********* Lets open a queue....");
 		
 		OpenQueuesInFolder oqf = new OpenQueuesInFolder();
-//		oqf.setQueueDir("profiles\\users\\tore.dev\\inbox");
-//		oqf.setQueueDir("C:\\_working\\au-ct\\amt-edit-bundle-branches\\branches\\0.2-Development\\dev\\src\\main\\profiles\\users\\tore.dev\\inbox");
-		oqf.setQueueDir("C:\\_working\\au-ct\\amt-edit-bundle-branch\\0.2-Development\\dev\\src\\main\\profiles\\users\\tore.dev\\inbox");
+		oqf.setQueueDir("src/main/profiles/users/tore.dev/inbox");
 		testQueueProcess.addTask(oqf);
 		testQueueProcess.addBranch(log1task, oqf, Condition.CONTINUE);
 		
@@ -276,14 +266,12 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		log1task.setMessage("-------- Starting assignment process...");
 
 		OpenQueuesInFolder oqf = new OpenQueuesInFolder();
-//		oqf.setQueueDir("profiles\\users\\tore.dev\\inbox");
-//		oqf.setQueueDir("C:\\_working\\au-ct\\amt-edit-bundle-branches\\branches\\0.2-Development\\dev\\src\\main\\profiles\\users\\tore.dev\\inbox");
-		oqf.setQueueDir("C:\\_working\\au-ct\\amt-edit-bundle-branch\\0.2-Development\\dev\\src\\main\\profiles\\users\\tore.dev\\inbox");
+		oqf.setQueueDir("profiles\\users\\tore.dev\\inbox");
 		assignmentProcess.addTask(oqf);
 		assignmentProcess.addBranch(log1task, oqf, Condition.CONTINUE);
 		
 		LaunchBatchGenAssignmentProcess genAssign = new LaunchBatchGenAssignmentProcess();
-		genAssign.setProcessFileStr( "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp" );		
+		genAssign.setProcessFileStr( "src/main/bp/TA assignment processes/dupReviewAssignment.bp" );		
 		assignmentProcess.addTask(genAssign);
 		assignmentProcess.addBranch(oqf, genAssign, Condition.CONTINUE);
 		
@@ -313,7 +301,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		
          List<List<UUID>> tempListList = uuidListOfLists;
 		int sizeOfList = tempListList.size();
-		System.out.println("********* size of list == "+ sizeOfList);
+		
         List<Collection<UUID>> uuidListList = null;
         if (sizeOfList > listListSize){
         	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, listListSize));
@@ -349,14 +337,14 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		/*
 		 * Set business process 
 		 */		    			    		
-		assignmentProcess.writeAttachment("processFileName", "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp");
+		assignmentProcess.writeAttachment("processFileName", "src/main/bp/TA assignment processes/dupReviewAssignment.bp");
 		getLog().info(">>>>>>>>>>>>>>>>> bp added <<<<<<<<<<<<<<<<<<<<<<<");
 		
 		/*
 		 * Set instruction file details
 		 */
 		assignmentProcess.writeAttachment("instructionFileName", "instructions_dup.html");
-		assignmentProcess.writeAttachment("directoryName", "C:\\_useful Stuff\\AMT Processes\\instructions");
+		assignmentProcess.writeAttachment("directoryName", "src/main/bp/instructions");
 		
 		getLog().info(">>>>>>>>>>>>>>>>> instruction added <<<<<<<<<<<<<<<<<<<<<<<");
 		
@@ -370,7 +358,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		// You could use set property here instead of writeAttachment if you prepend and A: as in "A: assigneeAddrPropName"
 		assignmentProcess.writeAttachment("assigneeAddrPropName", addresses);
 		assignmentProcess.writeAttachment("batchGenAssigneePropName", addresses);
-		assignmentProcess.writeAttachment("processFileStr", "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp");
+		assignmentProcess.writeAttachment("processFileStr", "src/main/bp/TA assignment processes/dupReviewAssignment.bp");
 		assignmentProcess.writeAttachment("processToAssignPropName", "processFileName");
 		assignmentProcess.writeAttachment("newDestinationProp", "tore.dev");
 		assignmentProcess.writeAttachment("destinationProp", "tore.dev");
@@ -383,9 +371,7 @@ public class CreateDuplicateReviewAssignments extends AbstractMojo {
 		assignmentProcess.setProperty(ProcessAttachmentKeys.BATCH_UUID_LIST2.getAttachmentKey(), uuidListList);
 		assignmentProcess.setProperty(ProcessAttachmentKeys.DESTINATION_ADR.getAttachmentKey(), "tore.dev");
 		assignmentProcess.setProperty(ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey(), addresses);
-		assignmentProcess.setProperty(ProcessAttachmentKeys.TO_ASSIGN_PROCESS.getAttachmentKey(), "C:\\_useful Stuff\\AMT Processes\\TA assignment processes\\dupReviewAssignment.bp");
-		assignmentProcess.writeAttachment(ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey(), addresses);
-		
+		assignmentProcess.setProperty(ProcessAttachmentKeys.TO_ASSIGN_PROCESS.getAttachmentKey(), "src/main/bp/TA assignment processes/dupReviewAssignment.bp");
 		
 		return assignmentProcess;
 	}

@@ -10,6 +10,7 @@ import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.util.Collection;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import javax.security.auth.login.LoginException;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
+import net.jini.security.ProxyPreparer;
 
 import org.dwfa.bpa.gui.I_ManageUserTransactions;
 import org.dwfa.bpa.process.I_Work;
@@ -29,7 +31,19 @@ import org.dwfa.bpa.worker.Worker;
 
 public class MojoWorker extends Worker {
 
-    /**
+    @Override
+	public ProxyPreparer getProxyPreparer() throws ConfigurationException {
+		
+		return new ProxyPreparer() {
+
+			public Object prepareProxy(Object obj) throws RemoteException {
+				return obj;
+			}
+			
+		};
+	}
+
+	/**
      * @param config
      * @param id
      * @param desc
