@@ -52,7 +52,7 @@ public class Classify extends AbstractTask {
      * Bean property
      */
     private TermEntry classifyRoot = new TermEntry(Type3UuidFactory.SNOMED_ROOT_UUID);
-
+    
     private transient I_SnorocketFactory snorocketFactory = null;
 
     private transient I_TermFactory termFactory;
@@ -66,11 +66,16 @@ public class Classify extends AbstractTask {
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        final int objDataVersion = in.readInt();
+
+        if (objDataVersion > 0) {
             factoryClass = (String) in.readObject();
-            classifyRoot = (TermEntry) in.readObject();
-        } else {
+            if (objDataVersion > 1) {
+                classifyRoot = (TermEntry) in.readObject();
+            } else if (objDataVersion > dataVersion) {
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
+            }
+        } else {        // <= 0
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -103,7 +108,7 @@ public class Classify extends AbstractTask {
             worker.getLogger().info("Classification Root: " + root);
 
             isaId = termFactory.getConcept(new UUID[] {Type3UuidFactory.SNOMED_ISA_REL_UUID}).getConceptId();
-            worker.getLogger().info("isa ID: " + isaId);
+            worker.getLogger().info("isa ID: " + isaId + " : " + termFactory.getConcept(isaId));
             snorocketFactory.addIsa(isaId);
             
             new Walker(termFactory, snorocketFactory, root).run();
@@ -135,26 +140,39 @@ public class Classify extends AbstractTask {
             // TODO
             // mark all existing inferred rels as not current
             //  - need to find all current inferred rels and add a new part
-            // only add "interesting" inferred rels
-            //  - done in SnorocketFactory
-            // preserve grouping
-            //  - should also be done in SnorocketFactory
             
             snorocketFactory.getResults(new I_SnorocketFactory.I_Callback() {
                 public void addRelationship(int c1, int rel, int c2, int relGroup) {
 //                    worker.getLogger().info("*** " + c1 + " " + rel + " " + c2 + " " + relGroup);
 
                     try {
-                        final UUID newRelUid = UUID.randomUUID();
                         final I_GetConceptData relSource = termFactory.getConcept(c1);
                         final I_GetConceptData relType = termFactory.getConcept(rel);
                         final I_GetConceptData relDestination = termFactory.getConcept(c2);
+
+                        worker.getLogger().info("*** " + getText(relType) +
+                                "\n\t" + getText(relSource) +
+                                "\n\t" + getText(relDestination) +
+                                "\t" + relGroup);
+
+                        final UUID newRelUid = UUID.randomUUID();
                         
                         termFactory.newRelationship(newRelUid, relSource, relType, relDestination, relCharacteristic, relRefinability, relStatus, relGroup, newConfig);
                     } catch (TerminologyException e) {
                         worker.getLogger().severe(e.getLocalizedMessage());
                     } catch (IOException e) {
                         worker.getLogger().severe(e.getLocalizedMessage());
+                    }
+                }
+                
+                private String getText(I_GetConceptData concept) throws IOException, TerminologyException {
+                    try {
+                        return concept.toString();
+                    } catch (RuntimeException e) {
+//                      for (I_DescriptionVersioned dv: concept.getDescriptions()) {
+//                          return dv.getUniversal().getVersions().get(0).getText();
+//                      }
+                        return "NONE: " + concept.getConceptId();
                     }
                 }
             });
@@ -346,7 +364,10 @@ public class Classify extends AbstractTask {
                         snorocketFactory.addRelationship(childId, isaId, parentId, 0);
                         queue.add(childId);
                     }
-                    getLogger().info((System.currentTimeMillis() - start)/1000.0 + " " + parentConcept);
+                    final double delay = (System.currentTimeMillis() - start)/1000.0;
+                    if (delay > 1.0) {
+                        getLogger().info(delay + " " + parentConcept);
+                    }
                 }
             }
         }
@@ -354,7 +375,7 @@ public class Classify extends AbstractTask {
         /**
          * 
          * @param concept
-         * @return true if the conce[t is active
+         * @return true if the concept is active
          * @throws IOException
          */
         private boolean processConcept(I_GetConceptData concept) throws IOException {
@@ -369,13 +390,13 @@ public class Classify extends AbstractTask {
                 final List<I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated, addUncommitted);
                 for (I_RelTuple relTuple: relTuples) {
                     if (definingCharacteristic == relTuple.getCharacteristicId()) {
-                        snorocketFactory.addRelationship(relTuple.getC1Id(), relTuple.getRelId(), relTuple.getC2Id(), relTuple.getGroup());
+                        snorocketFactory.addRelationship(relTuple.getC1Id(), relTuple.getRelTypeId(), relTuple.getC2Id(), relTuple.getGroup());
                     }
                 }
                 
                 return true;
             } else if (tuples.size() > 1) {
-                throw new AssertionError("Unexpected number of tuples: " + tuples.size());
+                throw new AssertionError("Unexpected number of tuples: " + tuples.size() + " for " + concept);
             }
             
             return false;

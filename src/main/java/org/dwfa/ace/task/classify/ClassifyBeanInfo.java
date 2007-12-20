@@ -26,7 +26,10 @@ public class ClassifyBeanInfo extends SimpleBeanInfo {
             classifyRoot.setDisplayName("<html><font color='green'>Classification Root Concept:");
             classifyRoot.setShortDescription("Define the root Concept for classification.");
 
-            PropertyDescriptor rv[] = { factoryClass, classifyRoot };
+            PropertyDescriptor rv[] = {
+                    factoryClass,
+                    classifyRoot,
+            };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
