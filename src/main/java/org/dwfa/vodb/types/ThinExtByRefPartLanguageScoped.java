@@ -102,5 +102,12 @@ public class ThinExtByRefPartLanguageScoped extends ThinExtByRefPartLanguage imp
    public I_ThinExtByRefPart duplicatePart() {
       return new ThinExtByRefPartLanguageScoped(this);
    }
+   public int compareTo(ThinExtByRefPart o) {
+       if (ThinExtByRefPartLanguageScoped.class.isAssignableFrom(o.getClass())) {
+           ThinExtByRefPartLanguageScoped otherPart = (ThinExtByRefPartLanguageScoped) o;
+           return this.priority- otherPart.priority;
+       }
+       return 1;
+   }
 
 }

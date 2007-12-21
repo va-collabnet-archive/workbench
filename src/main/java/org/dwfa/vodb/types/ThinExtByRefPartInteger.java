@@ -66,4 +66,12 @@ public class ThinExtByRefPartInteger extends ThinExtByRefPart implements I_ThinE
       super();
    }
 
+   public int compareTo(ThinExtByRefPart o) {
+       if (ThinExtByRefPartInteger.class.isAssignableFrom(o.getClass())) {
+           ThinExtByRefPartInteger otherPart = (ThinExtByRefPartInteger) o;
+           return this.value - otherPart.value;
+       }
+       return 1;
+   }
+
 }

@@ -1363,8 +1363,25 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JPanel refsetViewPrefPanel = new JPanel(new GridLayout(0, 1));
         refsetViewPrefPanel.add(new JScrollPane(refsetViewList));
         
-        return refsetViewPrefPanel;
+        return new JScrollPane(refsetViewPrefPanel);
     }
+
+    private JComponent makeRefsetTaxonomySortPanel() {
+        
+        TerminologyListModel refsetTaxonomySortTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getRefsetsToSortTaxonomy().getListValues()) {
+            refsetTaxonomySortTableModel.addElement(ConceptBean.get(id));
+        }
+        refsetTaxonomySortTableModel.addListDataListener(aceFrameConfig.getRefsetsToSortTaxonomy());
+        TerminologyList refsetTaxonomySortList = new TerminologyList(refsetTaxonomySortTableModel, aceFrameConfig);
+
+        refsetTaxonomySortList.setBorder(BorderFactory.createTitledBorder("Refsets to sort taxonomy view: "));
+        JPanel refsetTaxonomySortPrefPanel = new JPanel(new GridLayout(0, 1));
+        refsetTaxonomySortPrefPanel.add(new JScrollPane(refsetTaxonomySortList));
+        
+        return new JScrollPane(refsetTaxonomySortPrefPanel);
+    }
+
     private JComponent makeDescPrefPanel() {
 
         TerminologyListModel descTypeTableModel = new TerminologyListModel();
@@ -1434,6 +1451,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                          aceFrameConfig.getShowViewerImagesInTaxonomy(), true));
         checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
                                          aceFrameConfig.getShowRefsetInfoInTaxonomy(), true));
+        checkPanel.add(getCheckboxEditor("sort taxonomy using refset", "sortTaxonomyUsingRefset",
+                                         aceFrameConfig.getSortTaxonomyUsingRefset(), true));
                 
         relPrefPanel.add(checkPanel);
         relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:", aceFrameConfig.getDestRelTypes())));
@@ -1488,7 +1507,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         statusValuesModel.addListDataListener(aceFrameConfig.getAllowedStatus());
         TerminologyList statusList = new TerminologyList(statusValuesModel, aceFrameConfig);
         statusList.setBorder(BorderFactory.createTitledBorder("Status values for display:"));
-        return statusList;
+        return new JScrollPane(statusList);
     }
 
     private JComponent makeRootPrefPanel() {
@@ -1497,17 +1516,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             rootModel.addElement(ConceptBean.get(id));
         }
         rootModel.addListDataListener(aceFrameConfig.getRoots());
-        TerminologyList statusList = new TerminologyList(rootModel, aceFrameConfig);
-        statusList.setBorder(BorderFactory.createTitledBorder("Hierarchy roots:"));
-        return statusList;
+        TerminologyList rootList = new TerminologyList(rootModel, aceFrameConfig);
+        rootList.setBorder(BorderFactory.createTitledBorder("Hierarchy roots:"));
+        return new JScrollPane(rootList);
     }
 
     private JTabbedPane makeViewConfig() throws Exception {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("descriptions", makeDescPrefPanel());
-        tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
-        tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("roots", makeRootPrefPanel());
+        tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
+        tabs.addTab("taxonomy sort", makeRefsetTaxonomySortPanel());
+        tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("refset", makeRefsetViewPanel());
         return tabs;
     }

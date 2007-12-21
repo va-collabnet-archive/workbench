@@ -69,7 +69,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 27;
+    private static final int dataVersion = 29;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -198,6 +198,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private boolean variableHeightTaxonomyView = false;
     private boolean showInferredInTaxonomy = false;
     private boolean showRefsetInfoInTaxonomy = false;
+    
+    // 28
+    private I_IntList refsetsToSortTaxonomy = new IntList();
+    
+    // 29
+    private boolean sortTaxonomyUsingRefset = false;
+    
+    
 
     // transient
     private transient MasterWorker worker;
@@ -330,6 +338,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         out.writeBoolean(showInferredInTaxonomy);
         out.writeBoolean(showRefsetInfoInTaxonomy);
 
+        // 28
+        IntList.writeIntList(out, refsetsToSortTaxonomy);
+        
+        // 29
+        out.writeBoolean(sortTaxonomyUsingRefset);
     }
 
     @SuppressWarnings("unchecked")
@@ -578,6 +591,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 variableHeightTaxonomyView = false;
                 showInferredInTaxonomy = false;
                 showRefsetInfoInTaxonomy = false;
+            }
+            
+            if (objDataVersion >= 28) {
+                refsetsToSortTaxonomy = IntList.readIntListIgnoreMapErrors(in);
+            } else {
+                refsetsToSortTaxonomy = new IntList();
+            }
+            if (objDataVersion >= 29) {
+                sortTaxonomyUsingRefset = in.readBoolean();
+            } else {
+                sortTaxonomyUsingRefset = false;
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -1800,5 +1824,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Boolean old = this.showRefsetInfoInTaxonomy;
         this.showRefsetInfoInTaxonomy = showRefsetInfoInTaxonomy;
         changeSupport.firePropertyChange("showRefsetInfoInTaxonomy", old, showRefsetInfoInTaxonomy);
+    }
+
+    public I_IntList getRefsetsToSortTaxonomy() {
+        return refsetsToSortTaxonomy;
+    }
+
+    public Boolean getSortTaxonomyUsingRefset() {
+        return sortTaxonomyUsingRefset;
+    }
+
+    public void setSortTaxonomyUsingRefset(boolean sortTaxonomyUsingRefset) {
+        this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
+    }
+    public void setSortTaxonomyUsingRefset(Boolean sortTaxonomyUsingRefset) {
+        this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
     }
 }

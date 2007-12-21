@@ -68,5 +68,12 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart implements I_ThinE
       return new ThinExtByRefPartConcept(this);
    }
 
-   
+   public int compareTo(ThinExtByRefPart o) {
+       if (ThinExtByRefPartConcept.class.isAssignableFrom(o.getClass())) {
+           ThinExtByRefPartConcept otherPart = (ThinExtByRefPartConcept) o;
+           return this.conceptId - otherPart.conceptId;
+       }
+       return 1;
+   }
+
 }

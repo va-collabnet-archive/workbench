@@ -67,5 +67,12 @@ public class ThinExtByRefPartConceptInt extends ThinExtByRefPartConcept
 	public I_ThinExtByRefPart duplicatePart() {
 		return new ThinExtByRefPartConceptInt(this);
 	}
+	   public int compareTo(ThinExtByRefPart o) {
+	       if (ThinExtByRefPartConceptInt.class.isAssignableFrom(o.getClass())) {
+	           ThinExtByRefPartConceptInt otherPart = (ThinExtByRefPartConceptInt) o;
+	           return this.intValue - otherPart.intValue;
+	       }
+	       return 1;
+	   }
 
 }

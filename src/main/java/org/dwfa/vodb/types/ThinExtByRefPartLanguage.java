@@ -96,5 +96,12 @@ public class ThinExtByRefPartLanguage extends ThinExtByRefPart implements I_Thin
    public ThinExtByRefPartLanguage() {
       super();
    }
+   public int compareTo(ThinExtByRefPart o) {
+       if (ThinExtByRefPartLanguage.class.isAssignableFrom(o.getClass())) {
+           ThinExtByRefPartLanguage otherPart = (ThinExtByRefPartLanguage) o;
+           return this.acceptabilityId - otherPart.acceptabilityId;
+       }
+       return 1;
+   }
 
 }

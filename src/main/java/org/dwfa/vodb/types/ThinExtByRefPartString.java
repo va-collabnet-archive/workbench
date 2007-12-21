@@ -70,4 +70,12 @@ public class ThinExtByRefPartString extends ThinExtByRefPart implements I_ThinEx
         this.stringValue = stringValue;
     }
 
+   public int compareTo(ThinExtByRefPart o) {
+       if (ThinExtByRefPartString.class.isAssignableFrom(o.getClass())) {
+           ThinExtByRefPartString otherPart = (ThinExtByRefPartString) o;
+           return this.stringValue.compareTo(otherPart.stringValue);
+       }
+       return 1;
+   }
+
  }

@@ -87,4 +87,12 @@ public class ThinExtByRefPartMeasurement extends ThinExtByRefPart implements I_T
       super();
    }
 
+   public int compareTo(ThinExtByRefPart o) {
+       if (ThinExtByRefPartMeasurement.class.isAssignableFrom(o.getClass())) {
+           ThinExtByRefPartMeasurement otherPart = (ThinExtByRefPartMeasurement) o;
+           return Double.compare(this.measurementValue, otherPart.measurementValue);
+       }
+       return 1;
+   }
+
 }

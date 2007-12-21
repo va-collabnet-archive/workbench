@@ -47,6 +47,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
@@ -1456,6 +1457,9 @@ public class VodbEnv implements I_ImplementTermFactory {
                                   Field.Index.UN_TOKENIZED));
                 doc.add(new Field("cnid", Integer.toString(descV.getConceptId()), Field.Store.YES,
                                   Field.Index.UN_TOKENIZED));
+                addIdsToIndex(doc, getId(descV.getDescId()));
+                addIdsToIndex(doc, getId(descV.getConceptId()));
+                
                 String lastDesc = null;
                 for (I_DescriptionTuple tuple : descV.getTuples()) {
                     if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
@@ -1480,6 +1484,12 @@ public class VodbEnv implements I_ImplementTermFactory {
             }
         } catch (DatabaseException ex) {
             throw new ToIoException(ex);
+        }
+    }
+
+    private void addIdsToIndex(Document doc, I_IdVersioned did) {
+        for (I_IdPart p: did.getVersions()) {
+            doc.add(new Field("desc", p.getSourceId().toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
         }
     }
 
@@ -2070,6 +2080,9 @@ public class VodbEnv implements I_ImplementTermFactory {
             doc
                     .add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES,
                                    Field.Index.UN_TOKENIZED));
+            addIdsToIndex(doc, getId(desc.getDescId()));
+            addIdsToIndex(doc, getId(desc.getConceptId()));
+
             String lastDesc = null;
             for (I_DescriptionTuple tuple : desc.getTuples()) {
                 if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
