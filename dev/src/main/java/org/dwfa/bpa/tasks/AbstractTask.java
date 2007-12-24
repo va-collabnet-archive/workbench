@@ -71,6 +71,7 @@ public abstract class AbstractTask  implements I_DefineTask {
     private static final Condition[] itemSkipOrCompleteArray = { Condition.ITEM_COMPLETE, Condition.ITEM_SKIPPED };
     private static final Condition[] itemCancelOrCompleteArray = { Condition.ITEM_COMPLETE, Condition.ITEM_CANCELED };
     private static final Condition[] conditionalTestConditionArray = { Condition.FALSE, Condition.TRUE };
+    private static final Condition[] conditionalTestConditionReverse = { Condition.TRUE, Condition.FALSE };
     private static final Condition[] stopConditionArray = { Condition.STOP };
     private static final Condition[] completeConditionArray = { Condition.PROCESS_COMPLETE };
     private static final Condition[] waitForWebFormArray = { Condition.WAIT_FOR_WEB_FORM };
@@ -82,7 +83,9 @@ public abstract class AbstractTask  implements I_DefineTask {
     public static final List<Condition> ITEM_CANCELED_OR_COMPLETE = Collections.unmodifiableList(Arrays
             .asList(itemCancelOrCompleteArray));
     public static final List<Condition> CONDITIONAL_TEST_CONDITIONS = Collections.unmodifiableList(Arrays
-            .asList(conditionalTestConditionArray));
+                                                                 .asList(conditionalTestConditionArray));
+    public static final List<Condition> CONDITIONAL_TEST_CONDITIONS_REVERSE = Collections.unmodifiableList(Arrays
+                                                                 .asList(conditionalTestConditionReverse));
     public static final List<Condition> STOP_CONDITION = Collections.unmodifiableList(Arrays
             .asList(stopConditionArray));
     public static final List<Condition> COMPLETE_CONDITION = Collections.unmodifiableList(Arrays
