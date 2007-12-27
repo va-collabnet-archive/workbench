@@ -18,4 +18,5 @@ public interface I_GetConceptDataForTree extends I_GetConceptData {
 	public ConceptBean getCoreBean();
 	public List<DefaultMutableTreeNode> getExtraParentNodes();
 	public I_DescriptionTuple getDescTuple(I_ConfigAceFrame aceConfig) throws IOException;
+	public int getRelId();
 }

@@ -7,7 +7,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 
 
-public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable<ThinExtByRefPart> {
+public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable<I_ThinExtByRefPart> {
    private int pathId;
    private int version;
    private int status;

@@ -113,5 +113,9 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
       return part.getUniversalPart();
    }
-
+   
+   public int compareTo(I_ThinExtByRefPart o) {
+     return part.compareTo(o);
+   }
+   
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartString;
@@ -70,7 +71,7 @@ public class ThinExtByRefPartString extends ThinExtByRefPart implements I_ThinEx
         this.stringValue = stringValue;
     }
 
-   public int compareTo(ThinExtByRefPart o) {
+   public int compareTo(I_ThinExtByRefPart o) {
        if (ThinExtByRefPartString.class.isAssignableFrom(o.getClass())) {
            ThinExtByRefPartString otherPart = (ThinExtByRefPartString) o;
            return this.stringValue.compareTo(otherPart.stringValue);

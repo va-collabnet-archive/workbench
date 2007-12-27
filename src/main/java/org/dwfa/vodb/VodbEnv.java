@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,6 +90,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
+import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
@@ -324,7 +327,7 @@ public class VodbEnv implements I_ImplementTermFactory {
                 AceLog.getAppLog().info("Setting cache size to: " + VodbEnv.cacheSize);
                 AceLog.getAppLog().info("Cache size is: " + envConfig.getCacheSize());
                 AceLog.getAppLog().info("Cache percent: " + envConfig.getCachePercent());
-                
+
                 activity.setProgressInfoLower("Setting cache size to: " + VodbEnv.cacheSize);
             }
 
@@ -1032,43 +1035,44 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
 
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException {
-       try {
-        Stopwatch timer = null;
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Getting extensions from componentId for: " + componentId);
-            timer = new Stopwatch();
-            timer.start();
-        }
-        DatabaseEntry secondaryKey = new DatabaseEntry();
-
-        componentKeyCreator.createSecondaryKey(Integer.MIN_VALUE, componentId, secondaryKey);
-        DatabaseEntry foundData = new DatabaseEntry();
-
-        SecondaryCursor mySecCursor = getComponentToExtMap().openSecondaryCursor(null, null);
-        OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
-        List<I_GetExtensionData> matches = new ArrayList<I_GetExtensionData>();
-        int count = 0;
-        int rejected = 0;
-        while (retVal == OperationStatus.SUCCESS) {
-            I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
-            if (extFromComponentId.getComponentId() == componentId) {
-                count++;
-                matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
-            } else {
-                rejected++;
-                break;
+        try {
+            Stopwatch timer = null;
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Getting extensions from componentId for: " + componentId);
+                timer = new Stopwatch();
+                timer.start();
             }
-            retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
+            DatabaseEntry secondaryKey = new DatabaseEntry();
+
+            componentKeyCreator.createSecondaryKey(Integer.MIN_VALUE, componentId, secondaryKey);
+            DatabaseEntry foundData = new DatabaseEntry();
+
+            SecondaryCursor mySecCursor = getComponentToExtMap().openSecondaryCursor(null, null);
+            OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
+            List<I_GetExtensionData> matches = new ArrayList<I_GetExtensionData>();
+            int count = 0;
+            int rejected = 0;
+            while (retVal == OperationStatus.SUCCESS) {
+                I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder
+                        .entryToObject(foundData);
+                if (extFromComponentId.getComponentId() == componentId) {
+                    count++;
+                    matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
+                } else {
+                    rejected++;
+                    break;
+                }
+                retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
+            }
+            mySecCursor.close();
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine(count + " extensions fetched, " + rejected + " extensions rejected " + "for: "
+                        + componentId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
+            }
+            return matches;
+        } catch (DatabaseException ex) {
+            throw new ToIoException(ex);
         }
-        mySecCursor.close();
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine(count + " extensions fetched, " + rejected + " extensions rejected " + "for: " + componentId
-                    + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
-        }
-        return matches;
-       } catch (DatabaseException ex) {
-          throw new ToIoException(ex);
-       }
     }
 
     public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
@@ -1358,7 +1362,7 @@ public class VodbEnv implements I_ImplementTermFactory {
      * @throws DatabaseException
      */
     public void searchRegex(I_TrackContinuation tracker, Pattern p, Collection<ThinDescVersioned> matches,
-        CountDownLatch latch, I_GetConceptData root, I_ConfigAceFrame config) throws DatabaseException {
+        CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException {
         Stopwatch timer = null;
         if (logger.isLoggable(Level.INFO)) {
             timer = new Stopwatch();
@@ -1370,7 +1374,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
             if (tracker.continueWork()) {
                 ThinDescVersioned descV = (ThinDescVersioned) descBinding.entryToObject(foundData);
-                ACE.threadPool.execute(new CheckAndProcessRegexMatch(p, matches, descV, root, config));
+                ACE.threadPool.execute(new CheckAndProcessRegexMatch(p, matches, descV, checkList, config));
             } else {
                 while (latch.getCount() > 0) {
                     latch.countDown();
@@ -1395,9 +1399,9 @@ public class VodbEnv implements I_ImplementTermFactory {
      * http://www.nabble.com/Lucene-in-Action-examples-complie-problem-tf2418478.html#a6743189
      */
 
-    public void searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
-        CountDownLatch latch, I_GetConceptData root, I_ConfigAceFrame config, LuceneProgressUpdator updater)
-            throws DatabaseException, IOException, ParseException {
+    public CountDownLatch searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
+        CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
+        LuceneProgressUpdator updater) throws DatabaseException, IOException, ParseException {
         Stopwatch timer = null;
         if (logger.isLoggable(Level.INFO)) {
             timer = new Stopwatch();
@@ -1417,13 +1421,22 @@ public class VodbEnv implements I_ImplementTermFactory {
         Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
         updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime) + " ms.");
         Hits hits = luceneSearcher.search(q);
+        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime) + " ms. Hits: " + hits.length());
+
+        CountDownLatch hitLatch = new CountDownLatch(hits.length());
+        updater.setHits(hits.length());
+        updater.setIndeterminate(false);
+
+        
         for (int i = 0; i < hits.length(); i++) {
             Document doc = hits.doc(i);
             float score = hits.score(i);
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Hit: " + doc + " Score: " + score);
             }
-            ACE.threadPool.execute(new CheckAndProcessLuceneMatch(doc, score, matches, root, config, VodbEnv.this));
+            
+            ACE.threadPool
+                    .execute(new CheckAndProcessLuceneMatch(hitLatch, updater, doc, score, matches, checkList, config, VodbEnv.this));
         }
         if (logger.isLoggable(Level.INFO)) {
             if (tracker.continueWork()) {
@@ -1433,6 +1446,7 @@ public class VodbEnv implements I_ImplementTermFactory {
             }
             timer.stop();
         }
+        return hitLatch;
     }
 
     public void createLuceneDescriptionIndex() throws IOException {
@@ -1459,7 +1473,7 @@ public class VodbEnv implements I_ImplementTermFactory {
                                   Field.Index.UN_TOKENIZED));
                 addIdsToIndex(doc, getId(descV.getDescId()));
                 addIdsToIndex(doc, getId(descV.getConceptId()));
-                
+
                 String lastDesc = null;
                 for (I_DescriptionTuple tuple : descV.getTuples()) {
                     if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
@@ -1488,7 +1502,7 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
 
     private void addIdsToIndex(Document doc, I_IdVersioned did) {
-        for (I_IdPart p: did.getVersions()) {
+        for (I_IdPart p : did.getVersions()) {
             doc.add(new Field("desc", p.getSourceId().toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
         }
     }
@@ -1508,32 +1522,38 @@ public class VodbEnv implements I_ImplementTermFactory {
 
         ThinDescVersioned descV;
 
-        I_GetConceptData root;
+        List<I_TestSearchResults> checkList;
 
         I_ConfigAceFrame config;
 
         public CheckAndProcessRegexMatch(Pattern p, Collection<ThinDescVersioned> matches, ThinDescVersioned descV,
-                I_GetConceptData root, I_ConfigAceFrame config) {
+                List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
             super();
             this.p = p;
             this.matches = matches;
             this.descV = descV;
-            this.root = root;
+            this.checkList = checkList;
             this.config = config;
         }
 
         public void run() {
             if (descV.matches(p)) {
-                if (root == null) {
+                if (checkList == null || checkList.size() == 0) {
                     matches.add(descV);
                 } else {
-                    ConceptBean descConcept = ConceptBean.get(descV.getConceptId());
                     try {
-                        if (root.isParentOf(descConcept, config.getAllowedStatus(), config.getDestRelTypes(), config
-                                .getViewPositionSet(), true)) {
+                        boolean failed = false;
+                        for (I_TestSearchResults test : checkList) {
+                            if (test.test(descV, config) == false) {
+                                failed = true;
+                                break;
+                            }
+                        }
+
+                        if (failed == false) {
                             matches.add(descV);
                         }
-                    } catch (IOException e) {
+                    } catch (TaskFailedException e) {
                         if (ACE.editMode) {
                             AceLog.getAppLog().alertAndLogException(e);
                         } else {
@@ -1550,7 +1570,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
         Collection<LuceneMatch> matches;
 
-        I_GetConceptData root;
+        List<I_TestSearchResults> checkList;
 
         I_ConfigAceFrame config;
 
@@ -1560,44 +1580,59 @@ public class VodbEnv implements I_ImplementTermFactory {
 
         private float score;
 
-        public CheckAndProcessLuceneMatch(Document doc, float score, Collection<LuceneMatch> matches,
-                I_GetConceptData root, I_ConfigAceFrame config, VodbEnv env) {
+        private CountDownLatch hitLatch;
+
+        public CheckAndProcessLuceneMatch(CountDownLatch hitLatch, LuceneProgressUpdator updater, Document doc, float score, Collection<LuceneMatch> matches,
+                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, VodbEnv env) {
             super();
             this.doc = doc;
             this.score = score;
             this.matches = matches;
-            this.root = root;
+            this.checkList = checkList;
             this.config = config;
             this.env = env;
+            this.hitLatch = hitLatch;
         }
 
         public void run() {
-            int nid = Integer.parseInt(doc.get("dnid"));
-            try {
-                ThinDescVersioned descV = (ThinDescVersioned) env.getDescription(nid);
-                LuceneMatch match = new LuceneMatch(descV, score);
-                if (root == null) {
-                    matches.add(match);
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine("processing match: " + descV + " new match size: " + matches.size());
-                    }
-                } else {
-                    ConceptBean descConcept = ConceptBean.get(descV.getConceptId());
-                    try {
-                        if (root.isParentOf(descConcept, config.getAllowedStatus(), config.getDestRelTypes(), config
-                                .getViewPositionSet(), true)) {
-                            matches.add(match);
+            if (hitLatch.getCount() > 0) {
+                int nid = Integer.parseInt(doc.get("dnid"));
+                try {
+                    ThinDescVersioned descV = (ThinDescVersioned) env.getDescription(nid);
+                    LuceneMatch match = new LuceneMatch(descV, score);
+                    if (checkList == null || checkList.size() == 0) {
+                        matches.add(match);
+                        if (logger.isLoggable(Level.FINE)) {
+                            logger.fine("processing match: " + descV + " new match size: " + matches.size());
                         }
-                    } catch (IOException e) {
-                        AceLog.getAppLog().alertAndLogException(e);
+                    } else {
+                        try {
+                            boolean failed = false;
+                            for (I_TestSearchResults test : checkList) {
+                                if (test.test(descV, config) == false) {
+                                    failed = true;
+                                    break;
+                                }
+                            }
+
+                            if (failed == false) {
+                                matches.add(match);
+                            }
+                        } catch (TaskFailedException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
                     }
+                } catch (IOException e1) {
+                    AceLog.getAppLog().alertAndLogException(e1);
                 }
-            } catch (IOException e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
+                this.hitLatch.countDown();
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Hit latch: " + this.hitLatch.getCount());
+                }
+
             }
 
         }
-
     }
 
     public Database getTimeBranchDb() {
@@ -1694,6 +1729,68 @@ public class VodbEnv implements I_ImplementTermFactory {
             }
         }
         relCursor.close();
+    }
+
+    private class ConceptIterator implements Iterator<I_GetConceptData> {
+
+        DatabaseEntry foundKey = new DatabaseEntry();
+        DatabaseEntry foundData = new DatabaseEntry();
+
+        boolean hasNext;
+        private Integer conceptId;
+        private Cursor concCursor;
+
+        private ConceptIterator() throws IOException {
+            super();
+            try {
+                concCursor = getConceptDb().openCursor(null, null);
+                getNext();
+            } catch (DatabaseException e) {
+                throw new ToIoException(e);
+            }
+        }
+
+        private void getNext() {
+            try {
+                hasNext = (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS);
+                if (hasNext) {
+                    conceptId = (Integer) intBinder.entryToObject(foundKey);
+                } else {
+                    conceptId = null;
+                    concCursor.close();
+                }
+            } catch (Exception ex) {
+                try {
+                    concCursor.close();
+                } catch (DatabaseException e) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+                AceLog.getAppLog().alertAndLogException(ex);
+                hasNext = false;
+            }
+        }
+
+        public boolean hasNext() {
+            return hasNext;
+        }
+
+        public I_GetConceptData next() {
+            if (hasNext) {
+                I_GetConceptData next = ConceptBean.get(conceptId);
+                getNext();
+                return next;
+            } 
+            return null;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+
+    public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
+        return new ConceptIterator();
     }
 
     public void iterateConceptAttributeEntries(I_ProcessConceptAttributeEntries processor) throws Exception {
@@ -2665,6 +2762,70 @@ public class VodbEnv implements I_ImplementTermFactory {
         iterateConceptAttributeEntries(wrapper);
     }
 
+    
+    
+    private class DescriptionIterator implements Iterator<I_DescriptionVersioned> {
+
+        DatabaseEntry foundKey = new DatabaseEntry();
+        DatabaseEntry foundData = new DatabaseEntry();
+
+        boolean hasNext;
+        private I_DescriptionVersioned desc;
+        private Cursor descCursor;
+
+        private DescriptionIterator() throws IOException {
+            super();
+            try {
+                descCursor = getDescDb().openCursor(null, null);
+                getNext();
+            } catch (DatabaseException e) {
+                throw new ToIoException(e);
+            }
+        }
+
+        private void getNext() {
+            try {
+                hasNext = (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS);
+                if (hasNext) {
+                    desc = (I_DescriptionVersioned) descBinding.entryToObject(foundData);
+                } else {
+                    desc = null;
+                    descCursor.close();
+                }
+            } catch (Exception ex) {
+                try {
+                    descCursor.close();
+                } catch (DatabaseException e) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+                AceLog.getAppLog().alertAndLogException(ex);
+                hasNext = false;
+            }
+        }
+
+        public boolean hasNext() {
+            return hasNext;
+        }
+
+        public I_DescriptionVersioned next() {
+            if (hasNext) {
+                I_DescriptionVersioned next = desc;
+                getNext();
+                return next;
+            } 
+            return null;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+    
+    public Iterator<I_DescriptionVersioned> getDescriptionIterator() throws IOException {
+        return new DescriptionIterator();
+    }
+
     public void iterateDescriptions(I_ProcessDescriptions processor) throws Exception {
         ProcessorWrapper wrapper = new ProcessorWrapper();
         wrapper.setDescProcessor(processor);
@@ -2904,56 +3065,56 @@ public class VodbEnv implements I_ImplementTermFactory {
         VodbEnv.cacheSize = cacheSize;
     }
 
-   public I_ConceptAttributePart newConceptAttributePart() {
-      return new ThinConPart();
-   }
+    public I_ConceptAttributePart newConceptAttributePart() {
+        return new ThinConPart();
+    }
 
-   public I_DescriptionPart newDescriptionPart() {
-      return new ThinDescPart();
-   }
+    public I_DescriptionPart newDescriptionPart() {
+        return new ThinDescPart();
+    }
 
-   public I_RelPart newRelPart() {
-      return new ThinRelPart();
-   }
+    public I_RelPart newRelPart() {
+        return new ThinRelPart();
+    }
 
-   public I_ThinExtByRefPartBoolean newBooleanExtensionPart() {
-      return new ThinExtByRefPartBoolean();
-   }
+    public I_ThinExtByRefPartBoolean newBooleanExtensionPart() {
+        return new ThinExtByRefPartBoolean();
+    }
 
-   public I_ThinExtByRefPartConcept newConceptExtensionPart() {
-      return new ThinExtByRefPartConcept();
-   }
+    public I_ThinExtByRefPartConcept newConceptExtensionPart() {
+        return new ThinExtByRefPartConcept();
+    }
 
-   public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId) {
-      return new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
-   }
+    public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId) {
+        return new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
+    }
 
-   public I_ThinExtByRefPartInteger newIntegerExtensionPart() {
-      return new ThinExtByRefPartInteger();
-   }
+    public I_ThinExtByRefPartInteger newIntegerExtensionPart() {
+        return new ThinExtByRefPartInteger();
+    }
 
-   public I_ThinExtByRefPartLanguage newLanguageExtensionPart() {
-      return new ThinExtByRefPartLanguage();
-   }
+    public I_ThinExtByRefPartLanguage newLanguageExtensionPart() {
+        return new ThinExtByRefPartLanguage();
+    }
 
-   public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart() {
-      return new ThinExtByRefPartLanguageScoped();
-   }
+    public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart() {
+        return new ThinExtByRefPartLanguageScoped();
+    }
 
-   public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart() {
-      return new ThinExtByRefPartMeasurement();
-   }
+    public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart() {
+        return new ThinExtByRefPartMeasurement();
+    }
 
-   public I_ThinExtByRefPartString newStringExtensionPart() {
-      return new ThinExtByRefPartString();
-   }
+    public I_ThinExtByRefPartString newStringExtensionPart() {
+        return new ThinExtByRefPartString();
+    }
 
-public Set<I_Transact> getUncommitted() {
-    return ACE.getUncommitted();
-}
+    public Set<I_Transact> getUncommitted() {
+        return ACE.getUncommitted();
+    }
 
-public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart() {
-	return new ThinExtByRefPartConceptInt();
-}
+    public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart() {
+        return new ThinExtByRefPartConceptInt();
+    }
 
 }

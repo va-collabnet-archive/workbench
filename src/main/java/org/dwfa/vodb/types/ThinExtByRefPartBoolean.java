@@ -67,7 +67,7 @@ public class ThinExtByRefPartBoolean extends ThinExtByRefPart implements I_ThinE
       this.value = another.value;
    }
 
-    public int compareTo(ThinExtByRefPart o) {
+    public int compareTo(I_ThinExtByRefPart o) {
         if (ThinExtByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
             ThinExtByRefPartBoolean otherPart = (ThinExtByRefPartBoolean) o;
             if (this.value == otherPart.value) {

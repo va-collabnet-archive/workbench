@@ -65,6 +65,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
 		public void actionPerformed(ActionEvent e) {
 			continueWork = false;
+			AceLog.getAppLog().info("Search canceled by user");
 			searchPanel.setProgressInfo("cancelled by user");
 			if (completeLatch != null) {
 				while (completeLatch.getCount() > 0) {
@@ -132,9 +133,11 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
 		private String info;
 
+        private Integer hits = null;
+
 		public LuceneProgressUpdator() {
 			super();
-			updateTimer = new Timer(100, this);
+			updateTimer = new Timer(1000, this);
 			updateTimer.start();
 		}
 
@@ -144,17 +147,25 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		public void actionPerformed(ActionEvent e) {
 			if (continueWork) {
 				if (firstUpdate) {
-					searchPanel.setProgressIndeterminate(true);
+				    if (hits == null) {
+	                    searchPanel.setProgressIndeterminate(true);
+				    }
 					searchPanel.setProgressMaximum(descCount);
 					firstUpdate = false;
 				}
 				if (completeLatch != null) {
+				    if (hits != null) {
+				        searchPanel.setProgressIndeterminate(false);
+				    }
+				    searchPanel.setProgressMaximum(descCount);
 					searchPanel
 					.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
 							.getCount()));
+				} else {
+                    AceLog.getAppLog().info("completeLatch is null");
 				}
-				searchPanel.setProgressInfo("   " + info +  ")");
-				if (searchPanel.getProgressValue() == searchPanel.getProgressMaximum()) {
+				searchPanel.setProgressInfo("   " + info +  "   ");
+				if (hits != null && completeLatch.getCount() == 0) {
 					normalCompletion();
 				}
 			} else {
@@ -174,12 +185,22 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				firstUpdate = false;
 			}
 			searchPanel.setProgressValue(descCount);
-			searchPanel.setProgressInfo(" Search complete, fetching results ");
+			searchPanel.setProgressInfo(" Search complete ");
 		}
 		
 		public void setProgressInfo(String info) {
 			this.info = info;
 		}
+
+        public void setHits(int hits) {
+            this.hits = hits;
+            descCount = hits;
+            searchPanel.setProgressMaximum(hits);
+        }
+        
+        public boolean continueWork() {
+            return continueWork;
+        }
 
 	}
 
@@ -218,11 +239,12 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		if (lucene) {
 			luceneMatches = Collections
 			.synchronizedCollection(new TreeSet<LuceneMatch>());
+			descCount = Integer.MAX_VALUE;
 			updater = new LuceneProgressUpdator();
 			completeLatch = new CountDownLatch(1);
 			new MatchUpdator();
-			AceConfig.getVodb().searchLucene(this, patternString, luceneMatches, completeLatch, 
-					searchPanel.getRootConcept(), config, (LuceneProgressUpdator) updater);
+			completeLatch = AceConfig.getVodb().searchLucene(this, patternString, luceneMatches, completeLatch, 
+					searchPanel.getExtraCriterion(), config, (LuceneProgressUpdator) updater);
 		} else {
 			regexMatches = Collections
 			.synchronizedCollection(new TreeSet<ThinDescVersioned>(
@@ -232,9 +254,9 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			completeLatch = new CountDownLatch(descCount);
 			Pattern p = Pattern.compile(patternString);
 			new MatchUpdator();
-			AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getRootConcept(), config);
-			completeLatch.await();
+			AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(), config);
 		}
+        completeLatch.await();
 		return updater;
 	}
 

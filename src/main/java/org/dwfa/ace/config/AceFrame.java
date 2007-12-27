@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.rmi.MarshalledObject;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
@@ -26,9 +27,9 @@ import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -257,8 +258,8 @@ public class AceFrame extends ComponentFrame {
 		return getCdePanel().getBatchConceptList();
 	}
 
-	public void performLuceneSearch(String query, I_GetConceptData root) {
-		getCdePanel().performLuceneSearch(query, root);
+	public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
+		getCdePanel().performLuceneSearch(query, extraCriterion);
 
 	}
 

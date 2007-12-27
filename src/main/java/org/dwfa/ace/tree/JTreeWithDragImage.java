@@ -152,6 +152,22 @@ public class JTreeWithDragImage extends JTree {
 		}
 		
 	}
+    private class RefreshListener implements PropertyChangeListener {
+
+        @SuppressWarnings("unchecked")
+        public void propertyChange(PropertyChangeEvent evt) {
+            DefaultTreeModel m = (DefaultTreeModel) JTreeWithDragImage.this.getModel();
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
+            Enumeration<DefaultMutableTreeNode> childEnum = root.children();
+            while (childEnum.hasMoreElements()) {
+                m.nodeChanged(childEnum.nextElement());
+            }
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog().fine("Tree data changed");
+            }
+        }
+        
+    }
 
 	/**
 	 * 
@@ -186,7 +202,10 @@ public class JTreeWithDragImage extends JTree {
 		map.put("copy", new AceTransferAction("copy"));
 		map.put("paste", new AceTransferAction("paste"));
 		config.addPropertyChangeListener("commit", new CommitListener());
-		config.addPropertyChangeListener("viewPositions", new CommitListener());
+        config.addPropertyChangeListener("viewPositions", new CommitListener());
+        config.addPropertyChangeListener("sortTaxonomyUsingRefset", new CommitListener());
+		config.addPropertyChangeListener("showViewerImagesInTaxonomy", new RefreshListener());
+        config.addPropertyChangeListener("showRefsetInfoInTaxonomy", new RefreshListener());
 	}
 
 	public I_ConfigAceFrame getConfig() {

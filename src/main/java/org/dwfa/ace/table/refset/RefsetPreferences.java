@@ -84,30 +84,51 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         super();
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getBooleanPreferences()
+     */
     public I_RefsetDefaultsBoolean getBooleanPreferences() {
         return booleanPreferences;
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getConceptPreferences()
+     */
     public I_RefsetDefaultsConcept getConceptPreferences() {
         return conceptPreferences;
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getIntegerPreferences()
+     */
     public I_RefsetDefaultsInteger getIntegerPreferences() {
         return integerPreferences;
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getLanguagePreferences()
+     */
     public I_RefsetDefaultsLanguage getLanguagePreferences() {
         return languagePreferences;
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getMeasurementPreferences()
+     */
     public I_RefsetDefaultsMeasurement getMeasurementPreferences() {
         return measurementPreferences;
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getLanguageScopedPreferences()
+     */
     public I_RefsetDefaultsLanguageScoped getLanguageScopedPreferences() {
         return languageScopedPreferences;
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getStringPreferences()
+     */
     public I_RefsetDefaultsString getStringPreferences() {
         if (stringPreferences == null) {
             try {
@@ -119,6 +140,9 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         return stringPreferences;
     }
 
+	/* (non-Javadoc)
+     * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getConIntPreferences()
+     */
 	public I_RefsetDefaultsConInt getConIntPreferences() {
 		return conIntPreferences;
 	}

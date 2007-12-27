@@ -28,21 +28,23 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	ConceptBean bean;
+	int relId;
 	int parentDepth;
 	List<DefaultMutableTreeNode> extraParentNodes  = new ArrayList<DefaultMutableTreeNode>();
 	private boolean parentOpened;
 	private boolean secondaryParentNode;
 	
-	public static ConceptBeanForTree get(int conceptId, int parentDepth, 
+	public static ConceptBeanForTree get(int conceptId, int relId, int parentDepth, 
 			boolean secondaryParentNode) {
 		ConceptBean bean = ConceptBean.get(conceptId);
-		return new ConceptBeanForTree(bean, parentDepth, secondaryParentNode);
+		return new ConceptBeanForTree(bean, relId, parentDepth, secondaryParentNode);
 	}
 
-	private ConceptBeanForTree(ConceptBean bean, int parentDepth,
+	private ConceptBeanForTree(ConceptBean bean, int relId, int parentDepth,
 			boolean secondaryParentNode) {
 		super();
 		this.bean = bean;
+		this.relId = relId;
 		this.parentDepth = parentDepth;
 		this.secondaryParentNode = secondaryParentNode;
 	}
@@ -194,6 +196,15 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
    public I_DescriptionTuple getDescTuple(I_IntList arg0, I_IntSet arg1, Set<I_Position> arg2) throws IOException {
       return bean.getDescTuple(arg0, arg1, arg2);
    }
+
+   public int getRelId() {
+       return relId;
+   }
+
+public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+    Set<I_Position> positions, boolean addUncommitted) throws IOException {
+    return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, addUncommitted);
+}
 	
 	/*
 

@@ -45,10 +45,13 @@ import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.ace.task.search.IsChildOf;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
+import org.dwfa.jini.TermEntry;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.NoMappingException;
@@ -188,24 +191,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private Set<String> visibleRefsets = new HashSet<String>();
 
     // 25
-    private Map<TOGGLES, RefsetPreferences> refsetPreferencesMap = setupRefsetPreferences();
+    private Map<TOGGLES, I_HoldRefsetPreferences> refsetPreferencesMap = setupRefsetPreferences();
 
     // 26
     private I_IntList refsetsToShowInTaxonomy = new IntList();
 
     // 27
     private boolean showViewerImagesInTaxonomy = false;
+
     private boolean variableHeightTaxonomyView = false;
+
     private boolean showInferredInTaxonomy = false;
+
     private boolean showRefsetInfoInTaxonomy = false;
-    
+
     // 28
     private I_IntList refsetsToSortTaxonomy = new IntList();
-    
+
     // 29
     private boolean sortTaxonomyUsingRefset = false;
-    
-    
 
     // transient
     private transient MasterWorker worker;
@@ -331,7 +335,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 26
         IntList.writeIntList(out, refsetsToShowInTaxonomy);
-        
+
         // 27
         out.writeBoolean(showViewerImagesInTaxonomy);
         out.writeBoolean(variableHeightTaxonomyView);
@@ -340,7 +344,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 28
         IntList.writeIntList(out, refsetsToSortTaxonomy);
-        
+
         // 29
         out.writeBoolean(sortTaxonomyUsingRefset);
     }
@@ -567,7 +571,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 visibleRefsets = new HashSet<String>();
             }
             if (objDataVersion >= 25) {
-                refsetPreferencesMap = (Map<TOGGLES, RefsetPreferences>) in.readObject();
+                refsetPreferencesMap = (Map<TOGGLES, I_HoldRefsetPreferences>) in.readObject();
                 if (refsetPreferencesMap == null) {
                     refsetPreferencesMap = setupRefsetPreferences();
                 }
@@ -592,7 +596,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 showInferredInTaxonomy = false;
                 showRefsetInfoInTaxonomy = false;
             }
-            
+
             if (objDataVersion >= 28) {
                 refsetsToSortTaxonomy = IntList.readIntListIgnoreMapErrors(in);
             } else {
@@ -609,8 +613,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         addListeners();
     }
 
-    private static HashMap<TOGGLES, RefsetPreferences> setupRefsetPreferences() throws IOException {
-        HashMap<TOGGLES, RefsetPreferences> map = new HashMap<TOGGLES, RefsetPreferences>();
+    private static HashMap<TOGGLES, I_HoldRefsetPreferences> setupRefsetPreferences() throws IOException {
+        HashMap<TOGGLES, I_HoldRefsetPreferences> map = new HashMap<TOGGLES, I_HoldRefsetPreferences>();
         for (TOGGLES toggle : TOGGLES.values()) {
             try {
                 map.put(toggle, new RefsetPreferences());
@@ -1476,7 +1480,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void performLuceneSearch(String query, I_GetConceptData root) {
-        aceFrame.performLuceneSearch(query, root);
+        try {
+            List<I_TestSearchResults> extraCriterion = new ArrayList<I_TestSearchResults>();
+            if (root != null) {
+                IsChildOf childTest = new IsChildOf();
+                childTest.setParentTerm(new TermEntry(root.getUids()));
+            }
+            aceFrame.performLuceneSearch(query, extraCriterion);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
+
+    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
+        aceFrame.performLuceneSearch(query, extraCriterion);
     }
 
     public void setShowAddresses(boolean show) {
@@ -1757,7 +1774,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
+            IOException {
         if (refsetPreferencesMap == null) {
             try {
                 refsetPreferencesMap = setupRefsetPreferences();
@@ -1765,20 +1783,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-        RefsetPreferences pref = refsetPreferencesMap.get(toggle);
+        I_HoldRefsetPreferences pref = refsetPreferencesMap.get(toggle);
         if (pref == null) {
-        	pref = new RefsetPreferences();
-        	refsetPreferencesMap.put(toggle, pref);
+            pref = new RefsetPreferences();
+            refsetPreferencesMap.put(toggle, pref);
         }
         return pref;
     }
-    
+
     public void setCommitAbortButtonsVisible(boolean visible) {
         aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
 
     }
 
-    public Map<TOGGLES, RefsetPreferences> getRefsetPreferencesMap() {
+    public Map<TOGGLES, I_HoldRefsetPreferences> getRefsetPreferencesMap() {
         return refsetPreferencesMap;
     }
 
@@ -1837,6 +1855,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setSortTaxonomyUsingRefset(boolean sortTaxonomyUsingRefset) {
         this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
     }
+
     public void setSortTaxonomyUsingRefset(Boolean sortTaxonomyUsingRefset) {
         this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
     }

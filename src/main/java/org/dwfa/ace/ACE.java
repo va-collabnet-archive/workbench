@@ -127,6 +127,7 @@ import org.dwfa.ace.table.refset.RefsetDefaultsLanguage;
 import org.dwfa.ace.table.refset.RefsetDefaultsLanguageScoped;
 import org.dwfa.ace.table.refset.RefsetDefaultsMeasurement;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
@@ -924,6 +925,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             if (f.isDirectory()) {
                 if (f.getName().equals("File")) {
                     newMenu = this.fileMenu;
+                    fileMenu.addSeparator();
+                    if (menuBar.getComponentIndex(fileMenu) == -1) {
+                        menuBar.add(fileMenu);
+                    }
+
                 } else {
                     newMenu = new JMenu(f.getName());
                     menuBar.add(newMenu);
@@ -947,9 +953,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             newMenu.add(processMenuItem);
                         }
                     }
-                }
-                if (newMenu == fileMenu) {
-                    fileMenu.addSeparator();
                 }
             }
         }
@@ -1034,9 +1037,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             menuItem = new JMenuItem("Save Profile As...");
             menuItem.addActionListener(new SaveProfileAs());
             fileMenu.add(menuItem);
-
             menuBar.add(fileMenu);
         }
+        
     }
 
     private static void addActionButton(ActionListener actionListener, String resource, String tooltipText,
@@ -1966,7 +1969,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
 
         for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
-            root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId, 0, false), true));
+            root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId, Integer.MIN_VALUE, 0, false), true));
         }
         model.setRoot(root);
         /*
@@ -2545,8 +2548,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return addressList;
     }
 
-    public void performLuceneSearch(String query, I_GetConceptData root) {
-        searchPanel.performLuceneSearch(query, root);
+    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
+        searchPanel.performLuceneSearch(query, extraCriterion);
     }
 
     public void setShowAddresses(boolean show) {

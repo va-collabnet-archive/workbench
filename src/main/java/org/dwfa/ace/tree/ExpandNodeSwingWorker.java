@@ -166,10 +166,12 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	private class AddChildWorker implements Runnable {
 		int conceptId;
+		int relId;
 
-		public AddChildWorker(int conceptId) {
+		public AddChildWorker(int conceptId, int relId) {
 			super();
 			this.conceptId = conceptId;
+			this.relId = relId;
 		}
 
 		public void run() {
@@ -180,7 +182,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 				}
 				DefaultMutableTreeNode child = null;
 				if (checkContinueWork("checking in add child worker")) {
-					I_GetConceptData cb = ConceptBeanForTree.get(conceptId, 0,
+					I_GetConceptData cb = ConceptBeanForTree.get(conceptId, relId, 0,
 							false);
 					cb.getInitialText();
 					boolean leaf = false;
@@ -211,7 +213,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 	private class MakeSrcChildWorkers implements Runnable {
 		public void run() {
 			for (I_RelTuple r : destRels) {
-				ACE.threadPool.execute(new AddChildWorker(r.getC1Id()));
+				ACE.threadPool.execute(new AddChildWorker(r.getC1Id(), r.getRelId()));
 			}
 		}
 
@@ -220,7 +222,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 	private class MakeDestChildWorkers implements Runnable {
 		public void run() {
 			for (I_RelTuple r : srcRels) {
-				ACE.threadPool.execute(new AddChildWorker(r.getC2Id()));
+				ACE.threadPool.execute(new AddChildWorker(r.getC2Id(), r.getRelId()));
 			}
 		}
 
