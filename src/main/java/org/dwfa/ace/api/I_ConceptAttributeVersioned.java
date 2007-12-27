@@ -8,7 +8,7 @@ import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_ConceptAttributeVersioned {
+public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
 	public boolean addVersion(I_ConceptAttributePart part);
 

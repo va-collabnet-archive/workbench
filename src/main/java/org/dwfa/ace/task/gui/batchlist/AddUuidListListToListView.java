@@ -11,10 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JList;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -38,6 +40,10 @@ public class AddUuidListListToListView extends AbstractTask {
 
    private static final int dataVersion = 1;
    
+   /**
+    * Property name for a list of uuid lists, typically used to represent a list
+    * of concepts in a transportable way. 
+    */
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
 
 
@@ -71,27 +77,40 @@ public class AddUuidListListToListView extends AbstractTask {
                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             
          JList conceptList = config.getBatchConceptList();
-         I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+         final I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
          
-         List<List<UUID>> idListList = (ArrayList<List<UUID>>) process.readProperty(uuidListListPropName);
+         final List<List<UUID>> idListList = (ArrayList<List<UUID>>) process.readProperty(uuidListListPropName);
+         AceLog.getAppLog().info("Adding list of size: " + idListList.size());
          
-         for (List<UUID> idList: idListList) {
-            I_GetConceptData conceptInList = AceTaskUtil.getConceptFromObject(idList);
-            model.addElement(conceptInList);
-         }
+         SwingUtilities.invokeAndWait(new Runnable() {
+
+            public void run() {
+                for (List<UUID> idList: idListList) {
+                    try {
+                        I_GetConceptData conceptInList = AceTaskUtil.getConceptFromObject(idList);
+                        model.addElement(conceptInList);
+                    } catch (TerminologyException e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                        return;
+                    } catch (IOException e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                        return;
+                    }
+                 }
+            }
+             
+         });
          
          return Condition.CONTINUE;
-      } catch (IOException e) {
-         throw new TaskFailedException(e);
       } catch (IntrospectionException e) {
          throw new TaskFailedException(e);
       } catch (IllegalAccessException e) {
          throw new TaskFailedException(e);
       } catch (InvocationTargetException e) {
          throw new TaskFailedException(e);
-      } catch (TerminologyException e) {
-         throw new TaskFailedException(e);
-      }
+      } catch (InterruptedException e) {
+          throw new TaskFailedException(e);
+    }
    }
 
    public Collection<Condition> getConditions() {

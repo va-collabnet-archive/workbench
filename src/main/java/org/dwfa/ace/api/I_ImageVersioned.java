@@ -8,7 +8,7 @@ import java.util.Set;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_ImageVersioned {
+public interface I_ImageVersioned extends I_AmTermComponent {
 
 	public byte[] getImage();
 

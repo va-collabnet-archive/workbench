@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_ThinExtByRefPart {
+public interface I_ThinExtByRefPart extends Comparable<I_ThinExtByRefPart> {
 
    public int getStatus();
 

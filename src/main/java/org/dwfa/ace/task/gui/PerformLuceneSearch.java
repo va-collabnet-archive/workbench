@@ -3,12 +3,14 @@ package org.dwfa.ace.task.gui;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -70,7 +72,7 @@ public class PerformLuceneSearch extends AbstractTask {
 					I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 						.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 					if (searchRoot == null) {
-						config.performLuceneSearch(searchString, null);
+						config.performLuceneSearch(searchString, new ArrayList<I_TestSearchResults>());
 					} else {
 						I_GetConceptData searchRootConcept = LocalVersionedTerminology.get().getConcept(searchRoot.ids);
 						config.performLuceneSearch(searchString, searchRootConcept);

@@ -9,7 +9,7 @@ import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_DescriptionVersioned {
+public interface I_DescriptionVersioned extends I_AmTermComponent {
 
 	public boolean addVersion(I_DescriptionPart newPart);
 

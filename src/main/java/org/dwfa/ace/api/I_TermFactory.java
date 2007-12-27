@@ -3,6 +3,7 @@ package org.dwfa.ace.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,12 +165,17 @@ public interface I_TermFactory {
             throws TerminologyException, IOException;
 
     public void iterateDescriptions(I_ProcessDescriptions processor) throws Exception;
+    
+    public Iterator<I_DescriptionVersioned> getDescriptionIterator() throws IOException;
 
     public void iterateRelationships(I_ProcessRelationships processor) throws Exception;
 
     public void iterateConcepts(I_ProcessConcepts procesor) throws Exception;
 
+    public Iterator<I_GetConceptData> getConceptIterator() throws IOException;
+
     public void iterateConceptAttributes(I_ProcessConceptAttributes processor) throws Exception;
+    
 
     public void iterateIds(I_ProcessIds processor) throws Exception;
 

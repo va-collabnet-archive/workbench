@@ -7,7 +7,7 @@ import java.util.Set;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_RelVersioned {
+public interface I_RelVersioned extends I_AmTermComponent {
 
 	public boolean addVersion(I_RelPart rel);
 

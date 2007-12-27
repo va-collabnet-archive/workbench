@@ -9,7 +9,7 @@ import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.tapi.TerminologyException;
 
 
-public interface I_IdVersioned {
+public interface I_IdVersioned extends I_AmTermComponent {
 
 	public int getNativeId();
 

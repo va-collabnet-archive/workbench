@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
@@ -241,7 +242,9 @@ public interface I_ConfigAceFrame {
 	
 	public void performLuceneSearch(String query, I_GetConceptData root);
 	
-	public void setShowPreferences(boolean shown);
+    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
+
+    public void setShowPreferences(boolean shown);
 	
 	public void setShowHistory(boolean shown);
     
@@ -300,4 +303,32 @@ public interface I_ConfigAceFrame {
     public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException;
     
     public void setCommitAbortButtonsVisible(boolean visible);
+    
+
+    public Map<TOGGLES, I_HoldRefsetPreferences> getRefsetPreferencesMap();
+
+    public I_IntList getRefsetsToShowInTaxonomy();
+
+    public boolean getShowViewerImagesInTaxonomy();
+
+    public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy);
+
+    public Boolean getVariableHeightTaxonomyView();
+
+    public void setVariableHeightTaxonomyView(Boolean variableHeightTaxonomyView);
+
+    public Boolean getShowInferredInTaxonomy();
+
+    public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy);
+
+    public Boolean getShowRefsetInfoInTaxonomy();
+
+    public void setShowRefsetInfoInTaxonomy(Boolean showRefsetInfoInTaxonomy);
+
+    public I_IntList getRefsetsToSortTaxonomy();
+
+    public Boolean getSortTaxonomyUsingRefset();
+
+    public void setSortTaxonomyUsingRefset(Boolean sortTaxonomyUsingRefset);
+
 }

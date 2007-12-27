@@ -78,4 +78,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException;
+	
+	public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+        Set<I_Position> positions, boolean addUncommitted) throws IOException;
 }

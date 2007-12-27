@@ -52,7 +52,7 @@ public class SetSignpostToDbProperties extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             Map<String, String> dbProps = LocalVersionedTerminology.get().getProperties();
             StringBuffer buff = new StringBuffer();
