@@ -289,6 +289,10 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
     public Object getObjFromFilesystem(Frame parent, String title, String startDir, FilenameFilter fileFilter) throws IOException, ClassNotFoundException;
 	public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj) throws IOException;
     public boolean isExecuting();
+    
+    public void flagExecutionStop();
+    public boolean isExecutionStopFlagged();
+    
     public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException;
     public I_KeepTime getTimer();
     public void setTimer(I_KeepTime timer);

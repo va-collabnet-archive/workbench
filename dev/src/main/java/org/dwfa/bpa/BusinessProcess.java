@@ -580,6 +580,9 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
+        if (worker.isExecutionStopFlagged()) {
+            return Condition.ITEM_CANCELED;
+        }
         worker.getProcessStack().push(this);
         I_DefineTask currentTask = this.getTask(this.getCurrentTaskId());
         Condition condition = Condition.CONTINUE;
@@ -588,6 +591,9 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                 && (condition.equals(Condition.STOP) == false)
                 && (condition.equals(Condition.PROCESS_COMPLETE) == false)
                 && (condition.equals(Condition.WAIT_FOR_WEB_FORM) == false)) {
+            if (worker.isExecutionStopFlagged()) {
+                return Condition.ITEM_CANCELED;
+            }
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine(process.getProcessID() + ": " + process.getCurrentTaskId()
                 		+ "/" + currentTask.getId()

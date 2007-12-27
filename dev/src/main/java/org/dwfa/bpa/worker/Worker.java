@@ -73,8 +73,37 @@ import org.dwfa.jini.JiniManager;
  * 
  */
 public abstract class Worker implements I_Work {
+    
+    public static class WorkerLevel extends Level {
+        
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        
+        protected WorkerLevel(String name, int value) {
+            super(name, value);
+        }
+        private static WorkerLevel infoPlus;
+        public static WorkerLevel getInfoPlusLevel() {
+            if (infoPlus == null) {
+                infoPlus = new WorkerLevel("INFO_PLUS", 801);
+            }
+            return infoPlus;
+        }
+    }
+    
+    private boolean stopExecutionFlagged = false;
 
-	public Object readAttachement(String key) {
+	public void flagExecutionStop() {
+        stopExecutionFlagged = true;
+     }
+	
+	public boolean isExecutionStopFlagged() {
+	    return stopExecutionFlagged;
+	}
+
+    public Object readAttachement(String key) {
 		return attachments.get(key);
 	}
 
@@ -248,6 +277,7 @@ public abstract class Worker implements I_Work {
 
 	public synchronized Condition execute(I_EncodeBusinessProcess process)
 			throws TaskFailedException {
+        stopExecutionFlagged = false;
 		executing = true;
 		Condition condition;
 		try {
@@ -282,6 +312,9 @@ public abstract class Worker implements I_Work {
 	 */
 	private Condition executeProcess(I_EncodeBusinessProcess process)
 			throws TaskFailedException {
+	    if (stopExecutionFlagged) {
+	        return Condition.ITEM_CANCELED;
+	    }
 		this.setProcessStack(new Stack<I_EncodeBusinessProcess>());
 		Condition condition = process.execute(this);
 		if (logger.isLoggable(Level.INFO)) {

@@ -79,12 +79,22 @@ import org.dwfa.bpa.process.ConditionPersistenceDelegate;
 import org.dwfa.bpa.process.I_DefineTask;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.worker.Worker;
+import org.dwfa.util.LogWithAlerts;
 
 /**
  * @author kec
  * 
  */
 public class ProcessBuilderPanel extends JPanel implements ActionListener {
+    
+    public class CancelProcessListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            worker.flagExecutionStop();
+        }
+        
+    }
 
    public class SaveProcessForXmlActionListener implements ActionListener {
 
@@ -141,6 +151,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
    private static final long serialVersionUID = 1L;
 
    private static Logger logger = Logger.getLogger(ProcessBuilderPanel.class.getName());
+   private static LogWithAlerts logWithAlerts = new LogWithAlerts(ProcessBuilderPanel.class.getName());
 
    private class ChangeToPropActionListener implements ActionListener {
 
@@ -372,6 +383,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
    }
 
    private class ExecuteProcessActionListener implements ActionListener {
+       
       Configuration config;
 
       UUID id;
@@ -379,6 +391,9 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
       I_Work worker;
 
       String exceptionMessage = "";
+      
+      boolean launchOnly = false;
+
 
       /**
        * @param config
@@ -386,11 +401,12 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
        * @param worker
        * @param frames
        */
-      public ExecuteProcessActionListener(Configuration config, UUID id, I_Work worker) {
+      public ExecuteProcessActionListener(Configuration config, UUID id, I_Work worker, boolean launchOnly) {
          super();
          this.config = config;
          this.id = id;
          this.worker = worker;
+         this.launchOnly = launchOnly;
       }
 
       /**
@@ -398,18 +414,35 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
        */
       public void actionPerformed(ActionEvent e) {
 
-         execute.setText("execute");
-         execute.setEnabled(false);
+          execute.setText("execute");
+          execute.setEnabled(false);
+          launch.setText("launch");
+          launch.setEnabled(false);
+          cancel.setEnabled(true);
          statusMessage.setText("<html><font color='red'>Executing process: " + "<font color='blue'>"
                + processPanel.getProcess().getName());
          Runnable r = new Runnable() {
             public void run() {
-               I_EncodeBusinessProcess process = processPanel.getProcess();
+               final long startTime = System.currentTimeMillis();
+               executingProcess = processPanel.getProcess();
+               if (launchOnly) {
+                   try {
+                    MarshalledObject mp = new MarshalledObject(executingProcess);
+                    executingProcess = (I_EncodeBusinessProcess) mp.get();
+                    executingProcess.getLogger().setLevel(Worker.WorkerLevel.getInfoPlusLevel());
+                } catch (IOException e) {
+                    logWithAlerts.alertAndLogException(e);
+                    return;
+                } catch (ClassNotFoundException e) {
+                    logWithAlerts.alertAndLogException(e);
+                    return;
+                }
+               }
                try {
                   logger.info("Worker: " + worker.getWorkerDesc() + " (" + worker.getId() + ") executing process: "
-                        + process.getName());
-                  worker.execute(process);
-                  SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(process.getExecutionRecords());
+                        + executingProcess.getName());
+                  worker.execute(executingProcess);
+                  SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(executingProcess.getExecutionRecords());
                   Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
                   if (logger.isLoggable(Level.FINE)) {
                      StringBuffer buff = new StringBuffer();
@@ -427,12 +460,18 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
                }
                SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                     execute.setText("<html><font color='#006400'>execute");
-                     execute.setEnabled(true);
+                      execute.setText("<html><font color='#006400'>execute");
+                      execute.setEnabled(true);
+                      launch.setText("<html><font color='#006400'>launch");
+                      launch.setEnabled(true);
+                      cancel.setEnabled(false);
+                      long elapsedTime = System.currentTimeMillis() - startTime;
                      if (exceptionMessage.equals("")) {
-                        statusMessage.setText("<html><font color='blue'>Process complete");
+                        statusMessage.setText("<html><font color='blue'>Process complete. Elapsed time: " + 
+                                              elapsedTime + " ms.");
                      } else {
-                        statusMessage.setText("<html><font color='blue'>Process complete: <font color='red'>"
+                        statusMessage.setText("<html><font color='blue'>Process complete: Elapsed time: " + 
+                                              elapsedTime + " ms.<font color='red'>"
                               + exceptionMessage);
                      }
                   }
@@ -441,7 +480,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
 
          };
          new Thread(r).start();
-
       }
 
    }
@@ -482,8 +520,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
 
    private SaveProcessForXmlActionListener saveProcessForXmlActionListener = new SaveProcessForXmlActionListener();
 
-   private ExecuteProcessActionListener executeProcessActionListener;
-
    private JSplitPane splitPane;
 
    private ProcessPanel processPanel;
@@ -491,6 +527,10 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
    private JPanel statusPanel;
 
    private JButton execute = new JButton("<html><font color='#006400'>execute");
+   
+   private JButton launch = new JButton("<html><font color='#006400'>launch");
+
+   private JButton cancel = new JButton("cancel");
 
    private JLabel statusMessage = new JLabel("<HTML><font color='blue'>Process Builder ready...");
 
@@ -511,6 +551,9 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
    private JTable propertiesPane;
 
    private String defaultOrigin;
+   
+   protected I_EncodeBusinessProcess executingProcess;
+
 
    /**
     * 
@@ -553,13 +596,15 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
       c.gridx = 0;
       c.gridy = 0;
       this.add(this.splitPane, c);
-      this.statusPanel = makeStatusPanel(this.statusMessage, execute);
+      this.statusPanel = makeStatusPanel(this.statusMessage, execute, cancel, launch);
       c.weighty = 0;
       c.gridy = 1;
       c.fill = GridBagConstraints.HORIZONTAL;
       this.add(this.statusPanel, c);
-      executeProcessActionListener = new ExecuteProcessActionListener(jiniConfig, UUID.randomUUID(), worker);
-      execute.addActionListener(executeProcessActionListener);
+      execute.addActionListener(new ExecuteProcessActionListener(jiniConfig, UUID.randomUUID(), worker, false));
+      launch.addActionListener(new ExecuteProcessActionListener(jiniConfig, UUID.randomUUID(), worker, true));
+      cancel.addActionListener(new CancelProcessListener());
+      cancel.setEnabled(false);
       tree.setSelectionRow(0);
    }
 
@@ -789,7 +834,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
 
    }
 
-   private JPanel makeStatusPanel(JLabel statusMessage, JButton execute) {
+   private JPanel makeStatusPanel(JLabel statusMessage, JButton execute, JButton cancel2, JButton launch2) {
       JPanel panel = new JPanel(new GridBagLayout());
       GridBagConstraints c = new GridBagConstraints();
       c.anchor = GridBagConstraints.WEST;
@@ -797,13 +842,15 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
       c.weightx = 0;
       c.weighty = 0;
       c.gridy = 0;
-      c.gridx = 7;
+      c.gridx = 8;
       panel.add(new JLabel("    "), c); // filler for grow box.
 
+      c.gridx = 7;
+      panel.add(launch2, c);
       c.gridx = 6;
       panel.add(execute, c);
       c.gridx = 5;
-      // panel.add(cancel, c);
+       panel.add(cancel2, c);
       c.gridx = 4;
       c.weightx = 1;
       c.fill = GridBagConstraints.HORIZONTAL;
