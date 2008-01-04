@@ -138,14 +138,14 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	
 	////////////////////////////////////////////////////////////////
 	
-	/**
-	 * Name of file to read uuids from
-	 * 
-	 * @parameter expression="${project.build.directory}\\default.txt"
-     * @required
-	 * 
-	 */
-	private File dupUuidFile;
+//	/**
+//	 * Name of file to read uuids from
+//	 * 
+//	 * @parameter expression="${project.build.directory}\\default.txt"
+//     * @required
+//	 * 
+//	 */
+//	private File dupUuidFile;
 	
 	
 	
@@ -167,14 +167,14 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	 */
 	private String wfAssignmentProcessFile;
 	
-	/**
-	 * File path of the business process to assign to the TAs
-	 * 
-	 * @parameter expression="${project.build.directory}\\..\\src\\main\\bp\\TA assignment processes\\dupReviewAssignment.bp"
-     * @required
-	 * 
-	 */
-	private String taAssignmentProcessFile;
+//	/**
+//	 * File path of the business process to assign to the TAs
+//	 * 
+//	 * @parameter expression="${project.build.directory}\\..\\src\\main\\bp\\TA assignment processes\\dupReviewAssignment.bp"
+//     * @required
+//	 * 
+//	 */
+//	private String taAssignmentProcessFile;
 	
 
 	private String separator = System.getProperty("file.separator");
@@ -190,7 +190,7 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 					
 			
 			
-			if(dupUuidFile.exists()){
+//			if(dupUuidFile.exists()){
 				
 				TransactionParticipantAggregator tpa = new TransactionParticipantAggregator(new String[] { "src/main/config/transactionAggregator.config"}, null);
 				LocalTransactionManager ltm = new LocalTransactionManager(new String[] { "src/main/config/transactionManager.config"}, null);
@@ -206,29 +206,29 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 //		    		fw.append(" }");
 //		    		fw.close();
 	    		
-	    		queueConfigFile = new File(inboxPath + separator + "queue.config");
+//	    		queueConfigFile = new File(inboxPath + separator + "queue.config");
 
 	    		String[] entries = new String[]{ queueConfigFile.getAbsolutePath() };
 	    	    
 	    				    		
 	    		 Configuration configuration = 
-	                 ConfigurationProvider.getInstance(entries,	                		 
-	                                                   getClass().getClassLoader());
+	                 ConfigurationProvider.getInstance( entries,	                		 
+	                                                    getClass().getClassLoader() );
 	    		 
 	    		 Configuration workerConfiguration = 
-	                 ConfigurationProvider.getInstance(new String[] { "myConfig.config" },	                		 
-	                                                   getClass().getClassLoader());
+	                 ConfigurationProvider.getInstance( new String[] { "myConfig.config" },	                		 
+	                                                    getClass().getClassLoader() );
 	    				    		
 	    		MojoWorker mw = new MojoWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker" );
 	    		
-	    		I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile(assigneeProfile, assigneeProfile, assigneeProfile, assigneeProfile);
-	    		mw.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame);
-	    		mw.getLogger().setLevel(Level.FINE);
+	    		I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile( assigneeProfile, assigneeProfile, assigneeProfile, assigneeProfile );
+	    		mw.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame );
+	    		mw.getLogger().setLevel( Level.FINE );
 	    		
-	    		getLog().info("Generate assignment process for workflow manager");
-	    		mw.execute(createAssignmentProcess(dupUuidFile));
+	    		getLog().info( "Generate assignment process for workflow manager" );
+	    		mw.execute( createAssignmentProcess() );
 	    		
-			}//End if
+//			}//End if
 		}
 		catch( Exception e){
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -236,104 +236,6 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 		
 	}//End method execute
 
-	private BusinessProcess createAssignmentProcess(File inputFile) throws PropertyVetoException, IOException, TerminologyException, IntrospectionException, IllegalAccessException, InvocationTargetException {
-		// Construct the process. 
-		BusinessProcess assignmentProcess = new BusinessProcess(
-		        "Assignment process", Condition.CONTINUE, false);
-		LogMessageOnWorkerLog log1task = (LogMessageOnWorkerLog) assignmentProcess.addTask(new LogMessageOnWorkerLog());
-		log1task.setMessage("-------- Starting assignment process...");
-
-		OpenQueuesInFolder oqf = new OpenQueuesInFolder();
-		oqf.setQueueDir(inboxPath);
-		assignmentProcess.addTask(oqf);
-		assignmentProcess.addBranch(log1task, oqf, Condition.CONTINUE);
-		
-		LaunchBatchGenAssignmentProcess genAssign = new LaunchBatchGenAssignmentProcess();
-		genAssign.setProcessFileStr( wfAssignmentProcessFile );		
-		assignmentProcess.addTask(genAssign);
-		assignmentProcess.addBranch(oqf, genAssign, Condition.CONTINUE);
-		
-		LogMessageOnWorkerLog log2task = (LogMessageOnWorkerLog) assignmentProcess.addTask(new LogMessageOnWorkerLog());
-		log2task.setMessage("-------- Finished assignment process....");
-		assignmentProcess.addBranch(genAssign, log2task, Condition.CONTINUE);
-
-		assignmentProcess.addBranch(log2task, assignmentProcess.addTask(new Complete()), Condition.CONTINUE);		
-
-//		List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
-//        BufferedReader br = new BufferedReader( new FileReader( inputFile ) );
-//        String uuidLineStr;
-//        int counter = 0;
-//        while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
-//        	List<UUID> uuidList = new ArrayList<UUID>();
-//        	for (String uuidStr: uuidLineStr.split("\t")){
-//        		assignmentProcess.getLogger().info("uuidStrs: " + uuidStr); 	
-//        		UUID uuid = UUID.fromString(uuidStr);
-//        		uuidList.add(uuid);
-//        		counter++;
-//        	}
-//        	uuidListOfLists.add(uuidList);
-//        } //End while 
-		
-         		
-//        List<List<UUID>> tempListList = uuidListOfLists;
-		List<List<UUID>> tempListList = createUuidListsFromFile( inputFile );
-		int sizeOfList = tempListList.size();
-		
-        List<Collection<UUID>> uuidListList = null;
-        if (sizeOfList > listListSize){
-        	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, listListSize));
-        } else {
-        	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, sizeOfList));
-        }
-        
-        
-		if (tempListList.removeAll(uuidListList)){
-        	//do nothing
-        } else {
-        	assignmentProcess.getLogger().info("error encountered in removing uuid collection from list");
-        }
-        
-		
-		
-		/*
-		 * Set workflow manager
-		 */
-		List<String> addresses = new ArrayList<String>();
-		addresses.add( assigneeProfile );
-		assignmentProcess.writeAttachment("workFlowManager", addresses);
-		
-		    		
-		
-		I_TermFactory termFact = LocalVersionedTerminology.get();
-		I_ConfigAceFrame cf = termFact.getActiveAceFrameConfig();
-		cf.setUsername(assigneeProfile);
-		assignmentProcess.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), cf );
-		
-		
-		// the getAttachmentKey method prepends an A: to the key, thus providing the information necessary to read and write
-		// the attachment as a property... Thus we use the get/setProperty methods. If you want to use
-		// the read/writeAttachments methods, call ProcessAttachmentKeys.ASSIGNEE.getName() instead of getAttachment key. 
-		
-		
-		
-		
-		for( String key : processAttachments.keySet() ){
-			String propertyLabel = ProcessAttachmentKeys.valueOf( key ).getAttachmentKey();
-			assignmentProcess.setProperty( propertyLabel, processAttachments.get( key ) );
-		}
-		
-		assignmentProcess.setProperty(ProcessAttachmentKeys.ASSIGNEE.getAttachmentKey(), assigneeProfile);
-		assignmentProcess.setProperty(ProcessAttachmentKeys.BATCH_UUID_LIST2.getAttachmentKey(), uuidListList);
-		assignmentProcess.setProperty(ProcessAttachmentKeys.DESTINATION_ADR.getAttachmentKey(), assigneeProfile);
-		assignmentProcess.setProperty(ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey(), addresses);
-		assignmentProcess.setProperty(ProcessAttachmentKeys.TO_ASSIGN_PROCESS.getAttachmentKey(), taAssignmentProcessFile);
-		assignmentProcess.setProperty(ProcessAttachmentKeys.DETAIL_HTML_DIR.getAttachmentKey(), "src/main/bp/instructions");
-		assignmentProcess.setProperty(ProcessAttachmentKeys.DETAIL_HTML_FILE.getAttachmentKey(), "instructions_dup.html");
-		
-		
-		return assignmentProcess;
-	}//End createAssignmentProcess
-	
 	private List<List<UUID>> createUuidListsFromFile( File inputFile ) throws IOException{
 		
 		List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
@@ -355,5 +257,93 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 		return uuidListOfLists;
 		
 	}//End createUuidListsFromFile
+	
+	private BusinessProcess createAssignmentProcess() throws PropertyVetoException, IOException, TerminologyException, IntrospectionException, IllegalAccessException, InvocationTargetException {
+		// Construct the process. 
+		BusinessProcess assignmentProcess = new BusinessProcess(
+		        "Assignment process", Condition.CONTINUE, false);
+		
+		
+		/*
+		 * Add tasks to assignemt process
+		 */
+		LogMessageOnWorkerLog log1task = (LogMessageOnWorkerLog) assignmentProcess.addTask(new LogMessageOnWorkerLog());
+		log1task.setMessage("-------- Starting assignment process...");
+
+		
+		OpenQueuesInFolder oqf = new OpenQueuesInFolder();
+		oqf.setQueueDir(inboxPath);
+		assignmentProcess.addTask(oqf);
+		assignmentProcess.addBranch(log1task, oqf, Condition.CONTINUE);
+		
+		LaunchBatchGenAssignmentProcess genAssign = new LaunchBatchGenAssignmentProcess();
+		genAssign.setProcessFileStr( wfAssignmentProcessFile );		
+		assignmentProcess.addTask(genAssign);
+		assignmentProcess.addBranch(oqf, genAssign, Condition.CONTINUE);
+		
+		LogMessageOnWorkerLog log2task = (LogMessageOnWorkerLog) assignmentProcess.addTask(new LogMessageOnWorkerLog());
+		log2task.setMessage("-------- Finished assignment process....");
+		assignmentProcess.addBranch(genAssign, log2task, Condition.CONTINUE);
+
+		assignmentProcess.addBranch(log2task, assignmentProcess.addTask(new Complete()), Condition.CONTINUE);		
+
+		if( uuidFile != null ){
+			List<List<UUID>> tempListList = createUuidListsFromFile( uuidFile );
+			int sizeOfList = tempListList.size();
+			
+	        List<Collection<UUID>> uuidListList = null;
+	        if (sizeOfList > listListSize){
+	        	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, listListSize));
+	        } else {
+	        	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, sizeOfList));
+	        }
+	        
+	        
+			if (tempListList.removeAll(uuidListList)){
+	        	//do nothing
+	        } else {
+	        	assignmentProcess.getLogger().info("error encountered in removing uuid collection from list");
+	        }
+		}//End if uuidFile != null
+		
+		/*
+		 * Set attachment values for assignment
+		 */    		
+		
+		// Set workflow manager
+		List<String> addresses = new ArrayList<String>();
+		addresses.add( assigneeProfile );
+		assignmentProcess.writeAttachment("workFlowManager", addresses);
+		
+
+		//Set config frame		
+		I_TermFactory termFact = LocalVersionedTerminology.get();
+		I_ConfigAceFrame cf = termFact.getActiveAceFrameConfig();
+		cf.setUsername(assigneeProfile);
+		assignmentProcess.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), cf );
+		
+		
+		// the getAttachmentKey method prepends an A: to the key, thus providing the information necessary to read and write
+		// the attachment as a property... Thus we use the get/setProperty methods. If you want to use
+		// the read/writeAttachments methods, call ProcessAttachmentKeys.ASSIGNEE.getName() instead of getAttachment key. 
+		
+		
+		//Set configuration attachements
+		for( String key : processAttachments.keySet() ){
+			String propertyLabel = ProcessAttachmentKeys.valueOf( key ).getAttachmentKey();
+			assignmentProcess.setProperty( propertyLabel, processAttachments.get( key ) );
+		}
+		
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.ASSIGNEE.getAttachmentKey(), assigneeProfile);
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.BATCH_UUID_LIST2.getAttachmentKey(), uuidListList);
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.DESTINATION_ADR.getAttachmentKey(), assigneeProfile);
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey(), addresses);
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.TO_ASSIGN_PROCESS.getAttachmentKey(), taAssignmentProcessFile);
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.DETAIL_HTML_DIR.getAttachmentKey(), "src/main/bp/instructions");
+//		assignmentProcess.setProperty(ProcessAttachmentKeys.DETAIL_HTML_FILE.getAttachmentKey(), "instructions_dup.html");
+		
+		
+		return assignmentProcess;
+	}//End createAssignmentProcess
 	
 }//End class 
