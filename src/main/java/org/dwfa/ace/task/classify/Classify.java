@@ -36,9 +36,6 @@ import org.dwfa.util.id.Type3UuidFactory;
 @BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
 public class Classify extends AbstractTask {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 2;
@@ -100,7 +97,6 @@ public class Classify extends AbstractTask {
         
         try {
             // GET ROOT
-//            I_GetConceptData root = termFactory.getConcept(new UUID[] {Type3UuidFactory.SNOMED_ROOT_UUID});
             I_GetConceptData root = termFactory.getConcept(classifyRoot.ids);
             if (null == root) {
                 throw new TaskFailedException("Classification root concept is null.  Id: " + classifyRoot.ids);
@@ -111,7 +107,7 @@ public class Classify extends AbstractTask {
             worker.getLogger().info("isa ID: " + isaId + " : " + termFactory.getConcept(isaId));
             snorocketFactory.addIsa(isaId);
             
-            new Walker(termFactory, snorocketFactory, root).run();
+            new DepthWalker(termFactory, snorocketFactory, root).run();
             worker.getLogger().info("Row Count: " + snorocketFactory.getRowCount());
 
             snorocketFactory.classify();
@@ -291,19 +287,18 @@ public class Classify extends AbstractTask {
         this.factoryClass = factoryClass;
     }
 
-//    static
-    class Walker {
+    abstract class Walker {
 
-        final private I_TermFactory termFactory;
-        final private I_SnorocketFactory snorocketFactory;
-        final private I_GetConceptData root;
-
-        final private I_IntSet isaTypes;
-        final private int definingCharacteristic;
-        final private I_IntSet activeStatus;
-        final private Set<I_Position> latestStated;
-        final private boolean addUncommitted;
-        final private I_IntSet processed;
+        final protected I_TermFactory termFactory;
+        final protected I_SnorocketFactory snorocketFactory;
+        final protected I_GetConceptData root;
+        
+        final protected I_IntSet isaTypes;
+        final protected int definingCharacteristic;
+        final protected I_IntSet activeStatus;
+        final protected Set<I_Position> latestStated;
+        final protected boolean addUncommitted;
+        final protected I_IntSet processed;
 
         Walker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
             this.termFactory = termFactory;
@@ -330,17 +325,88 @@ public class Classify extends AbstractTask {
             latestStated.add(termFactory.newPosition(statedPath, Integer.MAX_VALUE));
             
             addUncommitted = false;
-
+            
             processed = termFactory.newIntSet();
         }
+
+        abstract public void run() throws IOException, TerminologyException;
+
+    }
+    
+    class DepthWalker extends Walker {
+
+        int count = 0;
         
+        DepthWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
+            super(termFactory, snorocketFactory, root);
+        }
+
+        @Override
+        public void run() throws IOException, TerminologyException {
+            // TODO Auto-generated method stub
+            processConcept(root);
+        }
+
+        private void processConcept(I_GetConceptData concept) throws IOException, TerminologyException {
+            final long start = System.currentTimeMillis();
+            final int conceptId = concept.getConceptId();
+            
+            if ((count++ % 1000) == 0) {
+                getLogger().info("counter: " + count + "\t" + concept);
+            }
+            
+            processed.add(conceptId);
+
+            final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
+            if (tuples.size() == 1) {
+                snorocketFactory.addConcept(conceptId, tuples.get(0).isDefined());
+
+                final List<I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated, addUncommitted);
+                for (I_RelTuple relTuple: relTuples) {
+                    if (definingCharacteristic == relTuple.getCharacteristicId()) {
+                        snorocketFactory.addRelationship(relTuple.getC1Id(), relTuple.getRelTypeId(), relTuple.getC2Id(), relTuple.getGroup());
+                    }
+                }
+                
+                List<I_RelTuple> childTuples = concept.getDestRelTuples(activeStatus, isaTypes, latestStated, addUncommitted);
+
+                final double delay = (System.currentTimeMillis() - start)/1000.0;
+                if (delay > 1.0) {
+                    getLogger().info(delay + " " + concept);
+                }
+
+                for (I_RelTuple childTuple: childTuples) {
+                    final int childId = childTuple.getC1Id();
+                    snorocketFactory.addRelationship(childId, isaId, conceptId, 0);
+                    
+                    if (!processed.contains(childId)) {
+                        processConcept(termFactory.getConcept(childId));
+                    }
+                }
+            } else if (tuples.size() > 1) {
+                throw new AssertionError("Unexpected number of tuples: " + tuples.size() + " for " + concept);
+            }
+            
+            return;
+        }
+
+    }
+    
+//    static
+    class BreadthWalker extends Walker {
+
+        BreadthWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
+            super(termFactory, snorocketFactory, root);
+        }
+
+        @Override
         public void run() throws IOException, TerminologyException {
             final I_IntSet queue = termFactory.newIntSet();
             queue.add(root.getConceptId());
             
 //            while (true) {
             // FIXME While we're developing, we limit the depth of traversal
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 50; i++) {
                 final int[] setValues = queue.getSetValues();
                 processed.addAll(setValues);
                 queue.clear();
@@ -401,6 +467,7 @@ public class Classify extends AbstractTask {
             
             return false;
         }
+        
     }
 
     public TermEntry getClassifyRoot() {
