@@ -49,6 +49,12 @@ public class Type5UuidFactory {
    public static UUID READV3_TEMPL_NOTES_SCREEN_ORDER_MEMBER_ID = UUID.fromString("5acad34d-b735-11dc-8314-0800200c9a66");
    public static UUID READV3_TEMPL_ATTRIBUTE_DISPLAYSTATUS_MEMBER_ID = UUID.fromString("5acad34e-b735-11dc-8314-0800200c9a66");
    public static UUID READV3_TEMPL_CHARACTERISTIC_STATUS_MEMBER_ID = UUID.fromString("5acad34f-b735-11dc-8314-0800200c9a66");
+   
+   public static UUID READV3_TEMPL_FOR_REL = UUID.fromString("bd98b290-bc0d-11dc-95ff-0800200c9a66");
+   public static UUID READV3_TEMPL = UUID.fromString("bd98b291-bc0d-11dc-95ff-0800200c9a66");
+   public static UUID READV3_CROSS_MAP_FOR_REL = UUID.fromString("bd98b292-bc0d-11dc-95ff-0800200c9a66");
+   public static UUID READV3_CROSS_MAP = UUID.fromString("bd98b293-bc0d-11dc-95ff-0800200c9a66");
+ 
 
     
    /* ICD 10AM UUIDS Added by NCCH */
