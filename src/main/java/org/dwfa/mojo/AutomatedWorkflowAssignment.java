@@ -65,7 +65,7 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	 * <h2>assigneeProfile</h2>
 	 * 
 	 * <p>Private property of type <strong>"String"</strong>, used to hold the name of user profile<br>
-	 * to assign generated workflow process to.</p> 
+	 * to assign generated workflow process to (usually the workflow manager).</p> 
 	 * <p>This property is <strong>required</strong> to always have a value set. For this reason, <br>
 	 * a default value is set by way of the parameter annotation expression value.</p>
 	 * 
@@ -98,14 +98,16 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	 * <h2>processAttachments</h2>
 	 * <p>Private property of type <strong>"Map"</strong>, used to hold a map of propertyName/Value pair for an attachment required by the workflow process.</p>
 	 * <p>This property is <strong>optional</strong>, so no default need be set.</p>
-	 * 
+	 * <p>If you require a pameter value to be a list of values, seperate the values using a ";"</p>
+	 * <p><ul>i.e: <br><ul>value1;value2;value3</ul></ul></p>
+	 * <p>You can also pas a list of lists by seperating each list of values with a ":"</p>
+	 * <p><ul>i.e: <br><ul>value1;value2;value3:val1;val2;val3</ul></ul></p>
 	 * @see java.util.Map
 	 * 
 	 * @parameter
 	 * 
 	 */
 	private Map<String, String> processAttachments;
-	
 	
 	
 	/**
@@ -136,46 +138,6 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	 */
 	private File uuidFile;
 	
-	////////////////////////////////////////////////////////////////
-	
-//	/**
-//	 * Name of file to read uuids from
-//	 * 
-//	 * @parameter expression="${project.build.directory}\\default.txt"
-//     * @required
-//	 * 
-//	 */
-//	private File dupUuidFile;
-	
-	
-	
-//	/**
-//	 * Name of business process to assign
-//	 * 
-//	 * @parameter expression="dupReviewAssignment.bp"
-//     * @required
-//	 * 
-//	 */
-//	private String businessProcessToAssign;
-	
-	/**
-	 * File path of the business process to assign to the workflow manager
-	 * 
-	 * @parameter expression="${project.build.directory}\\..\\src\\main\\bp\\assignment generators\\assignmentGenFromUuidList_InProperty.bp"
-     * @required
-	 * 
-	 */
-	private String wfAssignmentProcessFile;
-	
-//	/**
-//	 * File path of the business process to assign to the TAs
-//	 * 
-//	 * @parameter expression="${project.build.directory}\\..\\src\\main\\bp\\TA assignment processes\\dupReviewAssignment.bp"
-//     * @required
-//	 * 
-//	 */
-//	private String taAssignmentProcessFile;
-	
 
 	private String separator = System.getProperty("file.separator");
 	private int listListSize = 250;
@@ -185,17 +147,12 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 		JiniManager.setLocalOnly(true);
 		
 		inboxPath = "src" + separator + "main" + separator + "profiles" + separator + "users" + separator + assigneeProfile + separator + "inbox";
-//		inboxPath = "target" + separator + "amt-edit-bundle.dir" + separator + "profiles" + separator + "users" + separator + workFlowManager + separator + "inbox";
+
 		try{		
-					
-			
-			
-//			if(dupUuidFile.exists()){
-				
-				TransactionParticipantAggregator tpa = new TransactionParticipantAggregator(new String[] { "src/main/config/transactionAggregator.config"}, null);
-				LocalTransactionManager ltm = new LocalTransactionManager(new String[] { "src/main/config/transactionManager.config"}, null);
+			TransactionParticipantAggregator tpa = new TransactionParticipantAggregator(new String[] { "src/main/config/transactionAggregator.config"}, null);
+			LocalTransactionManager ltm = new LocalTransactionManager(new String[] { "src/main/config/transactionManager.config"}, null);
 					    		
-	    		I_ConfigAceFrame config = LocalVersionedTerminology.get().getActiveAceFrameConfig();
+	    	I_ConfigAceFrame config = LocalVersionedTerminology.get().getActiveAceFrameConfig();
 	    			    		
 //		    		queueDirectory = new File("target/myConfig.config");
 //		    		queueDirectory.getParentFile().mkdirs();
@@ -208,27 +165,25 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	    		
 //	    		queueConfigFile = new File(inboxPath + separator + "queue.config");
 
-	    		String[] entries = new String[]{ queueConfigFile.getAbsolutePath() };
+	    	String[] entries = new String[]{ queueConfigFile.getAbsolutePath() };
 	    	    
 	    				    		
-	    		 Configuration configuration = 
+	    	Configuration configuration = 
 	                 ConfigurationProvider.getInstance( entries,	                		 
 	                                                    getClass().getClassLoader() );
 	    		 
-	    		 Configuration workerConfiguration = 
+	    	Configuration workerConfiguration = 
 	                 ConfigurationProvider.getInstance( new String[] { "myConfig.config" },	                		 
 	                                                    getClass().getClassLoader() );
 	    				    		
-	    		MojoWorker mw = new MojoWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker" );
+	    	MojoWorker mw = new MojoWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker" );
 	    		
-	    		I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile( assigneeProfile, assigneeProfile, assigneeProfile, assigneeProfile );
-	    		mw.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame );
-	    		mw.getLogger().setLevel( Level.FINE );
-	    		
-	    		getLog().info( "Generate assignment process for workflow manager" );
-	    		mw.execute( createAssignmentProcess() );
-	    		
-//			}//End if
+	    	I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile( assigneeProfile, assigneeProfile, assigneeProfile, assigneeProfile );
+	    	mw.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame );
+	    	mw.getLogger().setLevel( Level.FINE );
+	    		    	
+	    	mw.execute( createAssignmentProcess() );
+
 		}
 		catch( Exception e){
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -277,7 +232,7 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 		assignmentProcess.addBranch(log1task, oqf, Condition.CONTINUE);
 		
 		LaunchBatchGenAssignmentProcess genAssign = new LaunchBatchGenAssignmentProcess();
-		genAssign.setProcessFileStr( wfAssignmentProcessFile );		
+		genAssign.setProcessFileStr( businessProcess );		
 		assignmentProcess.addTask(genAssign);
 		assignmentProcess.addBranch(oqf, genAssign, Condition.CONTINUE);
 		
@@ -286,12 +241,11 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 		assignmentProcess.addBranch(genAssign, log2task, Condition.CONTINUE);
 
 		assignmentProcess.addBranch(log2task, assignmentProcess.addTask(new Complete()), Condition.CONTINUE);		
-
+		List<Collection<UUID>> uuidListList = null;
 		if( uuidFile != null ){
 			List<List<UUID>> tempListList = createUuidListsFromFile( uuidFile );
 			int sizeOfList = tempListList.size();
-			
-	        List<Collection<UUID>> uuidListList = null;
+	        
 	        if (sizeOfList > listListSize){
 	        	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, listListSize));
 	        } else {
@@ -327,21 +281,47 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 		// the attachment as a property... Thus we use the get/setProperty methods. If you want to use
 		// the read/writeAttachments methods, call ProcessAttachmentKeys.ASSIGNEE.getName() instead of getAttachment key. 
 		
-		
+				
 		//Set configuration attachements
 		for( String key : processAttachments.keySet() ){
-			String propertyLabel = ProcessAttachmentKeys.valueOf( key ).getAttachmentKey();
-			assignmentProcess.setProperty( propertyLabel, processAttachments.get( key ) );
-		}
-		
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.ASSIGNEE.getAttachmentKey(), assigneeProfile);
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.BATCH_UUID_LIST2.getAttachmentKey(), uuidListList);
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.DESTINATION_ADR.getAttachmentKey(), assigneeProfile);
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.SELECTED_ADDRESSES.getAttachmentKey(), addresses);
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.TO_ASSIGN_PROCESS.getAttachmentKey(), taAssignmentProcessFile);
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.DETAIL_HTML_DIR.getAttachmentKey(), "src/main/bp/instructions");
-//		assignmentProcess.setProperty(ProcessAttachmentKeys.DETAIL_HTML_FILE.getAttachmentKey(), "instructions_dup.html");
-		
+			String propertyLabel = ProcessAttachmentKeys.valueOf( key.toUpperCase() ).getAttachmentKey();
+			
+			if( processAttachments.get( key ).equalsIgnoreCase("uuidListList") ){
+				assignmentProcess.setProperty( propertyLabel, uuidListList );
+			}
+			else{
+				
+				if( processAttachments.get( key ).contains(":") ){
+					//Create list of list
+					String[] array = processAttachments.get( key ).split( ":" );
+					List<List> listOfLists = new ArrayList<List>();
+					for( String listValues : array ){
+						List<String> tempList = new ArrayList<String>();
+						String[] array2 = listValues.split(";");
+						for( String value : array ){
+							getLog().info("value >> " + value);
+							if( value != null && !value.equalsIgnoreCase("") ) tempList.add( value );
+						}
+						listOfLists.add( tempList );
+					}
+					assignmentProcess.setProperty( propertyLabel, listOfLists );
+				}
+				
+				
+				if( processAttachments.get( key ).contains(";") ){
+					List<String> tempList = new ArrayList<String>();
+					String[] array = processAttachments.get( key ).split( ";" );
+					for( String value : array ){
+						getLog().info("value >> " + value);
+						if( value != null && !value.equalsIgnoreCase("") ) tempList.add( value );
+					}
+					assignmentProcess.setProperty( propertyLabel, tempList );
+				}
+				else{
+					assignmentProcess.setProperty( propertyLabel, processAttachments.get( key ) );
+				}
+			}
+		}//End for loop
 		
 		return assignmentProcess;
 	}//End createAssignmentProcess
