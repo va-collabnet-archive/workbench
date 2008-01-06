@@ -190,6 +190,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
             IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is a (relationship type)"}, null,
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_SAME_AS_REL("is same as (relationship type)",
+                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             DUP_REL_TYPE("dup rel type (terminology constant)",
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_POT_DUP_REL("is-a potential duplicate rel (terminology constant)",
