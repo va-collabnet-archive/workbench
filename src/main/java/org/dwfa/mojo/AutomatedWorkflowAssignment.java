@@ -182,7 +182,10 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	    	mw.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame );
 	    	mw.getLogger().setLevel( Level.FINE );
 	    		    	
-	    	mw.execute( createAssignmentProcess() );
+	    	BusinessProcess assignmentProcess = createAssignmentProcess();
+	    	
+	    	if( assignmentProcess != null )
+	    		mw.execute( createAssignmentProcess() );
 
 		}
 		catch( Exception e){
@@ -287,6 +290,11 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 			String propertyLabel = ProcessAttachmentKeys.valueOf( key.toUpperCase() ).getAttachmentKey();
 			
 			if( processAttachments.get( key ).equalsIgnoreCase("uuidListList") ){
+				/* This suggests that the uuid list is required and can not be empty/null.
+				 * If the uuid list is empty or null we want to return a null business process so nothing gets executed.
+				 */
+				if( uuidListList == null || uuidListList.isEmpty() ) return null;
+				
 				assignmentProcess.setProperty( propertyLabel, uuidListList );
 			}
 			else{
