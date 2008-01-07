@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -301,6 +302,10 @@ public interface I_ConfigAceFrame {
     public boolean isToggleVisible(TOGGLES toggle);
     
     public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException;
+    
+    public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible);
+    
+    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle);
     
     public void setCommitAbortButtonsVisible(boolean visible);
     
