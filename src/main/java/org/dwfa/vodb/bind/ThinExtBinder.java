@@ -2,6 +2,7 @@ package org.dwfa.vodb.bind;
 
 import java.util.List;
 
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
@@ -13,14 +14,19 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.vodb.I_MapIds;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
+import org.dwfa.vodb.types.ThinExtByRefPartCrossmap;
+import org.dwfa.vodb.types.ThinExtByRefPartCrossmapForRel;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
 import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 import org.dwfa.vodb.types.ThinExtByRefPartString;
+import org.dwfa.vodb.types.ThinExtByRefPartTemplate;
+import org.dwfa.vodb.types.ThinExtByRefPartTemplateForRel;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -36,12 +42,22 @@ public class ThinExtBinder extends TupleBinding {
 	private static int SCOPED_LANGUAGE_ID = 6;
 	private static int STRING_ID = 7;
 	private static int CON_INT_ID = 8;
+    private static int TEMPLATE_FOR_REL_ID = 9;
+    private static int TEMPLATE_ID = 10;
+    private static int CROSS_MAP_FOR_REL_ID = 11;
+    private static int CROSS_MAP_ID = 12;
 	
     public static enum EXT_TYPE {
         BOOLEAN(BOOLEAN_ID, "boolean"), CONCEPT(CONCEPT_ID, "concept"), CON_INT(CON_INT_ID, "con int"),
         STRING(STRING_ID, "string"), INTEGER(INTEGER_ID, "integer"), 
         MEASUREMENT(MEASUREMENT_ID, "measurement"), LANGUAGE(LANGUAGE_ID,
-                "language"), SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language");
+                "language"), SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language"), 
+                TEMPLATE_FOR_REL(TEMPLATE_FOR_REL_ID, "template for rel"),
+                TEMPLATE(TEMPLATE_ID, "template"),
+                CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel"),
+                CROSS_MAP(CROSS_MAP_ID, "cross map"),
+                
+                ;
 
         private int enumId;
 
@@ -74,6 +90,14 @@ public class ThinExtBinder extends TupleBinding {
                 return STRING;
             case 8:
             	return CON_INT;
+            case 9:
+                return TEMPLATE_FOR_REL;
+            case 10:
+                return TEMPLATE;
+            case 11:
+                return CROSS_MAP_FOR_REL;
+            case 12:
+                return CROSS_MAP;
 
             default:
                 throw new RuntimeException("Can't convert to EXT_TYPE: " + id);
@@ -102,10 +126,11 @@ public class ThinExtBinder extends TupleBinding {
         int memberId = ti.readInt();
         int componentId = ti.readInt();
         EXT_TYPE type = EXT_TYPE.fromEnumId(ti.readInt());
-        int typeId = getExtensionType(type);
+        int typeId = getExtensionTypeNid(type);
 
         int partCount = ti.readInt();
-        I_ThinExtByRefVersioned versioned = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
+        I_ThinExtByRefVersioned versioned = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId,
+                                                                      partCount);
         if (fixedOnly) {
             return versioned;
         }
@@ -200,31 +225,224 @@ public class ThinExtBinder extends TupleBinding {
                 versioned.addVersion(part);
             }
             break;
+        case CROSS_MAP:
+            for (int x = 0; x < partCount; x++) {
+                ThinExtByRefPartCrossmap part = new ThinExtByRefPartCrossmap();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatus(ti.readInt());
+                part.setAdditionalCodeId(ti.readInt());
+                part.setBlockNo(ti.readInt());
+                part.setElementNo(ti.readInt());
+                part.setMapStatusId(ti.readInt());
+                part.setRefineFlagId(ti.readInt());
+                part.setTargetCodeId(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+        case CROSS_MAP_FOR_REL:
+            for (int x = 0; x < partCount; x++) {
+                ThinExtByRefPartCrossmapForRel part = new ThinExtByRefPartCrossmapForRel();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatus(ti.readInt());
+                part.setAdditionalCodeId(ti.readInt());
+                part.setBlockNo(ti.readInt());
+                part.setElementNo(ti.readInt());
+                part.setRefineFlagId(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+        case TEMPLATE:
+            for (int x = 0; x < partCount; x++) {
+                ThinExtByRefPartTemplate part = new ThinExtByRefPartTemplate();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatus(ti.readInt());
+                part.setAttributeDisplayStatusId(ti.readInt());
+                part.setAttributeId(ti.readInt());
+                part.setBrowseAttributeOrder(ti.readInt());
+                part.setBrowseValueOrder(ti.readInt());
+                part.setCardinality(ti.readInt());
+                part.setCharacteristicStatusId(ti.readInt());
+                part.setNotesScreenOrder(ti.readInt());
+                part.setSemanticStatusId(ti.readInt());
+                part.setTargetCodeId(ti.readInt());
+                part.setValueTypeId(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+        case TEMPLATE_FOR_REL:
+            for (int x = 0; x < partCount; x++) {
+                ThinExtByRefPartTemplateForRel part = new ThinExtByRefPartTemplateForRel();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatus(ti.readInt());
+                part.setAttributeDisplayStatusId(ti.readInt());
+                part.setBrowseAttributeOrder(ti.readInt());
+                part.setBrowseValueOrder(ti.readInt());
+                part.setCardinality(ti.readInt());
+                part.setCharacteristicStatusId(ti.readInt());
+                part.setNotesScreenOrder(ti.readInt());
+                part.setSemanticStatusId(ti.readInt());
+                part.setValueTypeId(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+
         default:
             throw new RuntimeException("Can't handle type: " + type);
         }
         return versioned;
     }
+    
+    private static Integer booleanNid;
+    private static Integer stringNid;
+    private static Integer conceptNid;
+    private static Integer integerNid;
+    private static Integer conIntNid;
+    private static Integer languageNid;
+    private static Integer scopedLanguageNid;
+    private static Integer measurementNid;
+    private static Integer crossMapNid;
+    private static Integer crossMapForRelNid;
+    private static Integer templateNid;
+    private static Integer templateForRelNid;
 
-    public static int getExtensionType(EXT_TYPE type) {
+    public static int getExtensionTypeNid(EXT_TYPE type) {
         try {
             switch (type) {
             case BOOLEAN:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids());
+                if (booleanNid == null) {
+                    booleanNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids());
+                }
+                return booleanNid;
             case STRING:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids());
+                if (stringNid == null) {
+                    stringNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids());
+                }
+                return stringNid;
             case CONCEPT:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
+                if (conceptNid == null) {
+                    conceptNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
+                }
+                return conceptNid;
             case INTEGER:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
+                if (integerNid == null) {
+                    integerNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
+                }
+                return integerNid;
             case CON_INT:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
+                if (conIntNid == null) {
+                    conIntNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
+                }
+                return conIntNid;
             case LANGUAGE:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
+                if (languageNid == null) {
+                    languageNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
+                }
+                return languageNid;
             case SCOPED_LANGUAGE:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
+                if (scopedLanguageNid == null) {
+                    scopedLanguageNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
+                }
+                return scopedLanguageNid;
             case MEASUREMENT:
-                return AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
+                if (measurementNid == null) {
+                    measurementNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
+                }
+                return measurementNid;
+            case CROSS_MAP:
+                if (crossMapNid == null) {
+                    crossMapNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
+                }
+                return crossMapNid;
+            case CROSS_MAP_FOR_REL:
+                if (crossMapForRelNid == null) {
+                    crossMapForRelNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids());
+                }
+                return crossMapForRelNid;
+            case TEMPLATE:
+                if (templateNid == null) {
+                    templateNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids());
+                }
+                return templateNid;
+            case TEMPLATE_FOR_REL:
+                if (templateForRelNid == null) {
+                    templateForRelNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids());
+                }
+                return templateForRelNid;
+            default:
+                throw new RuntimeException("Can't convert to type: " + type);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int getExtensionTypeNid(EXT_TYPE type, I_MapIds map, I_Path idPath, int version) {
+        try {
+            switch (type) {
+            case BOOLEAN:
+                if (booleanNid == null) {
+                    booleanNid = map.getIntId(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids(), idPath, version);
+                }
+                return booleanNid;
+            case STRING:
+                if (stringNid == null) {
+                    stringNid = map.getIntId(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids(), idPath, version);
+                }
+                return stringNid;
+            case CONCEPT:
+                if (conceptNid == null) {
+                    conceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids(), idPath, version);
+                }
+                return conceptNid;
+            case INTEGER:
+                if (integerNid == null) {
+                    integerNid = map.getIntId(RefsetAuxiliary.Concept.INT_EXTENSION.getUids(), idPath, version);
+                }
+                return integerNid;
+            case CON_INT:
+                if (conIntNid == null) {
+                    conIntNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids(), idPath, version);
+                }
+                return conIntNid;
+            case LANGUAGE:
+                if (languageNid == null) {
+                    languageNid = map.getIntId(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids(), idPath, version);
+                }
+                return languageNid;
+            case SCOPED_LANGUAGE:
+                if (scopedLanguageNid == null) {
+                    scopedLanguageNid = map.getIntId(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids(), idPath, version);
+                }
+                return scopedLanguageNid;
+            case MEASUREMENT:
+                if (measurementNid == null) {
+                    measurementNid = map.getIntId(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids(), idPath, version);
+                }
+                return measurementNid;
+            case CROSS_MAP:
+                if (crossMapNid == null) {
+                    crossMapNid = map.getIntId(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids(), idPath, version);
+                }
+                return crossMapNid;
+            case CROSS_MAP_FOR_REL:
+                if (crossMapForRelNid == null) {
+                    crossMapForRelNid = map.getIntId(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids(), idPath, version);
+                }
+                return crossMapForRelNid;
+            case TEMPLATE:
+                if (templateNid == null) {
+                    templateNid = map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids(), idPath, version);
+                }
+                return templateNid;
+            case TEMPLATE_FOR_REL:
+                if (templateForRelNid == null) {
+                    templateForRelNid = map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids(), idPath, version);
+                }
+                return templateForRelNid;
             default:
                 throw new RuntimeException("Can't convert to type: " + type);
             }
@@ -332,6 +550,73 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getTagId());
                 to.writeInt(part.getPriority());
             }
+        case CROSS_MAP:
+            List<ThinExtByRefPartCrossmap> crossMapParts = (List<ThinExtByRefPartCrossmap>) versioned
+            .getVersions();
+            for (ThinExtByRefPartCrossmap part: crossMapParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatus());
+                to.writeInt(part.getAdditionalCodeId());
+                to.writeInt(part.getBlockNo());
+                to.writeInt(part.getElementNo());
+                to.writeInt(part.getMapStatusId());
+                to.writeInt(part.getRefineFlagId());
+                to.writeInt(part.getTargetCodeId());
+                versioned.addVersion(part);
+            }
+            break;
+        case CROSS_MAP_FOR_REL:
+            List<ThinExtByRefPartCrossmapForRel> crossMapForRelParts = (List<ThinExtByRefPartCrossmapForRel>) versioned
+            .getVersions();
+            for (ThinExtByRefPartCrossmapForRel part: crossMapForRelParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatus());
+                to.writeInt(part.getAdditionalCodeId());
+                to.writeInt(part.getBlockNo());
+                to.writeInt(part.getElementNo());
+                to.writeInt(part.getRefineFlagId());
+                versioned.addVersion(part);
+            }
+            break;
+        case TEMPLATE:
+            List<ThinExtByRefPartTemplate> templateParts = (List<ThinExtByRefPartTemplate>) versioned
+            .getVersions();
+            for (ThinExtByRefPartTemplate part: templateParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatus());
+                to.writeInt(part.getAttributeDisplayStatusId());
+                to.writeInt(part.getAttributeId());
+                to.writeInt(part.getBrowseAttributeOrder());
+                to.writeInt(part.getBrowseValueOrder());
+                to.writeInt(part.getCardinality());
+                to.writeInt(part.getCharacteristicStatusId());
+                to.writeInt(part.getNotesScreenOrder());
+                to.writeInt(part.getSemanticStatusId());
+                to.writeInt(part.getTargetCodeId());
+                to.writeInt(part.getValueTypeId());
+                versioned.addVersion(part);
+            }
+            break;
+        case TEMPLATE_FOR_REL:
+            List<ThinExtByRefPartTemplateForRel> templateForRelParts = (List<ThinExtByRefPartTemplateForRel>) versioned
+            .getVersions();
+            for (ThinExtByRefPartTemplateForRel part: templateForRelParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatus());
+                to.writeInt(part.getAttributeDisplayStatusId());
+                to.writeInt(part.getBrowseAttributeOrder());
+                to.writeInt(part.getBrowseValueOrder());
+                to.writeInt(part.getCardinality());
+                to.writeInt(part.getCharacteristicStatusId());
+                to.writeInt(part.getNotesScreenOrder());
+                to.writeInt(part.getSemanticStatusId());
+                to.writeInt(part.getValueTypeId());
+                versioned.addVersion(part);
+            }
             break;
         default:
             throw new RuntimeException("Can't handle type: " + extType);
@@ -341,31 +626,30 @@ public class ThinExtBinder extends TupleBinding {
     public static EXT_TYPE getExtensionType(I_ThinExtByRefVersioned versioned) {
         if (versioned.getVersions() == null || versioned.getVersions().size() == 0) {
             try {
-                if (versioned.getTypeId() == AceConfig.getVodb().uuidToNative(
-                                                                              RefsetAuxiliary.Concept.BOOLEAN_EXTENSION
-                                                                                      .getUids())) {
+                if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.BOOLEAN)) {
                     return EXT_TYPE.BOOLEAN;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.STRING)) {
                     return EXT_TYPE.STRING;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT)) {
                     return EXT_TYPE.CONCEPT;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CON_INT)) {
                     return EXT_TYPE.CON_INT;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.INTEGER)) {
                     return EXT_TYPE.INTEGER;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.LANGUAGE)) {
                     return EXT_TYPE.LANGUAGE;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.SCOPED_LANGUAGE)) {
                     return EXT_TYPE.SCOPED_LANGUAGE;
-                } else if (versioned.getTypeId() == AceConfig.getVodb()
-                        .uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids())) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.MEASUREMENT)) {
                     return EXT_TYPE.MEASUREMENT;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CROSS_MAP)) {
+                    return EXT_TYPE.CROSS_MAP;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CROSS_MAP_FOR_REL)) {
+                    return EXT_TYPE.CROSS_MAP_FOR_REL;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE)) {
+                    return EXT_TYPE.TEMPLATE;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE_FOR_REL)) {
+                    return EXT_TYPE.TEMPLATE_FOR_REL;
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -388,6 +672,14 @@ public class ThinExtBinder extends TupleBinding {
                 return EXT_TYPE.SCOPED_LANGUAGE;
             } else if (ThinExtByRefPartMeasurement.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.MEASUREMENT;
+            }else if (ThinExtByRefPartTemplate.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.TEMPLATE;
+            }else if (ThinExtByRefPartTemplateForRel.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.TEMPLATE_FOR_REL;
+            }else if (ThinExtByRefPartCrossmap.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CROSS_MAP;
+            }else if (ThinExtByRefPartCrossmapForRel.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CROSS_MAP_FOR_REL;
             }
         }
         throw new UnsupportedOperationException("Can't convert to type: " + versioned);

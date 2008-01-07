@@ -148,7 +148,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 	private int snomedIntIdSource;
 	private int currentId;
 
-	public ProcessSnomedBerkeley(VodbEnv vodb, Map<UUID, Integer> constantToIntMap, int constantDate) throws DatabaseException, TerminologyException, IOException  {
+	public ProcessSnomedBerkeley(VodbEnv vodb, int constantDate) throws DatabaseException, TerminologyException, IOException  {
 		super(constantDate);
 		this.vodb = vodb;
 		//this.uuidToIntMap = constantToIntMap;

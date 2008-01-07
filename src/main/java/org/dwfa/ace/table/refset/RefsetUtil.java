@@ -242,6 +242,34 @@ public class RefsetUtil {
             setComboForField(host, extTable, REFSET_FIELDS.SCOPE, (IntList) host.getConfig()
                     .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds());
             break;
+        case CROSS_MAP:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getCrossMapPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getCrossMapPreferences().getStatusPopupIds());
+            //TODO finish the combo fields
+            break;
+        case CROSS_MAP_FOR_REL:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getCrossMapForRelPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getCrossMapForRelPreferences().getStatusPopupIds());
+            //TODO finish the combo fields
+            break;
+        case TEMPLATE:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getTemplatePreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getStatusPopupIds());
+            //TODO finish the combo fields
+            break;
+        case TEMPLATE_FOR_REL:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getTemplateForRelPreferences().getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                             .getRefsetPreferencesForToggle(toggle).getIntegerPreferences().getStatusPopupIds());
+            //TODO finish the combo fields
+            break;
 
         default:
             throw new RuntimeException("Can't handle extension type: " + extType);

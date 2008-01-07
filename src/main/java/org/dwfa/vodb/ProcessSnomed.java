@@ -17,6 +17,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -95,13 +96,13 @@ public abstract class ProcessSnomed extends ProcessSources {
 					
 					BufferedReader br = new BufferedReader(isr);
 					if (contentFile.getName().startsWith("sct_concepts_")) {
-						readConcepts(br, releaseDate, FORMAT.SNOMED);
+						readConcepts(br, releaseDate, FORMAT.SNOMED, new CountDownLatch(Integer.MAX_VALUE));
 					} else if (contentFile.getName().startsWith(
 							"sct_descriptions_")) {
-						readDescriptions(br, releaseDate, FORMAT.SNOMED);
+						readDescriptions(br, releaseDate, FORMAT.SNOMED, new CountDownLatch(Integer.MAX_VALUE));
 					} else if (contentFile.getName().startsWith(
 							"sct_relationships_")) {
-						readRelationships(br, releaseDate, FORMAT.SNOMED);
+						readRelationships(br, releaseDate, FORMAT.SNOMED, new CountDownLatch(Integer.MAX_VALUE));
 					}
 					br.close();
 				}
@@ -145,20 +146,20 @@ public abstract class ProcessSnomed extends ProcessSources {
 				if (processConcepts && je.getName().contains("concepts")) {
 					InputStreamReader isr = new InputStreamReader(
 							snomedJar.getInputStream(je), Charset.forName("UTF-8"));
-					readConcepts(isr, releaseDate, FORMAT.SNOMED);
+					readConcepts(isr, releaseDate, FORMAT.SNOMED, new CountDownLatch(Integer.MAX_VALUE));
 					isr.close();
 				} else if (processDescriptions && je.getName().contains("descriptions")) {
 					InputStream is = snomedJar.getInputStream(je);
 					InputStreamReader isr = new InputStreamReader(
 							is, Charset.forName("UTF-8"));
 					readDescriptions(new InputStreamReader(
-							snomedJar.getInputStream(je)), releaseDate, FORMAT.SNOMED);
+							snomedJar.getInputStream(je)), releaseDate, FORMAT.SNOMED, new CountDownLatch(Integer.MAX_VALUE));
 					isr.close();
 				} else if (processRels && je.getName().contains("relationships")) {
 					InputStreamReader isr = new InputStreamReader(
 							snomedJar.getInputStream(je), Charset.forName("UTF-8"));
 					readRelationships(new InputStreamReader(
-							snomedJar.getInputStream(je)), releaseDate, FORMAT.SNOMED);
+							snomedJar.getInputStream(je)), releaseDate, FORMAT.SNOMED, new CountDownLatch(Integer.MAX_VALUE));
 					isr.close();
 				}
 			}

@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_IntSet;
@@ -52,7 +53,7 @@ public abstract class ProcessSources {
         this.skipFirstLine = skipFirstLine;
     }
 
-    public void readLicitWords(Reader br) throws IOException {
+    public void readLicitWords(Reader br, CountDownLatch licitWordLatch) throws IOException {
         long start = System.currentTimeMillis();
         int licitWords = 0;
         StreamTokenizer st = new StreamTokenizer(br);
@@ -72,7 +73,7 @@ public abstract class ProcessSources {
                 // LF
                 tokenType = st.nextToken();
             }
-
+            licitWordLatch.countDown();
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -85,7 +86,7 @@ public abstract class ProcessSources {
 
     public abstract void optimizeLicitWords() throws IOException;
 
-    public void readIllicitWords(Reader br) throws Exception {
+    public void readIllicitWords(Reader br, CountDownLatch illicitWordLatch) throws Exception {
         long start = System.currentTimeMillis();
         int illicitWords = 0;
         StreamTokenizer st = new StreamTokenizer(br);
@@ -105,6 +106,8 @@ public abstract class ProcessSources {
                 tokenType = st.nextToken();
             }
 
+            illicitWordLatch.countDown();
+            
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -113,13 +116,13 @@ public abstract class ProcessSources {
                               + illicitWords);
     }
 
-    protected void readConcepts(Reader r, Date releaseDate, FORMAT format) throws Exception {
+    protected void readConcepts(Reader r, Date releaseDate, FORMAT format, CountDownLatch conceptLatch) throws Exception {
         switch (format) {
         case SNOMED:
-            processSnomedFormatConcepts(r, releaseDate);
+            processSnomedFormatConcepts(r, releaseDate, conceptLatch);
             break;
         case ACE:
-            processAceFormatConcepts(r);
+            processAceFormatConcepts(r, conceptLatch);
             break;
 
         default:
@@ -127,7 +130,7 @@ public abstract class ProcessSources {
         }
     }
 
-    private void processAceFormatConcepts(Reader r) throws IOException, Exception {
+    private void processAceFormatConcepts(Reader r, CountDownLatch conceptLatch) throws IOException, Exception {
 
         long start = System.currentTimeMillis();
 
@@ -138,7 +141,7 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int concepts = 0;
 
-        skipLineOne(st);
+        skipLineOne(st, conceptLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
             Object conceptKey = getId(st);
@@ -158,6 +161,7 @@ public abstract class ProcessSources {
 
             writeConcept(statusDate, conceptKey, conceptStatus, defChar, Arrays.asList(new Object[] { pathId }));
             concepts++;
+            conceptLatch.countDown();
 
             // CR or LF
             tokenType = st.nextToken();
@@ -172,7 +176,7 @@ public abstract class ProcessSources {
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed concepts: " + concepts);
     }
 
-    public void readIds(Reader r) throws IOException, Exception {
+    public void readIds(Reader r, CountDownLatch idLatch) throws IOException, Exception {
 
         long start = System.currentTimeMillis();
 
@@ -182,8 +186,9 @@ public abstract class ProcessSources {
         st.whitespaceChars('\t', '\t');
         st.eolIsSignificant(true);
         int ids = 0;
+        UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next();
 
-        skipLineOne(st);
+        skipLineOne(st, idLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
             if (st.sval.equals("Primary UUID")) {
@@ -217,7 +222,6 @@ public abstract class ProcessSources {
                     statusDate = getDate(st);
                 }
 
-                UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next();
                 
                 tokenType = st.nextToken();
                 if ((tokenType != 13) && (tokenType != 10)) {
@@ -234,6 +238,7 @@ public abstract class ProcessSources {
                     tokenType = st.nextToken();
                 }
 
+                idLatch.countDown();
                 // Beginning of loop
                 tokenType = st.nextToken();
                 while (tokenType == 10) {
@@ -248,7 +253,7 @@ public abstract class ProcessSources {
     public abstract void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid,
         Date statusDate, UUID pathUuid) throws Exception;
 
-    private void processSnomedFormatConcepts(Reader r, Date releaseDate) throws IOException, Exception {
+    private void processSnomedFormatConcepts(Reader r, Date releaseDate, CountDownLatch conceptLatch) throws IOException, Exception {
         // CONCEPTID CONCEPTSTATUS FULLYSPECIFIEDNAME CTV3ID SNOMEDID
         // ISPRIMITIVE
         long start = System.currentTimeMillis();
@@ -260,7 +265,7 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int concepts = 0;
 
-        skipLineOne(st);
+        skipLineOne(st, conceptLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
             Object conceptKey = getId(st);
@@ -283,6 +288,7 @@ public abstract class ProcessSources {
             writeConcept(releaseDate, conceptKey, conceptStatus, defChar,
                          ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             concepts++;
+            conceptLatch.countDown();
 
             // CR or LF
             tokenType = st.nextToken();
@@ -297,13 +303,13 @@ public abstract class ProcessSources {
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed SNOMED concepts: " + concepts);
     }
 
-    protected void readRelationships(Reader r, Date releaseDate, FORMAT format) throws Exception {
+    protected void readRelationships(Reader r, Date releaseDate, FORMAT format, CountDownLatch relationshipLatch) throws Exception {
         switch (format) {
         case SNOMED:
-            processSnomedFormatRelationships(r, releaseDate);
+            processSnomedFormatRelationships(r, releaseDate, relationshipLatch);
             break;
         case ACE:
-            processAceFormatRelationships(r);
+            processAceFormatRelationships(r, relationshipLatch);
             break;
 
         default:
@@ -311,7 +317,7 @@ public abstract class ProcessSources {
         }
     }
 
-    private void processAceFormatRelationships(Reader r) throws IOException, Exception {
+    private void processAceFormatRelationships(Reader r, CountDownLatch relationshipLatch) throws IOException, Exception {
         // RELATIONSHIPID
         // STATUSID
         // CONCEPTID1
@@ -329,7 +335,7 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int rels = 0;
 
-        skipLineOne(st);
+        skipLineOne(st, relationshipLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
             // RELATIONSHIPID
@@ -373,14 +379,14 @@ public abstract class ProcessSources {
                 // LF
                 tokenType = st.nextToken();
             }
-
+            relationshipLatch.countDown();
             // Beginning of loop
             tokenType = st.nextToken();
         }
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed relationsips: " + rels);
     }
 
-    private void processSnomedFormatRelationships(Reader r, Date releaseDate) throws IOException, Exception {
+    private void processSnomedFormatRelationships(Reader r, Date releaseDate, CountDownLatch relationshipLatch) throws IOException, Exception {
         // RELATIONSHIPID
         // CONCEPTID1
         // RELATIONSHIPTYPE
@@ -397,7 +403,7 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int rels = 0;
 
-        skipLineOne(st);
+        skipLineOne(st, relationshipLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
             // RELATIONSHIPID
@@ -433,6 +439,8 @@ public abstract class ProcessSources {
                 tokenType = st.nextToken();
             }
 
+            relationshipLatch.countDown();
+            
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -440,26 +448,43 @@ public abstract class ProcessSources {
     }
 
     protected abstract Object getId(StreamTokenizer st);
+    
+    private class DateFormatterThreadLocal extends ThreadLocal<SimpleDateFormat> {
+        String formatStr;
 
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        private DateFormatterThreadLocal(String formatStr) {
+            super();
+            this.formatStr = formatStr;
+        }
 
-    SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat(formatStr);
+        }
+
+        
+        
+    }
+
+    DateFormatterThreadLocal formatter = new DateFormatterThreadLocal("yyyy-MM-dd HH:mm:ss");
+
+    DateFormatterThreadLocal formatter2 = new DateFormatterThreadLocal("yyyyMMdd HH:mm:ss");
 
     protected Date getDate(StreamTokenizer st) throws ParseException {
         if (st.sval.contains("-")) {
-            return formatter.parse(st.sval);
+            return formatter.get().parse(st.sval);
         } else {
-            return formatter2.parse(st.sval);
+            return formatter2.get().parse(st.sval);
         }
     }
 
-    protected void readDescriptions(Reader r, Date releaseDate, FORMAT format) throws Exception {
+    protected void readDescriptions(Reader r, Date releaseDate, FORMAT format, CountDownLatch descriptionLatch) throws Exception {
         switch (format) {
         case SNOMED:
-            processSnomedFormatDescriptions(r, releaseDate);
+            processSnomedFormatDescriptions(r, releaseDate, descriptionLatch);
             break;
         case ACE:
-            processAceFormatDescriptions(r);
+            processAceFormatDescriptions(r, descriptionLatch);
             break;
 
         default:
@@ -467,7 +492,7 @@ public abstract class ProcessSources {
         }
     }
 
-    private void processAceFormatDescriptions(Reader r) throws IOException, Exception {
+    private void processAceFormatDescriptions(Reader r, CountDownLatch descriptionLatch) throws IOException, Exception {
         // DESCRIPTIONID
         // DESCRIPTIONSTATUS
         // CONCEPTID
@@ -484,7 +509,7 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int descriptions = 0;
 
-        skipLineOne(st);
+        skipLineOne(st, descriptionLatch);
         int tokenType = st.nextToken();
 
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -529,7 +554,7 @@ public abstract class ProcessSources {
                 // LF
                 tokenType = st.nextToken();
             }
-
+            descriptionLatch.countDown();
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -537,7 +562,7 @@ public abstract class ProcessSources {
                 .info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
     }
 
-    private void processSnomedFormatDescriptions(Reader r, Date releaseDate) throws IOException, Exception {
+    private void processSnomedFormatDescriptions(Reader r, Date releaseDate, CountDownLatch descriptionLatch) throws IOException, Exception {
         // DESCRIPTIONID
         // DESCRIPTIONSTATUS
         // CONCEPTID
@@ -554,7 +579,7 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int descriptions = 0;
 
-        skipLineOne(st);
+        skipLineOne(st, descriptionLatch);
         int tokenType = st.nextToken();
 
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -594,6 +619,7 @@ public abstract class ProcessSources {
                 tokenType = st.nextToken();
             }
 
+            descriptionLatch.countDown();
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -619,12 +645,13 @@ public abstract class ProcessSources {
 
     protected abstract Object getCharacteristic(StreamTokenizer st);
 
-    protected void skipLineOne(StreamTokenizer st) throws IOException {
+    protected void skipLineOne(StreamTokenizer st, CountDownLatch latch) throws IOException {
         if (skipFirstLine) {
             int tokenType = st.nextToken();
             while (tokenType != StreamTokenizer.TT_EOL) {
                 tokenType = st.nextToken();
             }
+            latch.countDown();
         }
     }
 

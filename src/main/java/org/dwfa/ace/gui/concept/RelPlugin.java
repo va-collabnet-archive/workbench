@@ -12,6 +12,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
@@ -31,7 +33,7 @@ import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 
-public abstract class RelPlugin extends AbstractPlugin {
+public abstract class RelPlugin extends AbstractPlugin implements TableModelListener {
 
 	public RelPlugin(boolean selectedByDefault) {
 		super(selectedByDefault);
@@ -42,9 +44,10 @@ public abstract class RelPlugin extends AbstractPlugin {
 
 	protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText,
 			boolean enableEdit, TOGGLES toggle) {
-      if (ACE.editMode == false) {
-         enableEdit = false;
-      }
+	    model.addTableModelListener(this);
+	    if (ACE.editMode == false) {
+	        enableEdit = false;
+	    }
 		JPanel relPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		JLabel srcRelLabel = new JLabel(labelText);
@@ -172,5 +175,15 @@ public abstract class RelPlugin extends AbstractPlugin {
       StringWithRelTuple swrt = (StringWithRelTuple) relTable.getValueAt(relTable.getSelectedRow(), 0);
       return swrt.getTuple().getRelId();
    }
- 
+   
+   public void tableChanged(TableModelEvent tme) {
+       if (relTable.getSelectedRow() == -1) {
+           if (relTable.getRowCount() > 0) {
+               int rowToSelect = 0; //relTable.getRowCount() -1;
+               relTable.setRowSelectionInterval(rowToSelect, rowToSelect);
+           }
+       }
+       
+   }
+
 }

@@ -39,6 +39,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -1769,6 +1770,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
         changeSupport.firePropertyChange("visibleRefsets", null, visibleRefsets);
     }
+    
+    public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible) {
+        setRefsetInToggleVisible(EXT_TYPE.valueOf(refsetType.name()), toggle, visible);        
+    }
+
+    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
+        return visibleRefsets.contains(refsetType.name() + toggle.toString());
+    }
 
     public boolean isRefsetInToggleVisible(EXT_TYPE refsetType, TOGGLES toggle) {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
@@ -1859,4 +1868,5 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setSortTaxonomyUsingRefset(Boolean sortTaxonomyUsingRefset) {
         this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
     }
+
 }

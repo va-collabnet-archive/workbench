@@ -20,6 +20,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
@@ -38,7 +40,7 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
-public class DescriptionPlugin extends AbstractPlugin {
+public class DescriptionPlugin extends AbstractPlugin implements TableModelListener {
 
 	private JPanel descPanel;
 	private I_HostConceptPlugins host;
@@ -113,6 +115,7 @@ public class DescriptionPlugin extends AbstractPlugin {
 	private JPanel getDescPanel(I_HostConceptPlugins host) {
 		descTableModel = new DescriptionsForConceptTableModel(getDescColumns(host),
 				host);
+		descTableModel.addTableModelListener(this);
 		JPanel descPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -266,5 +269,16 @@ public class DescriptionPlugin extends AbstractPlugin {
       StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(descTable.getSelectedRow(), 0);
       return swdt.getTuple().getDescId();
    }
+   
+   public void tableChanged(TableModelEvent tme) {
+       if (descTable.getSelectedRow() == -1) {
+           if (descTable.getRowCount() > 0) {
+               int rowToSelect = 0; //descTable.getRowCount() -1;
+               descTable.setRowSelectionInterval(rowToSelect, rowToSelect);
+           }
+       }
+       
+   }
+
 
 }

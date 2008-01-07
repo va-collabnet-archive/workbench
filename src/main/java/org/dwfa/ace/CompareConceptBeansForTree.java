@@ -72,7 +72,13 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                         } else if (c2ExtTuple == null) {
                             return -1;
                         }
-                        return c1ExtTuple.getPart().compareTo(c2ExtTuple.getPart());
+                        int comparison = c1ExtTuple.getPart().compareTo(c2ExtTuple.getPart());
+                        if (comparison != 0) {
+                            return comparison;
+                        } else {
+                            return compareDescriptions(cb1, cb2);
+                        }
+                        
                     }
                 }
             } else {

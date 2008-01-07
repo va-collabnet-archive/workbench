@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -154,6 +155,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.JEVersion;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.PreloadConfig;
@@ -334,6 +336,8 @@ public class VodbEnv implements I_ImplementTermFactory {
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
             env = new Environment(envHome, envConfig);
+            AceLog.getAppLog().info("Berkeley DB info: " + JEVersion.CURRENT_VERSION.getVersionString());
+
             DatabaseConfig conceptDbConfig = makeConfig(readOnly);
             activity.setProgressInfoLower("Opening concepts...");
             conceptDb = env.openDatabase(null, "concept", conceptDbConfig);
@@ -1356,8 +1360,6 @@ public class VodbEnv implements I_ImplementTermFactory {
      * @param continueWork
      * @param p
      * @param matches
-     *            This collection must be synchronized since this is a
-     *            mutlithreaded method.
      * @param latch
      * @throws DatabaseException
      */
@@ -1923,7 +1925,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         throw new TerminologyException("UIDs have multiple id records: " + ids + " when getting for: " + uids);
     }
 
-    public boolean hasId(List<UUID> uids) throws DatabaseException {
+    public boolean hasId(Collection<UUID> uids) throws DatabaseException {
         for (UUID uid : uids) {
             if (hasId(uid)) {
                 return true;
@@ -1993,8 +1995,16 @@ public class VodbEnv implements I_ImplementTermFactory {
                 DatabaseEntry idValue = new DatabaseEntry();
                 intBinder.objectToEntry(newId.getNativeId(), idKey);
                 idBinding.objectToEntry(newId, idValue);
-                idDb.put(null, idKey, idValue);
-                return newId.getNativeId();
+                
+                try {
+                    idPutSemaphore.acquire();
+                    idDb.put(null, idKey, idValue);
+                    idPutSemaphore.release();
+                } catch (InterruptedException e2) {
+                    throw new DatabaseException(e2);
+                }
+                
+               return newId.getNativeId();
             } catch (DatabaseException ex) {
                 throw new ToIoException(ex);
             }
@@ -2035,7 +2045,13 @@ public class VodbEnv implements I_ImplementTermFactory {
                 DatabaseEntry idValue = new DatabaseEntry();
                 intBinder.objectToEntry(newId.getNativeId(), idKey);
                 idBinding.objectToEntry(newId, idValue);
-                idDb.put(null, idKey, idValue);
+                try {
+                    idPutSemaphore.acquire();
+                    idDb.put(null, idKey, idValue);
+                    idPutSemaphore.release();
+                } catch (InterruptedException ex) {
+                    throw new DatabaseException(ex);
+                }
                 return newId.getNativeId();
             } catch (DatabaseException e2) {
                 throw new ToIoException(e2);
@@ -2047,12 +2063,20 @@ public class VodbEnv implements I_ImplementTermFactory {
         return Integer.class;
     }
 
+    Semaphore idPutSemaphore = new Semaphore(1);
     public void writeId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
         intBinder.objectToEntry(id.getNativeId(), idKey);
         idBinding.objectToEntry(id, idValue);
-        idDb.put(null, idKey, idValue);
+        
+        try {
+            idPutSemaphore.acquire();
+            idDb.put(null, idKey, idValue);
+            idPutSemaphore.release();
+        } catch (InterruptedException e) {
+            throw new DatabaseException(e);
+        }
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Writing nativeId : " + id);
         }
@@ -2356,6 +2380,13 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
 
     public I_IdVersioned getId(int nativeId) throws IOException {
+        I_IdVersioned id = getIdNullOk(nativeId);
+        if (id != null) {
+            return id;
+        }
+        throw new ToIoException(new DatabaseException("Concept: " + nativeId + " not found."));
+    }
+    public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Getting id record for : " + nativeId);
@@ -2376,7 +2407,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         } catch (DatabaseException e) {
             new ToIoException(e);
         }
-        throw new ToIoException(new DatabaseException("Concept: " + nativeId + " not found."));
+        return null;
     }
 
     public List<TimePathId> getTimePathList() throws Exception {

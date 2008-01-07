@@ -1657,6 +1657,22 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     .getStringPreferences(), type);
 
             break;
+        case CROSS_MAP:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                        .getCrossMapPreferences(), type);
+            break;
+        case CROSS_MAP_FOR_REL:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                        .getCrossMapForRelPreferences(), type);
+            break;
+        case TEMPLATE:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                        .getTemplatePreferences(), type);
+            break;
+        case TEMPLATE_FOR_REL:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                        .getTemplateForRelPreferences(), type);
+            break;
         default:
             break;
         }
@@ -1751,6 +1767,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         case STRING:
             // @todo string
+            break;
+        case CROSS_MAP:
+         // @todo
+            break;
+        case CROSS_MAP_FOR_REL:
+         // @todo
+            break;
+        case TEMPLATE:
+         // @todo
+            break;
+        case TEMPLATE_FOR_REL:
+         // @todo
             break;
         default:
             break;

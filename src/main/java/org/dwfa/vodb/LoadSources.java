@@ -28,8 +28,7 @@ public class LoadSources {
 			AddImage.addStockImages(AceConfig.getVodb());
 			int[] releaseDates = loadConstants.getReleaseDates();
 			if (args.length > 2) {
-				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(),
-						loadConstants.getConstantToIntMap(), releaseDates[0]);
+				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(), releaseDates[0]);
 				AceLog.getAppLog().info("(2) Starting to process SNOMED: " + args[2]);
 				loadSnomed.execute(new File(args[2]));
 				AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());

@@ -10,11 +10,15 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
 import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
 import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
+import org.dwfa.ace.refset.I_RefsetDefaultsCrossMap;
+import org.dwfa.ace.refset.I_RefsetDefaultsCrossMapForRel;
 import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguage;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguageScoped;
 import org.dwfa.ace.refset.I_RefsetDefaultsMeasurement;
 import org.dwfa.ace.refset.I_RefsetDefaultsString;
+import org.dwfa.ace.refset.I_RefsetDefaultsTemplate;
+import org.dwfa.ace.refset.I_RefsetDefaultsTemplateForRel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 
@@ -25,7 +29,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     private I_RefsetDefaultsBoolean booleanPreferences = new RefsetDefaultsBoolean();
 
@@ -42,7 +46,15 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
     private I_RefsetDefaultsString stringPreferences = new RefsetDefaultsString();
     
     private I_RefsetDefaultsConInt conIntPreferences = new RefsetDefaultsConInt();
+    
+    private I_RefsetDefaultsCrossMap crossMapPreferences = new RefsetDefaultsCrossMap();
 
+    private I_RefsetDefaultsCrossMapForRel crossMapForRelPreferences = new RefsetDefaultsCrossMapForRel();
+
+    private I_RefsetDefaultsTemplate templatePreferences = new RefsetDefaultsTemplate();
+    
+    private I_RefsetDefaultsTemplateForRel templateForRelPreferences = new RefsetDefaultsTemplateForRel();
+    
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -53,6 +65,10 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(languageScopedPreferences);
         out.writeObject(measurementPreferences);
         out.writeObject(conIntPreferences);
+        out.writeObject(crossMapPreferences);
+        out.writeObject(crossMapForRelPreferences);
+        out.writeObject(templatePreferences);
+        out.writeObject(templateForRelPreferences);
     }
 
     @SuppressWarnings("unchecked")
@@ -66,13 +82,28 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
             languageScopedPreferences = (I_RefsetDefaultsLanguageScoped) in.readObject();
             measurementPreferences = (I_RefsetDefaultsMeasurement) in.readObject();
             if (objDataVersion > 1) {
-            	conIntPreferences = (I_RefsetDefaultsConInt) in.readObject();
+                conIntPreferences = (I_RefsetDefaultsConInt) in.readObject();
             } else {
-            	try {
-					conIntPreferences = new RefsetDefaultsConInt();
-				} catch (TerminologyException e) {
-					throw new ToIoException(e);
-				}
+                try {
+                    conIntPreferences = new RefsetDefaultsConInt();
+                } catch (TerminologyException e) {
+                    throw new ToIoException(e);
+                }
+            }
+            if (objDataVersion > 2) {
+                crossMapPreferences = (I_RefsetDefaultsCrossMap) in.readObject();
+                crossMapForRelPreferences = (I_RefsetDefaultsCrossMapForRel) in.readObject();
+                templatePreferences = (I_RefsetDefaultsTemplate) in.readObject();
+                templateForRelPreferences = (I_RefsetDefaultsTemplateForRel) in.readObject();
+            } else {
+                try {
+                    crossMapPreferences = new RefsetDefaultsCrossMap();
+                    crossMapForRelPreferences = new RefsetDefaultsCrossMapForRel();
+                    templatePreferences = new RefsetDefaultsTemplate();
+                    templateForRelPreferences = new RefsetDefaultsTemplateForRel();
+                } catch (TerminologyException e) {
+                    throw new ToIoException(e);
+                }
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -146,5 +177,21 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 	public I_RefsetDefaultsConInt getConIntPreferences() {
 		return conIntPreferences;
 	}
+
+    public I_RefsetDefaultsCrossMap getCrossMapPreferences() {
+        return crossMapPreferences;
+    }
+
+    public I_RefsetDefaultsCrossMapForRel getCrossMapForRelPreferences() {
+        return crossMapForRelPreferences;
+    }
+
+    public I_RefsetDefaultsTemplate getTemplatePreferences() {
+        return templatePreferences;
+    }
+
+    public I_RefsetDefaultsTemplateForRel getTemplateForRelPreferences() {
+        return templateForRelPreferences;
+    }
 
 }

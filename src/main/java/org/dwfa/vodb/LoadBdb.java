@@ -137,8 +137,7 @@ public class LoadBdb {
 		int[] releaseDates = loadConstants.getReleaseDates();
         for (String arg: argSet) {
             ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(
-                                                                        (VodbEnv) LocalVersionedTerminology.get(), loadConstants.getConstantToIntMap(),
-                                                                        releaseDates[0]);
+                                                                        (VodbEnv) LocalVersionedTerminology.get(), releaseDates[0]);
                                                                 AceLog.getAppLog().info("(1) Starting to process SNOMED: " + arg);
                                                                 loadSnomed.execute(new JarFile(arg));
                                                                 AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: "

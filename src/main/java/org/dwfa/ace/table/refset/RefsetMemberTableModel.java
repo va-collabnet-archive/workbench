@@ -63,11 +63,15 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
+import org.dwfa.vodb.types.ThinExtByRefPartCrossmap;
+import org.dwfa.vodb.types.ThinExtByRefPartCrossmapForRel;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
 import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 import org.dwfa.vodb.types.ThinExtByRefPartString;
+import org.dwfa.vodb.types.ThinExtByRefPartTemplate;
+import org.dwfa.vodb.types.ThinExtByRefPartTemplateForRel;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
@@ -272,8 +276,33 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         TAG("tag", 5, 100, 1000), SCOPE("scope", 5, 100, 1000), PRIORITY("priority", 5, 50, 100),
 
         // Measurement extension
-        MEASUREMENT_VALUE("measurement value", 75, 100, 1000), MEASUREMENT_UNITS_ID("units of measure", 75, 100, 1000);
-
+        MEASUREMENT_VALUE("measurement value", 75, 100, 1000), MEASUREMENT_UNITS_ID("units of measure", 75, 100, 1000),
+        
+        // Template for rel extension
+        T_VALUE_TYPE("value type", 5, 100, 1000), 
+        T_CARDINALITY("cardinality", 5, 50, 100), 
+        T_SEMANTIC_STATUS("semantic status", 5, 100, 1000), 
+        T_BROWSE_ATTRIBUTE_ORDER("attribute order", 5, 50, 100), 
+        T_BROWSE_VALUE_ORDER("value order", 5, 50, 100), 
+        T_NOTES_SCREEN_ORDER("screen order", 5, 50, 100), 
+        T_DISPLAY_STATUS("display status", 5, 100, 1000), 
+        T_CHARACTERISTIC_STATUS("characteristic status", 5, 100, 1000),
+        
+        // Template extension
+        
+        T_ATTRIBUTE("attribute", 5, 100, 1000), T_TARGET("value", 5, 100, 1000),
+        
+        // Cross mapping for rel extension
+        MAP_REFINABILITY("map refinability", 5, 100, 1000), 
+        MAP_ADDITIONAL_CODE("additional code", 5, 100, 1000), 
+        MAP_ELEMENT_NO("element", 5, 50, 100), 
+        MAP_BLOCK_NO("block", 5, 50, 100),
+        
+        // Cross mapping extension
+        MAP_STATUS("map status", 5, 100, 1000),
+        MAP_TARGET("target", 5, 100, 1000)
+        
+        ;
         private String columnName;
 
         private int min;
@@ -393,6 +422,111 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     // REFSET_FIELDS.BRANCH
     };
 
+    private static REFSET_FIELDS[] templateForRel = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.T_VALUE_TYPE, 
+        REFSET_FIELDS.T_CARDINALITY, 
+        REFSET_FIELDS.T_SEMANTIC_STATUS, 
+        REFSET_FIELDS.T_BROWSE_ATTRIBUTE_ORDER, 
+        REFSET_FIELDS.T_BROWSE_VALUE_ORDER, 
+        REFSET_FIELDS.T_NOTES_SCREEN_ORDER, 
+        REFSET_FIELDS.T_DISPLAY_STATUS, 
+        REFSET_FIELDS.T_CHARACTERISTIC_STATUS,
+        REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH
+
+    };
+    
+    private static REFSET_FIELDS[] templateForRelNoHistory = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.T_VALUE_TYPE, 
+        REFSET_FIELDS.T_CARDINALITY, 
+        REFSET_FIELDS.T_SEMANTIC_STATUS, 
+        REFSET_FIELDS.T_BROWSE_ATTRIBUTE_ORDER, 
+        REFSET_FIELDS.T_BROWSE_VALUE_ORDER, 
+        REFSET_FIELDS.T_NOTES_SCREEN_ORDER, 
+        REFSET_FIELDS.T_DISPLAY_STATUS, 
+        REFSET_FIELDS.T_CHARACTERISTIC_STATUS,
+        REFSET_FIELDS.STATUS
+    };
+    
+    private static REFSET_FIELDS[] template = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.T_ATTRIBUTE, 
+        REFSET_FIELDS.T_TARGET,
+        REFSET_FIELDS.T_VALUE_TYPE, 
+        REFSET_FIELDS.T_CARDINALITY, 
+        REFSET_FIELDS.T_SEMANTIC_STATUS, 
+        REFSET_FIELDS.T_BROWSE_ATTRIBUTE_ORDER, 
+        REFSET_FIELDS.T_BROWSE_VALUE_ORDER, 
+        REFSET_FIELDS.T_NOTES_SCREEN_ORDER, 
+        REFSET_FIELDS.T_DISPLAY_STATUS, 
+        REFSET_FIELDS.T_CHARACTERISTIC_STATUS,
+        REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH
+    };
+    private static REFSET_FIELDS[] templateNoHistory = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.T_ATTRIBUTE, 
+        REFSET_FIELDS.T_TARGET,
+        REFSET_FIELDS.T_VALUE_TYPE, 
+        REFSET_FIELDS.T_CARDINALITY, 
+        REFSET_FIELDS.T_SEMANTIC_STATUS, 
+        REFSET_FIELDS.T_BROWSE_ATTRIBUTE_ORDER, 
+        REFSET_FIELDS.T_BROWSE_VALUE_ORDER, 
+        REFSET_FIELDS.T_NOTES_SCREEN_ORDER, 
+        REFSET_FIELDS.T_DISPLAY_STATUS, 
+        REFSET_FIELDS.T_CHARACTERISTIC_STATUS,
+        REFSET_FIELDS.STATUS
+    };
+
+    private static REFSET_FIELDS[] crossMapForRelFields = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.MAP_REFINABILITY, 
+        REFSET_FIELDS.MAP_ADDITIONAL_CODE, 
+        REFSET_FIELDS.MAP_ELEMENT_NO, 
+        REFSET_FIELDS.MAP_BLOCK_NO,
+        REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH
+    };
+    private static REFSET_FIELDS[] crossMapForRelFieldsNoHistory = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.MAP_REFINABILITY, 
+        REFSET_FIELDS.MAP_ADDITIONAL_CODE, 
+        REFSET_FIELDS.MAP_ELEMENT_NO, 
+        REFSET_FIELDS.MAP_BLOCK_NO,
+        REFSET_FIELDS.STATUS
+    };
+    
+    private static REFSET_FIELDS[] crossMapFields = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.MAP_STATUS,
+        REFSET_FIELDS.MAP_TARGET,
+        REFSET_FIELDS.MAP_REFINABILITY, 
+        REFSET_FIELDS.MAP_ADDITIONAL_CODE, 
+        REFSET_FIELDS.MAP_ELEMENT_NO, 
+        REFSET_FIELDS.MAP_BLOCK_NO,
+        REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH
+
+    };
+    private static REFSET_FIELDS[] crossMapFieldsNoHistory = new REFSET_FIELDS[] {
+        REFSET_FIELDS.REFSET_ID,
+        // REFSET_FIELDS.MEMBER_ID, REFSET_FIELDS.COMPONENT_ID,
+        REFSET_FIELDS.MAP_STATUS,
+        REFSET_FIELDS.MAP_TARGET,
+        REFSET_FIELDS.MAP_REFINABILITY, 
+        REFSET_FIELDS.MAP_ADDITIONAL_CODE, 
+        REFSET_FIELDS.MAP_ELEMENT_NO, 
+        REFSET_FIELDS.MAP_BLOCK_NO,
+        REFSET_FIELDS.STATUS
+
+    };
+
+    
     public static REFSET_FIELDS[] getRefsetColumns(I_HostConceptPlugins host, EXT_TYPE type) {
         if (host.getShowHistory()) {
             switch (type) {
@@ -412,6 +546,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 return scopedLanguageRefsetFields;
             case MEASUREMENT:
                 return measurementRefsetFields;
+            case CROSS_MAP:
+                return crossMapFields;
+            case CROSS_MAP_FOR_REL:
+                return crossMapForRelFields;
+            case TEMPLATE:
+                return template;
+            case TEMPLATE_FOR_REL:
+                return templateForRel;
             default:
                 throw new UnsupportedOperationException("Can't handle type: " + type);
             }
@@ -433,6 +575,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 return scopedLanguageRefsetFieldsNoHistory;
             case MEASUREMENT:
                 return measurementRefsetFieldsNoHistory;
+            case CROSS_MAP:
+                return crossMapFieldsNoHistory;
+            case CROSS_MAP_FOR_REL:
+                return crossMapForRelFieldsNoHistory;
+            case TEMPLATE:
+                return templateNoHistory;
+            case TEMPLATE_FOR_REL:
+                return templateForRelNoHistory;
             default:
                 throw new UnsupportedOperationException("Can't handle type: " + type);
             }
@@ -483,6 +633,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             return ThinExtByRefPartLanguageScoped.class;
         case MEASUREMENT:
             return ThinExtByRefPartMeasurement.class;
+        case CROSS_MAP:
+            return ThinExtByRefPartCrossmap.class;
+        case CROSS_MAP_FOR_REL:
+            return ThinExtByRefPartCrossmapForRel.class;
+        case TEMPLATE:
+            return ThinExtByRefPartTemplate.class;
+        case TEMPLATE_FOR_REL:
+            return ThinExtByRefPartTemplateForRel.class;
         default:
             throw new UnsupportedOperationException("Can't handle type: " + refsetType);
         }
@@ -691,6 +849,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences();
         case MEASUREMENT:
             return host.getConfig().getRefsetPreferencesForToggle(toggle).getMeasurementPreferences();
+        case CROSS_MAP:
+            return host.getConfig().getRefsetPreferencesForToggle(toggle).getCrossMapPreferences();
+        case CROSS_MAP_FOR_REL:
+            return host.getConfig().getRefsetPreferencesForToggle(toggle).getCrossMapForRelPreferences();
+        case TEMPLATE:
+            return host.getConfig().getRefsetPreferencesForToggle(toggle).getTemplatePreferences();
+        case TEMPLATE_FOR_REL:
+            return host.getConfig().getRefsetPreferencesForToggle(toggle).getTemplateForRelPreferences();
         default:
             throw new Exception("Can't handle refset type: " + refsetType);
         }
@@ -940,6 +1106,18 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case SCOPED_LANGUAGE:
                 refsetDefaults = preferences.getLanguageScopedPreferences();
                 break;
+            case CROSS_MAP:
+                refsetDefaults = preferences.getCrossMapPreferences();
+                break;
+            case CROSS_MAP_FOR_REL:
+                refsetDefaults = preferences.getCrossMapForRelPreferences();
+                break;
+            case TEMPLATE:
+                refsetDefaults = preferences.getTemplatePreferences();
+                break;
+            case TEMPLATE_FOR_REL:
+                refsetDefaults = preferences.getTemplateForRelPreferences();
+                break;
             default:
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
             }
@@ -951,7 +1129,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             
             
             I_ThinExtByRefVersioned extension = new ThinExtByRefVersioned(refsetId, memberId, tableComponentId,
-                                                                        ThinExtBinder.getExtensionType(refsetType));
+                                                                        ThinExtBinder.getExtensionTypeNid(refsetType));
             switch (refsetType) {
             case BOOLEAN:
                 for (I_Path editPath : host.getConfig().getEditingPathSet()) {
@@ -1053,6 +1231,78 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                             .getDefaultPriorityForScopedLanguageRefset());
                     scopedLaguagePart.setVersion(Integer.MAX_VALUE);
                     extension.addVersion(scopedLaguagePart);
+                }
+                break;
+            case CROSS_MAP:
+                for (I_Path editPath : host.getConfig().getEditingPathSet()) {
+                    ThinExtByRefPartCrossmap part = new ThinExtByRefPartCrossmap();
+                    part.setPathId(editPath.getConceptId());
+                    part.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                    part.setVersion(Integer.MAX_VALUE);
+                    part.setAdditionalCodeId(preferences.getCrossMapPreferences().getAdditionalCode().getConceptId());
+                    part.setBlockNo(preferences.getCrossMapPreferences().getDefaultBlockNo());
+                    part.setElementNo(preferences.getCrossMapPreferences().getDefaultElementNo());
+                    part.setRefineFlagId(preferences.getCrossMapPreferences().getRefineFlag().getConceptId());
+                    if (host.getConfig().getHierarchySelection() != null) {
+                        part.setTargetCodeId(host.getConfig().getHierarchySelection().getConceptId());
+                    } else {
+                        part.setTargetCodeId(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid());
+                    }
+                    part.setMapStatusId(preferences.getCrossMapPreferences().getMapStatus().getConceptId());
+                    extension.addVersion(part);
+                }
+                break;
+            case CROSS_MAP_FOR_REL:
+                for (I_Path editPath : host.getConfig().getEditingPathSet()) {
+                    ThinExtByRefPartCrossmapForRel part = new ThinExtByRefPartCrossmapForRel();
+                    part.setPathId(editPath.getConceptId());
+                    part.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                    part.setVersion(Integer.MAX_VALUE);
+                    part.setAdditionalCodeId(preferences.getCrossMapForRelPreferences().getAdditionalCode().getConceptId());
+                    part.setBlockNo(preferences.getCrossMapForRelPreferences().getDefaultBlockNo());
+                    part.setElementNo(preferences.getCrossMapForRelPreferences().getDefaultElementNo());
+                    part.setRefineFlagId(preferences.getCrossMapForRelPreferences().getRefineFlag().getConceptId());
+                    extension.addVersion(part);
+                }
+                break;
+            case TEMPLATE:
+                for (I_Path editPath : host.getConfig().getEditingPathSet()) {
+                    ThinExtByRefPartTemplate part = new ThinExtByRefPartTemplate();
+                    part.setPathId(editPath.getConceptId());
+                    part.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                    part.setVersion(Integer.MAX_VALUE);
+                    part.setAttributeDisplayStatusId(preferences.getTemplatePreferences().getAttributeDisplayStatus().getConceptId());
+                    part.setBrowseAttributeOrder(preferences.getTemplatePreferences().getBrowseAttributeOrder());
+                    part.setBrowseValueOrder(preferences.getTemplatePreferences().getBrowseValueOrder());
+                    part.setCardinality(preferences.getTemplatePreferences().getCardinality());
+                    part.setCharacteristicStatusId(preferences.getTemplatePreferences().getCharacteristicStatus().getConceptId());
+                    part.setNotesScreenOrder(preferences.getTemplatePreferences().getNotesScreenOrder());
+                    part.setSemanticStatusId(preferences.getTemplatePreferences().getSemanticStatus().getConceptId());
+                    part.setValueTypeId(preferences.getTemplatePreferences().getValueType().getConceptId());
+                    if (host.getConfig().getHierarchySelection() != null) {
+                        part.setTargetCodeId(host.getConfig().getHierarchySelection().getConceptId());
+                    } else {
+                        part.setTargetCodeId(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid());
+                    }
+                    part.setAttributeId(preferences.getTemplatePreferences().getAttribute().getConceptId());
+                    extension.addVersion(part);
+               }
+                break;
+            case TEMPLATE_FOR_REL:
+                for (I_Path editPath : host.getConfig().getEditingPathSet()) {
+                    ThinExtByRefPartTemplateForRel part = new ThinExtByRefPartTemplateForRel();
+                    part.setPathId(editPath.getConceptId());
+                    part.setStatus(refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                    part.setVersion(Integer.MAX_VALUE);
+                    part.setAttributeDisplayStatusId(preferences.getTemplateForRelPreferences().getAttributeDisplayStatus().getConceptId());
+                    part.setBrowseAttributeOrder(preferences.getTemplateForRelPreferences().getBrowseAttributeOrder());
+                    part.setBrowseValueOrder(preferences.getTemplateForRelPreferences().getBrowseValueOrder());
+                    part.setCardinality(preferences.getTemplateForRelPreferences().getCardinality());
+                    part.setCharacteristicStatusId(preferences.getTemplateForRelPreferences().getCharacteristicStatus().getConceptId());
+                    part.setNotesScreenOrder(preferences.getTemplateForRelPreferences().getNotesScreenOrder());
+                    part.setSemanticStatusId(preferences.getTemplateForRelPreferences().getSemanticStatus().getConceptId());
+                    part.setValueTypeId(preferences.getTemplateForRelPreferences().getValueType().getConceptId());
+                    extension.addVersion(part);
                 }
                 break;
             default:
