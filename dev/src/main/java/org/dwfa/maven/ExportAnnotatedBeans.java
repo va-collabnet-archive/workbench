@@ -99,7 +99,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     /**
      * @parameter
      */
-    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta" };
+    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta","au.com.ncch" };
 
     private String[] forbiddenRoots = { "org.dwfa.cement" };
 
