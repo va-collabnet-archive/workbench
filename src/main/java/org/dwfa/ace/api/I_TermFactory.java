@@ -239,6 +239,8 @@ public interface I_TermFactory {
      */
     public I_RelPart newRelPart();
     
+    public I_ThinExtByRefVersioned getExtension(int memberId) throws IOException;
+    
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
     
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
