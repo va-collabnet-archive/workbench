@@ -908,14 +908,18 @@ public class VodbEnv implements I_ImplementTermFactory {
         throw new DatabaseException("Rel: " + relId + " not found.");
     }
 
-    public I_ThinExtByRefVersioned getExtension(int memberId) throws DatabaseException {
+    public I_ThinExtByRefVersioned getExtension(int memberId) throws IOException {
         DatabaseEntry extKey = new DatabaseEntry();
         DatabaseEntry extValue = new DatabaseEntry();
         intBinder.objectToEntry(memberId, extKey);
-        if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-            return (I_ThinExtByRefVersioned) extBinder.entryToObject(extValue);
+        try {
+            if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                return (I_ThinExtByRefVersioned) extBinder.entryToObject(extValue);
+            }
+        } catch (DatabaseException ex) {
+            throw new ToIoException(ex);
         }
-        throw new DatabaseException("Ext: " + memberId + " not found.");
+        throw new IOException("Ext: " + memberId + " not found.");
     }
 
     public boolean hasExtension(int memberId) throws DatabaseException {

@@ -183,11 +183,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     */
    public I_ThinExtByRefVersioned getExtension() throws IOException {
         if (extension == null) {
-            try {
-                extension = AceConfig.getVodb().getExtension(memberId);
-            } catch (DatabaseException e) {
-                throw new ToIoException(e);
-            }
+                 extension = AceConfig.getVodb().getExtension(memberId);
         }
         return extension;
     }
