@@ -210,8 +210,8 @@ public class FasterLoad extends AbstractTask {
             worker.getLogger().info("FasterLoad load time: " + (System.currentTimeMillis() - startTime));
             
             executionService.shutdown();
-            executionService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
             startTime = System.currentTimeMillis();
+            executionService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
             worker.getLogger().info("FasterLoad termination time: " + (System.currentTimeMillis() - startTime));
             startTime = System.currentTimeMillis();
             rocket.classify();
