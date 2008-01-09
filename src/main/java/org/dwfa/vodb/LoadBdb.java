@@ -133,6 +133,7 @@ public class LoadBdb {
 		AceLog.getAppLog().info("Finished loading constants. Elapsed time: "
 				+ timer.getElapsedTime());
 		Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
+        loadConstants.flushIdBuffer();
 		AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
 		int[] releaseDates = loadConstants.getReleaseDates();
         for (String arg: argSet) {
