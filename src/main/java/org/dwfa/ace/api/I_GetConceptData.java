@@ -48,7 +48,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
         boolean addUncommitted) throws IOException;
 
     /**
-     *
+     * If you want to get all the is-a immediate parents for this concept, pass in
+     * only is-a relationship types in the allowed types field.
      * @param allowedStatus
      *            set of allowed status values that the I_RelTuple must conform
      *            with
