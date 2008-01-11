@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public class UniversalAceExtByRefBean implements Serializable {
+public class UniversalAceExtByRefBean implements I_AmChangeSetObject, Serializable {
 
    /**
     * 
