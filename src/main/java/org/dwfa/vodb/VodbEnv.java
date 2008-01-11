@@ -3121,7 +3121,10 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
 
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId) {
-        return new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
+        ThinExtByRefVersioned thinEbr = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
+        ExtensionByReferenceBean ebrBean =  ExtensionByReferenceBean.makeNew(memberId, thinEbr);
+        ACE.addUncommitted(ebrBean);
+        return thinEbr;
     }
 
     public I_ThinExtByRefPartInteger newIntegerExtensionPart() {
