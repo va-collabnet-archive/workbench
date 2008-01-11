@@ -110,6 +110,9 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
             semanticStatus = readConcept(in);
             semanticStatusPopupIds = IntList.readIntListIgnoreMapErrors(in);
             
+            browseAttributeOrder = in.readInt();
+            browseAttributeOrderPopupItems = (Integer[]) in.readObject();
+            
             browseValueOrder = in.readInt();
             browseValueOrderPopupItems = (Integer[]) in.readObject();
 
