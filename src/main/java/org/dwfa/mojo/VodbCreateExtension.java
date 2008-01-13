@@ -8,6 +8,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -103,6 +104,7 @@ public class VodbCreateExtension extends AbstractMojo {
 
         public void processConcept(I_GetConceptData concept) throws Exception {
 
+            //System.out.println(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids().iterator().next());
             int conceptId = concept.getConceptId();
             int currentStatusId = termFactory.uuidToNative(
                     ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
@@ -126,13 +128,18 @@ public class VodbCreateExtension extends AbstractMojo {
             conceptExtension.setConceptId(conceptId);
 
             extension.addVersion(conceptExtension);
-
+            //System.out.println("Number of ext for member: "
+            //        + termFactory.getExtension(memberId));
 
             termFactory.addUncommitted(concept);
             //System.out.println("Uncommitted 2: " + termFactory.getUncommitted().size());
             //termFactory.commit();
 
-            //System.out.println(termFactory.getExtensionsForComponent(conceptId).size());
+            //ExtensionByReferenceBean ebrBean = ExtensionByReferenceBean.makeNew(
+            //        extension.getMemberId(), extension);
+            //System.out.println("Number of ext for concept: "
+             //       + termFactory.getExtensionsForComponent(conceptId).size());
+
             extensionCount++;
 
         }

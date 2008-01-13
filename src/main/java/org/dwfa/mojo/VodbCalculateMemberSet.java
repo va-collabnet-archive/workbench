@@ -3,6 +3,7 @@ package org.dwfa.mojo;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.HashSet;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -95,6 +96,10 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             I_GetConceptData memberSetSpecConcept = memberSetSpecDescriptor.getVerifiedConcept();
             memberSetId = memberSetSpecConcept.getConceptId();
 
+            // initialise sets
+            memberSet = new HashSet<Integer>();
+            excludedMemberSet = new HashSet<Integer>();
+
             // execute calculate member set plugin
             MemberSetCalculator calculator =
                 new MemberSetCalculator(referenceSetId);
@@ -161,7 +166,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
             // process each reference set extension
             for (I_GetExtensionData refSetExtension: extensions) {
-                System.out.println(refSetExtension.getMemberId());
+                //System.out.println(refSetExtension.getMemberId());
 
                 I_ThinExtByRefVersioned part = refSetExtension.getExtension();
 
