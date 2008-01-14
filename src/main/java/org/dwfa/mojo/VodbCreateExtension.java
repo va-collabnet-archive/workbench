@@ -51,6 +51,11 @@ public class VodbCreateExtension extends AbstractMojo {
      */
     private ConceptDescriptor refSetTypeDescriptor;
 
+    /**
+     * @parameter
+     */
+    private boolean overrideRefSetTypeWithRandomType = false;
+
     private I_Path memberSetPath;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -104,7 +109,6 @@ public class VodbCreateExtension extends AbstractMojo {
 
         public void processConcept(I_GetConceptData concept) throws Exception {
 
-            //System.out.println(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids().iterator().next());
             int conceptId = concept.getConceptId();
             int currentStatusId = termFactory.uuidToNative(
                     ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
@@ -113,34 +117,46 @@ public class VodbCreateExtension extends AbstractMojo {
                     ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
                     termFactory.getPaths(), Integer.MAX_VALUE);
 
-            //System.out.println(termFactory.getExtensionsForComponent(conceptId).size());
-            I_ThinExtByRefVersioned extension =
-                termFactory.newExtension(referenceSetId, memberId, conceptId,
-                    typeId);
+            int includeLineageId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_LINEAGE.getUids().iterator().next());
+            int includeIndividualId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
+            int excludeLineageId = termFactory.uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_LINEAGE.getUids().iterator().next());
+            int excludeIndividualId = termFactory.uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids().iterator().next());
+            int conceptTypeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next());
 
-            //I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
-            I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
-            //ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
+            int i = 1 + (int) (Math.random() * 10);
+            boolean skipExtension = false;
+            if (overrideRefSetTypeWithRandomType) {
+                if (i == 1) {
+                    typeId = includeLineageId;
+                } else if (i == 2) {
+                    typeId = includeIndividualId;
+                } else if (i == 3) {
+                    typeId = excludeLineageId;
+                } else if (i == 4) {
+                    typeId = excludeIndividualId;
+                } else {
+                    skipExtension = true;
+                }
+            }
 
-            conceptExtension.setPathId(memberSetPath.getConceptId());
-            conceptExtension.setStatus(currentStatusId);
-            conceptExtension.setVersion(Integer.MAX_VALUE);
-            conceptExtension.setConceptId(conceptId);
+            if (!skipExtension) {
+                I_ThinExtByRefVersioned extension =
+                    termFactory.newExtension(referenceSetId, memberId, conceptId,
+                            conceptTypeId);
 
-            extension.addVersion(conceptExtension);
-            //System.out.println("Number of ext for member: "
-            //        + termFactory.getExtension(memberId));
+                I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
 
-            termFactory.addUncommitted(concept);
-            //System.out.println("Uncommitted 2: " + termFactory.getUncommitted().size());
-            //termFactory.commit();
+                conceptExtension.setPathId(memberSetPath.getConceptId());
+                conceptExtension.setStatus(currentStatusId);
+                conceptExtension.setVersion(Integer.MAX_VALUE);
+                conceptExtension.setConceptId(typeId);
 
-            //ExtensionByReferenceBean ebrBean = ExtensionByReferenceBean.makeNew(
-            //        extension.getMemberId(), extension);
-            //System.out.println("Number of ext for concept: "
-             //       + termFactory.getExtensionsForComponent(conceptId).size());
+                extension.addVersion(conceptExtension);
 
-            extensionCount++;
+                termFactory.addUncommitted(concept);
+
+                extensionCount++;
+            }
 
         }
 

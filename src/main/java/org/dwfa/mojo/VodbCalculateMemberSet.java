@@ -18,6 +18,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
@@ -71,12 +72,26 @@ public class VodbCalculateMemberSet extends AbstractMojo {
     /**
      * The ids of the concepts which form part of the member set.
      */
-    private Set<Integer> memberSet;
+    private Set<Integer> includedLineage;
 
     /**
      * The ids of the concepts which should be EXCLUDED from the member set.
      */
-    private Set<Integer> excludedMemberSet;
+    private Set<Integer> excludedLineage;
+
+    /**
+     * The ids of the concepts which have already been added to member set.
+     */
+    private Set<Integer> memberSet;
+
+
+
+    /**
+     * @parameter
+     * @required
+     * The root concept.
+     */
+    private ConceptDescriptor rootDescriptor;
 
     /**
      * Iterates over each concept and calculates the member set.
@@ -96,16 +111,19 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             I_GetConceptData memberSetSpecConcept = memberSetSpecDescriptor.getVerifiedConcept();
             memberSetId = memberSetSpecConcept.getConceptId();
 
+            I_GetConceptData root = rootDescriptor.getVerifiedConcept();
+
             // initialise sets
+            includedLineage = new HashSet<Integer>();
+            excludedLineage = new HashSet<Integer>();
             memberSet = new HashSet<Integer>();
-            excludedMemberSet = new HashSet<Integer>();
 
             // execute calculate member set plugin
             MemberSetCalculator calculator =
                 new MemberSetCalculator(referenceSetId);
 
-            // iterate over each concept
-            termFactory.iterateConcepts(calculator);
+            // iterate over each concept, starting at the root
+            calculator.processConcept(root);
 
             String message = "Number of members found in reference set: "
                             + calculator.getMemberSetCount();
@@ -126,6 +144,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
         private int includeIndividualId;
         private int excludeLineageId;
         private int excludeIndividualId;
+        private int conceptTypeId;
         private int typeId;
         private int currentStatusId;
 
@@ -144,6 +163,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             this.includeIndividualId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
             this.excludeLineageId = termFactory.uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_LINEAGE.getUids().iterator().next());
             this.excludeIndividualId = termFactory.uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids().iterator().next());
+            this.conceptTypeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next());
 
             typeId = termFactory.uuidToNative(
                     RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
@@ -164,35 +184,74 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             List<I_GetExtensionData> extensions =
                 termFactory.getExtensionsForComponent(conceptId);
 
-            // process each reference set extension
+            // process each refset associated with this concept and work out
+            // if any of them are the refset we are looking for
+            int refsetCount = 0;
             for (I_GetExtensionData refSetExtension: extensions) {
-                //System.out.println(refSetExtension.getMemberId());
-
-                I_ThinExtByRefVersioned part = refSetExtension.getExtension();
-
                 if (refSetExtension.getExtension().getRefsetId() == referenceSetId) {
+                    refsetCount++;
+                }
+            }
+
+            // no refsets have been found so check if there are any inherited
+            // conditions
+            if (refsetCount == 0) {
+                if (includedLineage.contains(conceptId)) {
+                    // this concept has an inherited condition for inclusion
+                    addToMemberSet(conceptId);
+                } else if (excludedLineage.contains(conceptId)) {
+                    // this concept has inherited condition for exclusion
+                    // do nothing
+                }
+            }
+
+            // process each reference set extension
+            for (I_GetExtensionData extensionData: extensions) {
+
+                I_ThinExtByRefVersioned part = extensionData.getExtension();
+                int extensionTypeId = part.getTypeId();
+
+                if (extensionTypeId != conceptTypeId) {
+
+                } else if (extensionData.getExtension().getRefsetId() == referenceSetId) {
                     // only look at the ref set extensions that correspond to
                     // the reference set as specified in maven plugin config
-                    boolean include = false;;
-                    if (part.getTypeId() == includeIndividualId) {
-                        if (!memberSet.contains(conceptId)) {
-                            addToMemberSet(conceptId);
-                        }
-                    } else if (part.getTypeId() == excludeIndividualId) {
-                        excludeFromMemberSet(conceptId);
-                    } else if (part.getTypeId() == includeLineageId) {
-                        include = true;
+                    int typeId = 0;
+
+                    List<? extends I_ThinExtByRefPart> extsTemp = part.getVersions();
+                    for (I_ThinExtByRefPart part_temp : extsTemp) {
+                        I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) part_temp;
+                        typeId = temp.getConceptId();
+                    }
+
+                    boolean include = true;
+                    if (typeId == includeIndividualId) {
                         addToMemberSet(conceptId);
-                        processChildren(concept, include);
-                    } else if (part.getTypeId() == excludeLineageId) {
-                        include = false;
-                        excludeFromMemberSet(conceptId);
-                        processChildren(concept, include);
+                    } else if (typeId == excludeIndividualId) {
+                        // do nothing
+                    } else if (typeId == includeLineageId) {
+                        addToMemberSet(conceptId);
+                        markAllChildren(concept, include);
+                    } else if (typeId == excludeLineageId) {
+                        markAllChildren(concept, !include);
                     } else {
-                        throw new Exception("Unknown extension type: " + part.getTypeId());
+                        System.out.println(termFactory.getConcept(typeId));
+                        throw new Exception("Unknown extension type: " + typeId);
                     }
                 }
+            }
 
+            // find the children of this concept
+            I_IntSet isARel = termFactory.newIntSet();
+            isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.
+                    IS_A_REL.getUids()).getConceptId());
+
+            List<I_RelTuple> children = concept.getDestRelTuples(
+                    null, isARel, null, false);
+
+            for (I_RelTuple child : children) {
+                int childId = child.getC1Id();
+                processConcept(termFactory.getConcept(childId));
             }
 
             termFactory.addUncommitted(concept);
@@ -205,8 +264,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          */
         public void addToMemberSet(int conceptId) throws Exception {
 
-            if (!excludedMemberSet.contains(conceptId)) {
+            if (!memberSet.contains(conceptId)) {
                 memberSetCount++;
+                memberSet.add(conceptId);
 
                 int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
                         ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
@@ -225,19 +285,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                 conceptExtension.setConceptId(conceptId);
 
                 newExtension.addVersion(conceptExtension);
-
-                memberSet.add(conceptId);
             }
-        }
-
-        /**
-         * Excludes a concept from inclusion in the member set.
-         * @param conceptId The concept id of the concept we wish to exclude.
-         * @throws Exception
-         */
-        public void excludeFromMemberSet(int conceptId) throws Exception {
-
-            excludedMemberSet.add(conceptId);
         }
 
         /**
@@ -248,7 +296,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          * @param includeChildren Whether children will be included or excluded when processed.
          * @throws Exception
          */
-        public void processChildren(I_GetConceptData concept, boolean includeChildren)
+        public void markAllChildren(I_GetConceptData concept, boolean includeChildren)
             throws Exception {
 
             // get latest IS-A relationships
@@ -264,11 +312,17 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                 int childId = child.getC1Id();
 
                 if (includeChildren) {
-                    addToMemberSet(childId);
+                    if (excludedLineage.contains(Integer.valueOf(childId))) {
+                        excludedLineage.remove(Integer.valueOf(childId));
+                    }
+                    includedLineage.add(Integer.valueOf(childId));
                 } else {
-                    excludeFromMemberSet(childId);
+                    if (includedLineage.contains(Integer.valueOf(childId))) {
+                        includedLineage.remove(Integer.valueOf(childId));
+                    }
+                    excludedLineage.add(Integer.valueOf(childId));
                 }
-                processChildren(termFactory.getConcept(childId), includeChildren);
+                markAllChildren(termFactory.getConcept(childId), includeChildren);
             }
         }
 
