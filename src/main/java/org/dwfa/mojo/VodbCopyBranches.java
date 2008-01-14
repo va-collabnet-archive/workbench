@@ -34,11 +34,7 @@ import org.dwfa.mojo.compare.MonitorComponents;
 
 /**
  * Goal which monitors two branches for changes. Agreed changes are copied
- * to a new branch. Any encountered conflicts result in a html summary report
- * and text file containing a list of the conflicting concept identifiers.
- *
- * Optionally can check for flagged concept status (exclude
- * components from being copied if they are flagged).
+ * to a new branch. Any encountered conflicts are not copied. 
  *
  * @goal vodb-copy-branches
  *
