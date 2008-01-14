@@ -941,16 +941,22 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             newMenu.add(submenu);
                             addSubmenMenuItems(submenu, processFile);
                         } else {
-                            ActionListener processMenuListener = new ProcessMenuActionListener(processFile, menuWorker);
-                            ObjectInputStream ois = new ObjectInputStream(
-                                                                          new BufferedInputStream(
-                                                                                                  new FileInputStream(
-                                                                                                                      processFile)));
-                            I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                            ois.close();
-                            JMenuItem processMenuItem = new JMenuItem(process.getName());
-                            processMenuItem.addActionListener(processMenuListener);
-                            newMenu.add(processMenuItem);
+                            try {
+                                ActionListener processMenuListener = new ProcessMenuActionListener(processFile, menuWorker);
+                                ObjectInputStream ois = new ObjectInputStream(
+                                                                              new BufferedInputStream(
+                                                                                                      new FileInputStream(
+                                                                                                                          processFile)));
+                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                                ois.close();
+                                JMenuItem processMenuItem = new JMenuItem(process.getName());
+                                processMenuItem.addActionListener(processMenuListener);
+                                newMenu.add(processMenuItem);
+                            } catch (IOException e) {
+                                AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "processing: " + processFile, e);
+                            }catch (ClassNotFoundException e) {
+                                AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "processing: " + processFile, e);
+                            }
                         }
                     }
                 }
