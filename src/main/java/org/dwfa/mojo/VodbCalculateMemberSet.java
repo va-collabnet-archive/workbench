@@ -1,9 +1,13 @@
 package org.dwfa.mojo;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.HashSet;
+import java.util.Collection;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -19,6 +23,8 @@ import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
@@ -70,21 +76,40 @@ public class VodbCalculateMemberSet extends AbstractMojo {
     private int memberSetId;
 
     /**
-     * The ids of the concepts which form part of the member set.
+     * The ids of the concepts which may be included in the member set (due to lineage).
+     * These may be excluded if they explicitly state a refset exclusion.
      */
     private Set<Integer> includedLineage;
 
     /**
-     * The ids of the concepts which should be EXCLUDED from the member set.
+     * The ids of the concepts which may be excluded from the member set (due to lineage).
+     * These may be included if they explicitly state a refset inclusion.
      */
     private Set<Integer> excludedLineage;
 
     /**
      * The ids of the concepts which have already been added to member set.
      */
-    private Set<Integer> memberSet;
+    private Set<Integer> includedMemberSet;
 
+    /**
+     * The ids of the concepts which have be explicitly exclude from the member set.
+     */
+    private Set<Integer> excludedMemberSet;
 
+    /**
+     * Location to write list of uuids for included concepts.
+     * @parameter
+     * @required
+     */
+    private File refsetInclusionsOutputFile;
+
+    /**
+     * Location to write list of uuids for excluded concepts.
+     * @parameter
+     * @required
+     */
+    private File refsetExclusionsOutputFile;
 
     /**
      * @parameter
@@ -116,7 +141,8 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             // initialise sets
             includedLineage = new HashSet<Integer>();
             excludedLineage = new HashSet<Integer>();
-            memberSet = new HashSet<Integer>();
+            includedMemberSet = new HashSet<Integer>();
+            excludedMemberSet = new HashSet<Integer>();
 
             // execute calculate member set plugin
             MemberSetCalculator calculator =
@@ -124,6 +150,37 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
             // iterate over each concept, starting at the root
             calculator.processConcept(root);
+
+            // write list of uuids for concepts that were included
+            // in the member set
+            refsetInclusionsOutputFile.getParentFile().mkdirs();
+            BufferedWriter uuidWriter = new BufferedWriter(
+                    new FileWriter(refsetInclusionsOutputFile));
+            for (int i : includedMemberSet) {
+                Collection<UUID> uuids = termFactory.getUids(i);
+                for (UUID uuid: uuids) {
+                    uuidWriter.write(uuid.toString());
+                    uuidWriter.append("\t");
+                    uuidWriter.append(calculator.getFsnFromConceptId(i));
+                    uuidWriter.newLine();
+                }
+            }
+            uuidWriter.close();
+
+            // write list of uuids for concepts that were excluded
+            // from member set
+            refsetExclusionsOutputFile.getParentFile().mkdirs();
+            uuidWriter = new BufferedWriter(
+                    new FileWriter(refsetExclusionsOutputFile));
+            for (int i : excludedMemberSet) {
+                Collection<UUID> uuids = termFactory.getUids(i);
+                for (UUID uuid: uuids) {
+                    uuidWriter.write(uuid.toString());
+                    uuidWriter.append("\t");
+                    uuidWriter.append(calculator.getFsnFromConceptId(i));
+                    uuidWriter.newLine();
+                }
+            }
 
             String message = "Number of members found in reference set: "
                             + calculator.getMemberSetCount();
@@ -202,6 +259,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                 } else if (excludedLineage.contains(conceptId)) {
                     // this concept has inherited condition for exclusion
                     // do nothing
+                    excludedMemberSet.add(conceptId);
                 }
             }
 
@@ -229,10 +287,12 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                         addToMemberSet(conceptId);
                     } else if (typeId == excludeIndividualId) {
                         // do nothing
+                        excludedMemberSet.add(conceptId);
                     } else if (typeId == includeLineageId) {
                         addToMemberSet(conceptId);
                         markAllChildren(concept, include);
                     } else if (typeId == excludeLineageId) {
+                        excludedMemberSet.add(conceptId);
                         markAllChildren(concept, !include);
                     } else {
                         System.out.println(termFactory.getConcept(typeId));
@@ -257,6 +317,25 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             termFactory.addUncommitted(concept);
         }
 
+        public String getFsnFromConceptId(int conceptId) throws Exception {
+
+            I_GetConceptData concept = termFactory.getConcept(conceptId);
+
+            List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
+            int fsnId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
+                    getUids().iterator().next());
+            for (I_DescriptionVersioned description : descriptions) {
+                List<I_DescriptionPart> parts = description.getVersions();
+                for (I_DescriptionPart part : parts) {
+                    if (fsnId == part.getTypeId()) {
+                        return part.getText();
+                    }
+                }
+            }
+
+            return "unknown";
+        }
+
         /**
          * Adds a particular concept to the member set.
          * @param conceptId the concept id of the concept we wish to add to the member set.
@@ -264,9 +343,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          */
         public void addToMemberSet(int conceptId) throws Exception {
 
-            if (!memberSet.contains(conceptId)) {
+            if (!includedMemberSet.contains(conceptId)) {
                 memberSetCount++;
-                memberSet.add(conceptId);
+                includedMemberSet.add(conceptId);
 
                 int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
                         ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
