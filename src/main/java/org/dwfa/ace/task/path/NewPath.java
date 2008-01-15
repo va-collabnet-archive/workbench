@@ -32,19 +32,24 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.id.Type5UuidFactory;
 
+/**
+ * @author Ming Zhang
+ *
+ * @created 15/01/2008
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ace/path", type = BeanType.TASK_BEAN) })
+
+/*This task has the same function with the "new path" in the preference panel */
 public class NewPath extends AbstractTask {
 
-   /**
-    * 
-    */
-   private static final long serialVersionUID = 1L;
+	
+private static final long serialVersionUID = 1L;
 
    private static final int dataVersion = 1;
-
+   // path's origin, need to be a "real" path
    private TermEntry originPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());  
    
-  //parent in the hierarchy
+   //parent in the hierarchy, it could be any concept
    private TermEntry parentPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
 
    private String originTime = "latest";
