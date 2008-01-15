@@ -35,6 +35,10 @@ public class NewEditPathForUser extends AbstractTask {
 
    private static final int dataVersion = 1;
 
+   /**
+    * A concept that is to be the parent of the newly created path concept, and that is also associated with 
+    * a valid path in the database, from which the new path's origin will be derived. 
+    */
    private TermEntry parentPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
 
    private String userPropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
