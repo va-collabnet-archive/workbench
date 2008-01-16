@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -114,6 +116,15 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 
 		termFactory = LocalVersionedTerminology.get(); 
 		try {
+			
+			try {
+                if (MojoUtil.alreadyRun(getLog(), "ExportRefSet")) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
+			
 			fsn_uuid = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next();
 			pft_uuid = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator().next();
 
@@ -285,7 +296,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 			}					
 		}
 
-
+getLog().info("Writing refset...");
 		File newrefsetFile = new File(refsetFile.getAbsolutePath().replace(".txt", fsn + "_" +memberType + ".txt"));
 		refsetWriter = new BufferedWriter(new FileWriter(newrefsetFile,append));
 
@@ -324,7 +335,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 		memberWriter = new BufferedWriter(new FileWriter(newmemberFile,append));
 
 		int extensiontype = -1;
-
+		getLog().info("Writing member...");
 		if (RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Language Extension");
 			extensiontype = LANGUAGE;
