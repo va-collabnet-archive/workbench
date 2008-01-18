@@ -43,7 +43,7 @@ import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.util.TableSorter;
-import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
+import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescTuple;
 import org.dwfa.vodb.types.ThinDescVersioned;

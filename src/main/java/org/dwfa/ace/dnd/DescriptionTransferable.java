@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.termviewer.dnd.FixedTerminologyTransferable;
+import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionTransferable implements Transferable {
