@@ -84,7 +84,7 @@ public class LocalFixedRel implements I_RelateConceptsLocally {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Relate#getC1()
+	 * @see org.dwfa.tapi.I_Relate#getC1()
 	 */
 	public LocalFixedConcept getC1() {
 		return LocalFixedConcept.get(c1nid);
@@ -93,7 +93,7 @@ public class LocalFixedRel implements I_RelateConceptsLocally {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Relate#getC2()
+	 * @see org.dwfa.tapi.I_Relate#getC2()
 	 */
 	public LocalFixedConcept getC2() {
 		return LocalFixedConcept.get(c2nid);
@@ -102,7 +102,7 @@ public class LocalFixedRel implements I_RelateConceptsLocally {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Relate#getCharacteristic()
+	 * @see org.dwfa.tapi.I_Relate#getCharacteristic()
 	 */
 	public I_ConceptualizeLocally getCharacteristic() {
 		return LocalFixedConcept.get(characteristicNid);
@@ -111,7 +111,7 @@ public class LocalFixedRel implements I_RelateConceptsLocally {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Relate#getRefinability()
+	 * @see org.dwfa.tapi.I_Relate#getRefinability()
 	 */
 	public I_ConceptualizeLocally getRefinability() {
 		return LocalFixedConcept.get(refinabilityNid);
@@ -120,7 +120,7 @@ public class LocalFixedRel implements I_RelateConceptsLocally {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Relate#getRelGrp()
+	 * @see org.dwfa.tapi.I_Relate#getRelGrp()
 	 */
 	public int getRelGrp() {
 		return relGrp;
@@ -129,7 +129,7 @@ public class LocalFixedRel implements I_RelateConceptsLocally {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Relate#getRelType()
+	 * @see org.dwfa.tapi.I_Relate#getRelType()
 	 */
 	public I_ConceptualizeLocally getRelType() {
 		return LocalFixedConcept.get(relTypeNid);

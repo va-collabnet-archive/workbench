@@ -205,7 +205,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getDescriptions()
+	 * @see org.dwfa.tapi.I_AmConcept#getDescriptions()
 	 */
 	public Collection<I_DescribeConceptLocally> getDescriptions()
 			throws IOException, TerminologyException {
@@ -218,7 +218,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getSourceRels()
+	 * @see org.dwfa.tapi.I_AmConcept#getSourceRels()
 	 */
 	public Collection<I_RelateConceptsLocally> getSourceRels() throws IOException, TerminologyException {
 		if (sourceRels == null) {
@@ -230,7 +230,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getDestRels()
+	 * @see org.dwfa.tapi.I_AmConcept#getDestRels()
 	 */
 	public Collection<I_RelateConceptsLocally> getDestRels() throws IOException, TerminologyException {
 		if (destRels == null) {
@@ -261,7 +261,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getDestRelConcepts()
+	 * @see org.dwfa.tapi.I_AmConcept#getDestRelConcepts()
 	 */
 	public Collection<I_ConceptualizeLocally> getDestRelConcepts()
 			throws IOException, TerminologyException {
@@ -275,7 +275,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getDestRelConcepts(java.util.List)
+	 * @see org.dwfa.tapi.I_AmConcept#getDestRelConcepts(java.util.List)
 	 */
 	public List<I_ConceptualizeLocally> getDestRelConcepts(
 			Collection<I_ConceptualizeLocally> types) throws IOException, TerminologyException {
@@ -291,7 +291,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getSrcRelConcepts()
+	 * @see org.dwfa.tapi.I_AmConcept#getSrcRelConcepts()
 	 */
 	public List<I_ConceptualizeLocally> getSrcRelConcepts() throws IOException, TerminologyException {
 		List<I_ConceptualizeLocally> results = new ArrayList<I_ConceptualizeLocally>();
@@ -304,7 +304,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#getSrcRelConcepts(java.util.List)
+	 * @see org.dwfa.tapi.I_AmConcept#getSrcRelConcepts(java.util.List)
 	 */
 	public List<I_ConceptualizeLocally> getSrcRelConcepts(
 			Collection<I_ConceptualizeLocally> types) throws IOException, TerminologyException {
@@ -320,7 +320,7 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_AmConcept#isPrimitive()
+	 * @see org.dwfa.tapi.I_AmConcept#isPrimitive()
 	 */
 	public boolean isPrimitive() throws IOException, TerminologyException {
 		if (primitive == null) {

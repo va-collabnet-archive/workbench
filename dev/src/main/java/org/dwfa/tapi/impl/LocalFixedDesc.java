@@ -122,7 +122,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Describe#getConcept()
+	 * @see org.dwfa.tapi.I_Describe#getConcept()
 	 */
 	public I_ConceptualizeLocally getConcept() {
 		return LocalFixedConcept.get(conceptNid);
@@ -131,7 +131,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Describe#getDescType()
+	 * @see org.dwfa.tapi.I_Describe#getDescType()
 	 */
 	public I_ConceptualizeLocally getDescType() {
 		return LocalFixedConcept.get(descTypeNid);
@@ -140,7 +140,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Describe#isInitialCapSig()
+	 * @see org.dwfa.tapi.I_Describe#isInitialCapSig()
 	 */
 	public boolean isInitialCapSig() {
 		return initialCapSig;
@@ -149,7 +149,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Describe#getLangCode()
+	 * @see org.dwfa.tapi.I_Describe#getLangCode()
 	 */
 	public String getLangCode() {
 		return langCode;
@@ -158,7 +158,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Describe#getStatus()
+	 * @see org.dwfa.tapi.I_Describe#getStatus()
 	 */
 	public I_ConceptualizeLocally getStatus() {
 		return LocalFixedConcept.get(statusNid);
@@ -167,7 +167,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.termviewer.I_Describe#getText()
+	 * @see org.dwfa.tapi.I_Describe#getText()
 	 */
 	public String getText() {
 		return text;
