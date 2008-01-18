@@ -87,6 +87,10 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
     private int conceptCount = 0;
 
     private int pathCount = 0;
+    
+    private int refsetMemberCount = 0;
+
+    private int idListCount = 0;
 
     private boolean initialized = false;
 
@@ -130,6 +134,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                       AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
                       ACE.addImported(commitAceBean((UniversalAceBean) obj, nextCommit, values));
                   } else if (UniversalIdList.class.isAssignableFrom(obj.getClass())) {
+                      idListCount++;
                       AceLog.getEditLog().fine("Read UniversalIdList... " + obj);
                       commitIdList((UniversalIdList) obj, nextCommit, values);
                   } else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
@@ -137,7 +142,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                       AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
                       commitAcePath((UniversalAcePath) obj, nextCommit);
                   } else if (UniversalAceExtByRefBean.class.isAssignableFrom(obj.getClass())) {
-                      pathCount++;
+                      refsetMemberCount++;
                       AceLog.getEditLog().info("Read UniversalAceExtByRefBean... " + obj);
                       commitAceEbr((UniversalAceExtByRefBean) obj, nextCommit, values);
                   } else {
@@ -165,7 +170,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
         }
         AceLog.getAppLog().info(
                                 "Change set imported " + count + " change objects. Concepts: " + conceptCount
-                                        + " paths: " + pathCount);
+                                        + " paths: " + pathCount + " refset members: " + refsetMemberCount + 
+                                        " idListCount:" + idListCount);
 
     }
 
@@ -192,6 +198,10 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
               try {
                if (v.validateFile(changeSetFile, getVodb()) == false) {
                     validated = false;
+                    AceLog.getEditLog().fine(
+                                             "Validation failed for: "
+                                                     + changeSetFile.getAbsolutePath() +
+                                                     " validator: " + v);
                     break;
                  }
             } catch (TerminologyException e) {
@@ -282,7 +292,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             if (getVodb() == null) {
                 throw new IOException("getVodb() returns null");
             }
-            // Do all the commiting...
+            // Do all the committing...
             Collection<UUID> memberUid = bean.getMemberUid();
             I_IdVersioned id = getVodb().getId(memberUid);
             int memberId = Integer.MIN_VALUE;
