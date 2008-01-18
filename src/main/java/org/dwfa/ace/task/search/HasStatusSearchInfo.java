@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class HasStatusSearchInfo extends SimpleBeanInfo {
 
@@ -15,7 +15,7 @@ public class HasStatusSearchInfo extends SimpleBeanInfo {
             PropertyDescriptor statusTerm =
                 new PropertyDescriptor("statusTerm", getBeanDescriptor().getBeanClass());
             statusTerm.setBound(true);
-            statusTerm.setPropertyEditorClass(QueueTypeEditor.class);
+            statusTerm.setPropertyEditorClass(ConceptLabelEditor.class);
             statusTerm.setDisplayName("<html><font color='green'>status kind:");
             statusTerm.setShortDescription("The concept to test for status is kind of.");
 

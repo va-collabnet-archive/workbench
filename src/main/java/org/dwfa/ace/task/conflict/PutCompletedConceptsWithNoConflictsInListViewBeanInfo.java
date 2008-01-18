@@ -5,8 +5,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 public class PutCompletedConceptsWithNoConflictsInListViewBeanInfo extends SimpleBeanInfo {
    
@@ -24,14 +24,14 @@ public class PutCompletedConceptsWithNoConflictsInListViewBeanInfo extends Simpl
            PropertyDescriptor statusTermEntry =
               new PropertyDescriptor("statusTermEntry", getBeanDescriptor().getBeanClass());
            statusTermEntry.setBound(true);
-           statusTermEntry.setPropertyEditorClass(QueueTypeEditor.class);
+           statusTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
            statusTermEntry.setDisplayName("completion status:");
            statusTermEntry.setShortDescription("<html><font color='green'>The status of the concept when an assignment is complete, and the concept is still active.");
 
           PropertyDescriptor retiredTermEntry =
              new PropertyDescriptor("retiredTermEntry", getBeanDescriptor().getBeanClass());
          retiredTermEntry.setBound(true);
-         retiredTermEntry.setPropertyEditorClass(QueueTypeEditor.class);
+         retiredTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
          retiredTermEntry.setDisplayName("retired status:");
          retiredTermEntry.setShortDescription("<html><font color='green'>The status of the concept when an assignment is complete, and the concept is flagged for retirement.");
 

@@ -5,8 +5,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 public class SetEditPathForProfileBeanInfo extends SimpleBeanInfo {
     
@@ -24,7 +24,7 @@ public class SetEditPathForProfileBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor editPathEntry =
                 new PropertyDescriptor("editPathEntry", getBeanDescriptor().getBeanClass());
             editPathEntry.setBound(true);
-            editPathEntry.setPropertyEditorClass(QueueTypeEditor.class);
+            editPathEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             editPathEntry.setDisplayName("<html><font color='green'>editing path:");
             editPathEntry.setShortDescription("The property that contains the editing path.");
 

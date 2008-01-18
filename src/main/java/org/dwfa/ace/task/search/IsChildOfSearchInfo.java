@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class IsChildOfSearchInfo extends SimpleBeanInfo {
 
@@ -15,7 +15,7 @@ public class IsChildOfSearchInfo extends SimpleBeanInfo {
             PropertyDescriptor parentTerm =
                 new PropertyDescriptor("parentTerm", getBeanDescriptor().getBeanClass());
             parentTerm.setBound(true);
-            parentTerm.setPropertyEditorClass(QueueTypeEditor.class);
+            parentTerm.setPropertyEditorClass(ConceptLabelEditor.class);
             parentTerm.setDisplayName("<html><font color='green'>parent:");
             parentTerm.setShortDescription("The concept to test for parentage of.");
 

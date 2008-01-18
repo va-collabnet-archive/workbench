@@ -5,9 +5,9 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 public class SetViewPositionBeanInfo extends SimpleBeanInfo {
     
@@ -32,7 +32,7 @@ public class SetViewPositionBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor viewPathEntry =
                 new PropertyDescriptor("viewPathEntry", getBeanDescriptor().getBeanClass());
             viewPathEntry.setBound(true);
-            viewPathEntry.setPropertyEditorClass(QueueTypeEditor.class);
+            viewPathEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             viewPathEntry.setDisplayName("<html><font color='green'>view path:");
             viewPathEntry.setShortDescription("The property that contains the concept that identifies the view path.");
 

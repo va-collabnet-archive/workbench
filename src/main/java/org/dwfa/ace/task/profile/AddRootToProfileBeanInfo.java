@@ -5,8 +5,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
     
@@ -24,7 +24,7 @@ public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor rootEntry =
                 new PropertyDescriptor("rootEntry", getBeanDescriptor().getBeanClass());
             rootEntry.setBound(true);
-            rootEntry.setPropertyEditorClass(QueueTypeEditor.class);
+            rootEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             rootEntry.setDisplayName("<html><font color='green'>root:");
             rootEntry.setShortDescription("The concept to add to the profile as a root.");
 
