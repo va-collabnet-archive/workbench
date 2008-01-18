@@ -10,6 +10,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+
 public class ToUserSelectedQueueAllGroupsBeanInfo extends SimpleBeanInfo{
 
     public ToUserSelectedQueueAllGroupsBeanInfo() {
@@ -22,7 +24,7 @@ public class ToUserSelectedQueueAllGroupsBeanInfo extends SimpleBeanInfo{
             PropertyDescriptor queueType =
                 new PropertyDescriptor("queueType", ToUserSelectedQueueAllGroups.class);
             queueType.setBound(true);
-            queueType.setPropertyEditorClass(QueueTypeEditor.class);
+            queueType.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType.setDisplayName("Queue type");
             queueType.setShortDescription("The type of queue to place this process into.");
 

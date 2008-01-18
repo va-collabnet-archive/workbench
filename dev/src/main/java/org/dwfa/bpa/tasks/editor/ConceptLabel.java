@@ -37,8 +37,8 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 
-public class ConceptLabelEditor extends JEditorPane {
-    private static Logger logger = Logger.getLogger(ConceptLabelEditor.class.getName());
+public class ConceptLabel extends JEditorPane {
+    private static Logger logger = Logger.getLogger(ConceptLabel.class.getName());
 
     public class TermViewerTransferHandler extends TransferHandler implements DragGestureListener, DragSourceListener {
 
@@ -68,14 +68,14 @@ public class ConceptLabelEditor extends JEditorPane {
                 return makeTableTransferable((JTable) c);
             } else if (JTree.class.isAssignableFrom(c.getClass())) {
                 return makeTreeTransferable((JTree) c);
-            } else if (ConceptLabelEditor.class.isAssignableFrom(c.getClass())) {
-                return makeConceptLabelTransferable((ConceptLabelEditor) c);
+            } else if (ConceptLabel.class.isAssignableFrom(c.getClass())) {
+                return makeConceptLabelTransferable((ConceptLabel) c);
             }
             logger.info("Making super.createTransferable(c): " + c);
             return super.createTransferable(c);
         }
 
-        private Transferable makeConceptLabelTransferable(ConceptLabelEditor label) {
+        private Transferable makeConceptLabelTransferable(ConceptLabel label) {
             I_ConceptualizeLocally concept = label.getConcept();
             return FixedTerminologyTransferable.get(concept);
         }
@@ -172,7 +172,7 @@ public class ConceptLabelEditor extends JEditorPane {
 
     }
 
-    public ConceptLabelEditor() {
+    public ConceptLabel() {
         super("text/html", nullLabel);
         this.setEditable(false);
         this.setFocusable(true);

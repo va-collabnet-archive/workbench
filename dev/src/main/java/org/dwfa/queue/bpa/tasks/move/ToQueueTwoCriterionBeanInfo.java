@@ -10,6 +10,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+
 public class ToQueueTwoCriterionBeanInfo extends SimpleBeanInfo {
 
     /**
@@ -24,14 +26,14 @@ public class ToQueueTwoCriterionBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor queueType =
                 new PropertyDescriptor("queueType", ToQueueTwoCriterion.class);
             queueType.setBound(true);
-            queueType.setPropertyEditorClass(QueueTypeEditor.class);
+            queueType.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType.setDisplayName("Queue type 1:");
             queueType.setShortDescription("The first criterion for the type of queue to place this process into.");
 
             PropertyDescriptor queueType2 =
                 new PropertyDescriptor("queueType2", ToQueueTwoCriterion.class);
             queueType2.setBound(true);
-            queueType2.setPropertyEditorClass(QueueTypeEditor.class);
+            queueType2.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType2.setDisplayName("Queue type 2:");
             queueType2.setShortDescription("The second criterion for the type of queue to place this process into.");
 

@@ -10,6 +10,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+
 public class ToQueueThreeCriterionBeanInfo extends SimpleBeanInfo {
 
     /**
@@ -24,21 +26,21 @@ public class ToQueueThreeCriterionBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor queueType =
                 new PropertyDescriptor("queueType", ToQueueThreeCriterion.class);
             queueType.setBound(true);
-            queueType.setPropertyEditorClass(QueueTypeEditor.class);
+            queueType.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType.setDisplayName("Queue type 1:");
             queueType.setShortDescription("The first criterion for the type of queue to place this process into.");
 
             PropertyDescriptor queueType2 =
                 new PropertyDescriptor("queueType2", ToQueueThreeCriterion.class);
             queueType2.setBound(true);
-            queueType2.setPropertyEditorClass(QueueTypeEditor.class);
+            queueType2.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType2.setDisplayName("Queue type 2:");
             queueType2.setShortDescription("The second criterion for the type of queue to place this process into.");
 
             PropertyDescriptor queueType3 =
                 new PropertyDescriptor("queueType3", ToQueueThreeCriterion.class);
             queueType3.setBound(true);
-            queueType3.setPropertyEditorClass(QueueTypeEditor.class);
+            queueType3.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType3.setDisplayName("Queue type 3:");
             queueType3.setShortDescription("The third criterion for the type of queue to place this process into.");
 
