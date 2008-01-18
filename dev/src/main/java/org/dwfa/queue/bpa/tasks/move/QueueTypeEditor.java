@@ -13,10 +13,10 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.termviewer.view.concept.ConceptLabel;
 
 
 /**
@@ -33,7 +33,7 @@ public class QueueTypeEditor extends PropertyEditorSupport
     private static final long serialVersionUID = 1L;
 
     
-    private ConceptLabel editor = new ConceptLabel();
+    private ConceptLabelEditor editor = new ConceptLabelEditor();
     /**
      * @param arg0
      */
