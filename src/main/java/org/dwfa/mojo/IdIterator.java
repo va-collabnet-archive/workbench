@@ -1,16 +1,13 @@
 package org.dwfa.mojo;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
+import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ProcessIds;
-import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-
-import java.util.List;
 
 public class IdIterator implements I_ProcessIds {
 

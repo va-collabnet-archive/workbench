@@ -49,7 +49,8 @@ public abstract class ProcessSnomedSources extends AbstractMojo {
 	*/
 	private MavenProjectHelper helper;
 	
-	public void execute() throws MojoExecutionException {
+	@SuppressWarnings("unchecked")
+    public void execute() throws MojoExecutionException {
 		File snomedDir = new File(sourceDirectory.getAbsolutePath()
 				+ "/../SNOMED/");
 		try {

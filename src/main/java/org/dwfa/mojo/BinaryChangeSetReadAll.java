@@ -1,25 +1,14 @@
 package org.dwfa.mojo;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.cs.ComponentValidator;
-import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.task.cs.ImportAllChangeSets;
-import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.maven.MojoUtil;
 

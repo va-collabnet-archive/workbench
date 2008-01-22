@@ -30,12 +30,10 @@ import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.queue.OpenQueuesInFolder;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.Condition;
-import org.dwfa.bpa.process.I_SelectProcesses;
 import org.dwfa.bpa.tasks.log.LogMessageOnWorkerLog;
 import org.dwfa.bpa.tasks.util.Complete;
 import org.dwfa.jini.JiniManager;
 import org.dwfa.jini.TransactionParticipantAggregator;
-import org.dwfa.queue.bpa.worker.HeadlessQueueWorker;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sun.jini.mahalo.LocalTransactionManager;
