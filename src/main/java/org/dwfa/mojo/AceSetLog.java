@@ -17,13 +17,15 @@ import org.dwfa.maven.SetLogSpec;
  */
 public class AceSetLog extends AbstractMojo {
     /**
-     * Specifications to apply to the specified logs
+     * Specifications to apply to the specified logs. If you want to specify the root log, use the
+     * logger name of "root". 
      * @parameter 
      */
     private SetLogSpec[] logSettings;
     
     /**
-     * Specifications to apply to all handlers associated with the specified logs
+     * Specifications to apply to all handlers associated with the specified logs. If you want to specify the root log, use the
+     * logger name of "root". 
      * @parameter 
      */
     private SetLogSpec[] handlerSettings;
@@ -40,7 +42,7 @@ public class AceSetLog extends AbstractMojo {
         if (handlerSettings != null) {
             for (SetLogSpec handlerSpec: handlerSettings) {
                 String spec = handlerSpec.getLogger();
-                if (spec==null || spec.equals(" ")) {
+                if (spec==null || spec.equals(" ") || spec.equals("root")) {
                     spec = "";
                 }
                 Logger log = Logger.getLogger(spec);
