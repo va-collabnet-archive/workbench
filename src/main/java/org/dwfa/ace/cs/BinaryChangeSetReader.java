@@ -91,6 +91,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
     private int refsetMemberCount = 0;
 
     private int idListCount = 0;
+    
+    private int unvalidated = 0;
 
     private boolean initialized = false;
 
@@ -125,6 +127,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 for (I_ValidateChangeSetChanges v: getValidators()) {
                    if (v.validateChange((I_AmChangeSetObject) obj, getVodb()) == false) {
                       validated = false;
+                      AceLog.getEditLog().fine("Failed validator: " + v);
                       break;
                    }
                 }
@@ -148,6 +151,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                   } else {
                       throw new IOException("Can't handle class: " + obj.getClass().getName());
                   }
+                } else {
+                    unvalidated++;
                 }
                 nextCommit = ois.readLong();
             } catch (EOFException ex) {
@@ -169,7 +174,9 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             throw new ToIoException(e);
         }
         AceLog.getAppLog().info(
-                                "Change set imported " + count + " change objects. Concepts: " + conceptCount
+                                "Change set contains " + count + " change objects. " + 
+                                "\n unvalidated objects: " + unvalidated +
+                                "\n imported Concepts: " + conceptCount
                                         + " paths: " + pathCount + " refset members: " + refsetMemberCount + 
                                         " idListCount:" + idListCount);
 
@@ -184,7 +191,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
         if (lastImportSize != null) {
             long lastSize = Long.parseLong(lastImportSize);
             if (lastSize == changeSetFile.length()) {
-                AceLog.getAppLog().info(
+                AceLog.getAppLog().finer(
                                         "Change set already fully read: "
                                                 + changeSetFile.toURI().toURL().toExternalForm());
                 // already imported, set to nothing to do...
