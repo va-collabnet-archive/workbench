@@ -2,6 +2,7 @@ package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 
@@ -28,11 +29,11 @@ public class ComponentValidator extends SimpleValidator {
        boolean validRelationship = relationshipValidator.validateAceBean(bean, tf);
 
        if (!validDescription) {
-           System.out.println("Invalid description: " + bean);
+           AceLog.getEditLog().info("Invalid description: " + bean);
        }
 
        if (!validRelationship) {
-           System.out.println("Invalid relationship: " + bean);
+           AceLog.getEditLog().info("Invalid relationship: " + bean);
        }
 
        return validDescription && validRelationship;

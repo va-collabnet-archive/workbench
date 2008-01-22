@@ -48,11 +48,11 @@ public class SimpleValidator implements I_ValidateChangeSetChanges {
    }
 
    protected boolean validateAceExtByRefBean(UniversalAceExtByRefBean bean, I_TermFactory tf) throws IOException, TerminologyException {
-      return false;
+      return true;
    }
 
    protected boolean validateAcePath(UniversalAcePath path, I_TermFactory tf) throws IOException, TerminologyException{
-      return false;
+      return true;
    }
 
    protected boolean validateAceIdList(UniversalIdList bean, I_TermFactory tf) throws IOException, TerminologyException{
