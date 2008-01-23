@@ -36,7 +36,7 @@ public class ConceptDescriptor {
                 if (description.toLowerCase().trim().equals(
                         tuple.getText().toLowerCase().trim())) {
                     return concept;
-                } 
+                }
             }
         } catch (Exception e) {
             throw new Exception(e.getMessage() + " : " + description);
@@ -49,16 +49,20 @@ public class ConceptDescriptor {
     public String getDescription() {
         return description;
     }
-    
+
     public String toString() {
-    	return description + " (" + uuid + ")";
+        return description + " (" + uuid + ")";
     }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public String getUuid() {
+        return uuid;
+    }
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
