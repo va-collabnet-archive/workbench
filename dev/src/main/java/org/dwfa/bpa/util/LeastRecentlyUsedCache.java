@@ -12,7 +12,7 @@ import java.util.Map;
  * @author kec
  *
  */
-public class LeastRecentlyUsedCache extends LinkedHashMap {
+public class LeastRecentlyUsedCache<K, V> extends LinkedHashMap<K, V> {
 
     /**
      * 
@@ -30,7 +30,7 @@ public class LeastRecentlyUsedCache extends LinkedHashMap {
 	}
 
 
-    protected boolean removeEldestEntry(Map.Entry eldest) {
+    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
        return size() > cacheSize;
     }
 }

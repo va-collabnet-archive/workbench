@@ -28,11 +28,11 @@ public class PlatformWebBrowser {
 	private static boolean tryNativeBrowser = true;
 
 	private static class OpenMacWebBrowser implements I_OpenURL {
-		Class fileManagerClass;
+		Class<?> fileManagerClass;
 
 		Object fileManagerObj;
 
-		Class[] defArgs = { String.class };
+		Class<?>[] defArgs = { String.class };
 
 		Method openUrlMethod;
 
@@ -73,7 +73,7 @@ public class PlatformWebBrowser {
 				NoSuchMethodException, IllegalArgumentException,
 				IllegalAccessException, InvocationTargetException {
 
-			Class desktopClass =
+			Class<?> desktopClass =
                     Class.forName("java.awt.Desktop");
 
 			Method getDesktopMethod = desktopClass.getMethod("getDesktop",

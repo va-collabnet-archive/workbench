@@ -35,7 +35,7 @@ public class Type3UuidFactory {
         return fromSNOMED(id.toString());
     }
     
-    public static UUID fromEnum(Enum e) {
+    public static UUID fromEnum(Enum<?> e) {
         String name = e.getClass().getName() + "." + e.name();
         try {
 			return UUID.nameUUIDFromBytes(name.getBytes(encoding));

@@ -674,8 +674,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
     private static boolean containsUuidElement(Collection<UUID> parentUuids, Collection<UUID> childUuids){
 
-        Iterator parentIt = parentUuids.iterator();
-        Iterator childIt = childUuids.iterator();
+        Iterator<UUID> parentIt = parentUuids.iterator();
+        Iterator<UUID> childIt = childUuids.iterator();
 
         while(parentIt.hasNext()){
             parentIt.next();

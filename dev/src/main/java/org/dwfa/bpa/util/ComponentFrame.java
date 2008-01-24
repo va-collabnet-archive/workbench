@@ -81,8 +81,8 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Class classToMake = ComponentFrame.this.getClass();
-                Constructor c = classToMake.getConstructor(new Class[] {String[].class, LifeCycle.class});
+                Class<? extends ComponentFrame> classToMake = ComponentFrame.this.getClass();
+                Constructor<? extends ComponentFrame> c = classToMake.getConstructor(new Class[] {String[].class, LifeCycle.class});
                 c.newInstance(new Object[] { args, lc});
             } catch (Exception e1) {
                 logger.log(Level.SEVERE, e1.getMessage());

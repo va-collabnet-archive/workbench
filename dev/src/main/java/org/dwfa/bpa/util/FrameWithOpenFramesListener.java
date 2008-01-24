@@ -114,8 +114,8 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     public void macOSXRegistration() {
         if (MAC_OS_X) {
             try {
-                Class osxAdapterClass = ClassLoader.getSystemClassLoader().loadClass("org.dwfa.app.OSXAdapter");
-                Constructor c = osxAdapterClass.getConstructor(new Class[] {I_ManageStandardAppFunctions.class });
+                Class<?> osxAdapterClass = ClassLoader.getSystemClassLoader().loadClass("org.dwfa.app.OSXAdapter");
+                Constructor<?> c = osxAdapterClass.getConstructor(new Class[] {I_ManageStandardAppFunctions.class });
                 c.newInstance(new Object[] { this });
             } catch (NoClassDefFoundError e) {
                 // This will be thrown first if the OSXAdapter is loaded on a

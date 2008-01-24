@@ -30,7 +30,7 @@ public class NewWindowGenerator implements I_InitComponentMenus {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Constructor c = classToMake.getConstructor(new Class[] {String[].class, LifeCycle.class});
+                Constructor<?> c = classToMake.getConstructor(new Class[] {String[].class, LifeCycle.class});
                 c.newInstance(new Object[] { frameArgs, null});
             } catch (Exception e1) {
                 logger.log(Level.SEVERE, e1.getMessage(), e1);
@@ -40,7 +40,7 @@ public class NewWindowGenerator implements I_InitComponentMenus {
         
     }
     private String[] frameArgs;
-    private Class classToMake;
+    private Class<?> classToMake;
     private String title;
 
     public NewWindowGenerator(String[] args, LifeCycle lc) throws ConfigurationException {
@@ -49,7 +49,7 @@ public class NewWindowGenerator implements I_InitComponentMenus {
                 .getClassLoader());
         this.title = (String) config.getEntry(this.getClass().getName(),
                 "frameName", String.class);
-        this.classToMake = (Class) config.getEntry(this.getClass().getName(),
+        this.classToMake = (Class<?>) config.getEntry(this.getClass().getName(),
                 "frameClass", Class.class);
         this.frameArgs = (String[]) config.getEntry(this.getClass().getName(),
                 "frameArgs", String[].class);

@@ -31,7 +31,7 @@ public interface I_Workspace {
 	/**
 	 * @return Returns the panelList.
 	 */
-	public List getPanelList();
+	public List<GridBagPanel> getPanelList();
 
 
 	/**
