@@ -28,7 +28,7 @@ public class PropertyNameLabelEditor implements PropertyEditor,
 
     private JLabel propertyName;
     
-    public Class getAcceptableClass() {
+    public Class<?> getAcceptableClass() {
         return Object.class;
     }
 

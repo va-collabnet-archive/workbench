@@ -28,7 +28,7 @@ public class DataIdEditor implements PropertyEditor,
 
     DataIdPanel dataIdPanel;
     
-    public Class getAcceptableClass() {
+    public Class<?> getAcceptableClass() {
         return Object.class;
     }
 

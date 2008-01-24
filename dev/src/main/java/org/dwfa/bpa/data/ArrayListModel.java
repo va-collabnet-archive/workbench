@@ -181,7 +181,7 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 	 * @param c
 	 * @return
 	 */
-	public boolean containsAll(Collection c) {
+	public boolean containsAll(Collection<?> c) {
 		return data.containsAll(c);
 	}
 	/**
@@ -247,7 +247,7 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 	 * @param c
 	 * @return
 	 */
-	public boolean removeAll(Collection c) {
+	public boolean removeAll(Collection<?> c) {
 		boolean removed = false;
 		for (Object o: c) {
 			if (remove(o)) {
@@ -260,7 +260,7 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 	 * @param c
 	 * @return
 	 */
-	public boolean retainAll(Collection c) {
+	public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException();
 	}
 	/**

@@ -26,7 +26,7 @@ public class BpaTargetListener implements DropTargetListener {
     
     private boolean dropHighlight = false;
     
-    private Class acceptableClass = Object.class;
+    private Class<?> acceptableClass = Object.class;
 
     /**
      * @param targetComponent
@@ -36,7 +36,7 @@ public class BpaTargetListener implements DropTargetListener {
      * @throws ClassNotFoundException
      */    
     public BpaTargetListener(I_DoDragAndDrop targetComponent,
-            String prefix, Class acceptableClass) throws ClassNotFoundException {
+            String prefix, Class<?> acceptableClass) throws ClassNotFoundException {
         super();
         this.targetComponent = targetComponent;
         this.prefix = prefix;

@@ -141,7 +141,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                     propertyDescriptorList.add(d);
                 }
             }
-            return (PropertyDescriptor[]) propertyDescriptorList
+            return propertyDescriptorList
                     .toArray(new PropertyDescriptor[propertyDescriptorList
                             .size()]);
         }
@@ -274,9 +274,9 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                     logger.log(Level.SEVERE, e.toString(), e);
                 }
             }
-            for (Map.Entry entry : attachments.entrySet()) {
+            for (Map.Entry<String, ?> entry : attachments.entrySet()) {
                 try {
-                    String desc = (String) entry.getKey();
+                    String desc = entry.getKey();
                     AttachmentGlue glue = new AttachmentGlue(desc);
                     PropertyDescriptor processPropDesc = new PropertyDescriptorWithTarget(
                             desc, glue, glue.getReadMethod().getName(), glue
@@ -292,7 +292,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                     if (value == null) {
                         processPropDesc.setPropertyEditorClass(null);
                     } else {
-                        Class valueClass = value.getClass();
+                        Class<?> valueClass = value.getClass();
                         if (Boolean.class.isAssignableFrom(valueClass)) {
                             processPropDesc
                                     .setPropertyEditorClass(CheckboxEditor.class);
@@ -314,7 +314,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                     logger.log(Level.SEVERE, e.toString(), e);
                 }
             }
-            return (PropertyDescriptor[]) propertyDescriptorList
+            return propertyDescriptorList
                     .toArray(new PropertyDescriptor[propertyDescriptorList
                             .size()]);
         }
@@ -552,7 +552,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
     /**
      * @see org.dwfa.bpa.process.I_EncodeBusinessProcess#getPrerequisites()
      */
-    public Set getPrerequisites() {
+    public Set<?> getPrerequisites() {
         // TODO Auto-generated method stub
         return null;
     }

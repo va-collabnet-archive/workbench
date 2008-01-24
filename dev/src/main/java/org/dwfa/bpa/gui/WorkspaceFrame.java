@@ -176,9 +176,9 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
             menu.add(showInInternalFrameMI);
             // if (this.workspace.isShownInInternalFrame()) {
             menu.addSeparator();
-            Iterator panelListItr = this.workspace.getPanelList().iterator();
+            Iterator<GridBagPanel> panelListItr = this.workspace.getPanelList().iterator();
             while (panelListItr.hasNext()) {
-                GridBagPanel gbp = (GridBagPanel) panelListItr.next();
+                GridBagPanel gbp = panelListItr.next();
                 JMenuItem menuItem = new JMenuItem(gbp.getTitle());
                 menuItem.addActionListener(new BringInternalFrameToFront(gbp));
                 menu.add(menuItem);

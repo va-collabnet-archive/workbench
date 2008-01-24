@@ -84,7 +84,7 @@ public class ToUserSelectedQueue extends AbstractTask {
             throws TaskFailedException {
         try {
             ServiceID serviceID = null;
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates;
             if (this.queueType == null) {
                 attrSetTemplates = null;

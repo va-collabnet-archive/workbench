@@ -79,7 +79,7 @@ public class ToSpecifiedQueueRootProcess extends AbstractTask {
             throws TaskFailedException {
         try {
             I_EncodeBusinessProcess rootProcess = worker.getProcessStack().get(0);
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = null;
             ServiceTemplate template = new ServiceTemplate(this.queueServiceId,
                serviceTypes,

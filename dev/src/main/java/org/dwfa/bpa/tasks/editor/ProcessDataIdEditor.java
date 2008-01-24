@@ -9,7 +9,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 
 public class ProcessDataIdEditor extends DataIdEditor implements I_OnlyWantOneLine{
 
-    public Class getAcceptableClass() {
+    public Class<I_EncodeBusinessProcess> getAcceptableClass() {
         return I_EncodeBusinessProcess.class;
     }
 

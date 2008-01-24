@@ -262,6 +262,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         return panel;
     }
 
+    @SuppressWarnings("unchecked")
     public void addGridBagPanel(GridBagPanel panel) {
 
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
@@ -287,6 +288,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void restartLayout() {
         
         int dividerLocation = this.splitPane.getDividerLocation();
@@ -333,6 +335,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
      * @param panels
      * @param layout
      */
+    @SuppressWarnings("unchecked")
     private void redoLayout() {
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
                 .getModel();
@@ -517,6 +520,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
          * 
          * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
          */
+        @SuppressWarnings("unchecked")
         public void propertyChange(PropertyChangeEvent evt) {
 
             if (logger.isLoggable(Level.FINE)) {
@@ -524,7 +528,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
                         + evt.getPropertyName());
             }
             if (evt.getPropertyName().equals("uncommittedComponents")) {
-                Collection uncommitted = (Collection) evt.getNewValue();
+                Collection<Object> uncommitted = (Collection<Object>) evt.getNewValue();
                 if (uncommitted.size() == 1) {
                     WorkspacePanel.this.statusMessage
                             .setText("<HTML><font color='red'>1 uncommitted component...");
@@ -676,6 +680,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     /**
      * @return Returns the panelList.
      */
+    @SuppressWarnings("unchecked")
     public List<GridBagPanel> getPanelList() {
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
                 .getModel();

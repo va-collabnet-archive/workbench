@@ -14,7 +14,7 @@ import org.dwfa.bpa.tasks.editor.DataIdEditorOneLine;
 import org.dwfa.bpa.tasks.editor.RelativeTimeEditor;
 
 public class CreateFailsafeBeanInfo extends SimpleBeanInfo {
-	protected Class getBeanClass() {
+	protected Class<? extends CreateFailsafe> getBeanClass() {
 		return CreateFailsafe.class;
     }
     public CreateFailsafeBeanInfo() {

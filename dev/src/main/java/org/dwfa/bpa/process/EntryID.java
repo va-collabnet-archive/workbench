@@ -12,7 +12,7 @@ import java.util.UUID;
  * @author kec
  *  
  */
-public class EntryID implements Serializable, Comparable {
+public class EntryID implements Serializable, Comparable<EntryID> {
     private static final long serialVersionUID = 1;
 
     private UUID id;
@@ -28,7 +28,7 @@ public class EntryID implements Serializable, Comparable {
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object obj) {
+    public int compareTo(EntryID obj) {
         EntryID another = (EntryID) obj;
         return this.id.toString().compareTo(another.id.toString());
     }

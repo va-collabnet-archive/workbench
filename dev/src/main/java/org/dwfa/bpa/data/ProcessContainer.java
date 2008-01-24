@@ -61,7 +61,7 @@ public class ProcessContainer extends DataContainer {
     /**
      * @see org.dwfa.bpa.process.I_ContainData#getEditorClass()
      */
-    public Class getEditorClass() {
+    public Class<ProcessReadOnly> getEditorClass() {
         return ProcessReadOnly.class;
     }
 

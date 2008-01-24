@@ -89,7 +89,7 @@ public class StringElement extends DataContainer {
     /**
      * @see org.dwfa.bpa.process.I_ContainData#getEditorClass()
      */
-    public Class getEditorClass() {
+    public Class<JTextFieldEditor> getEditorClass() {
         return JTextFieldEditor.class;
     }
 }

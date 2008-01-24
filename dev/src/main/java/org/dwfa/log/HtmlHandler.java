@@ -132,6 +132,7 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         
     }
 
+    @SuppressWarnings("unchecked")
     private String format(LogRecord rec) {
         StringBuffer buf = new StringBuffer(1000);
         buf.append("<font size='3' face='Courier'>");
@@ -185,7 +186,7 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
     		     if (params[i] == null) {
     		    	 buf.append("null");
     		     } else if (Collection.class.isAssignableFrom(params[i].getClass())) {
-    		    	 	Iterator itr = ((Collection) params[i]).iterator();
+    		    	 	Iterator<Object> itr = ((Collection<Object>) params[i]).iterator();
     		    	 	while (itr.hasNext()) {
     		                buf.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
     		                buf.append(itr.next());

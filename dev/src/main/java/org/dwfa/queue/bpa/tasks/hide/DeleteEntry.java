@@ -62,10 +62,11 @@ public class DeleteEntry extends AbstractTask {
         super();
     }
 
+    @SuppressWarnings("unchecked")
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-        Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+        Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] {};
             QueueEntryData qed = null;
             for (PropertyDescriptor d : process

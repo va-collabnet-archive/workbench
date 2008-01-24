@@ -83,7 +83,7 @@ public class ToQueue extends AbstractTask {
             throws TaskFailedException {
         try {
             ServiceID serviceID = null;
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { this.queueType };
             ServiceTemplate template = new ServiceTemplate(serviceID,
                serviceTypes,

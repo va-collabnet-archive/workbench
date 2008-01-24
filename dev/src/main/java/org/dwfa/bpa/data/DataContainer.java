@@ -34,7 +34,7 @@ public abstract class DataContainer implements I_ContainData {
     private String description;
     private Serializable data;
     private Rectangle bounds;
-    private Class elementClass;
+    private Class<?> elementClass;
 
     private static final long serialVersionUID = 1;
 
@@ -60,7 +60,7 @@ public abstract class DataContainer implements I_ContainData {
             this.description = (String) in.readObject();
             this.data = (Serializable) in.readObject();
             this.bounds = (Rectangle) in.readObject();
-            this.elementClass = (Class) in.readObject();
+            this.elementClass = (Class<?>) in.readObject();
             this.vetoSupport = new VetoableChangeSupport(this);
             this.changeSupport = new PropertyChangeSupport(this);
        } else {
@@ -73,7 +73,7 @@ public abstract class DataContainer implements I_ContainData {
 	 * @param description
 	 * @param data
 	 */
-	public DataContainer(int id, String description, Serializable data, Class elementClass) {
+	public DataContainer(int id, String description, Serializable data, Class<?> elementClass) {
 		super();
 		this.id = id;
 		this.description = description;
@@ -242,7 +242,7 @@ public abstract class DataContainer implements I_ContainData {
 	/**
 	 * @see org.dwfa.bpa.process.I_ContainData#getElementClass()
 	 */
-	public Class getElementClass() {
+	public Class<?> getElementClass() {
 		return this.elementClass;
 	}
 	/**

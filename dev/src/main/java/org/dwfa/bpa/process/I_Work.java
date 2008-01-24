@@ -235,10 +235,10 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
     public ServiceItemFilter getServiceProxyFilter()
             throws ConfigurationException;
 
-    public Object doAsPrivileged(PrivilegedExceptionAction action,
+    public Object doAsPrivileged(PrivilegedExceptionAction<Object> action,
             AccessControlContext acc) throws PrivilegedActionException;
 
-    public Object doAsPrivileged(PrivilegedAction action,
+    public Object doAsPrivileged(PrivilegedAction<Object> action,
             AccessControlContext acc);
 
     public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,

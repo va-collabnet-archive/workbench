@@ -52,8 +52,8 @@ public class ListEditor implements PropertyEditor, ListDataListener  {
      * @return true or false
      * @see java.beans.PropertyEditor#getValue()
      */
-    public ArrayListModel getValue() {
-        return (ArrayListModel) list.getModel();
+    public ArrayListModel<?> getValue() {
+        return (ArrayListModel<?>) list.getModel();
     }
        
        
@@ -63,7 +63,7 @@ public class ListEditor implements PropertyEditor, ListDataListener  {
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
-        this.list.setModel((ArrayListModel) value);
+        this.list.setModel((ArrayListModel<?>) value);
         this.firePropertyChange();
     }
 

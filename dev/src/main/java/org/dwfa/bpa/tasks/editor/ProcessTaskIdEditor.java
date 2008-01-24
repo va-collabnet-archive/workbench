@@ -29,7 +29,7 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
 
     TaskIdPanel idPanel;
 
-    public Class getAcceptableClass() {
+    public Class<I_EncodeBusinessProcess> getAcceptableClass() {
         return I_EncodeBusinessProcess.class;
     }
 

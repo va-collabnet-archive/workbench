@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -41,11 +42,11 @@ public class SetDataContainer extends DataContainer implements ListModel {
      * @param elementClass
      */
     public SetDataContainer() {
-        super(-1, "Set #", new ArrayListModel(), Object.class);
+        super(-1, "Set #", new ArrayListModel<Set<?>>(), Object.class);
     }
     
-    private ArrayList getList() throws IOException, ClassNotFoundException {
-        return (ArrayList) this.getData();
+    private ArrayList<?> getList() throws IOException, ClassNotFoundException {
+        return (ArrayList<?>) this.getData();
     }
 
     /**
@@ -107,7 +108,7 @@ public class SetDataContainer extends DataContainer implements ListModel {
     /**
      * @see org.dwfa.bpa.process.I_ContainData#getEditorClass()
      */
-    public Class getEditorClass() {
+    public Class<?> getEditorClass() {
         return ListEditor.class;
     }
     /**

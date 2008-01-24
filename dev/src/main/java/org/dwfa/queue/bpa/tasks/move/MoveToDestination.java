@@ -65,7 +65,7 @@ public class MoveToDestination extends AbstractTask {
             throws TaskFailedException {
         try {
             ServiceID serviceID = null;
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { new ElectronicAddress(process.getDestination()) };
             ServiceTemplate template = new ServiceTemplate(serviceID,
                serviceTypes,

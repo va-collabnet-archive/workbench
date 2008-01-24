@@ -30,7 +30,7 @@ public class ProxyDoAsSubjectFactory {
         this.worker = worker;
     }
 
-    public Object makeProxy(Object obj, Class interfaceClass) {
+    public Object makeProxy(Object obj, Class<?> interfaceClass) {
         Handler handler = new Handler(obj);
         return Proxy.newProxyInstance(obj.getClass().getClassLoader(),
                 new Class[] { interfaceClass }, handler);

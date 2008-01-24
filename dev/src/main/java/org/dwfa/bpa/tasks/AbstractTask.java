@@ -305,10 +305,10 @@ public abstract class AbstractTask  implements I_DefineTask {
 		vetoSupport.fireVetoableChange(propertyName, oldValue, newValue);
 	}
 
-    protected Object getService(I_Work worker, Class interfaceClass, String message, long timeout) throws RemoteException, InterruptedException, IOException, ConfigurationException, TaskFailedException {
+    protected Object getService(I_Work worker, Class<?> interfaceClass, String message, long timeout) throws RemoteException, InterruptedException, IOException, ConfigurationException, TaskFailedException {
         return getService( worker, interfaceClass, message, timeout, false);
     }
-    protected Object getService(I_Work worker, Class interfaceClass, String message, long timeout, boolean lookupLocal) throws RemoteException, InterruptedException, IOException, ConfigurationException, TaskFailedException {
+    protected Object getService(I_Work worker, Class<?> interfaceClass, String message, long timeout, boolean lookupLocal) throws RemoteException, InterruptedException, IOException, ConfigurationException, TaskFailedException {
         ServiceTemplate queryServerTemplate = new ServiceTemplate(null,
                 new Class[] { interfaceClass }, null);
     

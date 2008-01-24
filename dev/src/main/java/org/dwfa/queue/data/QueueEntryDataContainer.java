@@ -71,7 +71,7 @@ public class QueueEntryDataContainer extends DataContainer {
     /**
      * @see org.dwfa.bpa.process.I_ContainData#getEditorClass()
      */
-    public Class getEditorClass() {
+    public Class<?> getEditorClass() {
         return ToStringReadOnlyEditor.class;
     }
     /**

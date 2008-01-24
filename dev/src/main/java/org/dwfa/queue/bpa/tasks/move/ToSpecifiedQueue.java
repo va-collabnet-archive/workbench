@@ -79,7 +79,7 @@ public class ToSpecifiedQueue extends AbstractTask {
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = null;
             ServiceTemplate template = new ServiceTemplate(this.queueServiceId,
                serviceTypes,

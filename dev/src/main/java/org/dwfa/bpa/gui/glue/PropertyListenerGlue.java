@@ -22,13 +22,13 @@ import java.util.Set;
  */
 public class PropertyListenerGlue implements PropertyChangeListener {
 	private String methodName;
-    private Class[] methodArgClasses;
+    private Class<?>[] methodArgClasses;
     private Object target;
 	/**
 	 * @param property
 	 * @param target
 	 */
-	public PropertyListenerGlue(String methodName, Class methodArgClass, Object target) {
+	public PropertyListenerGlue(String methodName, Class<?> methodArgClass, Object target) {
 		this.methodName = methodName;
         this.methodArgClasses = new Class[] {methodArgClass};
 		this.target = target;

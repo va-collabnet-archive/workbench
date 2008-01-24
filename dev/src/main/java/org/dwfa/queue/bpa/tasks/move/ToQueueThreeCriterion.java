@@ -108,7 +108,7 @@ public class ToQueueThreeCriterion extends AbstractTask {
             throws TaskFailedException {
         try {
             ServiceID serviceID = null;
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { this.queueType, this.queueType2, this.queueType3 };
             ServiceTemplate template = new ServiceTemplate(serviceID,
                serviceTypes,

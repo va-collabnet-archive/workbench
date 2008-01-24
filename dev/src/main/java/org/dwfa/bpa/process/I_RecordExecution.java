@@ -13,7 +13,7 @@ import java.util.Date;
  * @author kec
  *  
  */
-public interface I_RecordExecution extends Serializable, Comparable {
+public interface I_RecordExecution extends Serializable, Comparable<I_RecordExecution> {
 
 	/**
 	 * @return The date this task completed. 

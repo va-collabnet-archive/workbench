@@ -38,7 +38,7 @@ public interface I_ContainData extends I_ManageVetoableProperties, I_ManagePrope
      * @return The class of element in this data container. If this container holds
      * a collection, the class of elements within the collection. 
      */
-    public Class getElementClass();
+    public Class<?> getElementClass();
     
     /**
      * @return True if this container holds a collection. 
@@ -84,7 +84,7 @@ public interface I_ContainData extends I_ManageVetoableProperties, I_ManagePrope
     public Transferable getTransferable() throws ClassNotFoundException;
     
     public JComponent getEditor() throws Exception;
-    public Class getEditorClass();
+    public Class<?> getEditorClass();
     public Method getReadMethod() throws SecurityException, NoSuchMethodException;
     public Method getWriteMethod() throws SecurityException, NoSuchMethodException;
 

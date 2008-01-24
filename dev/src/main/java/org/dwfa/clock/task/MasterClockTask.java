@@ -45,7 +45,7 @@ public abstract class MasterClockTask extends AbstractTask {
     public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
  		try {
- 	        Class[] serviceTypes = new Class[] { I_KeepIncrementalTime.class };
+ 	        Class<?>[] serviceTypes = new Class<?>[] { I_KeepIncrementalTime.class };
  	        Entry[] attrSetTemplates = new Entry[] {};
  	        
  	        ServiceTemplate template = new ServiceTemplate(null, serviceTypes, attrSetTemplates);

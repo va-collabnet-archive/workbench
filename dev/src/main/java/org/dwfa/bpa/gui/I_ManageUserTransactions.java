@@ -34,6 +34,6 @@ public interface I_ManageUserTransactions {
     throws TransactionException;
     
     public void setTransactionDuration(long transactionDuration);
-    public Collection getUncommittedComponents() throws TransactionException;
+    public Collection<?> getUncommittedComponents() throws TransactionException;
     public void abortActiveTransaction() throws TransactionException, RemoteException;
 }

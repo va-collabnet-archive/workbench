@@ -89,7 +89,7 @@ public class CreateSyncRecord extends AbstractTask {
 
         try {
             ServiceID serviceID = null;
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.SYNCHRONIZATION_QUEUE.getUids()) };
             ServiceTemplate template = new ServiceTemplate(serviceID,
                     serviceTypes, attrSetTemplates);

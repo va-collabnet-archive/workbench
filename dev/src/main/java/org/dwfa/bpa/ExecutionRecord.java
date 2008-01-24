@@ -120,7 +120,7 @@ public class ExecutionRecord implements I_RecordExecution {
 	/**
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object o) {
+	public int compareTo(I_RecordExecution o) {
         ExecutionRecord another = (ExecutionRecord) o;
 		int comp = this.date.compareTo(another.getDate());
         if (comp == 0) {
@@ -137,7 +137,7 @@ public class ExecutionRecord implements I_RecordExecution {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
-		return compareTo(obj) == 0;
+		return compareTo((I_RecordExecution) obj) == 0;
 	}
 	/**
 	 * @see java.lang.Object#hashCode()

@@ -14,13 +14,14 @@ import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.bpa.process.I_SelectProcesses;
+import org.dwfa.bpa.process.I_Work;
 
 /**
  * @author kec
  *  
  */
 public class QueueWorkerSpec {
-    private Class workerClass;
+    private Class<? extends I_Work> workerClass;
 
     private String workerName;
 
@@ -40,7 +41,7 @@ public class QueueWorkerSpec {
     /**
      * @return Returns the workerClass.
      */
-    public Class getWorkerClass() {
+    public Class<? extends I_Work> getWorkerClass() {
         return workerClass;
     }
 
@@ -64,11 +65,11 @@ public class QueueWorkerSpec {
      * @param workerId
      * @param selector
      */
-    public QueueWorkerSpec(Class workerClass, String workerName, UUID workerId,
+    public QueueWorkerSpec(Class<? extends I_Work> workerClass, String workerName, UUID workerId,
             I_SelectProcesses selector) {
         this(workerClass, workerName, workerId, selector, null);
     }
-    public QueueWorkerSpec(Class workerClass, String workerName, UUID workerId,
+    public QueueWorkerSpec(Class<? extends I_Work> workerClass, String workerName, UUID workerId,
             I_SelectProcesses selector, String[] specifiedConfigArgs) {
         super(); 
         this.workerClass = workerClass;
@@ -82,7 +83,7 @@ public class QueueWorkerSpec {
             throws SecurityException, NoSuchMethodException,
             IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException, ConfigurationException {
-        Constructor c = this.workerClass.getConstructor(new Class[] {
+        Constructor<? extends I_Work> c = this.workerClass.getConstructor(new Class[] {
                 Configuration.class, UUID.class, String.class,
                 I_SelectProcesses.class });
         

@@ -12,7 +12,7 @@ import java.beans.BeanDescriptor;
  *
  */
 public class CreateFailsafeParentProcessBeanInfo extends CreateFailsafeBeanInfo {
-    protected Class getBeanClass() {
+    protected Class<CreateFailsafeParentProcess> getBeanClass() {
         return CreateFailsafeParentProcess.class;
     }
     /**

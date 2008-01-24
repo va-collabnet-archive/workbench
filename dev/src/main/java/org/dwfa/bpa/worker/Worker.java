@@ -262,7 +262,7 @@ public abstract class Worker implements I_Work {
 		// testLookup(serviceDiscovery);
 	}
 
-	public Worker(Configuration config, Class workerClass)
+	public Worker(Configuration config, Class<?> workerClass)
 			throws ConfigurationException, LoginException, IOException,
 			PrivilegedActionException {
 		this(config, (UUID) config.getEntry(workerClass.getName(),
@@ -359,7 +359,7 @@ public abstract class Worker implements I_Work {
 	}
 
 	private class ExecuteAsPriviledgedAction implements
-			PrivilegedExceptionAction {
+			PrivilegedExceptionAction<Object> {
 		I_EncodeBusinessProcess process;
 
 		/**
@@ -431,7 +431,7 @@ public abstract class Worker implements I_Work {
 			Worker.logger.info(this.getWorkerDesc() + " exception: "
 					+ e.getClass().getName() + " " + e.getMessage());
 		}
-		this.doAsPrivileged(new PrivilegedExceptionAction() {
+		this.doAsPrivileged(new PrivilegedExceptionAction<Object>() {
 
 			public Object run() throws LeaseDeniedException, RemoteException,
 					InterruptedException {
@@ -633,7 +633,7 @@ public abstract class Worker implements I_Work {
 	public Object prepareProxy(final Object proxy,
 			final Class<I_QueueProcesses> interfaceClass)
 			throws ConfigurationException, PrivilegedActionException {
-		return this.doAsPrivileged(new PrivilegedExceptionAction() {
+		return this.doAsPrivileged(new PrivilegedExceptionAction<Object>() {
 			public Object run() throws Exception {
 				ProxyPreparer preparer = getProxyPreparer();
 				ProxyDoAsSubjectFactory proxyFactory = new ProxyDoAsSubjectFactory(
@@ -812,7 +812,8 @@ public abstract class Worker implements I_Work {
 	/**
 	 * @throws ConfigurationException
 	 */
-	private void testAccess() {
+	@SuppressWarnings("unchecked")
+    private void testAccess() {
 		AuthenticationPermission p = null;
 		try {
 			SecurityManager sm = System.getSecurityManager();
@@ -837,9 +838,9 @@ public abstract class Worker implements I_Work {
 					.getPrincipals().iterator().next();
 			logger.info("clientPrincipal: " + clientPrincipal + " class: "
 					+ clientPrincipal.getClass().getName());
-			Set reggiePrincipalSet = (Set) this.config.getEntry(this.getClass()
+			Set<Principal> reggiePrincipalSet = (Set<Principal>) this.config.getEntry(this.getClass()
 					.getName(), "reggiePrincipal", Set.class);
-			Principal reggiePrincipal = (Principal) reggiePrincipalSet
+			Principal reggiePrincipal = reggiePrincipalSet
 					.iterator().next();
 			logger.info("reggiePrincipal: " + reggiePrincipal + " class: "
 					+ reggiePrincipal.getClass());
@@ -965,7 +966,7 @@ public abstract class Worker implements I_Work {
 	public Transaction createTransaction(final long transactionDuration)
 			throws PrivilegedActionException {
 		return (Transaction) this.doAsPrivileged(
-				new PrivilegedExceptionAction() {
+				new PrivilegedExceptionAction<Object>() {
 					public Object run() throws Exception {
 						return Worker.this.jiniManager
 								.createTransaction(transactionDuration);
@@ -978,7 +979,7 @@ public abstract class Worker implements I_Work {
 			final ServiceDiscoveryListener listener) throws RemoteException,
 			PrivilegedActionException {
 		return (LookupCache) this.doAsPrivileged(
-				new PrivilegedExceptionAction() {
+				new PrivilegedExceptionAction<Object>() {
 					public Object run() throws Exception {
 						return Worker.this.jiniManager.createLookupCache(tmpl,
 								filter, listener);
@@ -997,7 +998,7 @@ public abstract class Worker implements I_Work {
 			final LeaseRenewalManager leaseMgr)
 			throws PrivilegedActionException {
 		return (JoinManager) this.doAsPrivileged(
-				new PrivilegedExceptionAction() {
+				new PrivilegedExceptionAction<Object>() {
 					public Object run() throws Exception {
 						return new JoinManager(object, entries, serviceID,
 								Worker.this.jiniManager

@@ -126,6 +126,7 @@ public class RemoveFailsafe extends AbstractTask {
         super();
     }
 
+    @SuppressWarnings("unchecked")
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
 
@@ -160,7 +161,7 @@ public class RemoveFailsafe extends AbstractTask {
             removeFailsafeProcess.addBranch(destroyTask, completeTask, Condition.CONTINUE);
 
             ServiceID sid = null;
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.OUTBOX_QUEUE.getUids()) };
             ServiceTemplate template = new ServiceTemplate(sid, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;

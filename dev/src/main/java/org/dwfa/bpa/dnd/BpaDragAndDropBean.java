@@ -45,7 +45,7 @@ public class BpaDragAndDropBean implements PropertyChangeListener, I_SupportDrag
 	 * @throws ClassNotFoundException
 	 */
 	public BpaDragAndDropBean(String prefix, I_DoDragAndDrop dndComponent,
-			boolean allowDrop, boolean allowDrag, Class acceptClass) throws ClassNotFoundException {
+			boolean allowDrop, boolean allowDrag, Class<?> acceptClass) throws ClassNotFoundException {
 		this.dndComponent = dndComponent;
 		this.dndComponent.getJComponent().addPropertyChangeListener("border",
 				this);

@@ -70,7 +70,7 @@ public class MoveToInBox extends AbstractTask {
 	public void complete(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.INBOX_QUEUE.getUids()) };
             ServiceTemplate template = new ServiceTemplate(null, serviceTypes,
                     attrSetTemplates);

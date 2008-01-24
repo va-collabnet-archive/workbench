@@ -47,7 +47,7 @@ public class DataIdPanel extends JLabel implements I_DoDragAndDrop, PropertyChan
      * @throws ClassNotFoundException
      * 
      */
-    public DataIdPanel(int id, I_EncodeBusinessProcess process, Class acceptableClass) throws ClassNotFoundException {
+    public DataIdPanel(int id, I_EncodeBusinessProcess process, Class<?> acceptableClass) throws ClassNotFoundException {
         super();
         this.process = process;
         this.dndBean = new BpaDragAndDropBean("DataId", this, true, false, acceptableClass);

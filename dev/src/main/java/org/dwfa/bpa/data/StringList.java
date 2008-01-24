@@ -41,7 +41,7 @@ public class StringList extends DataContainer {
 	 * @param elementClass
 	 */
 	public StringList() {
-		super(-1, "String List #", new ArrayListModel(), String.class);
+		super(-1, "String List #", new ArrayListModel<String>(), String.class);
 	}
     @Override
     public I_SupportDragAndDrop getDragAndDropSupport(String prefix, I_DoDragAndDrop dndComponent,
@@ -61,7 +61,7 @@ public class StringList extends DataContainer {
     /**
      * @see org.dwfa.bpa.process.I_ContainData#getEditorClass()
      */
-    public Class getEditorClass() {
+    public Class<?> getEditorClass() {
         return ListEditor.class;
     }
     /**

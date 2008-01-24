@@ -21,7 +21,7 @@ public class QueueEntryDataIdEditor extends DataIdEditor {
     public QueueEntryDataIdEditor(Object obj) throws ClassNotFoundException {
         super(obj);
     }
-    public Class getAcceptableClass() {
+    public Class<?> getAcceptableClass() {
         return QueueEntryData.class;
     }
 

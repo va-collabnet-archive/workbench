@@ -13,13 +13,14 @@ import java.util.Set;
 public class PropertySetListenerGlue {
 
     private String removeMethodName, addMethodName, replaceMethodName, getSetMethodName;
-    private Class methodArgClass;
+    private Class<?> methodArgClass;
     private Object target;
     /**
      * @param property
      * @param target
      */
-    public PropertySetListenerGlue(String removeMethodName, String addMethodName, String replaceMethodName, String getSetMethodName, Class methodArgClass, Object target) {
+    public PropertySetListenerGlue(String removeMethodName, String addMethodName, 
+        String replaceMethodName, String getSetMethodName, Class<?> methodArgClass, Object target) {
         this.removeMethodName = removeMethodName;
         this.addMethodName = addMethodName;
         this.replaceMethodName = replaceMethodName;
@@ -49,11 +50,11 @@ public class PropertySetListenerGlue {
         Method targetMethod = target.getClass().getMethod(this.replaceMethodName, new Class[] {methodArgClass, methodArgClass});
         targetMethod.invoke(target, new Object[] {oldObj, newObj});
     }
-    public Set getSet() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public Set<?> getSet() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         if (this.getSetMethodName == null) {
-            return new HashSet();
+            return new HashSet<Object>();
         }
         Method targetMethod = target.getClass().getMethod(this.getSetMethodName, new Class[] {});
-        return (Set) targetMethod.invoke(target, new Object[] {});
+        return (Set<?>) targetMethod.invoke(target, new Object[] {});
     }
 }

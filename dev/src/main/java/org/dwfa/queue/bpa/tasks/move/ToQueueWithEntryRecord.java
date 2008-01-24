@@ -98,7 +98,7 @@ public class ToQueueWithEntryRecord extends AbstractTask {
              
 
             ServiceID serviceID = qed.getQueueID();
-            Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { };
             ServiceTemplate template = new ServiceTemplate(serviceID,
                     serviceTypes, attrSetTemplates);

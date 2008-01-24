@@ -389,7 +389,7 @@ public class LookupJiniAndLocal implements I_LookupServices {
 		}
 	}
 
-	private static WeakHashMap<Class, Field[]> fieldArrays;
+	private static WeakHashMap<Class<?>, Field[]> fieldArrays;
 
 	/**
 	 * Calculate the list of usable fields for this type
@@ -399,7 +399,7 @@ public class LookupJiniAndLocal implements I_LookupServices {
 
 		synchronized (LookupJiniAndLocal.class) {
 			if (fieldArrays == null)
-				fieldArrays = new WeakHashMap<Class, Field[]>();
+				fieldArrays = new WeakHashMap<Class<?>, Field[]>();
 			else {
 				fields = (Field[]) fieldArrays.get(entry.getClass());
 				if (fields != null)

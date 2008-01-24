@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  */
 public class ItemListenerGlue implements ItemListener {
     private String methodName;
-    private Class[] methodArgClasses;
+    private Class<?>[] methodArgClasses;
     private Object target;
     /**
      * @param property

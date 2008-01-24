@@ -8,7 +8,7 @@ import java.beans.SimpleBeanInfo;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class HideEntryBeanInfo extends SimpleBeanInfo {
-    protected Class getBeanClass() {
+    protected Class<?> getBeanClass() {
         return HideEntry.class;
     }
     /**

@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 public class ActionListenerGlue implements ActionListener {
 
     private String methodName;
-    private Class[] methodArgClasses;
+    private Class<?>[] methodArgClasses;
     private Object[] methodArgs;
     private Object target;
     /**
