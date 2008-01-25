@@ -10,6 +10,14 @@ import org.dwfa.maven.MojoUtil;
 
 /**
  * Import <a href='../dataimport.html'>ACE format</a> data files from a directory and load into an ACE Berkeley database. 
+ * <p><font color=red>IMPORTANT USAGE NOTE</font>
+ * Please note that this goal cannot be used for incremental imports. It uses a memory buffer for managing identifier, 
+ * and this memory buffer is read from the disk files, and maintained in memory until all files have been imported, 
+ * then it is flushed to the database. This buffering provides significant performance improvements over relying on the
+ * database for the identifier lookup. 
+ * <p>
+ * If this goal is applied to an existing database, identifiers might get overwritten, 
+ * <font color=red>resulting in data corruption</font>. 
  * 
  * @goal berkley-vodb-dir
  * 
