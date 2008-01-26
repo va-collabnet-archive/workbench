@@ -450,7 +450,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 		this.progress = progress;
 	}
 
-	public static class StringWithConceptTuple implements Comparable, I_CellTextWithTuple {
+	public static class StringWithConceptTuple implements Comparable<StringWithConceptTuple>, I_CellTextWithTuple {
 		String cellText;
 
 		I_ConceptAttributeTuple tuple;
@@ -479,8 +479,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			return cellText;
 		}
 
-		public int compareTo(Object o) {
-			StringWithConceptTuple another = (StringWithConceptTuple) o;
+		public int compareTo(StringWithConceptTuple another) {
 			return cellText.compareTo(another.cellText);
 		}
 	}

@@ -137,13 +137,14 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 		}
 	}
 
-	protected void importChangeSet(File csFile, final Configuration riverConfig) throws TaskFailedException {
+	@SuppressWarnings("unchecked")
+    protected void importChangeSet(File csFile, final Configuration riverConfig) throws TaskFailedException {
 		try {
 
 			lowerProgressMessage = "Processing change set";
 			AceLog.getEditLog().info("Importing change set: " + csFile.getAbsolutePath());
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(csFile));
-			Class readerClass = (Class) ois.readObject();
+			Class<I_ReadChangeSet> readerClass = (Class<I_ReadChangeSet>) ois.readObject();
 			ois.close();
 			I_ReadChangeSet reader = (I_ReadChangeSet) readerClass.newInstance();
 			processed = 0;

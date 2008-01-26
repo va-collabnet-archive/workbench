@@ -222,7 +222,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		}
 		
 	}
-	public static class StringWithImageTuple implements Comparable, I_CellTextWithTuple {
+	public static class StringWithImageTuple implements Comparable<StringWithImageTuple>, I_CellTextWithTuple {
 		String cellText;
 		I_ImageTuple tuple;
 		public StringWithImageTuple(String cellText, I_ImageTuple tuple) {
@@ -240,8 +240,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		public String toString() {
 			return cellText;
 		}
-		public int compareTo(Object o) {
-			StringWithImageTuple another = (StringWithImageTuple) o;
+		public int compareTo(StringWithImageTuple another) {
 			return cellText.compareTo(another.cellText);
 		}
 	}

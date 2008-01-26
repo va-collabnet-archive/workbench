@@ -75,6 +75,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
    private boolean showRefsetInfoInTaxonomy;
 
+   @SuppressWarnings("unused")
    private boolean variableHeightTaxonomyView;
 
    private boolean showViewerImagesInTaxonomy;

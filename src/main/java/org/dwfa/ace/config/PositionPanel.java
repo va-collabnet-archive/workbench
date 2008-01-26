@@ -312,7 +312,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             this.fineControl.setValue(this.fineControl.getMaximum());
             this.updateFineControl();
             if (this.selectGlue != null) {
-                Iterator positionItr = this.selectGlue.getSet().iterator();
+                Iterator<?> positionItr = this.selectGlue.getSet().iterator();
                 while (positionItr.hasNext()) {
                     Position position = (Position) positionItr.next();
                     if (position.getPath() != null && this.path != null) {

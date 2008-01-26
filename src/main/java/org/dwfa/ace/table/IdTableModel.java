@@ -45,7 +45,7 @@ public class IdTableModel extends AbstractTableModel implements
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static class StringWithIdTuple implements Comparable, I_CellTextWithTuple {
+	public static class StringWithIdTuple implements Comparable<StringWithIdTuple>, I_CellTextWithTuple {
 		String cellText;
 
 		I_IdTuple tuple;
@@ -68,8 +68,7 @@ public class IdTableModel extends AbstractTableModel implements
 			return cellText;
 		}
 
-		public int compareTo(Object o) {
-			StringWithIdTuple another = (StringWithIdTuple) o;
+		public int compareTo(StringWithIdTuple another) {
 			return cellText.compareTo(another.cellText);
 		}
 	}

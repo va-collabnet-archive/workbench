@@ -60,6 +60,7 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntList;
+import org.dwfa.vodb.types.ThinExtByRefPart;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
@@ -615,7 +616,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     private TOGGLES toggle;
 
-    protected Class getExtPartClass() {
+    protected Class<? extends ThinExtByRefPart> getExtPartClass() {
         switch (refsetType) {
         case BOOLEAN:
             return ThinExtByRefPartBoolean.class;

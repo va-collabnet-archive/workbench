@@ -22,7 +22,7 @@ public class LoadSources {
 			AceConfig.getVodb().setup(new File(args[0]), false, 600000000L);
 			loadConstants = new ProcessAceFormatSourcesBerkeley(AceConfig.getVodb());
 			AceLog.getAppLog().info("Starting to process AceAuxillary.");
-			loadConstants.execute(new File(args[1]));
+			loadConstants.executeSnomed(new File(args[1]));
 			AceLog.getAppLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
 			Path.writeBasePaths(AceConfig.getVodb());
 			AddImage.addStockImages(AceConfig.getVodb());

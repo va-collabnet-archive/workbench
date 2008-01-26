@@ -186,6 +186,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
         readUntil(Long.MAX_VALUE);
     }
 
+    @SuppressWarnings("unchecked")
     private void lazyInit() throws FileNotFoundException, IOException, ClassNotFoundException {
         String lastImportSize = getVodb().getProperty(changeSetFile.toURI().toURL().toExternalForm());
         if (lastImportSize != null) {
@@ -219,7 +220,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
               FileInputStream fis = new FileInputStream(changeSetFile);
               BufferedInputStream bis = new BufferedInputStream(fis);
               ois = new ObjectInputStream(bis);
-              Class readerClass = (Class) ois.readObject();
+              Class<I_ReadChangeSet> readerClass = (Class<I_ReadChangeSet>) ois.readObject();
               if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
                   AceLog.getEditLog().fine(
                                            "Now reading change set with BinaryChangeSetReader: "

@@ -24,6 +24,9 @@ import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.util.io.JarExtractor;
+
 import com.sleepycat.je.DatabaseException;
 
 public abstract class ProcessAceFormatSources extends ProcessSources {
@@ -72,7 +75,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
         return lineCount;
     }
 	
-	public void execute(File constantDir) throws Exception {
+	public void executeSnomed(File constantDir) throws Exception {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -137,7 +140,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 		cleanup(null);
 	}
 
-	public void execute(JarFile constantJar) throws Exception {
+	public void execute(File constantJar) throws Exception {
 		execute(constantJar, "org/jehri/cement/", FORMAT.SNOMED);
 	}
 
@@ -421,56 +424,83 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	protected abstract void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
 			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception;
 
-	public void execute(JarFile constantJar, String dataDir, FORMAT format)
+	public void execute(File jarFile, String dataDir, FORMAT format)
 			throws Exception {
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Enumeration<JarEntry> jarEnum = constantJar.entries();
-		while (jarEnum.hasMoreElements()) {
-			JarEntry je = jarEnum.nextElement();
-			if (je.getName().startsWith(dataDir)
-					&& je.getName().endsWith(".txt")) {
-				int startIndex = dataDir.length();
-				int endIndex = startIndex + "yyyy-MM-dd".length();
-				Date releaseDate = dateFormat.parse(je.getName().substring(
-						startIndex, endIndex));
-				addReleaseDate(releaseDate);
-				getLog().info(je.getName());
-				if (je.getName().contains("concepts")) {
-					InputStreamReader isr = new InputStreamReader(constantJar
-							.getInputStream(je));
-					readConcepts(isr, releaseDate, format, new CountDownLatch(Integer.MAX_VALUE));
-					isr.close();
-				} else if (je.getName().contains("descriptions")) {
-					InputStreamReader isr = new InputStreamReader(constantJar
-							.getInputStream(je));
-					readDescriptions(isr, releaseDate, format,  new CountDownLatch(Integer.MAX_VALUE));
-					isr.close();
-				} else if (je.getName().contains("relationships")) {
-					InputStreamReader isr = new InputStreamReader(constantJar
-							.getInputStream(je));
-					readRelationships(isr, releaseDate, format,  new CountDownLatch(Integer.MAX_VALUE));
-					isr.close();
-				} else if (je.getName().contains("illicit_words")) {
-					getLog().info(
-							"Found illicit_words jar entry: " + je.getName());
-					InputStreamReader isr = new InputStreamReader(constantJar
-							.getInputStream(je));
-					readIllicitWords(isr,  new CountDownLatch(Integer.MAX_VALUE));
-				} else if (je.getName().contains("licit_words")) {
-					getLog().info(
-							"Found licit_words jar entry: " + je.getName());
-					InputStreamReader isr = new InputStreamReader(constantJar
-							.getInputStream(je));
-					readLicitWords(isr,  new CountDownLatch(Integer.MAX_VALUE));
-				} else {
-					getLog().info(
-							"Don't know what to do with jar entry: "
-									+ je.getName());
-				}
-			}
-			cleanup(null);
-		}
+	    if (format == FORMAT.ACE) {
+	        File extractDir = new File("target", "unjar");
+	        JarExtractor.execute(jarFile, extractDir);
+            AceLog.getEditLog().info("Extracted jar into: " + extractDir.getAbsolutePath());
+	        File rootDir = new File(extractDir, dataDir);
+            AceLog.getEditLog().info("rootDir: " + rootDir.getAbsolutePath());
+	        File[] subRoots = rootDir.listFiles(new FileFilter() {
+
+                public boolean accept(File pathname) {
+                    if (pathname.isDirectory() && pathname.getName().length() == "yyyy-MM-dd".length()) {
+                        return true;
+                    }
+                    return false;
+                }
+	        });
+	        if (subRoots != null && subRoots.length > 0) {
+	            rootDir = subRoots[0];
+	            AceLog.getEditLog().info("Found sub root: " + rootDir.getAbsolutePath());
+	        }
+	        executeFromDir(rootDir);
+	    } else {
+	        //Need to depricate this method for processing SNOMED, and inferring history. 
+	        //Better to have everyone use ace format. 
+	        JarFile constantJar = new JarFile(jarFile);
+
+	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	        Enumeration<JarEntry> jarEnum = constantJar.entries();
+	        while (jarEnum.hasMoreElements()) {
+	            JarEntry je = jarEnum.nextElement();
+	            if (je.getName().startsWith(dataDir)
+	                    && je.getName().endsWith(".txt")) {
+	                int startIndex = dataDir.length();
+	                int endIndex = startIndex + "yyyy-MM-dd".length();
+	                Date releaseDate = dateFormat.parse(je.getName().substring(
+	                        startIndex, endIndex));
+	                addReleaseDate(releaseDate);
+	                getLog().info(je.getName());
+	                if (je.getName().contains("concepts")) {
+	                    InputStreamReader isr = new InputStreamReader(constantJar
+	                            .getInputStream(je));
+	                    readConcepts(isr, releaseDate, format, new CountDownLatch(Integer.MAX_VALUE));
+	                    isr.close();
+	                } else if (je.getName().contains("descriptions")) {
+	                    InputStreamReader isr = new InputStreamReader(constantJar
+	                            .getInputStream(je));
+	                    readDescriptions(isr, releaseDate, format,  new CountDownLatch(Integer.MAX_VALUE));
+	                    isr.close();
+	                } else if (je.getName().contains("relationships")) {
+	                    InputStreamReader isr = new InputStreamReader(constantJar
+	                            .getInputStream(je));
+	                    readRelationships(isr, releaseDate, format,  new CountDownLatch(Integer.MAX_VALUE));
+	                    isr.close();
+	                } else if (je.getName().contains("illicit_words")) {
+	                    getLog().info(
+	                            "Found illicit_words jar entry: " + je.getName());
+	                    InputStreamReader isr = new InputStreamReader(constantJar
+	                            .getInputStream(je));
+	                    readIllicitWords(isr,  new CountDownLatch(Integer.MAX_VALUE));
+	                } else if (je.getName().contains("licit_words")) {
+	                    getLog().info(
+	                            "Found licit_words jar entry: " + je.getName());
+	                    InputStreamReader isr = new InputStreamReader(constantJar
+	                            .getInputStream(je));
+	                    readLicitWords(isr,  new CountDownLatch(Integer.MAX_VALUE));
+	                } else {
+	                    getLog().info(
+	                            "Don't know what to do with jar entry: "
+	                                    + je.getName());
+	                }
+	            }
+	            cleanup(null);
+	        }
+	    }
+        
 	}
 
 	protected Object getId(StreamTokenizer st) {

@@ -270,7 +270,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		this.progress = progress;
 	}
 
-	public static class StringWithDescTuple implements Comparable, I_CellTextWithTuple {
+	public static class StringWithDescTuple implements Comparable<StringWithDescTuple>, I_CellTextWithTuple {
 		String cellText;
 
 		I_DescriptionTuple tuple;
@@ -295,8 +295,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			return cellText;
 		}
 
-		public int compareTo(Object o) {
-			StringWithDescTuple another = (StringWithDescTuple) o;
+		public int compareTo(StringWithDescTuple another) {
 			return cellText.compareTo(another.cellText);
 		}
 

@@ -362,7 +362,7 @@ public class JarWriter implements  ActionListener {
 		entries.put(nameStr, attributes);
 	}
 	
-	private void addToZip(Class theClass, JarOutputStream output) throws IOException, ClassNotFoundException {
+	private void addToZip(Class<?> theClass, JarOutputStream output) throws IOException, ClassNotFoundException {
 		String classFileName = theClass.getName().replace('.', '/') + ".class";
 		ZipEntry entry = new ZipEntry(classFileName);
 		output.putNextEntry(entry);

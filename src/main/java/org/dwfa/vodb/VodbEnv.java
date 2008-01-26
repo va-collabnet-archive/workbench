@@ -2063,7 +2063,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         }
     }
 
-    public Class getNativeIdClass() {
+    public Class<Integer> getNativeIdClass() {
         return Integer.class;
     }
 
@@ -2073,16 +2073,28 @@ public class VodbEnv implements I_ImplementTermFactory {
         DatabaseEntry idValue = new DatabaseEntry();
         intBinder.objectToEntry(id.getNativeId(), idKey);
         idBinding.objectToEntry(id, idValue);
-        
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Writing nativeId : " + id);
+            for (I_IdPart p: id.getVersions()) {
+                if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
+                    UUID secondaryId = (UUID) p.getSourceId();
+                    try {
+                        int nid = uuidToNative(secondaryId);
+                        logger.fine("Found nid: " + nid + " for : " + secondaryId);
+                    } catch (TerminologyException e) {
+                        logger.fine("No nid for : " + secondaryId);
+                    } catch (IOException e) {
+                        logger.fine("No nid for : " + secondaryId);
+                    }
+                }
+            }
+        }
         try {
             idPutSemaphore.acquire();
             idDb.put(null, idKey, idValue);
             idPutSemaphore.release();
         } catch (InterruptedException e) {
             throw new DatabaseException(e);
-        }
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Writing nativeId : " + id);
         }
     }
 
@@ -2392,8 +2404,8 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
     public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
         Stopwatch timer = null;
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Getting id record for : " + nativeId);
+        if (logger.isLoggable(Level.FINER)) {
+            logger.finer("Getting id record for : " + nativeId);
             timer = new Stopwatch();
             timer.start();
         }
@@ -2402,8 +2414,8 @@ public class VodbEnv implements I_ImplementTermFactory {
         intBinder.objectToEntry(nativeId, idKey);
         try {
             if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000
+                if (logger.isLoggable(Level.FINER)) {
+                    logger.finer("Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000
                             + " secs");
                 }
                 return (I_IdVersioned) idBinding.entryToObject(idValue);

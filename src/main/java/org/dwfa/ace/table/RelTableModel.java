@@ -505,7 +505,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         this.progress = progress;
     }
 
-    public static class StringWithRelTuple implements Comparable, I_CellTextWithTuple {
+    public static class StringWithRelTuple implements Comparable<StringWithRelTuple>, I_CellTextWithTuple {
         String cellText;
 
         I_RelTuple tuple;
@@ -528,8 +528,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             return cellText;
         }
 
-        public int compareTo(Object o) {
-            StringWithRelTuple another = (StringWithRelTuple) o;
+        public int compareTo(StringWithRelTuple another) {
             return cellText.compareTo(another.cellText);
         }
     }

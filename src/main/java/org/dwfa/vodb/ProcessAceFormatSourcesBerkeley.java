@@ -258,7 +258,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         // map = new BerkeleyIdMapper();
         map = new MemoryIdMapper();
         this.vodb = vodb;
-        Class nativeIdClass = this.vodb.getNativeIdClass();
+        Class<?> nativeIdClass = this.vodb.getNativeIdClass();
         if (nativeIdClass.equals(Integer.class)) {
             for (PrimordialId primId : PrimordialId.values()) {
                 for (UUID uid : primId.getUids()) {

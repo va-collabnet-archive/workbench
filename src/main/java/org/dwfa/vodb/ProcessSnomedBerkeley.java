@@ -230,6 +230,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		optimizeLicitWords();
 		monitor.setProgressInfoUpper("Starting cleanup.");
 		vodb.close();
+        monitor.setProgressInfoUpper("Close complete.");
 		printElapsedTime();
 
 	}
