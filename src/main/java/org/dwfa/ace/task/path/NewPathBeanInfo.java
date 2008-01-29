@@ -6,10 +6,9 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
-
 
 
 public class NewPathBeanInfo extends SimpleBeanInfo {
@@ -25,20 +24,22 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             profilePropName.setShortDescription("The property containing the profile to set the editing path to the created path.");
 
 
-            PropertyDescriptor parentPathTermEntry =
-                new PropertyDescriptor("parentPathTermEntry", getBeanDescriptor().getBeanClass());
-            parentPathTermEntry.setBound(true);
-            parentPathTermEntry.setPropertyEditorClass(QueueTypeEditor.class);
-            parentPathTermEntry.setDisplayName("<html><font color='green'>path parent:");
-            parentPathTermEntry.setShortDescription("The parent for the new editing path.");
-            
+          
             
             PropertyDescriptor originPathTermEntry =
                 new PropertyDescriptor("originPathTermEntry", getBeanDescriptor().getBeanClass());
             originPathTermEntry.setBound(true);
-            originPathTermEntry.setPropertyEditorClass(QueueTypeEditor.class);
+            originPathTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             originPathTermEntry.setDisplayName("<html><font color='green'>origin Path:");
             originPathTermEntry.setShortDescription("The parent for the new editing path.");
+            
+            PropertyDescriptor parentPathTermEntry =
+                new PropertyDescriptor("parentPathTermEntry", getBeanDescriptor().getBeanClass());
+            parentPathTermEntry.setBound(true);
+            parentPathTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            parentPathTermEntry.setDisplayName("<html><font color='green'>path parent:");
+            parentPathTermEntry.setShortDescription("The parent for the new editing path.");
+            
 
             PropertyDescriptor originTime =
                 new PropertyDescriptor("originTime", getBeanDescriptor().getBeanClass());
@@ -48,14 +49,14 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             originTime.setShortDescription("The origin time in yyyy.MM.dd HH:mm:ss format or 'latest' for the latest change on the path.");
  
             PropertyDescriptor pathDescription =
-                new PropertyDescriptor("DescriptionForNewPath", getBeanDescriptor().getBeanClass());
+                new PropertyDescriptor("PathDescription", getBeanDescriptor().getBeanClass());
             pathDescription.setBound(true);
-            pathDescription.setPropertyEditorClass(JTextFieldEditor.class);
+            pathDescription.setPropertyEditorClass(PropertyNameLabelEditor.class);
             pathDescription.setDisplayName("<html><font color='green'>Path Description");
             pathDescription.setShortDescription("Description For NewPath");
  
             PropertyDescriptor rv[] =
-                {  parentPathTermEntry,originPathTermEntry, originTime, profilePropName,pathDescription};
+                { originPathTermEntry, parentPathTermEntry, originTime, profilePropName,pathDescription};
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

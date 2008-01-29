@@ -56,15 +56,15 @@ private static final long serialVersionUID = 1L;
 
    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
    
-   private String DescriptionForNewPath = "description";
+   private String  PathDescription = "Use Attachement";
 
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
-      out.writeObject(originPathTermEntry);
+      out.writeObject(originPathTermEntry);;
       out.writeObject(originTime);
       out.writeObject(profilePropName);
       out.writeObject(parentPathTermEntry );
-      out.writeObject(DescriptionForNewPath);
+      out.writeObject(PathDescription);
    }
 
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -74,7 +74,7 @@ private static final long serialVersionUID = 1L;
     	  originTime = (String)in.readObject();
           profilePropName = (String)in.readObject();
           parentPathTermEntry = (TermEntry)in.readObject();
-          DescriptionForNewPath = (String)in.readObject();    
+          PathDescription = (String)in.readObject();    
          
       } else {
          throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -89,14 +89,13 @@ private static final long serialVersionUID = 1L;
 
    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
       try {
+    	 String DescriptionForNewPath = (String) process.readProperty(PathDescription);
          I_TermFactory tf = LocalVersionedTerminology.get();
          I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
          Set<I_Path> savedEditingPaths = new HashSet<I_Path>(activeProfile.getEditingPathSet());
          try {
             //create parent of path 
             I_GetConceptData newPathConcept = createComponents(DescriptionForNewPath, tf, activeProfile,parentPathTermEntry);
-
-            tf.commit();
             // create origin of path 
             Set<I_Position> origins = new HashSet<I_Position>();
 
@@ -189,12 +188,13 @@ public void setOriginPathTermEntry(TermEntry originPathTermEntry) {
 	this.originPathTermEntry = originPathTermEntry;
 }
 
-public String getDescriptionForNewPath() {
-	return DescriptionForNewPath;
+public String getPathDescription() {
+	return PathDescription;
 }
 
-public void setDescriptionForNewPath(String descriptionForNewPath) {
-	DescriptionForNewPath = descriptionForNewPath;
+public void setPathDescription(String pathDescription) {
+	PathDescription = pathDescription;
 }
+
 
 }
