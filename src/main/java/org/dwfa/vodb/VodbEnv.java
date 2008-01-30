@@ -60,6 +60,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConceptAttributes;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
+import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_ProcessIds;
 import org.dwfa.ace.api.I_ProcessImages;
 import org.dwfa.ace.api.I_ProcessPaths;
@@ -119,6 +120,7 @@ import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
+import org.dwfa.vodb.types.I_ProcessExtByRefEntries;
 import org.dwfa.vodb.types.I_ProcessIdEntries;
 import org.dwfa.vodb.types.I_ProcessImageEntries;
 import org.dwfa.vodb.types.I_ProcessPathEntries;
@@ -226,7 +228,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
     TimePathIdBinder tbBinder = new TimePathIdBinder();
 
-    ThinExtBinder extBinder = new ThinExtBinder();
+    static ThinExtBinder extBinder = new ThinExtBinder();
 
     static ThinImageBinder imageBinder = new ThinImageBinder();
 
@@ -1427,22 +1429,22 @@ public class VodbEnv implements I_ImplementTermFactory {
         Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
         updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime) + " ms.");
         Hits hits = luceneSearcher.search(q);
-        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime) + " ms. Hits: " + hits.length());
+        updater.setProgressInfo("Query complete in " + Long.toString(System.currentTimeMillis() - startTime)
+                + " ms. Hits: " + hits.length());
 
         CountDownLatch hitLatch = new CountDownLatch(hits.length());
         updater.setHits(hits.length());
         updater.setIndeterminate(false);
 
-        
         for (int i = 0; i < hits.length(); i++) {
             Document doc = hits.doc(i);
             float score = hits.score(i);
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Hit: " + doc + " Score: " + score);
             }
-            
-            ACE.threadPool
-                    .execute(new CheckAndProcessLuceneMatch(hitLatch, updater, doc, score, matches, checkList, config, VodbEnv.this));
+
+            ACE.threadPool.execute(new CheckAndProcessLuceneMatch(hitLatch, updater, doc, score, matches, checkList,
+                                                                  config, VodbEnv.this));
         }
         if (logger.isLoggable(Level.INFO)) {
             if (tracker.continueWork()) {
@@ -1588,8 +1590,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 
         private CountDownLatch hitLatch;
 
-        public CheckAndProcessLuceneMatch(CountDownLatch hitLatch, LuceneProgressUpdator updater, Document doc, float score, Collection<LuceneMatch> matches,
-                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, VodbEnv env) {
+        public CheckAndProcessLuceneMatch(CountDownLatch hitLatch, LuceneProgressUpdator updater, Document doc,
+                float score, Collection<LuceneMatch> matches, List<I_TestSearchResults> checkList,
+                I_ConfigAceFrame config, VodbEnv env) {
             super();
             this.doc = doc;
             this.score = score;
@@ -1737,13 +1740,55 @@ public class VodbEnv implements I_ImplementTermFactory {
         relCursor.close();
     }
 
+    public void iterateExtByRefEntries(I_ProcessExtByRefEntries processor) throws Exception {
+        Cursor extCursor = extensionDb.openCursor(null, null);
+        DatabaseEntry foundKey = processor.getKeyEntry();
+        DatabaseEntry foundData = processor.getDataEntry();
+        while (extCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            try {
+                processor.processEbr(foundKey, foundData);
+            } catch (Exception e) {
+                extCursor.close();
+                throw e;
+            }
+        }
+        extCursor.close();
+    }
+
+    public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException {
+        try {
+            List<I_ThinExtByRefVersioned> returnList = new ArrayList<I_ThinExtByRefVersioned>();
+            Cursor extCursor = extensionDb.openCursor(null, null);
+            DatabaseEntry foundKey = new DatabaseEntry();
+            DatabaseEntry foundData = new DatabaseEntry();
+            while (extCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                try {
+                    I_ThinExtByRefVersioned extension = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
+                    if (extension.getRefsetId() == refsetId) {
+                        returnList.add(extension);
+                    }
+                } catch (Exception e) {
+                    extCursor.close();
+                    throw e;
+                }
+            }
+            extCursor.close();
+            return returnList;
+        } catch (Exception e) {
+            throw new ToIoException(e);
+        }
+    }
+
     private class ConceptIterator implements Iterator<I_GetConceptData> {
 
         DatabaseEntry foundKey = new DatabaseEntry();
+
         DatabaseEntry foundData = new DatabaseEntry();
 
         boolean hasNext;
+
         private Integer conceptId;
+
         private Cursor concCursor;
 
         private ConceptIterator() throws IOException {
@@ -1785,7 +1830,7 @@ public class VodbEnv implements I_ImplementTermFactory {
                 I_GetConceptData next = ConceptBean.get(conceptId);
                 getNext();
                 return next;
-            } 
+            }
             return null;
         }
 
@@ -1999,7 +2044,7 @@ public class VodbEnv implements I_ImplementTermFactory {
                 DatabaseEntry idValue = new DatabaseEntry();
                 intBinder.objectToEntry(newId.getNativeId(), idKey);
                 idBinding.objectToEntry(newId, idValue);
-                
+
                 try {
                     idPutSemaphore.acquire();
                     idDb.put(null, idKey, idValue);
@@ -2007,8 +2052,8 @@ public class VodbEnv implements I_ImplementTermFactory {
                 } catch (InterruptedException e2) {
                     throw new DatabaseException(e2);
                 }
-                
-               return newId.getNativeId();
+
+                return newId.getNativeId();
             } catch (DatabaseException ex) {
                 throw new ToIoException(ex);
             }
@@ -2068,6 +2113,7 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
 
     Semaphore idPutSemaphore = new Semaphore(1);
+
     public void writeId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
@@ -2075,7 +2121,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         idBinding.objectToEntry(id, idValue);
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Writing nativeId : " + id);
-            for (I_IdPart p: id.getVersions()) {
+            for (I_IdPart p : id.getVersions()) {
                 if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                     UUID secondaryId = (UUID) p.getSourceId();
                     try {
@@ -2402,6 +2448,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         }
         throw new ToIoException(new DatabaseException("Concept: " + nativeId + " not found."));
     }
+
     public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (logger.isLoggable(Level.FINER)) {
@@ -2671,7 +2718,8 @@ public class VodbEnv implements I_ImplementTermFactory {
     }
 
     private static class ProcessorWrapper implements I_ProcessDescriptionEntries, I_ProcessConceptAttributeEntries,
-            I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessPathEntries {
+            I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessPathEntries,
+            I_ProcessExtByRefEntries {
 
         I_ProcessConceptAttributes conceptAttributeProcessor;
 
@@ -2684,6 +2732,8 @@ public class VodbEnv implements I_ImplementTermFactory {
         I_ProcessImages imageProcessor;
 
         I_ProcessPaths pathProcessor;
+
+        I_ProcessExtByRef extProcessor;
 
         public ProcessorWrapper() {
             super();
@@ -2775,6 +2825,15 @@ public class VodbEnv implements I_ImplementTermFactory {
             this.pathProcessor.processPath(path);
         }
 
+        public void setExtProcessor(I_ProcessExtByRef extProcessor) {
+            this.extProcessor = extProcessor;
+        }
+
+        public void processEbr(DatabaseEntry key, DatabaseEntry value) throws Exception {
+            I_ThinExtByRefVersioned extension = (I_ThinExtByRefVersioned) extBinder.entryToObject(value);
+            this.extProcessor.processExtensionByReference(extension);
+        }
+
     }
 
     public static class ConceptIteratorWrapper implements I_ProcessConceptAttributeEntries {
@@ -2809,15 +2868,16 @@ public class VodbEnv implements I_ImplementTermFactory {
         iterateConceptAttributeEntries(wrapper);
     }
 
-    
-    
     private class DescriptionIterator implements Iterator<I_DescriptionVersioned> {
 
         DatabaseEntry foundKey = new DatabaseEntry();
+
         DatabaseEntry foundData = new DatabaseEntry();
 
         boolean hasNext;
+
         private I_DescriptionVersioned desc;
+
         private Cursor descCursor;
 
         private DescriptionIterator() throws IOException {
@@ -2859,7 +2919,7 @@ public class VodbEnv implements I_ImplementTermFactory {
                 I_DescriptionVersioned next = desc;
                 getNext();
                 return next;
-            } 
+            }
             return null;
         }
 
@@ -2868,7 +2928,7 @@ public class VodbEnv implements I_ImplementTermFactory {
         }
 
     }
-    
+
     public Iterator<I_DescriptionVersioned> getDescriptionIterator() throws IOException {
         return new DescriptionIterator();
     }
@@ -2907,6 +2967,12 @@ public class VodbEnv implements I_ImplementTermFactory {
     public void iterateConcepts(I_ProcessConcepts processor) throws Exception {
         ConceptIteratorWrapper wrapper = new ConceptIteratorWrapper(processor);
         iterateConceptAttributeEntries(wrapper);
+    }
+
+    public void iterateExtByRefs(I_ProcessExtByRef processor) throws Exception {
+        ProcessorWrapper wrapper = new ProcessorWrapper();
+        wrapper.setExtProcessor(processor);
+        iterateExtByRefEntries(wrapper);
     }
 
     private void writeTolicitIndex(String word, String type) throws IOException {
@@ -3134,7 +3200,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId) {
         ThinExtByRefVersioned thinEbr = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
-        ExtensionByReferenceBean ebrBean =  ExtensionByReferenceBean.makeNew(memberId, thinEbr);
+        ExtensionByReferenceBean ebrBean = ExtensionByReferenceBean.makeNew(memberId, thinEbr);
         ACE.addUncommitted(ebrBean);
         return thinEbr;
     }
