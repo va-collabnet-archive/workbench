@@ -176,7 +176,8 @@ public interface I_TermFactory {
 
     public void iterateConceptAttributes(I_ProcessConceptAttributes processor) throws Exception;
     
-
+    public void iterateExtByRefs(I_ProcessExtByRef processor) throws Exception;
+    
     public void iterateIds(I_ProcessIds processor) throws Exception;
 
     public void iterateImages(I_ProcessImages processor) throws Exception;
@@ -240,7 +241,9 @@ public interface I_TermFactory {
     public I_RelPart newRelPart();
     
     public I_ThinExtByRefVersioned getExtension(int memberId) throws IOException;
-    
+
+    public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException;
+
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
     
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
