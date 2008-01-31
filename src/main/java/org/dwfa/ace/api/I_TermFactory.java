@@ -121,7 +121,8 @@ public interface I_TermFactory {
     public void forget(I_RelVersioned rel);
 
     public void addUncommitted(I_GetConceptData concept);
-    public void addUncommitted(I_ThinExtByRefVersioned concept);
+    
+    public void addUncommitted(I_ThinExtByRefVersioned extension);
     /**
      * 
      * @return An unmodifiable set of uncommitted items. 
@@ -246,10 +247,6 @@ public interface I_TermFactory {
     public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException;
 
     /**
-     * 
-     * @param componentId
-     * @return
-     * @throws IOException
      * @deprecated use getAllExtensionsForComponent
      */
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
