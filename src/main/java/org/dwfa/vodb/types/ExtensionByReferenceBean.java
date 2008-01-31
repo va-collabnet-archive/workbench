@@ -30,7 +30,8 @@ import com.sleepycat.je.DatabaseException;
 
 public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 
-    private static WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>> ebrBeans = new WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>>();
+    private static WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>> ebrBeans = 
+        new WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>>();
 
     private ExtensionByReferenceBean(int memberId) {
         super();

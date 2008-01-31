@@ -247,7 +247,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData, I_Trans
             }
         }
         return descriptions;
-    }
+     }
 
     /*
      * (non-Javadoc)

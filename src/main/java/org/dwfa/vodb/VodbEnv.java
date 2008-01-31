@@ -1085,6 +1085,47 @@ public class VodbEnv implements I_ImplementTermFactory {
         }
     }
 
+    public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException {
+        try {
+            Stopwatch timer = null;
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Getting extensions from componentId for: " + componentId);
+                timer = new Stopwatch();
+                timer.start();
+            }
+            DatabaseEntry secondaryKey = new DatabaseEntry();
+
+            componentKeyCreator.createSecondaryKey(Integer.MIN_VALUE, componentId, secondaryKey);
+            DatabaseEntry foundData = new DatabaseEntry();
+
+            SecondaryCursor mySecCursor = getComponentToExtMap().openSecondaryCursor(null, null);
+            OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
+            List<I_ThinExtByRefVersioned> matches = new ArrayList<I_ThinExtByRefVersioned>();
+            int count = 0;
+            int rejected = 0;
+            while (retVal == OperationStatus.SUCCESS) {
+                I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder
+                        .entryToObject(foundData);
+                if (extFromComponentId.getComponentId() == componentId) {
+                    count++;
+                    matches.add(extFromComponentId);
+                } else {
+                    rejected++;
+                    break;
+                }
+                retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
+            }
+            mySecCursor.close();
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine(count + " extensions fetched, " + rejected + " extensions rejected " + "for: "
+                        + componentId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
+            }
+            return matches;
+        } catch (DatabaseException ex) {
+            throw new ToIoException(ex);
+        }
+    }
+
     public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
         Stopwatch timer = null;
         if (logger.isLoggable(Level.FINE)) {
@@ -2697,6 +2738,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
     public void addUncommitted(I_GetConceptData concept) {
         ACE.addUncommitted((I_Transact) concept);
+    }
+
+    public void addUncommitted(I_ThinExtByRefVersioned extension) {
+        ACE.addUncommitted(ExtensionByReferenceBean.make(extension.getMemberId(), extension));
     }
 
     public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
