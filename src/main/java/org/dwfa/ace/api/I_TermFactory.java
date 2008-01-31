@@ -121,6 +121,7 @@ public interface I_TermFactory {
     public void forget(I_RelVersioned rel);
 
     public void addUncommitted(I_GetConceptData concept);
+    public void addUncommitted(I_ThinExtByRefVersioned concept);
     /**
      * 
      * @return An unmodifiable set of uncommitted items. 
@@ -216,8 +217,8 @@ public interface I_TermFactory {
     public void suspendChangeSetWriters();
 
     /**
-     * Resume wrting of changes to change sets. 
-     * Typical usage is to call this mehods after completion
+     * Resume writing of changes to change sets. 
+     * Typical usage is to call this methods after completion
      * of importing change sets, so than user changes get 
      * properly recorded. 
      *
@@ -244,8 +245,17 @@ public interface I_TermFactory {
 
     public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException;
 
+    /**
+     * 
+     * @param componentId
+     * @return
+     * @throws IOException
+     * @deprecated use getAllExtensionsForComponent
+     */
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
-    
+
+    public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
+
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
     
     public I_ThinExtByRefPartBoolean newBooleanExtensionPart();

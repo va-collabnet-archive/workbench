@@ -1,6 +1,5 @@
 package org.dwfa.ace.task.commit;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.bpa.process.TaskFailedException;
 
@@ -10,7 +9,7 @@ import org.dwfa.bpa.process.TaskFailedException;
  * 
  * The intent is to provide a generic class for testing data constraints that can be applied:
  * <ol>
- * <li>When a change is made to a component
+ * <li>When a change is made to a component, before a commit
  * <li>When a change to a component is committed
  * <li>When a business process is applied to a component
  * <li>When a change set is imported
@@ -21,9 +20,6 @@ import org.dwfa.bpa.process.TaskFailedException;
  */
 public interface I_TestDataConstraints {
 
-    public boolean test(I_Transact component, 
-        I_ConfigAceFrame frameConfig, I_AlertToDataConstraintFailure alertObject) throws TaskFailedException;
-    
-    
+    public boolean test(I_Transact component, I_AlertToDataConstraintFailure failureAlertObject) throws TaskFailedException;
 
 }

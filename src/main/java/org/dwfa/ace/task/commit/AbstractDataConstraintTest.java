@@ -6,9 +6,6 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
-import javax.swing.JOptionPane;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -23,40 +20,6 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
 
     private static final int dataVersion = 1;
     
-    private class Alerter implements I_AlertToDataConstraintFailure {
-        private I_Work worker;
-        
-        public Alerter(I_Work worker) {
-            super();
-            this.worker = worker;
-        }
-
-        public void alert(String alertMessage) {
-            alert(alertMessage, null);
-        }
-        public Object alert(String alertMessage, Object[] fixOptions) {
-            if (showAlertOnFailure) {
-                JOptionPane.showMessageDialog(null, alertMessage,
-                                              "Commit test failed: ",
-                                              JOptionPane.ERROR_MESSAGE);
-                
-                if (fixOptions != null) {
-                     return JOptionPane.showInputDialog(null, "Would you like to apply one \n"+
-                                                                   "of the following data fixes?",
-                                                                   "Fixup avaible",
-                                                                   JOptionPane.QUESTION_MESSAGE,
-                                                                   null, // do not use a custom icon
-                                                                   fixOptions,
-                                                                   fixOptions[0]);
-                }
-            }
-            worker.getLogger().warning("Commit test failed: " + alertMessage);
-            return null;
-        }
-        
-    }
-    
-
     /**
      * Property name for the term component to test. 
      */
@@ -71,7 +34,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
      * If true, shows an alert on failure, in addition to the message written to the 
      * worker's log, if false, failure messages are sent only to the worker's log. 
      */
-    private Boolean showAlertOnFailure = false;
+    Boolean showAlertOnFailure = false;
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -100,8 +63,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         
         try {
             I_Transact component = (I_Transact) process.readProperty(componentPropName);
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            if (test(component, config, new Alerter(worker))) {
+            if (test(component, new Alerter(showAlertOnFailure, worker.getLogger()))) {
                 return Condition.TRUE;
             }
             return Condition.FALSE;
@@ -146,7 +108,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         this.componentPropName = componentPropName;
     }
 
-    public abstract boolean test(I_Transact component, I_ConfigAceFrame frameConfig, I_AlertToDataConstraintFailure alertObject)
+    public abstract boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject)
             throws TaskFailedException;
 
     public Boolean getShowAlertOnFailure() {
