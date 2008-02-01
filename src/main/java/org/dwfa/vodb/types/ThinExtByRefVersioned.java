@@ -356,7 +356,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         }
     }
 
-   public List<I_ThinExtByRefTuple> addTuples(I_IntSet allowedStatus, Set<I_Position> positions, boolean addUncommitted) {
+   public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus, Set<I_Position> positions, boolean addUncommitted) {
         List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
         addTuples(allowedStatus, positions, returnTuples, addUncommitted);
         return returnTuples;
