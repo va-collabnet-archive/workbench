@@ -34,7 +34,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
      * If true, shows an alert on failure, in addition to the message written to the 
      * worker's log, if false, failure messages are sent only to the worker's log. 
      */
-    Boolean showAlertOnFailure = false;
+    private Boolean showAlertOnFailure = false;
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {

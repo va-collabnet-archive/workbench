@@ -31,6 +31,10 @@ public interface I_ThinExtByRefVersioned {
     *      org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
     */
    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
-         List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted);
+       List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted);
+
+   public List<I_ThinExtByRefTuple> addTuples(I_IntSet allowedStatus, 
+                                              Set<I_Position> positions, 
+                                              boolean addUncommitted);
 
 }
