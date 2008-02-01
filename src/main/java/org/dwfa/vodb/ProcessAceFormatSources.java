@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -47,9 +48,25 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
         }
 	};
 	
+	private static class NamedThreadFactory implements ThreadFactory {
+	    private int threadCount = 0;
+	    private String factoryName = "factory";
+	    
+	    public NamedThreadFactory(String factoryName) {
+            super();
+            this.factoryName = factoryName;
+        }
 
-    protected static ExecutorService executors = Executors.newFixedThreadPool(8);
-    private static ExecutorService refsetExecutors = Executors.newFixedThreadPool(6);
+        public Thread newThread(Runnable r) {
+	        Thread t = new Thread(r);
+	        t.setName(factoryName + "-" + threadCount++);
+	        return t;
+	      }
+
+	}
+
+    protected static ExecutorService executors = Executors.newFixedThreadPool(8, new NamedThreadFactory("import executor"));
+    private static ExecutorService refsetExecutors = Executors.newFixedThreadPool(6, new NamedThreadFactory("refset executor"));
 
 
 

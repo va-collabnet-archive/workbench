@@ -40,7 +40,6 @@ public class ProcessMemberTaskInteger extends ProcessMemberTask {
         int version, int memberId, int intExt) throws Exception {
         check();
         semaphore.acquire();
-        
         if (taskArray == null) {
             
             taskArray = new ProcessMemberTaskInteger[TASK_SIZE + 2]; 

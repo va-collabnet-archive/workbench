@@ -3250,6 +3250,11 @@ public class VodbEnv implements I_ImplementTermFactory {
         return thinEbr;
     }
 
+    public I_ThinExtByRefVersioned newExtensionBypassCommit(int refsetId, int memberId, int componentId, int typeId) {
+        ThinExtByRefVersioned thinEbr = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
+        return thinEbr;
+    }
+
     public I_ThinExtByRefPartInteger newIntegerExtensionPart() {
         return new ThinExtByRefPartInteger();
     }

@@ -46,6 +46,7 @@ public abstract class ProcessMemberTask implements Runnable {
     public void run() {
         if (getProcessException() != null) {
             getSemaphore().release();
+            //System.out.println("ProcessMemberTask release 1 memberId: " + memberId);
             return;
         }
         boolean ready = true;
@@ -60,6 +61,7 @@ public abstract class ProcessMemberTask implements Runnable {
 
         if (getProcessException() != null) {
             getSemaphore().release();
+            //System.out.println("ProcessMemberTask release 2 memberId: " + memberId);
             return;
         }
         if (ready) {
@@ -83,7 +85,7 @@ public abstract class ProcessMemberTask implements Runnable {
                         }
                     }
                 } else {
-                    ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+                    ext = tf.newExtensionBypassCommit(refsetId, memberId, componentId, typeId);
                 }
                 
                 part.setPathId(pathId);
@@ -95,9 +97,11 @@ public abstract class ProcessMemberTask implements Runnable {
                 tf.writeExt(ext);
                 usable = true;
                 getSemaphore().release();
+                //System.out.println("ProcessMemberTask release 3 memberId: " + memberId);
             } catch (Exception ex) {
                 setProcessException(ex);
                 getSemaphore().release();
+                //System.out.println("ProcessMemberTask release 5 memberId: " + memberId);
             }
         } else {
             ProcessAceFormatSources.executors.submit(this);
