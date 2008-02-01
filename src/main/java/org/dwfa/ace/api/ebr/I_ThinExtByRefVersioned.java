@@ -33,7 +33,7 @@ public interface I_ThinExtByRefVersioned {
    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
        List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted);
 
-   public List<I_ThinExtByRefTuple> addTuples(I_IntSet allowedStatus, 
+   public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus, 
                                               Set<I_Position> positions, 
                                               boolean addUncommitted);
 
