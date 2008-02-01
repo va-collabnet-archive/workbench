@@ -39,8 +39,12 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		protected Map<Integer, ConceptBean> construct() throws Exception {
 			getProgress().setActive(true);
 			Map<Integer, ConceptBean> concepts = new HashMap<Integer, ConceptBean>();
-			for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
-				if (stopWork) {
+            Set<Integer> fetchSet = null;
+            synchronized (conceptsToFetch) {
+                fetchSet = new HashSet<Integer>(conceptsToFetch);
+            }
+            for (Integer id : fetchSet) {
+ 				if (stopWork) {
 					break;
 				}
 				ConceptBean b = ConceptBean.get(id);

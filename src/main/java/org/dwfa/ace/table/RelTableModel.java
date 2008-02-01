@@ -97,7 +97,11 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         @Override
         protected Map<Integer, ConceptBean> construct() throws Exception {
             referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, ConceptBean>());
-            for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
+            Set<Integer> fetchSet = null;
+            synchronized (conceptsToFetch) {
+                fetchSet = new HashSet<Integer>(conceptsToFetch);
+            }
+            for (Integer id : fetchSet) {
                 if (stopWork) {
                     break;
                 }
