@@ -31,20 +31,20 @@ import com.sleepycat.je.DatabaseException;
 
 public abstract class ProcessAceFormatSources extends ProcessSources {
 
-	enum REFSET_FILES {
+	enum REFSET_FILE_TYPES {
 		BOOLEAN("boolean.refset"), CONCEPT("concept.refset"), CONINT(
 				"conint.refset"), MEASUREMENT("measurement.refset"), INTEGER("integer.refset"), 
 				LANGUAGE("language.refset"), STRING("string.refset");
 
-		private String fileName;
+		private String fileNameSuffix;
 
-		REFSET_FILES(String fileName) {
-			this.fileName = fileName;
+		REFSET_FILE_TYPES(String fileName) {
+			this.fileNameSuffix = fileName;
 		}
 
-		private File getFile(File rootDir) {
-			return new File(rootDir, fileName);
-		}
+        public String getFileNameSuffix() {
+            return fileNameSuffix;
+        }
 	};
 	
 
@@ -252,19 +252,30 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	    HashMap<String, CountDownLatch> refsetLatchMap = new HashMap<String, CountDownLatch>();
 	    HashMap<String, Future<Boolean>> refsetFutureMap = new HashMap<String, Future<Boolean>>();
         
-		for (REFSET_FILES rf : REFSET_FILES.values()) {
-			if (rf.getFile(dataDir).exists()) {
-				getLog().info("Refset file: " + rf);
-	            int lineCount = countLines(rf.getFile(dataDir));
-	            getLog().info("Content file: " + rf.getFile(dataDir).getName() + " has lines: " + lineCount);
-                CountDownLatch refsetLatch = new CountDownLatch(lineCount);
-                refsetLatchMap.put(rf.toString(), refsetLatch);
-				FileReader fr = new FileReader(rf.getFile(dataDir));
-				BufferedReader br = new BufferedReader(fr);
-				LoadRefset refsetLoader = new LoadRefset(br, rf, refsetLatch);
-                Future<Boolean> future = refsetExecutors.submit(refsetLoader);
-                refsetFutureMap.put(rf.toString(), future);
-			}
+		for (final REFSET_FILE_TYPES refsetFileType : REFSET_FILE_TYPES.values()) {
+		    File[] matchingFiles = dataDir.listFiles(new FileFilter() {
+                public boolean accept(File f) {
+                    if (f.getName().toLowerCase().endsWith(refsetFileType.getFileNameSuffix().toLowerCase())) {
+                        return true;
+                    }
+                    return false;
+                }
+		    });
+		    
+		    if (matchingFiles != null) {
+		        for (File match: matchingFiles) {
+	                getLog().info("Refset file: " + match);
+	                int lineCount = countLines(match);
+	                getLog().info("Content file: " + match.getName() + " has lines: " + lineCount);
+	                CountDownLatch refsetLatch = new CountDownLatch(lineCount);
+	                refsetLatchMap.put(match.toString(), refsetLatch);
+	                FileReader fr = new FileReader(match);
+	                BufferedReader br = new BufferedReader(fr);
+	                LoadRefset refsetLoader = new LoadRefset(br, refsetFileType, match, refsetLatch);
+	                Future<Boolean> future = refsetExecutors.submit(refsetLoader);
+	                refsetFutureMap.put(match.toString(), future);
+		        }
+		    }
 		}
 
         for (String latchKey: refsetLatchMap.keySet()) {
@@ -306,14 +317,16 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	private class LoadRefset implements Callable<Boolean>  {
 	    
 	    Reader r;
-	    REFSET_FILES rf;
+	    File rf;
 	    CountDownLatch refsetLatch;
+        private REFSET_FILE_TYPES refsetType;
 	    
-	    private LoadRefset(Reader r, REFSET_FILES rf, CountDownLatch refsetLatch) {
+	    private LoadRefset(Reader r, REFSET_FILE_TYPES refsetType, File rf, CountDownLatch refsetLatch) {
             super();
             this.r = r;
             this.rf = rf;
             this.refsetLatch = refsetLatch;
+            this.refsetType = refsetType;
         }
 
         public Boolean call() throws Exception {
@@ -321,7 +334,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
                 long start = System.currentTimeMillis();
                 getLog().info("Started load of " + rf);
 
-                startRefsetRead(rf);
+                startRefsetRead(refsetType, rf);
                 StreamTokenizer st = new StreamTokenizer(r);
                 st.resetSyntax();
                 st.wordChars('\u001F', '\u00FF');
@@ -345,7 +358,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
                     tokenType = st.nextToken();
                     UUID pathUuid = (UUID) getId(st);
 
-                    finishMemberRead(rf, st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+                    finishMemberRead(refsetType, st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
 
                     members++;
 
@@ -370,7 +383,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
                 }
                 getLog().info("starting finish of " + rf);
-                finishRefsetRead(rf, refsetLatch);
+                finishRefsetRead(refsetType, rf, refsetLatch);
                 r.close();
                 getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed members: " + members);
             } catch (Exception ex) {
@@ -382,9 +395,9 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
 	}
 
-	private void finishMemberRead(REFSET_FILES rf, StreamTokenizer st, UUID refsetUuid,
+	private void finishMemberRead(REFSET_FILE_TYPES refsetFileType, StreamTokenizer st, UUID refsetUuid,
 			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
-		switch (rf) {
+		switch (refsetFileType) {
 		case BOOLEAN:
 			readBooleanMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
 			break;
@@ -407,13 +420,13 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             readStringMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
             break;
 		default:
-			throw new IOException("Can't handle refset type: " + rf);
+			throw new IOException("Can't handle refset type: " + refsetFileType);
 		}
 		
 	}
 	
-	protected abstract void startRefsetRead(REFSET_FILES rf) throws IOException;
-	protected abstract void finishRefsetRead(REFSET_FILES rf, CountDownLatch refsetLatch) throws IOException, Exception;
+	protected abstract void startRefsetRead(REFSET_FILE_TYPES refsetFileType, File rf) throws IOException;
+	protected abstract void finishRefsetRead(REFSET_FILE_TYPES refsetFileType, File rf, CountDownLatch refsetLatch) throws IOException, Exception;
 
     protected abstract void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
 			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception; 

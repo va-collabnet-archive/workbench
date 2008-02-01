@@ -1,5 +1,6 @@
 package org.dwfa.vodb;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
@@ -564,8 +565,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     }
 
     @Override
-    protected void finishRefsetRead(REFSET_FILES rf, CountDownLatch refsetLatch) throws Exception {
-        switch (rf) {
+    protected void finishRefsetRead(REFSET_FILE_TYPES refsetType, File refsetFile, CountDownLatch refsetLatch) throws Exception {
+        switch (refsetType) {
         case BOOLEAN:
             ProcessMemberTaskBoolean.check();
             getLog().info("Waiting for refset latch for boolean refset: " + refsetLatch.getCount());
@@ -609,13 +610,13 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             ProcessMemberTaskString.check();
             break;
         default:
-            throw new IOException("Can't handle refset type: " + rf);
+            throw new IOException("Can't handle refset type: " + refsetType);
         }
     }
 
     @Override
-    protected void startRefsetRead(REFSET_FILES rf) throws IOException {
-        switch (rf) {
+    protected void startRefsetRead(REFSET_FILE_TYPES refsetType, File refsetfile) throws IOException {
+        switch (refsetType) {
         case BOOLEAN:
             break;
         case CONCEPT:
@@ -631,7 +632,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         case STRING:
             break;
         default:
-            throw new IOException("Can't handle refset type: " + rf);
+            throw new IOException("Can't handle refset type: " + refsetType);
         }
     }
 
