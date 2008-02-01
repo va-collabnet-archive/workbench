@@ -145,13 +145,13 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 			}
 			getLog().info("Iteration complete...writing refsets");
 			for (I_ThinExtByRefVersioned ext: concept_extensions) {
-				writeRefsetFile(ext,"concept");
+				writeRefsetFile(ext);
 			}
 			for (I_ThinExtByRefVersioned ext: desc_extensions) {
-				writeRefsetFile(ext,"description");
+				writeRefsetFile(ext);
 			}
 			for (I_ThinExtByRefVersioned ext: rel_extensions) {
-				writeRefsetFile(ext,"relationship");
+				writeRefsetFile(ext);
 			}
 
 		} catch (IOException e) {
@@ -224,40 +224,6 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 					extensions.add(ext);
 				}
 
-				/*
-				if (version instanceof I_ThinExtByRefPartBoolean) {
-					System.out.println("boolean");
-				} else  if (version instanceof I_ThinExtByRefPartConcept) {					
-					if (RefsetAuxiliary.Concept.INCLUDE_LINEAGE.getUids().contains(termFactory.getConcept(((I_ThinExtByRefPartConcept) version).getConceptId()).getUids().iterator().next())) {
-						System.out.println("include linage");
-						this.addConceptInLinage(nativeId);
-
-					}
-					if (RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().contains(termFactory.getConcept(((I_ThinExtByRefPartConcept) version).getConceptId()).getUids().iterator().next())) {
-						System.out.println("include individual");
-
-					}
-					if (RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids().contains(termFactory.getConcept(((I_ThinExtByRefPartConcept) version).getConceptId()).getUids().iterator().next())) {
-						System.out.println("exclude invidivual");
-
-					}
-					if (RefsetAuxiliary.Concept.EXCLUDE_LINEAGE.getUids().contains(termFactory.getConcept(((I_ThinExtByRefPartConcept) version).getConceptId()).getUids().iterator().next())) {
-						System.out.println("exclude linage");
-
-					}
-				} else  if (version instanceof I_ThinExtByRefPartInteger) {
-					System.out.println("integer");					
-				} else  if (version instanceof I_ThinExtByRefPartLanguage) {
-					System.out.println("language");					
-				} else  if (version instanceof I_ThinExtByRefPartMeasurement) {
-					System.out.println("measurement");					
-				} else  if (version instanceof I_ThinExtByRefPartString) {
-					System.out.println("string");
-				} else  if (version instanceof I_ThinExtByRefTuple) {
-					System.out.println("tuple");
-				} 
-				 */
-
 				List<I_ThinExtByRefVersioned> ext_members = members.get(ext.getRefsetId());
 				if (ext_members == null) {
 					ext_members = new ArrayList<I_ThinExtByRefVersioned>();
@@ -282,7 +248,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 	}
 	 */
 
-	public void writeRefsetFile(I_ThinExtByRefVersioned ext, String memberType) throws IOException, TerminologyException {
+	private void writeRefsetFile(I_ThinExtByRefVersioned ext) throws IOException, TerminologyException {
 		String fsn = null;
 		String pft = null;
 
@@ -297,7 +263,9 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 		}
 
 getLog().info("Writing refset...");
-		File newrefsetFile = new File(refsetFile.getAbsolutePath().replace(".txt", fsn + "_" +memberType + ".txt"));
+		
+		
+		File newrefsetFile = new File(refsetFile.getAbsolutePath().replace(".txt", fsn + ".txt"));
 		refsetWriter = new BufferedWriter(new FileWriter(newrefsetFile,append));
 
 		refsetWriter.write("Refset uuid\tEffectiveTime\tStatus\tName\tShortName\tRefSetType\t");
@@ -323,52 +291,64 @@ getLog().info("Writing refset...");
 		refsetWriter.newLine();
 		refsetWriter.close();
 
-		writeMembers(ext.getRefsetId(), fsn, termFactory.getConcept(ext.getTypeId()),memberType);
+		writeMembers(ext.getRefsetId(), fsn, termFactory.getConcept(ext.getTypeId()));
 
 	}
 
-	public void writeMembers(int refsetId, String fsn, I_GetConceptData type,String memberType) throws IOException, TerminologyException {
+	public void writeMembers(int refsetId, String fsn, I_GetConceptData type) throws IOException, TerminologyException {
 
 		List<I_ThinExtByRefVersioned> ext_members = members.get(refsetId);
 
-		File newmemberFile = new File(memberFile.getAbsolutePath().replace(".txt", fsn + "_" +memberType + ".txt"));
-		memberWriter = new BufferedWriter(new FileWriter(newmemberFile,append));
-
 		int extensiontype = -1;
+		String fileextension = "";
+
 		getLog().info("Writing member...");
+
 		if (RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Language Extension");
 			extensiontype = LANGUAGE;
+			fileextension  = "language.refset";		
 		}
 		if (RefsetAuxiliary.Concept.INT_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Int Extension");
 			extensiontype = INTEGER;
+			fileextension  = "integer.refset";		
 		}
 		if (RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Measurement Extension");
 			extensiontype = MEASUREMENT;
+			fileextension  = "measurement.refset";		
 		}
 		if (RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Concept Extensions");
 			extensiontype = CONCEPT;
+			fileextension  = "concept.refset";		
 		}
 		if (RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Concept-Int Extension");
 			extensiontype = CONCEPT_INTEGER;
+			fileextension  = "conint.refset";		
 		}
 		if (RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Boolean Extension");
 			extensiontype = BOOLEAN;
+			fileextension  = "boolean.refset";		
 		}
 		if (RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting Scoped Language Extension");
 			extensiontype = SCOPED;
+			fileextension  = "scoped.refset";		
 		}
 		if (RefsetAuxiliary.Concept.STRING_EXTENSION.getUids().contains(type.getUids().iterator().next())) {
 			getLog().info("Exporting String Extension");
 			extensiontype = STRING;
+			fileextension  = "string.refset";		
 		}
 
+		
+		File newmemberFile = new File(memberFile.getAbsolutePath().replace(".txt", fsn + "." + fileextension));		
+		memberWriter = new BufferedWriter(new FileWriter(newmemberFile,append));
+		
 		memberWriter.write("refset uuid\tmember uuid\tstatus uuid\tcomponent uuid\teffective date\tpath");
 		switch (extensiontype) {
 		case LANGUAGE:							
