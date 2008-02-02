@@ -20,6 +20,13 @@ public class TestForUneditedDefaultsBeanInfo extends SimpleBeanInfo {
             showAlertOnFailure.setDisplayName("<html><font color='green'>Show alerts:");
             showAlertOnFailure.setShortDescription("Show alerts on failure...");
 
+            PropertyDescriptor forCommit =
+                new PropertyDescriptor("forCommit", getBeanDescriptor().getBeanClass());
+            forCommit.setBound(true);
+            forCommit.setPropertyEditorClass(CheckboxEditor.class);
+            forCommit.setDisplayName("<html><font color='green'>Show alerts:");
+            forCommit.setShortDescription("Show alerts on failure...");
+
             PropertyDescriptor profilePropName =
                 new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
@@ -35,7 +42,7 @@ public class TestForUneditedDefaultsBeanInfo extends SimpleBeanInfo {
             componentPropName.setShortDescription("The property that contains the component to test.");
 
             PropertyDescriptor rv[] =
-                { showAlertOnFailure, profilePropName, componentPropName };
+                { showAlertOnFailure, forCommit, profilePropName, componentPropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

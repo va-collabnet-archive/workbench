@@ -32,17 +32,17 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
     }
 
     @Override
-    public boolean test(I_GetConceptData concept, I_AlertToDataConstraintFailure alertObject)
+    public boolean test(I_GetConceptData concept, I_AlertToDataConstraintFailure alertObject, boolean forCommit)
             throws TaskFailedException {
         boolean success = true;
         try {
             for (I_DescriptionVersioned desc: concept.getDescriptions()) {
-                if (testDescription(alertObject, desc) == false) {
+                if (testDescription(alertObject, desc, forCommit) == false) {
                     success = false;
                 }
             }
             for (I_DescriptionVersioned desc: concept.getUncommittedDescriptions()) {
-                if (testDescription(alertObject, desc) == false) {
+                if (testDescription(alertObject, desc, forCommit) == false) {
                     success = false;
                 }
             }
@@ -52,7 +52,7 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
         return success;
     }
 
-    private boolean testDescription(I_AlertToDataConstraintFailure alertObject, I_DescriptionVersioned desc) {
+    private boolean testDescription(I_AlertToDataConstraintFailure alertObject, I_DescriptionVersioned desc, boolean forCommit) {
         for (I_DescriptionPart part: desc.getVersions()) {
             if (part.getVersion() == Integer.MAX_VALUE) {
                 if (part.getText().equalsIgnoreCase("New Fully Specified Description") || 

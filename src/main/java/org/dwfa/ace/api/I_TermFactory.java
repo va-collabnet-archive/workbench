@@ -242,6 +242,8 @@ public interface I_TermFactory {
      */
     public I_RelPart newRelPart();
     
+    public I_GetExtensionData getExtensionWrapper(int memberId) throws IOException;
+    
     public I_ThinExtByRefVersioned getExtension(int memberId) throws IOException;
 
     public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException;
@@ -252,6 +254,8 @@ public interface I_TermFactory {
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
 
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
+
+    public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted) throws IOException;
 
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
     

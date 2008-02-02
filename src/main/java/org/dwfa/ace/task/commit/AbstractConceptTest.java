@@ -26,12 +26,12 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
     }
 
     @Override
-    public final boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject) throws TaskFailedException {
+    public final boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject, boolean forCommit) throws TaskFailedException {
         if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
-            return test((I_GetConceptData) component, alertObject);
+            return test((I_GetConceptData) component, alertObject, forCommit);
         }
         return true;
     }
     
-    public abstract boolean test(I_GetConceptData concept, I_AlertToDataConstraintFailure alertObject) throws TaskFailedException;
+    public abstract boolean test(I_GetConceptData concept, I_AlertToDataConstraintFailure alertObject, boolean forCommit) throws TaskFailedException;
 }

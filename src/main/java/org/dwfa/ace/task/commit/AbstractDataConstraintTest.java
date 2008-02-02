@@ -35,6 +35,11 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
      * worker's log, if false, failure messages are sent only to the worker's log. 
      */
     private Boolean showAlertOnFailure = false;
+    
+    /**
+     * If true, the task does the data constraint test with the forCommit paramater set to true. 
+     */
+    private Boolean forCommit = true;
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -63,7 +68,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         
         try {
             I_Transact component = (I_Transact) process.readProperty(componentPropName);
-            if (test(component, new Alerter(showAlertOnFailure, worker.getLogger()))) {
+            if (test(component, new Alerter(showAlertOnFailure, worker.getLogger()), forCommit)) {
                 return Condition.TRUE;
             }
             return Condition.FALSE;
@@ -108,7 +113,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         this.componentPropName = componentPropName;
     }
 
-    public abstract boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject)
+    public abstract boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject, boolean forCommit)
             throws TaskFailedException;
 
     public Boolean getShowAlertOnFailure() {
@@ -118,5 +123,13 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
     public void setShowAlertOnFailure(Boolean showAlertOnFailure) {
         this.showAlertOnFailure = showAlertOnFailure;
     }
+
+	public Boolean getForCommit() {
+		return forCommit;
+	}
+
+	public void setForCommit(Boolean forCommit) {
+		this.forCommit = forCommit;
+	}
 
 }

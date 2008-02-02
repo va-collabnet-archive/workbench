@@ -20,6 +20,6 @@ import org.dwfa.bpa.process.TaskFailedException;
  */
 public interface I_TestDataConstraints {
 
-    public boolean test(I_Transact component, I_AlertToDataConstraintFailure failureAlertObject) throws TaskFailedException;
+    public boolean test(I_Transact component, I_AlertToDataConstraintFailure failureAlertObject, boolean forCommit) throws TaskFailedException;
 
 }

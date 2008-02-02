@@ -27,19 +27,19 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
     }
 
     @Override
-    public final boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject) throws TaskFailedException {
+    public final boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject, boolean forCommit) throws TaskFailedException {
         if (I_GetExtensionData.class.isAssignableFrom(component.getClass())) {
             I_GetExtensionData extension = (I_GetExtensionData) component;
             try {
-                return test(extension.getExtension(), alertObject);
+                return test(extension.getExtension(), alertObject, forCommit);
             } catch (IOException e) {
                 throw new TaskFailedException(e);
             }
         } else if (I_ThinExtByRefVersioned.class.isAssignableFrom(component.getClass())) {
-            return test((I_ThinExtByRefVersioned) component, alertObject);
+            return test((I_ThinExtByRefVersioned) component, alertObject, forCommit);
         } 
         return true;
     }
     
-    public abstract boolean test(I_ThinExtByRefVersioned extension, I_AlertToDataConstraintFailure alertObject) throws TaskFailedException;
+    public abstract boolean test(I_ThinExtByRefVersioned extension, I_AlertToDataConstraintFailure alertObject, boolean forCommit) throws TaskFailedException;
 }
