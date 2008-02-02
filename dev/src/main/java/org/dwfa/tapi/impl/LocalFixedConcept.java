@@ -166,7 +166,8 @@ public class LocalFixedConcept implements I_ConceptualizeLocally,
 			concept.primitive = primitive;
 		} else {
 			if (concept.primitive.equals(primitive) == false) {
-				throw new TerminologyException("Primitive states do not agree for: " + uids);
+				throw new TerminologyException("Primitive states do not agree for: " + uids +
+						" provided: " + primitive + " retrieved: " + concept.primitive);
 			}
 		}
 		return concept;
