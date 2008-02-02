@@ -101,7 +101,6 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 				ConceptBean b = ConceptBean.get(id);
 				b.getDescriptions();
 				concepts.put(id, b);
-
 			}
 			return concepts;
 		}

@@ -218,7 +218,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static void addUncommitted(I_Transact to) {
         for (I_TestDataConstraints test : creationTests) {
             try {
-                if (test.test(to, dataTestAlerter) == false) {
+                if (test.test(to, dataTestAlerter, false) == false) {
                     to.abort();
                     return;
                 }
@@ -283,7 +283,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         for (I_Transact to : uncommitted) {
             for (I_TestDataConstraints test : commitTests) {
                 try {
-                    if (test.test(to, dataTestAlerter) == false) {
+                    if (test.test(to, dataTestAlerter, true) == false) {
                         testFailureSet.add(to);
                         testFailures = true;
                     }

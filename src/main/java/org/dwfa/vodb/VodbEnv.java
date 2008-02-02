@@ -1085,6 +1085,17 @@ public class VodbEnv implements I_ImplementTermFactory {
         }
     }
 
+	public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId,
+			boolean addUncommitted) throws IOException {
+		List<I_ThinExtByRefVersioned> extensions = getAllExtensionsForComponent(componentId);
+		
+		for (I_GetExtensionData wrapper: ExtensionByReferenceBean.getNewExtensions(componentId)) {
+			extensions.add(wrapper.getExtension());
+		}
+		
+		return extensions;
+	}
+
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException {
         try {
             Stopwatch timer = null;
@@ -1108,7 +1119,8 @@ public class VodbEnv implements I_ImplementTermFactory {
                         .entryToObject(foundData);
                 if (extFromComponentId.getComponentId() == componentId) {
                     count++;
-                    matches.add(extFromComponentId);
+                    ExtensionByReferenceBean extBean = ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId);
+                    matches.add(extBean.getExtension());
                 } else {
                     rejected++;
                     break;
@@ -3282,5 +3294,10 @@ public class VodbEnv implements I_ImplementTermFactory {
     public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart() {
         return new ThinExtByRefPartConceptInt();
     }
+
+	public I_GetExtensionData getExtensionWrapper(int nid) throws IOException {
+		return ExtensionByReferenceBean.get(nid);
+	}
+
 
 }

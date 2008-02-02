@@ -260,7 +260,9 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
     * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
     */
    public I_ConceptualizeLocally getLocalFixedConcept() {
-      return LocalFixedConcept.get(conId, versions.get(versions.size() - 1).isDefined());
+	  boolean isDefined = versions.get(versions.size() - 1).isDefined();
+	  boolean isPrimitive = ! isDefined;
+      return LocalFixedConcept.get(conId, isPrimitive);
    }
 
    @Override
