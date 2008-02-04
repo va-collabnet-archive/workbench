@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -468,34 +470,25 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 					+ ") - start for concept " + getFsnFromConceptId(extensionPart.getComponentId()));
 
             if (extensionPart != null) {
-
-                int latest = Integer.MIN_VALUE;
                 I_ThinExtByRefPart latestVersion = null;
-                int pathId = memberSetPath.getConceptId();
-                                
-                for (I_ThinExtByRefPart currentVersion : extensionPart.getVersions()) {
-					if (currentVersion.getPathId() == pathId && currentVersion.getVersion() > latest) {
-                        latest = currentVersion.getVersion();
-                        latestVersion = currentVersion;
-                    }
-                }
+                
+    			I_IntSet status = termFactory.newIntSet();
+    			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
+                
+                List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+                extensionPart.addTuples(status, null, exensionParts, true);
+                
+                latestVersion = assertExactlyOne(exensionParts);
 
-                if (latestVersion != null) {
-	                // this is the latest version, so mark as retired
-	                I_ThinExtByRefPart clone = latestVersion.duplicatePart();
-	                clone.setStatus(retiredConceptId);
-	                clone.setVersion(Integer.MAX_VALUE);
-	                extensionPart.addVersion(clone);
+                I_ThinExtByRefPart clone = latestVersion.duplicatePart();
+                clone.setStatus(retiredConceptId);
+                clone.setVersion(Integer.MAX_VALUE);
+                extensionPart.addVersion(clone);
 	
-	    			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
-	    					+ getFsnFromConceptId(extensionPart.getComponentId()));
+    			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
+    					+ getFsnFromConceptId(extensionPart.getComponentId()));
 	    			
-	    			termFactory.addUncommitted(extensionPart);
-                } else {
-                	getLog().info("No latest version in " + extensionPart.getVersions() + " for " 
-                			+ getFsnFromConceptId(extensionPart.getComponentId()) + " for path " + pathId);
-                }
-                	
+    			termFactory.addUncommitted(extensionPart);
             }
 
 			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
