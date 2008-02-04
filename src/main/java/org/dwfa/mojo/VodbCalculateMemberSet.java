@@ -33,6 +33,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
  * Calculates the member set of a particular reference set.
@@ -115,8 +116,6 @@ public class VodbCalculateMemberSet extends AbstractMojo {
      */
     private ConceptDescriptor rootDescriptor;
     
-    private UUID[] IS_A_UUID = new UUID[] {UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")};
-
     /**
      * Iterates over each concept and calculates the member set.
      */
@@ -227,14 +226,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             I_GetConceptData memberSetPathConcept = memberSetPathDescriptor.getVerifiedConcept();
             memberSetPath = termFactory.getPath(memberSetPathConcept.getUids());
 
-            // find the children of this concept
-            I_IntSet generatesRel = termFactory.newIntSet();
-            generatesRel.add(ConceptConstants.GENERATES_REL.localize().getNid());
-
-			I_IntSet status = termFactory.newIntSet();
-			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-
-            I_GetConceptData memberSetSpecConcept = assertExactlyOne(refConcept.getSourceRelTargets(status, generatesRel, null, false));
+            I_GetConceptData memberSetSpecConcept = assertExactlyOne(refConcept.getSourceRelTargets(
+            		getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), 
+            		getIntSet(ConceptConstants.GENERATES_REL), null, false));
                         
             memberSetId = memberSetSpecConcept.getConceptId();
 
@@ -386,16 +380,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                 }
             }
 
-            // find the children of this concept
-            I_IntSet isARel = termFactory.newIntSet();
-			isARel.add(termFactory.getConcept(IS_A_UUID).getConceptId());
-
-			I_IntSet status = termFactory.newIntSet();
-			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId());
-
             List<I_RelTuple> children = concept.getDestRelTuples(
-                    status, isARel, null, false);
+            		getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
+            		getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
 
             getLog().info("processConcept(I_GetConceptData) - processing " + children.size() + " children");
             
@@ -425,39 +412,14 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 				getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
                 return false;
             }
-
-            int latest = Integer.MIN_VALUE;
-
-            List<? extends I_ThinExtByRefPart> extensionVersions = extensionPart.getVersions();
-            for (I_ThinExtByRefPart currentVersion : extensionVersions) {
-                if (currentVersion.getVersion() > latest) {
-                    latest = currentVersion.getVersion();
-                }
-            }
-
-            for (I_ThinExtByRefPart currentVersion : extensionVersions) {
-                if (currentVersion.getVersion() == latest) {
-                    if (currentVersion.getStatus() == retiredConceptId) {
-                        // the concept has been retired, so the latest version
-                        // does NOT include this concept
-
-						getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
-                        return false;
-                    } else if (currentVersion.getStatus() == currentStatusId) {
-						getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + true); //$NON-NLS-1$
-                        return true;
-                    } else {
-                        System.out.println("Unknown status: " + currentVersion.getStatus());
-                        System.exit(1);
-
-						getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
-                        return false;
-                    }
-                }
-            }
-
-			getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
-            return false;
+            
+            List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+            extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+            
+            boolean result = exensionParts.size() > 0;
+			getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
+			
+			return result;
         }
 
         /**
@@ -470,15 +432,11 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 					+ ") - start for concept " + getFsnFromConceptId(extensionPart.getComponentId()));
 
             if (extensionPart != null) {
-                I_ThinExtByRefPart latestVersion = null;
-                
-    			I_IntSet status = termFactory.newIntSet();
-    			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-                
+                                
                 List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
-                extensionPart.addTuples(status, null, exensionParts, true);
+                extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
                 
-                latestVersion = assertExactlyOne(exensionParts);
+                I_ThinExtByRefPart latestVersion = assertExactlyOne(exensionParts);
 
                 I_ThinExtByRefPart clone = latestVersion.duplicatePart();
                 clone.setStatus(retiredConceptId);
@@ -533,15 +491,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
         private int getMembershipType(int includeTypeConceptId) throws Exception {
 			I_GetConceptData includeConcept = termFactory.getConcept(includeTypeConceptId);
-			
-            // get latest IS-A relationships
-            I_IntSet relType = termFactory.newIntSet();
-            relType.add(ConceptConstants.CREATES_MEMBERSHIP_TYPE.localize().getNid());
-
-			I_IntSet status = termFactory.newIntSet();
-			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-			
-			Set<I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(status, relType, null, false);
+						
+			Set<I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(
+					getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(ConceptConstants.CREATES_MEMBERSHIP_TYPE), null, false);
 			
 			return assertExactlyOne(membershipTypes).getConceptId();
 		}
@@ -560,16 +512,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 					+ concept.getDescriptions().iterator().next() 
 					+ ", boolean=" + includeChildren + ") - start");
 
-            // get latest IS-A relationships
-            I_IntSet isARel = termFactory.newIntSet();
-            isARel.add(termFactory.getConcept(IS_A_UUID).getConceptId());
-
-			I_IntSet status = termFactory.newIntSet();
-			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-			status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId());
-
             List<I_RelTuple> children = concept.getDestRelTuples(
-                    status, isARel, null, false);
+            		getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
+            		getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
             
             getLog().info("markAllChildren(I_GetConceptData, boolean) - concept has " + children.size() + " children");
 
@@ -596,7 +541,27 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 			getLog().info("markAllChildren(I_GetConceptData, boolean) - end");
         }
+		
+		private I_IntSet getIntSet(ArchitectonicAuxiliary.Concept... concepts) throws Exception {
+			I_IntSet status = termFactory.newIntSet();
+			
+			for (ArchitectonicAuxiliary.Concept concept : concepts) {
+				status.add(termFactory.getConcept(concept.getUids()).getConceptId());
+			}
+			
+			return status;
+		}
 
+		private I_IntSet getIntSet(ConceptSpec... concepts) throws Exception {
+			I_IntSet status = termFactory.newIntSet();
+			
+			for (ConceptSpec concept : concepts) {
+				status.add(concept.localize().getNid());
+			}
+			
+			return status;
+		}
+		
         /**
          * Gets the number of members in the specified reference set.
          * @return
