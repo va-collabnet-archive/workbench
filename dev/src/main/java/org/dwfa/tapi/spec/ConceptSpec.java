@@ -22,7 +22,7 @@ public class ConceptSpec {
     private RelSpec[] relSpecs;
 
     public ConceptSpec(String description, String uuid) {
-        this(description, uuid, (RelSpec) null);
+        this(description, uuid, new RelSpec[]{});
     }
 
     public ConceptSpec(String description, String uuid, RelSpec... relSpecs) {
@@ -30,7 +30,7 @@ public class ConceptSpec {
     }
 
     public ConceptSpec(String description, UUID uuid) {
-        this(description, new UUID[] { uuid }, (RelSpec) null);
+        this(description, new UUID[] { uuid }, new RelSpec[]{});
     }
 
     public ConceptSpec(String description, UUID uuid, RelSpec... relSpecs) {
