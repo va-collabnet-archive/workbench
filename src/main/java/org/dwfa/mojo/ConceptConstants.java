@@ -9,8 +9,8 @@ import org.dwfa.tapi.spec.ConceptSpec;
  */
 public class ConceptConstants {
 
-	public static final ConceptSpec GENERATES_REL = new ConceptSpec("generates", "76121e86-0a1f-4de4-a6e2-d7d4e23fe082");
-	public static final ConceptSpec CREATES_MEMBERSHIP_TYPE = new ConceptSpec("creates membership type", "4da3d37b-4e17-4672-b28f-15ac4e739b9f");
+	public static final ConceptSpec GENERATES_REL = new ConceptSpec("generates", "e22745a4-c59b-4ebe-b703-bd3fffaa4e80");
+	public static final ConceptSpec CREATES_MEMBERSHIP_TYPE = new ConceptSpec("creates membership type", "6873fb42-95b1-4835-994d-9745263393fb");
 	public static final ConceptSpec SNOMED_IS_A = new ConceptSpec("is a", "c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
 
 }
