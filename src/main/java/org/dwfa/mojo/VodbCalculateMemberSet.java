@@ -436,17 +436,19 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                 List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
                 extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
                 
-                I_ThinExtByRefPart latestVersion = assertExactlyOne(exensionParts);
+                if (exensionParts.size() > 0) {
+                    I_ThinExtByRefPart latestVersion = assertExactlyOne(exensionParts);
 
-                I_ThinExtByRefPart clone = latestVersion.duplicatePart();
-                clone.setStatus(retiredConceptId);
-                clone.setVersion(Integer.MAX_VALUE);
-                extensionPart.addVersion(clone);
-	
-    			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
-    					+ getFsnFromConceptId(extensionPart.getComponentId()));
-	    			
-    			termFactory.addUncommitted(extensionPart);
+                    I_ThinExtByRefPart clone = latestVersion.duplicatePart();
+                    clone.setStatus(retiredConceptId);
+                    clone.setVersion(Integer.MAX_VALUE);
+                    extensionPart.addVersion(clone);
+    	
+        			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
+        					+ getFsnFromConceptId(extensionPart.getComponentId()));
+    	    			
+        			termFactory.addUncommitted(extensionPart);
+                }
             }
 
 			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
