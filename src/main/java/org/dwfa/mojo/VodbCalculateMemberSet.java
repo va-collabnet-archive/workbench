@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -53,7 +54,6 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 	/**
      * @parameter
-     * @required
      * The concept descriptor for the ref set spec.
      */
     private ConceptDescriptor refSetSpecDescriptor;
@@ -116,10 +116,52 @@ public class VodbCalculateMemberSet extends AbstractMojo {
      */
     private ConceptDescriptor rootDescriptor;
     
+    
+
+    
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		
+
+    	if (refSetSpecDescriptor==null) {
+            try {
+                I_TermFactory termFactory = LocalVersionedTerminology.get();
+            	termFactory.iterateExtByRefs(new I_ProcessExtByRef() {
+					public void processExtensionByReference(
+							I_ThinExtByRefVersioned extension) throws Exception {
+				        	I_TermFactory termFactory = LocalVersionedTerminology.get();
+				        	I_GetConceptData refsetConcept = termFactory.getConcept(extension.getRefsetId());
+				        	
+				        	I_IntSet purpose = termFactory.newIntSet();
+				        	purpose.add(termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId());
+				        	I_IntSet status = termFactory.newIntSet();
+				        	purpose.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
+				        	
+				            I_GetConceptData purposeConcept = refsetConcept.getSourceRelTargets(status,purpose, null, false).iterator().next();
+				        	if (purposeConcept.getConceptId()==termFactory.getConcept(RefsetAuxiliary.Concept.INCLUSION_SPECIFICATION.getUids()).getConceptId()) {
+				        		getLog().debug("Found refset with inclusion specification: " + refsetConcept);
+								runMojo(refsetConcept);
+				        	} else {
+				        		getLog().debug("Found refset without inclusion specification: " + refsetConcept);
+				        	}
+					}});
+            } catch (Exception e) {
+            	throw new MojoExecutionException(e.getMessage());
+            } 
+    		
+    	} else {		
+    		try {
+    			runMojo(refSetSpecDescriptor.getVerifiedConcept());
+    		} catch (Exception e) {
+            	throw new MojoExecutionException(e.getMessage());
+    		}
+    	}
+	}
+
+	
     /**
      * Iterates over each concept and calculates the member set.
      */
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void runMojo(I_GetConceptData refSetSpecDescriptor) throws MojoExecutionException, MojoFailureException {
 
     	getLog().info("Executing VodbCalculateMemberSet mojo");
     	
@@ -131,7 +173,8 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
             // iterate over each concept, starting at the root
             calculator.processConcept(calculator.getRoot());
-
+            
+            
             // write list of uuids for concepts that were included
             // in the member set
             refsetInclusionsOutputFile.getParentFile().mkdirs();
@@ -167,7 +210,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             String message = "Number of members found in reference set: "
                             + calculator.getMemberSetCount();
             getLog().info(message);
-            termFactory.commit();
+//            termFactory.commit();
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -208,6 +251,8 @@ public class VodbCalculateMemberSet extends AbstractMojo {
         private int currentStatusId;
         private I_GetConceptData root;
 
+        private int processedConcepts = 0;
+        
         /**
          * Calculates a member set given a reference set spec.
          * @param referenceSetId The id of the reference set of which we wish to
@@ -215,7 +260,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          * @throws Exception
          */
         public MemberSetCalculator() throws Exception {
-			getLog().info("MemberSetCalculator() - start");
+			getLog().debug("MemberSetCalculator() - start");
 
             termFactory = LocalVersionedTerminology.get();
 
@@ -251,7 +296,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             typeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
             currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 
-			getLog().info("MemberSetCalculator() - end");
+			getLog().debug("MemberSetCalculator() - end");
         }
 
         private <T> T assertExactlyOne(
@@ -269,8 +314,13 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          * (recursively).
          */
         public void processConcept(I_GetConceptData concept) throws Exception {
-			getLog().info("processConcept(I_GetConceptData) " 
+			getLog().debug("processConcept(I_GetConceptData) " 
 					+ concept == null ? null : concept.getDescriptions().iterator().next() + " - start");
+			
+			processedConcepts++;
+			if (processedConcepts % 10000 ==0) {
+				getLog().info("Processed " + processedConcepts + " concepts");
+			}
 			
             int conceptId = concept.getConceptId();
             
@@ -283,30 +333,30 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             I_ThinExtByRefVersioned memberSet = null;
             for (I_GetExtensionData refSetExtension: extensions) {
                 if (refSetExtension.getExtension().getRefsetId() == referenceSetId) {
-        			getLog().info("processConcept(I_GetConceptData) - found refset spec " + referenceSetId);
+        			getLog().debug("processConcept(I_GetConceptData) - found refset spec " + referenceSetId);
                     refsetCount++;
                 }
                 if (refSetExtension.getExtension().getRefsetId() == memberSetId) {
-        			getLog().info("processConcept(I_GetConceptData) - found refset membership " + referenceSetId);
+        			getLog().debug("processConcept(I_GetConceptData) - found refset membership " + referenceSetId);
                     memberSet = refSetExtension.getExtension();
                 }
             }
             boolean includedInLatestMemberSet = latestMembersetIncludesConcept(memberSet);
             
             if (refsetCount == 0) {
-    			getLog().info("processConcept(I_GetConceptData) - no explicit refset instruction");
+    			getLog().debug("processConcept(I_GetConceptData) - no explicit refset instruction");
     			
     			// no refsets have been found so check if there are any inherited
                 // conditions
                 if (includedLineage.contains(conceptId)) {
-        			getLog().info("processConcept(I_GetConceptData) - inherited include " + getFsnFromConceptId(concept.getConceptId()));
+        			getLog().debug("processConcept(I_GetConceptData) - inherited include " + getFsnFromConceptId(concept.getConceptId()));
 
         			// this concept has an inherited condition for inclusion
                     if (!includedInLatestMemberSet) {
                         addToMemberSet(conceptId, includeLineageId);
                     }
                 } else if (excludedLineage.contains(conceptId)) {
-                	getLog().info("processConcept(I_GetConceptData) - inherited exclude " + getFsnFromConceptId(concept.getConceptId()));
+                	getLog().debug("processConcept(I_GetConceptData) - inherited exclude " + getFsnFromConceptId(concept.getConceptId()));
                     excludedMemberSet.add(conceptId);
                     if (memberSet != null) {
                     	retireLatestExtension(memberSet);
@@ -319,7 +369,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
                 I_ThinExtByRefVersioned part = extensionData.getExtension();
                 int extensionTypeId = part.getTypeId();
-            	getLog().info("processConcept(I_GetConceptData) - processing extensionTypeId " + extensionTypeId 
+            	getLog().debug("processConcept(I_GetConceptData) - processing extensionTypeId " + extensionTypeId 
             			+ " referenceSetId " + extensionData.getExtension().getRefsetId());
 
 
@@ -328,50 +378,50 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                     // only look at the ref set extensions that correspond to
                     // the reference set as specified in maven plugin config
                     int typeId = 0;
-                	getLog().info("processConcept(I_GetConceptData) - valid type/refset, processing");
+                	getLog().debug("processConcept(I_GetConceptData) - valid type/refset, processing");
 
                     List<? extends I_ThinExtByRefPart> versions = part.getVersions();
                     for (I_ThinExtByRefPart version : versions) {
                         I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) version;
                         typeId = temp.getConceptId();
-                    	getLog().info("processConcept(I_GetConceptData) - determining type version " 
+                    	getLog().debug("processConcept(I_GetConceptData) - determining type version " 
                     			+ temp.getVersion() + " type now " + typeId);
                     }
 
                     boolean include = true;
                     if (typeId == includeIndividualId) {
                         if (!includedInLatestMemberSet) {
-                        	getLog().info("processConcept(I_GetConceptData) - including individual " + getFsnFromConceptId(concept.getConceptId()));
+                        	getLog().debug("processConcept(I_GetConceptData) - including individual " + getFsnFromConceptId(concept.getConceptId()));
                             addToMemberSet(conceptId, typeId);
                         } else {
-                        	getLog().info("processConcept(I_GetConceptData) - already included in last generation");
+                        	getLog().debug("processConcept(I_GetConceptData) - already included in last generation");
                         }
                     } else if (typeId == includeLineageId) {
                         if (!includedInLatestMemberSet) {
-                        	getLog().info("processConcept(I_GetConceptData) - including individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
+                        	getLog().debug("processConcept(I_GetConceptData) - including individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
                             addToMemberSet(conceptId, typeId);
                         } else {
-                        	getLog().info("processConcept(I_GetConceptData) - already included in last generation");
+                        	getLog().debug("processConcept(I_GetConceptData) - already included in last generation");
                         }
-                    	getLog().info("processConcept(I_GetConceptData) - including all children");
+                    	getLog().debug("processConcept(I_GetConceptData) - including all children");
                         markAllChildren(concept, include);
                     } else if (typeId == excludeIndividualId) {
                         if (includedInLatestMemberSet) {
-                        	getLog().info("processConcept(I_GetConceptData) - excluding individual " + getFsnFromConceptId(concept.getConceptId()));
+                        	getLog().debug("processConcept(I_GetConceptData) - excluding individual " + getFsnFromConceptId(concept.getConceptId()));
                             retireLatestExtension(memberSet);
                             excludedMemberSet.add(conceptId);
                         } else {
-                        	getLog().info("processConcept(I_GetConceptData) - already excluded in last generation");
+                        	getLog().debug("processConcept(I_GetConceptData) - already excluded in last generation");
                         }
                     } else if (typeId == excludeLineageId) {
                         if (includedInLatestMemberSet) {
-                        	getLog().info("processConcept(I_GetConceptData) - excluding individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
+                        	getLog().debug("processConcept(I_GetConceptData) - excluding individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
                             retireLatestExtension(memberSet);
                             excludedMemberSet.add(conceptId);
                         } else {
-                        	getLog().info("processConcept(I_GetConceptData) - already excluded in last generation");
+                        	getLog().debug("processConcept(I_GetConceptData) - already excluded in last generation");
                         }
-                        getLog().info("processConcept(I_GetConceptData) - including all children");
+                        getLog().debug("processConcept(I_GetConceptData) - including all children");
                         markAllChildren(concept, !include);
                     } else {
                         System.out.println(termFactory.getConcept(typeId));
@@ -384,19 +434,14 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             		getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
             		getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
 
-            getLog().info("processConcept(I_GetConceptData) - processing " + children.size() + " children");
+            getLog().debug("processConcept(I_GetConceptData) - processing " + children.size() + " children");
             
             for (I_RelTuple child : children) {
                 int childId = child.getC1Id();
                 processConcept(termFactory.getConcept(childId));
             }
 
-            getLog().info("adding uncommitted change to concept " + concept.getUids() + " " + getFsnFromConceptId(concept.getConceptId()));
-
-            termFactory.addUncommitted(concept);
-
-
-			getLog().info("processConcept(I_GetConceptData) - end");
+			getLog().debug("processConcept(I_GetConceptData) - end");
         }
 
         /**
@@ -406,10 +451,10 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          * @throws Exception
          */
         public boolean latestMembersetIncludesConcept(I_ThinExtByRefVersioned extensionPart) throws Exception {
-			getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned=" + extensionPart + ") - start"); //$NON-NLS-1$ //$NON-NLS-2$
+			getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned=" + extensionPart + ") - start"); //$NON-NLS-1$ //$NON-NLS-2$
 
             if (extensionPart == null) {
-				getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
+				getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
                 return false;
             }
             
@@ -417,7 +462,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
             
             boolean result = exensionParts.size() > 0;
-			getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
+			getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
 			
 			return result;
         }
@@ -428,30 +473,30 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          * @throws Exception
          */
         public void retireLatestExtension(I_ThinExtByRefVersioned extensionPart) throws Exception {
-			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned=" + extensionPart 
+			getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned=" + extensionPart 
 					+ ") - start for concept " + getFsnFromConceptId(extensionPart.getComponentId()));
 
             if (extensionPart != null) {
                                 
-                List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
-                extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
-                
-                if (exensionParts.size() > 0) {
-                    I_ThinExtByRefPart latestVersion = assertExactlyOne(exensionParts);
+                List<I_ThinExtByRefTuple> extensionParts = new ArrayList<I_ThinExtByRefTuple>();
+                extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, extensionParts, true);
+                              
+                if (extensionParts.size() > 0) {
+                    I_ThinExtByRefPart latestVersion = assertExactlyOne(extensionParts);
 
                     I_ThinExtByRefPart clone = latestVersion.duplicatePart();
                     clone.setStatus(retiredConceptId);
                     clone.setVersion(Integer.MAX_VALUE);
                     extensionPart.addVersion(clone);
     	
-        			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
+        			getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
         					+ getFsnFromConceptId(extensionPart.getComponentId()));
     	    			
         			termFactory.addUncommitted(extensionPart);
                 }
             }
 
-			getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
+			getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
         }
 
         /**
@@ -461,7 +506,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          * @throws Exception
          */
         public void addToMemberSet(int conceptId, int includeTypeConceptId) throws Exception {
-			getLog().info("addToMemberSet(int=" + conceptId + ") - start for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
+			getLog().debug("addToMemberSet(int=" + conceptId + ") - start for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
 
             if (!includedMemberSet.contains(conceptId)) {
                 memberSetCount++;
@@ -484,11 +529,12 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                 conceptExtension.setConceptId(getMembershipType(includeTypeConceptId));
 
                 newExtension.addVersion(conceptExtension);
-    			getLog().info("addToMemberSet(int=" + conceptId + ") - start added new extension for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
+    			getLog().debug("addToMemberSet(int=" + conceptId + ") - start added new extension for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
 
+                termFactory.addUncommitted(termFactory.getConcept(conceptId));    			
             }
 
-			getLog().info("addToMemberSet(int) - end");
+			getLog().debug("addToMemberSet(int) - end");
         }
 
         private int getMembershipType(int includeTypeConceptId) throws Exception {
@@ -510,7 +556,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
          */
         public void markAllChildren(I_GetConceptData concept, boolean includeChildren)
             throws Exception {
-			getLog().info("markAllChildren(I_GetConceptData=" 
+			getLog().debug("markAllChildren(I_GetConceptData=" 
 					+ concept.getDescriptions().iterator().next() 
 					+ ", boolean=" + includeChildren + ") - start");
 
@@ -518,7 +564,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
             		getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
             		getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
             
-            getLog().info("markAllChildren(I_GetConceptData, boolean) - concept has " + children.size() + " children");
+            getLog().debug("markAllChildren(I_GetConceptData, boolean) - concept has " + children.size() + " children");
 
             for (I_RelTuple child : children) {
 
@@ -536,12 +582,12 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                     excludedLineage.add(Integer.valueOf(childId));
                 }
                 
-                getLog().info("markAllChildren(I_GetConceptData, boolean) - include children's children");
+                getLog().debug("markAllChildren(I_GetConceptData, boolean) - include children's children");
 
                 markAllChildren(termFactory.getConcept(childId), includeChildren);
             }
 
-			getLog().info("markAllChildren(I_GetConceptData, boolean) - end");
+			getLog().debug("markAllChildren(I_GetConceptData, boolean) - end");
         }
 		
 		private I_IntSet getIntSet(ArchitectonicAuxiliary.Concept... concepts) throws Exception {
@@ -613,5 +659,14 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
     public void setRootDescriptor(ConceptDescriptor rootDescriptor) {
         this.rootDescriptor = rootDescriptor;
+    }
+    
+    private class ProcessRefSets implements I_ProcessConcepts {
+
+		public void processConcept(I_GetConceptData concept) throws Exception {
+			
+			
+		}
+    	
     }
 }
