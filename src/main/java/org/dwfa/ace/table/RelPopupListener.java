@@ -20,6 +20,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
@@ -28,6 +29,7 @@ import org.dwfa.ace.table.RelTableModel.FieldToChange;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ThinRelVersioned;
 
 public class RelPopupListener extends MouseAdapter {
 
@@ -50,7 +52,8 @@ public class RelPopupListener extends MouseAdapter {
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setStatusId(config.getDefaultStatus().getConceptId());
+					newPart.setStatusId(config.getDefaultStatus()
+							.getConceptId());
 					selectedObject.getTuple().getRelVersioned().getVersions()
 							.add(newPart);
 
@@ -75,6 +78,25 @@ public class RelPopupListener extends MouseAdapter {
 			} catch (IOException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
+		}
+	}
+
+	private class UndoActionListener implements ActionListener {
+
+		public UndoActionListener() {
+			super();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
+					.getC1Id());
+			I_RelTuple tuple = selectedObject.getTuple();
+			ThinRelVersioned versioned = (ThinRelVersioned) tuple
+					.getRelVersioned();
+			versioned.getVersions().remove(tuple.getPart());
+			ACE.addUncommitted(sourceBean);
+			model.allTuples = null;
+			model.fireTableDataChanged();
 		}
 	}
 
@@ -109,17 +131,20 @@ public class RelPopupListener extends MouseAdapter {
 					case CHARACTERISTIC:
 						newPart.setCharacteristicId((AceConfig.getVodb()
 								.uuidToNative(ids)));
-						newPart.setStatusId(config.getDefaultStatus().getConceptId());
+						newPart.setStatusId(config.getDefaultStatus()
+								.getConceptId());
 						break;
 					case REFINABILITY:
 						newPart.setRefinabilityId((AceConfig.getVodb()
 								.uuidToNative(ids)));
-						newPart.setStatusId(config.getDefaultStatus().getConceptId());
+						newPart.setStatusId(config.getDefaultStatus()
+								.getConceptId());
 						break;
 					case TYPE:
 						newPart.setRelTypeId((AceConfig.getVodb()
 								.uuidToNative(ids)));
-						newPart.setStatusId(config.getDefaultStatus().getConceptId());
+						newPart.setStatusId(config.getDefaultStatus()
+								.getConceptId());
 						break;
 
 					default:
@@ -127,31 +152,38 @@ public class RelPopupListener extends MouseAdapter {
 								+ field);
 					}
 
-               model.referencedConcepts.put(newPart.getStatusId(),
-                     ConceptBean.get(newPart.getStatusId()));
-               model.referencedConcepts.put(newPart.getCharacteristicId(),
-                     ConceptBean.get(newPart.getCharacteristicId()));
-               model.referencedConcepts.put(newPart.getRefinabilityId(),
-                     ConceptBean.get(newPart.getRefinabilityId()));
-               model.referencedConcepts.put(newPart.getRelTypeId(),
-                     ConceptBean.get(newPart.getRelTypeId()));
+					model.referencedConcepts.put(newPart.getStatusId(),
+							ConceptBean.get(newPart.getStatusId()));
+					model.referencedConcepts.put(newPart.getCharacteristicId(),
+							ConceptBean.get(newPart.getCharacteristicId()));
+					model.referencedConcepts.put(newPart.getRefinabilityId(),
+							ConceptBean.get(newPart.getRefinabilityId()));
+					model.referencedConcepts.put(newPart.getRelTypeId(),
+							ConceptBean.get(newPart.getRelTypeId()));
 
-               I_RelVersioned srcRel = sourceBean.getSourceRel(
-                     selectedObject.getTuple().getRelId());
-               I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
+					I_RelVersioned srcRel = sourceBean
+							.getSourceRel(selectedObject.getTuple().getRelId());
+					I_RelVersioned destRel = destBean.getDestRel(selectedObject
+							.getTuple().getRelId());
 
-               srcRel.addVersion(newPart);
-               if (srcRel != destRel) {
-                  destRel.addVersion(newPart);
-               } else {
-                  AceLog.getEditLog().info("Suppressed duplicate addition of new rel part");
-               }
-               if (srcRel != selectedObject.getTuple().getRelVersioned()) {
-                  selectedObject.getTuple().getRelVersioned().getVersions()
-                  .add(newPart);
-               } else {
-                  AceLog.getEditLog().info("Suppressed duplicate addition of new rel part 2");
-               }
+					srcRel.addVersion(newPart);
+					if (srcRel != destRel) {
+						destRel.addVersion(newPart);
+					} else {
+						AceLog
+								.getEditLog()
+								.info(
+										"Suppressed duplicate addition of new rel part");
+					}
+					if (srcRel != selectedObject.getTuple().getRelVersioned()) {
+						selectedObject.getTuple().getRelVersioned()
+								.getVersions().add(newPart);
+					} else {
+						AceLog
+								.getEditLog()
+								.info(
+										"Suppressed duplicate addition of new rel part 2");
+					}
 				}
 				ACE.addUncommitted(sourceBean);
 				ACE.addUncommitted(destBean);
@@ -194,16 +226,20 @@ public class RelPopupListener extends MouseAdapter {
 				popup.add(noActionItem);
 				selectedObject = (StringWithRelTuple) table.getValueAt(row,
 						column);
+				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+					JMenuItem undoActonItem = new JMenuItem("Undo");
+					undoActonItem.addActionListener(new UndoActionListener());
+					popup.add(undoActonItem);
+				}
 				JMenuItem changeItem = new JMenuItem("Change");
 				popup.add(changeItem);
 				changeItem.addActionListener(change);
 				/*
-				JMenuItem retireItem = new JMenuItem("Retire");
-				retireItem.addActionListener(new ChangeFieldActionListener(
-						ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
-						FieldToChange.STATUS));
-				popup.add(retireItem);
-				*/
+				 * JMenuItem retireItem = new JMenuItem("Retire");
+				 * retireItem.addActionListener(new ChangeFieldActionListener(
+				 * ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
+				 * FieldToChange.STATUS)); popup.add(retireItem);
+				 */
 				JMenu changeType = new JMenu("Change Type");
 				popup.add(changeType);
 				addSubmenuItems(changeType, FieldToChange.TYPE, model.host
@@ -256,17 +292,11 @@ public class RelPopupListener extends MouseAdapter {
 				int row = table.rowAtPoint(e.getPoint());
 				selectedObject = (StringWithRelTuple) table.getValueAt(row,
 						column);
-				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
-					JOptionPane
-							.showMessageDialog(
-									table.getTopLevelAncestor(),
-									"<html>To change an uncommitted relationship, <br>use the cancel button, or change the value<br>directly on the uncommitted concept...");
-				} else {
-					makePopup(e);
-					if (popup != null) {
-						popup.show(e.getComponent(), e.getX(), e.getY());
-					}
+				makePopup(e);
+				if (popup != null) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
+
 			} else {
 				JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
 						"You must select at least one path to edit on...");

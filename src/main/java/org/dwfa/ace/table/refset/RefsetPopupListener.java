@@ -27,6 +27,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
@@ -34,461 +35,572 @@ import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
+import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
 public class RefsetPopupListener extends MouseAdapter {
 
-   private RefsetMemberTableModel model;
+	private RefsetMemberTableModel model;
 
-   private class ChangeActionListener implements ActionListener {
+	private class ChangeActionListener implements ActionListener {
 
-      public ChangeActionListener() {
-         super();
-      }
+		public ChangeActionListener() {
+			super();
+		}
 
-      public void actionPerformed(ActionEvent e) {
-         try {
-             if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                 for (I_Path p : config.getEditingPathSet()) {
-                     I_ThinExtByRefPart newPart = selectedObject.getTuple().getPart().duplicatePart();
-                     newPart.setPathId(p.getConceptId());
-                     newPart.setVersion(Integer.MAX_VALUE);
-                     setProperStatus(newPart);
-                     model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
-                     selectedObject.getTuple().addVersion(newPart);
-                  }
-                  ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
-                  model.allTuples = null;
-                  model.fireTableDataChanged();
-                  model.propertyChange(null);
-             }
-         } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         }
-      }
-   }
+		public void actionPerformed(ActionEvent e) {
+			try {
+				if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+					for (I_Path p : config.getEditingPathSet()) {
+						I_ThinExtByRefPart newPart = selectedObject.getTuple()
+								.getPart().duplicatePart();
+						newPart.setPathId(p.getConceptId());
+						newPart.setVersion(Integer.MAX_VALUE);
+						setProperStatus(newPart);
+						model.referencedConcepts.put(newPart.getStatus(),
+								ConceptBean.get(newPart.getStatus()));
+						selectedObject.getTuple().addVersion(newPart);
+					}
+					ACE.addUncommitted(ExtensionByReferenceBean
+							.get(selectedObject.getTuple().getMemberId()));
+					model.allTuples = null;
+					model.fireTableDataChanged();
+					model.propertyChange(null);
+				}
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
+	}
 
-   private class ChangeFieldActionListener implements ActionListener {
-      private Collection<UUID> ids;
+	private class UndoActionListener implements ActionListener {
 
-      private REFSET_FIELDS field;
+		public UndoActionListener() {
+			super();
+		}
 
-      public ChangeFieldActionListener(Collection<UUID> ids, REFSET_FIELDS field) {
-         super();
-         this.ids = ids;
-         this.field = field;
-      }
+		public void actionPerformed(ActionEvent e) {
+			ExtensionByReferenceBean sourceBean = ExtensionByReferenceBean
+					.get(selectedObject.getTuple().getMemberId());
+			I_ThinExtByRefTuple tuple = selectedObject.getTuple();
+			ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) tuple
+					.getCore();
+			versioned.getVersions().remove(tuple.getPart());
+			ACE.addUncommitted(sourceBean);
+			model.allTuples = null;
+			model.fireTableDataChanged();
+		}
+	}
 
-      public void actionPerformed(ActionEvent e) {
-         try {
-            for (I_Path p : config.getEditingPathSet()) {
-                I_ThinExtByRefPart newPart; 
-                if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                    newPart = selectedObject.getTuple().getPart().duplicatePart();                    
-                } else {
-                    newPart = selectedObject.getTuple().getPart();
-                }
-               
-               newPart.setPathId(p.getConceptId());
-               newPart.setVersion(Integer.MAX_VALUE);
-               setProperStatus(newPart);
-               switch (field) {
-               case STATUS:
-                  newPart.setStatus((AceConfig.getVodb().uuidToNative(ids)));
-                  model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
-                  break;
-               case CONCEPT_ID:
-                  ((I_ThinExtByRefPartConcept) newPart).setConceptId((AceConfig.getVodb().uuidToNative(ids)));
-                  break;
-               case ACCEPTABILITY:
-                  ((I_ThinExtByRefPartLanguage) newPart).setAcceptabilityId((AceConfig.getVodb().uuidToNative(ids)));
-                  break;
-               case CORRECTNESS:
-                  ((I_ThinExtByRefPartLanguage) newPart).setCorrectnessId((AceConfig.getVodb().uuidToNative(ids)));
-                  break;
-               case DEGREE_OF_SYNONYMY:
-                  ((I_ThinExtByRefPartLanguage) newPart).setDegreeOfSynonymyId((AceConfig.getVodb().uuidToNative(ids)));
-                  break;
-               case TAG:
-                  ((I_ThinExtByRefPartLanguageScoped) newPart).setTagId((AceConfig.getVodb().uuidToNative(ids)));
-                  break;
-               case SCOPE:
-                  ((I_ThinExtByRefPartLanguageScoped) newPart).setScopeId((AceConfig.getVodb().uuidToNative(ids)));
-                  break;
-               case MEASUREMENT_UNITS_ID:
-                   ((I_ThinExtByRefPartMeasurement) newPart).setUnitsOfMeasureId((AceConfig.getVodb().uuidToNative(ids)));
-                   break;
+	private class ChangeFieldActionListener implements ActionListener {
+		private Collection<UUID> ids;
 
-               case INTEGER_VALUE:
-               case PRIORITY:
-               case BOOLEAN_VALUE:
-               case MEASUREMENT_VALUE:
-               case STRING_VALUE:
-               default:
-                  throw new Exception("Don't know how to handle: " + field);
-               }
+		private REFSET_FIELDS field;
 
-               model.referencedConcepts.put(AceConfig.getVodb().uuidToNative(ids), ConceptBean.get((AceConfig.getVodb()
-                     .uuidToNative(ids))));
-               model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
-               if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                   selectedObject.getTuple().addVersion(newPart);
-               }
-            }
-            ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
-            model.allTuples = null;
-            model.fireTableDataChanged();
-            model.propertyChange(null);
-         } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         }
-      }
+		public ChangeFieldActionListener(Collection<UUID> ids,
+				REFSET_FIELDS field) {
+			super();
+			this.ids = ids;
+			this.field = field;
+		}
 
-   }
-   private class ChangeFieldIntegerActionListener implements ActionListener {
-       private Integer value;
+		public void actionPerformed(ActionEvent e) {
+			try {
+				for (I_Path p : config.getEditingPathSet()) {
+					I_ThinExtByRefPart newPart;
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						newPart = selectedObject.getTuple().getPart()
+								.duplicatePart();
+					} else {
+						newPart = selectedObject.getTuple().getPart();
+					}
 
-       private REFSET_FIELDS field;
+					newPart.setPathId(p.getConceptId());
+					newPart.setVersion(Integer.MAX_VALUE);
+					setProperStatus(newPart);
+					switch (field) {
+					case STATUS:
+						newPart.setStatus((AceConfig.getVodb()
+								.uuidToNative(ids)));
+						model.referencedConcepts.put(newPart.getStatus(),
+								ConceptBean.get(newPart.getStatus()));
+						break;
+					case CONCEPT_ID:
+						((I_ThinExtByRefPartConcept) newPart)
+								.setConceptId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
+					case ACCEPTABILITY:
+						((I_ThinExtByRefPartLanguage) newPart)
+								.setAcceptabilityId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
+					case CORRECTNESS:
+						((I_ThinExtByRefPartLanguage) newPart)
+								.setCorrectnessId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
+					case DEGREE_OF_SYNONYMY:
+						((I_ThinExtByRefPartLanguage) newPart)
+								.setDegreeOfSynonymyId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
+					case TAG:
+						((I_ThinExtByRefPartLanguageScoped) newPart)
+								.setTagId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
+					case SCOPE:
+						((I_ThinExtByRefPartLanguageScoped) newPart)
+								.setScopeId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
+					case MEASUREMENT_UNITS_ID:
+						((I_ThinExtByRefPartMeasurement) newPart)
+								.setUnitsOfMeasureId((AceConfig.getVodb()
+										.uuidToNative(ids)));
+						break;
 
-       public ChangeFieldIntegerActionListener(Integer value, REFSET_FIELDS field) {
-          super();
-          this.value = value;
-          this.field = field;
-       }
+					case INTEGER_VALUE:
+					case PRIORITY:
+					case BOOLEAN_VALUE:
+					case MEASUREMENT_VALUE:
+					case STRING_VALUE:
+					default:
+						throw new Exception("Don't know how to handle: "
+								+ field);
+					}
 
-       public void actionPerformed(ActionEvent e) {
-          try {
-             for (I_Path p : config.getEditingPathSet()) {
-                 I_ThinExtByRefPart newPart; 
-                 if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                     newPart = selectedObject.getTuple().getPart().duplicatePart();                    
-                 } else {
-                     newPart = selectedObject.getTuple().getPart();
-                 }
-                
-                newPart.setPathId(p.getConceptId());
-                newPart.setVersion(Integer.MAX_VALUE);
-                setProperStatus(newPart);
-                switch (field) {
-                case INTEGER_VALUE:
-                    ((I_ThinExtByRefPartInteger) newPart).setValue(value);
-                   break;
-                case PRIORITY:
-                    ((I_ThinExtByRefPartLanguageScoped) newPart).setPriority(value);
-                    break;
-                case CONCEPT_ID:
-                case ACCEPTABILITY:
-                case CORRECTNESS:
-                case DEGREE_OF_SYNONYMY:
-                case TAG:
-                case SCOPE:
-                case STATUS:
-                case BOOLEAN_VALUE:
-                case MEASUREMENT_VALUE:
-                case MEASUREMENT_UNITS_ID:
-                case STRING_VALUE:
-                default:
-                   throw new Exception("Don't know how to handle: " + field);
-                }
-                model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
-                if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                    selectedObject.getTuple().addVersion(newPart);
-                }
-             }
-             ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
-             model.allTuples = null;
-             model.fireTableDataChanged();
-             model.propertyChange(null);
-          } catch (Exception ex) {
-             AceLog.getAppLog().alertAndLogException(ex);
-          }
-       }
+					model.referencedConcepts.put(AceConfig.getVodb()
+							.uuidToNative(ids), ConceptBean.get((AceConfig
+							.getVodb().uuidToNative(ids))));
+					model.referencedConcepts.put(newPart.getStatus(),
+							ConceptBean.get(newPart.getStatus()));
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						selectedObject.getTuple().addVersion(newPart);
+					}
+				}
+				ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject
+						.getTuple().getMemberId()));
+				model.allTuples = null;
+				model.fireTableDataChanged();
+				model.propertyChange(null);
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
 
-    }
-   private class ChangeFieldDoubleActionListener implements ActionListener {
-       private Double value;
+	}
 
-       private REFSET_FIELDS field;
+	private class ChangeFieldIntegerActionListener implements ActionListener {
+		private Integer value;
 
-       public ChangeFieldDoubleActionListener(Double value, REFSET_FIELDS field) {
-          super();
-          this.value = value;
-          this.field = field;
-       }
+		private REFSET_FIELDS field;
 
-       public void actionPerformed(ActionEvent e) {
-          try {
-             for (I_Path p : config.getEditingPathSet()) {
-                 I_ThinExtByRefPart newPart; 
-                 if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                     newPart = selectedObject.getTuple().getPart().duplicatePart();                    
-                 } else {
-                     newPart = selectedObject.getTuple().getPart();
-                 }
-                
-                newPart.setPathId(p.getConceptId());
-                newPart.setVersion(Integer.MAX_VALUE);
-                setProperStatus(newPart);
-                switch (field) {
-                case MEASUREMENT_VALUE:
-                    ((I_ThinExtByRefPartMeasurement) newPart).setMeasurementValue(value);
-                   break;
+		public ChangeFieldIntegerActionListener(Integer value,
+				REFSET_FIELDS field) {
+			super();
+			this.value = value;
+			this.field = field;
+		}
 
-                case PRIORITY:
-                case CONCEPT_ID:
-                case ACCEPTABILITY:
-                case CORRECTNESS:
-                case DEGREE_OF_SYNONYMY:
-                case TAG:
-                case SCOPE:
-                case STATUS:
-                case BOOLEAN_VALUE:
-                case INTEGER_VALUE:
-                case MEASUREMENT_UNITS_ID:
-                case STRING_VALUE:
-                default:
-                   throw new Exception("Don't know how to handle: " + field);
-                }
-                model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
+		public void actionPerformed(ActionEvent e) {
+			try {
+				for (I_Path p : config.getEditingPathSet()) {
+					I_ThinExtByRefPart newPart;
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						newPart = selectedObject.getTuple().getPart()
+								.duplicatePart();
+					} else {
+						newPart = selectedObject.getTuple().getPart();
+					}
 
-                if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                    selectedObject.getTuple().addVersion(newPart);
-                }
-             }
-             ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
-             model.allTuples = null;
-             model.fireTableDataChanged();
-             model.propertyChange(null);
-          } catch (Exception ex) {
-             AceLog.getAppLog().alertAndLogException(ex);
-          }
-       }
+					newPart.setPathId(p.getConceptId());
+					newPart.setVersion(Integer.MAX_VALUE);
+					setProperStatus(newPart);
+					switch (field) {
+					case INTEGER_VALUE:
+						((I_ThinExtByRefPartInteger) newPart).setValue(value);
+						break;
+					case PRIORITY:
+						((I_ThinExtByRefPartLanguageScoped) newPart)
+								.setPriority(value);
+						break;
+					case CONCEPT_ID:
+					case ACCEPTABILITY:
+					case CORRECTNESS:
+					case DEGREE_OF_SYNONYMY:
+					case TAG:
+					case SCOPE:
+					case STATUS:
+					case BOOLEAN_VALUE:
+					case MEASUREMENT_VALUE:
+					case MEASUREMENT_UNITS_ID:
+					case STRING_VALUE:
+					default:
+						throw new Exception("Don't know how to handle: "
+								+ field);
+					}
+					model.referencedConcepts.put(newPart.getStatus(),
+							ConceptBean.get(newPart.getStatus()));
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						selectedObject.getTuple().addVersion(newPart);
+					}
+				}
+				ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject
+						.getTuple().getMemberId()));
+				model.allTuples = null;
+				model.fireTableDataChanged();
+				model.propertyChange(null);
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
 
-    }
+	}
 
-   private class ChangeFieldBooleanActionListener implements ActionListener {
-       private Boolean value;
+	private class ChangeFieldDoubleActionListener implements ActionListener {
+		private Double value;
 
-       private REFSET_FIELDS field;
+		private REFSET_FIELDS field;
 
-       public ChangeFieldBooleanActionListener(Boolean value, REFSET_FIELDS field) {
-          super();
-          this.value = value;
-          this.field = field;
-       }
+		public ChangeFieldDoubleActionListener(Double value, REFSET_FIELDS field) {
+			super();
+			this.value = value;
+			this.field = field;
+		}
 
-       public void actionPerformed(ActionEvent e) {
-          try {
-             for (I_Path p : config.getEditingPathSet()) {
-                 I_ThinExtByRefPart newPart; 
-                 if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                     newPart = selectedObject.getTuple().getPart().duplicatePart();                    
-                 } else {
-                     newPart = selectedObject.getTuple().getPart();
-                 }
-                
-                newPart.setPathId(p.getConceptId());
-                newPart.setVersion(Integer.MAX_VALUE);
-                setProperStatus(newPart);
-                switch (field) {
-                case BOOLEAN_VALUE:
-                    ((I_ThinExtByRefPartBoolean) newPart).setValue(value);
-                   break;
+		public void actionPerformed(ActionEvent e) {
+			try {
+				for (I_Path p : config.getEditingPathSet()) {
+					I_ThinExtByRefPart newPart;
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						newPart = selectedObject.getTuple().getPart()
+								.duplicatePart();
+					} else {
+						newPart = selectedObject.getTuple().getPart();
+					}
 
-                case PRIORITY:
-                case CONCEPT_ID:
-                case ACCEPTABILITY:
-                case CORRECTNESS:
-                case DEGREE_OF_SYNONYMY:
-                case TAG:
-                case SCOPE:
-                case STATUS:
-                case MEASUREMENT_VALUE:
-                case INTEGER_VALUE:
-                case MEASUREMENT_UNITS_ID:
-                case STRING_VALUE:
-                default:
-                   throw new Exception("Don't know how to handle: " + field);
-                }
-                model.referencedConcepts.put(newPart.getStatus(), ConceptBean.get(newPart.getStatus()));
+					newPart.setPathId(p.getConceptId());
+					newPart.setVersion(Integer.MAX_VALUE);
+					setProperStatus(newPart);
+					switch (field) {
+					case MEASUREMENT_VALUE:
+						((I_ThinExtByRefPartMeasurement) newPart)
+								.setMeasurementValue(value);
+						break;
 
-                if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                    selectedObject.getTuple().addVersion(newPart);
-                }
-             }
-             ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
-             model.allTuples = null;
-             model.fireTableDataChanged();
-             model.propertyChange(null);
-          } catch (Exception ex) {
-             AceLog.getAppLog().alertAndLogException(ex);
-          }
-       }
+					case PRIORITY:
+					case CONCEPT_ID:
+					case ACCEPTABILITY:
+					case CORRECTNESS:
+					case DEGREE_OF_SYNONYMY:
+					case TAG:
+					case SCOPE:
+					case STATUS:
+					case BOOLEAN_VALUE:
+					case INTEGER_VALUE:
+					case MEASUREMENT_UNITS_ID:
+					case STRING_VALUE:
+					default:
+						throw new Exception("Don't know how to handle: "
+								+ field);
+					}
+					model.referencedConcepts.put(newPart.getStatus(),
+							ConceptBean.get(newPart.getStatus()));
 
-    }
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						selectedObject.getTuple().addVersion(newPart);
+					}
+				}
+				ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject
+						.getTuple().getMemberId()));
+				model.allTuples = null;
+				model.fireTableDataChanged();
+				model.propertyChange(null);
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
 
-   private JPopupMenu popup;
+	}
 
-   private JTable table;
+	private class ChangeFieldBooleanActionListener implements ActionListener {
+		private Boolean value;
 
-   private ActionListener change;
+		private REFSET_FIELDS field;
 
-   private StringWithExtTuple selectedObject;
+		public ChangeFieldBooleanActionListener(Boolean value,
+				REFSET_FIELDS field) {
+			super();
+			this.value = value;
+			this.field = field;
+		}
 
-   private I_ConfigAceFrame config;
+		public void actionPerformed(ActionEvent e) {
+			try {
+				for (I_Path p : config.getEditingPathSet()) {
+					I_ThinExtByRefPart newPart;
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						newPart = selectedObject.getTuple().getPart()
+								.duplicatePart();
+					} else {
+						newPart = selectedObject.getTuple().getPart();
+					}
 
-   private I_RefsetDefaults preferences;
+					newPart.setPathId(p.getConceptId());
+					newPart.setVersion(Integer.MAX_VALUE);
+					setProperStatus(newPart);
+					switch (field) {
+					case BOOLEAN_VALUE:
+						((I_ThinExtByRefPartBoolean) newPart).setValue(value);
+						break;
 
-   public RefsetPopupListener(JTable table, I_ConfigAceFrame config, I_RefsetDefaults defaults,
-                              RefsetMemberTableModel model) {
-      super();
-      this.table = table;
-      this.config = config;
-      this.model = model;
-      this.preferences = defaults;
-      
-      change = new ChangeActionListener();
-   }
+					case PRIORITY:
+					case CONCEPT_ID:
+					case ACCEPTABILITY:
+					case CORRECTNESS:
+					case DEGREE_OF_SYNONYMY:
+					case TAG:
+					case SCOPE:
+					case STATUS:
+					case MEASUREMENT_VALUE:
+					case INTEGER_VALUE:
+					case MEASUREMENT_UNITS_ID:
+					case STRING_VALUE:
+					default:
+						throw new Exception("Don't know how to handle: "
+								+ field);
+					}
+					model.referencedConcepts.put(newPart.getStatus(),
+							ConceptBean.get(newPart.getStatus()));
 
-   private void makePopup(MouseEvent e) {
-      try {
-         popup = null;
-         int column = table.columnAtPoint(e.getPoint());
-         int row = table.rowAtPoint(e.getPoint());
-         if ((row != -1) && (column != -1)) {
-            popup = new JPopupMenu();
-            JMenuItem noActionItem = new JMenuItem("");
-            popup.add(noActionItem);
-            selectedObject = (StringWithExtTuple) table.getValueAt(row, column);
-            JMenuItem changeItem = new JMenuItem("Change");
-            popup.add(changeItem);
-            changeItem.addActionListener(change);
-            for (REFSET_FIELDS field: model.getPopupFields()) {
-                if (REFSET_FIELDS.REFSET_ID.equals(field)) {
-                    // Not allowed to change the refset.
-                } else {
-                    JMenu changeMenu = new JMenu("Change " + field.getColumnName());
-                    popup.add(changeMenu);
+					if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+						selectedObject.getTuple().addVersion(newPart);
+					}
+				}
+				ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject
+						.getTuple().getMemberId()));
+				model.allTuples = null;
+				model.fireTableDataChanged();
+				model.propertyChange(null);
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
 
-                    switch (field) {
-                    case REFSET_ID:
-                        addSubmenuItems(changeMenu, field, preferences.getRefsetPopupIds());
-                        break;
-                    case STATUS:
-                       addSubmenuItems(changeMenu, field, preferences.getStatusPopupIds());
-                       break;
-                    case CONCEPT_ID:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsConcept)preferences).getConceptPopupIds());
-                       break;
-                    case ACCEPTABILITY:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsLanguage)preferences).getAcceptabilityPopupIds());
-                       break;
-                    case CORRECTNESS:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsLanguage)preferences).getCorrectnessPopupIds());
-                       break;
-                    case DEGREE_OF_SYNONYMY:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsLanguage)preferences).getDegreeOfSynonymyPopupIds());
-                       break;
-                    case TAG:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsLanguageScoped)preferences).getTagPopupIds());
-                       break;
-                    case SCOPE:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsLanguageScoped)preferences).getScopePopupIds());
-                       break;
-                    case MEASUREMENT_UNITS_ID:
-                       addSubmenuItems(changeMenu, field, ((RefsetDefaultsMeasurement)preferences).getUnitsOfMeasurePopupIds());
-                       break;               
-                    case INTEGER_VALUE:
-                        addSubmenuObjects(changeMenu, field, ((RefsetDefaultsInteger)preferences).getIntegerPopupItems());
-                        break;                 
-                    case PRIORITY:
-                        addSubmenuObjects(changeMenu, field, ((RefsetDefaultsLanguageScoped)preferences).getPriorityPopupItems());
-                        break;
-                    case BOOLEAN_VALUE:
-                        addSubmenuObjects(changeMenu, field, ((RefsetDefaultsBoolean)preferences).getBooleanPopupItems());
-                        break;
-                    case STRING_VALUE:
-                        addSubmenuObjects(changeMenu, field, ((RefsetDefaultsString)preferences).getStringPopupItems().toArray());
-                        break;
-                    case MEASUREMENT_VALUE:
-                        addSubmenuObjects(changeMenu, field, ((RefsetDefaultsMeasurement)preferences).getMeasurementValuePopupItems());
-                        break;
-                    default:
-                       AceLog.getAppLog().alertAndLogException(new Exception("Don't know how to handle: " + field));
-                    }
-                    
-                }
-               
-            }
-         }
-      } catch (TerminologyException e1) {
-         AceLog.getAppLog().alertAndLogException(e1);
-      } catch (IOException e1) {
-         AceLog.getAppLog().alertAndLogException(e1);
-      }
-   }
-   private void setProperStatus(I_ThinExtByRefPart newPart) throws Exception {
-      newPart.setStatus(preferences.getDefaultStatusForRefset().getConceptId());
-   }
+	}
 
-   private void addSubmenuItems(JMenu menu, REFSET_FIELDS field, I_IntList possibleValues) throws TerminologyException,
-         IOException {
-      for (int id : possibleValues.getListValues()) {
-         I_GetConceptData possibleValue = LocalVersionedTerminology.get().getConcept(id);
-         JMenuItem changeStatusItem = new JMenuItem(possibleValue.toString());
-         changeStatusItem.addActionListener(new ChangeFieldActionListener(possibleValue.getUids(), field));
-         menu.add(changeStatusItem);
-      }
-   }
-   
-   private void addSubmenuObjects(JMenu menu, REFSET_FIELDS field, Object[] values) {
-       for (Object value : values) {
-           JMenuItem menuItem = new JMenuItem(value.toString());
-           if (Integer.class.equals(value.getClass())) {
-               menuItem.addActionListener(new ChangeFieldIntegerActionListener((Integer) value, field));
-               menu.add(menuItem);
-           } else if (Double.class.equals(value.getClass())) {
-               menuItem.addActionListener(new ChangeFieldDoubleActionListener((Double) value, field));
-               menu.add(menuItem);
-           } else if (Boolean.class.equals(value.getClass())) {
-               menuItem.addActionListener(new ChangeFieldBooleanActionListener((Boolean) value, field));
-               menu.add(menuItem);
-           } else {
-               AceLog.getAppLog().alertAndLogException(new Exception("can't handle objects of class: " + value.getClass()));
-           }
-        }
-   }
+	private JPopupMenu popup;
 
-   public void mousePressed(MouseEvent e) {
-      maybeShowPopup(e);
-   }
+	private JTable table;
 
-   public void mouseReleased(MouseEvent e) {
-      maybeShowPopup(e);
-   }
+	private ActionListener change;
 
-   private void maybeShowPopup(MouseEvent e) {
-      if (e.isPopupTrigger()) {
-         if (config.getEditingPathSet().size() > 0) {
-            int column = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
-            selectedObject = (StringWithExtTuple) table.getValueAt(row, column);
-            if (selectedObject != null) {
-                if ((selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) && config.getEditingPathSet().size() > 1) {
-                    JOptionPane
-                          .showMessageDialog(
-                                table.getTopLevelAncestor(),
-                                "<html>To change an uncommitted extension with > 1 edit path, <br>use the cancel button, or change the value directly<br>on the uncommitted concept...");
-                 } else {
-                    makePopup(e);
-                    if (popup != null) {
-                       popup.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                 }
-            }
-         } else {
-            JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
-                  "You must select at least one path to edit on...");
-         }
-      }
-   }
+	private StringWithExtTuple selectedObject;
+
+	private I_ConfigAceFrame config;
+
+	private I_RefsetDefaults preferences;
+
+	public RefsetPopupListener(JTable table, I_ConfigAceFrame config,
+			I_RefsetDefaults defaults, RefsetMemberTableModel model) {
+		super();
+		this.table = table;
+		this.config = config;
+		this.model = model;
+		this.preferences = defaults;
+
+		change = new ChangeActionListener();
+	}
+
+	private void makePopup(MouseEvent e) {
+		try {
+			popup = null;
+			int column = table.columnAtPoint(e.getPoint());
+			int row = table.rowAtPoint(e.getPoint());
+			if ((row != -1) && (column != -1)) {
+				popup = new JPopupMenu();
+				JMenuItem noActionItem = new JMenuItem("");
+				popup.add(noActionItem);
+				selectedObject = (StringWithExtTuple) table.getValueAt(row,
+						column);
+				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+					JMenuItem undoActonItem = new JMenuItem("Undo");
+					undoActonItem.addActionListener(new UndoActionListener());
+					popup.add(undoActonItem);
+				}
+				JMenuItem changeItem = new JMenuItem("Change");
+				popup.add(changeItem);
+				changeItem.addActionListener(change);
+				for (REFSET_FIELDS field : model.getPopupFields()) {
+					if (REFSET_FIELDS.REFSET_ID.equals(field)) {
+						// Not allowed to change the refset.
+					} else {
+						JMenu changeMenu = new JMenu("Change "
+								+ field.getColumnName());
+						popup.add(changeMenu);
+
+						switch (field) {
+						case REFSET_ID:
+							addSubmenuItems(changeMenu, field, preferences
+									.getRefsetPopupIds());
+							break;
+						case STATUS:
+							addSubmenuItems(changeMenu, field, preferences
+									.getStatusPopupIds());
+							break;
+						case CONCEPT_ID:
+							addSubmenuItems(changeMenu, field,
+									((RefsetDefaultsConcept) preferences)
+											.getConceptPopupIds());
+							break;
+						case ACCEPTABILITY:
+							addSubmenuItems(changeMenu, field,
+									((RefsetDefaultsLanguage) preferences)
+											.getAcceptabilityPopupIds());
+							break;
+						case CORRECTNESS:
+							addSubmenuItems(changeMenu, field,
+									((RefsetDefaultsLanguage) preferences)
+											.getCorrectnessPopupIds());
+							break;
+						case DEGREE_OF_SYNONYMY:
+							addSubmenuItems(changeMenu, field,
+									((RefsetDefaultsLanguage) preferences)
+											.getDegreeOfSynonymyPopupIds());
+							break;
+						case TAG:
+							addSubmenuItems(
+									changeMenu,
+									field,
+									((RefsetDefaultsLanguageScoped) preferences)
+											.getTagPopupIds());
+							break;
+						case SCOPE:
+							addSubmenuItems(
+									changeMenu,
+									field,
+									((RefsetDefaultsLanguageScoped) preferences)
+											.getScopePopupIds());
+							break;
+						case MEASUREMENT_UNITS_ID:
+							addSubmenuItems(changeMenu, field,
+									((RefsetDefaultsMeasurement) preferences)
+											.getUnitsOfMeasurePopupIds());
+							break;
+						case INTEGER_VALUE:
+							addSubmenuObjects(changeMenu, field,
+									((RefsetDefaultsInteger) preferences)
+											.getIntegerPopupItems());
+							break;
+						case PRIORITY:
+							addSubmenuObjects(
+									changeMenu,
+									field,
+									((RefsetDefaultsLanguageScoped) preferences)
+											.getPriorityPopupItems());
+							break;
+						case BOOLEAN_VALUE:
+							addSubmenuObjects(changeMenu, field,
+									((RefsetDefaultsBoolean) preferences)
+											.getBooleanPopupItems());
+							break;
+						case STRING_VALUE:
+							addSubmenuObjects(changeMenu, field,
+									((RefsetDefaultsString) preferences)
+											.getStringPopupItems().toArray());
+							break;
+						case MEASUREMENT_VALUE:
+							addSubmenuObjects(changeMenu, field,
+									((RefsetDefaultsMeasurement) preferences)
+											.getMeasurementValuePopupItems());
+							break;
+						default:
+							AceLog.getAppLog().alertAndLogException(
+									new Exception("Don't know how to handle: "
+											+ field));
+						}
+
+					}
+
+				}
+			}
+		} catch (TerminologyException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		} catch (IOException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+	}
+
+	private void setProperStatus(I_ThinExtByRefPart newPart) throws Exception {
+		newPart.setStatus(preferences.getDefaultStatusForRefset()
+				.getConceptId());
+	}
+
+	private void addSubmenuItems(JMenu menu, REFSET_FIELDS field,
+			I_IntList possibleValues) throws TerminologyException, IOException {
+		for (int id : possibleValues.getListValues()) {
+			I_GetConceptData possibleValue = LocalVersionedTerminology.get()
+					.getConcept(id);
+			JMenuItem changeStatusItem = new JMenuItem(possibleValue.toString());
+			changeStatusItem.addActionListener(new ChangeFieldActionListener(
+					possibleValue.getUids(), field));
+			menu.add(changeStatusItem);
+		}
+	}
+
+	private void addSubmenuObjects(JMenu menu, REFSET_FIELDS field,
+			Object[] values) {
+		for (Object value : values) {
+			JMenuItem menuItem = new JMenuItem(value.toString());
+			if (Integer.class.equals(value.getClass())) {
+				menuItem
+						.addActionListener(new ChangeFieldIntegerActionListener(
+								(Integer) value, field));
+				menu.add(menuItem);
+			} else if (Double.class.equals(value.getClass())) {
+				menuItem.addActionListener(new ChangeFieldDoubleActionListener(
+						(Double) value, field));
+				menu.add(menuItem);
+			} else if (Boolean.class.equals(value.getClass())) {
+				menuItem
+						.addActionListener(new ChangeFieldBooleanActionListener(
+								(Boolean) value, field));
+				menu.add(menuItem);
+			} else {
+				AceLog.getAppLog().alertAndLogException(
+						new Exception("can't handle objects of class: "
+								+ value.getClass()));
+			}
+		}
+	}
+
+	public void mousePressed(MouseEvent e) {
+		maybeShowPopup(e);
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		maybeShowPopup(e);
+	}
+
+	private void maybeShowPopup(MouseEvent e) {
+		if (e.isPopupTrigger()) {
+			if (config.getEditingPathSet().size() > 0) {
+				int column = table.columnAtPoint(e.getPoint());
+				int row = table.rowAtPoint(e.getPoint());
+				selectedObject = (StringWithExtTuple) table.getValueAt(row,
+						column);
+				if (selectedObject != null) {
+					makePopup(e);
+					if (popup != null) {
+						popup.show(e.getComponent(), e.getX(), e.getY());
+					}
+
+				}
+			} else {
+				JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
+						"You must select at least one path to edit on...");
+			}
+		}
+	}
 }

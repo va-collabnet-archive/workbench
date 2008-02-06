@@ -20,6 +20,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -28,10 +29,13 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ThinImageVersioned;
 
 public class ImagePopupListener extends MouseAdapter {
 
-    enum FieldToChange { TYPE, STATUS};
+	enum FieldToChange {
+		TYPE, STATUS
+	};
 
 	private ImageTableModel model;
 
@@ -42,11 +46,10 @@ public class ImagePopupListener extends MouseAdapter {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			ConceptBean sourceBean = ConceptBean.get(selectedObject
-					.getTuple().getConceptId());
+			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
+					.getConceptId());
 			for (I_Path p : config.getEditingPathSet()) {
-				I_ImagePart newPart = selectedObject.getTuple()
-						.duplicatePart();
+				I_ImagePart newPart = selectedObject.getTuple().duplicatePart();
 				newPart.setPathId(p.getConceptId());
 				newPart.setVersion(Integer.MAX_VALUE);
 				newPart.setStatusId(config.getDefaultStatus().getConceptId());
@@ -56,6 +59,25 @@ public class ImagePopupListener extends MouseAdapter {
 			model.allImageTuples = null;
 			model.allImages = null;
 			model.fireTableDataChanged();
+		}
+	}
+
+	private class UndoActionListener implements ActionListener {
+
+		public UndoActionListener() {
+			super();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
+					.getConceptId());
+			I_ImageTuple tuple = selectedObject.getTuple();
+			ThinImageVersioned versioned = (ThinImageVersioned) tuple
+					.getVersioned();
+			versioned.getVersions().remove(tuple.getPart());
+			ACE.addUncommitted(sourceBean);
+			model.propertyChange(new PropertyChangeEvent(this, "undo",
+					sourceBean, sourceBean));
 		}
 	}
 
@@ -78,7 +100,7 @@ public class ImagePopupListener extends MouseAdapter {
 						.getTuple().getConceptId());
 				for (I_Path p : config.getEditingPathSet()) {
 					I_ImagePart newPart = selectedObject.getTuple()
-					.duplicatePart();
+							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
 					switch (field) {
@@ -89,7 +111,8 @@ public class ImagePopupListener extends MouseAdapter {
 					case TYPE:
 						newPart.setTypeId((AceConfig.getVodb()
 								.uuidToNative(ids)));
-						newPart.setStatusId(config.getDefaultStatus().getConceptId());
+						newPart.setStatusId(config.getDefaultStatus()
+								.getConceptId());
 						break;
 
 					default:
@@ -101,15 +124,17 @@ public class ImagePopupListener extends MouseAdapter {
 							ConceptBean.get(newPart.getStatusId()));
 					model.referencedConcepts.put(newPart.getTypeId(),
 							ConceptBean.get(newPart.getTypeId()));
-					selectedObject.getTuple().getVersioned().getVersions()
-							.add(newPart);
+					selectedObject.getTuple().getVersioned().getVersions().add(
+							newPart);
 				}
 				ACE.addUncommitted(sourceBean);
 				model.allImageTuples = null;
 				model.allImages = null;
-				
+
 				model.fireTableDataChanged();
-				model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
+				model.propertyChange(new PropertyChangeEvent(this,
+						I_ContainTermComponent.TERM_COMPONENT, null, model.host
+								.getTermComponent()));
 			} catch (Exception ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
@@ -146,16 +171,20 @@ public class ImagePopupListener extends MouseAdapter {
 				popup.add(noActionItem);
 				selectedObject = (StringWithImageTuple) table.getValueAt(row,
 						column);
+				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+					JMenuItem undoActonItem = new JMenuItem("Undo");
+					undoActonItem.addActionListener(new UndoActionListener());
+					popup.add(undoActonItem);
+				}
 				JMenuItem changeItem = new JMenuItem("Change");
 				popup.add(changeItem);
 				changeItem.addActionListener(change);
 				/*
-				JMenuItem retireItem = new JMenuItem("Retire");
-				retireItem.addActionListener(new ChangeFieldActionListener(
-						ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
-						FieldToChange.STATUS));
-				popup.add(retireItem);
-				*/
+				 * JMenuItem retireItem = new JMenuItem("Retire");
+				 * retireItem.addActionListener(new ChangeFieldActionListener(
+				 * ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
+				 * FieldToChange.STATUS)); popup.add(retireItem);
+				 */
 
 				JMenu changeType = new JMenu("Change Type");
 				popup.add(changeType);
@@ -200,16 +229,9 @@ public class ImagePopupListener extends MouseAdapter {
 				int row = table.rowAtPoint(e.getPoint());
 				selectedObject = (StringWithImageTuple) table.getValueAt(row,
 						column);
-				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
-					JOptionPane
-							.showMessageDialog(
-									table.getTopLevelAncestor(),
-									"<html>To change an uncommitted description, <br>use the cancel button, or change the value<br>directly on the uncommitted description...");
-				} else {
-					makePopup(e);
-					if (popup != null) {
-						popup.show(e.getComponent(), e.getX(), e.getY());
-					}
+				makePopup(e);
+				if (popup != null) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
 			} else {
 				JOptionPane.showMessageDialog(table.getTopLevelAncestor(),

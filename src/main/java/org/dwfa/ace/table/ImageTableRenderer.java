@@ -27,6 +27,7 @@ public class ImageTableRenderer extends AceTableRenderer {
 				table, value, isSelected, hasFocus, row, column);
 		boolean same = false;
 		if (StringWithImageTuple.class.isAssignableFrom(value.getClass())) {
+			setIcon(null);
 			setupStringWithTuple(table, value, isSelected, row, column, renderComponent, same);
 		} else if (ImageWithImageTuple.class.isAssignableFrom(value.getClass())) {
 			ImageWithImageTuple icon = (ImageWithImageTuple) value;

@@ -17,6 +17,7 @@ import javax.swing.JTable;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -29,6 +30,7 @@ import org.dwfa.ace.table.ConceptAttributeTableModel.FieldToChange;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ThinConVersioned;
 
 public class AttributePopupListener extends MouseAdapter {
 
@@ -49,15 +51,37 @@ public class AttributePopupListener extends MouseAdapter {
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setConceptStatus(config.getDefaultStatus().getConceptId());
+					newPart.setConceptStatus(config.getDefaultStatus()
+							.getConceptId());
 					sourceBean.getConceptAttributes().addVersion(newPart);
 				}
 				ACE.addUncommitted(sourceBean);
 			} catch (IOException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
-         model.allTuples = null;
-         model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
+			model.allTuples = null;
+			model.propertyChange(new PropertyChangeEvent(this,
+					I_ContainTermComponent.TERM_COMPONENT, null, model.host
+							.getTermComponent()));
+		}
+	}
+
+	private class UndoActionListener implements ActionListener {
+
+		public UndoActionListener() {
+			super();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
+					.getConId());
+			I_ConceptAttributeTuple tuple = selectedObject.getTuple();
+			ThinConVersioned versioned = (ThinConVersioned) tuple
+					.getConVersioned();
+			versioned.getVersions().remove(tuple.getPart());
+			ACE.addUncommitted(sourceBean);
+			model.allTuples = null;
+			model.fireTableDataChanged();
 		}
 	}
 
@@ -66,8 +90,7 @@ public class AttributePopupListener extends MouseAdapter {
 
 		private FieldToChange field;
 
-		public ChangeFieldActionListener(Object obj,
-				FieldToChange field) {
+		public ChangeFieldActionListener(Object obj, FieldToChange field) {
 			super();
 			this.obj = obj;
 			this.field = field;
@@ -91,7 +114,8 @@ public class AttributePopupListener extends MouseAdapter {
 						break;
 					case DEFINED:
 						newPart.setDefined((Boolean) obj);
-						newPart.setConceptStatus(config.getDefaultStatus().getConceptId());
+						newPart.setConceptStatus(config.getDefaultStatus()
+								.getConceptId());
 						break;
 
 					default:
@@ -108,8 +132,10 @@ public class AttributePopupListener extends MouseAdapter {
 			} catch (Exception ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
-         model.allTuples = null;
-         model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
+			model.allTuples = null;
+			model.propertyChange(new PropertyChangeEvent(this,
+					I_ContainTermComponent.TERM_COMPONENT, null, model.host
+							.getTermComponent()));
 		}
 	}
 
@@ -143,16 +169,20 @@ public class AttributePopupListener extends MouseAdapter {
 				popup.add(noActionItem);
 				selectedObject = (StringWithConceptTuple) table.getValueAt(row,
 						column);
+				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+					JMenuItem undoActonItem = new JMenuItem("Undo");
+					undoActonItem.addActionListener(new UndoActionListener());
+					popup.add(undoActonItem);
+				}
 				JMenuItem changeItem = new JMenuItem("Change");
 				popup.add(changeItem);
 				changeItem.addActionListener(change);
 				/*
-				JMenuItem retireItem = new JMenuItem("Retire");
-				retireItem.addActionListener(new ChangeFieldActionListener(
-						ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
-						FieldToChange.STATUS));
-				popup.add(retireItem);
-				*/
+				 * JMenuItem retireItem = new JMenuItem("Retire");
+				 * retireItem.addActionListener(new ChangeFieldActionListener(
+				 * ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
+				 * FieldToChange.STATUS)); popup.add(retireItem);
+				 */
 
 				JMenu changeType = new JMenu("Change Defined");
 				popup.add(changeType);
@@ -169,16 +199,17 @@ public class AttributePopupListener extends MouseAdapter {
 		}
 	}
 
-	private void addBooleanSubmenuItems(JMenu menu, FieldToChange field) throws TerminologyException, IOException {
-			JMenuItem changeBooleanItem = new JMenuItem("true");
-			changeBooleanItem.addActionListener(new ChangeFieldActionListener(
-					true, field));
-			menu.add(changeBooleanItem);
-			changeBooleanItem = new JMenuItem("false");
-			changeBooleanItem.addActionListener(new ChangeFieldActionListener(
-					false, field));
-			menu.add(changeBooleanItem);
-		
+	private void addBooleanSubmenuItems(JMenu menu, FieldToChange field)
+			throws TerminologyException, IOException {
+		JMenuItem changeBooleanItem = new JMenuItem("true");
+		changeBooleanItem.addActionListener(new ChangeFieldActionListener(true,
+				field));
+		menu.add(changeBooleanItem);
+		changeBooleanItem = new JMenuItem("false");
+		changeBooleanItem.addActionListener(new ChangeFieldActionListener(
+				false, field));
+		menu.add(changeBooleanItem);
+
 	}
 
 	private void addSubmenuItems(JMenu menu, FieldToChange field,
@@ -208,17 +239,11 @@ public class AttributePopupListener extends MouseAdapter {
 				int row = table.rowAtPoint(e.getPoint());
 				selectedObject = (StringWithConceptTuple) table.getValueAt(row,
 						column);
-				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
-					JOptionPane
-							.showMessageDialog(
-									table.getTopLevelAncestor(),
-									"<html>To change an uncommitted attribute, <br>use the cancel button, or change the value<br>directly on the uncommitted attribute...");
-				} else {
-					makePopup(e);
-					if (popup != null) {
-						popup.show(e.getComponent(), e.getX(), e.getY());
-					}
+				makePopup(e);
+				if (popup != null) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
+
 			} else {
 				JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
 						"You must select at least one path to edit on...");

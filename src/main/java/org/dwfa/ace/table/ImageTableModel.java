@@ -1,9 +1,13 @@
 package org.dwfa.ace.table;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,8 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
 
@@ -36,6 +44,118 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public static class TextFieldEditor extends DefaultCellEditor {
+
+		private static final long serialVersionUID = 1L;
+
+		public TextFieldEditor() {
+			super(new JTextField());
+			final JTextField textField = new JTextField();
+			editorComponent = textField;
+
+			delegate = new EditorDelegate() {
+				private static final long serialVersionUID = 1L;
+
+				public void setValue(Object value) {
+					if (StringWithImageTuple.class.isAssignableFrom(value
+							.getClass())) {
+						StringWithImageTuple swdt = (StringWithImageTuple) value;
+						textField.setText((value != null) ? swdt.tuple
+								.getTextDescription() : "");
+					} else {
+						textField.setText((value != null) ? value.toString()
+								: "");
+					}
+				}
+
+				public Object getCellEditorValue() {
+					return textField.getText();
+				}
+			};
+			textField.addActionListener(delegate);
+		}
+
+		public Component getTableCellEditorComponent(JTable table,
+				Object value, boolean isSelected, int row, int column) {
+			((JComponent) getComponent())
+					.setBorder(new LineBorder(Color.black));
+			return super.getTableCellEditorComponent(table, value, isSelected,
+					row, column);
+		}
+
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
+	}
+
+	public static class TypeFieldEditor extends AbstractPopupFieldEditor {
+
+		private static final long serialVersionUID = 1L;
+
+		public TypeFieldEditor(I_ConfigAceFrame config) {
+			super(config);
+		}
+
+		@Override
+		public int[] getPopupValues() {
+			return config.getEditImageTypePopup().getListArray();
+		}
+
+		@Override
+		public ConceptBean getSelectedItem(Object value) {
+			StringWithImageTuple swdt = (StringWithImageTuple) value;
+			return ConceptBean.get(swdt.getTuple().getTypeId());
+		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
+	}
+
+	public static class StatusFieldEditor extends AbstractPopupFieldEditor {
+
+		private static final long serialVersionUID = 1L;
+
+		public StatusFieldEditor(I_ConfigAceFrame config) {
+			super(config);
+		}
+
+		@Override
+		public int[] getPopupValues() {
+			return config.getEditStatusTypePopup().getListArray();
+		}
+
+		@Override
+		public ConceptBean getSelectedItem(Object value) {
+			StringWithImageTuple swdt = (StringWithImageTuple) value;
+			return ConceptBean.get(swdt.getTuple().getStatusId());
+		}
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
+	}
+
 	public enum IMAGE_FIELD {
 		IMAGE_ID("iid", 5, 100, 100), CON_ID("cid", 5, 100, 100), 
 		DESC("Description", 5, 200, 1000), IMAGE("image", 5, 200, 1000), 
@@ -472,6 +592,42 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	}
 	public ImagePopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {
 		return new ImagePopupListener(table, config, this);
+	}
+
+	public void setValueAt(Object value, int row, int col) {
+		try {
+			I_ImageTuple image = getImage(row);
+			if (image.getVersion() == Integer.MAX_VALUE) {
+				switch (columns[col]) {
+				case IMAGE_ID:
+					break;
+				case CON_ID:
+					break;
+				case DESC:
+					image.getPart().setTextDescription(value.toString());
+					break;
+				case STATUS:
+					Integer statusId = (Integer) value;
+					image.getPart().setStatusId(statusId);
+					getReferencedConcepts().put(statusId,
+							ConceptBean.get(statusId));
+					break;
+				case TYPE:
+					Integer typeId = (Integer) value;
+					image.getPart().setTypeId(typeId);
+					getReferencedConcepts()
+							.put(typeId, ConceptBean.get(typeId));
+					break;
+				case VERSION:
+					break;
+				case PATH:
+					break;
+				}
+				fireTableDataChanged();
+			}
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
 	}
 
 }

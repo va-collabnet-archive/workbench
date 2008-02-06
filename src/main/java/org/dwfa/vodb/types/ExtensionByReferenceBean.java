@@ -231,4 +231,15 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
         return memberId;
     }
 
+public boolean isUncommitted() throws IOException {
+	if (getExtension().getVersions().size() > 0) {
+		for (I_ThinExtByRefPart part: getExtension().getVersions()) {
+			if (part.getVersion() == Integer.MAX_VALUE) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 }

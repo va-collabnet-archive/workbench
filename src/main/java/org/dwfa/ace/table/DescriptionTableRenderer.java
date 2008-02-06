@@ -29,6 +29,13 @@ public class DescriptionTableRenderer extends AceTableRenderer {
       JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
             column);
       boolean same = false;
+      if (isSelected == false) {
+          renderComponent.setBackground(colorForRow(row));
+          renderComponent.setForeground(UIManager.getColor("Table.foreground"));
+       } else {
+          renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
+          renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
+       }
 
       StringWithDescTuple swt = (StringWithDescTuple) value;
       boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
@@ -43,13 +50,6 @@ public class DescriptionTableRenderer extends AceTableRenderer {
          setBorder(column, this, false, uncommitted);
       }
 
-      if (isSelected == false) {
-         renderComponent.setBackground(colorForRow(row));
-         renderComponent.setForeground(UIManager.getColor("Table.foreground"));
-      } else {
-         renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
-         renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
-      }
       TableColumn c = table.getColumnModel().getColumn(column);
       if (swt.wrapLines) {
          if (BasicHTML.isHTMLString(renderComponent.getText())) {

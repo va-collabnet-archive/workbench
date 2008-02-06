@@ -19,6 +19,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
@@ -28,10 +29,13 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class DescPopupListener extends MouseAdapter {
 
-    enum FieldToChange { TYPE, STATUS};
+	enum FieldToChange {
+		TYPE, STATUS
+	};
 
 	private DescriptionsForConceptTableModel model;
 
@@ -42,16 +46,35 @@ public class DescPopupListener extends MouseAdapter {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			ConceptBean sourceBean = ConceptBean.get(selectedObject
-					.getTuple().getConceptId());
-  			for (I_Path p : config.getEditingPathSet()) {
+			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
+					.getConceptId());
+			for (I_Path p : config.getEditingPathSet()) {
 				I_DescriptionPart newPart = selectedObject.getTuple()
 						.duplicatePart();
 				newPart.setPathId(p.getConceptId());
 				newPart.setVersion(Integer.MAX_VALUE);
 				newPart.setStatusId(config.getDefaultStatus().getConceptId());
-				selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
+				selectedObject.getTuple().getDescVersioned().getVersions().add(
+						newPart);
 			}
+			ACE.addUncommitted(sourceBean);
+			model.allTuples = null;
+			model.fireTableDataChanged();
+		}
+	}
+
+	private class UndoActionListener implements ActionListener {
+
+		public UndoActionListener() {
+			super();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
+					.getConceptId());
+			I_DescriptionTuple tuple = selectedObject.getTuple();
+			ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
+			versioned.getVersions().remove(tuple.getPart());
 			ACE.addUncommitted(sourceBean);
 			model.allTuples = null;
 			model.fireTableDataChanged();
@@ -77,7 +100,7 @@ public class DescPopupListener extends MouseAdapter {
 						.getTuple().getConceptId());
 				for (I_Path p : config.getEditingPathSet()) {
 					I_DescriptionPart newPart = selectedObject.getTuple()
-					.duplicatePart();
+							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
 					switch (field) {
@@ -88,7 +111,8 @@ public class DescPopupListener extends MouseAdapter {
 					case TYPE:
 						newPart.setTypeId((AceConfig.getVodb()
 								.uuidToNative(ids)));
-						newPart.setStatusId(config.getDefaultStatus().getConceptId());
+						newPart.setStatusId(config.getDefaultStatus()
+								.getConceptId());
 						break;
 
 					default:
@@ -106,7 +130,9 @@ public class DescPopupListener extends MouseAdapter {
 				ACE.addUncommitted(sourceBean);
 				model.allTuples = null;
 				model.fireTableDataChanged();
-				model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host.getTermComponent()));
+				model.propertyChange(new PropertyChangeEvent(this,
+						I_ContainTermComponent.TERM_COMPONENT, null, model.host
+								.getTermComponent()));
 			} catch (Exception ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
@@ -143,16 +169,20 @@ public class DescPopupListener extends MouseAdapter {
 				popup.add(noActionItem);
 				selectedObject = (StringWithDescTuple) table.getValueAt(row,
 						column);
+				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+					JMenuItem undoActonItem = new JMenuItem("Undo");
+					undoActonItem.addActionListener(new UndoActionListener());
+					popup.add(undoActonItem);
+				}
 				JMenuItem changeItem = new JMenuItem("Change");
 				popup.add(changeItem);
 				changeItem.addActionListener(change);
 				/*
-				JMenuItem retireItem = new JMenuItem("Retire");
-				retireItem.addActionListener(new ChangeFieldActionListener(
-						ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
-						FieldToChange.STATUS));
-				popup.add(retireItem);
-				*/
+				 * JMenuItem retireItem = new JMenuItem("Retire");
+				 * retireItem.addActionListener(new ChangeFieldActionListener(
+				 * ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
+				 * FieldToChange.STATUS)); popup.add(retireItem);
+				 */
 
 				JMenu changeType = new JMenu("Change Type");
 				popup.add(changeType);
@@ -197,16 +227,9 @@ public class DescPopupListener extends MouseAdapter {
 				int row = table.rowAtPoint(e.getPoint());
 				selectedObject = (StringWithDescTuple) table.getValueAt(row,
 						column);
-				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
-					JOptionPane
-							.showMessageDialog(
-									table.getTopLevelAncestor(),
-									"<html>To change an uncommitted description, <br>use the cancel button, or change the value<br>directly on the uncommitted description...");
-				} else {
-					makePopup(e);
-					if (popup != null) {
-						popup.show(e.getComponent(), e.getX(), e.getY());
-					}
+				makePopup(e);
+				if (popup != null) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
 			} else {
 				JOptionPane.showMessageDialog(table.getTopLevelAncestor(),

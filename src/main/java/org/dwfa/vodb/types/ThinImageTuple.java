@@ -73,5 +73,8 @@ public class ThinImageTuple implements I_ImageTuple {
 	public I_ImageVersioned getVersioned() {
 		return core;
 	}
+	public I_ImagePart getPart() {
+		return part;
+	}
 
 }

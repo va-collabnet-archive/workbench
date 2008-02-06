@@ -1411,6 +1411,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void addUncommitted(I_GetConceptData uncommitted) {
         this.changeSupport.firePropertyChange("uncommitted", null, uncommitted);
     }
+    public void removeUncommitted(I_GetConceptData uncommitted) {
+        this.changeSupport.firePropertyChange("uncommitted", uncommitted, null);
+    }
 
     public void addImported(I_GetConceptData imported) {
         this.changeSupport.firePropertyChange("imported", null, imported);

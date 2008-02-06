@@ -216,6 +216,35 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static Alerter dataTestAlerter = new Alerter();
 
     public static void addUncommitted(I_Transact to) {
+    	I_Transact extraToAdd = null;
+    	if (ExtensionByReferenceBean.class.isAssignableFrom(to.getClass())) {
+    		ExtensionByReferenceBean eb = (ExtensionByReferenceBean) to;
+    		try {
+				if (eb.isUncommitted() == false) {
+					removeUncommitted(to);
+					ConceptBean cbForExt = ConceptBean.get(eb.getExtension().getComponentId());
+					if (cbForExt.isUncommitted()) {
+						removeUncommitted(cbForExt);
+					}
+					return;
+				} else {
+					extraToAdd = ConceptBean.get(eb.getExtension().getComponentId());
+				}
+			} catch (IOException e) {
+	             AceLog.getEditLog().alertAndLogException(e);
+			}
+    	}
+    	if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+    		ConceptBean tb = (ConceptBean) to;
+    		try {
+				if (tb.isUncommitted() == false) {
+					removeUncommitted(to);
+					return;
+				}
+			} catch (IOException e) {
+	             AceLog.getEditLog().alertAndLogException(e);
+			}
+    	}
         for (I_TestDataConstraints test : creationTests) {
             try {
                 if (test.test(to, dataTestAlerter, false) == false) {
@@ -227,6 +256,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         }
         uncommitted.add(to);
+        if (extraToAdd != null) {
+        	addUncommitted(extraToAdd);
+        }
         if (aceConfig != null) {
             for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
                 frameConfig.setCommitEnabled(true);
@@ -241,7 +273,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         uncommitted.remove(to);
         if (aceConfig != null) {
             for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-                frameConfig.addUncommitted(null);
+                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+                    frameConfig.removeUncommitted((I_GetConceptData) to);
+                }
                 if (uncommitted.size() == 0) {
                     frameConfig.setCommitEnabled(false);
                 }

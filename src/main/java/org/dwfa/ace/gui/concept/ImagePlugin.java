@@ -71,6 +71,7 @@ public class ImagePlugin extends AbstractPlugin {
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
+			setupEditorsAndRenderers(host);
 			imageTableModel.propertyChange(evt);
 		}
 	}
@@ -171,9 +172,7 @@ public class ImagePlugin extends AbstractPlugin {
 		c.weighty = 1.0;
 		c.gridheight = 6;
 
-		imageTable.setDefaultRenderer(String.class, new ImageTableRenderer());
-		imageTable.setDefaultRenderer(ImageWithImageTuple.class,
-				new ImageTableRenderer());
+		setupEditorsAndRenderers(host);
 		imagePanel.add(imageTable, c);
 
       c.weightx = 0.0;
@@ -203,5 +202,23 @@ public class ImagePlugin extends AbstractPlugin {
       StringWithImageTuple swit = (StringWithImageTuple) imageTable.getValueAt(imageTable.getSelectedRow(), 0);
       return swit.getTuple().getImageId();
    }
+   
+	private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
+		ImageTableRenderer renderer = new ImageTableRenderer();
+      if (ACE.editMode) {
+    	  imageTable.setDefaultEditor(StringWithImageTuple.class,
+               new ImageTableModel.TextFieldEditor());
+    	  imageTable.getColumn(IMAGE_FIELD.TYPE).setCellEditor(
+               new ImageTableModel.TypeFieldEditor(host.getConfig()));
+    	  imageTable.getColumn(IMAGE_FIELD.STATUS).setCellEditor(
+               new ImageTableModel.StatusFieldEditor(host.getConfig()));
+      }
+
+      imageTable.setDefaultRenderer(ImageWithImageTuple.class, renderer);
+      imageTable.setDefaultRenderer(StringWithImageTuple.class, renderer);
+      imageTable.setDefaultRenderer(Number.class, renderer);
+      imageTable.setDefaultRenderer(String.class, renderer);
+	}
+
 
 }
