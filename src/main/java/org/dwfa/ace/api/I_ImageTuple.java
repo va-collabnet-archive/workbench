@@ -2,26 +2,29 @@ package org.dwfa.ace.api;
 
 public interface I_ImageTuple {
 
-	public abstract byte[] getImage();
+	public byte[] getImage();
 
-	public abstract int getImageId();
+	public int getImageId();
 
-	public abstract int getPathId();
+	public int getPathId();
 
-	public abstract int getStatusId();
+	public int getStatusId();
 
-	public abstract int getVersion();
+	public int getVersion();
 
-	public abstract String getTextDescription();
+	public String getTextDescription();
 
-	public abstract int getTypeId();
+	public int getTypeId();
 
-	public abstract String getFormat();
+	public String getFormat();
 
-	public abstract int getConceptId();
+	public int getConceptId();
 
-	public abstract I_ImageVersioned getVersioned();
+	public I_ImageVersioned getVersioned();
 
-	public abstract I_ImagePart duplicatePart();
+	public I_ImagePart duplicatePart();
+
+	public I_ImagePart getPart();
+
 
 }

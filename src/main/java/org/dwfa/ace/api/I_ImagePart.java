@@ -3,28 +3,29 @@ package org.dwfa.ace.api;
 
 public interface I_ImagePart {
 
-	public abstract int getPathId();
+	public int getPathId();
 
-	public abstract int getStatusId();
+	public int getStatusId();
 
-	public abstract int getVersion();
+	public int getVersion();
 
-	public abstract void setPathId(int pathId);
+	public void setPathId(int pathId);
 
-	public abstract void setStatusId(int status);
+	public void setStatusId(int status);
 
-	public abstract void setVersion(int version);
+	public void setVersion(int version);
 
-	public abstract String getTextDescription();
+	public String getTextDescription();
 
-	public abstract void setTextDescription(String name);
+	public void setTextDescription(String name);
 
-	public abstract int getTypeId();
+	public int getTypeId();
 
-	public abstract void setTypeId(int type);
+	public void setTypeId(int type);
 
-	public abstract boolean hasNewData(I_ImagePart another);
+	public boolean hasNewData(I_ImagePart another);
 
-	public abstract void convertIds(I_MapNativeToNative jarToDbNativeMap);
+	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
+	
 
 }

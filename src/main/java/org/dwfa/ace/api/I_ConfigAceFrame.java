@@ -203,6 +203,7 @@ public interface I_ConfigAceFrame {
 	public boolean isCommitEnabled();
 	
 	public void addUncommitted(I_GetConceptData conceptBean);
+	public void removeUncommitted(I_GetConceptData uncommitted);
 	
 	public void addImported(I_GetConceptData conceptBean);
 	
