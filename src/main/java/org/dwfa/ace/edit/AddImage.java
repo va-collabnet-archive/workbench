@@ -75,6 +75,7 @@ public class AddImage extends AddComponent {
 					image, parts, format, cb.getConceptId());
 
 			cb.getUncommittedImages().add(imageCore);
+			cb.getUncommittedIds().add(imageCore.getImageId());
 			ACE.addUncommitted(cb);
 			termContainer.setTermComponent(cb);
 	}
