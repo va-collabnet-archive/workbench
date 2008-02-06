@@ -208,10 +208,10 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 			// in the member set
 			refsetInclusionsOutputFile.getParentFile().mkdirs();
 			
-			refsetInclusionsOutputFile = renameOutputFile(refSetSpecDescriptor.toString(),refsetInclusionsOutputFile);
+			File refsetInclusionsOutputFile_temp = renameOutputFile(refSetSpecDescriptor.toString(),refsetInclusionsOutputFile);
 			
 			BufferedWriter uuidWriter = new BufferedWriter(
-					new FileWriter(refsetInclusionsOutputFile));
+					new FileWriter(refsetInclusionsOutputFile_temp));
 			for (int i : includedMemberSet) {
 				Collection<UUID> uuids = termFactory.getUids(i);
 				for (UUID uuid: uuids) {
@@ -225,9 +225,11 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 			// write list of uuids for concepts that were excluded
 			// from member set
+			File refsetExclusionsOutputFile_temp = renameOutputFile(refSetSpecDescriptor.toString(),refsetExclusionsOutputFile);
+
 			refsetExclusionsOutputFile.getParentFile().mkdirs();
 			uuidWriter = new BufferedWriter(
-					new FileWriter(refsetExclusionsOutputFile));
+					new FileWriter(refsetExclusionsOutputFile_temp));
 			for (int i : excludedMemberSet) {
 				Collection<UUID> uuids = termFactory.getUids(i);
 				for (UUID uuid: uuids) {
