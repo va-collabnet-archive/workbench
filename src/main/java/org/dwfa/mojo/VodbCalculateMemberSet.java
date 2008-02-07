@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -122,7 +123,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-
+		List<Thread> threads = new LinkedList<Thread>(); 
 		if (refSetSpecDescriptor==null) {
 			try {
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
@@ -139,31 +140,36 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 					I_IntSet purpose = termFactory.newIntSet();
 
 					Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
-					
+
 					List<I_RelVersioned> rels = refsetConcept.getSourceRels();
 					for (I_RelVersioned rel: rels) {
 						List<I_RelTuple> tuples = rel.getTuples();
 						for (I_RelTuple tuple : tuples) {
 							if (tuple.getStatusId()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() && 
-								tuple.getRelTypeId()==termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId()) {
-								
+									tuple.getRelTypeId()==termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId()) {
+
 								purposeConcepts.add(termFactory.getConcept(tuple.getC2Id()));
 							}
 						}
 					}
-					
+
 					if (purposeConcepts.size()==1) {
 
 						if (purposeConcepts.iterator().next().getConceptId()==termFactory.getConcept(RefsetAuxiliary.Concept.INCLUSION_SPECIFICATION.getUids()).getConceptId()) {
 							getLog().info("Found refset with inclusion specification: " + refsetConcept);
-							runMojo(refsetConcept);
+							threads.add(runMojo(refsetConcept));
 						} 
 					} 
 				}
+				
+				for (Thread t : threads) {
+					t.join();
+				}
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
-
+			
 		} else {		
 			try {
 				runMojo(refSetSpecDescriptor.getVerifiedConcept());
@@ -175,7 +181,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 
 	private File renameOutputFile(String suffix, File refsetInclusionsOutputFile) {
-		
+
 		String filename = refsetInclusionsOutputFile.getAbsolutePath();
 		int index = -1;
 		if ((index = filename.lastIndexOf("."))!=-1) {
@@ -184,72 +190,30 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 		} else {
 			filename = filename + "." + suffix+".txt";
 		}		
-		
+
 		refsetInclusionsOutputFile = new File(filename);
 		return refsetInclusionsOutputFile;
 	}
-	
+
 	/**
 	 * Iterates over each concept and calculates the member set.
 	 */
-	public void runMojo(I_GetConceptData refSetSpecDescriptor) throws MojoExecutionException, MojoFailureException {
+	public Thread runMojo(I_GetConceptData refSetSpecDescriptor) throws MojoExecutionException, MojoFailureException {
 
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		MemberSetCalculator calculator = null;
 		try {
 
 			// execute calculate member set plugin
-			MemberSetCalculator calculator = new MemberSetCalculator(refSetSpecDescriptor);
-
+			calculator = new MemberSetCalculator(refSetSpecDescriptor);
 			// iterate over each concept, starting at the root
-			calculator.processConcept(calculator.getRoot());
-
-
-			// write list of uuids for concepts that were included
-			// in the member set
-			refsetInclusionsOutputFile.getParentFile().mkdirs();
-			
-			File refsetInclusionsOutputFile_temp = renameOutputFile(refSetSpecDescriptor.toString(),refsetInclusionsOutputFile);
-			
-			BufferedWriter uuidWriter = new BufferedWriter(
-					new FileWriter(refsetInclusionsOutputFile_temp));
-			for (int i : includedMemberSet) {
-				Collection<UUID> uuids = termFactory.getUids(i);
-				for (UUID uuid: uuids) {
-					uuidWriter.write(uuid.toString());
-					uuidWriter.append("\t");
-					uuidWriter.append(getFsnFromConceptId(i));
-					uuidWriter.newLine();
-				}
-			}
-			uuidWriter.close();
-
-			// write list of uuids for concepts that were excluded
-			// from member set
-			File refsetExclusionsOutputFile_temp = renameOutputFile(refSetSpecDescriptor.toString(),refsetExclusionsOutputFile);
-
-			refsetExclusionsOutputFile.getParentFile().mkdirs();
-			uuidWriter = new BufferedWriter(
-					new FileWriter(refsetExclusionsOutputFile_temp));
-			for (int i : excludedMemberSet) {
-				Collection<UUID> uuids = termFactory.getUids(i);
-				for (UUID uuid: uuids) {
-					uuidWriter.write(uuid.toString());
-					uuidWriter.append("\t");
-					uuidWriter.append(getFsnFromConceptId(i));
-					uuidWriter.newLine();
-				}
-			}
-			uuidWriter.close();
-
-			String message = "Number of members found in reference set: "
-				+ calculator.getMemberSetCount();
-			getLog().info(message);
-//			termFactory.commit();
+			calculator.start();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			//throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
+		
+		return calculator;
 	}
 
 	public String getFsnFromConceptId(int conceptId) throws Exception {
@@ -271,7 +235,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 		return "unknown";
 	}
 
-	private class MemberSetCalculator implements I_ProcessConcepts {
+	private class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
 		private I_TermFactory termFactory;
 		private int memberSetCount;
@@ -285,6 +249,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 		private int typeId;
 		private int currentStatusId;
 		private I_GetConceptData root;
+		private I_GetConceptData refConcept;
 
 		private int processedConcepts = 0;
 
@@ -298,7 +263,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 			getLog().debug("MemberSetCalculator() - start");
 
 			termFactory = LocalVersionedTerminology.get();
-
+			this.refConcept = refConcept;
 			// verify concepts
 			referenceSetId = refConcept.getConceptId();
 
@@ -341,6 +306,58 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 			return collection.iterator().next();
 		}
 
+		public void run() {
+			try {
+				System.out.println("Running analysis for : " + refConcept.toString() + " \nusing root : " + getRoot());
+				processConcept(getRoot());		
+
+				// write list of uuids for concepts that were included
+				// in the member set
+				refsetInclusionsOutputFile.getParentFile().mkdirs();
+
+				File refsetInclusionsOutputFile_temp = renameOutputFile(refConcept.toString(),refsetInclusionsOutputFile);
+
+				BufferedWriter uuidWriter = new BufferedWriter(
+						new FileWriter(refsetInclusionsOutputFile_temp));
+				for (int i : includedMemberSet) {
+					Collection<UUID> uuids = termFactory.getUids(i);
+					for (UUID uuid: uuids) {
+						uuidWriter.write(uuid.toString());
+						uuidWriter.append("\t");
+						uuidWriter.append(getFsnFromConceptId(i));
+						uuidWriter.newLine();
+					}
+				}
+				uuidWriter.close();
+
+				// write list of uuids for concepts that were excluded
+				// from member set
+				File refsetExclusionsOutputFile_temp = renameOutputFile(refConcept.toString(),refsetExclusionsOutputFile);
+
+				refsetExclusionsOutputFile.getParentFile().mkdirs();
+				uuidWriter = new BufferedWriter(
+						new FileWriter(refsetExclusionsOutputFile_temp));
+				for (int i : excludedMemberSet) {
+					Collection<UUID> uuids = termFactory.getUids(i);
+					for (UUID uuid: uuids) {
+						uuidWriter.write(uuid.toString());
+						uuidWriter.append("\t");
+						uuidWriter.append(getFsnFromConceptId(i));
+						uuidWriter.newLine();
+					}
+				}
+				uuidWriter.close();
+
+				String message = "Number of members found in reference set: "
+					+ getMemberSetCount();
+				getLog().info(message);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		/**
 		 * Processes each concept in the database. Concepts may be included
 		 * or excluded from the member set based on the reference set extension
@@ -348,6 +365,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 		 * (recursively).
 		 */
 		public void processConcept(I_GetConceptData concept) throws Exception {
+
+
+
 			getLog().debug("processConcept(I_GetConceptData) " 
 					+ concept == null ? null : concept.getDescriptions().iterator().next() + " - start");
 
