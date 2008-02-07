@@ -32,7 +32,7 @@ public class DescriptionTableRenderer extends AceTableRenderer {
       if (isSelected == false) {
           renderComponent.setBackground(colorForRow(row));
           renderComponent.setForeground(UIManager.getColor("Table.foreground"));
-       } else {
+       } else {	
           renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
           renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
        }

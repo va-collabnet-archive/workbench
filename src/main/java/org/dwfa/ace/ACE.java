@@ -391,11 +391,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
         try {
+        	
+        	
             for (I_Transact cb : uncommitted) {
                 cb.commit(version, values);
             }
             AceConfig.getVodb().addTimeBranchValues(values);
             AceConfig.getVodb().sync();
+            
+            
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }
