@@ -99,7 +99,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		
 		this.log = log;
 		
-		getLog().info("MemberSetCalculator() - start");
+		getLog().debug("MemberSetCalculator() - start");
 
 		this.refsetInclusionsOutputFile = refsetInclusionsOutputFile;
 		this.refsetExclusionsOutputFile = refsetExclusionsOutputFile;
@@ -137,7 +137,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		typeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
 		currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 
-		getLog().info("MemberSetCalculator() - end");
+		getLog().debug("MemberSetCalculator() - end");
 	}
 
 	private <T> T assertExactlyOne(
@@ -165,7 +165,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
 	public void run() {
 		try {
-			System.out.println("Running analysis for : " + refConcept.toString() + " \nusing root : " + getRoot());
+			getLog().info("Running analysis for : " + refConcept.toString() + " \nusing root : " + getRoot());
 			processConcept(getRoot());		
 
 			// write list of uuids for concepts that were included
@@ -244,7 +244,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
 
 
-		getLog().info("processConcept(I_GetConceptData) " 
+		getLog().debug("processConcept(I_GetConceptData) " 
 				+ concept == null ? null : concept.getDescriptions().iterator().next() + " - start");
 
 		processedConcepts++;
@@ -262,32 +262,31 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		int refsetCount = 0;
 		I_ThinExtByRefVersioned memberSet = null;
 		for (I_GetExtensionData refSetExtension: extensions) {
-			System.out.println("looking at: " + refSetExtension.getExtension().getRefsetId() + " " + referenceSetId + " " + memberSetId);
 			if (refSetExtension.getExtension().getRefsetId() == referenceSetId) {
-				getLog().info("processConcept(I_GetConceptData) - found refset spec " + referenceSetId);
+				getLog().debug("processConcept(I_GetConceptData) - found refset spec " + referenceSetId);
 				refsetCount++;
 			}
 			if (refSetExtension.getExtension().getRefsetId() == memberSetId) {
-				getLog().info("processConcept(I_GetConceptData) - found refset membership " + memberSetId);
+				getLog().debug("processConcept(I_GetConceptData) - found refset membership " + memberSetId);
 				memberSet = refSetExtension.getExtension();
 			}
 		}
 		boolean includedInLatestMemberSet = latestMembersetIncludesConcept(memberSet);
 
 		if (refsetCount == 0) {
-			getLog().info("processConcept(I_GetConceptData) - no explicit refset instruction");
+			getLog().debug("processConcept(I_GetConceptData) - no explicit refset instruction");
 
 			// no refsets have been found so check if there are any inherited
 			// conditions
 			if (includedLineage.contains(conceptId)) {
-				getLog().info("processConcept(I_GetConceptData) - inherited include " + getFsnFromConceptId(concept.getConceptId()));
+				getLog().debug("processConcept(I_GetConceptData) - inherited include " + getFsnFromConceptId(concept.getConceptId()));
 
 				// this concept has an inherited condition for inclusion
 				if (!includedInLatestMemberSet) {
 					addToMemberSet(conceptId, includeLineageId);
 				}
 			} else if (excludedLineage.contains(conceptId)) {
-				getLog().info("processConcept(I_GetConceptData) - inherited exclude " + getFsnFromConceptId(concept.getConceptId()));
+				getLog().debug("processConcept(I_GetConceptData) - inherited exclude " + getFsnFromConceptId(concept.getConceptId()));
 				excludedMemberSet.add(conceptId);
 				if (memberSet != null) {
 					retireLatestExtension(memberSet);
@@ -300,7 +299,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 			includedInLatestMemberSet = latestMembersetIncludesConcept(memberSet);
 			I_ThinExtByRefVersioned part = extensionData.getExtension();
 			int extensionTypeId = part.getTypeId();
-			getLog().info("processConcept(I_GetConceptData) - processing extensionTypeId " + extensionTypeId 
+			getLog().debug("processConcept(I_GetConceptData) - processing extensionTypeId " + extensionTypeId 
 					+ " referenceSetId " + extensionData.getExtension().getRefsetId());
 
 
@@ -309,53 +308,52 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 				// only look at the ref set extensions that correspond to
 				// the reference set as specified in maven plugin config
 				int typeId = 0;
-				getLog().info("processConcept(I_GetConceptData) - valid type/refset, processing");
+				getLog().debug("processConcept(I_GetConceptData) - valid type/refset, processing");
 
 				List<? extends I_ThinExtByRefPart> versions = part.getVersions();
 				for (I_ThinExtByRefPart version : versions) {
 					I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) version;
 					typeId = temp.getConceptId();
-					getLog().info("processConcept(I_GetConceptData) - determining type version " 
+					getLog().debug("processConcept(I_GetConceptData) - determining type version " 
 							+ temp.getVersion() + " type now " + typeId);
 				}
 
 				boolean include = true;
 				if (typeId == includeIndividualId) {
 					if (!includedInLatestMemberSet) {
-						getLog().info("processConcept(I_GetConceptData) - including individual " + getFsnFromConceptId(concept.getConceptId()));
+						getLog().debug("processConcept(I_GetConceptData) - including individual " + getFsnFromConceptId(concept.getConceptId()));
 						addToMemberSet(conceptId, typeId);
 					} else {
-						getLog().info("processConcept(I_GetConceptData) - already included in last generation");
+						getLog().debug("processConcept(I_GetConceptData) - already included in last generation");
 					}
 				} else if (typeId == includeLineageId) {
 					if (!includedInLatestMemberSet) {
-						getLog().info("processConcept(I_GetConceptData) - including individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
+						getLog().debug("processConcept(I_GetConceptData) - including individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
 						addToMemberSet(conceptId, typeId);
 					} else {
-						getLog().info("processConcept(I_GetConceptData) - already included in last generation");
+						getLog().debug("processConcept(I_GetConceptData) - already included in last generation");
 					}
-					getLog().info("processConcept(I_GetConceptData) - including all children");
+					getLog().debug("processConcept(I_GetConceptData) - including all children");
 					markAllChildren(concept, include);
 				} else if (typeId == excludeIndividualId) {
 					if (includedInLatestMemberSet) {
-						getLog().info("processConcept(I_GetConceptData) - excluding individual " + getFsnFromConceptId(concept.getConceptId()));
+						getLog().debug("processConcept(I_GetConceptData) - excluding individual " + getFsnFromConceptId(concept.getConceptId()));
 						retireLatestExtension(memberSet);
 						excludedMemberSet.add(conceptId);
 					} else {
-						getLog().info("processConcept(I_GetConceptData) - already excluded in last generation");
+						getLog().debug("processConcept(I_GetConceptData) - already excluded in last generation");
 					}
 				} else if (typeId == excludeLineageId) {
 					if (includedInLatestMemberSet) {
-						getLog().info("processConcept(I_GetConceptData) - excluding individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
+						getLog().debug("processConcept(I_GetConceptData) - excluding individual for lineage instruction " + getFsnFromConceptId(concept.getConceptId()));
 						retireLatestExtension(memberSet);
 						excludedMemberSet.add(conceptId);
 					} else {
-						getLog().info("processConcept(I_GetConceptData) - already excluded in last generation");
+						getLog().debug("processConcept(I_GetConceptData) - already excluded in last generation");
 					}
-					getLog().info("processConcept(I_GetConceptData) - including all children");
+					getLog().debug("processConcept(I_GetConceptData) - including all children");
 					markAllChildren(concept, !include);
 				} else {
-					System.out.println(termFactory.getConcept(typeId));
 					throw new Exception("Unknown extension type: " + typeId);
 				}
 				
@@ -366,14 +364,14 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
 				getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
 
-		getLog().info("processConcept(I_GetConceptData) - processing " + children.size() + " children");
+		getLog().debug("processConcept(I_GetConceptData) - processing " + children.size() + " children");
 
 		for (I_RelTuple child : children) {
 			int childId = child.getC1Id();
 			processConcept(termFactory.getConcept(childId));
 		}
 
-		getLog().info("processConcept(I_GetConceptData) - end");
+		getLog().debug("processConcept(I_GetConceptData) - end");
 	}
 
 	/**
@@ -383,10 +381,10 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 	 * @throws Exception
 	 */
 	public boolean latestMembersetIncludesConcept(I_ThinExtByRefVersioned extensionPart) throws Exception {
-		getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned=" + extensionPart + ") - start"); //$NON-NLS-1$ //$NON-NLS-2$
+		getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned=" + extensionPart + ") - start"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (extensionPart == null) {
-			getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
+			getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
 			return false;
 		}
 
@@ -394,7 +392,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
 
 		boolean result = exensionParts.size() > 0;
-		getLog().info("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
+		getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
 
 		return result;
 	}
@@ -405,7 +403,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 	 * @throws Exception
 	 */
 	public void retireLatestExtension(I_ThinExtByRefVersioned extensionPart) throws Exception {
-		getLog().info("retireLatestExtension(I_ThinExtByRefVersioned=" + extensionPart 
+		getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned=" + extensionPart 
 				+ ") - start for concept " + getFsnFromConceptId(extensionPart.getComponentId()));
 
 		if (extensionPart != null) {
@@ -421,7 +419,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 				clone.setVersion(Integer.MAX_VALUE);
 				extensionPart.addVersion(clone);
 
-				getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
+				getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for " 
 						+ getFsnFromConceptId(extensionPart.getComponentId()));
 
 				termFactory.addUncommitted(extensionPart);
@@ -429,7 +427,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 			}
 		}
 
-		getLog().info("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
+		getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
 	}
 
 	/**
@@ -439,7 +437,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 	 * @throws Exception
 	 */
 	public void addToMemberSet(int conceptId, int includeTypeConceptId) throws Exception {
-		getLog().info("addToMemberSet(int=" + conceptId + ") - start for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
+		getLog().debug("addToMemberSet(int=" + conceptId + ") - start for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (!includedMemberSet.contains(conceptId)) {
 			memberSetCount++;
@@ -462,12 +460,12 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 			conceptExtension.setConceptId(getMembershipType(includeTypeConceptId));
 
 			newExtension.addVersion(conceptExtension);
-			getLog().info("addToMemberSet(int=" + conceptId + ") - start added new extension for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
+			getLog().debug("addToMemberSet(int=" + conceptId + ") - start added new extension for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
 
 			termFactory.addUncommitted(termFactory.getConcept(conceptId));    			
 		}
 
-		getLog().info("addToMemberSet(int) - end");
+		getLog().debug("addToMemberSet(int) - end");
 	}
 
 	private int getMembershipType(int includeTypeConceptId) throws Exception {
@@ -489,7 +487,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 	 */
 	public void markAllChildren(I_GetConceptData concept, boolean includeChildren)
 	throws Exception {
-		getLog().info("markAllChildren(I_GetConceptData=" 
+		getLog().debug("markAllChildren(I_GetConceptData=" 
 				+ concept.getDescriptions().iterator().next() 
 				+ ", boolean=" + includeChildren + ") - start");
 
@@ -497,7 +495,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
 				getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
 
-		getLog().info("markAllChildren(I_GetConceptData, boolean) - concept has " + children.size() + " children");
+		getLog().debug("markAllChildren(I_GetConceptData, boolean) - concept has " + children.size() + " children");
 
 		for (I_RelTuple child : children) {
 
@@ -515,12 +513,12 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 				excludedLineage.add(Integer.valueOf(childId));
 			}
 
-			getLog().info("markAllChildren(I_GetConceptData, boolean) - include children's children");
+			getLog().debug("markAllChildren(I_GetConceptData, boolean) - include children's children");
 
 			markAllChildren(termFactory.getConcept(childId), includeChildren);
 		}
 
-		getLog().info("markAllChildren(I_GetConceptData, boolean) - end");
+		getLog().debug("markAllChildren(I_GetConceptData, boolean) - end");
 	}
 
 	private I_IntSet getIntSet(ArchitectonicAuxiliary.Concept... concepts) throws Exception {
