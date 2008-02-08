@@ -2180,6 +2180,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	public int uuidToNative(UUID uid) throws TerminologyException, IOException {
+		if (uid.equals(originalStatedUuid) || uid.equals(additionalStatedUuid)) {
+			return PrimordialId.STATED_CHARACTERISTIC_ID.getNativeId(Integer.MIN_VALUE);
+		}
+		if (uid.equals(originalInferredUuid) || uid.equals(additionalInferredUuid)) {
+			return PrimordialId.INFERRED_CHARACTERISTIC_ID.getNativeId(Integer.MIN_VALUE);
+		}
+		
 		I_IdVersioned id = getId(uid);
 		if (id != null) {
 			return id.getNativeId();
@@ -2196,9 +2203,33 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return id.getNativeId();
 	}
 
+	public static UUID originalStatedUuid = UUID.fromString("3fde38f6-e079-3cdc-a819-eda3ec74732d");
+	public static UUID originalInferredUuid = UUID.fromString("d8fb4fb0-18c3-3352-9431-4919193f85bc");
+
+	public static UUID additionalStatedUuid = UUID.fromString("7cf285d6-a3b7-11dc-8314-0800200c9a66");
+	public static UUID additionalInferredUuid = UUID.fromString("1ebef994-a3b8-11dc-8314-0800200c9a66");
+
 	public ThinIdVersioned getId(UUID uid) throws TerminologyException,
 			IOException {
+		ThinIdVersioned returnValue = getIdCore(uid);
+		if (returnValue == null) {
+			if (uid.equals(originalStatedUuid)) {
+				returnValue = getIdCore(additionalStatedUuid);
+			} else if (uid.equals(additionalStatedUuid)) {
+				returnValue = getIdCore(originalStatedUuid);
+			} else if (uid.equals(originalInferredUuid)) {
+				returnValue = getIdCore(additionalInferredUuid);
+			} else if (uid.equals(additionalInferredUuid)) {
+				returnValue = getIdCore(originalInferredUuid);
+			}
+		}
+		return returnValue;
+	}
+
+	private ThinIdVersioned getIdCore(UUID uid) throws ToIoException {
 		Stopwatch timer = null;
+		
+		
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Getting nativeId : " + uid);
 			timer = new Stopwatch();
@@ -3626,6 +3657,10 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public I_GetExtensionData getExtensionWrapper(int nid) throws IOException {
 		return ExtensionByReferenceBean.get(nid);
+	}
+
+	public static boolean isTransactional() {
+		return transactional;
 	}
 
 }
