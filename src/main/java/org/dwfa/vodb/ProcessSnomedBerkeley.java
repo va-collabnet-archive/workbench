@@ -50,6 +50,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import com.sleepycat.je.Transaction;
 
 /**
  * Goal which touches a timestamp file.
@@ -169,7 +170,11 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		//Update the history records for the relationships...
 		printElapsedTime();
 		AceLog.getAppLog().info("Starting rel history update.");
-		Cursor relC = vodb.getRelDb().openCursor(null, null);
+		Transaction txn = null;
+		if (VodbEnv.isTransactional()) {
+			txn = vodb.getEnv().beginTransaction(null, null);
+		}
+		Cursor relC = vodb.getRelDb().openCursor(txn, null);
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
 		int compressedRels = 0;
@@ -205,6 +210,9 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			}			
 		}
 		relC.close();
+		if (txn != null) {
+			txn.commit();
+		}
 		AceLog.getAppLog().info("Total rels: " + totalRels);
 		AceLog.getAppLog().info("Compressed rels: " + compressedRels);
 		AceLog.getAppLog().info("Retired rels: " + retiredRels);
