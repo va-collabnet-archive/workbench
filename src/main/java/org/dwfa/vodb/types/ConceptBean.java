@@ -42,8 +42,10 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
+import org.dwfa.vodb.VodbEnv;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -52,6 +54,32 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	private static WeakHashMap<ConceptBean, WeakReference<ConceptBean>> cbeans = new WeakHashMap<ConceptBean, WeakReference<ConceptBean>>();
 
 	public static ConceptBean get(int conceptId) {
+		try {
+			if (conceptId == PrimordialId.INFERRED_CHARACTERISTIC_ID
+					.getNativeId(Integer.MIN_VALUE)) {
+				ConceptBean testBean = privateGet(conceptId);
+				if (testBean.getDescriptions() != null
+						&& testBean.getDescriptions().size() > 0) {
+					return testBean;
+				}
+				return privateGet(AceConfig.getVodb().getId(VodbEnv.additionalInferredUuid).getNativeId());
+			} else if (conceptId == PrimordialId.STATED_CHARACTERISTIC_ID
+					.getNativeId(Integer.MIN_VALUE)) {
+				ConceptBean testBean = privateGet(conceptId);
+				if (testBean.getDescriptions() != null
+						&& testBean.getDescriptions().size() > 0) {
+					return testBean;
+				}
+				return privateGet(AceConfig.getVodb().getId(VodbEnv.additionalStatedUuid).getNativeId());
+			}
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+
+		return privateGet(conceptId);
+	}
+
+	private static ConceptBean privateGet(int conceptId) {
 		ConceptBean cb = new ConceptBean(conceptId);
 		WeakReference<ConceptBean> ref = cbeans.get(cb);
 		if (ref != null) {
@@ -71,11 +99,37 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 
 	public static ConceptBean get(UUID uid) throws TerminologyException,
 			IOException {
+		if (uid.equals(VodbEnv.additionalInferredUuid)) {
+			ConceptBean testBean = get(AceConfig.getVodb().uuidToNative(
+					VodbEnv.originalInferredUuid));
+			if (testBean.getDescriptions() != null
+					&& testBean.getDescriptions().size() > 0) {
+				return testBean;
+			}
+			return get(AceConfig.getVodb().uuidToNative(
+					VodbEnv.additionalInferredUuid));
+		} else if (uid.equals(VodbEnv.additionalStatedUuid)) {
+			ConceptBean testBean = get(AceConfig.getVodb().uuidToNative(
+					VodbEnv.originalStatedUuid));
+			if (testBean.getDescriptions() != null
+					&& testBean.getDescriptions().size() > 0) {
+				return testBean;
+			}
+			return get(AceConfig.getVodb().uuidToNative(
+					VodbEnv.additionalStatedUuid));
+		}
 		return get(AceConfig.getVodb().uuidToNative(uid));
 	}
 
 	public static ConceptBean get(Collection<UUID> uids)
 			throws TerminologyException, IOException {
+		if (uids.contains(VodbEnv.additionalInferredUuid)) {
+			return get(AceConfig.getVodb().uuidToNative(
+					VodbEnv.originalInferredUuid));
+		} else if (uids.contains(VodbEnv.additionalStatedUuid)) {
+			return get(AceConfig.getVodb().uuidToNative(
+					VodbEnv.originalStatedUuid));
+		}
 		return get(AceConfig.getVodb().uuidToNative(uids));
 	}
 
@@ -361,17 +415,37 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 									ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 											.getUids());
 				}
-				I_DescriptionVersioned desc = getDescriptions().get(0);
-				for (I_DescriptionVersioned d : getDescriptions()) {
-					for (I_DescriptionPart part : d.getVersions()) {
-						if ((part.getTypeId() == fsDescNid)
-								|| (part.getTypeId() == fsXmlDescNid)) {
-							return part.getText();
+				if (getDescriptions().size() > 0) {
+					I_DescriptionVersioned desc = getDescriptions().get(0);
+					for (I_DescriptionVersioned d : getDescriptions()) {
+						for (I_DescriptionPart part : d.getVersions()) {
+							if ((part.getTypeId() == fsDescNid)
+									|| (part.getTypeId() == fsXmlDescNid)) {
+								return part.getText();
+							}
 						}
 					}
+					return desc.getVersions().get(0).getText();
+				} else {
+					AceLog.getEditLog().severe(
+							"Uuids: "
+									+ AceConfig.getVodb().getUids(conceptId)
+											.toString());
+					AceLog.getEditLog().severe(
+							"id: " + AceConfig.getVodb().getId(conceptId));
+					AceLog.getEditLog().severe(
+							"nid: "
+									+ AceConfig.getVodb().uuidToNative(
+											getUids()));
+
+					int sequence = conceptId + Integer.MIN_VALUE;
+					String errString = "No desc for concept: " + conceptId
+							+ " (" + sequence + ") " + " " + getUids();
+					AceLog.getEditLog().severe(errString);
+					throw new Exception(errString);
+					// return errString;
 				}
 
-				return desc.getVersions().get(0).getText();
 			} catch (Exception ex) {
 				AceLog.getAppLog().nonModalAlertAndLogException(ex);
 			}
@@ -1062,8 +1136,8 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				}
 			}
 		}
-		
-		for (I_Transact to: ACE.getUncommitted()) {
+
+		for (I_Transact to : ACE.getUncommitted()) {
 			if (ExtensionByReferenceBean.class.isAssignableFrom(to.getClass())) {
 				ExtensionByReferenceBean ebr = (ExtensionByReferenceBean) to;
 				if (ebr.getExtension().getComponentId() == this.conceptId) {

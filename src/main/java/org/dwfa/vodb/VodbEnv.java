@@ -2203,6 +2203,7 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return id.getNativeId();
 	}
 
+	//TODO remove these after sufficient releases have gont by to ensure that the additional uids are no longer in use. 
 	public static UUID originalStatedUuid = UUID.fromString("3fde38f6-e079-3cdc-a819-eda3ec74732d");
 	public static UUID originalInferredUuid = UUID.fromString("d8fb4fb0-18c3-3352-9431-4919193f85bc");
 
