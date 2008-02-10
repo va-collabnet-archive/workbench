@@ -201,12 +201,22 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 		this.rootDescriptor = rootDescriptor;
 	}
 
-	private class ProcessRefSets implements I_ProcessConcepts {
+	public String getFsnFromConceptId(int conceptId) throws Exception {
 
-		public void processConcept(I_GetConceptData concept) throws Exception {
+		I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(conceptId);
 
-
+		List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
+		int fsnId = LocalVersionedTerminology.get().uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
+				getUids().iterator().next());
+		for (I_DescriptionVersioned description : descriptions) {
+			List<I_DescriptionPart> parts = description.getVersions();
+			for (I_DescriptionPart part : parts) {
+				if (fsnId == part.getTypeId()) {
+					return part.getText();
+				}
+			}
 		}
 
+		return "unknown";
 	}
 }

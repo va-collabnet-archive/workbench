@@ -233,7 +233,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
 		return "unknown";
 	}
-
+	
 	/**
 	 * Processes each concept in the database. Concepts may be included
 	 * or excluded from the member set based on the reference set extension
