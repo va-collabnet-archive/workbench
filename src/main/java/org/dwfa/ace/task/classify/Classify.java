@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -105,73 +106,24 @@ public class Classify extends AbstractTask {
 
             isaId = termFactory.getConcept(new UUID[] {Type3UuidFactory.SNOMED_ISA_REL_UUID}).getConceptId();
             worker.getLogger().info("isa ID: " + isaId + " : " + termFactory.getConcept(isaId));
-            snorocketFactory.addIsa(isaId);
+            snorocketFactory.setIsa(isaId);
             
-            new DepthWalker(termFactory, snorocketFactory, root).run();
-            worker.getLogger().info("Row Count: " + snorocketFactory.getRowCount());
+            final long start = System.currentTimeMillis();
+            
+            new IteratorWalker(termFactory, snorocketFactory, root).run();
+            if (false) {
+                new BreadthWalker(termFactory, snorocketFactory, root).run();
+                new DepthWalker(termFactory, snorocketFactory, root).run();
+            }
+            
+            worker.getLogger().info("Walker time: " + (System.currentTimeMillis()-start)/1000.0 + "sec");
+if (true) return Condition.CONTINUE; // FIXME delete
 
             snorocketFactory.classify();
             
-            worker.getLogger().info("Row Count: " + snorocketFactory.getRowCount());
             worker.getLogger().info("Classified!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             
-            final I_Path statedPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
-            final I_Path inferredPath = getInferredPath(statedPath, termFactory.getActiveAceFrameConfig());
-
-            final I_ConfigAceFrame newConfig = NewDefaultProfile.newProfile("", "", "", "");
-            newConfig.getEditingPathSet().clear();
-            newConfig.addEditingPath(inferredPath);
-
-            worker.getLogger().info("get results");
-
-//            final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
-            final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            final I_GetConceptData relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            final I_GetConceptData relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            
-            worker.getLogger().info("Inferred nid is " + relCharacteristic.getConceptId());
-            worker.getLogger().info("Inferred UUIDs are " + relCharacteristic.getUids());
-            worker.getLogger().info("Inferred concept is " + relCharacteristic);
-
-            // TODO
-            // mark all existing inferred rels as not current
-            //  - need to find all current inferred rels and add a new part
-            
-            snorocketFactory.getResults(new I_SnorocketFactory.I_Callback() {
-                public void addRelationship(int c1, int rel, int c2, int relGroup) {
-//                    worker.getLogger().info("*** " + c1 + " " + rel + " " + c2 + " " + relGroup);
-
-                    try {
-                        final I_GetConceptData relSource = termFactory.getConcept(c1);
-                        final I_GetConceptData relType = termFactory.getConcept(rel);
-                        final I_GetConceptData relDestination = termFactory.getConcept(c2);
-
-                        worker.getLogger().info("*** " + getText(relType) +
-                                "\n\t" + getText(relSource) +
-                                "\n\t" + getText(relDestination) +
-                                "\t" + relGroup);
-
-                        final UUID newRelUid = UUID.randomUUID();
-                        
-                        termFactory.newRelationship(newRelUid, relSource, relType, relDestination, relCharacteristic, relRefinability, relStatus, relGroup, newConfig);
-                    } catch (TerminologyException e) {
-                        worker.getLogger().severe(e.getLocalizedMessage());
-                    } catch (IOException e) {
-                        worker.getLogger().severe(e.getLocalizedMessage());
-                    }
-                }
-                
-                private String getText(I_GetConceptData concept) throws IOException, TerminologyException {
-                    try {
-                        return concept.toString();
-                    } catch (RuntimeException e) {
-//                      for (I_DescriptionVersioned dv: concept.getDescriptions()) {
-//                          return dv.getUniversal().getVersions().get(0).getText();
-//                      }
-                        return "NONE: " + concept.getConceptId();
-                    }
-                }
-            });
+            getClassifierResults(worker, snorocketFactory);
 
 //            // GET CHILDREN
 //            I_IntSet relTypes = termFactory.newIntSet();
@@ -207,65 +159,6 @@ public class Classify extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private I_Path getInferredPath(I_Path statedPath, I_ConfigAceFrame config) throws TerminologyException, IOException, Exception {
-        final UUID pathUUID = UUID.fromString("0f71239a-a796-11dc-8314-0800200c9a66");
-        try {
-            return termFactory.getPath(new UUID[] {pathUUID});
-        } catch (NoMappingException e) {
-            // path doesn't exist - create it
-            I_GetConceptData pathConcept = termFactory.newConcept(pathUUID, false,config);
-
-            termFactory.newDescription(UUID.randomUUID(), pathConcept, "en", "SNOMED Inferred Path",
-                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(),
-                    config);
-
-            termFactory.newDescription(UUID.randomUUID(), pathConcept, "en", "SNOMED Inferred Path",
-                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), config);
-
-            termFactory.newRelationship(UUID.randomUUID(),
-                    pathConcept,
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.RELEASE.getUids()),
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()),
-                    0, config);
-
-            termFactory.commit();
-            
-            Set<I_Position> origins = new HashSet<I_Position>(statedPath.getOrigins());
-
-            final I_Path inferredPath = termFactory.newPath(origins, pathConcept);
-            
-            termFactory.commit();
-
-            return inferredPath;
-        }
-    }
-
-//    private void sampleCreateNewThings(I_GetConceptData snomedRoot, I_ConfigAceFrame config) throws TerminologyException, IOException, Exception {
-//        
-//        I_GetConceptData newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-//
-//        termFactory.newDescription(UUID.randomUUID(), newConcept, "en", "New Fully Specified Description",
-//                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(),
-//                config);
-//
-//        termFactory.newDescription(UUID.randomUUID(), newConcept, "en", "New Preferred Description",
-//                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), config);
-//
-//        UUID newRelUid = UUID.randomUUID();
-//        I_GetConceptData relType = termFactory.getConcept(new UUID[] {Type3UuidFactory.SNOMED_ISA_REL_UUID});
-//        I_GetConceptData relDestination = snomedRoot;
-//        I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
-//        I_GetConceptData relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-//        I_GetConceptData relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-//        int relGroup = 0;
-//        termFactory.newRelationship(newRelUid, newConcept, relType, relDestination, relCharacteristic, relRefinability, relStatus, relGroup, config);
-//
-//        termFactory.commit();
-//    }
-
     private void handleException(Exception e) throws TaskFailedException {
         snorocketFactory = null;
         throw new TaskFailedException(e);
@@ -287,7 +180,7 @@ public class Classify extends AbstractTask {
         this.factoryClass = factoryClass;
     }
 
-    abstract class Walker {
+    abstract class AbstractWalker {
 
         final protected I_TermFactory termFactory;
         final protected I_SnorocketFactory snorocketFactory;
@@ -300,67 +193,53 @@ public class Classify extends AbstractTask {
         final protected boolean addUncommitted;
         final protected I_IntSet processed;
 
-        Walker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
+        AbstractWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
             this.termFactory = termFactory;
             this.snorocketFactory = snorocketFactory;
             this.root = root;
             
-            isaTypes = termFactory.newIntSet();
-            try {
-                isaTypes.add(termFactory.uuidToNative(Type3UuidFactory.SNOMED_ISA_REL_UUID));
-            } catch (TerminologyException e) {
-                getLogger().warning("SNOMED ISA not defined: " + e.getLocalizedMessage());
-            }
-            isaTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+//            isaTypes = termFactory.newIntSet();
+//            try {
+//                isaTypes.add(termFactory.uuidToNative(Type3UuidFactory.SNOMED_ISA_REL_UUID));
+//            } catch (TerminologyException e) {
+//                getLogger().warning("SNOMED ISA not defined: " + e.getLocalizedMessage());
+//            }
+//            isaTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
             
             definingCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()).getConceptId();
-            
-            activeStatus = termFactory.newIntSet();
-            activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
-            activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-            activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId());
-            
-            final I_Path statedPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
-            latestStated = new HashSet<I_Position>();
-            latestStated.add(termFactory.newPosition(statedPath, Integer.MAX_VALUE));
+
+            final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
+            activeStatus = frameConfig.getAllowedStatus();
+            isaTypes = frameConfig.getDestRelTypes();
+            latestStated = frameConfig.getViewPositionSet();
+
+//            activeStatus = termFactory.newIntSet();
+//            activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
+//            activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
+//            activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId());
+//            
+//            final I_Path statedPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
+//            latestStated = new HashSet<I_Position>();
+//            latestStated.add(termFactory.newPosition(statedPath, Integer.MAX_VALUE));
             
             addUncommitted = false;
             
             processed = termFactory.newIntSet();
         }
 
-        abstract public void run() throws IOException, TerminologyException;
-
-    }
-    
-    class DepthWalker extends Walker {
-
-        int count = 0;
+        abstract void run() throws IOException, TerminologyException;
         
-        DepthWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
-            super(termFactory, snorocketFactory, root);
-        }
+        abstract void visit(int conceptId) throws IOException, TerminologyException;
 
-        @Override
-        public void run() throws IOException, TerminologyException {
-            // TODO Auto-generated method stub
-            processConcept(root);
-        }
-
-        private void processConcept(I_GetConceptData concept) throws IOException, TerminologyException {
-            final long start = System.currentTimeMillis();
+        final void processConcept(final I_GetConceptData concept, final boolean visitChildren) throws IOException, TerminologyException {
             final int conceptId = concept.getConceptId();
             
-            if ((count++ % 1000) == 0) {
-                getLogger().info("counter: " + count + "\t" + concept);
-            }
-            
             processed.add(conceptId);
-
+        
             final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
             if (tuples.size() == 1) {
                 snorocketFactory.addConcept(conceptId, tuples.get(0).isDefined());
-
+        
                 final List<I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated, addUncommitted);
                 for (I_RelTuple relTuple: relTuples) {
                     if (definingCharacteristic == relTuple.getCharacteristicId()) {
@@ -368,32 +247,76 @@ public class Classify extends AbstractTask {
                     }
                 }
                 
-                List<I_RelTuple> childTuples = concept.getDestRelTuples(activeStatus, isaTypes, latestStated, addUncommitted);
+                if (visitChildren) {
+                    List<I_RelTuple> childTuples = concept.getDestRelTuples(activeStatus, isaTypes, latestStated, addUncommitted);
 
-                final double delay = (System.currentTimeMillis() - start)/1000.0;
-                if (delay > 1.0) {
-                    getLogger().info(delay + " " + concept);
-                }
+                    for (I_RelTuple childTuple: childTuples) {
+                        final int childId = childTuple.getC1Id();
+                        snorocketFactory.addRelationship(childId, isaId, conceptId, 0);
 
-                for (I_RelTuple childTuple: childTuples) {
-                    final int childId = childTuple.getC1Id();
-                    snorocketFactory.addRelationship(childId, isaId, conceptId, 0);
-                    
-                    if (!processed.contains(childId)) {
-                        processConcept(termFactory.getConcept(childId));
+                        if (!processed.contains(childId)) {
+                            visit(childId);
+                        }
                     }
                 }
             } else if (tuples.size() > 1) {
                 throw new AssertionError("Unexpected number of tuples: " + tuples.size() + " for " + concept);
             }
-            
-            return;
         }
 
     }
     
-//    static
-    class BreadthWalker extends Walker {
+    class IteratorWalker extends AbstractWalker {
+
+        IteratorWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
+            super(termFactory, snorocketFactory, root);
+        }
+
+        @Override
+        void run() throws IOException, TerminologyException {
+            final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
+            final I_IntSet allowedStatus = frameConfig .getAllowedStatus();
+            final I_IntSet allowedTypes = frameConfig.getDestRelTypes();
+            final Set<I_Position> positions = frameConfig.getViewPositionSet();
+            int i=0;
+            final Iterator<I_GetConceptData> itr = termFactory.getConceptIterator();
+            while (itr.hasNext() && i++ < 1000) {
+                final I_GetConceptData concept = itr.next();
+                
+                if (root.isParentOfOrEqualTo(concept, allowedStatus, allowedTypes, positions, addUncommitted)) {
+                    processConcept(concept, false);
+                }
+            }
+        }
+
+        @Override
+        void visit(int conceptId) throws IOException, TerminologyException {
+            throw new AssertionError("The visit method should never be called for this class.");
+        }
+        
+    }
+    
+    class DepthWalker extends AbstractWalker {
+        
+        DepthWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
+            super(termFactory, snorocketFactory, root);
+        }
+
+        @Override
+        public void run() throws IOException, TerminologyException {
+            visit(root.getConceptId());
+        }
+
+        @Override
+        void visit(int conceptId) throws IOException, TerminologyException {
+            processConcept(termFactory.getConcept(conceptId), true);
+        }
+
+    }
+    
+    class BreadthWalker extends AbstractWalker {
+
+        private I_IntSet queue;
 
         BreadthWalker(final I_TermFactory termFactory, final I_SnorocketFactory snorocketFactory, final I_GetConceptData root) throws TerminologyException, IOException {
             super(termFactory, snorocketFactory, root);
@@ -401,12 +324,12 @@ public class Classify extends AbstractTask {
 
         @Override
         public void run() throws IOException, TerminologyException {
-            final I_IntSet queue = termFactory.newIntSet();
+            queue = termFactory.newIntSet();
             queue.add(root.getConceptId());
             
 //            while (true) {
             // FIXME While we're developing, we limit the depth of traversal
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 2; i++) {
                 final int[] setValues = queue.getSetValues();
                 processed.addAll(setValues);
                 queue.clear();
@@ -418,54 +341,16 @@ public class Classify extends AbstractTask {
                 }
                 
                 for (int parentId: setValues) {
-                    final long start = System.currentTimeMillis();
                     final I_GetConceptData parentConcept = termFactory.getConcept(parentId);
                     
-                    processConcept(parentConcept);
-
-                    List<I_RelTuple> childTuples = parentConcept.getDestRelTuples(activeStatus, isaTypes, latestStated, addUncommitted);
-                    
-                    for (I_RelTuple childTuple: childTuples) {
-                        final int childId = childTuple.getC1Id();
-                        snorocketFactory.addRelationship(childId, isaId, parentId, 0);
-                        queue.add(childId);
-                    }
-                    final double delay = (System.currentTimeMillis() - start)/1000.0;
-                    if (delay > 1.0) {
-                        getLogger().info(delay + " " + parentConcept);
-                    }
+                    processConcept(parentConcept, true);
                 }
             }
         }
 
-        /**
-         * 
-         * @param concept
-         * @return true if the concept is active
-         * @throws IOException
-         */
-        private boolean processConcept(I_GetConceptData concept) throws IOException {
-            final int conceptId = concept.getConceptId();
-            
-            processed.add(conceptId);
-
-            final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
-            if (tuples.size() == 1) {
-                snorocketFactory.addConcept(conceptId, tuples.get(0).isDefined());
-
-                final List<I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated, addUncommitted);
-                for (I_RelTuple relTuple: relTuples) {
-                    if (definingCharacteristic == relTuple.getCharacteristicId()) {
-                        snorocketFactory.addRelationship(relTuple.getC1Id(), relTuple.getRelTypeId(), relTuple.getC2Id(), relTuple.getGroup());
-                    }
-                }
-                
-                return true;
-            } else if (tuples.size() > 1) {
-                throw new AssertionError("Unexpected number of tuples: " + tuples.size() + " for " + concept);
-            }
-            
-            return false;
+        @Override
+        void visit(final int childId) {
+            queue.add(childId);
         }
         
     }
@@ -477,5 +362,104 @@ public class Classify extends AbstractTask {
     public void setClassifyRoot(TermEntry classifyRoot) {
         this.classifyRoot = classifyRoot;
     }
+
+    protected void getClassifierResults(final I_Work worker, final I_SnorocketFactory rocket)
+            throws TerminologyException, IOException, Exception {
+                    final I_TermFactory termFactory = LocalVersionedTerminology.get();
+                    final I_Path statedPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
+                    final I_Path inferredPath = getInferredPath(termFactory, statedPath, termFactory.getActiveAceFrameConfig());
+            
+                    final I_ConfigAceFrame newConfig = NewDefaultProfile.newProfile("", "", "", "");
+                    newConfig.getEditingPathSet().clear();
+                    newConfig.addEditingPath(inferredPath);
+            
+                    worker.getLogger().info("get results");
+            
+                    //            final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+                    final I_GetConceptData relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+                    final I_GetConceptData relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+                    final I_GetConceptData relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            
+                    worker.getLogger().info("Inferred id is " + relCharacteristic.getConceptId());
+                    worker.getLogger().info("Inferred UUIDs are " + relCharacteristic.getUids());
+                    worker.getLogger().info("Inferred concept is " + relCharacteristic);
+            
+                    // TODO
+                    // mark all existing inferred rels as not current
+                    //  - need to find all current inferred rels and add a new part
+            
+                    rocket.getResults(new I_SnorocketFactory.I_Callback() {
+                        public void addRelationship(int c1, int rel, int c2, int relGroup) {
+            //                    worker.getLogger().info("*** " + c1 + " " + rel + " " + c2 + " " + relGroup);
+            
+                            try {
+                                final I_GetConceptData relSource = termFactory.getConcept(c1);
+                                final I_GetConceptData relType = termFactory.getConcept(rel);
+                                final I_GetConceptData relDestination = termFactory.getConcept(c2);
+            
+                                worker.getLogger().info("*** " + getText(relType) +
+                                        "\n\t" + getText(relSource) +
+                                        "\n\t" + getText(relDestination) +
+                                        "\t" + relGroup);
+            
+                                final UUID newRelUid = UUID.randomUUID();
+            
+                                termFactory.newRelationship(newRelUid, relSource, relType, relDestination, relCharacteristic, relRefinability, relStatus, relGroup, newConfig);
+                            } catch (TerminologyException e) {
+                                worker.getLogger().severe(e.getLocalizedMessage());
+                            } catch (IOException e) {
+                                worker.getLogger().severe(e.getLocalizedMessage());
+                            }
+                        }
+            
+                        private String getText(I_GetConceptData concept) throws IOException, TerminologyException {
+                            try {
+                                return concept.toString();
+                            } catch (RuntimeException e) {
+                                //                      for (I_DescriptionVersioned dv: concept.getDescriptions()) {
+                                //                          return dv.getUniversal().getVersions().get(0).getText();
+                                //                      }
+                                return "NONE: " + concept.getConceptId();
+                            }
+                        }
+                    });
+                }
+
+    private I_Path getInferredPath(I_TermFactory termFactory, I_Path statedPath, I_ConfigAceFrame config)
+            throws TerminologyException, IOException, Exception {
+                final UUID pathUUID = UUID.fromString("0f71239a-a796-11dc-8314-0800200c9a66");
+                try {
+                    return termFactory.getPath(new UUID[] {pathUUID});
+                } catch (NoMappingException e) {
+                    // path doesn't exist - create it
+                    I_GetConceptData pathConcept = termFactory.newConcept(pathUUID, false,config);
+            
+                    termFactory.newDescription(UUID.randomUUID(), pathConcept, "en", "SNOMED Inferred Path",
+                            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(),
+                            config);
+            
+                    termFactory.newDescription(UUID.randomUUID(), pathConcept, "en", "SNOMED Inferred Path",
+                            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), config);
+            
+                    termFactory.newRelationship(UUID.randomUUID(),
+                            pathConcept,
+                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
+                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.RELEASE.getUids()),
+                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
+                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()),
+                            0, config);
+            
+                    termFactory.commit();
+            
+                    Set<I_Position> origins = new HashSet<I_Position>(statedPath.getOrigins());
+            
+                    final I_Path inferredPath = termFactory.newPath(origins, pathConcept);
+            
+                    termFactory.commit();
+            
+                    return inferredPath;
+                }
+            }
     
 }

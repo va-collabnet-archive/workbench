@@ -18,13 +18,7 @@ public class StubSnorocketFactory implements I_SnorocketFactory {
         
     }
 
-    public int getRowCount() {
-        // TODO Auto-generated method stub
-        
-        return 0;
-    }
-
-    public void addIsa(int id) {
+    public void setIsa(int id) {
         // TODO Auto-generated method stub
         
     }
