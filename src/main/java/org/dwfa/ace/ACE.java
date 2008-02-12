@@ -121,14 +121,16 @@ import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.SearchPanel;
+import org.dwfa.ace.table.UncommittedListModel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
 import org.dwfa.ace.table.refset.RefsetDefaultsLanguage;
 import org.dwfa.ace.table.refset.RefsetDefaultsLanguageScoped;
 import org.dwfa.ace.table.refset.RefsetDefaultsMeasurement;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.commit.Alerter;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
@@ -202,7 +204,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (aceConfig != null) {
             for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
                 frameConfig.setCommitEnabled(true);
-                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+                 if (ConceptBean.class.isAssignableFrom(to.getClass())) {
                     frameConfig.addImported((I_GetConceptData) to);
                 }
             }
@@ -213,7 +215,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
     
-    private static Alerter dataTestAlerter = new Alerter();
+	private JComponent uncommittedComponentScroller;
 
     public static void addUncommitted(I_Transact to) {
     	I_Transact extraToAdd = null;
@@ -245,12 +247,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 	             AceLog.getEditLog().alertAndLogException(e);
 			}
     	}
+    	List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
         for (I_TestDataConstraints test : creationTests) {
             try {
-                if (test.test(to, dataTestAlerter, false) == false) {
-                    to.abort();
-                    return;
-                }
+            	warningsAndErrors.addAll(test.test(to, false));
             } catch (Exception e) {
                 AceLog.getEditLog().alertAndLogException(e);
             }
@@ -262,6 +262,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (aceConfig != null) {
             for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
                 frameConfig.setCommitEnabled(true);
+                ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
+                aceInstance.getUncommittedListModel().clear();
+            	aceInstance.getUncommittedListModel().addAll(warningsAndErrors);
+            	if (aceInstance.getUncommittedListModel().size() > 0) {
+            		aceInstance.leftTabs.setSelectedComponent(aceInstance.uncommittedComponentScroller);
+            	}
                 if (ConceptBean.class.isAssignableFrom(to.getClass())) {
                     frameConfig.addUncommitted((I_GetConceptData) to);
                 }
@@ -314,13 +320,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static void commit() throws IOException {
         boolean testFailures = false;
         Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
+    	List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
         for (I_Transact to : uncommitted) {
             for (I_TestDataConstraints test : commitTests) {
                 try {
-                    if (test.test(to, dataTestAlerter, true) == false) {
-                        testFailureSet.add(to);
-                        testFailures = true;
-                    }
+                	for (AlertToDataConstraintFailure failure: test.test(to, true)) {
+                    	warningsAndErrors.add(failure);
+                    	if (failure.getAlertType() == ALERT_TYPE.ERROR) {
+                    		testFailureSet.add(to);
+                    		testFailures = true;
+                    	}
+                	}
+                	
                 } catch (Exception e) {
                     AceLog.getEditLog().alertAndLogException(e);
                 }
@@ -341,7 +352,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 to.abort();
             }
         }
-        
+
         Date now = new Date();
         Set<TimePathId> values = new HashSet<TimePathId>();
         if (writeChangeSets) {
@@ -412,6 +423,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         uncommitted.clear();
         fireCommit();
         AceLog.getEditLog().info("Finished commit: " + version + " (" + now.getTime() + ")");
+        if (aceConfig != null) {
+            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                frameConfig.setCommitEnabled(true);
+                ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
+                aceInstance.getUncommittedListModel().clear();
+            }
+        }
     }
 
     public static void abort() throws IOException {
@@ -764,6 +782,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JLabel statusLabel = new JLabel();
 
     private JTreeWithDragImage tree;
+    
+    private JTabbedPane leftTabs = new JTabbedPane();
 
     private JPanel topPanel;
 
@@ -844,6 +864,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private ArrayList<ConceptPanel> conceptPanels;
 
     private MasterWorker menuWorker;
+
+	private UncommittedListModel uncommittedListModel;
 
     /**
      * 
@@ -1237,7 +1259,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
         termTreeConceptSplit.setRightComponent(conceptTabs);
-        termTreeConceptSplit.setLeftComponent(termTree);
+        leftTabs.addTab("taxonomy", termTree);
+        leftTabs.addTab("data checks", getUncommittedList());
+        termTreeConceptSplit.setLeftComponent(leftTabs);
         termTree.setMinimumSize(new Dimension(0, 0));
         termTreeConceptSplit.setOneTouchExpandable(true);
         termTreeConceptSplit.setContinuousLayout(true);
@@ -1267,6 +1291,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         return content;
     }
+
+	private JComponent getUncommittedList() {
+		uncommittedListModel = new UncommittedListModel();
+		JList uncommittedList = new JList();
+		uncommittedList.setModel(uncommittedListModel);
+		uncommittedComponentScroller = new JScrollPane(uncommittedList);
+		return uncommittedComponentScroller;
+	}
 
     CollectionEditorContainer conceptListEditor;
 
@@ -3046,5 +3078,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static Set<I_Transact> getUncommitted() {
         return Collections.unmodifiableSet(uncommitted);
     }
+
+	public UncommittedListModel getUncommittedListModel() {
+		return uncommittedListModel;
+	}
 
 }
