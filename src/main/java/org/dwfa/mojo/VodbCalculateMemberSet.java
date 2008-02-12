@@ -90,10 +90,10 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
+		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		List<Thread> threads = new LinkedList<Thread>(); 
 		if (refSetSpecDescriptor==null) {
 			try {
-				I_TermFactory termFactory = LocalVersionedTerminology.get();
 				I_IntSet status = termFactory.newIntSet();
 				status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
 
@@ -149,6 +149,12 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		
+		try {
+			termFactory.commit();
+		} catch (Exception e) {
+			throw new MojoExecutionException("failed to commit results of member set calculation", e);
 		}
 
 	}

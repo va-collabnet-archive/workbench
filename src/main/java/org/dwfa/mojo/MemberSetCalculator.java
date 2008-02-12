@@ -426,7 +426,6 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 						+ getFsnFromConceptId(extensionPart.getComponentId()));
 
 				termFactory.addUncommitted(extensionPart);
-				termFactory.commit();
 			}
 		}
 
@@ -465,7 +464,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 			newExtension.addVersion(conceptExtension);
 			getLog().debug("addToMemberSet(int=" + conceptId + ") - start added new extension for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
 
-			termFactory.addUncommitted(termFactory.getConcept(conceptId));    			
+			termFactory.addUncommitted(newExtension);    			
 		}
 
 		getLog().debug("addToMemberSet(int) - end");
