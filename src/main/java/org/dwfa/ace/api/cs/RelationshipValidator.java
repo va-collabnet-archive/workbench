@@ -3,10 +3,11 @@ package org.dwfa.ace.api.cs;
 import java.io.IOException;
 import java.util.List;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
@@ -58,7 +59,7 @@ public class RelationshipValidator extends SimpleValidator {
             }
 
             if (!foundMatch) {
-                System.out.println("Failed to find matching relationship");
+            	AceLog.getEditLog().info("Failed to find matching relationship");
                 return false;
             }
         }
@@ -98,11 +99,11 @@ public class RelationshipValidator extends SimpleValidator {
                 newPart.setStatusId(termFactory.uuidToNative(part.getStatusId()));
 
                 if (databaseRelationship.getVersions().contains(newPart) == false) {
-                    System.out.println("parts different");
+                	AceLog.getEditLog().info("parts different");
 
-                    System.out.println(databaseRelationship.getVersions());
-                    System.out.println("..........");
-                    System.out.println("new part: " + newPart);
+                    AceLog.getEditLog().info(databaseRelationship.getVersions().toString());
+                    AceLog.getEditLog().info("..........");
+                    AceLog.getEditLog().info("new part: " + newPart);
                     return false; // Test 5
                 }
             }

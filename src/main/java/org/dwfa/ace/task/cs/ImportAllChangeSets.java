@@ -33,20 +33,28 @@ public class ImportAllChangeSets extends AbstractTask {
 
     private String rootDirStr = "profiles";
 
+    private Boolean validateChangeSets = true;
+
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(rootDirStr);
+        out.writeBoolean(validateChangeSets);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
                                                                  ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
+        if (objDataVersion <= dataVersion) {
             rootDirStr = (String) in.readObject();
+            if (objDataVersion > 1) {
+            	validateChangeSets = in.readBoolean();
+            } else {
+            	validateChangeSets = true;
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -78,7 +86,9 @@ public class ImportAllChangeSets extends AbstractTask {
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = LocalVersionedTerminology.get()
                 .newBinaryChangeSetReader(csf);
-                csr.getValidators().add(new ComponentValidator());
+                if (validateChangeSets == true) {
+                	csr.getValidators().add(new ComponentValidator());
+                }
                 readerSet.add(csr);
 
                 logger.info("Adding reader: " + csf.getAbsolutePath());
@@ -210,4 +220,12 @@ public class ImportAllChangeSets extends AbstractTask {
     public void setRootDirStr(String rootDirStr) {
         this.rootDirStr = rootDirStr;
     }
+
+	public Boolean getValidateChangeSets() {
+		return validateChangeSets;
+	}
+
+	public void setValidateChangeSets(Boolean validateChangeSets) {
+		this.validateChangeSets = validateChangeSets;
+	}
 }

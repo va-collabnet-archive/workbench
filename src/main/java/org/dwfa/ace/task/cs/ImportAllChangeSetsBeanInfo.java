@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 public class ImportAllChangeSetsBeanInfo extends SimpleBeanInfo {
@@ -17,7 +18,14 @@ public class ImportAllChangeSetsBeanInfo extends SimpleBeanInfo {
 	            rootDirStr.setDisplayName("<html><font color='green'>root dir:");
 	            rootDirStr.setShortDescription("The directory root to search for change sets. ");
 	            
-	            PropertyDescriptor rv[] = { rootDirStr };
+	            PropertyDescriptor validateChangeSets =
+	                new PropertyDescriptor("validateChangeSets", getBeanDescriptor().getBeanClass());
+	            validateChangeSets.setBound(true);
+	            validateChangeSets.setPropertyEditorClass(CheckboxEditor.class);
+	            validateChangeSets.setDisplayName("<html><font color='green'>validate:");
+	            validateChangeSets.setShortDescription("Select if you want to validate change sets. ");
+
+	            PropertyDescriptor rv[] = { rootDirStr, validateChangeSets };
 	            return rv;
 	        } catch (IntrospectionException e) {
 	             throw new Error(e.toString());
