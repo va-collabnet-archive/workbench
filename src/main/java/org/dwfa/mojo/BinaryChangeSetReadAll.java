@@ -31,10 +31,10 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
     String changeSetDir;
 
     /**
-     * Whether to validate the change set first or not.
+     * Whether to validate the change set first or not. Default value is true; 
      * @parameter
      */
-    boolean validate = false;
+    boolean validate = true;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -49,6 +49,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         
         ImportAllChangeSets importAllChangeSetsTask = new ImportAllChangeSets();
+        importAllChangeSetsTask.setValidateChangeSets(validate);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
         try {
         	importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));

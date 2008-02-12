@@ -112,9 +112,12 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		I_GetConceptData memberSetPathConcept = memberSetPathDescriptor.getVerifiedConcept();
 		memberSetPath = termFactory.getPath(memberSetPathConcept.getUids());
 
+		I_IntSet currentIntSet = getIntSet(ArchitectonicAuxiliary.Concept.CURRENT);
+		I_IntSet generatesRelIntSet = getIntSet(ConceptConstants.GENERATES_REL);
+		
 		I_GetConceptData memberSetSpecConcept = assertExactlyOne(refConcept.getSourceRelTargets(
-				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), 
-				getIntSet(ConceptConstants.GENERATES_REL), null, false));
+				currentIntSet, 
+				generatesRelIntSet, null, false));
 
 		memberSetId = memberSetSpecConcept.getConceptId();
 
@@ -527,7 +530,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		for (ArchitectonicAuxiliary.Concept concept : concepts) {
 			status.add(termFactory.getConcept(concept.getUids()).getConceptId());
 		}
-
+		assert status.getSetValues().length > 0: "getIntSet returns an empty set";
 		return status;
 	}
 
