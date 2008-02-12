@@ -11,44 +11,51 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.log.AceLog;
 
-public class Alerter implements I_AlertToDataConstraintFailure {
+public class Alerter  {
     private Logger log;
     boolean showAlertOnFailure;
-    Object selectedOption = null;
-    public Alerter(boolean showAlertOnFailure, Logger log) {
+	private AlertToDataConstraintFailure alert;
+	private Exception ex;
+    public Alerter(boolean showAlertOnFailure, Logger log, AlertToDataConstraintFailure alert) {
         super();
         this.showAlertOnFailure = showAlertOnFailure;
         this.log = log;
+        this.alert = alert;
     }
-    public Alerter(Logger log) {
+    public Alerter(Logger log, AlertToDataConstraintFailure alert) {
         super();
         this.showAlertOnFailure = true;
         this.log = log;
+        this.alert = alert;
     }
-    public Alerter() {
+    public Alerter(AlertToDataConstraintFailure alert) {
         super();
         this.showAlertOnFailure = true;
         this.log = Logger.getLogger(AceLog.getEditLog().getName());
+        this.alert = alert;
     }
 
-    public void alert(String alertMessage) {
-        alert(alertMessage, null);
-    }
-    public Object alert(final String alertMessage, final Object[] fixOptions) {
-        selectedOption = null;
+    public void alert() throws Exception {
          if (this.showAlertOnFailure) {
             try {
                 if (java.awt.EventQueue.isDispatchThread()) {
-                    presentAlert(alertMessage, fixOptions);
+                    presentAlert();
                 } else {
                     SwingUtilities.invokeAndWait(new Runnable() {
 
                         public void run() {
-                            presentAlert(alertMessage, fixOptions);
+                            try {
+								presentAlert();
+							} catch (Exception e) {
+								ex = e;
+							}
                         }
 
                         
                     });
+                    if (ex != null) {
+                    	throw ex;
+                    }
                 }
             } catch (InterruptedException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -56,22 +63,25 @@ public class Alerter implements I_AlertToDataConstraintFailure {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-        log.warning("Commit test failed: " + alertMessage);
-        return selectedOption;
+        log.warning("Commit test " + alert.getAlertType() + 
+        		": " + alert.getAlertMessage());
     }
-    private void presentAlert(final String alertMessage, final Object[] fixOptions) {
-        JOptionPane.showMessageDialog(null, alertMessage,
+    private void presentAlert() throws Exception {
+        JOptionPane.showMessageDialog(null, alert.getAlertMessage(),
                                       "Commit test failed: ",
                                       JOptionPane.ERROR_MESSAGE);
         
-        if (fixOptions != null) {
-            selectedOption = JOptionPane.showInputDialog(null, "Would you like to apply one \n"+
+        if (alert.getFixOptions() != null && alert.getFixOptions().size() > 0) {
+        	I_Fixup selectedOption = (I_Fixup) JOptionPane.showInputDialog(null, "Would you like to apply one \n"+
                                                            "of the following data fixes?",
                                                            "Fixup avaible",
                                                            JOptionPane.QUESTION_MESSAGE,
                                                            null, // do not use a custom icon
-                                                           fixOptions,
-                                                           fixOptions[0]);
+                                                           alert.getFixOptions().toArray(),
+                                                           alert.getFixOptions().get(0));
+        	if (selectedOption != null) {
+        		selectedOption.fix();
+        	}
         }
     }
 

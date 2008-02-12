@@ -2,6 +2,8 @@ package org.dwfa.ace.task.commit;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Transact;
@@ -26,12 +28,14 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
     }
 
     @Override
-    public final boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject, boolean forCommit) throws TaskFailedException {
+    public final List<AlertToDataConstraintFailure> test(I_Transact component, 
+    		boolean forCommit) throws TaskFailedException {
         if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
-            return test((I_GetConceptData) component, alertObject, forCommit);
+            return test((I_GetConceptData) component, forCommit);
         }
-        return true;
+        return new ArrayList<AlertToDataConstraintFailure>();
     }
     
-    public abstract boolean test(I_GetConceptData concept, I_AlertToDataConstraintFailure alertObject, boolean forCommit) throws TaskFailedException;
+    public abstract List<AlertToDataConstraintFailure> test(I_GetConceptData concept, 
+    		boolean forCommit) throws TaskFailedException;
 }

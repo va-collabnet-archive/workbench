@@ -8,9 +8,9 @@ import java.util.List;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -41,10 +41,12 @@ public class VerifySingleMemberPerConceptForRefset extends AbstractExtensionTest
 
     private static I_IntSet singleConceptRefsets;
     @Override
-    public boolean test(I_ThinExtByRefVersioned extension, I_AlertToDataConstraintFailure alertObject, boolean forCommit)
+    public List<AlertToDataConstraintFailure> test(I_ThinExtByRefVersioned extension, 
+    		boolean forCommit)
             throws TaskFailedException {
         try {
             I_TermFactory tf = LocalVersionedTerminology.get();
+            List<AlertToDataConstraintFailure> returnValues = new ArrayList<AlertToDataConstraintFailure>();
             if (singleConceptRefsets == null) {
                 singleConceptRefsets = tf.newIntSet();
                 singleConceptRefsets.add(RefsetAuxiliary.Concept.ALLERGY_RXN_INCLUSION_SPEC.localize().getNid());
@@ -68,30 +70,22 @@ public class VerifySingleMemberPerConceptForRefset extends AbstractExtensionTest
                     I_GetConceptData conceptWithDuplicate = tf.getConcept(extension.getComponentId());
                     I_GetConceptData refsetIdentity = tf.getConcept(extension.getRefsetId());
                 	if (forCommit) {
-                        alertObject.alert("Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
-                                + " for concept: " + conceptWithDuplicate.getInitialText()
-                                + "\nPlease fix this up...");
+                		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.ERROR,
+                				"<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
+                                + "<br>for concept: " + conceptWithDuplicate.getInitialText());
+                		returnValues.add(alert);
                 	} else {
-                        // if not for commit, give option of rollback or continue
-                		
-                		String rollbackOpt = "don't add new refset member";
-                		String letItGoOption = "let it go, I'll fix it before commit. ";
-                        Object option = alertObject.alert("Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
-                                + " for concept: " + conceptWithDuplicate.getInitialText()
-                                + "\nPlease fix this up...", new String[] {rollbackOpt, letItGoOption});
-                        if (option == letItGoOption) {
-                        	return true;
-                        }
-                        if (option == rollbackOpt) {
-                        	((I_Transact) tf.getExtensionWrapper(extension.getMemberId())).abort();
-                        }
+                        // if not for commit, give option of rollback
+                		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.WARNING,
+                				"<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
+                                + "<br>for concept: " + conceptWithDuplicate.getInitialText());
+                		returnValues.add(alert);
+                        AbortExtension abortFixup = new AbortExtension(extension, "don't add new refset member");
+                		alert.getFixOptions().add(abortFixup);
                 	}
-                    return false;
                 }
-
             }
-            
-            return true;
+            return returnValues;
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {

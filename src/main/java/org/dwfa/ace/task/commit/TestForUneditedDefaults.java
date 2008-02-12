@@ -2,6 +2,8 @@ package org.dwfa.ace.task.commit;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -12,6 +14,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/commit", type = BeanType.TASK_BEAN),
+        @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
         @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
 public class TestForUneditedDefaults extends AbstractConceptTest {
 
@@ -32,38 +35,43 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
     }
 
     @Override
-    public boolean test(I_GetConceptData concept, I_AlertToDataConstraintFailure alertObject, boolean forCommit)
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, 
+    		boolean forCommit)
             throws TaskFailedException {
-        boolean success = true;
+    	List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
         try {
             for (I_DescriptionVersioned desc: concept.getDescriptions()) {
-                if (testDescription(alertObject, desc, forCommit) == false) {
-                    success = false;
-                }
+            	alerts.addAll(testDescription(desc, forCommit));
             }
             for (I_DescriptionVersioned desc: concept.getUncommittedDescriptions()) {
-                if (testDescription(alertObject, desc, forCommit) == false) {
-                    success = false;
-                }
+            	alerts.addAll(testDescription(desc, forCommit));
             }
         } catch (IOException e) {
             throw new TaskFailedException(e);
         }
-        return success;
+        return alerts;
     }
 
-    private boolean testDescription(I_AlertToDataConstraintFailure alertObject, I_DescriptionVersioned desc, boolean forCommit) {
+    private List<AlertToDataConstraintFailure> testDescription(I_DescriptionVersioned desc, boolean forCommit) {
         for (I_DescriptionPart part: desc.getVersions()) {
             if (part.getVersion() == Integer.MAX_VALUE) {
                 if (part.getText().equalsIgnoreCase("New Fully Specified Description") || 
                         part.getText().equalsIgnoreCase("New Preferred Description")) {
-                    alertObject.alert("Unedited default description found: " + part.getText()
-                                      + "\nPlease edit this value appropriately before commit...");
-                    return false;
+                    String alertString = "<html>Unedited default description found: <font color='blue'>" + part.getText()
+                                      + "</font><br>Please edit this value appropriately before commit...";
+                    AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
+                    if (forCommit) {
+                         alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
+                    }
+                    AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType,
+                    		alertString);
+                    ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
+                    alertList.add(alert);
+                    return alertList;
                 }
             }
         }
-        return true;
+        return new ArrayList<AlertToDataConstraintFailure>();
     }
 
 }

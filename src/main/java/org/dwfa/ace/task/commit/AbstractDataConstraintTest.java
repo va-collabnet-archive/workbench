@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.List;
 
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -68,7 +69,19 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         
         try {
             I_Transact component = (I_Transact) process.readProperty(componentPropName);
-            if (test(component, new Alerter(showAlertOnFailure, worker.getLogger()), forCommit)) {
+            List<AlertToDataConstraintFailure> alerts = test(component, forCommit);
+ 
+            boolean noFailures = true;
+            for (AlertToDataConstraintFailure failure: alerts) {
+            	if (showAlertOnFailure) {
+            		Alerter alert = new Alerter(showAlertOnFailure, worker.getLogger(), failure);
+            		alert.alert();
+            	}
+            	if (failure.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.ERROR)) {
+            		noFailures = false;
+            	}            	
+            }
+            if (noFailures) {
                 return Condition.TRUE;
             }
             return Condition.FALSE;
@@ -80,7 +93,9 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
             throw new TaskFailedException(e);
-        }
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+		}
     }
     
     /**
@@ -113,7 +128,8 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         this.componentPropName = componentPropName;
     }
 
-    public abstract boolean test(I_Transact component, I_AlertToDataConstraintFailure alertObject, boolean forCommit)
+    public abstract List<AlertToDataConstraintFailure> test(I_Transact component, 
+    		boolean forCommit)
             throws TaskFailedException;
 
     public Boolean getShowAlertOnFailure() {
