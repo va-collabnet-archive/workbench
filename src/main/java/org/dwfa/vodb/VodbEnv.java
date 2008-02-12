@@ -347,8 +347,13 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 			EnvironmentConfig envConfig = new EnvironmentConfig();
 			envConfig.setTransactional(transactional);
+			transactional = envConfig.getTransactional();
+			
 			envConfig.setTxnNoSync(txnNoSync);
+			txnNoSync = envConfig.getTxnNoSync();
+			
 			envConfig.setTxnTimeout(transactionTimeout);
+			transactionTimeout = envConfig.getTxnTimeout();
 
 			if (VodbEnv.cacheSize != null) {
 				envConfig.setCacheSize(VodbEnv.cacheSize);
