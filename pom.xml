@@ -28,6 +28,11 @@
   </scm>
   <dependencies>
     <dependency>
+      <groupId>org.dwfa</groupId>
+      <artifactId>ace-api</artifactId>
+      <version>1.6-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>2.2.0</version>
@@ -47,17 +52,6 @@
       <groupId>org.dwfa</groupId>
       <artifactId>icons</artifactId>
       <version>1.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dwfa</groupId>
-      <artifactId>foundation</artifactId>
-      <version>2.0.13</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.dwfa</groupId>
-      <artifactId>ace-api</artifactId>
-      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
