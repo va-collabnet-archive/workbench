@@ -195,7 +195,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-    private static Set<I_Transact> uncommitted = new HashSet<I_Transact>();
+    private static Set<I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
 
     private static List<I_Transact> imported = new ArrayList<I_Transact>();
 
@@ -318,118 +318,121 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
      * 
      */
     public static void commit() throws IOException {
-        boolean testFailures = false;
-        Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
-    	List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-        for (I_Transact to : uncommitted) {
-            for (I_TestDataConstraints test : commitTests) {
-                try {
-                	for (AlertToDataConstraintFailure failure: test.test(to, true)) {
-                    	warningsAndErrors.add(failure);
-                    	if (failure.getAlertType() == ALERT_TYPE.ERROR) {
-                    		testFailureSet.add(to);
-                    		testFailures = true;
+    	synchronized (uncommitted) {
+            boolean testFailures = false;
+            Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
+        	List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+        	AceLog.getEditLog().info("Uncommitted: " + uncommitted);
+            for (I_Transact to : uncommitted) {
+                for (I_TestDataConstraints test : commitTests) {
+                    try {
+                    	for (AlertToDataConstraintFailure failure: test.test(to, true)) {
+                        	warningsAndErrors.add(failure);
+                        	if (failure.getAlertType() == ALERT_TYPE.ERROR) {
+                        		testFailureSet.add(to);
+                        		testFailures = true;
+                        	}
                     	}
-                	}
-                	
-                } catch (Exception e) {
-                    AceLog.getEditLog().alertAndLogException(e);
-                }
-            }
-        }
-        
-        if (testFailures) {
-            int n = JOptionPane.showConfirmDialog(null,
-                                                  "Would you like to cancel the commit?\n" +
-                                                  "If you continue, components with test failures will be rolled back prior to commit.\n  ",
-                                                  "Failures Detected",
-                                                  JOptionPane.YES_NO_OPTION, 
-                                                  JOptionPane.QUESTION_MESSAGE);
-            if (n == JOptionPane.YES_OPTION) {
-                return;
-            }
-            for (I_Transact to: testFailureSet) {
-                to.abort();
-            }
-        }
-
-        Date now = new Date();
-        Set<TimePathId> values = new HashSet<TimePathId>();
-        if (writeChangeSets) {
-            for (I_WriteChangeSet writer : csWriters) {
-                AceLog.getEditLog().info("Opening writer: " + writer.toString());
-                writer.open();
-            }
-        }
-        int version = ThinVersionHelper.convert(now.getTime());
-        AceLog.getEditLog().info("Starting commit: " + version + " (" + now.getTime() + ")");
-
-        UniversalIdList uncommittedIds = new UniversalIdList();
-
-        for (I_Transact cb : uncommitted) {
-            if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
-                I_GetConceptData igcd = (I_GetConceptData) cb;
-                for (int nid : igcd.getUncommittedIds().getSetValues()) {
-                    I_IdVersioned idv = AceConfig.getVodb().getId(nid);
-                    try {
-                        uncommittedIds.getUncommittedIds().add(idv.getUniversal());
-                    } catch (TerminologyException e) {
-                        throw new ToIoException(e);
-                    }
-                }
-            } else if (ExtensionByReferenceBean.class.isAssignableFrom(cb.getClass())) {
-                ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
-                if (ebrBean.isFirstCommit()) {
-                    I_IdVersioned idv = AceConfig.getVodb().getId(ebrBean.getMemberId());
-                    try {
-                        uncommittedIds.getUncommittedIds().add(idv.getUniversal());
-                    } catch (TerminologyException e) {
-                        throw new ToIoException(e);
+                    	
+                    } catch (Exception e) {
+                        AceLog.getEditLog().alertAndLogException(e);
                     }
                 }
             }
-        }
-        if (writeChangeSets) {
-            for (I_WriteChangeSet writer : csWriters) {
-                writer.writeChanges(uncommittedIds, ThinVersionHelper.convert(version));
+            
+            if (testFailures) {
+                int n = JOptionPane.showConfirmDialog(null,
+                                                      "Would you like to cancel the commit?\n" +
+                                                      "If you continue, components with test failures will be rolled back prior to commit.\n  ",
+                                                      "Failures Detected",
+                                                      JOptionPane.YES_NO_OPTION, 
+                                                      JOptionPane.QUESTION_MESSAGE);
+                if (n == JOptionPane.YES_OPTION) {
+                    return;
+                }
+                for (I_Transact to: testFailureSet) {
+                    to.abort();
+                }
             }
 
-            for (I_Transact cb : uncommitted) {
+            Date now = new Date();
+            Set<TimePathId> values = new HashSet<TimePathId>();
+            if (writeChangeSets) {
                 for (I_WriteChangeSet writer : csWriters) {
-                    writer.writeChanges(cb, ThinVersionHelper.convert(version));
+                    AceLog.getEditLog().info("Opening writer: " + writer.toString());
+                    writer.open();
                 }
             }
-        }
+            int version = ThinVersionHelper.convert(now.getTime());
+            AceLog.getEditLog().info("Starting commit: " + version + " (" + now.getTime() + ")");
 
-        try {
-        	
-        	
+            UniversalIdList uncommittedIds = new UniversalIdList();
+
             for (I_Transact cb : uncommitted) {
-                cb.commit(version, values);
+                if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
+                    I_GetConceptData igcd = (I_GetConceptData) cb;
+                    for (int nid : igcd.getUncommittedIds().getSetValues()) {
+                        I_IdVersioned idv = AceConfig.getVodb().getId(nid);
+                        try {
+                            uncommittedIds.getUncommittedIds().add(idv.getUniversal());
+                        } catch (TerminologyException e) {
+                            throw new ToIoException(e);
+                        }
+                    }
+                } else if (ExtensionByReferenceBean.class.isAssignableFrom(cb.getClass())) {
+                    ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
+                    if (ebrBean.isFirstCommit()) {
+                        I_IdVersioned idv = AceConfig.getVodb().getId(ebrBean.getMemberId());
+                        try {
+                            uncommittedIds.getUncommittedIds().add(idv.getUniversal());
+                        } catch (TerminologyException e) {
+                            throw new ToIoException(e);
+                        }
+                    }
+                }
             }
-            AceConfig.getVodb().addTimeBranchValues(values);
-            AceConfig.getVodb().sync();
-            
-            
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
-        if (writeChangeSets) {
-            for (I_WriteChangeSet writer : csWriters) {
-                AceLog.getEditLog().info("Committing writer: " + writer.toString());
-                writer.commit();
+            if (writeChangeSets) {
+                for (I_WriteChangeSet writer : csWriters) {
+                    writer.writeChanges(uncommittedIds, ThinVersionHelper.convert(version));
+                }
+
+                for (I_Transact cb : uncommitted) {
+                    for (I_WriteChangeSet writer : csWriters) {
+                        writer.writeChanges(cb, ThinVersionHelper.convert(version));
+                    }
+                }
             }
-        }
-        uncommitted.clear();
-        fireCommit();
-        AceLog.getEditLog().info("Finished commit: " + version + " (" + now.getTime() + ")");
-        if (aceConfig != null) {
-            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-                frameConfig.setCommitEnabled(true);
-                ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
-                aceInstance.getUncommittedListModel().clear();
+
+            try {
+            	
+            	
+                for (I_Transact cb : uncommitted) {
+                    cb.commit(version, values);
+                }
+                AceConfig.getVodb().addTimeBranchValues(values);
+                AceConfig.getVodb().sync();
+                
+                
+            } catch (DatabaseException e) {
+                throw new ToIoException(e);
             }
-        }
+            if (writeChangeSets) {
+                for (I_WriteChangeSet writer : csWriters) {
+                    AceLog.getEditLog().info("Committing writer: " + writer.toString());
+                    writer.commit();
+                }
+            }
+            uncommitted.clear();
+            fireCommit();
+            AceLog.getEditLog().info("Finished commit: " + version + " (" + now.getTime() + ")");
+            if (aceConfig != null) {
+                for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+                    frameConfig.setCommitEnabled(true);
+                    ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
+                    aceInstance.getUncommittedListModel().clear();
+                }
+            }
+    	}
     }
 
     public static void abort() throws IOException {

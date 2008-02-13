@@ -3067,10 +3067,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 	}
 
 	public void addUncommitted(I_GetConceptData concept) {
+		AceLog.getEditLog().fine("Adding uncommitted " + concept + " from vodb: " + this);
 		ACE.addUncommitted((I_Transact) concept);
 	}
 
 	public void addUncommitted(I_ThinExtByRefVersioned extension) {
+		AceLog.getEditLog().fine("Adding uncommitted extension " + extension + " from vodb: " + this);
 		ACE.addUncommitted(ExtensionByReferenceBean.make(extension
 				.getMemberId(), extension));
 	}
