@@ -53,6 +53,7 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 		try {
             try {
                 if (MojoUtil.alreadyRun(getLog(), changeSetFileName)) {
+                	
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {
@@ -62,6 +63,7 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 			.getActiveAceFrameConfig();
 			activeConfig.getChangeSetWriters().add(
 					new BinaryChangeSetWriter(new File(changeSetFileName), new File(changeSetTempFileName)));
+			getLog().info("Change set writers: " + activeConfig.getChangeSetWriters());
 		} catch (TerminologyException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		} catch (IOException e) {

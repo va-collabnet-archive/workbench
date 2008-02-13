@@ -37,14 +37,18 @@ public class VodbCommit  extends AbstractMojo {
     private MavenSession session;
     
 	public void execute() throws MojoExecutionException, MojoFailureException {
-      getLog().info("Context: " + getPluginContext());
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
+        getLog().info("commiting: " + termFactory);
         if (termFactory.getUncommitted().size() > 0) {
             try {
+
                 termFactory.commit();
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }       
+        } else {
+        	getLog().info("termfactory.getUncommitted().size() = " + termFactory.getUncommitted().size());
         }
+        
 	}
 }
