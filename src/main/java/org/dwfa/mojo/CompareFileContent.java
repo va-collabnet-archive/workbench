@@ -72,18 +72,18 @@ public class CompareFileContent extends AbstractMojo{
 	public void execute() throws MojoExecutionException{
 		try{
 			if( firstFile.exists() && secondFile.exists() ){
-		
-				if( !firstFile.isFile() || !secondFile.isFile() ) {
+				if( firstFile.isDirectory() && secondFile.isDirectory() ) {
 					
 					if( !firstFile.isDirectory() || !secondFile.isDirectory() )
 						throw new ComparisonFailure( typeMismatchMsg );
 					else
 						processDirectories( firstFile, secondFile );
+					
 				}
-				else 
+				else{ 
 					setFileInfoMsg( firstFile, secondFile );
 					compareFiles( firstFile , secondFile );
-				
+				}//End if/else
 			}//End if
 		}
 		catch ( ComparisonFailure e ){
@@ -114,6 +114,10 @@ public class CompareFileContent extends AbstractMojo{
 	 */
 	private boolean textComparison( File file1, File file2 ) throws MojoExecutionException{
 		try{
+			
+			if( file1.isDirectory() || file2.isDirectory()) return false;
+			
+			
 			BufferedReader f1Reader = new BufferedReader( new FileReader( file1 ) );
 			BufferedReader f2Reader = new BufferedReader( new FileReader( file2 ) );
 			
@@ -163,9 +167,6 @@ public class CompareFileContent extends AbstractMojo{
 		catch ( ComparisonFailure e ){
 			throw new MojoExecutionException( e.getMessage() );
 		}
-		catch ( FileNotFoundException e ) {
-			throw new MojoExecutionException( fileNotFoundMsg );
-		}
 		catch ( IOException e ) {
 			throw new MojoExecutionException( e.getLocalizedMessage(), e );
 		}
@@ -178,6 +179,9 @@ public class CompareFileContent extends AbstractMojo{
 	 */
 	private boolean byteComparison( File file1, File file2 ) throws MojoExecutionException {
 		try{
+			
+			if( file1.isDirectory() || file2.isDirectory() ) return false;
+			
 			InputStream is1 = new FileInputStream( file1 );
 			InputStream is2 = new FileInputStream( file2 );
 			
@@ -230,7 +234,7 @@ public class CompareFileContent extends AbstractMojo{
 	private HashMap<String, File> getFiles( File directory ){
 		HashMap<String, File> files = new HashMap<String, File>();
 		for( File file : directory.listFiles() ){
-			if( file.isFile() ) 
+			if( !file.isDirectory() ) 
 				files.put( file.getName(), file );
 		}
 				
