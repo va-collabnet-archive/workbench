@@ -732,6 +732,12 @@ public class VodbEnv implements I_ImplementTermFactory {
 			} catch (DatabaseException ex) {
 				throw new ToIoException(ex);
 			}
+		} else {
+			try {
+				env.checkpoint(null);
+			} catch (DatabaseException e) {
+				throw new ToIoException(e);
+			}
 		}
 
 	}
