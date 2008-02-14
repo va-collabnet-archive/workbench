@@ -2,16 +2,13 @@ package org.dwfa.mojo;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -21,15 +18,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary.Concept;
-
-import com.sun.tools.javac.code.Attribute.Constant;
+import org.dwfa.maven.MojoUtil;
 
 
 /**
@@ -83,7 +77,13 @@ public class AddRefsetsFromFile extends AbstractMojo{
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
 		try{
-			
+			try {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+					return;
+	            }
+	        } catch (NoSuchAlgorithmException e) {
+	        	throw new MojoExecutionException(e.getLocalizedMessage(), e);
+	        } 
 
 			if( referenceSetFile.isDirectory() && !referenceSetFile.isFile() ){
 				/*
@@ -91,7 +91,6 @@ public class AddRefsetsFromFile extends AbstractMojo{
 				 */
 				for( File file : referenceSetFile.listFiles() ){					
 					extensionType = findExtensionType( file.getName() );		
-					
 					if(extensionType != null) processFile( file );
 				}//End for loop
 			}else{
@@ -141,7 +140,6 @@ public class AddRefsetsFromFile extends AbstractMojo{
 			line = reader.readLine();
 						
 			while( line != null ){
-				
 				String[] tokens = line.split( "\t" );
 				
 				int referenceSetId = termFactory.uuidToNative( UUID.fromString( tokens[0] ) );
@@ -200,14 +198,16 @@ public class AddRefsetsFromFile extends AbstractMojo{
 					extPart.setPathId( pathId );
 					extPart.setStatus( statusId );
 					extPart.setVersion( Integer.MAX_VALUE );
-				
+
 					newExtension.addVersion( extPart );
+					termFactory.addUncommitted(newExtension);
 				}
 							
 				line = reader.readLine();
 			}//End while loop
 			
 			reader.close();
+			
 			termFactory.commit();
 			
 			
