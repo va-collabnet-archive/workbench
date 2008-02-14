@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -152,7 +153,9 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 		}
 		
 		try {
-			termFactory.commit();
+			if (termFactory.getUncommitted().size()>0) {
+				termFactory.commit();
+			}
 		} catch (Exception e) {
 			throw new MojoExecutionException("failed to commit results of member set calculation", e);
 		}
