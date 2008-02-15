@@ -150,6 +150,7 @@ import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
@@ -734,7 +735,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 			}
 		} else {
 			try {
-				env.checkpoint(null);
+				CheckpointConfig check = new CheckpointConfig();
+				check.setForce(true);
+				env.checkpoint(check);
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
 			}
