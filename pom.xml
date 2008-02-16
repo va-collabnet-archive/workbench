@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>ace-api</artifactId>
-  <version>1.6</version>
+  <version>1.7-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>ACE API</name>
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-api/site</url>
   <scm>
-    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/tags/ace-api-1.6</connection>
-    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/tags/ace-api-1.6</developerConnection>
-    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/tags/ace-api-1.6</url>
+    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</connection>
+    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</developerConnection>
+    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
   </scm>
   <distributionManagement>
     <repository>
