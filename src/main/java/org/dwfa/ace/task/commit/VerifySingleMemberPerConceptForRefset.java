@@ -72,13 +72,13 @@ public class VerifySingleMemberPerConceptForRefset extends AbstractExtensionTest
                 	if (forCommit) {
                 		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.ERROR,
                 				"<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
-                                + "<br>for concept: " + conceptWithDuplicate.getInitialText());
+                                + "<br>for concept: " + conceptWithDuplicate.getInitialText(), conceptWithDuplicate);
                 		returnValues.add(alert);
                 	} else {
                         // if not for commit, give option of rollback
                 		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.WARNING,
                 				"<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
-                                + "<br>for concept: " + conceptWithDuplicate.getInitialText());
+                                + "<br>for concept: " + conceptWithDuplicate.getInitialText(), conceptWithDuplicate);
                 		returnValues.add(alert);
                         AbortExtension abortFixup = new AbortExtension(extension, "don't add new refset member");
                 		alert.getFixOptions().add(abortFixup);

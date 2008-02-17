@@ -41,10 +41,10 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
     	List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
         try {
             for (I_DescriptionVersioned desc: concept.getDescriptions()) {
-            	alerts.addAll(testDescription(desc, forCommit));
+            	alerts.addAll(testDescription(concept, desc, forCommit));
             }
             for (I_DescriptionVersioned desc: concept.getUncommittedDescriptions()) {
-            	alerts.addAll(testDescription(desc, forCommit));
+            	alerts.addAll(testDescription(concept, desc, forCommit));
             }
         } catch (IOException e) {
             throw new TaskFailedException(e);
@@ -52,19 +52,27 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
         return alerts;
     }
 
-    private List<AlertToDataConstraintFailure> testDescription(I_DescriptionVersioned desc, boolean forCommit) {
+    private List<AlertToDataConstraintFailure> testDescription(I_GetConceptData concept, I_DescriptionVersioned desc, boolean forCommit) {
         for (I_DescriptionPart part: desc.getVersions()) {
             if (part.getVersion() == Integer.MAX_VALUE) {
                 if (part.getText().equalsIgnoreCase("New Fully Specified Description") || 
-                        part.getText().equalsIgnoreCase("New Preferred Description")) {
-                    String alertString = "<html>Unedited default description found: <font color='blue'>" + part.getText()
-                                      + "</font><br>Please edit this value appropriately before commit...";
+                        part.getText().equalsIgnoreCase("New Preferred Description") || 
+                        part.getText().equalsIgnoreCase("New Description")) {
+                    String alertString = "<html>Unedited default found:<br> <font color='blue'>" + part.getText()
+                                      + "</font><br>Please edit this value before commit...";
                     AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
                     if (forCommit) {
                          alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
                     }
                     AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType,
-                    		alertString);
+                    		alertString, concept);
+                    
+                    if (part.getText().equalsIgnoreCase("New Description")) {
+                    	AbortDescriptionPart fixup = new AbortDescriptionPart(concept,
+                    			desc, part);
+                    	alert.getFixOptions().add(fixup);
+                    }
+                    
                     ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
                     alertList.add(alert);
                     return alertList;
