@@ -47,6 +47,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.TermComponentDataCheckSelectionListener;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.TermComponentListSelectionListener;
 import org.dwfa.ace.TermComponentTreeSelectionListener;
@@ -166,13 +167,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
    public static ImageIcon LIST_LINK_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/carabiner_up_arrow.png"));
 
+   public static ImageIcon DATA_CHECK_LINK_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/carabiner_alert.png"));
+
    public static ImageIcon SMALL_SEARCH_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/find.png"));
 
    public static ImageIcon SMALL_TREE_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/text_tree.png"));
 
    public static ImageIcon SMALL_LIST_LINK_ICON = new ImageIcon(ACE.class
-         .getResource("/16x16/plain/arrow_up_green.png"));
-
+	         .getResource("/16x16/plain/arrow_up_green.png"));
+	   
+   public static ImageIcon SMALL_ALERT_LINK_ICON = new ImageIcon(ACE.class
+	         .getResource("/16x16/plain/warning.png"));
+	   
    private ConflictPlugin conflictPlugin = new ConflictPlugin();
 
    private AbstractPlugin srcRelPlugin = new SrcRelPlugin();
@@ -303,9 +309,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                setToolTipText("This panel is not linked to other selections");
                tabIcon = null;
             } else if (value == LIST_LINK_ICON) {
-               setToolTipText("This panel is linked to the list selection above");
-               tabIcon = SMALL_LIST_LINK_ICON;
-            }
+                setToolTipText("This panel is linked to the list selection above");
+                tabIcon = SMALL_LIST_LINK_ICON;
+             }else if (value == DATA_CHECK_LINK_ICON) {
+                 setToolTipText("This panel is linked to the data check selection");
+                 tabIcon = SMALL_ALERT_LINK_ICON;
+              }
          }
       }
 
@@ -355,10 +364,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
       GridBagConstraints c = new GridBagConstraints();
 
       LinkListModel linkSpinnerModel = new LinkListModel(new ImageIcon[] { UNLINKED_ICON, SEARCH_LINK_ICON,
-            TREE_LINK_ICON }, link.ordinal());
+            TREE_LINK_ICON, DATA_CHECK_LINK_ICON }, link.ordinal());
       if (enableListLink) {
          linkSpinnerModel = new LinkListModel(new ImageIcon[] { UNLINKED_ICON, SEARCH_LINK_ICON, TREE_LINK_ICON,
-               LIST_LINK_ICON }, link.ordinal());
+        		 DATA_CHECK_LINK_ICON, LIST_LINK_ICON }, link.ordinal());
       }
       JSpinner linkSpinner = new JSpinner(linkSpinnerModel);
       linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
@@ -680,7 +689,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                }
             } catch (IOException e) {
                AceLog.getAppLog().alertAndLogException(e);
-               desc = termComponent.toString();
+               setTermComponent(null);
+               return;
             }
             String shortDesc;
             if (desc.length() > titleLength) {
@@ -691,6 +701,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             }
             conceptTabs.setTitleAt(index, shortDesc);
             conceptTabs.setToolTipTextAt(index, desc);
+         } else {
+             conceptTabs.setTitleAt(index, "empty");
+             conceptTabs.setToolTipTextAt(index, "empty");
          }
          conceptTabs.setIconAt(index, tabIcon);
       }
@@ -719,6 +732,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
    private TermComponentTreeSelectionListener treeListener;
 
    private TermComponentListSelectionListener listListener;
+   
+   private TermComponentDataCheckSelectionListener dataCheckListener;
 
    private JList linkedList;
 
@@ -730,6 +745,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
       if (listListener != null) {
          linkedList.removeListSelectionListener(listListener);
          listListener = null;
+      }
+      if (dataCheckListener != null) {
+    	  ace.removeDataCheckListener(dataCheckListener);
+    	  dataCheckListener = null;
       }
       ace.removeSearchLinkedComponent(this);
       switch (type) {
@@ -748,6 +767,11 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             linkedList.addListSelectionListener(listListener);
          }
          break;
+      case DATA_CHECK_LINK:
+    	  dataCheckListener = new TermComponentDataCheckSelectionListener(this);
+    	  ace.addDataCheckListener(dataCheckListener);
+    	  break;
+    	  
       }
    }
 

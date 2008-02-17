@@ -1,4 +1,4 @@
-package org.dwfa.ace.table;
+package org.dwfa.ace.checks;
 
 import java.util.Collection;
 
