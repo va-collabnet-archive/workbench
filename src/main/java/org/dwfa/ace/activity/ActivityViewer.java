@@ -4,8 +4,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -22,7 +24,7 @@ import org.dwfa.bpa.util.ComponentFrame;
 
 public class ActivityViewer {
 
-	private static ActivityViewer viewer ;
+	private static ActivityViewer viewer;
 
 	private class ActivityViewerFrame extends ComponentFrame {
 
@@ -33,13 +35,13 @@ public class ActivityViewer {
 
 		public ActivityViewerFrame() throws Exception {
 			super(null, null);
-            getQuitList().clear();
+			getQuitList().clear();
 		}
 
 		@Override
 		public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -66,11 +68,11 @@ public class ActivityViewer {
 
 		public void addInternalFrames(JMenu menu) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
-	
+
 	ComponentFrame viewerFrame;
 
 	JPanel activitiesPanel = new JPanel(new GridLayout(0, 1));
@@ -107,28 +109,33 @@ public class ActivityViewer {
 
 	}
 
-	public static void addActivity(final I_ShowActivity activity) throws Exception {
+	public static void addActivity(final I_ShowActivity activity)
+			throws Exception {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				if (viewer == null) {
-					try {
-						viewer = new ActivityViewer();
-					} catch (Exception e) {
-						AceLog.getAppLog().alertAndLogException(e);
+				try {
+					if (viewer == null) {
+						try {
+							viewer = new ActivityViewer();
+						} catch (Exception e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						}
 					}
+					while (viewer.activitiesList.size() > 10) {
+						viewer.activitiesList.remove(9);
+					}
+					viewer.activitiesList.add(0, activity);
+					viewer.activitiesPanel.removeAll();
+					for (I_ShowActivity a : viewer.activitiesList) {
+						viewer.activitiesPanel.add(a.getViewPanel());
+					}
+					tickleSize();
+				} catch (HeadlessException e) {
+					AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 				}
-				while (viewer.activitiesList.size() > 10) {
-					viewer.activitiesList.remove(9);
-				}
-				viewer.activitiesList.add(0, activity);
-				viewer.activitiesPanel.removeAll();
-				for (I_ShowActivity a : viewer.activitiesList) {
-					viewer.activitiesPanel.add(a.getViewPanel());
-				}
-				tickleSize();
 			}
-			
+
 		});
 	}
 
@@ -136,13 +143,14 @@ public class ActivityViewer {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-		viewer.activitiesList.remove(activity);
-		viewer.activitiesPanel.removeAll();
-		for (I_ShowActivity a : viewer.activitiesList) {
-			viewer.activitiesPanel.add(a.getViewPanel());
-		}
-		tickleSize();
-			}});
+				viewer.activitiesList.remove(activity);
+				viewer.activitiesPanel.removeAll();
+				for (I_ShowActivity a : viewer.activitiesList) {
+					viewer.activitiesPanel.add(a.getViewPanel());
+				}
+				tickleSize();
+			}
+		});
 	}
 
 	private static void tickleSize() {
