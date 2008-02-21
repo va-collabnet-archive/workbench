@@ -1,5 +1,6 @@
 package org.dwfa.maven;
 
+import java.awt.HeadlessException;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
@@ -246,6 +247,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                             }
                                         }
 
+                                    } catch (HeadlessException e) {
+                                    	getLog().info(e.toString());
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
