@@ -17,6 +17,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
@@ -38,6 +39,7 @@ public class AceReadOnlyRunner {
 
    public AceReadOnlyRunner(final String[] args, final LifeCycle lc) {
       ACE.editMode = false;
+      ActivityViewer.setHeadless(false);
       JiniManager.setLocalOnly(true);
       try {
          this.args = args;

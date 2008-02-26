@@ -26,6 +26,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -83,6 +84,7 @@ public class AceRunner {
 
    public AceRunner(final String[] args, final LifeCycle lc) {
       try {
+         ActivityViewer.setHeadless(false);
          this.args = args;
          this.lc = lc;
          AceLog.getAppLog().info("java.protocol.handler.pkgs: " + System.getProperty("java.protocol.handler.pkgs"));

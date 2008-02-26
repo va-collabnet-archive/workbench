@@ -24,6 +24,8 @@ import org.dwfa.bpa.util.ComponentFrame;
 
 public class ActivityViewer {
 
+	private static boolean headless = true;
+
 	private static ActivityViewer viewer;
 
 	private class ActivityViewerFrame extends ComponentFrame {
@@ -81,62 +83,66 @@ public class ActivityViewer {
 
 	private ActivityViewer() throws Exception {
 		super();
-		viewerFrame = new ActivityViewerFrame();
-		JScrollPane scroller = new JScrollPane();
-		scroller
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		viewerFrame.setContentPane(scroller);
-		viewerFrame.setLocation(20, 20);
-		viewerFrame.setSize(500, 300);
-		viewerFrame.setVisible(true);
+		if (headless == false) {
+			viewerFrame = new ActivityViewerFrame();
+			JScrollPane scroller = new JScrollPane();
+			scroller
+					.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			viewerFrame.setContentPane(scroller);
+			viewerFrame.setLocation(20, 20);
+			viewerFrame.setSize(500, 300);
+			viewerFrame.setVisible(true);
 
-		JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridheight = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		activitiesAndFillerPanel.add(activitiesPanel, gbc);
+			JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.gridheight = 1;
+			gbc.weightx = 1.0;
+			gbc.weighty = 0;
+			gbc.anchor = GridBagConstraints.NORTHWEST;
+			activitiesAndFillerPanel.add(activitiesPanel, gbc);
 
-		gbc.gridy++;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		activitiesAndFillerPanel.add(new JPanel(), gbc);
-		scroller.setViewportView(activitiesAndFillerPanel);
+			gbc.gridy++;
+			gbc.weighty = 1;
+			gbc.fill = GridBagConstraints.BOTH;
+			activitiesAndFillerPanel.add(new JPanel(), gbc);
+			scroller.setViewportView(activitiesAndFillerPanel);
+		}
 
 	}
 
 	public static void addActivity(final I_ShowActivity activity)
 			throws Exception {
-		SwingUtilities.invokeLater(new Runnable() {
+		if (headless == false) {
+			SwingUtilities.invokeLater(new Runnable() {
 
-			public void run() {
-				try {
-					if (viewer == null) {
-						try {
-							viewer = new ActivityViewer();
-						} catch (Exception e) {
-							AceLog.getAppLog().alertAndLogException(e);
+				public void run() {
+					try {
+						if (viewer == null) {
+							try {
+								viewer = new ActivityViewer();
+							} catch (Exception e) {
+								AceLog.getAppLog().alertAndLogException(e);
+							}
 						}
+						while (viewer.activitiesList.size() > 10) {
+							viewer.activitiesList.remove(9);
+						}
+						viewer.activitiesList.add(0, activity);
+						viewer.activitiesPanel.removeAll();
+						for (I_ShowActivity a : viewer.activitiesList) {
+							viewer.activitiesPanel.add(a.getViewPanel());
+						}
+						tickleSize();
+					} catch (HeadlessException e) {
+						AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 					}
-					while (viewer.activitiesList.size() > 10) {
-						viewer.activitiesList.remove(9);
-					}
-					viewer.activitiesList.add(0, activity);
-					viewer.activitiesPanel.removeAll();
-					for (I_ShowActivity a : viewer.activitiesList) {
-						viewer.activitiesPanel.add(a.getViewPanel());
-					}
-					tickleSize();
-				} catch (HeadlessException e) {
-					AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 				}
-			}
 
-		});
+			});
+		}
 	}
 
 	public static void removeActivity(final I_ShowActivity activity) {
@@ -158,6 +164,14 @@ public class ActivityViewer {
 		Dimension tempSize = new Dimension(size.width, size.height + 1);
 		viewer.viewerFrame.setSize(tempSize);
 		viewer.viewerFrame.setSize(size);
+	}
+
+	public static boolean isHeadless() {
+		return headless;
+	}
+
+	public static void setHeadless(boolean headless) {
+		ActivityViewer.headless = headless;
 	}
 
 }

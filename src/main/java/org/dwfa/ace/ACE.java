@@ -1562,11 +1562,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
 		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.DATA_CHECK_LINK,
 				conceptTabs);
-		conceptPanels.add(c3panel);
-		conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, c4panel, "Data Checks Linked");
-		// conceptTabs.addTab("Description List", getDescListEditor());
+		conceptPanels.add(c4panel);
 		if (editMode) {
 			conceptTabs.addTab("List", getConceptListEditor());
+			conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, c4panel, "Data Checks Linked");
+		} else {
+			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
 		}
 
 		conceptTabs.setMinimumSize(new Dimension(0, 0));
@@ -1575,7 +1576,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		termTreeConceptSplit.setRightComponent(conceptTabs);
 		leftTabs.addTab("taxonomy", termTree);
 		dataCheckTabLabel = "data checks";
-		leftTabs.addTab(dataCheckTabLabel, getUncommittedList());
+		if (editMode) {
+			leftTabs.addTab(dataCheckTabLabel, getUncommittedList());
+		}
 		termTreeConceptSplit.setLeftComponent(leftTabs);
 		termTree.setMinimumSize(new Dimension(0, 0));
 		termTreeConceptSplit.setOneTouchExpandable(true);
