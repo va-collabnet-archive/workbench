@@ -200,7 +200,9 @@ public interface I_TermFactory {
 
     public I_IntList newIntList();
 
-    public I_IdVersioned getId(int nid) throws IOException;
+    public I_IdVersioned getId(int nid) throws TerminologyException, IOException;
+    public I_IdVersioned getId(UUID uid) throws TerminologyException, IOException;
+    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException;
     
     /**
      * Delete any uncommitted changes. 

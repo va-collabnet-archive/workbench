@@ -135,7 +135,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
    }
 
    public static void copyFromPathToPath(I_TermFactory tf, I_Path toPath, I_GetConceptData concept, Set<I_Position> fromSet,
-         Map<Integer, Integer> conceptStatusNidMap, Map<Integer, Integer> elementStatusNidMap) throws IOException {
+         Map<Integer, Integer> conceptStatusNidMap, Map<Integer, Integer> elementStatusNidMap) throws IOException, TerminologyException {
       copyId(toPath, concept.getId(), elementStatusNidMap);
       for (I_ConceptAttributeTuple t: concept.getConceptAttributeTuples(null, fromSet)) {
          I_ConceptAttributePart newPart = t.duplicatePart();
