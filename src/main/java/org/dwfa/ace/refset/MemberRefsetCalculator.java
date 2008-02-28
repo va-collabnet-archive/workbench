@@ -334,7 +334,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					if (oldMembers==null || !oldMembers.contains(i)) {
 						reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
 						reportWriter.newLine();
-						if (!conflicts) { 
+						if (!conflicts && !validateOnly) { 
 							addToMemberSet(i.getConceptId(), i.getInclusionTypeId(), refset);
 						}
 					}
@@ -365,7 +365,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				for (ConceptRefsetInclusionDetails i : exclusions) {
 					reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
-					if (!conflicts) { 
+					if (!conflicts  && !validateOnly) { 
 						I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(),refset);
 						if (ext!=null) {
 							retireLatestExtension(ext);
