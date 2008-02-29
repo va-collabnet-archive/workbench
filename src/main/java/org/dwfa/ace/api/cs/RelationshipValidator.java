@@ -1,7 +1,15 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
@@ -16,6 +24,7 @@ import org.dwfa.tapi.TerminologyException;
 public class RelationshipValidator extends SimpleValidator {
 
     I_TermFactory termFactory;
+	private Map<UUID, Integer> cache = new HashMap<UUID, Integer>();
     @Override
     protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
         throws IOException, TerminologyException {
@@ -42,20 +51,36 @@ public class RelationshipValidator extends SimpleValidator {
         I_GetConceptData concept = tf.getConcept(tf.uuidToNative(bean.getId().getUIDs()));
         List<I_RelVersioned> databaseRelationships = concept.getSourceRels();
         List<UniversalAceRelationship> beanRelationships = bean.getSourceRels();
-
+        
         if (databaseRelationships.size() != beanRelationships.size()) {
             System.out.println("number of relationships different");
             return false; // test 1
         }
+        
+        //take a copy of the list so that we can remove matches from it as we go - reduce the number of comparisons
+        List<I_RelVersioned> databaseRelationshipsCopy = new ArrayList<I_RelVersioned>(databaseRelationships.size());
+        for (I_RelVersioned relVersioned : databaseRelationships) {
+        	databaseRelationshipsCopy.add(relVersioned);
+		}
+        
+        Iterator<I_RelVersioned> databaseRelationshipIterator = databaseRelationshipsCopy.iterator();
 
         for (UniversalAceRelationship beanRelationship : beanRelationships) {
 
             boolean foundMatch = false;
+            
+        	int beanRelId = getNativeId(beanRelationship.getRelId());
+			int beanC1Id = getNativeId(beanRelationship.getC1Id());
+			int beanC2Id = getNativeId(beanRelationship.getC2Id());
+			
+            while (databaseRelationshipIterator.hasNext()) {
+            	I_RelVersioned databaseRelationship = databaseRelationshipIterator.next();
 
-            for (I_RelVersioned databaseRelationship : databaseRelationships) {
-                if (relationshipsEqual(beanRelationship, databaseRelationship)) {
-                    foundMatch = true;
-                }
+				if (relationshipsEqual(beanRelationship, databaseRelationship, beanRelId, beanC1Id, beanC2Id)) {
+            		foundMatch = true;
+            		databaseRelationshipIterator.remove();
+            		break;
+            	}
             }
 
             if (!foundMatch) {
@@ -67,22 +92,19 @@ public class RelationshipValidator extends SimpleValidator {
     }
 
     public boolean relationshipsEqual(UniversalAceRelationship beanRelationship,
-            I_RelVersioned databaseRelationship)  throws IOException, TerminologyException {
+            I_RelVersioned databaseRelationship, int beanRelId, int beanC1Id, int beanC2Id)  throws IOException, TerminologyException {
 
-        if (termFactory.uuidToNative(beanRelationship.getRelId()) !=
-                databaseRelationship.getRelId()) {
+        if (beanRelId != databaseRelationship.getRelId()) {
             //System.out.println("rel ids different");
             return false; // Test 2
         }
 
-        if (termFactory.uuidToNative(beanRelationship.getC1Id()) !=
-                databaseRelationship.getC1Id()) {
+        if (beanC1Id != databaseRelationship.getC1Id()) {
             //System.out.println("c1 id diff");
             return false; // Test 3
          }
 
-        if (termFactory.uuidToNative(beanRelationship.getC2Id()) !=
-                databaseRelationship.getC2Id()) {
+        if (beanC2Id != databaseRelationship.getC2Id()) {
             //System.out.println("c2 id diff");
             return false; // Test 4
         }
@@ -91,12 +113,12 @@ public class RelationshipValidator extends SimpleValidator {
             if (part.getTime() != Long.MAX_VALUE) {
                 I_RelPart newPart = termFactory.newRelPart();
                 newPart.setVersion(termFactory.convertToThinVersion(part.getTime()));
-                newPart.setPathId(termFactory.uuidToNative(part.getPathId()));
-                newPart.setCharacteristicId(termFactory.uuidToNative(part.getCharacteristicId()));
+                newPart.setPathId(getNativeId(part.getPathId()));
+                newPart.setCharacteristicId(getNativeId(part.getCharacteristicId()));
                 newPart.setGroup(part.getGroup());
-                newPart.setRefinabilityId(termFactory.uuidToNative(part.getRefinabilityId()));
-                newPart.setRelTypeId(termFactory.uuidToNative(part.getRelTypeId()));
-                newPart.setStatusId(termFactory.uuidToNative(part.getStatusId()));
+                newPart.setRefinabilityId(getNativeId(part.getRefinabilityId()));
+                newPart.setRelTypeId(getNativeId(part.getRelTypeId()));
+                newPart.setStatusId(getNativeId(part.getStatusId()));
 
                 if (databaseRelationship.getVersions().contains(newPart) == false) {
                 	AceLog.getEditLog().info("parts different");
@@ -111,5 +133,24 @@ public class RelationshipValidator extends SimpleValidator {
 
         return true;
     }
+
+	private int getNativeId(Collection<UUID> uuids)
+			throws TerminologyException, IOException {
+
+		Integer cacheValue = null;
+		Iterator<UUID> uuidsIterator = uuids.iterator();
+		while (cacheValue == null && uuidsIterator.hasNext()) {
+			 cacheValue = cache.get(uuidsIterator.next());
+		}
+				
+		if (cacheValue == null) {
+			cacheValue = termFactory.uuidToNative(uuids);
+			for (UUID uuid : uuids) {
+				cache.put(uuid, cacheValue);
+			}
+		}
+		
+		return cacheValue;
+	}
 
 }

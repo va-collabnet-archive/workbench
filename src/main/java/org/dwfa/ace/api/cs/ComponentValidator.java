@@ -13,6 +13,9 @@ import org.dwfa.tapi.TerminologyException;
  */
 public class ComponentValidator extends SimpleValidator {
 
+   private final RelationshipValidator relationshipValidator = new RelationshipValidator();
+   private final DescriptionValidator descriptionValidator = new DescriptionValidator();
+
    @Override
    protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
        throws IOException, TerminologyException {
@@ -22,21 +25,21 @@ public class ComponentValidator extends SimpleValidator {
         * 2) all source relationships must match
         */
 
-       DescriptionValidator descriptionValidator = new DescriptionValidator();
-       RelationshipValidator relationshipValidator = new RelationshipValidator();
-
        boolean validDescription = descriptionValidator.validateAceBean(bean, tf);
-       boolean validRelationship = relationshipValidator.validateAceBean(bean, tf);
 
        if (!validDescription) {
            AceLog.getEditLog().info("Invalid description: " + bean);
+           return false;
        }
+
+       boolean validRelationship = relationshipValidator.validateAceBean(bean, tf);
 
        if (!validRelationship) {
            AceLog.getEditLog().info("Invalid relationship: " + bean);
+           return false;
        }
 
-       return validDescription && validRelationship;
+       return true;
 
    }
 
