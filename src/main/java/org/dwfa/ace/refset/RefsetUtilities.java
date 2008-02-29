@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
@@ -65,7 +66,11 @@ public abstract class RefsetUtilities {
 		 * Iterate over children
 		 **/
 		for (I_RelTuple child : childrentuples) {
-			children.add(child.getC1Id());
+			
+			List<I_ConceptAttributeTuple> atts = termFactory.getConcept(child.getC1Id()).getConceptAttributeTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), null);
+			if (atts.size()==1) {
+				children.add(child.getC1Id());
+			} 
 		}
 		return children;
 	}
