@@ -212,7 +212,7 @@ public interface I_TermFactory {
     public void cancel() throws IOException;
 
     /**
-     * Turn off the writing of changes to to change sets. 
+     * Turn off the writing of changes to change sets. 
      * Typical usage is to call this method before importing
      * change sets so that the changes don't get duplicated. 
      *
