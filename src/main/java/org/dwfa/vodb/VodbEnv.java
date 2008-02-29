@@ -68,6 +68,7 @@ import org.dwfa.ace.api.I_ProcessRelationships;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -170,7 +171,7 @@ import com.sleepycat.je.SecondaryDatabase;
  * @author kec
  * 
  */
-public class VodbEnv implements I_ImplementTermFactory {
+public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 	private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
 
 	private Environment env;
@@ -275,9 +276,9 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	private static boolean preloadDescriptions = false;
 
-	private static boolean transactional = true;
+	private static boolean transactional = false;
 
-	private static boolean deferredWrite = false;
+	private static boolean deferredWrite = true;
 
 	private static boolean txnNoSync = true;
 
@@ -2321,6 +2322,50 @@ public class VodbEnv implements I_ImplementTermFactory {
 		return uuidToNativeWithGeneration(uids, source, idPath, version);
 	}
 
+	public int getCurrentStatusNid() {
+		return PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE);
+	}
+	public int nativeGenerationForUuid(UUID uid, int source, int pathId,
+			int version) throws TerminologyException, IOException {
+		// create a new one...
+		try {
+			Cursor idCursor = getIdDb().openCursor(null, null);
+			DatabaseEntry foundKey = new DatabaseEntry();
+			DatabaseEntry foundData = new DatabaseEntry();
+			int lastId = Integer.MIN_VALUE;
+			if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				lastId = (Integer) intBinder.entryToObject(foundKey);
+			}
+			idCursor.close();
+			I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
+			// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
+			// newId.getNativeId());
+			ThinIdPart idPart = new ThinIdPart();
+			idPart.setIdStatus(getCurrentStatusNid());
+			idPart.setPathId(pathId);
+			idPart.setSource(source);
+			idPart.setSourceId(uid);
+			idPart.setVersion(version);
+			newId.addVersion(idPart);
+
+
+			DatabaseEntry idKey = new DatabaseEntry();
+			DatabaseEntry idValue = new DatabaseEntry();
+			intBinder.objectToEntry(newId.getNativeId(), idKey);
+			idBinding.objectToEntry(newId, idValue);
+			try {
+				idPutSemaphore.acquire();
+				idDb.put(null, idKey, idValue);
+				idPutSemaphore.release();
+			} catch (InterruptedException ex) {
+				throw new DatabaseException(ex);
+			}
+			return newId.getNativeId();
+		} catch (DatabaseException e2) {
+			throw new ToIoException(e2);
+		}
+	}
+
 	public int uuidToNativeWithGeneration(Collection<UUID> uids, int source,
 			I_Path idPath, int version) throws TerminologyException,
 			IOException {
@@ -2498,14 +2543,14 @@ public class VodbEnv implements I_ImplementTermFactory {
 		conceptDb.put(null, key, value);
 	}
 
-	public void writeRel(I_RelVersioned rel) throws DatabaseException {
+	public void writeRel(I_RelVersioned rel) throws IOException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		if (debugWrites) {
 			HashSet<I_RelPart> partSet = new HashSet<I_RelPart>(rel
 					.getVersions());
 			if (partSet.size() != rel.getVersions().size()) {
-				throw new DatabaseException("Redundant parts: "
+				throw new IOException("Redundant parts: "
 						+ rel.getVersions());
 			} else {
 				logger.info("rel parts same size: " + rel.getVersions().size());
@@ -2513,7 +2558,11 @@ public class VodbEnv implements I_ImplementTermFactory {
 		}
 		intBinder.objectToEntry(rel.getRelId(), key);
 		relBinding.objectToEntry(rel, value);
-		relDb.put(null, key, value);
+		try {
+			relDb.put(null, key, value);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException,
@@ -3678,6 +3727,33 @@ public class VodbEnv implements I_ImplementTermFactory {
 
 	public static boolean isTransactional() {
 		return transactional;
+	}
+
+	public I_RelVersioned newRelationship(UUID relUuid, 
+			int uuidType,
+			int conceptNid, 
+			int relDestinationNid,
+			int pathNid,
+			int version,
+			int relStatusNid,
+			int relTypeNid,
+			int relCharacteristicNid,
+			int relRefinabilityNid, 
+			int relGroup) throws TerminologyException, IOException {
+		
+		int relId = nativeGenerationForUuid(relUuid, uuidType,
+				pathNid, version);
+		ThinRelVersioned rel = new ThinRelVersioned(relId, conceptNid, relDestinationNid, 1);
+		ThinRelPart part = new ThinRelPart();
+		part.setCharacteristicId(relCharacteristicNid);
+		part.setGroup(relGroup);
+		part.setPathId(pathNid);
+		part.setRefinabilityId(relRefinabilityNid);
+		part.setRelTypeId(relTypeNid);
+		part.setStatusId(relStatusNid);
+		part.setVersion(version);
+		rel.addVersion(part);
+		return rel;
 	}
 
 }
