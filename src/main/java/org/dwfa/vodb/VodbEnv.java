@@ -173,6 +173,25 @@ import com.sleepycat.je.SecondaryDatabase;
  */
 public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 	private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
+	
+	private class NidGenerator {
+		private int lastId = Integer.MIN_VALUE;
+		private NidGenerator() throws DatabaseException {
+			Cursor idCursor = getIdDb().openCursor(null, null);
+			DatabaseEntry foundKey = new DatabaseEntry();
+			DatabaseEntry foundData = new DatabaseEntry();
+			lastId = Integer.MIN_VALUE;
+			if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				lastId = (Integer) intBinder.entryToObject(foundKey);
+			}
+			idCursor.close();
+		}
+		
+		public synchronized int nextId() {
+			lastId++;
+			return lastId;
+		}
+	}
 
 	private Environment env;
 
@@ -246,6 +265,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 	private SecondaryDatabase conceptImageMap;
 
 	private File luceneDir;
+	
+	private NidGenerator nidGenerator;
 
 	public VodbEnv() {
 		LocalVersionedTerminology.set(this);
@@ -408,6 +429,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 			activity.setProgressInfoLower("Opening ids...");
 			idDb = env.openDatabase(null, "idDb", mapDbConfig);
 			createUidToIdMap();
+			nidGenerator = new NidGenerator();
 
 			// Reset the authority id so that each time the db starts, it gets a
 			// new
@@ -730,6 +752,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 					if (!env.getConfig().getReadOnly()) {
 						env.sync();
 					}
+					getLogger().info("Finished sync.");
 				}
 			} catch (DatabaseException ex) {
 				throw new ToIoException(ex);
@@ -2329,15 +2352,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 			int version) throws TerminologyException, IOException {
 		// create a new one...
 		try {
-			Cursor idCursor = getIdDb().openCursor(null, null);
-			DatabaseEntry foundKey = new DatabaseEntry();
-			DatabaseEntry foundData = new DatabaseEntry();
-			int lastId = Integer.MIN_VALUE;
-			if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				lastId = (Integer) intBinder.entryToObject(foundKey);
-			}
-			idCursor.close();
-			I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
+			I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
 			// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
 			// newId.getNativeId());
 			ThinIdPart idPart = new ThinIdPart();
@@ -2373,17 +2388,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 			return uuidToNative(uids);
 		} catch (TerminologyException e) {
 			// create a new one...
-			Cursor idCursor;
 			try {
-				idCursor = getIdDb().openCursor(null, null);
-				DatabaseEntry foundKey = new DatabaseEntry();
-				DatabaseEntry foundData = new DatabaseEntry();
-				int lastId = Integer.MIN_VALUE;
-				if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					lastId = (Integer) intBinder.entryToObject(foundKey);
-				}
-				idCursor.close();
-				I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
+				I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
 				// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
@@ -2428,15 +2434,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 		} catch (NoMappingException e) {
 			// create a new one...
 			try {
-				Cursor idCursor = getIdDb().openCursor(null, null);
-				DatabaseEntry foundKey = new DatabaseEntry();
-				DatabaseEntry foundData = new DatabaseEntry();
-				int lastId = Integer.MIN_VALUE;
-				if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					lastId = (Integer) intBinder.entryToObject(foundKey);
-				}
-				idCursor.close();
-				I_IdVersioned newId = new ThinIdVersioned(lastId + 1, 0);
+				I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
 				// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
