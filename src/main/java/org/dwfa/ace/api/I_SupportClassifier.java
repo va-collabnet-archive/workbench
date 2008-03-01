@@ -20,4 +20,6 @@ public interface I_SupportClassifier extends I_TermFactory {
 			int relCharacteristicNid,
 			int relRefinabilityNid, 
 			int relGroup) throws TerminologyException, IOException;
+	
+	
 }
