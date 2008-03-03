@@ -252,26 +252,33 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
 		processedConcepts++;
 		if (processedConcepts % 10000 ==0) {
-			getLog().info("Processed " + processedConcepts + " concepts");
+			getLog().info("Processed DDD " + processedConcepts + " concepts");
 		}
 
 		int conceptId = concept.getConceptId();
 
-		List<I_GetExtensionData> extensions =
-			termFactory.getExtensionsForComponent(conceptId);
-
+		List<I_ThinExtByRefVersioned> extensions =
+			termFactory.getAllExtensionsForComponent(conceptId);
+		
 		// process each refset associated with this concept and work out
 		// if any of them are the refset we are looking for
 		int refsetCount = 0;
 		I_ThinExtByRefVersioned memberSet = null;
-		for (I_GetExtensionData refSetExtension: extensions) {
-			if (refSetExtension.getExtension().getRefsetId() == referenceSetId) {
+		for (I_ThinExtByRefVersioned refSetExtension: extensions) {
+			List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+			refSetExtension.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+			if (exensionParts.size() == 0) {
+				// this is dodgy, but basically if the latest version of the refset doesn't have a current status skip the refset
+				continue;
+			}
+			
+			if (refSetExtension.getRefsetId() == referenceSetId) {
 				getLog().debug("processConcept(I_GetConceptData) - found refset spec " + referenceSetId);
 				refsetCount++;
 			}
-			if (refSetExtension.getExtension().getRefsetId() == memberSetId) {
+			if (refSetExtension.getRefsetId() == memberSetId) {
 				getLog().debug("processConcept(I_GetConceptData) - found refset membership " + memberSetId);
-				memberSet = refSetExtension.getExtension();
+				memberSet = refSetExtension;
 			}
 		}
 		boolean includedInLatestMemberSet = latestMembersetIncludesConcept(memberSet);
@@ -288,26 +295,38 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 				if (!includedInLatestMemberSet) {
 					addToMemberSet(conceptId, includeLineageId);
 				}
-			} else if (excludedLineage.contains(conceptId)) {
-				getLog().debug("processConcept(I_GetConceptData) - inherited exclude " + getFsnFromConceptId(concept.getConceptId()));
-				excludedMemberSet.add(conceptId);
+			} else { 
+				if (excludedLineage.contains(conceptId)) {
+					getLog().debug("processConcept(I_GetConceptData) - inherited exclude " + getFsnFromConceptId(concept.getConceptId()));
+				} else {
+					getLog().debug("processConcept(I_GetConceptData) - no longer under a lineage include therefore retire " + getFsnFromConceptId(concept.getConceptId()));
+				}
+				
 				if (memberSet != null) {
+					excludedMemberSet.add(conceptId);
 					retireLatestExtension(memberSet);
 				}
 			}
 		}
 
 		// process each reference set extension
-		for (I_GetExtensionData extensionData: extensions) {
+		for (I_ThinExtByRefVersioned extensionData: extensions) {
+			List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+			extensionData.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+			if (exensionParts.size() == 0) {
+				// this is dodgy, but basically if the latest version of the refset doesn't have a current status skip the refset
+				continue;
+			}
+			
 			includedInLatestMemberSet = latestMembersetIncludesConcept(memberSet);
-			I_ThinExtByRefVersioned part = extensionData.getExtension();
+			I_ThinExtByRefVersioned part = extensionData;
 			int extensionTypeId = part.getTypeId();
 			getLog().debug("processConcept(I_GetConceptData) - processing extensionTypeId " + extensionTypeId 
-					+ " referenceSetId " + extensionData.getExtension().getRefsetId());
+					+ " referenceSetId " + extensionData.getRefsetId());
 
 
 			if (extensionTypeId == conceptTypeId &&
-					extensionData.getExtension().getRefsetId() == referenceSetId) {
+					extensionData.getRefsetId() == referenceSetId) {
 				// only look at the ref set extensions that correspond to
 				// the reference set as specified in maven plugin config
 				int typeId = 0;
