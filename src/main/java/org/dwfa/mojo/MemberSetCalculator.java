@@ -252,7 +252,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
 		processedConcepts++;
 		if (processedConcepts % 10000 ==0) {
-			getLog().info("Processed DDD " + processedConcepts + " concepts");
+			getLog().info("Processed synced " + processedConcepts + " concepts");
 		}
 
 		int conceptId = concept.getConceptId();
@@ -266,7 +266,9 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		I_ThinExtByRefVersioned memberSet = null;
 		for (I_ThinExtByRefVersioned refSetExtension: extensions) {
 			List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
-			refSetExtension.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+			synchronized (termFactory) {
+				refSetExtension.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+			}
 			if (exensionParts.size() == 0) {
 				// this is dodgy, but basically if the latest version of the refset doesn't have a current status skip the refset
 				continue;
@@ -312,7 +314,9 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		// process each reference set extension
 		for (I_ThinExtByRefVersioned extensionData: extensions) {
 			List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
-			extensionData.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+			synchronized (termFactory) {
+				extensionData.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+			}
 			if (exensionParts.size() == 0) {
 				// this is dodgy, but basically if the latest version of the refset doesn't have a current status skip the refset
 				continue;
@@ -411,7 +415,9 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		}
 
 		List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
-		extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
+		synchronized (termFactory) {
+			extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);			
+		}
 
 		boolean result = exensionParts.size() > 0;
 		getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
@@ -431,7 +437,10 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 		if (extensionPart != null) {
 
 			List<I_ThinExtByRefTuple> extensionParts = new ArrayList<I_ThinExtByRefTuple>();
-			extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, extensionParts, true);
+
+			synchronized (termFactory) {
+				extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, extensionParts, true);
+			}
 
 			if (extensionParts.size() > 0) {
 				I_ThinExtByRefPart latestVersion = assertExactlyOne(extensionParts);
@@ -468,12 +477,17 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 					ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
 					termFactory.getPaths(), Integer.MAX_VALUE);
 
-			I_ThinExtByRefVersioned newExtension =
-				termFactory.newExtension(memberSetId, memberId, conceptId,
-						typeId);
-
-			I_ThinExtByRefPartConcept conceptExtension =
-				termFactory.newConceptExtensionPart();
+			I_ThinExtByRefVersioned newExtension;
+			I_ThinExtByRefPartConcept conceptExtension;
+			
+			synchronized (termFactory) {
+				newExtension =
+					termFactory.newExtension(memberSetId, memberId, conceptId,
+							typeId);
+	
+				conceptExtension =
+					termFactory.newConceptExtensionPart();
+			}
 
 			conceptExtension.setPathId(memberSetPath.getConceptId());
 			conceptExtension.setStatus(currentStatusId);
@@ -483,7 +497,9 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 			newExtension.addVersion(conceptExtension);
 			getLog().debug("addToMemberSet(int=" + conceptId + ") - start added new extension for " + getFsnFromConceptId(conceptId)); //$NON-NLS-1$ //$NON-NLS-2$
 
-			termFactory.addUncommitted(newExtension);    			
+			synchronized (termFactory) {
+				termFactory.addUncommitted(newExtension);
+			}
 		}
 
 		getLog().debug("addToMemberSet(int) - end");
