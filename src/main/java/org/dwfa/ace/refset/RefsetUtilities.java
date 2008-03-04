@@ -25,36 +25,82 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.spec.ConceptSpec;
+import org.dwfa.ace.refset.ConceptConstants;
 
 public abstract class RefsetUtilities {
-	
+
 	protected I_GetConceptData pathConcept;
-	
+
 	private I_TermFactory termFactory;
-	
+
 	protected int retiredConceptId;
 	protected int currentStatusId;
 	protected int typeId;
 
-	
+	Map<Integer,I_GetConceptData> conceptCache = new HashMap<Integer,I_GetConceptData>();
+
 	public int getInclusionTypeForRefset(I_ThinExtByRefVersioned part) {
 		int typeId = 0;
-		
+		I_ThinExtByRefPart latest = null;
 		List<? extends I_ThinExtByRefPart> versions = part.getVersions();
 		for (I_ThinExtByRefPart version : versions) {
-			I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) version;
-			typeId = temp.getConceptId();
+
+			if (latest == null) {
+				latest = version;
+			} else {
+				if (latest.getVersion()<version.getVersion()) {
+					latest = version;
+				}				
+			}			
 		}
 
+		I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) latest;
+		typeId = temp.getConceptId();
+
 		return typeId;
+	}
+
+	public Set<Integer> getParentsOfConcept(int conceptId) throws IOException, Exception {
+
+		Set<Integer> parents = new HashSet<Integer>();
+
+		I_GetConceptData concept = getConcept(conceptId);
+		List<I_RelTuple> parenttuples = concept.getSourceRelTuples(
+				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
+				getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
+
+		/*
+		 * Iterate over children
+		 **/
+		for (I_RelTuple parent : parenttuples) {
+
+			List<I_ConceptAttributeTuple> atts = getConcept(parent.getC2Id()).getConceptAttributeTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), null);
+			if (atts.size()==1) {
+				parents.add(parent.getC2Id());
+			} 
+		}
+
+		return parents;
+	}
+
+	public Set<Integer> getAncestorsOfConcept(int conceptId) throws IOException, Exception {
+
+		Set<Integer> allParents = new HashSet<Integer>();
+
+		Set<Integer> parents = getParentsOfConcept(conceptId);
+		for (Integer parent: parents) {
+			allParents.add(parent);
+			allParents.addAll(getAncestorsOfConcept(parent));			
+		}
+		return allParents;
 	}
 
 
 	public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
 
 		List<Integer> children = new ArrayList<Integer>();
-		
-		I_GetConceptData concept = termFactory.getConcept(conceptId);
+
+		I_GetConceptData concept = getConcept(conceptId);
 		/*
 		 * Find all children
 		 **/
@@ -66,21 +112,21 @@ public abstract class RefsetUtilities {
 		 * Iterate over children
 		 **/
 		for (I_RelTuple child : childrentuples) {
-			
-			List<I_ConceptAttributeTuple> atts = termFactory.getConcept(child.getC1Id()).getConceptAttributeTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), null);
+
+			List<I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), null);
 			if (atts.size()==1) {
 				children.add(child.getC1Id());
 			} 
 		}
 		return children;
 	}
-	
+
 	public List<Integer> findAllowedRefsets() throws TerminologyException, IOException {
-		
+
 		List<Integer> allowedRefsets = new ArrayList<Integer>();
-		
+
 		termFactory = LocalVersionedTerminology.get();
-		
+
 		I_IntSet status = termFactory.newIntSet();
 		status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
 
@@ -100,7 +146,7 @@ public abstract class RefsetUtilities {
 					if (tuple.getStatusId()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() && 
 							tuple.getRelTypeId()==termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId()) {
 
-						purposeConcepts.add(termFactory.getConcept(tuple.getC2Id()));
+						purposeConcepts.add(getConcept(tuple.getC2Id()));
 					}
 				}
 			}
@@ -123,7 +169,7 @@ public abstract class RefsetUtilities {
 		assert status.getSetValues().length > 0: "getIntSet returns an empty set";
 		return status;
 	}
-	
+
 	protected I_IntSet getIntSet(ConceptSpec... concepts) throws Exception {
 		I_IntSet status = termFactory.newIntSet();
 
@@ -134,7 +180,7 @@ public abstract class RefsetUtilities {
 		return status;
 	}
 
-	private <T> T assertOneOrNone(
+	protected <T> T assertOneOrNone(
 			Collection<T> collection) {
 		assert collection.size() <= 1 :
 			"Exactly one element expected, encountered " + collection;
@@ -146,14 +192,14 @@ public abstract class RefsetUtilities {
 		}
 	}
 
-	private <T> T assertExactlyOne(
+	protected<T> T assertExactlyOne(
 			Collection<T> collection) {
 		assert collection.size() == 1 :
 			"Exactly one element expected, encountered " + collection;
 
 		return collection.iterator().next();
 	}
-	
+
 	public void addToNestedSet(Map<Integer,Set<ConceptRefsetInclusionDetails>> nestedList, ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
 		Set<ConceptRefsetInclusionDetails> conceptsInRefset = nestedList.get(refset);
 		if (conceptsInRefset==null) {
@@ -167,12 +213,12 @@ public abstract class RefsetUtilities {
 		I_IntSet currentIntSet = getIntSet(ArchitectonicAuxiliary.Concept.CURRENT);
 		I_IntSet generatesRelIntSet = getIntSet(ConceptConstants.GENERATES_REL);
 
-		I_GetConceptData memberSetSpecConcept = assertOneOrNone(termFactory.getConcept(refsetId).getSourceRelTargets(
+		I_GetConceptData memberSetSpecConcept = assertOneOrNone(getConcept(refsetId).getSourceRelTargets(
 				currentIntSet, 
 				generatesRelIntSet, null, false));
 		return memberSetSpecConcept;
 	}
-	
+
 	/**
 	 * Retires the latest version of a specified extension.
 	 * @param extensionPart The extension to check.
@@ -181,23 +227,32 @@ public abstract class RefsetUtilities {
 	public void retireLatestExtension(I_ThinExtByRefVersioned extensionPart) throws Exception {
 
 		if (extensionPart != null) {
+			I_ThinExtByRefPart latestVersion = getLatestVersion(extensionPart);
 
-			List<I_ThinExtByRefTuple> extensionParts = new ArrayList<I_ThinExtByRefTuple>();
-			extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, extensionParts, true);
+			I_ThinExtByRefPart clone = latestVersion.duplicatePart();
+			clone.setStatus(retiredConceptId);
+			clone.setVersion(Integer.MAX_VALUE);
+			extensionPart.addVersion(clone);
 
-			if (extensionParts.size() > 0) {
-				I_ThinExtByRefPart latestVersion = assertExactlyOne(extensionParts);
-
-				I_ThinExtByRefPart clone = latestVersion.duplicatePart();
-				clone.setStatus(retiredConceptId);
-				clone.setVersion(Integer.MAX_VALUE);
-				extensionPart.addVersion(clone);
-
-
-				termFactory.addUncommitted(extensionPart);
-			}
+			termFactory.addUncommitted(extensionPart);
 		}
 
+	}
+
+	public I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned ext) {
+		I_ThinExtByRefPart latest = null;
+		List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
+		for (I_ThinExtByRefPart version : versions) {
+
+			if (latest == null) {
+				latest = version;
+			} else {
+				if (latest.getVersion()<version.getVersion()) {
+					latest = version;
+				}				
+			}			
+		}
+		return latest;
 	}
 
 	/**
@@ -207,31 +262,99 @@ public abstract class RefsetUtilities {
 	 * @throws Exception
 	 */
 	public void addToMemberSet(int conceptId, int includeTypeConceptId, int memberSetId) throws Exception {
+		I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId,memberSetId);
+		if (ext != null) {
 
-		int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-				ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-				termFactory.getPaths(), Integer.MAX_VALUE);
+			I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
+			I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
+			conceptClone.setPathId(pathConcept.getConceptId());
+			conceptClone.setConceptId(getMembershipType(includeTypeConceptId));
+			conceptClone.setStatus(currentStatusId);
+			conceptClone.setVersion(Integer.MAX_VALUE);
+			ext.addVersion(conceptClone);
+			termFactory.addUncommitted(ext);
 
-		I_ThinExtByRefVersioned newExtension =
-			termFactory.newExtension(memberSetId, memberId, conceptId,typeId);
+		} else {
+			int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+					ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
+					termFactory.getPaths(), Integer.MAX_VALUE);
 
-		I_ThinExtByRefPartConcept conceptExtension =
-			termFactory.newConceptExtensionPart();
+			I_ThinExtByRefVersioned newExtension =
+				termFactory.newExtension(memberSetId, memberId, conceptId,typeId);
+
+			I_ThinExtByRefPartConcept conceptExtension =
+				termFactory.newConceptExtensionPart();
 
 
-		conceptExtension.setPathId(pathConcept.getConceptId());
-		conceptExtension.setStatus(currentStatusId);
-		conceptExtension.setVersion(Integer.MAX_VALUE);
-		conceptExtension.setConceptId(getMembershipType(includeTypeConceptId));
+			conceptExtension.setPathId(pathConcept.getConceptId());
+			conceptExtension.setStatus(currentStatusId);
+			conceptExtension.setVersion(Integer.MAX_VALUE);
+			conceptExtension.setConceptId(getMembershipType(includeTypeConceptId));
 
-		newExtension.addVersion(conceptExtension);
+			newExtension.addVersion(conceptExtension);
 
-		termFactory.addUncommitted(newExtension);    			
+			termFactory.addUncommitted(newExtension);    			
+		}
+	}
+
+	/**
+	 * Adds a particular concept to the member set.
+	 * @param conceptId the concept id of the concept we wish to add to the member set.
+	 * @param includeTypeConceptId 
+	 * @throws Exception
+	 */
+	public void addToMemberSetAsParent(int conceptId, int memberSetId) throws Exception {
+
+		I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId,memberSetId);
+		if (ext != null) {
+
+			I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
+			I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
+			conceptClone.setPathId(pathConcept.getConceptId());
+			conceptClone.setConceptId(ConceptConstants.PARENT_MARKER.localize().getNid());
+			conceptClone.setStatus(currentStatusId);
+			conceptClone.setVersion(Integer.MAX_VALUE);
+			ext.addVersion(conceptClone);
+			termFactory.addUncommitted(ext);
+
+		} else {
+
+			int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+					ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
+					termFactory.getPaths(), Integer.MAX_VALUE);
+
+			I_ThinExtByRefVersioned newExtension =
+				termFactory.newExtension(memberSetId, memberId, conceptId,typeId);
+
+			I_ThinExtByRefPartConcept conceptExtension =
+				termFactory.newConceptExtensionPart();
+
+			conceptExtension.setPathId(pathConcept.getConceptId());
+			conceptExtension.setStatus(currentStatusId);
+			conceptExtension.setVersion(Integer.MAX_VALUE);
+			conceptExtension.setConceptId(ConceptConstants.PARENT_MARKER.localize().getNid());
+
+			newExtension.addVersion(conceptExtension);
+			termFactory.addUncommitted(newExtension);    			
+
+		}
 
 	}
-	
+
+	protected I_ThinExtByRefVersioned getExtensionForComponent(int conceptId,
+			Integer refset) throws IOException {
+
+		List<I_ThinExtByRefVersioned> exts = termFactory.getAllExtensionsForComponent(conceptId);
+		for (I_ThinExtByRefVersioned ext : exts) {
+			if (ext.getRefsetId()==refset.intValue()) {
+				return ext;
+			}
+		}
+		return null;
+	}
+
 	private int getMembershipType(int includeTypeConceptId) throws Exception {
-		I_GetConceptData includeConcept = termFactory.getConcept(includeTypeConceptId);
+		I_GetConceptData includeConcept = getConcept(includeTypeConceptId);
 
 		Set<I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(
 				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(ConceptConstants.CREATES_MEMBERSHIP_TYPE), null, false);
@@ -247,5 +370,14 @@ public abstract class RefsetUtilities {
 
 	public void setPathConcept(I_GetConceptData pathConcept) {
 		this.pathConcept = pathConcept;
+	}
+
+	public I_GetConceptData getConcept(int id) throws TerminologyException, IOException {
+		I_GetConceptData concept = conceptCache.get(id);
+		if (concept==null) {
+			concept = termFactory.getConcept(id);
+			conceptCache.put(id, concept);
+		}
+		return concept;
 	}
 }

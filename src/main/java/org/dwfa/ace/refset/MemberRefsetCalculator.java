@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -29,6 +32,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private File outputDirectory;
 
 	private boolean validateOnly = true;
+	private boolean markParents = true;
 
 	private I_TermFactory termFactory;
 
@@ -89,7 +93,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 				int memberSetId = getMemberSetConcept(i).getConceptId();
 
-				System.out.println("Checking refset: " + termFactory.getConcept(memberSetId));
+				System.out.println("Checking refset: " + getConcept(memberSetId));
 
 				List<Integer> conceptsWithInclusion = new ArrayList<Integer>();
 				List<Integer> conceptsWithExclusion = new ArrayList<Integer>();
@@ -105,17 +109,22 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				 * Skip children which are in the exclusion individual set
 				 * */
 				for (I_ThinExtByRefVersioned member : refsetMembers) {
-
-					List<I_ThinExtByRefTuple> versions = member.getTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, false);					
-					if (versions.size()==1) {
+					
+					List<I_ThinExtByRefTuple> versions = member.getTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, false);
+					
+					if (versions.size()>=1) {
 						int inclusiontype = getInclusionTypeForRefset(member);
 						if (inclusiontype==this.includeLineage) {
+							System.out.println("include lineage: " + termFactory.getConcept(member.getComponentId()));
 							conceptsWithInclusion.add(member.getComponentId());						
 						} else if (inclusiontype==this.excludeLineage) {
+							System.out.println("exclude lineage: " + termFactory.getConcept(member.getComponentId()));
 							conceptsWithExclusion.add(member.getComponentId());
 						} else if (inclusiontype==this.includeIndividual) {
+							System.out.println("include ind: " + termFactory.getConcept(member.getComponentId()));
 							conceptsWithIncludeIndividual.add(member.getComponentId());
 						} else if (inclusiontype==this.excludeIndividual) {
+							System.out.println("exclude ind: " + termFactory.getConcept(member.getComponentId()));
 							conceptsWithExcludeIndividual.add(member.getComponentId());
 						}
 					} 
@@ -153,7 +162,17 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				 * Add all members to the member refset so we know what was already there
 				 * */
 				for (I_ThinExtByRefVersioned member : conceptsInMemberRefset) {
-					addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId()),memberSetId);
+					List<I_ThinExtByRefTuple> parts = member.getTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, false);
+					I_ThinExtByRefTuple tuple = assertOneOrNone(parts);
+					if (tuple!=null) {
+						I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple.getPart();
+						if (part.getConceptId()!=ConceptConstants.PARENT_MARKER.localize().getNid()) {
+							System.out.println("NORMAL MEMBER : " + termFactory.getConcept(member.getComponentId()));
+							addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId()),memberSetId);
+						} else {
+							System.out.println("PARENT MEMBER : " + termFactory.getConcept(member.getComponentId()));						
+						}
+					}
 				}
 
 			}
@@ -264,36 +283,40 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	}
 
 	private void setMembers() throws Exception {
+
+
+
+		System.out.println("Starting reporting " + new Date());
 		for (Integer refset : newRefsetMembers.keySet()) {
-			reportWriter.write("\n\nIncluded members of refset " + termFactory.getConcept(refset) + " are: ");
+			reportWriter.write("\n\nIncluded members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
 			Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
 			if (newMembers!=null) {
 				for (ConceptRefsetInclusionDetails i: newMembers) {
-					reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
+					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 				}
 			}
 		}
 		for (Integer refset : newRefsetExclusion.keySet()) {
-			reportWriter.write("\n\nExcluded members of refset " + termFactory.getConcept(refset) + " are: ");
+			reportWriter.write("\n\nExcluded members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
 			Set<ConceptRefsetInclusionDetails> newMembers = newRefsetExclusion.get(refset);
 			if (newMembers!=null) {
 				for (ConceptRefsetInclusionDetails i: newMembers) {
-					reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
+					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 				}
 			}
 		}
 
 		for (Integer refset : existingRefsetMembers.keySet()) {
-			reportWriter.write("\n\nPrevious members of refset " + termFactory.getConcept(refset) + " are: ");
+			reportWriter.write("\n\nPrevious members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
 			Set<ConceptRefsetInclusionDetails> newMembers = existingRefsetMembers.get(refset);
 			if (newMembers!=null) {
 				for (ConceptRefsetInclusionDetails i : newMembers) {
-					reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
+					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 				}
 			}
@@ -303,8 +326,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		for (Integer refset : newRefsetMembers.keySet()) {
 			Set<ConceptRefsetInclusionDetails> exclusions = new HashSet<ConceptRefsetInclusionDetails>();
 
+		
+			Set<ConceptRefsetInclusionDetails> oldparents = findParentsToBeMarked(existingRefsetMembers.get(refset));
+			Set<ConceptRefsetInclusionDetails> parents = findParentsToBeMarked(newRefsetMembers.get(refset));
+
+
 			boolean conflicts = false;
-			conflictWriter.write("\n\nConflicts in refset " + termFactory.getConcept(refset) + " are: ");
+			conflictWriter.write("\n\nConflicts in refset " + getConcept(refset) + " are: ");
 			conflictWriter.newLine();
 			Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
 			Set<ConceptRefsetInclusionDetails> oldMembers = newRefsetExclusion.get(refset);
@@ -313,9 +341,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					if (oldMembers!=null && oldMembers.contains(i)) {
 						for (ConceptRefsetInclusionDetails old: oldMembers) {
 							if (old.equals(i)) {
-								conflictWriter.write(termFactory.getConcept(i.getConceptId()).toString());
-								conflictWriter.write(" because of " + termFactory.getConcept(i.getInclusionReasonId()).toString());
-								conflictWriter.write(" conflicts with " +termFactory.getConcept(old.getInclusionReasonId()).toString());
+								conflictWriter.write(getConcept(i.getConceptId()).toString());
+								conflictWriter.write(" because of " + getConcept(i.getInclusionReasonId()).toString());
+								conflictWriter.write(" conflicts with " +getConcept(old.getInclusionReasonId()).toString());
 								conflictWriter.newLine();
 							}
 						}
@@ -324,15 +352,19 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				}
 			}
 
+			if (conflicts) {
+				System.out.println("\nConflicts exist in refset " + getConcept(refset));
+				System.out.println("No changes made\n");
+			}
 
-			reportWriter.write("\n\nNew included members of refset " + termFactory.getConcept(refset) + " are: ");
+			reportWriter.write("\n\nNew included members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
 			newMembers = newRefsetMembers.get(refset);
 			oldMembers = existingRefsetMembers.get(refset);
 			if (newMembers!=null) {
 				for (ConceptRefsetInclusionDetails i: newMembers) {					
 					if (oldMembers==null || !oldMembers.contains(i)) {
-						reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
+						reportWriter.write(getConcept(i.getConceptId()).toString());
 						reportWriter.newLine();
 						if (!conflicts && !validateOnly) { 
 							addToMemberSet(i.getConceptId(), i.getInclusionTypeId(), refset);
@@ -341,8 +373,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				}
 
 
-				reportWriter.write("\n\nNew excluded members who used to be members of refset " + termFactory.getConcept(refset) + " are: ");
-				reportWriter.newLine();
 				newMembers = existingRefsetMembers.get(refset);
 				oldMembers = newRefsetMembers.get(refset);
 				if (newMembers!=null) {
@@ -362,8 +392,10 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						}
 					}
 				}
+				reportWriter.write("\n\nNew excluded members who used to be members of refset " + getConcept(refset) + " are: ");
+				reportWriter.newLine();
 				for (ConceptRefsetInclusionDetails i : exclusions) {
-					reportWriter.write(termFactory.getConcept(i.getConceptId()).toString());
+					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 					if (!conflicts  && !validateOnly) { 
 						I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(),refset);
@@ -374,25 +406,66 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						}
 					}
 				}
-			}else {
-				System.out.println("\nConflicts exist in refset " + termFactory.getConcept(refset));
-				System.out.println("No changes made\n");
+				
+				if (markParents) {
+					
+					oldparents.removeAll(existingRefsetMembers.get(refset));
+					parents.removeAll(newRefsetMembers.get(refset));
+					
+					reportWriter.write("\n\nParents that are not marked but will be marked in refset " + getConcept(refset) + " are: ");
+					reportWriter.newLine();
+					for (ConceptRefsetInclusionDetails parent: parents) {
+						if (oldparents==null || (oldparents!=null && !oldparents.contains(parent))) {
+							if (!conflicts && !validateOnly) {
+								addToMemberSetAsParent(parent.getConceptId(), refset);
+								reportWriter.write(getConcept(parent.getConceptId()).toString());
+								reportWriter.newLine();						
+							}
+						} else {
+							reportWriter.write(getConcept(parent.getConceptId()).toString() + " ------- is already marked as parent");
+							reportWriter.newLine();						
+						}
+					}
+					oldparents.removeAll(parents);
+					for (ConceptRefsetInclusionDetails existingParent: oldparents) {
+						I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),refset);
+						if (ext!=null) {
+							if (!conflicts && !validateOnly) {
+								retireLatestExtension(ext);
+							}
+						} else {
+							System.out.println("No extension exists with this refset id for this component : " + getConcept(existingParent.getConceptId()).toString());
+						}
+						reportWriter.write(getConcept(existingParent.getConceptId()).toString() + " ------- to be retired");
+						reportWriter.newLine();
+					}
+				}
+				
+
 			}
 		} 
 	}
 
+	private Set<ConceptRefsetInclusionDetails> findParentsToBeMarked(Set<ConceptRefsetInclusionDetails> concepts) throws IOException, Exception {
+		Set<ConceptRefsetInclusionDetails> nonMarkedParents = new HashSet<ConceptRefsetInclusionDetails>();
 
-	private I_ThinExtByRefVersioned getExtensionForComponent(int conceptId,
-			Integer refset) throws IOException {
-		
-		List<I_ThinExtByRefVersioned> exts = termFactory.getAllExtensionsForComponent(conceptId);
-		for (I_ThinExtByRefVersioned ext : exts) {
-			if (ext.getRefsetId()==refset.intValue()) {
-				return ext;
+		if (concepts!=null) {
+			for (ConceptRefsetInclusionDetails conceptId: concepts) {
+				Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId());
+				for (Integer parentId: parents) {
+					System.out.println("has ancestor " + termFactory.getConcept(parentId));
+					ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId,0,0);
+					if (!concepts.contains(parent)) {
+						System.out.println("adding ancestor " + termFactory.getConcept(parentId));
+						nonMarkedParents.add(parent);
+					}
+				}
 			}
 		}
-		return null;
+		return nonMarkedParents;		
 	}
+
+
 
 
 	public File getOutputDirectory() {
@@ -422,6 +495,36 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 	public void setAllowedRefsets(List<Integer> allowedRefsets) {
 		this.allowedRefsets = allowedRefsets;
+	}
+
+
+	public boolean isMarkParents() {
+		return markParents;
+	}
+
+
+	public void setMarkParents(boolean markParents) {
+		this.markParents = markParents;
+	}
+
+
+	public File getConflictFile() {
+		return conflictFile;
+	}
+
+
+	public void setConflictFile(File conflictFile) {
+		this.conflictFile = conflictFile;
+	}
+
+
+	public File getReportFile() {
+		return reportFile;
+	}
+
+
+	public void setReportFile(File reportFile) {
+		this.reportFile = reportFile;
 	}
 
 
