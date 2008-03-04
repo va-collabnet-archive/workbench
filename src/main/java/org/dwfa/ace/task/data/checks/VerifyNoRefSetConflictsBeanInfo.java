@@ -13,19 +13,9 @@ public class VerifyNoRefSetConflictsBeanInfo extends SimpleBeanInfo{
 	}
 	
 	public PropertyDescriptor[] getPropertyDescriptors() {
-        try {
-            PropertyDescriptor activeConceptPropName =
-            	new PropertyDescriptor("activeConceptPropName", getBeanDescriptor().getBeanClass());
-            activeConceptPropName.setBound(true);
-            activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");
-            activeConceptPropName.setShortDescription("Name of the property containing the concept. ");
-                     
-            PropertyDescriptor rv[] = { activeConceptPropName };
+
+            PropertyDescriptor rv[] = {};
             return rv;
-        } catch (IntrospectionException e) {
-             throw new Error(e.toString());
-        }
     }
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
