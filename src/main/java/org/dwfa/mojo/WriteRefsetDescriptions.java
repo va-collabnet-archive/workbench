@@ -22,9 +22,11 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
@@ -87,6 +89,7 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 
 	public void processExtensionByReference(I_ThinExtByRefVersioned refset)
 			throws Exception {
+		
 		I_IntSet status = termFactory.newIntSet();
 		status.add(termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId());
 		status.add(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(CURRENT_STATUS_UUIDS));
@@ -111,6 +114,8 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			I_GetConceptData concept = termFactory.getConcept((thinExtByRefTuple.getComponentId()));
 			String conceptUuids = concept.getUids().iterator().next().toString();
 
+			I_GetConceptData value = termFactory.getConcept(((I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart()).getConceptId());
+			
 			List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(status, preferredTerm, null);
 			if (descriptionTuples.size() == 0) {
 				getLog().warn("Concept " + conceptUuids + " has no active preferred term");
@@ -128,12 +133,14 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			} else {
 				conceptName = "Concept has no active description, only " + concept.getDescriptions();
 			}
-						
+			
 			writer.append(getSnomedId(descriptionId));
 			writer.append("\t");
 			writer.append(getSnomedId(concept.getConceptId()));
 			writer.append("\t");
 			writer.append(conceptName);
+			writer.append("\t");
+			writer.append(value.toString());
 			writer.append("\r\n");
 		}
 	}
