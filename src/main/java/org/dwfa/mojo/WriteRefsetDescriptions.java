@@ -2,10 +2,8 @@ package org.dwfa.mojo;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +15,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
@@ -37,6 +34,7 @@ import org.dwfa.tapi.TerminologyException;
 *
 * @phase process-classes
 * @requiresDependencyResolution compile
+* @author Dion McMurtrie
 */
 public class WriteRefsetDescriptions extends AbstractMojo implements
 		I_ProcessExtByRef {
@@ -54,7 +52,6 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 	private I_TermFactory termFactory;
 	private Map<String, Writer> fileMap = new HashMap<String, Writer>();
 	private BufferedWriter noDescriptionWriter;
-	private BufferedWriter limitedDescriptionWriter;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -65,9 +62,7 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			}
 
 			noDescriptionWriter = new BufferedWriter(new FileWriter(new File(outputDirectory, "Concepts with no descriptions.txt")));
-			
-			limitedDescriptionWriter = new BufferedWriter(new FileWriter(new File(outputDirectory, "Concepts with limited descriptions.txt")));
-			
+						
 			termFactory = LocalVersionedTerminology.get();
 			System.out.println("Exporting reference sets as description files");
 			if (!outputDirectory.exists()) {
@@ -83,9 +78,6 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			
 			noDescriptionWriter.flush();
 			noDescriptionWriter.close();
-			
-			limitedDescriptionWriter.flush();
-			limitedDescriptionWriter.close();
 
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -122,6 +114,8 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(status, preferredTerm, null);
 			if (descriptionTuples.size() == 0) {
 				getLog().warn("Concept " + conceptUuids + " has no active preferred term");
+				noDescriptionWriter.append("Concept " + conceptUuids + " has no active preferred term");
+				noDescriptionWriter.append("\r\n");
 				continue;
 			}
 			
