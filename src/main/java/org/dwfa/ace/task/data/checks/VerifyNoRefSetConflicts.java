@@ -48,7 +48,6 @@ public class VerifyNoRefSetConflicts extends AbstractTask {
 	private static final long serialVersionUID = 1;
 	private static final int dataVersion = 2;
 	
-	
 	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }// End method writeObject
@@ -106,6 +105,5 @@ public class VerifyNoRefSetConflicts extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }//End getDataContainerIds	
-	
-	
+		
 }//End class VerifyNoRefSetConflicts
