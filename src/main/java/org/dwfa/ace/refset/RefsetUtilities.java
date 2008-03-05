@@ -74,11 +74,11 @@ public abstract class RefsetUtilities {
 		 **/
 		for (I_RelTuple parent : parenttuples) {
 
-			List<I_ConceptAttributeTuple> atts = getConcept(parent.getC1Id()).getConceptAttributeTuples(null, null);
+			List<I_ConceptAttributeTuple> atts = getConcept(parent.getC2Id()).getConceptAttributeTuples(null, null);
 			I_ConceptAttributeTuple att = getLatestAttribute(atts);
 			if (att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
 				att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId()) {
-				parents.add(parent.getC1Id());				
+				parents.add(parent.getC2Id());				
 			}
 		}
 
