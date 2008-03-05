@@ -33,19 +33,19 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private boolean validateOnly = true;
 	private boolean markParents = true;
 
-	private I_TermFactory termFactory;
+	protected I_TermFactory termFactory;
 
 	/**
 	 * The ids of the concepts which may be included in the member set (due to lineage).
 	 * These may be excluded if they explicitly state a refset exclusion.
 	 */
-	private Map<Integer,Set<ConceptRefsetInclusionDetails>> newRefsetMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+	protected Map<Integer,Set<ConceptRefsetInclusionDetails>> newRefsetMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
 
 	/**
 	 * The ids of the concepts which may be excluded from the member set (due to lineage).
 	 * These may be included if they explicitly state a refset inclusion.
 	 */
-	private Map<Integer,Set<ConceptRefsetInclusionDetails>> newRefsetExclusion = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+	protected Map<Integer,Set<ConceptRefsetInclusionDetails>> newRefsetExclusion = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
 
 	/**
 	 * The ids of the concepts which may be excluded from the member set (due to lineage).
