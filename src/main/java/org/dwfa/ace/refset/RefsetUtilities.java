@@ -74,10 +74,12 @@ public abstract class RefsetUtilities {
 		 **/
 		for (I_RelTuple parent : parenttuples) {
 
-			List<I_ConceptAttributeTuple> atts = getConcept(parent.getC2Id()).getConceptAttributeTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), null);
-			if (atts.size()==1) {
-				parents.add(parent.getC2Id());
-			} 
+			List<I_ConceptAttributeTuple> atts = getConcept(parent.getC1Id()).getConceptAttributeTuples(null, null);
+			I_ConceptAttributeTuple att = getLatestAttribute(atts);
+			if (att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
+				att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId()) {
+				parents.add(parent.getC1Id());				
+			}
 		}
 
 		return parents;
@@ -113,11 +115,13 @@ public abstract class RefsetUtilities {
 		 **/
 		for (I_RelTuple child : childrentuples) {
 
-			List<I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), null);
-			if (atts.size()==1) {
-				children.add(child.getC1Id());
-			} 
-		}
+			List<I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(null, null);
+			I_ConceptAttributeTuple att = getLatestAttribute(atts);
+			if (att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
+				att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId()) {
+				children.add(child.getC1Id());				
+			}
+		} 
 		return children;
 	}
 
@@ -237,6 +241,20 @@ public abstract class RefsetUtilities {
 			termFactory.addUncommitted(extensionPart);
 		}
 
+	}
+
+	public I_ConceptAttributeTuple getLatestAttribute(List<I_ConceptAttributeTuple> atts) {
+		I_ConceptAttributeTuple latest = null;
+		for (I_ConceptAttributeTuple att: atts) {
+			if (latest == null) {
+				latest = att;
+			} else {
+				if (latest.getVersion()<att.getVersion()) {
+					latest = att;
+				}				
+			}		
+		}
+		return latest;
 	}
 
 	public I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned ext) {
