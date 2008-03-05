@@ -5,15 +5,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.RefSetConflictValidator;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
+import org.dwfa.ace.refset.MemberRefsetCalculator;
+import org.dwfa.bpa.process.Condition;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
@@ -71,85 +77,28 @@ public class VodbValidateRefSet extends AbstractMojo {
 	        	throw new MojoExecutionException(e.getLocalizedMessage(), e);
 	        } 
     		
-	        RefSetConflictValidator validator = null;
-	        
-	        if(refSetSpecDescriptor == null){
-	        	validator = new RefSetConflictValidator();
-	        }
-	        else{
-	        	I_GetConceptData specConcept = refSetSpecDescriptor.getVerifiedConcept();
-	        	validator = new RefSetConflictValidator(specConcept);
-	        }
-	        
-    		
-    		getLog().info("Checking for conflicts...");
-    		validator.validate();
-    		    	  
+	        MyMemberRefsetCalculator mrc = new MyMemberRefsetCalculator();
+    		mrc.setOutputDirectory(conflictsOutputFile);
+    		mrc.setValidateOnly(true);
+    		mrc.run();
+	            		
+    		List<String> details = mrc.conflictDetails;
     		BufferedWriter writer = new BufferedWriter(new FileWriter(conflictsOutputFile));
-    		if(!validator.hasConflicts()){
-    			writer.write("No refset conflicts found.");
-    			writer.close();
-    		}
-    		else{
-    			I_TermFactory termFactory = LocalVersionedTerminology.get();
-    			
-    			getLog().info("Conflicts found!");
-    			
-    			HashMap<Integer, RefSetConflictValidator.Conflicts> conflictedConcepts = validator.getConflicts();
-    			
-    			
-    			
-    			writer.write("While verifying ref set specs [" + conflictedConcepts.size() +
-                  			 "] concepts were found to have conflicts.");
+    		for(String conflict : details){
+    			writer.write(conflict);
     			writer.newLine();
-    			
-    			
-    			for(Integer conceptId : conflictedConcepts.keySet()){
-    				I_GetConceptData concept = termFactory.getConcept(conceptId);
-    				
-    				StringBuffer stringBuffer = new StringBuffer();
-    				
-    				stringBuffer.append("Concept ");
-    				stringBuffer.append(concept.getInitialText());
-
-    				stringBuffer.append(" has the following conflicts:");
-    				stringBuffer.append(System.getProperty("line.separator"));
-    				    				
-    				HashMap<Integer, Integer> conflicts = conflictedConcepts.get(conceptId).getConflictDetails(); 
-    				for(Integer parentConceptId : conflicts.keySet()){
-    					I_GetConceptData parentConcept = termFactory.getConcept(parentConceptId);
-    					
-    					int refsetTypeId = conflicts.get(parentConceptId);
-    					I_GetConceptData refSetTypeConcept = termFactory.getConcept(refsetTypeId);
-    					
-    					stringBuffer.append("\t Parent concept ");
-    					stringBuffer.append(parentConcept.getInitialText());
-    					stringBuffer.append(" is using ");
-    					stringBuffer.append(refSetTypeConcept.getInitialText());
-    					stringBuffer.append(" inheritance.");
-    					stringBuffer.append(System.getProperty("line.separator"));
-    					
-    				}//End inner for loop
-    				stringBuffer.append(System.getProperty("line.separator"));
-    				stringBuffer.append("\t \t ............... ");
-    				stringBuffer.append(System.getProperty("line.separator"));
-    				
-    				writer.write(stringBuffer.toString());
-    				writer.newLine();
- 
-    			}//End outer for loop
-    			writer.close();
+    		}
+	        
+    		writer.close();
+    		if(details.size() > 0){
     			getLog().info("Conflicts logged in " + conflictsOutputFile.getAbsolutePath());
     			throw new ConflictFailure("Conflicts found during ref set spec verification. See report file for more details.");
     		}
-    		
+
     	}
     	catch(ConflictFailure e){
     		throw new MojoExecutionException( e.getMessage() );
     	}	
-    	catch(TerminologyException e){
-    		throw new MojoExecutionException( e.getMessage() );
-    	}
     	catch(IOException e){
     		throw new MojoExecutionException( e.getMessage() );
     	}
@@ -166,6 +115,75 @@ public class VodbValidateRefSet extends AbstractMojo {
         this.refSetSpecDescriptor = descriptor;
     }
 
+class MyMemberRefsetCalculator extends MemberRefsetCalculator{
+    	
+    	private boolean conflicts = false;
+    	protected List<String> conflictDetails = new ArrayList<String>();
+    	
+    	
+    	public boolean hasConflicts(){
+    		return conflicts;
+    	}
+    	
+    	    	
+    	protected void setMembers() throws Exception {
+    		
+    		for (Integer refset : newRefsetMembers.keySet()) {
+				Set<ConceptRefsetInclusionDetails> exclusions = new HashSet<ConceptRefsetInclusionDetails>();
+
+				conflictDetails.add("Conflicts in refset " + termFactory.getConcept(refset) + " are: ");
+
+				Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
+				Set<ConceptRefsetInclusionDetails> oldMembers = newRefsetExclusion.get(refset);
+				if (newMembers!=null) {
+					
+					for (ConceptRefsetInclusionDetails i: newMembers) {					
+						if (oldMembers!=null && oldMembers.contains(i)) {
+							List<Integer> addedConcepts = new ArrayList<Integer>();
+							for (ConceptRefsetInclusionDetails old: oldMembers) {
+								//Show only first level conflict
+								I_IntSet isARel = termFactory.newIntSet();
+								isARel.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+								isARel.add(termFactory.uuidToNative(SNOMED.Concept.IS_A.getUids()));
+								if (old.equals(i)) {
+									for(I_GetConceptData c :termFactory.getConcept(i.getConceptId()).getSourceRelTargets(null, isARel, null, false)){
+										int conceptId = c.getConceptId();
+										if(conceptId == termFactory.getConcept(i.getInclusionReasonId()).getConceptId() ||
+											conceptId == termFactory.getConcept(old.getInclusionReasonId()).getConceptId()){
+											
+											if(!addedConcepts.contains(new Integer(conceptId))){
+											
+												StringBuffer sb = new StringBuffer();
+												sb.append(termFactory.getConcept(i.getConceptId()).toString());
+												sb.append(" because of " + termFactory.getConcept(i.getInclusionReasonId()).toString());
+												sb.append(" conflicts with " +termFactory.getConcept(old.getInclusionReasonId()).toString());
+												
+												conflictDetails.add(sb.toString());
+												addedConcepts.add(new Integer(conceptId));
+											}
+										}
+									}//End inner for loop :termFactory.getConcept(i.getConceptId()).getSourceRelTargets
+								}
+								//Show all levels conflicts
+//								if (old.equals(i)) {							
+//									StringBuffer sb = new StringBuffer();
+//									sb.append(termFactory.getConcept(i.getConceptId()).toString());
+//									sb.append(" because of " + termFactory.getConcept(i.getInclusionReasonId()).toString());
+//									sb.append(" conflicts with " +termFactory.getConcept(old.getInclusionReasonId()).toString());
+//									
+//									conflictDetails.add(sb.toString());
+//									
+//								}
+							}//End inner for loop :oldMembers
+							conflicts = true;
+						}
+					}//End inner for loop :newMembers
+				}
+			}//End for loop
+		}//End method setMembers
+    }//End nested class MyMemberRefsetCalculator
+    
+    
     /*
 	 * Custom exception so we can exit and notify of file comparison failure
 	 */
