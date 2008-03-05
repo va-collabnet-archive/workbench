@@ -409,8 +409,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				
 				if (markParents) {
 					
-					oldparents.removeAll(existingRefsetMembers.get(refset));
-					parents.removeAll(newRefsetMembers.get(refset));
+					if (existingRefsetMembers.get(refset)!=null) {
+						oldparents.removeAll(existingRefsetMembers.get(refset));
+					}
+					if (newRefsetMembers.get(refset)!=null) {
+						parents.removeAll(newRefsetMembers.get(refset));
+					}
 					
 					reportWriter.write("\n\nParents that are not marked but will be marked in refset " + getConcept(refset) + " are: ");
 					reportWriter.newLine();
@@ -453,10 +457,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 			for (ConceptRefsetInclusionDetails conceptId: concepts) {
 				Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId());
 				for (Integer parentId: parents) {
-					System.out.println("has ancestor " + termFactory.getConcept(parentId));
 					ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId,0,0);
 					if (!concepts.contains(parent)) {
-						System.out.println("adding ancestor " + termFactory.getConcept(parentId));
 						nonMarkedParents.add(parent);
 					}
 				}
