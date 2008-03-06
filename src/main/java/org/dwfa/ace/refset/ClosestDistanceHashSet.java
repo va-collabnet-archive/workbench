@@ -24,12 +24,14 @@ public class ClosestDistanceHashSet<T> extends HashSet<T> {
 			} else {
 				if (oldConcept.getDistance() > newConcept.getDistance()) {
 					remove(o);
+					/*
 					try {
 						if (LocalVersionedTerminology.get()!=null) {
 							System.out.println("Found concept with closer distance : " + LocalVersionedTerminology.get().getConcept(oldConcept.getConceptId()));
 							System.out.println("further specification was in : " + LocalVersionedTerminology.get().getConcept(oldConcept.getInclusionReasonId()));
 							System.out.println("closer specification was in : " + LocalVersionedTerminology.get().getConcept(newConcept.getInclusionReasonId()));
 						}
+						
 					} catch (TerminologyException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -37,6 +39,7 @@ public class ClosestDistanceHashSet<T> extends HashSet<T> {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					*/
 					return super.add(o);
 				}
 			}

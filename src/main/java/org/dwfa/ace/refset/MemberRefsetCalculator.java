@@ -166,11 +166,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					if (tuple!=null) {
 						I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple.getPart();
 						if (part.getConceptId()!=ConceptConstants.PARENT_MARKER.localize().getNid()) {
-							System.out.println("NORMAL MEMBER : " + termFactory.getConcept(member.getComponentId()));
 							addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId(),0),memberSetId);
-						} else {
-							System.out.println("PARENT MEMBER : " + termFactory.getConcept(member.getComponentId()));						
-						}
+						} 
 					}
 				}
 
