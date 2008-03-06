@@ -5,6 +5,8 @@ public class ConceptRefsetInclusionDetails {
 	private int conceptId;
 	private int inclusionTypeId;
 	private int inclusionReasonId;
+	private int distance;
+	
 	public int getConceptId() {
 		return conceptId;
 	}
@@ -24,11 +26,12 @@ public class ConceptRefsetInclusionDetails {
 		this.inclusionReasonId = inclusionReasonId;
 	}
 	public ConceptRefsetInclusionDetails(int conceptId, int inclusionTypeId,
-			int inclusionReasonId) {
+			int inclusionReasonId, int distance) {
 		super();
 		this.conceptId = conceptId;
 		this.inclusionTypeId = inclusionTypeId;
 		this.inclusionReasonId = inclusionReasonId;
+		this.distance = distance;
 		
 	}
 	
@@ -57,6 +60,12 @@ public class ConceptRefsetInclusionDetails {
 				return false;
 			}
 		}
+	}
+	public int getDistance() {
+		return distance;
+	}
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 		
 }

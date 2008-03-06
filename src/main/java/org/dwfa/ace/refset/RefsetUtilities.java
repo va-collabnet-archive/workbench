@@ -207,7 +207,7 @@ public abstract class RefsetUtilities {
 	public void addToNestedSet(Map<Integer,Set<ConceptRefsetInclusionDetails>> nestedList, ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
 		Set<ConceptRefsetInclusionDetails> conceptsInRefset = nestedList.get(refset);
 		if (conceptsInRefset==null) {
-			conceptsInRefset = new HashSet<ConceptRefsetInclusionDetails>();
+			conceptsInRefset = new ClosestDistanceHashSet<ConceptRefsetInclusionDetails>();
 			nestedList.put(refset, conceptsInRefset);
 		}
 		conceptsInRefset.add(conceptDetails);
