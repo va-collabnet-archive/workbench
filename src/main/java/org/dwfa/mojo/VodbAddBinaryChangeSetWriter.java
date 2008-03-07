@@ -45,6 +45,14 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 	 */
 	private String changeSetTempFileName = changeSetFileName + ".temp";
 
+	/**
+	 * Set to true if you want to split the changeset files into multiple
+	 * files instead of one large file
+	 * 
+	 * @parameter
+	 */
+	private boolean splitFiles = false;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (addTimestampToFileName) {
 			changeSetFileName = changeSetFileName.replaceAll(".jcs", "." + System.currentTimeMillis() + ".jcs");
@@ -61,8 +69,15 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
             }
 			I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get()
 			.getActiveAceFrameConfig();
-			activeConfig.getChangeSetWriters().add(
-					new BinaryChangeSetWriter(new File(changeSetFileName), new File(changeSetTempFileName)));
+			if (!splitFiles) {
+				activeConfig.getChangeSetWriters().add(
+						new BinaryChangeSetWriter(new File(changeSetFileName), new File(changeSetTempFileName)));
+				
+			} else {
+				activeConfig.getChangeSetWriters().add(
+						new WriteChangeSetToMultipleBinaryFiles(new File(changeSetFileName), new File(changeSetTempFileName)));
+
+			}
 			getLog().info("Change set writers: " + activeConfig.getChangeSetWriters());
 		} catch (TerminologyException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
