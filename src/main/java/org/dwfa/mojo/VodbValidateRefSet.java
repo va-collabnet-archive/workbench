@@ -9,12 +9,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
 import org.dwfa.ace.refset.MemberRefsetCalculator;
 import org.dwfa.bpa.process.Condition;
@@ -77,8 +80,15 @@ public class VodbValidateRefSet extends AbstractMojo {
 	        	throw new MojoExecutionException(e.getLocalizedMessage(), e);
 	        } 
     		
+	        
 	        MyMemberRefsetCalculator mrc = new MyMemberRefsetCalculator();
-    		mrc.setOutputDirectory(conflictsOutputFile);
+    		
+	        I_TermFactory termFactory = LocalVersionedTerminology.get();
+	        List<Integer> allowedRefsets = new ArrayList<Integer>();
+	        allowedRefsets.add(refSetSpecDescriptor.getVerifiedConcept().getConceptId());
+	        mrc.setAllowedRefsets(allowedRefsets);
+	        
+	        //mrc.setOutputDirectory(conflictsOutputFile);
     		mrc.setValidateOnly(true);
     		mrc.run();
 	            		
