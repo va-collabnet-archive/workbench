@@ -49,6 +49,9 @@ public class WriteChangeSetToMultipleBinaryFiles implements org.dwfa.ace.api.cs.
 			fileCounter++;
 		}
 		changeCounter++;
-		binaryWriter.writeChanges(change,time);
+		/*
+		 * Each file must have a incremented timestamp on it, so that it gets read
+		 * */
+		binaryWriter.writeChanges(change,time+fileCounter);
 	}
 }
