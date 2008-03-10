@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -52,6 +53,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	 * These may be included if they explicitly state a refset inclusion.
 	 */
 	private Map<Integer,Set<ConceptRefsetInclusionDetails>> existingRefsetMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+
+	/**
+	 * The ids of the concepts which may be excluded from the member set (due to lineage).
+	 * These may be included if they explicitly state a refset inclusion.
+	 */
+	private Map<Integer,Set<ConceptRefsetInclusionDetails>> existingParentMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
 
 	/**
 	 * The list of specification refsets to be analysed
@@ -167,7 +174,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple.getPart();
 						if (part.getConceptId()!=ConceptConstants.PARENT_MARKER.localize().getNid()) {
 							addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId(),0),memberSetId);
-						} 
+						}  else {
+							addToExistingParentMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId(),0),memberSetId);
+						}
 					}
 				}
 
@@ -242,6 +251,10 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 	public void addToExistingRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
 		addToNestedSet(existingRefsetMembers,conceptDetails,refset);
+	}
+
+	public void addToExistingParentMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
+		addToNestedSet(existingParentMembers,conceptDetails,refset);
 	}
 
 	public void addToRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
@@ -326,7 +339,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 			Set<ConceptRefsetInclusionDetails> exclusions = new HashSet<ConceptRefsetInclusionDetails>();
 
 
-			Set<ConceptRefsetInclusionDetails> oldparents = findParentsToBeMarked(existingRefsetMembers.get(refset));
+			Set<ConceptRefsetInclusionDetails> oldparents = existingParentMembers.get(refset);
 			Set<ConceptRefsetInclusionDetails> parents = findParentsToBeMarked(newRefsetMembers.get(refset));
 
 
@@ -369,7 +382,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 			if (oldMembers!=null && oldMembersToBeRemoved!=null) {
 				oldMembers.removeAll(oldMembersToBeRemoved);
 			}
-			
+
 			if (conflicts) {
 				System.out.println("\nUnresolved conflicts exist in refset " + getConcept(refset));
 				System.out.println("No changes made\n");
@@ -448,18 +461,20 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 							reportWriter.newLine();						
 						}
 					}
-					oldparents.removeAll(parents);
-					for (ConceptRefsetInclusionDetails existingParent: oldparents) {
-						I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),refset);
-						if (ext!=null) {
-							if (!conflicts && !validateOnly) {
-								retireLatestExtension(ext);
+					if (oldparents!=null) {
+						oldparents.removeAll(parents);			
+						for (ConceptRefsetInclusionDetails existingParent: oldparents) {
+							I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),refset);
+							if (ext!=null) {
+								if (!conflicts && !validateOnly) {
+									retireLatestExtension(ext);
+								}
+							} else {
+								System.out.println("No extension exists with this refset id for this component : " + getConcept(existingParent.getConceptId()).toString());
 							}
-						} else {
-							System.out.println("No extension exists with this refset id for this component : " + getConcept(existingParent.getConceptId()).toString());
+							reportWriter.write(getConcept(existingParent.getConceptId()).toString() + " ------- to be retired");
+							reportWriter.newLine();
 						}
-						reportWriter.write(getConcept(existingParent.getConceptId()).toString() + " ------- to be retired");
-						reportWriter.newLine();
 					}
 				}
 
