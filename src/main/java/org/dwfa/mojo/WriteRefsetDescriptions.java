@@ -22,24 +22,26 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
 /**
-*
-* @goal write-refset-descriptions
-*
-* @phase process-classes
-* @requiresDependencyResolution compile
-* @author Dion McMurtrie
-*/
+ *
+ * @goal write-refset-descriptions
+ *
+ * @phase process-classes
+ * @requiresDependencyResolution compile
+ * @author Dion McMurtrie
+ */
 public class WriteRefsetDescriptions extends AbstractMojo implements
-		I_ProcessExtByRef {
+I_ProcessExtByRef {
 
 	private static final Collection<UUID> CURRENT_STATUS_UUIDS = ArchitectonicAuxiliary.Concept.CURRENT.getUids();
 	private static final Collection<UUID> PREFERED_TERM_UUIDS = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids();
@@ -64,7 +66,7 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			}
 
 			noDescriptionWriter = new BufferedWriter(new FileWriter(new File(outputDirectory, "Concepts with no descriptions.txt")));
-						
+
 			termFactory = LocalVersionedTerminology.get();
 			System.out.println("Exporting reference sets as description files");
 			if (!outputDirectory.exists()) {
@@ -72,12 +74,12 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 			}
 
 			termFactory.iterateExtByRefs(this);
-			
+
 			for (Writer writer : fileMap.values()) {
 				writer.flush();
 				writer.close();
 			}
-			
+
 			noDescriptionWriter.flush();
 			noDescriptionWriter.close();
 
@@ -88,8 +90,8 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 	}
 
 	public void processExtensionByReference(I_ThinExtByRefVersioned refset)
-			throws Exception {
-		
+	throws Exception {
+
 		I_IntSet status = termFactory.newIntSet();
 		status.add(termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId());
 		status.add(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(CURRENT_STATUS_UUIDS));
@@ -103,61 +105,82 @@ public class WriteRefsetDescriptions extends AbstractMojo implements
 		preferredTerm.add(ArchitectonicAuxiliary.getSnomedDescriptionTypeId(PREFERED_TERM_UUIDS));
 
 		I_DescriptionTuple refsetName = assertExactlyOne(termFactory.getConcept((refset.getRefsetId())).getDescriptionTuples(status, fsn, null));
-		
+
 		getLog().info("Exporting " + refsetName.getText());
-		
+
 		Writer writer = getWriter(refsetName.getText());
-				
-		List<I_ThinExtByRefTuple> tuples = refset.getTuples(status, null, false);
-		
-		for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
-			I_GetConceptData concept = termFactory.getConcept((thinExtByRefTuple.getComponentId()));
+
+		I_ThinExtByRefPart part = getLatestVersionIfCurrent(refset);
+
+		if (part!=null) {
+
+			I_GetConceptData concept = termFactory.getConcept((refset.getComponentId()));
 			String conceptUuids = concept.getUids().iterator().next().toString();
 
-			I_GetConceptData value = termFactory.getConcept(((I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart()).getConceptId());
-			
+			I_GetConceptData value = termFactory.getConcept(((I_ThinExtByRefPartConcept) part).getConceptId());
+
 			List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(status, preferredTerm, null);
 			if (descriptionTuples.size() == 0) {
 				getLog().warn("Concept " + conceptUuids + " has no active preferred term");
 				noDescriptionWriter.append("Concept " + conceptUuids + " has no active preferred term");
 				noDescriptionWriter.append("\r\n");
-				continue;
-			}
-			
-			String conceptName;
-			int descriptionId = 0;
-			if (descriptionTuples != null) {
-				I_DescriptionTuple descriptionTuple = descriptionTuples.iterator().next();
-				conceptName = descriptionTuple.getText();
-				descriptionId = descriptionTuple.getDescId();
 			} else {
-				conceptName = "Concept has no active description, only " + concept.getDescriptions();
+				String conceptName;
+				int descriptionId = 0;
+				if (descriptionTuples != null) {
+					I_DescriptionTuple descriptionTuple = descriptionTuples.iterator().next();
+					conceptName = descriptionTuple.getText();
+					descriptionId = descriptionTuple.getDescId();
+				} else {
+					conceptName = "Concept has no active description, only " + concept.getDescriptions();
+				}
+
+				if (value.getConceptId()!=ConceptConstants.PARENT_MARKER.localize().getNid()) {
+					writer.append(getSnomedId(descriptionId));
+					writer.append("\t");
+					writer.append(getSnomedId(concept.getConceptId()));
+					writer.append("\t");
+					writer.append(conceptName);
+					writer.append("\r\n");
+				}
 			}
-			
-			writer.append(getSnomedId(descriptionId));
-			writer.append("\t");
-			writer.append(getSnomedId(concept.getConceptId()));
-			writer.append("\t");
-			writer.append(conceptName);
-			writer.append("\t");
-			writer.append(value.toString());
-			writer.append("\r\n");
 		}
 	}
 
+	public I_ThinExtByRefPart getLatestVersionIfCurrent(I_ThinExtByRefVersioned ext) throws TerminologyException, IOException {
+		I_ThinExtByRefPart latest = null;
+		List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
+		for (I_ThinExtByRefPart version : versions) {
+
+			if (latest == null) {
+				latest = version;
+			} else {
+				if (latest.getVersion()<version.getVersion()) {
+					latest = version;
+				}				
+			}			
+		}
+
+		if (!(latest.getStatus()==termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId())) {
+			latest = null;
+		}
+
+		return latest;
+	}
+
 	private String getSnomedId(int nid) throws IOException, TerminologyException {
-		
+
 		if (nid == 0) {
 			return "no identifier";
 		}
-		
+
 		I_IdVersioned idVersioned = termFactory.getId(nid);
 		for (I_IdPart idPart : idVersioned.getVersions()) {
 			if (idPart.getSource() == termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) {
 				return idPart.getSourceId().toString();
 			}
 		}
-		
+
 		return "no SCTID found";
 	}
 
