@@ -168,10 +168,10 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				 * Add all members to the member refset so we know what was already there
 				 * */
 				for (I_ThinExtByRefVersioned member : conceptsInMemberRefset) {
-					List<I_ThinExtByRefTuple> parts = member.getTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, false);
-					I_ThinExtByRefTuple tuple = assertOneOrNone(parts);
-					if (tuple!=null) {
-						I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple.getPart();
+					
+					I_ThinExtByRefPart latest = getLatestVersion(member);
+					if (latest!=null && latest.getStatus()== currentStatusId) {
+						I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) latest;
 						if (part.getConceptId()!=ConceptConstants.PARENT_MARKER.localize().getNid()) {
 							addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId(),0),memberSetId);
 						}  else {
@@ -440,10 +440,10 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 				if (markParents) {
 
-					if (existingRefsetMembers.get(refset)!=null) {
+					if (existingRefsetMembers.get(refset)!=null && oldparents!=null) {
 						oldparents.removeAll(existingRefsetMembers.get(refset));
 					}
-					if (newRefsetMembers.get(refset)!=null) {
+					if (newRefsetMembers.get(refset)!=null && parents!=null) {
 						parents.removeAll(newRefsetMembers.get(refset));
 					}
 
