@@ -39,6 +39,17 @@
   </scm>
   <dependencies>
     <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-core</artifactId>
+      <version>1.0-alpha-9</version>
+    </dependency>
+        <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-impl</artifactId>
+      <version>2.0</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>core</artifactId>
       <version>2.0.8-SNAPSHOT</version>
