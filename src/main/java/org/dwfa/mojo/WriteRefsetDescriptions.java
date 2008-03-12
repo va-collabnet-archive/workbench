@@ -141,6 +141,8 @@ I_ProcessExtByRef {
 					writer.append(getSnomedId(concept.getConceptId()));
 					writer.append("\t");
 					writer.append(conceptName);
+					writer.append("\t");
+					writer.append(value.toString());
 					writer.append("\r\n");
 				}
 			}
