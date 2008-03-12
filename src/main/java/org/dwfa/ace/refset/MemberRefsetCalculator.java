@@ -167,12 +167,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				/*
 				 * Add all members to the member refset so we know what was already there
 				 * */
+				int parent_marker_nid = ConceptConstants.PARENT_MARKER.localize().getNid();
 				for (I_ThinExtByRefVersioned member : conceptsInMemberRefset) {
 					
 					I_ThinExtByRefPart latest = getLatestVersion(member);
 					if (latest!=null && latest.getStatus()== currentStatusId) {
 						I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) latest;
-						if (part.getConceptId()!=ConceptConstants.PARENT_MARKER.localize().getNid()) {
+						if (part.getConceptId()!=parent_marker_nid) {
 							addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId(),0),memberSetId);
 						}  else {
 							addToExistingParentMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),includeIndividual,member.getComponentId(),0),memberSetId);
