@@ -358,10 +358,10 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 							if (old.equals(i)) {
 								if (i.getDistance() > old.getDistance()) {
 									conflictWriter.write("Resolving to exclusion: ");
-									newMembersToBeRemoved.remove(old);
+									newMembersToBeRemoved.add(i);
 								} else if (i.getDistance() < old.getDistance()) {
 									conflictWriter.write("Resolving to inclusion: ");
-									oldMembersToBeRemoved.remove(i);
+									oldMembersToBeRemoved.add(old);
 								} else {
 									conflictWriter.write("!Unresolved: " );
 									conflicts = true;
