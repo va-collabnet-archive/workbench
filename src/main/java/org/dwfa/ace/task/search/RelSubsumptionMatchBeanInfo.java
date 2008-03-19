@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RelSubsumptionMatchBeanInfo extends AbstractSearchTestBeanInfo {
-    private static  RelSubsumptionMatchSearchInfo searchInfo = new RelSubsumptionMatchSearchInfo();
+    private static  AbstractSeachTestSearchInfo searchInfo = new RelSubsumptionMatchSearchInfo();
 
     
     public PropertyDescriptor[] getPropertyDescriptors() {

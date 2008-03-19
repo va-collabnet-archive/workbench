@@ -7,10 +7,11 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
-public class HasStatusSearchInfo extends SimpleBeanInfo {
+public class HasStatusSearchInfo extends AbstractSeachTestSearchInfo {
 
-    public PropertyDescriptor[] getPropertyDescriptors() {
-        try {  
+	@Override
+	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+		try {
 
             PropertyDescriptor statusTerm =
                 new PropertyDescriptor("statusTerm", getBeanDescriptor().getBeanClass());

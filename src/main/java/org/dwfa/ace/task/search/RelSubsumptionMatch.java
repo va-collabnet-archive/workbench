@@ -39,7 +39,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
      */
     private TermEntry relRestrictionTerm = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
             .getUids());
-
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.relTypeTerm);
@@ -70,7 +70,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                 testConcept = LocalVersionedTerminology.get().getConcept(desc.getConceptId());
             } else {
                 AceLog.getAppLog().info("Can't handle component: " + component);
-                return false;
+                return applyInversion(false);
             }
 
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -100,11 +100,11 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                             AceLog.getAppLog().fine("  matched restriction: " + relRestriction);
                         }
                         AceLog.getAppLog().info("Rel subsumption OK: " + testConcept.getUids());
-                        return true;
+                        return applyInversion(true);
                     }
                 }
             }
-            return false;
+            return applyInversion(false);
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {

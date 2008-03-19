@@ -33,6 +33,11 @@ public abstract class AbstractSearchTest extends AbstractTask implements I_TestS
      */
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
+	/**
+	 * Attribute that indicates if the search criteria should be inverted
+	 */
+	protected boolean inverted = false;
+
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -109,5 +114,28 @@ public abstract class AbstractSearchTest extends AbstractTask implements I_TestS
     public void setComponentPropName(String componentPropName) {
         this.componentPropName = componentPropName;
     }
+
+	public boolean isInverted() {
+		return inverted;
+	}
+
+	public void setInverted(boolean inverted) {
+		this.inverted = inverted;
+	}
+
+	/**
+	 * Applies the inversion attribute of this class to the specified result.
+	 * 
+	 * @param b
+	 * @return if inverted==true then the inverse of the passed boolean value, 
+	 * otherwise the unmodified passed boolean value
+	 */
+	protected boolean applyInversion(boolean b) {
+		if (inverted) {
+			return ! b;
+		} else {
+			return b;
+		}
+	}
 
 }

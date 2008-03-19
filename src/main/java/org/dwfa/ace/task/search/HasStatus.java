@@ -61,7 +61,7 @@ public class HasStatus extends AbstractSearchTest {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
                 conceptToTest = LocalVersionedTerminology.get().getConcept(desc.getConceptId());
             } else {
-                return false;
+                return applyInversion(false);
             }
             
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -78,13 +78,13 @@ public class HasStatus extends AbstractSearchTest {
                        AceLog.getAppLog().fine("    status check " + statusToTest + "true for " + conceptToTest);
                    }
                    AceLog.getAppLog().info("Status OK: " + conceptToTest.getUids());
-                   return true;
+                   return applyInversion(true);
                }
                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                    AceLog.getAppLog().fine("    status check false " + statusToTest + " for " + conceptToTest);
                }
            }
-            return false;
+            return applyInversion(false);
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {

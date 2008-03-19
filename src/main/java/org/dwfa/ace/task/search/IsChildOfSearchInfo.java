@@ -3,15 +3,14 @@ package org.dwfa.ace.task.search;
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
-public class IsChildOfSearchInfo extends SimpleBeanInfo {
+public class IsChildOfSearchInfo extends AbstractSeachTestSearchInfo {
 
-    public PropertyDescriptor[] getPropertyDescriptors() {
-        try {  
-
+	@Override
+	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+		try {
             PropertyDescriptor parentTerm =
                 new PropertyDescriptor("parentTerm", getBeanDescriptor().getBeanClass());
             parentTerm.setBound(true);

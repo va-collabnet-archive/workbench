@@ -58,11 +58,11 @@ public class IsChildOf extends AbstractSearchTest {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
                 potChild = LocalVersionedTerminology.get().getConcept(desc.getConceptId());
             } else {
-                return false;
+                return applyInversion(false);
             }
             
-            return parent.isParentOf(potChild, frameConfig.getAllowedStatus(), 
-                                     frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false);
+            return applyInversion(parent.isParentOf(potChild, frameConfig.getAllowedStatus(), 
+                                     frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false));
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {

@@ -40,7 +40,7 @@ public class RefsetMatch extends AbstractSearchTest {
      * refset concept the component must be a member of.
      */
     private TermEntry refset = new TermEntry(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.refset);
@@ -63,21 +63,27 @@ public class RefsetMatch extends AbstractSearchTest {
             
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
+            boolean result = false;
+            
             if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
             	return isComponentInRefset(frameConfig, termFactory, ((I_GetConceptData) component).getConceptId(), refsetId);            	
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {            	
             	I_DescriptionVersioned description = (I_DescriptionVersioned) component;
             	
             	if (isComponentInRefset(frameConfig, termFactory, description.getDescId(), refsetId)) {
-            		return true;
+            		result = true;
+            	} else {
+            	   	result = isComponentInRefset(frameConfig, termFactory, description.getConceptId(), refsetId);
             	}
-            	
-            	return isComponentInRefset(frameConfig, termFactory, description.getConceptId(), refsetId);
             } else if (I_RelVersioned.class.isAssignableFrom(component.getClass())) {
-            	return isComponentInRefset(frameConfig, termFactory, ((I_RelVersioned) component).getRelId(), refsetId);
+            	result = isComponentInRefset(frameConfig, termFactory, ((I_RelVersioned) component).getRelId(), refsetId);
             }
             
-            return false;
+            if (inverted) {
+            	return ! result;
+            } else {
+            	return result;
+            }
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {
@@ -110,5 +116,13 @@ public class RefsetMatch extends AbstractSearchTest {
     public void setRefset(TermEntry refset) {
         this.refset = refset;
     }
+
+	public boolean isInverted() {
+		return inverted;
+	}
+
+	public void setInverted(boolean inverted) {
+		this.inverted = inverted;
+	}
 
 }

@@ -5,13 +5,14 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
-public class RefsetMatchSearchInfo extends SimpleBeanInfo {
+public class RefsetMatchSearchInfo extends AbstractSeachTestSearchInfo {
 
-    public PropertyDescriptor[] getPropertyDescriptors() {
-        try {  
-
+	@Override
+	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+		try {
             PropertyDescriptor refsetTerm =
                 new PropertyDescriptor("refset", getBeanDescriptor().getBeanClass());
             refsetTerm.setBound(true);
