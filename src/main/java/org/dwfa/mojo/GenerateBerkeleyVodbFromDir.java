@@ -44,6 +44,12 @@ public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
     * @required
     */
    private MavenSession session;
+   
+   /**
+    * The encoding of the input files. The default is "UTF-8";
+    * @parameter
+    */
+   private String fileEncoding = "UTF8";
 
    public void execute() throws MojoExecutionException {
       if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
@@ -51,7 +57,7 @@ public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
             if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath())) {
                return;
             }
-            LocalVersionedTerminology.get().loadFromDirectory(dataDirectory);
+            LocalVersionedTerminology.get().loadFromDirectory(dataDirectory, fileEncoding);
          } catch (Exception ex) {
             throw new MojoExecutionException("Error processing dependency. Reason: " + ex.getMessage(), ex);
          }
