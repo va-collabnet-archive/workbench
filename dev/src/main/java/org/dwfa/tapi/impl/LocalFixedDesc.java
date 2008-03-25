@@ -42,13 +42,20 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 			ClassNotFoundException {
 		try {
 			int uidCount = in.readInt();
-			Collection<UUID> uids = new ArrayList<UUID>(uidCount);
+			Collection<UUID> duids = new ArrayList<UUID>(uidCount);
 			for (int i = 0; i < uidCount; i++) {
 				long msb = in.readLong();
 				long lsb = in.readLong();
-				uids.add(new UUID(msb, lsb));
+				duids.add(new UUID(msb, lsb));
 			}
-			nid = LocalFixedTerminology.getStore().getNid(uids);
+			nid = LocalFixedTerminology.getStore().getNid(duids);
+			Collection<UUID> cuids = new ArrayList<UUID>(uidCount);
+			for (int i = 0; i < uidCount; i++) {
+				long msb = in.readLong();
+				long lsb = in.readLong();
+				cuids.add(new UUID(msb, lsb));
+			}
+			conceptNid = LocalFixedTerminology.getStore().getNid(cuids);
 		} catch (Exception e) {
 			IOException ioe = new IOException();
 			ioe.initCause(e);
@@ -58,7 +65,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 
 	private Object readResolve() throws ObjectStreamException {
 		try {
-			return LocalFixedTerminology.getStore().getDescription(nid);
+			return LocalFixedTerminology.getStore().getDescription(nid, conceptNid);
 		} catch (Exception e) {
 			ObjectStreamException oes = new InvalidObjectException(e
 					.getMessage());
@@ -66,24 +73,11 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 			throw oes;
 		}
 	}
-	public static I_DescribeConceptLocally get(UUID conceptUid,
+	public static I_DescribeConceptLocally get(UUID descriptionUid, UUID conceptUid,
 			I_StoreLocalFixedTerminology sourceServer) throws Exception {
-		int nid = sourceServer.getNid(conceptUid);
-		return sourceServer.getDescription(nid);
-	}
-
-	public static I_DescribeConceptLocally get(Collection<UUID> uids,
-			I_StoreLocalFixedTerminology sourceServer) throws Exception {
-		for (UUID id : uids) {
-			int nid;
-			try {
-				nid = sourceServer.getNid(id);
-				return sourceServer.getDescription(nid);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		throw new Exception("Can't find: " + uids);
+		int dnid = sourceServer.getNid(descriptionUid);
+		int cnid = sourceServer.getNid(conceptUid);
+		return sourceServer.getDescription(dnid, cnid);
 	}
 
 
@@ -92,6 +86,12 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 			Collection<UUID> uids = LocalFixedTerminology.getStore().getUids(nid);
 			out.writeInt(uids.size());
 			for (UUID uid : uids) {
+				out.writeLong(uid.getMostSignificantBits());
+				out.writeLong(uid.getLeastSignificantBits());
+			}
+			Collection<UUID> concUids = LocalFixedTerminology.getStore().getUids(conceptNid);
+			out.writeInt(concUids.size());
+			for (UUID uid : concUids) {
 				out.writeLong(uid.getMostSignificantBits());
 				out.writeLong(uid.getLeastSignificantBits());
 			}

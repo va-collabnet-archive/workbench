@@ -14,7 +14,7 @@ public interface I_StoreLocalFixedTerminology {
 	
 	public I_ConceptualizeLocally getConcept(int conceptNid) throws IOException, TerminologyException;
 	
-	public I_DescribeConceptLocally getDescription(int descriptionNid) throws IOException, TerminologyException;
+	public I_DescribeConceptLocally getDescription(int descriptionNid, int conceptNid) throws IOException, TerminologyException;
 	public Collection<I_DescribeConceptLocally> getDescriptionsForConcept(I_ConceptualizeLocally concept) throws IOException, TerminologyException;
 
 	public I_RelateConceptsLocally getRel(int relNid) throws IOException, TerminologyException;

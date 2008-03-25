@@ -118,7 +118,7 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
       return conceptMap.get(conceptNid);
    }
 
-   public I_DescribeConceptLocally getDescription(int descriptionNid) throws IOException, TerminologyException {
+   public I_DescribeConceptLocally getDescription(int descriptionNid, int conceptNid) throws IOException, TerminologyException {
       return descMap.get(descriptionNid);
    }
 
