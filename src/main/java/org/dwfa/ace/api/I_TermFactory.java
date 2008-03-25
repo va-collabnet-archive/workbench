@@ -63,7 +63,7 @@ public interface I_TermFactory {
         String text, I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException;
 
-    public I_DescriptionVersioned getDescription(int dnid) throws TerminologyException, IOException;
+    public I_DescriptionVersioned getDescription(int dnid, int cnid) throws TerminologyException, IOException;
 
     /**
      * Uses the configuration to set default values for the relationship, and
@@ -186,10 +186,6 @@ public interface I_TermFactory {
 
     public void iteratePaths(I_ProcessPaths processor) throws Exception;
 
-    public Hits searchLicitWords(String query) throws IOException, ParseException;
-
-    public Hits doLicitSearch(String query) throws IOException, ParseException;
-
     public Hits doLuceneSearch(String query) throws IOException, ParseException;
 
     public int convertToThinVersion(long time);
@@ -269,5 +265,7 @@ public interface I_TermFactory {
     public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
     public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart();
     public I_ThinExtByRefPartString newStringExtensionPart();
+    
+    public String getStats() throws IOException;
 
 }

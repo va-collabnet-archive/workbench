@@ -336,5 +336,16 @@ public interface I_ConfigAceFrame {
     public Boolean getSortTaxonomyUsingRefset();
 
     public void setSortTaxonomyUsingRefset(Boolean sortTaxonomyUsingRefset);
-
+    
+    /**
+     * Processes can add and remove I_OverrideTaxonomyRenderer objects. 
+     * @return
+     */
+    public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList();
+    
+    /**
+     * Processes can add and remove I_FilterTaxonomyRels objects. 
+     * @return
+     */
+    public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList();
 }

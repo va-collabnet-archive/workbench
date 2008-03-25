@@ -38,6 +38,8 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
 
    public void setToggleState(TOGGLES toggle, boolean state);
 
+   public boolean getToggleState(TOGGLES toggle);
+
    public void setAllTogglesToState(boolean state);
 
    public void setLinkType(LINK_TYPE link);

@@ -3,38 +3,38 @@ package org.dwfa.ace.api;
 
 public interface I_RelPart {
 
-	public abstract boolean hasNewData(I_RelPart another);
+	public boolean hasNewData(I_RelPart another);
 
-	public abstract int getPathId();
+	public int getPathId();
 
-	public abstract void setPathId(int pathId);
+	public void setPathId(int pathId);
 
-	public abstract int getCharacteristicId();
+	public int getCharacteristicId();
 
-	public abstract void setCharacteristicId(int characteristicId);
+	public void setCharacteristicId(int characteristicId);
 
-	public abstract int getGroup();
+	public int getGroup();
 
-	public abstract void setGroup(int group);
+	public void setGroup(int group);
 
-	public abstract int getRefinabilityId();
+	public int getRefinabilityId();
 
-	public abstract void setRefinabilityId(int refinabilityId);
+	public void setRefinabilityId(int refinabilityId);
 
-	public abstract int getRelTypeId();
+	public int getRelTypeId();
 
-	public abstract void setRelTypeId(int relTypeId);
+	public void setRelTypeId(int relTypeId);
 
-	public abstract int getVersion();
+	public int getVersion();
 
-	public abstract void setVersion(int version);
+	public void setVersion(int version);
 
-	public abstract int getStatusId();
+	public int getStatusId();
 
-	public abstract void setStatusId(int statusId);
+	public void setStatusId(int statusId);
 
-	public abstract void convertIds(I_MapNativeToNative jarToDbNativeMap);
+	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-	public abstract I_RelPart duplicate();
+	public I_RelPart duplicate();
 
 }

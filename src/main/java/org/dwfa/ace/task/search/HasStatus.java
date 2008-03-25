@@ -76,8 +76,8 @@ public class HasStatus extends AbstractSearchTest {
                                      frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false)) {
                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                        AceLog.getAppLog().fine("    status check " + statusToTest + "true for " + conceptToTest);
+                       AceLog.getAppLog().info("Status OK: " + conceptToTest.getUids());
                    }
-                   AceLog.getAppLog().info("Status OK: " + conceptToTest.getUids());
                    return applyInversion(true);
                }
                if (AceLog.getAppLog().isLoggable(Level.FINE)) {

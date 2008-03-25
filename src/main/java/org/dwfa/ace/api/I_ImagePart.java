@@ -27,5 +27,6 @@ public interface I_ImagePart {
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 	
+	public I_ImagePart duplicate();
 
 }
