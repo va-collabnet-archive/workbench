@@ -30,7 +30,7 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>ace-api</artifactId>
-      <version>1.7-SNAPSHOT</version>
+      <version>1.7</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>icons</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.dwfa</groupId>
