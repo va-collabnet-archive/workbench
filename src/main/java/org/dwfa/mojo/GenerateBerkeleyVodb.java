@@ -12,6 +12,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
@@ -64,6 +65,11 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 	 * @parameter
 	 */
 	private String dataLocationInJar;
+	
+	/**
+	 * @parameter 
+	 */
+	private DatabaseSetupConfig dbSetupConfig;
 
 	private String[] allowedGoals = new String[] { "install","deploy" };
 
@@ -126,11 +132,14 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 					}
 				}
 
+				if (dbSetupConfig == null) {
+					dbSetupConfig = new DatabaseSetupConfig();
+				}
 				if (dataLocationInJar == null) {
-					LocalVersionedTerminology.openDefaultFactory(outputDirectory, false, 600000000L);
+					LocalVersionedTerminology.createFactory(outputDirectory, false, 600000000L, dbSetupConfig);
 					LocalVersionedTerminology.get().loadFromMultipleJars(args);
 				} else {
-					LocalVersionedTerminology.openDefaultFactory(outputDirectory, false, 600000000L);
+					LocalVersionedTerminology.createFactory(outputDirectory, false, 600000000L, dbSetupConfig);
 					LocalVersionedTerminology.get().loadFromSingleJar(args[1], dataLocationInJar);
 				}
 

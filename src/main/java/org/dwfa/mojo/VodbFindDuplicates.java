@@ -397,7 +397,7 @@ public class VodbFindDuplicates extends AbstractMojo {
                             if (doNotProcess == false) {
                                 int dnid = Integer.parseInt(d.get("dnid"));
                                 I_DescriptionVersioned potDup = termFactory
-                                        .getDescription(dnid);
+                                        .getDescription(dnid, cnid);
 
                                 if (descTypeSet.contains(potDup.getFirstTuple().getTypeId())) {
 
@@ -740,7 +740,7 @@ public class VodbFindDuplicates extends AbstractMojo {
                             // do something useful here
                             int dnid = Integer.parseInt(d.get("dnid"));
                             I_DescriptionVersioned potDup = termFactory
-                                    .getDescription(dnid);
+                                    .getDescription(dnid, cnid);
                             if (potDup.getFirstTuple().getTypeId() == xhtmlFullySpecifed
                                     .getConceptId()
                                     || potDup.getFirstTuple().getTypeId() == xhtmlPreferred
@@ -845,7 +845,7 @@ public class VodbFindDuplicates extends AbstractMojo {
                             // I_GetConceptData potDupConcept =
                             // termFactory.getConcept(cnid);
                             I_DescriptionVersioned potDup = termFactory
-                                    .getDescription(dnid);
+                                    .getDescription(dnid, cnid);
                             if (potDup.getFirstTuple().getTypeId() == xhtmlFullySpecifed
                                     .getConceptId()
                                     || potDup.getFirstTuple().getTypeId() == xhtmlPreferred

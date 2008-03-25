@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 /**
@@ -48,6 +49,11 @@ public class VodbOpen  extends AbstractMojo {
 	 */
 	boolean useExistingDb = false;
 	
+	/**
+	 * @parameter 
+	 */
+	private DatabaseSetupConfig dbSetupConfig;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			if (useExistingDb && LocalVersionedTerminology.get()!=null) {
@@ -60,7 +66,10 @@ public class VodbOpen  extends AbstractMojo {
             } catch (NoSuchAlgorithmException e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
-			LocalVersionedTerminology.openDefaultFactory(vodbDirectory, readOnly, cacheSize);
+			if (dbSetupConfig == null) {
+				dbSetupConfig = new DatabaseSetupConfig();
+			}
+			LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
 		} catch (InstantiationException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		} catch (IllegalAccessException e) {
