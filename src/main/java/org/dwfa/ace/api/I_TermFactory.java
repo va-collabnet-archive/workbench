@@ -143,7 +143,7 @@ public interface I_TermFactory {
 
     public void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception;
 
-    public void loadFromDirectory(File dataDir) throws Exception;
+    public void loadFromDirectory(File dataDir, String encoding) throws Exception;
 
     /**
      * 
