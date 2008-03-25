@@ -158,6 +158,9 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 			setProperty("ID_DB_TYPE", dbSetupConfig.getIdDbType().name());
 			sync();
 		} else {
+			if (dbSetupConfig == null) {
+				dbSetupConfig = new DatabaseSetupConfig();
+			}
 			String coreDbType = getProperty("CORE_DB_TYPE");
 			dbSetupConfig.setCoreDbTypeStr(coreDbType);
 			String idDbType = getProperty("ID_DB_TYPE");

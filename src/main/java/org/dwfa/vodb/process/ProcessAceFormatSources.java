@@ -172,10 +172,15 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
 
         public Boolean call() throws Exception {
-            Reader isr = new BufferedReader(new FileReader(dataFile));
-            readDescriptions(isr, null, format, descriptionLatch);
-            isr.close();
-            return true;
+        	try {
+        		Reader isr = new BufferedReader(new FileReader(dataFile));
+        		readDescriptions(isr, null, format, descriptionLatch);
+        		isr.close();
+        		return true;
+        	} catch (RuntimeException ex) {
+        		AceLog.getAppLog().nonModalAlertAndLogException(ex);
+        		throw new Exception(ex);
+        	}
         }
 	    
 	}

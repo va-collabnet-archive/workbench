@@ -860,11 +860,17 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	public List<I_DescriptionVersioned> getDescriptions(int conceptId)
 			throws DatabaseException, IOException {
 		ConceptBean bean = ConceptBean.get(conceptId);
+		if (bean.descriptions == null) {
+			bean.descriptions = new ArrayList<I_DescriptionVersioned>();
+		}
 		return bean.descriptions;
 	}
 
 	public boolean hasDescription(int descId, int conceptId)
 			throws DatabaseException, IOException {
+		if (getDescriptions(conceptId) == null) {
+			return false;
+		}
 		for (I_DescriptionVersioned desc : getDescriptions(conceptId)) {
 			if (desc.getDescId() == descId) {
 				return true;
@@ -1072,31 +1078,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			bean.getDescriptions().add(newDesc);
 		}
 		writeConceptToBdb(bean);
-
-		/*
-		 * I_DescriptionVersioned retrievedDesc =
-		 * getDescription(newDesc.getDescId(), newDesc.getConceptId());
-		 * 
-		 * if (newDesc.equals(retrievedDesc)) { //System.out.println("Retrieved
-		 * Desc equal. "); } else { System.out.println("Retrieved Desc NOT
-		 * equal. "); }
-		 * 
-		 * 
-		 * DatabaseEntry key = new DatabaseEntry(); DatabaseEntry value = new
-		 * DatabaseEntry(); intBinder.objectToEntry(newDesc.getConceptId(),
-		 * key); if (conDescDb.get(null, key, value, LockMode.DEFAULT) ==
-		 * OperationStatus.SUCCESS) { ArrayList<I_DescriptionVersioned>
-		 * retrievedDescList = (ArrayList<I_DescriptionVersioned>)
-		 * descListBinding.entryToObject(value); AceLog.getAppLog().info(
-		 * "retrievedDescList: " + retrievedDescList ); }
-		 * 
-		 * intBinder.objectToEntry(newDesc.getConceptId(), key); if
-		 * (conDescDb.get(null, key, value, LockMode.DEFAULT) ==
-		 * OperationStatus.SUCCESS) { I_ConceptAttributeVersioned
-		 * conceptAttributes = (I_ConceptAttributeVersioned)
-		 * attributeBinding.entryToObject(value); AceLog.getAppLog().info(
-		 * "conceptAttributes: " + conceptAttributes ); }
-		 */
 
 	}
 
