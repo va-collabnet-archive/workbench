@@ -125,7 +125,7 @@ public abstract class RefsetUtilities {
 		return children;
 	}
 
-	public List<Integer> findAllowedRefsets() throws TerminologyException, IOException {
+	public List<Integer> getSpecificationRefsets() throws TerminologyException, IOException {
 
 		List<Integer> allowedRefsets = new ArrayList<Integer>();
 

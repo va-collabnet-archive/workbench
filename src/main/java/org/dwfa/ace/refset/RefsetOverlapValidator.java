@@ -65,7 +65,7 @@ public class RefsetOverlapValidator extends RefsetUtilities{
 				 * Need to get all refsets and compare against each other
 				 */
 				List<Integer> allowedRefsets = new ArrayList<Integer>();
-				allowedRefsets = findAllowedRefsets();
+				allowedRefsets = getSpecificationRefsets();
 				List<Integer> compareRefsets = new ArrayList<Integer>();
 				compareRefsets.addAll(allowedRefsets);
 				

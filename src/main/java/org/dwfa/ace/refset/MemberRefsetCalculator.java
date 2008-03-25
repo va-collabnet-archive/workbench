@@ -86,7 +86,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		try {
 			Map<Integer,ConceptRefsetInclusionDetails> currentRefsetInclusionType = new HashMap<Integer,ConceptRefsetInclusionDetails>();
 			if (allowedRefsets.size()==0) {
-				allowedRefsets = findAllowedRefsets();
+				allowedRefsets = getSpecificationRefsets();
 			}
 			setUp();
 

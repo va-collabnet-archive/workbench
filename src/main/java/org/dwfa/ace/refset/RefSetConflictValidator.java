@@ -80,7 +80,7 @@ public class RefSetConflictValidator extends RefsetUtilities/*implements I_Proce
     	
     	  if(referenceSetId == -1){
     		  //Get all allowed refsets
-    		  List<Integer> allowedRefsets = findAllowedRefsets();
+    		  List<Integer> allowedRefsets = getSpecificationRefsets();
     		  for(Integer refsetId : allowedRefsets){
     			  
     			  referenceSetId = refsetId;
