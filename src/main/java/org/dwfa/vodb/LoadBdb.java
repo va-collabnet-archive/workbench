@@ -30,13 +30,13 @@ public class LoadBdb {
         AceLog.getAppLog().info(end.toString());
     }
 
-    public static void loadFromDirectory(File dataDir) throws Exception {
+    public static void loadFromDirectory(File dataDir, String encoding) throws Exception {
         ProcessAceFormatSourcesBerkeley loadConstants = null;
         timer = new Stopwatch();
         timer.start();
         loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
         AceLog.getAppLog().info("Starting to process " + dataDir);
-        loadConstants.executeFromDir(dataDir);
+        loadConstants.executeFromDir(dataDir, encoding);
         Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
         try {
             AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());

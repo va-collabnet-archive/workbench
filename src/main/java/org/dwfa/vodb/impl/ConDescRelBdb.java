@@ -346,10 +346,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				if (conceptBean.conceptAttributes == null) {
 					to.writeShort(0);
 				} else {
-					to.writeShort(conceptBean.getConceptAttributes()
-							.versionCount());
-					for (I_ConceptAttributePart conAttrPart : conceptBean
-							.getConceptAttributes().getVersions()) {
+					to.writeShort(conceptBean.conceptAttributes.versionCount());
+					for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getVersions()) {
 						to.writeInt(conPartBdb.getConPartId(conAttrPart));
 					}
 				}

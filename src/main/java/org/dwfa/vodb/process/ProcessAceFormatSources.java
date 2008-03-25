@@ -161,19 +161,21 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
         private File dataFile;
         private FORMAT format;
         private CountDownLatch descriptionLatch;
+        String encoding;
 
 
-        private LoadDescriptionCallable(File dataFile, FORMAT format, CountDownLatch descriptionLatch) {
+        private LoadDescriptionCallable(File dataFile, String encoding, FORMAT format, CountDownLatch descriptionLatch) {
             super();
             this.dataFile = dataFile;
             this.format = format;
             this.descriptionLatch = descriptionLatch;
+            this.encoding = encoding;
         }
 
 
         public Boolean call() throws Exception {
         	try {
-        		Reader isr = new BufferedReader(new FileReader(dataFile));
+        		Reader isr = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile), encoding));
         		readDescriptions(isr, null, format, descriptionLatch);
         		isr.close();
         		return true;
@@ -188,9 +190,10 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	/**
 	 * This is the one I think we will support going forward. 
 	 * @param dataDir
+	 * @param encoding 
 	 * @throws Exception
 	 */
-	public void executeFromDir(File dataDir) throws Exception {
+	public void executeFromDir(File dataDir, String encoding) throws Exception {
 		FORMAT format = FORMAT.ACE;
 		File[] dataFiles = dataDir.listFiles(new FileFilter() {
 			public boolean accept(File f) {
@@ -209,7 +212,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             getLog().info(dataFile.getName());
 			if (dataFile.getName().contains("concepts")) {
 			    CountDownLatch conceptLatch = new CountDownLatch(lineCount);
-				Reader isr = new BufferedReader(new FileReader(dataFile));
+				Reader isr = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile), encoding));
 				readConcepts(isr, null, format, conceptLatch);
 				isr.close();
 				getLog().info("Awaiting concept latch: " + conceptLatch.getCount());
@@ -217,14 +220,14 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 			} else if (dataFile.getName().contains("descriptions")) {
                 CountDownLatch descriptionLatch = new CountDownLatch(lineCount);
                 latchMap.put("descriptions", descriptionLatch);
-                LoadDescriptionCallable descriptionLoader = new LoadDescriptionCallable(dataFile, format, descriptionLatch);
+                LoadDescriptionCallable descriptionLoader = new LoadDescriptionCallable(dataFile, encoding, format, descriptionLatch);
                 Future<Boolean> future = executors.submit(descriptionLoader);
                 futureMap.put("descriptions", future);
 				getLog().info("Awaiting description latch: " + descriptionLatch.getCount());
                 descriptionLatch.await();
 			} else if (dataFile.getName().contains("relationships")) {
                 CountDownLatch relationshipLatch = new CountDownLatch(lineCount);
-				Reader isr = new BufferedReader(new FileReader(dataFile));
+				Reader isr = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile), encoding));
 				readRelationships(isr, null, format, relationshipLatch);
 				isr.close();
                 getLog().info("Awaiting relationshipLatch: " + relationshipLatch.getCount());
@@ -268,8 +271,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	                getLog().info("Content file: " + match.getName() + " has lines: " + lineCount);
 	                CountDownLatch refsetLatch = new CountDownLatch(lineCount);
 	                refsetLatchMap.put(match.toString(), refsetLatch);
-	                FileReader fr = new FileReader(match);
-	                BufferedReader br = new BufferedReader(fr);
+	                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(match), encoding));
 	                LoadRefset refsetLoader = new LoadRefset(br, refsetFileType, match, refsetLatch);
 	                Future<Boolean> future = refsetExecutors.submit(refsetLoader);
 	                refsetFutureMap.put(match.toString(), future);
@@ -302,8 +304,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             int lineCount = countLines(idFile);
             getLog().info("Content file: " + idFile.getName() + " has lines: " + lineCount);
             CountDownLatch idLatch = new CountDownLatch(lineCount);
-			FileReader fr = new FileReader(idFile);
-			BufferedReader br = new BufferedReader(fr);
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(idFile), encoding));
 			readIds(br, idLatch);
             getLog().info("Awaiting idLatch: " + idLatch.getCount());
             idLatch.await();
@@ -458,7 +459,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	            rootDir = subRoots[0];
 	            AceLog.getEditLog().info("Found sub root: " + rootDir.getAbsolutePath());
 	        }
-	        executeFromDir(rootDir);
+	        executeFromDir(rootDir, "UTF-8");
 	    } else {
 	        //Need to depricate this method for processing SNOMED, and inferring history. 
 	        //Better to have everyone use ace format. 

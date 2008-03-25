@@ -45,6 +45,7 @@ import org.dwfa.vodb.I_StoreConceptAttributes;
 import org.dwfa.vodb.I_StoreDescriptions;
 import org.dwfa.vodb.I_StoreIdentifiers;
 import org.dwfa.vodb.ToIoException;
+import org.dwfa.vodb.bind.ThinDescVersionedBinding;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
@@ -233,20 +234,13 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 					ThinDescVersioned descV = new ThinDescVersioned(descId,
 							conceptNid, versionCount);
 					conceptBean.descriptions.add(descV);
-					I_DescriptionPart lastPart = null;
+					String lastText = null;
 					for (int y = 0; y < versionCount; y++) {
 						ThinDescPartCore descCore = descCoreBdb
 								.getDescPartCore(ti.readInt());
-						boolean newString = ti.readBoolean();
-						String text;
-						if (newString) {
-							text = ti.readString();
-						} else {
-							text = lastPart.getText();
-						}
-						lastPart = new ThinDescPartWithCoreDelegate(text,
-								descCore);
-						descV.addVersion(lastPart);
+						lastText = ThinDescVersionedBinding.readDescText(lastText, ti);
+						descV.addVersion(new ThinDescPartWithCoreDelegate(lastText,
+								descCore));
 					}
 				}
 				return conceptBean;
@@ -259,8 +253,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 			try {
 				ConceptBean conceptBean = (ConceptBean) obj;
 				to.writeInt(conceptBean.getConceptId());
-				to
-						.writeShort(conceptBean.getConceptAttributes()
+				to.writeShort(conceptBean.getConceptAttributes()
 								.versionCount());
 				for (I_ConceptAttributePart conAttrPart : conceptBean
 						.getConceptAttributes().getVersions()) {
@@ -275,22 +268,11 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 						.getDescriptions()) {
 					to.writeInt(desc.getDescId());
 					to.writeShort(desc.versionCount());
-					I_DescriptionPart lastPart = null;
+					byte[] lastText = new byte[0];
 					for (I_DescriptionPart part : desc.getVersions()) {
 						try {
 							to.writeInt(descCoreBdb.getDescPartCoreId(part));
-							if (lastPart == null) {
-								to.writeBoolean(true);
-								to.writeString(part.getText());
-							} else {
-								if (lastPart.getText().equals(part.getText())) {
-									to.writeBoolean(false);
-								} else {
-									to.writeBoolean(true);
-									to.writeString(part.getText());
-								}
-							}
-							lastPart = part;
+							lastText = ThinDescVersionedBinding.writeDescText(lastText, part, to);
 						} catch (DatabaseException e) {
 							throw new RuntimeException(e);
 						}

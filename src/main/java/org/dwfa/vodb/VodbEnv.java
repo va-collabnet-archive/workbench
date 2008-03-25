@@ -841,8 +841,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 		LoadBdb.loadFromSingleJar(jarFile, dataPrefix);
 	}
 
-	public void loadFromDirectory(File dataDir) throws Exception {
-		LoadBdb.loadFromDirectory(dataDir);
+	public void loadFromDirectory(File dataDir, String encoding) throws Exception {
+		LoadBdb.loadFromDirectory(dataDir, encoding);
 	}
 
 	/**
