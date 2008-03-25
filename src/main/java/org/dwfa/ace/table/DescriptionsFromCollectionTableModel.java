@@ -12,9 +12,9 @@ import javax.swing.event.TableModelEvent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class DescriptionsFromCollectionTableModel extends DescriptionTableModel {
 	public DescriptionsFromCollectionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
@@ -25,7 +25,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private List<ThinDescVersioned> descriptionList = new ArrayList<ThinDescVersioned>();
+	private List<I_DescriptionVersioned> descriptionList = new ArrayList<I_DescriptionVersioned>();
 	private List<Float> scoreList = new ArrayList<Float>();
 	
 	@Override
@@ -37,8 +37,8 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 		return descriptionList.size();
 	}
 
-	public void setDescriptions(Collection<ThinDescVersioned> descriptions) {
-		descriptionList = new ArrayList<ThinDescVersioned>(descriptions);
+	public void setDescriptions(Collection<I_DescriptionVersioned> descriptions) {
+		descriptionList = new ArrayList<I_DescriptionVersioned>(descriptions);
 		scoreList = null;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -47,7 +47,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	}
 	
 	public void setLuceneMatches(Collection<LuceneMatch> matches) {
-		descriptionList = new ArrayList<ThinDescVersioned>(matches.size());
+		descriptionList = new ArrayList<I_DescriptionVersioned>(matches.size());
 		scoreList = new ArrayList<Float>(matches.size());
 		synchronized (matches) {
 			for (LuceneMatch m: matches) {
@@ -72,11 +72,11 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	@Override
 	public Map<Integer, ConceptBean> getReferencedConcepts() {
         Map<Integer, ConceptBean> referencedConcept = new HashMap<Integer, ConceptBean>();
-        List<ThinDescVersioned> descriptionListCopy;
+        List<I_DescriptionVersioned> descriptionListCopy;
         synchronized (descriptionList) {
-            descriptionListCopy = new ArrayList<ThinDescVersioned>(descriptionList);
+            descriptionListCopy = new ArrayList<I_DescriptionVersioned>(descriptionList);
         }
-        for (ThinDescVersioned desc: descriptionListCopy) {
+        for (I_DescriptionVersioned desc: descriptionListCopy) {
             for (I_DescriptionPart part: desc.getVersions()) {
                 referencedConcept.put(part.getTypeId(), ConceptBean.get(part.getTypeId()));
             }

@@ -12,10 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
@@ -428,6 +430,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     public void setValueAt(Object value, int row, int col) {
         I_RelTuple rel = allTuples.get(row);
         REL_FIELD field = columns[col];
+		boolean changed = false;
         switch (field) {
         case REL_ID:
             break;
@@ -437,11 +440,13 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             Integer typeId = (Integer) value;
             rel.setRelTypeId(typeId);
             referencedConcepts.put(typeId, ConceptBean.get(typeId));
+			changed = true;
             break;
         case DEST_ID:
             Integer destId = (Integer) value;
             rel.getFixedPart().setC2Id(destId);
             referencedConcepts.put(destId, ConceptBean.get(destId));
+			changed = true;
             break;
         case GROUP:
             if (String.class.isAssignableFrom(value.getClass())) {
@@ -450,21 +455,25 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             } else {
                 rel.setGroup((Integer) value);
             }
+			changed = true;
             break;
         case REFINABILITY:
             Integer refinabilityId = (Integer) value;
             rel.setRefinabilityId(refinabilityId);
             referencedConcepts.put(refinabilityId, ConceptBean.get(refinabilityId));
+			changed = true;
             break;
         case CHARACTERISTIC:
             Integer characteristicId = (Integer) value;
             rel.setCharacteristicId(characteristicId);
             referencedConcepts.put(characteristicId, ConceptBean.get(characteristicId));
+			changed = true;
             break;
         case STATUS:
             Integer statusId = (Integer) value;
             rel.setStatusId(statusId);
             referencedConcepts.put(statusId, ConceptBean.get(statusId));
+			changed = true;
             break;
         case VERSION:
             break;
@@ -472,7 +481,51 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             break;
         }
         fireTableDataChanged();
+		if (changed) {
+			AceLog.getAppLog().info("Rel table changed");
+			updateDataAlerts(row);
+		}
     }
+
+	java.util.Timer timer = new java.util.Timer("updateDataAlertsTimer");
+	private class UpdateDataAlertsTimerTask extends TimerTask {
+		boolean active = true;
+		final int row;
+		
+		
+		public UpdateDataAlertsTimerTask(int row) {
+			super();
+			this.row = row;
+		}
+		@Override
+		public void run() {
+			if (active) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (active) {
+							I_RelTuple rel = allTuples.get(row);
+							ACE.addUncommitted(ConceptBean.get(rel.getC1Id()));
+						}
+					}});
+			}
+		}
+		public boolean isActive() {
+			return active;
+		}
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+	}
+	UpdateDataAlertsTimerTask alertUpdater;
+	private void updateDataAlerts(int row) {
+		if (alertUpdater != null) {
+			alertUpdater.setActive(false);
+		}
+		alertUpdater = new UpdateDataAlertsTimerTask(row);
+		timer.schedule(alertUpdater, 2000);
+		
+	}
 
     public Class<?> getColumnClass(int c) {
         return StringWithRelTuple.class;

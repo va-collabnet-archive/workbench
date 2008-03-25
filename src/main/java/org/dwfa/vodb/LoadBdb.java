@@ -12,7 +12,9 @@ import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.NoMappingException;
-import org.dwfa.vodb.ProcessAceFormatSources.FORMAT;
+import org.dwfa.vodb.process.ProcessAceFormatSourcesBerkeley;
+import org.dwfa.vodb.process.ProcessSnomedBerkeley;
+import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.types.Path;
 
 public class LoadBdb {
@@ -44,23 +46,13 @@ public class LoadBdb {
         AceLog.getAppLog().info("Finished loading " + dataDir + ". Elapsed time: " + timer.getElapsedTime());
         printElapsedTime();
         AceLog.getAppLog().info("Creating concept->desc map.");
-        ((VodbEnv) LocalVersionedTerminology.get()).getConceptDescMap();
         // Update the history records for the relationships...
         printElapsedTime();
 
-        // monitor.setProgressInfoUpper("Starting c1RelMap.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createC1RelMap();
         printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting c2RelMap.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createC2RelMap();
         printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting createIdMaps.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createIdMaps();
-        printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting createConceptImageMap.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createConceptImageMap();
         // monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
-        ((VodbEnv) LocalVersionedTerminology.get()).populateTimeBranchDb();
+        ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
         printElapsedTime();
         // AceConfig.monitor.setProgressInfoUpper("Starting
         // makeLuceneIndex().");
@@ -87,24 +79,9 @@ public class LoadBdb {
         }
         AceLog.getAppLog().info("Finished loading " + jarFile + ". Elapsed time: " + timer.getElapsedTime());
         printElapsedTime();
-        AceLog.getAppLog().info("Creating concept->desc map.");
-        ((VodbEnv) LocalVersionedTerminology.get()).getConceptDescMap();
-        // Update the history records for the relationships...
-        printElapsedTime();
-
-        // monitor.setProgressInfoUpper("Starting c1RelMap.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createC1RelMap();
-        printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting c2RelMap.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createC2RelMap();
-        printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting createIdMaps.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createIdMaps();
-        printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting createConceptImageMap.");
-        ((VodbEnv) LocalVersionedTerminology.get()).createConceptImageMap();
+        AceLog.getAppLog().info("Starting populateTimeBranchDb()");
         // monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
-        ((VodbEnv) LocalVersionedTerminology.get()).populateTimeBranchDb();
+        ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
         printElapsedTime();
         // AceConfig.monitor.setProgressInfoUpper("Starting
         // makeLuceneIndex().");

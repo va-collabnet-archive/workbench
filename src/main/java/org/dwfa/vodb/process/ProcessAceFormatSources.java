@@ -1,4 +1,4 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -129,15 +129,6 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 					readDescriptions(br, releaseDate, FORMAT.SNOMED,  new CountDownLatch(Integer.MAX_VALUE));
 				} else if (contentFile.getName().startsWith("relationships")) {
 					readRelationships(br, releaseDate, FORMAT.SNOMED,  new CountDownLatch(Integer.MAX_VALUE));
-				} else if (contentFile.getName().startsWith("illicit_words")) {
-					getLog().info(
-							"Found illicit_words file: "
-									+ contentFile.getName());
-					readIllicitWords(br,  new CountDownLatch(Integer.MAX_VALUE));
-				} else if (contentFile.getName().startsWith("licit_words")) {
-					getLog().info(
-							"Found licit_words file: " + contentFile.getName());
-					readLicitWords(br, new CountDownLatch(Integer.MAX_VALUE));
 				} else {
 					getLog().info(
 							"(1) Don't know what to do with file: "
@@ -154,7 +145,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 			BufferedReader br = new BufferedReader(fr);
 			readIds(br, new CountDownLatch(Integer.MAX_VALUE));
 		}
-		cleanup(null);
+		cleanupSNOMED(null);
 	}
 
 	public void execute(File constantJar) throws Exception {
@@ -224,6 +215,8 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
                 LoadDescriptionCallable descriptionLoader = new LoadDescriptionCallable(dataFile, format, descriptionLatch);
                 Future<Boolean> future = executors.submit(descriptionLoader);
                 futureMap.put("descriptions", future);
+				getLog().info("Awaiting description latch: " + descriptionLatch.getCount());
+                descriptionLatch.await();
 			} else if (dataFile.getName().contains("relationships")) {
                 CountDownLatch relationshipLatch = new CountDownLatch(lineCount);
 				Reader isr = new BufferedReader(new FileReader(dataFile));
@@ -231,22 +224,6 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 				isr.close();
                 getLog().info("Awaiting relationshipLatch: " + relationshipLatch.getCount());
                 relationshipLatch.await();
-			} else if (dataFile.getName().contains("illicit_words")) {
-                CountDownLatch illicitWordLatch = new CountDownLatch(lineCount);
-				getLog().info(
-						"Found illicit_words jar entry: " + dataFile.getName());
-				Reader isr = new BufferedReader(new FileReader(dataFile));
-				readIllicitWords(isr, illicitWordLatch);
-                getLog().info("Awaiting illicitWordLatch: " + illicitWordLatch.getCount());
-                illicitWordLatch.await();
-			} else if (dataFile.getName().contains("licit_words")) {
-                CountDownLatch licitWordLatch = new CountDownLatch(lineCount);
-				getLog().info(
-						"Found licit_words jar entry: " + dataFile.getName());
-				Reader isr = new BufferedReader(new FileReader(dataFile));
-				readLicitWords(isr, licitWordLatch);
-                getLog().info("Awaiting licitWordLatch: " + licitWordLatch.getCount());
-                licitWordLatch.await();
 			} else {
 				getLog().info(
 						"(2) Don't know what to do with file: "
@@ -326,7 +303,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             getLog().info("Awaiting idLatch: " + idLatch.getCount());
             idLatch.await();
 		}
-		cleanup(null);
+		cleanupSNOMED(null);
 	}
 	
 	protected abstract void flushIdBuffer() throws Exception;
@@ -509,25 +486,13 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	                            .getInputStream(je));
 	                    readRelationships(isr, releaseDate, format,  new CountDownLatch(Integer.MAX_VALUE));
 	                    isr.close();
-	                } else if (je.getName().contains("illicit_words")) {
-	                    getLog().info(
-	                            "Found illicit_words jar entry: " + je.getName());
-	                    InputStreamReader isr = new InputStreamReader(constantJar
-	                            .getInputStream(je));
-	                    readIllicitWords(isr,  new CountDownLatch(Integer.MAX_VALUE));
-	                } else if (je.getName().contains("licit_words")) {
-	                    getLog().info(
-	                            "Found licit_words jar entry: " + je.getName());
-	                    InputStreamReader isr = new InputStreamReader(constantJar
-	                            .getInputStream(je));
-	                    readLicitWords(isr,  new CountDownLatch(Integer.MAX_VALUE));
 	                } else {
 	                    getLog().info(
 	                            "Don't know what to do with jar entry: "
 	                                    + je.getName());
 	                }
 	            }
-	            cleanup(null);
+	            cleanupSNOMED(null);
 	        }
 	    }
         

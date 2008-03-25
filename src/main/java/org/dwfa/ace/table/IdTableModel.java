@@ -22,19 +22,25 @@ import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -139,13 +145,13 @@ public class IdTableModel extends AbstractTableModel implements
 	}
 
 	public class TableChangedSwingWorker extends SwingWorker<Object> {
-		I_GetConceptData cb;
+		I_AmTermComponent tc;
 
 		private boolean stopWork = false;
 
-		public TableChangedSwingWorker(I_GetConceptData cb) {
+		public TableChangedSwingWorker(I_AmTermComponent tc) {
 			super();
-			this.cb = cb;
+			this.tc = tc;
 		}
 
 		@Override
@@ -155,10 +161,12 @@ public class IdTableModel extends AbstractTableModel implements
 			}
 			conceptsToFetch.clear();
 			referencedConcepts.clear();
-			if (cb == null) {
+			if (tc == null) {
 				return 0;
 			}
-			I_IdVersioned id = cb.getId();
+			int nid = getNidFromTermComponent(tc);
+			
+			I_IdVersioned id = LocalVersionedTerminology.get().getId(nid);
 			for (I_IdPart part : id.getVersions()) {
 				conceptsToFetch.add(part.getIdStatus());
 				conceptsToFetch.add(part.getPathId());
@@ -168,6 +176,7 @@ public class IdTableModel extends AbstractTableModel implements
 			refConWorker.start();
 			return null;
 		}
+
 
 		@Override
 		protected void finished() {
@@ -281,7 +290,7 @@ public class IdTableModel extends AbstractTableModel implements
 		if (tableChangeWorker != null) {
 			tableChangeWorker.stop();
 		}
-		tableChangeWorker = new TableChangedSwingWorker((I_GetConceptData) evt
+		tableChangeWorker = new TableChangedSwingWorker((I_AmTermComponent) evt
 				.getNewValue());
 		tableChangeWorker.start();
 	}
@@ -293,12 +302,16 @@ public class IdTableModel extends AbstractTableModel implements
 		return columns.length;
 	}
 	private I_IdTuple getIdTuple(int rowIndex) throws IOException {
-		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
-		if (cb == null) {
+		I_AmTermComponent tc = (I_AmTermComponent) host.getTermComponent();
+		if (tc == null) {
 			return null;
 		}
 		if (allTuples == null) {
-			allTuples = cb.getId().getTuples();
+			try {
+				allTuples = LocalVersionedTerminology.get().getId(getNidFromTermComponent(tc)).getTuples();
+			} catch (TerminologyException e) {
+				throw new ToIoException(e);
+			}
 		}
 		return allTuples.get(rowIndex);
 	}
@@ -387,6 +400,20 @@ public class IdTableModel extends AbstractTableModel implements
 			return StringWithIdTuple.class;
 		}
 		return String.class;
+	}
+	private int getNidFromTermComponent(I_AmTermComponent tc) {
+		int nid = Integer.MIN_VALUE;
+		if (I_DescriptionVersioned.class.isAssignableFrom(tc.getClass())) {
+			I_DescriptionVersioned dv = (I_DescriptionVersioned) tc;
+			nid = dv.getDescId();
+		} else if (I_GetConceptData.class.isAssignableFrom(tc.getClass())) {
+			I_GetConceptData cb = (I_GetConceptData) tc;
+			nid = cb.getConceptId();
+		} else if (I_RelVersioned.class.isAssignableFrom(tc.getClass())) {
+			I_RelVersioned rel = (I_RelVersioned) tc;
+			nid = rel.getRelId();
+		}
+		return nid;
 	}
 
 	public SmallProgressPanel getProgress() {

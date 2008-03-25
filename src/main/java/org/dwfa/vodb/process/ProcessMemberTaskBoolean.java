@@ -1,61 +1,58 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
-import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
+import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 
-public class ProcessMemberTaskMeasurement extends ProcessMemberTask {
+public class ProcessMemberTaskBoolean extends ProcessMemberTask {
     
-    private static ProcessMemberTaskMeasurement[] taskArray;
+    private static ProcessMemberTaskBoolean[] taskArray;
     private static Exception processException;
     protected static Semaphore semaphore = new Semaphore(TASK_SIZE, true);
     
-    private double measurementValue;
-    private UUID unitsOfMeasureUuid;
+    private boolean booleanExt;
 
-    ProcessMemberTaskMeasurement(int arrayIndex) {
+    ProcessMemberTaskBoolean(int arrayIndex) {
         super(arrayIndex);
     }
     
     
     protected EXT_TYPE getRefsetType() {
-        return EXT_TYPE.MEASUREMENT;
+        return EXT_TYPE.BOOLEAN;
     }
 
     protected void reset(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, double measurementValue, UUID unitsOfMeasureUuid) {
+        int version, int memberId, boolean booleanExt) {
         resetCore(refsetUuid, statusUuid, componentUuid, pathUuid,
               version, memberId);
-        this.measurementValue = measurementValue;
-        this.unitsOfMeasureUuid = unitsOfMeasureUuid;
+        this.booleanExt = booleanExt;
     }
 
-    protected ThinExtByRefPartMeasurement makeNewPart() throws Exception {
-        ThinExtByRefPartMeasurement part = new ThinExtByRefPartMeasurement();
-        int unitsOfMeasureId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) unitsOfMeasureUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
-        part.setUnitsOfMeasureId(unitsOfMeasureId);
-        part.setMeasurementValue(measurementValue);
+
+    protected ThinExtByRefPartBoolean makeNewPart() throws Exception {
+        ThinExtByRefPartBoolean part = new ThinExtByRefPartBoolean();
+        part.setValue(booleanExt);
         return part;
     }
 
     public static void acquire(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, double measurementValue, UUID unitsOfMeasureUuid) throws Exception {
+        int version, int memberId, boolean booleanExt) throws Exception {
         check();
         semaphore.acquire();
         
         if (taskArray == null) {
-            taskArray = new ProcessMemberTaskMeasurement[TASK_SIZE + 2]; 
+            taskArray = new ProcessMemberTaskBoolean[TASK_SIZE + 2]; 
             for (int i = 0; i < taskArray.length; i++) {
-                taskArray[i] = new ProcessMemberTaskMeasurement(i);
+                taskArray[i] = new ProcessMemberTaskBoolean(i);
             }
         }
         boolean foundUsableTask = false;
-        for (ProcessMemberTaskMeasurement task: taskArray) {
+        for (ProcessMemberTaskBoolean task: taskArray) {
             if (task.isUsable()) {
                 task.reset(refsetUuid, statusUuid, componentUuid, pathUuid,
-                           version, memberId, measurementValue, unitsOfMeasureUuid);
+                           version, memberId, booleanExt);
                 ProcessAceFormatSources.executors.submit(task);
                 foundUsableTask = true;
                 break;
@@ -66,15 +63,16 @@ public class ProcessMemberTaskMeasurement extends ProcessMemberTask {
         }
     }
 
+
     public Exception getProcessException() {
         return processException;
     }
 
     public void setProcessException(Exception processException) {
-        ProcessMemberTaskMeasurement.processException = processException;
+        ProcessMemberTaskBoolean.processException = processException;
     }
 
-    public ProcessMemberTaskMeasurement[] getTaskArray() {
+    public ProcessMemberTaskBoolean[] getTaskArray() {
         return taskArray;
     }
     

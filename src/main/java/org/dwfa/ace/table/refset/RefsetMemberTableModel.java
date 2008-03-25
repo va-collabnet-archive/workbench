@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -1341,12 +1342,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     public void setValueAt(Object value, int row, int col) {
         I_ThinExtByRefTuple extTuple = allTuples.get(row);
+		boolean changed = false;
         if (extTuple.getVersion() == Integer.MAX_VALUE) {
             switch (columns[col]) {
             case REFSET_ID:
                 Integer refsetId = (Integer) value;
                 extTuple.getCore().setRefsetId(refsetId);
                 referencedConcepts.put(refsetId, ConceptBean.get(refsetId));
+				changed = true;
                 break;
             case MEMBER_ID:
                 break;
@@ -1356,6 +1359,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 Integer statusId = (Integer) value;
                 extTuple.setStatus(statusId);
                 referencedConcepts.put(statusId, ConceptBean.get(statusId));
+				changed = true;
+				break;
             case VERSION:
                 break;
             case PATH:
@@ -1363,15 +1368,18 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case BOOLEAN_VALUE:
                 Boolean booleanValue = (Boolean) value;
                 ((I_ThinExtByRefPartBoolean) extTuple.getPart()).setValue(booleanValue);
+				changed = true;
                 break;
             case STRING_VALUE:
                 String stringValue = (String) value;
                 ((I_ThinExtByRefPartString) extTuple.getPart()).setStringValue(stringValue);
+				changed = true;
                 break;
             case CONCEPT_ID:
                 Integer conceptId = (Integer) value;
                 ((I_ThinExtByRefPartConcept) extTuple.getPart()).setConceptId(conceptId);
                 referencedConcepts.put(conceptId, ConceptBean.get(conceptId));
+				changed = true;
                 break;
             case INTEGER_VALUE:
                 Integer intValue = (Integer) value;
@@ -1380,49 +1388,102 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 } else {
                     ((I_ThinExtByRefPartInteger) extTuple.getPart()).setValue(intValue);
                 }
+				changed = true;
                 break;
             case ACCEPTABILITY:
                 Integer acceptabilityId = (Integer) value;
                 ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setAcceptabilityId(acceptabilityId);
                 referencedConcepts.put(acceptabilityId, ConceptBean.get(acceptabilityId));
+				changed = true;
                 break;
             case CORRECTNESS:
                 Integer correctnessId = (Integer) value;
                 ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setCorrectnessId(correctnessId);
                 referencedConcepts.put(correctnessId, ConceptBean.get(correctnessId));
+				changed = true;
                 break;
             case DEGREE_OF_SYNONYMY:
                 Integer dosId = (Integer) value;
                 ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setDegreeOfSynonymyId(dosId);
                 referencedConcepts.put(dosId, ConceptBean.get(dosId));
-                break;
+				changed = true;
+               break;
             case TAG:
                 Integer tagId = (Integer) value;
                 ((I_ThinExtByRefPartLanguageScoped) extTuple.getPart()).setTagId(tagId);
                 referencedConcepts.put(tagId, ConceptBean.get(tagId));
+				changed = true;
                 break;
             case SCOPE:
                 Integer scopeId = (Integer) value;
                 ((I_ThinExtByRefPartLanguageScoped) extTuple.getPart()).setScopeId(scopeId);
                 referencedConcepts.put(scopeId, ConceptBean.get(scopeId));
+				changed = true;
                 break;
             case PRIORITY:
                 Integer priority = (Integer) value;
                 ((I_ThinExtByRefPartLanguageScoped) extTuple.getPart()).setPriority(priority);
+				changed = true;
                 break;
             case MEASUREMENT_UNITS_ID:
                 Integer unitsId = (Integer) value;
                 ((I_ThinExtByRefPartMeasurement) extTuple.getPart()).setUnitsOfMeasureId(unitsId);
                 referencedConcepts.put(unitsId, ConceptBean.get(unitsId));
+				changed = true;
                 break;
             case MEASUREMENT_VALUE:
                 Double measurementValue = (Double) value;
                 ((I_ThinExtByRefPartMeasurement) extTuple.getPart()).setMeasurementValue(measurementValue);
+				changed = true;
                 break;
             }
             fireTableDataChanged();
+			if (changed) {
+				AceLog.getAppLog().info("refset table changed");
+				updateDataAlerts(row);
+			}
         }
     }
+
+	java.util.Timer timer = new java.util.Timer("updateDataAlertsTimer");
+	private class UpdateDataAlertsTimerTask extends TimerTask {
+		boolean active = true;
+		final int row;
+		
+		
+		public UpdateDataAlertsTimerTask(int row) {
+			super();
+			this.row = row;
+		}
+		@Override
+		public void run() {
+			if (active) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (active) {
+							ThinExtByRefTuple tuple = allTuples.get(row);
+							ACE.addUncommitted(ExtensionByReferenceBean.get(tuple.getMemberId()));
+						}
+					}});
+			}
+		}
+		public boolean isActive() {
+			return active;
+		}
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+	}
+	UpdateDataAlertsTimerTask alertUpdater;
+	private void updateDataAlerts(int row) {
+		if (alertUpdater != null) {
+			alertUpdater.setActive(false);
+		}
+		alertUpdater = new UpdateDataAlertsTimerTask(row);
+		timer.schedule(alertUpdater, 2000);
+		
+	}
 
     public Class<?> getColumnClass(int c) {
         switch (columns[c]) {

@@ -31,11 +31,13 @@ import net.jini.lookup.ServiceItemFilter;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.SubversionData;
@@ -73,7 +75,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 29;
+    private static final int dataVersion = 30;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -211,6 +213,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 29
     private boolean sortTaxonomyUsingRefset = false;
+    
+    // 30
+    
+    private List<I_OverrideTaxonomyRenderer> taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
+    private List<I_FilterTaxonomyRels> taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
 
     // transient
     private transient MasterWorker worker;
@@ -348,6 +355,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 29
         out.writeBoolean(sortTaxonomyUsingRefset);
+        
+        // 30
+        out.writeObject(taxonomyRendererOverrideList);
+        out.writeObject(taxonomyRelFilterList);
+       
+
     }
 
     @SuppressWarnings("unchecked")
@@ -607,6 +620,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 sortTaxonomyUsingRefset = in.readBoolean();
             } else {
                 sortTaxonomyUsingRefset = false;
+            }
+            
+            if (objDataVersion >= 30) {
+                taxonomyRendererOverrideList = (ArrayList<I_OverrideTaxonomyRenderer>) in.readObject();
+                taxonomyRelFilterList = (ArrayList<I_FilterTaxonomyRels>) in.readObject();
+            } else {
+                taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
+                taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -1871,5 +1892,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setSortTaxonomyUsingRefset(Boolean sortTaxonomyUsingRefset) {
         this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
     }
+
+	public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList() {
+		return taxonomyRendererOverrideList;
+	}
+
+	public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList() {
+		return taxonomyRelFilterList;
+	}
 
 }

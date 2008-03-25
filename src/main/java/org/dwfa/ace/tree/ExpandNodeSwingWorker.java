@@ -24,6 +24,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -288,6 +289,9 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		lowerProgressMessage = "getting source rels ";
 		srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes,
 				positions, false);
+		for (I_FilterTaxonomyRels taxonomyFilter: acePanel.getAceFrameConfig().getTaxonomyRelFilterList()) {
+			taxonomyFilter.filter(cb, srcRels, destRels, acePanel.getAceFrameConfig());
+		}
 		maxChildren = destRels.size() + srcRels.size();
 		completeLatch = new CountDownLatch(maxChildren);
 		lowerProgressMessage = "fetching ";

@@ -230,16 +230,8 @@ public class ImportBaselineJarReader implements ActionListener {
 				}
 			}
 
-			lowerProgressMessage = "Starting c1RelMap.";
-			AceConfig.getVodb().createC1RelMap();
-			lowerProgressMessage = "Starting c2RelMap.";
-			AceConfig.getVodb().createC2RelMap();
-			lowerProgressMessage = "Starting createIdMaps.";
-			AceConfig.getVodb().createIdMaps();
-			lowerProgressMessage = "Starting createConceptImageMap.";
-			AceConfig.getVodb().createConceptImageMap();
 			lowerProgressMessage = "Starting populateTimeBranchDb().";
-			AceConfig.getVodb().populateTimeBranchDb();
+			AceConfig.getVodb().populatePositions();
 			lowerProgressMessage = "Starting sync.";
 			AceConfig.getVodb().sync();
 			

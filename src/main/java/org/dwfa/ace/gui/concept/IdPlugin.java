@@ -37,22 +37,22 @@ public class IdPlugin extends AbstractPlugin {
 		super(false);
 	}
 
-
 	private IdTableModel idTableModel;
 	private JPanel idPanel;
 	private I_HostConceptPlugins host;
 	private JTableWithDragImage idTable;
+	private boolean showBorder = true;
 
 	@Override
 	protected ImageIcon getImageIcon() {
 		return new ImageIcon(ACE.class.getResource("/24x24/plain/id_card.png"));
 	}
 
-
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			PropertyChangeEvent evt = new PropertyChangeEvent(host,
+					"termComponent", null, host.getTermComponent());
 			ID_FIELD[] columnEnums = getIdColumns(host);
 			idTableModel.setColumns(getIdColumns(host));
 			for (int i = 0; i < idTableModel.getColumnCount(); i++) {
@@ -71,13 +71,16 @@ public class IdPlugin extends AbstractPlugin {
 		if (idPanel == null) {
 			this.host = host;
 			idPanel = getIdPanel(host);
-			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY,
+					this);
 			host.addPropertyChangeListener("commit", this);
-			PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			PropertyChangeEvent evt = new PropertyChangeEvent(host,
+					"termComponent", null, host.getTermComponent());
 			idTableModel.propertyChange(evt);
 		}
 		return idPanel;
 	}
+
 	private ID_FIELD[] getIdColumns(I_HostConceptPlugins host) {
 		List<ID_FIELD> fields = new ArrayList<ID_FIELD>();
 		fields.add(ID_FIELD.EXT_ID);
@@ -89,10 +92,8 @@ public class IdPlugin extends AbstractPlugin {
 		return fields.toArray(new ID_FIELD[fields.size()]);
 	}
 
-
 	private JPanel getIdPanel(I_HostConceptPlugins host) {
-		idTableModel = new IdTableModel(getIdColumns(host),
-				host);
+		idTableModel = new IdTableModel(getIdColumns(host), host);
 		JPanel idPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -128,11 +129,11 @@ public class IdPlugin extends AbstractPlugin {
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(idTableModel);
 		idTable = new JTableWithDragImage(sortingTable);
-      idTable.getSelectionModel().addListSelectionListener(this);
+		idTable.getSelectionModel().addListSelectionListener(this);
 		/*
-		idTable.addMouseListener(idTableModel.makePopupListener(idTable,
-				host.getConfig()));
-		*/
+		 * idTable.addMouseListener(idTableModel.makePopupListener(idTable,
+		 * host.getConfig()));
+		 */
 		idTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortingTable.setTableHeader(idTable.getTableHeader());
 
@@ -195,22 +196,32 @@ public class IdPlugin extends AbstractPlugin {
 
 		idTable.setDefaultRenderer(String.class, renderer);
 		idPanel.add(idTable, c);
-		idPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
+		if (showBorder) {
+			idPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
+					.createEmptyBorder(1, 1, 1, 3), BorderFactory
+					.createLineBorder(Color.GRAY)));
+		}
 		c.gridheight = 1;
 		c.gridx = 0;
 		return idPanel;
 	}
 
+	@Override
+	protected String getToolTipText() {
+		return "show/hide identifiers for this concept";
+	}
 
-   @Override
-   protected String getToolTipText() {
-      return "show/hide identifiers for this concept";
-   }
-   @Override
-   protected int getComponentId() {
-      return Integer.MIN_VALUE;
-   }
+	@Override
+	protected int getComponentId() {
+		return Integer.MIN_VALUE;
+	}
+
+	public boolean getShowBorder() {
+		return showBorder;
+	}
+
+	public void setShowBorder(boolean showBorder) {
+		this.showBorder = showBorder;
+	}
 
 }

@@ -29,9 +29,13 @@ public class IntSet implements ListDataListener, I_IntSet {
 	
 	public IntSet(int[] values) {
 		super();
-		this.setValues = new int[0];
-		for (int i: values) {
-		   addNoIntervalAdded(i);
+		this.setValues = new int[values.length];
+		System.arraycopy(values, 0, this.setValues, 0, values.length);
+		Arrays.sort(this.setValues);
+		for (int i = 1; i < values.length; i++) {
+		   if (this.setValues[i-1] == this.setValues[i]) {
+			   throw new RuntimeException("Set array contains duplicates: " + Arrays.asList(this.setValues));
+		   }
       }
 	}
 	public IntSet() {

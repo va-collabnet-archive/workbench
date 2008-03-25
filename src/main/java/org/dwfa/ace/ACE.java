@@ -480,18 +480,21 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		if (aceConfig != null) {
 			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
 				frameConfig.setCommitEnabled(true);
-				updateDataAlerts(frameConfig);
+				updateAlerts(frameConfig);
 				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
 					frameConfig.addUncommitted((I_GetConceptData) to);
 				}
 			}
 		}
 	}
-
-	private static void updateDataAlerts(I_ConfigAceFrame frameConfig) {
+	
+	public static void updateAlerts(I_ConfigAceFrame frameConfig) {
 		ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame()
 				.getCdePanel();
 		aceInstance.getUncommittedListModel().clear();
+		
+		
+		
 		for (Collection<AlertToDataConstraintFailure> alerts: dataCheckMap.values()) {
 			aceInstance.getUncommittedListModel().addAll(alerts);
 		}
@@ -516,7 +519,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
 				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
 					frameConfig.removeUncommitted((I_GetConceptData) to);
-					updateDataAlerts(frameConfig);
+					updateAlerts(frameConfig);
 				}
 				if (uncommitted.size() == 0) {
 					frameConfig.setCommitEnabled(false);
@@ -558,7 +561,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			boolean testFailures = false;
 			Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
 			List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-			AceLog.getEditLog().info("Uncommitted: " + uncommitted);
+			AceLog.getEditLog().info("Uncommitted count: " + uncommitted.size());
+			AceLog.getEditLog().info("Uncommitted set: " + uncommitted);
 			for (I_Transact to : uncommitted) {
 				for (I_TestDataConstraints test : commitTests) {
 					try {
@@ -654,7 +658,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				for (I_Transact cb : uncommitted) {
 					cb.commit(version, values);
 				}
-				AceConfig.getVodb().addTimeBranchValues(values);
+				AceConfig.getVodb().addPositions(values);
 				AceConfig.getVodb().sync();
 
 			} catch (DatabaseException e) {
@@ -698,7 +702,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
 						frameConfig.fireCommit();
 						frameConfig.setCommitEnabled(false);
-						updateDataAlerts(frameConfig);
+						updateAlerts(frameConfig);
 					}
 				}
 			}
@@ -1564,8 +1568,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				conceptTabs);
 		conceptPanels.add(c4panel);
 		if (editMode) {
-			conceptTabs.addTab("List", getConceptListEditor());
+			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
 			conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, c4panel, "Data Checks Linked");
+			conceptTabs.addTab("List", getConceptListEditor());
 		} else {
 			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
 		}

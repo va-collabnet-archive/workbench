@@ -1,4 +1,4 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.vodb.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -51,69 +51,6 @@ public abstract class ProcessSources {
     public ProcessSources(boolean skipFirstLine) throws DatabaseException {
         super();
         this.skipFirstLine = skipFirstLine;
-    }
-
-    public void readLicitWords(Reader br, CountDownLatch licitWordLatch) throws IOException {
-        long start = System.currentTimeMillis();
-        int licitWords = 0;
-        StreamTokenizer st = new StreamTokenizer(br);
-        st.resetSyntax();
-        st.wordChars('\u001F', '\u00FF');
-        st.whitespaceChars('\t', '\t');
-        st.eolIsSignificant(true);
-
-        int tokenType = st.nextToken();
-        while (tokenType != StreamTokenizer.TT_EOF) {
-            writeLicitWord(st.sval);
-            licitWords++;
-
-            // CR or LF
-            tokenType = st.nextToken();
-            if (tokenType == 13) { // is CR
-                // LF
-                tokenType = st.nextToken();
-            }
-            licitWordLatch.countDown();
-            // Beginning of loop
-            tokenType = st.nextToken();
-        }
-        getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed licit words: " + licitWords);
-    }
-
-    public abstract void writeLicitWord(String word) throws IOException;
-
-    public abstract void writeIllicitWord(String word) throws IOException;
-
-    public abstract void optimizeLicitWords() throws IOException;
-
-    public void readIllicitWords(Reader br, CountDownLatch illicitWordLatch) throws Exception {
-        long start = System.currentTimeMillis();
-        int illicitWords = 0;
-        StreamTokenizer st = new StreamTokenizer(br);
-        st.resetSyntax();
-        st.wordChars('\u001F', '\u00FF');
-        st.whitespaceChars('\t', '\t');
-        st.eolIsSignificant(true);
-        int tokenType = st.nextToken();
-        while (tokenType != StreamTokenizer.TT_EOF) {
-            writeIllicitWord(st.sval);
-            illicitWords++;
-
-            // CR or LF
-            tokenType = st.nextToken();
-            if (tokenType == 13) { // is CR
-                // LF
-                tokenType = st.nextToken();
-            }
-
-            illicitWordLatch.countDown();
-            
-            // Beginning of loop
-            tokenType = st.nextToken();
-        }
-        getLog().info(
-                      "Process time: " + (System.currentTimeMillis() - start) + " Parsed illicit words: "
-                              + illicitWords);
     }
 
     protected void readConcepts(Reader r, Date releaseDate, FORMAT format, CountDownLatch conceptLatch) throws Exception {
@@ -543,10 +480,9 @@ public abstract class ProcessSources {
 
             tokenType = st.nextToken();
             Object pathId = getId(st);
-
             writeDescription(statusDate, descriptionId, status, conceptId, text, capSignificant, typeInt, lang, Arrays
                     .asList(new Object[] { pathId }));
-            descriptions++;
+           descriptions++;
 
             // CR or LF
             tokenType = st.nextToken();
@@ -671,7 +607,7 @@ public abstract class ProcessSources {
 
     public abstract void execute(File snomedDir) throws Exception;
 
-    public abstract void cleanup(I_IntSet relsToIgnore) throws Exception;
+    public abstract void cleanupSNOMED(I_IntSet relsToIgnore) throws Exception;
 
     public abstract void writeConcept(Date releaseDate, Object conceptKey, Object conceptStatus, boolean defChar,
         Object pathId) throws Exception;

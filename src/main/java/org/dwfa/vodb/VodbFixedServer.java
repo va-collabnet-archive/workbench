@@ -89,9 +89,9 @@ public class VodbFixedServer implements I_StoreLocalFixedTerminology {
 		throw new UnsupportedOperationException();
 	}
 
-	public I_DescribeConceptLocally getDescription(int descriptionNid)
+	public I_DescribeConceptLocally getDescription(int descriptionNid, int concNid)
 			throws IOException, TerminologyException {
-			I_DescriptionVersioned vDesc = server.getDescription(descriptionNid);
+			I_DescriptionVersioned vDesc = server.getDescription(descriptionNid, concNid);
 			return vDesc.toLocalFixedDesc();
 	}
 

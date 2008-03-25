@@ -1,9 +1,8 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +27,7 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
-import org.dwfa.vodb.bind.ThinConVersionedBinding;
-import org.dwfa.vodb.bind.ThinDescVersionedBinding;
-import org.dwfa.vodb.bind.ThinIdVersionedBinding;
-import org.dwfa.vodb.bind.ThinRelVersionedBinding;
+import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
@@ -43,14 +39,7 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-import com.sleepycat.bind.EntryBinding;
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.je.Cursor;
-import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.Transaction;
 
 /**
  * Goal which touches a timestamp file.
@@ -107,9 +96,6 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			int newId = vodb.uuidToNativeWithGeneration(snomedUid, snomedType3UuidSource,
 					snomedPath, thinVers);
 			idMap.put(snomedId, newId);
-			DatabaseEntry key = new DatabaseEntry(); 
-			intBinder.objectToEntry(newId, key);
-			DatabaseEntry value = new DatabaseEntry(); 
 			I_IdVersioned idv = new ThinIdVersioned(newId, 2);
 			//add 
 			ThinIdPart idPart = new ThinIdPart();
@@ -127,19 +113,12 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			idPart.setSourceId(new Long(snomedId));
 			idPart.setVersion(thinVers);
 			idv.addVersion(idPart);
-
-			idBinder.objectToEntry(idv, value);
-			vodb.getIdDb().put(null, key, value);
+			vodb.writeId(idv);
 			return newId;
 		}
 	
 	
 		
-	private ThinIdVersionedBinding idBinder = new ThinIdVersionedBinding();
-	private EntryBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
-	private ThinConVersionedBinding conBinder = new ThinConVersionedBinding();
-	private ThinDescVersionedBinding descBinder = new ThinDescVersionedBinding();
-	private ThinRelVersionedBinding relBinder = new ThinRelVersionedBinding();
 	private VodbEnv vodb;
 	//private Map<UUID, Integer> uuidToIntMap;	
 	private Stopwatch timer;
@@ -156,86 +135,23 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		this.timer = new Stopwatch();
 		this.timer.start();
 		monitor = new UpperInfoOnlyConsoleMonitor();
-		snomedPath = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()),
+		snomedPath = new Path(getSnomedCorePathId(),
 				new ArrayList<I_Position>());
 		snomedType3UuidSource = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID.getUids());
 		snomedIntIdSource = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 		currentId = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 	}
 
-	public void cleanup(I_IntSet relsToIgnore) throws Exception {
-		printElapsedTime();
-		AceLog.getAppLog().info("Creating concept->desc map.");
-		vodb.getConceptDescMap();
+	public void cleanupSNOMED(I_IntSet relsToIgnore) throws Exception {
 		//Update the history records for the relationships...
 		printElapsedTime();
-		AceLog.getAppLog().info("Starting rel history update.");
-		Transaction txn = null;
-		if (VodbEnv.isTransactional()) {
-			txn = vodb.getEnv().beginTransaction(null, null);
-		}
-		Cursor relC = vodb.getRelDb().openCursor(txn, null);
-		DatabaseEntry relKey = new DatabaseEntry();
-		DatabaseEntry relValue = new DatabaseEntry();
-		int compressedRels = 0;
-		int retiredRels = 0;
-		int currentRels = 0;
-		int totalRels = 0;
-		int[] releases = getReleaseDates();
-		Arrays.sort(releases);
-		while (relC.getNext(relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			totalRels++;
-			I_RelVersioned vrel = (I_RelVersioned) relBinder.entryToObject(relValue);
-			if (relsToIgnore.contains(vrel.getRelId()) == false) {
-				boolean addRetired = vrel.addRetiredRec(releases,
-						vodb.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
-				boolean removeRedundant = vrel.removeRedundantRecs();
-				if (addRetired && removeRedundant) {
-					relBinder.objectToEntry(vrel, relValue);
-					relC.put(relKey, relValue);
-					retiredRels++;
-					compressedRels++;
-				} else if (addRetired) {
-					relBinder.objectToEntry(vrel, relValue);
-					relC.put(relKey, relValue);
-					retiredRels++;
-				} else if (removeRedundant) {
-					relBinder.objectToEntry(vrel, relValue);
-					relC.put(relKey, relValue);
-					compressedRels++;
-					currentRels++;
-				} else {
-					currentRels++;
-				}
-			}			
-		}
-		relC.close();
-		if (txn != null) {
-			txn.commit();
-		}
-		AceLog.getAppLog().info("Total rels: " + totalRels);
-		AceLog.getAppLog().info("Compressed rels: " + compressedRels);
-		AceLog.getAppLog().info("Retired rels: " + retiredRels);
-		AceLog.getAppLog().info("Current rels: " + currentRels);
-		printElapsedTime();
-		monitor.setProgressInfoUpper("Starting c1RelMap.");
-		vodb.createC1RelMap();
-		printElapsedTime();
-		monitor.setProgressInfoUpper("Starting c2RelMap.");
-		vodb.createC2RelMap();
-		printElapsedTime();
-		monitor.setProgressInfoUpper("Starting createIdMaps.");
-		vodb.createIdMaps();
-		printElapsedTime();
-		monitor.setProgressInfoUpper("Starting createConceptImageMap.");
-		vodb.createConceptImageMap();
-		monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
-		vodb.populateTimeBranchDb();
+		vodb.cleanupSNOMED(relsToIgnore, getReleaseDates());
+		monitor.setProgressInfoUpper("Starting populate positions.");
+		vodb.populatePositions();
 		printElapsedTime();
 		monitor.setProgressInfoUpper("Starting makeLuceneIndex().");
 		vodb.createLuceneDescriptionIndex();
 		printElapsedTime();
-		optimizeLicitWords();
 		monitor.setProgressInfoUpper("Starting cleanup.");
 		vodb.close();
         monitor.setProgressInfoUpper("Close complete.");
@@ -262,23 +178,19 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		
 		con.setConceptStatus(getNativeStatus((Integer) conceptStatus));
 		con.setDefined(defChar);
-		DatabaseEntry key = new DatabaseEntry(); 
 		
-		intBinder.objectToEntry(getIntId((Long) conceptKey, releaseDate), key);
-		DatabaseEntry value = new DatabaseEntry(); 
+		int conId = getIntId((Long) conceptKey, releaseDate);
 		
-		I_ConceptAttributeVersioned vcon;
-		if (vodb.getConceptDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vcon = (I_ConceptAttributeVersioned) conBinder.entryToObject(value);
-		} else {
+		I_ConceptAttributeVersioned vcon = null;
+		if (vodb.hasConcept(conId)) {
+			 vcon = vodb.getConceptAttributes(conId);
+		} 
+		if (vcon == null) {
 			vcon = new ThinConVersioned(getIntId((Long) conceptKey, releaseDate), 1);
 		}
 		if (vcon.addVersion(con)) {
-			value = new DatabaseEntry(); 
-			conBinder.objectToEntry(vcon, value);
-			vodb.getConceptDb().put(null, key, value);
+			vodb.writeConceptAttributes(vcon);
 		}
-		
 	}
 
 	private int getNativeStatus(Integer conceptStatus) throws IOException, TerminologyException {
@@ -310,7 +222,14 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		int refinabilityNativeId = vodb.uuidToNative(refinability.getUids());
 		return refinabilityNativeId;
 	}
-
+	private Integer snomedCorePathId;
+	
+	private int getSnomedCorePathId() throws TerminologyException, IOException {
+		if (snomedCorePathId == null) {
+			snomedCorePathId = vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
+		}
+		return snomedCorePathId;
+	}
 	public void writeDescription(Date releaseDate, Object descriptionId,
 			Object status, Object conceptId, String text, boolean capStatus,
 			Object typeInt, String lang, Object ignoredPath) throws Exception {
@@ -339,7 +258,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
             }
         }
 		ThinDescPart desc = new ThinDescPart();
-		desc.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
+		desc.setPathId(getSnomedCorePathId());
 		desc.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		desc.setStatusId(getNativeStatus((Integer) status));
 		desc.setInitialCaseSignificant(capStatus);
@@ -347,21 +266,17 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		desc.setText(text);
 		desc.setTypeId(getNativeDescType((Integer) typeInt));
 		
-		DatabaseEntry key = new DatabaseEntry(); 
-		intBinder.objectToEntry(getIntId((Long) descriptionId, releaseDate), key);
-		DatabaseEntry value = new DatabaseEntry(); 
-		
+		int descId = getIntId((Long) descriptionId, releaseDate);
+		int concId = getIntId((Long) conceptId, releaseDate);
 		I_DescriptionVersioned vdesc;
-		if (vodb.getDescDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vdesc = (I_DescriptionVersioned) descBinder.entryToObject(value);
+		if (vodb.hasDescription(descId, concId)) {
+			 vdesc = vodb.getDescription(descId, concId);
 		} else {
-			vdesc = new ThinDescVersioned(getIntId((Long) descriptionId, releaseDate), 
-					getIntId((Long) conceptId, releaseDate), 1);
+			vdesc = new ThinDescVersioned(descId, 
+					concId, 1);
 		}
 		if (vdesc.addVersion(desc)) {
-			value = new DatabaseEntry(); 
-			descBinder.objectToEntry(vdesc, value);
-			vodb.getDescDb().put(null, key, value);
+			vodb.writeDescriptionNoLuceneUpdate(vdesc);
 		}	
 	}
 
@@ -370,7 +285,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			Object conceptTwoID, Object characteristic, Object refinability, int group, Object ignoredPath)
 			throws Exception {
 		ThinRelPart rel = new ThinRelPart();
-		rel.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
+		rel.setPathId(getSnomedCorePathId());
 		rel.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		rel.setStatusId(getNativeStatus(0));
 		rel.setCharacteristicId(getNativeCharacteristicType((Integer) characteristic));
@@ -378,22 +293,19 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		rel.setRefinabilityId(getNativeRefinability((Integer) refinability));
 		rel.setRelTypeId(getIntId((Long) relationshipTypeConceptID, releaseDate));
 
-		DatabaseEntry key = new DatabaseEntry(); 
-		intBinder.objectToEntry(getIntId((Long) relID, releaseDate), key);
-		DatabaseEntry value = new DatabaseEntry(); 
+		int relId = getIntId((Long) relID, releaseDate);
+		int c1id = getIntId((Long) conceptOneID, releaseDate);
 		I_RelVersioned vrel;
-		if (vodb.getRelDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			 vrel = (I_RelVersioned) relBinder.entryToObject(value);
+		if (vodb.hasRel(relId, c1id)) {
+			 vrel = vodb.getRel(relId, c1id);
 		} else {
 			vrel = new ThinRelVersioned(getIntId((Long) relID, releaseDate),
-					getIntId((Long) conceptOneID, releaseDate),
+					c1id,
 					getIntId((Long) conceptTwoID, releaseDate),
 					1);
 		}
 		if (vrel.addVersionNoRedundancyCheck(rel)) {
-			value = new DatabaseEntry(); 
-			relBinder.objectToEntry(vrel, value);
-			vodb.getRelDb().put(null, key, value);
+			vodb.writeRel(vrel);
 		}
 		
 	}
@@ -405,21 +317,6 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 	@Override
 	public void iterateRelationships(MakeRelSet oldRelItr) throws Exception {
 		vodb.iterateRelationships(oldRelItr);
-	}
-
-	@Override
-	public void writeIllicitWord(String word) throws IOException {
-		vodb.writeIllicitWord(word);	
-	}
-
-	@Override
-	public void writeLicitWord(String word)  throws IOException {
-		vodb.writeLicitWord(word);
-	}
-	
-	@Override
-	public void optimizeLicitWords() throws IOException {
-		vodb.optimizeLicitWords();
 	}
 
     @Override

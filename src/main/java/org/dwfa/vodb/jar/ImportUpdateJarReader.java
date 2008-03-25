@@ -275,17 +275,9 @@ public class ImportUpdateJarReader implements ActionListener {
 					processTimePaths(jf.getInputStream(je));
 				} 
 			}
-			AceConfig.getVodb().addTimeBranchValues(timePathSet);
-			
-			lowerProgressMessage = "Starting c1RelMap.";
-			AceConfig.getVodb().createC1RelMap();
-			lowerProgressMessage = "Starting c2RelMap.";
-			AceConfig.getVodb().createC2RelMap();
-			lowerProgressMessage = "Starting createIdMaps.";
-			AceConfig.getVodb().createIdMaps();
-			lowerProgressMessage = "Starting createConceptImageMap.";
-			AceConfig.getVodb().createConceptImageMap();
-			lowerProgressMessage = "Starting sync.";
+			lowerProgressMessage = "Adding positions.";
+			AceConfig.getVodb().addPositions(timePathSet);
+						lowerProgressMessage = "Starting sync.";
 			AceConfig.getVodb().sync();
 
 			continueWork = false;
@@ -456,8 +448,8 @@ public class ImportUpdateJarReader implements ActionListener {
 			ThinRelVersioned jarRel = binding.entryToObject(input);
 			jarRel.convertIds(jarToDbNativeMap);
 			if (AceConfig.getVodb().hasRel(jarRel
-					.getRelId())) {
-				I_RelVersioned dbRel = AceConfig.getVodb().getRel(jarRel.getRelId());
+					.getRelId(), jarRel.getC1Id())) {
+				I_RelVersioned dbRel = AceConfig.getVodb().getRel(jarRel.getRelId(), jarRel.getC1Id());
 				if (dbRel.merge(jarRel)) {
 					AceConfig.getVodb().writeRel(dbRel);
 					timePathSet.addAll(jarRel.getTimePathSet());
@@ -490,8 +482,8 @@ public class ImportUpdateJarReader implements ActionListener {
 			ThinDescVersioned jarDesc = binding.entryToObject(input);
 			jarDesc.convertIds(jarToDbNativeMap);
 			if (AceConfig.getVodb().hasDescription(jarDesc
-					.getDescId())) {
-				I_DescriptionVersioned dbDesc = AceConfig.getVodb().getDescription(jarDesc.getDescId());
+					.getDescId(), jarDesc.getConceptId())) {
+				I_DescriptionVersioned dbDesc = AceConfig.getVodb().getDescription(jarDesc.getDescId(), jarDesc.getConceptId());
 				if (dbDesc.merge(jarDesc)) {
 					AceConfig.getVodb().writeDescription(dbDesc);
 					timePathSet.addAll(jarDesc.getTimePathSet());

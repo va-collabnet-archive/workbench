@@ -2,16 +2,21 @@ package org.dwfa.ace.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.EventObject;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.AbstractTableModel;
@@ -197,6 +202,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 	public void setValueAt(Object value, int row, int col) {
 		try {
 			I_DescriptionTuple desc = getDescription(row);
+			boolean changed = false;
 			if (desc.getVersion() == Integer.MAX_VALUE) {
 				switch (columns[col]) {
 				case DESC_ID:
@@ -205,24 +211,29 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 					break;
 				case TEXT:
 					desc.setText(value.toString());
+					changed = true;
 					break;
 				case LANG:
 					desc.setLang(value.toString());
+					changed = true;
 					break;
 				case CASE_FIXED:
 					desc.setInitialCaseSignificant((Boolean) value);
+					changed = true;
 					break;
 				case STATUS:
 					Integer statusId = (Integer) value;
 					desc.setStatusId(statusId);
 					getReferencedConcepts().put(statusId,
 							ConceptBean.get(statusId));
+					changed = true;
 					break;
 				case TYPE:
 					Integer typeId = (Integer) value;
 					desc.setTypeId(typeId);
 					getReferencedConcepts()
 							.put(typeId, ConceptBean.get(typeId));
+					changed = true;
 					break;
 				case VERSION:
 					break;
@@ -230,12 +241,59 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 					break;
 				}
 				fireTableDataChanged();
+				if (changed) {
+					AceLog.getAppLog().info("Description table changed");
+					updateDataAlerts(row);
+				}
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	Timer timer = new Timer("updateDataAlertsTimer");
+	private class UpdateDataAlertsTimerTask extends TimerTask {
+		boolean active = true;
+		final int row;
+		
+		
+		public UpdateDataAlertsTimerTask(int row) {
+			super();
+			this.row = row;
+		}
+		@Override
+		public void run() {
+			if (active) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (active) {
+							try {
+								I_DescriptionTuple desc = getDescription(row);
+								ACE.addUncommitted(ConceptBean.get(desc.getConceptId()));
+							} catch (IOException e) {
+								AceLog.getAppLog().alertAndLogException(e);
+							}
+						}
+					}});
+			}
+		}
+		public boolean isActive() {
+			return active;
+		}
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+	}
+	UpdateDataAlertsTimerTask alertUpdater;
+	private void updateDataAlerts(int row) {
+		if (alertUpdater != null) {
+			alertUpdater.setActive(false);
+		}
+		alertUpdater = new UpdateDataAlertsTimerTask(row);
+		timer.schedule(alertUpdater, 2000);
+		
+	}
 	public abstract Map<Integer, ConceptBean> getReferencedConcepts();
 
 	public Class<?> getColumnClass(int c) {
@@ -307,14 +365,30 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
          this.wrapLines = wrapLines;
       }
 	}
+	
 
 	public static class DescTextFieldEditor extends DefaultCellEditor {
 
 		private static final long serialVersionUID = 1L;
+		private class TextFieldFocusListener implements FocusListener {
 
+			public void focusGained(FocusEvent e) {
+				// nothing to do
+			}
+
+			public void focusLost(FocusEvent e) {
+				delegate.stopCellEditing();
+			}
+			
+		}
+
+		JTextField textField;
+		int row;
+		int column;
 		public DescTextFieldEditor() {
 			super(new JTextField());
-			final JTextField textField = new JTextField();
+			textField = new JTextField();
+			textField.addFocusListener(new TextFieldFocusListener());
 			editorComponent = textField;
 
 			delegate = new EditorDelegate() {
@@ -341,6 +415,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
+			this.row = row;
+			this.column = column;
 			((JComponent) getComponent())
 					.setBorder(new LineBorder(Color.black));
 			return super.getTableCellEditorComponent(table, value, isSelected,

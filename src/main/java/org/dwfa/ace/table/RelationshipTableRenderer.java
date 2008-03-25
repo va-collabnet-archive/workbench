@@ -21,7 +21,7 @@ public class RelationshipTableRenderer extends AceTableRenderer {
 		boolean same = false;
 		StringWithRelTuple swt = (StringWithRelTuple) value;
 		boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
-
+		
 		if (row > 0) {
 			StringWithRelTuple prevSwt = (StringWithRelTuple) table.getValueAt(row - 1, column);
 			same = swt.getTuple().getRelId() == prevSwt.getTuple().getRelId();

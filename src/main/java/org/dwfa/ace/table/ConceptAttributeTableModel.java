@@ -11,9 +11,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
@@ -385,6 +387,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 	}
 
 	public void setValueAt(Object value, int row, int col) {
+		boolean changed = false;
 		try {
 			switch (columns[col]) {
 			case CON_ID:
@@ -394,9 +397,11 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 				getConceptTuple(row).setStatusId(statusId);
 				getReferencedConcepts()
 						.put(statusId, ConceptBean.get(statusId));
+				changed = true;
 				break;
 			case DEFINED:
 				getConceptTuple(row).setDefined((Boolean) value);
+				changed = true;
 				break;
 			case VERSION:
 				break;
@@ -404,9 +409,53 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 				break;
 			}
 			fireTableCellUpdated(row, col);
+			if (changed) {
+				AceLog.getAppLog().info("Attributes table changed");
+				updateDataAlerts(row);
+			}
 		} catch (Exception ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
+	}
+
+	java.util.Timer timer = new java.util.Timer("updateDataAlertsTimer");
+	private class UpdateDataAlertsTimerTask extends TimerTask {
+		boolean active = true;
+		final int row;
+		
+		
+		public UpdateDataAlertsTimerTask(int row) {
+			super();
+			this.row = row;
+		}
+		@Override
+		public void run() {
+			if (active) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (active) {
+							I_ConceptAttributeTuple tuple = allTuples.get(row);
+							ACE.addUncommitted(ConceptBean.get(tuple.getConId()));
+						}
+					}});
+			}
+		}
+		public boolean isActive() {
+			return active;
+		}
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+	}
+	UpdateDataAlertsTimerTask alertUpdater;
+	private void updateDataAlerts(int row) {
+		if (alertUpdater != null) {
+			alertUpdater.setActive(false);
+		}
+		alertUpdater = new UpdateDataAlertsTimerTask(row);
+		timer.schedule(alertUpdater, 2000);
+		
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {

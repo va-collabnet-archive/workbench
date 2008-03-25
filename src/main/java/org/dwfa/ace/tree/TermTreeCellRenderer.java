@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -274,6 +275,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                      this.setIcon(null);
                   }
                }
+               for (I_OverrideTaxonomyRenderer override: aceConfig.getTaxonomyRendererOverrideList()) {
+               		override.overrideTreeCellRendererComponent(this, tree, cb, sel, expanded, leaf, row, hasFocus, aceConfig);
+               }
             } else {
                this.setIcon(null);
                this.setText(node.getUserObject().toString());
@@ -285,7 +289,10 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
       } catch (IOException e) {
          this.setText(e.toString());
          AceLog.getAppLog().alertAndLogException(e);
-      }
+      } catch (TerminologyException e) {
+          this.setText(e.toString());
+          AceLog.getAppLog().alertAndLogException(e);
+	}
       return this;
    }
 

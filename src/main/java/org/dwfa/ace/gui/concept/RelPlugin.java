@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
@@ -19,8 +22,11 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddRelationship;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -33,7 +39,7 @@ import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 
-public abstract class RelPlugin extends AbstractPlugin implements TableModelListener {
+public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 
 	public RelPlugin(boolean selectedByDefault) {
 		super(selectedByDefault);
@@ -41,6 +47,8 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
    
    protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
 	private JTableWithDragImage relTable;
+	protected boolean idToggleState = false;
+	protected IdPlugin idPlugin;
 
 	protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText,
 			boolean enableEdit, TOGGLES toggle) {
@@ -99,7 +107,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 
 		TableSorter relSortingTable = new TableSorter(model);
 		relTable = new JTableWithDragImage(relSortingTable);
-      relTable.getSelectionModel().addListSelectionListener(this);
+        relTable.getSelectionModel().addListSelectionListener(this);
 		relSortingTable.setTableHeader(relTable.getTableHeader());
 		relSortingTable
 				.getTableHeader()
@@ -138,6 +146,14 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
       c.gridheight = 1;
       c.gridx = 0;
       c.gridwidth = 2;
+
+		if (host.getToggleState(TOGGLES.ID) == true) {
+			idPlugin = new IdPlugin();
+			idPlugin.setShowBorder(false);
+			relPanel.add(idPlugin.getComponent(this), c);
+			c.gridy++;
+		}
+
       visibleExtensions.clear();
       RefsetUtil.addRefsetTables(host, this, toggle, c, visibleExtensions, relPanel);
 		relPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
@@ -186,4 +202,85 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
        
    }
 
+	public I_GetConceptData getHierarchySelection() {
+		return getHost().getHierarchySelection();
+	}
+
+	public boolean getShowHistory() {
+		return getHost().getShowHistory();
+	}
+
+	public boolean getShowRefsets() {
+		return getHost().getShowRefsets();
+	}
+
+	public boolean getToggleState(TOGGLES toggle) {
+		return getHost().getToggleState(toggle);
+	}
+
+	public boolean getUsePrefs() {
+		return getHost().getUsePrefs();
+	}
+
+	public VIEW_TYPE getViewType() {
+		return getHost().getViewType();
+	}
+
+	public void setAllTogglesToState(boolean state) {
+		getHost().setAllTogglesToState(state);
+	}
+
+	public void setLinkType(LINK_TYPE link) {
+		getHost().setLinkType(link);
+	}
+
+	public void setToggleState(TOGGLES toggle, boolean state) {
+		getHost().setToggleState(toggle, state);
+	}
+
+	public void unlink() {
+		getHost().unlink();
+	}
+
+
+	public I_ConfigAceFrame getConfig() {
+		return getHost().getConfig();
+	}
+
+	public I_AmTermComponent getTermComponent() {
+		return getSelectedPluginComponent();
+	}
+
+	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+	public void removePropertyChangeListener(String propertyName,
+			PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(propertyName, listener);
+	}
+
+	public void addPropertyChangeListener(String propertyName,
+			PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(propertyName, listener);
+	}
+
+	public void setTermComponent(I_AmTermComponent arg0) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent evt) {
+		super.valueChanged(evt);
+		pcs.firePropertyChange(I_ContainTermComponent.TERM_COMPONENT, null, getSelectedPluginComponent());
+	}
+	
+	protected I_AmTermComponent getSelectedPluginComponent() {
+		if (relTable.getSelectedRow() < 0) {
+			return null;
+		}
+		StringWithRelTuple swrt = (StringWithRelTuple) relTable.getValueAt(
+				relTable.getSelectedRow(), 0);
+		return swrt.getTuple().getRelVersioned();
+	}
+
+	
+	protected abstract I_HostConceptPlugins getHost();
 }

@@ -7,6 +7,7 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 
 
 public class ThinDescPart implements I_DescriptionPart {
+	
 	private int pathId;
 	private int version;
 	private int statusId;

@@ -1,10 +1,11 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ThinExtByRefPart;

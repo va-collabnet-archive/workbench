@@ -1,4 +1,4 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,8 +22,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.vodb.ProcessAceFormatSources.FORMAT;
-import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
+import org.dwfa.ace.api.I_ProcessRelationships;
+import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.types.IntSet;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -37,7 +38,7 @@ public abstract class ProcessSnomed extends ProcessSources {
 		this.constantDate = constantDate;
 	}
 
-	static class MakeRelSet implements I_ProcessRelationshipEntries {
+	static class MakeRelSet implements I_ProcessRelationships {
 		List<Integer> ids = new ArrayList<Integer>();
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
@@ -45,19 +46,6 @@ public abstract class ProcessSnomed extends ProcessSources {
 		
 		public MakeRelSet() {
 			super();
-		}
-
-		public void processRel(DatabaseEntry key, DatabaseEntry value) throws Exception {
-			ids.add((Integer) intBinder.entryToObject(key));
-			
-		}
-
-		public DatabaseEntry getDataEntry() {
-			return key;
-		}
-
-		public DatabaseEntry getKeyEntry() {
-			return value;
 		}
 		
 		public I_IntSet getIntSet() {
@@ -68,6 +56,10 @@ public abstract class ProcessSnomed extends ProcessSources {
 			}
 			Arrays.sort(values);
 			return new IntSet(values);
+		}
+
+		public void processRelationship(I_RelVersioned rel) throws Exception {
+			ids.add(rel.getRelId());
 		}
 	}
 
@@ -108,7 +100,7 @@ public abstract class ProcessSnomed extends ProcessSources {
 				}
 			}
 			
-			cleanup(oldRelSet.getIntSet());
+			cleanupSNOMED(oldRelSet.getIntSet());
 	}
 	boolean processConcepts = true;
 	boolean processRels = true;
@@ -164,7 +156,7 @@ public abstract class ProcessSnomed extends ProcessSources {
 				}
 			}
 		}
-		cleanup(oldRelSet.getIntSet());
+		cleanupSNOMED(oldRelSet.getIntSet());
 	}
 
 	protected Object getId(StreamTokenizer st) {

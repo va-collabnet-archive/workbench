@@ -9,6 +9,17 @@ public class ThinIdPart implements I_IdPart {
 	private int source;
 	private Object sourceId;
 	
+	public ThinIdPart() {
+		super();
+	}
+	public ThinIdPart(I_IdPart another) {
+		super();
+		this.pathId = another.getPathId();
+		this.version = another.getVersion();
+		this.idStatus = another.getIdStatus();
+		this.source = another.getSource();
+		this.sourceId = another.getSourceId();
+	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdPart#getPathId()
 	 */
@@ -95,16 +106,19 @@ public class ThinIdPart implements I_IdPart {
 	}
 	@Override
 	public boolean equals(Object obj) {
-		ThinIdPart another = (ThinIdPart) obj;
-		return ((pathId == another.pathId) &&
-				(version == another.version) &&
-				(idStatus == another.idStatus) &&
-				(source == another.source) &&
-				(sourceId.equals(another.sourceId)));
+		I_IdPart another = (I_IdPart) obj;
+		return ((pathId == another.getPathId()) &&
+				(version == another.getVersion()) &&
+				(idStatus == another.getIdStatus()) &&
+				(source == another.getSource()) &&
+				(sourceId.equals(another.getSourceId())));
 	}
 	@Override
 	public int hashCode() {
 		return HashFunction.hashCode(new int[] {pathId, version, idStatus, source, sourceId.hashCode()});
+	}
+	public I_IdPart duplicate() {
+		return new ThinIdPart(this);
 	}
 
 }

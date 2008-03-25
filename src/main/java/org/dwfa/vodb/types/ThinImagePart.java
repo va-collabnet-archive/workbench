@@ -9,6 +9,11 @@ public class ThinImagePart implements I_ImagePart {
 	private int statusId;
 	private String textDescription;
 	private int typeId;
+	
+	public ThinImagePart() {
+		super();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#getPathId()
 	 */
@@ -35,9 +40,6 @@ public class ThinImagePart implements I_ImagePart {
 		this.statusId = status;
 		this.textDescription = textDescription;
 		this.typeId = type;
-	}
-	public ThinImagePart() {
-		
 	}
 	public ThinImagePart(I_ImagePart another) {
 		super();
@@ -120,6 +122,9 @@ public class ThinImagePart implements I_ImagePart {
 	public int hashCode() {
 		return HashFunction.hashCode(new int[] {pathId, statusId, textDescription.hashCode(),
 				typeId, version});
+	}
+	public I_ImagePart duplicate() {
+		return new ThinImagePart(this);
 	}
 	
 	

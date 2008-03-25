@@ -15,11 +15,11 @@ import javax.swing.Timer;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.swing.SwingWorker;
-import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinDescVersionedComparator;
 
 public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements I_TrackContinuation {
@@ -35,7 +35,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
 	private int descCount;
 
-	private Collection<ThinDescVersioned> regexMatches;
+	private Collection<I_DescriptionVersioned> regexMatches;
 	private Collection<LuceneMatch> luceneMatches;
 
 	private DescriptionsFromCollectionTableModel model;
@@ -218,7 +218,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		this.patternString = patternString;
 		this.lucene = lucene;
 
-	}
+	}           
 
 	public void updateMatches() {
 		if (luceneMatches != null) {
@@ -247,7 +247,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 					searchPanel.getExtraCriterion(), config, (LuceneProgressUpdator) updater);
 		} else {
 			regexMatches = Collections
-			.synchronizedCollection(new TreeSet<ThinDescVersioned>(
+			.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
 					new ThinDescVersionedComparator()));
 			updater = new RegexProgressUpdator();
 			descCount = AceConfig.getVodb().countDescriptions();

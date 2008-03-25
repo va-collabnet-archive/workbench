@@ -44,6 +44,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -53,7 +54,6 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class SearchPanel extends JPanel {
 
@@ -109,7 +109,7 @@ public class SearchPanel extends JPanel {
                     QueryBean qb = (QueryBean) ois.readObject();
                     ois.close();
                     setQuery(qb);
-                    model.setDescriptions(new ArrayList<ThinDescVersioned>());
+                    model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
                     //startSearch();
                 }
 
@@ -402,9 +402,13 @@ public class SearchPanel extends JPanel {
 
         if (searchPhraseField.getText().length() > 2) {
             setShowProgress(true);
-            model.setDescriptions(new ArrayList<ThinDescVersioned>());
+            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
             ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config, luceneRadio
                     .isSelected()));
+        } else if (searchPhraseField.getText().length() == 0) {
+            setShowProgress(true);
+            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+            ACE.threadPool.execute(new SearchAllWorker(this, model, config));
         } else {
             JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 2 characters: "
                     + searchPhraseField.getText(), "Search Error", JOptionPane.ERROR_MESSAGE);

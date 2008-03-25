@@ -1,4 +1,4 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +28,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinConVersionedBinding;
-import org.dwfa.vodb.bind.ThinDescVersionedBinding;
-import org.dwfa.vodb.bind.ThinIdVersionedBinding;
-import org.dwfa.vodb.bind.ThinRelVersionedBinding;
+import org.dwfa.vodb.I_MapIds;
+import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
@@ -43,16 +41,11 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-import com.sleepycat.bind.EntryBinding;
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
 
 public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
-    protected void flushIdBuffer() throws Exception {
+    public void flushIdBuffer() throws Exception {
         map.flushIdBuffer();
     }
     
@@ -162,7 +155,12 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
         int encodingSource = PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE);
 
-        public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
+        public BerkeleyIdMapper() throws DatabaseException {
+			super();
+			vodb.logIdDbStats();
+		}
+
+		public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
             Integer nid = idsFromCollection.get(uids);
             if (nid != null) {
                 return nid;
@@ -179,17 +177,13 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             int newId = vodb.uuidToNativeWithGeneration(firstId, encodingSource, idPath, version);
             idsFromCollection.put(uids, newId);
 
-            DatabaseEntry key = new DatabaseEntry();
-            intBinder.objectToEntry(newId, key);
-            DatabaseEntry value = new DatabaseEntry();
             I_IdVersioned idv = new ThinIdVersioned(newId, 1);
             addUuidPart(idPath, version, firstId, idv);
             while (idsItr.hasNext()) {
                 addUuidPart(idPath, version, idsItr.next(), idv);
             }
 
-            idBinder.objectToEntry(idv, value);
-            vodb.getIdDb().put(null, key, value);
+			vodb.writeId(idv);
             return newId;
         }
 
@@ -208,15 +202,11 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             int newId = vodb.uuidToNativeWithGeneration(uid, encodingSource, idPath, version);
             ids.put(uid, newId);
 
-            DatabaseEntry key = new DatabaseEntry();
-            intBinder.objectToEntry(newId, key);
-            DatabaseEntry value = new DatabaseEntry();
             I_IdVersioned idv = new ThinIdVersioned(newId, 1);
 
             addUuidPart(idPath, version, uid, idv);
+			vodb.writeId(idv);
 
-            idBinder.objectToEntry(idv, value);
-            vodb.getIdDb().put(null, key, value);
             return newId;
         }
 
@@ -237,16 +227,6 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             // Nothing to do...
         }
     }
-
-    private EntryBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
-
-    private ThinIdVersionedBinding idBinder = new ThinIdVersionedBinding();
-
-    private ThinConVersionedBinding conBinder = new ThinConVersionedBinding();
-
-    private ThinDescVersionedBinding descBinder = new ThinDescVersionedBinding();
-
-    private ThinRelVersionedBinding relBinder = new ThinRelVersionedBinding();
 
     private VodbEnv vodb;
 
@@ -286,8 +266,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     }
 
     @Override
-    public void cleanup(I_IntSet relsToIgnore) throws Exception {
-        optimizeLicitWords();
+    public void cleanupSNOMED(I_IntSet relsToIgnore) throws Exception {
+        //nothing to clean up since using ace formats. 
     }
 
     @SuppressWarnings("unchecked")
@@ -299,22 +279,17 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         con.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
         con.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
         con.setConceptStatus(map.getIntId((UUID) conceptStatus, aceAuxPath, version));
-        con.setDefined(defChar);
-        DatabaseEntry key = new DatabaseEntry();
-
-        intBinder.objectToEntry(map.getIntId((UUID) conceptKey, aceAuxPath, version), key);
-        DatabaseEntry value = new DatabaseEntry();
-
-        I_ConceptAttributeVersioned vcon;
-        if (vodb.getConceptDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-            vcon = (I_ConceptAttributeVersioned) conBinder.entryToObject(value);
-        } else {
+        con.setDefined(defChar);        
+        int conceptId = map.getIntId((UUID) conceptKey, aceAuxPath, version);
+        I_ConceptAttributeVersioned vcon = null;
+        if (vodb.hasConcept(conceptId)) {
+            vcon = vodb.getConceptAttributes(conceptId);
+        } 
+        if (vcon == null) {
             vcon = new ThinConVersioned(map.getIntId((UUID) conceptKey, aceAuxPath, version), 1);
         }
         if (vcon.addVersion(con)) {
-            value = new DatabaseEntry();
-            conBinder.objectToEntry(vcon, value);
-            vodb.getConceptDb().put(null, key, value);
+            vodb.writeConceptAttributes(vcon);
         }
     }
 
@@ -332,21 +307,18 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         desc.setText(text);
         desc.setTypeId(map.getIntId((UUID) typeInt, aceAuxPath, ThinVersionHelper.convert(releaseDate.getTime())));
 
-        DatabaseEntry key = new DatabaseEntry();
-        intBinder.objectToEntry(map.getIntId((UUID) descriptionId, aceAuxPath, version), key);
-        DatabaseEntry value = new DatabaseEntry();
+        int descId = map.getIntId((UUID) descriptionId, aceAuxPath, version);
+        int concId = map.getIntId((UUID) conceptId, aceAuxPath, version);
 
         I_DescriptionVersioned vdesc;
-        if (vodb.getDescDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-            vdesc = (I_DescriptionVersioned) descBinder.entryToObject(value);
+        if (vodb.hasDescription(descId, concId)) {
+            vdesc = vodb.getDescription(descId, concId);
         } else {
             vdesc = new ThinDescVersioned(map.getIntId((UUID) descriptionId, aceAuxPath, version), map
                     .getIntId((UUID) conceptId, aceAuxPath, ThinVersionHelper.convert(releaseDate.getTime())), 1);
         }
         if (vdesc.addVersion(desc)) {
-            value = new DatabaseEntry();
-            descBinder.objectToEntry(vdesc, value);
-            vodb.getDescDb().put(null, key, value);
+            vodb.writeDescriptionNoLuceneUpdate(vdesc);
         }
     }
 
@@ -377,21 +349,14 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         part.setRefinabilityId(map.getIntId((UUID) refinability, aceAuxPath, version));
         part.setRelTypeId(map.getIntId((UUID) relationshipTypeConceptID, aceAuxPath, version));
 
-        DatabaseEntry key = new DatabaseEntry();
-        intBinder.objectToEntry(map.getIntId((UUID) relID, aceAuxPath, version), key);
-        DatabaseEntry value = new DatabaseEntry();
+        int relId = map.getIntId((UUID) relID, aceAuxPath, version);
         I_RelVersioned vrel;
-        if (vodb.getRelDb().get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-            vrel = (I_RelVersioned) relBinder.entryToObject(value);
+        if (vodb.hasRel(relId, c1id)) {
+            vrel = vodb.getRel(relId, c1id);
             if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
                 // rel ok
             } else {
-                // log for now, throw exception later
-                AceLog.getEditLog().log(Level.SEVERE, "Duplicate rels with different c1 and c2 for: " + relID);
-                vrel = new ThinRelVersioned(map.getIntId(UUID.randomUUID(), aceAuxPath, version), map
-                        .getIntId((UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID,
-                                                                                          aceAuxPath, version), 1);
-
+                 throw new Exception("Duplicate rels with different c1 and c2 for: " + relID);
             }
         } else {
             vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
@@ -399,28 +364,10 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                                                                                       version), 1);
         }
         if (vrel.addVersionNoRedundancyCheck(part)) {
-            value = new DatabaseEntry();
-            relBinder.objectToEntry(vrel, value);
-            vodb.getRelDb().put(null, key, value);
+            vodb.writeRel(vrel);
         }
     }
 
-    @Override
-    public void writeIllicitWord(String word) throws IOException {
-        vodb.writeIllicitWord(word);
-
-    }
-
-    @Override
-    public void writeLicitWord(String word) throws IOException {
-        vodb.writeLicitWord(word);
-
-    }
-
-    @Override
-    public void optimizeLicitWords() throws IOException {
-        vodb.optimizeLicitWords();
-    }
 
     @Override
     public void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid, Date statusDate,

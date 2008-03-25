@@ -12,7 +12,6 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
@@ -30,6 +29,7 @@ public class SrcRelPlugin extends RelPlugin {
    TOGGLES toggleType = TOGGLES.SOURCE_RELS;
 
 	public JPanel getComponent(I_HostConceptPlugins host) {
+	  this.host = host;
       if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
          createPluginComponent(host);
       }
@@ -37,6 +37,7 @@ public class SrcRelPlugin extends RelPlugin {
 	}
 
    private void createPluginComponent(I_HostConceptPlugins host) {
+	  this.host = host;
       if (AceLog.getAppLog().isLoggable(Level.FINE)) {
          AceLog.getAppLog().fine("creating src rel plugin component...");
       }
@@ -45,7 +46,6 @@ public class SrcRelPlugin extends RelPlugin {
       pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true, toggleType);
       host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
       host.addPropertyChangeListener("commit", this);
-      this.host = host;
       PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
       srcRelTableModel.propertyChange(evt);
    }
@@ -72,9 +72,14 @@ public class SrcRelPlugin extends RelPlugin {
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
+			
+		if (idPlugin != null) {
+			idPlugin.update();
+		}
 
-         if (RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
-            createPluginComponent(host);
+         if (RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)|| host.getToggleState(TOGGLES.ID) != idToggleState) {
+				idToggleState = host.getToggleState(TOGGLES.ID);
+				createPluginComponent(host);
          }
 
          PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
@@ -96,5 +101,10 @@ public class SrcRelPlugin extends RelPlugin {
    protected String getToolTipText() {
       return "show/hide source relationships for this concept";
    }
+
+	@Override
+	protected I_HostConceptPlugins getHost() {
+		return host;
+	}
 
 }

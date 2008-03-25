@@ -3,14 +3,16 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_TermFactory;
@@ -30,32 +32,57 @@ import com.sleepycat.je.DatabaseException;
 
 public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 
-    private static WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>> ebrBeans = 
-        new WeakHashMap<ExtensionByReferenceBean, WeakReference<ExtensionByReferenceBean>>();
+
+	public static enum REF_TYPE {SOFT, WEAK};
+	
+	private static REF_TYPE refType = REF_TYPE.SOFT;
+
+	
+	private static HashMap<Integer, Reference<ExtensionByReferenceBean>> ebrBeans = 
+        new HashMap<Integer, Reference<ExtensionByReferenceBean>>();
 
     private ExtensionByReferenceBean(int memberId) {
         super();
         this.memberId = memberId;
     }
 
-    public static ExtensionByReferenceBean get(int memberId) {
-        ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
-        WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
-        if (ref != null) {
-            ebrBean = ref.get();
-        } else {
-            synchronized (ebrBeans) {
-                ref = ebrBeans.get(ebrBean);
-                if (ref == null) {
-                    ebrBeans.put(ebrBean, new WeakReference<ExtensionByReferenceBean>(ebrBean));
-                } else {
-                    ebrBean = ref.get();
-                }
-            }
-        }
-        return ebrBean;
-    }
+	public static ExtensionByReferenceBean get(int memberId) {
+		if (ebrBeans.containsKey(ebrBeans)) {
+			Reference<ExtensionByReferenceBean> ref = ebrBeans.get(memberId);
+			if (ref.isEnqueued() == false) {
+				ExtensionByReferenceBean ebrBean = ref.get();
+				if (ebrBean != null) {
+					return ebrBean;
+				} 				
+			}
+		}
 
+		synchronized (ebrBeans) {
+			if (ebrBeans.containsKey(memberId)) {
+				Reference<ExtensionByReferenceBean> ref = ebrBeans.get(memberId);
+				if (ref.isEnqueued()) {
+					ebrBeans.remove(memberId);				
+				} else {
+					ExtensionByReferenceBean ebrBean = ref.get();
+					if (ebrBean != null) {
+						return ebrBean;
+					} else {
+						ebrBeans.remove(memberId);
+					}
+				}
+			}
+			ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
+			if (refType == REF_TYPE.SOFT) {
+				ebrBeans.put(memberId, new SoftReference<ExtensionByReferenceBean>(ebrBean));
+			} else {
+				ebrBeans.put(memberId, new WeakReference<ExtensionByReferenceBean>(ebrBean));
+			}
+			return ebrBean;
+		}
+	}
+
+    
+    
     public static I_GetExtensionData make(UUID uid, I_ThinExtByRefVersioned extension) throws TerminologyException,
             IOException {
         return make(AceConfig.getVodb().uuidToNative(uid), extension);
@@ -71,7 +98,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     public static ExtensionByReferenceBean makeNew(int memberId, I_ThinExtByRefVersioned extension) {
         ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
         ebrBean.firstCommit = true;
-        WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        Reference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
         if (ref != null) {
             throw new RuntimeException("ExtensionByReferenceBean already exists for: " + memberId);
         }
@@ -82,7 +109,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 
     public static ExtensionByReferenceBean make(int memberId, I_ThinExtByRefVersioned extension) {
         ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
-        WeakReference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        Reference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
         if (ref != null) {
             return ref.get();
         }

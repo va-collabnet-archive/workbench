@@ -43,6 +43,7 @@ import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
 
 import com.sleepycat.je.DatabaseException;
@@ -158,6 +159,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 					}
 					AceConfig.getVodb().setup(dbFolder, readOnly, cacheSize);
 				} catch (IOException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 				aceFrames = (List<I_ConfigAceFrame>) in.readObject();
@@ -352,7 +355,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	public static void setupAceConfig(AceConfig config, File configFile,
 			Long cacheSize, boolean includeSnomed) throws DatabaseException, ParseException,
 			TerminologyException, IOException, FileNotFoundException {
-		AceConfig.getVodb().setup(config.dbFolder, config.readOnly, cacheSize);
+		try {
+			AceConfig.getVodb().setup(config.dbFolder, config.readOnly, cacheSize);
+		} catch (Exception e) {
+			throw new ToIoException(e);
+		}
 		SvnPrompter prompter = new SvnPrompter();
 		prompter.prompt("config file", "username");
 		config.setUsername(prompter.getUsername());

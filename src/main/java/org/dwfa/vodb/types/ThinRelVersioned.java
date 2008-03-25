@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -16,6 +17,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
@@ -31,6 +33,11 @@ public class ThinRelVersioned implements I_RelVersioned {
 
 	private List<I_RelPart> versions;
 
+	public ThinRelVersioned(int componentOneId, int componentTwoId,
+			int count) {
+		this(Integer.MIN_VALUE, componentOneId, componentTwoId,
+				count);
+	}
 	public ThinRelVersioned(int relId, int componentOneId, int componentTwoId,
 			int count) {
 		super();
@@ -92,22 +99,45 @@ public class ThinRelVersioned implements I_RelVersioned {
 		if (lastRelVersion.getVersion() != releases[releases.length - 1]) {
 			// last version is not from the last release,
 			// so we need to inactivate the relationship.
-			int lastMention = 0;
-			for (; releases[lastMention] != lastRelVersion.getVersion(); lastMention++) {
-
+			int lastMention = -1;
+			for (int i = 0; i < releases.length - 1; i++) {
+				if (releases[i] == lastRelVersion.getVersion()) {
+					lastMention = i;
+					break;
+				}
 			}
-			int retiredVersion = releases[lastMention + 1];
-			ThinRelPart retiredRel = new ThinRelPart();
-			retiredRel.setPathId(lastRelVersion.getPathId());
-			retiredRel.setVersion(retiredVersion);
-			retiredRel.setStatusId(retiredStatusId);
-			retiredRel
-					.setCharacteristicId(lastRelVersion.getCharacteristicId());
-			retiredRel.setGroup(lastRelVersion.getGroup());
-			retiredRel.setRefinabilityId(lastRelVersion.getRefinabilityId());
-			retiredRel.setRelTypeId(lastRelVersion.getRelTypeId());
-			versions.add(retiredRel);
-			return true;
+			
+
+			if (lastMention != -1) {
+				int retiredVersion = releases[lastMention + 1];
+				ThinRelPart retiredRel = new ThinRelPart();
+				retiredRel.setPathId(lastRelVersion.getPathId());
+				retiredRel.setVersion(retiredVersion);
+				retiredRel.setStatusId(retiredStatusId);
+				retiredRel
+						.setCharacteristicId(lastRelVersion.getCharacteristicId());
+				retiredRel.setGroup(lastRelVersion.getGroup());
+				retiredRel.setRefinabilityId(lastRelVersion.getRefinabilityId());
+				retiredRel.setRelTypeId(lastRelVersion.getRelTypeId());
+				versions.add(retiredRel);
+				return true;
+			} else {
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					StringBuffer b = new StringBuffer();
+					b.append("[");
+					for (int releaseVersion: releases) {
+						b.append(ThinVersionHelper.format(releaseVersion));
+						b.append("(");
+						b.append(releaseVersion);
+						b.append("), ");
+					}
+					b.append("]");
+					AceLog.getAppLog().fine("\nUnable to add retired record for: " + this + 
+							"\nreleases: " + b.toString() + 
+							"\nc1 " + ConceptBean.get(componentOneId).toString() + 
+							"\nc2 " + ConceptBean.get(componentTwoId).toString());
+				}
+			}
 		}
 		return false;
 	}
@@ -440,6 +470,13 @@ public class ThinRelVersioned implements I_RelVersioned {
 	@Override
 	public int hashCode() {
 		return relId;
+	}
+	public void setRelId(int relId) {
+		if (this.relId == Integer.MIN_VALUE) {
+			this.relId = relId;
+		} else {
+			throw new RuntimeException("Cannot change the relid once set");
+		}
 	}
 
 }

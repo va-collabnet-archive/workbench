@@ -102,19 +102,6 @@ public class AceRunner {
          
          config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
 
-         Boolean preloadRels = (Boolean) config.getEntry(this.getClass().getName(), "preloadRels",
-                                               Boolean.class, null);
-         AceLog.getAppLog().info("preloadRels " + preloadRels);
-         if (preloadRels != null) {
-             VodbEnv.setPreloadRels(preloadRels);
-         }
-         
-         Boolean preloadDescriptions = (Boolean) config.getEntry(this.getClass().getName(), "preloadDescriptions",
-                                                                 Boolean.class, null);
-         AceLog.getAppLog().info("preloadDescriptions " + preloadDescriptions);
-         if (preloadRels != null) {
-             VodbEnv.setPreloadDescriptions(preloadDescriptions);
-         }
                    
          Boolean logTimingInfo = (Boolean) config.getEntry(this.getClass().getName(), "logTimingInfo",
                                                                  Boolean.class, null);

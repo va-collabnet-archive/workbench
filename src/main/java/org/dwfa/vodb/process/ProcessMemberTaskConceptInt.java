@@ -1,57 +1,62 @@
-package org.dwfa.vodb;
+package org.dwfa.vodb.process;
 
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
-import org.dwfa.vodb.types.ThinExtByRefPartInteger;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
 
-public class ProcessMemberTaskInteger extends ProcessMemberTask {
+public class ProcessMemberTaskConceptInt extends ProcessMemberTask {
     
-    private static ProcessMemberTaskInteger[] taskArray;
+    private static ProcessMemberTaskConceptInt[] taskArray;
     private static Exception processException;
-    private static Semaphore semaphore = new Semaphore(TASK_SIZE, true);
+    protected static Semaphore semaphore = new Semaphore(TASK_SIZE, true);
     
+    private UUID conceptUuid;
     private int intExt;
 
-    ProcessMemberTaskInteger(int arrayIndex) {
+    ProcessMemberTaskConceptInt(int arrayIndex) {
         super(arrayIndex);
     }
     
+    
+    protected EXT_TYPE getRefsetType() {
+        return EXT_TYPE.CON_INT;
+    }
+
     protected void reset(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, int intExt) {
+        int version, int memberId, UUID conceptUuid, int intExt) {
         resetCore(refsetUuid, statusUuid, componentUuid, pathUuid,
               version, memberId);
+        this.conceptUuid = conceptUuid;
         this.intExt = intExt;
     }
 
-    
-    protected EXT_TYPE getRefsetType() {
-        return EXT_TYPE.INTEGER;
-    }
 
-    protected ThinExtByRefPartInteger makeNewPart() throws Exception {
-        ThinExtByRefPartInteger part = new ThinExtByRefPartInteger();
-        part.setValue(intExt);
+    protected ThinExtByRefPartConceptInt makeNewPart() throws Exception {
+        ThinExtByRefPartConceptInt part = new ThinExtByRefPartConceptInt();
+        int conceptId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) conceptUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+        part.setConceptId(conceptId);
+        part.setIntValue(intExt);
         return part;
     }
 
     public static void acquire(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, int intExt) throws Exception {
+        int version, int memberId, UUID conceptUuid, int intExt) throws Exception {
         check();
         semaphore.acquire();
+        
         if (taskArray == null) {
-            
-            taskArray = new ProcessMemberTaskInteger[TASK_SIZE + 2]; 
+            taskArray = new ProcessMemberTaskConceptInt[TASK_SIZE + 2]; 
             for (int i = 0; i < taskArray.length; i++) {
-                taskArray[i] = new ProcessMemberTaskInteger(i);
+                taskArray[i] = new ProcessMemberTaskConceptInt(i);
             }
         }
         boolean foundUsableTask = false;
-        for (ProcessMemberTaskInteger task: taskArray) {
+        for (ProcessMemberTaskConceptInt task: taskArray) {
             if (task.isUsable()) {
                 task.reset(refsetUuid, statusUuid, componentUuid, pathUuid,
-                           version, memberId, intExt);
+                           version, memberId, conceptUuid, intExt);
                 ProcessAceFormatSources.executors.submit(task);
                 foundUsableTask = true;
                 break;
@@ -68,10 +73,10 @@ public class ProcessMemberTaskInteger extends ProcessMemberTask {
     }
 
     public void setProcessException(Exception processException) {
-        ProcessMemberTaskInteger.processException = processException;
+        ProcessMemberTaskConceptInt.processException = processException;
     }
 
-    public ProcessMemberTaskInteger[] getTaskArray() {
+    public ProcessMemberTaskConceptInt[] getTaskArray() {
         return taskArray;
     }
     

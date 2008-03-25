@@ -22,7 +22,7 @@ import org.dwfa.ace.log.AceLog;
 
 public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
 
-   public void valueChanged(ListSelectionEvent arg0) {
+   public void valueChanged(ListSelectionEvent evt) {
       for (I_HoldRefsetData l: refSetListeners) {
          try {
             l.setComponentId(getComponentId());

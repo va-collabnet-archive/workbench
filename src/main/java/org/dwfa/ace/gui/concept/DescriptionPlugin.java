@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,14 +22,18 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddDescription;
 import org.dwfa.ace.table.DescriptionTableModel;
@@ -40,14 +46,16 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
-public class DescriptionPlugin extends AbstractPlugin implements TableModelListener {
+public class DescriptionPlugin extends AbstractPlugin implements
+		TableModelListener, I_HostConceptPlugins {
 
 	private JPanel descPanel;
 	private I_HostConceptPlugins host;
 	private DescriptionsForConceptTableModel descTableModel;
 	private JTableWithDragImage descTable;
-   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
-
+	private boolean idToggleState = false;
+	protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+	private IdPlugin idPlugin;
 
 	public DescriptionPlugin() {
 		super(true);
@@ -55,18 +63,26 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 
 	@Override
 	protected ImageIcon getImageIcon() {
-		return new ImageIcon(ACE.class.getResource("/24x24/plain/paragraph.png"));
+		return new ImageIcon(ACE.class
+				.getResource("/24x24/plain/paragraph.png"));
 	}
 
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
+			
+			if (idPlugin != null) {
+				idPlugin.update();
+			}
 
-         if (RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this, visibleExtensions)) {
-            createPluginComponent(host);
-         } 
+			if (RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this,
+					visibleExtensions) || host.getToggleState(TOGGLES.ID) != idToggleState) {
+				idToggleState = host.getToggleState(TOGGLES.ID);
+				createPluginComponent(host);
+			}
 
-         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+			PropertyChangeEvent evt = new PropertyChangeEvent(host,
+					"termComponent", null, host.getTermComponent());
 			DESC_FIELD[] columnEnums = getDescColumns(host);
 			descTableModel.setColumns(columnEnums);
 			for (int i = 0; i < descTableModel.getColumnCount(); i++) {
@@ -83,20 +99,23 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
-		if (descPanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this, visibleExtensions)) {
+		if (descPanel == null
+				|| RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this,
+						visibleExtensions)) {
 			createPluginComponent(host);
 		}
 		return descPanel;
 	}
 
-   private void createPluginComponent(I_HostConceptPlugins host) {
-      this.host = host;
-      descPanel = getDescPanel(host);
-      host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-      host.addPropertyChangeListener("commit", this);
-      PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-      descTableModel.propertyChange(evt);
-   }
+	private void createPluginComponent(I_HostConceptPlugins host) {
+		this.host = host;
+		descPanel = getDescPanel(host);
+		host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+		host.addPropertyChangeListener("commit", this);
+		PropertyChangeEvent evt = new PropertyChangeEvent(host,
+				"termComponent", null, host.getTermComponent());
+		descTableModel.propertyChange(evt);
+	}
 
 	private DESC_FIELD[] getDescColumns(I_HostConceptPlugins host) {
 		List<DESC_FIELD> fields = new ArrayList<DESC_FIELD>();
@@ -113,8 +132,8 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 	}
 
 	private JPanel getDescPanel(I_HostConceptPlugins host) {
-		descTableModel = new DescriptionsForConceptTableModel(getDescColumns(host),
-				host);
+		descTableModel = new DescriptionsForConceptTableModel(
+				getDescColumns(host), host);
 		descTableModel.addTableModelListener(this);
 		JPanel descPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -142,32 +161,33 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		c.gridheight = 2;
-      
-      if (ACE.editMode) {
-         JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-               .getResource("/24x24/plain/row_add_after.png")));
-         descPanel.add(rowAddAfter, c);
-         rowAddAfter.addActionListener(new AddDescription(host, host.getConfig()));
-      } else {
-         JPanel filler = new JPanel();
-         filler.setMaximumSize(new Dimension(40, 32));
-         filler.setMinimumSize(new Dimension(40, 32));
-         filler.setPreferredSize(new Dimension(40, 32));
-         descPanel.add(filler, c);
-      }
+
+		if (ACE.editMode) {
+			JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
+					.getResource("/24x24/plain/row_add_after.png")));
+			descPanel.add(rowAddAfter, c);
+			rowAddAfter.addActionListener(new AddDescription(host, host
+					.getConfig()));
+		} else {
+			JPanel filler = new JPanel();
+			filler.setMaximumSize(new Dimension(40, 32));
+			filler.setMinimumSize(new Dimension(40, 32));
+			filler.setPreferredSize(new Dimension(40, 32));
+			descPanel.add(filler, c);
+		}
 
 		c.gridheight = 1;
 		c.gridx++;
 		TableSorter sortingTable = new TableSorter(descTableModel);
 		descTable = new JTableWithDragImage(sortingTable);
-      descTable.getSelectionModel().addListSelectionListener(this);
+		descTable.getSelectionModel().addListSelectionListener(this);
 		descTable.setDragEnabled(true);
 		descTable.setTransferHandler(new TerminologyTransferHandler());
-      
-      if (ACE.editMode) {
-         descTable.addMouseListener(descTableModel.makePopupListener(descTable,
-               host.getConfig()));
-      }
+
+		if (ACE.editMode) {
+			descTable.addMouseListener(descTableModel.makePopupListener(
+					descTable, host.getConfig()));
+		}
 
 		descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortingTable.setTableHeader(descTable.getTableHeader());
@@ -200,16 +220,25 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 		setupEditorsAndRenderers(host);
 		descPanel.add(descTable, c);
 
-      c.weightx = 0.0;
-      c.weighty = 0.0;
-      c.gridy = c.gridy + c.gridheight;
-      c.gridheight = 1;
-      c.gridx = 0;
-      c.gridwidth = 2;
-      visibleExtensions.clear();
-      RefsetUtil.addRefsetTables(host, this, TOGGLES.DESCRIPTIONS, c, visibleExtensions, descPanel);
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		c.gridy = c.gridy + c.gridheight;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridwidth = 2;
 
-      descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
+		if (host.getToggleState(TOGGLES.ID) == true) {
+			idPlugin = new IdPlugin();
+			idPlugin.setShowBorder(false);
+			descPanel.add(idPlugin.getComponent(this), c);
+			c.gridy++;
+		}
+
+		visibleExtensions.clear();
+		RefsetUtil.addRefsetTables(host, this, TOGGLES.DESCRIPTIONS, c,
+				visibleExtensions, descPanel);
+
+		descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createEmptyBorder(1, 1, 1, 3), BorderFactory
 				.createLineBorder(Color.GRAY)));
 
@@ -240,45 +269,128 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 		};
 		comboBox.addItem(new Boolean(true));
 		comboBox.addItem(new Boolean(false));
-      if (ACE.editMode) {
-         descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
-               comboBox));
+		if (ACE.editMode) {
+			descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
+					comboBox));
 
-         descTable.setDefaultEditor(StringWithDescTuple.class,
-               new DescriptionTableModel.DescTextFieldEditor());
-         descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
-               new DescriptionTableModel.DescTypeFieldEditor(host.getConfig()));
-         descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
-               new DescriptionTableModel.DescStatusFieldEditor(host.getConfig()));
-      }
+			descTable.setDefaultEditor(StringWithDescTuple.class,
+					new DescriptionTableModel.DescTextFieldEditor());
+			descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
+					new DescriptionTableModel.DescTypeFieldEditor(host
+							.getConfig()));
+			descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
+					new DescriptionTableModel.DescStatusFieldEditor(host
+							.getConfig()));
+		}
 
-      descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
+		descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
 		descTable.setDefaultRenderer(Number.class, renderer);
 		descTable.setDefaultRenderer(String.class, renderer);
 	}
-   @Override
-   protected String getToolTipText() {
-      return "show/hide descriptions for this concept";
-   }
-   
-   @Override
-   protected int getComponentId() {
-      if (descTable.getSelectedRow() < 0) {
-         return Integer.MIN_VALUE;
-      }
-      StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(descTable.getSelectedRow(), 0);
-      return swdt.getTuple().getDescId();
-   }
-   
-   public void tableChanged(TableModelEvent tme) {
-       if (descTable.getSelectedRow() == -1) {
-           if (descTable.getRowCount() > 0) {
-               int rowToSelect = 0; //descTable.getRowCount() -1;
-               descTable.setRowSelectionInterval(rowToSelect, rowToSelect);
-           }
-       }
-       
-   }
 
+	@Override
+	protected String getToolTipText() {
+		return "show/hide descriptions for this concept";
+	}
+
+	@Override
+	protected int getComponentId() {
+		if (descTable.getSelectedRow() < 0) {
+			return Integer.MIN_VALUE;
+		}
+		StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(
+				descTable.getSelectedRow(), 0);
+		return swdt.getTuple().getDescId();
+	}
+
+	protected I_AmTermComponent getSelectedPluginComponent() {
+		if (descTable.getSelectedRow() < 0) {
+			return null;
+		}
+		StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(
+				descTable.getSelectedRow(), 0);
+		return swdt.getTuple().getDescVersioned();
+	}
+
+
+	public void tableChanged(TableModelEvent tme) {
+		if (descTable.getSelectedRow() == -1) {
+			if (descTable.getRowCount() > 0) {
+				int rowToSelect = 0; // descTable.getRowCount() -1;
+				descTable.setRowSelectionInterval(rowToSelect, rowToSelect);
+			}
+		}
+
+	}
+
+	public I_GetConceptData getHierarchySelection() {
+		return host.getHierarchySelection();
+	}
+
+	public boolean getShowHistory() {
+		return host.getShowHistory();
+	}
+
+	public boolean getShowRefsets() {
+		return host.getShowRefsets();
+	}
+
+	public boolean getToggleState(TOGGLES toggle) {
+		return host.getToggleState(toggle);
+	}
+
+	public boolean getUsePrefs() {
+		return host.getUsePrefs();
+	}
+
+	public VIEW_TYPE getViewType() {
+		return host.getViewType();
+	}
+
+	public void setAllTogglesToState(boolean state) {
+		host.setAllTogglesToState(state);
+	}
+
+	public void setLinkType(LINK_TYPE link) {
+		host.setLinkType(link);
+	}
+
+	public void setToggleState(TOGGLES toggle, boolean state) {
+		host.setToggleState(toggle, state);
+	}
+
+	public void unlink() {
+		host.unlink();
+	}
+
+
+	public I_ConfigAceFrame getConfig() {
+		return host.getConfig();
+	}
+
+	public I_AmTermComponent getTermComponent() {
+		return getSelectedPluginComponent();
+	}
+
+	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+	public void removePropertyChangeListener(String propertyName,
+			PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(propertyName, listener);
+	}
+
+	public void addPropertyChangeListener(String propertyName,
+			PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(propertyName, listener);
+	}
+
+	public void setTermComponent(I_AmTermComponent arg0) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent evt) {
+		super.valueChanged(evt);
+		pcs.firePropertyChange(I_ContainTermComponent.TERM_COMPONENT, null, getSelectedPluginComponent());
+	}
 
 }
