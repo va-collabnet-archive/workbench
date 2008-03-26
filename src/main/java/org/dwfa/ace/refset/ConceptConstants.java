@@ -14,4 +14,6 @@ public class ConceptConstants {
 	public static final ConceptSpec CREATES_MEMBERSHIP_TYPE = new ConceptSpec("creates membership type", "adccc8cc-cfe0-4947-b2b2-2c493034ac3a");
 	public static final ConceptSpec SNOMED_IS_A = new ConceptSpec("Is a (attribute)", "c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
 	public static final ConceptSpec PARENT_MARKER = new ConceptSpec("marked parent member", "125f3d04-de17-490e-afec-1431c2a39e29");
+	public static final ConceptSpec REFSET_TYPE_REL = new ConceptSpec("refset type rel","f353db14-3b0d-3001-9f27-7d8b00f51a1c"); 
+	public static final ConceptSpec REFSET_PURPOSE_REL = new ConceptSpec("refest purpose rel","f60922c9-cb3d-3099-8960-1097d2c5afdc");
 }
