@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -267,74 +268,79 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) {
 			try {
-				int conceptNid = conceptBean.getConceptId();
-				int attributeParts = ti.readShort();
-				if (attributeParts != 0) {
-					ThinConVersioned conceptAttributes = new ThinConVersioned(
-							conceptNid, attributeParts);
-					for (int x = 0; x < attributeParts; x++) {
-						I_ConceptAttributePart conAttrPart;
-						try {
-							conAttrPart = conPartBdb.getConPart(ti.readInt());
-						} catch (IndexOutOfBoundsException e) {
-							throw new RuntimeException(e);
-						} catch (DatabaseException e) {
-							throw new RuntimeException(e);
+				synchronized (conceptBean) {
+
+					int conceptNid = conceptBean.getConceptId();
+					int attributeParts = ti.readShort();
+					if (attributeParts != 0) {
+						ThinConVersioned conceptAttributes = new ThinConVersioned(
+								conceptNid, attributeParts);
+						for (int x = 0; x < attributeParts; x++) {
+							I_ConceptAttributePart conAttrPart;
+							try {
+								conAttrPart = conPartBdb.getConPart(ti
+										.readInt());
+							} catch (IndexOutOfBoundsException e) {
+								throw new RuntimeException(e);
+							} catch (DatabaseException e) {
+								throw new RuntimeException(e);
+							}
+							conceptAttributes.addVersion(conAttrPart);
 						}
-						conceptAttributes.addVersion(conAttrPart);
+						conceptBean.conceptAttributes = conceptAttributes;
 					}
-					conceptBean.conceptAttributes = conceptAttributes;
-				}
-				int descCount = ti.readShort();
-				conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
-						descCount);
-				for (int x = 0; x < descCount; x++) {
-					int descId = ti.readInt();
-					int versionCount = ti.readShort();
-					ThinDescVersioned descV = new ThinDescVersioned(descId,
-							conceptNid, versionCount);
-					conceptBean.descriptions.add(descV);
-					I_DescriptionPart lastPart = null;
-					for (int y = 0; y < versionCount; y++) {
-						ThinDescPartCore descCore = descCoreBdb
-								.getDescPartCore(ti.readInt());
-						boolean newString = ti.readBoolean();
-						String text;
-						if (newString) {
-							text = ti.readString();
-						} else {
-							text = lastPart.getText();
+					int descCount = ti.readShort();
+					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
+							descCount);
+					for (int x = 0; x < descCount; x++) {
+						int descId = ti.readInt();
+						int versionCount = ti.readShort();
+						ThinDescVersioned descV = new ThinDescVersioned(descId,
+								conceptNid, versionCount);
+						conceptBean.descriptions.add(descV);
+						I_DescriptionPart lastPart = null;
+						for (int y = 0; y < versionCount; y++) {
+							ThinDescPartCore descCore = descCoreBdb
+									.getDescPartCore(ti.readInt());
+							boolean newString = ti.readBoolean();
+							String text;
+							if (newString) {
+								text = ti.readString();
+							} else {
+								text = lastPart.getText();
+							}
+							lastPart = new ThinDescPartWithCoreDelegate(text,
+									descCore);
+							descV.addVersion(lastPart);
 						}
-						lastPart = new ThinDescPartWithCoreDelegate(text,
-								descCore);
-						descV.addVersion(lastPart);
 					}
-				}
-				int relCount = ti.readInt();
-				conceptBean.sourceRels = new ArrayList<I_RelVersioned>(relCount);
-				for (int x = 0; x < relCount; x++) {
-					int relId = ti.readInt();
-					int c2Id = ti.readInt();
-					int versionCount = ti.readShort();
-					ThinRelVersioned relv = new ThinRelVersioned(relId,
-							conceptNid, c2Id, versionCount);
-					conceptBean.sourceRels.add(relv);
-					for (int y = 0; y < versionCount; y++) {
-						relv.addVersionNoRedundancyCheck(relPartBdb
-								.getRelPart(ti.readInt()));
+					int relCount = ti.readInt();
+					conceptBean.sourceRels = new ArrayList<I_RelVersioned>(
+							relCount);
+					for (int x = 0; x < relCount; x++) {
+						int relId = ti.readInt();
+						int c2Id = ti.readInt();
+						int versionCount = ti.readShort();
+						ThinRelVersioned relv = new ThinRelVersioned(relId,
+								conceptNid, c2Id, versionCount);
+						conceptBean.sourceRels.add(relv);
+						for (int y = 0; y < versionCount; y++) {
+							relv.addVersionNoRedundancyCheck(relPartBdb
+									.getRelPart(ti.readInt()));
+						}
 					}
-				}
-				int relOriginCount = ti.readInt();
-				if (relOriginCount > 0) {
-					int[] setElements = new int[relOriginCount];
-					for (int i = 0; i < relOriginCount; i++) {
-						setElements[i] = ti.readInt();
+					int relOriginCount = ti.readInt();
+					if (relOriginCount > 0) {
+						int[] setElements = new int[relOriginCount];
+						for (int i = 0; i < relOriginCount; i++) {
+							setElements[i] = ti.readInt();
+						}
+						conceptBean.setRelOrigins(new IntSet(setElements));
+					} else {
+						conceptBean.setRelOrigins(new IntSet());
 					}
-					conceptBean.setRelOrigins(new IntSet(setElements));
-				} else {
-					conceptBean.setRelOrigins(new IntSet());
+					return conceptBean;
 				}
-				return conceptBean;
 			} catch (DatabaseException e) {
 				throw new RuntimeException(e);
 			}
@@ -343,86 +349,90 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		public void objectToEntry(Object obj, TupleOutput to) {
 			try {
 				ConceptBean conceptBean = (ConceptBean) obj;
-				if (conceptBean.conceptAttributes == null) {
-					to.writeShort(0);
-				} else {
-					to.writeShort(conceptBean.conceptAttributes.versionCount());
-					for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getVersions()) {
-						to.writeInt(conPartBdb.getConPartId(conAttrPart));
+				synchronized (conceptBean) {
+					if (conceptBean.conceptAttributes == null) {
+						to.writeShort(0);
+					} else {
+						to.writeShort(conceptBean.conceptAttributes
+								.versionCount());
+						for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes
+								.getVersions()) {
+							to.writeInt(conPartBdb.getConPartId(conAttrPart));
+						}
 					}
-				}
-				if (conceptBean.descriptions == null) {
-					to.writeShort(0);
-				} else {
-					/*
-					 * if (conceptBean.conceptAttributes == null) { throw new
-					 * RuntimeException("Concept has descriptions, but no
-					 * concept attributes: " + conceptBean); }
-					 */
-					to.writeShort(conceptBean.getDescriptions().size());
-					for (I_DescriptionVersioned desc : conceptBean.descriptions) {
-						to.writeInt(desc.getDescId());
-						to.writeShort(desc.versionCount());
-						I_DescriptionPart lastPart = null;
-						for (I_DescriptionPart part : desc.getVersions()) {
-							try {
-								to
-										.writeInt(descCoreBdb
-												.getDescPartCoreId(part));
-								if (lastPart == null) {
-									to.writeBoolean(true);
-									to.writeString(part.getText());
-								} else {
-									if (lastPart.getText().equals(
-											part.getText())) {
-										to.writeBoolean(false);
-									} else {
+					if (conceptBean.descriptions == null) {
+						to.writeShort(0);
+					} else {
+						/*
+						 * if (conceptBean.conceptAttributes == null) { throw
+						 * new RuntimeException("Concept has descriptions, but
+						 * no concept attributes: " + conceptBean); }
+						 */
+						int descSize = conceptBean.getDescriptions().size();
+						to.writeShort(descSize);
+						for (I_DescriptionVersioned desc : conceptBean.descriptions) {
+							to.writeInt(desc.getDescId());
+							to.writeShort(desc.versionCount());
+							I_DescriptionPart lastPart = null;
+							for (I_DescriptionPart part : desc.getVersions()) {
+								try {
+									to.writeInt(descCoreBdb
+											.getDescPartCoreId(part));
+									if (lastPart == null) {
 										to.writeBoolean(true);
 										to.writeString(part.getText());
+									} else {
+										if (lastPart.getText().equals(
+												part.getText())) {
+											to.writeBoolean(false);
+										} else {
+											to.writeBoolean(true);
+											to.writeString(part.getText());
+										}
 									}
+									lastPart = part;
+								} catch (DatabaseException e) {
+									throw new RuntimeException(e);
 								}
-								lastPart = part;
-							} catch (DatabaseException e) {
-								throw new RuntimeException(e);
 							}
 						}
 					}
-				}
-				if ((conceptBean.sourceRels == null)
-						|| (conceptBean.sourceRels.size() == 0)) {
-					to.writeInt(0);
-				} else {
-					/*
-					 * if (conceptBean.conceptAttributes == null) { throw new
-					 * RuntimeException("Concept has relationships, but no
-					 * concept attributes: " + conceptBean); } if
-					 * (conceptBean.descriptions == null ||
-					 * conceptBean.descriptions.size() == 0) { throw new
-					 * RuntimeException("Concept has relationships, but no
-					 * descriptions: " + conceptBean); }
-					 */
-					to.writeInt(conceptBean.sourceRels.size());
-					for (I_RelVersioned rel : conceptBean.sourceRels) {
-						to.writeInt(rel.getRelId());
-						to.writeInt(rel.getC2Id());
-						to.writeShort(rel.versionCount());
-						for (I_RelPart part : rel.getVersions()) {
-							try {
-								to.writeInt(relPartBdb.getRelPartId(part));
-							} catch (DatabaseException e) {
-								throw new RuntimeException(e);
+					if ((conceptBean.sourceRels == null)
+							|| (conceptBean.sourceRels.size() == 0)) {
+						to.writeInt(0);
+					} else {
+						/*
+						 * if (conceptBean.conceptAttributes == null) { throw
+						 * new RuntimeException("Concept has relationships, but
+						 * no concept attributes: " + conceptBean); } if
+						 * (conceptBean.descriptions == null ||
+						 * conceptBean.descriptions.size() == 0) { throw new
+						 * RuntimeException("Concept has relationships, but no
+						 * descriptions: " + conceptBean); }
+						 */
+						to.writeInt(conceptBean.sourceRels.size());
+						for (I_RelVersioned rel : conceptBean.sourceRels) {
+							to.writeInt(rel.getRelId());
+							to.writeInt(rel.getC2Id());
+							to.writeShort(rel.versionCount());
+							for (I_RelPart part : rel.getVersions()) {
+								try {
+									to.writeInt(relPartBdb.getRelPartId(part));
+								} catch (DatabaseException e) {
+									throw new RuntimeException(e);
+								}
 							}
 						}
 					}
-				}
-				if (conceptBean.getRelOrigins() == null) {
-					to.writeInt(0);
-				} else {
-					to
-							.writeInt(conceptBean.getRelOrigins()
-									.getSetValues().length);
-					for (int i : conceptBean.getRelOrigins().getSetValues()) {
-						to.writeInt(i);
+					if (conceptBean.getRelOrigins() == null) {
+						to.writeInt(0);
+					} else {
+						to
+								.writeInt(conceptBean.getRelOrigins()
+										.getSetValues().length);
+						for (int i : conceptBean.getRelOrigins().getSetValues()) {
+							to.writeInt(i);
+						}
 					}
 				}
 			} catch (DatabaseException e) {
@@ -461,7 +471,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		PreloadConfig preloadConfig = new PreloadConfig();
 		preloadConfig.setLoadLNs(false);
 		conDescRelDb.preload(preloadConfig);
-		
+
 		conPartBdb = new ConCoreBdb(env, dbConfig);
 		descCoreBdb = new DescCoreBdb(env, dbConfig);
 		relPartBdb = new RelPartBdb2(env, dbConfig);
@@ -777,6 +787,46 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			}
 			bean.descriptions.addAll(bean.uncommittedDescriptions);
 			bean.uncommittedDescriptions = null;
+		}
+		if (bean.sourceRels != null) {
+			for (I_RelVersioned srcRel : bean.sourceRels) {
+				for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
+						.listIterator(); partItr.hasNext();) {
+					I_RelPart part = partItr.next();
+					if (part.getVersion() == Integer.MAX_VALUE) {
+						changed = true;
+						part.setVersion(version);
+						values.add(new TimePathId(version, part.getPathId()));
+					}
+				}
+			}
+		}
+		if (bean.uncommittedSourceRels != null) {
+			for (I_RelVersioned rel : bean.uncommittedSourceRels) {
+				changed = true;
+				ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+				if (destBean.getRelOrigins() == null) {
+					destBean.setRelOrigins(new IntSet());
+				}
+				destBean.getRelOrigins().add(bean.getConceptId());
+				writeConceptToBdb(destBean);
+				for (I_RelPart p : rel.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						p.setVersion(version);
+						values.add(new TimePathId(version, p.getPathId()));
+					}
+				}
+				if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+					AceLog.getEditLog().fine("Committing: " + rel);
+				}
+			}
+			if (bean.sourceRels == null) {
+				bean.sourceRels = new ArrayList<I_RelVersioned>();
+			}
+			bean.sourceRels.addAll(bean.uncommittedSourceRels);
+			bean.uncommittedSourceRels = null;
+			bean.flushDestRelsOnTargetBeans(version, values);
+			bean.destRels = null;
 		}
 		if (changed) {
 			writeConceptToBdb(bean);

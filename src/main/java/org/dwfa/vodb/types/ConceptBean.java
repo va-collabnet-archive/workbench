@@ -302,7 +302,9 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	 */
 	public List<I_DescriptionVersioned> getDescriptions() throws IOException {
 		if (isPrimordial()) {
-			return new ArrayList<I_DescriptionVersioned>();
+			if (descriptions == null) {
+				return new ArrayList<I_DescriptionVersioned>();
+			}
 		}
 		if (descriptions == null) {
 			try {
@@ -641,14 +643,6 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	}
 
 	public void flush() throws DatabaseException, IOException {
-		conceptAttributes = null;
-		uncommittedConceptAttributes = null;
-		descriptions = null;
-		uncommittedDescriptions = null;
-		sourceRels = null;
-		uncommittedSourceRels = null;
-		images = null;
-		uncommittedImages = null;
 		flushDestRelsOnTargetBeans();
 	}
 

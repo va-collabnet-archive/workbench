@@ -151,13 +151,13 @@ public class ThinDescPart implements I_DescriptionPart {
 
 	@Override
 	public boolean equals(Object obj) {
-		ThinDescPart another = (ThinDescPart) obj;
-		return ((initialCaseSignificant == another.initialCaseSignificant) &&
-				(lang.equals(another.lang)) && 
-				(pathId == another.pathId) && 
-				(text.equals(another.text)) &&
-				(typeId == another.typeId) &&
-				(version == another.version));
+		I_DescriptionPart another = (I_DescriptionPart) obj;
+		return ((initialCaseSignificant == another.getInitialCaseSignificant()) &&
+				(lang.equals(another.getLang())) && 
+				(pathId == another.getPathId()) && 
+				(text.equals(another.getText())) &&
+				(typeId == another.getTypeId()) &&
+				(version == another.getVersion()));
 	}
 
 	@Override

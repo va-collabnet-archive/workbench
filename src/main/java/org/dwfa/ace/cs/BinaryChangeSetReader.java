@@ -134,26 +134,26 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 if (validated) {
                    if (UniversalAceBean.class.isAssignableFrom(obj.getClass())) {
                       conceptCount++;
-                      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                          AceLog.getEditLog().fine("Read UniversalAceBean... " + obj);
+                      if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+                          AceLog.getEditLog().info("Read UniversalAceBean... " + obj);
                       }
                       ACE.addImported(commitAceBean((UniversalAceBean) obj, nextCommit, values));
                   } else if (UniversalIdList.class.isAssignableFrom(obj.getClass())) {
                       idListCount++;
-                      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                          AceLog.getEditLog().fine("Read UniversalIdList... " + obj);
+                      if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+                          AceLog.getEditLog().info("Read UniversalIdList... " + obj);
                       }
                       commitIdList((UniversalIdList) obj, nextCommit, values);
                   } else if (UniversalAcePath.class.isAssignableFrom(obj.getClass())) {
                       pathCount++;
-                      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                          AceLog.getEditLog().fine("Read UniversalAcePath... " + obj);
+                      if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+                          AceLog.getEditLog().info("Read UniversalAcePath... " + obj);
                       }
                       commitAcePath((UniversalAcePath) obj, nextCommit);
                   } else if (UniversalAceExtByRefBean.class.isAssignableFrom(obj.getClass())) {
                       refsetMemberCount++;
-                      if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                          AceLog.getEditLog().fine("Read UniversalAceExtByRefBean... " + obj);
+                      if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+                          AceLog.getEditLog().info("Read UniversalAceExtByRefBean... " + obj);
                       }
                       commitAceEbr((UniversalAceExtByRefBean) obj, nextCommit, values);
                   } else {
@@ -275,16 +275,20 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             if (time == Long.MAX_VALUE) {
                 throw new IOException("commit time = Long.MAX_VALUE");
             }
+            UniversalAceIdentification uid = bean.getId();
+            if (uid.getUIDs().contains(UUID.fromString("e11581f5-66c2-5faf-bf15-5e6da308b42d"))) {
+            	AceLog.getAppLog().info("Found concept: " + bean);
+            }
             // Do all the commiting...
             commitUncommittedIds(time, bean, values);
+            commitUncommittedConceptAttributes(time, bean, values);
             commitUncommittedDescriptions(time, bean, values);
             commitUncommittedRelationships(time, bean, values);
-            commitUncommittedConceptAttributes(time, bean, values);
             commitUncommittedImages(time, bean, values);
 
+            commitConceptAttributeChanges(time, bean, values);
             commitDescriptionChanges(time, bean, values);
             commitRelationshipChanges(time, bean, values);
-            commitConceptAttributeChanges(time, bean, values);
             commitImageChanges(time, bean, values);
 
             ConceptBean localBean = ConceptBean.get(bean.getId().getUIDs());
@@ -476,13 +480,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 thinAttributes.addVersion(newPart);
             }
             try {
-                ThinConVersioned oldVersioned = (ThinConVersioned) getVodb().getConceptAttributes(
-                                                                                                  thinAttributes
-                                                                                                          .getConId());
-                oldVersioned.merge(thinAttributes);
-                AceLog.getEditLog().fine(
+                ThinConVersioned oldVersioned = (ThinConVersioned) getVodb().
+                		getConceptAttributes(thinAttributes.getConId());
+                if (oldVersioned != null) {
+                	oldVersioned.merge(thinAttributes);
+                	AceLog.getEditLog().fine(
                                          "Merging attributes with existing (should have been null): \n"
                                                  + thinAttributes + "\n\n" + oldVersioned);
+                }
             } catch (IOException e) {
                 if (ToIoException.class.isAssignableFrom(e.getClass())) {
                     // expected exception if this is a new concept...
@@ -545,10 +550,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             }
             try {
                 ThinImageVersioned oldVersioned = (ThinImageVersioned) getVodb().getImage(thinImage.getImageId());
-                oldVersioned.merge(thinImage);
-                AceLog.getEditLog().fine(
-                                         "Merging image with existing (should have been null): \n" + thinImage + "\n\n"
-                                                 + oldVersioned);
+                if (oldVersioned != null) {
+                    oldVersioned.merge(thinImage);
+                    AceLog.getEditLog().fine(
+                                             "Merging image with existing (should have been null): \n" + thinImage + "\n\n"
+                                                     + oldVersioned);
+                }
             } catch (DatabaseException e) {
                 // expected exception...
             }
@@ -582,11 +589,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 }
                 try {
                     ThinRelVersioned oldVersioned = (ThinRelVersioned) getVodb().getRel(thinRel.getRelId(), thinRel.getC1Id());
-                    oldVersioned.merge(thinRel);
-                    AceLog.getEditLog().fine(
-                                             "Merging rel with existing (should have been null): \n" + thinRel + "\n\n"
-                                                     + oldVersioned);
-                } catch (DatabaseException e) {
+                    if (oldVersioned != null) {
+                        oldVersioned.merge(thinRel);
+                        AceLog.getEditLog().fine(
+                                                 "Merging rel with existing (should have been null): \n" + thinRel + "\n\n"
+                                                         + oldVersioned);
+                    }
+                 } catch (DatabaseException e) {
                     // expected exception...
                 }
                 getVodb().writeRel(thinRel);
@@ -647,8 +656,17 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
     private void commitDescriptionChanges(long time, UniversalAceBean bean, Set<TimePathId> values)
             throws DatabaseException, TerminologyException, IOException {
         for (UniversalAceDescription desc : bean.getDescriptions()) {
-            ThinDescVersioned thinDesc = (ThinDescVersioned) getVodb().getDescription(getNid(desc.getDescId()), 
-            		getNid(desc.getConceptId()));
+            ThinDescVersioned thinDesc;
+			try {
+				thinDesc = (ThinDescVersioned) getVodb().getDescription(getNid(desc.getDescId()), 
+						getNid(desc.getConceptId()));
+			} catch (IOException e) {
+				AceLog.getAppLog().info("Description: " + desc.getDescId());
+				AceLog.getAppLog().info("Concept: " + desc.getConceptId());
+				AceLog.getAppLog().info("UniversalAceBean: " + bean);
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, "Processing " + desc, e);
+				throw e;
+			}
             boolean changed = false;
             for (UniversalAceDescriptionPart part : desc.getVersions()) {
                 if (part.getTime() == Long.MAX_VALUE) {
@@ -701,10 +719,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             try {
                 ThinDescVersioned oldDescVersioned = (ThinDescVersioned) getVodb().getDescription(thinDesc.getDescId(), 
                 		thinDesc.getConceptId());
-                oldDescVersioned.merge(thinDesc);
-                AceLog.getEditLog().fine(
-                                         "Merging desc with existing (should have been null): \n" + thinDesc + "\n\n"
-                                                 + oldDescVersioned);
+                if (oldDescVersioned != null) {
+                    oldDescVersioned.merge(thinDesc);
+                    AceLog.getEditLog().fine(
+                                             "Merging desc with existing (should have been null): \n" + thinDesc + "\n\n"
+                                                     + oldDescVersioned);
+                }
             } catch (IOException e) {
                 // expected exception...
             }
