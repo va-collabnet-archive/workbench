@@ -509,7 +509,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		if (desc != null) {
 			return desc.getText();
 		}
-		return "null pref desc: " + cb.getInitialText();
+		return cb.getInitialText();
 	}
 
 	public SmallProgressPanel getProgress() {

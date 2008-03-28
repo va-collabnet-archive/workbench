@@ -311,7 +311,12 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 						.getVersion()), conTuple);
 			case PATH:
 				if (getReferencedConcepts().containsKey(conTuple.getPathId())) {
-					return new StringWithConceptTuple(getPrefText(conTuple.getPathId()), conTuple);
+					try {
+						return new StringWithConceptTuple(getPrefText(conTuple.getPathId()), conTuple);
+					} catch (Exception e) {
+						return new StringWithConceptTuple(Integer.toString(conTuple
+								.getPathId()), conTuple);
+					}
 				}
 				return new StringWithConceptTuple(Integer.toString(conTuple
 						.getPathId()), conTuple);
@@ -330,7 +335,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 		}
 		cb = getReferencedConcepts().get(id);
 		desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
-		return "null pref desc: " + cb.getInitialText();
+		return cb.getInitialText();
 	}
 
 	private I_ConceptAttributeTuple getConceptTuple(int rowIndex) throws IOException {

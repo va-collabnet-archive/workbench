@@ -356,7 +356,11 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                 return new StringWithRelTuple(ThinVersionHelper.format(rel.getVersion()), rel);
             case PATH:
                 if (referencedConcepts.containsKey(rel.getPathId())) {
-                    return new StringWithRelTuple(getPrefText(rel.getPathId()), rel);
+                    try {
+						return new StringWithRelTuple(getPrefText(rel.getPathId()), rel);
+					} catch (Exception e) {
+						new StringWithRelTuple(Integer.toString(rel.getPathId()) + " no pref text...", rel);;
+					}
                 }
                 return new StringWithRelTuple(Integer.toString(rel.getPathId()), rel);
             }
@@ -374,7 +378,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         }
         cb = referencedConcepts.get(id);
         desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
-        return "null pref desc: " + cb.getInitialText();
+        return cb.getInitialText();
     }
 
     public String getColumnName(int col) {

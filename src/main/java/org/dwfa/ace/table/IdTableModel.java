@@ -332,8 +332,11 @@ public class IdTableModel extends AbstractTableModel implements
 	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = getReferencedConcepts().get(id);
 		I_DescriptionTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
-		String text = statusDesc.getText();
-		return text;
+		if (statusDesc != null) {
+			String text = statusDesc.getText();
+			return text;
+		}
+		return "null stat for " + id;
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {

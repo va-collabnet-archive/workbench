@@ -97,6 +97,6 @@ public class ThinConPart implements I_ConceptAttributePart {
 	}
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": defined" + defined + " status nid: " + conceptStatus + " version " + version;
+		return this.getClass().getSimpleName() + ": defined" + defined + " status nid: " + conceptStatus + " pathId " + pathId + " version " + version;
 	}
 }

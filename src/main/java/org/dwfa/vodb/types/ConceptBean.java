@@ -382,7 +382,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			try {
 				return getText();
 			} catch (IndexOutOfBoundsException e2) {
-				return "No desc for: " + conceptId;
+				return conceptId + " has no desc" ;
 			}
 		}
 	}
@@ -439,12 +439,11 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 											getUids()));
 
 					int sequence = conceptId + Integer.MIN_VALUE;
-					String errString = "No desc for concept: " + conceptId
-							+ " (" + sequence + ") " + " " + getUids();
+					String errString = conceptId
+							+ " (" + sequence + ") " + " has no descriptions " + getUids();
 					getDescriptions();
 					AceLog.getEditLog().severe(errString);
-					throw new Exception(errString);
-					// return errString;
+					return errString;
 				}
 
 			} catch (Exception ex) {

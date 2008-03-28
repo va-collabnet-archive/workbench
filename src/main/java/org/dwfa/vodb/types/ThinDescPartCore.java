@@ -35,6 +35,9 @@ public class ThinDescPartCore {
 	 * @see org.dwfa.vodb.types.I_DescriptionPart#setPathId(int)
 	 */
 	public void setPathId(int pathId) {
+		if (pathId == -2147483393) {
+			throw new RuntimeException("Invaid path: " + pathId);
+		}
 		this.pathId = pathId;
 	}
 	/* (non-Javadoc)

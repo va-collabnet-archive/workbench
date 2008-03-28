@@ -1058,7 +1058,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         }
         cb = referencedConcepts.get(id);
         desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
-        return "null pref desc: " + cb.getInitialText();
+        return cb.getInitialText();
     }
 
     public REFSET_FIELDS[] getColumns() {

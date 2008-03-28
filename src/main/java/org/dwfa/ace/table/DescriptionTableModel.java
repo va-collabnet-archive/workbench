@@ -26,6 +26,7 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -109,7 +110,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		if (desc != null) {
 			return desc.getText();
 		}
-		return "null pref desc: " + cb.getInitialText();
+		return cb.getInitialText() + " null pref desc";
 	}
 
 
@@ -164,7 +165,12 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 						.getVersion()), desc, false);
 			case PATH:
 				if (getReferencedConcepts().containsKey(desc.getPathId())) {
-					return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false);
+					try {
+						return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false);
+					} catch (Exception e) {
+						return new StringWithDescTuple(Integer.toString(desc
+								.getPathId()) + " no pref desc...", desc, false);
+					}
 				}
 				return new StringWithDescTuple(Integer.toString(desc
 						.getPathId()), desc, false);
