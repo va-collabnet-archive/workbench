@@ -5,7 +5,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.ace.task.NewConcept;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class CreateRefsetMembersetPairBeanInfo extends SimpleBeanInfo{
@@ -33,7 +32,7 @@ public class CreateRefsetMembersetPairBeanInfo extends SimpleBeanInfo{
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(NewConcept.class);
+        BeanDescriptor bd = new BeanDescriptor(CreateRefsetMembersetPair.class);
         bd.setDisplayName("<html><font color='green'><center>Create New Refset/Memberset pair");
         return bd;
     }
