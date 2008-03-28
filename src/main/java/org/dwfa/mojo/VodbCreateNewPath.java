@@ -146,7 +146,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 			if (status!=null) {
 				SetStatusUtil.setStatusOfRelInfo(status.getVerifiedConcept(),rel.getTuples());
 			}            
-//			need to do an immediate commit so that new concept will be avaible to path when read from changeset
+//			need to do an immediate commit so that new concept will be available to path when read from changeset
 			tf.commit(); 
 
 			tf.newPath(pathOrigins, pathConcept);
