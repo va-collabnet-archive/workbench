@@ -2,8 +2,8 @@ package org.dwfa.ace.api;
 
 public class DatabaseSetupConfig {
 	
-	public enum CORE_DB_TYPE { LAZY, CON_DESC, CON_DESC_REL };
-	public enum ID_DB_TYPE { UUID_MAP_PRIMARY, UUID_MAP_SECONDARY };
+	public enum CORE_DB_TYPE { LAZY, CON_DESC, CON_DESC_REL, CON_COMPDESC_REL, CON_DESCMAP_REL };
+	public enum ID_DB_TYPE { UUID_MAP_PRIMARY, UUID_MAP_SECONDARY, UUID_MAP_PRIMARY_WITH_CORES };
 
 	private CORE_DB_TYPE coreDbType = CORE_DB_TYPE.CON_DESC_REL;
 	
