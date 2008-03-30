@@ -6,12 +6,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 
 public class StringCompressionTest {
 
@@ -32,13 +36,22 @@ public class StringCompressionTest {
 		long bytesSaved = 0;
 		Map<String, Integer> uniqueTokens = new TreeMap<String, Integer>();
 		ArrayList<String> tokenList = new ArrayList<String>();
+		Set<String> semanticTags = new HashSet<String>();
 		descReader.readLine(); // skip first line. 
 		while (descReader.ready()) {
 			String line = descReader.readLine();
 			List<Integer> encoding = new ArrayList<Integer>();
 			String[] fields = line.split("\t");
 			if (fields[3].endsWith(")")) {
-				tags++;
+				int tagStart = fields[3].lastIndexOf(" (");
+				if (tagStart > 0) {
+					String semanticTag = fields[3].substring(tagStart);
+					semanticTags.add(semanticTag);
+					tags++;
+				} else {
+					System.out.println("messed up tag: " + fields[3]);
+				}
+				
 			}
 			for (String fieldToken: fields[3].split(" ")) {
 				tokens++;
@@ -68,6 +81,8 @@ public class StringCompressionTest {
 		System.out.println("Found " + uniqueTokens.size() + " unique tokens. ");
 		System.out.println("Found " + uniqueTokenBytes + " unique token bytes. ");
 		System.out.println("Found " + tags + " tags. ");
+		System.out.println("Found unique " + semanticTags.size() + " tags. ");
+		System.out.println(semanticTags);
 		System.out.println("Bytes saved " + bytesSaved + " bytesSaved. ");
 		
 		String one = "Anatomical organisational pattern";
@@ -76,7 +91,31 @@ public class StringCompressionTest {
 		
 		int bytes = one.getBytes().length + two.getBytes().length + three.getBytes().length;
 		
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		baos.write(one.getBytes("UTF-8"));
+		baos.write('\0');
+		baos.write(two.getBytes("UTF-8"));
+		baos.write('\0');
+		baos.write(three.getBytes("UTF-8"));
+		baos.write('\0');
+		byte[] toCompress = baos.toByteArray();
+		
+		
 		System.out.println("Uncompressed size: " + bytes);
+		
+		byte[] deflateCompressArray = compressArray(toCompress, Deflater.BEST_COMPRESSION);
+		System.out.println("deflate size, best compression: " + deflateCompressArray.length);
+		deflateCompressArray = compressArray(toCompress, Deflater.BEST_SPEED);
+		System.out.println("deflate size, BEST_SPEED: " + deflateCompressArray.length);
+		deflateCompressArray = compressArray(toCompress, Deflater.HUFFMAN_ONLY);
+		System.out.println("deflate size, HUFFMAN_ONLY: " + deflateCompressArray.length);
+		deflateCompressArray = compressArray(toCompress, Deflater.DEFAULT_STRATEGY);
+		System.out.println("deflate size, DEFAULT_STRATEGY: " + deflateCompressArray.length);
+		deflateCompressArray = compressArray(toCompress, Deflater.DEFAULT_COMPRESSION);
+		System.out.println("deflate size, DEFAULT_COMPRESSION: " + deflateCompressArray.length);
+		
+		
 
 		bytes = compressString(one).length + compressString(two).length + compressString(three).length;
 
@@ -97,7 +136,15 @@ public class StringCompressionTest {
 		zout.close();
 		return compressed;
 	}
-
+	// example at http://java.sun.com/j2se/1.5.0/docs/api/java/util/zip/Deflater.html
+	private static byte[] compressArray(byte[] toCompress, int level) throws IOException {
+		ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
+		DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut, new Deflater(level));
+		dout.write(toCompress);
+		dout.close();
+		return compressedOut.toByteArray();
+	}	
+	
 }
 /*
 Body structure, altered from its original anatomical structure

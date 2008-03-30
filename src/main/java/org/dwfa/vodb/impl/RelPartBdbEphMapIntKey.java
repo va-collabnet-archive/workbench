@@ -1,12 +1,13 @@
 package org.dwfa.vodb.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.I_StoreInBdb;
-import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinRelPart;
 
@@ -21,11 +22,14 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.SecondaryConfig;
-import com.sleepycat.je.SecondaryDatabase;
-import com.sleepycat.je.SecondaryKeyCreator;
+import com.sleepycat.je.PreloadConfig;
 
-public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
+/**
+ * Use hash maps generated ephemerally instead of using a secondary database. 
+ * @author kec
+ *
+ */
+public class RelPartBdbEphMapIntKey implements I_StoreInBdb, I_StoreRelParts<Integer> {
 
 	private class PartIdGenerator {
 		private int lastId = Integer.MIN_VALUE;
@@ -74,99 +78,80 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
 
 	}
 
-		
-		
-		
-	public class RelPartKeyCreator implements SecondaryKeyCreator {
-
-		public boolean createSecondaryKey(SecondaryDatabase secDb,
-	            DatabaseEntry keyEntry, 
-	            DatabaseEntry dataEntry,
-	            DatabaseEntry resultEntry)
-				throws DatabaseException {
-			I_RelPart part = (I_RelPart) relPartBinding.entryToObject(dataEntry);
-			relPartBinding.objectToEntry(part, resultEntry);
-			return true;
-		}
-
-	}
-
 
 	private RelPartVersionedBinding relPartBinding = new RelPartVersionedBinding();
 	private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
-
 	
 	private Database relPartDb;
-	private SecondaryDatabase relPartMapDb;
 	private PartIdGenerator partIdGenerator;
+	private HashMap<I_RelPart, Integer> partIdMap = new HashMap<I_RelPart, Integer>();
+	private HashMap<Integer, I_RelPart> idPartMap = new HashMap<Integer, I_RelPart>();
 
-	public RelPartBdb(Environment env, DatabaseConfig dbConfig)
+	public RelPartBdbEphMapIntKey(Environment env, DatabaseConfig dbConfig)
 			throws DatabaseException {
 		super();	
+		
 		relPartDb = env.openDatabase(null, "relPartDb", dbConfig);
-
-		RelPartKeyCreator relPartKeyCreator = new RelPartKeyCreator();
-		SecondaryConfig relPartConfig = new SecondaryConfig();
-		relPartConfig.setReadOnly(VodbEnv.isReadOnly());
-		relPartConfig.setDeferredWrite(VodbEnv.isDeferredWrite());
-		relPartConfig.setAllowCreate(!VodbEnv.isReadOnly());
-		relPartConfig.setSortedDuplicates(false);
-		relPartConfig.setKeyCreator(relPartKeyCreator);
-		relPartConfig.setAllowPopulate(true);
-		relPartConfig.setTransactional(VodbEnv.isTransactional());
-		relPartMapDb = env.openSecondaryDatabase(null, "relPartMapDb", relPartDb,
-				relPartConfig);
+		PreloadConfig preloadConfig = new PreloadConfig();
+		preloadConfig.setLoadLNs(true);
+		relPartDb.preload(preloadConfig);
+		Cursor partCursor = relPartDb.openCursor(null, null);
+		DatabaseEntry foundKey = new DatabaseEntry();
+		DatabaseEntry foundData = new DatabaseEntry();
+		while (partCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			int relPartId = (Integer) intBinder.entryToObject(foundKey);
+			I_RelPart relPart = (I_RelPart) relPartBinding.entryToObject(foundData);
+			partIdMap.put(relPart, relPartId);
+			idPartMap.put(relPartId, relPart);
+		}
+		partCursor.close();
+		AceLog.getAppLog().info("rel part map size: " + partIdMap.size());
 		partIdGenerator = new PartIdGenerator();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPartId(org.dwfa.ace.api.I_RelPart)
 	 */
-	public Integer getRelPartId(I_RelPart part) throws DatabaseException {
-		DatabaseEntry partKey = new DatabaseEntry();
-		DatabaseEntry primaryKey = new DatabaseEntry();
-		DatabaseEntry partValue = new DatabaseEntry();
-		relPartBinding.objectToEntry(part, partKey);
-		if (relPartMapDb.get(null, partKey, primaryKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			
-			 int partId = (Integer) intBinder.entryToObject(primaryKey);
-			 //AceLog.getAppLog().info("returning part id: " + partId + " for:" + part);
-			 return partId;
+	public Integer getRelPartId(I_RelPart relPart) throws DatabaseException {
+		if (partIdMap.containsKey(relPart)) {
+			return partIdMap.get(relPart);
 		}
-		int newPartId = partIdGenerator.nextId();
-		intBinder.objectToEntry((Integer) newPartId, partKey);
-		relPartBinding.objectToEntry(part, partValue);
+		int relPartId = partIdGenerator.nextId();
+		DatabaseEntry partKey = new DatabaseEntry();
+		DatabaseEntry partValue = new DatabaseEntry();
+		intBinder.objectToEntry((Integer) relPartId, partKey);
+		relPartBinding.objectToEntry(relPart, partValue);
 		relPartDb.put(null, partKey, partValue);
+		partIdMap.put(relPart, relPartId);
+		idPartMap.put(relPartId, relPart);
+		if (partIdMap.size() % 250 == 0) {
+			AceLog.getAppLog().info("rel part map size now: " + partIdMap.size());
+		}
 		//AceLog.getAppLog().info("Writing part id: " + newPartId + " " + part);
-		return newPartId;
+		return relPartId;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
 	 */
 	public I_RelPart getRelPart(Integer partId) throws DatabaseException {
-		DatabaseEntry partKey = new DatabaseEntry();
-		DatabaseEntry partValue = new DatabaseEntry();
-		intBinder.objectToEntry(partId, partKey);
-		if (relPartDb.get(null, partKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			return (I_RelPart) relPartBinding.entryToObject(partValue);
+		if (idPartMap.containsKey(partId)) {
+			return idPartMap.get(partId);
 		}
 		throw new DatabaseException("Rel part: " + partId + " not found.");
 	}
 
 	public void close() throws DatabaseException {
 		relPartDb.close();
-		relPartMapDb.close();
 	}
 
 	public void sync() throws DatabaseException {
 		relPartDb.sync();
-		relPartMapDb.sync();
 	}
 
 	public void commit(ConceptBean bean, int version, Set<TimePathId> values)
 			throws DatabaseException, IOException {
-		// nothing to do
+		// nothing to do...
 		
 	}
 

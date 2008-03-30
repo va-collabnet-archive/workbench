@@ -307,7 +307,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 	private SecondaryDatabase c1RelMap;
 	private SecondaryDatabase c2RelMap;
 
-	private I_StoreRelParts relPartBdb;
+	private I_StoreRelParts<Integer> relPartBdb;
 
 	private C1KeyForRelCreator c1ToRelKeyCreator;
 
@@ -340,7 +340,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 		relDb = env.openDatabase(null, "relDb", dbConfig);
 		createC1RelMap();
 		createC2RelMap();
-		relPartBdb = new RelPartBdb2(env, dbConfig);
+		relPartBdb = new RelPartBdbEphMapIntKey(env, dbConfig);
 	}
 
 	private void createC1RelMap() throws DatabaseException {

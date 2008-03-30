@@ -181,6 +181,9 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		case UUID_MAP_SECONDARY:
 			identifierDb = new IdentifierBdbWithSecondaryMap(getEnv(), makeConfig(readOnly, VodbEnv.isTransactional()));
 			break;
+		case UUID_MAP_PRIMARY_WITH_CORES:
+			identifierDb = new IdWithPartCoresBdb(getEnv(), makeConfig(readOnly, VodbEnv.isTransactional()));
+			break;
 		}
 		databases.add(identifierDb);
 		// Reset the authority id so that each time the db starts, it gets a
@@ -201,8 +204,10 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 			databases.add(relBdb);
 			break;
 		case CON_DESC_REL:
+		case CON_DESCMAP_REL:
+		case CON_COMPDESC_REL:
 			ConDescRelBdb conDescRelBdb = new ConDescRelBdb(env, makeConfig(
-					readOnly, VodbEnv.isTransactional()), luceneDir, identifierDb);
+					readOnly, VodbEnv.isTransactional()), luceneDir, identifierDb, dbSetupConfig.getCoreDbType());
 			conAttBdb = conDescRelBdb;
 			relBdb = conDescRelBdb;
 			descBdb = conDescRelBdb;

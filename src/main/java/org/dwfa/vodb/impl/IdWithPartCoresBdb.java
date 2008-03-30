@@ -84,7 +84,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 			I_IdVersioned versioned = new ThinIdVersioned(Integer.MIN_VALUE,
 					size);
 			for (int x = 0; x < size; x++) {
-				int partId = ti.readInt();
+				short partId = ti.readShort();
 				ThinIdPartCore core;
 				try {
 					core = idPartCoreBdb.getIdPartCore(partId);
@@ -115,7 +115,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 			to.writeShort(versioned.getVersions().size());
 			for (I_IdPart id : versioned.getVersions()) {
 				try {
-					to.writeInt(idPartCoreBdb.getIdPartCoreId(id));
+					to.writeShort(idPartCoreBdb.getIdPartCoreId(id));
 				} catch (DatabaseException e) {
 					throw new RuntimeException();
 				}

@@ -24,28 +24,23 @@ import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.PreloadConfig;
 
-/**
- * Use hash maps generated ephemerally instead of using a secondary database. 
- * @author kec
- *
- */
-public class RelPartBdb2 implements I_StoreInBdb, I_StoreRelParts {
+public class RelPartBdbEphMapShortKey implements I_StoreInBdb, I_StoreRelParts<Short> {
 
 	private class PartIdGenerator {
-		private int lastId = Integer.MIN_VALUE;
+		private short lastId = Short.MIN_VALUE;
 
 		private PartIdGenerator() throws DatabaseException {
 			Cursor idCursor = relPartDb.openCursor(null, null);
 			DatabaseEntry foundKey = new DatabaseEntry();
 			DatabaseEntry foundData = new DatabaseEntry();
-			lastId = Integer.MIN_VALUE;
+			lastId = Short.MIN_VALUE;
 			if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				lastId = (Integer) intBinder.entryToObject(foundKey);
+				lastId = (Short) shortBinder.entryToObject(foundKey);
 			}
 			idCursor.close();
 		}
 
-		public synchronized int nextId() {
+		public synchronized short nextId() {
 			lastId++;
 			return lastId;
 		}
@@ -80,14 +75,14 @@ public class RelPartBdb2 implements I_StoreInBdb, I_StoreRelParts {
 
 
 	private RelPartVersionedBinding relPartBinding = new RelPartVersionedBinding();
-	private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+	private TupleBinding shortBinder = TupleBinding.getPrimitiveBinding(Short.class);
 	
 	private Database relPartDb;
 	private PartIdGenerator partIdGenerator;
-	private HashMap<I_RelPart, Integer> partIdMap = new HashMap<I_RelPart, Integer>();
-	private HashMap<Integer, I_RelPart> idPartMap = new HashMap<Integer, I_RelPart>();
+	private HashMap<I_RelPart, Short> partIdMap = new HashMap<I_RelPart, Short>();
+	private HashMap<Short, I_RelPart> idPartMap = new HashMap<Short, I_RelPart>();
 
-	public RelPartBdb2(Environment env, DatabaseConfig dbConfig)
+	public RelPartBdbEphMapShortKey(Environment env, DatabaseConfig dbConfig)
 			throws DatabaseException {
 		super();	
 		
@@ -99,7 +94,7 @@ public class RelPartBdb2 implements I_StoreInBdb, I_StoreRelParts {
 		DatabaseEntry foundKey = new DatabaseEntry();
 		DatabaseEntry foundData = new DatabaseEntry();
 		while (partCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			int relPartId = (Integer) intBinder.entryToObject(foundKey);
+			Short relPartId = (Short) shortBinder.entryToObject(foundKey);
 			I_RelPart relPart = (I_RelPart) relPartBinding.entryToObject(foundData);
 			partIdMap.put(relPart, relPartId);
 			idPartMap.put(relPartId, relPart);
@@ -112,14 +107,14 @@ public class RelPartBdb2 implements I_StoreInBdb, I_StoreRelParts {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPartId(org.dwfa.ace.api.I_RelPart)
 	 */
-	public int getRelPartId(I_RelPart relPart) throws DatabaseException {
+	public Short getRelPartId(I_RelPart relPart) throws DatabaseException {
 		if (partIdMap.containsKey(relPart)) {
 			return partIdMap.get(relPart);
 		}
-		int relPartId = partIdGenerator.nextId();
+		Short relPartId = partIdGenerator.nextId();
 		DatabaseEntry partKey = new DatabaseEntry();
 		DatabaseEntry partValue = new DatabaseEntry();
-		intBinder.objectToEntry((Integer) relPartId, partKey);
+		shortBinder.objectToEntry((Short) relPartId, partKey);
 		relPartBinding.objectToEntry(relPart, partValue);
 		relPartDb.put(null, partKey, partValue);
 		partIdMap.put(relPart, relPartId);
@@ -134,7 +129,7 @@ public class RelPartBdb2 implements I_StoreInBdb, I_StoreRelParts {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
 	 */
-	public I_RelPart getRelPart(int partId) throws DatabaseException {
+	public I_RelPart getRelPart(Short partId) throws DatabaseException {
 		if (idPartMap.containsKey(partId)) {
 			return idPartMap.get(partId);
 		}

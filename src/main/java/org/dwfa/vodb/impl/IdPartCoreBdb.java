@@ -26,20 +26,20 @@ import com.sleepycat.je.OperationStatus;
 public class IdPartCoreBdb implements I_StoreInBdb {
 
 	private class PartIdGenerator {
-		private int lastId = Integer.MIN_VALUE;
+		private short lastId = Short.MIN_VALUE;
 
 		private PartIdGenerator() throws DatabaseException {
 			Cursor idCursor = idPartDb.openCursor(null, null);
 			DatabaseEntry foundKey = new DatabaseEntry();
 			DatabaseEntry foundData = new DatabaseEntry();
-			lastId = Integer.MIN_VALUE;
+			lastId = Short.MIN_VALUE;
 			if (idCursor.getPrev(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				lastId = (Integer) intBinder.entryToObject(foundKey);
+				lastId = (Short) shortBinder.entryToObject(foundKey);
 			}
 			idCursor.close();
 		}
 
-		public synchronized int nextId() {
+		public synchronized short nextId() {
 			lastId++;
 			return lastId;
 		}
@@ -66,13 +66,13 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 	}
 
 	private ThinIdCoreBinding idCoreBinding = new ThinIdCoreBinding();
-	private TupleBinding intBinder = TupleBinding
-			.getPrimitiveBinding(Integer.class);
+	private TupleBinding shortBinder = TupleBinding
+			.getPrimitiveBinding(Short.class);
 
 	private Database idPartDb;
 	private PartIdGenerator partIdGenerator;
-	private HashMap<ThinIdPartCore, Integer> partIdMap = new HashMap<ThinIdPartCore, Integer>();
-	private HashMap<Integer, ThinIdPartCore> idPartMap = new HashMap<Integer, ThinIdPartCore>();
+	private HashMap<ThinIdPartCore, Short> partIdMap = new HashMap<ThinIdPartCore, Short>();
+	private HashMap<Short, ThinIdPartCore> idPartMap = new HashMap<Short, ThinIdPartCore>();
 
 	public IdPartCoreBdb(Environment env, DatabaseConfig dbConfig)
 			throws DatabaseException {
@@ -83,7 +83,7 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 		DatabaseEntry foundKey = new DatabaseEntry();
 		DatabaseEntry foundData = new DatabaseEntry();
 		while (partCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			int conAttrPartId = (Integer) intBinder.entryToObject(foundKey);
+			short conAttrPartId = (Short) shortBinder.entryToObject(foundKey);
 			ThinIdPartCore conAttrPart = (ThinIdPartCore) idCoreBinding
 					.entryToObject(foundData);
 			partIdMap.put(conAttrPart, conAttrPartId);
@@ -99,15 +99,15 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 	 * 
 	 * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPartId(org.dwfa.ace.api.I_RelPart)
 	 */
-	public int getIdPartCoreId(ThinIdPartCore idPartCore)
+	public short getIdPartCoreId(ThinIdPartCore idPartCore)
 			throws DatabaseException {
 		if (partIdMap.containsKey(idPartCore)) {
 			return partIdMap.get(idPartCore);
 		}
-		int conAttrPartId = partIdGenerator.nextId();
+		Short conAttrPartId = partIdGenerator.nextId();
 		DatabaseEntry partKey = new DatabaseEntry();
 		DatabaseEntry partValue = new DatabaseEntry();
-		intBinder.objectToEntry((Integer) conAttrPartId, partKey);
+		shortBinder.objectToEntry(conAttrPartId, partKey);
 		idCoreBinding.objectToEntry(idPartCore, partValue);
 		idPartDb.put(null, partKey, partValue);
 		partIdMap.put(idPartCore, conAttrPartId);
@@ -121,7 +121,7 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 		return conAttrPartId;
 	}
 
-	public int getIdPartCoreId(I_IdPart idPart) throws DatabaseException {
+	public short getIdPartCoreId(I_IdPart idPart) throws DatabaseException {
 		ThinIdPartCore idPartCore = new ThinIdPartCore();
 		idPartCore.setIdStatus(idPart.getIdStatus());
 		idPartCore.setPathId(idPart.getPathId());
@@ -135,7 +135,7 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 	 * 
 	 * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
 	 */
-	public ThinIdPartCore getIdPartCore(int partId)
+	public ThinIdPartCore getIdPartCore(short partId)
 			throws DatabaseException {
 		if (idPartMap.containsKey(partId)) {
 			return idPartMap.get(partId);

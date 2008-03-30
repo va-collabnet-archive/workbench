@@ -98,26 +98,19 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                     nid = maxId.next();
                 }
                 for (UUID uuid : uids) {
-                	if (snomedCoreUUid.equals(uuid)) {
-                		AceLog.getAppLog().info("## (2) creating nid " + nid + " for " + uuid);
-                	}
-                    ids.put(uuid, nid);
+                     ids.put(uuid, nid);
                 }
             }
             return nid;
         }
 
-        UUID snomedCoreUUid = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
-        public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
+         public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
             if (ids.containsKey(uid)) {
                 return ids.get(uid);
             } else {
                 int nid = maxId.next();
                 ids.put(uid, nid);
-            	if (snomedCoreUUid.equals(uid)) {
-            		AceLog.getAppLog().info("## creating nid " + nid + " for " + uid);
-            	}
-                return nid;
+                 return nid;
             }
         }
 

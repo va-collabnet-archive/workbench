@@ -1,17 +1,29 @@
 package org.dwfa.vodb.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -26,6 +38,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -259,8 +272,21 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 
 	}
+	public class ConDescRelBinding extends TupleBinding implements I_BindConDescRel {
+		
+		private ConCoreBdb conPartBdb;
 
-	public class ConDescRelBinding extends TupleBinding {
+		private DescCoreBdb descCoreBdb;
+
+		private I_StoreRelParts<Integer> relPartBdb;
+
+
+		public ConDescRelBinding(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
+			super();
+			conPartBdb = new ConCoreBdb(env, dbConfig);
+			descCoreBdb = new DescCoreBdb(env, dbConfig);
+			relPartBdb = new RelPartBdbEphMapIntKey(env, dbConfig);
+		}
 
 		public ConceptBean entryToObject(TupleInput ti) {
 			throw new UnsupportedOperationException();
@@ -427,8 +453,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					if (conceptBean.getRelOrigins() == null) {
 						to.writeInt(0);
 					} else {
-						to
-								.writeInt(conceptBean.getRelOrigins()
+						to.writeInt(conceptBean.getRelOrigins()
 										.getSetValues().length);
 						for (int i : conceptBean.getRelOrigins().getSetValues()) {
 							to.writeInt(i);
@@ -441,20 +466,616 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				throw new RuntimeException(e);
 			}
 		}
+
+		public void close() throws DatabaseException {
+			if (conPartBdb != null) {
+				conPartBdb.close();
+				conPartBdb = null;
+			}
+			if (descCoreBdb != null) {
+				descCoreBdb.close();
+				descCoreBdb = null;
+			}
+			if (relPartBdb != null) {
+				relPartBdb.close();
+				relPartBdb = null;
+			}
+		}
+
+		public void sync() throws DatabaseException {
+			if (conPartBdb != null) {
+				conPartBdb.sync();
+			}
+			if (descCoreBdb != null) {
+				descCoreBdb.sync();
+			}
+			if (relPartBdb != null) {
+				relPartBdb.sync();
+			}
+		}
 	}
 
-	private ConDescRelBinding conDescRelBinding = new ConDescRelBinding();
+	protected static class DescriptionMap implements Callable<Boolean> {
+		
+		private short nextId = Short.MIN_VALUE;
+		private HashMap<String, Short> textMap = new HashMap<String, Short>();
+		private HashMap<Short, String> idMap = new HashMap<Short, String>();
+		private byte[] inputBytes;
+		
+		public DescriptionMap(List<I_DescriptionVersioned> descriptions) throws UnsupportedEncodingException, DataFormatException {
+			super();
+			if (descriptions != null && descriptions.size() > 0) {
+				for (I_DescriptionVersioned desc: descriptions) {
+					for (I_DescriptionPart part: desc.getVersions()) {
+						addToMap(part.getText());
+					}
+				}
+			}
+		}
+		public DescriptionMap(byte[] inputBytes) throws DataFormatException, UnsupportedEncodingException {
+			super();
+			this.inputBytes = inputBytes;
+			
+		}
+		public Boolean call() throws DataFormatException, UnsupportedEncodingException {
+			if (inputBytes == null) {
+				return true;
+			}
+			int startIndex = 0;
+			for (int i = 0; i < inputBytes.length; i++) {
+				if (inputBytes[i] == '\0') {
+					int length = i - startIndex;
+					byte[] textBytes = new byte[length];
+					System.arraycopy(inputBytes, startIndex, textBytes, 0, length);
+					String text = new String(textBytes, "UTF-8");
+					addToMap(text);
+					startIndex = i + 1;
+				}
+			}
+			inputBytes = null;
+			return true;
+		}
 
+		public short getId(String text) throws UnsupportedEncodingException, DataFormatException {
+			if (textMap.containsKey(text)) {
+				return textMap.get(text);
+			}
+			return addToMap(text);
+		}
+		private short addToMap(String text) throws UnsupportedEncodingException, DataFormatException {
+			if (text == null) {
+				AceLog.getAppLog().info("Attempting to add null text to map. " + textMap);
+			}
+			short returnId = nextId;
+			nextId++;
+			textMap.put(text, returnId);
+			idMap.put(returnId, text);
+			return returnId;
+		}
+		public String getText(short id) throws UnsupportedEncodingException, DataFormatException {
+			return idMap.get(id);
+		}
+		
+		public byte[] getBytes() throws UnsupportedEncodingException, IOException {
+			if (textMap.size() == 0) {
+				return new byte[0];
+			}
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			for (short id = Short.MIN_VALUE; id < (Short.MIN_VALUE + idMap.size()); id++) {
+				baos.write(idMap.get(id).getBytes("UTF-8"));
+				baos.write('\0');
+			}
+			return baos.toByteArray();
+		}
+	}
+
+	protected static class DescriptionCompressionMap implements Callable<Boolean> {
+		
+		private short nextId = Short.MIN_VALUE;
+		private HashMap<String, Short> textMap = new HashMap<String, Short>();
+		private HashMap<Short, String> idMap = new HashMap<Short, String>();
+		private byte[] inputBytes;
+		
+		public DescriptionCompressionMap(List<I_DescriptionVersioned> descriptions) throws UnsupportedEncodingException, DataFormatException {
+			super();
+			if (descriptions != null && descriptions.size() > 0) {
+				for (I_DescriptionVersioned desc: descriptions) {
+					for (I_DescriptionPart part: desc.getVersions()) {
+						addToMap(part.getText());
+					}
+				}
+			}
+		}
+		public DescriptionCompressionMap(byte[] inputBytes) throws DataFormatException, UnsupportedEncodingException {
+			super();
+			this.inputBytes = inputBytes;
+			
+		}
+		public Boolean call() throws DataFormatException, UnsupportedEncodingException {
+			if (inputBytes == null) {
+				return true;
+			}
+			Inflater decompresser = new Inflater();
+			decompresser.setInput(inputBytes);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			byte[] buff = new byte[1024];
+			int read = decompresser.inflate(buff);
+			while (read > 0) {
+				baos.write(buff, 0, read);
+				read = decompresser.inflate(buff);
+			}
+			byte[] outputBytes = baos.toByteArray();
+			int startIndex = 0;
+			for (int i = 0; i < outputBytes.length; i++) {
+				if (outputBytes[i] == '\0') {
+					int length = i - startIndex;
+					byte[] textBytes = new byte[length];
+					System.arraycopy(outputBytes, startIndex, textBytes, 0, length);
+					String text = new String(textBytes, "UTF-8");
+					addToMap(text);
+					startIndex = i + 1;
+				}
+			}
+			inputBytes = null;
+			return true;
+		}
+
+		public short getId(String text) throws UnsupportedEncodingException, DataFormatException {
+			if (textMap.containsKey(text)) {
+				return textMap.get(text);
+			}
+			return addToMap(text);
+		}
+		private short addToMap(String text) throws UnsupportedEncodingException, DataFormatException {
+			if (text == null) {
+				AceLog.getAppLog().info("Attempting to add null text to map. " + textMap);
+			}
+			short returnId = nextId;
+			nextId++;
+			textMap.put(text, returnId);
+			idMap.put(returnId, text);
+			return returnId;
+		}
+		public String getText(short id) throws UnsupportedEncodingException, DataFormatException {
+			return idMap.get(id);
+		}
+		
+		public byte[] getBytes() throws UnsupportedEncodingException, IOException {
+			if (textMap.size() == 0) {
+				return new byte[0];
+			}
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			for (short id = Short.MIN_VALUE; id < (Short.MIN_VALUE + idMap.size()); id++) {
+				baos.write(idMap.get(id).getBytes("UTF-8"));
+				baos.write('\0');
+			}
+			ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
+			DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut, new Deflater(Deflater.BEST_COMPRESSION));
+			dout.write(baos.toByteArray());
+			dout.close();
+			return compressedOut.toByteArray();
+		}
+	}
+
+	public class ConDescRelBindingWithDescCompression extends TupleBinding implements I_BindConDescRel {
+		   private ExecutorService exec = Executors.newFixedThreadPool(2);
+
+
+			private ConCoreBdb conPartBdb;
+
+			private DescCoreBdb descCoreBdb;
+
+			private I_StoreRelParts<Short> relPartBdb;
+
+
+			public ConDescRelBindingWithDescCompression(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
+				super();
+				conPartBdb = new ConCoreBdb(env, dbConfig);
+				descCoreBdb = new DescCoreBdb(env, dbConfig);
+				relPartBdb = new RelPartBdbEphMapShortKey(env, dbConfig);
+			}
+
+		public ConceptBean entryToObject(TupleInput ti) {
+			throw new UnsupportedOperationException();
+		}
+
+		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) throws DataFormatException, IOException {
+			try {
+				synchronized (conceptBean) {
+					int descMapByteSize = ti.readInt();
+					byte[] descMapBytes = new byte[descMapByteSize];
+					ti.readFast(descMapBytes);
+					DescriptionCompressionMap descMap = new DescriptionCompressionMap(descMapBytes);
+					Future<Boolean> descMapFuture = exec.submit(descMap);
+					int conceptNid = conceptBean.getConceptId();
+					int attributeParts = ti.readShort();
+					if (attributeParts != 0) {
+						ThinConVersioned conceptAttributes = new ThinConVersioned(
+								conceptNid, attributeParts);
+						for (int x = 0; x < attributeParts; x++) {
+							I_ConceptAttributePart conAttrPart;
+							try {
+								conAttrPart = conPartBdb.getConPart(ti
+										.readInt());
+							} catch (IndexOutOfBoundsException e) {
+								throw new RuntimeException(e);
+							} catch (DatabaseException e) {
+								throw new RuntimeException(e);
+							}
+							conceptAttributes.addVersion(conAttrPart);
+						}
+						conceptBean.conceptAttributes = conceptAttributes;
+					}
+					int relCount = ti.readInt();
+					conceptBean.sourceRels = new ArrayList<I_RelVersioned>(
+							relCount);
+					for (int x = 0; x < relCount; x++) {
+						int relId = ti.readInt();
+						int c2Id = ti.readInt();
+						int versionCount = ti.readShort();
+						ThinRelVersioned relv = new ThinRelVersioned(relId,
+								conceptNid, c2Id, versionCount);
+						conceptBean.sourceRels.add(relv);
+						for (int y = 0; y < versionCount; y++) {
+							relv.addVersionNoRedundancyCheck(relPartBdb
+									.getRelPart(ti.readShort()));
+						}
+					}
+					int relOriginCount = ti.readInt();
+					if (relOriginCount > 0) {
+						int[] setElements = new int[relOriginCount];
+						for (int i = 0; i < relOriginCount; i++) {
+							setElements[i] = ti.readInt();
+						}
+						conceptBean.setRelOrigins(new IntSet(setElements));
+					} else {
+						conceptBean.setRelOrigins(new IntSet());
+					}
+					
+					int descCount = ti.readShort();
+					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
+							descCount);
+					descMapFuture.get();
+					for (int x = 0; x < descCount; x++) {
+						int descId = ti.readInt();
+						int versionCount = ti.readShort();
+						ThinDescVersioned descV = new ThinDescVersioned(descId,
+								conceptNid, versionCount);
+						conceptBean.descriptions.add(descV);
+						for (int y = 0; y < versionCount; y++) {
+							ThinDescPartCore descCore = descCoreBdb
+									.getDescPartCore(ti.readInt());
+							String text = descMap.getText(ti.readShort());
+							descV.addVersion(new ThinDescPartWithCoreDelegate(text,
+									descCore));
+						}
+					}
+					return conceptBean;
+				}
+			} catch (DatabaseException e) {
+				throw new RuntimeException(e);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public void objectToEntry(Object obj, TupleOutput to) {
+			try {
+				ConceptBean conceptBean = (ConceptBean) obj;
+				synchronized (conceptBean) {
+					DescriptionCompressionMap descMap = new DescriptionCompressionMap(conceptBean.descriptions);
+					byte[] descMapBytes = descMap.getBytes();
+					to.writeInt(descMapBytes.length);
+					to.writeFast(descMapBytes);
+					if (conceptBean.conceptAttributes == null) {
+						to.writeShort(0);
+					} else {
+						to.writeShort(conceptBean.conceptAttributes
+								.versionCount());
+						for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes
+								.getVersions()) {
+							to.writeInt(conPartBdb.getConPartId(conAttrPart));
+						}
+					}
+					if ((conceptBean.sourceRels == null)
+							|| (conceptBean.sourceRels.size() == 0)) {
+						to.writeInt(0);
+					} else {
+						to.writeInt(conceptBean.sourceRels.size());
+						for (I_RelVersioned rel : conceptBean.sourceRels) {
+							to.writeInt(rel.getRelId());
+							to.writeInt(rel.getC2Id());
+							to.writeShort(rel.versionCount());
+							for (I_RelPart part : rel.getVersions()) {
+								try {
+									to.writeShort(relPartBdb.getRelPartId(part));
+								} catch (DatabaseException e) {
+									throw new RuntimeException(e);
+								}
+							}
+						}
+					}
+					if (conceptBean.getRelOrigins() == null) {
+						to.writeInt(0);
+					} else {
+						to
+								.writeInt(conceptBean.getRelOrigins()
+										.getSetValues().length);
+						for (int i : conceptBean.getRelOrigins().getSetValues()) {
+							to.writeInt(i);
+						}
+					}
+					if (conceptBean.descriptions == null) {
+						to.writeShort(0);
+					} else {
+						int descSize = conceptBean.getDescriptions().size();
+						to.writeShort(descSize);
+						for (I_DescriptionVersioned desc : conceptBean.descriptions) {
+							to.writeInt(desc.getDescId());
+							to.writeShort(desc.versionCount());
+							for (I_DescriptionPart part : desc.getVersions()) {
+								try {
+									to.writeInt(descCoreBdb
+											.getDescPartCoreId(part));
+									to.writeShort(descMap.getId(part.getText()));
+								} catch (DatabaseException e) {
+									throw new RuntimeException(e);
+								}
+							}
+						}
+					}
+				}
+			} catch (DatabaseException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (DataFormatException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		public void close() throws DatabaseException {
+			if (conPartBdb != null) {
+				conPartBdb.close();
+				conPartBdb = null;
+			}
+			if (descCoreBdb != null) {
+				descCoreBdb.close();
+				descCoreBdb = null;
+			}
+			if (relPartBdb != null) {
+				relPartBdb.close();
+				relPartBdb = null;
+			}
+		}
+
+		public void sync() throws DatabaseException {
+			if (conPartBdb != null) {
+				conPartBdb.sync();
+			}
+			if (descCoreBdb != null) {
+				descCoreBdb.sync();
+			}
+			if (relPartBdb != null) {
+				relPartBdb.sync();
+			}
+		}
+	}
+	
+	public class ConDescRelBindingWithDescMap extends TupleBinding implements I_BindConDescRel {
+		   private ExecutorService exec = Executors.newFixedThreadPool(2);
+
+
+			private ConCoreBdb conPartBdb;
+
+			private DescCoreBdb descCoreBdb;
+
+			private I_StoreRelParts<Short> relPartBdb;
+
+
+		public ConDescRelBindingWithDescMap(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
+			super();
+			conPartBdb = new ConCoreBdb(env, dbConfig);
+			descCoreBdb = new DescCoreBdb(env, dbConfig);
+			relPartBdb = new RelPartBdbEphMapShortKey(env, dbConfig);
+		}
+
+		public ConceptBean entryToObject(TupleInput ti) {
+			throw new UnsupportedOperationException();
+		}
+
+		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) throws DataFormatException, IOException {
+			try {
+				synchronized (conceptBean) {
+					int descMapByteSize = ti.readInt();
+					byte[] descMapBytes = new byte[descMapByteSize];
+					ti.readFast(descMapBytes);
+					DescriptionMap descMap = new DescriptionMap(descMapBytes);
+					Future<Boolean> descMapFuture = exec.submit(descMap);
+					int conceptNid = conceptBean.getConceptId();
+					int attributeParts = ti.readShort();
+					if (attributeParts != 0) {
+						ThinConVersioned conceptAttributes = new ThinConVersioned(
+								conceptNid, attributeParts);
+						for (int x = 0; x < attributeParts; x++) {
+							I_ConceptAttributePart conAttrPart;
+							try {
+								conAttrPart = conPartBdb.getConPart(ti
+										.readInt());
+							} catch (IndexOutOfBoundsException e) {
+								throw new RuntimeException(e);
+							} catch (DatabaseException e) {
+								throw new RuntimeException(e);
+							}
+							conceptAttributes.addVersion(conAttrPart);
+						}
+						conceptBean.conceptAttributes = conceptAttributes;
+					}
+					int relCount = ti.readInt();
+					conceptBean.sourceRels = new ArrayList<I_RelVersioned>(
+							relCount);
+					for (int x = 0; x < relCount; x++) {
+						int relId = ti.readInt();
+						int c2Id = ti.readInt();
+						int versionCount = ti.readShort();
+						ThinRelVersioned relv = new ThinRelVersioned(relId,
+								conceptNid, c2Id, versionCount);
+						conceptBean.sourceRels.add(relv);
+						for (int y = 0; y < versionCount; y++) {
+							relv.addVersionNoRedundancyCheck(relPartBdb
+									.getRelPart(ti.readShort()));
+						}
+					}
+					int relOriginCount = ti.readInt();
+					if (relOriginCount > 0) {
+						int[] setElements = new int[relOriginCount];
+						for (int i = 0; i < relOriginCount; i++) {
+							setElements[i] = ti.readInt();
+						}
+						conceptBean.setRelOrigins(new IntSet(setElements));
+					} else {
+						conceptBean.setRelOrigins(new IntSet());
+					}
+					
+					int descCount = ti.readShort();
+					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
+							descCount);
+					descMapFuture.get();
+					for (int x = 0; x < descCount; x++) {
+						int descId = ti.readInt();
+						int versionCount = ti.readShort();
+						ThinDescVersioned descV = new ThinDescVersioned(descId,
+								conceptNid, versionCount);
+						conceptBean.descriptions.add(descV);
+						for (int y = 0; y < versionCount; y++) {
+							ThinDescPartCore descCore = descCoreBdb
+									.getDescPartCore(ti.readInt());
+							String text = descMap.getText(ti.readShort());
+							descV.addVersion(new ThinDescPartWithCoreDelegate(text,
+									descCore));
+						}
+					}
+					return conceptBean;
+				}
+			} catch (DatabaseException e) {
+				throw new RuntimeException(e);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	public void objectToEntry(Object obj, TupleOutput to) {
+		try {
+			ConceptBean conceptBean = (ConceptBean) obj;
+			synchronized (conceptBean) {
+				DescriptionMap descMap = new DescriptionMap(conceptBean.descriptions);
+				byte[] descMapBytes = descMap.getBytes();
+				to.writeInt(descMapBytes.length);
+				to.writeFast(descMapBytes);
+				if (conceptBean.conceptAttributes == null) {
+					to.writeShort(0);
+				} else {
+					to.writeShort(conceptBean.conceptAttributes
+							.versionCount());
+					for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes
+							.getVersions()) {
+						to.writeInt(conPartBdb.getConPartId(conAttrPart));
+					}
+				}
+				if ((conceptBean.sourceRels == null)
+						|| (conceptBean.sourceRels.size() == 0)) {
+					to.writeInt(0);
+				} else {
+					to.writeInt(conceptBean.sourceRels.size());
+					for (I_RelVersioned rel : conceptBean.sourceRels) {
+						to.writeInt(rel.getRelId());
+						to.writeInt(rel.getC2Id());
+						to.writeShort(rel.versionCount());
+						for (I_RelPart part : rel.getVersions()) {
+							try {
+								to.writeShort(relPartBdb.getRelPartId(part));
+							} catch (DatabaseException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					}
+				}
+				if (conceptBean.getRelOrigins() == null) {
+					to.writeInt(0);
+				} else {
+					to
+							.writeInt(conceptBean.getRelOrigins()
+									.getSetValues().length);
+					for (int i : conceptBean.getRelOrigins().getSetValues()) {
+						to.writeInt(i);
+					}
+				}
+				if (conceptBean.descriptions == null) {
+					to.writeShort(0);
+				} else {
+					int descSize = conceptBean.getDescriptions().size();
+					to.writeShort(descSize);
+					for (I_DescriptionVersioned desc : conceptBean.descriptions) {
+						to.writeInt(desc.getDescId());
+						to.writeShort(desc.versionCount());
+						for (I_DescriptionPart part : desc.getVersions()) {
+							try {
+								to.writeInt(descCoreBdb
+										.getDescPartCoreId(part));
+								to.writeShort(descMap.getId(part.getText()));
+							} catch (DatabaseException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					}
+				}
+			}
+		} catch (DatabaseException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (DataFormatException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void close() throws DatabaseException {
+		if (conPartBdb != null) {
+			conPartBdb.close();
+			conPartBdb = null;
+		}
+		if (descCoreBdb != null) {
+			descCoreBdb.close();
+			descCoreBdb = null;
+		}
+		if (relPartBdb != null) {
+			relPartBdb.close();
+			relPartBdb = null;
+		}
+	}
+
+	public void sync() throws DatabaseException {
+		if (conPartBdb != null) {
+			conPartBdb.sync();
+		}
+		if (descCoreBdb != null) {
+			descCoreBdb.sync();
+		}
+		if (relPartBdb != null) {
+			relPartBdb.sync();
+		}
+	}
+}
+
+	private I_BindConDescRel conDescRelBinding;
+	
 	private TupleBinding intBinder = TupleBinding
 			.getPrimitiveBinding(Integer.class);
 
 	private Database conDescRelDb;
 
-	private ConCoreBdb conPartBdb;
-
-	private DescCoreBdb descCoreBdb;
-
-	private I_StoreRelParts relPartBdb;
 
 	private File luceneDir;
 
@@ -463,18 +1084,29 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	private IndexSearcher luceneSearcher = null;
 
 	public ConDescRelBdb(Environment env, DatabaseConfig dbConfig,
-			File luceneDir, I_StoreIdentifiers identifierDb)
-			throws DatabaseException {
+			File luceneDir, I_StoreIdentifiers identifierDb, DatabaseSetupConfig.CORE_DB_TYPE type) throws DatabaseException {
 		super();
 		this.luceneDir = luceneDir;
+		
+		switch (type) {
+		case CON_COMPDESC_REL:
+			conDescRelBinding = new ConDescRelBindingWithDescCompression(env, dbConfig);
+			break;
+		case CON_DESC_REL:
+			conDescRelBinding = new ConDescRelBinding(env, dbConfig);
+			break;
+		case CON_DESCMAP_REL: 
+			conDescRelBinding = new ConDescRelBindingWithDescMap(env, dbConfig);
+			break;
+			
+		default:
+			throw new DatabaseException("Unsupported CORE_DB_TYPE: " + type);
+		}
 		conDescRelDb = env.openDatabase(null, "conDescRelDb", dbConfig);
 		PreloadConfig preloadConfig = new PreloadConfig();
 		preloadConfig.setLoadLNs(false);
 		conDescRelDb.preload(preloadConfig);
 
-		conPartBdb = new ConCoreBdb(env, dbConfig);
-		descCoreBdb = new DescCoreBdb(env, dbConfig);
-		relPartBdb = new RelPartBdb2(env, dbConfig);
 		this.identifierDb = identifierDb;
 		logStats();
 	}
@@ -681,18 +1313,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			conDescRelDb.close();
 			conDescRelDb = null;
 		}
-		if (conPartBdb != null) {
-			conPartBdb.close();
-			conPartBdb = null;
-		}
-		if (descCoreBdb != null) {
-			descCoreBdb.close();
-			descCoreBdb = null;
-		}
-		if (relPartBdb != null) {
-			relPartBdb.close();
-			relPartBdb = null;
-		}
+		conDescRelBinding.close();
 	}
 
 	public void sync() throws DatabaseException {
@@ -701,15 +1322,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				conDescRelDb.sync();
 			}
 		}
-		if (conPartBdb != null) {
-			conPartBdb.sync();
-		}
-		if (descCoreBdb != null) {
-			descCoreBdb.sync();
-		}
-		if (relPartBdb != null) {
-			relPartBdb.sync();
-		}
+		conDescRelBinding.sync();
 	}
 
 	public I_ConceptAttributeVersioned conAttrEntryToObject(DatabaseEntry key,
@@ -1362,6 +1975,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				}
 			}
 		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		} catch (DataFormatException e) {
 			throw new ToIoException(e);
 		}
 	}
