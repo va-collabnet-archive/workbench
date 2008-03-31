@@ -104,21 +104,23 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 		if (partIdMap.containsKey(idPartCore)) {
 			return partIdMap.get(idPartCore);
 		}
-		Short conAttrPartId = partIdGenerator.nextId();
-		DatabaseEntry partKey = new DatabaseEntry();
-		DatabaseEntry partValue = new DatabaseEntry();
-		shortBinder.objectToEntry(conAttrPartId, partKey);
-		idCoreBinding.objectToEntry(idPartCore, partValue);
-		idPartDb.put(null, partKey, partValue);
-		partIdMap.put(idPartCore, conAttrPartId);
-		idPartMap.put(conAttrPartId, idPartCore);
-		if (partIdMap.size() % 100 == 0) {
-			AceLog.getAppLog().info(
-					"id part core map size now: " + partIdMap.size());
+		synchronized (partIdMap) {
+			Short conAttrPartId = partIdGenerator.nextId();
+			DatabaseEntry partKey = new DatabaseEntry();
+			DatabaseEntry partValue = new DatabaseEntry();
+			shortBinder.objectToEntry(conAttrPartId, partKey);
+			idCoreBinding.objectToEntry(idPartCore, partValue);
+			idPartDb.put(null, partKey, partValue);
+			partIdMap.put(idPartCore, conAttrPartId);
+			idPartMap.put(conAttrPartId, idPartCore);
+			if (partIdMap.size() % 100 == 0) {
+				AceLog.getAppLog().info(
+						"id part core map size now: " + partIdMap.size());
+			}
+			// AceLog.getAppLog().info("Writing part id: " + newPartId + " " +
+			// part);
+			return conAttrPartId;
 		}
-		// AceLog.getAppLog().info("Writing part id: " + newPartId + " " +
-		// part);
-		return conAttrPartId;
 	}
 
 	public short getIdPartCoreId(I_IdPart idPart) throws DatabaseException {

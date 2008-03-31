@@ -32,11 +32,27 @@ public class IntSet implements ListDataListener, I_IntSet {
 		this.setValues = new int[values.length];
 		System.arraycopy(values, 0, this.setValues, 0, values.length);
 		Arrays.sort(this.setValues);
+		boolean duplicates = false;
 		for (int i = 1; i < values.length; i++) {
 		   if (this.setValues[i-1] == this.setValues[i]) {
+			   duplicates = true;
 			   throw new RuntimeException("Set array contains duplicates: " + Arrays.asList(this.setValues));
 		   }
       }
+		if (duplicates) {
+			AceLog.getAppLog().info("Set array contains duplicates: " + Arrays.asList(this.setValues));
+			HashSet<Integer> hashSetValues = new HashSet<Integer>();
+			for (int i: values) {
+				hashSetValues.add(i);
+			}
+			this.setValues = new int[hashSetValues.size()];
+			int i = 0;
+			for (Integer value: hashSetValues) {
+				this.setValues[i] = value;
+				i++;
+			}
+			Arrays.sort(this.setValues);                 
+		}
 	}
 	public IntSet() {
 		super();
@@ -78,7 +94,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 		addNoIntervalAdded(key);
 		intervalAdded(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
 	}
-	private void addNoIntervalAdded(int key) {
+	private synchronized void addNoIntervalAdded(int key) {
 		if (setValues.length == 0) {
 			setValues = new int[1];
 			setValues[0] = key;
@@ -106,7 +122,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 		removeNoIntervalRemoved(key);
 		intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
 	}
-	private void removeNoIntervalRemoved(int key) {
+	private synchronized void removeNoIntervalRemoved(int key) {
 		int insertionPoint = Arrays.binarySearch(setValues, key);
 		if (insertionPoint < 0) {
 			return;
@@ -124,7 +140,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.api.I_IntSet#addAll(int[])
 	 */
-	public void addAll(int[] keys) {
+	public synchronized void addAll(int[] keys) {
 		for (int i = 0; i < keys.length; i++) {
 			addNoIntervalAdded(keys[i]);
 		}
@@ -133,7 +149,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
 	 */
-	public void removeAll(int[] keys) {
+	public synchronized void removeAll(int[] keys) {
 		for (int i = 0; i < keys.length; i++) {
 			remove(keys[i]);
 		}

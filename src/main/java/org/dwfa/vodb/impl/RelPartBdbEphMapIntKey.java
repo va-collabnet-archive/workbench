@@ -116,19 +116,21 @@ public class RelPartBdbEphMapIntKey implements I_StoreInBdb, I_StoreRelParts<Int
 		if (partIdMap.containsKey(relPart)) {
 			return partIdMap.get(relPart);
 		}
-		int relPartId = partIdGenerator.nextId();
-		DatabaseEntry partKey = new DatabaseEntry();
-		DatabaseEntry partValue = new DatabaseEntry();
-		intBinder.objectToEntry((Integer) relPartId, partKey);
-		relPartBinding.objectToEntry(relPart, partValue);
-		relPartDb.put(null, partKey, partValue);
-		partIdMap.put(relPart, relPartId);
-		idPartMap.put(relPartId, relPart);
-		if (partIdMap.size() % 250 == 0) {
-			AceLog.getAppLog().info("rel part map size now: " + partIdMap.size());
+		synchronized (partIdMap) {
+			int relPartId = partIdGenerator.nextId();
+			DatabaseEntry partKey = new DatabaseEntry();
+			DatabaseEntry partValue = new DatabaseEntry();
+			intBinder.objectToEntry((Integer) relPartId, partKey);
+			relPartBinding.objectToEntry(relPart, partValue);
+			relPartDb.put(null, partKey, partValue);
+			partIdMap.put(relPart, relPartId);
+			idPartMap.put(relPartId, relPart);
+			if (partIdMap.size() % 250 == 0) {
+				AceLog.getAppLog().info("rel part map size now: " + partIdMap.size());
+			}
+			//AceLog.getAppLog().info("Writing part id: " + newPartId + " " + part);
+			return relPartId;
 		}
-		//AceLog.getAppLog().info("Writing part id: " + newPartId + " " + part);
-		return relPartId;
 	}
 	
 	/* (non-Javadoc)

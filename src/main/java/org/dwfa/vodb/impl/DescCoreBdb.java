@@ -118,21 +118,23 @@ public class DescCoreBdb implements I_StoreInBdb {
 		if (partIdMap.containsKey(descPartCore)) {
 			return partIdMap.get(descPartCore);
 		}
-		int descPartCoreId = partIdGenerator.nextId();
-		DatabaseEntry partKey = new DatabaseEntry();
-		DatabaseEntry partValue = new DatabaseEntry();
-		intBinder.objectToEntry((Integer) descPartCoreId, partKey);
-		descPartCoreBinding.objectToEntry(descPartCore, partValue);
-		descPartDb.put(null, partKey, partValue);
-		partIdMap.put(descPartCore, descPartCoreId);
-		conPartMap.put(descPartCoreId, descPartCore);
-		if (partIdMap.size() % 100 == 0) {
-			AceLog.getAppLog().info(
-					"desc core part map size now: " + partIdMap.size());
+		synchronized (partIdMap) {
+			int descPartCoreId = partIdGenerator.nextId();
+			DatabaseEntry partKey = new DatabaseEntry();
+			DatabaseEntry partValue = new DatabaseEntry();
+			intBinder.objectToEntry((Integer) descPartCoreId, partKey);
+			descPartCoreBinding.objectToEntry(descPartCore, partValue);
+			descPartDb.put(null, partKey, partValue);
+			partIdMap.put(descPartCore, descPartCoreId);
+			conPartMap.put(descPartCoreId, descPartCore);
+			if (partIdMap.size() % 100 == 0) {
+				AceLog.getAppLog().info(
+						"desc core part map size now: " + partIdMap.size());
+			}
+			// AceLog.getAppLog().info("Writing part id: " + newPartId + " " +
+			// part);
+			return descPartCoreId;
 		}
-		// AceLog.getAppLog().info("Writing part id: " + newPartId + " " +
-		// part);
-		return descPartCoreId;
 	}
 
 	/*

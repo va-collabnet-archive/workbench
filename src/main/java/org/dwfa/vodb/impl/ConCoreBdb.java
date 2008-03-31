@@ -104,21 +104,23 @@ public class ConCoreBdb implements I_StoreInBdb {
 		if (partIdMap.containsKey(conAttrPart)) {
 			return partIdMap.get(conAttrPart);
 		}
-		int conAttrPartId = partIdGenerator.nextId();
-		DatabaseEntry partKey = new DatabaseEntry();
-		DatabaseEntry partValue = new DatabaseEntry();
-		intBinder.objectToEntry((Integer) conAttrPartId, partKey);
-		conPartBinding.objectToEntry(conAttrPart, partValue);
-		conPartDb.put(null, partKey, partValue);
-		partIdMap.put(conAttrPart, conAttrPartId);
-		conPartMap.put(conAttrPartId, conAttrPart);
-		if (partIdMap.size() % 100 == 0) {
-			AceLog.getAppLog().info(
-					"rel part map size now: " + partIdMap.size());
+		synchronized (partIdMap) {
+			int conAttrPartId = partIdGenerator.nextId();
+			DatabaseEntry partKey = new DatabaseEntry();
+			DatabaseEntry partValue = new DatabaseEntry();
+			intBinder.objectToEntry((Integer) conAttrPartId, partKey);
+			conPartBinding.objectToEntry(conAttrPart, partValue);
+			conPartDb.put(null, partKey, partValue);
+			partIdMap.put(conAttrPart, conAttrPartId);
+			conPartMap.put(conAttrPartId, conAttrPart);
+			if (partIdMap.size() % 100 == 0) {
+				AceLog.getAppLog().info(
+						"rel part map size now: " + partIdMap.size());
+			}
+			// AceLog.getAppLog().info("Writing part id: " + newPartId + " " +
+			// part);
+			return conAttrPartId;
 		}
-		// AceLog.getAppLog().info("Writing part id: " + newPartId + " " +
-		// part);
-		return conAttrPartId;
 	}
 
 	/*

@@ -63,7 +63,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	private static ConceptBean privateGet(int conceptId) throws IOException {
 		if (cbeans.containsKey(conceptId)) {
 			Reference<ConceptBean> ref = cbeans.get(conceptId);
-			if (ref.isEnqueued() == false) {
+			if (ref != null && ref.isEnqueued() == false) {
 				ConceptBean cb = ref.get();
 				if (cb != null) {
 					return cb;
@@ -74,7 +74,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		synchronized (cbeans) {
 			if (cbeans.containsKey(conceptId)) {
 				Reference<ConceptBean> ref = cbeans.get(conceptId);
-				if (ref.isEnqueued()) {
+				if (ref != null && ref.isEnqueued()) {
 					cbeans.remove(conceptId);				
 				} else {
 					ConceptBean cb = ref.get();
