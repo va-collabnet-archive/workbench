@@ -229,15 +229,14 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			c.weighty = 1;
 			c.gridy++;
 			uncommittedListPanel.add(new JPanel(), c);
-
-			for (int i = 0; i < leftTabs.getTabCount(); i++) {
-				if (leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
-					if (dataCheckListModel.size() > 0) {
-						leftTabs.setSelectedIndex(i);
-					}
-					leftTabs.setComponentAt(i, uncommittedComponentScroller);
-					break;
-				}
+			
+			int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+			leftTabs.setComponentAt(dataCheckIndex, uncommittedComponentScroller);
+			int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
+			if (dataCheckListModel.size() > 0) {
+				leftTabs.setSelectedIndex(dataCheckIndex);
+			} else {
+				leftTabs.setSelectedIndex(taxonomyIndex);
 			}
 		}
 
@@ -1143,7 +1142,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private UncommittedListModel dataCheckListModel;
 
-	private static String dataCheckTabLabel;
+	private static String dataCheckTabLabel = "data checks";
+	private static String taxonomyTabLabel = "taxonomy";
+	
+	
 
 	/**
 	 * 
@@ -1579,8 +1581,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		c2Panel.setMinimumSize(new Dimension(0, 0));
 
 		termTreeConceptSplit.setRightComponent(conceptTabs);
-		leftTabs.addTab("taxonomy", termTree);
-		dataCheckTabLabel = "data checks";
+		leftTabs.addTab(taxonomyTabLabel, termTree);
 		if (editMode) {
 			leftTabs.addTab(dataCheckTabLabel, getUncommittedList());
 		}

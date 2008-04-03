@@ -739,7 +739,6 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 			}
 			bean.sourceRels.addAll(bean.uncommittedSourceRels);
 			bean.uncommittedSourceRels = null;
-			bean.flushDestRelsOnTargetBeans(version, values);
 			bean.destRels = null;
 		}
 	}

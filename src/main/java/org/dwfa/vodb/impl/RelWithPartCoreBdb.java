@@ -870,7 +870,6 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 			}
 			bean.sourceRels.addAll(bean.uncommittedSourceRels);
 			bean.uncommittedSourceRels = null;
-			bean.flushDestRelsOnTargetBeans(version, values);
 			bean.destRels = null;
 		}
 	}

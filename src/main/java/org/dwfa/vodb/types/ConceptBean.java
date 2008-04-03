@@ -104,7 +104,6 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 	}
 
-
 	public static ConceptBean get(UUID uid) throws TerminologyException,
 			IOException {
 		return get(AceConfig.getVodb().uuidToNative(uid));
@@ -611,25 +610,6 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
-		}
-	}
-
-	public void flushDestRelsOnTargetBeans(int version, Set<TimePathId> values)
-			throws DatabaseException, IOException {
-		for (I_RelVersioned rel : getSourceRels()) {
-			boolean changed = false;
-			for (I_RelPart p : rel.getVersions()) {
-				if (p.getVersion() == Integer.MAX_VALUE) {
-					ConceptBean destBean = ConceptBean.get(rel.getC2Id());
-					destBean.flushDestRels();
-					p.setVersion(version);
-					values.add(new TimePathId(version, p.getPathId()));
-					changed = true;
-				}
-			}
-			if (changed) {
-				AceConfig.getVodb().writeRel(rel);
-			}
 		}
 	}
 

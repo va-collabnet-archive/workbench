@@ -1422,6 +1422,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					destBean.setRelOrigins(new IntSet());
 				}
 				destBean.getRelOrigins().add(bean.getConceptId());
+				destBean.flushDestRels();
 				writeConceptToBdb(destBean);
 				for (I_RelPart p : rel.getVersions()) {
 					if (p.getVersion() == Integer.MAX_VALUE) {
@@ -1438,7 +1439,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			}
 			bean.sourceRels.addAll(bean.uncommittedSourceRels);
 			bean.uncommittedSourceRels = null;
-			bean.flushDestRelsOnTargetBeans(version, values);
 			bean.destRels = null;
 		}
 		if (changed) {
