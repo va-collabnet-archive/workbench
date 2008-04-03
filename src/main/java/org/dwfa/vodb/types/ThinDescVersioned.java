@@ -52,12 +52,6 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
       } else if (index >= 0) {
          I_DescriptionPart prevDesc = versions.get(index);
          if (prevDesc.hasNewData(newPart)) {
-            if (prevDesc.getText().equals(newPart.getText())) {
-               newPart.setText(prevDesc.getText());
-            }
-            if (prevDesc.getLang().equals(newPart.getLang())) {
-               newPart.setLang(prevDesc.getLang());
-            }
             return versions.add(newPart);
          }
       }

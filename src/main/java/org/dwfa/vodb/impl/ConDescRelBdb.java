@@ -1487,6 +1487,11 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			}
 			writer.addDocument(doc);
 			writer.close();
+			if (luceneSearcher != null) {
+				luceneSearcher.close();
+				AceLog.getAppLog().info("Closing lucene searcher");
+			}
+			luceneSearcher = null;
 		} catch (CorruptIndexException e) {
 			throw new DatabaseException(e);
 		} catch (IOException e) {
@@ -1507,6 +1512,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 		if (luceneSearcher == null) {
 			luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
+			AceLog.getAppLog().info("Creating lucene searcher");
 		}
 		Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
 		return luceneSearcher.search(q);
@@ -1727,10 +1733,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		boolean newDescForConcept = true;
 		for (I_DescriptionVersioned desc : bean.getDescriptions()) {
 			if (desc.getDescId() == newDesc.getDescId()) {
-				if (desc.getVersions().size() == newDesc.getVersions().size()) {
-					throw new DatabaseException(
-							"Description versions are not the same size");
-				}
 				newDescForConcept = false;
 				break;
 			}
