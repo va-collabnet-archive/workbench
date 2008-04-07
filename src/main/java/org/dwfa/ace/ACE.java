@@ -235,8 +235,29 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
 			if (dataCheckListModel.size() > 0) {
 				leftTabs.setSelectedIndex(dataCheckIndex);
+				if (dataCheckPanel == null) {
+					try {
+						dataCheckPanel = new ConceptPanel(ACE.this, LINK_TYPE.DATA_CHECK_LINK,
+								conceptTabs);
+						conceptPanels.add(dataCheckPanel);
+					} catch (DatabaseException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					} catch (IOException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					} catch (ClassNotFoundException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					}
+				}
+				conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel, "Data Checks Linked");
+				
 			} else {
 				leftTabs.setSelectedIndex(taxonomyIndex);
+				if (dataCheckPanel != null) {
+					if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
+						conceptTabs.remove(dataCheckPanel);
+						dataCheckPanel.setTermComponent(null);
+					}
+				}
 			}
 		}
 
@@ -1141,6 +1162,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private MasterWorker menuWorker;
 
 	private UncommittedListModel dataCheckListModel;
+	private ConceptPanel dataCheckPanel;
 
 	private static String dataCheckTabLabel = "data checks";
 	private static String taxonomyTabLabel = "taxonomy";
@@ -1545,12 +1567,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private JComponent getContentPanel() throws DatabaseException, IOException,
 			ClassNotFoundException, TerminologyException {
 		termTree = getHierarchyPanel();
-		/*
-		 * String htmlLabel = "<html><img src='" +
-		 * ACE.class.getResource("/circle_red_x.gif") +"' border='0' ><img
-		 * src='" + ACE.class.getResource("/triangle_yellow_exclamation.gif")
-		 * +"' border='0' ></html>"; c1Panel = new JLabel(htmlLabel);
-		 */
 		conceptPanels = new ArrayList<ConceptPanel>();
 		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs);
 		conceptPanels.add(c1Panel);
@@ -1566,12 +1582,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				conceptTabs);
 		conceptPanels.add(c3panel);
 		conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
-		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.DATA_CHECK_LINK,
+		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
 				conceptTabs);
 		conceptPanels.add(c4panel);
 		if (editMode) {
 			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
-			conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, c4panel, "Data Checks Linked");
 			conceptTabs.addTab("List", getConceptListEditor());
 		} else {
 			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			

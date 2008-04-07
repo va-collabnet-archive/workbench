@@ -24,6 +24,7 @@ import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
+import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.bind.EntryBinding;
@@ -375,7 +376,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 		}
 	}
 
-	public void cleanupSNOMED(I_IntSet relsToIgnore, int[] releases)
+	public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases)
 			throws Exception {
 		// Update the history records for the relationships...
 		AceLog.getAppLog().info("Starting rel history update.");
@@ -387,7 +388,6 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 		int retiredRels = 0;
 		int currentRels = 0;
 		int totalRels = 0;
-		Arrays.sort(releases);
 		int retiredNid = LocalVersionedTerminology.get().uuidToNative(
 				ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 		while (relC.getNext(relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
@@ -395,7 +395,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 			I_RelVersioned vrel = (I_RelVersioned) relWithPartCoreBinding
 					.entryToObject(relValue);
 			if (relsToIgnore.contains(vrel.getRelId()) == false) {
-				boolean addRetired = vrel.addRetiredRec(releases, retiredNid);
+				boolean addRetired = vrel.addRetiredRec(releases.getSetValues(), retiredNid);
 				boolean removeRedundant = vrel.removeRedundantRecs();
 				if (addRetired && removeRedundant) {
 					relWithPartCoreBinding.objectToEntry(vrel, relValue);
@@ -882,5 +882,6 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 	public void setupBean(ConceptBean cb) throws IOException {
 		// nothing to do
 	}
+
 
 }

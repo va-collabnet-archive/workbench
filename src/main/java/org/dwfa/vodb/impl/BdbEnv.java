@@ -810,7 +810,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		return env.beginTransaction(null, null);
 	}
 
-	public void cleanupSNOMED(I_IntSet relsToIgnore, int[] releases)
+	public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases)
 			throws Exception {
 		relBdb.cleanupSNOMED(relsToIgnore, releases);
 	}

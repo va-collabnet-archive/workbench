@@ -2,7 +2,6 @@ package org.dwfa.vodb.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -646,7 +645,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 		relCursor.close();
 	}
 
-	public void cleanupSNOMED(I_IntSet relsToIgnore, int[] releases)
+	public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases)
 			throws Exception {
 		// Update the history records for the relationships...
 		AceLog.getAppLog().info("Starting rel history update.");
@@ -658,7 +657,6 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 		int retiredRels = 0;
 		int currentRels = 0;
 		int totalRels = 0;
-		Arrays.sort(releases);
 		int retiredNid = LocalVersionedTerminology.get().uuidToNative(
 				ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 		while (relC.getNext(relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
@@ -666,7 +664,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 			I_RelVersioned vrel = (I_RelVersioned) relBinding
 					.entryToObject(relValue);
 			if (relsToIgnore.contains(vrel.getRelId()) == false) {
-				boolean addRetired = vrel.addRetiredRec(releases, retiredNid);
+				boolean addRetired = vrel.addRetiredRec(releases.getSetValues(), retiredNid);
 				boolean removeRedundant = vrel.removeRedundantRecs();
 				if (addRetired && removeRedundant) {
 					relBinding.objectToEntry(vrel, relValue);

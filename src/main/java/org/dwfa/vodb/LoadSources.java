@@ -3,6 +3,7 @@ package org.dwfa.vodb;
 import java.io.File;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.edit.AddImage;
@@ -28,9 +29,9 @@ public class LoadSources {
 			AceLog.getAppLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
 			Path.writeBasePaths(AceConfig.getVodb());
 			AddImage.addStockImages(AceConfig.getVodb());
-			int[] releaseDates = loadConstants.getReleaseDates();
+			I_IntSet releaseDates = loadConstants.getReleaseDates();
 			if (args.length > 2) {
-				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(), releaseDates[0]);
+				ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley(AceConfig.getVodb(), releaseDates.getSetValues()[0]);
 				AceLog.getAppLog().info("(2) Starting to process SNOMED: " + args[2]);
 				loadSnomed.execute(new File(args[2]));
 				AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());

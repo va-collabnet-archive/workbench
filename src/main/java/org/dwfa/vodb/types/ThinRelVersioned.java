@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -150,8 +151,12 @@ public class ThinRelVersioned implements I_RelVersioned {
 	public boolean removeRedundantRecs() {
 		I_RelVersioned compact = new ThinRelVersioned(relId, componentOneId,
 				componentTwoId, versions.size());
+		TreeMap<Integer, I_RelPart> partMap = new TreeMap<Integer, I_RelPart>();
 		for (I_RelPart v : versions) {
-			compact.addVersion(v);
+			partMap.put(v.getVersion(), v);
+		}
+		for (Integer key : partMap.keySet()) {
+			compact.addVersion(partMap.get(key));
 		}
 		if (versions.size() == compact.getVersions().size()) {
 			return false;

@@ -48,7 +48,7 @@ public interface I_StoreRelationships extends I_StoreInBdb {
 	public void iterateRelationshipEntries(I_ProcessRelationshipEntries processor)
 			throws Exception;
 
-	public void cleanupSNOMED(I_IntSet relsToIgnore, int[] releases) throws Exception;
+	public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases) throws Exception;
 	
 	public I_RelVersioned relEntryToObject(DatabaseEntry key, DatabaseEntry value);
 

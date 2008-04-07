@@ -22,10 +22,9 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
@@ -35,6 +34,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
+import org.dwfa.vodb.types.IntSet;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -44,7 +44,7 @@ public abstract class ProcessSources {
 
     boolean skipFirstLine;
 
-    private List<Date> releaseDates = new ArrayList<Date>();
+    private TreeSet<Date> releaseDates = new TreeSet<Date>();
 
     protected ThinVersionHelper vh = new ThinVersionHelper();
 
@@ -595,14 +595,12 @@ public abstract class ProcessSources {
         releaseDates.add(releaseDate);
     }
 
-    public int[] getReleaseDates() {
-        int[] releases = new int[releaseDates.size()];
-        int i = 0;
+    public I_IntSet getReleaseDates() {
+        IntSet intSet = new IntSet();
         for (Date rdate : releaseDates) {
-            releases[i] = ThinVersionHelper.convert(rdate.getTime());
-            i++;
+        	intSet.add(ThinVersionHelper.convert(rdate.getTime()));
         }
-        return releases;
+        return intSet;
     }
 
     public abstract void execute(File snomedDir) throws Exception;

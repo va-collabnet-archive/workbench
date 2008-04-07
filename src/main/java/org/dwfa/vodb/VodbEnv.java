@@ -1441,7 +1441,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 		return bdbEnv.beginTransaction();
 	}
 
-	public void cleanupSNOMED(I_IntSet relsToIgnore, int[] releases)
+	public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases)
 			throws Exception {
 		bdbEnv.cleanupSNOMED(relsToIgnore, releases);
 	}

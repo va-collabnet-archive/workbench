@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarFile;
 
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.log.AceLog;
@@ -116,10 +117,10 @@ public class LoadBdb {
         loadConstants.flushIdBuffer();
         Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
         AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
-        int[] releaseDates = loadConstants.getReleaseDates();
+        I_IntSet releaseDates = loadConstants.getReleaseDates();
         for (String arg : argSet) {
             ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley((VodbEnv) LocalVersionedTerminology.get(),
-                                                                         releaseDates[0]);
+                                                                         releaseDates.getSetValues()[0]);
             AceLog.getAppLog().info("(1) Starting to process SNOMED: " + arg);
             loadSnomed.execute(new JarFile(arg));
             AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());

@@ -738,36 +738,38 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		int titleLength = 15;
 		if (conceptTabs != null) {
 			int index = conceptTabs.indexOfComponent(this);
-			if (termComponent != null) {
-				ConceptBean cb = (ConceptBean) termComponent;
-				String desc;
-				try {
-					I_DescriptionTuple tdt = cb.getDescTuple(getConfig()
-							.getShortLabelDescPreferenceList(), getConfig());
-					if (tdt != null) {
-						desc = tdt.getText();
-					} else {
-						desc = cb.getInitialText();
+			if (index >= 0) {
+				if (termComponent != null) {
+					ConceptBean cb = (ConceptBean) termComponent;
+					String desc;
+					try {
+						I_DescriptionTuple tdt = cb.getDescTuple(getConfig()
+								.getShortLabelDescPreferenceList(), getConfig());
+						if (tdt != null) {
+							desc = tdt.getText();
+						} else {
+							desc = cb.getInitialText();
+						}
+					} catch (IOException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+						setTermComponent(null);
+						return;
 					}
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-					setTermComponent(null);
-					return;
-				}
-				String shortDesc;
-				if (desc.length() > titleLength) {
-					shortDesc = desc.substring(0, titleLength);
-					shortDesc = shortDesc + "...";
+					String shortDesc;
+					if (desc.length() > titleLength) {
+						shortDesc = desc.substring(0, titleLength);
+						shortDesc = shortDesc + "...";
+					} else {
+						shortDesc = desc;
+					}
+					conceptTabs.setTitleAt(index, shortDesc);
+					conceptTabs.setToolTipTextAt(index, desc);
 				} else {
-					shortDesc = desc;
+					conceptTabs.setTitleAt(index, "empty");
+					conceptTabs.setToolTipTextAt(index, "empty");
 				}
-				conceptTabs.setTitleAt(index, shortDesc);
-				conceptTabs.setToolTipTextAt(index, desc);
-			} else {
-				conceptTabs.setTitleAt(index, "empty");
-				conceptTabs.setToolTipTextAt(index, "empty");
+				conceptTabs.setIconAt(index, tabIcon);
 			}
-			conceptTabs.setIconAt(index, tabIcon);
 		}
 	}
 

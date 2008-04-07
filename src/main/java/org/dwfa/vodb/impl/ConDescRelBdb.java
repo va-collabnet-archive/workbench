@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1881,7 +1880,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			if (concept.sourceRels == null) {
 				concept.sourceRels = new ArrayList<I_RelVersioned>();
 			}
-			concept.sourceRels.add(rel);
+			if (concept.sourceRels.contains(rel) == false) {
+				concept.sourceRels.add(rel);
+			}
 			writeConceptToBdb(concept);
 		} catch (DatabaseException e) {
 			AceLog.getAppLog().nonModalAlertAndLogException(
@@ -1903,7 +1904,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 	}
 
-	public void cleanupSNOMED(I_IntSet relsToIgnore, int[] releases)
+	public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases)
 			throws Exception {
 		// Update the history records for the relationships...
 		AceLog.getAppLog().info("Starting rel history update.");
@@ -1912,7 +1913,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		int retiredRels = 0;
 		int currentRels = 0;
 		int totalRels = 0;
-		Arrays.sort(releases);
 		int retiredNid = LocalVersionedTerminology.get().uuidToNative(
 				ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 		while (conItr.hasNext()) {
@@ -1923,7 +1923,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				totalRels++;
 				I_RelVersioned vrel = relItr.next();
 				if (relsToIgnore.contains(vrel.getRelId()) == false) {
-					boolean addRetired = vrel.addRetiredRec(releases,
+					boolean addRetired = vrel.addRetiredRec(releases.getSetValues(),
 							retiredNid);
 					boolean removeRedundant = vrel.removeRedundantRecs();
 					if (addRetired && removeRedundant) {
