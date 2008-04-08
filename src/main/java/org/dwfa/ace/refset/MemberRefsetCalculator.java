@@ -295,7 +295,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 	}
 
-	private void setMembers() throws Exception {
+	protected void setMembers() throws Exception {
 
 
 
