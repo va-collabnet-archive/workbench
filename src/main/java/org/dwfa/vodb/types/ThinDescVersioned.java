@@ -209,7 +209,8 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
                   uncommittedParts.add(part);
                   continue;
                } else if ((allowedStatus != null) && (!allowedStatus.contains(part.getStatusId()))) {
-                  if (possible != null) {
+                  if (possible != null && position.getPath()
+                          .getMatchingPath(part.getPathId()) != null) {
                      Position rejectedStatusPosition = new Position(part.getVersion(), position.getPath()
                            .getMatchingPath(part.getPathId()));
                      I_Path possiblePath = position.getPath().getMatchingPath(possible.getPathId());

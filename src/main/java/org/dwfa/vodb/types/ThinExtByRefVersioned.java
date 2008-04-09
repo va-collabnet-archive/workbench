@@ -272,7 +272,8 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
                         continue;
                     } else if ((allowedStatus != null)
                             && (!allowedStatus.contains(part.getStatus()))) {
-                        if (possible != null) {
+                    	if (possible != null && position.getPath()
+                                .getMatchingPath(part.getPathId()) != null) {
                             I_Position rejectedStatusPosition = new Position(
                                     part.getVersion(), position.getPath()
                                             .getMatchingPath(part.getPathId()));

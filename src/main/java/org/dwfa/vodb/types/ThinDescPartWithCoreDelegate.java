@@ -149,7 +149,7 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
 
 	@Override
 	public boolean equals(Object obj) {
-		ThinDescPart another = (ThinDescPart) obj;
+		I_DescriptionPart another = (I_DescriptionPart) obj;
 		return ((core.getInitialCaseSignificant() == another.getInitialCaseSignificant()) &&
 				(core.getLang().equals(another.getLang())) && 
 				(core.getPathId() == another.getPathId()) && 

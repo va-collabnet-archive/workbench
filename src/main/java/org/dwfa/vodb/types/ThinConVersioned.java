@@ -190,7 +190,8 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 					} else if ((allowedStatus != null)
 							&& (!allowedStatus
 									.contains(part.getConceptStatus()))) {
-						if (possible != null) {
+						if (possible != null && position.getPath()
+		                          .getMatchingPath(part.getPathId()) != null) {
 							I_Path matchingPartPath = position.getPath()
 									.getMatchingPath(possible.getPathId());
 							if (matchingPartPath != null) {

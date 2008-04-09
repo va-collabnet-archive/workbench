@@ -135,8 +135,18 @@ public class ThinRelPart implements I_RelPart {
 
 	@Override
 	public boolean equals(Object obj) {
-		ThinRelPart another = (ThinRelPart) obj;
-		return Arrays.equals(getAsArray(), another.getAsArray());
+		if (ThinRelPart.class.isAssignableFrom(obj.getClass())) {
+			ThinRelPart another = (ThinRelPart) obj;
+			return Arrays.equals(getAsArray(), another.getAsArray());
+		} else if (I_RelPart.class.isAssignableFrom(obj.getClass())) {
+			I_RelPart another = (I_RelPart) obj;
+			return Arrays.equals(getAsArray(), getAsArray(another));
+		}
+		return false;
+	}
+	private static int[] getAsArray(I_RelPart part) {
+		return new int[] { part.getPathId(), part.getVersion(), part.getStatusId(),
+				part.getRelTypeId(), part.getCharacteristicId(), part.getRefinabilityId(), part.getGroup()};
 	}
 	
 	private int[] getAsArray() {

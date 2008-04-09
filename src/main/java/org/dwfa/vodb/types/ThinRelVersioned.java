@@ -296,7 +296,8 @@ public class ThinRelVersioned implements I_RelVersioned {
 						continue;
 					} else if ((allowedStatus != null)
 							&& (!allowedStatus.contains(part.getStatusId()))) {
-						if (possible != null) {
+						if (possible != null && position.getPath()
+		                          .getMatchingPath(part.getPathId()) != null) {
 							I_Position rejectedStatusPosition = new Position(
 									part.getVersion(), position.getPath()
 											.getMatchingPath(part.getPathId()));
