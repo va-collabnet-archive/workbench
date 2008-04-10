@@ -7,6 +7,7 @@ package org.dwfa.bpa.gui;
 
 
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
@@ -15,8 +16,10 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.dwfa.bpa.process.I_Workspace;
@@ -34,9 +37,11 @@ public class FieldInputPanel extends GridBagPanel {
     private String[] labels = new String[0];
     private String[] values = new String[0];
     private JTextField[] valueFields = new JTextField[0];
+    private String[] tabLabels;
     private JButton cancel = new JButton("cancel");
     private JButton complete = new JButton("complete");
     private int columns = 1;
+	private Map<String, JComponent> labelComponentMap;
     /**
      * @param title
      */
@@ -56,10 +61,21 @@ public class FieldInputPanel extends GridBagPanel {
         redoLayout();
     }
     
+    public void setTabs(String[] tabLabels, Map<String, JComponent> labelComponentMap) {
+    	this.tabLabels = tabLabels;
+    	this.labelComponentMap = labelComponentMap;
+        redoLayout();
+    }
+    
     /**
      * 
      */
     private void redoLayout() {
+    	if (this.getComponentCount() > 0) {
+        	for (Component child: this.getComponents()) {
+        		remove(child);
+        	}
+    	}
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -86,12 +102,22 @@ public class FieldInputPanel extends GridBagPanel {
             c.gridwidth = 2;
             this.add(this.valueFields[i], c);
         }
-        c.gridwidth = 1;
+        c.gridwidth = 4;
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 1;
+        c.gridx = 0;
         c.gridy++;
-        this.add(new JPanel(), c);
+        if (this.tabLabels != null) {
+        	JTabbedPane tabs = new JTabbedPane();
+        	for (String label: tabLabels) {
+        		tabs.addTab(label, labelComponentMap.get(label));
+        	}
+            this.add(tabs, c);
+        } else {
+            this.add(new JPanel(), c);
+        }
         
+        c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridy++;
         c.gridx = 0;
@@ -105,6 +131,7 @@ public class FieldInputPanel extends GridBagPanel {
         c.fill = GridBagConstraints.NONE;
         c.gridwidth = 1;
         c.gridx++;
+        c.anchor = GridBagConstraints.EAST;
         this.cancel.setEnabled(false);
         this.add(this.cancel, c);
         c.gridx++;
