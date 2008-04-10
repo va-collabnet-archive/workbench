@@ -24,11 +24,7 @@ public class ExtensionValidator{
 		
 	private I_TermFactory termFactory = null;
 	private HashMap<String, Integer> extensions = new HashMap<String, Integer>();
-	private int[] extNids = {ConceptConstants.BOOLEAN_EXT.localize().getNid()
-							,ConceptConstants.CONCEPT_EXT.localize().getNid()
-							,ConceptConstants.CON_INT_EXT.localize().getNid()
-							,
-							}; 
+	 
 		
 	public ExtensionValidator(){
 		termFactory = LocalVersionedTerminology.get();
@@ -87,7 +83,7 @@ public class ExtensionValidator{
 	    		/*
 				 * Get concept for Refset Auxilary -> "inclusion type"
 				 */
-				inclusionTypeConcept = termFactory.getConcept(ConceptConstants.REFSET.localize().getNid());
+				inclusionTypeConcept = termFactory.getConcept(ConceptConstants.INCLUSION_TYPE.localize().getNid());
 	    	}
 	    	else if(refsetType == extensions.get(REFSET_TYPES.CON_INT.name()).intValue()){
 	    	}
@@ -121,7 +117,7 @@ public class ExtensionValidator{
 	    	Set<I_GetConceptData> inclusionTypes = inclusionTypeConcept.getDestRelOrigins(null, allowedTypes, null, false);
 			
 			
-			for (I_ThinExtByRefVersioned ext: termFactory.getAllExtensionsForComponent(componentId, false)) {
+			for (I_ThinExtByRefVersioned ext: termFactory.getAllExtensionsForComponent(componentId, true)) {
 	    		
 	    		List<? extends I_ThinExtByRefPart> extensionVersions = ext.getVersions();
 	    		int latest = Integer.MIN_VALUE;
@@ -132,7 +128,7 @@ public class ExtensionValidator{
 	            }//End 1st inner for loop
 	            
 	            boolean alertAdded = false;
-	            	            
+	            	          
 	            for (I_ThinExtByRefPart currentVersion : extensionVersions) {
 	                if (currentVersion.getVersion() == latest) {
 	                    I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) currentVersion;
@@ -151,12 +147,14 @@ public class ExtensionValidator{
 	                			
 	                			AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 	                            if (forCommit) {
-	                                 alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
+	                                 alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 	                            }
 	                            AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType,
 	                            		alertString, termFactory.getConcept(componentId));
 	                            
-	                            alertList.add(alert);                     	
+	                            if(!alertList.contains(alert)){
+	                            	alertList.add(alert);          
+	                            }
 	                            alertAdded = true;
 	                    	}//End if
 	                    }//End if 
@@ -174,7 +172,7 @@ public class ExtensionValidator{
 	            			
 	            			AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 	                        if (forCommit) {
-	                             alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
+	                             alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 	                        }
 	//                        AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType,
 	//                        		alertString, termFactory.getConcept(extension.getComponentId()));
@@ -197,10 +195,10 @@ public class ExtensionValidator{
 		
 		}
 		catch (IOException e) {
-            throw new TaskFailedException(e);
+			throw new TaskFailedException(e);
     	}
          catch (TerminologyException e) {
-            throw new TaskFailedException(e);
+        	 throw new TaskFailedException(e);
         }
 		
 		
