@@ -38,11 +38,9 @@ public class VerifyRefsetExtensionDetails extends AbstractExtensionTest{
     }
 
     
-    @Override
-    public List<AlertToDataConstraintFailure> test(I_ThinExtByRefVersioned extension, 
+        public List<AlertToDataConstraintFailure> test(I_ThinExtByRefVersioned extension, 
     		boolean forCommit)
             throws TaskFailedException {
-    	List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
     	
     	ExtensionValidator ev = new ExtensionValidator();
     	
