@@ -225,7 +225,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 	protected I_DescriptionTuple getDescription(int rowIndex)
 			throws IOException {
 		
-		
+		if (rowIndex == -1) {
+			return null;
+		}
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
 		if (cb == null) {
 			return null;
