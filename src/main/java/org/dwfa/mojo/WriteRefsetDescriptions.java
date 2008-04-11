@@ -190,6 +190,7 @@ I_ProcessExtByRef {
 		Writer writer = fileMap.get(text);
 		if (writer == null) {
 			File outputFile = new File(outputDirectory, text + ".refset.text");
+			outputFile.createNewFile();
 			writer = new BufferedWriter(new FileWriter(outputFile));
 			fileMap.put(text, writer);
 		}
