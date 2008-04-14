@@ -1,6 +1,7 @@
 package org.dwfa.ace.tree;
 
 import java.awt.Color;
+import java.awt.Event;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -196,6 +197,12 @@ public class JTreeWithDragImage extends JTree {
 		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit
 				.getDefaultToolkit().getMenuShortcutKeyMask()), TransferHandler
 				.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
+          		 TransferHandler.getCutAction().getValue(Action.NAME));
+           imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
+                   TransferHandler.getCopyAction().getValue(Action.NAME));
+           imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
+                   TransferHandler.getPasteAction().getValue(Action.NAME));
 
 		ActionMap map = this.getActionMap();
 		map.put("cut", new AceTransferAction("cut"));
