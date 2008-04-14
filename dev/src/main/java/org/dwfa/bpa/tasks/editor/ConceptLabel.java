@@ -1,5 +1,6 @@
 package org.dwfa.bpa.tasks.editor;
 
+import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -189,6 +190,12 @@ public class ConceptLabel extends JEditorPane {
                  TransferHandler.getCopyAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                  TransferHandler.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
+          		 TransferHandler.getCutAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
+                   TransferHandler.getCopyAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
+                   TransferHandler.getPasteAction().getValue(Action.NAME));
 
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "DEL");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DEL");

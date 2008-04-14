@@ -7,6 +7,7 @@ package org.dwfa.bpa.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -302,15 +303,18 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
         this.setBackground(Color.WHITE);
         
         InputMap imap = this.getInputMap();
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getCutAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getCopyAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+        		 TransferHandler.getCutAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                 TransferHandler.getCopyAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                 TransferHandler.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
+       		 TransferHandler.getCutAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
+                TransferHandler.getCopyAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
+                TransferHandler.getPasteAction().getValue(Action.NAME));
 
         ActionMap map = this.getActionMap();
         map.put("cut",
