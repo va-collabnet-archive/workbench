@@ -1,8 +1,11 @@
 package org.dwfa.ace.table.refset;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -22,8 +25,11 @@ import java.util.logging.Level;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
@@ -80,42 +86,71 @@ import org.dwfa.vodb.types.ThinExtByRefVersioned;
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
 
-    public static class StringFieldEditor extends DefaultCellEditor {
+	public static class StringExtFieldEditor extends DefaultCellEditor {
 
-        private static final long serialVersionUID = 1L;
-        private JComboBox combo;
-        
-        I_ConfigAceFrame config;
+		private static final long serialVersionUID = 1L;
+		private class TextFieldFocusListener implements FocusListener {
 
-        REFSET_FIELDS field;
+			public void focusGained(FocusEvent e) {
+				// nothing to do
+			}
 
-        public StringFieldEditor(I_ConfigAceFrame config, String[] items, REFSET_FIELDS field) {
-            super(new JComboBox());
-            this.field = field;
-            combo = new JComboBox(items);
-            combo.setMaximumRowCount(20);
-            this.config = config;
-             editorComponent = combo;
+			public void focusLost(FocusEvent e) {
+				delegate.stopCellEditing();
+			}
+			
+		}
 
-            delegate = new EditorDelegate() {
-                private static final long serialVersionUID = 1L;
+		JTextField textField;
+		int row;
+		int column;
+	    REFSET_FIELDS field = REFSET_FIELDS.STRING_VALUE;
+		public StringExtFieldEditor() {
+			super(new JTextField());
+			textField = new JTextField();
+			textField.addFocusListener(new TextFieldFocusListener());
+			editorComponent = textField;
 
-                public void setValue(Object value) {
-                        combo.setSelectedItem(getSelectedItem(value));
-                }
+			delegate = new EditorDelegate() {
+				private static final long serialVersionUID = 1L;
 
-                public Object getCellEditorValue() {
-                    return ((ConceptBean) combo.getSelectedItem()).getConceptId();
-                }
-            };
-            combo.addActionListener(delegate);
-        }
+				public void setValue(Object value) {
+					if (StringWithExtTuple.class.isAssignableFrom(value
+							.getClass())) {
+						StringWithExtTuple swet = (StringWithExtTuple) value;
+						textField.setText((value != null) ? swet.getCellText() : "");
+					} else {
+						textField.setText((value != null) ? value.toString()
+								: "");
+					}
+				}
 
-         
-        public Component getTableCellEditorComponent(JTable table,
-                Object value, boolean isSelected, int row, int column) {
-            return super.getTableCellEditorComponent(table, value, isSelected,
-                    row, column);
+				public Object getCellEditorValue() {
+					return textField.getText();
+				}
+			};
+			textField.addActionListener(delegate);
+		}
+
+		public Component getTableCellEditorComponent(JTable table,
+				Object value, boolean isSelected, int row, int column) {
+			this.row = row;
+			this.column = column;
+			((JComponent) getComponent())
+					.setBorder(new LineBorder(Color.black));
+			return super.getTableCellEditorComponent(table, value, isSelected,
+					row, column);
+		}
+	
+        @Override
+        public boolean isCellEditable(EventObject evt) {
+            if (evt instanceof MouseEvent) {
+                int clickCount;
+                // For double-click activation
+                clickCount = 2;
+                return ((MouseEvent) evt).getClickCount() >= clickCount;
+            }
+            return true;
         }
 
         public String getSelectedItem(Object value) {
@@ -129,18 +164,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             }
         }
-
-        @Override
-        public boolean isCellEditable(EventObject evt) {
-            if (evt instanceof MouseEvent) {
-                int clickCount;
-                // For double-click activation
-                clickCount = 2;
-                return ((MouseEvent) evt).getClickCount() >= clickCount;
-            }
-            return true;
-        }
-    }
+	}
+	
 
     public static class ConceptFieldEditor extends DefaultCellEditor {
 

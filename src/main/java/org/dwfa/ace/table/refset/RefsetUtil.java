@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -27,7 +26,6 @@ import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.ConceptFieldEditor;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
-import org.dwfa.ace.table.refset.RefsetMemberTableModel.StringFieldEditor;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.IntList;
@@ -176,8 +174,8 @@ public class RefsetUtil {
                              .getRefsetPreferencesForToggle(toggle).getStringPreferences().getRefsetPopupIds());
             setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
                              .getRefsetPreferencesForToggle(toggle).getStringPreferences().getStatusPopupIds());
-            setComboForField(host, extTable, REFSET_FIELDS.STRING_VALUE, host.getConfig()
-                             .getRefsetPreferencesForToggle(toggle).getStringPreferences().getStringPopupItems());
+            extTable.getColumn(REFSET_FIELDS.STRING_VALUE).setCellEditor(new RefsetMemberTableModel.StringExtFieldEditor());
+            
             break;
 
         case CONCEPT:
@@ -289,12 +287,6 @@ public class RefsetUtil {
     private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable,
         REFSET_FIELDS comboField, IntList comboIntList) {
         ConceptFieldEditor conceptCombo = new RefsetMemberTableModel.ConceptFieldEditor(host.getConfig(), comboIntList,
-                                                                                        comboField);
-        extTable.getColumn(comboField).setCellEditor(conceptCombo);
-    }
-    private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable,
-        REFSET_FIELDS comboField, List<String> items) {
-        StringFieldEditor conceptCombo = new RefsetMemberTableModel.StringFieldEditor(host.getConfig(), items.toArray(new String[items.size()]),
                                                                                         comboField);
         extTable.getColumn(comboField).setCellEditor(conceptCombo);
     }
