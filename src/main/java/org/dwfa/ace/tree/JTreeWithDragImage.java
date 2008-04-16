@@ -199,9 +199,9 @@ public class JTreeWithDragImage extends JTree {
 				.getPasteAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
           		 TransferHandler.getCutAction().getValue(Action.NAME));
-           imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
                    TransferHandler.getCopyAction().getValue(Action.NAME));
-           imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
                    TransferHandler.getPasteAction().getValue(Action.NAME));
 
 		ActionMap map = this.getActionMap();

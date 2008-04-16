@@ -34,6 +34,7 @@ import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
+import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.RelTableModel;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
@@ -434,6 +435,10 @@ public class TerminologyTransferHandler extends TransferHandler {
 		}
 		if (JTable.class.isAssignableFrom(comp.getClass())) {
 			JTable table = (JTable) comp;
+			TableModel model = table.getModel();
+			if (DescriptionsFromCollectionTableModel.class.isAssignableFrom(model.getClass())) {
+				return false;
+			}
 			Point mouseLoc = table.getMousePosition();
 			if (mouseLoc != null) {
 				return true;

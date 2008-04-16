@@ -34,7 +34,7 @@ public class TreeMouseListener implements MouseListener {
 			if (selRow != -1) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
 						.getLastPathComponent();
-				TermTreeCellRenderer renderer = (TermTreeCellRenderer) tree
+				I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree
 						.getCellRenderer();
 				I_GetConceptDataForTree treeBean = (I_GetConceptDataForTree) node
 						.getUserObject();

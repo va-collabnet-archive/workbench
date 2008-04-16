@@ -21,12 +21,16 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 	private ArrayList<I_GetConceptData> ancestors;
 	private TreePath lastPath;
 	private DefaultMutableTreeNode lastChildNode;
+	I_GetConceptData focus;
 
 	
 	
 	public ExpandPathToNodeStateListener(JTreeWithDragImage tree, I_ConfigAceFrame config, I_GetConceptData focus) throws IOException {
 		super();
 		this.tree = tree;
+		this.focus = focus;
+		config.getParentExpandedNodes().clear();
+		config.getChildrenExpandedNodes().clear();
 		tree.addWorkerFinishedListener(this);
 		ancestors = new ArrayList<I_GetConceptData>();
 		ancestors.add(focus);
@@ -48,8 +52,6 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			DefaultMutableTreeNode termRoot = (DefaultMutableTreeNode) rootNode.getChildAt(i);
 			tree.collapsePath(new TreePath(termRoot.getPath()));
 		}
-		AceLog.getAppLog().info("All should be collapsed.");
-		
 		for (I_GetConceptData child: ancestors) {
 			boolean found = false;
 			for (int i = 0; i < rootNode.getChildCount(); i++) {
@@ -57,14 +59,15 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 				ConceptBeanForTree dbft = (ConceptBeanForTree) childNode.getUserObject();
 				if (dbft.getCoreBean().equals(child)) {
 					lastPath = new TreePath(childNode.getPath());
-					tree.expandPath(lastPath);
+					if (child.equals(focus)) {
+						tree.collapsePath(lastPath);
+					} else {
+						tree.expandPath(lastPath);
+					}
 					rootNode = childNode;
 					found = true;
 					break;
 				}
-			}
-			if (found == false) {
-				AceLog.getAppLog().info("Could not find node for: " + child);
 			}
 		}
 		
@@ -80,6 +83,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 	public void stateChanged(ChangeEvent e) {
 		DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree
 				.getModel().getRoot();
+
 		boolean allFound = true;
 		for (I_GetConceptData child : ancestors) {
 			boolean found = false;
@@ -90,14 +94,18 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 				if (dbft.getCoreBean().equals(child)) {
 					lastChildNode = childNode;
 					lastPath = new TreePath(childNode.getPath());
-					tree.expandPath(lastPath);
+					if (dbft.getCoreBean().equals(focus)) {
+						tree.collapsePath(lastPath);
+					} else {
+						tree.expandPath(lastPath);
+					}
+					tree.scrollPathToVisible(lastPath);
 					rootNode = childNode;
 					found = true;
 					break;
 				}
 			}
 			if (found == false) {
-				AceLog.getAppLog().info("Could not find node for: " + child);
 				allFound = false;
 			} 
 		}
@@ -105,10 +113,14 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			tree.removeWorkerFinishedListener(this);
 			tree.setSelectionPath(lastPath);
 			tree.scrollPathToVisible(lastPath);
+			tree.scrollPathToVisible(lastPath);
+			
 			int sibCount = 0;
 			DefaultMutableTreeNode sibling = lastChildNode.getNextSibling();
 			while (sibling != null && sibCount < 4) {
-				tree.scrollPathToVisible(new TreePath(sibling.getPath()));
+				TreePath siblingPath = new TreePath(sibling.getPath());
+				tree.collapsePath(siblingPath);
+				tree.scrollPathToVisible(siblingPath);
 				sibling = sibling.getNextSibling();
 				sibCount++;
 			}

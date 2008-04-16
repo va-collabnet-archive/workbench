@@ -40,7 +40,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return new ConceptBeanForTree(bean, relId, parentDepth, secondaryParentNode);
 	}
 
-	private ConceptBeanForTree(ConceptBean bean, int relId, int parentDepth,
+	public ConceptBeanForTree(ConceptBean bean, int relId, int parentDepth,
 			boolean secondaryParentNode) {
 		super();
 		this.bean = bean;

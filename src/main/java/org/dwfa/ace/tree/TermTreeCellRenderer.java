@@ -42,7 +42,7 @@ import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
-public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements PropertyChangeListener {
+public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements PropertyChangeListener, I_RenderAndFocusOnBean {
 
    private static ImageIcon multiParentClosed = new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_green.png"));
 

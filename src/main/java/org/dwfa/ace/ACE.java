@@ -2678,6 +2678,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		tree.setTransferHandler(new TerminologyTransferHandler());
 		tree.setDragEnabled(true);
+
 		tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
@@ -2994,6 +2995,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		c.gridx++;
 		topPanel.add(new JLabel("   "), c);
 		c.gridx++;
+		
+		TransporterLabel flashButton = new TransporterLabel(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/flash.png")), this);
+		topPanel.add(flashButton, c);
+		c.gridx++;
 
 		showQueuesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/inbox.png")));
@@ -3130,6 +3136,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		showSignpostPanelToggle.setVisible(true);
 		bottomPanel.add(showSignpostPanelToggle, c);
 		c.gridx++;
+		
+		TransporterLabel flashButton = new TransporterLabel(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/flash.png")), this);
+		bottomPanel.add(flashButton, c);
+		c.gridx++;
+
 		bottomPanel.add(new JLabel("  "), c);
 		c.gridx++;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -3678,6 +3690,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public UncommittedListModel getUncommittedListModel() {
 		return dataCheckListModel;
+	}
+
+	public JTreeWithDragImage getTree() {
+		return tree;
 	}
 
 }
