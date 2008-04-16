@@ -57,7 +57,7 @@ public class RefsetOverlapValidator extends RefsetUtilities{
 	/*
 	 * Define methods
 	 */
-	public void validate(){		
+	public void validate() throws Exception{		
 		try{
 			if(firstReferenceSetId == -1 || secondReferenceSetId == -1){
 				/*

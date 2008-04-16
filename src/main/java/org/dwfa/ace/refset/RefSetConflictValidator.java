@@ -76,7 +76,7 @@ public class RefSetConflictValidator extends RefsetUtilities/*implements I_Proce
       }
       
 	
-      public void validate(/*I_GetConceptData concept*/) throws IOException, TerminologyException{
+      public void validate(/*I_GetConceptData concept*/) throws Exception{
     	
     	  if(referenceSetId == -1){
     		  //Get all allowed refsets
