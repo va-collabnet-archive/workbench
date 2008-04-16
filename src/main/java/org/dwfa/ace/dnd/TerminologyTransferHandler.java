@@ -436,6 +436,10 @@ public class TerminologyTransferHandler extends TransferHandler {
 		if (JTable.class.isAssignableFrom(comp.getClass())) {
 			JTable table = (JTable) comp;
 			TableModel model = table.getModel();
+			if (TableSorter.class.isAssignableFrom(model.getClass())) {
+				TableSorter sorter = (TableSorter) model;
+				model = sorter.getTableModel();
+			}
 			if (DescriptionsFromCollectionTableModel.class.isAssignableFrom(model.getClass())) {
 				return false;
 			}

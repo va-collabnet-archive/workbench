@@ -244,7 +244,6 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 
 
 	public void actionPerformed(ActionEvent e) {
-		AceLog.getAppLog().info("Popup action: " + e.getActionCommand());
 		if (e.getActionCommand().equals("Show in taxonomy")) {
 			try {
 				new ExpandPathToNodeStateListener(this.ace.getTree(), this.ace.getAceFrameConfig(), (I_GetConceptData) termComponent);
