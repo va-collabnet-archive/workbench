@@ -19,13 +19,11 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.spec.ConceptSpec;
-import org.dwfa.ace.refset.ConceptConstants;
 
 public abstract class RefsetUtilities {
 
@@ -125,7 +123,7 @@ public abstract class RefsetUtilities {
 		return children;
 	}
 
-	public List<Integer> getSpecificationRefsets() throws TerminologyException, IOException {
+	public List<Integer> getSpecificationRefsets() throws Exception {
 
 		List<Integer> allowedRefsets = new ArrayList<Integer>();
 
@@ -158,7 +156,11 @@ public abstract class RefsetUtilities {
 			if (purposeConcepts.size()==1) {
 
 				if (purposeConcepts.iterator().next().getConceptId()==termFactory.getConcept(RefsetAuxiliary.Concept.INCLUSION_SPECIFICATION.getUids()).getConceptId()) {
-					allowedRefsets.add(refsetConcept.getConceptId());
+					if (getMemberSetConcept(refsetConcept.getConceptId()) == null) {
+						System.out.println("ERROR: inclusion specification concept does not have a defined 'generates' relationship. Skipping generation of refset " + refsetConcept);
+					} else {
+						allowedRefsets.add(refsetConcept.getConceptId());
+					}
 				} 
 			} 
 		}
@@ -182,18 +184,6 @@ public abstract class RefsetUtilities {
 		}
 
 		return status;
-	}
-
-	protected <T> T assertOneOrNone(
-			Collection<T> collection) {
-		assert collection.size() <= 1 :
-			"Exactly one element expected, encountered " + collection;
-
-		if (collection.size()==1) {		
-			return collection.iterator().next();
-		} else {
-			return null;
-		}
 	}
 
 	protected<T> T assertExactlyOne(
@@ -221,6 +211,18 @@ public abstract class RefsetUtilities {
 				currentIntSet, 
 				generatesRelIntSet, null, false));
 		return memberSetSpecConcept;
+	}
+	
+	protected <T> T assertOneOrNone(
+			Collection<T> collection) {
+		assert collection.size() <= 1 :
+			"Exactly one element expected, encountered " + collection;
+
+		if (collection.size()==1) {		
+			return collection.iterator().next();
+		} else {
+			return null;
+		}
 	}
 
 	/**
