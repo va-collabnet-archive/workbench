@@ -67,7 +67,6 @@ public class SetConceptViewToConcept extends AbstractTask {
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			config.selectConceptViewer(hostIndex);
 			I_HostConceptPlugins viewer = config.getConceptViewer(hostIndex);
-			viewer.unlink();
 			Object obj = process.readProperty(propName);
 			I_AmTermComponent termComponent = AceTaskUtil.getConceptFromObject(obj);
 			viewer.setTermComponent(termComponent);
