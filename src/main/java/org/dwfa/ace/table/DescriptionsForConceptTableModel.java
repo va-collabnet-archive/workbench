@@ -196,14 +196,14 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		List<I_DescriptionTuple> selectedTuples = new ArrayList<I_DescriptionTuple>();
 		I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		I_IntSet allowedTypes = null;
-		Set<I_Position> positions = null;
+		Set<I_Position> positions = host.getConfig().getViewPositionSet();
 		if (host.getUsePrefs()) {
          if (host.getConfig().getDescTypes().getSetValues().length == 0) {
             allowedTypes = null;
          } else {
             allowedTypes = host.getConfig().getDescTypes();
          }
-			positions = host.getConfig().getViewPositionSet();
+			
 		}
 		if (host.getShowHistory()) {
 			positions = null;

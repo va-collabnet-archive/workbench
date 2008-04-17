@@ -10,15 +10,16 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
@@ -241,150 +242,25 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return new ThinRelTuple(this, versions.get(versions.size() - 1));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet,
-	 *      org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
-	 */
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positions, List<I_RelTuple> returnRels,
-			boolean addUncommitted) {
-		Set<I_RelPart> uncommittedParts = new HashSet<I_RelPart>();
-		if (positions == null) {
-			List<I_RelPart> addedParts = new ArrayList<I_RelPart>();
-			Set<I_RelPart> rejectedParts = new HashSet<I_RelPart>();
-			for (I_RelPart part : versions) {
-				if (part.getVersion() == Integer.MAX_VALUE) {
-					uncommittedParts.add(part);
-				} else {
-					if ((allowedStatus != null)
-							&& (!allowedStatus.contains(part.getStatusId()))) {
-						rejectedParts.add(part);
-						continue;
-					}
-					if ((allowedTypes != null)
-							&& (!allowedTypes.contains(part.getRelTypeId()))) {
-						rejectedParts.add(part);
-						continue;
-					}
-					addedParts.add(part);
-				}
-			}
-			for (I_RelPart part : addedParts) {
-				boolean addPart = true;
-				for (I_RelPart reject : rejectedParts) {
-					if ((part.getVersion() <= reject.getVersion())
-							&& (part.getPathId() == reject.getPathId())) {
-						addPart = false;
-						continue;
-					}
-				}
-				if (addPart) {
-					returnRels.add(new ThinRelTuple(this, part));
-				}
-			}
-		} else {
+	private class RelTupleAdder extends
+			TupleAdder<I_RelTuple, ThinRelVersioned> {
 
-			Set<I_RelPart> addedParts = new HashSet<I_RelPart>();
-			for (I_Position position : positions) {
-				Set<I_RelPart> rejectedParts = new HashSet<I_RelPart>();
-				ThinRelTuple possible = null;
-				for (I_RelPart part : versions) {
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						uncommittedParts.add(part);
-						continue;
-					} else if ((allowedStatus != null)
-							&& (!allowedStatus.contains(part.getStatusId()))) {
-						if (possible != null && position.getPath()
-		                          .getMatchingPath(part.getPathId()) != null) {
-							I_Position rejectedStatusPosition = new Position(
-									part.getVersion(), position.getPath()
-											.getMatchingPath(part.getPathId()));
-							I_Path possiblePath = position.getPath()
-									.getMatchingPath(possible.getPathId());
-							I_Position possibleStatusPosition = new Position(
-									possible.getVersion(), possiblePath);
-
-							if (rejectedStatusPosition.getPath() != null
-									&& rejectedStatusPosition
-											.isSubsequentOrEqualTo(possibleStatusPosition)
-									&& position
-											.isSubsequentOrEqualTo(rejectedStatusPosition)) {
-								possible = null;
-							}
-						}
-						rejectedParts.add(part);
-						continue;
-					}
-					if ((allowedTypes != null)
-							&& (!allowedTypes.contains(part.getRelTypeId()))) {
-						rejectedParts.add(part);
-						continue;
-					}
-					if (position.isSubsequentOrEqualTo(part.getVersion(), part
-							.getPathId())) {
-						if (possible == null) {
-							if (!addedParts.contains(part)) {
-								possible = new ThinRelTuple(this, part);
-								addedParts.add(part);
-							}
-						} else {
-							if (possible.getPathId() == part.getPathId()) {
-								if (part.getVersion() > possible.getVersion()) {
-									if (!addedParts.contains(part)) {
-										possible = new ThinRelTuple(this, part);
-										addedParts.add(part);
-									}
-								}
-							} else {
-                        int depth1 = position.getDepth(part.getPathId());
-                        int depth2 = position.getDepth(possible.getPathId());
-								if (depth1 < depth2) {
-									if (!addedParts.contains(part)) {
-										possible = new ThinRelTuple(this, part);
-										addedParts.add(part);
-									}
-								}
-							}
-						}
-					}
-
-				}
-				if (possible != null) {
-					I_Path possiblePath = position.getPath().getMatchingPath(
-							possible.getPathId());
-					I_Position possibleStatusPosition = new Position(possible
-							.getVersion(), possiblePath);
-					boolean addPart = true;
-					for (I_RelPart reject : rejectedParts) {
-                  int version = reject.getVersion();
-                  I_Path matchingPath = position.getPath()
-                  .getMatchingPath(reject.getPathId());
-                  if (matchingPath != null) {
-                     I_Position rejectedStatusPosition = new Position(version, matchingPath);
-                     if (rejectedStatusPosition.getPath() != null
-                           && rejectedStatusPosition
-                                 .isSubsequentOrEqualTo(possibleStatusPosition)
-                           && position
-                                 .isSubsequentOrEqualTo(rejectedStatusPosition)) {
-                        addPart = false;
-                        continue;
-                     }
-                  }
-					}
-					if (addPart) {
-						returnRels.add(possible);
-					}
-				}
-			}
+		@Override
+		public I_RelTuple makeTuple(I_AmPart part, ThinRelVersioned core) {
+			return new ThinRelTuple(core, (I_RelPart) part);
 		}
-		if (addUncommitted) {
-			for (I_RelPart p : uncommittedParts) {
-				returnRels.add(new ThinRelTuple(this, p));
-			}
-		}
+
 	}
+
+	RelTupleAdder adder = new RelTupleAdder();
+
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_RelTuple> matchingTuples,
+			boolean addUncommitted) {
+		adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples,
+				addUncommitted, versions, this);
+	}
+
 
 	/*
 	 * (non-Javadoc)

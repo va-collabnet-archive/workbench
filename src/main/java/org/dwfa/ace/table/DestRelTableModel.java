@@ -28,14 +28,14 @@ public class DestRelTableModel extends RelTableModel {
 		List<I_RelTuple> selectedTuples = new ArrayList<I_RelTuple>();
 		I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		I_IntSet allowedTypes = null;
-		Set<I_Position> positions = null;
+		Set<I_Position> positions = host.getConfig().getViewPositionSet();
 		if (usePrefs) {
          if (host.getConfig().getDestRelTypes().getSetValues().length == 0) {
             allowedTypes = null;
          } else {
             allowedTypes = host.getConfig().getDestRelTypes();
          }
-			positions = host.getConfig().getViewPositionSet();
+			
 		}
 		if (showHistory) {
 			positions = null;

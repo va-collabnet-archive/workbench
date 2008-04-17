@@ -117,5 +117,8 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    public int compareTo(I_ThinExtByRefPart o) {
      return part.compareTo(o);
    }
+public int getStatusId() {
+	return part.getStatusId();
+}
    
 }

@@ -28,14 +28,14 @@ public class SrcRelTableModel extends RelTableModel {
 		List<I_RelTuple> selectedTuples = new ArrayList<I_RelTuple>();
 		I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		I_IntSet allowedTypes = null;
-		Set<I_Position> positions = null;
+		Set<I_Position> positions = host.getConfig().getViewPositionSet();
 		if (usePrefs) {
          if (host.getConfig().getSourceRelTypes().getSetValues().length == 0) {
             allowedTypes = null;
          } else {
             allowedTypes = host.getConfig().getSourceRelTypes();
          }
-			positions = host.getConfig().getViewPositionSet();
+			
 		}
 		if (showHistory) {
 			positions = null;

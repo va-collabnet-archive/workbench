@@ -12,7 +12,10 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
    private int version;
    private int status;
    
-   /* (non-Javadoc)
+   public int getStatusId() {
+	   return getStatus();
+   }
+/* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getStatus()
     */
    public int getStatus() {

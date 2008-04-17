@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -139,143 +140,26 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 		addTuples(allowedStatus, positions, returnTuples, true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addTuples(org.dwfa.ace.IntSet,
-	 *      java.util.Set, java.util.List)
-	 */
-	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
-			List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted) {
-		Set<ThinConPart> uncommittedParts = new HashSet<ThinConPart>();
-		if (positions == null) {
-			List<ThinConPart> addedParts = new ArrayList<ThinConPart>();
-			Set<ThinConPart> rejectedParts = new HashSet<ThinConPart>();
-			for (I_ConceptAttributePart part : versions) {
-				if (part.getVersion() == Integer.MAX_VALUE) {
-					uncommittedParts.add((ThinConPart) part);
-				} else {
-					if ((allowedStatus != null)
-							&& (!allowedStatus
-									.contains(part.getConceptStatus()))) {
-						rejectedParts.add((ThinConPart) part);
-						continue;
-					}
-					addedParts.add((ThinConPart) part);
-				}
-			}
-			for (I_ConceptAttributePart part : addedParts) {
-				boolean addPart = true;
-				for (I_ConceptAttributePart reject : rejectedParts) {
-					if ((part.getVersion() <= reject.getVersion())
-							&& (part.getPathId() == reject.getPathId())) {
-						addPart = false;
-						continue;
-					}
-				}
-				if (addPart) {
-					returnTuples.add(new ThinConTuple(this, part));
-				}
-			}
-		} else {
+	
+	private class ConTupleAdder extends
+			TupleAdder<I_ConceptAttributeTuple, ThinConVersioned> {
 
-			Set<ThinConPart> addedParts = new HashSet<ThinConPart>();
-			for (I_Position position : positions) {
-				Set<ThinConPart> rejectedParts = new HashSet<ThinConPart>();
-				ThinConTuple possible = null;
-				for (I_ConceptAttributePart part : versions) {
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						uncommittedParts.add((ThinConPart) part);
-						continue;
-					} else if ((allowedStatus != null)
-							&& (!allowedStatus
-									.contains(part.getConceptStatus()))) {
-						if (possible != null && position.getPath()
-		                          .getMatchingPath(part.getPathId()) != null) {
-							I_Path matchingPartPath = position.getPath()
-									.getMatchingPath(possible.getPathId());
-							if (matchingPartPath != null) {
-								I_Position rejectedStatusPosition = new Position(
-										part.getVersion(), matchingPartPath);
-								I_Path possiblePath = position.getPath()
-										.getMatchingPath(possible.getPathId());
-								I_Position possibleStatusPosition = new Position(
-										possible.getVersion(), possiblePath);
-								if (position
-										.isSubsequentOrEqualTo(rejectedStatusPosition)) {
-									if (rejectedStatusPosition
-											.isSubsequentOrEqualTo(possibleStatusPosition)) {
-										possible = null;
-									}
-								}
-							}
-						}
-						rejectedParts.add((ThinConPart) part);
-						continue;
-					}
-					if (position.isSubsequentOrEqualTo(part.getVersion(), part
-							.getPathId())) {
-						if (possible == null) {
-							if (!addedParts.contains(part)) {
-								possible = new ThinConTuple(this, part);
-								addedParts.add((ThinConPart) part);
-							}
-						} else {
-							if (possible.getPathId() == part.getPathId()) {
-								if (part.getVersion() > possible.getVersion()) {
-									if (!addedParts.contains(part)) {
-										possible = new ThinConTuple(this, part);
-										addedParts.add((ThinConPart) part);
-									}
-								}
-							} else {
-								if (position.getDepth(part.getPathId()) < position
-										.getDepth(possible.getPathId())) {
-									if (!addedParts.contains(part)) {
-										possible = new ThinConTuple(this, part);
-										addedParts.add((ThinConPart) part);
-									}
-								}
-							}
-						}
-					}
+		@Override
+		public I_ConceptAttributeTuple makeTuple(I_AmPart part,
+				ThinConVersioned core) {
+			return new ThinConTuple(core, (I_ConceptAttributePart) part);
+		}
 
-				}
-				if (possible != null) {
-					I_Path possiblePath = position.getPath().getMatchingPath(
-							possible.getPathId());
-					I_Position possibleStatusPosition = new Position(possible
-							.getVersion(), possiblePath);
-					boolean addPart = true;
-					for (I_ConceptAttributePart reject : rejectedParts) {
-						int version = reject.getVersion();
-						I_Path matchingPath = position.getPath()
-								.getMatchingPath(reject.getPathId());
-						if (matchingPath != null) {
-							I_Position rejectedStatusPosition = new Position(
-									version, matchingPath);
-							if ((rejectedStatusPosition
-									.isSubsequentOrEqualTo(possibleStatusPosition))
-									&& (position
-											.isSubsequentOrEqualTo(rejectedStatusPosition))) {
-								addPart = false;
-								continue;
-							}
-						}
-					}
-					if (addPart) {
-						returnTuples.add(possible);
-					}
-				}
-			}
-		}
-		if (addUncommitted) {
-			for (I_ConceptAttributePart p : uncommittedParts) {
-				returnTuples.add(new ThinConTuple(this, p));
-			}
-		}
 	}
 
+	ConTupleAdder adder = new ConTupleAdder();
+
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+			List<I_ConceptAttributeTuple> matchingTuples, boolean addUncommitted) {
+		adder.addTuples(allowedStatus, null, positions, matchingTuples,
+				addUncommitted, versions, this);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

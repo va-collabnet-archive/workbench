@@ -10,14 +10,15 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
 import org.dwfa.tapi.I_DescribeConceptLocally;
@@ -160,128 +161,20 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
       return new ThinDescTuple(this, versions.get(versions.size() - 1));
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#addTuples(org.dwfa.ace.IntSet,
-    *      org.dwfa.ace.IntSet, java.util.Set, java.util.List)
-    */
-   public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
-         List<I_DescriptionTuple> matchingTuples, boolean addUncommitted) {
-      Set<I_DescriptionPart> uncommittedParts = new HashSet<I_DescriptionPart>();
-      if (positions == null) {
-         List<I_DescriptionPart> addedParts = new ArrayList<I_DescriptionPart>();
-         Set<I_DescriptionPart> rejectedParts = new HashSet<I_DescriptionPart>();
-         for (I_DescriptionPart part : versions) {
-            if (part.getVersion() == Integer.MAX_VALUE) {
-               uncommittedParts.add(part);
-            } else {
-               if ((allowedStatus != null) && (!allowedStatus.contains(part.getStatusId()))) {
-                  rejectedParts.add(part);
-                  continue;
-               }
-               if ((allowedTypes != null) && (!allowedTypes.contains(part.getTypeId()))) {
-                  rejectedParts.add(part);
-                  continue;
-               }
-               addedParts.add(part);
-            }
-         }
-         for (I_DescriptionPart part : addedParts) {
-            boolean addPart = true;
-            for (I_DescriptionPart reject : rejectedParts) {
-               if ((part.getVersion() <= reject.getVersion()) && (part.getPathId() == reject.getPathId())) {
-                  addPart = false;
-                  continue;
-               }
-            }
-            if (addPart) {
-               matchingTuples.add(new ThinDescTuple(this, part));
-            }
-         }
-      } else {
-         Set<I_DescriptionPart> addedParts = new HashSet<I_DescriptionPart>();
-         for (I_Position position : positions) {
-            Set<I_DescriptionPart> rejectedParts = new HashSet<I_DescriptionPart>();
-            ThinDescTuple possible = null;
-            for (I_DescriptionPart part : versions) {
-               if (part.getVersion() == Integer.MAX_VALUE) {
-                  uncommittedParts.add(part);
-                  continue;
-               } else if ((allowedStatus != null) && (!allowedStatus.contains(part.getStatusId()))) {
-                  if (possible != null && position.getPath()
-                          .getMatchingPath(part.getPathId()) != null) {
-                     Position rejectedStatusPosition = new Position(part.getVersion(), position.getPath()
-                           .getMatchingPath(part.getPathId()));
-                     I_Path possiblePath = position.getPath().getMatchingPath(possible.getPathId());
-                     I_Position possibleStatusPosition = new Position(possible.getVersion(), possiblePath);
-                     if (rejectedStatusPosition.getPath() != null
-                           && rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition)
-                           && position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
-                        possible = null;
-                     }
-                  }
-                  rejectedParts.add(part);
-                  continue;
-               }
-               if ((allowedTypes != null) && (!allowedTypes.contains(part.getTypeId()))) {
-                  rejectedParts.add(part);
-                  continue;
-               }
-               if (position.isSubsequentOrEqualTo(part.getVersion(), part.getPathId())) {
-                  if (possible == null) {
-                     if (!addedParts.contains(part)) {
-                        possible = new ThinDescTuple(this, part);
-                        addedParts.add(part);
-                     }
-                  } else {
-                     if (possible.getPathId() == part.getPathId()) {
-                        if (part.getVersion() > possible.getVersion()) {
-                           if (!addedParts.contains(part)) {
-                              possible = new ThinDescTuple(this, part);
-                              addedParts.add(part);
-                           }
-                        }
-                     } else {
-                        if (position.getDepth(part.getPathId()) < position.getDepth(possible.getPathId())) {
-                           if (!addedParts.contains(part)) {
-                              possible = new ThinDescTuple(this, part);
-                              addedParts.add(part);
-                           }
-                        }
-                     }
-                  }
-               }
+   private class DescTupleAdder extends TupleAdder<I_DescriptionTuple, ThinDescVersioned> {
 
-            }
-            if (possible != null) {
-               I_Path possiblePath = position.getPath().getMatchingPath(possible.getPathId());
-               I_Position possibleStatusPosition = new Position(possible.getVersion(), possiblePath);
-               boolean addPart = true;
-               for (I_DescriptionPart reject : rejectedParts) {
-                  int version = reject.getVersion();
-                  I_Path matchingPath = position.getPath().getMatchingPath(reject.getPathId());
-                  if (matchingPath != null) {
-                     Position rejectedStatusPosition = new Position(version, matchingPath);
-                     if (rejectedStatusPosition.getPath() != null
-                           && rejectedStatusPosition.isSubsequentOrEqualTo(possibleStatusPosition)
-                           && position.isSubsequentOrEqualTo(rejectedStatusPosition)) {
-                        addPart = false;
-                        continue;
-                     }
-                  }
-               }
-               if (addPart) {
-                  matchingTuples.add(possible);
-               }
-            }
-         }
-      }
-      if (addUncommitted) {
-         for (I_DescriptionPart p : uncommittedParts) {
-            matchingTuples.add(new ThinDescTuple(this, p));
-         }
-      }
+	@Override
+	public I_DescriptionTuple makeTuple(I_AmPart part, ThinDescVersioned core) {
+		return new ThinDescTuple(core, (I_DescriptionPart) part);
+	}
+	   
+   }
+
+   DescTupleAdder adder = new DescTupleAdder();
+   
+   public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+	         List<I_DescriptionTuple> matchingTuples, boolean addUncommitted) {
+	   adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, addUncommitted, versions, this);
    }
 
    /*

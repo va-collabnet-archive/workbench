@@ -184,6 +184,10 @@ public class ThinRelPart implements I_RelPart {
 		part.setVersion(version);
 		return part;
 	}
+
+	public int getTypeId() {
+		return getRelTypeId();
+	}
 	
 	
 }
