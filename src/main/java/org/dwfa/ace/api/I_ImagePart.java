@@ -1,13 +1,7 @@
 package org.dwfa.ace.api;
 
 
-public interface I_ImagePart {
-
-	public int getPathId();
-
-	public int getStatusId();
-
-	public int getVersion();
+public interface I_ImagePart extends I_AmTypedPart {
 
 	public void setPathId(int pathId);
 
@@ -18,8 +12,6 @@ public interface I_ImagePart {
 	public String getTextDescription();
 
 	public void setTextDescription(String name);
-
-	public int getTypeId();
 
 	public void setTypeId(int type);
 

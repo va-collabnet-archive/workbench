@@ -1,11 +1,9 @@
 package org.dwfa.ace.api;
 
 
-public interface I_DescriptionPart {
+public interface I_DescriptionPart extends I_AmTypedPart {
 
 	public boolean hasNewData(I_DescriptionPart another);
-
-	public int getPathId();
 
 	public void setPathId(int pathId);
 
@@ -17,19 +15,13 @@ public interface I_DescriptionPart {
 
 	public void setLang(String lang);
 
-	public int getStatusId();
-
 	public void setStatusId(int status);
 
 	public String getText();
 
 	public void setText(String text);
 
-	public int getTypeId();
-
 	public void setTypeId(int typeInt);
-
-	public int getVersion();
 
 	public void setVersion(int version);
 

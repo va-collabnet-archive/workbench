@@ -1,11 +1,9 @@
 package org.dwfa.ace.api;
 
 
-public interface I_RelPart {
+public interface I_RelPart extends I_AmTypedPart {
 
 	public boolean hasNewData(I_RelPart another);
-
-	public int getPathId();
 
 	public void setPathId(int pathId);
 
@@ -25,11 +23,7 @@ public interface I_RelPart {
 
 	public void setRelTypeId(int relTypeId);
 
-	public int getVersion();
-
 	public void setVersion(int version);
-
-	public int getStatusId();
 
 	public void setStatusId(int statusId);
 

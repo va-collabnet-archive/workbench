@@ -1,8 +1,6 @@
 package org.dwfa.ace.api;
 
-public interface I_ConceptAttributePart {
-
-	public int getPathId();
+public interface I_ConceptAttributePart extends I_AmPart {
 
 	public void setPathId(int pathId);
 
@@ -13,8 +11,6 @@ public interface I_ConceptAttributePart {
 	public boolean isDefined();
 
 	public void setDefined(boolean defined);
-
-	public int getVersion();
 
 	public void setVersion(int version);
 
