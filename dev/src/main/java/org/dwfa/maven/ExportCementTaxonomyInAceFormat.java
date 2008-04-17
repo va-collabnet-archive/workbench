@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
@@ -88,6 +89,13 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
    private String output;
    
    /**
+    * Effective date for exported content - defaults to now if not set
+    * 
+    * @parameter
+    */
+   private Date effectiveDate;
+   
+   /**
     * The maven session
     * 
     * @parameter expression="${session}"
@@ -121,7 +129,10 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
                output = output.replace('/', File.separatorChar);
                prefix = output + File.separator;
             }
-            MemoryTermServer mts = new MemoryTermServer();
+			MemoryTermServer mts = new MemoryTermServer();
+			if (effectiveDate != null) {
+				mts.setEffectiveDate(effectiveDate);
+			}
             LocalFixedTerminology.setStore(mts);
             mts.setGenerateIds(true);
             for (String tstr: taxonomies) {
