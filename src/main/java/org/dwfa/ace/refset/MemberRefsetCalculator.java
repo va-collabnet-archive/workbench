@@ -96,7 +96,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 			for (Integer i: allowedRefsets) {
 
-
 				int memberSetId = getMemberSetConcept(i).getConceptId();
 
 				System.out.println("Checking refset: " + getConcept(memberSetId));
