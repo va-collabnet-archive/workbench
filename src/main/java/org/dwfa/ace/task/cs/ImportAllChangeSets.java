@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.ComponentValidator;
+import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -34,6 +35,8 @@ public class ImportAllChangeSets extends AbstractTask {
     private String rootDirStr = "profiles";
 
     private Boolean validateChangeSets = true;
+    
+    private String[] validators = new String[]{ComponentValidator.class.getName()};
 
     private static final long serialVersionUID = 1;
 
@@ -77,7 +80,8 @@ public class ImportAllChangeSets extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    public void importAllChangeSets(Logger logger) throws TaskFailedException {
+    @SuppressWarnings("unchecked")
+	public void importAllChangeSets(Logger logger) throws TaskFailedException {
         try {
             File rootFile = new File(rootDirStr);
             List<File> changeSetFiles = new ArrayList<File>();
@@ -86,8 +90,11 @@ public class ImportAllChangeSets extends AbstractTask {
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = LocalVersionedTerminology.get()
                 .newBinaryChangeSetReader(csf);
-                if (validateChangeSets == true) {
-                	csr.getValidators().add(new ComponentValidator());
+                if (validateChangeSets == true && validators.length > 0) {
+                	for (String validator : validators) {
+                		Class<I_ValidateChangeSetChanges> validatorClass = (Class<I_ValidateChangeSetChanges>) Class.forName(validator);
+                		csr.getValidators().add(validatorClass.newInstance());
+					}
                 }
                 readerSet.add(csr);
 
@@ -227,5 +234,13 @@ public class ImportAllChangeSets extends AbstractTask {
 
 	public void setValidateChangeSets(Boolean validateChangeSets) {
 		this.validateChangeSets = validateChangeSets;
+	}
+
+	public String[] getValidators() {
+		return validators;
+	}
+
+	public void setValidators(String[] validators) {
+		this.validators = validators;
 	}
 }

@@ -1,10 +1,8 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -19,17 +17,18 @@ import org.dwfa.tapi.TerminologyException;
 
 public class DescriptionValidator extends SimpleValidator {
 
-	private I_TermFactory termFactory;
-	private Map<UUID, Integer> cache = new HashMap<UUID, Integer>();
+	private boolean timeLenient = false;
+	private String failureReport;
 	
 	@Override
 	protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
 			throws IOException, TerminologyException {
 		termFactory = tf;
-		
+		failureReport = "";
+
 		/*
 		 * The universal bean descriptions must be converted and compared with a
-		 * thin descriptios from the term factory. This validator will return
+		 * thin descriptions from the term factory. This validator will return
 		 * false if, for each description in the UniverasalAceBean: 1. The
 		 * concept ids are not equal 2. One of the starting descriptions
 		 * (descriptions whose time is not Long.MAX_VALUE) 3. The number of
@@ -39,6 +38,7 @@ public class DescriptionValidator extends SimpleValidator {
 			Set<I_DescriptionPart> startParts = new HashSet<I_DescriptionPart>();
 			I_DescriptionVersioned thinDesc = tf.getDescription(getNativeId(desc.getDescId()), getNativeId(desc.getConceptId()));
 			if (thinDesc.getConceptId() != getNativeId(desc.getConceptId())) {
+				failureReport += "description concept ids don't match " + thinDesc + " and " + desc;
 				return false; // Test 1
 			}
 			for (UniversalAceDescriptionPart part : desc.getVersions()) {
@@ -54,13 +54,15 @@ public class DescriptionValidator extends SimpleValidator {
 					newPart.setVersion(tf.convertToThinVersion(part.getTime()));
 
 					startParts.add(newPart);
-					if (thinDesc.getVersions().contains(newPart) == false) {
+
+					if (!containsPart(thinDesc, newPart)) {
+						failureReport += "concept does not contain a description part match. \nnewPart was " + newPart + ", \nexisting versions " + thinDesc.getVersions() + "\n";
 						return false; // test 2
 					}
 				}
 			}
 			if (startParts.size() != thinDesc.getVersions().size()) {
-				System.out.println("number of description parts is different");
+				failureReport += "number of concept attribute parts is different for " + bean + " and " + thinDesc.getVersions();
 				return false; // test 3
 			}
 		}
@@ -69,22 +71,41 @@ public class DescriptionValidator extends SimpleValidator {
 		return true;
 	}
 
-	private int getNativeId(Collection<UUID> uuids)	throws TerminologyException, IOException {
-
-		Integer cacheValue = null;
-		Iterator<UUID> uuidsIterator = uuids.iterator();
-		while (cacheValue == null && uuidsIterator.hasNext()) {
-			cacheValue = cache.get(uuidsIterator.next());
-		}
-
-		if (cacheValue == null) {
-			cacheValue = termFactory.uuidToNative(uuids);
-			for (UUID uuid : uuids) {
-				cache.put(uuid, cacheValue);
+	private boolean containsPart(I_DescriptionVersioned thinDesc,
+			I_DescriptionPart newPart) {
+		if (!timeLenient) {
+			return thinDesc.getVersions().contains(newPart);
+		} else {
+			boolean match = false;
+			for (I_DescriptionPart descriptionPart : thinDesc.getVersions()) {
+				if (descriptionPart.getInitialCaseSignificant() == newPart.getInitialCaseSignificant()
+						&& descriptionPart.getPathId() == newPart.getPathId()
+						&& descriptionPart.getStatusId() == newPart.getStatusId()
+						&& descriptionPart.getTypeId() == newPart.getTypeId()
+						&& descriptionPart.getText().equals(descriptionPart.getText())
+						&& descriptionPart.getLang().equals(newPart.getLang())) {
+					
+					//found a match, no need to keep looking
+					match = true;
+					break;
+				}
 			}
+			
+			return match;
 		}
+	}
 
-		return cacheValue;
+	@Override
+	public String getFailureReport() {
+		return failureReport;
+	}
+
+	public boolean isTimeLenient() {
+		return timeLenient;
+	}
+
+	public void setTimeLenient(boolean timeLenient) {
+		this.timeLenient = timeLenient;
 	}
 
 }

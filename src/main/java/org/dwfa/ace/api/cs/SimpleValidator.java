@@ -2,6 +2,11 @@ package org.dwfa.ace.api.cs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_TermFactory;
@@ -21,6 +26,10 @@ import org.dwfa.tapi.TerminologyException;
  */
 public class SimpleValidator implements I_ValidateChangeSetChanges {
 
+
+   Map<UUID, Integer> cache = new HashMap<UUID, Integer>();
+   protected I_TermFactory termFactory;
+	
    public boolean validateChange(I_AmChangeSetObject csObj, I_TermFactory tf) throws IOException, TerminologyException {
       if (UniversalAceBean.class.isAssignableFrom(csObj.getClass())) {
          if (AceLog.getEditLog().isLoggable(Level.FINE)) {
@@ -67,5 +76,28 @@ public class SimpleValidator implements I_ValidateChangeSetChanges {
    public boolean validateFile(File csFile, I_TermFactory tf) throws IOException {
       return csFile.exists();
    }
+   
+   public String getFailureReport() {
+	   return "";
+   }
+
+	protected int getNativeId(Collection<UUID> uuids)
+			throws TerminologyException, IOException {
+
+		Integer cacheValue = null;
+		Iterator<UUID> uuidsIterator = uuids.iterator();
+		while (cacheValue == null && uuidsIterator.hasNext()) {
+			cacheValue = cache.get(uuidsIterator.next());
+		}
+
+		if (cacheValue == null) {
+			cacheValue = termFactory.uuidToNative(uuids);
+			for (UUID uuid : uuids) {
+				cache.put(uuid, cacheValue);
+			}
+		}
+
+		return cacheValue;
+	}
 
 }

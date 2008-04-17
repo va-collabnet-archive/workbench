@@ -1,12 +1,7 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +10,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
@@ -23,8 +17,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class RelationshipValidator extends SimpleValidator {
 
-    I_TermFactory termFactory;
-	private Map<UUID, Integer> cache = new HashMap<UUID, Integer>();
+	boolean timeLenient = false;
+	private String failureReport;
     @Override
     protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
         throws IOException, TerminologyException {
@@ -47,24 +41,18 @@ public class RelationshipValidator extends SimpleValidator {
          */
 
         termFactory = tf;
+        failureReport = "";
 
         I_GetConceptData concept = tf.getConcept(tf.uuidToNative(bean.getId().getUIDs()));
         List<I_RelVersioned> databaseRelationships = concept.getSourceRels();
         List<UniversalAceRelationship> beanRelationships = bean.getSourceRels();
         
-        if (databaseRelationships.size() != beanRelationships.size()) {
-            System.out.println("number of relationships different");
+        if (databaseRelationships.size() > beanRelationships.size()) {
+			failureReport += "number of relationship doesn't match " + databaseRelationships + " and " + beanRelationships + "\nfor change bean " + bean;
             return false; // test 1
         }
-        
-        //take a copy of the list so that we can remove matches from it as we go - reduce the number of comparisons
-        List<I_RelVersioned> databaseRelationshipsCopy = new ArrayList<I_RelVersioned>(databaseRelationships.size());
-        for (I_RelVersioned relVersioned : databaseRelationships) {
-        	databaseRelationshipsCopy.add(relVersioned);
-		}
-        
-        Iterator<I_RelVersioned> databaseRelationshipIterator = databaseRelationshipsCopy.iterator();
 
+        int relationshipMismatches = 0;
         for (UniversalAceRelationship beanRelationship : beanRelationships) {
 
             boolean foundMatch = false;
@@ -73,22 +61,20 @@ public class RelationshipValidator extends SimpleValidator {
 			int beanC1Id = getNativeId(beanRelationship.getC1Id());
 			int beanC2Id = getNativeId(beanRelationship.getC2Id());
 			
-            while (databaseRelationshipIterator.hasNext()) {
-            	I_RelVersioned databaseRelationship = databaseRelationshipIterator.next();
-
+            for (I_RelVersioned databaseRelationship : databaseRelationships) {
 				if (relationshipsEqual(beanRelationship, databaseRelationship, beanRelId, beanC1Id, beanC2Id)) {
             		foundMatch = true;
-            		databaseRelationshipIterator.remove();
             		break;
             	}
             }
 
             if (!foundMatch) {
-            	AceLog.getEditLog().info("Failed to find matching relationship");
-                return false;
+            	failureReport += "Failed to find matching relationship for " + beanRelationship + " in " + databaseRelationships + "\nfor bean" + bean;
+                relationshipMismatches++;
             }
         }
-        return true;
+        //if the database has the same number less versions than we found matches, then it is OK
+        return relationshipMismatches == beanRelationships.size() - databaseRelationships.size();
     }
 
     public boolean relationshipsEqual(UniversalAceRelationship beanRelationship,
@@ -120,12 +106,9 @@ public class RelationshipValidator extends SimpleValidator {
                 newPart.setRelTypeId(getNativeId(part.getRelTypeId()));
                 newPart.setStatusId(getNativeId(part.getStatusId()));
 
-                if (databaseRelationship.getVersions().contains(newPart) == false) {
-                	AceLog.getEditLog().info("parts different");
+                if (containsPart(databaseRelationship, newPart) == false) {
 
-                    AceLog.getEditLog().info(databaseRelationship.getVersions().toString());
-                    AceLog.getEditLog().info("..........");
-                    AceLog.getEditLog().info("new part: " + newPart);
+					failureReport += "concept does not contain a relationship part match. \nnewPart was " + newPart + ", \nexisting versions " + databaseRelationship.getVersions() + "\n";
                     return false; // Test 5
                 }
             }
@@ -133,24 +116,41 @@ public class RelationshipValidator extends SimpleValidator {
 
         return true;
     }
+    
+    public String getFailureReport() {
+    	return failureReport;
+    }
 
-	private int getNativeId(Collection<UUID> uuids)
-			throws TerminologyException, IOException {
-
-		Integer cacheValue = null;
-		Iterator<UUID> uuidsIterator = uuids.iterator();
-		while (cacheValue == null && uuidsIterator.hasNext()) {
-			 cacheValue = cache.get(uuidsIterator.next());
-		}
-				
-		if (cacheValue == null) {
-			cacheValue = termFactory.uuidToNative(uuids);
-			for (UUID uuid : uuids) {
-				cache.put(uuid, cacheValue);
+	private boolean containsPart(I_RelVersioned databaseRelationship,
+			I_RelPart newPart) {
+		if (!timeLenient) {
+			return databaseRelationship.getVersions().contains(newPart);
+		} else {
+			boolean match = false;
+			for (I_RelPart relPart : databaseRelationship.getVersions()) {
+				if (relPart.getPathId() == newPart.getPathId()
+						&& relPart.getCharacteristicId() == newPart.getCharacteristicId()
+						&& relPart.getGroup() == newPart.getGroup()
+						&& relPart.getRefinabilityId() == newPart.getRefinabilityId()
+						&& relPart.getRelTypeId() == newPart.getRelTypeId()
+						&& relPart.getStatusId() == newPart.getStatusId()) {
+					
+					//found a match, no need to keep looking
+					match = true;
+					break;
+				}
 			}
+			
+			return match;
 		}
-		
-		return cacheValue;
+	}
+
+	public boolean isTimeLenient() {
+		return timeLenient;
+	}
+
+	public void setTimeLenient(boolean timeLenient) {
+		this.timeLenient = timeLenient;
 	}
 
 }
