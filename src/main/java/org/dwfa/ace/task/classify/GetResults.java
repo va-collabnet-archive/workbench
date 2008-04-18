@@ -86,13 +86,11 @@ public class GetResults extends AbstractTask {
     }
 
     public Collection<Condition> getConditions() {
-        // TODO Auto-generated method stub
-        return null;
+        return CONTINUE_CONDITION;
     }
 
     public int[] getDataContainerIds() {
-        // TODO Auto-generated method stub
-        return null;
+        return new int[] {};
     }
 
     private void getClassifierResults(I_Work worker, I_SnorocketFactory rocket)
