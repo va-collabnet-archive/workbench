@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -20,11 +19,9 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
 import org.dwfa.ace.refset.MemberRefsetCalculator;
-import org.dwfa.bpa.process.Condition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.maven.MojoUtil;
-import org.dwfa.tapi.TerminologyException;
 
 
 /**
