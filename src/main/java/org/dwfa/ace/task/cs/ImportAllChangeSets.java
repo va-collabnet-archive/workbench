@@ -36,16 +36,17 @@ public class ImportAllChangeSets extends AbstractTask {
 
     private Boolean validateChangeSets = true;
     
-    private String[] validators = new String[]{ComponentValidator.class.getName()};
+    private String validators = ComponentValidator.class.getName();
 
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(rootDirStr);
         out.writeBoolean(validateChangeSets);
+        out.writeObject(validators);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -57,6 +58,12 @@ public class ImportAllChangeSets extends AbstractTask {
             	validateChangeSets = in.readBoolean();
             } else {
             	validateChangeSets = true;
+            }
+            
+            if (objDataVersion > 2) {
+            	validators = (String) in.readObject();
+            } else {
+            	validators = ComponentValidator.class.getName();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -83,6 +90,12 @@ public class ImportAllChangeSets extends AbstractTask {
     @SuppressWarnings("unchecked")
 	public void importAllChangeSets(Logger logger) throws TaskFailedException {
         try {
+        	String[] validatorArray = new String[]{};
+        	
+        	if (validators != null && validators != "") {
+        		validatorArray = validators.split("'");
+        	}
+        	
             File rootFile = new File(rootDirStr);
             List<File> changeSetFiles = new ArrayList<File>();
             addAllChangeSetFiles(rootFile, changeSetFiles);
@@ -90,8 +103,9 @@ public class ImportAllChangeSets extends AbstractTask {
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = LocalVersionedTerminology.get()
                 .newBinaryChangeSetReader(csf);
-                if (validateChangeSets == true && validators.length > 0) {
-                	for (String validator : validators) {
+                
+                if (validateChangeSets == true && validatorArray.length > 0) {
+                	for (String validator : validatorArray) {
                 		Class<I_ValidateChangeSetChanges> validatorClass = (Class<I_ValidateChangeSetChanges>) Class.forName(validator);
                 		csr.getValidators().add(validatorClass.newInstance());
 					}
@@ -236,11 +250,11 @@ public class ImportAllChangeSets extends AbstractTask {
 		this.validateChangeSets = validateChangeSets;
 	}
 
-	public String[] getValidators() {
+	public String getValidators() {
 		return validators;
 	}
 
-	public void setValidators(String[] validators) {
+	public void setValidators(String validators) {
 		this.validators = validators;
 	}
 }

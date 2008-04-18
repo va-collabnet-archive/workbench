@@ -25,7 +25,14 @@ public class ImportAllChangeSetsBeanInfo extends SimpleBeanInfo {
 	            validateChangeSets.setDisplayName("<html><font color='green'>validate:");
 	            validateChangeSets.setShortDescription("Select if you want to validate change sets. ");
 
-	            PropertyDescriptor rv[] = { rootDirStr, validateChangeSets };
+	            PropertyDescriptor validators =
+	                new PropertyDescriptor("validators", getBeanDescriptor().getBeanClass());
+	            validators.setBound(true);
+	            validators.setPropertyEditorClass(JTextFieldEditor.class);
+	            validators.setDisplayName("<html><font color='green'>validators:");
+	            validators.setShortDescription("The validators used on the change sets. ");
+	            
+	            PropertyDescriptor rv[] = { rootDirStr, validateChangeSets, validators };
 	            return rv;
 	        } catch (IntrospectionException e) {
 	             throw new Error(e.toString());
