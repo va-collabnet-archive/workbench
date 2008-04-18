@@ -1461,11 +1461,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_HostConceptPlugins getConceptViewer(int index) {
-        return aceFrame.getCdePanel().getConceptPanels().get(index);
+    	if (index == 0) {
+            return aceFrame.getCdePanel().getConceptPanels().get(index);
+    	}
+        return aceFrame.getCdePanel().getConceptPanels().get(index - 1);
     }
 
     public void selectConceptViewer(int index) {
-        aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index - 1);
+    	if (index == 0) {
+            aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index);
+    	} else {
+            aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index - 1);
+    	}
     }
 
     public JPanel getWorkflowPanel() {
