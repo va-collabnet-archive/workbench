@@ -47,7 +47,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     }
 
 	public static ExtensionByReferenceBean get(int memberId) {
-		if (ebrBeans.containsKey(ebrBeans)) {
+		if (ebrBeans.containsKey(memberId)) {
 			Reference<ExtensionByReferenceBean> ref = ebrBeans.get(memberId);
 			if (ref.isEnqueued() == false) {
 				ExtensionByReferenceBean ebrBean = ref.get();
@@ -98,7 +98,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     public static ExtensionByReferenceBean makeNew(int memberId, I_ThinExtByRefVersioned extension) {
         ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
         ebrBean.firstCommit = true;
-        Reference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        Reference<ExtensionByReferenceBean> ref = ebrBeans.get(memberId);
         if (ref != null) {
             throw new RuntimeException("ExtensionByReferenceBean already exists for: " + memberId);
         }
@@ -108,12 +108,11 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     }
 
     public static ExtensionByReferenceBean make(int memberId, I_ThinExtByRefVersioned extension) {
-        ExtensionByReferenceBean ebrBean = new ExtensionByReferenceBean(memberId);
-        Reference<ExtensionByReferenceBean> ref = ebrBeans.get(ebrBean);
+        Reference<ExtensionByReferenceBean> ref = ebrBeans.get(memberId);
         if (ref != null) {
             return ref.get();
         }
-        ebrBean = get(memberId);
+        ExtensionByReferenceBean ebrBean = get(memberId);
         ebrBean.extension = extension;
         return ebrBean;
     }
@@ -163,7 +162,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
         extension = null;
         newExtensions.remove(this);
         if (firstCommit) {
-            ebrBeans.remove(this);
+            ebrBeans.remove(this.memberId);
         }
     }
 
