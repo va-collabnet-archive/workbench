@@ -462,9 +462,17 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 
 		public void processConceptAttributes(I_ConceptAttributeVersioned conc)
 				throws Exception {
-			for (I_ConceptAttributePart c : conc.getVersions()) {
-				TimePathId tb = new TimePathId(c.getVersion(), c.getPathId());
-				values.add(tb);
+			if (conc != null) {
+				if (conc.getVersions() != null) {
+					for (I_ConceptAttributePart c : conc.getVersions()) {
+						TimePathId tb = new TimePathId(c.getVersion(), c.getPathId());
+						values.add(tb);
+					}
+				} else {
+					AceLog.getAppLog().warning("null concept versions for: " + ConceptBean.get(conc.getConId()));
+				}
+			} else {
+				throw new Exception("concept is null");
 			}
 		}
 
@@ -1015,7 +1023,13 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 			throws Exception {
 		Iterator<I_GetConceptData> conItr = bdbEnv.getConceptIterator();
 		while (conItr.hasNext()) {
-			processor.processConceptAttributes(conItr.next().getConceptAttributes());
+			I_GetConceptData con = conItr.next();
+			I_ConceptAttributeVersioned cav = con.getConceptAttributes();
+			if (cav != null){
+				processor.processConceptAttributes(cav);
+			} else {
+				AceLog.getAppLog().warning("null concept versions for: " + ConceptBean.get(con.getConceptId()));
+			}
 		}
 	}
 
