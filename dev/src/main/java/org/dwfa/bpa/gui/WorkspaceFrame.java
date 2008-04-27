@@ -91,6 +91,9 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
         this.cfb.intervalAdded(null);
     }
 
+    public static int getMenuMask() {
+    	return MENU_MASK;
+    }
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == this.saveMI) {
@@ -198,7 +201,17 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
      * @see org.dwfa.bpa.util.ComponentFrame#addAppMenus(javax.swing.JMenuBar)
      */
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
-        mainMenuBar.add(fileMenu = new JMenu("File"));
+    	if (mainMenuBar.getMenuCount() == 0) {
+            mainMenuBar.add(fileMenu = new JMenu("File"));
+    	} else {
+    		for (int i = 0; i < mainMenuBar.getMenuCount(); i++) {
+    			JMenu menuItem = mainMenuBar.getMenu(i);
+    			if (menuItem.getText().toLowerCase().startsWith("edit")) {
+    		           mainMenuBar.add(fileMenu = new JMenu("File"), i);
+    		           break;
+    			}
+    		}
+    	}
         System.out.println("Adding app menus: " + this.menuDir);
         if (this.menuDir != null) {
             System.out.println(this.menuDir.getName());
@@ -239,11 +252,9 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
         }
         fileMenu.add(saveMI = new JMenuItem("Save Workspace Configuration"));
         saveMI.addActionListener(this);
-        saveMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_MASK));
 
         fileMenu.add(loadMI = new JMenuItem("Load Workspace Configuration"));
         loadMI.addActionListener(this);
-        loadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, MENU_MASK));
 
         showInInternalFrameMI = new JCheckBoxMenuItem("Internal Frames", true);
         showInInternalFrameMI.setAccelerator(KeyStroke.getKeyStroke(
