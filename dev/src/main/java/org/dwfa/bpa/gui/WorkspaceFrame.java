@@ -283,4 +283,8 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
         return count;
     }
 
+	public JMenu getFileMenu() {
+		return fileMenu;
+	}
+
 }
