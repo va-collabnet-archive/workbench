@@ -38,6 +38,7 @@ public abstract class RefsetUtilities {
 	Map<Integer,I_GetConceptData> conceptCache = new HashMap<Integer,I_GetConceptData>();
 
 	public int getInclusionTypeForRefset(I_ThinExtByRefVersioned part) {
+		System.out.println("getInclusionTypeForRefset " + part);
 		int typeId = 0;
 		I_ThinExtByRefPart latest = null;
 		List<? extends I_ThinExtByRefPart> versions = part.getVersions();
@@ -54,6 +55,9 @@ public abstract class RefsetUtilities {
 
 		I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) latest;
 		typeId = temp.getConceptId();
+		
+
+		System.out.println("getInclusionTypeForRefset resul " + temp);
 
 		return typeId;
 	}
@@ -195,10 +199,10 @@ public abstract class RefsetUtilities {
 		return collection.iterator().next();
 	}
 
-	public void addToNestedSet(Map<Integer,Set<ConceptRefsetInclusionDetails>> nestedList, ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
-		Set<ConceptRefsetInclusionDetails> conceptsInRefset = nestedList.get(refset);
+	public void addToNestedSet(Map<Integer,ClosestDistanceHashSet> nestedList, ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
+		ClosestDistanceHashSet conceptsInRefset = nestedList.get(refset);
 		if (conceptsInRefset==null) {
-			conceptsInRefset = new ClosestDistanceHashSet<ConceptRefsetInclusionDetails>();
+			conceptsInRefset = new ClosestDistanceHashSet();
 			nestedList.put(refset, conceptsInRefset);
 		}
 		conceptsInRefset.add(conceptDetails);

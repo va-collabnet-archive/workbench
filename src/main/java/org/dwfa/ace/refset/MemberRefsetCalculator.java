@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -40,25 +42,25 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	 * The ids of the concepts which may be included in the member set (due to lineage).
 	 * These may be excluded if they explicitly state a refset exclusion.
 	 */
-	protected Map<Integer,Set<ConceptRefsetInclusionDetails>> newRefsetMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+	protected Map<Integer,ClosestDistanceHashSet> newRefsetMembers = new HashMap<Integer,ClosestDistanceHashSet>();
 
 	/**
 	 * The ids of the concepts which may be excluded from the member set (due to lineage).
 	 * These may be included if they explicitly state a refset inclusion.
 	 */
-	protected Map<Integer,Set<ConceptRefsetInclusionDetails>> newRefsetExclusion = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+	protected Map<Integer,ClosestDistanceHashSet> newRefsetExclusion = new HashMap<Integer,ClosestDistanceHashSet>();
 
 	/**
 	 * The ids of the concepts which may be excluded from the member set (due to lineage).
 	 * These may be included if they explicitly state a refset inclusion.
 	 */
-	private Map<Integer,Set<ConceptRefsetInclusionDetails>> existingRefsetMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+	private Map<Integer,ClosestDistanceHashSet> existingRefsetMembers = new HashMap<Integer,ClosestDistanceHashSet>();
 
 	/**
 	 * The ids of the concepts which may be excluded from the member set (due to lineage).
 	 * These may be included if they explicitly state a refset inclusion.
 	 */
-	private Map<Integer,Set<ConceptRefsetInclusionDetails>> existingParentMembers = new HashMap<Integer,Set<ConceptRefsetInclusionDetails>>();
+	private Map<Integer,ClosestDistanceHashSet> existingParentMembers = new HashMap<Integer,ClosestDistanceHashSet>();
 
 	/**
 	 * The list of specification refsets to be analysed
@@ -84,7 +86,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		termFactory = LocalVersionedTerminology.get();
 
 		try {
-			Map<Integer,ConceptRefsetInclusionDetails> currentRefsetInclusionType = new HashMap<Integer,ConceptRefsetInclusionDetails>();
 			if (allowedRefsets.size()==0) {
 				allowedRefsets = getSpecificationRefsets();
 			}
@@ -98,7 +99,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 				int memberSetId = getMemberSetConcept(i).getConceptId();
 
-				System.out.println("Checking refset: " + getConcept(memberSetId));
+				I_GetConceptData memberSet = getConcept(memberSetId);
+				System.out.println("Checking refset: " + memberSet);
 
 				List<Integer> conceptsWithInclusion = new ArrayList<Integer>();
 				List<Integer> conceptsWithExclusion = new ArrayList<Integer>();
@@ -115,30 +117,38 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				 * */
 				for (I_ThinExtByRefVersioned member : refsetMembers) {
 
+					System.out.println("getting versions for " + member);
 					List<I_ThinExtByRefTuple> versions = member.getTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, false);
-
+					System.out.println("done getting versions for " + member);
+					
 					if (versions.size()>=1) {
 						int inclusiontype = getInclusionTypeForRefset(member);
 						if (inclusiontype==this.includeLineage) {
 							System.out.println("include lineage: " + termFactory.getConcept(member.getComponentId()));
-							conceptsWithInclusion.add(member.getComponentId());						
+							conceptsWithInclusion.add(member.getComponentId());
+							System.out.println("inclusion lineage added");
 						} else if (inclusiontype==this.excludeLineage) {
 							System.out.println("exclude lineage: " + termFactory.getConcept(member.getComponentId()));
 							conceptsWithExclusion.add(member.getComponentId());
+							System.out.println("exclusion lineage added");
 						} else if (inclusiontype==this.includeIndividual) {
 							System.out.println("include ind: " + termFactory.getConcept(member.getComponentId()));
+							System.out.println("included individual");
 							conceptsWithIncludeIndividual.add(member.getComponentId());
 						} else if (inclusiontype==this.excludeIndividual) {
 							System.out.println("exclude ind: " + termFactory.getConcept(member.getComponentId()));
 							conceptsWithExcludeIndividual.add(member.getComponentId());
+							System.out.println("excluded individual");
 						}
 					} 
 				}
+				System.out.println("Done calcuating for refset " + memberSet + " - commencing update");
+				
 				conceptsWithDirectInclusion.put(memberSetId, conceptsWithInclusion);
 				conceptsWithDirectExclusion.put(memberSetId, conceptsWithExclusion);
-
-
+				
 				for (Integer member : conceptsWithInclusion) {
+					
 					IncludeAllChildren(member,memberSetId,member,0);
 				}
 
@@ -221,13 +231,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	}
 
 	private void removeFromRefsetExclusion(int componentId, int refsetId) {
-		Set<ConceptRefsetInclusionDetails> members = newRefsetExclusion.get(refsetId);
+		ClosestDistanceHashSet members = newRefsetExclusion.get(refsetId);
 		if (members!=null) {
 			members.remove(new ConceptRefsetInclusionDetails(componentId,includeLineage,0,0));			
 		}
 	}
 	private void removeFromRefsetInclusion(int componentId, int refsetId) {
-		Set<ConceptRefsetInclusionDetails> members = newRefsetMembers.get(refsetId);
+		ClosestDistanceHashSet members = newRefsetMembers.get(refsetId);
 		if (members!=null) {
 			members.remove(new ConceptRefsetInclusionDetails(componentId,includeLineage,0,0));
 		}
@@ -235,7 +245,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 
 	private void IncludeAllChildren(int componentId, int refsetId,int parentId, int distance) throws IOException, Exception {
-
 		if (!conceptsWithDirectExclusion.get(refsetId).contains(componentId)) {
 
 			addToRefsetMembers(new ConceptRefsetInclusionDetails(componentId,includeLineage,parentId,distance),refsetId);
@@ -302,9 +311,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		for (Integer refset : newRefsetMembers.keySet()) {
 			reportWriter.write("\n\nIncluded members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
-			Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
+			ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
 			if (newMembers!=null) {
-				for (ConceptRefsetInclusionDetails i: newMembers) {
+				for (ConceptRefsetInclusionDetails i: newMembers.values()) {
 					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 				}
@@ -313,9 +322,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		for (Integer refset : newRefsetExclusion.keySet()) {
 			reportWriter.write("\n\nExcluded members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
-			Set<ConceptRefsetInclusionDetails> newMembers = newRefsetExclusion.get(refset);
+			ClosestDistanceHashSet newMembers = newRefsetExclusion.get(refset);
 			if (newMembers!=null) {
-				for (ConceptRefsetInclusionDetails i: newMembers) {
+				for (ConceptRefsetInclusionDetails i: newMembers.values()) {
 					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 				}
@@ -325,9 +334,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		for (Integer refset : existingRefsetMembers.keySet()) {
 			reportWriter.write("\n\nPrevious members of refset " + getConcept(refset) + " are: ");
 			reportWriter.newLine();
-			Set<ConceptRefsetInclusionDetails> newMembers = existingRefsetMembers.get(refset);
+			ClosestDistanceHashSet newMembers = existingRefsetMembers.get(refset);
 			if (newMembers!=null) {
-				for (ConceptRefsetInclusionDetails i : newMembers) {
+				for (ConceptRefsetInclusionDetails i : newMembers.values()) {
 					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 				}
@@ -336,43 +345,41 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 
 		for (Integer refset : newRefsetMembers.keySet()) {
-			Set<ConceptRefsetInclusionDetails> exclusions = new HashSet<ConceptRefsetInclusionDetails>();
+			ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
 
 
-			Set<ConceptRefsetInclusionDetails> oldparents = existingParentMembers.get(refset);
-			Set<ConceptRefsetInclusionDetails> parents = findParentsToBeMarked(newRefsetMembers.get(refset));
+			ClosestDistanceHashSet oldparents = existingParentMembers.get(refset);
+			ClosestDistanceHashSet parents = findParentsToBeMarked(newRefsetMembers.get(refset));
 
 
 			boolean conflicts = false;
 			conflictWriter.write("\n\nConflicts in refset " + getConcept(refset) + " are: ");
 			conflictWriter.newLine();
-			Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
-			Set<ConceptRefsetInclusionDetails> oldMembers = newRefsetExclusion.get(refset);
-			Set<ConceptRefsetInclusionDetails> newMembersToBeRemoved = new HashSet<ConceptRefsetInclusionDetails>();
-			Set<ConceptRefsetInclusionDetails> oldMembersToBeRemoved = new HashSet<ConceptRefsetInclusionDetails>();
-			if (newMembers!=null) {
-				for (ConceptRefsetInclusionDetails i: newMembers) {					
-					if (oldMembers!=null && oldMembers.contains(i)) {
-						for (ConceptRefsetInclusionDetails old: oldMembers) {
-							if (old.equals(i)) {
-								if (i.getDistance() > old.getDistance()) {
-									conflictWriter.write("Resolving to exclusion: ");
-									newMembersToBeRemoved.add(i);
-								} else if (i.getDistance() < old.getDistance()) {
-									conflictWriter.write("Resolving to inclusion: ");
-									oldMembersToBeRemoved.add(old);
-								} else {
-									conflictWriter.write("!Unresolved: " );
-									conflicts = true;
-								}
-								conflictWriter.write(getConcept(i.getConceptId()).toString());
-								conflictWriter.write(" because of " + getConcept(i.getInclusionReasonId()).toString());
-								conflictWriter.write(" conflicts with " +getConcept(old.getInclusionReasonId()).toString());
-								conflictWriter.newLine();
-
-							}
-						}
+			ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
+			ClosestDistanceHashSet oldMembers = newRefsetExclusion.get(refset);
+			ClosestDistanceHashSet newMembersToBeRemoved = new ClosestDistanceHashSet();
+			ClosestDistanceHashSet oldMembersToBeRemoved = new ClosestDistanceHashSet();
+			if (newMembers!=null && oldMembers != null) {
+				Set<Integer> keySet = new HashSet<Integer>();
+				keySet.addAll(newMembers.keySet());
+				keySet.retainAll(oldMembers.keySet());
+				for (Integer key : keySet) {
+					ConceptRefsetInclusionDetails newMember = newMembers.get(key);
+					ConceptRefsetInclusionDetails old = oldMembers.get(key);
+					if (newMember.getDistance() > old.getDistance()) {
+						conflictWriter.write("Resolving to exclusion: ");
+						newMembersToBeRemoved.add(newMember);
+					} else if (newMember.getDistance() < old.getDistance()) {
+						conflictWriter.write("Resolving to inclusion: ");
+						oldMembersToBeRemoved.add(old);
+					} else {
+						conflictWriter.write("!Unresolved: " );
+						conflicts = true;
 					}
+					conflictWriter.write(getConcept(newMember.getConceptId()).toString());
+					conflictWriter.write(" because of " + getConcept(newMember.getInclusionReasonId()).toString());
+					conflictWriter.write(" conflicts with " +getConcept(old.getInclusionReasonId()).toString());
+					conflictWriter.newLine();
 				}
 			}
 
@@ -393,39 +400,50 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 			newMembers = newRefsetMembers.get(refset);
 			oldMembers = existingRefsetMembers.get(refset);
 			if (newMembers!=null) {
-				for (ConceptRefsetInclusionDetails i: newMembers) {					
-					if (oldMembers==null || !oldMembers.contains(i)) {
-						reportWriter.write(getConcept(i.getConceptId()).toString());
-						reportWriter.newLine();
-						if (!conflicts && !validateOnly) { 
-							addToMemberSet(i.getConceptId(), i.getInclusionTypeId(), refset);
-						}
+				Set<Integer> keySet = new HashSet<Integer>();
+				keySet.addAll(newMembers.keySet());
+				if (oldMembers != null) {
+					keySet.removeAll(oldMembers.keySet());
+				}
+				
+				for (Integer conceptId: keySet) {
+					ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
+					reportWriter.write(getConcept(member.getConceptId()).toString());
+					reportWriter.newLine();
+					if (!conflicts && !validateOnly) { 
+						addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
 					}
 				}
 
-
 				newMembers = existingRefsetMembers.get(refset);
 				oldMembers = newRefsetMembers.get(refset);
+
 				if (newMembers!=null) {
-					for (ConceptRefsetInclusionDetails i: newMembers) {					
-						if (oldMembers==null || !oldMembers.contains(i)) {
-							exclusions.add(i);
-						}
+					keySet = new HashSet<Integer>();
+					keySet.addAll(newMembers.keySet());
+					if (oldMembers != null) {
+						keySet.removeAll(oldMembers.keySet());
+					}
+					for (Integer conceptId: keySet) {
+						exclusions.add(newMembers.get(conceptId));
 					}
 				}
 
 				newMembers = existingRefsetMembers.get(refset);
 				oldMembers = newRefsetExclusion.get(refset);
 				if (newMembers!=null) {
-					for (ConceptRefsetInclusionDetails i: newMembers) {					
-						if (oldMembers!=null && oldMembers.contains(i)) {
-							exclusions.add(i);
-						}
+					keySet = new HashSet<Integer>();
+					keySet.addAll(newMembers.keySet());
+					if (oldMembers != null) {
+						keySet.retainAll(oldMembers.keySet());
+					}
+					for (Integer key: keySet) {
+						exclusions.add(newMembers.get(key));
 					}
 				}
 				reportWriter.write("\n\nNew excluded members who used to be members of refset " + getConcept(refset) + " are: ");
 				reportWriter.newLine();
-				for (ConceptRefsetInclusionDetails i : exclusions) {
+				for (ConceptRefsetInclusionDetails i : exclusions.values()) {
 					reportWriter.write(getConcept(i.getConceptId()).toString());
 					reportWriter.newLine();
 					if (!conflicts  && !validateOnly) { 
@@ -449,8 +467,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 					reportWriter.write("\n\nParents that are not marked but will be marked in refset " + getConcept(refset) + " are: ");
 					reportWriter.newLine();
-					for (ConceptRefsetInclusionDetails parent: parents) {
-						if (oldparents==null || (oldparents!=null && !oldparents.contains(parent))) {
+					for (ConceptRefsetInclusionDetails parent: parents.values()) {
+						if (oldparents==null || (oldparents!=null && !oldparents.containsKey(parent.getConceptId()))) {
 							if (!conflicts && !validateOnly) {
 								addToMemberSetAsParent(parent.getConceptId(), refset);
 								reportWriter.write(getConcept(parent.getConceptId()).toString());
@@ -463,7 +481,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					}
 					if (oldparents!=null) {
 						oldparents.removeAll(parents);			
-						for (ConceptRefsetInclusionDetails existingParent: oldparents) {
+						for (ConceptRefsetInclusionDetails existingParent: oldparents.values()) {
 							I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),refset);
 							if (ext!=null) {
 								if (!conflicts && !validateOnly) {
@@ -483,15 +501,15 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		} 
 	}
 
-	private Set<ConceptRefsetInclusionDetails> findParentsToBeMarked(Set<ConceptRefsetInclusionDetails> concepts) throws IOException, Exception {
-		Set<ConceptRefsetInclusionDetails> nonMarkedParents = new HashSet<ConceptRefsetInclusionDetails>();
+	private ClosestDistanceHashSet findParentsToBeMarked(ClosestDistanceHashSet concepts) throws IOException, Exception {
+		ClosestDistanceHashSet nonMarkedParents = new ClosestDistanceHashSet();
 
 		if (concepts!=null) {
-			for (ConceptRefsetInclusionDetails conceptId: concepts) {
+			for (ConceptRefsetInclusionDetails conceptId: concepts.values()) {
 				Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId());
 				for (Integer parentId: parents) {
 					ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId,0,0,0);
-					if (!concepts.contains(parent)) {
+					if (!concepts.containsKey(parent.getConceptId())) {
 						nonMarkedParents.add(parent);
 					}
 				}

@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.refset.ClosestDistanceHashSet;
 import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
 import org.dwfa.ace.refset.MemberRefsetCalculator;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -205,18 +206,18 @@ public class VerifyNoRefSetConflicts extends AbstractTask {
     	protected void setMembers() throws Exception {
 				
 			for (Integer refset : newRefsetMembers.keySet()) {
-				Set<ConceptRefsetInclusionDetails> exclusions = new HashSet<ConceptRefsetInclusionDetails>();
+				ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
 
 				conflictDetails.add("Conflicts in refset " + termFactory.getConcept(refset) + " are: ");
 
-				Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
-				Set<ConceptRefsetInclusionDetails> oldMembers = newRefsetExclusion.get(refset);
+				ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
+				ClosestDistanceHashSet oldMembers = newRefsetExclusion.get(refset);
 				if (newMembers!=null) {
 					
-					for (ConceptRefsetInclusionDetails i: newMembers) {					
-						if (oldMembers!=null && oldMembers.contains(i)) {
+					for (ConceptRefsetInclusionDetails i: newMembers.values()) {					
+						if (oldMembers!=null && oldMembers.containsKey(i.getConceptId())) {
 							List<Integer> addedConcepts = new ArrayList<Integer>();
-							for (ConceptRefsetInclusionDetails old: oldMembers) {
+							for (ConceptRefsetInclusionDetails old: oldMembers.values()) {
 								//Show only first level conflict
 								I_IntSet isARel = termFactory.newIntSet();
 								isARel.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
