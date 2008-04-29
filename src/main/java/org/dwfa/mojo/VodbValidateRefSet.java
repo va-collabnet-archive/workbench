@@ -17,6 +17,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.ClosestDistanceHashSet;
 import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
 import org.dwfa.ace.refset.MemberRefsetCalculator;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -140,53 +141,45 @@ class MyMemberRefsetCalculator extends MemberRefsetCalculator{
 
 				conflictDetails.add("Conflicts in refset " + termFactory.getConcept(refset) + " are: ");
 
-				Set<ConceptRefsetInclusionDetails> newMembers = newRefsetMembers.get(refset);
-				Set<ConceptRefsetInclusionDetails> oldMembers = newRefsetExclusion.get(refset);
-				if (newMembers!=null) {
+				ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
+				ClosestDistanceHashSet oldMembers = newRefsetExclusion.get(refset);
+				
+				Set<Integer> keySet = new HashSet<Integer>();
+				keySet.addAll(newMembers.keySet());
+				keySet.retainAll(oldMembers.keySet());
+				
+				for (Integer integer : keySet) {
+					//Show only first level conflict
+					I_IntSet isARel = termFactory.newIntSet();
+					isARel.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+					isARel.add(termFactory.uuidToNative(SNOMED.Concept.IS_A.getUids()));
+
+					List<Integer> addedConcepts = new ArrayList<Integer>();
 					
-					for (ConceptRefsetInclusionDetails i: newMembers) {					
-						if (oldMembers!=null && oldMembers.contains(i)) {
-							List<Integer> addedConcepts = new ArrayList<Integer>();
-							for (ConceptRefsetInclusionDetails old: oldMembers) {
-								//Show only first level conflict
-								I_IntSet isARel = termFactory.newIntSet();
-								isARel.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-								isARel.add(termFactory.uuidToNative(SNOMED.Concept.IS_A.getUids()));
-								if (old.equals(i)) {
-									for(I_GetConceptData c :termFactory.getConcept(i.getConceptId()).getSourceRelTargets(null, isARel, null, false)){
-										int conceptId = c.getConceptId();
-										if(conceptId == termFactory.getConcept(i.getInclusionReasonId()).getConceptId() ||
-											conceptId == termFactory.getConcept(old.getInclusionReasonId()).getConceptId()){
-											
-											if(!addedConcepts.contains(new Integer(conceptId))){
-											
-												StringBuffer sb = new StringBuffer();
-												sb.append(termFactory.getConcept(i.getConceptId()).toString());
-												sb.append(" because of " + termFactory.getConcept(i.getInclusionReasonId()).toString());
-												sb.append(" conflicts with " +termFactory.getConcept(old.getInclusionReasonId()).toString());
-												
-												conflictDetails.add(sb.toString());
-												addedConcepts.add(new Integer(conceptId));
-											}
-										}
-									}//End inner for loop :termFactory.getConcept(i.getConceptId()).getSourceRelTargets
-								}
-								//Show all levels conflicts
-//								if (old.equals(i)) {							
-//									StringBuffer sb = new StringBuffer();
-//									sb.append(termFactory.getConcept(i.getConceptId()).toString());
-//									sb.append(" because of " + termFactory.getConcept(i.getInclusionReasonId()).toString());
-//									sb.append(" conflicts with " +termFactory.getConcept(old.getInclusionReasonId()).toString());
-//									
-//									conflictDetails.add(sb.toString());
-//									
-//								}
-							}//End inner for loop :oldMembers
-							conflicts = true;
+					ConceptRefsetInclusionDetails old = oldMembers.get(integer);
+					ConceptRefsetInclusionDetails newMember = newMembers.get(integer);
+					
+					for(I_GetConceptData c :termFactory.getConcept(newMember.getConceptId()).getSourceRelTargets(null, isARel, null, false)){
+						int conceptId = c.getConceptId();
+						if(conceptId == termFactory.getConcept(newMember.getInclusionReasonId()).getConceptId() ||
+							conceptId == termFactory.getConcept(old.getInclusionReasonId()).getConceptId()){
+							
+							if(!addedConcepts.contains(new Integer(conceptId))){
+							
+								StringBuffer sb = new StringBuffer();
+								sb.append(termFactory.getConcept(newMember.getConceptId()).toString());
+								sb.append(" because of " + termFactory.getConcept(newMember.getInclusionReasonId()).toString());
+								sb.append(" conflicts with " +termFactory.getConcept(old.getInclusionReasonId()).toString());
+								
+								conflictDetails.add(sb.toString());
+								addedConcepts.add(new Integer(conceptId));
+							}
 						}
-					}//End inner for loop :newMembers
+					}
 				}
-			}//End for loop
+
+				conflicts = true;
+    		}
 		}//End method setMembers
     }//End nested class MyMemberRefsetCalculator
     

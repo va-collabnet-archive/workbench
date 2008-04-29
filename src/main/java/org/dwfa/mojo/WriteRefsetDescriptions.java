@@ -190,6 +190,8 @@ I_ProcessExtByRef {
 		Writer writer = fileMap.get(text);
 		if (writer == null) {
 			File outputFile = new File(outputDirectory, text + ".refset.text");
+			System.out.println("making directory - " + outputFile.getParentFile());
+			outputFile.getParentFile().mkdirs();
 			outputFile.createNewFile();
 			writer = new BufferedWriter(new FileWriter(outputFile));
 			fileMap.put(text, writer);
