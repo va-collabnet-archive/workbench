@@ -252,16 +252,16 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
 		} else if (e.getActionCommand().equals("Put in tab 1")) {
-			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(0);
-			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in tab 2")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(1);
 			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in tab 3")) {
+		} else if (e.getActionCommand().equals("Put in tab 2")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(2);
 			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in tab 4")) {
+		} else if (e.getActionCommand().equals("Put in tab 3")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(3);
+			viewer.setTermComponent(termComponent);
+		} else if (e.getActionCommand().equals("Put in tab 4")) {
+			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(4);
 			viewer.setTermComponent(termComponent);
 		} else if (e.getActionCommand().equals("Add to list")) {
 	         JList conceptList = this.ace.getAceFrameConfig().getBatchConceptList();
