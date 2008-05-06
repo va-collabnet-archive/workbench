@@ -136,7 +136,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                            cb.getConceptId());
                      for (int i : refsetsToShow.getListArray()) {
                         for (I_GetExtensionData ext : extensions) {
-                           if (ext.getExtension().getRefsetId() == i) {
+                           if (ext != null && 
+                        		   ext.getExtension() != null &&
+                        		   ext.getExtension().getRefsetId() == i) {
                               I_ThinExtByRefVersioned ebr = ext.getExtension();
                               List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
                               switch (ThinExtBinder.getExtensionType(ebr)) {
