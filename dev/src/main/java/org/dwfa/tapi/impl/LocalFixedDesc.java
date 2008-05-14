@@ -23,6 +23,10 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private static int dataVersion = 3;
+	
+	public static int defaultDataVersion = 2;
 
 	private int nid;
 
@@ -41,7 +45,17 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		try {
-			int uidCount = in.readInt();
+			int version = defaultDataVersion;
+			int versionOrCount = in.readInt();
+			int uidCount = -1;
+			if (versionOrCount < 0) {
+				version = versionOrCount - Integer.MIN_VALUE;
+				uidCount = in.readInt();
+			} else {
+				uidCount = versionOrCount;
+			}
+			
+			
 			Collection<UUID> duids = new ArrayList<UUID>(uidCount);
 			for (int i = 0; i < uidCount; i++) {
 				long msb = in.readLong();
@@ -49,13 +63,17 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 				duids.add(new UUID(msb, lsb));
 			}
 			nid = LocalFixedTerminology.getStore().getNid(duids);
-			Collection<UUID> cuids = new ArrayList<UUID>(uidCount);
-			for (int i = 0; i < uidCount; i++) {
-				long msb = in.readLong();
-				long lsb = in.readLong();
-				cuids.add(new UUID(msb, lsb));
+			if (version >= 2) {
+				Collection<UUID> cuids = new ArrayList<UUID>(uidCount);
+				for (int i = 0; i < uidCount; i++) {
+					long msb = in.readLong();
+					long lsb = in.readLong();
+					cuids.add(new UUID(msb, lsb));
+				}
+				conceptNid = LocalFixedTerminology.getStore().getNid(cuids);
+			} else {
+				conceptNid = Integer.MIN_VALUE;
 			}
-			conceptNid = LocalFixedTerminology.getStore().getNid(cuids);
 		} catch (Exception e) {
 			IOException ioe = new IOException();
 			ioe.initCause(e);
@@ -83,6 +101,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 
 	public void writeExternal(ObjectOutput out) throws IOException {
 		try {
+			out.writeInt(Integer.MIN_VALUE + dataVersion);
 			Collection<UUID> uids = LocalFixedTerminology.getStore().getUids(nid);
 			out.writeInt(uids.size());
 			for (UUID uid : uids) {
