@@ -64,6 +64,7 @@ public class LocalFixedDesc implements I_DescribeConceptLocally, Externalizable 
 			}
 			nid = LocalFixedTerminology.getStore().getNid(duids);
 			if (version >= 2) {
+				uidCount = in.readInt();
 				Collection<UUID> cuids = new ArrayList<UUID>(uidCount);
 				for (int i = 0; i < uidCount; i++) {
 					long msb = in.readLong();
