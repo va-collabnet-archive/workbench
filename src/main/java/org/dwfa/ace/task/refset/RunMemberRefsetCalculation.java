@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -61,8 +60,7 @@ public class RunMemberRefsetCalculation extends AbstractTask {
 			cal.run();
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new TaskFailedException(e.getMessage());
+			throw new TaskFailedException("Member refset calculation run failed", e);
 		}
 
 		return Condition.CONTINUE;
