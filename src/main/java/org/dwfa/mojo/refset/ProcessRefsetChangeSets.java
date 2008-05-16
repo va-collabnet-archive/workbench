@@ -26,7 +26,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
  * VODB version is available.
  * 
  * @goal processRefsetChangeSets
- * @phase process-resources
+ * @phase process-classes
  * @requiresDependencyResolution compile
  * @author Dion McMurtrie
  */
