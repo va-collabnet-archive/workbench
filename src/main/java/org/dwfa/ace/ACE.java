@@ -616,7 +616,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
 			List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
 			AceLog.getEditLog().info("Uncommitted count: " + uncommitted.size());
-			AceLog.getEditLog().info("Uncommitted set: " + uncommitted);
+			AceLog.getEditLog().finer("Uncommitted set: " + uncommitted);
 			for (I_Transact to : uncommitted) {
 				for (I_TestDataConstraints test : commitTests) {
 					try {
