@@ -87,14 +87,16 @@ public abstract class RefsetUtilities {
 		return parents;
 	}
 
-	public Set<Integer> getAncestorsOfConcept(int conceptId) throws IOException, Exception {
+	public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) throws IOException, Exception {
 
 		Set<Integer> allParents = new HashSet<Integer>();
 
 		Set<Integer> parents = getParentsOfConcept(conceptId);
 		for (Integer parent: parents) {
-			allParents.add(parent);
-			allParents.addAll(getAncestorsOfConcept(parent));			
+			if (!concepts.keySet().contains(parent)) {
+				allParents.add(parent);
+				allParents.addAll(getAncestorsOfConcept(parent, concepts));
+			}
 		}
 		return allParents;
 	}
