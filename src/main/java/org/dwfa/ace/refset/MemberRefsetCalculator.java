@@ -146,7 +146,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				conceptsWithDirectExclusion.put(memberSetId, conceptsWithExclusion);
 				
 				for (Integer member : conceptsWithInclusion) {
-					
+					System.out.println("getting children for lineage include for concept " + termFactory.getConcept(member) + " for member set " + memberSet);
 					IncludeAllChildren(member,memberSetId,member,0);
 				}
 
@@ -158,6 +158,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				 * skip children which are in the inclusion individual set
 				 * */
 				for (Integer member : conceptsWithExclusion) {
+					System.out.println("getting children for lineage exclude for concept " + termFactory.getConcept(member) + " for member set " + memberSet);
 					removeFromRefsetInclusion(member,memberSetId);
 					ExcludeAllChildren(member,memberSetId,member,0);
 				}
@@ -175,7 +176,14 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				 * Add all members to the member refset so we know what was already there
 				 * */
 				int parent_marker_nid = ConceptConstants.PARENT_MARKER.localize().getNid();
+
+				System.out.println("collecting existing refset members for comparison");
+				int counter = 0;
 				for (I_ThinExtByRefVersioned member : conceptsInMemberRefset) {
+					counter++;
+					if (counter % 1000 == 0) {
+						System.out.println("processed " + counter + " of " + conceptsInMemberRefset.size() + " for refset " + memberSet);
+					}
 					
 					I_ThinExtByRefPart latest = getLatestVersion(member);
 					if (latest!=null && latest.getStatus()== currentStatusId) {
@@ -301,8 +309,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	}
 
 	protected void setMembers() throws Exception {
-
-
 
 		System.out.println("Starting reporting " + new Date());
 		for (Integer refset : newRefsetMembers.keySet()) {
