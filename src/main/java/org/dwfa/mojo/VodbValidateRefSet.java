@@ -62,6 +62,12 @@ public class VodbValidateRefSet extends AbstractMojo {
      * @required
      */
     private File conflictsOutputFile;
+    
+	/**
+	 * @parameter
+	 * The number of items to add to the uncommitted list before committing
+	 */
+	private int commitSize = 1000;
 
    
     /**
@@ -88,6 +94,7 @@ public class VodbValidateRefSet extends AbstractMojo {
 	        
 	        //mrc.setOutputDirectory(conflictsOutputFile);
     		mrc.setValidateOnly(true);
+    		mrc.setCommitSize(commitSize);
     		mrc.run();
 	            		
     		List<String> details = mrc.conflictDetails;
