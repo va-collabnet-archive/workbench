@@ -32,7 +32,7 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ace/change sets", type = BeanType.TASK_BEAN) })
 public class ImportAllChangeSets extends AbstractTask {
 
-    private String rootDirStr = "profiles";
+    private String rootDirStr = "profiles/";
 
     private Boolean validateChangeSets = true;
     
