@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,11 +112,14 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.checks.UncommittedListModel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -431,11 +435,17 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			.synchronizedSet(new HashSet<I_Transact>());
 	
 	private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
+	
+	private static int maxHistoryListSize = 100;
 
-	private static List<I_Transact> imported = new ArrayList<I_Transact>();
+	private static LinkedList<I_Transact> imported = new LinkedList<I_Transact>();
 
 	public static void addImported(I_Transact to) {
-		imported.add(to);
+		imported.addLast(to);
+		while (imported.size() > maxHistoryListSize) {
+			imported.removeFirst();
+		}
+
 		if (aceConfig != null) {
 			for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
 				frameConfig.setCommitEnabled(true);
@@ -460,9 +470,23 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					removeUncommitted(to);
 					uncommittedBean = ConceptBean.get(eb.getExtension()
 							.getComponentId());
-					if (uncommittedBean.isUncommitted()) {
+					if (uncommittedBean.isUncommitted() && uncommittedBean.isExtensionUncommitted()) {
 						removeUncommitted(uncommittedBean);
 					}
+					if (eb.getExtension().getVersions().size() == 0) {
+						eb.abort();
+					}
+					List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+					dataCheckMap.put(uncommittedBean, warningsAndErrors);
+					addUncommitted(uncommittedBean);
+					 for (I_ThinExtByRefVersioned ext: LocalVersionedTerminology.get().getAllExtensionsForComponent(uncommittedBean.getConceptId(), true)) {
+						 for (I_ThinExtByRefPart part: ext.getVersions()) {
+							 if (part.getVersion() == Integer.MAX_VALUE) {
+								 addUncommitted(ExtensionByReferenceBean.get(ext.getMemberId()));
+								 break;
+							 }
+						 }
+					 }
 					return;
 				} else {
 					extraToAdd = ConceptBean.get(eb.getExtension()
@@ -475,7 +499,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		if (ConceptBean.class.isAssignableFrom(to.getClass())) {
 			uncommittedBean = (ConceptBean) to;
 			try {
-				if (uncommittedBean.isUncommitted() == false) {
+				if (uncommittedBean.isUncommitted() == false 
+						&& uncommittedBean.isExtensionUncommitted() == false) {
 					dataCheckMap.remove(uncommittedBean);
 					removeUncommitted(to);
 					return;
@@ -502,7 +527,16 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				frameConfig.setCommitEnabled(true);
 				updateAlerts(frameConfig);
 				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-					frameConfig.addUncommitted((I_GetConceptData) to);
+					ConceptBean cb = (ConceptBean) to;
+					try {
+						if (cb.isUncommitted() || cb.isExtensionUncommitted()) {
+							frameConfig.addUncommitted(cb);
+						} else {
+							frameConfig.removeUncommitted(cb);
+						}
+					} catch (IOException e) {
+						AceLog.getEditLog().alertAndLogException(e);
+					}
 				}
 			}
 		}
@@ -3235,7 +3269,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		} else if (evt.getPropertyName().equals("lastViewed")) {
 			viewerHistoryTableModel.addElement(0, (ConceptBean) evt
 					.getNewValue());
-			while (viewerHistoryTableModel.getSize() > 40) {
+			while (viewerHistoryTableModel.getSize() > maxHistoryListSize) {
 				viewerHistoryTableModel.removeElement(viewerHistoryTableModel
 						.getSize() - 1);
 			}

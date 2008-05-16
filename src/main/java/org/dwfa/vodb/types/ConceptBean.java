@@ -959,6 +959,10 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			}
 		}
 
+		return false;
+	}
+	
+	public boolean isExtensionUncommitted() throws IOException {
 		for (I_Transact to : ACE.getUncommitted()) {
 			if (ExtensionByReferenceBean.class.isAssignableFrom(to.getClass())) {
 				ExtensionByReferenceBean ebr = (ExtensionByReferenceBean) to;

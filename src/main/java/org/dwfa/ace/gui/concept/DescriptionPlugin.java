@@ -304,12 +304,14 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	}
 
 	protected I_AmTermComponent getSelectedPluginComponent() {
-		if (descTable.getSelectedRow() < 0) {
-			return null;
+		if (descTable.getSelectedRow() >= 0) {
+			StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(
+					descTable.getSelectedRow(), 0);
+			if (swdt != null && swdt.getTuple() != null) {
+				return swdt.getTuple().getDescVersioned();
+			}
 		}
-		StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(
-				descTable.getSelectedRow(), 0);
-		return swdt.getTuple().getDescVersioned();
+		return null;
 	}
 
 

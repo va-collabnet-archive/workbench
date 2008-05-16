@@ -6,16 +6,15 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
-import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
+import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 
 public class BinaryChangeSetWriter implements I_WriteChangeSet {
@@ -85,22 +84,33 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
    }
 
    public void writeChanges(I_Transact change, long time) throws IOException {
-      tempOut.writeLong(time);
-      if (I_GetConceptData.class.isAssignableFrom(change.getClass())) {
-         writeChanges((I_GetConceptData) change, time);
+      if (ConceptBean.class.isAssignableFrom(change.getClass())) {
+    	  ConceptBean conceptChange = (ConceptBean) change;
+    	  if (conceptChange.isUncommitted()) {
+              tempOut.writeLong(time);
+              writeChanges(conceptChange, time);
+    	  }
       } else if (I_Path.class.isAssignableFrom(change.getClass())) {
-         writeChanges((I_Path) change, time);
+    	  I_Path pathChange = (I_Path) change;
+          tempOut.writeLong(time);
+          writeChanges(pathChange, time);
       } else if (UniversalIdList.class.isAssignableFrom(change.getClass())) {
-         writeIds((UniversalIdList) change, time);
+    	  UniversalIdList idListChange = (UniversalIdList) change;
+          tempOut.writeLong(time);
+          writeIds(idListChange, time);
       } else if (ExtensionByReferenceBean.class.isAssignableFrom(change.getClass())) {
-         writeExtension((I_GetExtensionData) change, time);
+    	  ExtensionByReferenceBean extensionChange = (ExtensionByReferenceBean) change;
+    	  if (extensionChange.isUncommitted()) {
+              tempOut.writeLong(time);
+              writeExtension(extensionChange, time);
+    	  }
       } else {
          throw new IOException("Can't handle class: " + change.getClass().getName());
       }
 
    }
 
-   private void writeChanges(I_GetConceptData cb, long time) throws IOException {
+   private void writeChanges(ConceptBean cb, long time) throws IOException {
       try {
          UniversalAceBean bean = cb.getUniversalAceBean();
          tempOut.writeObject(bean);
@@ -111,7 +121,7 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
       }
    }
 
-   private void writeExtension(I_GetExtensionData ebrBean, long time) throws IOException {
+   private void writeExtension(ExtensionByReferenceBean ebrBean, long time) throws IOException {
       try {
          UniversalAceExtByRefBean bean = ebrBean.getUniversalAceBean();
          tempOut.writeObject(bean);

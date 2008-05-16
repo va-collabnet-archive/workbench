@@ -85,6 +85,9 @@ public class RefsetPopupListener extends MouseAdapter {
 			ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) tuple
 					.getCore();
 			versioned.getVersions().remove(tuple.getPart());
+			if (versioned.getVersions().size() == 0) {
+				
+			}
 			ACE.addUncommitted(sourceBean);
 			model.allTuples = null;
 			model.fireTableDataChanged();

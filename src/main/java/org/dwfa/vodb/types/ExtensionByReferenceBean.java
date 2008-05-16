@@ -159,11 +159,8 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     }
 
     public void abort() throws IOException {
-        extension = null;
         newExtensions.remove(this);
-        if (firstCommit) {
-            ebrBeans.remove(this.memberId);
-        }
+        ebrBeans.remove(this.memberId);
     }
 
     public void commit(int version, Set<TimePathId> values) throws IOException {
@@ -258,10 +255,12 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     }
 
 public boolean isUncommitted() throws IOException {
-	if (getExtension().getVersions().size() > 0) {
-		for (I_ThinExtByRefPart part: getExtension().getVersions()) {
-			if (part.getVersion() == Integer.MAX_VALUE) {
-				return true;
+	if (extension != null) {
+		if (extension.getVersions().size() > 0) {
+			for (I_ThinExtByRefPart part: getExtension().getVersions()) {
+				if (part.getVersion() == Integer.MAX_VALUE) {
+					return true;
+				}
 			}
 		}
 	}

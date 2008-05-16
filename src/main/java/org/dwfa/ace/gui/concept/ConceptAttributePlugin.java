@@ -241,7 +241,10 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         }
         StringWithConceptTuple swct = (StringWithConceptTuple) conceptTable
                 .getValueAt(conceptTable.getSelectedRow(), 0);
-        return swct.getTuple().getConId();
+        if (swct != null && swct.getTuple() != null) {
+            return swct.getTuple().getConId();
+        }
+        return Integer.MIN_VALUE;
     }
 
     public void tableChanged(TableModelEvent tme) {
