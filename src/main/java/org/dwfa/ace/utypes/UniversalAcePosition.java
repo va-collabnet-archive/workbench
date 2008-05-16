@@ -21,11 +21,28 @@ public class UniversalAcePosition implements Serializable {
 		super();
 	}
 
-   public UniversalAcePosition(Collection<UUID> pathId, long time) {
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+    public void setPathId(Collection<UUID> pathId) {
+		this.pathId = pathId;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
+
+    public UniversalAcePosition(Collection<UUID> pathId, long time) {
       super();
       this.pathId = pathId;
       this.time = time;
-   }
+    }
 
 	public Collection<UUID> getPathId() {
 		return pathId;

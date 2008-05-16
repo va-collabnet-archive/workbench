@@ -29,6 +29,114 @@ public class UniversalAceRelationship implements Serializable {
 		this.versions = new ArrayList<UniversalAceRelationshipPart>(count);
 	}
 
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public UniversalAceRelationship() {
+		super();
+	}
+	
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public Collection<UUID> getComponentOneId() {
+		return componentOneId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setComponentOneId(Collection<UUID> componentOneId) {
+		this.componentOneId = componentOneId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public Collection<UUID> getComponentTwoId() {
+		return componentTwoId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setComponentTwoId(Collection<UUID> componentTwoId) {
+		this.componentTwoId = componentTwoId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setRelId(Collection<UUID> relId) {
+		this.relId = relId;
+	}
+	
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setVersions(List<UniversalAceRelationshipPart> versions) {
+		this.versions = versions;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
+	
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelVersioned#addVersion(org.dwfa.vodb.types.I_RelPart)
 	 */

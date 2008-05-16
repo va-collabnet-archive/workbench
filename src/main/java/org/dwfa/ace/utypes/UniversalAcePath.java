@@ -20,6 +20,42 @@ public class UniversalAcePath implements Serializable, I_AmChangeSetObject {
 		this.pathId = pathId;
 		this.origins = origins;
 	}
+	
+	public UniversalAcePath() {
+		super();
+	}
+	
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setPathId(List<UUID> pathId) {
+		this.pathId = pathId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setOrigins(List<UniversalAcePosition> origins) {
+		this.origins = origins;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
 
 	public List<UniversalAcePosition> getOrigins() {
 		return origins;

@@ -21,6 +21,25 @@ public class UniversalIdList implements Serializable, I_Transact, I_AmChangeSetO
 
 	private Set<UniversalAceIdentification> uncommittedIds = new HashSet<UniversalAceIdentification>();
 
+
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setUncommittedIds(Set<UniversalAceIdentification> uncommittedIds) {
+		this.uncommittedIds = uncommittedIds;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
+	
+	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(uncommittedIds);

@@ -24,6 +24,68 @@ public class UniversalAceDescription implements Serializable {
 		this.conceptId = conceptId;
 		this.versions = new ArrayList<UniversalAceDescriptionPart>(count);
 	}
+	
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public UniversalAceDescription() {
+		super();
+	}	
+	
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setDescId(Collection<UUID> descId) {
+		this.descId = descId;
+	}
+	
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setConceptId(Collection<UUID> conceptId) {
+		this.conceptId = conceptId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setVersions(List<UniversalAceDescriptionPart> versions) {
+		this.versions = versions;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionVersioned#addVersion(org.dwfa.vodb.types.I_DescriptionPart)

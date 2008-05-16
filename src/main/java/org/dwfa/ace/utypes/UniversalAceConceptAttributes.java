@@ -23,6 +23,53 @@ public class UniversalAceConceptAttributes implements Serializable {
 		this.versions = new ArrayList<UniversalAceConceptAttributesPart>(count);
 	}
 
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public UniversalAceConceptAttributes() {
+		super();
+	}
+	
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setConId(Collection<UUID> conId) {
+		this.conId = conId;
+	}
+
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setVersions(List<UniversalAceConceptAttributesPart> versions) {
+		this.versions = versions;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
+	
 	/*
 	 * (non-Javadoc)
 	 * 

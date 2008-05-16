@@ -16,6 +16,40 @@ public class UniversalAceIdentification implements Serializable {
 		super();
 		this.versions = new ArrayList<UniversalAceIdentificationPart>(count);
 	}
+	
+
+	// START: ADDED TO IMPLEMENT JAVABEANS SPEC
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public UniversalAceIdentification() {
+		super();
+	}
+	
+	/**
+	 * DO NOT USE THIS METHOD.
+	 * 
+	 * This method has been included to meet the JavaBeans specification,
+	 * however it should not be used as it allows access to attributes that
+	 * should not be modifiable and weakens the interface. The method has been
+	 * added as a convenience to allow JavaBeans tools access via introspection
+	 * but is not intended for general use by developers.
+	 * 
+	 * @deprecated
+	 */
+	public void setVersions(List<UniversalAceIdentificationPart> versions) {
+		this.versions = versions;
+	}
+	// END: ADDED TO IMPLEMENT JAVABEANS SPEC
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdVersioned#getVersions()
 	 */
