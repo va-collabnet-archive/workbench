@@ -267,5 +267,14 @@ public interface I_TermFactory {
     public I_ThinExtByRefPartString newStringExtensionPart();
     
     public String getStats() throws IOException;
+    
+    /**
+     * Use of this call is discouraged for routine use. It is provided to allow more efficiency for some types of 
+     * operations such as writing the results of a large computation such as a classification or a refset generation. 
+     * It should not be used to bypass the transactional model for manually generated changes. 
+     * 
+     * @return
+     */
+    public I_WriteDirectToDb getDirectInterface();
 
 }
