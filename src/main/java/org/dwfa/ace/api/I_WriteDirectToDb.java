@@ -87,5 +87,14 @@ public interface I_WriteDirectToDb {
 	 * @throws IOException
 	 */
 	public void sync() throws IOException;
+	
+	/**
+	 * Adds an entry to the time/path database. This entry is necessary for the 
+	 * time/path to show up in the preferences panel. 
+	 * @param timePath
+	 * @throws IOException
+	 */
+	
+	public void writeTimePath(TimePathId timePath) throws IOException;
 
 }

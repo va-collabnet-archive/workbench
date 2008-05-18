@@ -276,5 +276,15 @@ public interface I_TermFactory {
      * @return
      */
     public I_WriteDirectToDb getDirectInterface();
-
+    
+    
+	public boolean hasId(Collection<UUID> uids) throws IOException;
+	public boolean hasId(UUID uid) throws IOException;
+	public boolean hasImage(int imageId) throws IOException;
+	public boolean hasPath(int nativeId) throws IOException;
+	public boolean hasRel(int relId, int conceptId) throws IOException;
+	public boolean hasDescription(int descId, int conceptId) throws IOException;
+	public boolean hasConcept(int conceptId) throws IOException;
+	public boolean hasExtension(int memberId) throws IOException;
+	
 }
