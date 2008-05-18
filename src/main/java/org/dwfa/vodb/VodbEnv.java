@@ -291,12 +291,20 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		bdbEnv.setProperty(key, value);
 	}
 
-	public boolean hasDescription(int descId, int conId) throws DatabaseException, IOException {
-		return bdbEnv.hasDescription(descId, conId);
+	public boolean hasDescription(int descId, int conId) throws IOException {
+		try {
+			return bdbEnv.hasDescription(descId, conId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
-	public boolean hasRel(int relId, int conceptId) throws DatabaseException, IOException {
-		return bdbEnv.hasRel(relId, conceptId);
+	public boolean hasRel(int relId, int conceptId) throws IOException {
+		try {
+			return bdbEnv.hasRel(relId, conceptId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public I_RelVersioned getRel(int relId, int conceptId) throws DatabaseException, IOException {
@@ -308,12 +316,20 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return bdbEnv.getExtension(memberId);
 	}
 
-	public boolean hasExtension(int memberId) throws DatabaseException {
-		return bdbEnv.hasExtension(memberId);
+	public boolean hasExtension(int memberId) throws IOException {
+		try {
+			return bdbEnv.hasExtension(memberId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
-	public boolean hasConcept(int conceptId) throws DatabaseException {
-		return bdbEnv.hasConcept(conceptId);
+	public boolean hasConcept(int conceptId) throws IOException {
+		try {
+			return bdbEnv.hasConcept(conceptId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public List<I_DescriptionVersioned> getDescriptions(int conceptId)
@@ -608,8 +624,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return bdbEnv.getPath(nativeId);
 	}
 
-	public boolean hasPath(int nativeId) throws DatabaseException {
-		return bdbEnv.hasPath(nativeId);
+	public boolean hasPath(int nativeId) throws IOException {
+		try {
+			return bdbEnv.hasPath(nativeId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public I_ImageVersioned getImage(UUID uid) throws TerminologyException,
@@ -617,8 +637,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return getImage(uuidToNative(uid));
 	}
 
-	public boolean hasImage(int imageId) throws DatabaseException {
-		return bdbEnv.hasImage(imageId);
+	public boolean hasImage(int imageId) throws IOException {
+		try {
+			return bdbEnv.hasImage(imageId);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public I_ImageVersioned getImage(int nativeId) throws DatabaseException {
@@ -644,8 +668,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	}
 
 
-	public void writeTimePath(TimePathId jarTimePath) throws DatabaseException {
-		bdbEnv.writeTimePath(jarTimePath);
+	public void writeTimePath(TimePathId jarTimePath) throws IOException {
+		try {
+			bdbEnv.writeTimePath(jarTimePath);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public void forget(I_GetConceptData concept) {
@@ -1373,12 +1401,20 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return bdbEnv.getUids(nativeId);
 	}
 
-	public boolean hasId(Collection<UUID> uids) throws DatabaseException {
-		return bdbEnv.hasId(uids);
+	public boolean hasId(Collection<UUID> uids) throws IOException {
+		try {
+			return bdbEnv.hasId(uids);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
-	public boolean hasId(UUID uid) throws DatabaseException {
-		return bdbEnv.hasId(uid);
+	public boolean hasId(UUID uid) throws IOException {
+		try {
+			return bdbEnv.hasId(uid);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public void iterateIdEntries(I_ProcessIdEntries processor) throws Exception {
