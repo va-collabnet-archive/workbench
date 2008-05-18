@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -124,7 +125,7 @@ import com.sleepycat.je.Transaction;
  * @author kec
  * 
  */
-public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
+public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_WriteDirectToDb {
 	private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
 
 	private static boolean readOnly;
@@ -553,13 +554,21 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 	}
 
 
-	public void writeImage(I_ImageVersioned image) throws DatabaseException {
-		bdbEnv.writeImage(image);
+	public void writeImage(I_ImageVersioned image) throws IOException {
+		try {
+			bdbEnv.writeImage(image);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public void writeConceptAttributes(I_ConceptAttributeVersioned concept)
-			throws DatabaseException, IOException {
-		bdbEnv.writeConceptAttributes(concept);
+			throws IOException {
+		try {
+			bdbEnv.writeConceptAttributes(concept);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public void writeRel(I_RelVersioned rel) throws IOException {
@@ -570,18 +579,29 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 		}
 	}
 
-	public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException,
-			IOException {
-		bdbEnv.writeExt(ext);
+	public void writeExt(I_ThinExtByRefVersioned ext) throws IOException {
+		try {
+			bdbEnv.writeExt(ext);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public void writeDescription(I_DescriptionVersioned desc)
-			throws DatabaseException, IOException {
-		bdbEnv.writeDescription(desc);
+			throws IOException {
+		try {
+			bdbEnv.writeDescription(desc);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
-	public void writePath(I_Path p) throws DatabaseException {
-		bdbEnv.writePath(p);
+	public void writePath(I_Path p) throws IOException {
+		try {
+			bdbEnv.writePath(p);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public I_Path getPath(int nativeId) throws DatabaseException {
@@ -1124,11 +1144,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 		Path newPath = new Path(pathConcept.getConceptId(),
 				new ArrayList<I_Position>(origins));
 		AceLog.getEditLog().fine("writing new path: \n" + newPath);
-		try {
-			AceConfig.getVodb().writePath(newPath);
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
+		AceConfig.getVodb().writePath(newPath);
 		return newPath;
 	}
 
@@ -1475,6 +1491,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier {
 	public void setupBean(ConceptBean cb) throws IOException {
 		bdbEnv.setupBean(cb);
 		
+	}
+
+	public I_WriteDirectToDb getDirectInterface() {
+		return this;
 	}
 
 }

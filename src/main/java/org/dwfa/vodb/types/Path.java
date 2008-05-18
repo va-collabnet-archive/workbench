@@ -200,11 +200,7 @@ public class Path implements I_Transact, I_Path {
 	 * @see org.dwfa.vodb.types.I_Path#commit(int, java.util.Set)
 	 */
 	public void commit(int version, Set<TimePathId> values) throws IOException {
-		try {
-			AceConfig.getVodb().writePath(this);
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
+		AceConfig.getVodb().writePath(this);
 
 	}
 

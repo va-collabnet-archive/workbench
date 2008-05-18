@@ -171,27 +171,23 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             buff = new StringBuffer();
         }
-        try {
-            if (extension != null) {
-                for (I_ThinExtByRefPart p : extension.getVersions()) {
-                    boolean changed = false;
-                    if (p.getVersion() == Integer.MAX_VALUE) {
-                        p.setVersion(version);
-                        values.add(new TimePathId(version, p.getPathId()));
-                        changed = true;
-                        if (buff != null) {
-                            buff.append("\n  Committing member: " + extension.getMemberId() + " for component: "
-                                    + extension.getComponentId() + " part:" + p);
-                        }
-                    }
-                    if (changed) {
-                        AceConfig.getVodb().writeExt(extension);
-                    }
-                }
-            }
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+        if (extension != null) {
+		    for (I_ThinExtByRefPart p : extension.getVersions()) {
+		        boolean changed = false;
+		        if (p.getVersion() == Integer.MAX_VALUE) {
+		            p.setVersion(version);
+		            values.add(new TimePathId(version, p.getPathId()));
+		            changed = true;
+		            if (buff != null) {
+		                buff.append("\n  Committing member: " + extension.getMemberId() + " for component: "
+		                        + extension.getComponentId() + " part:" + p);
+		            }
+		        }
+		        if (changed) {
+		            AceConfig.getVodb().writeExt(extension);
+		        }
+		    }
+		}
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Finished commit for ExtensionByReferenceBean: " + this);
         }

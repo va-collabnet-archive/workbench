@@ -205,7 +205,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
 	}
 
 	public void commit(ConceptBean bean, int version, Set<TimePathId> values)
-			throws DatabaseException {
+			throws IOException, DatabaseException {
 		if (bean.images != null) {
 			for (I_ImageVersioned image : bean.images) {
 				boolean changed = false;

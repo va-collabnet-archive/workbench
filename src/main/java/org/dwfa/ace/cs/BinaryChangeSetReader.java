@@ -511,9 +511,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				AceLog.getEditLog().fine(
 						"Importing changed attributes: \n" + thinAttributes);
 			}
-			} catch (DatabaseException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"Database exception. Ignoring component, and continuing import." + bean.getConceptAttributes(), e);
 			} catch (TerminologyException e) {
 				AceLog.getEditLog().alertAndLog(Level.SEVERE,
 						"TerminologyException. Ignoring component, and continuing import." + bean.getConceptAttributes(), e);
@@ -799,9 +796,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				AceLog.getEditLog().fine(
 						"Importing desc changes: \n" + thinDesc);
 			}
-			} catch (DatabaseException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"Database exception. Ignoring component, and continuing import." + desc, e);
 			} catch (TerminologyException e) {
 				AceLog.getEditLog().alertAndLog(Level.SEVERE,
 						"TerminologyException. Ignoring component, and continuing import." + desc, e);
