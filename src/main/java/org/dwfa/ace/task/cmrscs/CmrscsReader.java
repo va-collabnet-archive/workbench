@@ -1,34 +1,43 @@
 package org.dwfa.ace.task.cmrscs;
 
 import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class CmrscsReader implements I_ReadChangeSet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private File changeSetFile;
 	private I_Count counter;
 	private boolean initialized = false;
-	private ObjectInputStream ois;
+	private DataInputStream dis;
 	private Long nextCommit;
 
 	public List<I_ValidateChangeSetChanges> getValidators() {
@@ -38,7 +47,7 @@ public class CmrscsReader implements I_ReadChangeSet {
 	public long nextCommitTime() throws IOException, ClassNotFoundException {
 		lazyInit();
 		if (nextCommit == null) {
-			nextCommit = ois.readLong();
+			nextCommit = dis.readLong();
 		}
 		return nextCommit;
 	}
@@ -47,45 +56,75 @@ public class CmrscsReader implements I_ReadChangeSet {
 		readUntil(Long.MAX_VALUE);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void readUntil(long endTime) throws IOException,
 			ClassNotFoundException {
 		HashSet<TimePathId> timePathValues = new HashSet<TimePathId>();
-		UUID endUid = new UUID(0,0);
-		while (nextCommitTime() < endTime) {
-			int count = 0;
-			try {
+		UUID endUid = new UUID(0, 0);
+		try {
+			int unspecifiedUuidNid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+					.localize().getNid();
+			int booleanExt = RefsetAuxiliary.Concept.BOOLEAN_EXTENSION
+					.localize().getNid();
+			while (nextCommitTime() < endTime) {
+				int count = 0;
 				count++;
 				if (counter != null) {
 					counter.increment();
 				}
-				UUID pathUid = readUuid(ois);
-				UUID refsetUid = readUuid(ois);
-				long time = ois.readLong();
-				UUID conceptUid = readUuid(ois);
+				UUID pathUid = readUuid(dis);
+				I_Path path = getVodb().getPath(new UUID[] { pathUid });
+				UUID refsetUid = readUuid(dis);
+				long time = dis.readLong();
+				UUID conceptUid = readUuid(dis);
 				while (conceptUid.equals(endUid) == false) {
-					UUID componentUid = readUuid(ois);
-					UUID memberUid = readUuid(ois);
-					UUID status = readUuid(ois);
+					UUID memberUid = readUuid(dis);
+					UUID componentUid = readUuid(dis);
+					UUID statusUid = readUuid(dis);
 					
-					if (getVodb().hasExtension(getVodb().uuidToNative(componentUid))) {
-						I_ThinExtByRefVersioned ebr = getVodb().getExtension(getVodb().uuidToNative(componentUid));
+					
+					I_ThinExtByRefVersioned ebr;
+					I_ThinExtByRefPartBoolean newPart = getVodb()
+							.newBooleanExtensionPart();
+					newPart.setPathId(getVodb().uuidToNative(pathUid));
+					newPart.setStatus(getVodb().uuidToNative(statusUid));
+					newPart.setValue(true);
+					newPart.setVersion(getVodb().convertToThinVersion(time));
+					if (getVodb().hasExtension(
+							getVodb().uuidToNative(memberUid))) {
+						ebr = getVodb().getExtension(
+								getVodb().uuidToNative(memberUid));
+						I_ThinExtByRefPartBoolean lastPart = (I_ThinExtByRefPartBoolean) ebr.getVersions().get(ebr.getVersions().size() -1);
+						ebr.getVersions().clear();
+						ebr.addVersion(lastPart);
+						ebr.addVersion(newPart);
 					} else {
-						
+						ebr = getVodb().newExtension(
+								getVodb().uuidToNative(refsetUid),
+								getVodb().uuidToNativeWithGeneration(memberUid,
+										unspecifiedUuidNid, path,
+										getVodb().convertToThinVersion(time)),
+								getVodb().uuidToNative(componentUid),
+								booleanExt);
+						((List<I_ThinExtByRefPartBoolean>) ebr.getVersions()).add(newPart);
+
 					}
+					getVodb().getDirectInterface().writeExt(ebr);
 				}
-				nextCommit = ois.readLong();
-			} catch (EOFException ex) {
-				ois.close();
-				AceLog.getEditLog().info("End of change set. ");
-				nextCommit = Long.MAX_VALUE;
-				getVodb().setProperty(
-						changeSetFile.toURI().toURL().toExternalForm(),
-						Long.toString(changeSetFile.length()));
-			} catch (TerminologyException e) {
-				IOException ioe = new IOException();
-				ioe.initCause(e);
-				throw ioe;
-			} 
+				nextCommit = dis.readLong();
+
+			}
+		} catch (EOFException ex) {
+			dis.close();
+			AceLog.getEditLog().info("End of change set. ");
+			nextCommit = Long.MAX_VALUE;
+			getVodb().setProperty(
+					changeSetFile.toURI().toURL().toExternalForm(),
+					Long.toString(changeSetFile.length()));
+		} catch (TerminologyException e) {
+			IOException ioe = new IOException();
+			ioe.initCause(e);
+			throw ioe;
 		}
 		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
 			AceLog.getEditLog().fine(
@@ -103,10 +142,10 @@ public class CmrscsReader implements I_ReadChangeSet {
 	public void setCounter(I_Count counter) {
 		this.counter = counter;
 	}
-	
-	private UUID readUuid(ObjectInputStream ois) throws IOException {
-		return new UUID(ois.readLong(), ois.readLong());
-		
+
+	private UUID readUuid(DataInputStream dis) throws IOException {
+		return new UUID(dis.readLong(), dis.readLong());
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -130,14 +169,15 @@ public class CmrscsReader implements I_ReadChangeSet {
 			if (initialized == false) {
 				FileInputStream fis = new FileInputStream(changeSetFile);
 				BufferedInputStream bis = new BufferedInputStream(fis);
-				ois = new ObjectInputStream(bis);
+				dis = new DataInputStream(bis);
 				initialized = true;
-				nextCommit = ois.readLong();
+				nextCommit = dis.readLong();
 			}
 		}
 	}
 
 	private I_TermFactory tf = null;
+
 	private I_TermFactory getVodb() {
 		if (tf == null) {
 			tf = LocalVersionedTerminology.get();

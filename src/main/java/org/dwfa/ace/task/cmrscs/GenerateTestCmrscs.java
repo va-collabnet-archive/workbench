@@ -1,26 +1,25 @@
 package org.dwfa.ace.task.cmrscs;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.logging.Logger;
+import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.ComponentValidator;
-import org.dwfa.ace.api.cs.I_ReadChangeSet;
-import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -66,6 +65,26 @@ public class GenerateTestCmrscs extends AbstractTask {
         }
 
     }
+    
+    private static class ConceptIterator implements I_ProcessConcepts {
+    	int count = 0;
+    	DataOutputStream dos;
+    	UUID currentStatus = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
+
+		public ConceptIterator(DataOutputStream dos) {
+			super();
+			this.dos = dos;
+		}
+
+		public void processConcept(I_GetConceptData concept) throws Exception {
+			if (count < 70000) {
+				writeUuid(UUID.randomUUID() , dos);
+				writeUuid(concept.getUids() , dos);
+				writeUuid(currentStatus , dos);
+			}
+		}
+    	
+    }
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
@@ -73,132 +92,44 @@ public class GenerateTestCmrscs extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
     throws TaskFailedException {
+    	File testCsFile = new File(rootDirStr, "test." + UUID.randomUUID().toString() + ".cmrscs");
+		try {
+			DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(testCsFile)));
+			
+			// commit time
+			dos.writeLong(System.currentTimeMillis());
+			// path 
+			writeUuid(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids(), dos);
+			// refset 
+			writeUuid(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids(), dos);
+			
+			LocalVersionedTerminology.get().iterateConcepts(new ConceptIterator(dos));
+			
+			UUID endUid = new UUID(0, 0);
 
-        LocalVersionedTerminology.get().suspendChangeSetWriters();
+			writeUuid(endUid, dos);
+			
+	    	dos.close();
+	    	
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		}
 
-        importAllChangeSets(worker.getLogger());
-
-        LocalVersionedTerminology.get().resumeChangeSetWriters();
+    	
 
         return Condition.CONTINUE;
     }
 
-    @SuppressWarnings("unchecked")
-	public void importAllChangeSets(Logger logger) throws TaskFailedException {
-        try {
-        	String[] validatorArray = new String[]{};
-        	
-        	if (validators != null && validators != "") {
-        		validatorArray = validators.split("'");
-        	}
-        	
-            File rootFile = new File(rootDirStr);
-            List<File> changeSetFiles = new ArrayList<File>();
-            addAllChangeSetFiles(rootFile, changeSetFiles);
-            TreeSet<I_ReadChangeSet> readerSet = getSortedReaderSet();
-            for (File csf : changeSetFiles) {
-                I_ReadChangeSet csr = LocalVersionedTerminology.get()
-                .newBinaryChangeSetReader(csf);
-                
-                if (validateChangeSets == true && validatorArray.length > 0) {
-                	for (String validator : validatorArray) {
-                		Class<I_ValidateChangeSetChanges> validatorClass = (Class<I_ValidateChangeSetChanges>) Class.forName(validator);
-                		csr.getValidators().add(validatorClass.newInstance());
-					}
-                }
-                readerSet.add(csr);
 
-                logger.info("Adding reader: " + csf.getAbsolutePath());
-            }
-            while (readerSet.size() > 0) {
-                readNext(readerSet);
-            }
-
-            LocalVersionedTerminology.get().commit();
-
-        } catch (IOException e) {
-            throw new TaskFailedException(e);
-        } catch (ClassNotFoundException e) {
-            throw new TaskFailedException(e);
-        } catch (Exception e) {
-            throw new TaskFailedException(e);
-        }
+    public static void writeUuid(Collection<UUID> uuidList, DataOutputStream dos) throws IOException {
+    	UUID uuid = uuidList.iterator().next();
+    	dos.writeLong(uuid.getMostSignificantBits());
+    	dos.writeLong(uuid.getLeastSignificantBits());
     }
-
-    public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
-        TreeSet<I_ReadChangeSet> readerSet = new TreeSet<I_ReadChangeSet>(new Comparator<I_ReadChangeSet>() {
-
-            public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
-                try {
-                    if (r1.nextCommitTime() == r2.nextCommitTime()) {
-                        return 0;
-                    }
-                    if (r1.nextCommitTime() > r2.nextCommitTime()) {
-                        return 1;
-                    }
-                    return -1;
-                } catch (IOException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (ClassNotFoundException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                }
-                return -1;
-            }
-
-        });
-        return readerSet;
+    public static void writeUuid(UUID uuid, DataOutputStream dos) throws IOException {
+    	dos.writeLong(uuid.getMostSignificantBits());
+    	dos.writeLong(uuid.getLeastSignificantBits());
     }
-
-    public static void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
-        if (readerSet.size() == 0) {
-            return;
-        }
-        I_ReadChangeSet first = readerSet.first();
-        readerSet.remove(first);
-        I_ReadChangeSet next = null;
-        if (readerSet.size() > 0) {
-            next = readerSet.first();
-        }
-
-        if (next == null) {
-            first.readUntil(Long.MAX_VALUE);
-        } else {
-            first.readUntil(next.nextCommitTime());
-        }
-        if (first.nextCommitTime() == Long.MAX_VALUE) {
-            //don't add back since it is complete.
-        } else {
-            readerSet.add(first);
-        }
-
-
-    }
-
-    public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles) {
-        File[] children = rootFile.listFiles(new FileFilter() {
-
-            public boolean accept(File child) {
-                if (child.isHidden() || child.getName().startsWith(".")) {
-                    return false;
-                }
-                if (child.isDirectory()) {
-                    return true;
-                }
-                return child.getName().endsWith(".jcs");
-            }
-        });
-        if (children != null) {
-            for (File child : children) {
-                if (child.isDirectory()) {
-                    addAllChangeSetFiles(child, changeSetFiles);
-                } else {
-                    changeSetFiles.add(child);
-                }
-            }
-        }
-
-    }
-
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
