@@ -195,12 +195,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				for (I_ThinExtByRefVersioned member : conceptsInMemberRefset) {
 					counter++;
 					if (counter % 1000 == 0) {
-						ClosestDistanceHashSet existingMembers = existingRefsetMembers.get(member.getComponentId());
+						ClosestDistanceHashSet existingMembers = existingRefsetMembers.get(memberSetId);
 						int existingMemberSize = 0;
 						if (existingMembers != null) {
 							existingMemberSize = existingMembers.size();
 						}
-						ClosestDistanceHashSet existingParents = existingParentMembers.get(member.getComponentId());
+						ClosestDistanceHashSet existingParents = existingParentMembers.get(memberSetId);
 						int existingParentsSize = 0;
 						if (existingParents != null) {
 							existingParentsSize = existingParents.size();
@@ -439,7 +439,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						System.out.println("adding member " + count + " of " + keySet.size() + " (" + (System.currentTimeMillis() - sysTime) + ")");
 						sysTime = System.currentTimeMillis();
 					}
-					if (termFactory.getUncommitted().size() > commitSize) {
+					if (!useNonTxInterface && termFactory.getUncommitted().size() > commitSize) {
 						termFactory.commit();
 					}
 					ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
@@ -489,11 +489,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					if (!validateOnly) { 
 						I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(),refset);
 						if (ext!=null) {
-							if (useNonTxInterface) {
-								I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
-								nonTxWriter.addToRefset(i.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
-							} else {
-								retireLatestExtension(ext);
+							if (!newestPartRetired(ext)) {
+								if (useNonTxInterface) {
+									I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
+									nonTxWriter.addToRefset(i.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
+								} else {
+									retireLatestExtension(ext);
+								}
 							}
 						} else {
 							System.out.println("No extension exists with this refset id for this component");
@@ -534,8 +536,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						for (ConceptRefsetInclusionDetails existingParent: oldparents.values()) {
 							I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),refset);
 							if (ext!=null) {
-								if (!validateOnly) {
-									retireLatestExtension(ext);
+								if (!newestPartRetired(ext)) {
+									if (useNonTxInterface) {
+										I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
+										nonTxWriter.addToRefset(existingParent.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
+									} else {
+										retireLatestExtension(ext);
+									}
 								}
 							} else {
 								System.out.println("No extension exists with this refset id for this component : " + getConcept(existingParent.getConceptId()).toString());
@@ -549,6 +556,17 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 			}
 		} 
+	}
+
+
+	private boolean newestPartRetired(I_ThinExtByRefVersioned ext) {
+		I_ThinExtByRefPart newestPart = null;
+		for (I_ThinExtByRefPart part : ext.getVersions()) {
+			if (newestPart == null || part.getVersion() > newestPart.getVersion()) {
+				newestPart = part;
+			}
+		}
+		return newestPart.getStatus() == retiredConceptId;
 	}
 
 	private ClosestDistanceHashSet findParentsToBeMarked(ClosestDistanceHashSet concepts) throws IOException, Exception {
