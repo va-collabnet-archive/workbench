@@ -40,6 +40,13 @@ public class CreateMemberRefset extends AbstractMojo {
 	 */
 	private int commitSize = 1000;
 	
+	/**
+	 * @parameter
+	 * Use the direct non-transaction ACE API (defaults to false)
+	 */
+	private boolean useNonTxInterface = false;
+	
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
@@ -48,6 +55,7 @@ public class CreateMemberRefset extends AbstractMojo {
 			calc.setPathConcept(memberSetPathDescriptor.getVerifiedConcept());
 			calc.setValidateOnly(false);
 			calc.setCommitSize(commitSize);
+			calc.setUseNonTxInterface(useNonTxInterface);
 			calc.run();
 		} catch (Exception e) {
 			throw new MojoExecutionException("member refset calculation failed with exception", e);
