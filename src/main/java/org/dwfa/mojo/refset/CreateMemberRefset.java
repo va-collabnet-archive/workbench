@@ -45,6 +45,14 @@ public class CreateMemberRefset extends AbstractMojo {
 	 * Use the direct non-transaction ACE API (defaults to false)
 	 */
 	private boolean useNonTxInterface = false;
+
+	/**
+	 * Output location for the change sets
+	 *
+	 * @parameter
+	 * @required
+	 */
+	private File changeSetOutputDirectory;
 	
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -52,6 +60,7 @@ public class CreateMemberRefset extends AbstractMojo {
 
 			MemberRefsetCalculator calc = new MemberRefsetCalculator();
 			calc.setOutputDirectory(outputDirectory);
+			calc.setChangeSetOutputDirectory(changeSetOutputDirectory);
 			calc.setPathConcept(memberSetPathDescriptor.getVerifiedConcept());
 			calc.setValidateOnly(false);
 			calc.setCommitSize(commitSize);
