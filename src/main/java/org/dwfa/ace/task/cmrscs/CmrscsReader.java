@@ -118,7 +118,6 @@ public class CmrscsReader implements I_ReadChangeSet {
 					memberUid = readUuid(dis);
 				}
 				nextCommit = dis.readLong();
-
 			}
 		} catch (EOFException ex) {
 			dis.close();
