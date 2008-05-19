@@ -40,6 +40,11 @@ public class CmrscsReader implements I_ReadChangeSet {
 	private DataInputStream dis;
 	private Long nextCommit;
 
+	public CmrscsReader(File changeSetFile) {
+		super();
+		this.changeSetFile = changeSetFile;
+	}
+
 	public List<I_ValidateChangeSetChanges> getValidators() {
 		return new ArrayList<I_ValidateChangeSetChanges>();
 	}
@@ -75,10 +80,8 @@ public class CmrscsReader implements I_ReadChangeSet {
 				UUID pathUid = readUuid(dis);
 				I_Path path = getVodb().getPath(new UUID[] { pathUid });
 				UUID refsetUid = readUuid(dis);
-				long time = dis.readLong();
-				UUID conceptUid = readUuid(dis);
-				while (conceptUid.equals(endUid) == false) {
-					UUID memberUid = readUuid(dis);
+				UUID memberUid = readUuid(dis);
+				while (memberUid.equals(endUid) == false) {
 					UUID componentUid = readUuid(dis);
 					UUID statusUid = readUuid(dis);
 					
@@ -89,27 +92,29 @@ public class CmrscsReader implements I_ReadChangeSet {
 					newPart.setPathId(getVodb().uuidToNative(pathUid));
 					newPart.setStatus(getVodb().uuidToNative(statusUid));
 					newPart.setValue(true);
-					newPart.setVersion(getVodb().convertToThinVersion(time));
+					newPart.setVersion(getVodb().convertToThinVersion(nextCommit));
 					if (getVodb().hasExtension(
-							getVodb().uuidToNative(memberUid))) {
+							getVodb().uuidToNativeWithGeneration(memberUid,
+									unspecifiedUuidNid, path,
+									getVodb().convertToThinVersion(nextCommit)))) {
 						ebr = getVodb().getExtension(
 								getVodb().uuidToNative(memberUid));
-						I_ThinExtByRefPartBoolean lastPart = (I_ThinExtByRefPartBoolean) ebr.getVersions().get(ebr.getVersions().size() -1);
+						I_ThinExtByRefPartBoolean lastPart = (I_ThinExtByRefPartBoolean) 
+							ebr.getVersions().get(ebr.getVersions().size() -1);
 						ebr.getVersions().clear();
 						ebr.addVersion(lastPart);
 						ebr.addVersion(newPart);
 					} else {
 						ebr = getVodb().newExtension(
 								getVodb().uuidToNative(refsetUid),
-								getVodb().uuidToNativeWithGeneration(memberUid,
-										unspecifiedUuidNid, path,
-										getVodb().convertToThinVersion(time)),
+								getVodb().uuidToNative(memberUid),
 								getVodb().uuidToNative(componentUid),
 								booleanExt);
 						((List<I_ThinExtByRefPartBoolean>) ebr.getVersions()).add(newPart);
 
 					}
 					getVodb().getDirectInterface().writeExt(ebr);
+					memberUid = readUuid(dis);
 				}
 				nextCommit = dis.readLong();
 

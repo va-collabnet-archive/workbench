@@ -81,6 +81,7 @@ public class GenerateTestCmrscs extends AbstractTask {
 				writeUuid(UUID.randomUUID() , dos);
 				writeUuid(concept.getUids() , dos);
 				writeUuid(currentStatus , dos);
+				count++;
 			}
 		}
     	

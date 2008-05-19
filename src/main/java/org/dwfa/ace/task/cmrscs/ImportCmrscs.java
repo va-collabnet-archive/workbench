@@ -73,8 +73,7 @@ public class ImportCmrscs extends AbstractTask {
             addAllChangeSetFiles(rootFile, changeSetFiles);
             TreeSet<I_ReadChangeSet> readerSet = getSortedReaderSet();
             for (File csf : changeSetFiles) {
-                I_ReadChangeSet csr = LocalVersionedTerminology.get()
-                .newBinaryChangeSetReader(csf);
+                I_ReadChangeSet csr = new CmrscsReader(csf);
                 
                 readerSet.add(csr);
 
