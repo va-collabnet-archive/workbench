@@ -380,7 +380,7 @@ public abstract class RefsetUtilities {
 		return null;
 	}
 
-	private int getMembershipType(int includeTypeConceptId) throws Exception {
+	public int getMembershipType(int includeTypeConceptId) throws Exception {
 		I_GetConceptData includeConcept = getConcept(includeTypeConceptId);
 
 		Set<I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(
@@ -407,4 +407,5 @@ public abstract class RefsetUtilities {
 		}
 		return concept;
 	}
+	
 }

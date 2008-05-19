@@ -31,6 +31,8 @@ import org.dwfa.tapi.TerminologyException;
 public class MemberRefsetCalculator extends RefsetUtilities {
 
 	private int commitSize = 1000;
+	
+	private boolean useNonTxInterface = false;
 
 	private File outputDirectory;
 
@@ -82,11 +84,19 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private Map<Integer,List<Integer>> conceptsWithDirectInclusion = new HashMap<Integer,List<Integer>>();
 	private Map<Integer,List<Integer>> conceptsWithDirectExclusion = new HashMap<Integer,List<Integer>>();
 
+	private MemberRefsetChangesetWriter nonTxWriter;
+	
 	public void run() {
 		// TODO Auto-generated method stub
 		termFactory = LocalVersionedTerminology.get();
-
+		
 		try {
+			
+			if (useNonTxInterface) {
+				nonTxWriter = new MemberRefsetChangesetWriter(outputDirectory.getAbsolutePath(), termFactory, 
+						ConceptConstants.AU_CT_EDIT_PATH.localize().getUids().iterator().next());
+			}			
+			
 			if (allowedRefsets.size()==0) {
 				allowedRefsets = getSpecificationRefsets();
 			}
@@ -281,9 +291,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 
 
-	private void shutDown() throws IOException {
+	private void shutDown() throws Exception {
 		conflictWriter.close();
 		reportWriter.close();
+		if (useNonTxInterface) {
+			nonTxWriter.close();
+		}
 	}
 
 
@@ -417,8 +430,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
 					reportWriter.write(getConcept(member.getConceptId()).toString());
 					reportWriter.newLine();
-					if (!validateOnly) { 
-						addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
+					if (!validateOnly) {
+						if (useNonTxInterface) {
+							nonTxWriter.addToRefset(member.getConceptId(), getMembershipType(member.getInclusionTypeId()), 
+									refset, currentStatusId);
+						} else {
+							addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
+						}
 					}
 				}
 
@@ -456,7 +474,11 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					if (!validateOnly) { 
 						I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(),refset);
 						if (ext!=null) {
-							retireLatestExtension(ext);
+							if (useNonTxInterface) {
+								nonTxWriter.addToRefset(i.getConceptId(), ((I_ThinExtByRefPartConcept) ext).getConceptId(), refset, retiredConceptId);
+							} else {
+								retireLatestExtension(ext);
+							}
 						} else {
 							System.out.println("No extension exists with this refset id for this component");
 						}
@@ -477,7 +499,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					for (ConceptRefsetInclusionDetails parent: parents.values()) {
 						if (oldparents==null || (oldparents!=null && !oldparents.containsKey(parent.getConceptId()))) {
 							if (!validateOnly) {
-								addToMemberSetAsParent(parent.getConceptId(), refset);
+								if (useNonTxInterface) {
+									nonTxWriter.addToRefset(parent.getConceptId(), 
+											ConceptConstants.PARENT_MARKER.localize().getNid(), refset, currentStatusId);
+								} else {
+									addToMemberSetAsParent(parent.getConceptId(), refset);
+								}
 								reportWriter.write(getConcept(parent.getConceptId()).toString());
 								reportWriter.newLine();						
 							}
@@ -602,6 +629,16 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 	public void setCommitSize(int commitSize) {
 		this.commitSize = commitSize;
+	}
+
+
+	public boolean getUseNonTxInterface() {
+		return useNonTxInterface;
+	}
+
+
+	public void setUseNonTxInterface(boolean useNonTxInterface) {
+		this.useNonTxInterface = useNonTxInterface;
 	}
 
 
