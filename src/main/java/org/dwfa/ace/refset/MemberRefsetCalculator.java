@@ -410,6 +410,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					if (count % commitSize == 0) {
 						System.out.println("adding member " + count + " of " + keySet.size() + " (" + (System.currentTimeMillis() - sysTime) + ")");
 						sysTime = System.currentTimeMillis();
+					}
+					if (termFactory.getUncommitted().size() > commitSize) {
 						termFactory.commit();
 					}
 					ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
