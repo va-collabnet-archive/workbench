@@ -110,5 +110,44 @@ public interface I_WriteDirectToDb {
 	 */
 	public I_ThinExtByRefVersioned newExtensionBypassCommit(int refsetId,
 			int memberId, int componentId, int typeId);
+	
+	/**
+	 * The new routines in the I_TermFactory automatically put the new components
+	 * on the commit list, and creates new threads to update the interface. This method
+	 * bypasses the commit list. 
+	 * 
+	 * @param conceptNid
+	 * @return
+	 * @throws IOException
+	 */
+	public I_GetConceptData newConceptBypassCommit(int conceptNid) throws IOException;
+	
+	/**
+	 * The new routines in the I_TermFactory automatically put the new components
+	 * on the commit list, and creates new threads to update the interface. This method
+	 * bypasses the commit list. 
+	 * 
+	 * @param descriptionNid
+	 * @param conceptNid
+	 * @return
+	 * @throws IOException
+	 */
+	public I_DescriptionVersioned newDescriptionBypassCommit(int descriptionNid,
+															 int conceptNid) throws IOException;
+	
+	/**
+	 * The new routines in the I_TermFactory automatically put the new components
+	 * on the commit list, and creates new threads to update the interface. This method
+	 * bypasses the commit list. 
+	 * 
+	 * @param relNid
+	 * @param conceptNid
+	 * @param relDestinationNid
+	 * @return
+	 * @throws IOException
+	 */
+
+	public I_RelVersioned newRelationshipBypassCommit(int relNid,
+													  int conceptNid, int relDestinationNid) throws IOException;
 
 }
