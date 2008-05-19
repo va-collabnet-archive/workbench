@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -49,19 +50,23 @@ public class ImportCmrscs extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
     throws TaskFailedException {
 
-        LocalVersionedTerminology.get().suspendChangeSetWriters();
+        importAllChangeSets(worker.getLogger());
+
+        return Condition.CONTINUE;
+    }
+
+	public void importAllChangeSets(Logger logger) throws TaskFailedException {
+		LocalVersionedTerminology.get().suspendChangeSetWriters();
         ChangeSetImporter csi = new ChangeSetImporter() {
 			@Override
 			public I_ReadChangeSet getChangeSetReader(File csf) {
 				return new CmrscsReader(csf);
 			}
         };
-        csi.importAllChangeSets(worker.getLogger(), null, rootDirStr, false, ".cmrscs");
+        csi.importAllChangeSets(logger, null, rootDirStr, false, ".cmrscs");
 
         LocalVersionedTerminology.get().resumeChangeSetWriters();
-
-        return Condition.CONTINUE;
-    }
+	}
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,

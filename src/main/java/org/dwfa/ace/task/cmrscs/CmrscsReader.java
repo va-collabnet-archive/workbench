@@ -20,7 +20,7 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -69,7 +69,7 @@ public class CmrscsReader implements I_ReadChangeSet {
 		try {
 			int unspecifiedUuidNid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
 					.localize().getNid();
-			int booleanExt = RefsetAuxiliary.Concept.BOOLEAN_EXTENSION
+			int conceptExt = RefsetAuxiliary.Concept.CONCEPT_EXTENSION
 					.localize().getNid();
 			while (nextCommitTime() < endTime) {
 				int count = 0;
@@ -85,14 +85,14 @@ public class CmrscsReader implements I_ReadChangeSet {
 				while (memberUid.equals(endUid) == false) {
 					UUID componentUid = readUuid(dis);
 					UUID statusUid = readUuid(dis);
-					
+					UUID conceptValueUid = readUuid(dis);
 					
 					I_ThinExtByRefVersioned ebr;
-					I_ThinExtByRefPartBoolean newPart = getVodb()
-							.newBooleanExtensionPart();
+					I_ThinExtByRefPartConcept newPart = getVodb()
+							.newConceptExtensionPart();
 					newPart.setPathId(getVodb().uuidToNative(pathUid));
 					newPart.setStatus(getVodb().uuidToNative(statusUid));
-					newPart.setValue(true);
+					newPart.setConceptId(getVodb().uuidToNative(conceptValueUid));
 					newPart.setVersion(getVodb().convertToThinVersion(nextCommit));
 					if (getVodb().hasExtension(
 							getVodb().uuidToNativeWithGeneration(memberUid,
@@ -100,7 +100,7 @@ public class CmrscsReader implements I_ReadChangeSet {
 									getVodb().convertToThinVersion(nextCommit)))) {
 						ebr = getVodb().getExtension(
 								getVodb().uuidToNative(memberUid));
-						I_ThinExtByRefPartBoolean lastPart = (I_ThinExtByRefPartBoolean) 
+						I_ThinExtByRefPartConcept lastPart = (I_ThinExtByRefPartConcept) 
 							ebr.getVersions().get(ebr.getVersions().size() -1);
 						ebr.getVersions().clear();
 						ebr.addVersion(lastPart);
@@ -110,8 +110,8 @@ public class CmrscsReader implements I_ReadChangeSet {
 								getVodb().uuidToNative(refsetUid),
 								getVodb().uuidToNative(memberUid),
 								getVodb().uuidToNative(componentUid),
-								booleanExt);
-						((List<I_ThinExtByRefPartBoolean>) ebr.getVersions()).add(newPart);
+								conceptExt);
+						((List<I_ThinExtByRefPartConcept>) ebr.getVersions()).add(newPart);
 
 					}
 					getVodb().getDirectInterface().writeExt(ebr);

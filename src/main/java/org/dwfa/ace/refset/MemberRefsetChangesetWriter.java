@@ -17,12 +17,15 @@ public class MemberRefsetChangesetWriter {
 
 	private HashMap<Integer, DataOutputStream> refsetStreams = new HashMap<Integer, DataOutputStream>();    
 	
-	private String baseDir;
+	private File baseDir;
 	
 	private I_TermFactory termFactory;
 	
-	public MemberRefsetChangesetWriter(String baseDir, I_TermFactory termFactory, UUID editPathUUID) {
-		this.baseDir = baseDir;
+	public MemberRefsetChangesetWriter(File changeSetOutputDirectory, I_TermFactory termFactory, UUID editPathUUID) {
+		if (!changeSetOutputDirectory.exists()) {
+			changeSetOutputDirectory.mkdirs();
+		}
+		this.baseDir = changeSetOutputDirectory;
 		this.termFactory = termFactory;
 		this.editPathUUID = editPathUUID;
 	}
@@ -32,10 +35,11 @@ public class MemberRefsetChangesetWriter {
 		if (!refsetStreams.containsKey(refsetId)) {
 			String postfix = "";
 			int count = 1;
-			File newRefsetFile = new File(baseDir, refsetId + postfix + ".cmrscs");
+			UUID refsetUuid = termFactory.getUids(refsetId).iterator().next();
+			File newRefsetFile = new File(baseDir, refsetUuid + postfix + ".cmrscs");
 			while (newRefsetFile.exists()) {
 				postfix = "." + count;
-				newRefsetFile = new File(baseDir, refsetId + postfix + ".cmrscs");
+				newRefsetFile = new File(baseDir, refsetUuid + postfix + ".cmrscs");
 			}
 			outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(newRefsetFile)));
 			
@@ -44,7 +48,7 @@ public class MemberRefsetChangesetWriter {
 			// path 
 			writeUuid(outputStream, editPathUUID);
 			// refset 
-			writeUuid(outputStream, termFactory.getUids(refsetId));
+			writeUuid(outputStream, refsetUuid);
 			
 			refsetStreams.put(refsetId, outputStream);
 		} else {

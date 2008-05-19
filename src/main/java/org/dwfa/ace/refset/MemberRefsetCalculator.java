@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -35,6 +36,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private boolean useNonTxInterface = false;
 
 	private File outputDirectory;
+
+	private File changeSetOutputDirectory;
 
 	private boolean validateOnly = true;
 	private boolean markParents = true;
@@ -87,14 +90,14 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private MemberRefsetChangesetWriter nonTxWriter;
 	
 	public void run() {
-		// TODO Auto-generated method stub
 		termFactory = LocalVersionedTerminology.get();
 		
 		try {
 			
 			if (useNonTxInterface) {
-				nonTxWriter = new MemberRefsetChangesetWriter(outputDirectory.getAbsolutePath(), termFactory, 
-						ConceptConstants.AU_CT_EDIT_PATH.localize().getUids().iterator().next());
+				assert changeSetOutputDirectory != null;
+				UUID path = pathConcept.getUids().iterator().next();
+				nonTxWriter = new MemberRefsetChangesetWriter(changeSetOutputDirectory, termFactory, path);
 			}			
 			
 			if (allowedRefsets.size()==0) {
@@ -192,7 +195,19 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				for (I_ThinExtByRefVersioned member : conceptsInMemberRefset) {
 					counter++;
 					if (counter % 1000 == 0) {
-						System.out.println("processed " + counter + " of " + conceptsInMemberRefset.size() + " for refset " + memberSet);
+						ClosestDistanceHashSet existingMembers = existingRefsetMembers.get(member.getComponentId());
+						int existingMemberSize = 0;
+						if (existingMembers != null) {
+							existingMemberSize = existingMembers.size();
+						}
+						ClosestDistanceHashSet existingParents = existingParentMembers.get(member.getComponentId());
+						int existingParentsSize = 0;
+						if (existingParents != null) {
+							existingParentsSize = existingParents.size();
+						}
+						System.out.println("processed " + counter + " of " + conceptsInMemberRefset.size() + " for refset " + memberSet + 
+								" existing member set is " + existingMemberSize + 
+								" existing parents size " + existingParentsSize);
 					}
 					
 					I_ThinExtByRefPart latest = getLatestVersion(member);
@@ -475,7 +490,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(),refset);
 						if (ext!=null) {
 							if (useNonTxInterface) {
-								nonTxWriter.addToRefset(i.getConceptId(), ((I_ThinExtByRefPartConcept) ext).getConceptId(), refset, retiredConceptId);
+								I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
+								nonTxWriter.addToRefset(i.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
 							} else {
 								retireLatestExtension(ext);
 							}
@@ -641,5 +657,14 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		this.useNonTxInterface = useNonTxInterface;
 	}
 
+
+	public File getChangeSetOutputDirectory() {
+		return changeSetOutputDirectory;
+	}
+
+
+	public void setChangeSetOutputDirectory(File changeSetOutputDirectory) {
+		this.changeSetOutputDirectory = changeSetOutputDirectory;
+	}
 
 }
