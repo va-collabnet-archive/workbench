@@ -694,15 +694,16 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				}
 			}
 			if (writeChangeSets) {
-				for (I_WriteChangeSet writer : csWriters) {
-					writer.writeChanges(uncommittedIds, ThinVersionHelper
-							.convert(version));
-				}
-
-				for (I_Transact cb : uncommitted) {
+				if (uncommitted.size() > 0) {
 					for (I_WriteChangeSet writer : csWriters) {
-						writer.writeChanges(cb, ThinVersionHelper
+						writer.writeChanges(uncommittedIds, ThinVersionHelper
 								.convert(version));
+					}
+					for (I_Transact cb : uncommitted) {
+						for (I_WriteChangeSet writer : csWriters) {
+							writer.writeChanges(cb, ThinVersionHelper
+									.convert(version));
+						}
 					}
 				}
 			}
