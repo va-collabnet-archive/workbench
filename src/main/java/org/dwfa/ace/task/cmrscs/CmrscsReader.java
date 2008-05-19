@@ -81,6 +81,7 @@ public class CmrscsReader implements I_ReadChangeSet {
 				I_Path path = getVodb().getPath(new UUID[] { pathUid });
 				UUID refsetUid = readUuid(dis);
 				UUID memberUid = readUuid(dis);
+				timePathValues.add(new TimePathId(getVodb().convertToThinVersion(nextCommit), path.getConceptId()));
 				while (memberUid.equals(endUid) == false) {
 					UUID componentUid = readUuid(dis);
 					UUID statusUid = readUuid(dis);
