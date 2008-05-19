@@ -32,7 +32,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.cs.ImportAllChangeSets;
+import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.fd.FileDialogUtil;
@@ -160,9 +160,9 @@ public class AceRunner {
                         stealthVodb.setup(dbFolder, false, cacheSize);
                         
                         List<File> changeSetFiles = new ArrayList<File>();
-                        ImportAllChangeSets.addAllChangeSetFiles(checkoutLocation, changeSetFiles);
+                        ChangeSetImporter.addAllChangeSetFiles(checkoutLocation, changeSetFiles, ".jcs");
                         
-                        TreeSet<I_ReadChangeSet> readerSet = ImportAllChangeSets.getSortedReaderSet();
+                        TreeSet<I_ReadChangeSet> readerSet = ChangeSetImporter.getSortedReaderSet();
                         
                         for (File csf : changeSetFiles) {
                             BinaryChangeSetReader csr = new BinaryChangeSetReader();
@@ -173,7 +173,7 @@ public class AceRunner {
                         }
 
                         while (readerSet.size() > 0) {
-                            ImportAllChangeSets.readNext(readerSet);
+                        	ChangeSetImporter.readNext(readerSet);
                         }
                         stealthVodb.close();
                         AceConfig.stealthVodb = null;
