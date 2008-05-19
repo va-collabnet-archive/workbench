@@ -106,7 +106,7 @@ public class CmrscsReader implements I_ReadChangeSet {
 						ebr.addVersion(lastPart);
 						ebr.addVersion(newPart);
 					} else {
-						ebr = getVodb().newExtension(
+						ebr = getVodb().getDirectInterface().newExtensionBypassCommit(
 								getVodb().uuidToNative(refsetUid),
 								getVodb().uuidToNative(memberUid),
 								getVodb().uuidToNative(componentUid),

@@ -96,5 +96,19 @@ public interface I_WriteDirectToDb {
 	 */
 	
 	public void writeTimePath(TimePathId timePath) throws IOException;
+	
+	/**
+	 * The new routines in the I_TermFactory automatically put the new components
+	 * on the commit list, and creates new threads to update the interface. This method
+	 * bypasses the commit list. 
+	 * 
+	 * @param refsetId
+	 * @param memberId
+	 * @param componentId
+	 * @param typeId
+	 * @return
+	 */
+	public I_ThinExtByRefVersioned newExtensionBypassCommit(int refsetId,
+			int memberId, int componentId, int typeId);
 
 }
