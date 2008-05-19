@@ -698,6 +698,13 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	public LogWithAlerts getEditLog() {
 		return AceLog.getEditLog();
 	}
+	
+	public I_GetConceptData newConceptBypassCommit(int conceptNid) throws IOException {
+		ConceptBean newBean = ConceptBean.get(conceptNid);
+		newBean.setPrimordial(true);
+		return newBean;
+	}
+
 
 	public I_GetConceptData newConcept(UUID newConceptId, boolean defined,
 			I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
@@ -729,6 +736,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return newBean;
 	}
 
+	public I_DescriptionVersioned newDescriptionBypassCommit(int descriptionNid,
+			 int conceptNid) throws IOException {
+		return new ThinDescVersioned(descriptionNid, conceptNid, 1);
+	}
+
+	
 	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
 			I_GetConceptData concept, String lang, String text,
 			I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig)
@@ -1360,6 +1373,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		part.setVersion(version);
 		rel.addVersion(part);
 		return rel;
+	}
+	public I_RelVersioned newRelationshipBypassCommit(int relNid,
+			  int conceptNid, int relDestinationNid) throws IOException {
+		return new ThinRelVersioned(relNid, conceptNid,
+				relDestinationNid, 1);
 	}
 
 	public static boolean isReadOnly() {
