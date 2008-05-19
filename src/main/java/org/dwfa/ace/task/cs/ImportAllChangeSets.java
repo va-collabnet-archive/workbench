@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.ComponentValidator;
@@ -71,7 +72,13 @@ public class ImportAllChangeSets extends AbstractTask {
     throws TaskFailedException {
 
         LocalVersionedTerminology.get().suspendChangeSetWriters();
+        importAllChangeSets(worker.getLogger());
+        LocalVersionedTerminology.get().resumeChangeSetWriters();
 
+        return Condition.CONTINUE;
+    }
+    
+    public void importAllChangeSets(Logger log) throws TaskFailedException {
         ChangeSetImporter csi = new ChangeSetImporter() {
 			@Override
 			public I_ReadChangeSet getChangeSetReader(File csf) {
@@ -82,10 +89,7 @@ public class ImportAllChangeSets extends AbstractTask {
 				}
 			}
         };
-        csi.importAllChangeSets(worker.getLogger(), validators, rootDirStr, validateChangeSets, ".jcs");
-        LocalVersionedTerminology.get().resumeChangeSetWriters();
-
-        return Condition.CONTINUE;
+        csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".jcs");
     }
 
     /**
