@@ -5,7 +5,10 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -20,6 +23,8 @@ public class MemberRefsetChangesetWriter {
 	private File baseDir;
 	
 	private I_TermFactory termFactory;
+
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
 	
 	public MemberRefsetChangesetWriter(File changeSetOutputDirectory, I_TermFactory termFactory, UUID editPathUUID) {
 		if (!changeSetOutputDirectory.exists()) {
@@ -33,14 +38,15 @@ public class MemberRefsetChangesetWriter {
 	public void addToRefset(int conceptId, int membershipTypeId, int refsetId, int statusId) throws Exception {
 		DataOutputStream outputStream;
 		if (!refsetStreams.containsKey(refsetId)) {
-			String postfix = "";
-			int count = 1;
+			File newRefsetFile = null;
 			UUID refsetUuid = termFactory.getUids(refsetId).iterator().next();
-			File newRefsetFile = new File(baseDir, refsetUuid + postfix + ".cmrscs");
-			while (newRefsetFile.exists()) {
-				postfix = "." + count;
-				newRefsetFile = new File(baseDir, refsetUuid + postfix + ".cmrscs");
-			}
+			do {
+				String postfix = "." + DATE_FORMAT.format(new Date());
+				String filename = refsetUuid + postfix + ".cmrscs";
+				System.out.println("Creating new file for refset " + refsetUuid + " - " + filename);
+				newRefsetFile = new File(baseDir, filename);
+				System.out.println();
+			} while (newRefsetFile.exists());
 			outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(newRefsetFile)));
 			
 			// commit time

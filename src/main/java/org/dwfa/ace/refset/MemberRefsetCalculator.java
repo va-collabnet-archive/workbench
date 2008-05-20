@@ -196,18 +196,18 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					counter++;
 					if (counter % 1000 == 0) {
 						ClosestDistanceHashSet existingMembers = existingRefsetMembers.get(memberSetId);
-						int existingMemberSize = 0;
+						String existingMemberSize = "empty";
 						if (existingMembers != null) {
-							existingMemberSize = existingMembers.size();
+							existingMemberSize = existingMembers.size() + "";
 						}
 						ClosestDistanceHashSet existingParents = existingParentMembers.get(memberSetId);
-						int existingParentsSize = 0;
+						String existingParentsSize = "empty";
 						if (existingParents != null) {
-							existingParentsSize = existingParents.size();
+							existingParentsSize = existingParents.size() + "";
 						}
 						System.out.println("processed " + counter + " of " + conceptsInMemberRefset.size() + " for refset " + memberSet + 
 								" existing member set is " + existingMemberSize + 
-								" existing parents size " + existingParentsSize);
+								" existing parents size is " + existingParentsSize);
 					}
 					
 					I_ThinExtByRefPart latest = getLatestVersion(member);
@@ -476,6 +476,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					keySet.addAll(newMembers.keySet());
 					if (oldMembers != null) {
 						keySet.retainAll(oldMembers.keySet());
+					} else {
+						keySet.clear();
 					}
 					for (Integer key: keySet) {
 						exclusions.add(newMembers.get(key));
