@@ -73,16 +73,19 @@ public class CmrscsReader implements I_ReadChangeSet {
 					.localize().getNid();
 			while (nextCommitTime() < endTime) {
 				int count = 0;
-				count++;
 				if (counter != null) {
 					counter.increment();
 				}
 				UUID pathUid = readUuid(dis);
+				int pathNid = getVodb().uuidToNative(pathUid);
 				I_Path path = getVodb().getPath(new UUID[] { pathUid });
 				UUID refsetUid = readUuid(dis);
+				int refsetNid = getVodb().uuidToNative(refsetUid);
 				UUID memberUid = readUuid(dis);
-				timePathValues.add(new TimePathId(getVodb().convertToThinVersion(nextCommit), path.getConceptId()));
+				int version = getVodb().convertToThinVersion(nextCommit);
+				timePathValues.add(new TimePathId(version, path.getConceptId()));
 				while (memberUid.equals(endUid) == false) {
+					count++;
 					UUID componentUid = readUuid(dis);
 					UUID statusUid = readUuid(dis);
 					UUID conceptValueUid = readUuid(dis);
@@ -90,16 +93,14 @@ public class CmrscsReader implements I_ReadChangeSet {
 					I_ThinExtByRefVersioned ebr;
 					I_ThinExtByRefPartConcept newPart = getVodb()
 							.newConceptExtensionPart();
-					newPart.setPathId(getVodb().uuidToNative(pathUid));
+					newPart.setPathId(pathNid);
 					newPart.setStatus(getVodb().uuidToNative(statusUid));
 					newPart.setConceptId(getVodb().uuidToNative(conceptValueUid));
-					newPart.setVersion(getVodb().convertToThinVersion(nextCommit));
-					if (getVodb().hasExtension(
-							getVodb().uuidToNativeWithGeneration(memberUid,
-									unspecifiedUuidNid, path,
-									getVodb().convertToThinVersion(nextCommit)))) {
-						ebr = getVodb().getExtension(
-								getVodb().uuidToNative(memberUid));
+					newPart.setVersion(version);
+					int memberNid = getVodb().uuidToNativeWithGeneration(memberUid,
+							unspecifiedUuidNid, path, version);
+					if (getVodb().hasExtension(memberNid)) {
+						ebr = getVodb().getExtension(memberNid);
 						I_ThinExtByRefPartConcept lastPart = (I_ThinExtByRefPartConcept) 
 							ebr.getVersions().get(ebr.getVersions().size() -1);
 						ebr.getVersions().clear();
@@ -107,8 +108,8 @@ public class CmrscsReader implements I_ReadChangeSet {
 						ebr.addVersion(newPart);
 					} else {
 						ebr = getVodb().getDirectInterface().newExtensionBypassCommit(
-								getVodb().uuidToNative(refsetUid),
-								getVodb().uuidToNative(memberUid),
+								refsetNid,
+								memberNid,
 								getVodb().uuidToNative(componentUid),
 								conceptExt);
 						((List<I_ThinExtByRefPartConcept>) ebr.getVersions()).add(newPart);
@@ -117,11 +118,12 @@ public class CmrscsReader implements I_ReadChangeSet {
 					getVodb().getDirectInterface().writeExt(ebr);
 					memberUid = readUuid(dis);
 				}
+				AceLog.getEditLog().info("End of commit set. Processed " + count + " items");
 				nextCommit = dis.readLong();
 			}
 		} catch (EOFException ex) {
 			dis.close();
-			AceLog.getEditLog().info("End of change set. ");
+			AceLog.getEditLog().info("End of change set: " + changeSetFile);
 			nextCommit = Long.MAX_VALUE;
 			getVodb().setProperty(
 					changeSetFile.toURI().toURL().toExternalForm(),

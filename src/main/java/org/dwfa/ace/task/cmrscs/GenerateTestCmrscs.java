@@ -70,7 +70,8 @@ public class GenerateTestCmrscs extends AbstractTask {
     	int count = 0;
     	DataOutputStream dos;
     	UUID currentStatus = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
-
+    	UUID conceptValue = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next();
+    	
 		public ConceptIterator(DataOutputStream dos) {
 			super();
 			this.dos = dos;
@@ -80,6 +81,7 @@ public class GenerateTestCmrscs extends AbstractTask {
 			if (count < 70000) {
 				writeUuid(UUID.randomUUID() , dos);
 				writeUuid(concept.getUids() , dos);
+				writeUuid(conceptValue , dos);
 				writeUuid(currentStatus , dos);
 				count++;
 			}
