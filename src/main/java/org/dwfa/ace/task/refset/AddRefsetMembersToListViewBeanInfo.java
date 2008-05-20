@@ -30,7 +30,7 @@ public class AddRefsetMembersToListViewBeanInfo extends SimpleBeanInfo {
 	 */
 	public BeanDescriptor getBeanDescriptor() {
 		BeanDescriptor bd = new BeanDescriptor(AddRefsetMembersToListView.class);
-		bd.setDisplayName("<html><font color='green'><center>Add Refset members to list view<br>");
+		bd.setDisplayName("<html><font color='green'><center>Add Refset members<br>to list view");
 		return bd;
 	}
 }

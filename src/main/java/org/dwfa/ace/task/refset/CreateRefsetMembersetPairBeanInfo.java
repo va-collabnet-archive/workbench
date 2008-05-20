@@ -33,7 +33,7 @@ public class CreateRefsetMembersetPairBeanInfo extends SimpleBeanInfo{
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CreateRefsetMembersetPair.class);
-        bd.setDisplayName("<html><font color='green'><center>Create New Refset/Memberset pair");
+        bd.setDisplayName("<html><font color='green'><center>Create New<br>Refset/Memberset pair");
         return bd;
     }
 }//End class CreateRefsetMembersetPairBeanInfo

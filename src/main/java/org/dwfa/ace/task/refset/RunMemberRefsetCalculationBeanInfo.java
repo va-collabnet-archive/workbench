@@ -20,7 +20,7 @@ public class RunMemberRefsetCalculationBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(RunMemberRefsetCalculation.class);
-        bd.setDisplayName("<html><font color='green'><center>Run member refset calculation<br>");
+        bd.setDisplayName("<html><font color='green'><center>Run member refset<br>calculation");
         return bd;
     }
 }

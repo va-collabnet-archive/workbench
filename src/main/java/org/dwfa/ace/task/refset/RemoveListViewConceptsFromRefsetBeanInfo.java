@@ -30,7 +30,7 @@ public class RemoveListViewConceptsFromRefsetBeanInfo extends SimpleBeanInfo {
 	 */
 	public BeanDescriptor getBeanDescriptor() {
 		BeanDescriptor bd = new BeanDescriptor(RemoveListViewConceptsFromRefset.class);
-		bd.setDisplayName("<html><font color='green'><center>Retire list view concepts<br>from specified refset<br>");
+		bd.setDisplayName("<html><font color='green'><center>Retire<br>list view concepts<br>from specified refset");
 		return bd;
 	}
 }

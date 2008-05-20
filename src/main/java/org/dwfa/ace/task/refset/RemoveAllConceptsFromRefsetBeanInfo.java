@@ -30,7 +30,7 @@ public class RemoveAllConceptsFromRefsetBeanInfo extends SimpleBeanInfo {
 	 */
 	public BeanDescriptor getBeanDescriptor() {
 		BeanDescriptor bd = new BeanDescriptor(RemoveAllConceptsFromRefset.class);
-		bd.setDisplayName("<html><font color='green'><center>Retire all refset members<br>");
+		bd.setDisplayName("<html><font color='green'><center>Retire all<br>refset members");
 		return bd;
 	}
 }
