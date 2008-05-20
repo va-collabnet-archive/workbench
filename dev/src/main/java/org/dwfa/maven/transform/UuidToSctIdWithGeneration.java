@@ -14,20 +14,20 @@ import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public abstract class UuidToSctIdWithGeneration extends AbstractTransform implements I_ReadAndTransform {
-   
-   
+
+
    private static Map<TYPE, UuidSnomedMap> mapMap;
    private static Map<TYPE, File> fileMap;
    private File sourceDirectory = null;
-   
+
    public void setupImpl(Transform transformer) throws IOException {
       // Nothing to setup
       File buildDirectory = transformer.getBuildDirectory();
       //[INFO]  buildDirectory: /au-ct/ace/amt-release/target
       File idGeneratedDir = new File(new File(buildDirectory, "generated-resources"), "sct-uuid-maps");
-      
+
       if (sourceDirectory==null) {
-    	  sourceDirectory = transformer.getSourceDirectory();
+          sourceDirectory = transformer.getSourceDirectory();
       }
        //[INFO]  sourceDirectory: /au-ct/ace/amt-release/src/main/java
       if (mapMap == null) {
@@ -39,10 +39,10 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
                public boolean accept(File f) {
                   return f.getName().endsWith(type + "-sct-map-rw.txt");
                }
-               
+
             });
             if (rwMapFileArray == null || rwMapFileArray.length != 1) {
-               throw new IOException("RW mapping file not found. There must be one--and only one--file of format [namespace]-[project]-" + 
+               throw new IOException("RW mapping file not found. There must be one--and only one--file of format [namespace]-[project]-" +
                      type + "-sct-map-rw.txt in the directory " + idSourceDir.getAbsolutePath());
             }
             fileMap.put(type, rwMapFileArray[0]);
@@ -55,7 +55,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
             public boolean accept(File f) {
                return f.getName().endsWith("sct-map.txt");
             }
-            
+
          })) {
             UuidSnomedFixedMap fixedMap = UuidSnomedFixedMap.read(fixedMapFile);
             for (TYPE type: TYPE.values()) {
@@ -67,7 +67,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
                public boolean accept(File f) {
                   return f.getName().endsWith("sct-map.txt");
                }
-               
+
             })) {
                UuidSnomedMap fixedMap = UuidSnomedMap.read(fixedMapFile);
                for (TYPE type: TYPE.values()) {
@@ -84,12 +84,16 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
       TYPE type = getType();
       return setLastTransform(Long.toString(mapMap.get(type).getWithGeneration(id, type)));
    }
-   
+
+   public Map<TYPE, UuidSnomedMap> getMap() {
+       return mapMap;
+   }
+
    public void cleanup(Transform transformer) throws Exception {
       if (mapMap != null) {
          for (TYPE type: TYPE.values()) {
             mapMap.get(type).write(fileMap.get(type));
-         }      
+         }
          mapMap = null;
          fileMap = null;
       }
