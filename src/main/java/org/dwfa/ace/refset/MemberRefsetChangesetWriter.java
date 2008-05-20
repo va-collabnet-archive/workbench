@@ -35,7 +35,7 @@ public class MemberRefsetChangesetWriter {
 		this.editPathUUID = editPathUUID;
 	}
 	
-	public void addToRefset(int conceptId, int membershipTypeId, int refsetId, int statusId) throws Exception {
+	public void addToRefset(Integer memberId, int conceptId, int membershipTypeId, int refsetId, int statusId) throws Exception {
 		DataOutputStream outputStream;
 		if (!refsetStreams.containsKey(refsetId)) {
 			File newRefsetFile = null;
@@ -61,7 +61,11 @@ public class MemberRefsetChangesetWriter {
 			outputStream = refsetStreams.get(refsetId);
 		}
 		
-		writeUuid(outputStream, UUID.randomUUID());
+		if (memberId == null) {
+			writeUuid(outputStream, UUID.randomUUID());
+		} else {
+			writeUuid(outputStream, termFactory.getUids(memberId));
+		}
 		writeUuid(outputStream, termFactory.getUids(conceptId));
 		writeUuid(outputStream, termFactory.getUids(statusId));
 		writeUuid(outputStream, termFactory.getUids(membershipTypeId));

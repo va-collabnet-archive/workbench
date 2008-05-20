@@ -447,7 +447,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					reportWriter.newLine();
 					if (!validateOnly) {
 						if (useNonTxInterface) {
-							nonTxWriter.addToRefset(member.getConceptId(), getMembershipType(member.getInclusionTypeId()), 
+							nonTxWriter.addToRefset(null, member.getConceptId(), getMembershipType(member.getInclusionTypeId()), 
 									refset, currentStatusId);
 						} else {
 							addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
@@ -494,7 +494,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 							if (!newestPartRetired(ext)) {
 								if (useNonTxInterface) {
 									I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
-									nonTxWriter.addToRefset(i.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
+									nonTxWriter.addToRefset(ext.getMemberId(), i.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
 								} else {
 									retireLatestExtension(ext);
 								}
@@ -520,7 +520,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						if (oldparents==null || (oldparents!=null && !oldparents.containsKey(parent.getConceptId()))) {
 							if (!validateOnly) {
 								if (useNonTxInterface) {
-									nonTxWriter.addToRefset(parent.getConceptId(), 
+									nonTxWriter.addToRefset(null, parent.getConceptId(), 
 											ConceptConstants.PARENT_MARKER.localize().getNid(), refset, currentStatusId);
 								} else {
 									addToMemberSetAsParent(parent.getConceptId(), refset);
@@ -541,7 +541,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 								if (!newestPartRetired(ext)) {
 									if (useNonTxInterface) {
 										I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
-										nonTxWriter.addToRefset(existingParent.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
+										nonTxWriter.addToRefset(ext.getMemberId(), existingParent.getConceptId(), latestExtVersion.getConceptId(), refset, retiredConceptId);
 									} else {
 										retireLatestExtension(ext);
 									}
