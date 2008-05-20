@@ -378,10 +378,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		for (Integer refset : newRefsetMembers.keySet()) {
 			ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
 
-
-			ClosestDistanceHashSet oldparents = existingParentMembers.get(refset);
-			ClosestDistanceHashSet parents = findParentsToBeMarked(newRefsetMembers.get(refset));
-
 			conflictWriter.write("\n\nConflicts in refset " + getConcept(refset) + " are: ");
 			conflictWriter.newLine();
 			ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
@@ -506,7 +502,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				}
 
 				if (markParents) {
-
+					ClosestDistanceHashSet oldparents = existingParentMembers.get(refset);
+					ClosestDistanceHashSet parents = findParentsToBeMarked(newRefsetMembers.get(refset));
+					
 					if (existingRefsetMembers.get(refset)!=null && oldparents!=null) {
 						oldparents.removeAll(existingRefsetMembers.get(refset));
 					}
