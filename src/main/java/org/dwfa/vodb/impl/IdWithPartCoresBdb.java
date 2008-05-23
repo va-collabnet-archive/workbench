@@ -170,6 +170,9 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 		super();
 		idCoreDb = env.openDatabase(null, "idCoreDb", mapDbConfig);
 		uuidToNidDb = env.openDatabase(null, "uuidToNidDb", mapDbConfig);
+		//PreloadConfig preloadConfig = new PreloadConfig();
+		//preloadConfig.setLoadLNs(true);
+		//uuidToNidDb.preload(preloadConfig);
 		// logIdDbStats();
 		nidGenerator = new NidGenerator();
 		idPartCoreBdb = new IdPartCoreBdb(env, mapDbConfig);
@@ -299,8 +302,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 	 */
 	public List<UUID> nativeToUuid(int nativeId) throws DatabaseException {
 		Stopwatch timer = null;
-		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("Getting id record for : " + nativeId);
+		if (AceLog.getAppLog().isLoggable(Level.FINER)) {
+			AceLog.getAppLog().finer("Getting id record for : " + nativeId);
 			timer = new Stopwatch();
 			timer.start();
 		}
@@ -308,8 +311,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, idKey);
 		if (idCoreDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine(
+			if (AceLog.getAppLog().isLoggable(Level.FINER)) {
+				AceLog.getAppLog().finer(
 						"Got id record for: " + nativeId + " elapsed time: "
 								+ timer.getElapsedTime() / 1000 + " secs");
 			}

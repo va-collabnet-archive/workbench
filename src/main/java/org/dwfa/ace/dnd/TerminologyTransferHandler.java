@@ -410,7 +410,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 	@Override
 	public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("Can import: " + comp);
+			AceLog.getAppLog().fine("Can import: " + comp.getClass().getCanonicalName());
 		}
 		if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
 			for (DataFlavor f : transferFlavors) {
@@ -468,6 +468,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 				AceLog.getAppLog().fine("Can't paste: " + e.toString());
 			}
 		}
+		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+			AceLog.getAppLog().fine("Can import: " + comp.getClass().getCanonicalName() + " false");
+		}
 		return false;
 	}
 
@@ -481,7 +484,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 
 	public static DataFlavor[] getSupportedFlavors() {
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("getSupportedFlavors ");
+			AceLog.getAppLog().fine("getSupportedFlavors TerminologyTransferHandler");
 		}
 		return supportedFlavors;
 	}
