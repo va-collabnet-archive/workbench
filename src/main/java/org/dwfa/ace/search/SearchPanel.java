@@ -266,18 +266,21 @@ public class SearchPanel extends JPanel {
 
         gbc.weightx = 1;
         gbc.gridx++;
-        this.searchPhraseField = new JTextField(40);
+        this.searchPhraseField = new JTextField(200);
         this.searchPhraseField.setDragEnabled(true);
+        this.searchPhraseField.setMinimumSize(new Dimension(400,20));
         add(searchPhraseField, gbc);
 
         gbc.gridx++;
-        gbc.weightx = 0;
 
+        gbc.weightx = 0.75;
         progressBar = new JProgressBar();
         progressBar.setVisible(true);
         progressBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         progressBar.setMinimumSize(new Dimension(300,20));
         add(progressBar, gbc);
+        
+        gbc.weightx = 0;
 
         // row 0, double height
         gbc.gridheight = 2;
