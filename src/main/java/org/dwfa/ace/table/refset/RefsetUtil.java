@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
@@ -20,6 +21,7 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.I_CellTextWithTuple;
@@ -121,7 +123,9 @@ public class RefsetUtil {
             column.setMinWidth(columnDesc.getMin());
         }
 
-        // setupEditors(host);
+        extTable.setDragEnabled(true);
+        extTable.setTransferHandler(new TerminologyTransferHandler());
+        extTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         if (ACE.editMode) {
             extTable.addMouseListener(refsetModel.makePopupListener(extTable, host.getConfig()));
         }
