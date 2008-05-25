@@ -40,4 +40,5 @@ public class IntSetTest extends TestCase {
 		assertTrue(set.contains(5));
 
 	}
+		
 }

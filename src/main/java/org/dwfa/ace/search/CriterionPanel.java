@@ -1,7 +1,9 @@
 package org.dwfa.ace.search;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.BeanInfo;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -65,6 +68,9 @@ public class CriterionPanel extends JPanel {
                     gbc.weightx = 1.0;
                     gbc.gridx++;
                     PropertyEditor editor = pd.createPropertyEditor(bean);
+                    if (AbstractButton.class.isAssignableFrom(editor.getCustomEditor().getClass())) {
+                        gbc.weightx = 0.0;
+                    }
 
                     Method readMethod = pd.getReadMethod();
                     Object value = readMethod.invoke(bean, (Object[]) null);
@@ -77,6 +83,7 @@ public class CriterionPanel extends JPanel {
 
                     gbc.gridx++;
                 }
+                editorPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
                 editorPanel.invalidate();
                 editorPanel.validate();
                 editorPanel.doLayout();
@@ -137,9 +144,47 @@ public class CriterionPanel extends JPanel {
 
         setupCriterionOptions();
 
-        criterionCombo = new JComboBox(comboItems.toArray());
+        criterionCombo = new JComboBox(comboItems.toArray()) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void setSize(Dimension d) {
+				d.width = getMinimumSize().width;
+				super.setSize(d);
+			}
+
+			@Override
+			public void setSize(int width, int height) {
+				super.setSize(getMinimumSize().width, height);
+			}
+
+			@Override
+			public void setBounds(int x, int y, int width, int height) {
+				super.setBounds(x, y, getMinimumSize().width, height);
+			}
+
+			@Override
+			public void setBounds(Rectangle r) {
+				r.width  = getMinimumSize().width;
+				super.setBounds(r);
+			}
+
+			@Override
+			public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.width  = getMinimumSize().width;
+				return d;
+			}
+        	
+        };
+        criterionCombo.setMinimumSize(new Dimension(175,20));
+        gbc.fill = GridBagConstraints.BOTH;
         add(criterionCombo, gbc);
         criterionCombo.addActionListener(new CriterionListener());
+        gbc.fill = GridBagConstraints.NONE;
         if (beanToSet != null) {
             for (String comboItem : comboItems) {
                 I_TestSearchResults menuBean = menuBeanMap.get(comboItem);
@@ -150,8 +195,6 @@ public class CriterionPanel extends JPanel {
                     
                     int index = criterionOptions.indexOf(menuBean);
                     criterionOptions.set(index, beanToSet);
-                    
-                    
                     
                     criterionCombo.setSelectedItem(comboItem);
                     break;

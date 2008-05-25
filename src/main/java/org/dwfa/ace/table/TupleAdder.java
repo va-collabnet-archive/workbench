@@ -123,6 +123,18 @@ public abstract class TupleAdder<V, W> {
 				positions, matchingTuples,
 				addUncommitted, versions, core);
 	}
+	
+	/**
+	 * 
+	 * @param allowedStatus <code>null</code> is a wildcard.
+	 * @param allowedTypes <code>null</code> is a wildcard.
+	 * @param positions <code>null</code> is a wildcard. Positions MUST be protected from concurrent modification externally. 
+	 * 					Synchronization within this call is to expensive for the environment. 
+	 * @param matchingTuples
+	 * @param addUncommitted
+	 * @param versions
+	 * @param core
+	 */
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positions, List<V> matchingTuples,
 			boolean addUncommitted, List<? extends I_AmPart> versions, W core) {
@@ -161,13 +173,13 @@ public abstract class TupleAdder<V, W> {
 			}
 			partsToAdd.removeAll(partsToRemove);
 		} else {
-			HashSet<I_Position> positionsCopy;
-			synchronized (positions) {
-				positionsCopy = new HashSet<I_Position>(positions);
-			}
-			for (I_Position p : positionsCopy) {
+			for (I_Position p : positions) {
 				ArrayList<PathSortInfo> pathInfo = new ArrayList<PathSortInfo>();
-				addPaths(pathInfo, 0, Integer.MAX_VALUE - 1, p.getPath());
+				if (p.getVersion() == Integer.MAX_VALUE) {
+					addPaths(pathInfo, 0, Integer.MAX_VALUE - 1, p.getPath());
+				} else {
+					addPaths(pathInfo, 0, p.getVersion(), p.getPath());
+				}
 				AdmitAndSortParts partSorter = new AdmitAndSortParts(pathInfo);
 				SortedSet<I_AmPart> partSet = new TreeSet<I_AmPart>(
 						partSorter);

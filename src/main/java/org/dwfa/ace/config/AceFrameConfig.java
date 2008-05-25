@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,7 +96,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private I_IntSet descTypes = new IntSet();
 
-    private Set<I_Position> viewPositions = new HashSet<I_Position>();
+    private Set<I_Position> viewPositions = Collections.synchronizedSet(new HashSet<I_Position>());
 
     private Rectangle bounds = new Rectangle(0, 0, 1400, 1028);
 

@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import org.dwfa.ace.ACE;
@@ -1074,11 +1076,67 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return isParentWithDepthCutoff(child, allowedStatus, allowedTypes,
 				positions, addUncommitted, 0);
 	}
-
+	
+	private transient Map<List<Integer>, SoftReference<Map<Integer, Boolean>>> isParentCacheMap;
+	private transient int isParentCacheMapCommitSequence = 0;
+	
+	private List<Integer> getParentCriterion(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions) {
+		List<Integer> intList = new ArrayList<Integer>();
+		
+		if (allowedStatus != null) {
+			for (int i: allowedStatus.getSetValues()) {
+				intList.add(i);
+			}
+		}
+		intList.add(Integer.MIN_VALUE);
+		if (allowedTypes != null) {
+			for (int i: allowedTypes.getSetValues()) {
+				intList.add(i);
+			}
+		}
+		intList.add(Integer.MIN_VALUE);
+		if (positions != null) {
+			for (I_Position p: positions) {
+				intList.add(p.getPath().getConceptId());
+				intList.add(p.getVersion());
+			}
+		}
+		intList.add(Integer.MIN_VALUE);
+		
+		return intList;
+	}
+	
 	private boolean isParentWithDepthCutoff(I_GetConceptData child,
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positions, boolean addUncommitted, int depth)
+				throws IOException {
+		Map<Integer, Boolean> isParentCache = null;
+		
+		if (isParentCacheMap == null || isParentCacheMapCommitSequence != ACE.commitSequence) {
+			isParentCacheMap = new ConcurrentHashMap<List<Integer>, SoftReference<Map<Integer,Boolean>>>();
+			isParentCacheMapCommitSequence = ACE.commitSequence;
+		}
+		List<Integer> key = getParentCriterion(allowedStatus, allowedTypes, positions);
+		if (isParentCacheMap.containsKey(key)) {
+			isParentCache = isParentCacheMap.get(key).get();
+		}
+		if (isParentCache == null) {
+			isParentCache = new ConcurrentHashMap<Integer, Boolean>();
+			isParentCacheMap.put(key, new SoftReference<Map<Integer,Boolean>>(isParentCache));
+		}
+		return isParentWithDepthCutoff(child,
+				allowedStatus, allowedTypes,
+				positions, addUncommitted, depth, isParentCache);
+	}
+
+	private boolean isParentWithDepthCutoff(I_GetConceptData child,
+			I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, boolean addUncommitted, int depth, Map<Integer, Boolean> isParentCache)
 			throws IOException {
+		if (isParentCache.containsKey(child.getConceptId())) {
+			return isParentCache.get(child.getConceptId());
+		}
 		Set<I_GetConceptData> parents = child.getSourceRelTargets(
 				allowedStatus, allowedTypes, positions, addUncommitted);
 		if (depth == 40) {
@@ -1099,17 +1157,21 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 							+ " is at isParentOf depth max for: \nparent: "
 							+ this + "\nchild: " + child + "\nparents: "
 							+ parents);
+			isParentCache.put(child.getConceptId(), Boolean.FALSE);
 			return false;
 		}
 		if (parents.contains(this)) {
+			isParentCache.put(child.getConceptId(), Boolean.TRUE);
 			return true;
 		}
 		for (I_GetConceptData childParent : parents) {
 			if (this.isParentWithDepthCutoff(childParent, allowedStatus,
-					allowedTypes, positions, addUncommitted, depth + 1)) {
+					allowedTypes, positions, addUncommitted, depth + 1, isParentCache)) {
+				isParentCache.put(child.getConceptId(), Boolean.TRUE);
 				return true;
 			}
 		}
+		isParentCache.put(child.getConceptId(), Boolean.FALSE);
 		return false;
 	}
 

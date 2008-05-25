@@ -822,7 +822,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				AceLog.getAppLog().info(
-						"Search time: " + timer.getElapsedTime());
+						"Search 5 time: " + timer.getElapsedTime());
 			} else {
 				AceLog.getAppLog().info(
 						"Search Canceled. Elapsed time: "
@@ -859,7 +859,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				AceLog.getAppLog().info(
-						"Search time: " + timer.getElapsedTime());
+						"Search 6 time: " + timer.getElapsedTime());
 			} else {
 				AceLog.getAppLog().info(
 						"Canceled. Elapsed time: " + timer.getElapsedTime());

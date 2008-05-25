@@ -16,6 +16,7 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.swing.SwingWorker;
@@ -80,7 +81,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 
 		public RegexProgressUpdator() {
 			super();
-			updateTimer = new Timer(100, this);
+			updateTimer = new Timer(500, this);
 			updateTimer.start();
 		}
 
@@ -92,20 +93,27 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 		public void actionPerformed(ActionEvent e) {
 			if (continueWork) {
 				if (firstUpdate) {
-					searchPanel.setProgressIndeterminate(false);
-					searchPanel.setProgressMaximum(descCount);
-					firstUpdate = false;
+					if (descCount == Integer.MAX_VALUE) {
+						searchPanel.setProgressIndeterminate(true);
+					} else {
+						searchPanel.setProgressIndeterminate(false);
+						searchPanel.setProgressMaximum(descCount);
+						firstUpdate = false;
+					}
 				}
 				if (completeLatch != null) {
 					searchPanel.setProgressValue((int) (searchPanel
 							.getProgressMaximum() - completeLatch.getCount()));
 				}
-				searchPanel
-						.setProgressInfo("   " + searchPanel.getProgressValue()
-								+ "/" + searchPanel.getProgressMaximum()
-								+ " descriptions   ");
+				if (firstUpdate) {
+					searchPanel
+					.setProgressInfo("   processing...   ");
+				} else {
+					updateProgress();
+				}
 				if (searchPanel.getProgressValue() == searchPanel
 						.getProgressMaximum()) {
+					AceLog.getAppLog().info("Normal completion at: " + searchPanel.getProgressMaximum());
 					normalCompletion();
 				}
 			} else {
@@ -121,99 +129,26 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 				firstUpdate = false;
 			}
 			searchPanel.setProgressValue(descCount);
-			searchPanel.setProgressInfo("   Starting lucene search   ");
+			updateProgress();
 		}
 
+		private void updateProgress() {
+			searchPanel.setProgressInfo("   " +
+					regexMatches.size() + " out of " + (searchPanel.getProgressMaximum() - completeLatch.getCount())
+							+ " descriptions   ");
+		}
 	}
 
-	public class LuceneProgressUpdator implements I_UpdateProgress {
-		Timer updateTimer;
-
-		boolean firstUpdate = true;
-
-		private String info;
-
-		private Integer hits = null;
-
-		public LuceneProgressUpdator() {
-			super();
-			updateTimer = new Timer(1000, this);
-			updateTimer.start();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.dwfa.ace.search.I_UpdateProgress#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent e) {
-			if (continueWork) {
-				if (firstUpdate) {
-					if (hits == null) {
-						searchPanel.setProgressIndeterminate(true);
-					}
-					searchPanel.setProgressMaximum(descCount);
-					firstUpdate = false;
-				}
-				if (completeLatch != null) {
-					if (hits != null) {
-						searchPanel.setProgressIndeterminate(false);
-					}
-					searchPanel.setProgressMaximum(descCount);
-					searchPanel.setProgressValue((int) (searchPanel
-							.getProgressMaximum() - completeLatch.getCount()));
-				} else {
-					AceLog.getAppLog().info("completeLatch is null");
-				}
-				searchPanel.setProgressInfo("   " + info + "   ");
-				if (hits != null && completeLatch.getCount() == 0) {
-					normalCompletion();
-				}
-			} else {
-				updateTimer.stop();
-			}
-		}
-
-		public void setIndeterminate(boolean value) {
-			searchPanel.setProgressIndeterminate(value);
-		}
-
-		public void normalCompletion() {
-			updateTimer.stop();
-			if (firstUpdate) {
-				searchPanel.setProgressIndeterminate(false);
-				searchPanel.setProgressMaximum(descCount);
-				firstUpdate = false;
-			}
-			searchPanel.setProgressValue(descCount);
-			searchPanel.setProgressInfo(" Search complete ");
-		}
-
-		public void setProgressInfo(String info) {
-			this.info = info;
-		}
-
-		public void setHits(int hits) {
-			this.hits = hits;
-			descCount = hits;
-			searchPanel.setProgressMaximum(hits);
-		}
-
-		public boolean continueWork() {
-			return continueWork;
-		}
-
-	}
 
 	public SearchAllWorker(SearchPanel searchPanel,
 			DescriptionsFromCollectionTableModel model,
 			I_ConfigAceFrame config) {
 		super();
-		this.config = config;
+		this.config =  new FrameConfigSnapshot(config);
 		this.model = model;
 		this.searchPanel = searchPanel;
 		this.searchPanel.addStopActionListener(stopListener);
-		this.searchPanel.setProgressInfo("   Searching...  ");
+		this.searchPanel.setProgressInfo("   Searching all...  ");
 		this.searchPanel.setProgressIndeterminate(true);
 
 	}
@@ -232,8 +167,11 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 		regexMatches = Collections
 				.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
 						new ThinDescVersionedComparator()));
+		descCount = Integer.MAX_VALUE;
 		I_UpdateProgress updater = new RegexProgressUpdator();
 		descCount = AceConfig.getVodb().countDescriptions();
+		AceLog.getAppLog().info("Desc count sa: " + descCount);
+		searchPanel.setProgressMaximum(descCount);
 		completeLatch = new CountDownLatch(descCount);
 		new MatchUpdator();
 		AceConfig.getVodb().searchRegex(this, null, regexMatches, completeLatch,
@@ -244,6 +182,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 	}
 
 	protected void finished() {
+		AceLog.getAppLog().info("Search a finished.");
 		try {
 			if (continueWork) {
 				continueWork = false;
@@ -262,6 +201,10 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 		}
 		searchPanel.removeStopActionListener(stopListener);
 		searchPanel.setShowProgress(false);
+		searchPanel.setProgressIndeterminate(false);
+		searchPanel.setProgressMaximum(searchPanel.getProgressValue());
+		searchPanel.setProgressValue(0);
+
 	}
 
 	public boolean continueWork() {

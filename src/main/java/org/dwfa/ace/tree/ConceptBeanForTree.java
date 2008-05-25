@@ -33,6 +33,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	List<DefaultMutableTreeNode> extraParentNodes  = new ArrayList<DefaultMutableTreeNode>();
 	private boolean parentOpened;
 	private boolean secondaryParentNode;
+	private static I_ConfigAceFrame config;
 	
 	public static ConceptBeanForTree get(int conceptId, int relId, int parentDepth, 
 			boolean secondaryParentNode) {
@@ -89,6 +90,13 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	}
 
 	public String getInitialText() throws IOException {
+		I_DescriptionTuple tuple = this.getDescTuple(
+				ConceptBeanForTree.config.getShortLabelDescPreferenceList(),
+				ConceptBeanForTree.config);
+		if (tuple != null) {
+			return tuple.getText();
+		}
+
 		return bean.getInitialText();
 	}
 
@@ -204,6 +212,14 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
     Set<I_Position> positions, boolean addUncommitted) throws IOException {
     return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, addUncommitted);
+}
+
+public static I_ConfigAceFrame getConfig() {
+	return config;
+}
+
+public static void setConfig(I_ConfigAceFrame config) {
+	ConceptBeanForTree.config = config;
 }
 	
 	/*

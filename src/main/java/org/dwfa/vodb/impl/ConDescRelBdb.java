@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
@@ -229,7 +230,12 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 		I_ConfigAceFrame config;
 
-		public CheckAndProcessRegexMatch(Pattern p,
+		private CountDownLatch descLatch;
+		
+		Semaphore checkSemaphore;
+
+		public CheckAndProcessRegexMatch(CountDownLatch descLatch, Semaphore checkSemaphore,
+				Pattern p,
 				Collection<I_DescriptionVersioned> matches,
 				I_DescriptionVersioned descV,
 				List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
@@ -239,6 +245,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			this.descV = descV;
 			this.checkList = checkList;
 			this.config = config;
+			this.descLatch = descLatch;
+			this.checkSemaphore = checkSemaphore;
 		}
 
 		public void run() {
@@ -268,6 +276,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					}
 				}
 			}
+			this.descLatch.countDown();
+			checkSemaphore.release();
 		}
 
 	}
@@ -1566,14 +1576,18 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				+ concId);
 	}
 
+	private Integer descCount = null;
 	public int countDescriptions() throws DatabaseException, IOException {
-		int count = 0;
-		Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
-		while (descItr.hasNext()) {
-			descItr.next();
-			count++;
+		if (descCount == null) {
+			int count = 0;
+			Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
+			while (descItr.hasNext()) {
+				descItr.next();
+				count++;
+			}
+			descCount = count;
 		}
-		return count;
+		return descCount;
 	}
 
 	public CountDownLatch searchLucene(I_TrackContinuation tracker,
@@ -1624,10 +1638,10 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				AceLog.getAppLog().info(
-						"Search time: " + timer.getElapsedTime());
+						"Search time 1: " + timer.getElapsedTime());
 			} else {
 				AceLog.getAppLog().info(
-						"Search Canceled. Elapsed time: "
+						"Search 1 Canceled. Elapsed time: "
 								+ timer.getElapsedTime());
 			}
 			timer.stop();
@@ -1645,23 +1659,33 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			timer.start();
 		}
 		Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
+		Semaphore checkSemaphore = new Semaphore(15);
 		while (descItr.hasNext()) {
+			try {
+				checkSemaphore.acquire();
+			} catch (InterruptedException e) {
+				AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+			}
 			if (tracker.continueWork()) {
 				I_DescriptionVersioned descV = descItr.next();
-				ACE.threadPool.execute(new CheckAndProcessRegexMatch(p,
-						matches, descV, checkList, config));
+				ACE.threadPool.execute(new CheckAndProcessRegexMatch(latch, checkSemaphore,
+						p, matches, descV, checkList, config));
 			} else {
 				while (latch.getCount() > 0) {
 					latch.countDown();
 				}
 				break;
 			}
-			latch.countDown();
+		}
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
 		}
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				AceLog.getAppLog().info(
-						"Search time: " + timer.getElapsedTime());
+						"Search 2 time: " + timer.getElapsedTime());
 			} else {
 				AceLog.getAppLog().info(
 						"Canceled. Elapsed time: " + timer.getElapsedTime());
@@ -1740,7 +1764,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			bean.getDescriptions().add(newDesc);
 		}
 		writeConceptToBdb(bean);
-
+		descCount = null;
 	}
 
 	public I_RelVersioned getRel(int relId, int conceptId)

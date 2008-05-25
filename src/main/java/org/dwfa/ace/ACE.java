@@ -124,6 +124,7 @@ import org.dwfa.ace.checks.UncommittedListModel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
+import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -144,6 +145,7 @@ import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.ace.tree.CompareConceptBeansForTree;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.tree.I_GetConceptDataForTree;
@@ -606,11 +608,14 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	public static void suspendChangeSetWriters() {
 		writeChangeSets = false;
 	}
+	
+	public static int commitSequence = 0;
 
 	/*
 	 * 
 	 */
 	public static void commit() throws IOException {
+		commitSequence++;
 		synchronized (uncommitted) {
 			boolean testFailures = false;
 			Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
@@ -1159,7 +1164,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private JToggleButton showSearchToggle;
 
-	public static ExecutorService threadPool = Executors.newFixedThreadPool(5);
+	public static ExecutorService threadPool = Executors.newFixedThreadPool(9);
 
 	public static ExecutorService treeExpandThread = Executors
 			.newFixedThreadPool(1);
@@ -2915,9 +2920,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				aceFrameConfig.getChildrenExpandedNodes().add(
 						userObject.getConceptId());
 				aceFrameConfig.setStatusMessage("Expanding " + nodeStr + "...");
+				FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
 				ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker(
 						(DefaultTreeModel) tree.getModel(), tree, node,
-						new CompareConceptBeansForTree(aceFrameConfig), this);
+						new CompareConceptBeansForTree(configSnap), this, configSnap);
 				treeExpandThread.execute(worker);
 				expansionWorkers.put(idPath, worker);
 			}

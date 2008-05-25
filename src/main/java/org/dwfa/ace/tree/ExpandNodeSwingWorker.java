@@ -24,6 +24,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -185,15 +186,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 				if (checkContinueWork("checking in add child worker")) {
 					I_GetConceptData cb = ConceptBeanForTree.get(conceptId, relId, 0,
 							false);
-					cb.getInitialText();
 					boolean leaf = false;
-					if ((acePanel.getAceFrameConfig().getDestRelTypes()
+					if ((config.getDestRelTypes()
 							.getSetValues().length == 0)
-							&& (acePanel.getAceFrameConfig()
+							&& (config
 									.getSourceRelTypes().getSetValues().length == 0)) {
 						leaf = cb.isLeaf(null, false);
 					} else {
-						leaf = cb.isLeaf(acePanel.getAceFrameConfig(), false);
+						leaf = cb.isLeaf(config, false);
 					}
 
 					child = new DefaultMutableTreeNode(cb, !leaf);
@@ -266,13 +266,12 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			}
 		});
 		upperProgressMessage = "Construct " + node + workerIdStr;
+		AceLog.getAppLog().info("Expanding node with view positions: " + this.config.getViewPositionSet());
 		I_GetConceptData cb = (I_GetConceptData) node.getUserObject();
-		I_IntSet allowedStatus = acePanel.getAceFrameConfig().getAllowedStatus();
-		I_IntSet destRelTypes = acePanel.getAceFrameConfig().getDestRelTypes();
-		I_IntSet sourceRelTypes = acePanel.getAceFrameConfig()
-				.getSourceRelTypes();
-		Set<I_Position> positions = acePanel.getAceFrameConfig()
-				.getViewPositionSet();
+		I_IntSet allowedStatus = this.config.getAllowedStatus();
+		I_IntSet destRelTypes = this.config.getDestRelTypes();
+		I_IntSet sourceRelTypes = this.config.getSourceRelTypes();
+		Set<I_Position> positions = this.config.getViewPositionSet();
 
 		if ((destRelTypes.getSetValues().length == 0)
 				&& (sourceRelTypes.getSetValues().length == 0)) {
@@ -289,8 +288,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		lowerProgressMessage = "getting source rels ";
 		srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes,
 				positions, false);
-		for (I_FilterTaxonomyRels taxonomyFilter: acePanel.getAceFrameConfig().getTaxonomyRelFilterList()) {
-			taxonomyFilter.filter(cb, srcRels, destRels, acePanel.getAceFrameConfig());
+		for (I_FilterTaxonomyRels taxonomyFilter: config.getTaxonomyRelFilterList()) {
+			taxonomyFilter.filter(cb, srcRels, destRels, config);
 		}
 		maxChildren = destRels.size() + srcRels.size();
 		completeLatch = new CountDownLatch(maxChildren);
@@ -363,7 +362,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			TreePath tp = new TreePath(child.getPath());
 			I_GetConceptData cb = (I_GetConceptData) child.getUserObject();
 
-			if (acePanel.getAceFrameConfig().getChildrenExpandedNodes()
+			if (config.getChildrenExpandedNodes()
 					.contains(cb.getConceptId())) {
 
 				DefaultMutableTreeNode ancestor = (DefaultMutableTreeNode) child
@@ -408,11 +407,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 	}
 
     private long expansionStart;
+
+	private I_ConfigAceFrame config;
     
 	public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree,
 			DefaultMutableTreeNode node,
-			Comparator<I_GetConceptDataForTree> conceptBeanComparator, ACE acePanel) {
+			Comparator<I_GetConceptDataForTree> conceptBeanComparator, ACE acePanel, I_ConfigAceFrame config) {
 		super();
+		ConceptBeanForTree.setConfig(config);
         expansionStart = System.currentTimeMillis();
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("ExpandNodeSwingWorker " + workerId + " starting.");
@@ -426,6 +428,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		progressUpdator.activity.addActionListener(this);
 		this.node = node;
 		this.acePanel = acePanel;
+		this.config = config;
 		this.conceptBeanComparator = conceptBeanComparator;
 		sortedNodes = Collections
 				.synchronizedSortedSet(new TreeSet<DefaultMutableTreeNode>(

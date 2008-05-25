@@ -1,4 +1,4 @@
-package org.dwfa.ace;
+package org.dwfa.ace.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +12,6 @@ import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.tree.I_GetConceptDataForTree;
 
 public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataForTree> {
 

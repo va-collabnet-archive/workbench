@@ -367,7 +367,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		descCursor.close();
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			AceLog.getAppLog().info(
-					"Desc count: " + count + " count time: "
+					"Desc count dbdb: " + count + " count time: "
 							+ timer.getElapsedTime());
 			timer.stop();
 		}
@@ -412,7 +412,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				AceLog.getAppLog().info(
-						"Search time: " + timer.getElapsedTime());
+						"Search 3 time: " + timer.getElapsedTime());
 			} else {
 				AceLog.getAppLog().info(
 						"Canceled. Elapsed time: " + timer.getElapsedTime());
@@ -483,7 +483,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {
 				AceLog.getAppLog().info(
-						"Search time: " + timer.getElapsedTime());
+						"Search 4 time: " + timer.getElapsedTime());
 			} else {
 				AceLog.getAppLog().info(
 						"Search Canceled. Elapsed time: "

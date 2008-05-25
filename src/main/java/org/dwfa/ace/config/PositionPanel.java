@@ -13,11 +13,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -224,7 +227,8 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      * @throws IllegalArgumentException
      * @throws SecurityException
      */
-    private JComponent setupSliderPanel() throws
+    @SuppressWarnings("unchecked")
+	private JComponent setupSliderPanel() throws
             SecurityException, IllegalArgumentException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
     	int coarseLabelInset = 8;
@@ -312,9 +316,11 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             this.fineControl.setValue(this.fineControl.getMaximum());
             this.updateFineControl();
             if (this.selectGlue != null) {
-                Iterator<?> positionItr = this.selectGlue.getSet().iterator();
-                while (positionItr.hasNext()) {
-                    Position position = (Position) positionItr.next();
+            	Set<Position> positions;
+            	synchronized (this.selectGlue.getSet()) {
+            		positions = new HashSet<Position>((Collection<? extends Position>) this.selectGlue.getSet());
+				}
+                for (Position position: positions) {
                     if (position.getPath() != null && this.path != null) {
                         if (position.getPath().equals(this.path)) {
                             setupPathsEqual(position);

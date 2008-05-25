@@ -1,9 +1,11 @@
 package org.dwfa.ace.search;
 
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -22,15 +24,13 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -154,17 +154,17 @@ public class SearchPanel extends JPanel {
 
     private JButton searchButton;
 
-    private JRadioButton regexRadio;
+    private static final String LUCENE_QUERY = "lucene query";
+    private static final String REGEX_QUERY = "regex query";
+    private static final String[] QUERY_TYPES = {LUCENE_QUERY, REGEX_QUERY};
 
-    private JRadioButton luceneRadio;
-
+    private JComboBox searchTypeCombo;
+    
     private JButton searchSetting;
 
     private JButton stopButton;
 
     private JProgressBar progressBar;
-
-    private JLabel progressInfo;
 
     private JTableWithDragImage descTable;
 
@@ -224,7 +224,45 @@ public class SearchPanel extends JPanel {
         gbc.gridx++;
 
         gbc.fill = GridBagConstraints.BOTH;
-        add(new JLabel(" lucene query: ", JLabel.RIGHT), gbc);
+        searchTypeCombo = new JComboBox(QUERY_TYPES) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void setSize(Dimension d) {
+				d.width = getMinimumSize().width;
+				super.setSize(d);
+			}
+
+			@Override
+			public void setSize(int width, int height) {
+				super.setSize(getMinimumSize().width, height);
+			}
+
+			@Override
+			public void setBounds(int x, int y, int width, int height) {
+				super.setBounds(x, y, getMinimumSize().width, height);
+			}
+
+			@Override
+			public void setBounds(Rectangle r) {
+				r.width  = getMinimumSize().width;
+				super.setBounds(r);
+			}
+
+			@Override
+			public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.width  = getMinimumSize().width;
+				return d;
+			}
+        	
+        };
+        searchTypeCombo.setSelectedItem(LUCENE_QUERY);
+        searchTypeCombo.setMinimumSize(new Dimension(175,20));
+        add(searchTypeCombo, gbc);
 
         gbc.weightx = 1;
         gbc.gridx++;
@@ -235,31 +273,11 @@ public class SearchPanel extends JPanel {
         gbc.gridx++;
         gbc.weightx = 0;
 
-        regexRadio = new JRadioButton("regex");
-        regexRadio.setSelected(false);
-        regexRadio.setVisible(false);
-        add(regexRadio, gbc);
-        gbc.gridy++;
-        luceneRadio = new JRadioButton("lucene");
-        luceneRadio.setSelected(true);
-        luceneRadio.setVisible(false);
-        add(luceneRadio, gbc);
-
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(regexRadio);
-        bg.add(luceneRadio);
-
-        gbc.gridy--;
-        gbc.gridx++;
         progressBar = new JProgressBar();
-        progressBar.setVisible(false);
+        progressBar.setVisible(true);
+        progressBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        progressBar.setMinimumSize(new Dimension(300,20));
         add(progressBar, gbc);
-
-        gbc.gridy++;
-        progressInfo = new JLabel();
-        progressInfo.setVisible(false);
-        add(progressInfo, gbc);
-        gbc.gridy--;
 
         // row 0, double height
         gbc.gridheight = 2;
@@ -296,7 +314,7 @@ public class SearchPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 7;
+        gbc.gridwidth = 6;
         gbc.gridheight = 3;
 
         add(criterion, gbc);
@@ -391,8 +409,7 @@ public class SearchPanel extends JPanel {
     public void setShowProgress(boolean show) {
         searchButton.setVisible(!show);
         stopButton.setVisible(show);
-        progressInfo.setVisible(show);
-        progressBar.setVisible(show);
+        //progressBar.setVisible(show);
         // regexRadio.setVisible(!show);
         // searchSetting.setVisible(!show);
     }
@@ -400,17 +417,17 @@ public class SearchPanel extends JPanel {
     private void startSearch() {
         updateExtraCriterion();
 
-        if (searchPhraseField.getText().length() > 2) {
+        if (searchPhraseField.getText().length() > 1) {
             setShowProgress(true);
             model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
-            ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config, luceneRadio
-                    .isSelected()));
+            ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config, 
+            		searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
         } else if (searchPhraseField.getText().length() == 0) {
             setShowProgress(true);
             model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
             ACE.threadPool.execute(new SearchAllWorker(this, model, config));
         } else {
-            JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 2 characters: "
+            JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 1 character: "
                     + searchPhraseField.getText(), "Search Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -423,8 +440,8 @@ public class SearchPanel extends JPanel {
     }
 
     public void setProgressInfo(String string) {
-        progressInfo.setText(string);
-
+    	progressBar.setStringPainted(true);
+    	progressBar.setString(string);
     }
 
     public void setProgressIndeterminate(boolean b) {
@@ -465,7 +482,7 @@ public class SearchPanel extends JPanel {
     }
 
     public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
-        luceneRadio.setSelected(true);
+    	searchTypeCombo.setSelectedItem(LUCENE_QUERY);
         searchPhraseField.setText(query);
         this.extraCriterion = extraCriterion;
         startSearch();

@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -216,7 +217,7 @@ public class Position implements I_Position {
 
 	public static Set<I_Position> readPositionSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int size = in.readInt();
-		Set<I_Position> positions = new HashSet<I_Position>(size);
+		Set<I_Position> positions = Collections.synchronizedSet(new HashSet<I_Position>(size));
 		for (int i = 0; i < size; i++) {
          try {
             positions.add(readPosition(in));

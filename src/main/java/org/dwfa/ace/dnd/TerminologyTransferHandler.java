@@ -8,6 +8,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 import javax.swing.Icon;
@@ -44,6 +45,9 @@ import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
+import org.dwfa.tapi.I_DescribeConceptUniversally;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescTuple;
@@ -246,22 +250,61 @@ public class TerminologyTransferHandler extends TransferHandler {
 		if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
 			I_ContainTermComponent ictc = (I_ContainTermComponent) comp;
 			try {
-				Object obj = t.getTransferData(conceptBeanFlavor);
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine("Transfer data for conceptBeanFlavor is: " + obj);
-				}
-				ConceptBean cb;
-				if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
-					ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
-					cb = cbt.getCoreBean();
-				} else {
-					cb = (ConceptBean) obj;
+				ConceptBean cb = null;
+				
+				if (t.isDataFlavorSupported(conceptBeanFlavor)) {
+					Object obj = t.getTransferData(conceptBeanFlavor);
+					if (obj == null) {
+						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+							AceLog.getAppLog().fine("t has null obj " + t);
+							AceLog.getAppLog().fine("t has null obj " + Arrays.asList(t.getTransferDataFlavors()));
+						}
+					}
+					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+						AceLog.getAppLog().fine("Transfer data for conceptBeanFlavor is: " + obj);
+					}
+					if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
+						ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
+						cb = cbt.getCoreBean();
+					} else {
+						cb = (ConceptBean) obj;
+					}
+				} else if (t.isDataFlavorSupported(FixedTerminologyTransferable.universalFixedConceptFlavor) ||
+						t.isDataFlavorSupported(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
+					Object obj = t.getTransferData(FixedTerminologyTransferable.universalFixedConceptFlavor);
+					if (obj == null) {
+						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+							AceLog.getAppLog().fine("t has null obj 2 " + t);
+							AceLog.getAppLog().fine("t has null obj 2" + Arrays.asList(t.getTransferDataFlavors()));
+						}
+					}
+					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+						AceLog.getAppLog().fine("Transfer data for universalFixedConceptFlavor is: " + obj);
+					}
+					I_ConceptualizeUniversally uc = (I_ConceptualizeUniversally) obj;
+					cb = ConceptBean.get(uc.getUids());
+				} else if (t.isDataFlavorSupported(FixedTerminologyTransferable.universalFixedDescFlavor) ||
+						t.isDataFlavorSupported(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
+					Object obj = t.getTransferData(FixedTerminologyTransferable.universalFixedConceptFlavor);
+					if (obj == null) {
+						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+							AceLog.getAppLog().fine("t has null obj 2 " + t);
+							AceLog.getAppLog().fine("t has null obj 2" + Arrays.asList(t.getTransferDataFlavors()));
+						}
+					}
+					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+						AceLog.getAppLog().fine("Transfer data for universalFixedConceptFlavor is: " + obj);
+					}
+					I_DescribeConceptUniversally ud = (I_DescribeConceptUniversally) obj;
+					cb = ConceptBean.get(ud.getConcept().getUids());
 				}
 				ictc.setTermComponent(cb);
 				return true;
 			} catch (UnsupportedFlavorException e) {
 				AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
+				AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+			} catch (TerminologyException e) {
 				AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 		}

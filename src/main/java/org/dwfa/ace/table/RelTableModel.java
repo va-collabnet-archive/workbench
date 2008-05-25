@@ -309,7 +309,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         REL_FIELD field = columns[columnIndex];
         try {
             I_RelTuple rel;
-            if (rowIndex >= allTuples.size()) {
+            if (rowIndex >= allTuples.size() || rowIndex < 0) {
                 return null;
             }
             rel = allTuples.get(rowIndex);
