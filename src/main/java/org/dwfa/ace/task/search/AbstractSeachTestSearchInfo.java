@@ -14,7 +14,7 @@ public abstract class AbstractSeachTestSearchInfo extends SimpleBeanInfo {
                 new PropertyDescriptor("inverted", getBeanDescriptor().getBeanClass());
             inverted.setBound(true);
             inverted.setPropertyEditorClass(CheckboxEditor.class);
-            inverted.setDisplayName("<html><font color='green'>Exclude matches");
+            inverted.setDisplayName("<html><font color='green'>exclude matches:");
             inverted.setShortDescription("If checked, excludes concepts that match this criteria");
             
             PropertyDescriptor[] childDescriptors = getAdditionalPropertyDescriptors();
