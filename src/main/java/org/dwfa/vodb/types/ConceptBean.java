@@ -1066,14 +1066,14 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		if (this.conceptId == child.getConceptId()) {
 			return true;
 		}
-		return isParentWithDepthCutoff(child, allowedStatus, allowedTypes,
+		return isParentWithDepthCutoffStartup(child, allowedStatus, allowedTypes,
 				positions, addUncommitted, 0);
 	}
 
 	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
-		return isParentWithDepthCutoff(child, allowedStatus, allowedTypes,
+		return isParentWithDepthCutoffStartup(child, allowedStatus, allowedTypes,
 				positions, addUncommitted, 0);
 	}
 	
@@ -1107,7 +1107,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		return intList;
 	}
 	
-	private boolean isParentWithDepthCutoff(I_GetConceptData child,
+	private boolean isParentWithDepthCutoffStartup(I_GetConceptData child,
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positions, boolean addUncommitted, int depth)
 				throws IOException {
@@ -1139,7 +1139,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 		}
 		Set<I_GetConceptData> parents = child.getSourceRelTargets(
 				allowedStatus, allowedTypes, positions, addUncommitted);
-		if (depth == 40) {
+		if (depth == 90) {
 			AceLog
 					.getAppLog()
 					.log(
@@ -1150,7 +1150,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 									+ this + "\nchild: " + child
 									+ "\nparents: " + parents);
 		}
-		if (depth == 50) {
+		if (depth == 100) {
 			AceLog.getAppLog().log(
 					Level.SEVERE,
 					"Depth " + depth
