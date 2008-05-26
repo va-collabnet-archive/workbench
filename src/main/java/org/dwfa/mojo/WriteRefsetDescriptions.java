@@ -56,6 +56,7 @@ I_ProcessExtByRef {
 	private I_TermFactory termFactory;
 	private Map<String, Writer> fileMap = new HashMap<String, Writer>();
 	private BufferedWriter noDescriptionWriter;
+	private Map<String, Integer> progressMap = new HashMap<String, Integer>();
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -106,7 +107,7 @@ I_ProcessExtByRef {
 
 		I_DescriptionTuple refsetName = assertExactlyOne(termFactory.getConcept((refset.getRefsetId())).getDescriptionTuples(status, fsn, null));
 
-		getLog().info("Exporting " + refsetName.getText());
+		logProgress(refsetName.getText());
 
 		Writer writer = getWriter(refsetName.getText());
 
@@ -146,6 +147,19 @@ I_ProcessExtByRef {
 					writer.append("\r\n");
 				}
 			}
+		}
+	}
+
+	private void logProgress(String refsetName) {
+		Integer progress = progressMap.get(refsetName);
+		if (progress == null) {
+			progress = 0;
+		}
+		
+		progressMap.put(refsetName, progress++);
+		
+		if (progress % 1000 == 0) {
+			getLog().info("Exported " + progress + " of refset " + refsetName);
 		}
 	}
 
