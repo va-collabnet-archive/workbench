@@ -28,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -45,6 +46,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -57,6 +59,28 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class SearchPanel extends JPanel {
 
+    public class AddToList implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+            	JList conceptList = config.getBatchConceptList();
+                I_ModelTerminologyList conceptListModel = (I_ModelTerminologyList) conceptList.getModel();
+            	
+            	HashSet<Integer> conceptsAdded = new HashSet<Integer>();
+            	for (int i = 0; i < model.getRowCount(); i++) {
+            		I_DescriptionTuple desc = model.getDescription(i);
+            		if (conceptsAdded.contains(desc.getConceptId()) == false) {
+            			conceptsAdded.add(desc.getConceptId());
+            			ConceptBean cb = ConceptBean.get(desc.getConceptId());
+            			conceptListModel.addElement(cb);
+            		}
+            	}
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+    }
     public class SaveQuery implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -184,6 +208,8 @@ public class SearchPanel extends JPanel {
 
     private List<I_TestSearchResults> extraCriterion;
 
+	private JButton addToList;
+
     public SearchPanel(I_ConfigAceFrame config) {
         super(new GridBagLayout());
         this.config = config;
@@ -282,6 +308,8 @@ public class SearchPanel extends JPanel {
         
         gbc.weightx = 0;
 
+        gbc.fill = GridBagConstraints.NONE;
+
         // row 0, double height
         gbc.gridheight = 2;
         searchSetting = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
@@ -306,14 +334,25 @@ public class SearchPanel extends JPanel {
         gbc.gridx++;
         gbc.gridheight = 1;
         gbc.gridwidth = 1;
+        
+        gbc.fill = GridBagConstraints.BOTH;
 
         loadButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
+        loadButton.setToolTipText("read search specification from disk");
         loadButton.addActionListener(new LoadQuery());
         add(loadButton, gbc);
         gbc.gridx++;
         saveButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/save_to_disk.png")));
+        saveButton.setToolTipText("save search specification to disk");
         saveButton.addActionListener(new SaveQuery());
         add(saveButton, gbc);
+
+        gbc.gridx++;
+        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/notebook_add.png")));
+        addToList.addActionListener(new AddToList());
+        addToList.setToolTipText("add concepts from search results to list view");
+        add(addToList, gbc);
+
 
         gbc.gridx = 0;
         gbc.gridy = 1;

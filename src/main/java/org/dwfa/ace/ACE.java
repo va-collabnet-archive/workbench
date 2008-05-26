@@ -1627,7 +1627,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		conceptPanels.add(c4panel);
 		if (editMode) {
 			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
-			conceptTabs.addTab("List", getConceptListEditor());
+			conceptTabs.addTab("List", 
+					new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")), getConceptListEditor());
 		} else {
 			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
 		}
