@@ -178,4 +178,14 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 	public Collection<Long> values() {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		if (conn != null && conn.isClosed() == false) {
+			conn.close();
+		}
+	}
+	
+	
 }
