@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -16,13 +17,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
-public class UuidSnomedMap implements Map<UUID, Long> {
+public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
 	private static Calendar now = Calendar.getInstance();
 	private boolean modified = false;
@@ -46,10 +46,16 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#addFixedMap(java.util.Map)
+	 */
 	public void addFixedMap(Map<UUID, Long> fixedMap) {
 		fixedMaps.add(fixedMap);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#getSnomedUuidListMap()
+	 */
 	public Map<Long, List<UUID>> getSnomedUuidListMap() {
 		Map<Long, List<UUID>> snomedUuidListMap = new HashMap<Long, List<UUID>>();
 		for (Entry<UUID, Long> entry : uuidSnomedMap.entrySet()) {
@@ -64,18 +70,30 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		return snomedUuidListMap;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#clear()
+	 */
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#containsKey(java.lang.Object)
+	 */
 	public boolean containsKey(Object arg0) {
 		return uuidSnomedMap.containsKey(arg0);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#containsValue(java.lang.Object)
+	 */
 	public boolean containsValue(Object arg0) {
 		return uuidSnomedMap.containsValue(arg0);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#entrySet()
+	 */
 	public Set<Entry<UUID, Long>> entrySet() {
 		return uuidSnomedMap.entrySet();
 	}
@@ -84,6 +102,9 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		return uuidSnomedMap.equals(obj);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#get(java.lang.Object)
+	 */
 	public Long get(Object key) {
 		for (Map<UUID, Long> fixed: fixedMaps) {
 			if (fixed.containsKey(key)) {
@@ -94,6 +115,9 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 	}
 
 	private static long MAX_SCT_ID = 999999999999999999L;
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#getWithGeneration(java.util.UUID, org.dwfa.maven.transform.SctIdGenerator.TYPE)
+	 */
 	public Long getWithGeneration(UUID key, TYPE type) {
 		Long returnValue = get(key);
 		if (returnValue == null) {
@@ -111,10 +135,16 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		return uuidSnomedMap.hashCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#isEmpty()
+	 */
 	public boolean isEmpty() {
 		return uuidSnomedMap.isEmpty();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#keySet()
+	 */
 	public Set<UUID> keySet() {
 		return uuidSnomedMap.keySet();
 	}
@@ -123,6 +153,9 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		String sequence = sctIdStr.substring(0, sctIdStr.length() - "011000036106".length());
 		return Long.parseLong(sequence);
 	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#put(java.util.UUID, java.lang.Long)
+	 */
 	public Long put(UUID key, Long sctId) {
 		try {
 			maxSequence = Math.max(maxSequence, getSequence(sctId));
@@ -132,6 +165,9 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		return uuidSnomedMap.put(key, sctId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#putAll(java.util.Map)
+	 */
 	public void putAll(Map<? extends UUID, ? extends Long> map) {
 		for (Entry<? extends UUID, ? extends Long> entry : map.entrySet()) {
 			maxSequence = Math.max(maxSequence, entry.getValue());
@@ -139,22 +175,37 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#remove(java.lang.Object)
+	 */
 	public Long remove(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#size()
+	 */
 	public int size() {
 		return uuidSnomedMap.size();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#values()
+	 */
 	public Collection<Long> values() {
 		return uuidSnomedMap.values();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#getMaxSequence()
+	 */
 	public long getMaxSequence() {
 		return maxSequence;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#write(java.io.File)
+	 */
 	public void write(File f) throws IOException {
 		if (modified) {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
@@ -230,11 +281,17 @@ public class UuidSnomedMap implements Map<UUID, Long> {
 		br.close();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#putEffectiveDate(java.lang.Long, java.lang.String, boolean)
+	 */
 	public void putEffectiveDate(Long sctId, String date, boolean update) {
 		effectiveDateOfSctId.put(sctId,date);
 		modified = update;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.maven.transform.I_MapUuidsToSnomed#getEffectiveDate(java.lang.Long)
+	 */
 	public String getEffectiveDate(Long sctId) {
 		return effectiveDateOfSctId.get(sctId);
 	}
