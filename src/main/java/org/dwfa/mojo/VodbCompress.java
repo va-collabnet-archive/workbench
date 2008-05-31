@@ -7,7 +7,7 @@ import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 
 /**
- * Compress database log files so there utilization is the value provided. 
+ * Compress database log files so their utilization is the value provided. 
  * Call this goal prior to closing the database. 
  * 
  * @goal vodb-compress
