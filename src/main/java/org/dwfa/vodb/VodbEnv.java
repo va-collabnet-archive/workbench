@@ -1551,4 +1551,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return this;
 	}
 
+	public void compress(int minUtilization) throws IOException {
+	    bdbEnv.compress(minUtilization);
+	}
+
 }

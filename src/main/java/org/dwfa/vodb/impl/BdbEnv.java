@@ -876,4 +876,42 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		}
 	}
 
+	public void compress(int utilization) throws IOException {
+		
+		try {
+			
+			String lookAheadCacheSize = env.getConfig().getConfigParam("je.cleaner.lookAheadCacheSize");
+			env.getConfig().setConfigParam("je.cleaner.lookAheadCacheSize", "81920");
+
+			String cluster = env.getConfig().getConfigParam("je.cleaner.cluster");
+			env.getConfig().setConfigParam("je.cleaner.cluster", "true");
+
+			String minFileUtilization = env.getConfig().getConfigParam("je.cleaner.minFileUtilization");
+			env.getConfig().setConfigParam("je.cleaner.minFileUtilization", Integer.toString(utilization));
+
+			String minUtilization = env.getConfig().getConfigParam("je.cleaner.minUtilization");
+			env.getConfig().setConfigParam("je.cleaner.minUtilization", Integer.toString(utilization));
+
+			String threads = env.getConfig().getConfigParam("je.cleaner.threads");
+			env.getConfig().setConfigParam("je.cleaner.threads", "4");
+
+			boolean anyCleaned = false;
+			  while (env.cleanLog() > 0) {
+			      anyCleaned = true;
+			  }
+			  if (anyCleaned) {
+			      CheckpointConfig force = new CheckpointConfig();
+			      force.setForce(true);
+			      env.checkpoint(force);
+			  }
+			  
+			  env.getConfig().setConfigParam("je.cleaner.lookAheadCacheSize", lookAheadCacheSize);
+			  env.getConfig().setConfigParam("je.cleaner.cluster", cluster);
+			  env.getConfig().setConfigParam("je.cleaner.minFileUtilization", minFileUtilization);
+			  env.getConfig().setConfigParam("je.cleaner.minUtilization", minUtilization);
+			  env.getConfig().setConfigParam("je.cleaner.threads", threads);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
+	}
 }
