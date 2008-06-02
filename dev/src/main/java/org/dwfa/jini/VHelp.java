@@ -27,7 +27,10 @@ public class VHelp {
         File dir = new File("lib-dl");
         String [] matches = dir.list(new VHelpFileFilter(prefix));
         warnIfEmpty(prefix, matches);
-        return matches[0];
+        if (matches.length >= 1) {
+        	return matches[0];
+        }
+        return "";
     }
     
     public static String addLibVersion(String prefix) {
