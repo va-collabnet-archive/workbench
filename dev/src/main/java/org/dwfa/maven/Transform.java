@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.util.io.FileIO;
 
@@ -114,7 +115,8 @@ public class Transform extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-    	getLog().info("starting transform: " + Arrays.asList(outputSpecs));
+    	Log logger = getLog();
+		logger.info("starting transform: " + Arrays.asList(outputSpecs));
     	
         // calculate the SHA-1 hashcode for this mojo based on input
         Sha1HashCodeGenerator generator;
@@ -151,7 +153,8 @@ public class Transform extends AbstractMojo {
             // hasn't been executed previously
             try {
                 for (OutputSpec outSpec: outputSpecs) {
-                    for (I_TransformAndWrite tw: outSpec.getWriters()) {
+                    I_TransformAndWrite[] writers = outSpec.getWriters();
+					for (I_TransformAndWrite tw: writers) {
                         File outputFile = new File(tw.getFileName());
                         outputFile.getParentFile().mkdirs();
                         FileOutputStream fos = new FileOutputStream(outputFile, tw.append());
@@ -163,15 +166,16 @@ public class Transform extends AbstractMojo {
                         for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
                             constantTransform.setup(this);
                             constantTransform.transform("test");
-                            for (I_TransformAndWrite tw: outSpec.getWriters()) {
+                            for (I_TransformAndWrite tw: writers) {
                                 tw.addTransform(constantTransform);
                             }
                         }
                     }
-                    for (InputFileSpec spec : outSpec.getInputSpecs()) {
+                    InputFileSpec[] inputSpecs = outSpec.getInputSpecs();
+					for (InputFileSpec spec : inputSpecs) {
                         nextColumnId = 0;
                         Map<Integer, Set<I_ReadAndTransform>> columnTransformerMap = new HashMap<Integer, Set<I_ReadAndTransform>>();
-                        getLog().info("Now processing file spec:\n\n" + spec);
+                        logger.info("Now processing file spec:\n\n" + spec);
 
                         for (I_ReadAndTransform t : spec.getColumnSpecs()) {
                             t.setup(this);
@@ -182,7 +186,7 @@ public class Transform extends AbstractMojo {
                             }
                             transformerSet.add(t);
 
-                            for (I_TransformAndWrite tw: outSpec.getWriters()) {
+                            for (I_TransformAndWrite tw: writers) {
                                 tw.addTransform(t);
                             }
                         }
@@ -241,7 +245,7 @@ public class Transform extends AbstractMojo {
                             }
 
 
-                            for (I_TransformAndWrite tw: outSpec.getWriters()) {
+                            for (I_TransformAndWrite tw: writers) {
                                 tw.processRec();
                             }
 
@@ -263,22 +267,37 @@ public class Transform extends AbstractMojo {
                             tokenType = st.nextToken();
                         }
                         fs.close();
-                        getLog().info("Processed: " + rowCount + " rows.");
+                        logger.info("Processed: " + rowCount + " rows.");
                     }
-                    for (I_TransformAndWrite tw: outSpec.getWriters()) {
+                    logger.info("closing writers");
+                    int count = 0;
+                    for (I_TransformAndWrite tw: writers) {
+                    	logger.info("closing " + ++count + " of " + writers.length);
                         tw.close();
                     }
-                    for (InputFileSpec ifs: outSpec.getInputSpecs()) {
-                       for (I_ReadAndTransform t : ifs.getColumnSpecs()) {
-                          t.cleanup(this);
-                      }
-                    }
+                    
+                    logger.info("cleanup inputs");
+                    count = 0;
+					for (InputFileSpec ifs : inputSpecs) {
+						logger.info("cleaning input spec " + ++count + " of "
+								+ inputSpecs.length);
+						int transformCount = 0;
+						I_ReadAndTransform[] columnSpecs = ifs.getColumnSpecs();
+						for (I_ReadAndTransform t : columnSpecs) {
+							logger.info("cleaning column spec "
+									+ ++transformCount + " of "
+									+ columnSpecs.length);
+							t.cleanup(this);
+						}
+					}
+
+                 	  logger.info("cleanup inputs - done");
                 }
 
 
 
                 if (uuidToNativeMap != null) {
-                    getLog().info("ID map is not null.");
+                    logger.info("ID map is not null.");
                     // write out id map...
                     File outputFileLoc = new File(idFileLoc);
                     outputFileLoc.getParentFile().mkdirs();
@@ -303,7 +322,7 @@ public class Transform extends AbstractMojo {
                     bw.close();
                 }
 
-
+                logger.info("writing out the source to uuid map");
                 for (Iterator keyItr = sourceToUuidMapMap.keySet().iterator(); keyItr.hasNext();) {
                     String key = (String) keyItr.next();
 
@@ -338,7 +357,9 @@ public class Transform extends AbstractMojo {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                
+                logger.info("execution complete");
+                
             } catch (FileNotFoundException e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             } catch (UnsupportedEncodingException e) {
@@ -349,7 +370,7 @@ public class Transform extends AbstractMojo {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
         } else {
-            getLog().info("Skipping goal - executed previously.");
+            logger.info("Skipping goal - executed previously.");
         }
     }
 
