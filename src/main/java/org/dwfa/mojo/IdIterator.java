@@ -2,31 +2,97 @@ package org.dwfa.mojo;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.UUID;
 
-import org.dwfa.ace.api.I_IdTuple;
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ProcessIds;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.bind.ThinVersionHelper;
+
 
 public class IdIterator implements I_ProcessIds {
 
 	
 	private BufferedWriter output = null;
-	public IdIterator(BufferedWriter output) throws IOException {
+	private int count = 0;
+	private I_TermFactory termFactory = LocalVersionedTerminology.get();
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+	private final BufferedWriter mapfile;
+	private Collection<UUID> snomedIdUuids;
+	
+	public IdIterator(BufferedWriter output, BufferedWriter mapfile) throws IOException {
+		System.out.println("IdIterator - blah");
+		this.mapfile = mapfile;
 		this.output = output;
+		snomedIdUuids = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids();
 	}
 	
 	public void processId(I_IdVersioned idv) throws Exception {
-		List<I_IdTuple> tuples = idv.getTuples();
+		
+		for (UUID uuid : idv.getUIDs()) {
+			for (I_IdPart idvPart : idv.getVersions()) {
+
+				Date date = new Date(ThinVersionHelper.convert(idvPart.getVersion()));
 				
-		for (I_IdTuple tuple: tuples) {			
-			String status = LocalVersionedTerminology.get().getUids(tuple.getIdStatus()).iterator().next().toString();
-			output.write(tuple.getUIDs().iterator().next().toString() + "\t" + status);
+				if (snomedSource(idvPart)) {
+					mapfile.write(uuid.toString());
+					mapfile.newLine();
+					mapfile.write(idvPart.getSourceId().toString());
+					mapfile.newLine();
+				}
+				
+				if (termFactory.hasConcept(idvPart.getSource())) {
+					UUID sourceUuid = getFirstUuid(idvPart.getSource());
+					UUID statusUuid = getFirstUuid(idvPart.getIdStatus());
+					UUID pathUuid = getFirstUuid(idvPart.getPathId());
+					output.write(uuid.toString() + "\t" + sourceUuid + "\t"
+							+ idvPart.getSourceId() + "\t" + statusUuid + "\t"
+							+ dateFormat.format(date) + "\t" + pathUuid);
+
+					output.newLine();
+				} else {
+					System.out.println("WARNING: id " + idv.getUIDs()
+							+ " has source id " + idvPart.getSourceId()
+							+ " but the source " + idvPart.getSource()
+							+ " does not map to a source concept - skipping");
+					try {
+						System.out.println("the uuids do map to a concept - " + termFactory.getConcept(idv.getUIDs()));
+					} catch (Exception e) {
+						System.out.println("the uuids do not map to a concept");
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 		
-		output.newLine();	
+		if (++count % 1000 == 0) {
+			System.out.println("processed id number " + count);
+		}
+		
 	}
-	
 
+	private boolean snomedSource(I_IdPart idvPart) throws TerminologyException, IOException {
+		if (termFactory.hasConcept(idvPart.getSource())) {
+			for (UUID uuid : termFactory.getUids(idvPart.getSource())) {
+				if (snomedIdUuids.contains(uuid)) {
+					return true;
+				}
+			}
+		} else {
+			System.out.println("no concept for source, id was " + idvPart.getSourceId());
+		}
+		return false;
+	}
+
+	private UUID getFirstUuid(int nid) throws TerminologyException,
+			IOException {
+		return termFactory.getUids(nid).iterator().next();
+	}
 }
