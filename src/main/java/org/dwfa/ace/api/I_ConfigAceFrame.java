@@ -348,4 +348,10 @@ public interface I_ConfigAceFrame {
      * @return
      */
     public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList();
+    
+    /**
+     * For storing history of concepts viewed by each component viewier. 
+     * @return
+     */
+    public Map<Integer, List<I_GetConceptData>> getTabHistoryMap();
 }
