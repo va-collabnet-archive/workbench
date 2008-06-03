@@ -7,6 +7,7 @@ package org.dwfa.bpa.util;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -96,7 +97,7 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     protected Configuration config;
 
     // Ask AWT which menu modifier we should be using.
-    protected final static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    protected static int MENU_MASK;
 
     // Check that we are on Mac OS X. This is crucial to loading and using the
     // OSXAdapter class.
@@ -130,6 +131,14 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
             JMenuBar mainMenuBar, boolean hiddenFrame) throws Exception {
         super();
+        // Ask AWT which menu modifier we should be using.
+        try {
+			MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		} catch (HeadlessException e) {
+			MENU_MASK = 0;
+			e.printStackTrace();
+		}
+
         this.mainMenuBar = mainMenuBar;
         this.frame = frame;
         this.frame.addWindowListener(this);
@@ -138,6 +147,7 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
         this.lifeCycle = lc;
         this.hiddenFrame = hiddenFrame;
         this.quitList.add(new StandardQuitter());
+ 
     }
 
     public void setup() throws Exception {
