@@ -13,9 +13,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -76,7 +78,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 30;
+    private static final int dataVersion = 31;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -219,6 +221,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     private List<I_OverrideTaxonomyRenderer> taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
     private List<I_FilterTaxonomyRels> taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
+    
+    // 31
+    private Map<Integer, List<I_GetConceptData>> tabHistoryMap = new TreeMap<Integer, List<I_GetConceptData>>();
 
     // transient
     private transient MasterWorker worker;
@@ -360,8 +365,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 30
         out.writeObject(taxonomyRendererOverrideList);
         out.writeObject(taxonomyRelFilterList);
-       
 
+        // 31
+        out.writeInt(tabHistoryMap.size());
+        for (Integer i: tabHistoryMap.keySet()) {
+            out.writeInt(i);
+            IntList il = new IntList();
+            for (I_GetConceptData concept: tabHistoryMap.get(i)) {
+            	il.add(concept.getConceptId());
+            }
+            IntList.writeIntList(out, il);
+         }
     }
 
     @SuppressWarnings("unchecked")
@@ -630,6 +644,19 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
                 taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
             }
+            tabHistoryMap = new TreeMap<Integer, List<I_GetConceptData>>();
+            if (objDataVersion >= 31) {
+            	int mapSize = in.readInt();
+            	for (int i = 0; i < mapSize; i++) {
+            		int mapId = in.readInt();
+            		IntList il = IntList.readIntListIgnoreMapErrors(in);
+            		List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
+            		for (int nid: il.getListArray()) {
+            			tabHistoryList.add(ConceptBean.get(nid));
+            		}
+            		tabHistoryMap.put(mapId, tabHistoryList);
+            	}
+            } 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -1907,6 +1934,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList() {
 		return taxonomyRelFilterList;
+	}
+
+	public Map<Integer, List<I_GetConceptData>> getTabHistoryMap() {
+		return tabHistoryMap;
 	}
 
 }

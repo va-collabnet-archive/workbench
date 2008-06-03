@@ -116,7 +116,7 @@ public class CollectionEditorContainer extends JPanel {
 		this.ace = ace;
 		this.processBuilder = descListProcessBuilderPanel;
 		conceptPanel = new ConceptPanel(ace,
-				LINK_TYPE.LIST_LINK, true);
+				LINK_TYPE.LIST_LINK, true, Integer.MIN_VALUE);
 		conceptPanel.setLinkedList(list);
 		conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
 		GridBagConstraints c = new GridBagConstraints();

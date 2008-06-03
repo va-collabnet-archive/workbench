@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -27,6 +30,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -35,8 +39,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
@@ -79,6 +85,42 @@ import com.sleepycat.je.DatabaseException;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		PropertyChangeListener, Scrollable {
+	
+	private class ShowHistoryListener implements ActionListener {
+		
+		private class ShowHistoryAction extends AbstractAction {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			I_GetConceptData concept;
+			
+			public ShowHistoryAction(I_GetConceptData concept) {
+				super(concept.toString());
+				this.concept = concept;
+			}
+
+			public void actionPerformed(ActionEvent e) {
+				ConceptPanel.this.setTermComponent(concept);
+			}
+			
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (tabHistoryList.size() > 1) {
+				JPopupMenu popup = new JPopupMenu();
+				for (I_GetConceptData historyItem: tabHistoryList) {
+					JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
+				    popup.add(menuItem);
+				}
+				Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+				SwingUtilities.convertPointFromScreen(mouseLocation, ConceptPanel.this);
+				popup.show(ConceptPanel.this,
+						mouseLocation.x, mouseLocation.y);
+			}
+		}
+	}
 
 	private class LabelListener implements PropertyChangeListener {
 
@@ -87,6 +129,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			if (label.getTermComponent() != null) {
 				ace.getAceFrameConfig().setLastViewed(
 						(I_GetConceptData) label.getTermComponent());
+				if (label.getTermComponent() == null) {
+					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+				} else if (label.getTermComponent().equals(tabHistoryList.getFirst()) == false){
+					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+				}
+				while (tabHistoryList.size() > 20) {
+					tabHistoryList.removeLast();
+				}
 			}
 			firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt
 					.getNewValue());
@@ -168,6 +218,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	private ACE ace;
 
+	public static ImageIcon HISTORY_ICON = new ImageIcon(ACE.class
+			.getResource("/24x24/plain/history2.png"));
+
 	public static ImageIcon UNLINKED_ICON = new ImageIcon(ACE.class
 			.getResource("/24x24/plain/carabiner.png"));
 
@@ -226,6 +279,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private PropertyChangeListener labelListener = new LabelListener();
 
 	private JToggleButton refsetToggleButton;
+
+	private JButton componentHistoryButton;
+	
+	private Integer panelId;
 
 	/**
 	 * 
@@ -344,26 +401,34 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link) throws DatabaseException,
+	public ConceptPanel(ACE ace, LINK_TYPE link, Integer panelId) throws DatabaseException,
 			IOException, ClassNotFoundException {
-		this(ace, link, null);
+		this(ace, link, null, panelId);
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link, boolean enableListLink)
+	public ConceptPanel(ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
 			throws DatabaseException, IOException, ClassNotFoundException {
-		this(ace, link, null, enableListLink);
+		this(ace, link, null, enableListLink, panelId);
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs)
+	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
 			throws DatabaseException, IOException, ClassNotFoundException {
-		this(ace, link, conceptTabs, false);
+		this(ace, link, conceptTabs, false, panelId);
 	}
 
+	LinkedList<I_GetConceptData> tabHistoryList;
+	
 	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs,
-			boolean enableListLink) throws DatabaseException, IOException,
+			boolean enableListLink, Integer panelId) throws DatabaseException, IOException,
 			ClassNotFoundException {
 		super(new GridBagLayout());
 		this.ace = ace;
+		this.panelId = panelId;
+		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(panelId);
+		if (this.tabHistoryList == null) {
+			this.tabHistoryList = new LinkedList<I_GetConceptData>();
+			ace.getAceFrameConfig().getTabHistoryMap().put(this.panelId, this.tabHistoryList);
+		}
 		UpdateTogglesPropertyChangeListener updateListener = new UpdateTogglesPropertyChangeListener();
 		this.ace.getAceFrameConfig().addPropertyChangeListener(
 				"visibleComponentToggles", updateListener);
@@ -412,10 +477,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
 		add(label, c);
+		c.weightx = 0.0;
+		c.gridx++;
+		componentHistoryButton = new JButton(HISTORY_ICON);
+		componentHistoryButton.addActionListener(new ShowHistoryListener());
+		add(componentHistoryButton, c);
 
 		c.gridx = 0;
 		c.gridy++;
-		c.gridwidth = 2;
+		c.gridwidth = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		add(getToggleBar(), c);
 		c.fill = GridBagConstraints.BOTH;
@@ -427,6 +497,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		add(contentScroller, c);
 		setBorder(BorderFactory.createRaisedBevelBorder());
 		label.addPropertyChangeListener("termComponent", labelListener);
+		if (this.tabHistoryList.getFirst() != null) {
+			this.setTermComponent(this.tabHistoryList.getFirst());
+		}
 	}
 
 	public JComponent getContentPane() throws DatabaseException {

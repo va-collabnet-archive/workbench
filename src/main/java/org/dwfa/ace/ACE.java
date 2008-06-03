@@ -244,7 +244,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				if (dataCheckPanel == null) {
 					try {
 						dataCheckPanel = new ConceptPanel(ACE.this, LINK_TYPE.DATA_CHECK_LINK,
-								conceptTabs);
+								conceptTabs, Integer.MAX_VALUE);
 						conceptPanels.add(dataCheckPanel);
 					} catch (DatabaseException e) {
 						AceLog.getAppLog().alertAndLogException(e);
@@ -1608,9 +1608,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			ClassNotFoundException, TerminologyException {
 		termTree = getHierarchyPanel();
 		conceptPanels = new ArrayList<ConceptPanel>();
-		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs);
+		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs, 1);
 		conceptPanels.add(c1Panel);
-		c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs);
+		c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
 		conceptPanels.add(c2Panel);
 		conceptTabs.addComponentListener(new ResizePalettesListener());
 		conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel,
@@ -1619,11 +1619,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				c2Panel, "Search Linked");
 
 		ConceptPanel c3panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
-				conceptTabs);
+				conceptTabs, 3);
 		conceptPanels.add(c3panel);
 		conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
 		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
-				conceptTabs);
+				conceptTabs, 4);
 		conceptPanels.add(c4panel);
 		if (editMode) {
 			conceptTabs.addTab("Empty", null, c4panel, "Unlinked");			
