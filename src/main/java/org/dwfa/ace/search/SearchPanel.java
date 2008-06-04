@@ -295,6 +295,7 @@ public class SearchPanel extends JPanel {
         this.searchPhraseField = new JTextField(200);
         this.searchPhraseField.setDragEnabled(true);
         this.searchPhraseField.setMinimumSize(new Dimension(400,20));
+        this.searchPhraseField.setText("search");
         add(searchPhraseField, gbc);
 
         gbc.gridx++;
