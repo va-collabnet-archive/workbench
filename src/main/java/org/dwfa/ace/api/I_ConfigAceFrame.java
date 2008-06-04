@@ -353,5 +353,5 @@ public interface I_ConfigAceFrame {
      * For storing history of concepts viewed by each component viewier. 
      * @return
      */
-    public Map<Integer, List<I_GetConceptData>> getTabHistoryMap();
+    public Map<String, List<I_GetConceptData>> getTabHistoryMap();
 }
