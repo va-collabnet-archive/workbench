@@ -4,6 +4,7 @@ import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class RelSubsumptionMatchSearchInfo extends AbstractSeachTestSearchInfo {
@@ -11,7 +12,14 @@ public class RelSubsumptionMatchSearchInfo extends AbstractSeachTestSearchInfo {
 	@Override
 	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
 		try {
-			PropertyDescriptor relTypeTerm = 
+            PropertyDescriptor applySubsumption =
+                new PropertyDescriptor("applySubsumption", getBeanDescriptor().getBeanClass());
+            applySubsumption.setBound(true);
+            applySubsumption.setPropertyEditorClass(CheckboxEditor.class);
+            applySubsumption.setDisplayName("<html><font color='green'>use subsumption:");
+            applySubsumption.setShortDescription("If checked, uses subsumption to test rel type and rel restriction.");
+
+            PropertyDescriptor relTypeTerm = 
 				new PropertyDescriptor("relTypeTerm", getBeanDescriptor().getBeanClass());
 			relTypeTerm.setBound(true);
 			relTypeTerm.setPropertyEditorClass(ConceptLabelEditor.class);
@@ -25,7 +33,7 @@ public class RelSubsumptionMatchSearchInfo extends AbstractSeachTestSearchInfo {
 			relRestrictionTerm.setDisplayName("<html><font color='green'>restriction kind:");
 			relRestrictionTerm.setShortDescription("The concept to test for restriction is kind of.");
 
-			PropertyDescriptor[] rv = { relTypeTerm, relRestrictionTerm };
+			PropertyDescriptor[] rv = { applySubsumption, relTypeTerm, relRestrictionTerm };
 			return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());

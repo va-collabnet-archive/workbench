@@ -28,7 +28,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
 
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 
 	/**
 	 * Rel type concept for the term component to test.
@@ -41,19 +41,27 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
 	 */
 	private TermEntry relRestrictionTerm = new TermEntry(
 			ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+	
+	private Boolean applySubsumption = true;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(this.relTypeTerm);
 		out.writeObject(this.relRestrictionTerm);
+		out.writeBoolean(applySubsumption);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
+		if (objDataVersion <= dataVersion) {
 			this.relTypeTerm = (TermEntry) in.readObject();
 			this.relRestrictionTerm = (TermEntry) in.readObject();
+			if (objDataVersion >= 2) {
+				applySubsumption = in.readBoolean();
+			} else {
+				applySubsumption = true;
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -109,50 +117,69 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
 									+ relRestrictionToMatch);
 				}
 				if (relTypeToMatch != null) {
-					if (relTypeToMatch.isParentOfOrEqualTo(relType, frameConfig
-							.getAllowedStatus(), frameConfig.getDestRelTypes(),
-							frameConfig.getViewPositionSet(), false)) {
-						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-							AceLog.getAppLog().fine(
-									"  matched type: " + relType);
-						}
-						if (relRestrictionToMatch != null) {
-							if (relRestrictionToMatch.isParentOfOrEqualTo(
-									relRestriction, frameConfig
-											.getAllowedStatus(), frameConfig
-											.getDestRelTypes(), frameConfig
-											.getViewPositionSet(), false)) {
+					if (applySubsumption) {
+						if (relTypeToMatch.isParentOfOrEqualTo(relType, frameConfig
+								.getAllowedStatus(), frameConfig.getDestRelTypes(),
+								frameConfig.getViewPositionSet(), false)) {
+							if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+								AceLog.getAppLog().fine(
+										"  matched type: " + relType);
+							}
+							if (relRestrictionToMatch != null) {
+								if (relRestrictionToMatch.isParentOfOrEqualTo(
+										relRestriction, frameConfig
+												.getAllowedStatus(), frameConfig
+												.getDestRelTypes(), frameConfig
+												.getViewPositionSet(), false)) {
+									if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+										AceLog.getAppLog().fine(
+												"  matched restriction: "
+														+ relRestriction);
+										AceLog.getAppLog().fine(
+												"Rel subsumption OK1: "
+														+ testConcept);
+									}
+									return applyInversion(true);
+								}
+							} else {
 								if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 									AceLog.getAppLog().fine(
-											"  matched restriction: "
-													+ relRestriction);
-									AceLog.getAppLog().fine(
-											"Rel subsumption OK1: "
-													+ testConcept);
+											"Rel subsumption OK2: " + testConcept);
 								}
 								return applyInversion(true);
 							}
-						} else {
-							if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-								AceLog.getAppLog().fine(
-										"Rel subsumption OK2: " + testConcept);
-							}
-							return applyInversion(true);
 						}
+					} else if (relTypeToMatch.equals(relType)) {
+						if (relRestrictionToMatch != null) {
+							if (relRestrictionToMatch.equals(relRestriction)) {
+								return applyInversion(true);
+							} else {
+								return applyInversion(false);
+							}
+						}
+						return applyInversion(true);
 					}
 
 				} else if (relRestrictionToMatch != null) {
-					if (relRestrictionToMatch.isParentOfOrEqualTo(
-							relRestriction, frameConfig.getAllowedStatus(),
-							frameConfig.getDestRelTypes(), frameConfig
-									.getViewPositionSet(), false)) {
-						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-							AceLog.getAppLog().fine(
-									"  matched restriction: " + relRestriction);
-							AceLog.getAppLog().fine(
-									"Rel subsumption OK3: " + testConcept);
+					if (applySubsumption) {
+						if (relRestrictionToMatch.isParentOfOrEqualTo(
+								relRestriction, frameConfig.getAllowedStatus(),
+								frameConfig.getDestRelTypes(), frameConfig
+										.getViewPositionSet(), false)) {
+							if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+								AceLog.getAppLog().fine(
+										"  matched restriction: " + relRestriction);
+								AceLog.getAppLog().fine(
+										"Rel subsumption OK3: " + testConcept);
+							}
+							return applyInversion(true);
 						}
-						return applyInversion(true);
+					} else {
+						if (relRestrictionToMatch.equals(relRestriction)) {
+							return applyInversion(true);
+						} else {
+							return applyInversion(false);
+						}
 					}
 				} else {
 					return applyInversion(true);
@@ -180,6 +207,14 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
 
 	public void setRelRestrictionTerm(TermEntry relRestrictionTerm) {
 		this.relRestrictionTerm = relRestrictionTerm;
+	}
+
+	public Boolean getApplySubsumption() {
+		return applySubsumption;
+	}
+
+	public void setApplySubsumption(Boolean applySubsumption) {
+		this.applySubsumption = applySubsumption;
 	}
 
 }
