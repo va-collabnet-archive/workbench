@@ -33,6 +33,7 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelTableModel;
 import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
+import org.dwfa.ace.table.RelTableModel.RelGroupFieldEditor;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
@@ -176,6 +177,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 		relTable.getColumn(REL_FIELD.STATUS)
 				.setCellEditor(
 						new RelTableModel.RelStatusFieldEditor(host.getConfig()));
+		relTable.setDefaultEditor(StringWithRelTuple.class, new RelGroupFieldEditor());
 	}
 
 	public JTableWithDragImage getRelTable() {

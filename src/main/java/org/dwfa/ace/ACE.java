@@ -1272,8 +1272,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			throw new RuntimeException(e);
 		}
 		this.config = config;
-		this.addComponentListener(new ResizeComponentAdaptor());
 
+		this.addComponentListener(new ResizeComponentAdaptor());
 	}
 
 	private void loadTests(String directory, List<I_TestDataConstraints> list) {
@@ -1385,6 +1385,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		add(getBottomPanel(), c);
 		aceFrameConfig.addPropertyChangeListener("statusMessage",
 				new StatusChangeListener());
+		if (aceFrameConfig.getTabHistoryMap().get("viewerHistoryList") == null) {
+			aceFrameConfig.getTabHistoryMap().put("viewerHistoryList", new ArrayList<I_GetConceptData>());
+		}
+		viewerHistoryTableModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("viewerHistoryList"));
 	}
 
 	public JMenuBar createMenuBar() throws LoginException, SecurityException,
@@ -2653,10 +2657,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				new LeftPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
 
-		if (aceFrameConfig.getTabHistoryMap().get("viewerHistoryList") == null) {
-			aceFrameConfig.getTabHistoryMap().put("viewerHistoryList", new ArrayList<I_GetConceptData>());
-		}
-		viewerHistoryTableModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("viewerHistoryList"));
 		TerminologyList viewerList = new TerminologyList(
 				viewerHistoryTableModel, false, aceFrameConfig);
 		tabs.addTab("viewer", new JScrollPane(viewerList));

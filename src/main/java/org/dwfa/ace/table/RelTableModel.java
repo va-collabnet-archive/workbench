@@ -1,6 +1,10 @@
 package org.dwfa.ace.table;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -15,10 +19,14 @@ import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComponent;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
@@ -660,6 +668,74 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         }
     }
 
+	public static class RelGroupFieldEditor extends DefaultCellEditor {
+
+		private static final long serialVersionUID = 1L;
+		private class TextFieldFocusListener implements FocusListener {
+
+			public void focusGained(FocusEvent e) {
+				// nothing to do
+			}
+
+			public void focusLost(FocusEvent e) {
+				delegate.stopCellEditing();
+			}
+			
+		}
+
+		JTextField textField;
+		int row;
+		int column;
+		public RelGroupFieldEditor() {
+			super(new JTextField());
+			textField = new JTextField();
+			textField.addFocusListener(new TextFieldFocusListener());
+			editorComponent = textField;
+
+			delegate = new EditorDelegate() {
+				private static final long serialVersionUID = 1L;
+
+				public void setValue(Object value) {
+					if (StringWithRelTuple.class.isAssignableFrom(value
+							.getClass())) {
+						StringWithRelTuple swrt = (StringWithRelTuple) value;
+						textField.setText((value != null) ? swrt.cellText : "");
+					} else {
+						textField.setText((value != null) ? value.toString()
+								: "");
+					}
+				}
+
+				public Object getCellEditorValue() {
+					return textField.getText();
+				}
+			};
+			textField.addActionListener(delegate);
+		}
+
+		public Component getTableCellEditorComponent(JTable table,
+				Object value, boolean isSelected, int row, int column) {
+			this.row = row;
+			this.column = column;
+			((JComponent) getComponent())
+					.setBorder(new LineBorder(Color.black));
+			return super.getTableCellEditorComponent(table, value, isSelected,
+					row, column);
+		}
+
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if (evt instanceof MouseEvent) {
+				int clickCount;
+				// For double-click activation
+				clickCount = 2;
+				return ((MouseEvent) evt).getClickCount() >= clickCount;
+			}
+			return true;
+		}
+	}
+
+    
     public static class RelCharactisticFieldEditor extends AbstractPopupFieldEditor {
 
         private static final long serialVersionUID = 1L;
