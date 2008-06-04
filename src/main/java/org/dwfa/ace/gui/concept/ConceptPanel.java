@@ -131,7 +131,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						(I_GetConceptData) label.getTermComponent());
 				if (label.getTermComponent() == null) {
 					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
-				} else if (label.getTermComponent().equals(tabHistoryList.getFirst()) == false){
+				} else if ((tabHistoryList.size() > 0) && 
+						(label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
+					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+				} else {
 					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
 				}
 				while (tabHistoryList.size() > 20) {
@@ -482,7 +485,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		componentHistoryButton = new JButton(HISTORY_ICON);
 		componentHistoryButton.addActionListener(new ShowHistoryListener());
 		add(componentHistoryButton, c);
-
+		
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 3;
@@ -497,7 +500,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		add(contentScroller, c);
 		setBorder(BorderFactory.createRaisedBevelBorder());
 		label.addPropertyChangeListener("termComponent", labelListener);
-		if (this.tabHistoryList.getFirst() != null) {
+		if (this.tabHistoryList.size() > 0 && this.tabHistoryList.getFirst() != null) {
 			this.setTermComponent(this.tabHistoryList.getFirst());
 		}
 	}
