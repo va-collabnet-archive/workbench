@@ -76,9 +76,14 @@ public class TerminologyTransferHandler extends TransferHandler {
 	public static DataFlavor thinDescTupleFlavor;
 
 	public static DataFlavor[] supportedFlavors;
+	
+	public JComponent thisComponent;
+	
+	public static JComponent transferringComponent;
 
-	public TerminologyTransferHandler() {
+	public TerminologyTransferHandler(JComponent thisComponent) {
 		super();
+		this.thisComponent = thisComponent;
 
 		if (conceptBeanFlavor == null) {
 			try {
@@ -108,6 +113,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 			AceLog.getAppLog().fine("Creating a transferable for: " + c);
 		}
+		transferringComponent = c;
 		if (JTree.class.isAssignableFrom(c.getClass())) {
 			JTree tree = (JTree) c;
 			Object obj = tree.getLastSelectedPathComponent();
@@ -463,6 +469,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 			}
 		}
 		if (TerminologyList.class.isAssignableFrom(comp.getClass())) {
+			if (thisComponent == transferringComponent) {
+				return false;
+			}
 			for (DataFlavor f : transferFlavors) {
 				if (f.equals(conceptBeanFlavor)) {
 					return true;

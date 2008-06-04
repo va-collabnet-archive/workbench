@@ -1191,6 +1191,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private TerminologyListModel importHistoryTableModel = new TerminologyListModel();
 
+	private TerminologyListModel favoritesTableModel = new TerminologyListModel();
+
 	private JToggleButton showPreferencesButton;
 
 	private Configuration config;
@@ -2651,6 +2653,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				new LeftPalettePoint());
 		JTabbedPane tabs = new JTabbedPane();
 
+		if (aceFrameConfig.getTabHistoryMap().get("viewerHistoryList") == null) {
+			aceFrameConfig.getTabHistoryMap().put("viewerHistoryList", new ArrayList<I_GetConceptData>());
+		}
+		viewerHistoryTableModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("viewerHistoryList"));
 		TerminologyList viewerList = new TerminologyList(
 				viewerHistoryTableModel, false, aceFrameConfig);
 		tabs.addTab("viewer", new JScrollPane(viewerList));
@@ -2662,6 +2668,15 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					importHistoryTableModel, false, aceFrameConfig);
 			tabs.addTab("imported", new JScrollPane(importList));
 		}
+		if (aceFrameConfig.getTabHistoryMap().get("favoritesList") == null) {
+			aceFrameConfig.getTabHistoryMap().put("favoritesList", new ArrayList<I_GetConceptData>());
+		}
+		favoritesTableModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("favoritesList"));
+		TerminologyList favorites = new TerminologyList(
+				favoritesTableModel, false, aceFrameConfig);
+		
+		
+		tabs.addTab("favorites", new JScrollPane(favorites));
 		historyPalette.add(tabs, BorderLayout.CENTER);
 		historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
@@ -2717,7 +2732,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		tree.addMouseListener(new TreeMouseListener(aceFrameConfig));
 		tree.setLargeModel(true);
 		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		tree.setTransferHandler(new TerminologyTransferHandler());
+		tree.setTransferHandler(new TerminologyTransferHandler(tree));
 		tree.setDragEnabled(true);
 
 		tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));

@@ -98,7 +98,7 @@ public class LineagePlugin extends AbstractPlugin {
 		// lineageTree.putClientProperty("JTree.lineStyle", "None");
 		lineageTree.setLargeModel(true);
 		lineageTree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		lineageTree.setTransferHandler(new TerminologyTransferHandler());
+		lineageTree.setTransferHandler(new TerminologyTransferHandler(lineageTree));
 		lineageTree.setDragEnabled(true);
 		lineageRenderer = new LineageTreeCellRenderer(host.getConfig());
 		lineageTree.setCellRenderer(lineageRenderer);

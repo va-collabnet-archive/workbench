@@ -223,7 +223,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private List<I_FilterTaxonomyRels> taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
     
     // 31
-    private Map<Integer, List<I_GetConceptData>> tabHistoryMap = new TreeMap<Integer, List<I_GetConceptData>>();
+    private Map<String, List<I_GetConceptData>> tabHistoryMap = new TreeMap<String, List<I_GetConceptData>>();
 
     // transient
     private transient MasterWorker worker;
@@ -368,10 +368,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 31
         out.writeInt(tabHistoryMap.size());
-        for (Integer i: tabHistoryMap.keySet()) {
-            out.writeInt(i);
+        for (String keyStr: tabHistoryMap.keySet()) {
+            out.writeObject(keyStr);
             IntList il = new IntList();
-            for (I_GetConceptData concept: tabHistoryMap.get(i)) {
+            for (I_GetConceptData concept: tabHistoryMap.get(keyStr)) {
             	il.add(concept.getConceptId());
             }
             IntList.writeIntList(out, il);
@@ -644,11 +644,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
                 taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
             }
-            tabHistoryMap = new TreeMap<Integer, List<I_GetConceptData>>();
+            tabHistoryMap = new TreeMap<String, List<I_GetConceptData>>();
             if (objDataVersion >= 31) {
             	int mapSize = in.readInt();
             	for (int i = 0; i < mapSize; i++) {
-            		int mapId = in.readInt();
+            		String mapId = (String) in.readObject();
             		IntList il = IntList.readIntListIgnoreMapErrors(in);
             		List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
             		for (int nid: il.getListArray()) {
@@ -1936,7 +1936,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		return taxonomyRelFilterList;
 	}
 
-	public Map<Integer, List<I_GetConceptData>> getTabHistoryMap() {
+	public Map<String, List<I_GetConceptData>> getTabHistoryMap() {
 		return tabHistoryMap;
 	}
 

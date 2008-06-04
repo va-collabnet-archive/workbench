@@ -129,14 +129,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			if (label.getTermComponent() != null) {
 				ace.getAceFrameConfig().setLastViewed(
 						(I_GetConceptData) label.getTermComponent());
-				if (label.getTermComponent() == null) {
+				if (tabHistoryList.size() == 0) {
 					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
 				} else if ((tabHistoryList.size() > 0) && 
 						(label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
 					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
-				} else {
-					tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
-				}
+				} 
 				while (tabHistoryList.size() > 20) {
 					tabHistoryList.removeLast();
 				}
@@ -427,10 +425,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		super(new GridBagLayout());
 		this.ace = ace;
 		this.panelId = panelId;
-		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(panelId);
+		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get("tab " + panelId);
 		if (this.tabHistoryList == null) {
 			this.tabHistoryList = new LinkedList<I_GetConceptData>();
-			ace.getAceFrameConfig().getTabHistoryMap().put(this.panelId, this.tabHistoryList);
+			ace.getAceFrameConfig().getTabHistoryMap().put("tab " + this.panelId, this.tabHistoryList);
 		}
 		UpdateTogglesPropertyChangeListener updateListener = new UpdateTogglesPropertyChangeListener();
 		this.ace.getAceFrameConfig().addPropertyChangeListener(

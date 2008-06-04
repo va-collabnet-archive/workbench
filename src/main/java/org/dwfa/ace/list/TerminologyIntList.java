@@ -49,7 +49,7 @@ public class TerminologyIntList extends JList {
 
 	private void init(I_ConfigAceFrame config) {
       setCellRenderer(new AceListRenderer(config));
-		setTransferHandler(new TerminologyTransferHandler());
+		setTransferHandler(new TerminologyTransferHandler(this));
 		setDragEnabled(true);
 		DeleteAction delete = new DeleteAction();
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(

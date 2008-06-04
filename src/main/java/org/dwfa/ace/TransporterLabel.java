@@ -149,7 +149,7 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 			}
         	
         });
-		setTransferHandler(new TerminologyTransferHandler());
+		setTransferHandler(new TerminologyTransferHandler(this));
 		
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
                 new DragGestureListenerWithImage(new TermLabelDragSourceListener()));

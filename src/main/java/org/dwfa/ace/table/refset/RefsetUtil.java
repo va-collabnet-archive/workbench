@@ -124,7 +124,7 @@ public class RefsetUtil {
         }
 
         extTable.setDragEnabled(true);
-        extTable.setTransferHandler(new TerminologyTransferHandler());
+        extTable.setTransferHandler(new TerminologyTransferHandler(extTable));
         extTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         if (ACE.editMode) {
             extTable.addMouseListener(refsetModel.makePopupListener(extTable, host.getConfig()));

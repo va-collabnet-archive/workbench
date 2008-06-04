@@ -93,7 +93,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		super("<html><font color=red>Empty");
 		this.config = config;
 		addFocusListener(this);
-		setTransferHandler(new TerminologyTransferHandler());
+		setTransferHandler(new TerminologyTransferHandler(this));
 		
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
                 new DragGestureListenerWithImage(new TermLabelDragSourceListener()));

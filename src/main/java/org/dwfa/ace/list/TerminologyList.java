@@ -62,7 +62,7 @@ public class TerminologyList extends JList {
 
 	private void init(boolean allowDelete, I_ConfigAceFrame config) {
       setCellRenderer(new AceListRenderer(config));
-		setTransferHandler(new TerminologyTransferHandler());
+		setTransferHandler(new TerminologyTransferHandler(this));
 		setDragEnabled(true);
 		if (allowDelete) {
 			DeleteAction delete = new DeleteAction();

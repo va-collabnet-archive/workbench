@@ -182,7 +182,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		descTable = new JTableWithDragImage(sortingTable);
 		descTable.getSelectionModel().addListSelectionListener(this);
 		descTable.setDragEnabled(true);
-		descTable.setTransferHandler(new TerminologyTransferHandler());
+		descTable.setTransferHandler(new TerminologyTransferHandler(descTable));
 
 		if (ACE.editMode) {
 			descTable.addMouseListener(descTableModel.makePopupListener(

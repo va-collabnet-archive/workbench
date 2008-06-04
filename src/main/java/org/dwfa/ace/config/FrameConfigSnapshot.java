@@ -825,7 +825,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		return baseFrame.isToggleVisible(toggle);
 	}
 
-	public Map<Integer, List<I_GetConceptData>> getTabHistoryMap() {
+	public Map<String, List<I_GetConceptData>> getTabHistoryMap() {
 		return baseFrame.getTabHistoryMap();
 	}
 

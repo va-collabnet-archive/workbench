@@ -376,7 +376,7 @@ public class SearchPanel extends JPanel {
         sortingTable = new TableSorter(model);
         descTable = new JTableWithDragImage(sortingTable);
         descTable.setDragEnabled(true);
-        descTable.setTransferHandler(new TerminologyTransferHandler());
+        descTable.setTransferHandler(new TerminologyTransferHandler(this));
         sortingTable.setTableHeader(descTable.getTableHeader());
 
         DESC_FIELD[] columnEnums = model.getColumnEnums();

@@ -92,7 +92,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 			relPanel.add(rowAddAfter, c);
 			rowAddAfter.setEnabled(enableEdit);
 			rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
-			rowAddAfter.setTransferHandler(new TerminologyTransferHandler());
+			rowAddAfter.setTransferHandler(new TerminologyTransferHandler(rowAddAfter));
 		} else {
 			JPanel filler = new JPanel();
 			filler.setMaximumSize(new Dimension(40, 32));
@@ -165,7 +165,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 
 	protected void setupEditors(I_HostConceptPlugins host) {
 		relTable.setDragEnabled(true);
-		relTable.setTransferHandler(new TerminologyTransferHandler());
+		relTable.setTransferHandler(new TerminologyTransferHandler(relTable));
 		relTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		relTable.getColumn(REL_FIELD.REL_TYPE).setCellEditor(
 				new RelTableModel.RelTypeFieldEditor(host.getConfig()));
