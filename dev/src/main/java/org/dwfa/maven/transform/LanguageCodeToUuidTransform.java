@@ -15,9 +15,8 @@ public class LanguageCodeToUuidTransform extends AbstractTransform implements
 
 	public String transform(String input) throws Exception {
 		String languageCode = input.toUpperCase();
-		languageCode.replace('-', '_');
 		
-		ArchitectonicAuxiliary.Concept concept = Enum.valueOf(ArchitectonicAuxiliary.Concept.class, languageCode);
+		ArchitectonicAuxiliary.Concept concept = Enum.valueOf(ArchitectonicAuxiliary.Concept.class, languageCode.replace('-', '_'));
 
 		UUID uuid = concept.getUids().iterator().next();
 

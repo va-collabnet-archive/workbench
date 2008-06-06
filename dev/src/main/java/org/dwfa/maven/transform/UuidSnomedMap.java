@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
@@ -126,6 +126,9 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 			if (returnValue > MAX_SCT_ID) {
 				throw new RuntimeException("SCT ID exceeds max allowed (" + MAX_SCT_ID + "): " + returnValue);
 			}
+			if (this.keySet().size() % 1000 == 0) {
+				System.out.println("Map for type " + type + " is now up to " + this.keySet().size());
+			}
 			put(key, returnValue);
 		}
 		return returnValue;
@@ -211,8 +214,13 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
 			Map<Long, List<UUID>> snomedUuidMap = this.getSnomedUuidListMap();
+			int total = snomedUuidMap.keySet().size();
+			int count = 0;
 			SortedSet<Long> sortedKeys = new TreeSet<Long>(snomedUuidMap.keySet());
 			for (Long sctId : sortedKeys) {
+				if (++count % 1000 == 0) {
+					System.out.println("Written " + count + " of " + total + " for map " + f);
+				}
 				List<UUID> idList = snomedUuidMap.get(sctId);
 				for (int i = 0; i < idList.size(); i++) {
 					UUID id = idList.get(i);

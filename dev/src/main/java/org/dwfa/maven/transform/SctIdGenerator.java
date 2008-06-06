@@ -15,7 +15,7 @@ public class SctIdGenerator {
    };
    
    public static enum PROJECT {
-      AMT("01"), PATHOLOGY("02"), ALLERGIES_AND_ADVERSE_REACTIONS("03"), RADIOLOGY("04"), DIAGNOSIS("05");
+      AMT("01"), AU("02");
       
       private String digits;
       private PROJECT(String digits) {
