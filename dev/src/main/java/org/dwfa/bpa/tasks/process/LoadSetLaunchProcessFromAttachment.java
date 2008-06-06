@@ -19,7 +19,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/start tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN)})
 public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
 
     private String processPropName;

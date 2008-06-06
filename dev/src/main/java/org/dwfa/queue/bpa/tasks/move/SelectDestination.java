@@ -32,7 +32,7 @@ import org.dwfa.jini.ElectronicAddress;
  *  
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/set-select", type = BeanType.TASK_BEAN)})
 public class SelectDestination extends AbstractTask {
 
     private static final long serialVersionUID = 1;

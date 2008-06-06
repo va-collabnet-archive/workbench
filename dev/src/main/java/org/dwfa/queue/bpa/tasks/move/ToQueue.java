@@ -31,7 +31,7 @@ import org.dwfa.util.bean.Spec;
  * Moves a process from one queue to another. The queue type to move to is specified in the task.
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
 public class ToQueue extends AbstractTask {
 
     private static final long serialVersionUID = 1;

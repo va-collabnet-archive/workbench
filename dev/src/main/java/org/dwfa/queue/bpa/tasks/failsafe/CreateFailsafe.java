@@ -67,7 +67,7 @@ import org.dwfa.util.bean.Spec;
   * 
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue/failsafe", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/failsafe", type = BeanType.TASK_BEAN)})
 public class CreateFailsafe extends AbstractTask {
 
     public static final String FAIL_SAFE_KEY = "failsafe";

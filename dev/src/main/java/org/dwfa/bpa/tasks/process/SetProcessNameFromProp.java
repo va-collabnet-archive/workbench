@@ -26,7 +26,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/set tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN)})
 public class SetProcessNameFromProp extends AbstractTask {
 
     private String newNameProp = "";

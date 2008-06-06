@@ -23,7 +23,7 @@ import org.dwfa.util.bean.Spec;
  * 
  * */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/set tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/property tasks", type = BeanType.TASK_BEAN)})
 public class SetPropertyFromText extends AbstractTask {
 
     private String localPropName = "";

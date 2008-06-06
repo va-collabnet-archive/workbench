@@ -26,7 +26,7 @@ import org.dwfa.util.bean.Spec;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/grid/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/clock tasks", type = BeanType.TASK_BEAN)})
 public class ResetWorkerSimulationClock extends AbstractTask {
     
     private static final long serialVersionUID = 1;

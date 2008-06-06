@@ -24,7 +24,7 @@ import org.dwfa.util.bean.Spec;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/sim/clock", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/clock tasks", type = BeanType.TASK_BEAN)})
 public class SetWorkerSimulationClock extends MasterClockTask {
     private static final long serialVersionUID = 1;
 

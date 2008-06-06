@@ -27,7 +27,7 @@ import org.dwfa.bpa.worker.Worker;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/deadline", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN)})
 public class SetDeadlineRelative extends AbstractTask {
 
     private static final long serialVersionUID = 1;

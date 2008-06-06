@@ -26,7 +26,7 @@ import org.dwfa.util.bean.Spec;
  * Moves a process to the electronic address. 
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
 public class MoveToDestination extends AbstractTask {
 
     private static final long serialVersionUID = 1;

@@ -31,7 +31,7 @@ import org.dwfa.util.bean.Spec;
  * two criterion selected in the task.
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
 public class ToQueueTwoCriterion extends AbstractTask {
 
     private static final long serialVersionUID = 1;

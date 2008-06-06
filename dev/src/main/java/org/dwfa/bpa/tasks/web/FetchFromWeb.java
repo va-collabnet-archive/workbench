@@ -22,7 +22,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/web", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/web tasks", type = BeanType.TASK_BEAN)})
 public class FetchFromWeb extends AbstractTask {
 
     private URL webURL = new URL("http://sparrow.vacd.med.umich.edu/vistawebsvcs/siteservice.asmx/getSite?siteID=688");

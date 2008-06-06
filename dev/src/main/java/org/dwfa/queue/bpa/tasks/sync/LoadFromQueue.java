@@ -32,7 +32,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/load", type = BeanType.TASK_BEAN)})
 public class LoadFromQueue extends AbstractTask {
 
     /**

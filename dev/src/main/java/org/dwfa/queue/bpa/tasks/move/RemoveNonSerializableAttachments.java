@@ -15,7 +15,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/attachments", type = BeanType.TASK_BEAN)})
 public class RemoveNonSerializableAttachments extends AbstractTask {
 
     private static final long serialVersionUID = 1;

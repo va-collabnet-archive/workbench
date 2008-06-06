@@ -29,7 +29,7 @@ import org.dwfa.bpa.process.TaskFailedException;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue/failsafe", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/failsafe", type = BeanType.TASK_BEAN)})
 public class CreateFailsafeParentProcess extends CreateFailsafe {
 
     /**

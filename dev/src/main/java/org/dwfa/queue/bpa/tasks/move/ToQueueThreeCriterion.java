@@ -31,7 +31,7 @@ import org.dwfa.jini.TermEntry;
  * three criterion selected in the task.
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
 public class ToQueueThreeCriterion extends AbstractTask {
 
     private static final long serialVersionUID = 1;

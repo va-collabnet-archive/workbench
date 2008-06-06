@@ -26,7 +26,7 @@ import org.dwfa.bpa.tasks.pwdbreaker.ConfigureCryptBreakerWorkspace;
  *  
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/workspace tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/workspace tasks", type = BeanType.TASK_BEAN)})
 public class WaitForInputFieldCancelOrComplete extends WaitForCancelOrComplete {
     private static final long serialVersionUID = 1;
 

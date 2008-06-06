@@ -32,7 +32,7 @@ import org.dwfa.bpa.tasks.ws.PanelIds;
  *  
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/workspace tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/flow tasks", type = BeanType.TASK_BEAN)})
 public class WaitForItemSkipOrComplete extends AbstractTask {
 	private transient Exception ex;
 

@@ -39,7 +39,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/start tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN)})
 public class LoadSetLaunchProcessFromURL extends AbstractTask {
 
     private URL processURL = new URL("http://www.informatics.com/hello.xml");

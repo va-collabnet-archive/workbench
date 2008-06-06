@@ -58,7 +58,7 @@ import org.dwfa.util.bean.Spec;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue/failsafe", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/failsafe", type = BeanType.TASK_BEAN)})
 public class RemoveFailsafe extends AbstractTask {
     public static final String REMOVE_FAIL_SAFE_KEY = "removeFailsafe";
 

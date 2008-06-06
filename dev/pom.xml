@@ -127,12 +127,12 @@
                                 </beanSpec>
                                 <beanSpec>
                                     <sourceName>MoveRootSafely</sourceName>
-                                    <dirName>processes/failsafe</dirName>
+                                    <dirName>processes/queue/failsafe tasks</dirName>
                                     <type>process</type>
                                 </beanSpec>
                                 <beanSpec>
                                     <sourceName>MoveRootSafely</sourceName>
-                                    <dirName>tasks/failsafe</dirName>
+                                    <dirName>tasks/queque/failsafe tasks</dirName>
                                     <type>process</type>
                                 </beanSpec>
                                 <beanSpec>

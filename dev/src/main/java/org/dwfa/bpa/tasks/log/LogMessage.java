@@ -28,7 +28,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/log", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/log tasks", type = BeanType.TASK_BEAN)})
 public class LogMessage extends AbstractTask {
     private String message = "Hello World";
     private String log = I_Work.class.getName();

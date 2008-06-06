@@ -19,7 +19,7 @@ import org.dwfa.util.bean.Spec;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/processes/copy tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/property tasks", type = BeanType.TASK_BEAN)})
 public class CopyLocalProperty extends AbstractTask {
 
     private String originalPropName = "";

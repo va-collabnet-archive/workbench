@@ -23,7 +23,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/set-select", type = BeanType.TASK_BEAN)})
 public class SetDestination extends AbstractTask {
 
     private String destination;

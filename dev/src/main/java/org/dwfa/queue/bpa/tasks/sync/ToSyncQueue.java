@@ -31,7 +31,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/sync", type = BeanType.TASK_BEAN)})
 public class ToSyncQueue extends AbstractTask {
 
     /**

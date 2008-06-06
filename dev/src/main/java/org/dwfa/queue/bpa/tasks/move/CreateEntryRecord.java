@@ -38,7 +38,7 @@ import org.dwfa.util.bean.Spec;
 *
 */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN)})
 public class CreateEntryRecord extends AbstractTask {
 
     /**

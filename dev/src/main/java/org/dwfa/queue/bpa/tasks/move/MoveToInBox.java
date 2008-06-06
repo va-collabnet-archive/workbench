@@ -33,7 +33,7 @@ import org.dwfa.util.bean.Spec;
  *  
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/queue", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
 public class MoveToInBox extends AbstractTask {
 
     private static final long serialVersionUID = 1;
