@@ -4,9 +4,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -100,8 +103,6 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 	BufferedWriter refsetWriter = null;
 	BufferedWriter memberWriter = null;	
 
-	String date = "";
-
 	UUID fsn_uuid = null;
 	UUID pft_uuid = null;
 
@@ -112,7 +113,6 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 	HashMap<Integer,List<I_ThinExtByRefVersioned>> members = new HashMap<Integer,List<I_ThinExtByRefVersioned>>();
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		setDate();
 
 		termFactory = LocalVersionedTerminology.get(); 
 		try {
@@ -155,65 +155,35 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 			}
 
 		} catch (IOException e) {
-			throw new MojoExecutionException("output file not available for writing");
+			throw new MojoExecutionException("output file not available for writing", e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new MojoExecutionException("Local Versioned Terminology Failed to iterate over identifiers");
+			throw new MojoExecutionException("Local Versioned Terminology Failed to iterate over identifiers", e);
 		}
 	}
 
 
 	int idCounter = 0;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public void processId(I_IdVersioned id, Set<I_ThinExtByRefVersioned> extensions) throws Exception {
 		idCounter++;			
 		if (idCounter%10000==0) {
 			getLog().info("Processed: " + idCounter + " identifiers");
 		}
-		
-		if (idCounter==1) {
-			System.out.println("Adding extension to " + termFactory.getConcept(id.getNativeId()));
-            List<I_GetExtensionData> extensions_test =
-                termFactory.getExtensionsForComponent(id.getNativeId());
-            System.out.println(extensions_test.size()); // ZERO
 
-            I_ThinExtByRefVersioned extension =
-                termFactory.newExtension(id.getNativeId(), id.getNativeId(), id.getNativeId(),
-                		id.getNativeId());
-            	
-            I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
-
-            conceptExtension.setPathId(id.getNativeId());
-            conceptExtension.setStatus(id.getNativeId());
-            conceptExtension.setVersion(Integer.MAX_VALUE);
-            conceptExtension.setConceptId(id.getNativeId());            
-
-            extension.addVersion(conceptExtension);
-            termFactory.addUncommitted(termFactory.getConcept(id.getNativeId()));
-            System.out.println(termFactory.getUncommitted());
-            extensions_test =
-                termFactory.getExtensionsForComponent(id.getNativeId());
-            
-            System.out.println(extensions_test.size()); // ZERO 
-		}
-		
-
-		int nativeId = id.getTuples().get(0).getNativeId();
-
-
+		int nativeId = id.getNativeId();
 
 		List<I_GetExtensionData> extensionData = termFactory.getExtensionsForComponent(nativeId);
 		
-	
-		
-		
 		for (I_GetExtensionData data : extensionData) {
 			I_ThinExtByRefVersioned ext = data.getExtension();
-			UniversalAceExtByRefBean bean = data.getUniversalAceBean();
-			getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
+			
+			if (getLog().isDebugEnabled()) {
+				UniversalAceExtByRefBean bean = data.getUniversalAceBean();
+				getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
+			}
 
-			List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
-
-			for (I_ThinExtByRefPart version : versions) {
+			for (I_ThinExtByRefPart version : ext.getVersions()) {
 				boolean found = false;
 				for (I_ThinExtByRefVersioned previous : extensions) {
 					if (previous.getRefsetId()==ext.getRefsetId()) {
@@ -266,29 +236,42 @@ getLog().info("Writing refset...");
 		
 		
 		File newrefsetFile = new File(refsetFile.getAbsolutePath().replace(".txt", fsn + ".txt"));
+		newrefsetFile.mkdirs();
+		if (!newrefsetFile.exists()) {
+			newrefsetFile.createNewFile();
+		}
 		refsetWriter = new BufferedWriter(new FileWriter(newrefsetFile,append));
 
 		refsetWriter.write("Refset uuid\tEffectiveTime\tStatus\tName\tShortName\tRefSetType\t");
 		refsetWriter.newLine();
-		// Id SCTID 
-		refsetWriter.write(termFactory.getUids(ext.getRefsetId()).iterator().next().toString());
-		refsetWriter.write("\t");
-		//EffectiveTime String[14]
-		refsetWriter.write(date);
-		refsetWriter.write("\t");
-		// Status Enum Status of the RefSet record
-		int status = termFactory.getConcept(ext.getRefsetId()).getConceptAttributes().getTuples().get(0).getConceptStatus();
-		refsetWriter.write(termFactory.getConcept(status).toString());
-		refsetWriter.write("\t");
-		// Name String[255] Name of the RefSet
-		refsetWriter.write(fsn);				
-		refsetWriter.write("\t");
-		// ShortName String[20] Short name for the RefSet
-		refsetWriter.write(pft);
-		refsetWriter.write("\t");
-		refsetWriter.write(termFactory.getConcept(ext.getTypeId()).toString());
-		refsetWriter.write("\t");
-		refsetWriter.newLine();
+		
+		for (I_ThinExtByRefPart version : ext.getVersions()) {
+			// Id SCTID
+			refsetWriter.write(termFactory.getUids(ext.getRefsetId())
+					.iterator().next().toString());
+			refsetWriter.write("\t");
+			// EffectiveTime String[14]
+			long datetime = termFactory.convertToThickVersion(version
+					.getVersion());
+			refsetWriter.write(getFormattedDate(datetime));
+			refsetWriter.write("\t");
+			// Status Enum Status of the RefSet record
+			int status = termFactory.getConcept(ext.getRefsetId())
+					.getConceptAttributes().getTuples().get(0)
+					.getConceptStatus();
+			refsetWriter.write(termFactory.getConcept(status).toString());
+			refsetWriter.write("\t");
+			// Name String[255] Name of the RefSet
+			refsetWriter.write(fsn);
+			refsetWriter.write("\t");
+			// ShortName String[20] Short name for the RefSet
+			refsetWriter.write(pft);
+			refsetWriter.write("\t");
+			refsetWriter.write(termFactory.getConcept(ext.getTypeId())
+					.toString());
+			refsetWriter.write("\t");
+			refsetWriter.newLine();
+		}
 		refsetWriter.close();
 
 		writeMembers(ext.getRefsetId(), fsn, termFactory.getConcept(ext.getTypeId()));
@@ -346,7 +329,7 @@ getLog().info("Writing refset...");
 		}
 
 		
-		File newmemberFile = new File(memberFile.getAbsolutePath().replace(".txt", fsn + "." + fileextension));		
+		File newmemberFile = new File(memberFile.getAbsolutePath().replace(".txt", fsn + "." + fileextension));
 		memberWriter = new BufferedWriter(new FileWriter(newmemberFile,append));
 		
 		memberWriter.write("refset uuid\tmember uuid\tstatus uuid\tcomponent uuid\teffective date\tpath");
@@ -483,27 +466,23 @@ getLog().info("Writing refset...");
 			memberWriter.write(termFactory.getUids(ext.getMemberId()).iterator().next().toString());
 			memberWriter.write("\t");				
 			//Status
-			memberWriter.write(termFactory.getUids(ext.getComponentId()).iterator().next().toString());
+			memberWriter.write(termFactory.getUids(version.getStatus()).iterator().next().toString());
 			memberWriter.write("\t");				
 			//ComponentId
 			memberWriter.write(termFactory.getUids(ext.getComponentId()).iterator().next().toString());
 			memberWriter.write("\t");				
 			//EffectiveTime
-			memberWriter.write(date);
+			long datetime = termFactory.convertToThickVersion(version.getVersion());
+			memberWriter.write(getFormattedDate(datetime));
 			memberWriter.write("\t");				
 			//path
 			memberWriter.write(termFactory.getUids(version.getPathId()).iterator().next().toString());
 		}
 
-		public void setDate() {
-			Calendar cal = Calendar.getInstance();
-			date = cal.get(Calendar.YEAR) + "-" + 
-			addLeadingZero(cal.get(Calendar.MONTH)) + "-" + 
-			addLeadingZero(cal.get(Calendar.DATE)) + " " + 
-			addLeadingZero(cal.get(Calendar.HOUR_OF_DAY)) + ":" + 
-			addLeadingZero(cal.get(Calendar.MINUTE)) + ":00";
-
+		private String getFormattedDate(long datetime) {
+			return dateFormat.format(new Date(datetime));
 		}
+
 
 		public String addLeadingZero(int i) {
 			if (i < 10) {
