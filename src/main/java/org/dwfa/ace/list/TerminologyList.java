@@ -8,6 +8,7 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 
@@ -28,6 +29,24 @@ public class TerminologyList extends JList {
 		private static final long serialVersionUID = 1L;
 
 		public void actionPerformed(ActionEvent e) {
+			if (confirmDelete) {
+				int selectedIndex = getSelectedIndex();
+				if (selectedIndex >= 0) {
+					TerminologyListModel tm = (TerminologyListModel) getModel();
+					int option = JOptionPane.showConfirmDialog(
+							TerminologyList.this,
+							"<html>Are you sure you want to erase item <font color='red'>" + tm.getElementAt(selectedIndex) + "</font> from the list?", "Erase the list?",
+							JOptionPane.YES_NO_OPTION);
+					if (option == JOptionPane.YES_OPTION) {
+						delete();
+					}
+				}
+			} else {
+				delete();
+			}
+		}
+
+		private void delete() {
 			int selectedIndex = getSelectedIndex();
 			if (selectedIndex >= 0) {
 				TerminologyListModel tm = (TerminologyListModel) getModel();
@@ -41,6 +60,8 @@ public class TerminologyList extends JList {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private boolean confirmDelete = false;
 
 	public TerminologyList(I_ConfigAceFrame config) {
 		super(new TerminologyListModel());
@@ -55,8 +76,9 @@ public class TerminologyList extends JList {
 		super(new TerminologyListModel());
 		init(allowDelete, config);
 	}
-	public TerminologyList(TerminologyListModel dataModel, boolean allowDelete, I_ConfigAceFrame config) {
+	public TerminologyList(TerminologyListModel dataModel, boolean allowDelete, boolean confirmDelete, I_ConfigAceFrame config) {
 		super(dataModel);
+		this.confirmDelete = confirmDelete;
 		init(allowDelete, config);
 	}
 

@@ -1197,7 +1197,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private Configuration config;
 
-	private JList batchConceptList;
+	private TerminologyList batchConceptList;
 
 	private ArrayList<ConceptPanel> conceptPanels;
 
@@ -1694,7 +1694,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private Component getConceptListEditor() throws DatabaseException,
 			IOException, ClassNotFoundException {
 		if (conceptListEditor == null) {
-			batchConceptList = new TerminologyList(aceFrameConfig);
+			if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {
+				aceFrameConfig.getTabHistoryMap().put("batchList", new ArrayList<I_GetConceptData>());
+			}
+			TerminologyListModel batchListModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("batchList"));
+			batchConceptList = new TerminologyList(batchListModel, true, true, aceFrameConfig);
 			conceptListEditor = new CollectionEditorContainer(batchConceptList,
 					this, descListProcessBuilderPanel);
 		}
@@ -2658,14 +2662,14 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		JTabbedPane tabs = new JTabbedPane();
 
 		TerminologyList viewerList = new TerminologyList(
-				viewerHistoryTableModel, false, aceFrameConfig);
+				viewerHistoryTableModel, false, false, aceFrameConfig);
 		tabs.addTab("viewer", new JScrollPane(viewerList));
 		if (editMode) {
 			TerminologyList commitList = new TerminologyList(
-					commitHistoryTableModel, false, aceFrameConfig);
+					commitHistoryTableModel, false, false, aceFrameConfig);
 			tabs.addTab("uncommitted", new JScrollPane(commitList));
 			TerminologyList importList = new TerminologyList(
-					importHistoryTableModel, false, aceFrameConfig);
+					importHistoryTableModel, false, false, aceFrameConfig);
 			tabs.addTab("imported", new JScrollPane(importList));
 		}
 		if (aceFrameConfig.getTabHistoryMap().get("favoritesList") == null) {
@@ -2673,7 +2677,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		}
 		favoritesTableModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("favoritesList"));
 		TerminologyList favorites = new TerminologyList(
-				favoritesTableModel, false, aceFrameConfig);
+				favoritesTableModel, true, false, aceFrameConfig);
 		
 		
 		tabs.addTab("favorites", new JScrollPane(favorites));

@@ -531,7 +531,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 			AceLog.getAppLog().fine("getSourceActions ");
 		}
-		return COPY_OR_MOVE;
+		return COPY;
 	}
 
 	public static DataFlavor[] getSupportedFlavors() {
