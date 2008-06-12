@@ -61,7 +61,7 @@ public class GetResults extends AbstractTask {
             throws TaskFailedException {
 
         try {
-            I_SnorocketFactory rocket = (I_SnorocketFactory) process.readProperty(ProcessKey.SNOROCKET.getAttachmentKey());
+            I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
             tf = (I_SupportClassifier) LocalVersionedTerminology.get();
             if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
                 throw new TaskFailedException(

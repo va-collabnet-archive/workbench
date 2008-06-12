@@ -590,6 +590,7 @@ public class LoadClassifyWrite extends AbstractTask {
                     // "org.dwfa.ace.task.classify.FasterLoad$MockSnorocketFactory"
             ).newInstance();
             tf = (I_SupportClassifier) LocalVersionedTerminology.get();
+            
             if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
                 throw new TaskFailedException(
                         "Profile must have only one edit path. Found: "
@@ -663,7 +664,7 @@ public class LoadClassifyWrite extends AbstractTask {
                     "LCW classify time: "
                     + (System.currentTimeMillis() - startTime));
   
-            process.setProperty(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
+            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
             
 //            worker.getLogger().info("Starting get results. ");
 //            getClassifierResults(worker, rocket);
