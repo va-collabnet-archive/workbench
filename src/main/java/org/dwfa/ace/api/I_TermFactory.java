@@ -60,8 +60,12 @@ public interface I_TermFactory {
     public Collection<UUID> getUids(int nid) throws TerminologyException, IOException;
 
     public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang,
-        String text, I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
-            IOException;
+            String text, I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
+                IOException;
+
+    public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang,
+            String text, I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
+                IOException;
 
     public I_DescriptionVersioned getDescription(int dnid, int cnid) throws TerminologyException, IOException;
 

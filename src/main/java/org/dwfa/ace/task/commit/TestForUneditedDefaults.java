@@ -57,7 +57,8 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
             if (part.getVersion() == Integer.MAX_VALUE) {
                 if (part.getText().equalsIgnoreCase("New Fully Specified Description") || 
                         part.getText().equalsIgnoreCase("New Preferred Description") || 
-                        part.getText().equalsIgnoreCase("New Description")) {
+                        part.getText().equalsIgnoreCase("New Description") ||
+                        part.getText().toLowerCase().startsWith("clone of ")) {
                     String alertString = "<html>Unedited default found:<br> <font color='blue'>" + part.getText()
                                       + "</font><br>Please edit this value before commit...";
                     AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
