@@ -31,6 +31,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
@@ -392,6 +393,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                                                                   getChangeSetWriterFileName()), 
                                                                   new File(changeSetRoot, 
                                                                            "." + getChangeSetWriterFileName())));
+        ACE.getCsWriters().add(new CommitLog(new File(changeSetRoot, 
+                "commitLog.xls"), 
+                new File(changeSetRoot, 
+                         "." + "commitLog.xls")));
     }
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
