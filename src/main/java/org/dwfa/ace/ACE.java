@@ -1187,6 +1187,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private TerminologyListModel viewerHistoryTableModel = new TerminologyListModel();
 
+	private TerminologyListModel uncommittedTableModel = new TerminologyListModel();
+
 	private TerminologyListModel commitHistoryTableModel = new TerminologyListModel();
 
 	private TerminologyListModel importHistoryTableModel = new TerminologyListModel();
@@ -2664,14 +2666,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		TerminologyList viewerList = new TerminologyList(
 				viewerHistoryTableModel, false, false, aceFrameConfig);
 		tabs.addTab("viewer", new JScrollPane(viewerList));
-		if (editMode) {
-			TerminologyList commitList = new TerminologyList(
-					commitHistoryTableModel, false, false, aceFrameConfig);
-			tabs.addTab("uncommitted", new JScrollPane(commitList));
-			TerminologyList importList = new TerminologyList(
-					importHistoryTableModel, false, false, aceFrameConfig);
-			tabs.addTab("imported", new JScrollPane(importList));
-		}
 		if (aceFrameConfig.getTabHistoryMap().get("favoritesList") == null) {
 			aceFrameConfig.getTabHistoryMap().put("favoritesList", new ArrayList<I_GetConceptData>());
 		}
@@ -2681,6 +2675,17 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		
 		
 		tabs.addTab("favorites", new JScrollPane(favorites));
+		if (editMode) {
+			TerminologyList uncommittedList = new TerminologyList(
+					uncommittedTableModel, false, false, aceFrameConfig);
+			tabs.addTab("uncommitted", new JScrollPane(uncommittedList));
+			TerminologyList commitList = new TerminologyList(
+					commitHistoryTableModel, false, false, aceFrameConfig);
+			tabs.addTab("changed", new JScrollPane(commitList));
+			TerminologyList importList = new TerminologyList(
+					importHistoryTableModel, false, false, aceFrameConfig);
+			tabs.addTab("imported", new JScrollPane(importList));
+		}
 		historyPalette.add(tabs, BorderLayout.CENTER);
 		historyPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
@@ -3282,9 +3287,16 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			updateHierarchyView(evt.getPropertyName());
 		} else if (evt.getPropertyName().equals("commit")) {
 			updateHierarchyView(evt.getPropertyName());
-			commitHistoryTableModel.clear();
+			for (int i = 0; i < uncommittedTableModel.getSize(); i++) {
+				commitHistoryTableModel.addElement(uncommittedTableModel.getElementAt(i));
+			}
+			uncommittedTableModel.clear();
 			removeConfigPalette();
-		} else if (evt.getPropertyName().equals("commitEnabled")) {
+			while (commitHistoryTableModel.getSize() > maxHistoryListSize) {
+				commitHistoryTableModel.removeElement(commitHistoryTableModel
+						.getSize() - 1);
+			}
+			} else if (evt.getPropertyName().equals("commitEnabled")) {
 			commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
 			if (aceFrameConfig.isCommitEnabled()) {
 				commitButton
@@ -3301,10 +3313,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 						.getSize() - 1);
 			}
 		} else if (evt.getPropertyName().equals("uncommitted")) {
-			commitHistoryTableModel.clear();
+			uncommittedTableModel.clear();
 			for (I_Transact t : uncommitted) {
 				if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-					commitHistoryTableModel.addElement((ConceptBean) t);
+					uncommittedTableModel.addElement((ConceptBean) t);
 				}
 			}
 		} else if (evt.getPropertyName().equals("imported")) {
