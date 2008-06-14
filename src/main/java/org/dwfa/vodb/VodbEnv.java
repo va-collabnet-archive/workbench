@@ -744,7 +744,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	
 	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
 			I_GetConceptData concept, String lang, String text,
-			I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig)
+			I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException {
 		canEdit(aceFrameConfig);
 		ACE.addUncommitted((I_Transact) concept);
@@ -769,12 +769,21 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			descPart.setLang(lang);
 			descPart.setStatusId(status);
 			descPart.setText(text);
-			descPart.setTypeId(descType.getNid());
+			descPart.setTypeId(descType.getConceptId());
 			desc.addVersion(descPart);
 		}
 		concept.getUncommittedDescriptions().add(desc);
 		concept.getUncommittedIds().add(descId);
 		return desc;
+	}
+
+	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
+			I_GetConceptData concept, String lang, String text,
+			I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException, IOException {
+		return newDescription(newDescriptionId,
+				concept, lang, text,
+				ConceptBean.get(descType.getNid()), aceFrameConfig);
 	}
 
 	private void canEdit(I_ConfigAceFrame aceFrameConfig)
