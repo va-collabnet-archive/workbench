@@ -166,7 +166,7 @@ public class AddRefsetsFromFile extends AbstractMojo{
 				}
 				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids() ) == typeId ){ 
 					extPart = termFactory.newConceptExtensionPart();			
-					((I_ThinExtByRefPartConcept)extPart).setConceptId( componentId );
+					((I_ThinExtByRefPartConcept)extPart).setConceptId( termFactory.uuidToNative( UUID.fromString( tokens[6] ) ));
 				}
 				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids() ) == typeId ){
 					extPart = termFactory.newConceptIntExtensionPart();
