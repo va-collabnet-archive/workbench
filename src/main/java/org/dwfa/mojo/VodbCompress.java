@@ -1,10 +1,14 @@
 package org.dwfa.mojo;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.maven.MojoUtil;
 
 /**
  * Compress database log files so their utilization is the value provided. 
@@ -25,7 +29,21 @@ public class VodbCompress extends AbstractMojo {
      */
     private int minUtilization = 90;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+    * @parameter expression="${mojoExecution}"
+    */
+    private org.apache.maven.plugin.MojoExecution execution;
+    
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+			if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId())) {
+			    return;
+			}
+		} catch (NoSuchAlgorithmException e1) {
+            throw new MojoExecutionException(e1.getLocalizedMessage(), e1);
+		} catch (IOException e1) {
+            throw new MojoExecutionException(e1.getLocalizedMessage(), e1);
+		}
 		I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology
 				.get();
 		try {
