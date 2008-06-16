@@ -8,7 +8,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 
 /**
  * Compress database log files so their utilization is the value provided. 
- * Call this goal prior to closing the database. 
+ * Call this goal prior to closing the database. Corresponds to je.cleaner.minUtilization.
  * 
  * @goal vodb-compress
  * 
@@ -18,16 +18,18 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 public class VodbCompress extends AbstractMojo {
 
     /**
-     * Minimum file utilization value.
+     * Ensure the total disk space utilization percentage is above this value. 
+     * The default is set to 90 percent. The maximum is 90 percent. The environmental
+     * default is 50 percent.
      * @parameter
      */
-    private int minFileUtilization = 90;
+    private int minUtilization = 90;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology
 				.get();
 		try {
-			termFactoryImpl.compress(minFileUtilization);
+			termFactoryImpl.compress(minUtilization);
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
