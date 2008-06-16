@@ -29,7 +29,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 3;
+    private static final int dataVersion = 4;
 
     private I_RefsetDefaultsBoolean booleanPreferences = new RefsetDefaultsBoolean();
 
@@ -69,6 +69,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(crossMapForRelPreferences);
         out.writeObject(templatePreferences);
         out.writeObject(templateForRelPreferences);
+        out.writeObject(stringPreferences);
     }
 
     @SuppressWarnings("unchecked")
@@ -104,6 +105,15 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
+            }
+            if (objDataVersion > 3) {
+            	stringPreferences = (I_RefsetDefaultsString) in.readObject();
+            } else {
+            	try {
+					stringPreferences = new RefsetDefaultsString();
+				} catch (TerminologyException e) {
+	                   throw new ToIoException(e);
+				}
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
