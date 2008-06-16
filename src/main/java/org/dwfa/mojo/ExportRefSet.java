@@ -234,9 +234,10 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 
 getLog().info("Writing refset...");
 		
-		
+		fsn = fsn.replace("/", "-");
+
 		File newrefsetFile = new File(refsetFile.getAbsolutePath().replace(".txt", fsn + ".txt"));
-		newrefsetFile.mkdirs();
+		newrefsetFile.getParentFile().mkdirs();
 		if (!newrefsetFile.exists()) {
 			newrefsetFile.createNewFile();
 		}
@@ -328,6 +329,7 @@ getLog().info("Writing refset...");
 			fileextension  = "string.refset";		
 		}
 
+		fsn = fsn.replace("/", "-");
 		
 		File newmemberFile = new File(memberFile.getAbsolutePath().replace(".txt", fsn + "." + fileextension));
 		memberWriter = new BufferedWriter(new FileWriter(newmemberFile,append));
