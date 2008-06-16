@@ -185,12 +185,14 @@ public class CollectionEditorContainer extends JPanel {
 		showComponentActionListener = new ShowComponentActionListener();
 		showComponentView.setVisible(ACE.editMode);
 		showComponentView.addActionListener(showComponentActionListener);
+		showComponentView.setToolTipText("Show component view associated with list view");
 		listEditorTopPanel.add(showComponentView, c);
 		c.gridx++;
 		showProcessBuilder = new Toggle32x32(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/cube_molecule.png")));
 		listEditorTopPanel.add(showProcessBuilder, c);
 		showProcessBuilder.setVisible(ACE.editMode);
+		showProcessBuilder.setToolTipText("Show process builder associated with list view");
 		showProcessBuilder
 				.addActionListener(new ShowProcessBuilderActionListener());
 		c.gridx++;

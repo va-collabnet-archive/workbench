@@ -495,6 +495,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx++;
 		componentHistoryButton = new JButton(HISTORY_ICON);
 		componentHistoryButton.addActionListener(new ShowHistoryListener());
+		componentHistoryButton.setToolTipText("click to show history of concepts displayed in this viewer");
 		add(componentHistoryButton, c);
 		
 		c.gridx = 0;
