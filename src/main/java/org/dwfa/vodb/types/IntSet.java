@@ -174,9 +174,7 @@ public class IntSet implements ListDataListener, I_IntSet {
         	try {
 				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
-				IOException newEx = new IOException();
-				newEx.initCause(e);
-				throw newEx;
+				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 			}
         }
 	}

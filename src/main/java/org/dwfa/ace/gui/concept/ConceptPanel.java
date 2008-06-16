@@ -67,6 +67,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -110,10 +111,22 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		public void actionPerformed(ActionEvent e) {
 			if (tabHistoryList.size() > 1) {
 				JPopupMenu popup = new JPopupMenu();
+				List<I_GetConceptData> historyToRemove = new ArrayList<I_GetConceptData>();
 				for (I_GetConceptData historyItem: tabHistoryList) {
-					JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
-				    popup.add(menuItem);
+					try {
+						if (LocalVersionedTerminology.get().getUids(historyItem.getConceptId()) != null) {
+							JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
+						    popup.add(menuItem);
+						} else {
+							historyToRemove.add(historyItem);
+						}
+					} catch (IOException e1) {
+						historyToRemove.add(historyItem);
+					} catch (TerminologyException e2) {
+						historyToRemove.add(historyItem);
+					}
 				}
+				tabHistoryList.removeAll(historyToRemove);
 				Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(mouseLocation, ConceptPanel.this);
 				popup.show(ConceptPanel.this,

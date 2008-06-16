@@ -54,9 +54,7 @@ public class IntList implements ListDataListener, I_IntList {
 			try {
 				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
-				IOException newEx = new IOException();
-				newEx.initCause(e);
-				throw newEx;
+				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 			}
 		}
 	}
