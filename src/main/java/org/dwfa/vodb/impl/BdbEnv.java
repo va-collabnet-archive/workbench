@@ -887,7 +887,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 			env.getConfig().setConfigParam("je.cleaner.cluster", "true");
 
 			String minFileUtilization = env.getConfig().getConfigParam("je.cleaner.minFileUtilization");
-			env.getConfig().setConfigParam("je.cleaner.minFileUtilization", Integer.toString(utilization));
+			env.getConfig().setConfigParam("je.cleaner.minFileUtilization", Integer.toString(50));
 
 			String minUtilization = env.getConfig().getConfigParam("je.cleaner.minUtilization");
 			env.getConfig().setConfigParam("je.cleaner.minUtilization", Integer.toString(utilization));
