@@ -86,6 +86,7 @@ public abstract class ChangeSetImporter {
         }
         I_ReadChangeSet first = readerSet.first();
         readerSet.remove(first);
+    	AceLog.getEditLog().info("Now reading change set: " + first.getChangeSetFile().getName());
         I_ReadChangeSet next = null;
         if (readerSet.size() > 0) {
             next = readerSet.first();
