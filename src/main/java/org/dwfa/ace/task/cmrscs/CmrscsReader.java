@@ -206,4 +206,8 @@ public class CmrscsReader implements I_ReadChangeSet {
 		return tf;
 	}
 
+	public File getChangeSetFile() {
+		return changeSetFile;
+	}
+
 }
