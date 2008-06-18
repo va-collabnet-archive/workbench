@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
@@ -146,6 +147,16 @@ public class LoadClassifyWrite extends AbstractTask {
         }
 
         public void getResults(I_Callback callback) {
+        }
+
+        public I_SnorocketFactory createExtension() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public InputStream getStream() throws IOException {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     }
@@ -585,10 +596,7 @@ public class LoadClassifyWrite extends AbstractTask {
 
             long startTime = System.currentTimeMillis();
 
-            I_SnorocketFactory rocket = (I_SnorocketFactory) Class.forName(
-                    "au.csiro.snorocket.ace.SnorocketFactory"
-                    // "org.dwfa.ace.task.classify.FasterLoad$MockSnorocketFactory"
-            ).newInstance();
+            final I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
             tf = (I_SupportClassifier) LocalVersionedTerminology.get();
             
             if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {

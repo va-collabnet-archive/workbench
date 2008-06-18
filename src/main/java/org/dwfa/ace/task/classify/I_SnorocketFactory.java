@@ -1,6 +1,9 @@
 
 package org.dwfa.ace.task.classify;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public interface I_SnorocketFactory {
 
     void setIsa(int id);
@@ -31,5 +34,21 @@ public interface I_SnorocketFactory {
         int group;
     }
     */
-    
+
+    /**
+     * Used for persistence.  This part of the API is not finalised - DO NOT USE.
+     * 
+     * @return
+     * @throws IOException
+     */
+    InputStream getStream() throws IOException;
+
+    /**
+     * Create a new classification engine that can be used to construct and incrementally classify
+     * an extension to the base ontology embodied by this classification engine.
+     * 
+     * @return
+     */
+    I_SnorocketFactory createExtension();
+
 }

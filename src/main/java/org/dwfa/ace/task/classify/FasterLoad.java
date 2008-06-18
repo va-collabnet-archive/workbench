@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
@@ -90,6 +91,16 @@ public class FasterLoad extends AbstractTask {
         }
 
         public void getResults(I_Callback callback) {
+        }
+
+        public I_SnorocketFactory createExtension() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public InputStream getStream() throws IOException {
+            // TODO Auto-generated method stub
+            return null;
         }
         
     }
