@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.rmi.MarshalledObject;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -118,6 +119,7 @@ public class AceFrame extends ComponentFrame {
 						}
 					});
 			if (startupFiles != null) {
+				Arrays.sort(startupFiles);
 				for (int i = 0; i < startupFiles.length; i++) {
 					try {
 						AceLog.getAppLog().info(
