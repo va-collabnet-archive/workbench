@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -117,6 +118,10 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	public void readUntil(long endTime) throws IOException,
 			ClassNotFoundException {
 		HashSet<TimePathId> values = new HashSet<TimePathId>();
+		if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+			AceLog.getEditLog().fine(
+					"Reading from log " + changeSetFile.getName() + " until " + new Date(endTime).toString());
+		}
 		while (nextCommitTime() < endTime) {
 			try {
 				Object obj = ois.readObject();
@@ -196,7 +201,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			throw new ToIoException(e);
 		}
 		AceLog.getAppLog().info(
-				"Change set contains " + count + " change objects. "
+				"Change set " + changeSetFile.getName() + " contains " + count + " change objects. "
 						+ "\n unvalidated objects: " + unvalidated
 						+ "\n imported Concepts: " + conceptCount + " paths: "
 						+ pathCount + " refset members: " + refsetMemberCount
