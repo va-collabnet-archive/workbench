@@ -139,68 +139,78 @@ public class AddRefsetsFromFile extends AbstractMojo{
 			String line = reader.readLine();
 			line = reader.readLine();
 						
-			while( line != null ){
+			while ( line != null ) {
 				String[] tokens = line.split( "\t" );
 				
 				int referenceSetId = termFactory.uuidToNative( UUID.fromString( tokens[0] ) );
-							
-				int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-	                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-	                    termFactory.getPaths(), Integer.MAX_VALUE);
-	
 				int statusId = termFactory.uuidToNative( UUID.fromString( tokens[2] ) );
 				int componentId = termFactory.uuidToNative( UUID.fromString( tokens[3] ) );
 				int pathId = termFactory.uuidToNative( UUID.fromString( tokens[5] ) );
-				
-				I_GetConceptData concept = termFactory.getConcept( componentId );
-						
 				int typeId = termFactory.uuidToNative( RefsetAuxiliary.Concept.valueOf( extensionType ).getUids().iterator().next() );
+
+				// check if the member id already exists - if it does we should be adding a version to the existing
+				// extension rather than creating a new extension with a new UUID
 				
-				I_ThinExtByRefVersioned newExtension = termFactory.newExtension( referenceSetId, memberId, componentId, typeId );
+				UUID memberUUID = UUID.fromString( tokens[1] );
+				boolean existingMember = termFactory.hasId( memberUUID );
+
+				int memberId;
+				if ( existingMember ) {
+					memberId = termFactory.uuidToNative( memberUUID );
+				} else {
+					memberId = termFactory.uuidToNativeWithGeneration( UUID.randomUUID(),
+		                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
+		                    termFactory.getPaths(), Integer.MAX_VALUE );
+				}
 				
 				I_ThinExtByRefPart extPart = null;
 				
-				if( termFactory.uuidToNative( RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids() ) == typeId ){
+				if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids() ) == typeId ) {
 					extPart = termFactory.newBooleanExtensionPart();		
 					((I_ThinExtByRefPartBoolean)extPart).setValue( new Boolean( tokens[6] ).booleanValue() );
 				}
-				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids() ) == typeId ){ 
+				else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids() ) == typeId ) { 
 					extPart = termFactory.newConceptExtensionPart();			
 					((I_ThinExtByRefPartConcept)extPart).setConceptId( termFactory.uuidToNative( UUID.fromString( tokens[6] ) ));
 				}
-				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids() ) == typeId ){
+				else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids() ) == typeId ) {
 					extPart = termFactory.newConceptIntExtensionPart();
 					((I_ThinExtByRefPartConceptInt)extPart).setConceptId( componentId );
 					((I_ThinExtByRefPartConceptInt)extPart).setIntValue( new Integer( tokens[6] ).intValue() );
 				}
-				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.STRING_EXTENSION.getUids() ) == typeId){
+				else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.STRING_EXTENSION.getUids() ) == typeId) {
 					extPart = termFactory.newStringExtensionPart();
 					((I_ThinExtByRefPartString)extPart).setStringValue( tokens[6] );
 				}
-				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.INT_EXTENSION.getUids() ) == typeId ){
+				else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.INT_EXTENSION.getUids() ) == typeId ) {
 					extPart = termFactory.newIntegerExtensionPart();
 					((I_ThinExtByRefPartInteger)extPart).setValue( new Integer( tokens[6] ).intValue() );
 				}
-				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids() ) == typeId ){
+				else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids() ) == typeId ) {
 					extPart = termFactory.newMeasurementExtensionPart();
 					((I_ThinExtByRefPartMeasurement)extPart).setMeasurementValue( new Double( tokens[6] ).doubleValue() );
 					((I_ThinExtByRefPartMeasurement)extPart).setUnitsOfMeasureId( new Integer( tokens[7] ).intValue() );
 				}
-				else if( termFactory.uuidToNative( RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids() ) == typeId ){
+				else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids() ) == typeId ) {
 					extPart = termFactory.newLanguageExtensionPart();
 					((I_ThinExtByRefPartLanguage)extPart).setAcceptabilityId( new Integer( tokens[6] ).intValue() );
 					((I_ThinExtByRefPartLanguage)extPart).setCorrectnessId( new Integer( tokens[7] ).intValue() );
 					((I_ThinExtByRefPartLanguage)extPart).setDegreeOfSynonymyId( new Integer( tokens[8] ).intValue() );
 				}
-					
 				
-				if( extPart != null ){
+				if ( extPart != null ) {
 					extPart.setPathId( pathId );
 					extPart.setStatus( statusId );
 					extPart.setVersion( Integer.MAX_VALUE );
-
-					newExtension.addVersion( extPart );
-					termFactory.addUncommitted(newExtension);
+					
+					I_ThinExtByRefVersioned extension;
+					if ( existingMember ) {
+						extension = termFactory.getExtension( memberId );
+					} else {
+						extension = termFactory.newExtension( referenceSetId, memberId, componentId, typeId );
+					}
+					extension.addVersion( extPart );
+					termFactory.addUncommitted( extension );
 				}
 							
 				line = reader.readLine();
@@ -209,7 +219,6 @@ public class AddRefsetsFromFile extends AbstractMojo{
 			reader.close();
 			
 			termFactory.commit();
-			
 			
 		}
 		catch(Exception e){
