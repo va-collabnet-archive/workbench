@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -115,7 +116,20 @@ public class CmrscsReader implements I_ReadChangeSet {
 						((List<I_ThinExtByRefPartConcept>) ebr.getVersions()).add(newPart);
 
 					}
-					getVodb().getDirectInterface().writeExt(ebr);
+					try {
+						getVodb().getDirectInterface().writeExt(ebr);
+					} catch (IOException e) {
+						AceLog.getEditLog().severe("Exception writing extension: " + ebr);
+						AceLog.getEditLog().severe("memberUid: " + memberUid + 
+								"\ncomponentUid: " + componentUid + 
+								"\npathUid: " + pathUid + 
+								"\nrefsetUid: " + refsetUid + 
+								"\nstatusUid: " + statusUid + 
+								"\nconceptValueUid: " + conceptValueUid + 
+								"\ndate: " + new Date(nextCommit));
+						AceLog.getEditLog().alertAndLogException(e);
+						throw e;
+					}
 					memberUid = readUuid(dis);
 				}
 				AceLog.getEditLog().info("End of commit set. Processed " + count + " items");
