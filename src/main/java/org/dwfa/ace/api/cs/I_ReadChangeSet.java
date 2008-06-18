@@ -44,6 +44,12 @@ public interface I_ReadChangeSet extends Serializable {
 	public void setChangeSetFile(File changeSetFile);
 	
    /**
+	* 
+	* @param changeSetFile the change set file to validate and read. 
+	*/
+	public File getChangeSetFile();
+		
+   /**
     * A counter to be incremented each time a change set component is imported. 
     * @param counter
     */
