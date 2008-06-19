@@ -108,6 +108,8 @@ public class CopyFromPathToPath extends AbstractMojo implements
 			for (ConceptDescriptor fromPath : fromPaths) {
 				fromPathConcepts.add(fromPath.getVerifiedConcept());
 			}
+			
+			fromPathIds = tf.newIntSet();
 			getFromPathIds(fromPathConcepts);
 			
 			toPathId = toPath.getVerifiedConcept().getConceptId();
