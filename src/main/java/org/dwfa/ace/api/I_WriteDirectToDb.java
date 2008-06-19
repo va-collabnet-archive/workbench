@@ -107,10 +107,22 @@ public interface I_WriteDirectToDb {
      * sync operation to ensure that the data persists. 
      * Use this method with great care. If you don't properly generate 
      * native identifiers, you will corrupt the database. 
+     * <br><br>Use the method <code>uuidToNativeDirectWithGeneration</code> to generate the 
+     * nid, then use the method <code>getId</code> in the I_TermFactory to retrieve the 
+     * I_IdVersioned, make any changes you like, then write back to the database using this method. 
 	 * @param id
 	 * @throws IOException
 	 */
 	public void writeId(I_IdVersioned id) throws IOException;
+	
+	/**
+	 * Generates a new id part that can be set with appropriate values, added to an
+	 * I_IdVersioned, and then written to the database. 
+	 * @return
+	 */
+	
+	public I_IdPart newIdPart();
+
 	
 	/**
 	 * Generate a new native identifier in the database from the provided information. 
@@ -178,13 +190,6 @@ public interface I_WriteDirectToDb {
 
 	public I_RelVersioned newRelationshipBypassCommit(int relNid,
 													  int conceptNid, int relDestinationNid) throws IOException;
-	/**
-	 * Generates a new I_IdVersioned, without putting the new object on the commit list. 
-	 * @param nid
-	 * @return
-	 */
-	public I_IdVersioned newIdVersionedBypassCommit(int nid);
 	
-	public I_IdPart newIdPart();
 
 }
