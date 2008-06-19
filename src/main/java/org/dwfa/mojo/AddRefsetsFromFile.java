@@ -158,13 +158,13 @@ public class AddRefsetsFromFile extends AbstractMojo{
 				int typeId = termFactory.uuidToNative( RefsetAuxiliary.Concept.valueOf( extensionType ).getUids().iterator().next() );
 
 				// check if the member id already exists - if it does we should be adding a version to the existing
-				// extension rather than creating a new extension with a new UUID
+				// extension rather than creating a new extension 
 				
 				I_ThinExtByRefVersioned extension;
 				if ( extensions.containsKey( memberUUID ) ) {
 					extension = extensions.get( memberUUID );
 				} else {
-					int memberId = termFactory.uuidToNativeWithGeneration( UUID.randomUUID(),
+					int memberId = termFactory.uuidToNativeWithGeneration( memberUUID,
 		                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
 		                    termFactory.getPaths(), Integer.MAX_VALUE );
 					extension = termFactory.newExtension( referenceSetId, memberId, componentId, typeId );
