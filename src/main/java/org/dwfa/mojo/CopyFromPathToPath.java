@@ -89,6 +89,18 @@ public class CopyFromPathToPath extends AbstractMojo implements
 
 	private I_WriteDirectToDb directInterface;
 
+	private int conceptAttributeCount;
+
+	private int descriptionCount;
+
+	private int extCount;
+
+	private int idCount;
+
+	private int imageCount;
+
+	private int relCount;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		tf = LocalVersionedTerminology.get();
 		try {
@@ -112,11 +124,22 @@ public class CopyFromPathToPath extends AbstractMojo implements
 			
 			directInterface = tf.getDirectInterface();
 			
+			getLog().info("Starting to iterate concept attributes to copy from " + fromPaths + " to " + toPath);
 			tf.iterateConceptAttributes(this);
+
+			getLog().info("Starting to iterate descriptions to copy from " + fromPaths + " to " + toPath);
 			tf.iterateDescriptions(this);
+
+			getLog().info("Starting to iterate extensions to copy from " + fromPaths + " to " + toPath);
 			tf.iterateExtByRefs(this);
+
+			getLog().info("Starting to iterate identifiers to copy from " + fromPaths + " to " + toPath);
 			tf.iterateIds(this);
+
+			getLog().info("Starting to iterate images to copy from " + fromPaths + " to " + toPath);
 			tf.iterateImages(this);
+
+			getLog().info("Starting to iterate relationships to copy from " + fromPaths + " to " + toPath);
 			tf.iterateRelationships(this);
 			
 		} catch (Exception e) {
@@ -140,6 +163,11 @@ public class CopyFromPathToPath extends AbstractMojo implements
 	public void processConceptAttributes(
 			I_ConceptAttributeVersioned conceptAttributeVersioned)
 			throws Exception {
+		
+		if (++conceptAttributeCount % 1000 == 0) {
+			getLog().info("processed concept attribute " + conceptAttributeCount);
+		}
+		
 		boolean datachanged = false;
 		for (I_ConceptAttributeTuple t : conceptAttributeVersioned.getTuples()) {
 			if (fromPathIds.contains(t.getPathId())) {
@@ -160,7 +188,11 @@ public class CopyFromPathToPath extends AbstractMojo implements
 
 	public void processDescription(I_DescriptionVersioned descriptionVersioned)
 			throws Exception {
-
+		
+		if (++descriptionCount % 1000 == 0) {
+			getLog().info("processed description " + descriptionCount);
+		}
+		
 		boolean datachanged = false;
 		for (I_DescriptionTuple t : descriptionVersioned.getTuples()) {
 
@@ -185,6 +217,10 @@ public class CopyFromPathToPath extends AbstractMojo implements
 	public void processExtensionByReference(I_ThinExtByRefVersioned extByRef)
 			throws Exception {
 
+		if (++extCount % 1000 == 0) {
+			getLog().info("processed extension " + extCount);
+		}
+		
 		boolean datachanged = false;
 		for (I_ThinExtByRefTuple t : extByRef.getTuples(null, null, true)) {
 			if (fromPathIds.contains(t.getPathId())) {
@@ -206,6 +242,10 @@ public class CopyFromPathToPath extends AbstractMojo implements
 
 	public void processId(I_IdVersioned idVersioned) throws Exception {
 
+		if (++idCount % 1000 == 0) {
+			getLog().info("processed id " + idCount);
+		}
+		
 		boolean datachanged = false;
 		for (I_IdTuple t : idVersioned.getTuples()) {
 
@@ -228,6 +268,10 @@ public class CopyFromPathToPath extends AbstractMojo implements
 
 	public void processImages(I_ImageVersioned imageVersioned) throws Exception {
 
+		if (++imageCount % 1000 == 0) {
+			getLog().info("processed image " + imageCount);
+		}
+		
 		boolean datachanged = false;
 		for (I_ImageTuple t : imageVersioned.getTuples()) {
 
@@ -251,6 +295,10 @@ public class CopyFromPathToPath extends AbstractMojo implements
 	public void processRelationship(I_RelVersioned relVersioned)
 			throws Exception {
 
+		if (++relCount % 1000 == 0) {
+			getLog().info("processed relationship " + relCount);
+		}
+		
 		boolean datachanged = false;
 		for (I_RelTuple t : relVersioned.getTuples()) {
 
