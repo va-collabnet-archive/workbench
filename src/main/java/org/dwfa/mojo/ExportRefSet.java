@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,6 +47,8 @@ import org.dwfa.tapi.TerminologyException;
  * 
  * This MoJo exports refset content from an ACE Berkeley Database. The format for export is described 
  * <a href="https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/dataimport.html"> here. </a>  
+ * 
+ * TODO - this class needs to be reworked.
  * 
  * @goal exportRefSets
  * @author Tore Fjellheim
@@ -97,6 +97,18 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 	 */
 	boolean relationships = false;
 
+	/**
+	 * Export specification that dictates which concepts are exported and which are not. Only reference sets
+	 * whose identifying concept is exported will be exported. Only members relating to components that will 
+	 * be exported will in turn be exported.
+	 * <p>
+	 * For example if you have a reference set identified by concept A, and members B, C and D. If the export spec
+	 * does not include exporting concept A then none of the reference set will be exported. However if the
+	 * export spec does include A, but not C then the reference set will be exported except it will only have
+	 * members B and D - C will be omitted.
+	 * @parameter
+	 */
+	ExportSpecification[] exportSpecifications;
 
 	I_TermFactory termFactory = null;
 
@@ -178,34 +190,47 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 		for (I_GetExtensionData data : extensionData) {
 			I_ThinExtByRefVersioned ext = data.getExtension();
 			
-			if (getLog().isDebugEnabled()) {
-				UniversalAceExtByRefBean bean = data.getUniversalAceBean();
-				getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
-			}
-
-			for (I_ThinExtByRefPart version : ext.getVersions()) {
-				boolean found = false;
-				for (I_ThinExtByRefVersioned previous : extensions) {
-					if (previous.getRefsetId()==ext.getRefsetId()) {
-						found = true;
+			I_GetConceptData refsetConcept = termFactory.getConcept(ext.getRefsetId());
+			if (testExportSpecification(refsetConcept)) {
+				if (getLog().isDebugEnabled()) {
+					UniversalAceExtByRefBean bean = data.getUniversalAceBean();
+					getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
+				}
+	
+				for (I_ThinExtByRefPart version : ext.getVersions()) {
+					boolean found = false;
+					for (I_ThinExtByRefVersioned previous : extensions) {
+						if (previous.getRefsetId()==ext.getRefsetId()) {
+							found = true;
+							break;
+						}
 					}
+					if (!found) {
+						extensions.add(ext);
+					}
+	
+					List<I_ThinExtByRefVersioned> ext_members = members.get(ext.getRefsetId());
+					if (ext_members == null) {
+						ext_members = new ArrayList<I_ThinExtByRefVersioned>();
+						members.put(ext.getRefsetId(),ext_members);
+					}
+					ext_members.add(ext);
 				}
-				if (!found) {
-					extensions.add(ext);
-				}
-
-				List<I_ThinExtByRefVersioned> ext_members = members.get(ext.getRefsetId());
-				if (ext_members == null) {
-					ext_members = new ArrayList<I_ThinExtByRefVersioned>();
-					members.put(ext.getRefsetId(),ext_members);
-				}
-				ext_members.add(ext);
-
-			}		
-
+			}
 		}
+	}
 
-
+	private boolean testExportSpecification(I_GetConceptData concept) throws Exception {
+		if (exportSpecifications == null || exportSpecifications.length == 0) {
+			return true;
+		}
+		
+		for (ExportSpecification spec : exportSpecifications) {
+			if (spec.test(concept)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*
@@ -232,9 +257,10 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 			}					
 		}
 
-getLog().info("Writing refset...");
-		
+		getLog().info("Writing refset...");
+
 		fsn = fsn.replace("/", "-");
+		fsn = fsn.replace("'", "_");
 
 		File newrefsetFile = new File(refsetFile.getAbsolutePath().replace(".txt", fsn + ".txt"));
 		newrefsetFile.getParentFile().mkdirs();
@@ -495,20 +521,34 @@ getLog().info("Writing refset...");
 
 
 		public void processConcept(I_GetConceptData concept) throws Exception {
-			this.processId(concept.getId(),concept_extensions);		
+			if (testExportSpecification(concept)) {
+				this.processId(concept.getId(),concept_extensions);
+			} else {
+				getLog().debug("Suppressing export of concept " + concept + " refsets");
+			}
+			
 		}
 
 
 		public void processDescription(I_DescriptionVersioned versionedDesc)
 		throws Exception {
-			this.processId(termFactory.getId(versionedDesc.getDescId()),desc_extensions);
-
+			if (testExportSpecification(termFactory.getConcept(versionedDesc.getConceptId()))) {
+				this.processId(termFactory.getId(versionedDesc.getDescId()),desc_extensions);
+			} else {
+				getLog().debug("Suppressing export of description " + versionedDesc + " refsets");
+			}
 		}
 
 
 		public void processRelationship(I_RelVersioned versionedRel)
 		throws Exception {
-			this.processId(termFactory.getId(versionedRel.getRelId()),rel_extensions);
+			if (testExportSpecification(termFactory.getConcept(versionedRel.getC1Id()))
+							&& testExportSpecification(termFactory.getConcept(versionedRel.getC2Id()))) {
+				
+				this.processId(termFactory.getId(versionedRel.getRelId()),rel_extensions);
+			} else {
+				getLog().debug("Suppressing export of relationship " + versionedRel + " refsets");
+			}
 		}
 
 		public boolean isConcepts() {
