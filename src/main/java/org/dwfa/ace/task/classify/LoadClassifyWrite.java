@@ -674,17 +674,17 @@ public class LoadClassifyWrite extends AbstractTask {
   
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
             
-//            worker.getLogger().info("Starting get results. ");
-//            getClassifierResults(worker, rocket);
-//            worker.getLogger().info("Finished get results. ");
-//            worker.getLogger().info(
-//                    "Stated and inferred: " + statedAndInferredCount
-//                    + " stated and subsumbed: "
-//                    + statedAndSubsumedCount + " inferred count: "
-//                    + inferredRelCount);
+            worker.getLogger().info("Starting get results. ");
+            getClassifierResults(worker, rocket);
+            worker.getLogger().info("Finished get results. ");
+            worker.getLogger().info(
+                    "Stated and inferred: " + statedAndInferredCount
+                    + " stated and subsumbed: "
+                    + statedAndSubsumedCount + " inferred count: "
+                    + inferredRelCount);
 
-//            tf.commit();
-//            worker.getLogger().info("Finished commit. ");
+            tf.commit();
+            worker.getLogger().info("Finished commit. ");
 
         } catch (Exception e) {
             throw new TaskFailedException(e);

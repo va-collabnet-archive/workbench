@@ -1,7 +1,10 @@
 package org.dwfa.ace.api;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * Methods in this interface write directly to the database, and bypass the
@@ -96,6 +99,32 @@ public interface I_WriteDirectToDb {
 	 */
 	
 	public void writeTimePath(TimePathId timePath) throws IOException;
+	/**
+	 * Write identifiers directly to the database. <br><br>
+	 * This method bypasses change set generation 
+	 * and the transactional model.
+	 * You still have to perform a 
+     * sync operation to ensure that the data persists. 
+     * Use this method with great care. If you don't properly generate 
+     * native identifiers, you will corrupt the database. 
+	 * @param id
+	 * @throws IOException
+	 */
+	public void writeId(I_IdVersioned id) throws IOException;
+	
+	/**
+	 * Generate a new native identifier in the database from the provided information. 
+	 * @param uids
+	 * @param source
+	 * @param idPath
+	 * @param version
+	 * @return
+	 * @throws TerminologyException
+	 * @throws IOException
+	 */
+	public int uuidToNativeDirectWithGeneration(Collection<UUID> uids, int source,
+			I_Path idPath, int version) throws TerminologyException,
+			IOException;
 	
 	/**
 	 * The new routines in the I_TermFactory automatically put the new components
@@ -149,5 +178,13 @@ public interface I_WriteDirectToDb {
 
 	public I_RelVersioned newRelationshipBypassCommit(int relNid,
 													  int conceptNid, int relDestinationNid) throws IOException;
+	/**
+	 * Generates a new I_IdVersioned, without putting the new object on the commit list. 
+	 * @param nid
+	 * @return
+	 */
+	public I_IdVersioned newIdVersionedBypassCommit(int nid);
+	
+	public I_IdPart newIdPart();
 
 }

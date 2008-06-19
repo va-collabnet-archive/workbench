@@ -269,7 +269,7 @@ public interface I_TermFactory {
     public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
     public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart();
     public I_ThinExtByRefPartString newStringExtensionPart();
-    
+        
     public String getStats() throws IOException;
     
     /**
