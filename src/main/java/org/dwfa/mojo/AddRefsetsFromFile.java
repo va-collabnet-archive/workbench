@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -69,6 +70,11 @@ public class AddRefsetsFromFile extends AbstractMojo{
 	 */
 	private String extensionType;
 	
+	
+	private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+	
+	/** An internal cache of the new uncommitted extensions, indexed by the member uuid */ 
+	private HashMap<UUID, I_ThinExtByRefVersioned> extensions = new HashMap<UUID, I_ThinExtByRefVersioned>();
 	
 	/*
 	 * Mojo execution method.
@@ -143,24 +149,26 @@ public class AddRefsetsFromFile extends AbstractMojo{
 				String[] tokens = line.split( "\t" );
 				
 				int referenceSetId = termFactory.uuidToNative( UUID.fromString( tokens[0] ) );
+				UUID memberUUID = UUID.fromString( tokens[1] );
 				int statusId = termFactory.uuidToNative( UUID.fromString( tokens[2] ) );
 				int componentId = termFactory.uuidToNative( UUID.fromString( tokens[3] ) );
+				long versionTime = DATE_FORMAT.parse( tokens[4] ).getTime();
 				int pathId = termFactory.uuidToNative( UUID.fromString( tokens[5] ) );
+				
 				int typeId = termFactory.uuidToNative( RefsetAuxiliary.Concept.valueOf( extensionType ).getUids().iterator().next() );
 
 				// check if the member id already exists - if it does we should be adding a version to the existing
 				// extension rather than creating a new extension with a new UUID
 				
-				UUID memberUUID = UUID.fromString( tokens[1] );
-				boolean existingMember = termFactory.hasId( memberUUID );
-
-				int memberId;
-				if ( existingMember ) {
-					memberId = termFactory.uuidToNative( memberUUID );
+				I_ThinExtByRefVersioned extension;
+				if ( extensions.containsKey( memberUUID ) ) {
+					extension = extensions.get( memberUUID );
 				} else {
-					memberId = termFactory.uuidToNativeWithGeneration( UUID.randomUUID(),
+					int memberId = termFactory.uuidToNativeWithGeneration( UUID.randomUUID(),
 		                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
 		                    termFactory.getPaths(), Integer.MAX_VALUE );
+					extension = termFactory.newExtension( referenceSetId, memberId, componentId, typeId );
+					extensions.put( memberUUID, extension );
 				}
 				
 				I_ThinExtByRefPart extPart = null;
@@ -202,13 +210,8 @@ public class AddRefsetsFromFile extends AbstractMojo{
 					extPart.setPathId( pathId );
 					extPart.setStatus( statusId );
 					extPart.setVersion( Integer.MAX_VALUE );
+					//extPart.setVersion( termFactory.convertToThinVersion(versionTime) );
 					
-					I_ThinExtByRefVersioned extension;
-					if ( existingMember ) {
-						extension = termFactory.getExtension( memberId );
-					} else {
-						extension = termFactory.newExtension( referenceSetId, memberId, componentId, typeId );
-					}
 					extension.addVersion( extPart );
 					termFactory.addUncommitted( extension );
 				}
