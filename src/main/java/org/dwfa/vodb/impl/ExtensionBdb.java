@@ -15,8 +15,11 @@ import org.dwfa.vodb.I_StoreExtensions;
 import org.dwfa.vodb.I_StoreInBdb;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
+import org.dwfa.vodb.bind.MemberAndSecondaryId;
+import org.dwfa.vodb.bind.MemberAndSecondaryIdBinding;
 import org.dwfa.vodb.bind.ThinExtBinder;
-import org.dwfa.vodb.bind.ThinExtSecondaryKeyCreator;
+import org.dwfa.vodb.bind.ThinExtComponentIdSecondaryKeyCreator;
+import org.dwfa.vodb.bind.ThinExtRefsetIdSecondaryKeyCreator;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.I_ProcessExtByRefEntries;
@@ -42,11 +45,8 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 	private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 	private ThinExtBinder extBinder = new ThinExtBinder();
 
-	ThinExtSecondaryKeyCreator refsetKeyCreator = new ThinExtSecondaryKeyCreator(
-			ThinExtSecondaryKeyCreator.KEY_TYPE.REFSET_ID);
-
-	ThinExtSecondaryKeyCreator componentKeyCreator = new ThinExtSecondaryKeyCreator(
-			ThinExtSecondaryKeyCreator.KEY_TYPE.COMPONENT_ID);
+	ThinExtRefsetIdSecondaryKeyCreator refsetKeyCreator = new ThinExtRefsetIdSecondaryKeyCreator();
+	ThinExtComponentIdSecondaryKeyCreator componentKeyCreator = new ThinExtComponentIdSecondaryKeyCreator();
 
 	public ExtensionBdb(Environment env, DatabaseConfig dbConfig)
 			throws DatabaseException {
@@ -185,8 +185,9 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		}
 		DatabaseEntry secondaryKey = new DatabaseEntry();
 
-		refsetKeyCreator.createSecondaryKey(Integer.MIN_VALUE, refsetId,
-				secondaryKey);
+		memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(Integer.MIN_VALUE, 
+				refsetId), secondaryKey);
+
 		DatabaseEntry foundData = new DatabaseEntry();
 
 		SecondaryCursor mySecCursor = refsetToExtMap.openSecondaryCursor(
@@ -230,8 +231,8 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			}
 			DatabaseEntry secondaryKey = new DatabaseEntry();
 
-			componentKeyCreator.createSecondaryKey(Integer.MIN_VALUE,
-					componentId, secondaryKey);
+			memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(componentId, 
+					Integer.MIN_VALUE), secondaryKey);
 			DatabaseEntry foundData = new DatabaseEntry();
 
 			SecondaryCursor mySecCursor = componentToExtMap
@@ -270,6 +271,8 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		}
 	}
 
+    MemberAndSecondaryIdBinding memberAndSecondaryIdBinding = new MemberAndSecondaryIdBinding();
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.I_StoreExtensions#getExtensionsForComponent(int)
 	 */
@@ -285,8 +288,8 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			}
 			DatabaseEntry secondaryKey = new DatabaseEntry();
 
-			componentKeyCreator.createSecondaryKey(Integer.MIN_VALUE,
-					componentId, secondaryKey);
+			memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(componentId, 
+					Integer.MIN_VALUE), secondaryKey);
 			DatabaseEntry foundData = new DatabaseEntry();
 
 			SecondaryCursor mySecCursor = componentToExtMap

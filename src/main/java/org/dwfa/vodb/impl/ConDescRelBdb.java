@@ -1714,8 +1714,14 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					Field.Store.YES, Field.Index.UN_TOKENIZED));
 			doc.add(new Field("cnid", Integer.toString(descV.getConceptId()),
 					Field.Store.YES, Field.Index.UN_TOKENIZED));
-			addIdsToIndex(doc, identifierDb.getId(descV.getDescId()));
-			addIdsToIndex(doc, identifierDb.getId(descV.getConceptId()));
+			try {
+				addIdsToIndex(doc, identifierDb.getId(descV.getDescId()));
+				addIdsToIndex(doc, identifierDb.getId(descV.getConceptId()));
+			} catch (ToIoException e) {
+				AceLog.getAppLog().severe("error indexing description: " + descV);
+				AceLog.getAppLog().alertAndLogException(e);
+				
+			}
 
 			String lastDesc = null;
 			for (I_DescriptionTuple tuple : descV.getTuples()) {

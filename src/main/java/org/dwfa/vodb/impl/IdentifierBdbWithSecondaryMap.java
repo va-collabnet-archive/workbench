@@ -235,7 +235,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 			}
 			return ((I_IdVersioned) idBinding.entryToObject(idValue)).getUIDs();
 		}
-		throw new DatabaseException("Concept: " + nativeId + " not found.");
+		throw new DatabaseException("List<UUID> not found for: " + nativeId + " (a).");
 	}
 
 	/*
@@ -248,8 +248,8 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 		if (id != null) {
 			return id;
 		}
-		throw new ToIoException(new DatabaseException("Concept: " + nativeId
-				+ " not found."));
+		throw new ToIoException(new DatabaseException("I_IdVersioned for " + nativeId
+				+ " not found (b)."));
 	}
 
 	/*

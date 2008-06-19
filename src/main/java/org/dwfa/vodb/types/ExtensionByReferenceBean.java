@@ -26,9 +26,6 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
-
-import com.sleepycat.je.DatabaseException;
 
 public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 

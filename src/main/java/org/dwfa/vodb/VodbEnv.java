@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
@@ -112,6 +113,7 @@ import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
 import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 import org.dwfa.vodb.types.ThinExtByRefPartString;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
+import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
@@ -1467,6 +1469,13 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return bdbEnv.uuidToNative(uid);
 	}
 
+	public int uuidToNativeDirectWithGeneration(Collection<UUID> uids, int source,
+			I_Path idPath, int version) throws TerminologyException,
+			IOException {
+		return bdbEnv.uuidToNativeWithGeneration(uids, source,
+				idPath, version);
+	}
+
 	public int uuidToNativeWithGeneration(Collection<UUID> uids, int source,
 			I_Path idPath, int version) throws TerminologyException,
 			IOException {
@@ -1487,8 +1496,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 				version);
 	}
 
-	public void writeId(I_IdVersioned id) throws DatabaseException {
-		bdbEnv.writeId(id);
+	public void writeId(I_IdVersioned id) throws IOException {
+		try {
+			bdbEnv.writeId(id);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public int getMaxId() throws DatabaseException {
@@ -1562,6 +1575,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void compress(int minUtilization) throws IOException {
 	    bdbEnv.compress(minUtilization);
+	}
+
+	public I_IdVersioned newIdVersionedBypassCommit(int nid) {
+		return new ThinIdVersioned(nid, 1);
+	}
+
+
+	public I_IdPart newIdPart() {
+		return new ThinIdPart();
 	}
 
 }

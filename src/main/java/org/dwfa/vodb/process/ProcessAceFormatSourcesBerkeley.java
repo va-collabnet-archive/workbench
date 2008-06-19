@@ -234,7 +234,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     protected static I_Path aceAuxPath;
 
-    public ProcessAceFormatSourcesBerkeley(VodbEnv vodb) throws DatabaseException {
+    public ProcessAceFormatSourcesBerkeley(VodbEnv vodb) throws DatabaseException, IOException {
         super();
         // map = new BerkeleyIdMapper();
         map = new MemoryIdMapper();
