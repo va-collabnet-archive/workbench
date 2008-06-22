@@ -148,16 +148,16 @@ public class GenerateScripts extends AbstractMojo {
             fw.write("java ");
          }
          if (debug) {
-			fw.write("-Xdebug");
-			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+			fw.write("-Xdebug ");
+			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
          }
          if (profile) {
-  			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/");
-  			fw.write("-Xint");
-  			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml");
-			fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar");
-			fw.write("-Xdebug");
-			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+  			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/ ");
+  			fw.write("-Xint ");
+  			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml ");
+			fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar ");
+			fw.write("-Xdebug ");
+			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
        	 
          }
 		fw.write("-Xms" + startHeap + " ");
@@ -193,16 +193,16 @@ public class GenerateScripts extends AbstractMojo {
 			// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
 			fw.write("java \\\n");
 	        if (debug) {
-				fw.write("-Xdebug");
-				fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+				fw.write("-Xdebug ");
+				fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
 	         }
 	         if (profile) {
-	  			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/");
-	  			fw.write("-Xint");
-	  			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml");
+	  			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/ ");
+	  			fw.write("-Xint ");
+	  			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml ");
 				fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar");
-				fw.write("-Xdebug");
-				fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+				fw.write("-Xdebug ");
+				fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
 	       	 
 	         }
 			fw.write("     -Xms" + startHeap + "  \\\n");
@@ -250,16 +250,16 @@ public class GenerateScripts extends AbstractMojo {
                fw.write("java \\\n");
             }
             if (debug) {
-    			fw.write("-Xdebug");
-    			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+    			fw.write("-Xdebug ");
+    			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
              }
              if (profile) {
-      			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/");
-      			fw.write("-Xint");
-      			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml");
-    			fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar");
-    			fw.write("-Xdebug");
-    			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+      			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/ ");
+      			fw.write("-Xint ");
+      			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml ");
+    			fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar ");
+    			fw.write("-Xdebug ");
+    			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
            	 
              }
 				fw.write("     -Xms" + startHeap + "  \\\n");
