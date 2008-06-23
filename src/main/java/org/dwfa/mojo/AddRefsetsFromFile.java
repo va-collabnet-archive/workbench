@@ -50,7 +50,7 @@ import org.dwfa.maven.MojoUtil;
 * @phase process-resources
 * @requiresDependencyResolution compile
 */
-public class AddRefsetsFromFile extends AbstractMojo{
+public class AddRefsetsFromFile extends AbstractMojo {
 	
 
 	/**
@@ -62,19 +62,38 @@ public class AddRefsetsFromFile extends AbstractMojo{
 	private File referenceSetFile;
 	
 	/**
-	 * The type of extension you want to load.
-	 * <li>i.e. BOOLEAN_EXTENSION, CONCEPT_EXTENSION...</li>
-	 * <br></br>
-	 * @parameter
+	 * Sets the type of extension you want to load. 
+	 * i.e. CONCEPT_EXTENSION, BOOLEAN_EXTENSION, ...
+	 * <p>
+	 * If the referenceSetFile parameter specifies a directory, the extension type for each file within  
+	 * the directory will determined from the file's name. 
+	 * For example *.concept.refset = CONCEPT_EXTENSION, *.boolean.refset = BOOLEAN_EXTENSION, ...
 	 * 
+	 * @parameter
 	 */
 	private String extensionType;
 	
+	/**
+	 * Overrides the refset uuid from the file being loaded.
+	 * This is the UUID of an existing specification refset concept in the target environment. 
+	 * 
+	 * @parameter
+	 */
+	private String refsetUUID;
+	
+	/**
+	 * Overrides the path uuid from the file being loaded.
+	 * This is the UUID of an existing edit path in the target environment. 
+	 */
+	private String pathUUID;
 	
 	private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 	
 	/** An internal cache of the new uncommitted extensions, indexed by the member uuid */ 
 	private HashMap<UUID, I_ThinExtByRefVersioned> extensions = new HashMap<UUID, I_ThinExtByRefVersioned>();
+
+	/** Keeps track of the latest version part for a particular extensions */
+	private HashMap<I_ThinExtByRefVersioned, I_ThinExtByRefPart> extensionParts = new HashMap<I_ThinExtByRefVersioned, I_ThinExtByRefPart>();
 	
 	/*
 	 * Mojo execution method.
@@ -144,16 +163,21 @@ public class AddRefsetsFromFile extends AbstractMojo{
 			reader = new BufferedReader( new FileReader( refsetFile ) );
 			String line = reader.readLine();
 			line = reader.readLine();
-						
+			
 			while ( line != null ) {
 				String[] tokens = line.split( "\t" );
-				
-				int referenceSetId = termFactory.uuidToNative( UUID.fromString( tokens[0] ) );
+								
+				String refsetId = (refsetUUID == null) ? tokens[0] : refsetUUID;
+				int refsetNid = termFactory.uuidToNative(UUID.fromString(refsetId));
+						
 				UUID memberUUID = UUID.fromString( tokens[1] );
 				int statusId = termFactory.uuidToNative( UUID.fromString( tokens[2] ) );
 				int componentId = termFactory.uuidToNative( UUID.fromString( tokens[3] ) );
 				long versionTime = DATE_FORMAT.parse( tokens[4] ).getTime();
-				int pathId = termFactory.uuidToNative( UUID.fromString( tokens[5] ) );
+				
+				String pathId = (pathUUID == null) ? tokens[5] : pathUUID;
+				int pathNid = termFactory.uuidToNative(UUID.fromString(pathId));
+				
 				
 				int typeId = termFactory.uuidToNative( RefsetAuxiliary.Concept.valueOf( extensionType ).getUids().iterator().next() );
 
@@ -167,7 +191,7 @@ public class AddRefsetsFromFile extends AbstractMojo{
 					int memberId = termFactory.uuidToNativeWithGeneration( memberUUID,
 		                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
 		                    termFactory.getPaths(), Integer.MAX_VALUE );
-					extension = termFactory.newExtension( referenceSetId, memberId, componentId, typeId );
+					extension = termFactory.newExtension( refsetNid, memberId, componentId, typeId );
 					extensions.put( memberUUID, extension );
 				}
 				
@@ -207,19 +231,34 @@ public class AddRefsetsFromFile extends AbstractMojo{
 				}
 				
 				if ( extPart != null ) {
-					extPart.setPathId( pathId );
+					extPart.setPathId( pathNid );
 					extPart.setStatus( statusId );
-					extPart.setVersion( Integer.MAX_VALUE );
-					//extPart.setVersion( termFactory.convertToThinVersion(versionTime) );
+					extPart.setVersion( termFactory.convertToThinVersion(versionTime) );
 					
-					extension.addVersion( extPart );
-					termFactory.addUncommitted( extension );
+					if (extensionParts.containsKey(extension)) {
+						I_ThinExtByRefPart existingExtPart = extensionParts.get(extension);
+						if (existingExtPart.getVersion() <= extPart.getVersion()) {
+							// overwrite older version
+							extensionParts.put(extension, extPart);
+						}
+					} else {
+						// create first version
+						extensionParts.put(extension, extPart);
+					}
 				}
 							
 				line = reader.readLine();
-			}//End while loop
-			
+			}
+
 			reader.close();
+			
+			// Add all extensions to be committed
+			for (I_ThinExtByRefVersioned extension : extensions.values()) {
+				I_ThinExtByRefPart extPart = extensionParts.get(extension);
+				extPart.setVersion(Integer.MAX_VALUE);
+				extension.addVersion(extPart);
+				termFactory.addUncommitted(extension);
+			}
 			
 			termFactory.commit();
 			
