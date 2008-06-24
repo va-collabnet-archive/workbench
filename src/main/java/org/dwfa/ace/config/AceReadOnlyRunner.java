@@ -60,6 +60,9 @@ public class AceReadOnlyRunner {
          String lookAndFeelClassName = (String) config.getEntry(this.getClass().getName(), "lookAndFeelClassName",
                String.class, UIManager.getSystemLookAndFeelClassName());
 
+         String userNameForWindow = (String) config.getEntry(this.getClass().getName(), "userNameForWindow",
+                 String.class, "AMT Viewer");
+
          UIManager.setLookAndFeel(lookAndFeelClassName);
 
          File aceConfigFile = (File) config.getEntry(this.getClass().getName(), "aceConfigFile", File.class, new File(
@@ -90,14 +93,14 @@ public class AceReadOnlyRunner {
          }
          ACE.setAceConfig(AceConfig.config);
          AceConfig.config.addChangeSetWriters();
-         AceConfig.config.setUsername("AMT Viewer");
+         AceConfig.config.setUsername(userNameForWindow);
          int successCount = 0;
          int frameCount = 0;
          for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
             frameCount++;
             if (ace.isActive()) {
                AceFrameConfig afc = (AceFrameConfig) ace;
-               afc.setUsername("AMT Viewer");
+               afc.setUsername(userNameForWindow);
                afc.setMasterConfig(AceConfig.config);
                successCount++;
                SwingUtilities.invokeLater(new Runnable() {
