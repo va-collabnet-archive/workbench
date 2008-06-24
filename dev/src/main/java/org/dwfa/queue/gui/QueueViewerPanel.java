@@ -123,7 +123,7 @@ public class QueueViewerPanel extends JPanel {
             this.id = id;
             this.worker = worker;
         }
-
+        List<I_Work> cloneList = new ArrayList<I_Work>();
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
@@ -172,7 +172,22 @@ public class QueueViewerPanel extends JPanel {
                         try {
                             I_EncodeBusinessProcess processToExecute = tableOfQueueEntriesModel.getQueue()
                                     .take(processMeta.getEntryID(), worker.getActiveTransaction());
-                            worker.execute(processToExecute);
+                            if (worker.isExecuting()) {
+                            	I_Work altWorker = null;
+                            	for (I_Work alt: cloneList) {
+                            		if (alt.isExecuting() == false) {
+                            			altWorker = alt;
+                            			break;
+                            		}
+                            	}
+                            	if (altWorker == null) {
+                            		altWorker = worker.getTransactionIndependentClone();
+                            		cloneList.add(altWorker);
+                            	}
+                            	altWorker.execute(processToExecute);
+                            } else {
+                                worker.execute(processToExecute);
+                            }
                             if (logger.isLoggable(Level.FINE)) {
                                 SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(processToExecute
                                         .getExecutionRecords());
