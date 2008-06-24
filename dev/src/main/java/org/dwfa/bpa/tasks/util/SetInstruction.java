@@ -27,7 +27,7 @@ import org.dwfa.bpa.tasks.ws.PanelIds;
  *  
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/misc tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/workspace tasks", type = BeanType.TASK_BEAN)})
 public class SetInstruction extends AbstractTask {
 
     private String instruction;

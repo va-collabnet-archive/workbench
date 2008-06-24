@@ -22,7 +22,7 @@ public class SetProcessDestinationBeanInfo extends SimpleBeanInfo {
             newDestination.setBound(true);
             newDestination.setPropertyEditorClass(JTextFieldEditor.class);
             newDestination.setDisplayName("set destination");
-            newDestination.setShortDescription("Sets the name of the process to the provided value.");
+            newDestination.setShortDescription("Sets the destination of the process to the provided value.");
 
 
             PropertyDescriptor rv[] = { newDestination };

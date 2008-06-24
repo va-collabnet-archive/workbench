@@ -23,6 +23,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 
 
 /**
+ * Takes the value of the element data container and places it in list data container (next available spot).
+ * 
  * @author kec
  *
  */

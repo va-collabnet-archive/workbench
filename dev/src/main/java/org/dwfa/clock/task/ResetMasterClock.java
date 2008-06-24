@@ -12,12 +12,12 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Resets the master clock to it's inital value. 
+ * Resets the master clock to it's initial value. 
  * @author kec
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN)})
 public class ResetMasterClock extends MasterClockTask {
     
     private static final long serialVersionUID = 1;

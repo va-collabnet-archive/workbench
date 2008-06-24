@@ -24,6 +24,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 
 
 /**
+ * Takes the first element from a list data container and places the value in the element data container. 
+ * <p>
  * @author kec
  *
  */

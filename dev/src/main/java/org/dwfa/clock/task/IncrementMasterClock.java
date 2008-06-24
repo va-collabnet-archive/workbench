@@ -18,7 +18,7 @@ import org.dwfa.util.bean.Spec;
  * will only have one master clock. 
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN)})
 public class IncrementMasterClock extends MasterClockTask {
     
     private static final long serialVersionUID = 1;

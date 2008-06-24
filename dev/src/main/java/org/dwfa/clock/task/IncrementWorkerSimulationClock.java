@@ -24,7 +24,7 @@ import org.dwfa.util.bean.Spec;
  *
  */
 @BeanList(specs = 
-{ @Spec(directory = "tasks/clock tasks", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN)})
 public class IncrementWorkerSimulationClock extends AbstractTask {
     
     private static final long serialVersionUID = 1;
