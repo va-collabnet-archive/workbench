@@ -83,6 +83,7 @@
             <plugin>
                 <groupId>org.dwfa</groupId>
                 <artifactId>dwfa-mojo</artifactId>
+
                 <executions>
                     <execution>
                         <id>write-beans</id>
@@ -132,7 +133,7 @@
                                 </beanSpec>
                                 <beanSpec>
                                     <sourceName>MoveRootSafely</sourceName>
-                                    <dirName>tasks/queque/failsafe tasks</dirName>
+                                    <dirName>tasks/queue tasks/failsafe</dirName>
                                     <type>process</type>
                                 </beanSpec>
                                 <beanSpec>
