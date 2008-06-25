@@ -229,7 +229,7 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                         if (f.listFiles() != null) {
                             for (File processFile : f.listFiles()) {
                                 ActionListener processMenuListener = new ProcessMenuActionListener(
-                                        processFile, worker);
+                                        processFile, this);
                                 ObjectInputStream ois = new ObjectInputStream(
                                         new BufferedInputStream(new FileInputStream(
                                                 processFile)));
@@ -296,6 +296,10 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
 
 	public JMenu getFileMenu() {
 		return fileMenu;
+	}
+
+	public I_Work getWorker() {
+		return worker;
 	}
 
 }

@@ -33,6 +33,7 @@ public class ProcessMenuActionListener implements ActionListener {
 
 
         public void run() {
+            I_Work worker = workspaceFrame.getWorker();
             try {
                 ObjectInputStream ois = new ObjectInputStream(
                         new BufferedInputStream(new FileInputStream(
@@ -40,6 +41,9 @@ public class ProcessMenuActionListener implements ActionListener {
                 I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
                         .readObject();
                 ois.close();
+                if (worker.isExecuting()) {
+                	worker = worker.getTransactionIndependentClone();
+                }
                 process.execute(worker);
                 worker.commitTransactionIfActive();
             } catch (Exception ex) {
@@ -53,12 +57,12 @@ public class ProcessMenuActionListener implements ActionListener {
         }
     };
     private File processFile;
-    private I_Work worker;
+    private WorkspaceFrame workspaceFrame;
 
-    public ProcessMenuActionListener(File processFile, I_Work worker) {
+    public ProcessMenuActionListener(File processFile, WorkspaceFrame workspaceFrame) {
         super();
         this.processFile = processFile;
-        this.worker = worker;
+        this.workspaceFrame = workspaceFrame;
     }
 
     public void actionPerformed(ActionEvent e) {
