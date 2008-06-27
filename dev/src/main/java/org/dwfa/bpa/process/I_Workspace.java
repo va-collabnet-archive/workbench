@@ -111,4 +111,10 @@ public interface I_Workspace {
     public void setShownInInternalFrame(boolean b);
     
     public void setOneTouchExpandable(boolean b);
+    
+    public void acquireOwnership();
+    
+    public void releaseOwnership();
+    
+    
 }
