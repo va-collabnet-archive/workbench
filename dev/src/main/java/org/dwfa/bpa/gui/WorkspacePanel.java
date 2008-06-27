@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,6 +107,9 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     private WorkspaceFrame frame;
 
     private I_ManageUserTransactions transactionInterface;
+    
+    private Semaphore ownership = new Semaphore(1);
+
 
     public boolean isShownInInternalFrame() {
         return this.showInInternalFrame;
@@ -820,4 +824,12 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
 		this.propChangeSupport.removePropertyChangeListener(property, l);
 		
 	}
+
+  public void acquireOwnership() {
+    ownership.acquireUninterruptibly();
+  }
+
+  public void releaseOwnership() {
+    ownership.release();
+  }
 }
