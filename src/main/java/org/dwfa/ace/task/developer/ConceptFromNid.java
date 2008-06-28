@@ -1,4 +1,4 @@
-package org.dwfa.ace.task;
+package org.dwfa.ace.task.developer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -23,7 +24,7 @@ import org.dwfa.util.bean.Spec;
  * @author Dion
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ace/developer", type = BeanType.TASK_BEAN) })
 public class ConceptFromNid extends AbstractTask{
 	
 	private static final long serialVersionUID = 1L;

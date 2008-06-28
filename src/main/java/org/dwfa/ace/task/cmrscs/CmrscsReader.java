@@ -117,6 +117,9 @@ public class CmrscsReader implements I_ReadChangeSet {
 
 					}
 					try {
+						if (memberUid.equals(UUID.fromString("1e3f44ed-bbe2-4148-bbe5-5240cd408b26"))) {
+							AceLog.getEditLog().severe("Encountered the problem ext member...");
+						}
 						getVodb().getDirectInterface().writeExt(ebr);
 					} catch (IOException e) {
 						AceLog.getEditLog().severe("Exception writing extension: " + ebr);
