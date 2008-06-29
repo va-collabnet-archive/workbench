@@ -177,7 +177,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 		relTable.getColumn(REL_FIELD.STATUS)
 				.setCellEditor(
 						new RelTableModel.RelStatusFieldEditor(host.getConfig()));
-		relTable.setDefaultEditor(StringWithRelTuple.class, new RelGroupFieldEditor());
+		relTable.getColumn(REL_FIELD.GROUP).setCellEditor(new RelGroupFieldEditor());
 	}
 
 	public JTableWithDragImage getRelTable() {
