@@ -18,7 +18,7 @@ public class LogWithAlerts {
 		logger = Logger.getLogger(logName);
 	}
 
-	protected Logger getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 
