@@ -1,6 +1,7 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -60,6 +61,9 @@ public interface I_ReadChangeSet extends Serializable {
     * @return the list of falidators associated with this change set. 
     */
    public List<I_ValidateChangeSetChanges> getValidators();
+   
+   
+   public int availableBytes() throws FileNotFoundException, IOException, ClassNotFoundException;
 	
 
 }

@@ -291,4 +291,11 @@ public interface I_TermFactory {
 	public boolean hasConcept(int conceptId) throws IOException;
 	public boolean hasExtension(int memberId) throws IOException;
 	
+	public boolean getTransactional();
+	public void startTransaction() throws IOException;
+	public void cancelTransaction() throws IOException;
+	public void commitTransaction() throws IOException;
+	
+	public I_ShowActivity newActivityPanel();
+	
 }

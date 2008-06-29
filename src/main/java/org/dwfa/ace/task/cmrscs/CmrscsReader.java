@@ -50,6 +50,14 @@ public class CmrscsReader implements I_ReadChangeSet {
 		return new ArrayList<I_ValidateChangeSetChanges>();
 	}
 
+	public int availableBytes() throws FileNotFoundException, IOException, ClassNotFoundException {
+		lazyInit();
+		if (dis != null) {
+			return dis.available();			
+		}
+		return 0;
+	}
+
 	public long nextCommitTime() throws IOException, ClassNotFoundException {
 		lazyInit();
 		if (nextCommit == null) {

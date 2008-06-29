@@ -1,7 +1,10 @@
 package org.dwfa.ace.task.cs;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,17 +12,30 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 
-public abstract class ChangeSetImporter {
+public abstract class ChangeSetImporter implements ActionListener {
+	
+	private boolean continueImport = true;
 
-    @SuppressWarnings("unchecked")
+    public void actionPerformed(ActionEvent arg0) {
+    	continueImport = false;
+	}
+
+	@SuppressWarnings("unchecked")
 	public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, String suffix) throws TaskFailedException {
         try {
+        	I_TermFactory tf = LocalVersionedTerminology.get();
+        	I_ShowActivity activity = tf.newActivityPanel();
+        	activity.setProgressInfoUpper("Importing " + suffix + " change sets. ");
+        	activity.setIndeterminate(true);
+        	activity.addActionListener(this);
         	String[] validatorArray = new String[]{};
         	
         	if (validators != null && validators != "") {
@@ -41,10 +57,19 @@ public abstract class ChangeSetImporter {
                 readerSet.add(csr);
                 logger.info("Adding reader: " + csf.getAbsolutePath());
             }
-            while (readerSet.size() > 0) {
+            
+            int max = avaibleBytes(readerSet);
+            activity.setMaximum(max);
+            activity.setValue(0);
+            activity.setIndeterminate(false);
+            while (readerSet.size() > 0 && continueImport) {
+                activity.setValue(max - avaibleBytes(readerSet));
+            	activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
                 readNext(readerSet);
             }
             LocalVersionedTerminology.get().commit();
+        	activity.setIndeterminate(false);
+        	activity.complete();
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (ClassNotFoundException e) {
@@ -52,6 +77,14 @@ public abstract class ChangeSetImporter {
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
+    }
+    
+    public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException, ClassNotFoundException {
+    	int available = 0;
+    	for (I_ReadChangeSet reader: readerSet) {
+    		available = available  + reader.availableBytes();
+    	}
+     	return available;
     }
     
     public abstract I_ReadChangeSet getChangeSetReader(File csf);
@@ -81,8 +114,12 @@ public abstract class ChangeSetImporter {
     }
 
     public static void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
-        if (readerSet.size() == 0) {
+    	if (readerSet.size() == 0) {
             return;
+        }
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        if (tf.getTransactional()) {
+        	tf.startTransaction();
         }
         I_ReadChangeSet first = readerSet.first();
         readerSet.remove(first);
@@ -101,6 +138,9 @@ public abstract class ChangeSetImporter {
             //don't add back since it is complete.
         } else {
             readerSet.add(first);
+        }
+        if (tf.getTransactional()) {
+            tf.commitTransaction();        	
         }
     }
 
