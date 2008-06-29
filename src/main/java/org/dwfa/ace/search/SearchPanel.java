@@ -34,8 +34,10 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -59,7 +61,27 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class SearchPanel extends JPanel {
 
-    public class AddToList implements ActionListener {
+    public class MaximizeSearchListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			JToggleButton toggle = (JToggleButton) e.getSource();
+			criterion.setVisible(!toggle.isSelected());
+			addToList.setVisible(!toggle.isSelected());
+			loadButton.setVisible(!toggle.isSelected());
+			progressBar.setVisible(!toggle.isSelected());
+			saveButton.setVisible(!toggle.isSelected());
+			searchButton.setVisible(!toggle.isSelected());
+			searchPhraseField.setVisible(!toggle.isSelected());
+			searchTypeCombo.setVisible(!toggle.isSelected());
+			addButton.setVisible(!toggle.isSelected());
+			removeButton.setVisible(!toggle.isSelected());
+			for (CriterionPanel test: criterionPanels) {
+				test.setVisible(toggle.isSelected());
+			}
+		}
+
+	}
+	public class AddToList implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             try {
@@ -210,6 +232,10 @@ public class SearchPanel extends JPanel {
 
 	private JButton addToList;
 
+	private JButton addButton;
+
+	private JButton removeButton;
+
     public SearchPanel(I_ConfigAceFrame config) {
         super(new GridBagLayout());
         this.config = config;
@@ -238,12 +264,12 @@ public class SearchPanel extends JPanel {
         gbc.weightx = 0;
         gbc.weighty = 0;
 
-        JButton addButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/add2.png")));
+        addButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/add2.png")));
         addButton.setIconTextGap(0);
         addButton.addActionListener(new AddCriterion(this));
         add(addButton, gbc);
         gbc.gridx++;
-        JButton removeButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
+        removeButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
         removeButton.setIconTextGap(0);
         removeButton.setEnabled(false);
         add(removeButton, gbc);
@@ -400,7 +426,14 @@ public class SearchPanel extends JPanel {
         gbc.gridwidth = 10;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        add(new JScrollPane(descTable), gbc);
+        JScrollPane scrollPane = new JScrollPane(descTable);
+        JToggleButton maximizeTable = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/fit_to_size.png")));
+        maximizeTable.setSelected(false);
+        maximizeTable.addActionListener(new MaximizeSearchListener());
+        
+        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, maximizeTable);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        add(scrollPane, gbc);
         descTable.getSelectionModel().addListSelectionListener(new SearchSelectionListener());
 
     }
