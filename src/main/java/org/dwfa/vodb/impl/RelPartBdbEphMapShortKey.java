@@ -117,7 +117,7 @@ public class RelPartBdbEphMapShortKey implements I_StoreInBdb, I_StoreRelParts<S
 			DatabaseEntry partValue = new DatabaseEntry();
 			shortBinder.objectToEntry((Short) relPartId, partKey);
 			relPartBinding.objectToEntry(relPart, partValue);
-			relPartDb.put(null, partKey, partValue);
+			relPartDb.put(BdbEnv.transaction, partKey, partValue);
 			partIdMap.put(relPart, relPartId);
 			idPartMap.put(relPartId, relPart);
 			if (partIdMap.size() % 250 == 0) {

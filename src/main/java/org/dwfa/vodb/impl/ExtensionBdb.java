@@ -121,7 +121,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(ext.getMemberId(), key);
 		extBinder.objectToEntry(ext, value);
-		extensionDb.put(null, key, value);
+		extensionDb.put(BdbEnv.transaction, key, value);
 	}
 
 	/* (non-Javadoc)
@@ -336,7 +336,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		DatabaseEntry extValue = new DatabaseEntry();
 		intBinder.objectToEntry(memberId, extKey);
 		try {
-			if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				return (I_ThinExtByRefVersioned) extBinder
 						.entryToObject(extValue);
 			}
@@ -353,7 +353,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		DatabaseEntry extKey = new DatabaseEntry();
 		DatabaseEntry extValue = new DatabaseEntry();
 		intBinder.objectToEntry(memberId, extKey);
-		if (extensionDb.get(null, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;

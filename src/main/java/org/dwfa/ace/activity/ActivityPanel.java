@@ -18,6 +18,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.swing.SwingTask;
 
 public class ActivityPanel extends JPanel implements I_ShowActivity {

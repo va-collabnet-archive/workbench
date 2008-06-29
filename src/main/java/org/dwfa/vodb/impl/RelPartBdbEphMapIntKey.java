@@ -122,7 +122,7 @@ public class RelPartBdbEphMapIntKey implements I_StoreInBdb, I_StoreRelParts<Int
 			DatabaseEntry partValue = new DatabaseEntry();
 			intBinder.objectToEntry((Integer) relPartId, partKey);
 			relPartBinding.objectToEntry(relPart, partValue);
-			relPartDb.put(null, partKey, partValue);
+			relPartDb.put(BdbEnv.transaction, partKey, partValue);
 			partIdMap.put(relPart, relPartId);
 			idPartMap.put(relPartId, relPart);
 			if (partIdMap.size() % 250 == 0) {

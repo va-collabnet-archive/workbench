@@ -11,10 +11,7 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -81,6 +78,7 @@ public class AceRunner {
 
    @SuppressWarnings("unused")
    private Timer ipChangeTimer;
+   private boolean listenForIpChanges = false;
 
    public AceRunner(final String[] args, final LifeCycle lc) {
       try {
@@ -101,8 +99,11 @@ public class AceRunner {
          startupLocalHost = InetAddress.getLocalHost();
          
          config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
+         VodbEnv.setTransactional(true);
+         VodbEnv.setTxnNoSync(false);
+         VodbEnv.setDeferredWrite(false);   
 
-                   
+         
          Boolean logTimingInfo = (Boolean) config.getEntry(this.getClass().getName(), "logTimingInfo",
                                                                  Boolean.class, null);
          if (logTimingInfo != null) {
@@ -116,9 +117,10 @@ public class AceRunner {
              VodbEnv.setCacheSize(cacheSize);
          }
 
-                   
-         ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
-         ipChangeTimer.start();
+         if (listenForIpChanges) {
+             ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
+             ipChangeTimer.start();
+         }
  
          String lookAndFeelClassName = (String) config.getEntry(this.getClass().getName(), "lookAndFeelClassName",
                String.class, UIManager.getSystemLookAndFeelClassName());
@@ -154,27 +156,26 @@ public class AceRunner {
                         File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
                         "target/berkeley-db"));
                         
-                        VodbEnv stealthVodb = new VodbEnv(true);
+                        final VodbEnv stealthVodb = new VodbEnv(true);
                         AceConfig.stealthVodb = stealthVodb;
                         LocalVersionedTerminology.setStealthfactory(stealthVodb);
                         stealthVodb.setup(dbFolder, false, cacheSize);
                         
-                        List<File> changeSetFiles = new ArrayList<File>();
-                        ChangeSetImporter.addAllChangeSetFiles(checkoutLocation, changeSetFiles, ".jcs");
-                        
-                        TreeSet<I_ReadChangeSet> readerSet = ChangeSetImporter.getSortedReaderSet();
-                        
-                        for (File csf : changeSetFiles) {
-                            BinaryChangeSetReader csr = new BinaryChangeSetReader();
-                            csr.setChangeSetFile(csf);
-                            csr.setVodb(stealthVodb);
-                            readerSet.add(csr);
-                            AceLog.getAppLog().info("Adding reader: " + csf.getAbsolutePath());
-                        }
+                        ChangeSetImporter jcsImporter = new ChangeSetImporter() {
 
-                        while (readerSet.size() > 0) {
-                        	ChangeSetImporter.readNext(readerSet);
-                        }
+							@Override
+							public I_ReadChangeSet getChangeSetReader(File csf) {
+								BinaryChangeSetReader csr = new BinaryChangeSetReader();
+	                            csr.setChangeSetFile(csf);
+	                            csr.setVodb(stealthVodb);
+	                            return csr;
+							}
+                        	
+                        };
+                        
+                        jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, 
+                        		checkoutLocation.getAbsolutePath(), false, ".jcs");
+                        
                         stealthVodb.close();
                         AceConfig.stealthVodb = null;
                         LocalVersionedTerminology.setStealthfactory(null);

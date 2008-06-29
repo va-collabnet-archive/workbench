@@ -197,7 +197,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, idKey);
 		try {
-			if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (idDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINER)) {
 					AceLog.getAppLog().finer(
 							"Got id record for: " + nativeId
@@ -227,7 +227,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, idKey);
-		if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (idDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINER)) {
 				AceLog.getAppLog().finer(
 						"Got id record for: " + nativeId + " elapsed time: "
@@ -297,7 +297,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 			idPutSemaphore.acquire();
 			nidGenerator.lastId = Math.max(nidGenerator.lastId, id
 					.getNativeId());
-			idDb.put(null, idKey, idValue);
+			idDb.put(BdbEnv.transaction, idKey, idValue);
 			idPutSemaphore.release();
 		} catch (InterruptedException e) {
 			throw new DatabaseException(e);
@@ -448,7 +448,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idValue = new DatabaseEntry();
 		uuidBinding.objectToEntry(uid, idKey);
 		try {
-			if (uidToIdMap.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (uidToIdMap.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 					AceLog.getAppLog().fine(
 							"Got nativeId: " + uid + " elapsed time: "
@@ -514,7 +514,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		uuidBinding.objectToEntry(uid, idKey);
-		if (uidToIdMap.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (uidToIdMap.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().fine(
 						"Got nativeId: " + uid + " elapsed time: "

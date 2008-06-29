@@ -68,7 +68,7 @@ public class ConceptAttributeBdb implements I_StoreConceptAttributes {
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(concept.getConId(), key);
 		conBinding.objectToEntry(concept, value);
-		conceptDb.put(null, key, value);
+		conceptDb.put(BdbEnv.transaction, key, value);
 		// logStats();
 	}
 
@@ -91,7 +91,7 @@ public class ConceptAttributeBdb implements I_StoreConceptAttributes {
 		DatabaseEntry conceptKey = new DatabaseEntry();
 		DatabaseEntry conceptValue = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, conceptKey);
-		if (conceptDb.get(null, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (conceptDb.get(BdbEnv.transaction, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -114,7 +114,7 @@ public class ConceptAttributeBdb implements I_StoreConceptAttributes {
 		DatabaseEntry conceptValue = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, conceptKey);
 		try {
-			if (conceptDb.get(null, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (conceptDb.get(BdbEnv.transaction, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 					AceLog.getAppLog().fine(
 							"Got concept: " + conceptId + " elapsed time: "

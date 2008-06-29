@@ -49,6 +49,7 @@ import org.dwfa.ace.api.I_ProcessPaths;
 import org.dwfa.ace.api.I_ProcessRelationships;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
@@ -148,7 +149,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	private static boolean txnNoSync = false;
 
-	private static long transactionTimeout = 30000; // 30 seconds
+	private static long transactionTimeout = 0; 
 
 	private ActivityPanel activityFrame;
 
@@ -176,6 +177,24 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		}
 	}
 
+    private class ShutdownThread extends Thread {
+
+    	
+
+        public ShutdownThread() {
+			super("Vodb Shutdown Thread");
+		}
+
+		public void run() {
+			try {
+				bdbEnv.cancelTransaction();
+				sync();
+			} catch (IOException e) {
+				AceLog.getEditLog().alertAndLogException(e);
+			}
+        }
+    }
+
 	/**
 	 * @throws Exception
 	 */
@@ -192,6 +211,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 					throw new IOException("dbSetupConfig cannot be null for new databases...");
 				}
 			}
+			Runtime.getRuntime().addShutdownHook(new ShutdownThread());
 			long startTime = System.currentTimeMillis();
 			this.envHome = envHome;
 			if (VodbEnv.cacheSize == null) {
@@ -249,7 +269,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void sync() throws IOException {
 		try {
-			bdbEnv.sync();
+			if (bdbEnv != null) {
+				bdbEnv.sync();				
+			}
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
@@ -1361,7 +1383,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return ExtensionByReferenceBean.get(nid);
 	}
 
-	public static boolean isTransactional() {
+	public static  boolean isTransactional() {
+		return transactional;
+	}
+
+	public  boolean getTransactional() {
 		return transactional;
 	}
 
@@ -1566,7 +1592,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void setupBean(ConceptBean cb) throws IOException {
 		bdbEnv.setupBean(cb);
-		
 	}
 
 	public I_WriteDirectToDb getDirectInterface() {
@@ -1586,4 +1611,29 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return new ThinIdPart();
 	}
 
+	public void startTransaction() throws IOException {
+		bdbEnv.startTransaction();
+	}
+	
+	public void cancelTransaction() throws IOException {
+		bdbEnv.cancelTransaction();
+	}
+	
+	public void commitTransaction() throws IOException {
+		bdbEnv.commitTransaction();
+	}
+
+	public I_ShowActivity newActivityPanel() {
+		ActivityPanel ap = new ActivityPanel(true, true);
+		ap.setIndeterminate(true);
+		ap.setProgressInfoUpper("New activty");
+		ap.setProgressInfoLower("");
+		try {
+			ActivityViewer.addActivity(ap);
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+		return ap;
+	}
+		
 }

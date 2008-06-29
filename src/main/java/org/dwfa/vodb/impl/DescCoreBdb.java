@@ -124,7 +124,7 @@ public class DescCoreBdb implements I_StoreInBdb {
 			DatabaseEntry partValue = new DatabaseEntry();
 			intBinder.objectToEntry((Integer) descPartCoreId, partKey);
 			descPartCoreBinding.objectToEntry(descPartCore, partValue);
-			descPartDb.put(null, partKey, partValue);
+			descPartDb.put(BdbEnv.transaction, partKey, partValue);
 			partIdMap.put(descPartCore, descPartCoreId);
 			conPartMap.put(descPartCoreId, descPartCore);
 			if (partIdMap.size() % 100 == 0) {

@@ -110,7 +110,7 @@ public class ConCoreBdb implements I_StoreInBdb {
 			DatabaseEntry partValue = new DatabaseEntry();
 			intBinder.objectToEntry((Integer) conAttrPartId, partKey);
 			conPartBinding.objectToEntry(conAttrPart, partValue);
-			conPartDb.put(null, partKey, partValue);
+			conPartDb.put(BdbEnv.transaction, partKey, partValue);
 			partIdMap.put(conAttrPart, conAttrPartId);
 			conPartMap.put(conAttrPartId, conAttrPart);
 			if (partIdMap.size() % 100 == 0) {

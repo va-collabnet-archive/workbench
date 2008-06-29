@@ -127,7 +127,7 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
 		DatabaseEntry primaryKey = new DatabaseEntry();
 		DatabaseEntry partValue = new DatabaseEntry();
 		relPartBinding.objectToEntry(part, partKey);
-		if (relPartMapDb.get(null, partKey, primaryKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (relPartMapDb.get(BdbEnv.transaction, partKey, primaryKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			
 			 int partId = (Integer) intBinder.entryToObject(primaryKey);
 			 //AceLog.getAppLog().info("returning part id: " + partId + " for:" + part);
@@ -136,7 +136,7 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
 		int newPartId = partIdGenerator.nextId();
 		intBinder.objectToEntry((Integer) newPartId, partKey);
 		relPartBinding.objectToEntry(part, partValue);
-		relPartDb.put(null, partKey, partValue);
+		relPartDb.put(BdbEnv.transaction, partKey, partValue);
 		//AceLog.getAppLog().info("Writing part id: " + newPartId + " " + part);
 		return newPartId;
 	}
@@ -148,7 +148,7 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
 		DatabaseEntry partKey = new DatabaseEntry();
 		DatabaseEntry partValue = new DatabaseEntry();
 		intBinder.objectToEntry(partId, partKey);
-		if (relPartDb.get(null, partKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (relPartDb.get(BdbEnv.transaction, partKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return (I_RelPart) relPartBinding.entryToObject(partValue);
 		}
 		throw new DatabaseException("Rel part: " + partId + " not found.");

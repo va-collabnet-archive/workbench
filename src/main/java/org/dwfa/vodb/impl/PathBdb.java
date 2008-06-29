@@ -60,7 +60,7 @@ public class PathBdb implements I_StoreInBdb, I_StorePaths {
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(p.getConceptId(), key);
 		pathBinder.objectToEntry(p, value);
-		pathDb.put(null, key, value);
+		pathDb.put(BdbEnv.transaction, key, value);
 		ACE.addUncommitted((I_Transact) p);
 	}
 
@@ -77,7 +77,7 @@ public class PathBdb implements I_StoreInBdb, I_StorePaths {
 		DatabaseEntry pathKey = new DatabaseEntry();
 		DatabaseEntry pathValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, pathKey);
-		if (pathDb.get(null, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (pathDb.get(BdbEnv.transaction, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().fine("Got path: " + nativeId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
@@ -101,7 +101,7 @@ public class PathBdb implements I_StoreInBdb, I_StorePaths {
 		DatabaseEntry pathKey = new DatabaseEntry();
 		DatabaseEntry pathValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, pathKey);
-		if (pathDb.get(null, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (pathDb.get(BdbEnv.transaction, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().fine("Got path: " + nativeId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");

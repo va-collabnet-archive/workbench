@@ -59,7 +59,7 @@ public class PositionBdb implements I_StoreInBdb, I_StorePositions {
 		for (TimePathId tb : values) {
 			btBinder.objectToEntry(tb, key);
 			tbBinder.objectToEntry(tb, value);
-			positionDb.put(null, key, value);
+			positionDb.put(BdbEnv.transaction, key, value);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class PositionBdb implements I_StoreInBdb, I_StorePositions {
 		DatabaseEntry value = new DatabaseEntry();
 		btBinder.objectToEntry(jarTimePath, key);
 		tbBinder.objectToEntry(jarTimePath, value);
-		positionDb.put(null, key, value);
+		positionDb.put(BdbEnv.transaction, key, value);
 	}
 
 	/* (non-Javadoc)

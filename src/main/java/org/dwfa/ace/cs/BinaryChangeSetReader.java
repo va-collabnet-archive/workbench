@@ -940,4 +940,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		return validators;
 	}
 
+	public int availableBytes() throws FileNotFoundException, IOException,
+			ClassNotFoundException {
+		lazyInit();
+		if (ois != null) {
+			return ois.available();			
+		}
+		return 0;
+	}
+
 }

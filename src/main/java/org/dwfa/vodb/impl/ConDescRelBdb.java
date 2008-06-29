@@ -1136,7 +1136,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(conceptAttributes.getConId(), key);
 		conDescRelBinding.objectToEntry(bean, value);
-		conDescRelDb.put(null, key, value);
+		conDescRelDb.put(BdbEnv.transaction, key, value);
 		// logStats();
 	}
 
@@ -1159,7 +1159,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, key);
-		if (conDescRelDb.get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (conDescRelDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -1460,7 +1460,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(bean.getConceptId(), key);
 		conDescRelBinding.objectToEntry(bean, value);
-		conDescRelDb.put(null, key, value);
+		conDescRelDb.put(BdbEnv.transaction, key, value);
 	}
 
 	private void writeToLucene(I_DescriptionVersioned desc)
@@ -1996,7 +1996,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(cb.getConceptId(), key);
 		try {
-			if (conDescRelDb.get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (conDescRelDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(value.getData());
 				conDescRelBinding.populateBean(ti, cb);
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {

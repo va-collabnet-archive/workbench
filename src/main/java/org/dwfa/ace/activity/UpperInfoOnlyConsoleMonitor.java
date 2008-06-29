@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 
 public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {

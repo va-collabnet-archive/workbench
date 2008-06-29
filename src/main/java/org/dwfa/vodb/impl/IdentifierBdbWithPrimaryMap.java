@@ -190,7 +190,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, idKey);
 		try {
-			if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (idDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINER)) {
 					AceLog.getAppLog().finer(
 							"Got id record for: " + nativeId
@@ -220,7 +220,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, idKey);
-		if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (idDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINER)) {
 				AceLog.getAppLog().finer(
 						"Got id record for: " + nativeId + " elapsed time: "
@@ -290,7 +290,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 			idPutSemaphore.acquire();
 			nidGenerator.lastId = Math.max(nidGenerator.lastId, id
 					.getNativeId());
-			idDb.put(null, idKey, idValue);
+			idDb.put(BdbEnv.transaction, idKey, idValue);
 			idPutSemaphore.release();
 			uuidToNidDbPutSemaphore.acquire();
 			for (I_IdPart p : id.getVersions()) {
@@ -298,7 +298,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 					UUID secondaryId = (UUID) p.getSourceId();
 					intBinder.objectToEntry(id.getNativeId(), idValue);
 					uuidBinding.objectToEntry(secondaryId, idKey);
-					uuidToNidDb.put(null, idKey, idValue);
+					uuidToNidDb.put(BdbEnv.transaction, idKey, idValue);
 				}
 			}
 			uuidToNidDbPutSemaphore.release();
@@ -495,7 +495,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
 		uuidBinding.objectToEntry(uid, idKey);
-		if (uuidToNidDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (uuidToNidDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().fine(
 						"Got nativeId: " + uid + " elapsed time: "
@@ -543,7 +543,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idValue = new DatabaseEntry();
 		uuidBinding.objectToEntry(uid, idKey);
 		try {
-			if (uuidToNidDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (uuidToNidDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				nid = (Integer) intBinder.entryToObject(idValue);
 				uuidNidMapCache.put(uid, nid);
 				return nid;
@@ -594,7 +594,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 		DatabaseEntry idValue = new DatabaseEntry();
 		uuidBinding.objectToEntry(uid, idKey);
 		try {
-			if (uuidToNidDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (uuidToNidDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 					AceLog.getAppLog().fine(
 							"Got nativeId: " + uid + " elapsed time: "
@@ -602,7 +602,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 				}
 				intBinder.objectToEntry((Integer) intBinder
 						.entryToObject(idValue), idKey);
-				if (idDb.get(null, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				if (idDb.get(BdbEnv.transaction, idKey, idValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 						AceLog.getAppLog().fine(
 								"Got nativeId: " + uid + " elapsed time: "

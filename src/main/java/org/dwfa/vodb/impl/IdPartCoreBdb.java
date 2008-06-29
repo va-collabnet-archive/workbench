@@ -110,7 +110,7 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 			DatabaseEntry partValue = new DatabaseEntry();
 			shortBinder.objectToEntry(conAttrPartId, partKey);
 			idCoreBinding.objectToEntry(idPartCore, partValue);
-			idPartDb.put(null, partKey, partValue);
+			idPartDb.put(BdbEnv.transaction, partKey, partValue);
 			partIdMap.put(idPartCore, conAttrPartId);
 			idPartMap.put(conAttrPartId, idPartCore);
 			if (partIdMap.size() % 100 == 0) {

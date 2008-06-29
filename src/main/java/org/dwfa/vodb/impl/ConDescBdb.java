@@ -333,7 +333,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(conceptAttributes.getConId(), key);
 		conDescBinding.objectToEntry(bean, value);
-		conDescDb.put(null, key, value);
+		conDescDb.put(BdbEnv.transaction, key, value);
 		// logStats();
 	}
 
@@ -356,7 +356,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, key);
-		if (conDescDb.get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (conDescDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -389,7 +389,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, key);
 		try {
-			if (conDescDb.get(null, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (conDescDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 					AceLog.getAppLog().fine(
 							"Got concept: " + conceptId + " elapsed time: "
@@ -660,7 +660,7 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(bean.getConceptId(), key);
 		conDescBinding.objectToEntry(bean, value);
-		conDescDb.put(null, key, value);
+		conDescDb.put(BdbEnv.transaction, key, value);
 	}
 
 	private void writeToLucene(I_DescriptionVersioned desc)
@@ -954,14 +954,14 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		 * 
 		 * DatabaseEntry key = new DatabaseEntry(); DatabaseEntry value = new
 		 * DatabaseEntry(); intBinder.objectToEntry(newDesc.getConceptId(),
-		 * key); if (conDescDb.get(null, key, value, LockMode.DEFAULT) ==
+		 * key); if (conDescDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) ==
 		 * OperationStatus.SUCCESS) { ArrayList<I_DescriptionVersioned>
 		 * retrievedDescList = (ArrayList<I_DescriptionVersioned>)
 		 * descListBinding.entryToObject(value); AceLog.getAppLog().info(
 		 * "retrievedDescList: " + retrievedDescList ); }
 		 * 
 		 * intBinder.objectToEntry(newDesc.getConceptId(), key); if
-		 * (conDescDb.get(null, key, value, LockMode.DEFAULT) ==
+		 * (conDescDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) ==
 		 * OperationStatus.SUCCESS) { I_ConceptAttributeVersioned
 		 * conceptAttributes = (I_ConceptAttributeVersioned)
 		 * attributeBinding.entryToObject(value); AceLog.getAppLog().info(

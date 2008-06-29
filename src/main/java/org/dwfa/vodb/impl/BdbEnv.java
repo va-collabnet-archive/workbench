@@ -71,6 +71,7 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentStats;
 import com.sleepycat.je.StatsConfig;
 import com.sleepycat.je.Transaction;
+import com.sleepycat.je.TransactionConfig;
 import com.sleepycat.je.utilint.DbLsn;
 
 public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
@@ -101,6 +102,49 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 	private I_StorePositions positionBdb;
 
 	private I_StorePaths pathBdb;
+
+	protected static Transaction transaction = null;
+	
+	public void startTransaction() throws IOException {
+		if (transaction != null) {
+			throw new IOException("Transaction already in progress");
+		}
+		if (VodbEnv.isTransactional() == false) {
+			throw new IOException("Database is not transactional");
+		}
+		TransactionConfig tc = new TransactionConfig();
+		tc.setReadUncommitted(true);
+		try {
+			transaction = env.beginTransaction(null, tc);
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
+	}
+	
+	public void cancelTransaction() throws IOException {
+		if (transaction != null) {
+			Transaction oldTransaction = transaction;
+			transaction = null;
+			try {
+				oldTransaction.abort();
+			} catch (DatabaseException e) {
+				throw new ToIoException(e);
+			}
+		}
+	}
+	
+	
+	public void commitTransaction() throws IOException {
+		if (transaction != null) {
+			Transaction oldTransaction = transaction;
+			transaction = null;
+			try {
+				oldTransaction.commit();
+			} catch (DatabaseException e) {
+				throw new ToIoException(e);
+			}
+		}
+	}
 
 	public BdbEnv(VodbEnv vodb, File envHome, boolean readOnly, Long cacheSize,
 			File luceneDir, DatabaseSetupConfig dbSetupConfig)
@@ -304,7 +348,9 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		} else {
 			CheckpointConfig check = new CheckpointConfig();
 			check.setForce(true);
-			env.checkpoint(check);
+			if (env != null) {
+				env.checkpoint(check);				
+			}
 		}
 
 	}

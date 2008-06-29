@@ -469,7 +469,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
 		intBinder.objectToEntry(relId, relKey);
-		if (relDb.get(null, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (relDb.get(BdbEnv.transaction, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			ThinRelVersioned rel = (ThinRelVersioned) relWithPartCoreBinding
 					.entryToObject(relValue);
 			rel.setRelId(relId);
@@ -650,7 +650,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
 		intBinder.objectToEntry(relId, relKey);
-		if (relDb.get(null, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (relDb.get(BdbEnv.transaction, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -811,7 +811,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
 		intBinder.objectToEntry(rel.getRelId(), key);
 		relWithPartCoreBinding.objectToEntry(rel, value);
 		try {
-			relDb.put(null, key, value);
+			relDb.put(BdbEnv.transaction, key, value);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}

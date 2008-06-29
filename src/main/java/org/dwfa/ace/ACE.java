@@ -156,10 +156,10 @@ import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
-import org.dwfa.bpa.gui.ProcessMenuActionListener;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -167,6 +167,7 @@ import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
+import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
@@ -193,6 +194,59 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		dataCheckListeners.add(l);
 	}
 
+	public class ProcessMenuActionListener implements ActionListener {
+	    private class MenuProcessThread implements Runnable {
+	        
+	        private String action;
+	        
+	        
+	        /**
+	         * @param action
+	         */
+	        public MenuProcessThread(String action) {
+	            super();
+	            // TODO Auto-generated constructor stub
+	            this.action = action;
+	        }
+
+
+	        public void run() {
+	            try {
+	                ObjectInputStream ois = new ObjectInputStream(
+	                        new BufferedInputStream(new FileInputStream(
+	                                processFile)));
+	                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
+	                        .readObject();
+	                ois.close();
+	                if (worker.isExecuting()) {
+	                	worker = worker.getTransactionIndependentClone();
+	                }
+	                process.execute(worker);
+	                worker.commitTransactionIfActive();
+	            } catch (Exception ex) {
+
+	                worker.getLogger().log(Level.SEVERE, ex.getMessage(),
+	                        ex);
+	                JOptionPane.showMessageDialog(null, "<html>Exception processing action: " + 
+	                        action + "<p><p>" + 
+	                        ex.getMessage() + "<p><p>See log for details.");
+	            }
+	        }
+	    };
+	    private File processFile;
+	    private I_Work worker;
+
+	    public ProcessMenuActionListener(File processFile, I_Work worker) {
+	        super();
+	        this.processFile = processFile;
+	        this.worker = worker;
+	    }
+
+	    public void actionPerformed(ActionEvent e) {
+	        new Thread(new MenuProcessThread(e.getActionCommand()), "Menu Process Execution").start();
+	    }
+	}
+	
 	public void removeDataCheckListener(TermComponentDataCheckSelectionListener l) {
 		dataCheckListeners.remove(l);
 	}
@@ -714,14 +768,22 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			}
 
 			try {
+		        if (VodbEnv.isTransactional()) {
+		        	AceConfig.getVodb().startTransaction();
+		        }
 
 				for (I_Transact cb : uncommitted) {
 					cb.commit(version, values);
 				}
 				AceConfig.getVodb().addPositions(values);
+		        if (VodbEnv.isTransactional()) {
+		        	AceConfig.getVodb().commitTransaction();
+		        }
 				AceConfig.getVodb().sync();
-
 			} catch (DatabaseException e) {
+		        if (VodbEnv.isTransactional()) {
+		        	AceConfig.getVodb().cancelTransaction();
+		        }
 				throw new ToIoException(e);
 			}
 			if (writeChangeSets) {

@@ -107,7 +107,7 @@ public class ConWithPartCoreBdb implements I_StoreConceptAttributes {
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(concept.getConId(), key);
 		conBinding.objectToEntry(concept, value);
-		conCoreDb.put(null, key, value);
+		conCoreDb.put(BdbEnv.transaction, key, value);
 		// logStats();
 	}
 
@@ -130,7 +130,7 @@ public class ConWithPartCoreBdb implements I_StoreConceptAttributes {
 		DatabaseEntry conceptKey = new DatabaseEntry();
 		DatabaseEntry conceptValue = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, conceptKey);
-		if (conCoreDb.get(null, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (conCoreDb.get(BdbEnv.transaction, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -153,7 +153,7 @@ public class ConWithPartCoreBdb implements I_StoreConceptAttributes {
 		DatabaseEntry conceptValue = new DatabaseEntry();
 		intBinder.objectToEntry(conceptId, conceptKey);
 		try {
-			if (conCoreDb.get(null, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (conCoreDb.get(BdbEnv.transaction, conceptKey, conceptValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 					AceLog.getAppLog().fine(
 							"Got concept: " + conceptId + " elapsed time: "

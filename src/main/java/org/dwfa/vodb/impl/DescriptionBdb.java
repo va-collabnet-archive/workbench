@@ -213,7 +213,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(desc.getDescId(), key);
 		descBinding.objectToEntry(desc, value);
-		descDb.put(null, key, value);
+		descDb.put(BdbEnv.transaction, key, value);
 	}
 
 	private void writeToLucene(I_DescriptionVersioned desc)
@@ -266,7 +266,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		DatabaseEntry descKey = new DatabaseEntry();
 		DatabaseEntry descValue = new DatabaseEntry();
 		intBinder.objectToEntry(descId, descKey);
-		if (descDb.get(null, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (descDb.get(BdbEnv.transaction, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -283,7 +283,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		DatabaseEntry descValue = new DatabaseEntry();
 		intBinder.objectToEntry(descId, descKey);
 		try {
-			if (descDb.get(null, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (descDb.get(BdbEnv.transaction, descKey, descValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				return (I_DescriptionVersioned) descBinding
 						.entryToObject(descValue);
 			}

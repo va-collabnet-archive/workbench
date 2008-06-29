@@ -40,7 +40,7 @@ public class MetaBdb implements I_StoreMetadata {
 
 		stringBinder.objectToEntry(key, propKey);
 		try {
-			if (metaInfoDb.get(null, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (metaInfoDb.get(BdbEnv.transaction, propKey, propValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				return (String) stringBinder.entryToObject(propValue);
 			}
 		} catch (DatabaseException e) {
@@ -84,7 +84,7 @@ public class MetaBdb implements I_StoreMetadata {
 		stringBinder.objectToEntry(key, propKey);
 		stringBinder.objectToEntry(value, propValue);
 		try {
-			metaInfoDb.put(null, propKey, propValue);
+			metaInfoDb.put(BdbEnv.transaction, propKey, propValue);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}

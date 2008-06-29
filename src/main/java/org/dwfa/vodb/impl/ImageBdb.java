@@ -69,7 +69,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
 		DatabaseEntry imageValue = new DatabaseEntry();
 		intBinder.objectToEntry(image.getImageId(), imageKey);
 		imageBinder.objectToEntry(image, imageValue);
-		imageDb.put(null, imageKey, imageValue);
+		imageDb.put(BdbEnv.transaction, imageKey, imageValue);
 	}
 
 	/* (non-Javadoc)
@@ -85,7 +85,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
 		DatabaseEntry imageKey = new DatabaseEntry();
 		DatabaseEntry imageValue = new DatabaseEntry();
 		intBinder.objectToEntry(imageId, imageKey);
-		if (imageDb.get(null, imageKey, imageValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (imageDb.get(BdbEnv.transaction, imageKey, imageValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().fine("Got image: " + imageId + " elapsed time: "
 						+ timer.getElapsedTime() / 1000 + " secs");
@@ -108,7 +108,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
 		DatabaseEntry imageKey = new DatabaseEntry();
 		DatabaseEntry imageValue = new DatabaseEntry();
 		intBinder.objectToEntry(nativeId, imageKey);
-		if (imageDb.get(null, imageKey, imageValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (imageDb.get(BdbEnv.transaction, imageKey, imageValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			I_ImageVersioned image = (I_ImageVersioned) imageBinder
 					.entryToObject(imageValue);
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {

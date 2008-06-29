@@ -51,6 +51,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>jung</groupId>
+      <artifactId>jung</artifactId>
+      <version>1.7.6</version>
+    </dependency>
+    <dependency>
       <groupId>com.sleepycat</groupId>
       <artifactId>je</artifactId>
       <version>3.3.62</version>

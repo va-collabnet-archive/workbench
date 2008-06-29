@@ -195,7 +195,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 		intBinder.objectToEntry(rel.getRelId(), key);
 		relBinding.objectToEntry(rel, value);
 		try {
-			relDb.put(null, key, value);
+			relDb.put(BdbEnv.transaction, key, value);
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
@@ -210,7 +210,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
 		intBinder.objectToEntry(relId, relKey);
-		if (relDb.get(null, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (relDb.get(BdbEnv.transaction, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
@@ -226,7 +226,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 		DatabaseEntry relKey = new DatabaseEntry();
 		DatabaseEntry relValue = new DatabaseEntry();
 		intBinder.objectToEntry(relId, relKey);
-		if (relDb.get(null, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (relDb.get(BdbEnv.transaction, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 			return (I_RelVersioned) relBinding.entryToObject(relValue);
 		}
 		throw new DatabaseException("Rel: " + relId + " not found.");

@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import net.jini.config.ConfigurationException;
 
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 
