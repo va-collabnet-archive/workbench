@@ -188,7 +188,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		public void run() {
 			try {
 				bdbEnv.cancelTransaction();
-				sync();
+				if (!closed) {
+					sync();
+				}
 			} catch (IOException e) {
 				AceLog.getEditLog().alertAndLogException(e);
 			}
@@ -277,9 +279,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		}
 	}
 
+	boolean closed = false;
 	public void close() throws IOException {
 		try {
 			bdbEnv.close();
+			closed = true;
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
