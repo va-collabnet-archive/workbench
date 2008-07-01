@@ -441,38 +441,44 @@ public class RefsetPopupListener extends MouseAdapter {
 					} else {
 						JMenu changeMenu = new JMenu("Change "
 								+ field.getColumnName());
-						popup.add(changeMenu);
 
 						switch (field) {
 						case REFSET_ID:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field, preferences
 									.getRefsetPopupIds());
 							break;
 						case STATUS:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field, preferences
 									.getStatusPopupIds());
 							break;
 						case CONCEPT_ID:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field,
 									((RefsetDefaultsConcept) preferences)
 											.getConceptPopupIds());
 							break;
 						case ACCEPTABILITY:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field,
 									((RefsetDefaultsLanguage) preferences)
 											.getAcceptabilityPopupIds());
 							break;
 						case CORRECTNESS:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field,
 									((RefsetDefaultsLanguage) preferences)
 											.getCorrectnessPopupIds());
 							break;
 						case DEGREE_OF_SYNONYMY:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field,
 									((RefsetDefaultsLanguage) preferences)
 											.getDegreeOfSynonymyPopupIds());
 							break;
 						case TAG:
+							popup.add(changeMenu);
 							addSubmenuItems(
 									changeMenu,
 									field,
@@ -480,6 +486,7 @@ public class RefsetPopupListener extends MouseAdapter {
 											.getTagPopupIds());
 							break;
 						case SCOPE:
+							popup.add(changeMenu);
 							addSubmenuItems(
 									changeMenu,
 									field,
@@ -487,16 +494,19 @@ public class RefsetPopupListener extends MouseAdapter {
 											.getScopePopupIds());
 							break;
 						case MEASUREMENT_UNITS_ID:
+							popup.add(changeMenu);
 							addSubmenuItems(changeMenu, field,
 									((RefsetDefaultsMeasurement) preferences)
 											.getUnitsOfMeasurePopupIds());
 							break;
 						case INTEGER_VALUE:
+							popup.add(changeMenu);
 							addSubmenuObjects(changeMenu, field,
 									((RefsetDefaultsInteger) preferences)
 											.getIntegerPopupItems());
 							break;
 						case PRIORITY:
+							popup.add(changeMenu);
 							addSubmenuObjects(
 									changeMenu,
 									field,
@@ -504,21 +514,20 @@ public class RefsetPopupListener extends MouseAdapter {
 											.getPriorityPopupItems());
 							break;
 						case BOOLEAN_VALUE:
+							popup.add(changeMenu);
 							addSubmenuObjects(changeMenu, field,
 									((RefsetDefaultsBoolean) preferences)
 											.getBooleanPopupItems());
 							break;
 						case STRING_VALUE:
-							addSubmenuObjects(changeMenu, field,
-									((RefsetDefaultsString) preferences)
-											.getStringPopupItems().toArray());
 							break;
 						case MEASUREMENT_VALUE:
+							popup.add(changeMenu);
 							addSubmenuObjects(changeMenu, field,
 									((RefsetDefaultsMeasurement) preferences)
 											.getMeasurementValuePopupItems());
 							break;
-						default:
+						default:							popup.add(changeMenu);
 							AceLog.getAppLog().alertAndLogException(
 									new Exception("Don't know how to handle: "
 											+ field));
@@ -570,11 +579,7 @@ public class RefsetPopupListener extends MouseAdapter {
 						.addActionListener(new ChangeFieldBooleanActionListener(
 								(Boolean) value, field));
 				menu.add(menuItem);
-			} else {
-				AceLog.getAppLog().alertAndLogException(
-						new Exception("can't handle objects of class: "
-								+ value.getClass()));
-			}
+			} 
 		}
 	}
 
