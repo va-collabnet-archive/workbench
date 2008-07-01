@@ -134,6 +134,7 @@ public class ExportIterator implements I_ProcessConcepts {
 			log.info("Iterated " + totalConcepts);
 		}
 
+		try {
 		if (isExportable(concept)) {
 			/*
 			 * Get concept details
@@ -147,11 +148,14 @@ public class ExportIterator implements I_ProcessConcepts {
 			conceptsSuppressed++;
 			log.info("Suppressing: " + concept);
 		}
+		} catch (Exception e) {
+			throw new Exception("Exception caught processing concept " + concept.getUids(), e);
+		}
 
 	}// End method processConcept
 
 	private void writeUuidBasedIdDetails(I_IdVersioned idVersioned,
-			I_IntSet allowedStatus2, Object object) throws TerminologyException, Exception {
+			I_IntSet allowedStatus, Object object) throws TerminologyException, Exception {
 
 		Object[] idTuples = idVersioned.getTuples().toArray();
 		Arrays.sort(idTuples, new Comparator<Object>() {
