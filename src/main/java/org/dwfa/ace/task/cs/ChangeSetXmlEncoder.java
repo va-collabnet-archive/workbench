@@ -15,7 +15,13 @@ import java.io.ObjectInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class ChangeSetXmlEncoder {
+/**
+ * Converts change sets to XML
+ * 
+ * @author Dion McMurtrie
+ *
+ */
+public class ChangeSetXmlEncoder implements ChangeSetTransformer {
 	
 	private String outputSuffix = ".xml";
 
