@@ -141,6 +141,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 			getLog().info("processed concept " + conceptCount);
 		}
 		
+		getLog().info("concept " + arg0 + " copied to path " + toPath);
+		
 		processConceptAttributes(arg0.getConceptAttributes());
 		processDescription(arg0.getDescriptions());
 		if (tf.hasExtension(arg0.getConceptId())) {
