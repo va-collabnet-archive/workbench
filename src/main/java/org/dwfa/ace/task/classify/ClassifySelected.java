@@ -13,7 +13,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -25,6 +24,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
+import org.dwfa.cement.SNOMED.Concept;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -72,13 +72,14 @@ public class ClassifySelected extends AbstractTask {
         try {
             final I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             final I_GetConceptData termComponent = config.getHierarchySelection();
+            final I_TermFactory termFactory = LocalVersionedTerminology.get();
             
 worker.getLogger().info("** Classifying: " + termComponent);
-            int isaId = ((I_SupportClassifier) LocalVersionedTerminology.get()).uuidToNative(SNOMED.Concept.IS_A.getUids());
-worker.getLogger().info("**** isaId: " + isaId + ": " + SNOMED.Concept.IS_A);
+            final Concept is_a = SNOMED.Concept.IS_A;
+            int isaId = termFactory.uuidToNative(is_a.getUids());
+worker.getLogger().info("**** isaId: " + isaId + ": " + is_a);
 
             final I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
-            final I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             new ConceptProcesser(termFactory, rocket).processConcept(worker, termComponent);
 
@@ -126,7 +127,8 @@ worker.getLogger().info("Classified! " + (System.currentTimeMillis() - startTime
         ConceptProcesser(final I_TermFactory termFactory, final I_SnorocketFactory rocket) throws TerminologyException, IOException {
             this.rocket = rocket;
             
-            definingCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()).getConceptId();
+            final org.dwfa.cement.ArchitectonicAuxiliary.Concept defining_characteristic = ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC;
+            definingCharacteristic = termFactory.getConcept(defining_characteristic.getUids()).getConceptId();
 
             final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
             activeStatus = frameConfig.getAllowedStatus();
@@ -147,12 +149,12 @@ worker.getLogger().info("Classified! " + (System.currentTimeMillis() - startTime
         final void processConcept(I_Work worker, final I_GetConceptData concept) throws IOException, TerminologyException {
             final int conceptId = concept.getConceptId();
 
-            rocket.addConcept(111, false);
-            rocket.addConcept(222, false);
-            rocket.addConcept(333, false);
-            rocket.addConcept(444, false);
-            rocket.addRelationship(111, -2147468542, 222, 0);
-            rocket.addRelationship(222, 333, 444, 0);
+//            rocket.addConcept(111, false);
+//            rocket.addConcept(222, false);
+//            rocket.addConcept(333, false);
+//            rocket.addConcept(444, false);
+//            rocket.addRelationship(111, -2147468542, 222, 0);
+            rocket.addRelationship(222, 116680003, 444, 0);
             
             final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
             if (tuples.size() == 1) {

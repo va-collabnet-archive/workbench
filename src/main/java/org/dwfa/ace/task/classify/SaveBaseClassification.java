@@ -23,18 +23,25 @@ public class SaveBaseClassification extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
+
+    /**
+     * Bean property
+     */
+    private String fileName = "baseState.txt";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        out.writeObject(getFileName());
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         final int objDataVersion = in.readInt();
 
-        if (objDataVersion <= dataVersion) {
-
-        } else {
+        if (objDataVersion > 1) {
+            setFileName((String) in.readObject());
+        }
+        if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -78,7 +85,7 @@ public class SaveBaseClassification extends AbstractTask {
 
         final InputStream is = rocket.getStream();
         
-        final FileOutputStream fos = new FileOutputStream("baseState.txt");   // TODO parameterise
+        final FileOutputStream fos = new FileOutputStream(getFileName());
 
         final byte[] buffer = new byte[4096];
         int len;
@@ -91,6 +98,14 @@ public class SaveBaseClassification extends AbstractTask {
         worker.getLogger().info(
                 "Save classification results time: "
                         + (System.currentTimeMillis() - startTime));
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
     
 }

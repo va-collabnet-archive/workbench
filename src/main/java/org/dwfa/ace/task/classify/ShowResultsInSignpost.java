@@ -64,6 +64,15 @@ public class ShowResultsInSignpost extends AbstractTask {
 
         try {
             sb = new StringBuilder();
+            sb.append("<tr><th>")
+            .append("CONCEPT 1")
+            .append("</th><th>")
+            .append("RELATIONSHIPS")
+            .append("</th><th>")
+            .append("CONCEPT 2")
+            .append("</th><th>")
+            .append("GROUP")
+            .append("</th></tr>\n");
             
             I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
 
@@ -91,7 +100,7 @@ public class ShowResultsInSignpost extends AbstractTask {
                     c.weightx = 1.0;
                     c.weighty = 1.0;
                     c.anchor = GridBagConstraints.NORTHWEST;
-                    signpostPanel.add(new JLabel("<table>" + sb + "</table>"), c);
+                    signpostPanel.add(new JLabel("<html><table>" + sb + "</table></html>"), c);
                     signpostPanel.validate();
                     Container cont = signpostPanel;
                     while (cont != null) {

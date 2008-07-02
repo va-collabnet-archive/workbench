@@ -5,11 +5,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import org.dwfa.ace.api.I_SupportClassifier;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -49,6 +53,9 @@ public class NewClassifier extends AbstractTask {
             final I_SnorocketFactory rocket = (I_SnorocketFactory) Class.forName(
                     "au.csiro.snorocket.ace.SnorocketFactory"
             ).newInstance();
+            final I_TermFactory tf = (I_TermFactory) LocalVersionedTerminology.get();
+            int isaId = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
+            rocket.setIsa(isaId);
             
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
         } catch (Exception e) {

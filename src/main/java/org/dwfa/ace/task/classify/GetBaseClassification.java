@@ -23,21 +23,29 @@ public class GetBaseClassification extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
-    
+    private static final int dataVersion = 2;
+
+    /**
+     * Bean property
+     */
+    private String fileName = "baseState.txt";
+
     final private static Object LOCK = new Object();
+    private static String stateName = null;
     private static I_SnorocketFactory rocket = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        out.writeObject(getFileName());
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         final int objDataVersion = in.readInt();
 
-        if (objDataVersion <= dataVersion) {
-
-        } else {
+        if (objDataVersion > 1) {
+            setFileName((String) in.readObject());
+        }
+        if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -51,9 +59,9 @@ public class GetBaseClassification extends AbstractTask {
             throws TaskFailedException {
 
         try {
-            I_SnorocketFactory rocket = getRocket();
+            I_SnorocketFactory rocket = getRocket().createExtension();
             
-            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket.createExtension());
+            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
         } catch (RuntimeException e) {
             throw new TaskFailedException(e);
         }
@@ -61,12 +69,13 @@ public class GetBaseClassification extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private static I_SnorocketFactory getRocket() throws TaskFailedException {
+    private I_SnorocketFactory getRocket() throws TaskFailedException {
         synchronized (LOCK) {
-            if (null == rocket) {
+            if (null == rocket || !getFileName().equals(stateName)) {
                 InputStream is;
                 try {
-                    is = new FileInputStream("baseState.txt");
+                    stateName = getFileName();
+                    is = new FileInputStream(stateName);
                     rocket = (I_SnorocketFactory) Class.forName(
                             "au.csiro.snorocket.ace.SnorocketFactory"
                     ).getConstructor(InputStream.class).newInstance(is);
@@ -84,6 +93,14 @@ public class GetBaseClassification extends AbstractTask {
 
     public int[] getDataContainerIds() {
         return new int[] {};
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
 }
