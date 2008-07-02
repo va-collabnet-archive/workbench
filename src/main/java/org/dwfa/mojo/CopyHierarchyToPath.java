@@ -187,6 +187,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_ConceptAttributePart newPart = latestPart.duplicatePart();
 		newPart.setPathId(toPathId);
 		latestPart.getConVersioned().addVersion(newPart);
+		getLog().info("concept attribute part copied " + latestPart);
 	}
 
 	private void processDescription(List<I_DescriptionVersioned> descriptions) throws Exception {
@@ -228,6 +229,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_DescriptionPart newPart = t.duplicatePart();
 		newPart.setPathId(toPathId);
 		t.getDescVersioned().addVersion(newPart);
+
+		getLog().info("concept description part copied " + t);
 	}
 
 	public void processExtensionByReference(I_ThinExtByRefVersioned extByRef)
@@ -263,6 +266,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_ThinExtByRefPart newPart = t.duplicatePart();
 		newPart.setPathId(toPathId);
 		t.getCore().addVersion(newPart);
+
+		getLog().info("concept refset part copied " + t);
 	}
 
 	public void processId(I_IdVersioned idVersioned) throws Exception {
@@ -297,6 +302,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_IdPart newPart = t.duplicatePart();
 		newPart.setPathId(toPathId);
 		t.getIdVersioned().addVersion(newPart);
+
+		getLog().info("concept id part copied " + t);
 	}
 
 	private void processImages(List<I_ImageVersioned> images) throws Exception {
@@ -337,6 +344,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_ImagePart newPart = t.duplicatePart();
 		newPart.setPathId(toPathId);
 		t.getVersioned().addVersion(newPart);
+		
+		getLog().info("concept image part copied " + t);
 	}
 
 	private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
@@ -378,6 +387,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_RelPart newPart = t.duplicatePart();
 		newPart.setPathId(toPathId);
 		t.getRelVersioned().addVersion(newPart);
+		
+		getLog().info("concept relationship part copied " + t);
 	}
 
 }
