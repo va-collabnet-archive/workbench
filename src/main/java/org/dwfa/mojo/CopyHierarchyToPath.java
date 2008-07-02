@@ -165,7 +165,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_ConceptAttributeTuple latestPart = null;
 		for (I_ConceptAttributeTuple t : conceptAttributeVersioned.getTuples()) {
 			if (latestStateOnly) {
-				if (latestPart != null && t.getVersion() > latestPart.getVersion()) {
+				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 					latestPart = t;
 				}
 			} else if (toPathId != t.getPathId()) {
@@ -207,7 +207,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_DescriptionTuple latestPart = null;
 		for (I_DescriptionTuple t : descriptionVersioned.getTuples()) {
 			if (latestStateOnly) {
-				if (latestPart  != null && t.getVersion() > latestPart.getVersion()) {
+				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 					latestPart = t;
 				}
 			} else if (toPathId != t.getPathId()) {
@@ -244,7 +244,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_ThinExtByRefTuple latestPart = null;
 		for (I_ThinExtByRefTuple t : extByRef.getTuples(null, null, true)) {
 			if (latestStateOnly) {
-				if (latestPart   != null && t.getVersion() > latestPart.getVersion()) {
+				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 					latestPart = t;
 				}
 			} else if (toPathId != t.getPathId()) {
@@ -280,7 +280,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_IdTuple latestPart = null;
 		for (I_IdTuple t : idVersioned.getTuples()) {
 			if (latestStateOnly) {
-				if (latestPart    != null && t.getVersion() > latestPart.getVersion()) {
+				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 					latestPart = t;
 				}
 			} else if (toPathId != t.getPathId()) {
@@ -322,7 +322,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_ImageTuple latestPart = null;
 		for (I_ImageTuple t : imageVersioned.getTuples()) {
 			if (latestStateOnly) {
-				if (latestPart != null && t.getVersion() > latestPart.getVersion()) {
+				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 					latestPart = t;
 				}
 			} else if (toPathId != t.getPathId()) {
@@ -365,7 +365,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		I_RelTuple latestPart = null;
 		for (I_RelTuple t : relVersioned.getTuples()) {
 			if (latestStateOnly) {
-				if (latestPart != null && t.getVersion() > latestPart.getVersion()) {
+				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 					latestPart = t;
 				}
 			} else if (toPathId != t.getPathId()) {
