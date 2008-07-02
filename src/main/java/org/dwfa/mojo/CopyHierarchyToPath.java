@@ -111,6 +111,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		
 		try {
 			toPathId = toPath.getVerifiedConcept().getConceptId();
+			directInterface = tf.getDirectInterface();
 			
 			processAllChildren(rootNode.getVerifiedConcept(), toIntSet(hierarchyRelationshipTypes), toIntSet(hierarchyRelationshipStatus));
 		} catch (Exception e) {
