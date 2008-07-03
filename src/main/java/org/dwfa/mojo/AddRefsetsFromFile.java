@@ -159,6 +159,7 @@ public class AddRefsetsFromFile extends AbstractMojo {
 	private void processFile( File refsetFile ) throws MojoExecutionException {
 		BufferedReader reader = null;
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		getLog().info("importing refset " + refsetFile);
 		try{
 			reader = new BufferedReader( new FileReader( refsetFile ) );
 			String line = reader.readLine();
