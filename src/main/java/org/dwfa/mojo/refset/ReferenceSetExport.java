@@ -162,7 +162,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		BufferedWriter refsetWriter = writerMap.get(refsetId);
 		if (refsetWriter == null) {
 			//must not have written to this file yet
-			refsetWriter = new BufferedWriter(new FileWriter(new File(refsetOutputDirectory, tf.getConcept(refsetId).getInitialText())));
+			String refsetName = tf.getConcept(refsetId).getInitialText();
+			refsetName = refsetName.replace("/", "-");
+			refsetName = refsetName.replace("'", "_");
+			
+			refsetWriter = new BufferedWriter(new FileWriter(new File(refsetOutputDirectory, refsetName)));
 			writerMap.put(refsetId, refsetWriter);
 			refsetWriter.write(refsetType.getRefsetWriter().getHeaderLine());
 			refsetWriter.newLine();
