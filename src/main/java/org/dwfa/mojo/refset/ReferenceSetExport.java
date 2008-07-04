@@ -169,13 +169,13 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			
 			refsetWriter = new BufferedWriter(new FileWriter(new File(refsetOutputDirectory, refsetName + refsetType.getFileExtension())));
 			writerMap.put(refsetId, refsetWriter);
-			refsetWriter.write(refsetType.getRefsetWriter().getHeaderLine());
+			refsetWriter.write(refsetType.getRefsetHandler().getHeaderLine());
 			refsetWriter.newLine();
 		}
 		
 		//note that we are assuming that the type of refset member will be the same as previous for this file type
 		//if not we'll get a class cast exception, as we probably should
-		refsetWriter.write(refsetType.getRefsetWriter().formatRefsetLine(tf, thinExtByRefTuple));
+		refsetWriter.write(refsetType.getRefsetHandler().formatRefsetLine(tf, thinExtByRefTuple));
 		refsetWriter.newLine();
 	}
 
