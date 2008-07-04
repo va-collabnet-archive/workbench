@@ -5,10 +5,10 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.mojo.ImportFromFile;
 import org.dwfa.mojo.file.FileHandler;
 
 
@@ -20,7 +20,7 @@ import org.dwfa.mojo.file.FileHandler;
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
-public class ImportRefsetFromDirectory extends ImportFromFile {
+public class ImportRefsetFromDirectory extends AbstractMojo {
 	
 	/**
 	 * Directory the files are to read from
