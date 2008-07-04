@@ -51,7 +51,6 @@ public abstract class FileHandler<T> implements Iterable<T> {
 		return this.headerLine;
 	}
 	
-	@Override
 	public Iterator<T> iterator() {
 		try {
 			return new FileHandlerIterator<T>(sourceFile);
