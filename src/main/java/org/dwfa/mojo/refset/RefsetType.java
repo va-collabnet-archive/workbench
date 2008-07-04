@@ -18,17 +18,19 @@ import org.dwfa.mojo.refset.writers.MemberRefsetWriter;
 import org.dwfa.mojo.refset.writers.StringRefsetWriter;
 
 enum RefsetType {
-	CONCEPT(ConceptRefsetWriter.class),
-	INTEGER(IntegerRefsetWriter.class),
-	STRING(StringRefsetWriter.class),
-	BOOLEAN(BooleanRefsetWriter.class),
-	CONCEPT_INTEGER(ConceptIntegerRefsetWriter.class);
+	CONCEPT(ConceptRefsetWriter.class, ".concept.refset"),
+	INTEGER(IntegerRefsetWriter.class, ".integer.refset"),
+	STRING(StringRefsetWriter.class, ".string.refset"),
+	BOOLEAN(BooleanRefsetWriter.class, ".boolean.refset"),
+	CONCEPT_INTEGER(ConceptIntegerRefsetWriter.class, ".concept.integer.refset");
 
 	private Class<? extends MemberRefsetWriter> refsetWriterClass;
 	private MemberRefsetWriter refsetWriter = null;
+	private String fileExtension = null;
 	
-	RefsetType(Class<? extends MemberRefsetWriter> refsetWriterClass) {
+	RefsetType(Class<? extends MemberRefsetWriter> refsetWriterClass, String fileExtension) {
 		this.refsetWriterClass = refsetWriterClass;
+		this.fileExtension = fileExtension;
 	}
 	
 	public static RefsetType getType(I_ThinExtByRefTuple thinExtByRefTuple) {
@@ -54,6 +56,10 @@ enum RefsetType {
 		}
 	
 		return refsetWriter;
+	}
+
+	public String getFileExtension() {
+		return fileExtension;
 	}
 	
 	

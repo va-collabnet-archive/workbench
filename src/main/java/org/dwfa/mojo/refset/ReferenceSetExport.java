@@ -25,6 +25,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.mojo.ExportSpecification;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.tapi.TerminologyException;
 
@@ -81,6 +82,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 					allowedStatuses.add(status.getVerifiedConcept().getConceptId());
 				}
 			}
+			
+			refsetOutputDirectory.mkdirs();
 			
 			tf.iterateConcepts(this);
 		} catch (Exception e) {
@@ -165,7 +168,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			refsetName = refsetName.replace("/", "-");
 			refsetName = refsetName.replace("'", "_");
 			
-			refsetWriter = new BufferedWriter(new FileWriter(new File(refsetOutputDirectory, refsetName)));
+			refsetWriter = new BufferedWriter(new FileWriter(new File(refsetOutputDirectory, refsetName + refsetType.getFileExtension())));
 			writerMap.put(refsetId, refsetWriter);
 			refsetWriter.write(refsetType.getRefsetWriter().getHeaderLine());
 			refsetWriter.newLine();

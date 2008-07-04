@@ -9,7 +9,7 @@ import org.dwfa.tapi.TerminologyException;
 
 public class MemberRefsetWriter {
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddThhmmss");;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");;
 
 	/**
 	 * @return the header line for the refset file of this type
@@ -33,7 +33,7 @@ public class MemberRefsetWriter {
 	}
 
 	private String getDate(I_TermFactory tf, int version) {
-		return dateFormat.format(tf.convertToThickVersion(version)) + "Z";
+		return dateFormat.format(tf.convertToThickVersion(version));
 	}
 
 	protected String toId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
