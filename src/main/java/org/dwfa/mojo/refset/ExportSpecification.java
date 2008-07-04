@@ -1,4 +1,4 @@
-package org.dwfa.mojo;
+package org.dwfa.mojo.refset;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +10,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.mojo.PositionDescriptor;
 
 public class ExportSpecification {
 

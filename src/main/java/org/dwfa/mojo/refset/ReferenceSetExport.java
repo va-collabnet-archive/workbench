@@ -25,7 +25,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.mojo.ConceptDescriptor;
-import org.dwfa.mojo.ExportSpecification;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.tapi.TerminologyException;
 

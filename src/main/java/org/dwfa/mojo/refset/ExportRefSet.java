@@ -1,4 +1,4 @@
-package org.dwfa.mojo;
+package org.dwfa.mojo.refset;
 
 import java.io.BufferedWriter;
 import java.io.File;
