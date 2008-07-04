@@ -37,6 +37,14 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 	 */
 	boolean transactional;
 
+	/**
+	 * Indicates if the files contain a header row or not. If true the first line of the file
+	 * will be skipped. Default value is true.
+	 * 
+	 * @parameter
+	 */
+	boolean hasHeader = true;
+	
 	private FilenameFilter filenameFilter;
 
 	/*
@@ -52,6 +60,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 				FileHandler<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
 				handler.setTransactional(transactional);
 				handler.setSourceFile(file);
+				handler.setHasHeader(hasHeader);
 				
 				for (I_ThinExtByRefPart thinExtByRefPart : handler) {
 					getLog().info("Imported from file " + file + " extension part " + thinExtByRefPart);

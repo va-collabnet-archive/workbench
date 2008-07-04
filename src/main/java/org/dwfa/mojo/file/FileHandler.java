@@ -44,7 +44,7 @@ public abstract class FileHandler<T> implements Iterable<T> {
 	 * @param hasHeader If true the first line of the file will not be iterated.
 	 * @see #getHeader()
 	 */
-	protected void setHasHeader(boolean hasHeader) {
+	public void setHasHeader(boolean hasHeader) {
 		this.hasHeader = hasHeader;
 	}
 
