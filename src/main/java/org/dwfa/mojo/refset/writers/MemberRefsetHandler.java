@@ -126,7 +126,7 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 			
 			int memberId = getTermFactory().uuidToNativeWithGeneration(uuid,
 		            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-		            getTermFactory().getPath(new UUID[]{(UUID) currentRow.get(MemberRefsetHandler.PATH_ID)}), Integer.MAX_VALUE );
+		            getTermFactory().getPaths(), Integer.MAX_VALUE );
 			
 			if (isTransactional() ) {
 				versioned = getTermFactory().newExtension(refsetNid, 
