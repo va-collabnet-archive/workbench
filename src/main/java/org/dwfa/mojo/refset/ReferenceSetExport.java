@@ -85,6 +85,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			refsetOutputDirectory.mkdirs();
 			
 			tf.iterateConcepts(this);
+			
+			for (BufferedWriter writer : writerMap.values()) {
+				writer.close();
+			}
+			
 		} catch (Exception e) {
 			throw new MojoExecutionException("exporting reference sets failed for specification " + exportSpecifications, e);
 		}
