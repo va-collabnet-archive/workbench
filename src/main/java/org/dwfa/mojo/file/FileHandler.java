@@ -23,6 +23,11 @@ public abstract class FileHandler<T> implements Iterable<T> {
 	
 	protected String headerLine;
 	
+	/**
+	 * Indicates if transactions should be used in the import
+	 */
+	protected boolean transactional;
+	
 	public File getSourceFile() {
 		return sourceFile;
 	}
@@ -112,5 +117,15 @@ public abstract class FileHandler<T> implements Iterable<T> {
 
 		public void remove() {
 		}		
+	}
+
+
+
+	public boolean isTransactional() {
+		return transactional;
+	}
+
+	public void setTransactional(boolean transactional) {
+		this.transactional = transactional;
 	}
 }
