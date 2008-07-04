@@ -58,7 +58,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 				}
 			}
 		} catch (Exception e) {
-			throw new MojoExecutionException("failed importing files from " + refsetDirectory);
+			throw new MojoExecutionException("failed importing files from " + refsetDirectory, e);
 		}
 	}
 
