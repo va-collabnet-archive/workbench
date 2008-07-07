@@ -587,6 +587,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 setTogglesInComponentPanelVisible(TOGGLES.SOURCE_RELS, true);
                 setTogglesInComponentPanelVisible(TOGGLES.DEST_RELS, true);
                 setTogglesInComponentPanelVisible(TOGGLES.LINEAGE, true);
+                setTogglesInComponentPanelVisible(TOGGLES.LINEAGE_GRAPH, true);
                 setTogglesInComponentPanelVisible(TOGGLES.IMAGE, true);
                 setTogglesInComponentPanelVisible(TOGGLES.CONFLICT, true);
                 setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED, false);

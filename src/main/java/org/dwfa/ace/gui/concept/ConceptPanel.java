@@ -69,6 +69,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.graph.GraphPlugin;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -275,6 +276,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private DescriptionPlugin descPlugin = new DescriptionPlugin();
 
 	private LineagePlugin lineagePlugin = new LineagePlugin();
+	
+	private GraphPlugin lineageGraphPlugin = new GraphPlugin();
 
 	ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
 
@@ -450,13 +453,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
 					.asList(new I_PluginToConceptPanel[] { idPlugin,
 							conceptAttributePlugin, descPlugin, srcRelPlugin,
-							destRelPlugin, lineagePlugin, imagePlugin,
+							destRelPlugin, lineagePlugin, lineageGraphPlugin, imagePlugin,
 							conflictPlugin }));
 		} else {
 			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
 					.asList(new I_PluginToConceptPanel[] { idPlugin,
 							conceptAttributePlugin, descPlugin, srcRelPlugin,
-							destRelPlugin, lineagePlugin, }));
+							destRelPlugin, lineagePlugin, lineageGraphPlugin}));
 		}
 		ace.getAceFrameConfig().addPropertyChangeListener("uncommitted",
 				new UncommittedChangeListener());
