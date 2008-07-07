@@ -14,7 +14,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.refset.RefsetExtensionType;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.mojo.file.FileHandler;
@@ -39,7 +38,7 @@ public class ExportedRefsetHandler extends FileHandler<I_ThinExtByRefVersioned> 
 
 	private final SimpleDateFormat EXPORTED_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 	
-	protected RefsetExtensionType refsetType;
+	protected RefsetType refsetType;
 
 	public ExportedRefsetHandler() {
 		super();
@@ -50,9 +49,9 @@ public class ExportedRefsetHandler extends FileHandler<I_ThinExtByRefVersioned> 
 	 * Get the refset type to be used. This may be defined in the mojo configuration otherwise 
 	 * it is determined from the name of the source file being handled.  
 	 */
-	public RefsetExtensionType getRefsetType() {
+	public RefsetType getRefsetType() {
 		if (refsetType == null && sourceFile != null) {
-			return RefsetExtensionType.findByFilename(sourceFile.getName());
+			return RefsetType.findByFilename(sourceFile.getName());
 		} else {
 			return refsetType;
 		}
@@ -64,7 +63,7 @@ public class ExportedRefsetHandler extends FileHandler<I_ThinExtByRefVersioned> 
 	 * @param extensionType Must be a literal name from the enumeration {@link org.dwfa.ace.refset.RefsetExtensionType}
 	 */
 	public void setRefsetType(String refsetType) {
-		this.refsetType = RefsetExtensionType.valueOf(refsetType);
+		this.refsetType = RefsetType.valueOf(refsetType);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.mojo.file.FileHandler;
 import org.dwfa.mojo.refset.writers.BooleanRefsetHandler;
 import org.dwfa.mojo.refset.writers.ConceptIntegerRefsetHandler;
@@ -23,23 +24,52 @@ import org.dwfa.mojo.refset.writers.IntegerRefsetHandler;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.mojo.refset.writers.StringRefsetHandler;
 
-enum RefsetType {
-	CONCEPT(ConceptRefsetHandler.class, ".concept.refset"),
-	INTEGER(IntegerRefsetHandler.class, ".integer.refset"),
-	STRING(StringRefsetHandler.class, ".string.refset"),
-	BOOLEAN(BooleanRefsetHandler.class, ".boolean.refset"),
-	CONCEPT_INTEGER(ConceptIntegerRefsetHandler.class, ".concept.integer.refset");
+enum RefsetType {	
+	
+	CONCEPT(
+		Concept.CONCEPT_EXTENSION,  
+		ConceptRefsetHandler.class, 
+		".concept.refset"
+	),
+	
+	INTEGER(
+		Concept.INT_EXTENSION, 
+		IntegerRefsetHandler.class, 
+		".integer.refset"
+	),
+	
+	STRING(
+		Concept.STRING_EXTENSION, 
+		StringRefsetHandler.class, 
+		".string.refset"
+	),
+	
+	BOOLEAN(
+		Concept.BOOLEAN_EXTENSION,
+		BooleanRefsetHandler.class,
+		".boolean.refset"
+	),
+	
+	CONCEPT_INTEGER(
+		Concept.CONCEPT_INT_EXTENSION, 
+		ConceptIntegerRefsetHandler.class,
+		".concept.integer.refset"
+	);
+	
 
+	
 	private Class<? extends MemberRefsetHandler> refsetWriterClass;
 	private MemberRefsetHandler refsetWriter = null;
+	private Concept auxiliaryConcept;
 	private String fileExtension = null;
 	
-	RefsetType(Class<? extends MemberRefsetHandler> refsetWriterClass, String fileExtension) {
-		this.refsetWriterClass = refsetWriterClass;
+	RefsetType(Concept auxiliaryConcept, Class<? extends MemberRefsetHandler> refsetWriterClass, String fileExtension) {
+		this.auxiliaryConcept = auxiliaryConcept;
+		this.refsetWriterClass = refsetWriterClass;		
 		this.fileExtension = fileExtension;
 	}
 	
-	public static RefsetType getType(I_ThinExtByRefTuple thinExtByRefTuple) {
+	public static RefsetType findByExtension(I_ThinExtByRefTuple thinExtByRefTuple) {
 		I_ThinExtByRefPart part = thinExtByRefTuple.getPart();
 		if (part instanceof I_ThinExtByRefPartBoolean) {
 			return BOOLEAN;
@@ -53,9 +83,27 @@ enum RefsetType {
 			return STRING;
 		}
 		
-		throw new EnumConstantNotPresentException(RefsetType.class, "No enum for the class " + thinExtByRefTuple.getClass() + " exists");
+		throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for the class " + thinExtByRefTuple.getClass() + " exists");
 	}
 
+	/**
+	 * @param filename 
+	 * @return The appropriate refset type based on the file name. 
+	 * @throws EnumConstantNotPresentException where the filename cannot be matched
+	 */
+	public static RefsetType findByFilename(String filename) {
+		for (RefsetType t : RefsetType.values()) {
+			if (t.matches(filename)) {
+				return t;
+			}
+		} 
+		throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for " + filename + " exists");
+	}	
+	
+	private boolean matches(String filename) {
+		return (filename.toLowerCase().endsWith(this.fileExtension));
+	}	
+	
 	public MemberRefsetHandler getRefsetHandler() throws InstantiationException, IllegalAccessException {
 		if (refsetWriter == null) {
 			refsetWriter = refsetWriterClass.newInstance();
@@ -64,6 +112,10 @@ enum RefsetType {
 		return refsetWriter;
 	}
 
+	public Concept getAuxiliaryConcept() {
+		return this.auxiliaryConcept;
+	}
+	
 	public String getFileExtension() {
 		return fileExtension;
 	}
@@ -93,13 +145,6 @@ enum RefsetType {
 	}
 
 	public static FileHandler<I_ThinExtByRefPart> getHandlerForFile(File file) throws InstantiationException, IllegalAccessException {
-		for (RefsetType refsetType : RefsetType.values()) {
-			if (file.getName().endsWith(refsetType.fileExtension)) {
-				return refsetType.getRefsetHandler();
-			}
-		}
-		throw new EnumConstantNotPresentException(RefsetType.class, "No handler for " + file + " exists");
+		return findByFilename(file.getName()).getRefsetHandler();
 	}
-	
-	
 }

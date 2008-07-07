@@ -161,7 +161,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		
 		RefsetType refsetType = refsetTypeMap.get(refsetId);
 		if (refsetType == null) {
-			refsetType = RefsetType.getType(thinExtByRefTuple);
+			refsetType = RefsetType.findByExtension(thinExtByRefTuple);
 			refsetTypeMap.put(refsetId, refsetType);
 		}
 		
