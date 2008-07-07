@@ -94,37 +94,34 @@ public class ExportedRefsetHandler extends FileHandler<I_ThinExtByRefVersioned> 
 			
 			I_ThinExtByRefPart extPart = null;
 			
-			if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids() ) == typeId ) {
-				extPart = termFactory.newBooleanExtensionPart();		
-				((I_ThinExtByRefPartBoolean)extPart).setValue( new Boolean( tokens[6] ).booleanValue() );
-			}
-			else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids() ) == typeId ) { 
-				extPart = termFactory.newConceptExtensionPart();			
-				((I_ThinExtByRefPartConcept)extPart).setConceptId( termFactory.uuidToNative( UUID.fromString( tokens[6] ) ));
-			}
-			else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids() ) == typeId ) {
-				extPart = termFactory.newConceptIntExtensionPart();
-				((I_ThinExtByRefPartConceptInt)extPart).setConceptId( componentId );
-				((I_ThinExtByRefPartConceptInt)extPart).setIntValue( new Integer( tokens[6] ).intValue() );
-			}
-			else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.STRING_EXTENSION.getUids() ) == typeId) {
-				extPart = termFactory.newStringExtensionPart();
-				((I_ThinExtByRefPartString)extPart).setStringValue( tokens[6] );
-			}
-			else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.INT_EXTENSION.getUids() ) == typeId ) {
-				extPart = termFactory.newIntegerExtensionPart();
-				((I_ThinExtByRefPartInteger)extPart).setValue( new Integer( tokens[6] ).intValue() );
-			}
-			else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids() ) == typeId ) {
-				extPart = termFactory.newMeasurementExtensionPart();
-				((I_ThinExtByRefPartMeasurement)extPart).setMeasurementValue( new Double( tokens[6] ).doubleValue() );
-				((I_ThinExtByRefPartMeasurement)extPart).setUnitsOfMeasureId( new Integer( tokens[7] ).intValue() );
-			}
-			else if ( termFactory.uuidToNative( RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids() ) == typeId ) {
-				extPart = termFactory.newLanguageExtensionPart();
-				((I_ThinExtByRefPartLanguage)extPart).setAcceptabilityId( new Integer( tokens[6] ).intValue() );
-				((I_ThinExtByRefPartLanguage)extPart).setCorrectnessId( new Integer( tokens[7] ).intValue() );
-				((I_ThinExtByRefPartLanguage)extPart).setDegreeOfSynonymyId( new Integer( tokens[8] ).intValue() );
+			switch (getRefsetType()) {
+			
+				case BOOLEAN : 
+					extPart = termFactory.newBooleanExtensionPart();		
+					((I_ThinExtByRefPartBoolean)extPart).setValue( new Boolean( tokens[6] ).booleanValue() );
+					break;
+				
+				case CONCEPT : 
+					extPart = termFactory.newConceptExtensionPart();			
+					((I_ThinExtByRefPartConcept)extPart).setConceptId( termFactory.uuidToNative( UUID.fromString( tokens[6] ) ));
+					break;
+				
+				case CONCEPT_INTEGER : 
+					extPart = termFactory.newConceptIntExtensionPart();
+					((I_ThinExtByRefPartConceptInt)extPart).setConceptId( componentId );
+					((I_ThinExtByRefPartConceptInt)extPart).setIntValue( new Integer( tokens[6] ).intValue() );
+					break;
+				
+				case STRING : 
+					extPart = termFactory.newStringExtensionPart();
+					((I_ThinExtByRefPartString)extPart).setStringValue( tokens[6] );
+					break;
+				
+				case INTEGER : 
+					extPart = termFactory.newIntegerExtensionPart();
+					((I_ThinExtByRefPartInteger)extPart).setValue( new Integer( tokens[6] ).intValue() );
+					break;
+					
 			}
 			
 			if ( extPart != null ) {
