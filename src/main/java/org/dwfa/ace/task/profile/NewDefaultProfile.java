@@ -326,6 +326,7 @@ public class NewDefaultProfile extends AbstractTask {
       activeConfig.setTogglesInComponentPanelVisible(TOGGLES.SOURCE_RELS, true);
       activeConfig.setTogglesInComponentPanelVisible(TOGGLES.DEST_RELS, true);
       activeConfig.setTogglesInComponentPanelVisible(TOGGLES.LINEAGE, true);
+      activeConfig.setTogglesInComponentPanelVisible(TOGGLES.LINEAGE_GRAPH, false);
       activeConfig.setTogglesInComponentPanelVisible(TOGGLES.IMAGE, true);
       activeConfig.setTogglesInComponentPanelVisible(TOGGLES.CONFLICT, true);
       activeConfig.setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED, false);
