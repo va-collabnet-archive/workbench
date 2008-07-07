@@ -677,7 +677,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		pluginMap.put(TOGGLES.DESCRIPTIONS, descPlugin);
 		pluginMap.put(TOGGLES.SOURCE_RELS, srcRelPlugin);
 		pluginMap.put(TOGGLES.DEST_RELS, destRelPlugin);
-		pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
+    pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
+    pluginMap.put(TOGGLES.LINEAGE_GRAPH, lineageGraphPlugin);
 		pluginMap.put(TOGGLES.IMAGE, imagePlugin);
 		pluginMap.put(TOGGLES.CONFLICT, conflictPlugin);
 

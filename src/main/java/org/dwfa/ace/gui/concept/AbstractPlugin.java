@@ -48,7 +48,7 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 			try {
 				update();
 			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
+				AceLog.getAppLog().alertAndLogException(e1);
 			}
 			for (ActionListener l: showComponentListeners) {
 				l.actionPerformed(e);

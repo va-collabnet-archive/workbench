@@ -20,20 +20,22 @@ public class GraphPlugin extends AbstractPlugin {
 
 
 	public enum GRAPH_LAYOUTS {
-		DAGLayout, FRLayout, FRLayout2, ISOMLayout, KKLayout, SpringLayout, SpringLayout2, AceGraphLayout
+		DAGLayout, FRLayout, ISOMLayout, KKLayout, SpringLayout, AceGraphLayout
 	};
 
+	private static boolean SHOWN_BY_DEFAULT = false;
 	private I_HostConceptPlugins host;
 
 	private JPanel graphWrapperPanel = new JPanel(new GridBagLayout());
-	private GraphPanel graphPanel;
+	private JPanel graphPanel;
 	private JPanel fillerPanel;
 	private GridBagConstraints gbc = new GridBagConstraints();
 	private boolean initialize = true;
-	private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.AceGraphLayout;
+	private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.KKLayout;
+	private boolean lastShown = SHOWN_BY_DEFAULT;
 
 	public GraphPlugin() {
-		super(true);
+		super(SHOWN_BY_DEFAULT);
 	}
 
 	@Override
@@ -48,18 +50,22 @@ public class GraphPlugin extends AbstractPlugin {
 			if (fillerPanel != null) {
 				graphWrapperPanel.remove(fillerPanel);
 			}
-			graphPanel = new GraphPanel(graphLayout, this, graphWrapperPanel.getSize());
-			graphWrapperPanel.add(graphPanel, gbc);
-			SwingUtilities.invokeLater(new Runnable() {
+			if (showComponent()) {
+	      graphPanel = new GraphPanel(graphLayout, this, graphWrapperPanel.getSize());
+	      graphWrapperPanel.add(graphPanel, gbc);
+	      SwingUtilities.invokeLater(new Runnable() {
 
-				public void run() {
-					graphPanel.validate();
-					graphWrapperPanel.validate();
-					graphWrapperPanel.getParent().validate();
-				}
-				
-			});
-			fillerPanel = graphPanel;
+	        public void run() {
+	          graphPanel.validate();
+	          graphWrapperPanel.validate();
+	          graphWrapperPanel.getParent().validate();
+	        }
+	        
+	      });
+	      fillerPanel = graphPanel;
+			} else {
+			  graphPanel = new JPanel();
+			}
 		}
 	}
 
