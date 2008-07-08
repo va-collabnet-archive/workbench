@@ -1,12 +1,12 @@
 package org.dwfa.mojo.refset;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -22,23 +22,16 @@ import org.dwfa.mojo.file.FileHandler;
  */
 public class SnomedIdListHandler extends FileHandler<I_ThinExtByRefVersioned> {
 	
+	protected I_TermFactory termFactory = LocalVersionedTerminology.get();
+	
 	@Override
 	protected I_ThinExtByRefVersioned processLine(String line) {
 
 		String[] tokens = line.split( "\t" );
 		
 		try {
-			// Search for the concept by the snomed id. It should be the top scoring hit.
-			
-			Hits hits = AceConfig.getVodb().doLuceneSearch(tokens[0]);
-			Document doc = getTopHit(hits);
-			int cnid = Integer.parseInt(doc.get("cnid"));
+			I_GetConceptData concept = findConcept(tokens[0]);
 
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
-			I_GetConceptData concept = termFactory.getConcept(cnid);
-		
-			// Create the new refset specification concept extension
-			
 			int memberId = termFactory.uuidToNativeWithGeneration( UUID.randomUUID(),
 	                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
 	                termFactory.getPaths(), Integer.MAX_VALUE );
@@ -66,24 +59,28 @@ public class SnomedIdListHandler extends FileHandler<I_ThinExtByRefVersioned> {
 		}
 	}
 
-	/**
-	 * Return the document for the highest scoring search hit 
-	 */
-	private Document getTopHit(Hits hits) throws MojoExecutionException {
-		int topHit = 0;
+	private I_GetConceptData findConcept(String snomedId) throws Exception {
+		
+		Hits hits = AceConfig.getVodb().doLuceneSearch(snomedId);
+
 		if (hits == null || hits.length() == 0) {
 			throw new MojoExecutionException("Search produced no results");
 		}
-		try {
-			for (int i = 0; i < hits.length(); i++) {
-				if (hits.score(topHit) < hits.score(i)) {
-					topHit = i;
+		
+		// Find the hit that actually has our snomed id in it
+		
+		for (int i = 0; i < hits.length(); i++) {
+			Document doc = hits.doc(i);
+			int cnid = Integer.parseInt(doc.get("cnid"));
+			I_GetConceptData concept = termFactory.getConcept(cnid);
+			for (I_IdPart version : concept.getId().getVersions()) {
+				if (version.getSourceId().equals(snomedId)) {
+					return concept;
 				}
 			}
-			return hits.doc(topHit);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
 		}
+		
+		throw new MojoExecutionException("Unable to locate a matching concept");
 	}
 	
 }
