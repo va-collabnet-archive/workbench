@@ -784,11 +784,16 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 	}
 
 	public I_RelVersioned getSourceRel(int id) throws IOException {
-		for (I_RelVersioned r : getSourceRels()) {
-			if (r.getRelId() == id) {
-				return r;
-			}
-		}
+    for (I_RelVersioned r : getSourceRels()) {
+      if (r.getRelId() == id) {
+        return r;
+      }
+    }
+    for (I_RelVersioned r : getUncommittedSourceRels()) {
+      if (r.getRelId() == id) {
+        return r;
+      }
+    }
 		return null;
 	}
 
