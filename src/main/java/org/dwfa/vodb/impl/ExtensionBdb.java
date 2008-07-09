@@ -250,7 +250,13 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 					ExtensionByReferenceBean extBean = ExtensionByReferenceBean
 							.make(extFromComponentId.getMemberId(),
 									extFromComponentId);
-					matches.add(extBean.getExtension());
+					if (extBean == null) {
+            AceLog.getAppLog().severe("extBean is null for component: " + ConceptBean.get(componentId));
+            AceLog.getAppLog().severe("extFromComponentId: " + extFromComponentId);
+            AceLog.getAppLog().severe("extFromComponentId.getMemberId(): " + extFromComponentId.getMemberId());
+					}
+					I_ThinExtByRefVersioned ext = extBean.getExtension();
+					matches.add(ext);
 				} else {
 					rejected++;
 					break;

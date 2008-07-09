@@ -106,8 +106,19 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 
     public static ExtensionByReferenceBean make(int memberId, I_ThinExtByRefVersioned extension) {
         Reference<ExtensionByReferenceBean> ref = ebrBeans.get(memberId);
-        if (ref != null) {
-            return ref.get();
+        if (ref != null && ref.isEnqueued()) {
+          synchronized (ebrBeans) {
+            ebrBeans.remove(memberId);        
+          }
+        } else if (ref != null) {
+          ExtensionByReferenceBean ebr = ref.get();
+          if (ebr != null) {
+            return ebr;
+          } else {
+            synchronized (ebrBeans) {
+              ebrBeans.remove(memberId);        
+            }
+          }
         }
         ExtensionByReferenceBean ebrBean = get(memberId);
         ebrBean.extension = extension;

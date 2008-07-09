@@ -78,7 +78,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 				Reference<ConceptBean> ref = cbeans.get(conceptId);
 				if (ref != null && ref.isEnqueued()) {
 					cbeans.remove(conceptId);				
-				} else {
+				} else if (ref != null) {
 					ConceptBean cb = ref.get();
 					if (cb != null) {
 						return cb;
