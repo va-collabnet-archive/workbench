@@ -37,7 +37,7 @@ public class ConvertAllChangeSetsToXmlBeanInfo extends SimpleBeanInfo {
 	                new PropertyDescriptor("inputSuffix", getBeanDescriptor().getBeanClass());
 	            inputSuffix.setBound(true);
 	            inputSuffix.setPropertyEditorClass(JTextFieldEditor.class);
-	            inputSuffix.setDisplayName("<html><font color='green'>output file suffix:");
+	            inputSuffix.setDisplayName("<html><font color='green'>input file suffix:");
 	            inputSuffix.setShortDescription("The input file suffix, used when scanning for files. ");
 	            
 	            PropertyDescriptor rv[] = { rootDirStr, recurseSubdirectories, outputSuffix, inputSuffix };
