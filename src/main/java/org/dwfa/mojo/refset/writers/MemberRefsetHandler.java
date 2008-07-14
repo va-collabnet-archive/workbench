@@ -1,5 +1,6 @@
 package org.dwfa.mojo.refset.writers;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,6 +18,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.maven.transform.UuidSnomedMapHandler;
+import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.file.FileHandler;
 import org.dwfa.tapi.TerminologyException;
 
@@ -27,7 +30,10 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 	protected static final String VERSION = "VERSION";
 	protected static final String PATH_ID = "PATH_ID";
 	protected static final String REFSET_ID = "REFSET_ID";
-	public static final String FILE_DELIMITER = "\t";
+	protected static final String FILE_DELIMITER = "\t";
+	private static UuidSnomedMapHandler sctGenerator = null;
+	private static File fixedMapDirectory;
+	private static File readWriteMapDirectory;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 	private I_TermFactory tf;
 	private StringTokenizer st;
@@ -43,24 +49,42 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 	
 	/**
 	 * @param tuple extension part to format
+	 * @param sctId true if the identifier should be a SNOMED ID, false otherwise
 	 * @return string representation of the part fit for a file of this handler's type
 	 * @throws IOException 
 	 * @throws TerminologyException 
 	 */
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
-		return toId(tf, tuple.getRefsetId()) + FILE_DELIMITER
-				+ toId(tf, tuple.getPathId()) + FILE_DELIMITER
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctId) throws TerminologyException, IOException {
+		return formatRefsetLine(tf, tuple, tuple.getRefsetId(), tuple.getComponentId(), sctId);
+	}
+	
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart tuple, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
+		return toId(tf, refsetId, sctId) + FILE_DELIMITER
+				+ toId(tf, tuple.getPathId(), sctId) + FILE_DELIMITER
 				+ getDate(tf, tuple.getVersion()) + FILE_DELIMITER
-				+ toId(tf, tuple.getStatus()) + FILE_DELIMITER
-				+ toId(tf, tuple.getComponentId());
+				+ toId(tf, tuple.getStatus(), sctId) + FILE_DELIMITER
+				+ toId(tf, componentId, sctId);
 	}
 
 	private String getDate(I_TermFactory tf, int version) {
 		return dateFormat.format(tf.convertToThickVersion(version));
 	}
 
-	protected String toId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
-		return tf.getUids(componentId).iterator().next().toString();
+	protected String toId(I_TermFactory tf, int componentId, boolean sctId) throws TerminologyException, IOException {
+		if (sctId) {
+			//TODO this assumes that the componentId is a concept! it might be a description or relationship
+			return Long.toString(getSctGenerator()
+					.getWithGeneration(tf.getUids(componentId).iterator().next(), TYPE.CONCEPT));
+		} else { //uuid
+			return tf.getUids(componentId).iterator().next().toString();
+		}
+	}
+
+	private static synchronized UuidSnomedMapHandler getSctGenerator() throws IOException {
+		if (sctGenerator == null) {
+			sctGenerator = new UuidSnomedMapHandler(fixedMapDirectory, readWriteMapDirectory);
+		}
+		return sctGenerator;
 	}
 
 	@Override
@@ -101,7 +125,7 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 		part.setVersion((Integer) currentRow.get(MemberRefsetHandler.VERSION));
 	}
 
-	protected I_ThinExtByRefVersioned getExtensionVersioned(String line, org.dwfa.cement.RefsetAuxiliary.Concept refsetType) throws Exception {
+	protected I_ThinExtByRefVersioned getExtensionVersioned(String line, RefsetAuxiliary.Concept refsetType) throws Exception {
 		Map<String, Object> currentRow = parseLine(line);
 		
 		UUID refsetUuid = (UUID) currentRow.get(MemberRefsetHandler.REFSET_ID);
@@ -121,7 +145,7 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 		if (versioned == null) {
 			UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." 
 					+ getTermFactory().getUids(componentNid) 
-					+ RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids() 
+					+ refsetType.getUids() 
 					+ getTermFactory().getUids(refsetNid)).getBytes("8859_1"));
 			
 			int memberId = getTermFactory().uuidToNativeWithGeneration(uuid,
@@ -148,5 +172,38 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 
 	protected int getNid(UUID id) throws TerminologyException, IOException {
 		return getTermFactory().uuidToNative(id);
-	}	
+	}
+
+	public File getFixedMapDirectory() {
+		return fixedMapDirectory;
+	}
+
+	public static synchronized void setFixedMapDirectory(File fixedMapDirectory) {
+		if (MemberRefsetHandler.fixedMapDirectory != null) {
+			throw new RuntimeException("Fixed map directory can only be set once! Current value is " 
+					+ fixedMapDirectory + " - please call MemberRefsetHandler.cleanup() to reset maps and files");
+		}
+		MemberRefsetHandler.fixedMapDirectory = fixedMapDirectory;
+	}
+
+	public File getReadWriteMapDirectory() {
+		return readWriteMapDirectory;
+	}
+
+	public static synchronized void setReadWriteMapDirectory(File readWriteMapDirectory) {
+		if (MemberRefsetHandler.readWriteMapDirectory != null) {
+			throw new RuntimeException("Read write map directory can only be set once! Current value is " 
+					+ readWriteMapDirectory + " - please call MemberRefsetHandler.cleanup() to reset maps and files");
+		}
+		MemberRefsetHandler.readWriteMapDirectory = readWriteMapDirectory;
+	}
+	
+	public static synchronized void cleanup() throws IOException {
+		if (sctGenerator != null) {
+			sctGenerator.writeMaps();
+			sctGenerator = null;
+			fixedMapDirectory = null;
+			readWriteMapDirectory = null;
+		}
+	}
 }

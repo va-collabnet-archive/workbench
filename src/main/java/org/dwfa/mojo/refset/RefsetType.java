@@ -69,8 +69,7 @@ enum RefsetType {
 		this.fileExtension = fileExtension;
 	}
 	
-	public static RefsetType findByExtension(I_ThinExtByRefTuple thinExtByRefTuple) {
-		I_ThinExtByRefPart part = thinExtByRefTuple.getPart();
+	public static RefsetType findByExtension(I_ThinExtByRefPart part) {
 		if (part instanceof I_ThinExtByRefPartBoolean) {
 			return BOOLEAN;
 		} else if (part instanceof I_ThinExtByRefPartConcept) {
@@ -83,7 +82,8 @@ enum RefsetType {
 			return STRING;
 		}
 		
-		throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for the class " + thinExtByRefTuple.getClass() + " exists");
+		throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for the class " 
+				+ part.getClass() + " exists. Full object is " + part);
 	}
 
 	/**

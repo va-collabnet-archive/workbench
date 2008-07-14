@@ -13,11 +13,11 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
 	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid) throws TerminologyException, IOException {
 		I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) tuple.getPart();
 		
-		return super.formatRefsetLine(tf, tuple) + MemberRefsetHandler.FILE_DELIMITER
-					+ toId(tf, conceptIntegerPart.getConceptId()) + MemberRefsetHandler.FILE_DELIMITER
+		return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
+					+ toId(tf, conceptIntegerPart.getConceptId(), sctid) + MemberRefsetHandler.FILE_DELIMITER
 					+ conceptIntegerPart.getIntValue();
 	}
 

@@ -14,11 +14,16 @@ import org.dwfa.tapi.TerminologyException;
 public class ConceptRefsetHandler extends MemberRefsetHandler {
 
 	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part) throws TerminologyException, IOException {
-		I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part.getPart();
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part, boolean sctid) throws TerminologyException, IOException {
+		return formatRefsetLine(tf, part, part.getRefsetId(), part.getComponentId(), sctid);
+	}
+	
+	@Override
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
+		I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
 		
-		return super.formatRefsetLine(tf, part) + "\t"
-					+ toId(tf, conceptPart.getConceptId());
+		return super.formatRefsetLine(tf, part, refsetId, componentId, sctId) + "\t"
+					+ toId(tf, conceptPart.getConceptId(), sctId);
 	}
 
 	@Override

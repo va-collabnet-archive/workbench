@@ -12,10 +12,10 @@ import org.dwfa.tapi.TerminologyException;
 
 public class IntegerRefsetHandler extends MemberRefsetHandler {
 	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid) throws TerminologyException, IOException {
 		I_ThinExtByRefPartInteger integerPart = (I_ThinExtByRefPartInteger) tuple.getPart();
 		
-		return super.formatRefsetLine(tf, tuple) + "\t"
+		return super.formatRefsetLine(tf, tuple, sctid) + "\t"
 					+ integerPart.getValue();
 	}
 

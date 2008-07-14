@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.refset.ExportSpecification;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -74,6 +75,10 @@ public class ExportIterator implements I_ProcessConcepts {
 
 	private Collection<UUID> snomedIdUuids;
 
+	private I_GetConceptData activeConcept;
+
+	private I_GetConceptData inactiveConcept;
+
 
 
 	public ExportIterator(Writer concepts, Writer descriptions,
@@ -92,6 +97,9 @@ public class ExportIterator implements I_ProcessConcepts {
 		this.log = log;
 		this.specs = specs;
 		this.termFactory = LocalVersionedTerminology.get();
+		
+		activeConcept = termFactory.getConcept(Concept.ACTIVE.getUids());
+		inactiveConcept = termFactory.getConcept(Concept.INACTIVE.getUids());
 		
 		snomedIdUuids = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids();
 		
@@ -208,7 +216,7 @@ public class ExportIterator implements I_ProcessConcepts {
 				createRecord(stringBuilder, part.getSourceId());
 
 				// status UUID
-				createRecord(stringBuilder, getFirstUuid(part.getIdStatus()));
+				createRecord(stringBuilder, getBinaryStatusValue(part.getIdStatus()));
 
 				// Effective time
 				createVersion(part.getVersion(), stringBuilder);
@@ -251,7 +259,7 @@ public class ExportIterator implements I_ProcessConcepts {
 	}
 
 	private boolean writeUuidBasedConceptDetails(I_GetConceptData concept,
-			I_IntSet allowedStatus) throws IOException, TerminologyException {
+			I_IntSet allowedStatus) throws Exception {
 
 		I_DescriptionTuple descForConceptFile = concept.getDescTuple(nameOrder,
 				null, positions);
@@ -312,6 +320,9 @@ public class ExportIterator implements I_ProcessConcepts {
 				
 				//Path Id
 				createRecord(stringBuilder, getFirstUuid(attribTup.getPart().getPathId()));
+
+				//Status active/inactive value
+				createRecord(stringBuilder, getBinaryStatusValue(attribTup.getPart().getStatusId()));
 				
 				// End record
 				createRecord(stringBuilder, System
@@ -407,6 +418,9 @@ public class ExportIterator implements I_ProcessConcepts {
 				//Path Id
 				createRecord(stringBuilder, getFirstUuid(part.getPathId()));
 				
+				//Status active/inactive value
+				createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()));
+				
 				createRecord(stringBuilder, System
 						.getProperty("line.separator"));
 
@@ -414,6 +428,18 @@ public class ExportIterator implements I_ProcessConcepts {
 			}
 		}
 	}// End method getUuidBasedRelDetails
+
+	private UUID getBinaryStatusValue(int statusId) throws Exception {
+		
+		I_GetConceptData status = termFactory.getConcept(statusId);
+		
+		if (activeConcept.isParentOf(status, null, null, null, false)) {
+			return activeConcept.getUids().iterator().next();
+		} else if (inactiveConcept.isParentOf(status, null, null, null, false)) {
+			return inactiveConcept.getUids().iterator().next();
+		}
+		throw new Exception("Status concept " + status + " is not a child of Active or Inactive - cannot be handled.");
+	}
 
 	private void createVersion(int version, StringBuilder stringBuilder) {
 		if (releaseDate == null) {
@@ -494,6 +520,9 @@ public class ExportIterator implements I_ProcessConcepts {
 
 				//Path Id
 				createRecord(stringBuilder, getFirstUuid(part.getPathId()));
+
+				//Status active/inactive value
+				createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()));
 				
 				// End record
 				createRecord(stringBuilder, System
