@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -1045,4 +1046,31 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         return localFullySpecifiedDescPrefList;
     }
 
+    public static String getLanguageCode(Collection<UUID> uuids) throws NoSuchElementException {
+      if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN.getUids()))
+          return "en";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_AU.getUids()))
+        return "en-AU";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_BZ.getUids()))
+        return "en-BZ";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_CA.getUids()))
+        return "en-CA";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_GB.getUids()))
+        return "en-GB";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_IE.getUids()))
+        return "en-IE";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_JM.getUids()))
+        return "en-JM";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_NZ.getUids()))
+        return "en-NZ";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_TT.getUids()))
+        return "en-TT";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_US.getUids()))
+        return "en-US";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_ZA.getUids()))
+        return "en-ZA";
+      throw new NoSuchElementException("UNK: " + uuids);
+  }
+
+   
 }
