@@ -11,9 +11,8 @@ public abstract class UuidToSctIdNoGeneration extends UuidToSctIdWithGeneration 
       UUID id = UUID.fromString(input);
       TYPE type = getType();
 
-      // find the existing SCT ID in the mapping
-      Long returnValue = super.getMap().get(type).get(id);
-
+      Long returnValue = super.getMappedId(id, type);
+      
       // if it isn't found, use a dummy value as we aren't generating new IDs
       if (returnValue == null) {
           returnValue = new Long(-1);
