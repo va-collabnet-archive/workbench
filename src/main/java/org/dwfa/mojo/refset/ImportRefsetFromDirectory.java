@@ -45,6 +45,13 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 	 */
 	boolean hasHeader = true;
 	
+	/**
+	 * List of filename expressions to exclude
+	 * 
+	 * @parameter
+	 */
+	List<String> exclusions;
+	
 	private FilenameFilter filenameFilter;
 
 	/*
@@ -57,18 +64,32 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 			List<File> files = recursivelyGetFiles(refsetDirectory);
 			
 			for (File file : files) {
-				FileHandler<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
-				handler.setTransactional(transactional);
-				handler.setSourceFile(file);
-				handler.setHasHeader(hasHeader);
-				
-				for (I_ThinExtByRefPart thinExtByRefPart : handler) {
-					getLog().info("Imported from file " + file + " extension part " + thinExtByRefPart);
+				if (notExcluded(file.getName())) {
+					FileHandler<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
+					handler.setTransactional(transactional);
+					handler.setSourceFile(file);
+					handler.setHasHeader(hasHeader);
+					
+					int i = 0;
+					for (I_ThinExtByRefPart thinExtByRefPart : handler) {
+						if (i % 1000 == 0) {
+							getLog().info("Imported " + ++i + " extensions from file " + file);
+						}
+					}
 				}
 			}
 		} catch (Exception e) {
 			throw new MojoExecutionException("failed importing files from " + refsetDirectory, e);
 		}
+	}
+
+	private boolean notExcluded(String name) {
+		for (String exclusion : exclusions) {
+			if (name.matches(exclusion)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private List<File> recursivelyGetFiles(File directory) {
