@@ -1639,5 +1639,21 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		}
 		return ap;
 	}
+
+  public Collection<I_WriteChangeSet> getChangeSetWriters() {
+    return ACE.getCsWriters();
+  }
+
+  public void addChangeSetReader(I_ReadChangeSet reader) {
+    ACE.getCsReaders().add(reader);
+  }
+
+  public Collection<I_ReadChangeSet> getChangeSetReaders() {
+    return ACE.getCsReaders();
+  }
+
+  public void removeChangeSetReader(I_ReadChangeSet reader) {
+    ACE.getCsReaders().remove(reader);
+  }
 		
 }
