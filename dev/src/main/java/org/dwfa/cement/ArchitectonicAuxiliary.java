@@ -653,8 +653,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     public static int getSnomedDescriptionStatusId(Collection<UUID> uuids){
         if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))
             return 0;
-      else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
-         return 0;
+        else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
+            return 0;
+        else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()))
+            return 0; 
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
             return 1;
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
