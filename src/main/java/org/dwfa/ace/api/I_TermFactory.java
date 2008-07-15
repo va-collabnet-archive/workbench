@@ -139,6 +139,14 @@ public interface I_TermFactory {
 
     public void removeChangeSetWriter(I_WriteChangeSet writer);
 
+    public Collection<I_WriteChangeSet> getChangeSetWriters();
+
+    public void addChangeSetReader(I_ReadChangeSet reader);
+
+    public void removeChangeSetReader(I_ReadChangeSet reader);
+
+    public Collection<I_ReadChangeSet> getChangeSetReaders();
+
     public void closeChangeSets() throws IOException;
 
     public I_WriteChangeSet newBinaryChangeSetWriter(File changeSetFile) throws IOException;
