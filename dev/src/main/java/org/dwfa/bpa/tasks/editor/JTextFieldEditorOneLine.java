@@ -17,6 +17,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -97,12 +98,14 @@ public class JTextFieldEditorOneLine
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
-        String message = (String) value;
-        this.editor.setText(message);
-        this.firePropertyChange();
+        final String message = (String) value;
+        SwingUtilities.invokeLater(new Runnable(){
+          public void run() {
+            editor.setText(message);
+            firePropertyChange();
+          }
+        });
     }
-
-
 
 
     /**

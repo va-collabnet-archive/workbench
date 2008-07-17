@@ -15,6 +15,7 @@ import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.bpa.process.I_SelectProcesses;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
 /**
  * @author kec

@@ -22,6 +22,8 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.I_Workspace;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.worker.task.I_CancelForm;
+import org.dwfa.bpa.worker.task.I_CompleteForm;
 
 public abstract class WaitForCancelOrComplete extends AbstractTask {
     private static final long serialVersionUID = 1;
@@ -94,6 +96,15 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
         this.exitCondition = null;
         this.cancelActionListener = new CancelActionListener();
         this.completeActionListener = new CompleteActionListener();
+        
+        if (worker.getPluginForInterface(I_CompleteForm.class) != null) {
+          I_CompleteForm completer = (I_CompleteForm) worker.getPluginForInterface(I_CompleteForm.class);
+          completer.setCompleteActionListener(completeActionListener);
+        }
+        if (worker.getPluginForInterface(I_CancelForm.class) != null) {
+          I_CancelForm canceler = (I_CancelForm) worker.getPluginForInterface(I_CancelForm.class);
+          canceler.setCancelActionListener(cancelActionListener);
+        }
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
     

@@ -89,6 +89,9 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
 
     public void abortActiveTransaction() throws UnknownTransactionException,
       CannotAbortException, RemoteException;
+    
+    public void discardActiveTransaction();
+    
     /**
      * Commits the active transaction, and makes the next transaction (if any)
      * the active transaction.
@@ -287,7 +290,7 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
             throws ConfigurationException;
     
     public Object getObjFromFilesystem(Frame parent, String title, String startDir, FilenameFilter fileFilter) throws IOException, ClassNotFoundException;
-	public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj) throws IOException;
+    public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj) throws IOException;
     public boolean isExecuting();
     
     public void flagExecutionStop();
@@ -300,4 +303,9 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
     public void writeAttachment(String key, Object value);
     public Object readAttachement(String key);
     public Object takeAttachment(String key);
+    
+    public I_PluginToWorker getPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface);
+    
+    public void setPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface, 
+        I_PluginToWorker plugin);
 }

@@ -58,7 +58,7 @@ import org.dwfa.bpa.util.Base64;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.bpa.worker.Worker;
-import org.dwfa.queue.I_GetWorkFromQueue;
+import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
 import com.sun.mail.pop3.POP3Folder;
 
@@ -92,11 +92,11 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
       private JTextField usernameField = new JTextField(20);
       private JPasswordField passwordField = new JPasswordField(20);
       private JButton okButton = new JButton("OK");
-	  private boolean done = false;
+      private boolean done = false;
 
         
       public MailAuthenticator(String username) throws Exception {
-    	  	/*
+    	  /*
       	List frameList = OpenFrames.getFrames();
       	JFrame frontFrame = null;
       	for (Iterator frameItr = frameList.iterator(); frameItr.hasNext();) {
@@ -211,11 +211,11 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
         mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
         mc.addMailcap(OutboxQueueWorker.PROCESS_ATTACHMENT_TYPE + ";; x-java-content-handler=com.sun.mail.handlers.text_plain");
         CommandMap.setDefaultCommandMap(mc);
-    
+        this.setPluginForInterface(I_GetWorkFromQueue.class, this);
     }
 
     /**
-     * @see org.dwfa.queue.I_GetWorkFromQueue#queueContentsChanged()
+     * @see org.dwfa.bpa.worker.task.I_GetWorkFromQueue#queueContentsChanged()
      */
     public void queueContentsChanged() {
         if (this.sleeping) {
@@ -224,7 +224,7 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
     }
 
     /**
-     * @see org.dwfa.queue.I_GetWorkFromQueue#start(org.dwfa.bpa.process.I_QueueProcesses)
+     * @see org.dwfa.bpa.worker.task.I_GetWorkFromQueue#start(org.dwfa.bpa.process.I_QueueProcesses)
      */
     public void start(I_QueueProcesses queue) {
         this.queue = queue;

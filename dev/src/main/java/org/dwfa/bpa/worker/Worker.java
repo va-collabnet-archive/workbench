@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -61,6 +62,7 @@ import net.jini.security.ProxyPreparer;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_PluginToWorker;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -136,6 +138,8 @@ public abstract class Worker implements I_Work {
 	public Logger getLogger() {
 		return logger;
 	}
+
+	protected Map<Class<? extends I_PluginToWorker>, I_PluginToWorker> pluginMap = new HashMap<Class<? extends I_PluginToWorker>, I_PluginToWorker>();
 
 	private HashMap<String, Object> attachments = new HashMap<String, Object>();
 
@@ -1034,5 +1038,24 @@ public abstract class Worker implements I_Work {
 	public long getTime() throws RemoteException {
 		return timer.getTime();
 	}
+
+	
+  public I_PluginToWorker getPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface) {
+    if (pluginMap.containsKey(pluginInterface)) {
+      return pluginMap.get(pluginInterface);      
+    }
+    for (Class<? extends I_PluginToWorker> pii: pluginMap.keySet()) {
+      if (pluginInterface.isAssignableFrom(pii)) {
+        return pluginMap.get(pii);      
+      }
+    }
+    return null;
+  }
+  
+  public void setPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface, 
+      I_PluginToWorker plugin) {
+    pluginMap.put(pluginInterface, plugin);
+  }
+
 
 }

@@ -35,6 +35,7 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_SelectProcesses;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.ProcessID;
+import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
 import com.sun.jini.start.LifeCycle;
 

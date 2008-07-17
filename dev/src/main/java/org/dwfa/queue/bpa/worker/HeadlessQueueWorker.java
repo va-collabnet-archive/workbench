@@ -32,7 +32,7 @@ import org.dwfa.bpa.process.NoSuchWorkspaceException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.process.WorkspaceActiveException;
 import org.dwfa.bpa.worker.Worker;
-import org.dwfa.queue.I_GetWorkFromQueue;
+import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
 
 /**
@@ -60,6 +60,7 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
         super(config, id, desc);
         this.selector = selector;
+        this.setPluginForInterface(I_GetWorkFromQueue.class, this);
     }
 
     /**
@@ -115,7 +116,7 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     }
 
     /**
-     * @see org.dwfa.queue.I_GetWorkFromQueue#queueContentsChanged()
+     * @see org.dwfa.bpa.worker.task.I_GetWorkFromQueue#queueContentsChanged()
      */
     public void queueContentsChanged() {
         if (this.sleeping) {
@@ -125,7 +126,7 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     }
 
     /**
-     * @see org.dwfa.queue.I_GetWorkFromQueue#start(org.dwfa.bpa.process.I_QueueProcesses)
+     * @see org.dwfa.bpa.worker.task.I_GetWorkFromQueue#start(org.dwfa.bpa.process.I_QueueProcesses)
      */
     public void start(I_QueueProcesses queue) {
         this.queue = queue;
