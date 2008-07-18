@@ -1,45 +1,36 @@
 package org.dwfa.bpa.worker.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.UUID;
-
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.bpa.worker.GenericWorkerManager;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/worker", type = BeanType.TASK_BEAN) })
-public class NewMasterWorker extends AbstractTask {
+public class NewGenericWorkerManager extends AbstractTask {
   private static final long serialVersionUID = 1;
   private static final int  dataVersion      = 1;
   
-  private String workerName = "Master Worker";
-  private String startupDirectory = "none";
-  private String workerPropName = ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey();
+  private String jiniConfigFile = "config/genericWorkerManager.config";
   
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.writeInt(dataVersion);
-    out.writeObject(workerName);
-    out.writeObject(startupDirectory);
-    out.writeObject(workerPropName);
+    out.writeObject(jiniConfigFile);
   }
 
   private void readObject(java.io.ObjectInputStream in) throws IOException,
       ClassNotFoundException {
     int objDataVersion = in.readInt();
     if (objDataVersion == 1) {
-      workerName = (String) in.readObject();
-      startupDirectory = (String) in.readObject();
-      workerPropName = (String) in.readObject();
+      jiniConfigFile = (String) in.readObject();
     } else {
       throw new IOException("Can't handle dataversion: " + objDataVersion);
     }
@@ -53,13 +44,9 @@ public class NewMasterWorker extends AbstractTask {
   public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
       throws TaskFailedException {
     
-    JiniConfigWrapper jcw = new JiniConfigWrapper(worker.getJiniConfig());
-    jcw.addObject(MasterWorker.class.getName(), "workerUuid", UUID.randomUUID());
-    jcw.addObject(MasterWorker.class.getName(), "name", workerName);
-    jcw.addObject(MasterWorker.class.getName(), "startupDirectory", new File(startupDirectory));
     try {
-      MasterWorker masterWorker = new MasterWorker(jcw);
-      process.setProperty(workerPropName, masterWorker);
+      new GenericWorkerManager(new String[] { jiniConfigFile }, null);
+      
     } catch (Exception e) {
       throw new TaskFailedException(e);
     } 
@@ -92,34 +79,12 @@ public class NewMasterWorker extends AbstractTask {
     return new int[] {};
   }
 
-  public String getWorkerName() {
-    return workerName;
+  public String getJiniConfigFile() {
+    return jiniConfigFile;
   }
 
-  public void setWorkerName(String workerName) {
-    Object old = this.workerName;
-    this.workerName = workerName;
-    this.firePropertyChange("workerName", old, workerName);
-  }
-
-  public String getStartupDirectory() {
-    return startupDirectory;
-  }
-
-  public void setStartupDirectory(String startupDirectory) {
-    Object old = this.startupDirectory;
-    this.startupDirectory = startupDirectory;
-    this.firePropertyChange("startupDirectory", old, startupDirectory);
-  }
-
-  public String getWorkerPropName() {
-    return workerPropName;
-  }
-
-  public void setWorkerPropName(String workerPropName) {
-    Object old = this.workerPropName;
-    this.workerPropName = workerPropName;
-    this.firePropertyChange("workerPropName", old, workerPropName);
+  public void setJiniConfigFile(String jiniConfigFile) {
+    this.jiniConfigFile = jiniConfigFile;
   }
 
 }
