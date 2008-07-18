@@ -21,208 +21,214 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class JTextFieldEditorOneLine   
-    implements PropertyEditor, ItemListener  {
+public class JTextFieldEditorOneLine implements PropertyEditor, ItemListener {
 
-    private class UpdateFieldDocumentListener implements DocumentListener {
+  private class UpdateFieldDocumentListener implements DocumentListener {
 
-        /**
-         * @param setMethod
-         * @param task
-         * @param textField
-         */
-        public UpdateFieldDocumentListener() {
-            super();
-        }
-
-        public void insertUpdate(DocumentEvent e) {
-            JTextFieldEditorOneLine.this.firePropertyChange();
-        }
-
-        public void removeUpdate(DocumentEvent e) {
-            JTextFieldEditorOneLine.this.firePropertyChange();
-        }
-
-        public void changedUpdate(DocumentEvent e) {
-            JTextFieldEditorOneLine.this.firePropertyChange();
-        }
-    }   
-        private class EditorComponent extends JTextArea {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * @param text
-         */
-        public EditorComponent() {
-            super(1, 10);
-            this.setLineWrap(true);
-            this.setBorder(BorderFactory.createLoweredBevelBorder());
-            this.getDocument().addDocumentListener(
-                    new UpdateFieldDocumentListener());
-
-        }
-        
+    /**
+     * @param setMethod
+     * @param task
+     * @param textField
+     */
+    public UpdateFieldDocumentListener() {
+      super();
     }
+
+    public void insertUpdate(DocumentEvent e) {
+      JTextFieldEditorOneLine.this.firePropertyChange();
+    }
+
+    public void removeUpdate(DocumentEvent e) {
+      JTextFieldEditorOneLine.this.firePropertyChange();
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+      JTextFieldEditorOneLine.this.firePropertyChange();
+    }
+  }
+
+  private class EditorComponent extends JTextArea {
+
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    
-    private EditorComponent editor = new EditorComponent();
-    
-    
-    /**
-     */
-    public JTextFieldEditorOneLine()  {
-        super();
-    }
-
-
-    
-    /**
-     * @return String
-     * @see java.beans.PropertyEditor#getValue()
-     */
-    public String getValue() {
-        return editor.getText();
-    }
-    
-    
 
     /**
-     * Must be a <code>String</code>. 
-     * @see java.beans.PropertyEditor#setValue(java.lang.Object)
+     * @param text
      */
-    public void setValue(Object value) {
-        final String message = (String) value;
-        SwingUtilities.invokeLater(new Runnable(){
-          public void run() {
-            editor.setText(message);
-            firePropertyChange();
-          }
-        });
+    public EditorComponent() {
+      super(1, 10);
+      this.setLineWrap(true);
+      this.setBorder(BorderFactory.createLoweredBevelBorder());
+      this.getDocument().addDocumentListener(new UpdateFieldDocumentListener());
+
     }
 
+  }
 
-    /**
-     * @see java.beans.PropertyEditor#isPaintable()
-     */
-    public boolean isPaintable() {
-        return true;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  private EditorComponent   editor           = new EditorComponent();
+
+  /**
+   */
+  public JTextFieldEditorOneLine() {
+    super();
+  }
+
+  /**
+   * @return String
+   * @see java.beans.PropertyEditor#getValue()
+   */
+  public Object getValue() {
+    return editor.getText();
+  }
+
+  /**
+   * Must be a <code>String</code>.
+   * 
+   * @see java.beans.PropertyEditor#setValue(java.lang.Object)
+   */
+  public void setValue(Object value) {
+    String message = (String) value;
+    if (editor.getText().equals(message)) {
+      //
+    } else {
+      editor.setText(message);
+      this.firePropertyChange();
     }
+  }
 
-    /**
-     * Calls the paint method on this swing component. 
-     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics, java.awt.Rectangle)
-     */
-    public void paintValue(Graphics gfx, Rectangle box) {
-        this.editor.setBounds(box);
-        this.editor.paintAll(gfx);
+  /**
+   * @see java.beans.PropertyEditor#isPaintable()
+   */
+  public boolean isPaintable() {
+    return true;
+  }
+
+  /**
+   * Calls the paint method on this swing component.
+   * 
+   * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
+   *      java.awt.Rectangle)
+   */
+  public void paintValue(Graphics gfx, Rectangle box) {
+    this.editor.setBounds(box);
+    this.editor.paintAll(gfx);
+  }
+
+  /**
+   * @see java.beans.PropertyEditor#getJavaInitializationString()
+   */
+  public String getJavaInitializationString() {
+    return "\"" + this.getValue() + "\"";
+  }
+
+  /**
+   * @see java.beans.PropertyEditor#getAsText()
+   */
+  public String getAsText() {
+    return this.getValue().toString();
+  }
+
+  /**
+   * @see java.beans.PropertyEditor#setAsText(java.lang.String)
+   */
+  public void setAsText(String text) throws IllegalArgumentException {
+    this.setValue(text);
+  }
+
+  /**
+   * Returns null since this editor provides a custom GUI component.
+   * 
+   * @see java.beans.PropertyEditor#getTags()
+   */
+  public String[] getTags() {
+    return null;
+  }
+
+  /**
+   * Returns swing component to edit the check box.
+   * 
+   * @see java.beans.PropertyEditor#getCustomEditor()
+   */
+  public Component getCustomEditor() {
+    return this.editor;
+  }
+
+  /**
+   * Returns true since this editor provides a custom GUI component.
+   * 
+   * @see java.beans.PropertyEditor#supportsCustomEditor()
+   */
+  public boolean supportsCustomEditor() {
+    return true;
+  }
+
+  public void itemStateChanged(ItemEvent e) {
+    this.firePropertyChange();
+  }
+
+  /**
+   * Register a listener for the PropertyChange event. The class will fire a
+   * PropertyChange value whenever the value is updated.
+   * 
+   * @param listener
+   *          An object to be invoked when a PropertyChange event is fired.
+   */
+  public synchronized void addPropertyChangeListener(
+      PropertyChangeListener listener) {
+    if (listeners == null) {
+      listeners = new java.util.Vector<PropertyChangeListener>();
     }
+    listeners.addElement(listener);
+  }
 
-    /**
-     * @see java.beans.PropertyEditor#getJavaInitializationString()
-     */
-    public String getJavaInitializationString() {
-        return "\"" +  this.getValue() + "\"";
+  /**
+   * Remove a listener for the PropertyChange event.
+   * 
+   * @param listener
+   *          The PropertyChange listener to be removed.
+   */
+  public synchronized void removePropertyChangeListener(
+      PropertyChangeListener listener) {
+    if (listeners == null) {
+      return;
     }
+    listeners.removeElement(listener);
+  }
 
-    /**
-     * @see java.beans.PropertyEditor#getAsText()
-     */
-    public String getAsText() {
-        return this.getValue().toString();
+  /**
+   * Report that we have been modified to any interested listeners.
+   */
+  public void firePropertyChange() {
+    final Vector<PropertyChangeListener> targets;
+    synchronized (this) {
+      if (listeners == null) {
+        return;
+      }
+      targets = new Vector<PropertyChangeListener>(listeners);
     }
+    // Tell our listeners that "everything" has changed.
 
-    /**
-     * @see java.beans.PropertyEditor#setAsText(java.lang.String)
-     */
-    public void setAsText(String text) throws IllegalArgumentException {
-        this.setValue(text);
-    }
+    SwingUtilities.invokeLater(new Runnable() {
 
-    /**
-     * Returns null since this editor provides a custom GUI component. 
-     * @see java.beans.PropertyEditor#getTags()
-     */
-    public String[] getTags() {
-        return null;
-    }
+      public void run() {
+        PropertyChangeEvent evt = new PropertyChangeEvent(editor, "value",
+            null, null);
 
-    /**
-     * Returns swing component to edit the check box. 
-     * @see java.beans.PropertyEditor#getCustomEditor()
-     */
-    public Component getCustomEditor() {
-        return this.editor;
-    }
-
-    /**
-     * Returns true since this editor provides a custom GUI component. 
-     * @see java.beans.PropertyEditor#supportsCustomEditor()
-     */
-    public boolean supportsCustomEditor() {
-        return true;
-    }
-
-
-
-    public void itemStateChanged(ItemEvent e) {
-        this.firePropertyChange();
-    }
-
-    /**
-     * Register a listener for the PropertyChange event. The class will fire a
-     * PropertyChange value whenever the value is updated.
-     * 
-     * @param listener
-     *            An object to be invoked when a PropertyChange event is fired.
-     */
-    public synchronized void addPropertyChangeListener(
-            PropertyChangeListener listener) {
-        if (listeners == null) {
-            listeners = new java.util.Vector<PropertyChangeListener>();
+        for (PropertyChangeListener l : targets) {
+          l.propertyChange(evt);
         }
-        listeners.addElement(listener);
-    }
+      }
 
-    /**
-     * Remove a listener for the PropertyChange event.
-     * 
-     * @param listener
-     *            The PropertyChange listener to be removed.
-     */
-    public synchronized void removePropertyChangeListener(
-            PropertyChangeListener listener) {
-        if (listeners == null) {
-            return;
-        }
-        listeners.removeElement(listener);
-    }
+    });
+  }
 
-    /**
-     * Report that we have been modified to any interested listeners.
-     */
-    public void firePropertyChange() {
-        Vector<PropertyChangeListener> targets;
-        synchronized (this) {
-            if (listeners == null) {
-                return;
-            }
-            targets = new Vector<PropertyChangeListener>(listeners);
-        }
-        // Tell our listeners that "everything" has changed.
-        PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value", null, null);
+  private java.util.Vector<PropertyChangeListener> listeners;
 
-        for (PropertyChangeListener l: targets) {
-            l.propertyChange(evt);
-        }
-    }
-
-    private java.util.Vector<PropertyChangeListener> listeners;
-   
 }
