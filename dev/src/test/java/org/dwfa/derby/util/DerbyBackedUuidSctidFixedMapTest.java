@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 import junit.framework.TestCase;
 
@@ -14,7 +15,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 public class DerbyBackedUuidSctidFixedMapTest extends TestCase {
 
 	private File testRoot = new File("target", "test");
-	private File testMap = new File(testRoot, "sample.map");
+	private File testMap = new File(testRoot, "sample." + UUID.randomUUID() + ".map");
 	private DerbyBackedUuidSctidFixedMap mapDb;
 	private int mapSize = 50000;
 	
@@ -46,6 +47,7 @@ public class DerbyBackedUuidSctidFixedMapTest extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
+		testMap.delete();
 	}
 
 	public void test() throws NoSuchAlgorithmException, UnsupportedEncodingException {
