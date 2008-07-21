@@ -12,8 +12,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.dependency.AbstractDependencyFilterMojo;
-import org.apache.maven.plugin.dependency.utils.filters.ArtifactsFilter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
 
 /**
  * 
@@ -137,8 +137,11 @@ public class ServiceStarter extends AbstractDependencyFilterMojo {
 		}
 	}
 
+	@Override
 	protected ArtifactsFilter getMarkedArtifactFilter() {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }
