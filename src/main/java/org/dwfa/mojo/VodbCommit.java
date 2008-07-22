@@ -38,8 +38,9 @@ public class VodbCommit  extends AbstractMojo {
     
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
-        getLog().info("commiting: " + termFactory);
-        if (termFactory.getUncommitted().size() > 0) {
+        getLog().info("commiting: " + termFactory);        
+        if (termFactory.getUncommitted() != null 
+        		&& termFactory.getUncommitted().size() > 0) {
             try {
 
                 termFactory.commit();
