@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.task.cs.transform.ChangeSetTransformer;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -117,7 +118,7 @@ public class ConvertAllChangeSets extends AbstractTask {
 		for (File file : changeSetFiles) {
 			logger.info("Processing change set " + file.getParent() + File.separator + file.getName());
 			try {
-				transformer.createXmlCopy(logger, file);
+				transformer.transform(logger, file);
 			} catch (Exception e) {
 				throw new TaskFailedException("Failed processing file " + file, e);
 			}

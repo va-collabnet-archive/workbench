@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.task.cs.transform.ChangeSetTransformFactory;
+import org.dwfa.ace.task.cs.transform.ChangeSetTransformer;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -64,10 +66,10 @@ public class ConvertChangeSetToXml extends AbstractTask {
 					+ "' either does not exist or cannot be read");
 		}
 
-		ChangeSetXmlEncoder encoder = new ChangeSetXmlEncoder();
-		encoder.setOutputSuffix(outputSuffix);
 		try {
-			encoder.createXmlCopy(logger, file);
+			ChangeSetTransformer encoder = ChangeSetTransformFactory.getTransformForFile(file);
+			encoder.setOutputSuffix(outputSuffix);
+			encoder.transform(logger, file);
 		} catch (Exception e) {
 			throw new TaskFailedException("Failed processing file " + file, e);
 		}

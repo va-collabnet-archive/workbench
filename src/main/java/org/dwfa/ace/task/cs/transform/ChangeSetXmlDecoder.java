@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.cs;
+package org.dwfa.ace.task.cs.transform;
 
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
@@ -11,17 +11,19 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.logging.Logger;
 
+
 /**
  * Converts XML change sets back to binary
  * 
  * @author Dion McMurtrie
  *
  */
-public class ChangeSetXmlDecoder implements ChangeSetTransformer {
+@InputSuffix(".xml")
+public class ChangeSetXmlDecoder extends ChangeSetTransformer {
 	
-	private String outputSuffix = ".jcs";
-
-	public void createXmlCopy(Logger logger, File changeset)
+	protected String outputSuffix = ".jcs"; 
+	
+	public void transform(Logger logger, File changeset)
 			throws IOException, FileNotFoundException, ClassNotFoundException {
 
 		XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(
@@ -58,12 +60,4 @@ public class ChangeSetXmlDecoder implements ChangeSetTransformer {
 		logger.info("Change set " + changeset + " complete. " + objectCount + " objects read/written, " + longCount + " Long values read/written, " + (longCount + objectCount) + " total");
 	}
 
-
-	public String getOutputSuffix() {
-		return outputSuffix;
-	}
-
-	public void setOutputSuffix(String outputSuffix) {
-		this.outputSuffix = outputSuffix;
-	}
 }

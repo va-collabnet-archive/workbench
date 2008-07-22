@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.task.cs.transform.ChangeSetTransformer;
+import org.dwfa.ace.task.cs.transform.ChangeSetTransformFactory;
+import org.dwfa.ace.task.cs.transform.ChangeSetXmlEncoder;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -107,18 +110,19 @@ public class ConvertAllChangeSetsToXml extends AbstractTask {
 		List<File> changeSetFiles = new ArrayList<File>();
 		addAllChangeSetFiles(rootDir, changeSetFiles, inputSuffix);
 
-		ChangeSetXmlEncoder encoder = new ChangeSetXmlEncoder();
-		encoder.setOutputSuffix(outputSuffix);
-		
 		for (File file : changeSetFiles) {
-			logger.info("Processing change set " + file.getParent() + File.separator + file.getName());
 			try {
-				encoder.createXmlCopy(logger, file);
+				logger.info("Processing change set " + file.getParent() + File.separator + file.getName());
+				
+				ChangeSetTransformer encoder = ChangeSetTransformFactory.getTransformForFile(file);
+				encoder.setOutputSuffix(outputSuffix);
+				encoder.transform(logger, file);
+				
 			} catch (Exception e) {
 				throw new TaskFailedException("Failed processing file " + file, e);
 			}
 		}
-
+			
 		return Condition.CONTINUE;
 	}
 
