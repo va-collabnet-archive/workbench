@@ -50,7 +50,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	List<String> exclusions;
+	List<String> exclusions = new ArrayList<String>();
 	
 	private FilenameFilter filenameFilter;
 
