@@ -104,7 +104,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         this(args, lc, false, menuDir);
     }
     public ComponentFrame(String[] args, LifeCycle lc, boolean hiddenFrame) throws Exception {
-        this(args, lc, false, null);
+        this(args, lc, hiddenFrame, null);
     }
     public ComponentFrame(String[] args, LifeCycle lc, boolean hiddenFrame, File menuDir) throws Exception {
         super();

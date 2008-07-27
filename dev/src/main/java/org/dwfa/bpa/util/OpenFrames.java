@@ -49,12 +49,18 @@ public class OpenFrames implements PropertyChangeListener {
 	 * @param sourceBean
 	 */
 	private OpenFrames() {
-		this.frames = new ArrayList<JFrame>();
+		this.frames = new HashSet<JFrame>();
         this.newWindowMenuItemGenerators = new HashSet<I_InitComponentMenus>();
 	}
 
     public static int getNumOfFrames() {
-        return singleton.frames.size();
+      int shownFrames = 0;
+      for (JFrame f: singleton.frames) {
+        if (f.isVisible()) {
+          shownFrames++;
+        }
+      }
+      return shownFrames;
     }
     public static Collection<JFrame> getFrames() {
         TreeSet<JFrame> sortedFrames = new TreeSet<JFrame>(new FrameComparator());
@@ -65,20 +71,20 @@ public class OpenFrames implements PropertyChangeListener {
 	public static synchronized void addFrame(JFrame frame) {
         singleton.frames.add(frame);
         frame.addPropertyChangeListener("title", singleton);
-		ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.INTERVAL_ADDED,  0,  singleton.frames.size() -1);
+        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.INTERVAL_ADDED,  0,  getNumOfFrames());
         singleton.fireIntervalAdded(lde);
     }
 
 	public static synchronized void removeFrame(JFrame frame) {
         singleton.frames.remove(frame);
-        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.INTERVAL_REMOVED,  0,  singleton.frames.size());
+        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.INTERVAL_REMOVED,  0,  getNumOfFrames());
         singleton.fireIntervalRemoved(lde);
 	}
     
     public static synchronized void addNewWindowMenuItemGenerator(I_InitComponentMenus generator) {
         singleton.newWindowMenuItemGenerators.add(generator);       
-        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.CONTENTS_CHANGED,  0,  singleton.frames.size() -1);
-        singleton.fireIntervalAdded(lde);
+        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.CONTENTS_CHANGED,  0,  getNumOfFrames());
+        singleton.fireContentsChanged(lde);
     }
 
 	/**

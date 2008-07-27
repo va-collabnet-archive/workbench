@@ -10,6 +10,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 
+import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.bpa.util.PhantomFrame;
+
 /**
  * @author kec
  *
@@ -28,8 +31,10 @@ public class BringWindowToFront implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		this.frame.requestFocus();
-        this.frame.toFront();
-
+    this.frame.toFront();
+    this.frame.setVisible(true);
+    if (PhantomFrame.class.isAssignableFrom(frame.getClass()) == false) {
+      OpenFrames.addFrame(frame);
+    }
 	}
-
 }
