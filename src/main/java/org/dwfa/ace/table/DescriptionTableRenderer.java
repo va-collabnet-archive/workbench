@@ -38,16 +38,18 @@ public class DescriptionTableRenderer extends AceTableRenderer {
        }
 
       StringWithDescTuple swt = (StringWithDescTuple) value;
-      boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
-      if (row > 0) {
-         StringWithDescTuple prevSwt = (StringWithDescTuple) table.getValueAt(row - 1, column);
-         same = swt.getTuple().getDescId() == prevSwt.getTuple().getDescId();
-         setBorder(column, this, same, uncommitted);
-         if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
-            renderComponent.setText("");
-         }
-      } else {
-         setBorder(column, this, false, uncommitted);
+      if (swt.getTuple() != null) {
+        boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
+        if (row > 0) {
+           StringWithDescTuple prevSwt = (StringWithDescTuple) table.getValueAt(row - 1, column);
+           same = swt.getTuple().getDescId() == prevSwt.getTuple().getDescId();
+           setBorder(column, this, same, uncommitted);
+           if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
+              renderComponent.setText("");
+           }
+        } else {
+           setBorder(column, this, false, uncommitted);
+        }
       }
 
       TableColumn c = table.getColumnModel().getColumn(column);

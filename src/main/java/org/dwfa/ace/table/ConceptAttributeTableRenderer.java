@@ -33,17 +33,19 @@ public class ConceptAttributeTableRenderer extends AceTableRenderer {
 				table, value, isSelected, hasFocus, row, column);
 		boolean same = false;
 		StringWithConceptTuple swt = (StringWithConceptTuple) value;
-		boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
-		if (row > 0) {
-			StringWithConceptTuple prevSwt = (StringWithConceptTuple) table.getValueAt(
-					row - 1, column);
-			same = swt.getTuple().getConId() == prevSwt.getTuple().getConId();
-			setBorder(column, this, same, uncommitted);
-			if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
-				renderComponent.setText("");
-			}
-		} else {
-			setBorder(column, this, false, uncommitted);
+		if (swt.getTuple() != null) {
+		  boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
+	    if (row > 0) {
+	      StringWithConceptTuple prevSwt = (StringWithConceptTuple) table.getValueAt(
+	          row - 1, column);
+	      same = swt.getTuple().getConId() == prevSwt.getTuple().getConId();
+	      setBorder(column, this, same, uncommitted);
+	      if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
+	        renderComponent.setText("");
+	      }
+	    } else {
+	      setBorder(column, this, false, uncommitted);
+	    }
 		}
 		if (isSelected == false) {
 			renderComponent.setBackground(colorForRow(row));
@@ -64,7 +66,7 @@ public class ConceptAttributeTableRenderer extends AceTableRenderer {
 				table.setRowHeight(row, (int) (prefYSpan + 4));
 			}
 		}
-        renderComponent.setToolTipText(swt.getCellText());
+    renderComponent.setToolTipText(swt.getCellText());
 		return renderComponent;
 	}
 }
