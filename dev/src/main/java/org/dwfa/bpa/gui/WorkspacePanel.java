@@ -72,7 +72,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     private static Logger logger = Logger.getLogger(WorkspacePanel.class
             .getName());
 
-    private JSplitPane splitPane;
+    //private JSplitPane splitPane;
 
     private JList panelList;
 
@@ -100,7 +100,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
 
     private PropertyChangeListener gridPanelListener = new GridPanelPropertyListener();
 
-    private boolean showInInternalFrame = true;
+    private boolean showInInternalFrame = false;
 
     private UUID id;
 
@@ -153,14 +153,14 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
 
         setupPanelList(panels);
 
-        JPanel configSide = new JPanel(new GridBagLayout());
+        //JPanel configSide = new JPanel(new GridBagLayout());
 
-        setupConfigSide(configSide);
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, configSide,
-                layoutPanel);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerLocation(200);
-        splitPane.setDividerLocation(0);
+        //setupConfigSide(configSide);
+        //splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, configSide,
+        //        layoutPanel);
+        //splitPane.setOneTouchExpandable(true);
+        //splitPane.setDividerLocation(200);
+        //splitPane.setDividerLocation(0);
 
         for (GridBagPanel gbp : panels) {
             gbp.addGridBagConstraintsListener(this.gridPanelListener);
@@ -174,14 +174,14 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
-        this.add(this.splitPane, c);
+        this.add(layoutPanel, c);
         c.weighty = 0;
         c.gridy = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add(this.statusPanel, c);
         this.addComponentListener(this);
-        this.splitPane.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
+        //this.splitPane.addPropertyChangeListener(
+        //        JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     }
 
     private void updateCommitButton(I_ManageUserTransactions config)
@@ -295,8 +295,8 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     @SuppressWarnings("unchecked")
     private void restartLayout() {
         
-        int dividerLocation = this.splitPane.getDividerLocation();
-        int lastDividerLocation = this.splitPane.getLastDividerLocation();
+        //int dividerLocation = this.splitPane.getDividerLocation();
+        //int lastDividerLocation = this.splitPane.getLastDividerLocation();
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
         .getModel();
         List<CandP> panelAndConstraint = new ArrayList<CandP>();
@@ -305,13 +305,37 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
             //reflect any user changes. 
             panelAndConstraint.add(new CandP(gbp.getConstraints(), gbp));
         }
-        this.layoutPanel.removeAll();
-        if (this.showInInternalFrame) {
-            layoutPanel = new JDesktopPane();
-        } else {
-            layoutPanel = new JLayeredPane();
+        for (Component c: this.layoutPanel.getComponents()) {
+          this.layoutPanel.remove(c);
         }
-        splitPane.setRightComponent(this.layoutPanel);
+        if (this.showInInternalFrame) {
+          if (JDesktopPane.class.isAssignableFrom(layoutPanel.getClass()) == false) {
+            this.remove(layoutPanel);
+            layoutPanel = new JDesktopPane();
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.gridx = 0;
+            c.gridy = 0;
+            this.add(layoutPanel, c);
+          }
+        } else {
+          if (JLayeredPane.class.isAssignableFrom(layoutPanel.getClass()) == false) {
+            this.remove(layoutPanel);
+            layoutPanel = new JLayeredPane();
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.gridx = 0;
+            c.gridy = 0;
+            this.add(layoutPanel, c);
+          }
+        }
+        //splitPane.setRightComponent(this.layoutPanel);
         for (GridBagPanel gbp : listModel) {
             gbp.setAddedToLayout(false);
             JInternalFrame intFrame = gbp.getInternalFrame();
@@ -325,8 +349,8 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         for (CandP entry: panelAndConstraint) {
             entry.p.setConstraints(entry.c);
         }
-        this.splitPane.setDividerLocation(dividerLocation);
-        this.splitPane.setLastDividerLocation(lastDividerLocation);
+        //this.splitPane.setDividerLocation(dividerLocation);
+        //this.splitPane.setLastDividerLocation(lastDividerLocation);
         this.setSize(this.getWidth() + 1, this.getHeight() + 1);
         this.setSize(this.getWidth() - 1, this.getHeight() - 1);
     }
@@ -801,7 +825,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     }
 
     public void setOneTouchExpandable(boolean b) {
-        this.splitPane.setOneTouchExpandable(b);
+        //this.splitPane.setOneTouchExpandable(b);
         
     }
 

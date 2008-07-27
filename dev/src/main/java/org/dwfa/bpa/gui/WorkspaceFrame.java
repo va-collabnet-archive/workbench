@@ -20,7 +20,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -32,7 +31,6 @@ import javax.swing.KeyStroke;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.bpa.gui.GridBagPanel.GridBagPanelConstraints;
-import org.dwfa.bpa.gui.action.BringInternalFrameToFront;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.I_Workspace;
@@ -175,9 +173,10 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
 
     public void addInternalFrames(JMenu menu) {
         if (this.workspace != null) {
+          /*
             menu.addSeparator();
             menu.add(showInInternalFrameMI);
-            // if (this.workspace.isShownInInternalFrame()) {
+            if (this.workspace.isShownInInternalFrame()) {
             menu.addSeparator();
             Iterator<GridBagPanel> panelListItr = this.workspace.getPanelList().iterator();
             while (panelListItr.hasNext()) {
@@ -186,7 +185,8 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                 menuItem.addActionListener(new BringInternalFrameToFront(gbp));
                 menu.add(menuItem);
             }
-            // }
+            }
+            */
         }
     }
 
@@ -256,7 +256,7 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
         fileMenu.add(loadMI = new JMenuItem("Load Workspace Configuration"));
         loadMI.addActionListener(this);
 
-        showInInternalFrameMI = new JCheckBoxMenuItem("Internal Frames", true);
+        showInInternalFrameMI = new JCheckBoxMenuItem("Internal Frames", false);
         showInInternalFrameMI.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_I, MENU_MASK));
         showInInternalFrameMI.addActionListener(this);
