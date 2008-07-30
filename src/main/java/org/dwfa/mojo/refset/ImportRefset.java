@@ -9,7 +9,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.mojo.ImportFromFile;
-
+import org.dwfa.maven.MojoUtil;
 
 /**
  * Imports the contents of a file as a sequence of extensions and adds them to an existing refset in the database.
@@ -39,7 +39,10 @@ public class ImportRefset extends ImportFromFile {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
 		try {
-		
+			if (MojoUtil.alreadyRun(getLog(), fileHandler.getSourceFile().toString())) {
+				return;
+			}
+
 			for (I_ThinExtByRefVersioned extension : fileHandler) {
 				
 				Integer memberId = extension.getMemberId();
