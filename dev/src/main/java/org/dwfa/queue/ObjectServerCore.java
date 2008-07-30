@@ -627,10 +627,13 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
             } else {
                 File[] files = this.directory.listFiles(new MatchObjectID(
                         objectID));
-                if (files == null || files.length != 1) {
-                    throw new NoMatchingEntryException("Found " + files.length
-                            + " matching files for objectID: " + objectID);
-                }
+                if (files == null) {
+                  throw new NoMatchingEntryException("Found no matching files for objectID: " + objectID);
+              }
+                if (files.length != 1) {
+                  throw new NoMatchingEntryException("Found " + files.length
+                          + " matching files for objectID: " + objectID);
+              }
 
                 File objectFile = files[0];
 
