@@ -627,7 +627,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
             } else {
                 File[] files = this.directory.listFiles(new MatchObjectID(
                         objectID));
-                if (files.length != 1) {
+                if (files == null || files.length != 1) {
                     throw new NoMatchingEntryException("Found " + files.length
                             + " matching files for objectID: " + objectID);
                 }
