@@ -405,6 +405,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     public Object read(EntryID entryID, Transaction t) throws IOException,
             ClassNotFoundException, NoMatchingEntryException {
         File[] files = this.directory.listFiles(new MatchEntryID(entryID));
+        if (files == null) {
+          throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+        }
         if (files.length != 1) {
             throw new NoMatchingEntryException("Found " + files.length
                     + " matching files for entryID: " + entryID);
@@ -427,6 +430,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     public Object read(UUID objectID, Transaction t) throws IOException,
             ClassNotFoundException, NoMatchingEntryException {
         File[] files = this.directory.listFiles(new MatchObjectID(objectID));
+        if (files == null) {
+          throw new NoMatchingEntryException("No matching files for objectID: " + objectID);
+        }
         if (files.length != 1) {
             throw new NoMatchingEntryException("Found " + files.length
                     + " matching files for objectID: " + objectID);
@@ -472,6 +478,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                 return this.read(entryID, t);
             }
             File[] files = this.directory.listFiles(new MatchEntryID(entryID));
+            if (files == null) {
+              throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+            }
             if (files.length != 1) {
                 throw new NoMatchingEntryException("Found " + files.length
                         + " matching files for entryID: " + entryID);
@@ -629,11 +638,11 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                         objectID));
                 if (files == null) {
                   throw new NoMatchingEntryException("Found no matching files for objectID: " + objectID);
-              }
+                }
                 if (files.length != 1) {
                   throw new NoMatchingEntryException("Found " + files.length
                           + " matching files for objectID: " + objectID);
-              }
+                }
 
                 File objectFile = files[0];
 
@@ -662,6 +671,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         try {
             File[] files = this.directory
                     .listFiles(new MatchObjectID(objectID));
+            if (files == null) {
+              throw new NoMatchingEntryException("No matching files for objectID: " + objectID);
+            }
             if (files.length != 1) {
                 throw new NoMatchingEntryException("Found " + files.length
                         + " matching files for objectID: " + objectID);
@@ -691,6 +703,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         try {
 
             File[] files = this.directory.listFiles(new MatchEntryID(entryID));
+            if (files == null) {
+              throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+            }
             if (files.length != 1) {
                 throw new NoMatchingEntryException("Found " + files.length
                         + " matching files for entryID: " + entryID);
