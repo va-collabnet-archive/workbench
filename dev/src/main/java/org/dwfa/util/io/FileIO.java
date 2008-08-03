@@ -22,12 +22,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  * From the book "Java Cookbook, 2nd Edition. Some simple file IO primitives
@@ -160,10 +162,67 @@ public class FileIO {
 	public static String inputStreamToString(InputStream is) throws IOException {
 		return readerToString(new InputStreamReader(is));
 	}
+	
+	public static class FileAndObjectResult {
+	   private FileAndObject returnValue;
+	   private Exception ex;
+    public FileAndObject getReturnValue() {
+      return returnValue;
+    }
+    public void setReturnValue(FileAndObject returnValue) {
+      this.returnValue = returnValue;
+    }
+    public Exception getEx() {
+      return ex;
+    }
+    public void setEx(Exception ex) {
+      this.ex = ex;
+    }
+	}
 
-	public static FileAndObject getObjFromFilesystem(Frame parent, String title, String startDir,
-			FilenameFilter fileFilter) throws IOException, ClassNotFoundException {
-		if (parent == null) {
+	public static FileAndObject getObjFromFilesystem(final Frame parent, final String title, final String startDir,
+			final FilenameFilter fileFilter) throws IOException, ClassNotFoundException {
+    final FileAndObjectResult returnValue = new FileAndObjectResult();
+	  if (SwingUtilities.isEventDispatchThread()) {
+	    returnValue.setReturnValue(getObjFromFilesystemCore(parent, title, startDir, fileFilter));
+	  } else {
+        try {
+          SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+              try {
+                returnValue.setReturnValue(getObjFromFilesystemCore(parent, title, startDir, fileFilter));
+              } catch (FileNotFoundException e) {
+                returnValue.setEx(e);
+              } catch (IOException e) {
+                returnValue.setEx(e);
+              } catch (ClassNotFoundException e) {
+                returnValue.setEx(e);
+              }
+            }
+            
+          });
+        } catch (InterruptedException e) {
+          IOException ioe = new IOException(returnValue.getEx().getMessage());
+          ioe.initCause(e);
+          throw ioe;
+        } catch (InvocationTargetException e) {
+          IOException ioe = new IOException(returnValue.getEx().getMessage());
+          ioe.initCause(e);
+          throw ioe;
+        }
+	  }
+	  if (returnValue.getEx() != null) {
+	    IOException ioe = new IOException(returnValue.getEx().getMessage());
+	    ioe.initCause(returnValue.getEx());
+	    throw ioe;
+	  }
+	  return returnValue.getReturnValue();
+	}
+
+  private static FileAndObject getObjFromFilesystemCore(Frame parent, String title,
+      String startDir, FilenameFilter fileFilter) throws FileNotFoundException,
+      IOException, ClassNotFoundException {
+    if (parent == null) {
 			parent = new JFrame();
 		}
 		FileDialog fd = new FileDialog(parent, title, FileDialog.LOAD);
@@ -187,11 +246,68 @@ public class FileIO {
 			return new FileAndObject(obj, objFile);
 		}
 		throw new IOException("User did not select a file");
+  }
+
+  public static class FileResult {
+    private File returnValue;
+    private Exception ex;
+   public File getReturnValue() {
+     return returnValue;
+   }
+   public void setReturnValue(File returnValue) {
+     this.returnValue = returnValue;
+   }
+   public Exception getEx() {
+     return ex;
+   }
+   public void setEx(Exception ex) {
+     this.ex = ex;
+   }
+ }
+
+  
+	public static File writeObjToFilesystem(final Frame parent, final String title, final String startDir, 
+	    final String defaultFile, final Object obj)
+	throws IOException {
+	   final FileResult returnValue = new FileResult();
+    if (SwingUtilities.isEventDispatchThread()) {
+      returnValue.setReturnValue(writeObjeToFilesystemCore(parent, title, startDir, defaultFile, obj));
+    } else {
+        try {
+          SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+              try {
+                returnValue.setReturnValue(writeObjeToFilesystemCore(parent, title, startDir, defaultFile, obj));
+              } catch (FileNotFoundException e) {
+                returnValue.setEx(e);
+              } catch (IOException e) {
+                returnValue.setEx(e);
+              } 
+            }
+            
+          });
+        } catch (InterruptedException e) {
+          IOException ioe = new IOException(returnValue.getEx().getMessage());
+          ioe.initCause(e);
+          throw ioe;
+        } catch (InvocationTargetException e) {
+          IOException ioe = new IOException(returnValue.getEx().getMessage());
+          ioe.initCause(e);
+          throw ioe;
+        }
+    }
+    if (returnValue.getEx() != null) {
+      IOException ioe = new IOException(returnValue.getEx().getMessage());
+      ioe.initCause(returnValue.getEx());
+      throw ioe;
+    }
+    return returnValue.getReturnValue();
 	}
 
-	public static File writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj)
-	throws IOException {
-		if (parent == null) {
+  private static File writeObjeToFilesystemCore(Frame parent, String title,
+      String startDir, String defaultFile, Object obj)
+      throws FileNotFoundException, IOException {
+    if (parent == null) {
 			parent = new JFrame();
 		}
 		FileDialog fd = new FileDialog(parent, title, FileDialog.SAVE);
@@ -209,12 +325,54 @@ public class FileIO {
 		} else {
 			throw new IOException("User canceled save operation");
 		}
+  }
+
+	public static File writeObjXmlToFilesystem(final Frame parent, final String title, final String startDir, 
+	    final String defaultFile,
+	    final Object obj, final Collection<PersistenceDelegateSpec> delegates, final Object owner) throws IOException {
+    final FileResult returnValue = new FileResult();
+    if (SwingUtilities.isEventDispatchThread()) {
+      returnValue.setReturnValue(writeObjXmlToFilesystemCore(parent, title, startDir, defaultFile,
+          obj, delegates, owner));
+    } else {
+        try {
+          SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+              try {
+                returnValue.setReturnValue(writeObjXmlToFilesystemCore(parent, title, startDir, defaultFile,
+                    obj, delegates, owner));
+              } catch (FileNotFoundException e) {
+                returnValue.setEx(e);
+              } catch (IOException e) {
+                returnValue.setEx(e);
+              } 
+            }
+            
+          });
+        } catch (InterruptedException e) {
+          IOException ioe = new IOException(returnValue.getEx().getMessage());
+          ioe.initCause(e);
+          throw ioe;
+        } catch (InvocationTargetException e) {
+          IOException ioe = new IOException(returnValue.getEx().getMessage());
+          ioe.initCause(e);
+          throw ioe;
+        }
+    }
+    if (returnValue.getEx() != null) {
+      IOException ioe = new IOException(returnValue.getEx().getMessage());
+      ioe.initCause(returnValue.getEx());
+      throw ioe;
+    }
+    return returnValue.getReturnValue();
 
 	}
 
-	public static File writeObjXmlToFilesystem(Frame parent, String title, String startDir, String defaultFile,
-			Object obj, Collection<PersistenceDelegateSpec> delegates, Object owner) throws IOException {
-		if (parent == null) {
+  private static File writeObjXmlToFilesystemCore(Frame parent, String title,
+      String startDir, String defaultFile, Object obj,
+      Collection<PersistenceDelegateSpec> delegates, Object owner)
+      throws FileNotFoundException, IOException {
+    if (parent == null) {
 			parent = new JFrame();
 		}
 		FileDialog fd = new FileDialog(parent, title, FileDialog.SAVE);
@@ -245,8 +403,7 @@ public class FileIO {
 		} else {
 			throw new IOException("User canceled save operation");
 		}
-
-	}
+  }
 
 	/**
 	 * Accepts a string with regular expressions and possibly /../ portions.
