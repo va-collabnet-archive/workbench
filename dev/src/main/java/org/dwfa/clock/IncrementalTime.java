@@ -4,8 +4,8 @@ import java.rmi.RemoteException;
 
 public class IncrementalTime implements I_KeepIncrementalTime {
 
-	private int increment;
-	private int count = 0;
+	private long increment;
+	private long count = 0;
 	private I_KeepTime base;
 	
 	public IncrementalTime(int increment, I_KeepTime base) {
