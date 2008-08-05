@@ -7,6 +7,7 @@ package org.dwfa.bpa.tasks.deadline;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
@@ -75,7 +76,12 @@ public class SetDeadlineRelative extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        Date now = new Date();
+        Date now;
+        try {
+          now = new Date(worker.getTime());
+        } catch (RemoteException e) {
+          throw new TaskFailedException(e);
+        }
         long lengthToExtend = relativeTimeInMins;
         lengthToExtend = lengthToExtend * 1000 * 60;
         Date deadline = new Date(now.getTime() + lengthToExtend);

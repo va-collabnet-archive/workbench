@@ -608,7 +608,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         if (selectedObjectInfo != null) {
             return this.read(selectedObjectInfo.getObjectID(), t);
         }
-        throw new NoMatchingEntryException();
+        throw new NoMatchingEntryException(selector.toString());
     }
 
     public EntryID getEntryID(File f) {

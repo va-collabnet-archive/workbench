@@ -250,10 +250,12 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                 }
             }
         }
-        fileMenu.add(saveMI = new JMenuItem("Save Workspace Configuration"));
+        saveMI = new JMenuItem("Save Workspace Configuration");
+        //fileMenu.add(saveMI);
         saveMI.addActionListener(this);
 
-        fileMenu.add(loadMI = new JMenuItem("Load Workspace Configuration"));
+        loadMI = new JMenuItem("Load Workspace Configuration");
+        //fileMenu.add(loadMI);
         loadMI.addActionListener(this);
 
         showInInternalFrameMI = new JCheckBoxMenuItem("Internal Frames", false);

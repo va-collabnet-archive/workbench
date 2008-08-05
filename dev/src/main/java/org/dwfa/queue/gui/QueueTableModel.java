@@ -92,8 +92,11 @@ public class QueueTableModel extends AbstractTableModel {
     }
     
     public I_DescribeQueueEntry getRowMetaData(int row) {
+      if (row < metaList.size() && row >= 0) {
         return metaList.get(row);
-    }
+      }
+      return null;
+     }
     
     public String getColumnName(int col) {
         return columnNames[col].toString();
