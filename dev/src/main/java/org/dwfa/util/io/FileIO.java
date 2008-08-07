@@ -407,7 +407,7 @@ public class FileIO {
 
 	/**
 	 * Accepts a string with regular expressions and possibly /../ portions.
-	 * Removes the /../ sections, by substuting the higher named directory, and
+	 * Removes the /../ sections, by substituting the higher named directory, and
 	 * then returns the first file in the file system that matches the
 	 * optionally included regular expression.
 	 * 
@@ -500,6 +500,10 @@ public class FileIO {
 		}
 		relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
 		return relativePath.toString();
+	}
+	
+	public static String getNormalizedRelativePath(File f) {
+	  return getRelativePath(f).replace('\\', '/');
 	}
 
 }
