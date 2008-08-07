@@ -49,6 +49,7 @@ import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -184,7 +185,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				AceLog.getEditLog().info("End of change set. ");
 				nextCommit = Long.MAX_VALUE;
 				getVodb().setProperty(
-						changeSetFile.toURI().toURL().toExternalForm(),
+				    FileIO.getNormalizedRelativePath(changeSetFile),
 						Long.toString(changeSetFile.length()));
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
@@ -216,15 +217,13 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	@SuppressWarnings("unchecked")
 	private void lazyInit() throws FileNotFoundException, IOException,
 			ClassNotFoundException {
-		String lastImportSize = getVodb().getProperty(
-				changeSetFile.toURI().toURL().toExternalForm());
+		String lastImportSize = getVodb().getProperty(FileIO.getNormalizedRelativePath(changeSetFile));
 		if (lastImportSize != null) {
 			long lastSize = Long.parseLong(lastImportSize);
 			if (lastSize == changeSetFile.length()) {
 				AceLog.getAppLog().finer(
 						"Change set already fully read: "
-								+ changeSetFile.toURI().toURL()
-										.toExternalForm());
+								+ FileIO.getNormalizedRelativePath(changeSetFile));
 				// already imported, set to nothing to do...
 				nextCommit = Long.MAX_VALUE;
 				initialized = true;
