@@ -56,6 +56,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                 }
                 readerSet.add(csr);
                 logger.info("Adding reader: " + csf.getAbsolutePath());
+                logger.info("This has nextCommitTime() of : " + csr.nextCommitTime());
             }
 
             int max = avaibleBytes(readerSet);
@@ -107,6 +108,10 @@ public abstract class ChangeSetImporter implements ActionListener {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
                 return -1;
+            }
+
+            public boolean equals(Object o) {
+                return false;
             }
 
         });
