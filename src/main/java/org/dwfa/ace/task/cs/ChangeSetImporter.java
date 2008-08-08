@@ -21,27 +21,27 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 
 public abstract class ChangeSetImporter implements ActionListener {
-	
-	private boolean continueImport = true;
+
+    private boolean continueImport = true;
 
     public void actionPerformed(ActionEvent arg0) {
-    	continueImport = false;
-	}
+        continueImport = false;
+    }
 
-	@SuppressWarnings("unchecked")
-	public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, String suffix) throws TaskFailedException {
+    @SuppressWarnings("unchecked")
+    public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, String suffix) throws TaskFailedException {
         try {
-        	I_TermFactory tf = LocalVersionedTerminology.get();
-        	I_ShowActivity activity = tf.newActivityPanel();
-        	activity.setProgressInfoUpper("Importing " + suffix + " change sets. ");
-        	activity.setIndeterminate(true);
-        	activity.addActionListener(this);
-        	String[] validatorArray = new String[]{};
-        	
-        	if (validators != null && validators != "") {
-        		validatorArray = validators.split("'");
-        	}
-        	
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ShowActivity activity = tf.newActivityPanel();
+            activity.setProgressInfoUpper("Importing " + suffix + " change sets. ");
+            activity.setIndeterminate(true);
+            activity.addActionListener(this);
+            String[] validatorArray = new String[]{};
+
+            if (validators != null && validators != "") {
+                validatorArray = validators.split("'");
+            }
+
             File rootFile = new File(rootDirStr);
             List<File> changeSetFiles = new ArrayList<File>();
             addAllChangeSetFiles(rootFile, changeSetFiles, suffix);
@@ -49,27 +49,27 @@ public abstract class ChangeSetImporter implements ActionListener {
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = getChangeSetReader(csf);
                 if (validateChangeSets == true && validatorArray.length > 0) {
-                	for (String validator : validatorArray) {
-                		Class<I_ValidateChangeSetChanges> validatorClass = (Class<I_ValidateChangeSetChanges>) Class.forName(validator);
-                		csr.getValidators().add(validatorClass.newInstance());
-					}
+                    for (String validator : validatorArray) {
+                        Class<I_ValidateChangeSetChanges> validatorClass = (Class<I_ValidateChangeSetChanges>) Class.forName(validator);
+                        csr.getValidators().add(validatorClass.newInstance());
+                    }
                 }
                 readerSet.add(csr);
                 logger.info("Adding reader: " + csf.getAbsolutePath());
             }
-            
+
             int max = avaibleBytes(readerSet);
             activity.setMaximum(max);
             activity.setValue(0);
             activity.setIndeterminate(false);
             while (readerSet.size() > 0 && continueImport) {
                 activity.setValue(max - avaibleBytes(readerSet));
-            	activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
+                activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
                 readNext(readerSet);
             }
             LocalVersionedTerminology.get().commit();
-        	activity.setIndeterminate(false);
-        	activity.complete();
+            activity.setIndeterminate(false);
+            activity.complete();
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (ClassNotFoundException e) {
@@ -78,15 +78,15 @@ public abstract class ChangeSetImporter implements ActionListener {
             throw new TaskFailedException(e);
         }
     }
-    
+
     public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException, ClassNotFoundException {
-    	int available = 0;
-    	for (I_ReadChangeSet reader: readerSet) {
-    		available = available  + reader.availableBytes();
-    	}
-     	return available;
+        int available = 0;
+        for (I_ReadChangeSet reader: readerSet) {
+            available = available  + reader.availableBytes();
+        }
+         return available;
     }
-    
+
     public abstract I_ReadChangeSet getChangeSetReader(File csf);
 
     public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
@@ -114,33 +114,40 @@ public abstract class ChangeSetImporter implements ActionListener {
     }
 
     public static void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
-    	if (readerSet.size() == 0) {
+        if (readerSet.size() == 0) {
             return;
         }
         I_TermFactory tf = LocalVersionedTerminology.get();
         if (tf.getTransactional()) {
-        	tf.startTransaction();
+            tf.startTransaction();
         }
         I_ReadChangeSet first = readerSet.first();
         readerSet.remove(first);
-    	AceLog.getEditLog().info("Now reading change set: " + first.getChangeSetFile().getName());
+        AceLog.getEditLog().info("Now reading change set: " + first.getChangeSetFile().getName());
+        System.out.println(">>>>>>>>>>>>Next commit time: " + first.nextCommitTime() + "<<<<<<<<<<");
         I_ReadChangeSet next = null;
         if (readerSet.size() > 0) {
             next = readerSet.first();
         }
 
+        System.out.println("LONG.MAX_VALUE = " + Long.MAX_VALUE);
+
         if (next == null) {
             first.readUntil(Long.MAX_VALUE);
+            System.out.println(">>>>>>>>>>>>Reading this changeset until " + Long.MAX_VALUE + "<<<<<<<<<<");
         } else {
             first.readUntil(next.nextCommitTime());
+            System.out.println(">>>>>>>>>>>>Reading this changeset until " + next.nextCommitTime() + "<<<<<<<<<<");
         }
         if (first.nextCommitTime() == Long.MAX_VALUE) {
             //don't add back since it is complete.
+            System.out.println(">>>>>>>>>>>>Finished reading first changeset" + "<<<<<<<<<<");
         } else {
             readerSet.add(first);
+            System.out.println(">>>>>>>>>>>>Adding changeset back to treeset as it's not completed" + "<<<<<<<<<<");
         }
         if (tf.getTransactional()) {
-            tf.commitTransaction();        	
+            tf.commitTransaction();
         }
     }
 
