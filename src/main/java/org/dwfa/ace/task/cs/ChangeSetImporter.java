@@ -109,11 +109,6 @@ public abstract class ChangeSetImporter implements ActionListener {
                 }
                 return -1;
             }
-
-            public boolean equals(Object o) {
-                return false;
-            }
-
         });
         return readerSet;
     }
@@ -129,7 +124,6 @@ public abstract class ChangeSetImporter implements ActionListener {
         I_ReadChangeSet first = readerSet.first();
         readerSet.remove(first);
         AceLog.getEditLog().info("Now reading change set: " + first.getChangeSetFile().getName());
-        System.out.println(">>>>>>>>>>>>Next commit time: " + first.nextCommitTime() + "<<<<<<<<<<");
         I_ReadChangeSet next = null;
         if (readerSet.size() > 0) {
             next = readerSet.first();
@@ -139,17 +133,13 @@ public abstract class ChangeSetImporter implements ActionListener {
 
         if (next == null) {
             first.readUntil(Long.MAX_VALUE);
-            System.out.println(">>>>>>>>>>>>Reading this changeset until " + Long.MAX_VALUE + "<<<<<<<<<<");
         } else {
             first.readUntil(next.nextCommitTime());
-            System.out.println(">>>>>>>>>>>>Reading this changeset until " + next.nextCommitTime() + "<<<<<<<<<<");
         }
         if (first.nextCommitTime() == Long.MAX_VALUE) {
             //don't add back since it is complete.
-            System.out.println(">>>>>>>>>>>>Finished reading first changeset" + "<<<<<<<<<<");
         } else {
             readerSet.add(first);
-            System.out.println(">>>>>>>>>>>>Adding changeset back to treeset as it's not completed" + "<<<<<<<<<<");
         }
         if (tf.getTransactional()) {
             tf.commitTransaction();
