@@ -21,6 +21,7 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
+import org.dwfa.tapi.spec.TaxonomySpec;
 
 /**
  * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize Terminology) taxonomies in
@@ -102,6 +103,12 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
     * @required
     */
    private MavenSession session;
+
+   /**
+    * Specification of the concepts to exclude from this export
+    * @parameter
+    */
+   private TaxonomySpec[] exclusions;
    
    /**
     * Only execute this mojo for one of the allowed goals. 
@@ -181,6 +188,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
 
 
             mts.setGenerateIds(false);
+            mts.setExclusions(exclusions);
 
             Writer altIdWriter = new FileWriter(altIdFile);
 
