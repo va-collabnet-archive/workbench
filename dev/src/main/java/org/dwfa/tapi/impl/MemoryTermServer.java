@@ -316,6 +316,9 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
 	private boolean inExclusionList(TaxonomySpec[] exclusions, I_ConceptualizeLocally c)
 			throws IOException, TerminologyException {
+		if (exclusions == null) {
+			return false;
+		}
 		for (TaxonomySpec exclusion : exclusions) {
 			if (exclusion.contains(c)) {
 				return true;
