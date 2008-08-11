@@ -34,6 +34,7 @@ import org.dwfa.tapi.I_RelateConceptsUniversally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.spec.TaxonomySpec;
 
 public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
@@ -234,6 +235,11 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
    int extensionCount = 0;
 
+   /**
+    * Contains the concept hierarchies to be excluded when exporting the cement taxonomies
+	*/
+   private TaxonomySpec[] exclusions;
+
    public synchronized void addExtension(I_ManifestLocally component, I_ConceptualizeLocally extensionType,
          I_ExtendLocally extension) {
       if (extensions.containsKey(component.getNid()) == false) {
@@ -249,15 +255,20 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
    public Collection<I_ConceptualizeLocally> getExtensionTypes() throws IOException, TerminologyException {
       return extensionTypes;
    }
-
+   
    public void writeConcepts(Writer conceptWriter, Writer altIdWriter, FILE_FORMAT format) throws IOException,
-         TerminologyException {
+   		TerminologyException {
+	   
       UUID currentId = getFirstUid(ArchitectonicAuxiliary.Concept.CURRENT);
       I_ConceptualizeLocally[] descTypeOrder = new I_ConceptualizeLocally[] {
             this.getConcept(this.getNid(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids())),
             this.getConcept(this.getNid(ArchitectonicAuxiliary.Concept.XHTML_DEF.getUids())) };
       List<I_ConceptualizeLocally> descTypePriorityList = Arrays.asList(descTypeOrder);
       for (I_ConceptualizeLocally c : conceptMap.values()) {
+    	 if (inExclusionList(exclusions, c)) {
+    		 continue;
+    	 }
+    	  
          UUID firstComponentId = processUids(altIdWriter, c.getUids());
          switch (format) {
          case SNOMED:
@@ -303,6 +314,16 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
       }
    }
 
+	private boolean inExclusionList(TaxonomySpec[] exclusions, I_ConceptualizeLocally c)
+			throws IOException, TerminologyException {
+		for (TaxonomySpec exclusion : exclusions) {
+			if (exclusion.contains(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
    private UUID processUids(Writer altIdWriter, Collection<UUID> componentIds) throws IOException {
       Iterator<UUID> componentIdItr = componentIds.iterator();
       UUID firstComponentId = componentIdItr.next();
@@ -315,11 +336,15 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
       }
       return firstComponentId;
    }
-
+   
    public void writeDescriptions(Writer descWriter, Writer altIdWriter, FILE_FORMAT format) throws IOException,
          TerminologyException {
       UUID currentId = getFirstUid(ArchitectonicAuxiliary.Concept.CURRENT);
       for (I_DescribeConceptLocally d : descMap.values()) {
+     	 if (inExclusionList(exclusions, d.getConcept())) {
+    		 continue;
+    	 }
+     	 
          UUID firstComponentId = processUids(altIdWriter, d.getUids());
          switch (format) {
          case SNOMED:
@@ -373,6 +398,14 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
          Exception {
       UUID currentId = getFirstUid(ArchitectonicAuxiliary.Concept.CURRENT);
       for (I_RelateConceptsLocally r : relMap.values()) {
+     	 if (inExclusionList(exclusions, r.getC1())
+     			 || inExclusionList(exclusions, r.getC2())
+     			 || inExclusionList(exclusions, r.getCharacteristic())
+     			 || inExclusionList(exclusions, r.getRefinability())
+     			 || inExclusionList(exclusions, r.getRelType())) {
+    		 continue;
+    	 }
+     	 
          UUID firstComponentId = processUids(altIdWriter, r.getUids());
          switch (format) {
          case SNOMED:
@@ -439,6 +472,9 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
    public void writeRoots(Writer rootsWriter, FILE_FORMAT format) throws IOException, TerminologyException {
       for (I_ConceptualizeLocally r : roots) {
+    	 if (inExclusionList(exclusions, r)) {
+    	  continue;
+    	 }
          rootsWriter.append(getFirstUid(r).toString());
          rootsWriter.append('\n');
       }
@@ -447,6 +483,9 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
    public void writeExtensionTypes(Writer extensionTypeWriter, Writer altIdWriter, FILE_FORMAT format)
          throws IOException, TerminologyException {
       for (I_ConceptualizeLocally extensionType : getExtensionTypes()) {
+    	 if (inExclusionList(exclusions, extensionType)) {
+    		 continue;
+    	 }
          UUID extensionTypeId = processUids(altIdWriter, extensionType.getUids());
          extensionTypeWriter.append(extensionTypeId.toString());
          extensionTypeWriter.append('\n');
@@ -459,6 +498,9 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
       for (Map.Entry<Integer, Map<Integer, I_ExtendLocally>> extEntry : extensions.entrySet()) {
          UUID componentUuid = getFirstUid(getUids(extEntry.getKey()));
          I_ExtendLocally extension = extEntry.getValue().get(extensionType.getNid());
+         if (inExclusionList(exclusions, extensionType)) {
+        	 continue;
+         }
          if (extension != null) {
             UUID extensionId = processUids(altIdWriter, extension.getUids());
             I_ExtendUniversally universalExtension = extension.universalize();
@@ -497,5 +539,12 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
 
    public void setEffectiveDate(Date effectiveDate) {
       this.effectiveDate = effectiveDate;
+   }
+
+   /**
+	* Sets the array of hierarchies that should be excluded when any of the write methods are called to export the content of this TermServer
+    */
+   public void setExclusions(TaxonomySpec[] exclusions) {
+	  this.exclusions = exclusions;
    }
 }

@@ -20,7 +20,14 @@ public class ConceptSpec {
     private String description;
 
     private RelSpec[] relSpecs;
-
+    
+    /**
+	 * added to allow JavaBeans spec use.
+	 */
+    public ConceptSpec() {
+    	super();
+    }
+    
     public ConceptSpec(String description, String uuid) {
         this(description, uuid, new RelSpec[]{});
     }
@@ -110,5 +117,58 @@ public class ConceptSpec {
             throw new RuntimeException("No description matching: " + description + " found for: " + local);
         }
     }
+
+	/**
+	 * added as an alternative way to get the uuids as strings rather than UUID objects
+	 * this was done to help with Maven making use of this class
+	 */
+	public String[] getUuidsAsString() {
+		String[] returnVal = new String[uuids.length];
+		int i = 0;
+		for (UUID uuid : uuids) {
+			returnVal[i++] = uuid.toString();
+		}
+		return returnVal;
+	}
+
+	/**
+	 * Added primarily for Maven so that using a String type configuration in
+     * a POM file the UUIDs array could be set.
+     * This allows the ConceptSpec class to be embedded into a object to be configured
+     * by Maven POM configuration. Note that the ConceptDescriptor class also exists
+     * for a similar purpose, however it exists in a dependent project and cannot
+     * be used in this project.
+	 */
+	public void setUuidsAsString(String[] uuids) {
+		this.uuids = new UUID[uuids.length];
+		int i = 0;
+		for (String uuid : uuids) {
+			this.uuids[i++] = UUID.fromString(uuid);
+		}
+	}
+
+	public UUID[] getUuids() {
+		return uuids;
+	}
+
+	public void setUuids(UUID[] uuids) {
+		this.uuids = uuids;
+	}	
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public RelSpec[] getRelSpecs() {
+		return relSpecs;
+	}
+
+	public void setRelSpecs(RelSpec[] relSpecs) {
+		this.relSpecs = relSpecs;
+	}
 
 }
