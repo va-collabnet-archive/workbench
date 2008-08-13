@@ -32,4 +32,5 @@ public class ConceptConstants {
 	public static final ConceptSpec TEMPLATE_EXT = new ConceptSpec("template extension", "92b3f835-6cc7-3163-aea0-d4a388ddc5ed");
 	public static final ConceptSpec TEMPLATE_FOR_REL_EXT = new ConceptSpec("template relationship extension", "344f3d87-8f28-315a-a0e5-4d057bf050ae");
 
+	public static final ConceptSpec PATH_VERSION_REFSET = new ConceptSpec("Path version reference set", "999d61ec-ba1e-48eb-b759-62ffeefbf4b1");
 }
