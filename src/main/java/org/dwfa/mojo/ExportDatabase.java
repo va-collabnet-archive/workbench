@@ -38,9 +38,9 @@ public class ExportDatabase extends AbstractMojo {
 
 	/**
 	 * Date format to use in output files
+	 * If not specified the Path Version Reference Set will be used to determine the release version.
 	 * 
 	 * @parameter
-	 * @required
 	 */
 	private String releaseDate;
 

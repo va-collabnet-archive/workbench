@@ -2,11 +2,10 @@ package org.dwfa.mojo;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -29,11 +28,14 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.refset.ExportSpecification;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ExportIterator implements I_ProcessConcepts {
@@ -79,12 +81,13 @@ public class ExportIterator implements I_ProcessConcepts {
 
 	private I_GetConceptData inactiveConcept;
 
-
-
-	public ExportIterator(Writer concepts, Writer descriptions,
-			Writer relationships, Writer idsWriter, Writer idMapWriter,
-			Writer errorWriter, Set<I_Position> positions, I_IntSet allowedStatus,
-			ExportSpecification[] specs, Log log) throws IOException, TerminologyException {
+	private HashMap<Integer, String> pathReleaseVersions = new HashMap<Integer, String>();
+	
+	public ExportIterator(Writer concepts, Writer descriptions, Writer relationships, Writer idsWriter, Writer idMapWriter,
+						  Writer errorWriter, Set<I_Position> positions, I_IntSet allowedStatus, ExportSpecification[] specs, 
+						  Log log) 
+			throws IOException, TerminologyException {
+		
 		super();
 		this.idsWriter = idsWriter;
 		this.idMapWriter = idMapWriter;
@@ -104,16 +107,10 @@ public class ExportIterator implements I_ProcessConcepts {
 		snomedIdUuids = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids();
 		
 		nameOrder = termFactory.newIntList();
-		nameOrder
-				.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-						.localize().getNid());
-		nameOrder
-				.add(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE
-						.localize().getNid());
-		nameOrder.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-				.localize().getNid());
-		nameOrder.add(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE
-				.localize().getNid());
+		nameOrder.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
+		nameOrder.add(ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.localize().getNid());
+		nameOrder.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
+		nameOrder.add(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid());
 	}
 
 	public int getTotals() {
@@ -163,16 +160,14 @@ public class ExportIterator implements I_ProcessConcepts {
 
 	}// End method processConcept
 
-	private void writeUuidBasedIdDetails(I_IdVersioned idVersioned,
-			I_IntSet allowedStatus, Object object) throws TerminologyException, Exception {
+	private void writeUuidBasedIdDetails(I_IdVersioned idVersioned, I_IntSet allowedStatus, Object object) 
+			throws TerminologyException, Exception {
 
 		Object[] idTuples = idVersioned.getTuples().toArray();
 		Arrays.sort(idTuples, new Comparator<Object>() {
-
 			public int compare(Object o1, Object o2) {
 				return ((I_IdTuple) o1).getVersion() - ((I_IdTuple) o2).getVersion();
 			}
-			
 		});
 		
 		String uuidString = "";
@@ -192,17 +187,14 @@ public class ExportIterator implements I_ProcessConcepts {
 			I_IdTuple tuple = (I_IdTuple) obj;
 			I_IdPart part = tuple.getPart();
 			I_IdVersioned id = tuple.getIdVersioned();
-			if (allowedStatus.contains(part.getIdStatus())
-					&& isExportable(ConceptBean.get(part.getSource()))) {
+			if (allowedStatus.contains(part.getIdStatus()) && isExportable(ConceptBean.get(part.getSource()))) {
 
 				if (snomedSource(part) && !snomedId.equals(part.getSourceId())) {
 					snomedId = (String) part.getSourceId();
 					idMapWriter.write(uuidString);
-					idMapWriter.write(System
-							.getProperty("line.separator"));
+					idMapWriter.write(System.getProperty("line.separator"));
 					idMapWriter.write(snomedId);
-					idMapWriter.write(System
-							.getProperty("line.separator"));
+					idMapWriter.write(System.getProperty("line.separator"));
 				}
 				
 				StringBuilder stringBuilder = new StringBuilder();
@@ -219,13 +211,12 @@ public class ExportIterator implements I_ProcessConcepts {
 				createRecord(stringBuilder, getBinaryStatusValue(part.getIdStatus()));
 
 				// Effective time
-				createVersion(part.getVersion(), stringBuilder);
+				createVersion(stringBuilder, part.getVersion(), part.getPathId());
 				
 				//Path Id
 				createRecord(stringBuilder, getFirstUuid(part.getPathId()));
 				
-				createRecord(stringBuilder, System
-						.getProperty("line.separator"));
+				createRecord(stringBuilder, System.getProperty("line.separator"));
 
 				idsWriter.write(stringBuilder.toString());
 			}
@@ -258,24 +249,21 @@ public class ExportIterator implements I_ProcessConcepts {
 		return "prepareConceptData";
 	}
 
-	private boolean writeUuidBasedConceptDetails(I_GetConceptData concept,
-			I_IntSet allowedStatus) throws Exception {
+	private boolean writeUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) 
+			throws Exception {
 
-		I_DescriptionTuple descForConceptFile = concept.getDescTuple(nameOrder,
-				null, positions);
+		I_DescriptionTuple descForConceptFile = concept.getDescTuple(nameOrder, null, positions);
 		if (descForConceptFile == null) {
-			errorWriter.append("\n\nnull desc for: " + concept.getUids() + " "
-					+ concept.getDescriptions());
-			return false;
+			errorWriter.append("\n\nnull desc for: " + concept.getUids() + " " + concept.getDescriptions());
+			return false;			
 		} else {
+			
 			StringBuilder stringBuilder = new StringBuilder("");
 
-			List<I_ConceptAttributeTuple> firstMatches = concept
-					.getConceptAttributeTuples(null, positions);
+			List<I_ConceptAttributeTuple> firstMatches = concept.getConceptAttributeTuples(null, positions);
 			List<I_ConceptAttributeTuple> matches = new LinkedList<I_ConceptAttributeTuple>();
 			for (int i = 0; i < firstMatches.size(); i++) {
-				if (allowedStatus.contains(firstMatches.get(i)
-						.getConceptStatus())) {
+				if (allowedStatus.contains(firstMatches.get(i).getConceptStatus())) {
 					matches.add(firstMatches.get(i));
 				}
 			}
@@ -283,62 +271,64 @@ public class ExportIterator implements I_ProcessConcepts {
 			if (matches == null || matches.size() == 0) {
 				return false;
 			}
+			
 			conceptsMatched++;
+			
+			I_ConceptAttributeTuple latestAttrib = null;
 			for (I_ConceptAttributeTuple attribTup : matches) {
-				// Snomed core
-				// ConceptId
-				createRecord(stringBuilder, concept.getUids().get(0));
-
-				// Concept status
-				createRecord(stringBuilder, ArchitectonicAuxiliary
-						.getSnomedConceptStatusId(termFactory.getUids(attribTup.getConceptStatus())));
-
-				// Fully specified name
-				createRecord(stringBuilder, descForConceptFile.getText());
-				// createRecord(stringBuilder,
-				// descriptionTuples.get(0).getText()
-				// );
-
-				// CTV3ID
-				createRecord(stringBuilder, "null");
-
-				// SNOMED 3 ID... We ignore this for now.
-				createRecord(stringBuilder, "null");
-
-				// IsPrimative value
-				createRecord(stringBuilder, attribTup.isDefined() ? 0 : 1);
-
-				// AMT added
-				// Concept UUID
-				createRecord(stringBuilder, concept.getUids().get(0));
-
-				// ConceptStatusId
-				createRecord(stringBuilder, getFirstUuid(attribTup.getConceptStatus()));
-
-				// Effective time
-				createVersion(attribTup.getPart().getVersion(), stringBuilder);
+				if (latestAttrib == null || attribTup.getVersion() >= latestAttrib.getVersion()) {
+					latestAttrib = attribTup;
+				}
+			}
 				
-				//Path Id
-				createRecord(stringBuilder, getFirstUuid(attribTup.getPart().getPathId()));
+			// ConceptId
+			createRecord(stringBuilder, concept.getUids().get(0));
 
-				//Status active/inactive value
-				createRecord(stringBuilder, getBinaryStatusValue(attribTup.getPart().getStatusId()));
+			// Concept status
+			createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedConceptStatusId(
+					termFactory.getUids(latestAttrib.getConceptStatus())));
+
+			// Fully specified name
+			createRecord(stringBuilder, descForConceptFile.getText());
+
+			// CTV3ID
+			createRecord(stringBuilder, "null");
+
+			// SNOMED 3 ID... We ignore this for now.
+			createRecord(stringBuilder, "null");
+
+			// IsPrimative value
+			createRecord(stringBuilder, latestAttrib.isDefined() ? 0 : 1);
+
+			// AMT added
+			// Concept UUID
+			createRecord(stringBuilder, concept.getUids().get(0));
+
+			// ConceptStatusId
+			createRecord(stringBuilder, getFirstUuid(latestAttrib.getConceptStatus()));
+
+			// Effective time
+			createVersion(stringBuilder, latestAttrib.getPart().getVersion(), latestAttrib.getPart().getPathId());
+			
+			//Path Id
+			createRecord(stringBuilder, getFirstUuid(latestAttrib.getPart().getPathId()));
+
+			//Status active/inactive value
+			createRecord(stringBuilder, getBinaryStatusValue(latestAttrib.getPart().getStatusId()));
+			
+			// End record
+			createRecord(stringBuilder, System.getProperty("line.separator"));
 				
-				// End record
-				createRecord(stringBuilder, System
-						.getProperty("line.separator"));
-			}// End while loop
 			conceptsWriter.write(stringBuilder.toString());
 
 			return true;
 		}// End method getUuidBasedConceptDetaiils
 	}
 
-	private void writeUuidBasedRelDetails(I_GetConceptData concept,
-			I_IntSet allowedStatus, I_IntSet allowedTypes) throws Exception {
+	private void writeUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes) 
+			throws Exception {
 
-		List<I_RelTuple> tuples = concept.getSourceRelTuples(null, null,
-				positions, false);
+		List<I_RelTuple> tuples = concept.getSourceRelTuples(null, null,positions, false);
 		int relId = 0;
 		for (I_RelTuple tuple : tuples) {
 			I_RelPart part = tuple.getPart();
@@ -359,10 +349,8 @@ public class ExportIterator implements I_ProcessConcepts {
 				createRecord(stringBuilder, getFirstUuid(rel.getRelId()));
 
 				// Concept status
-				createRecord(
-						stringBuilder,
-						ArchitectonicAuxiliary
-								.getSnomedConceptStatusId(termFactory.getUids(part.getStatusId())));
+				createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedConceptStatusId(
+						termFactory.getUids(part.getStatusId())));
 
 				// Concept Id 1 UUID
 				createRecord(stringBuilder, getFirstUuid((rel.getC1Id())));
@@ -374,18 +362,17 @@ public class ExportIterator implements I_ProcessConcepts {
 				createRecord(stringBuilder, getFirstUuid(rel.getC2Id()));
 
 				// (Characteristict Type integer)
-				int snomedCharacter = ArchitectonicAuxiliary
-						.getSnomedCharacteristicTypeId(termFactory.getUids(part.getCharacteristicId()));
+				int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(
+						termFactory.getUids(part.getCharacteristicId()));
 				if (snomedCharacter == -1) {
 					errorWriter.append("\nNo characteristic mapping for: "
-							+ termFactory.getConcept(
-									part.getCharacteristicId()));
+							+ termFactory.getConcept(part.getCharacteristicId()));
 				}
 				createRecord(stringBuilder, snomedCharacter);
 
 				// Refinability integer
-				createRecord(stringBuilder, ArchitectonicAuxiliary
-						.getSnomedRefinabilityTypeId(termFactory.getUids(part.getRefinabilityId())));
+				createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(
+						termFactory.getUids(part.getRefinabilityId())));
 
 				// Relationship Group
 				createRecord(stringBuilder, part.getGroup());
@@ -413,7 +400,7 @@ public class ExportIterator implements I_ProcessConcepts {
 				createRecord(stringBuilder, getFirstUuid(part.getStatusId()));
 
 				// Effective Time
-				createVersion(part.getVersion(), stringBuilder);
+				createVersion(stringBuilder, part.getVersion(), part.getPathId());
 
 				//Path Id
 				createRecord(stringBuilder, getFirstUuid(part.getPathId()));
@@ -421,8 +408,7 @@ public class ExportIterator implements I_ProcessConcepts {
 				//Status active/inactive value
 				createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()));
 				
-				createRecord(stringBuilder, System
-						.getProperty("line.separator"));
+				createRecord(stringBuilder, System.getProperty("line.separator"));
 
 				relationshipsWriter.write(stringBuilder.toString());
 			}
@@ -441,93 +427,144 @@ public class ExportIterator implements I_ProcessConcepts {
 		throw new Exception("Status concept " + status + " is not a child of Active or Inactive - cannot be handled.");
 	}
 
-	private void createVersion(int version, StringBuilder stringBuilder) {
-		if (releaseDate == null) {
-			createRecord(stringBuilder, new SimpleDateFormat(DATE_FORMAT)
-					.format(new Date(ThinVersionHelper.convert(version))));
+	
+	private void createVersion(StringBuilder buffer, int version, int pathId) {
+		if (releaseDate != null) {
+			createRecord(buffer, releaseDate);
 		} else {
-			createRecord(stringBuilder, releaseDate);
+			createReleaseVersion(buffer, pathId);
 		}
 	}
 
-	private void writeUuidBasedDescriptionDetails(I_GetConceptData concept,
-			I_IntSet allowedStatus, I_IntSet allowedTypes) throws Exception {
+	/*
+	 * Get the defined "release" version for a specific path.
+	 * This is declared in the Path Version Reference Set (String).
+	 * The path concept must contain exactly one extensions for the path version refset.
+	 */
+	private void createReleaseVersion(StringBuilder buffer, int pathId) {
+		if (pathReleaseVersions.containsKey(pathId)) {
+			createRecord(buffer, pathReleaseVersions.get(pathId));
+		} else {
+			String pathUuidStr = Integer.toString(pathId);
+			try {
+				String pathVersion = null;
+				pathUuidStr = termFactory.getUids(pathId).iterator().next().toString();
+				
+				int pathVersionRefsetNid = termFactory.uuidToNative(ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
+				int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+				for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(pathId)) {
+					if (extension.getRefsetId() == pathVersionRefsetNid) {
+						I_ThinExtByRefPart latestPart = getLatestVersion(extension);
+						if (latestPart.getStatusId() == currentStatusId) {
+							
+							if (pathVersion != null) {
+								throw new TerminologyException("Concept contains multiple extensions for refset" +
+										ConceptConstants.PATH_VERSION_REFSET.getDescription());
+							}
+							
+							pathVersion = ((I_ThinExtByRefPartString) latestPart).getStringValue();
+						}
+					}
+				}
+				
+				if (pathVersion == null) {
+					throw new TerminologyException("Concept not a member of " + 
+							ConceptConstants.PATH_VERSION_REFSET.getDescription());					 
+				}
 
-		List<I_DescriptionTuple> tuples = concept.getDescriptionTuples(null,
-				null, positions);
+				createRecord(buffer, pathVersion);
+				
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to obtain the release version for the path " + pathUuidStr, e);
+			}
+		}
+	}
+
+	private void writeUuidBasedDescriptionDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes) 
+			throws Exception {
+
+		List<I_DescriptionTuple> tuples = concept.getDescriptionTuples(null,null, positions);
 		
 		int descId = 0;
+		
+		// Filter the tuples down to just the latest version for each unique description
+		HashMap<Integer, I_DescriptionTuple> latestDesc = new HashMap<Integer, I_DescriptionTuple>();
 		for (I_DescriptionTuple tuple : tuples) {
-			I_DescriptionPart part = tuple.getPart();
-			if (allowedStatus.contains(part.getStatusId())
-					&& isExportable(ConceptBean.get(part.getTypeId()))) {
-
-				if (descId != tuple.getDescId()) {
-					descId = tuple.getDescId();
+			
+			if (!latestDesc.containsKey(tuple.getDescId())) {
+				latestDesc.put(tuple.getDescId(), tuple);
+			} else {
+				I_DescriptionTuple latestTuple = latestDesc.get(tuple.getDescId());
+				if (tuple.getVersion() >= latestTuple.getVersion()) {
+					latestDesc.put(tuple.getDescId(), tuple);
+				}
+			}
+		}
+		
+		for (I_DescriptionTuple desc : latestDesc.values()) {
+			
+			I_DescriptionPart part = desc.getPart();
+			if (allowedStatus.contains(part.getStatusId()) && isExportable(ConceptBean.get(part.getTypeId()))) {
+	
+				if (descId != desc.getDescId()) {
+					descId = desc.getDescId();
 					writeUuidBasedIdDetails(termFactory.getId(descId), allowedStatus, null);
 				}
 				
 				StringBuilder stringBuilder = new StringBuilder("");
-				createRecord(stringBuilder, termFactory
-						.getConcept(tuple.getDescVersioned().getDescId())
-						.getUids().get(0));
-
+				createRecord(stringBuilder, termFactory.getConcept(desc.getDescVersioned().getDescId()).getUids().get(0));
+	
 				// Description Status
-				createRecord(
-						stringBuilder,
-						ArchitectonicAuxiliary
-								.getSnomedDescriptionStatusId(termFactory.getUids(part.getStatusId())));
-
+				createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedDescriptionStatusId(
+						termFactory.getUids(part.getStatusId())));
+	
 				// ConceptId
 				createRecord(stringBuilder, concept.getUids().get(0));
-
+	
 				// Term
 				createRecord(stringBuilder, part.getText());
-
+	
 				// Case sensitivity
-				createRecord(stringBuilder,
-						part.getInitialCaseSignificant() ? 1 : 0);
-
+				createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
+	
 				// Initial Capital Status
-				createRecord(stringBuilder,
-						part.getInitialCaseSignificant() ? 1 : 0);
-
+				createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
+	
 				// Description Type
-				createRecord(stringBuilder, ArchitectonicAuxiliary
-						.getSnomedDescriptionTypeId(termFactory.getUids(part.getTypeId())));
-
+				createRecord(stringBuilder, ArchitectonicAuxiliary.getSnomedDescriptionTypeId(
+						termFactory.getUids(part.getTypeId())));
+	
 				// Language code
 				createRecord(stringBuilder, part.getLang());
-
+	
 				// Language code for UUID
 				createRecord(stringBuilder, part.getLang());
-
+	
 				// AMT added
 				// Description UUID
-				createRecord(stringBuilder, getFirstUuid(tuple.getDescVersioned().getDescId()));
-
+				createRecord(stringBuilder, getFirstUuid(desc.getDescVersioned().getDescId()));
+	
 				// Description status UUID
 				createRecord(stringBuilder, getFirstUuid(part.getStatusId()));
-
+	
 				// Description type UUID
 				createRecord(stringBuilder, getFirstUuid(part.getTypeId()));
-
+	
 				// ConceptId
 				createRecord(stringBuilder, concept.getUids().get(0));
-
+	
 				// Effective time
-				createVersion(part.getVersion(), stringBuilder);
-
+				createVersion(stringBuilder, part.getVersion(), part.getPathId());
+	
 				//Path Id
 				createRecord(stringBuilder, getFirstUuid(part.getPathId()));
-
+	
 				//Status active/inactive value
 				createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()));
 				
 				// End record
-				createRecord(stringBuilder, System
-						.getProperty("line.separator"));
-
+				createRecord(stringBuilder, System.getProperty("line.separator"));
+	
 				descriptionsWriter.write(stringBuilder.toString());
 			}
 		}
@@ -538,6 +575,16 @@ public class ExportIterator implements I_ProcessConcepts {
 		return termFactory.getUids(nid).iterator().next();
 	}
 
+	private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
+		I_ThinExtByRefPart latestPart = null;
+		for (I_ThinExtByRefPart part : extension.getVersions()) {
+			if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
+				latestPart = part;
+			}
+		}
+		return latestPart;
+	}
+	
 	public int getConceptsSuppressed() {
 		return conceptsSuppressed;
 	}
