@@ -81,11 +81,11 @@ public class ThinExtBinder extends TupleBinding {
             case 3:
                 return INTEGER;
             case 4:
-                return LANGUAGE;
-            case 5:
-                return SCOPED_LANGUAGE;
-            case 6:
                 return MEASUREMENT;
+            case 5:
+                return LANGUAGE;
+            case 6:
+                return SCOPED_LANGUAGE;
             case 7:
                 return STRING;
             case 8:
@@ -334,12 +334,12 @@ public class ThinExtBinder extends TupleBinding {
                 return integerNid;
             case CON_INT:
                 if (conIntNid == null) {
-                    conIntNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
+                    conIntNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
                 }
                 return conIntNid;
             case LANGUAGE:
                 if (languageNid == null) {
-                    languageNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
+                    languageNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
                 }
                 return languageNid;
             case SCOPED_LANGUAGE:
