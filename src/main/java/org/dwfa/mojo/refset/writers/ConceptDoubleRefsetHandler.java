@@ -17,13 +17,13 @@ public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
         I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) tuple.getPart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
-                    + toId(tf, measurementPart.getUnitsOfMeasureId(), sctid) + MemberRefsetHandler.FILE_DELIMITER
-                    + measurementPart.getMeasurementValue();
+                      + toId(tf, measurementPart.getUnitsOfMeasureId(), sctid) + MemberRefsetHandler.FILE_DELIMITER
+                      + measurementPart.getMeasurementValue();
     }
 
     @Override
     public String getHeaderLine() {
-        return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "UNITS_OF_MEASURE" + MemberRefsetHandler.FILE_DELIMITER + "MEASUREMENT_VALUE";
+        return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "CONCEPT_VALUE" + MemberRefsetHandler.FILE_DELIMITER + "DOUBLE_VALUE";
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
             String conceptValue = getNextCurrentRowToken();
             part.setUnitsOfMeasureId(getNid(UUID.fromString(conceptValue)));
 
-            part.setMeasurementValue(Integer.parseInt(getNextCurrentRowToken()));
+            part.setMeasurementValue(Double.parseDouble(getNextCurrentRowToken()));
 
             versioned.addVersion(part);
 

@@ -10,12 +10,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.mojo.file.FileHandler;
 
 /**
@@ -42,7 +40,7 @@ public class ExportedRefsetHandler extends FileHandler<I_ThinExtByRefVersioned> 
 
     public ExportedRefsetHandler() {
         super();
-        setHasHeader(true);
+        setHasHeader(hasHeader);
     }
 
     /**
