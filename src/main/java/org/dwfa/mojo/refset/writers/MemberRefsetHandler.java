@@ -2,6 +2,7 @@ package org.dwfa.mojo.refset.writers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +32,7 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 	protected static final String PATH_ID = "PATH_ID";
 	protected static final String REFSET_ID = "REFSET_ID";
 	protected static final String FILE_DELIMITER = "\t";
+	private static final String ID = "MEMBER_ID";
 	private static UuidSnomedMapHandler sctGenerator = null;
 	private static File fixedMapDirectory;
 	private static File readWriteMapDirectory;
@@ -44,7 +46,7 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 	 */
 	public String getHeaderLine() {
 		return "ID" + FILE_DELIMITER + PATH_ID + FILE_DELIMITER + "EFFECTIVE_DATE" + FILE_DELIMITER
-				+ "ACTIVE" + FILE_DELIMITER + COMPONENT_ID;
+				+ "ACTIVE" + FILE_DELIMITER + "REFSET_ID" + FILE_DELIMITER + COMPONENT_ID;
 	}
 	
 	/**
@@ -55,15 +57,43 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 	 * @throws TerminologyException 
 	 */
 	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctId) throws TerminologyException, IOException {
-		return formatRefsetLine(tf, tuple, tuple.getRefsetId(), tuple.getComponentId(), sctId);
+		return formatRefsetLine(tf, tuple, tuple.getMemberId(), tuple.getRefsetId(), tuple.getComponentId(), sctId);
 	}
 	
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart tuple, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
-		return toId(tf, refsetId, sctId) + FILE_DELIMITER
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart tuple, Integer memberId, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
+		return getMemberId(memberId, sctId, componentId, refsetId) + FILE_DELIMITER
 				+ toId(tf, tuple.getPathId(), sctId) + FILE_DELIMITER
 				+ getDate(tf, tuple.getVersion()) + FILE_DELIMITER
 				+ toId(tf, tuple.getStatus(), sctId) + FILE_DELIMITER
+				+ toId(tf, refsetId, sctId) + FILE_DELIMITER
 				+ toId(tf, componentId, sctId);
+	}
+
+	private String getMemberId(Integer memberId, boolean sctId, int componentNid, int refsetNid) throws UnsupportedEncodingException, TerminologyException, IOException {
+		UUID uuid;
+		if (memberId == null) {
+			//generate new id
+			uuid = UUID.nameUUIDFromBytes(("org.dwfa." 
+					+ getTermFactory().getUids(componentNid)
+					+ getTermFactory().getUids(refsetNid)).getBytes("8859_1"));
+		} else {
+			if (getTermFactory().getUids(memberId) == null) {
+				System.out.println("Member id " + memberId + " has no UUIDs!!! for refset " + getTermFactory().getConcept(refsetNid) + " for component " + getTermFactory().getConcept(componentNid));
+				
+				uuid = UUID.nameUUIDFromBytes(("org.dwfa." 
+						+ getTermFactory().getUids(componentNid)
+						+ getTermFactory().getUids(refsetNid)).getBytes("8859_1"));
+			} else {
+				uuid = getTermFactory().getUids(memberId).iterator().next();
+			}
+		}
+		
+		if (sctId) {
+			return Long.toString(getSctGenerator()
+					.getWithGeneration(uuid, TYPE.SUBSET));
+		} else {
+			return uuid.toString();
+		}
 	}
 
 	private String getDate(I_TermFactory tf, int version) {
@@ -94,10 +124,11 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 		st = new StringTokenizer(line, FILE_DELIMITER);
 		currentRow = new HashMap<String, Object>();
 
-		currentRow.put(REFSET_ID, UUID.fromString(st.nextToken()));
+		currentRow.put(ID, UUID.fromString(st.nextToken()));
 		currentRow.put(PATH_ID, UUID.fromString(st.nextToken()));
 		currentRow.put(VERSION, getAceVersionFromDateString(st.nextToken()));
 		currentRow.put(STATUS_ID, UUID.fromString(st.nextToken()));
+		currentRow.put(REFSET_ID, UUID.fromString(st.nextToken()));
 		currentRow.put(COMPONENT_ID, UUID.fromString(st.nextToken()));
 		return currentRow;
 	}
@@ -130,37 +161,39 @@ public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart
 		
 		UUID refsetUuid = (UUID) currentRow.get(MemberRefsetHandler.REFSET_ID);
 		UUID componentUuid = (UUID) currentRow.get(MemberRefsetHandler.COMPONENT_ID);
+		UUID memberUuid = (UUID) currentRow.get(MemberRefsetHandler.ID);
 		int componentNid = getNid(componentUuid);
 		List<I_ThinExtByRefVersioned> extensions = getTermFactory().getAllExtensionsForComponent(componentNid, true);
 
 		I_ThinExtByRefVersioned versioned = null;
 		int refsetNid = getNid(refsetUuid);
-		for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
-			if (thinExtByRefVersioned.getRefsetId() == refsetNid) {
-				versioned = thinExtByRefVersioned;
-				break;
+		
+		Integer memberNid = null;
+		if (getTermFactory().hasId(memberUuid)) {
+			memberNid = getNid(memberUuid);
+			
+			for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
+				if (thinExtByRefVersioned.getMemberId() == memberNid) {
+					versioned = thinExtByRefVersioned;
+					break;
+				}
 			}
 		}
-
+		
 		if (versioned == null) {
-			UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." 
-					+ getTermFactory().getUids(componentNid) 
-					+ refsetType.getUids() 
-					+ getTermFactory().getUids(refsetNid)).getBytes("8859_1"));
-			
-			int memberId = getTermFactory().uuidToNativeWithGeneration(uuid,
+			memberNid = getTermFactory().uuidToNativeWithGeneration(memberUuid,
 		            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-		            getTermFactory().getPaths(), Integer.MAX_VALUE );
+		            getTermFactory().getPaths(), Integer.MAX_VALUE);
 			
 			if (isTransactional() ) {
 				versioned = getTermFactory().newExtension(refsetNid, 
-						memberId, 
+						memberNid, 
 						componentNid, 
 						getTermFactory().uuidToNative(refsetType.getUids()));				
 			} else {
 				versioned = getTermFactory().getDirectInterface()
 								.newExtensionBypassCommit(refsetNid, 
-										memberId, 
+										memberNid, 
 										componentNid, 
 										getTermFactory().uuidToNative(refsetType.getUids()));
 			}

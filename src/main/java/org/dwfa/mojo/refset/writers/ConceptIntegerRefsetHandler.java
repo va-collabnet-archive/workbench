@@ -22,6 +22,15 @@ public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
 	}
 
 	@Override
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
+		I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) part;
+		
+		return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId) + MemberRefsetHandler.FILE_DELIMITER
+					+ toId(tf, conceptIntegerPart.getConceptId(), sctId) + MemberRefsetHandler.FILE_DELIMITER
+					+ conceptIntegerPart.getIntValue();
+	}
+	
+	@Override
 	public String getHeaderLine() {
 		return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "CONCEPT_VALUE" + MemberRefsetHandler.FILE_DELIMITER + "INTEGER_VALUE";
 	}

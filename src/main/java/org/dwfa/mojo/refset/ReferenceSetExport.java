@@ -143,6 +143,15 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 	
 	public void processConcept(I_GetConceptData concept) throws Exception {
 		if (testSpecification(concept)) {
+			//export the status refset for this concept
+			I_ConceptAttributePart latest = getLatestAttributePart(concept);
+			if (latest == null) {
+				getLog().warn("Concept " + concept + " is exportable for specification " 
+						+ exportSpecifications + " but has no parts valid for statuses " 
+						+ allowedStatuses + " and positions " + positions);
+				return;
+			}
+			
 			exportRefsets(concept.getConceptId());
 			
 			//export relationship refsets
@@ -154,23 +163,23 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			for (I_DescriptionVersioned desc : concept.getDescriptions()) {
 				processDescription(desc);
 			}
-			
-			//export the status refset for this concept
-			I_ConceptAttributePart latest = null;
-			for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(allowedStatuses, positions)) {
-				if (latest == null || latest.getVersion() < tuple.getVersion()) {
-					latest = tuple.getPart();
-				}
-			}
-			if (latest == null) {
-				throw new MojoExecutionException("Concept " + concept + " is exportable for specification " 
-						+ exportSpecifications + " but has no parts valid for statuses " 
-						+ allowedStatuses + " and positions " + positions);
-			}
 
-			extractStatus(latest, concept.getConceptId());
-			extractDefinitionType(latest, concept.getConceptId());
+			//TODO commented out because it costs too many SCTIDs and we need to release pathology - to be included later
+		//	extractStatus(latest, concept.getConceptId());
+		//	extractDefinitionType(latest, concept.getConceptId());
 		}
+	}
+
+
+	private I_ConceptAttributePart getLatestAttributePart(
+			I_GetConceptData concept) throws IOException {
+		I_ConceptAttributePart latest = null;
+		for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(allowedStatuses, positions)) {
+			if (latest == null || latest.getVersion() < tuple.getVersion()) {
+				latest = tuple.getPart();
+			}
+		}
+		return latest;
 	}
 
 
@@ -197,7 +206,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			int descId = versionedDesc.getDescId();
 			exportRefsets(descId);
 			
-			extractStatus(latest, descId);
+			//TODO commented out because it costs too many SCTIDs and we need to release pathology - to be included later
+			//extractStatus(latest, descId);
 		}
 	}
 
@@ -227,48 +237,52 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 				int relId = versionedRel.getRelId();
 				exportRefsets(relId);
 				
-				extractRelationshipRefinability(latest, relId);
-				extractStatus(latest, relId);
+
+				//TODO commented out because it costs too many SCTIDs and we need to release pathology - to be included later
+			//	extractRelationshipRefinability(latest, relId);
+			//	extractStatus(latest, relId);
 			}
 		}
 	}
 
 	private void extractStatus(I_AmPart latest, int relId) throws TerminologyException, IOException, InstantiationException, IllegalAccessException {
-		I_ThinExtByRefPartConcept tuple = (I_ThinExtByRefPartConcept) getCurrentExtension(relId, ConceptConstants.STATUS_REASON_EXTENSION);
-		if (tuple == null) {
+		I_ThinExtByRefTuple tuple = getCurrentExtension(relId, ConceptConstants.STATUS_REASON_EXTENSION);
+		I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
+		if (part == null) {
 			// if the status is INACTIVE or ACTIVE there is no need for a reason. For simplicity, CURRENT will be treated this way too,
 			if (latest.getStatusId() != getNid(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE)
 				&& latest.getStatusId() != getNid(org.dwfa.cement.ArchitectonicAuxiliary.Concept.INACTIVE)
 				&& latest.getStatusId() != getNid(org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT)) {
 				//no extension at all
-				tuple = tf.newConceptExtensionPart();
-				tuple.setConceptId(latest.getStatusId());
-				tuple.setPathId(latest.getPathId());
-				tuple.setStatus(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-				tuple.setVersion(latest.getVersion());
-				export(tuple, ConceptConstants.STATUS_REASON_EXTENSION.localize().getNid(), relId);
+				part = tf.newConceptExtensionPart();
+				part.setConceptId(latest.getStatusId());
+				part.setPathId(latest.getPathId());
+				part.setStatus(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+				part.setVersion(latest.getVersion());
+				export(part, null, ConceptConstants.STATUS_REASON_EXTENSION.localize().getNid(), relId);
 			}
-		} else if (tuple.getConceptId() != latest.getStatusId()) {
+		} else if (part.getConceptId() != latest.getStatusId()) {
 			//add a new row with the latest refinability			
-			tuple.setConceptId(latest.getStatusId());
-			export((I_ThinExtByRefTuple) tuple);
+			part.setConceptId(latest.getStatusId());
+			export((I_ThinExtByRefTuple) part);
 		}
 	}
 
 	private void extractDefinitionType(I_ConceptAttributePart latest, int conceptId) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
-		I_ThinExtByRefPartConcept tuple = (I_ThinExtByRefPartConcept) getCurrentExtension(conceptId, ConceptConstants.DEFINITION_TYPE_EXTENSION);
-		if (tuple == null) {
+		I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.DEFINITION_TYPE_EXTENSION);
+		I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
+		if (part == null) {
 			//no extension at all
-			tuple = tf.newConceptExtensionPart();
-			tuple.setConceptId(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
-			tuple.setPathId(latest.getPathId());
-			tuple.setStatus(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-			tuple.setVersion(latest.getVersion());
-			export(tuple, ConceptConstants.DEFINITION_TYPE_EXTENSION.localize().getNid(), conceptId);
-		} else if (tuple.getConceptId() != latest.getStatusId()) {
+			part = tf.newConceptExtensionPart();
+			part.setConceptId(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
+			part.setPathId(latest.getPathId());
+			part.setStatus(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			part.setVersion(latest.getVersion());
+			export(part, null, ConceptConstants.DEFINITION_TYPE_EXTENSION.localize().getNid(), conceptId);
+		} else if (part.getConceptId() != latest.getStatusId()) {
 			//add a new row with the latest refinability
-			tuple.setConceptId(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
-			export((I_ThinExtByRefTuple) tuple);
+			part.setConceptId(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
+			export((I_ThinExtByRefTuple) part);
 		}
 	}
 
@@ -280,18 +294,19 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 	private void extractRelationshipRefinability(I_RelPart latest, int relId)
 			throws IOException, TerminologyException, InstantiationException,
 			IllegalAccessException {
-		I_ThinExtByRefPartConcept tuple = (I_ThinExtByRefPartConcept) getCurrentExtension(relId, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION);
-		if (tuple == null) {
+		I_ThinExtByRefTuple tuple = getCurrentExtension(relId, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION);
+		I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
+		if (part == null) {
 			//no extension at all
-			tuple = tf.newConceptExtensionPart();
-			tuple.setConceptId(latest.getRefinabilityId());
-			tuple.setPathId(latest.getPathId());
-			tuple.setStatus(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-			tuple.setVersion(latest.getVersion());
-			export(tuple, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid(), relId);
-		} else if (tuple.getConceptId() != latest.getRefinabilityId()) {
+			part = tf.newConceptExtensionPart();
+			part.setConceptId(latest.getRefinabilityId());
+			part.setPathId(latest.getPathId());
+			part.setStatus(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			part.setVersion(latest.getVersion());
+			export(part, null, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid(), relId);
+		} else if (part.getConceptId() != latest.getRefinabilityId()) {
 			//add a new row with the latest refinability			
-			tuple.setConceptId(latest.getRefinabilityId());
+			part.setConceptId(latest.getRefinabilityId());
 			export((I_ThinExtByRefTuple) tuple);
 		}
 	}
@@ -326,10 +341,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 	}
 
 	private void export(I_ThinExtByRefTuple thinExtByRefTuple) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
-		export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getRefsetId(), thinExtByRefTuple.getComponentId());
+		export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(), thinExtByRefTuple.getComponentId());
 	}
 	
-	private void export(I_ThinExtByRefPart thinExtByRefPart, int refsetId, int componentId) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
+	private void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
 		RefsetType refsetType = refsetTypeMap.get(refsetId);
 		if (refsetType == null) {
 			try {
@@ -368,16 +383,16 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		
 		//note that we are assuming that the type of refset member will be the same as previous for this file type
 		//if not we'll get a class cast exception, as we probably should
-		uuidRefsetWriter.write(refsetType.getRefsetHandler().formatRefsetLine(tf, thinExtByRefPart, refsetId, componentId, false));
+		uuidRefsetWriter.write(refsetType.getRefsetHandler().formatRefsetLine(tf, thinExtByRefPart, memberId, refsetId, componentId, false));
 		uuidRefsetWriter.newLine();
 
-		sctIdRefsetWriter.write(refsetType.getRefsetHandler().formatRefsetLine(tf, thinExtByRefPart, refsetId, componentId, true));
+		sctIdRefsetWriter.write(refsetType.getRefsetHandler().formatRefsetLine(tf, thinExtByRefPart, memberId, refsetId, componentId, true));
 		sctIdRefsetWriter.newLine();
 	}
 
 	private boolean testSpecification(I_GetConceptData concept) throws Exception {
 		for (ExportSpecification spec : exportSpecifications) {
-			if (spec.test(concept)) {
+			if (spec.test(concept) && getLatestAttributePart(concept) != null) {
 				return true;
 			}
 		}

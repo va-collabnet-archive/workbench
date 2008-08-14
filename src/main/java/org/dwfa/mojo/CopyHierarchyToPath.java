@@ -30,6 +30,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.mojo.refset.ExportSpecification;
 
 /**
  * Given a root node, this mojo will copy the latest version of every component in this hierarchy
@@ -66,6 +67,12 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 	 * @parameter
 	 */
 	ConceptDescriptor[] hierarchyRelationshipStatus = null;
+	
+	/**
+	 * Exclusion from the hierarchy
+	 * @parameter
+	 */
+	ExportSpecification[] exclusions = null;
 	
 	/**
 	 * Flag that indicates if the just the latest data or all history should be copied - defaults to latest only
@@ -137,21 +144,37 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		}
 	}
 
-	public void processConcept(I_GetConceptData arg0) throws Exception {
+	public void processConcept(I_GetConceptData concept) throws Exception {
 		if (++conceptCount % 1000 == 0) {
 			getLog().info("processed concept " + conceptCount);
 		}
 		
-		getLog().info("concept " + arg0 + " copied to path " + toPath);
-		
-		processConceptAttributes(arg0.getConceptAttributes());
-		processDescription(arg0.getDescriptions());
-		if (tf.hasExtension(arg0.getConceptId())) {
-			processExtensionByReference(tf.getExtension(arg0.getConceptId()));
+		if (inExclusions(concept)) {
+			getLog().info("Suppressed copy of " + concept + " due to exclusions");
+		} else {
+			getLog().info("concept " + concept + " copied to path " + toPath);
+			
+			processConceptAttributes(concept.getConceptAttributes());
+			processDescription(concept.getDescriptions());
+			if (tf.hasExtension(concept.getConceptId())) {
+				processExtensionByReference(tf.getExtension(concept.getConceptId()));
+			}
+			processId(concept.getId());
+			processImages(concept.getImages());
+			processRelationship(concept.getSourceRels());
 		}
-		processId(arg0.getId());
-		processImages(arg0.getImages());
-		processRelationship(arg0.getSourceRels());
+	}
+
+	private boolean inExclusions(I_GetConceptData concept) throws Exception {
+		if (exclusions == null) {
+			return false;
+		}
+		for (ExportSpecification spec : exclusions) {
+			if (spec.test(concept)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void processConceptAttributes(

@@ -3,7 +3,9 @@ package org.dwfa.mojo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -79,7 +81,13 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 	 * 
 	 * @parameter
 	 */
-	boolean latestStateOnly = false;
+	boolean copyOnlyLatestState = false;
+	
+	/**
+	 * Indicates whether to read all parts of the object and copy any found, or only the very latest part in time sequence across all paths
+	 * @parameter
+	 */
+	boolean readLatestPartOnly = false;
 	
 	private I_IntSet fromPathIds;
 	private int toPathId;
@@ -102,6 +110,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 	private int relCount;
 
 	private int conceptCount;
+
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		tf = LocalVersionedTerminology.get();
@@ -174,10 +183,19 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 		
 		boolean datachanged = false;
 		I_ConceptAttributeTuple latestPart = null;
-		for (I_ConceptAttributeTuple t : conceptAttributeVersioned.getTuples()) {
+		
+		Collection<I_ConceptAttributeTuple> conceptAttributes;
+		if (readLatestPartOnly) {
+			conceptAttributes = new ArrayList<I_ConceptAttributeTuple>();
+			conceptAttributes.add(getLatestAttributes(conceptAttributeVersioned.getTuples()));
+		} else {
+			conceptAttributes = conceptAttributeVersioned.getTuples();
+		}
+		
+		for (I_ConceptAttributeTuple t : conceptAttributes) {
 			if (fromPathIds.contains(t.getPathId())) {
-				if (latestStateOnly) {
-					if (latestPart != null && t.getVersion() > latestPart.getVersion()) {
+				if (copyOnlyLatestState) {
+					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 						latestPart = t;
 					}
 				} else {
@@ -186,13 +204,24 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 				}
 			}
 		}
-		if (latestStateOnly && latestPart != null) {
+		if (copyOnlyLatestState && latestPart != null) {
 			duplicateConceptAttributeTuple(latestPart);
 			datachanged = true;
 		}
 		if (datachanged) {
 			directInterface.writeConceptAttributes(conceptAttributeVersioned);
 		}
+	}
+
+	private I_ConceptAttributeTuple getLatestAttributes(
+			List<I_ConceptAttributeTuple> tuples) {
+		I_ConceptAttributeTuple latest = null;
+		for (I_ConceptAttributeTuple conceptAttributeTuple : tuples) {
+			if (latest == null || latest.getVersion() < conceptAttributeTuple.getVersion()) {
+				latest = conceptAttributeTuple;
+			}
+		}
+		return latest;
 	}
 
 	private void duplicateConceptAttributeTuple(
@@ -222,13 +251,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 			getLog().info("processed description " + descriptionCount);
 		}
 		
+		Collection<I_DescriptionTuple> descriptions;
+		if (readLatestPartOnly) {
+			descriptions = getLatestDescriptions(descriptionVersioned.getTuples());
+		} else {
+			descriptions = descriptionVersioned.getTuples();
+		}
+		
 		boolean datachanged = false;
 		I_DescriptionTuple latestPart = null;
-		for (I_DescriptionTuple t : descriptionVersioned.getTuples()) {
+		for (I_DescriptionTuple t : descriptions) {
 
 			if (fromPathIds.contains(t.getPathId())) {
-				if (latestStateOnly) {
-					if (latestPart  != null && t.getVersion() > latestPart.getVersion()) {
+				if (copyOnlyLatestState) {
+					if (latestPart  == null || t.getVersion() > latestPart.getVersion()) {
 						latestPart = t;
 					}
 				} else {
@@ -237,7 +273,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 				}
 			}
 		}
-		if (latestStateOnly && latestPart != null) {
+		if (copyOnlyLatestState && latestPart != null) {
 			duplicateDescriptionTuple(latestPart);
 			datachanged = true;
 		}
@@ -245,6 +281,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 		if (datachanged) {
 			directInterface.writeDescription(descriptionVersioned);
 		}
+	}
+
+	private Collection<I_DescriptionTuple> getLatestDescriptions(List<I_DescriptionTuple> tuples) {
+		Map<Integer, I_DescriptionTuple> map = new HashMap<Integer, I_DescriptionTuple>();
+		for (I_DescriptionTuple description : tuples) {
+			if (map.containsKey(description.getDescId())) {
+				if (map.get(description.getDescId()).getVersion() < description.getVersion()) {
+					map.put(description.getDescId(), description);
+				}
+			} else {
+				map.put(description.getDescId(), description);
+			}
+		}
+		return map.values();
 	}
 
 	private void duplicateDescriptionTuple(I_DescriptionTuple t) {
@@ -264,12 +314,19 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 			getLog().info("processed extension " + extCount);
 		}
 		
+		Collection<I_ThinExtByRefTuple> extensions;
+		if (readLatestPartOnly) {
+			extensions = getLatestExtensions(extByRef.getTuples(null, null, true));
+		} else {
+			extensions = extByRef.getTuples(null, null, true);
+		}
+		
 		boolean datachanged = false;
 		I_ThinExtByRefTuple latestPart = null;
-		for (I_ThinExtByRefTuple t : extByRef.getTuples(null, null, true)) {
+		for (I_ThinExtByRefTuple t : extensions) {
 			if (fromPathIds.contains(t.getPathId())) {
-				if (latestStateOnly) {
-					if (latestPart   != null && t.getVersion() > latestPart.getVersion()) {
+				if (copyOnlyLatestState) {
+					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 						latestPart = t;
 					}
 				} else {
@@ -278,7 +335,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 				}
 			}
 		}
-		if (latestStateOnly && latestPart != null) {
+		if (copyOnlyLatestState && latestPart != null) {
 			duplicateExtensionTuple(latestPart);
 			datachanged = true;
 		}
@@ -286,6 +343,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 		if (datachanged) {
 			directInterface.writeExt(extByRef);
 		}
+	}
+
+	private Collection<I_ThinExtByRefTuple> getLatestExtensions(List<I_ThinExtByRefTuple> tuples) {
+		Map<Integer, I_ThinExtByRefTuple> map = new HashMap<Integer, I_ThinExtByRefTuple>();
+		for (I_ThinExtByRefTuple extension : tuples) {
+			if (map.containsKey(extension.getMemberId())) {
+				if (map.get(extension.getMemberId()).getVersion() < extension.getVersion()) {
+					map.put(extension.getMemberId(), extension);
+				}
+			} else {
+				map.put(extension.getMemberId(), extension);
+			}
+		}
+		return map.values();
 	}
 
 	private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
@@ -304,13 +375,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 			getLog().info("processed id " + idCount);
 		}
 		
+		Collection<I_IdTuple> ids;
+		if (readLatestPartOnly) {
+			ids = getLatest(idVersioned.getTuples());
+		} else {
+			ids = idVersioned.getTuples();
+		}
+		
 		boolean datachanged = false;
 		I_IdTuple latestPart = null;
-		for (I_IdTuple t : idVersioned.getTuples()) {
+		for (I_IdTuple t : ids) {
 
 			if (fromPathIds.contains(t.getPathId())) {
-				if (latestStateOnly) {
-					if (latestPart    != null && t.getVersion() > latestPart.getVersion()) {
+				if (copyOnlyLatestState) {
+					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 						latestPart = t;
 					}
 				} else {
@@ -319,7 +397,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 				}
 			}
 		}
-		if (latestStateOnly && latestPart != null) {
+		if (copyOnlyLatestState && latestPart != null) {
 			duplicateIdTuple(latestPart);
 			datachanged = true;
 		}
@@ -327,6 +405,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 		if (datachanged) {
 			directInterface.writeId(idVersioned);
 		}
+	}
+
+	private Collection<I_IdTuple> getLatest(List<I_IdTuple> tuples) {
+		Map<Integer, I_IdTuple> map = new HashMap<Integer, I_IdTuple>();
+		for (I_IdTuple ids : tuples) {
+			if (map.containsKey(ids.getNativeId())) {
+				if (map.get(ids.getNativeId()).getVersion() < ids.getVersion()) {
+					map.put(ids.getNativeId(), ids);
+				}
+			} else {
+				map.put(ids.getNativeId(), ids);
+			}
+		}
+		return map.values();
 	}
 
 	private void duplicateIdTuple(I_IdTuple t) {
@@ -351,13 +443,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 			getLog().info("processed image " + imageCount);
 		}
 		
+		Collection<I_ImageTuple> images;
+		if (readLatestPartOnly) {
+			images = getLatest(imageVersioned.getTuples());
+		} else {
+			images = imageVersioned.getTuples();
+		}
+		
 		boolean datachanged = false;
 		I_ImageTuple latestPart = null;
-		for (I_ImageTuple t : imageVersioned.getTuples()) {
+		for (I_ImageTuple t : images) {
 
 			if (fromPathIds.contains(t.getPathId())) {
-				if (latestStateOnly) {
-					if (latestPart     != null && t.getVersion() > latestPart.getVersion()) {
+				if (copyOnlyLatestState) {
+					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 						latestPart = t;
 					}
 				} else {
@@ -366,7 +465,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 				}
 			}
 		}
-		if (latestStateOnly && latestPart != null) {
+		if (copyOnlyLatestState && latestPart != null) {
 			duplicateImageTuple(latestPart);
 			datachanged = true;
 		}
@@ -374,6 +473,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 		if (datachanged) {
 			directInterface.writeImage(imageVersioned);
 		}
+	}
+
+	private Collection<I_ImageTuple> getLatest(Collection<I_ImageTuple> tuples) {
+		Map<Integer, I_ImageTuple> map = new HashMap<Integer, I_ImageTuple>();
+		for (I_ImageTuple image : tuples) {
+			if (map.containsKey(image.getImageId())) {
+				if (map.get(image.getImageId()).getVersion() < image.getVersion()) {
+					map.put(image.getImageId(), image);
+				}
+			} else {
+				map.put(image.getImageId(), image);
+			}
+		}
+		return map.values();
 	}
 
 	private void duplicateImageTuple(I_ImageTuple t) {
@@ -402,13 +515,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 			getLog().info("processed relationship " + relCount);
 		}
 		
+		Collection<I_RelTuple> rels;
+		if (readLatestPartOnly) {
+			rels = getLatestRelationships(relVersioned.getTuples());
+		} else {
+			rels = relVersioned.getTuples();
+		}
+		
 		boolean datachanged = false;
 		I_RelTuple latestPart = null;
-		for (I_RelTuple t : relVersioned.getTuples()) {
+		for (I_RelTuple t : rels) {
 
 			if (fromPathIds.contains(t.getPathId())) {
-				if (latestStateOnly) {
-					if (latestPart      != null && t.getVersion() > latestPart.getVersion()) {
+				if (copyOnlyLatestState) {
+					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
 						latestPart = t;
 					}
 				} else {
@@ -417,7 +537,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 				}
 			}
 		}
-		if (latestStateOnly && latestPart != null) {
+		if (copyOnlyLatestState && latestPart != null) {
 			duplicateRelationshipTuple(latestPart);
 			datachanged = true;
 		}
@@ -425,6 +545,20 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 		if (datachanged) {
 			directInterface.writeRel(relVersioned);
 		}
+	}
+
+	private Collection<I_RelTuple> getLatestRelationships(List<I_RelTuple> tuples) {
+		Map<Integer, I_RelTuple> map = new HashMap<Integer, I_RelTuple>();
+		for (I_RelTuple rel : tuples) {
+			if (map.containsKey(rel.getRelId())) {
+				if (map.get(rel.getRelId()).getVersion() < rel.getVersion()) {
+					map.put(rel.getRelId(), rel);
+				}
+			} else {
+				map.put(rel.getRelId(), rel);
+			}
+		}
+		return map.values();
 	}
 
 	private void duplicateRelationshipTuple(I_RelTuple t) {

@@ -15,13 +15,21 @@ public class BooleanRefsetHandler extends MemberRefsetHandler {
 	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid) throws TerminologyException, IOException {
 		I_ThinExtByRefPartBoolean booleanPart = (I_ThinExtByRefPartBoolean) tuple.getPart();
 		
-		return super.formatRefsetLine(tf, tuple, sctid) + "\t"
+		return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
+					+ (booleanPart.getValue() ? 1 : 0); // 1 for true, 0 for false
+	}
+	
+	@Override
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
+		I_ThinExtByRefPartBoolean booleanPart = (I_ThinExtByRefPartBoolean) part;
+		
+		return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId) + MemberRefsetHandler.FILE_DELIMITER
 					+ (booleanPart.getValue() ? 1 : 0); // 1 for true, 0 for false
 	}
 
 	@Override
 	public String getHeaderLine() {
-		return super.getHeaderLine() + "\t" + "BOOLEAN_VALUE";
+		return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "BOOLEAN_VALUE";
 	}
 
 	@Override

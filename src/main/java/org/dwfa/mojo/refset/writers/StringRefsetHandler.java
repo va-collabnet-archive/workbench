@@ -15,13 +15,21 @@ public class StringRefsetHandler extends MemberRefsetHandler {
 	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid) throws TerminologyException, IOException {
 		I_ThinExtByRefPartString stringPart = (I_ThinExtByRefPartString) tuple.getPart();
 		
-		return super.formatRefsetLine(tf, tuple, sctid) + "\t"
+		return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
 					+ stringPart.getStringValue();
 	}
 
 	@Override
+	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
+		I_ThinExtByRefPartString stringPart = (I_ThinExtByRefPartString) part;
+		
+		return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId) + MemberRefsetHandler.FILE_DELIMITER
+					+ stringPart.getStringValue();
+	}
+	
+	@Override
 	public String getHeaderLine() {
-		return super.getHeaderLine() + "\t" + "STRING_VALUE";
+		return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "STRING_VALUE";
 	}
 	
 	@Override
