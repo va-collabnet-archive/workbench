@@ -1,6 +1,6 @@
 package org.dwfa.mojo.refset;
 
-import java.util.UUID;
+import org.dwfa.mojo.ConceptDescriptor;
 
 /**
  * Describes a destination refset to be modified, including the path 
@@ -8,24 +8,24 @@ import java.util.UUID;
  */
 public class DestinationRefsetDescriptor {
 
-	private UUID refsetUUID;
+	private ConceptDescriptor refset;
 	
-	private UUID pathUUID;
+	private ConceptDescriptor path;
 
-	public UUID getRefsetUUID() {
-		return refsetUUID;
+	public ConceptDescriptor getRefset() {
+		return refset;
 	}
 
-	public void setRefsetUUID(String refsetUUID) {
-		this.refsetUUID = UUID.fromString(refsetUUID);
+	public void setRefset(ConceptDescriptor refset) {
+		this.refset = refset;
 	}
 
-	public UUID getPathUUID() {
-		return pathUUID;
+	public ConceptDescriptor getPath() {
+		return path;
 	}
 
-	public void setPathUUID(String pathUUID) {
-		this.pathUUID = UUID.fromString(pathUUID);
+	public void setPath(ConceptDescriptor path) {
+		this.path = path;
 	}
 	
 }

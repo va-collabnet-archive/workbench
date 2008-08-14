@@ -79,8 +79,8 @@ public class ImportRefset extends ImportFromFile {
 				extPart.setVersion(Integer.MAX_VALUE); // uncommitted 
 				
 				if (destination != null) {
-					extPart.setPathId(termFactory.uuidToNative(destination.getPathUUID()));
-					extension.setRefsetId(termFactory.uuidToNative(destination.getRefsetUUID()));
+					extPart.setPathId(destination.getPath().getVerifiedConcept().getId().getNativeId());
+					extension.setRefsetId(destination.getRefset().getVerifiedConcept().getId().getNativeId());
 				}
 				
 				extension.addVersion(extPart);

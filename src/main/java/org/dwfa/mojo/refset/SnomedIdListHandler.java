@@ -14,6 +14,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.file.FileHandler;
 
 /**
@@ -23,6 +24,12 @@ import org.dwfa.mojo.file.FileHandler;
 public class SnomedIdListHandler extends FileHandler<I_ThinExtByRefVersioned> {
 	
 	protected I_TermFactory termFactory = LocalVersionedTerminology.get();
+	
+	/**
+	 * @parameter 
+	 * @required
+	 */
+	protected ConceptDescriptor refsetType;
 	
 	@Override
 	protected I_ThinExtByRefVersioned processLine(String line) {
@@ -42,8 +49,7 @@ public class SnomedIdListHandler extends FileHandler<I_ThinExtByRefVersioned> {
             int statusId = termFactory.uuidToNative(
                     ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 			
-            int specTypeId = termFactory.uuidToNative(
-            		RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
+            int specTypeId = getRefsetType().getVerifiedConcept().getId().getNativeId();
             
 			I_ThinExtByRefPartConcept extPart = termFactory.newConceptExtensionPart();			
 			extPart.setConceptId( specTypeId );
@@ -82,5 +88,14 @@ public class SnomedIdListHandler extends FileHandler<I_ThinExtByRefVersioned> {
 		
 		throw new MojoExecutionException("Unable to locate a matching concept");
 	}
-	
+
+	public ConceptDescriptor getRefsetType() {
+		assert (refsetType != null) : "A refset type has not been specified";
+		return refsetType;
+	}
+
+	public void setRefsetType(ConceptDescriptor refsetType) {
+		this.refsetType = refsetType;
+	}
+
 }
