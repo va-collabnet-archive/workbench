@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
@@ -24,7 +25,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -90,9 +90,27 @@ I_ProcessExtByRef {
 
 	}
 
-	public void processExtensionByReference(I_ThinExtByRefVersioned refset)
-	throws Exception {
+	public void processExtensionByReference(I_ThinExtByRefVersioned refset) throws Exception {
 
+		I_GetConceptData refsetConcept = termFactory.getConcept(refset.getRefsetId());
+		
+		if (refset.getTypeId() != RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid()) {
+			getLog().info("Skipping non-concept type refset " + refsetConcept.getId().getUIDs().iterator().next());
+			return;
+		}
+		
+		List<I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
+		I_ConceptAttributePart latestAttributePart = null;
+		for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
+			if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
+				latestAttributePart = attributePart;
+			}
+		}
+		if (latestAttributePart.getConceptStatus() != ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
+			getLog().info("Skipping non-current refset " + refsetConcept.getId().getUIDs().iterator().next());
+			return;
+		}
+		
 		I_IntSet status = termFactory.newIntSet();
 		status.add(termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId());
 		status.add(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(CURRENT_STATUS_UUIDS));
