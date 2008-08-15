@@ -406,11 +406,15 @@ public abstract class ProcessSources {
     DateFormatterThreadLocal formatter = new DateFormatterThreadLocal("yyyy-MM-dd HH:mm:ss");
 
     DateFormatterThreadLocal formatter2 = new DateFormatterThreadLocal("yyyyMMdd HH:mm:ss");
+    
+    DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal("yyyyMMddTHHmmssZ");
 
     protected Date getDate(StreamTokenizer st) throws ParseException {
         if (st.sval.contains("-")) {
             return formatter.get().parse(st.sval);
-        } else {
+        } else if (st.sval.endsWith("Z")) {
+            return formatter3.get().parse(st.sval);
+        } {
             return formatter2.get().parse(st.sval);
         }
     }
