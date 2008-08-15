@@ -46,9 +46,9 @@ import org.dwfa.util.bean.Spec;
  * <p>
  * 
  * <ol>
- * <li>Simplify the test to determine if a concept is part of the
- * classification hierarchy. The <code>isParentOfOrEqualTo</code> method is to
- * slow. We will instead check based on the following assumptions.
+ * <li>Simplify the test to determine if a concept is part of the classification
+ * hierarchy. The <code>isParentOfOrEqualTo</code> method is to slow. We will
+ * instead check based on the following assumptions.
  * <ul>
  * <li>The is-a relationship is unique to the classification. For example, the
  * SNOMED is-a has a different concept id than the ace-auxiliary is-a
@@ -56,7 +56,7 @@ import org.dwfa.util.bean.Spec;
  * one is-a relationship of the proper type.
  * <li>There is a single root concept, and that root is part of the set of
  * included concept
- * <li> Assume that the versions are linear, independent of path, and therefore
+ * <li>Assume that the versions are linear, independent of path, and therefore
  * the status with the latest date on an allowable path is the latest status.
  * <li>Assume that relationships to retired concepts will have a special status
  * so that retired concepts are not encountered by following current
@@ -113,8 +113,7 @@ public class LoadClassifyWrite extends AbstractTask {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-    ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         final int objDataVersion = in.readInt();
 
         if (objDataVersion <= dataVersion) {
@@ -138,8 +137,7 @@ public class LoadClassifyWrite extends AbstractTask {
             isACount++;
         }
 
-        synchronized public void addRelationship(int c1, int rel, int c2,
-                                                 int group) {
+        synchronized public void addRelationship(int c1, int rel, int c2, int group) {
             relationshipCount++;
         }
 
@@ -168,33 +166,26 @@ public class LoadClassifyWrite extends AbstractTask {
         private int rootNid;
         private int isaId;
 
-        FilterConcept(Logger logger, int rootNid, int isaId)
-        throws TerminologyException, IOException {
+        FilterConcept(Logger logger, int rootNid, int isaId) throws TerminologyException, IOException {
             this.logger = logger;
             this.rootNid = rootNid;
             this.isaId = isaId;
 
             allowedPaths = tf.newIntSet();
-            for (I_Position p : tf.getActiveAceFrameConfig()
-                    .getViewPositionSet()) {
+            for (I_Position p : tf.getActiveAceFrameConfig().getViewPositionSet()) {
                 addPathIds(allowedPaths, p);
             }
 
             I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
             activeStatus = frameConfig.getAllowedStatus();
             statedForms = tf.newIntSet();
-            statedForms
-            .add(getNid(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP));
-            statedForms
-            .add(getNid(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC));
-            statedForms
-            .add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP));
-            statedForms
-            .add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP));
         }
 
-        private void addPathIds(I_IntSet allowedPaths, I_Position p)
-        throws TerminologyException, IOException {
+        private void addPathIds(I_IntSet allowedPaths, I_Position p) throws TerminologyException, IOException {
             allowedPaths.add(p.getPath().getConceptId());
             for (I_Position origin : p.getPath().getOrigins()) {
                 addPathIds(allowedPaths, origin);
@@ -214,30 +205,19 @@ public class LoadClassifyWrite extends AbstractTask {
                             if (allowedPaths.contains(part.getPathId())) {
                                 if (latestPart == null) {
                                     latestPart = part;
-                                } else {
-                                    if (latestPart.getVersion() <= part
-                                            .getVersion()) {
-                                        if (latestPart.getVersion() == part
-                                                .getVersion()) {
-                                            if (getLogger().isLoggable(
-                                                    Level.FINE)) {
-                                                getLogger().log(
-                                                        Level.FINE,
-                                                        "has multiple entries with same version: "
-                                                        + rel + " for "
-                                                        + concept);
-                                            }
-                                            multipleRelEntriesForVersion2++;
+                                } else if (latestPart.getVersion() <= part.getVersion()) {
+                                    if (latestPart.getVersion() == part.getVersion()) {
+                                        if (getLogger().isLoggable(Level.FINE)) {
+                                            getLogger().log(Level.FINE,
+                                                    "has multiple entries with same version: " + rel + " for " + concept);
                                         }
-                                        latestPart = part;
+                                        multipleRelEntriesForVersion2++;
                                     }
+                                    latestPart = part;
                                 }
                             }
                         }
-                        if (latestPart != null
-                                && latestPart.getRelTypeId() == isaId
-                                && activeStatus.contains(latestPart
-                                        .getStatusId())) {
+                        if (latestPart != null && latestPart.getRelTypeId() == isaId && activeStatus.contains(latestPart.getStatusId())) {
                             foundIsa = true;
                             break;
                         }
@@ -249,34 +229,24 @@ public class LoadClassifyWrite extends AbstractTask {
                 }
 
                 I_ConceptAttributePart latestAttributePart = null;
-                for (I_ConceptAttributePart attributePart : concept
-                        .getConceptAttributes().getVersions()) {
+                for (I_ConceptAttributePart attributePart : concept.getConceptAttributes().getVersions()) {
                     if (allowedPaths.contains(attributePart.getPathId())) {
                         if (latestAttributePart == null) {
                             latestAttributePart = attributePart;
-                        } else {
-                            if (latestAttributePart.getVersion() <= attributePart
-                                    .getVersion()) {
-                                if (latestAttributePart.getVersion() == attributePart
-                                        .getVersion()) {
-                                    if (getLogger().isLoggable(Level.FINE)) {
-                                        getLogger().log(
-                                                Level.FINE,
-                                                "has multiple entries with same version: "
-                                                + attributePart
-                                                + " for " + concept);
-                                    }
-                                    multipleAttrEntriesForVersion++;
+                        } else if (latestAttributePart.getVersion() <= attributePart.getVersion()) {
+                            if (latestAttributePart.getVersion() == attributePart.getVersion()) {
+                                if (getLogger().isLoggable(Level.FINE)) {
+                                    getLogger().log(Level.FINE,
+                                            "has multiple entries with same version: " + attributePart + " for " + concept);
                                 }
-                                latestAttributePart = attributePart;
+                                multipleAttrEntriesForVersion++;
                             }
+                            latestAttributePart = attributePart;
                         }
                     }
                 }
 
-                if (latestAttributePart == null
-                        || activeStatus.contains(latestAttributePart
-                                .getConceptStatus()) == false) {
+                if (latestAttributePart == null || activeStatus.contains(latestAttributePart.getConceptStatus()) == false) {
                     return null;
                 }
                 return latestAttributePart;
@@ -303,8 +273,7 @@ public class LoadClassifyWrite extends AbstractTask {
         private FilterConcept filter;
         private Semaphore s;
 
-        public TestForPrimitiveAndAdd(I_SnorocketFactory rocket,
-                                      I_GetConceptData concept, FilterConcept filter, Semaphore s) {
+        public TestForPrimitiveAndAdd(I_SnorocketFactory rocket, I_GetConceptData concept, FilterConcept filter, Semaphore s) {
             super();
             this.rocket = rocket;
             this.concept = concept;
@@ -315,9 +284,7 @@ public class LoadClassifyWrite extends AbstractTask {
         public void run() {
             I_ConceptAttributePart attribute = filter.ok(concept);
             if (attribute != null) {
-                rocket
-                .addConcept(concept.getConceptId(), attribute
-                        .isDefined());
+                rocket.addConcept(concept.getConceptId(), attribute.isDefined());
                 classifyConceptCount++;
                 try {
                     for (I_RelVersioned rel : concept.getSourceRels()) {
@@ -329,61 +296,43 @@ public class LoadClassifyWrite extends AbstractTask {
                                 if (allowedPaths.contains(part.getPathId())) {
                                     if (latestPart == null) {
                                         latestPart = part;
-                                    } else {
-                                        if (latestPart.getVersion() <= part
-                                                .getVersion()) {
-                                            if (latestPart.getVersion() == part
-                                                    .getVersion()) {
-                                                if (filter.getLogger()
-                                                        .isLoggable(Level.FINE)) {
-                                                    filter.getLogger().log(
-                                                            Level.FINE,
-                                                            "has multiple entries with same version: "
-                                                            + rel
-                                                            + " for "
-                                                            + concept);
-                                                }
-                                                multipleRelEntriesForVersion++;
+                                    } else if (latestPart.getVersion() <= part.getVersion()) {
+                                        if (latestPart.getVersion() == part.getVersion()) {
+                                            if (filter.getLogger().isLoggable(Level.FINE)) {
+                                                filter.getLogger().log(Level.FINE,
+                                                        "has multiple entries with same version: " + rel + " for " + concept);
                                             }
-                                            latestPart = part;
+                                            multipleRelEntriesForVersion++;
                                         }
+                                        latestPart = part;
                                     }
                                 }
                             }
 
                             if (latestPart != null) {
                                 relsOnPathCount++;
-                                if (filter.getActiveStatus().contains(
-                                        latestPart.getStatusId())) {
+                                if (filter.getActiveStatus().contains(latestPart.getStatusId())) {
                                     activeRelCount++;
-                                    if (statedForms.contains(latestPart
-                                            .getCharacteristicId())) {
+                                    if (statedForms.contains(latestPart.getCharacteristicId())) {
                                         statedRelCount++;
-                                        rocket.addRelationship(rel.getC1Id(),
-                                                latestPart.getRelTypeId(), rel
-                                                .getC2Id(), latestPart
+                                        rocket.addRelationship(rel.getC1Id(), latestPart.getRelTypeId(), rel.getC2Id(), latestPart
                                                 .getGroup());
                                     }
                                 }
                             }
                         } catch (Exception e) {
-                            filter.getLogger().log(
-                                    Level.SEVERE,
-                                    "Processing rel: " + rel + " for "
-                                    + concept, e);
+                            filter.getLogger().log(Level.SEVERE, "Processing rel: " + rel + " for " + concept, e);
                         }
                     }
                 } catch (Exception e) {
-                    filter.getLogger().log(Level.SEVERE,
-                            e.getLocalizedMessage(), e);
+                    filter.getLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
                 }
             }
             s.release();
         }
     }
 
-    private static class ProcessConcepts implements I_ProcessConcepts,
-    Callable<Boolean> {
+    private static class ProcessConcepts implements I_ProcessConcepts, Callable<Boolean> {
 
         private I_Work worker;
         private I_SnorocketFactory rocket;
@@ -391,8 +340,7 @@ public class LoadClassifyWrite extends AbstractTask {
         private FilterConcept filter;
         private Semaphore s = new Semaphore(20);
 
-        public ProcessConcepts(I_Work worker, I_SnorocketFactory rocket,
-                               FilterConcept filter, ExecutorService executionService) {
+        public ProcessConcepts(I_Work worker, I_SnorocketFactory rocket, FilterConcept filter, ExecutorService executionService) {
             super();
             this.worker = worker;
             this.rocket = rocket;
@@ -403,8 +351,7 @@ public class LoadClassifyWrite extends AbstractTask {
         public void processConcept(I_GetConceptData concept) throws Exception {
             conceptCount++;
             s.acquire();
-            executionService.execute(new TestForPrimitiveAndAdd(rocket,
-                    concept, filter, s));
+            executionService.execute(new TestForPrimitiveAndAdd(rocket, concept, filter, s));
         }
 
         public Boolean call() throws Exception {
@@ -416,8 +363,7 @@ public class LoadClassifyWrite extends AbstractTask {
 
     }
 
-    private static class ProcessResults implements Callable<Boolean>,
-    I_SnorocketFactory.I_Callback {
+    private static class ProcessResults implements Callable<Boolean>, I_SnorocketFactory.I_Callback {
 
         private I_Work worker;
         private I_SnorocketFactory rocket;
@@ -430,27 +376,17 @@ public class LoadClassifyWrite extends AbstractTask {
         private Semaphore resultSemaphore = new Semaphore(20);
         private int returnedRelCount = 0;
 
-        public ProcessResults(final I_Work worker,
-                              final I_SnorocketFactory rocket, ExecutorService executorService)
-        throws Exception {
+        public ProcessResults(final I_Work worker, final I_SnorocketFactory rocket, ExecutorService executorService) throws Exception {
             this.worker = worker;
             this.rocket = rocket;
             this.executionService = executorService;
 
-            relCharacteristic = termFactory
-            .getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-                    .getUids());
-            relRefinability = termFactory
-            .getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                    .getUids());
-            relStatus = termFactory
-            .getConcept(ArchitectonicAuxiliary.Concept.CURRENT
-                    .getUids());
+            relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
-            worker.getLogger().info(
-                    "Inferred id is " + relCharacteristic.getConceptId());
-            worker.getLogger().info(
-                    "Inferred UUIDs are " + relCharacteristic.getUids());
+            worker.getLogger().info("Inferred id is " + relCharacteristic.getConceptId());
+            worker.getLogger().info("Inferred UUIDs are " + relCharacteristic.getUids());
             worker.getLogger().info("Inferred concept is " + relCharacteristic);
         }
 
@@ -462,16 +398,14 @@ public class LoadClassifyWrite extends AbstractTask {
             return true;
         }
 
-        public void addRelationship(int conceptId1, int roleId, int conceptId2,
-                                    int group) {
+        public void addRelationship(int conceptId1, int roleId, int conceptId2, int group) {
             try {
                 resultSemaphore.acquire();
                 returnedRelCount++;
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            AddNewRelationship addNewRelationship = new AddNewRelationship(
-                    conceptId1, roleId, conceptId2, group, resultSemaphore);
+            AddNewRelationship addNewRelationship = new AddNewRelationship(conceptId1, roleId, conceptId2, group, resultSemaphore);
             executionService.execute(addNewRelationship);
         }
 
@@ -485,8 +419,7 @@ public class LoadClassifyWrite extends AbstractTask {
         private int group;
         private Semaphore resultSemaphore;
 
-        public AddNewRelationship(int conceptId1, int typeId, int conceptId2,
-                                  int group, Semaphore resultSemaphore) {
+        public AddNewRelationship(int conceptId1, int typeId, int conceptId2, int group, Semaphore resultSemaphore) {
             this.c1 = conceptId1;
             this.typeId = typeId;
             this.c2 = conceptId2;
@@ -510,8 +443,7 @@ public class LoadClassifyWrite extends AbstractTask {
                                     if (latestPart == null) {
                                         latestPart = part;
                                     } else {
-                                        if (latestPart.getVersion() <= part
-                                                .getVersion()) {
+                                        if (latestPart.getVersion() <= part.getVersion()) {
                                             latestPart = part;
                                         }
                                     }
@@ -519,21 +451,17 @@ public class LoadClassifyWrite extends AbstractTask {
                             }
 
                             if (latestPart != null) {
-                                if ((latestPart.getRelTypeId() == typeId)
-                                        && (latestPart.getGroup() == group)) {
-                                    if (activeStatus.contains(latestPart
-                                            .getStatusId())) {
+                                if ((latestPart.getRelTypeId() == typeId) && (latestPart.getGroup() == group)) {
+                                    if (activeStatus.contains(latestPart.getStatusId())) {
                                         statedAndInferredCount++;
                                         found = true;
                                         // check that defining characteristic is
                                         // proper and possibly add part if not.
                                         if (latestPart.getCharacteristicId() != statedAndInferredNid) {
-                                            I_RelPart newPart = latestPart
-                                            .duplicate();
+                                            I_RelPart newPart = latestPart.duplicate();
                                             newPart.setVersion(version);
                                             newPart.setStatusId(activeNid);
-                                            newPart
-                                            .setCharacteristicId(statedAndInferredNid);
+                                            newPart.setCharacteristicId(statedAndInferredNid);
                                             rel.addVersion(newPart);
                                             tf.writeRel(rel);
                                         }
@@ -541,8 +469,7 @@ public class LoadClassifyWrite extends AbstractTask {
                                         inferredRelCount++;
                                         found = true;
                                         // add part with active status
-                                        I_RelPart newPart = latestPart
-                                        .duplicate();
+                                        I_RelPart newPart = latestPart.duplicate();
                                         newPart.setVersion(version);
                                         newPart.setStatusId(activeNid);
                                         rel.addVersion(newPart);
@@ -557,11 +484,8 @@ public class LoadClassifyWrite extends AbstractTask {
                     }
                     if (found == false) {
                         inferredRelCount++;
-                        I_RelVersioned newRel = tf.newRelationship(UUID
-                                .randomUUID(), unspecifiedUuidNid, c1, c2,
-                                pathNid, version, activeNid, typeId,
-                                inferredCharacteristicNid,
-                                optionalRefinabilityNid, group);
+                        I_RelVersioned newRel = tf.newRelationship(UUID.randomUUID(), unspecifiedUuidNid, c1, c2, pathNid, version,
+                                activeNid, typeId, inferredCharacteristicNid, optionalRefinabilityNid, group);
                         tf.writeRel(newRel);
                         concept1.getSourceRels().add(newRel);
                     }
@@ -578,8 +502,7 @@ public class LoadClassifyWrite extends AbstractTask {
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-    throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             worker.getLogger().info("LCW start evaluate()");
@@ -598,93 +521,60 @@ public class LoadClassifyWrite extends AbstractTask {
 
             final I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
             tf = (I_SupportClassifier) LocalVersionedTerminology.get();
-            
+
             if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
-                throw new TaskFailedException(
-                        "Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig()
-                        .getEditingPathSet());
+                throw new TaskFailedException("Profile must have only one edit path. Found: "
+                        + tf.getActiveAceFrameConfig().getEditingPathSet());
             }
 
-            pathNid = tf.getActiveAceFrameConfig().getEditingPathSet()
-            .iterator().next().getConceptId();
-            activeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-                    .getUids());
-            optionalRefinabilityNid = tf
-            .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
-                    .getUids());
-            inferredCharacteristicNid = tf
-            .uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP
-                    .getUids());
-            statedAndInferredNid = tf
-            .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                    .getUids());
-            unspecifiedUuidNid = tf
-            .uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                    .getUids());
+            pathNid = tf.getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptId();
+            activeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            optionalRefinabilityNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            inferredCharacteristicNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+            statedAndInferredNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+            unspecifiedUuidNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
             int snomedRootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
             isaId = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rocket.setIsa(isaId);
 
-            FilterConcept filter = new FilterConcept(worker.getLogger(),
-                    snomedRootNid, isaId);
+            FilterConcept filter = new FilterConcept(worker.getLogger(), snomedRootNid, isaId);
 
             ExecutorService executionService = Executors.newFixedThreadPool(6);
-            Future<Boolean> conceptFuture = executionService
-            .submit(new ProcessConcepts(worker, rocket, filter,
-                    executionService));
+            Future<Boolean> conceptFuture = executionService.submit(new ProcessConcepts(worker, rocket, filter, executionService));
 
             conceptFuture.get();
 
-            worker.getLogger().info(
-                    "LCW load time (ms): "
-                    + (System.currentTimeMillis() - startTime));
+            worker.getLogger().info("LCW load time (ms): " + (System.currentTimeMillis() - startTime));
 
             executionService.shutdown();
             startTime = System.currentTimeMillis();
-            executionService.awaitTermination(Long.MAX_VALUE,
-                    TimeUnit.MILLISECONDS);
+            executionService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            worker.getLogger().info("LCW executionService termination time (ms): " + (System.currentTimeMillis() - startTime));
+            worker.getLogger().info("Processed total concepts: " + conceptCount + " for classification: " + classifyConceptCount);
             worker.getLogger().info(
-                    "LCW executionService termination time (ms): "
-                    + (System.currentTimeMillis() - startTime));
-            worker.getLogger().info(
-                    "Processed total concepts: " + conceptCount
-                    + " for classification: " + classifyConceptCount);
-            worker.getLogger().info(
-                    "Processed total rels: " + relCount + " rels on path: "
-                    + relsOnPathCount + " active: " + activeRelCount
-                    + " stated: " + statedRelCount);
-            worker.getLogger().info(
-                    "Rels with multiple entries for version: "
-                    + multipleRelEntriesForVersion);
-            worker.getLogger().info(
-                    "Rels with multiple entries for version2: "
-                    + multipleRelEntriesForVersion2);
-            worker.getLogger().info(
-                    "Concepts with multiple entries for attribute: "
-                    + multipleAttrEntriesForVersion);
+                    "Processed total rels: " + relCount + " rels on path: " + relsOnPathCount + " active: " + activeRelCount + " stated: "
+                            + statedRelCount);
+            worker.getLogger().info("Rels with multiple entries for version: " + multipleRelEntriesForVersion);
+            worker.getLogger().info("Rels with multiple entries for version2: " + multipleRelEntriesForVersion2);
+            worker.getLogger().info("Concepts with multiple entries for attribute: " + multipleAttrEntriesForVersion);
 
             worker.getLogger().info("Starting classify. ");
 
             startTime = System.currentTimeMillis();
             rocket.classify();
-            worker.getLogger().info(
-                    "LCW classify time: "
-                    + (System.currentTimeMillis() - startTime));
-  
-            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
-            
-            worker.getLogger().info("Starting get results. ");
-            getClassifierResults(worker, rocket);
-            worker.getLogger().info("Finished get results. ");
-            worker.getLogger().info(
-                    "Stated and inferred: " + statedAndInferredCount
-                    + " stated and subsumbed: "
-                    + statedAndSubsumedCount + " inferred count: "
-                    + inferredRelCount);
+            worker.getLogger().info("LCW classify time: " + (System.currentTimeMillis() - startTime));
 
-            tf.commit();
-            worker.getLogger().info("Finished commit. ");
+            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
+
+//            worker.getLogger().info("Starting get results. ");
+//            getClassifierResults(worker, rocket);
+//            worker.getLogger().info("Finished get results. ");
+//            worker.getLogger().info(
+//                    "Stated and inferred: " + statedAndInferredCount + " stated and subsumbed: " + statedAndSubsumedCount
+//                            + " inferred count: " + inferredRelCount);
+//
+//            tf.commit();
+//            worker.getLogger().info("Finished commit. ");
 
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -693,31 +583,23 @@ public class LoadClassifyWrite extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private void getClassifierResults(I_Work worker, I_SnorocketFactory rocket)
-    throws Exception {
+    private void getClassifierResults(I_Work worker, I_SnorocketFactory rocket) throws Exception {
         long startTime = System.currentTimeMillis();
         version = tf.convertToThinVersion(startTime);
         ExecutorService executionService = Executors.newFixedThreadPool(15);
 
-        Future<Boolean> resultFuture = executionService
-        .submit(new ProcessResults(worker, rocket, executionService));
+        Future<Boolean> resultFuture = executionService.submit(new ProcessResults(worker, rocket, executionService));
         resultFuture.get();
 
-        worker.getLogger().info(
-                "LCW getResults time: "
-                + (System.currentTimeMillis() - startTime));
+        worker.getLogger().info("LCW getResults time: " + (System.currentTimeMillis() - startTime));
 
         executionService.shutdown();
         startTime = System.currentTimeMillis();
-        executionService
-        .awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        worker.getLogger().info(
-                "LCW termination time: "
-                + (System.currentTimeMillis() - startTime));
+        executionService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        worker.getLogger().info("LCW termination time: " + (System.currentTimeMillis() - startTime));
     }
 
-    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
-    throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1) throws TaskFailedException {
         // nothing to do...
     }
 
@@ -729,8 +611,7 @@ public class LoadClassifyWrite extends AbstractTask {
         return new int[] {};
     }
 
-    private static int getNid(I_ConceptualizeUniversally concept)
-    throws TerminologyException, IOException {
+    private static int getNid(I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
         return tf.uuidToNative(concept.getUids());
     }
 
