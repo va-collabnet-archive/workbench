@@ -71,10 +71,6 @@ public abstract class ChangeSetImporter implements ActionListener {
             LocalVersionedTerminology.get().commit();
             activity.setIndeterminate(false);
             activity.complete();
-        } catch (IOException e) {
-            throw new TaskFailedException(e);
-        } catch (ClassNotFoundException e) {
-            throw new TaskFailedException(e);
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
