@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TreeSet;
@@ -386,37 +385,10 @@ public abstract class ProcessSources {
 
     protected abstract Object getId(StreamTokenizer st);
     
-    private class DateFormatterThreadLocal extends ThreadLocal<SimpleDateFormat> {
-        String formatStr;
 
-        private DateFormatterThreadLocal(String formatStr) {
-            super();
-            this.formatStr = formatStr;
-        }
-
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat(formatStr);
-        }
-
-        
-        
-    }
-
-    DateFormatterThreadLocal formatter = new DateFormatterThreadLocal("yyyy-MM-dd HH:mm:ss");
-
-    DateFormatterThreadLocal formatter2 = new DateFormatterThreadLocal("yyyyMMdd HH:mm:ss");
-    
-    DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal("yyyyMMdd'T'HHmmssZ");
 
     protected Date getDate(StreamTokenizer st) throws ParseException {
-        if (st.sval.contains("-")) {
-            return formatter.get().parse(st.sval);
-        } else if (st.sval.endsWith("Z")) {
-            return formatter3.get().parse(st.sval);
-        } {
-            return formatter2.get().parse(st.sval);
-        }
+        return ProcessDates.getDate(st.sval);
     }
 
     protected void readDescriptions(Reader r, Date releaseDate, FORMAT format, CountDownLatch descriptionLatch) throws Exception {
