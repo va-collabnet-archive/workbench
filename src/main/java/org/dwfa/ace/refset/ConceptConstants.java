@@ -33,4 +33,6 @@ public class ConceptConstants {
 	public static final ConceptSpec TEMPLATE_FOR_REL_EXT = new ConceptSpec("template relationship extension", "344f3d87-8f28-315a-a0e5-4d057bf050ae");
 
 	public static final ConceptSpec PATH_VERSION_REFSET = new ConceptSpec("Path version reference set", "999d61ec-ba1e-48eb-b759-62ffeefbf4b1");
+
+	public static final ConceptSpec EXCLUDE_MEMBERS_REL_TYPE = new ConceptSpec("exclude members", "4fdc7569-ff5a-49ec-bcfb-cc41308abcc0");
 }

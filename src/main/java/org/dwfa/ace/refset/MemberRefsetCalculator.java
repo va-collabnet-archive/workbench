@@ -88,8 +88,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private Map<Integer,List<Integer>> conceptsWithDirectExclusion = new HashMap<Integer,List<Integer>>();
 
 	private MemberRefsetChangesetWriter nonTxWriter;
-	
+
 	public void run() {
+		
 		termFactory = LocalVersionedTerminology.get();
 		
 		try {
@@ -101,7 +102,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 			}			
 			
 			if (allowedRefsets.size()==0) {
-				allowedRefsets = getSpecificationRefsets();
+				allowedRefsets = getSpecificationRefsets();				
 			}
 			setUp();
 
@@ -153,6 +154,23 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 						}
 					} 
 				}
+				
+				// If the specification refset has a "exclude members" source relationship then get all
+				// the members of the destination refset and add them to conceptsWithExcludeIndividual
+				
+				int excludeMembersRefsetId = getExcludeMembersRefset(i);
+				if (excludeMembersRefsetId != 0) {
+					I_GetConceptData exclusionSet = getConcept(excludeMembersRefsetId);
+					System.out.println("Applying additional exclusion members from " + 
+							exclusionSet.getId().getUIDs().iterator().next() + " to member refset " + 
+							memberSet.getId().getUIDs().iterator().next());
+					
+					for (I_ThinExtByRefVersioned additionalExclusionMember : 
+							termFactory.getRefsetExtensionMembers(excludeMembersRefsetId)) {
+						conceptsWithExcludeIndividual.add(additionalExclusionMember.getComponentId());						
+					}
+				} 
+				
 				System.out.println("Done calcuating for refset " + memberSet + " - commencing update");
 				
 				conceptsWithDirectInclusion.put(memberSetId, conceptsWithInclusion);
@@ -297,11 +315,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	}
 
 	public void addToRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
+		//System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" + conceptDetails.getConceptId());
 		addToNestedSet(newRefsetMembers,conceptDetails,refset);
 	}
 
 	public void addToRefsetExclusion(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
-		addToNestedSet(newRefsetExclusion,conceptDetails,refset);
+		//System.out.println("*** addToRefsetExclusion refset=" + refset + " concept=" + conceptDetails.getConceptId());
+		addToNestedSet(newRefsetExclusion,conceptDetails,refset);		
 	}
 
 
@@ -581,8 +601,16 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					System.out.println("finding parent to be marked " + count + " of " + concepts.size() + " (" + (System.currentTimeMillis() - sysTime) + ")");
 					sysTime = System.currentTimeMillis();
 				}
+				
+				//String conceptUuid = termFactory.getUids(conceptId.getConceptId()).iterator().next().toString();
+				//System.out.println("* concept " + conceptUuid + " (" + conceptId.getConceptId() + ")");
+				
 				Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId(), concepts);
 				for (Integer parentId: parents) {
+					
+					//String parentUuid = termFactory.getUids(parentId).iterator().next().toString();					
+					//System.out.println("    parent " + parentUuid + " (" + parentId + ")");
+					
 					ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId,0,0,0);
 					if (!concepts.containsKey(parent.getConceptId())) {
 						nonMarkedParents.add(parent);

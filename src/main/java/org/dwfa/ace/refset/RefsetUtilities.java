@@ -23,6 +23,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.UnknownComponentException;
 import org.dwfa.tapi.spec.ConceptSpec;
 
 public abstract class RefsetUtilities {
@@ -193,9 +194,8 @@ public abstract class RefsetUtilities {
 		return status;
 	}
 
-	protected<T> T assertExactlyOne(
-			Collection<T> collection) {
-		assert collection.size() == 1 :
+	protected<T> T assertExactlyOne(Collection<T> collection) {
+		assert collection.size() == 1 : 
 			"Exactly one element expected, encountered " + collection;
 
 		return collection.iterator().next();
@@ -220,8 +220,7 @@ public abstract class RefsetUtilities {
 		return memberSetSpecConcept;
 	}
 	
-	protected <T> T assertOneOrNone(
-			Collection<T> collection) {
+	protected <T> T assertOneOrNone(Collection<T> collection) {
 		assert collection.size() <= 1 :
 			"Exactly one element expected, encountered " + collection;
 
@@ -380,15 +379,38 @@ public abstract class RefsetUtilities {
 		return null;
 	}
 
-	public int getMembershipType(int includeTypeConceptId) throws Exception {
-		I_GetConceptData includeConcept = getConcept(includeTypeConceptId);
+	/**
+	 * Get the target of a particular type of source relation on a concept.
+	 * The source relationship must be current and there must be only one of that type present.
+	 */
+	public int getRelTypeTarget(int conceptId, ConceptSpec relType) throws Exception {
+		I_GetConceptData concept = getConcept(conceptId);
 
-		Set<I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(
-				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(ConceptConstants.CREATES_MEMBERSHIP_TYPE), null, false);
+		Set<I_GetConceptData> membershipTypes = concept.getSourceRelTargets(
+				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(relType), null, false);
 
-		return assertExactlyOne(membershipTypes).getConceptId();
+		if (membershipTypes.size() == 0) {
+			throw new TerminologyException(
+					"A source relationship of type '" + relType.getDescription() + 
+					"' was not found for concept " + concept.getId().getUIDs().iterator().next());
+		}
+		
+		if (membershipTypes.size() > 1) {
+			throw new TerminologyException(
+					"More than one source relationship of type '" + relType.getDescription() + 
+					"' was found for concept " + concept.getId().getUIDs().iterator().next());
+		}
+		
+		return membershipTypes.iterator().next().getConceptId();
 	}
 
+	public int getMembershipType(int includeTypeConceptId) throws Exception {
+		return getRelTypeTarget(includeTypeConceptId, ConceptConstants.CREATES_MEMBERSHIP_TYPE);
+	}
+
+	public int getExcludeMembersRefset(int specRefsetConceptId) throws Exception {
+		return getRelTypeTarget(specRefsetConceptId, ConceptConstants.EXCLUDE_MEMBERS_REL_TYPE); 
+	}
 
 	public I_GetConceptData getPathConcept() {
 		return pathConcept;
