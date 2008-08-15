@@ -491,7 +491,7 @@ public abstract class ProcessSources {
                 tokenType = st.nextToken();
             }
             descriptionLatch.countDown();
-            System.out.println("count down description latch. up to description " + descriptions + "Latch: " + descriptionLatch.getCount());
+            System.out.println("count down description latch. up to description " + descriptions + " Latch: " + descriptionLatch.getCount());
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -557,7 +557,7 @@ public abstract class ProcessSources {
             }
 
             descriptionLatch.countDown();
-            System.out.println("count down description latch. up to description " + descriptions + "Latch: " + descriptionLatch.getCount());
+            System.out.println("count down description latch. up to description " + descriptions + " Latch: " + descriptionLatch.getCount());
             // Beginning of loop
             tokenType = st.nextToken();
         }
