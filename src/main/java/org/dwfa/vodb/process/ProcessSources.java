@@ -407,7 +407,7 @@ public abstract class ProcessSources {
 
     DateFormatterThreadLocal formatter2 = new DateFormatterThreadLocal("yyyyMMdd HH:mm:ss");
     
-    DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal("yyyyMMddTHHmmssZ");
+    DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal("yyyyMMdd'T'HHmmssZ");
 
     protected Date getDate(StreamTokenizer st) throws ParseException {
         if (st.sval.contains("-")) {
