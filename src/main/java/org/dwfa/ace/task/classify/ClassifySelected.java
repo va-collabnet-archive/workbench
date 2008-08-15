@@ -149,13 +149,6 @@ worker.getLogger().info("Classified! " + (System.currentTimeMillis() - startTime
         final void processConcept(I_Work worker, final I_GetConceptData concept) throws IOException, TerminologyException {
             final int conceptId = concept.getConceptId();
 
-//            rocket.addConcept(111, false);
-//            rocket.addConcept(222, false);
-//            rocket.addConcept(333, false);
-//            rocket.addConcept(444, false);
-//            rocket.addRelationship(111, -2147468542, 222, 0);
-            rocket.addRelationship(222, 116680003, 444, 0);
-            
             final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
             if (tuples.size() == 1) {
 worker.getLogger().info("Add concept: " + conceptId + " : " + concept.getId() + ": " + tuples.get(0).isDefined());
