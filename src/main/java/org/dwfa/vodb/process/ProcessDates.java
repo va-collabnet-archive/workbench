@@ -29,6 +29,8 @@ public class ProcessDates {
     
     DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal("yyyyMMdd'T'HHmmssZ");
     
+    DateFormatterThreadLocal formatter4 = new DateFormatterThreadLocal("yyyyMMdd");
+
     private static ProcessDates dateProcessor = new ProcessDates();
     
     private Date getDateFromString(String dateStr) throws ParseException {
@@ -36,7 +38,9 @@ public class ProcessDates {
             return formatter.get().parse(dateStr);
         } else if (dateStr.contains("T")) {
             return formatter3.get().parse(dateStr.replace("Z", "-0000"));
-        } {
+        } else if (dateStr.length() < 8) {
+            return formatter4.get().parse(dateStr);
+        } else {
             return formatter2.get().parse(dateStr);
         }
     }

@@ -18,6 +18,8 @@ public class TestProcessSources extends TestCase {
 		try {
 			String dateStr = "20080831T000000Z";
 			ProcessDates.getDate(dateStr);
+			dateStr = "20080131";
+			ProcessDates.getDate(dateStr);
 		} catch (ParseException e) {
 			fail(e.toString());
 		}
