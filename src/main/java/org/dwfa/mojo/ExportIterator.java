@@ -276,7 +276,7 @@ public class ExportIterator implements I_ProcessConcepts {
 			
 			I_ConceptAttributeTuple latestAttrib = null;
 			for (I_ConceptAttributeTuple attribTup : matches) {
-				if (latestAttrib == null || attribTup.getVersion() >= latestAttrib.getVersion()) {
+				if (validPosition(attribTup.getPathId()) && (latestAttrib == null || attribTup.getVersion() >= latestAttrib.getVersion())) {
 					latestAttrib = attribTup;
 				}
 			}
@@ -323,6 +323,16 @@ public class ExportIterator implements I_ProcessConcepts {
 
 			return true;
 		}// End method getUuidBasedConceptDetaiils
+	}
+
+	private boolean validPosition(int pathId) {
+		for (I_Position position : positions) {
+			if (position.getPath().getConceptId() == pathId) {
+				return true;
+			}
+			
+		}
+		return false;
 	}
 
 	private void writeUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes) 
@@ -504,7 +514,7 @@ public class ExportIterator implements I_ProcessConcepts {
 		for (I_DescriptionTuple desc : latestDesc.values()) {
 			
 			I_DescriptionPart part = desc.getPart();
-			if (allowedStatus.contains(part.getStatusId()) && isExportable(ConceptBean.get(part.getTypeId()))) {
+			if (validPosition(part.getPathId()) && allowedStatus.contains(part.getStatusId()) && isExportable(ConceptBean.get(part.getTypeId()))) {
 	
 				if (descId != desc.getDescId()) {
 					descId = desc.getDescId();
