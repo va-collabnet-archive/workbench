@@ -9,8 +9,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -31,14 +33,10 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
 public class ShowResultsInSignpost extends AbstractTask {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-
-    public StringBuilder sb;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -55,15 +53,15 @@ public class ShowResultsInSignpost extends AbstractTask {
     }
 
     public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
-            throws TaskFailedException {
+    throws TaskFailedException {
         // nothing to do...
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    throws TaskFailedException {
 
         try {
-            sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append("<tr><th>")
             .append("CONCEPT 1")
             .append("</th><th>")
@@ -73,16 +71,20 @@ public class ShowResultsInSignpost extends AbstractTask {
             .append("</th><th>")
             .append("GROUP")
             .append("</th></tr>\n");
-            
+
             I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
 
-            rocket.getResults(new ProcessResults(worker));
-            
+            rocket.getResults(new ProcessResults(worker, sb));
+
             worker.getLogger().info(sb.toString());
-            
-//          update signpost            
+
+            //          update signpost            
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             final JPanel signpostPanel = config.getSignpostPanel();
+
+            final JLabel resultsTable = new JLabel("<html><table align=\"center\" border=\"1\">" + sb + "</table></html>");
+            final JComponent component = new JScrollPane(resultsTable);
+
             SwingUtilities.invokeAndWait(new Runnable() {
 
                 public void run() {
@@ -100,7 +102,7 @@ public class ShowResultsInSignpost extends AbstractTask {
                     c.weightx = 1.0;
                     c.weighty = 1.0;
                     c.anchor = GridBagConstraints.NORTHWEST;
-                    signpostPanel.add(new JLabel("<html><table>" + sb + "</table></html>"), c);
+                    signpostPanel.add(component, c);
                     signpostPanel.validate();
                     Container cont = signpostPanel;
                     while (cont != null) {
@@ -109,13 +111,13 @@ public class ShowResultsInSignpost extends AbstractTask {
                     }
                 }
             });
-            
+
             worker.getLogger().info("Finished get results. ");
-//            worker.getLogger().info(
-//                    "Stated and inferred: " + statedAndInferredCount
-//                    + " stated and subsumbed: "
-//                    + statedAndSubsumedCount + " inferred count: "
-//                    + inferredRelCount);
+            //            worker.getLogger().info(
+            //                    "Stated and inferred: " + statedAndInferredCount
+            //                    + " stated and subsumbed: "
+            //                    + statedAndSubsumedCount + " inferred count: "
+            //                    + inferredRelCount);
 
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -134,7 +136,8 @@ public class ShowResultsInSignpost extends AbstractTask {
 
     private class ProcessResults implements I_SnorocketFactory.I_Callback {
 
-        private I_Work worker;
+        final private I_Work worker;
+        final private StringBuilder sb;
 
         private I_TermFactory termFactory = LocalVersionedTerminology.get();
         public I_GetConceptData relCharacteristic;
@@ -142,9 +145,10 @@ public class ShowResultsInSignpost extends AbstractTask {
         public I_GetConceptData relStatus;
         private int returnedRelCount = 0;
 
-        public ProcessResults(final I_Work worker)
+        public ProcessResults(final I_Work worker, StringBuilder sb)
         throws Exception {
             this.worker = worker;
+            this.sb = sb;
 
             relCharacteristic = 
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
@@ -158,24 +162,23 @@ public class ShowResultsInSignpost extends AbstractTask {
             worker.getLogger().info("Inferred concept is " + relCharacteristic);
         }
 
-        public void addRelationship(int conceptId1, int roleId, int conceptId2,
-                                    int group) {
+        public void addRelationship(int conceptId1, int roleId, int conceptId2, int group) {
             try {
-                worker.getLogger().info(conceptId1 + " " + roleId + " " + conceptId2 + " " + group);
                 returnedRelCount++;
                 final I_GetConceptData relSource = termFactory.getConcept(conceptId1);
                 final I_GetConceptData relType = termFactory.getConcept(roleId);
                 final I_GetConceptData relDestination = termFactory.getConcept(conceptId2);
-                
+                //                worker.getLogger().info(relSource + " " + relType + " " + relDestination + " " + group);
+
                 sb.append("<tr><td>")
-                  .append(relSource.getConceptId())
-                  .append("</td><td>")
-                  .append(relType.getConceptId())
-                  .append("</td><td>")
-                  .append(relDestination.getConceptId())
-                  .append("</td><td>")
-                  .append(group)
-                  .append("</td></tr>\n");
+                .append(relSource)
+                .append("</td><td>")
+                .append(relType)
+                .append("</td><td>")
+                .append(relDestination)
+                .append("</td><td>")
+                .append(group)
+                .append("</td></tr>\n");
             } catch (TerminologyException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -186,5 +189,5 @@ public class ShowResultsInSignpost extends AbstractTask {
         }
 
     }
-    
+
 }
