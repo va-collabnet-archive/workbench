@@ -18,6 +18,7 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
 public class GetBaseClassification extends AbstractTask {
+    
     /**
      * 
      */
@@ -31,8 +32,9 @@ public class GetBaseClassification extends AbstractTask {
     private String fileName = "baseState.txt";
 
     final private static Object LOCK = new Object();
-    private static String stateName = null;
-    private static I_SnorocketFactory rocket = null;
+    private static volatile String stateName = null;
+    private static volatile I_SnorocketFactory rocket = null;
+    private static volatile I_SnorocketFactory newRocket = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -48,6 +50,16 @@ public class GetBaseClassification extends AbstractTask {
         if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    getRocket();
+                } catch (TaskFailedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
@@ -59,7 +71,7 @@ public class GetBaseClassification extends AbstractTask {
             throws TaskFailedException {
 
         try {
-            I_SnorocketFactory rocket = getRocket().createExtension();
+            final I_SnorocketFactory rocket = getRocket();
             
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
         } catch (RuntimeException e) {
@@ -70,6 +82,7 @@ public class GetBaseClassification extends AbstractTask {
     }
 
     private I_SnorocketFactory getRocket() throws TaskFailedException {
+        I_SnorocketFactory result;
         synchronized (LOCK) {
             if (null == rocket || !getFileName().equals(stateName)) {
                 InputStream is;
@@ -83,8 +96,14 @@ public class GetBaseClassification extends AbstractTask {
                     throw new TaskFailedException(e);
                 }
             }
+            result = null == newRocket ? rocket.createExtension() : newRocket;
+            new Thread(new Runnable() {
+                public void run() {
+                    newRocket = rocket.createExtension();
+                }
+            }).start();
         }
-        return rocket;
+        return result;
     }
 
     public Collection<Condition> getConditions() {
