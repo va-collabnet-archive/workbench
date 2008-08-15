@@ -38,7 +38,7 @@ public class ProcessDates {
             return formatter.get().parse(dateStr);
         } else if (dateStr.contains("T")) {
             return formatter3.get().parse(dateStr.replace("Z", "-0000"));
-        } else if (dateStr.length() < 8) {
+        } else if (dateStr.length() < 9) {
             return formatter4.get().parse(dateStr);
         } else {
             return formatter2.get().parse(dateStr);
