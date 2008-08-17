@@ -339,8 +339,26 @@ public class ExportIterator implements I_ProcessConcepts {
 			throws Exception {
 
 		List<I_RelTuple> tuples = concept.getSourceRelTuples(null, null,positions, false);
-		int relId = 0;
+		
+		HashMap<Integer, I_RelTuple> latestRel = new HashMap<Integer, I_RelTuple>();
 		for (I_RelTuple tuple : tuples) {
+			
+			if (!validPosition(tuple.getPathId())) {
+				continue;
+			}
+			
+			if (!latestRel.containsKey(tuple.getRelId())) {
+				latestRel.put(tuple.getRelId(), tuple);
+			} else {
+				I_RelTuple latestTuple = latestRel.get(tuple.getRelId());
+				if (tuple.getVersion() >= latestTuple.getVersion()) {
+					latestRel.put(tuple.getRelId(), tuple);
+				}
+			}
+		}
+		
+		int relId = 0;
+		for (I_RelTuple tuple : latestRel.values()) {
 			I_RelPart part = tuple.getPart();
 			I_RelVersioned rel = tuple.getRelVersioned();
 			if (allowedStatus.contains(part.getStatusId())
@@ -500,6 +518,10 @@ public class ExportIterator implements I_ProcessConcepts {
 		// Filter the tuples down to just the latest version for each unique description
 		HashMap<Integer, I_DescriptionTuple> latestDesc = new HashMap<Integer, I_DescriptionTuple>();
 		for (I_DescriptionTuple tuple : tuples) {
+			
+			if (!validPosition(tuple.getPathId())) {
+				continue;
+			}
 			
 			if (!latestDesc.containsKey(tuple.getDescId())) {
 				latestDesc.put(tuple.getDescId(), tuple);
