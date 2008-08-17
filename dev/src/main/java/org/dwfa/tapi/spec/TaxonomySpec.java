@@ -46,15 +46,23 @@ public class TaxonomySpec {
 	 */
 	public boolean contains(I_ConceptualizeLocally concept) throws IOException, TerminologyException {
 		//first check if it is the root node
-		if (rootNode.localize().equals(concept)) {
+		I_ConceptualizeLocally root = rootNode.localize();
+		if (root.getNid() == concept.getNid()) {
 			return true;
 		}
+		return processChildren(root, concept);
+	}
+
+	private boolean processChildren(I_ConceptualizeLocally root, I_ConceptualizeLocally concept)
+			throws IOException, TerminologyException {
 		//if not, for each of the children
-		for (I_RelateConceptsLocally relationship : concept.getSourceRels(convertToConceptualizeList(relationshipTypes))) {
-			if (relationship.getC2().equals(rootNode.localize())) {
+		for (I_RelateConceptsLocally relationship : root.getDestRels(convertToConceptualizeList(relationshipTypes))) {
+			if (relationship.getC1().getNid() == concept.getNid()) {
 				return true;
 			} else {
-				return contains(relationship.getC2());
+				if (processChildren(relationship.getC1(), concept)) {
+					return true;
+				}
 			}
 		}
 		return false;
