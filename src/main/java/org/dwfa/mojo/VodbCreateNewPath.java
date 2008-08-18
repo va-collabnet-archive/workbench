@@ -1,6 +1,7 @@
 package org.dwfa.mojo;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -110,44 +111,13 @@ public class VodbCreateNewPath extends AbstractMojo {
 
 			UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
 
-			I_GetConceptData pathConcept = tf
-			.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
-
-			I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
-			if (status!=null) {
-				SetStatusUtil.setStatusOfConceptInfo(status.getVerifiedConcept(),cav.getTuples());
+			I_GetConceptData pathConcept;
+			
+			if (tf.hasId(pathUUID)) {
+				pathConcept = tf.getConcept(new UUID[] {pathUUID});
+			} else {
+				pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
 			}
-
-			UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-					pathUUID.toString() + 
-					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + 
-					pathFsDesc);
-
-			I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
-					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
-			if (status!=null) {
-				SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idv.getTuples());
-			}
-			UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-					pathUUID.toString() + 
-					ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + 
-					pathPrefDesc);
-
-			I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
-					ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
-			if (status!=null) {
-				SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idvpt.getTuples());
-			}
-
-			UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-					pathUUID.toString() + fsDescUuid + prefDescUuid);
-
-			I_RelVersioned rel = tf.newRelationship(relUuid, pathConcept, activeConfig);
-			if (status!=null) {
-				SetStatusUtil.setStatusOfRelInfo(status.getVerifiedConcept(),rel.getTuples());
-			}            
-//			need to do an immediate commit so that new concept will be available to path when read from changeset
-			tf.commit(); 
 
 			tf.newPath(pathOrigins, pathConcept);
 		} catch (TerminologyException e) {
@@ -159,6 +129,51 @@ public class VodbCreateNewPath extends AbstractMojo {
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
+	}
+
+	private I_GetConceptData createNewPathConcept(I_TermFactory tf,
+			I_ConfigAceFrame activeConfig, UUID pathUUID)
+			throws TerminologyException, IOException, Exception,
+			NoSuchAlgorithmException, UnsupportedEncodingException {
+		I_GetConceptData pathConcept = tf
+		.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
+
+		I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
+		if (status!=null) {
+			SetStatusUtil.setStatusOfConceptInfo(status.getVerifiedConcept(),cav.getTuples());
+		}
+
+		UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
+				pathUUID.toString() + 
+				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + 
+				pathFsDesc);
+
+		I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
+				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
+		if (status!=null) {
+			SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idv.getTuples());
+		}
+		UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
+				pathUUID.toString() + 
+				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + 
+				pathPrefDesc);
+
+		I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
+				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
+		if (status!=null) {
+			SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idvpt.getTuples());
+		}
+
+		UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
+				pathUUID.toString() + fsDescUuid + prefDescUuid);
+
+		I_RelVersioned rel = tf.newRelationship(relUuid, pathConcept, activeConfig);
+		if (status!=null) {
+			SetStatusUtil.setStatusOfRelInfo(status.getVerifiedConcept(),rel.getTuples());
+		}            
+//			need to do an immediate commit so that new concept will be available to path when read from changeset
+		tf.commit();
+		return pathConcept;
 	}
 
 	
