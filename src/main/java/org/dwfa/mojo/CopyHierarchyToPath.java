@@ -1,5 +1,8 @@
 package org.dwfa.mojo;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,10 +66,10 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 	ConceptDescriptor[] hierarchyRelationshipTypes = null;
 	
 	/**
-	 * Relationship status for the hierarchy - defaults to current
+	 * Allowed statuses for the hierarchy - defaults to active or a child of active
 	 * @parameter
 	 */
-	ConceptDescriptor[] hierarchyRelationshipStatus = null;
+	ConceptDescriptor[] hierarchyStatuses = null;
 	
 	/**
 	 * Exclusion from the hierarchy
@@ -100,36 +103,60 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 
 	private int conceptCount;
 
+	private I_IntSet allowedStatus;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		tf = LocalVersionedTerminology.get();
 
-		if (hierarchyRelationshipTypes == null) {
-			hierarchyRelationshipTypes = new ConceptDescriptor[]{new ConceptDescriptor()};
-			hierarchyRelationshipTypes[0].setDescription("Is a (attribute)");
-			hierarchyRelationshipTypes[0].setUuid("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
-		}
-		
-		if (hierarchyRelationshipStatus == null) {
-			hierarchyRelationshipStatus = new ConceptDescriptor[]{new ConceptDescriptor()};
-			hierarchyRelationshipStatus[0].setDescription("current (active status type)");
-			hierarchyRelationshipStatus[0].setUuid("2faa9261-8fb2-11db-b606-0800200c9a66");
-		}
-		
 		try {
+		
+			if (hierarchyRelationshipTypes == null) {
+				
+				hierarchyRelationshipTypes = new ConceptDescriptor[]{
+						new ConceptDescriptor("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25", "Is a (attribute)")
+				};
+			}
+			
+			if (hierarchyStatuses == null) {
+				
+				// Initialise the array of allowed statuses (if none are provide from the configuration)
+				// with the status concept "active" and its children
+				
+				ConceptDescriptor activeStatus = new ConceptDescriptor("32dc7b19-95cc-365e-99c9-5095124ebe72","active");
+				ConceptDescriptor currentStatus = new ConceptDescriptor("2faa9261-8fb2-11db-b606-0800200c9a66","current");
+				
+				hierarchyStatuses = new ConceptDescriptor[] { activeStatus, currentStatus };
+				
+				Set<I_GetConceptData> children = activeStatus.getVerifiedConcept().getDestRelOrigins(
+						toIntSet(hierarchyStatuses), toIntSet(hierarchyRelationshipTypes), null, false);
+				
+				ArrayList<ConceptDescriptor> statusDescriptors = new ArrayList<ConceptDescriptor>();
+				statusDescriptors.add(activeStatus);
+				for (I_GetConceptData child : children) {
+					ConceptDescriptor childStatus = new ConceptDescriptor();
+					childStatus.setDescription(child.getInitialText());
+					childStatus.setUuid(child.getUids().get(0).toString());
+					statusDescriptors.add(childStatus);
+				}
+				
+				hierarchyStatuses = statusDescriptors.toArray(hierarchyStatuses);
+			}
+				
+			allowedStatus = toIntSet(hierarchyStatuses);
+		
 			toPathId = toPath.getVerifiedConcept().getConceptId();
 			directInterface = tf.getDirectInterface();
 			
-			processAllChildren(rootNode.getVerifiedConcept(), toIntSet(hierarchyRelationshipTypes), toIntSet(hierarchyRelationshipStatus));
+			processAllChildren(rootNode.getVerifiedConcept(), toIntSet(hierarchyRelationshipTypes), allowedStatus);
 		} catch (Exception e) {
 			throw new MojoExecutionException("Failed executing hierarchy copy due to exception", e);
 		}
 
 	}
 	
-	private I_IntSet toIntSet(ConceptDescriptor[] hierarchyRelationshipTypes2) throws Exception {
+	private I_IntSet toIntSet(ConceptDescriptor[] concepts) throws Exception {
 		I_IntSet intset = tf.newIntSet();
-		for (ConceptDescriptor conceptDescriptor : hierarchyRelationshipTypes2) {
+		for (ConceptDescriptor conceptDescriptor : concepts) {
 			intset.add(conceptDescriptor.getVerifiedConcept().getConceptId());
 		}
 		return intset;
@@ -197,7 +224,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 				datachanged = true;
 			}
 		}
-		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId) {
+		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId
+				&& allowedStatus.contains(latestPart.getConceptStatus())) {
 			duplicateConceptAttributeTuple(latestPart);
 			datachanged = true;
 		}
@@ -229,6 +257,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		
 		boolean datachanged = false;
 		I_DescriptionTuple latestPart = null;
+		
 		for (I_DescriptionTuple t : descriptionVersioned.getTuples()) {
 			if (latestStateOnly) {
 				if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
@@ -239,7 +268,9 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 				datachanged = true;
 			}
 		}
-		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId) {
+		
+		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId
+				&& allowedStatus.contains(latestPart.getStatusId())) {
 			duplicateDescriptionTuple(latestPart);
 			datachanged = true;
 		}
@@ -276,7 +307,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 				datachanged = true;
 			}
 		}
-		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId) {
+		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId
+				&& allowedStatus.contains(latestPart.getStatusId())) {
 			duplicateExtensionTuple(latestPart);
 			datachanged = true;
 		}
@@ -312,7 +344,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 				datachanged = true;
 			}
 		}
-		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId) {
+		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId
+				&& allowedStatus.contains(latestPart.getIdStatus())) {
 			duplicateIdTuple(latestPart);
 			datachanged = true;
 		}
@@ -354,7 +387,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 				datachanged = true;
 			}
 		}
-		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId) {
+		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId
+				&& allowedStatus.contains(latestPart.getStatusId())) {
 			duplicateImageTuple(latestPart);
 			datachanged = true;
 		}
@@ -397,7 +431,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 				datachanged = true;
 			}
 		}
-		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId) {
+		if (latestStateOnly && latestPart != null && latestPart.getPathId() != toPathId
+				&& allowedStatus.contains(latestPart.getStatusId())) {
 			duplicateRelationshipTuple(latestPart);
 			datachanged = true;
 		}
