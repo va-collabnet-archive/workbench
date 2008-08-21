@@ -27,8 +27,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.mojo.ConceptDescriptor;
@@ -99,6 +101,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 	private HashMap<String, BufferedWriter> writerMap = new HashMap<String, BufferedWriter>();
 
 	private HashMap<Integer, RefsetType> refsetTypeMap = new HashMap<Integer, RefsetType>();
+
+	private HashMap<Integer, String> pathReleaseVersions = new HashMap<Integer, String>();
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (!fixedMapDirectory.exists() || !fixedMapDirectory.isDirectory() || !fixedMapDirectory.canRead()) {
@@ -245,7 +249,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		}
 	}
 
-	private void extractStatus(I_AmPart latest, int relId) throws TerminologyException, IOException, InstantiationException, IllegalAccessException {
+	private void extractStatus(I_AmPart latest, int relId) throws Exception {
 		I_ThinExtByRefTuple tuple = getCurrentExtension(relId, ConceptConstants.STATUS_REASON_EXTENSION);
 		I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
 		if (part == null) {
@@ -268,7 +272,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		}
 	}
 
-	private void extractDefinitionType(I_ConceptAttributePart latest, int conceptId) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
+	private void extractDefinitionType(I_ConceptAttributePart latest, int conceptId) throws Exception {
 		I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.DEFINITION_TYPE_EXTENSION);
 		I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
 		if (part == null) {
@@ -292,8 +296,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
 
 	private void extractRelationshipRefinability(I_RelPart latest, int relId)
-			throws IOException, TerminologyException, InstantiationException,
-			IllegalAccessException {
+			throws Exception {
 		I_ThinExtByRefTuple tuple = getCurrentExtension(relId, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION);
 		I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
 		if (part == null) {
@@ -340,11 +343,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		}
 	}
 
-	private void export(I_ThinExtByRefTuple thinExtByRefTuple) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
+	private void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
 		export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(), thinExtByRefTuple.getComponentId());
 	}
 	
-	private void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws IOException, TerminologyException, InstantiationException, IllegalAccessException {
+	private void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
 		RefsetType refsetType = refsetTypeMap.get(refsetId);
 		if (refsetType == null) {
 			try {
@@ -360,16 +363,19 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		BufferedWriter sctIdRefsetWriter = writerMap.get(refsetId + "SCTID");
 		if (sctIdRefsetWriter == null) {
 			//must not have written to this file yet
-			String refsetName = tf.getConcept(refsetId).getInitialText();
+			I_GetConceptData refsetConcept = tf.getConcept(refsetId);
+			String refsetName = refsetConcept.getInitialText();
 			
 			//TODO this is not the best way, but it works for now.
 			refsetName = refsetName.replace("/", "-");
 			refsetName = refsetName.replace("'", "_");
 			
+			String releaseVersion = getReleaseVersion(refsetConcept);
+			
 			uuidRefsetWriter = new BufferedWriter(new FileWriter(
-					new File(uuidRefsetOutputDirectory, "UUID_" + refsetName + refsetType.getFileExtension())));
+					new File(uuidRefsetOutputDirectory, "UUID_" + refsetName + "_" + releaseVersion + "." + refsetType.getFileExtension())));
 			sctIdRefsetWriter = new BufferedWriter(new FileWriter(
-					new File(sctidRefsetOutputDirectory, "SCTID_" + refsetName + refsetType.getFileExtension())));
+					new File(sctidRefsetOutputDirectory, "SCTID_" + refsetName + "_" + releaseVersion + "." + refsetType.getFileExtension())));
 			
 			writerMap.put(refsetId + "UUID", uuidRefsetWriter);
 			writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);
@@ -390,6 +396,60 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		sctIdRefsetWriter.newLine();
 	}
 
+	private String getReleaseVersion(I_GetConceptData refsetConcept) throws Exception {
+		
+		if (pathReleaseVersions.containsKey(refsetConcept.getConceptId())) {
+			return pathReleaseVersions.get(refsetConcept.getConceptId());
+		} else {
+			int pathid = getLatestAttributePart(refsetConcept).getPathId();
+			
+			String pathUuidStr = Integer.toString(pathid);
+			try {
+				String pathVersion = null;
+				pathUuidStr = tf.getUids(pathid).iterator().next().toString();
+				
+				int pathVersionRefsetNid = tf.uuidToNative(org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
+				int currentStatusId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+				for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(pathid)) {
+					if (extension.getRefsetId() == pathVersionRefsetNid) {
+						I_ThinExtByRefPart latestPart = getLatestVersion(extension);
+						if (latestPart.getStatusId() == currentStatusId) {
+							
+							if (pathVersion != null) {
+								throw new TerminologyException("Concept contains multiple extensions for refset" +
+										org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getDescription());
+							}
+							
+							pathVersion = ((I_ThinExtByRefPartString) latestPart).getStringValue();
+						}
+					}
+				}
+				
+				if (pathVersion == null) {
+					throw new TerminologyException("Concept not a member of " + 
+							org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getDescription());					 
+				}
+
+				String releaseVersion = tf.getConcept(pathid).getInitialText() + "_" + pathVersion;
+				pathReleaseVersions.put(refsetConcept.getConceptId(), releaseVersion);
+				return releaseVersion;
+				
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to obtain the release version for the path " + pathUuidStr, e);
+			}
+		}
+	}
+
+	private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
+		I_ThinExtByRefPart latestPart = null;
+		for (I_ThinExtByRefPart part : extension.getVersions()) {
+			if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
+				latestPart = part;
+			}
+		}
+		return latestPart;
+	}
+	
 	private boolean testSpecification(I_GetConceptData concept) throws Exception {
 		for (ExportSpecification spec : exportSpecifications) {
 			if (spec.test(concept) && getLatestAttributePart(concept) != null) {
