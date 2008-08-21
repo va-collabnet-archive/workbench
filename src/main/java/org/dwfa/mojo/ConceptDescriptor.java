@@ -13,6 +13,13 @@ public class ConceptDescriptor {
     private String uuid;
     private String description;
 
+    public ConceptDescriptor() {}
+    
+    public ConceptDescriptor(String uuid, String description) {
+    	setUuid(uuid);
+    	setDescription(description);    	
+    }
+    
     public I_GetConceptData getVerifiedConcept() throws Exception {
 
         if (uuid == null) {
