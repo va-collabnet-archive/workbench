@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -16,6 +17,12 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * Returns a new classifier extension instance keyed off filename.
+ *   
+ * @author law223
+ *
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
 public class GetBaseClassification extends AbstractTask {
     
@@ -73,12 +80,16 @@ public class GetBaseClassification extends AbstractTask {
         try {
             final I_SnorocketFactory rocket = getRocket();
             
+            if (null == rocket) {
+                return Condition.FALSE;
+            }
+            
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
         } catch (RuntimeException e) {
             throw new TaskFailedException(e);
         }
 
-        return Condition.CONTINUE;
+        return Condition.TRUE;
     }
 
     private I_SnorocketFactory getRocket() throws TaskFailedException {
@@ -92,6 +103,8 @@ public class GetBaseClassification extends AbstractTask {
                     rocket = (I_SnorocketFactory) Class.forName(
                             "au.csiro.snorocket.ace.SnorocketFactory"
                     ).getConstructor(InputStream.class).newInstance(is);
+                } catch (FileNotFoundException e) {
+                    return null;
                 } catch (Exception e) {
                     throw new TaskFailedException(e);
                 }
@@ -107,7 +120,7 @@ public class GetBaseClassification extends AbstractTask {
     }
 
     public Collection<Condition> getConditions() {
-        return CONTINUE_CONDITION;
+        return CONDITIONAL_TEST_CONDITIONS;
     }
 
     public int[] getDataContainerIds() {
