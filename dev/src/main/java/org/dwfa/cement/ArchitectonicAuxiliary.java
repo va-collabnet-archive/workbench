@@ -704,6 +704,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
      * <li>3 OUTDATED.
      * <li>4 AMBIGUOS
      * <li>5 ERRONEOUS.
+     * <li>6 LIMITED.
+     * <li>7 INAPPROPRIATE.
+     * <li>8 CONCEPT_RETIRED.
      * <li>10 MOVEDELSEWHERE
      * <li>11 PENDINGMOVE
      *
@@ -726,8 +729,14 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             return 3;
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.AMBIGUOUS.getUids()))
             return 4;
-        else if(uuids.contains(ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids()))
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids()))
             return 5;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LIMITED.getUids()))
+            return 6;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.INAPPROPRIATE.getUids()))
+            return 7;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids()))
+            return 8;
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids()))
             return 10;
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()))
