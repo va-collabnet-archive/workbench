@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -119,7 +116,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 				replaceString = "";
 			}
 
-            List<String> processedDescriptions = new ArrayList<String>();
+            String processedDescriptions = "";
 
             if ((searchString != null && !searchString.equals("")) &&
 					(searchAll || searchFsn || searchPft || searchSynonym)) {
@@ -138,7 +135,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 		            // For the current FSN and PT of this concept
 					for (I_DescriptionTuple description : descriptionTuples) {
 
-                        if (!processedDescriptions.contains("" + description.getConceptId())) {
+                        if (!processedDescriptions.contains(":" + description.getConceptId() + ":")) {
                             // If it contains the search string
                             if ((caseSensitive && description.getText().contains(searchString)) ||
                                     (!caseSensitive && description.getText().toUpperCase().contains(searchString.toUpperCase()))) {
@@ -177,7 +174,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 }
                             }
                         } else {
-                            processedDescriptions.add(description.getDescId());
+                            processedDescriptions += ":" + description.getConceptId() + ":";
                         }
                     }
 				}

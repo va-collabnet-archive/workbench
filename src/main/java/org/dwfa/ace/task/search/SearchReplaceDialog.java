@@ -123,9 +123,9 @@ public class SearchReplaceDialog extends JDialog {
     private void $$$setupUI$$$() {
         contentPane = new JPanel();
         contentPane.setLayout(new GridBagLayout());
-        contentPane.setMaximumSize(new Dimension(550, 150));
-        contentPane.setMinimumSize(new Dimension(550, 150));
-        contentPane.setPreferredSize(new Dimension(550, 150));
+        contentPane.setMaximumSize(new Dimension(550, 180));
+        contentPane.setMinimumSize(new Dimension(550, 180));
+        contentPane.setPreferredSize(new Dimension(550, 180));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridBagLayout());
         GridBagConstraints gbc;
@@ -182,6 +182,12 @@ public class SearchReplaceDialog extends JDialog {
         gbc.gridy = 2;
         gbc.fill = GridBagConstraints.VERTICAL;
         panel1.add(spacer2, gbc);
+        final JPanel spacer3 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        panel1.add(spacer3, gbc);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -262,12 +268,12 @@ public class SearchReplaceDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel3.add(searchReplaceButton, gbc);
-        final JPanel spacer3 = new JPanel();
+        final JPanel spacer4 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel3.add(spacer3, gbc);
+        panel3.add(spacer4, gbc);
         cancelButton = new JButton();
         cancelButton.setText("Cancel");
         gbc = new GridBagConstraints();
@@ -277,30 +283,30 @@ public class SearchReplaceDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel3.add(cancelButton, gbc);
-        final JPanel spacer4 = new JPanel();
+        final JPanel spacer5 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.VERTICAL;
-        panel3.add(spacer4, gbc);
-        final JPanel spacer5 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        contentPane.add(spacer5, gbc);
+        panel3.add(spacer5, gbc);
         final JPanel spacer6 = new JPanel();
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         contentPane.add(spacer6, gbc);
         final JPanel spacer7 = new JPanel();
         gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        contentPane.add(spacer7, gbc);
+        final JPanel spacer8 = new JPanel();
+        gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.fill = GridBagConstraints.VERTICAL;
-        contentPane.add(spacer7, gbc);
+        contentPane.add(spacer8, gbc);
     }
 
     /**
