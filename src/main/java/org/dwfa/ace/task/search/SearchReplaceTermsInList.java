@@ -135,7 +135,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 		            // For the current FSN and PT of this concept
 					for (I_DescriptionTuple description : descriptionTuples) {
 
-                        if (!processedDescriptions.contains(":" + description.getConceptId() + ":")) {
+                        if (!processedDescriptions.contains(":" + description.getDescId() + ":")) {
                             // If it contains the search string
                             if ((caseSensitive && description.getText().contains(searchString)) ||
                                     (!caseSensitive && description.getText().toUpperCase().contains(searchString.toUpperCase()))) {
@@ -173,11 +173,10 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     termFactory.addUncommitted(child);
                                 }
                             }
-                        } else {
-                            processedDescriptions += ":" + description.getConceptId() + ":";
+                            processedDescriptions += ":" + description.getDescId() + ":";
                         }
                     }
-				}
+                }
 				
 				signpostOutput = "<html>\n" +
  					  "<TABLE width='100%' cellpadding='1' cellspacing='0' border='1' style='font-family:arial;' bgcolor='white' bordercolor='gray'>\n" +
