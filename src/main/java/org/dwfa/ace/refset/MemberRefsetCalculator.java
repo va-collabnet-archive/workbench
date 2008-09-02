@@ -159,7 +159,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				// the members of the destination refset and add them to conceptsWithExcludeIndividual
 				
 				int excludeMembersRefsetId = getExcludeMembersRefset(i);
-				if (excludeMembersRefsetId != 0) {
+				if (excludeMembersRefsetId != ID_NOT_FOUND) {
 					I_GetConceptData exclusionSet = getConcept(excludeMembersRefsetId);
 					System.out.println("Applying additional exclusion members from " + 
 							exclusionSet.getId().getUIDs().iterator().next() + " to member refset " + 

@@ -28,6 +28,8 @@ import org.dwfa.tapi.spec.ConceptSpec;
 
 public abstract class RefsetUtilities {
 
+	public final int ID_NOT_FOUND = 0;
+	
 	protected I_GetConceptData pathConcept;
 
 	private I_TermFactory termFactory;
@@ -40,7 +42,7 @@ public abstract class RefsetUtilities {
 
 	public int getInclusionTypeForRefset(I_ThinExtByRefVersioned part) {
 		System.out.println("getInclusionTypeForRefset " + part);
-		int typeId = 0;
+		int typeId = ID_NOT_FOUND;
 		I_ThinExtByRefPart latest = null;
 		List<? extends I_ThinExtByRefPart> versions = part.getVersions();
 		for (I_ThinExtByRefPart version : versions) {
@@ -408,8 +410,12 @@ public abstract class RefsetUtilities {
 		return getRelTypeTarget(includeTypeConceptId, ConceptConstants.CREATES_MEMBERSHIP_TYPE);
 	}
 
-	public int getExcludeMembersRefset(int specRefsetConceptId) throws Exception {
-		return getRelTypeTarget(specRefsetConceptId, ConceptConstants.EXCLUDE_MEMBERS_REL_TYPE); 
+	public int getExcludeMembersRefset(int specRefsetConceptId) {
+		try {
+			return getRelTypeTarget(specRefsetConceptId, ConceptConstants.EXCLUDE_MEMBERS_REL_TYPE);
+		} catch (Exception ex) {
+			return ID_NOT_FOUND;
+		}
 	}
 
 	public I_GetConceptData getPathConcept() {
