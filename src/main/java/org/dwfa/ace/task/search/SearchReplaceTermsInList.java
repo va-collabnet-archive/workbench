@@ -224,6 +224,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 	private void displayOutput() {
 		
 		JPanel signpostPanel = config.getSignpostPanel();
+		signpostPanel.setLayout(new BorderLayout());
 		
 		signpostPanel.removeAll();
         signpostPanel.validate();
