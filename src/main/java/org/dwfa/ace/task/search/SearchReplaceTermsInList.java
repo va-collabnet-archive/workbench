@@ -224,6 +224,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 	private void displayOutput() {
 		
 		JPanel signpostPanel = config.getSignpostPanel();
+		
 		signpostPanel.removeAll();
         signpostPanel.validate();
 //        JLabel outputLabel = new JLabel(signpostOutput, JLabel.CENTER);
@@ -236,7 +237,8 @@ public class SearchReplaceTermsInList extends AbstractTask {
         htmlPane.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(htmlPane);
         signpostPanel.add(scrollPane, BorderLayout.CENTER);
-        scrollPane.setPreferredSize(new Dimension(900, 180));
+        scrollPane.setPreferredSize(new Dimension(signpostPanel.getSize()));
+        
 
 //        signpostPanel.setPreferredSize(new Dimension(1200,300));
 //        signpostPanel.validate();
