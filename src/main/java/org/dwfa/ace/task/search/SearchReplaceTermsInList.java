@@ -6,10 +6,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.List;
+import java.awt.*;
 
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import org.dwfa.ace.api.*;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -179,7 +179,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                 }
 				
 				signpostOutput = "<html>\n" +
- 					  "<TABLE width='100%' cellpadding='1' cellspacing='0' border='1' style='font-family:arial;' bgcolor='white' bordercolor='gray'>\n" +
+ 					  "<TABLE width='100%' cellpadding='1' cellspacing='0' border='1' style='font-family:arial;font-size:10px;' bgcolor='white' bordercolor='gray'>\n" +
 					  "<TR>\n" +
 					  "  <TD bgcolor='#00CCCC' align='center'>Update No.</TD>\n" +
 					  "  <TD bgcolor='#00CCCC'>Description Type</TD>\n" +
@@ -226,11 +226,22 @@ public class SearchReplaceTermsInList extends AbstractTask {
 		
 		JPanel signpostPanel = config.getSignpostPanel();
 		signpostPanel.removeAll();
-		JLabel outputLabel = new JLabel(signpostOutput, JLabel.CENTER);
-		signpostPanel.add(outputLabel);
+        signpostPanel.validate();
+//        JLabel outputLabel = new JLabel(signpostOutput, JLabel.CENTER);
 //		JScrollPane scrollPane = new JScrollPane(outputLabel);
-//		signpostPanel.add(scrollPane);
-	}
+//        scrollPane.add(outputLabel);
+//        scrollPane.setPreferredSize(new Dimension(800, 300));
+//        signpostPanel.add(scrollPane);
+
+        JEditorPane htmlPane = new JEditorPane("text/html", signpostOutput);
+        htmlPane.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(htmlPane);
+        signpostPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setPreferredSize(new Dimension(900, 180));
+
+//        signpostPanel.setPreferredSize(new Dimension(1200,300));
+//        signpostPanel.validate();
+    }
 
 	public String getSearchStringPropName() {
 		return searchStringPropName;
