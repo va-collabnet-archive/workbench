@@ -151,8 +151,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 String origDescHtml = description.getText().replaceAll(searchPrepend + searchString, "<font color='red'>" + searchString + "</font>");
                                 String finalDescHtml = description.getText().replaceAll(searchPrepend + searchString, "<font color='green'>" + replaceString + "</font>");
 
-                                // TODO LSS: Need to get the description type text from the type id
-                                String descType = "" + description.getTypeId();
+                                String descType = termFactory.getConcept(description.getTypeId()).getInitialText();
 
                                 // Add to our list of descriptions that will require change
                                 SearchReplaceDescription srDesc = new SearchReplaceDescription(origDesc, finalDesc, origDescHtml, finalDescHtml, descType);
