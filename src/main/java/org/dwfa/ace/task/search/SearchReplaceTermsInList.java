@@ -165,7 +165,6 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     I_DescriptionPart newPart = description.duplicatePart();
                                     newPart.setPathId(path.getConceptId());
                                     newPart.setText(finalDesc);
-                                    newPart.setStatusId(currentUnreviewedId);
                                     newPart.setVersion(Integer.MAX_VALUE);
                                     description.getDescVersioned().addVersion(newPart);
 
