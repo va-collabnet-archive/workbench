@@ -20,6 +20,10 @@ public class RelationshipTableRenderer extends AceTableRenderer {
 				row, column);
 		boolean same = false;
 		StringWithRelTuple swt = (StringWithRelTuple) value;
+		if (swt == null || swt.getTuple() == null) {
+			renderComponent.setText("null");
+			return renderComponent;
+		}
 		boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
 		
 		if (row > 0) {
