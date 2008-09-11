@@ -32,6 +32,10 @@ public class IdTableRenderer extends AceTableRenderer {
 				table, value, isSelected, hasFocus, row, column);
 		boolean same = false;
 		StringWithIdTuple swt = (StringWithIdTuple) value;
+		if (swt == null || swt.getTuple() == null) {
+			renderComponent.setText("null");
+			return renderComponent;
+		}
 		boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
 		if (row > 0) {
 			StringWithIdTuple prevSwt = (StringWithIdTuple) table.getValueAt(

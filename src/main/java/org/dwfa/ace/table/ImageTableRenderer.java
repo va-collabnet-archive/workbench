@@ -26,6 +26,10 @@ public class ImageTableRenderer extends AceTableRenderer {
 		JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(
 				table, value, isSelected, hasFocus, row, column);
 		boolean same = false;
+		if (value == null) {
+			renderComponent.setText("null");
+			return renderComponent;
+		}
 		if (StringWithImageTuple.class.isAssignableFrom(value.getClass())) {
 			setIcon(null);
 			setupStringWithTuple(table, value, isSelected, row, column, renderComponent, same);

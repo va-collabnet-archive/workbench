@@ -33,6 +33,10 @@ public class ConceptAttributeTableRenderer extends AceTableRenderer {
 				table, value, isSelected, hasFocus, row, column);
 		boolean same = false;
 		StringWithConceptTuple swt = (StringWithConceptTuple) value;
+		if (swt == null || swt.getTuple() == null) {
+			renderComponent.setText("null");
+			return renderComponent;
+		}
 		if (swt.getTuple() != null) {
 		  boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
 	    if (row > 0) {

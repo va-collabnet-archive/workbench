@@ -38,6 +38,10 @@ public class DescriptionTableRenderer extends AceTableRenderer {
        }
 
       StringWithDescTuple swt = (StringWithDescTuple) value;
+		if (swt == null || swt.getTuple() == null) {
+			renderComponent.setText("null");
+			return renderComponent;
+		}
       if (swt.getTuple() != null) {
         boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
         if (row > 0) {
