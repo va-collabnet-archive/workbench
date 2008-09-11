@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,6 +74,8 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
 public class LoadClassifyWrite extends AbstractTask {
 
+    final static Object LOCK = new Object();
+    
     /**
      * 
      */
@@ -82,32 +83,18 @@ public class LoadClassifyWrite extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private static int conceptCount = 0;
-    private static int classifyConceptCount = 0;
-    private static int relCount = 0;
-    private static int relsOnPathCount = 0;
-    private static int activeRelCount = 0;
-    private static int statedRelCount = 0;
-    private static int statedAndInferredCount = 0;
-    private static int inferredRelCount = 0;
-    private static int statedAndSubsumedCount = 0;
+    private static volatile int conceptCount = 0;
+    private static volatile int classifyConceptCount = 0;
+    private static volatile int relCount = 0;
+    private static volatile int relsOnPathCount = 0;
+    private static volatile int activeRelCount = 0;
+    private static volatile int statedRelCount = 0;
+    
     private static int multipleRelEntriesForVersion = 0;
     private static int multipleRelEntriesForVersion2 = 0;
     private static int multipleAttrEntriesForVersion = 0;
 
     private static int isaId = Integer.MIN_VALUE;
-    private static int pathNid = Integer.MIN_VALUE;
-    private static int activeNid = Integer.MIN_VALUE;
-    private static int optionalRefinabilityNid = Integer.MIN_VALUE;
-    private static int inferredCharacteristicNid = Integer.MIN_VALUE;
-    private static int statedAndInferredNid = Integer.MIN_VALUE;
-    private static int unspecifiedUuidNid = Integer.MIN_VALUE;
-    private static int version = Integer.MAX_VALUE;
-
-    private static I_SupportClassifier tf;
-    private static I_IntSet allowedPaths;
-    private static I_IntSet statedForms;
-    private static I_IntSet activeStatus;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -142,6 +129,7 @@ public class LoadClassifyWrite extends AbstractTask {
         }
 
         public void classify() {
+            System.err.println("*** " + conceptCount + "\t" + relationshipCount);
         }
 
         public void getResults(I_Callback callback) {
@@ -159,37 +147,20 @@ public class LoadClassifyWrite extends AbstractTask {
 
     }
 
-    private static class FilterConcept {
+    private class FilterConcept {
 
-        private Logger logger;
+        final private Logger logger;
 
-        private int rootNid;
-        private int isaId;
+        final private int rootNid;
+        final private int isaId;
+        
+        final private Context context;
 
-        FilterConcept(Logger logger, int rootNid, int isaId) throws TerminologyException, IOException {
+        FilterConcept(Logger logger, int rootNid, int isaId, Context context) throws TerminologyException, IOException {
             this.logger = logger;
             this.rootNid = rootNid;
             this.isaId = isaId;
-
-            allowedPaths = tf.newIntSet();
-            for (I_Position p : tf.getActiveAceFrameConfig().getViewPositionSet()) {
-                addPathIds(allowedPaths, p);
-            }
-
-            I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
-            activeStatus = frameConfig.getAllowedStatus();
-            statedForms = tf.newIntSet();
-            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP));
-            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC));
-            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP));
-            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP));
-        }
-
-        private void addPathIds(I_IntSet allowedPaths, I_Position p) throws TerminologyException, IOException {
-            allowedPaths.add(p.getPath().getConceptId());
-            for (I_Position origin : p.getPath().getOrigins()) {
-                addPathIds(allowedPaths, origin);
-            }
+            this.context = context;
         }
 
         I_ConceptAttributePart ok(I_GetConceptData concept) {
@@ -202,7 +173,7 @@ public class LoadClassifyWrite extends AbstractTask {
                         for (I_RelPart part : rel.getVersions()) {
                             // check the rel parts to see if there is a proper
                             // is-a.
-                            if (allowedPaths.contains(part.getPathId())) {
+                            if (context.allowedPaths.contains(part.getPathId())) {
                                 if (latestPart == null) {
                                     latestPart = part;
                                 } else if (latestPart.getVersion() <= part.getVersion()) {
@@ -217,7 +188,7 @@ public class LoadClassifyWrite extends AbstractTask {
                                 }
                             }
                         }
-                        if (latestPart != null && latestPart.getRelTypeId() == isaId && activeStatus.contains(latestPart.getStatusId())) {
+                        if (latestPart != null && latestPart.getRelTypeId() == isaId && context.activeStatus.contains(latestPart.getStatusId())) {
                             foundIsa = true;
                             break;
                         }
@@ -230,7 +201,7 @@ public class LoadClassifyWrite extends AbstractTask {
 
                 I_ConceptAttributePart latestAttributePart = null;
                 for (I_ConceptAttributePart attributePart : concept.getConceptAttributes().getVersions()) {
-                    if (allowedPaths.contains(attributePart.getPathId())) {
+                    if (context.allowedPaths.contains(attributePart.getPathId())) {
                         if (latestAttributePart == null) {
                             latestAttributePart = attributePart;
                         } else if (latestAttributePart.getVersion() <= attributePart.getVersion()) {
@@ -246,7 +217,7 @@ public class LoadClassifyWrite extends AbstractTask {
                     }
                 }
 
-                if (latestAttributePart == null || activeStatus.contains(latestAttributePart.getConceptStatus()) == false) {
+                if (latestAttributePart == null || context.activeStatus.contains(latestAttributePart.getConceptStatus()) == false) {
                     return null;
                 }
                 return latestAttributePart;
@@ -259,32 +230,35 @@ public class LoadClassifyWrite extends AbstractTask {
         public Logger getLogger() {
             return logger;
         }
-
-        public I_IntSet getActiveStatus() {
-            return activeStatus;
-        }
     }
 
-    private static class TestForPrimitiveAndAdd implements Runnable {
+    private class TestForPrimitiveAndAdd implements Runnable {
 
-        private I_SnorocketFactory rocket;
-        private I_GetConceptData concept;
+        final private I_SnorocketFactory rocket;
+        final private I_GetConceptData concept;
 
-        private FilterConcept filter;
-        private Semaphore s;
+        final private FilterConcept filter;
+        final private Semaphore s;
+        
+        final private Context context;
 
-        public TestForPrimitiveAndAdd(I_SnorocketFactory rocket, I_GetConceptData concept, FilterConcept filter, Semaphore s) {
+        public TestForPrimitiveAndAdd(I_SnorocketFactory rocket, I_GetConceptData concept, FilterConcept filter, Semaphore s, Context context) {
             super();
             this.rocket = rocket;
             this.concept = concept;
             this.filter = filter;
             this.s = s;
+            this.context = context;
         }
 
         public void run() {
+synchronized (LOCK)
+{
             I_ConceptAttributePart attribute = filter.ok(concept);
             if (attribute != null) {
-                rocket.addConcept(concept.getConceptId(), attribute.isDefined());
+                final boolean isDefined = attribute.isDefined();
+
+                rocket.addConcept(concept.getConceptId(), isDefined);
                 classifyConceptCount++;
                 try {
                     for (I_RelVersioned rel : concept.getSourceRels()) {
@@ -293,7 +267,7 @@ public class LoadClassifyWrite extends AbstractTask {
 
                             I_RelPart latestPart = null;
                             for (I_RelPart part : rel.getVersions()) {
-                                if (allowedPaths.contains(part.getPathId())) {
+                                if (context.allowedPaths.contains(part.getPathId())) {
                                     if (latestPart == null) {
                                         latestPart = part;
                                     } else if (latestPart.getVersion() <= part.getVersion()) {
@@ -311,12 +285,14 @@ public class LoadClassifyWrite extends AbstractTask {
 
                             if (latestPart != null) {
                                 relsOnPathCount++;
-                                if (filter.getActiveStatus().contains(latestPart.getStatusId())) {
+                                if (context.activeStatus.contains(latestPart.getStatusId())) {
                                     activeRelCount++;
-                                    if (statedForms.contains(latestPart.getCharacteristicId())) {
+                                    if (context.statedForms.contains(latestPart.getCharacteristicId())) {
                                         statedRelCount++;
-                                        rocket.addRelationship(rel.getC1Id(), latestPart.getRelTypeId(), rel.getC2Id(), latestPart
-                                                .getGroup());
+                                        final int cId1 = rel.getC1Id();
+                                        final int relId = latestPart.getRelTypeId();
+                                        final int cId2 = rel.getC2Id();
+                                        rocket.addRelationship(cId1, relId, cId2, latestPart.getGroup());
                                     }
                                 }
                             }
@@ -330,28 +306,32 @@ public class LoadClassifyWrite extends AbstractTask {
             }
             s.release();
         }
+}
     }
 
-    private static class ProcessConcepts implements I_ProcessConcepts, Callable<Boolean> {
+    private class ProcessConcepts implements I_ProcessConcepts, Callable<Boolean> {
 
-        private I_Work worker;
-        private I_SnorocketFactory rocket;
-        private ExecutorService executionService;
-        private FilterConcept filter;
-        private Semaphore s = new Semaphore(20);
+        final private I_Work worker;
+        final private I_SnorocketFactory rocket;
+        final private ExecutorService executionService;
+        final private FilterConcept filter;
+        final private Context context;
 
-        public ProcessConcepts(I_Work worker, I_SnorocketFactory rocket, FilterConcept filter, ExecutorService executionService) {
+        final private Semaphore s = new Semaphore(20);
+
+        public ProcessConcepts(I_Work worker, I_SnorocketFactory rocket, FilterConcept filter, ExecutorService executionService, Context context) {
             super();
             this.worker = worker;
             this.rocket = rocket;
             this.executionService = executionService;
             this.filter = filter;
+            this.context = context;
         }
 
         public void processConcept(I_GetConceptData concept) throws Exception {
-            conceptCount++;
             s.acquire();
-            executionService.execute(new TestForPrimitiveAndAdd(rocket, concept, filter, s));
+            conceptCount++;
+            executionService.execute(new TestForPrimitiveAndAdd(rocket, concept, filter, s, context));
         }
 
         public Boolean call() throws Exception {
@@ -363,143 +343,41 @@ public class LoadClassifyWrite extends AbstractTask {
 
     }
 
-    private static class ProcessResults implements Callable<Boolean>, I_SnorocketFactory.I_Callback {
+    private static class Context {
 
-        private I_Work worker;
-        private I_SnorocketFactory rocket;
-        private ExecutorService executionService;
+        final private I_SupportClassifier tf;
+        final private I_IntSet allowedPaths;
+        final private I_IntSet statedForms;
+        final private I_IntSet activeStatus;
 
-        private I_TermFactory termFactory = LocalVersionedTerminology.get();
-        public I_GetConceptData relCharacteristic;
-        public I_GetConceptData relRefinability;
-        public I_GetConceptData relStatus;
-        private Semaphore resultSemaphore = new Semaphore(20);
-        private int returnedRelCount = 0;
+        public Context() throws TerminologyException, IOException {
+            tf = (I_SupportClassifier) LocalVersionedTerminology.get();
 
-        public ProcessResults(final I_Work worker, final I_SnorocketFactory rocket, ExecutorService executorService) throws Exception {
-            this.worker = worker;
-            this.rocket = rocket;
-            this.executionService = executorService;
+            final I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
 
-            relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-
-            worker.getLogger().info("Inferred id is " + relCharacteristic.getConceptId());
-            worker.getLogger().info("Inferred UUIDs are " + relCharacteristic.getUids());
-            worker.getLogger().info("Inferred concept is " + relCharacteristic);
-        }
-
-        public Boolean call() throws Exception {
-            worker.getLogger().info("get results");
-            rocket.getResults(this);
-            worker.getLogger().info("Returned " + returnedRelCount + " rels.");
-
-            return true;
-        }
-
-        public void addRelationship(int conceptId1, int roleId, int conceptId2, int group) {
-            try {
-                resultSemaphore.acquire();
-                returnedRelCount++;
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            allowedPaths = tf.newIntSet();
+            for (I_Position p : tf.getActiveAceFrameConfig().getViewPositionSet()) {
+                addPathIds(allowedPaths, p);
             }
-            AddNewRelationship addNewRelationship = new AddNewRelationship(conceptId1, roleId, conceptId2, group, resultSemaphore);
-            executionService.execute(addNewRelationship);
+
+            activeStatus = frameConfig.getAllowedStatus();
+            statedForms = tf.newIntSet();
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP));
+            statedForms.add(getNid(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP));
         }
 
+        private int getNid(I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
+            return tf.uuidToNative(concept.getUids());
+        }
     }
 
-    private static class AddNewRelationship implements Runnable {
-
-        private int c1;
-        private int typeId;
-        private int c2;
-        private int group;
-        private Semaphore resultSemaphore;
-
-        public AddNewRelationship(int conceptId1, int typeId, int conceptId2, int group, Semaphore resultSemaphore) {
-            this.c1 = conceptId1;
-            this.typeId = typeId;
-            this.c2 = conceptId2;
-            this.group = group;
-            this.resultSemaphore = resultSemaphore;
+    private static void addPathIds(I_IntSet allowedPaths, I_Position p) throws TerminologyException, IOException {
+        allowedPaths.add(p.getPath().getConceptId());
+        for (I_Position origin : p.getPath().getOrigins()) {
+            addPathIds(allowedPaths, origin);
         }
-
-        public void run() {
-            try {
-                I_GetConceptData concept1 = tf.getConcept(c1);
-                synchronized (concept1) {
-                    boolean found = false;
-                    for (I_RelVersioned rel : concept1.getSourceRels()) {
-                        if (rel.getC2Id() == c2) {
-                            I_RelPart latestPart = null;
-                            for (I_RelPart part : rel.getVersions()) {
-                                // check the rel parts to see if there is a
-                                // proper
-                                // is-a.
-                                if (allowedPaths.contains(part.getPathId())) {
-                                    if (latestPart == null) {
-                                        latestPart = part;
-                                    } else {
-                                        if (latestPart.getVersion() <= part.getVersion()) {
-                                            latestPart = part;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (latestPart != null) {
-                                if ((latestPart.getRelTypeId() == typeId) && (latestPart.getGroup() == group)) {
-                                    if (activeStatus.contains(latestPart.getStatusId())) {
-                                        statedAndInferredCount++;
-                                        found = true;
-                                        // check that defining characteristic is
-                                        // proper and possibly add part if not.
-                                        if (latestPart.getCharacteristicId() != statedAndInferredNid) {
-                                            I_RelPart newPart = latestPart.duplicate();
-                                            newPart.setVersion(version);
-                                            newPart.setStatusId(activeNid);
-                                            newPart.setCharacteristicId(statedAndInferredNid);
-                                            rel.addVersion(newPart);
-                                            tf.writeRel(rel);
-                                        }
-                                    } else {
-                                        inferredRelCount++;
-                                        found = true;
-                                        // add part with active status
-                                        I_RelPart newPart = latestPart.duplicate();
-                                        newPart.setVersion(version);
-                                        newPart.setStatusId(activeNid);
-                                        rel.addVersion(newPart);
-                                        tf.writeRel(rel);
-                                    }
-                                }
-                            }
-                        }
-                        if (found) {
-                            break;
-                        }
-                    }
-                    if (found == false) {
-                        inferredRelCount++;
-                        I_RelVersioned newRel = tf.newRelationship(UUID.randomUUID(), unspecifiedUuidNid, c1, c2, pathNid, version,
-                                activeNid, typeId, inferredCharacteristicNid, optionalRefinabilityNid, group);
-                        tf.writeRel(newRel);
-                        concept1.getSourceRels().add(newRel);
-                    }
-                }
-
-            } catch (TerminologyException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                resultSemaphore.release();
-            }
-        }
-
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
@@ -513,34 +391,28 @@ public class LoadClassifyWrite extends AbstractTask {
             relsOnPathCount = 0;
             activeRelCount = 0;
             statedRelCount = 0;
-            statedAndInferredCount = 0;
-            inferredRelCount = 0;
-            statedAndSubsumedCount = 0;
 
             long startTime = System.currentTimeMillis();
 
-            final I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
-            tf = (I_SupportClassifier) LocalVersionedTerminology.get();
+            final I_SnorocketFactory rocket =
+                (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
+//                new MockSnorocketFactory();
 
-            if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
+            final Context context = new Context();
+            
+            if (context.tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
                 throw new TaskFailedException("Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet());
+                        + context.tf.getActiveAceFrameConfig().getEditingPathSet());
             }
 
-            pathNid = tf.getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptId();
-            activeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            optionalRefinabilityNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            inferredCharacteristicNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
-            statedAndInferredNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-            unspecifiedUuidNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-            int snomedRootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
-            isaId = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
+            final int snomedRootNid = context.tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
+            isaId = context.tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rocket.setIsa(isaId);
 
-            FilterConcept filter = new FilterConcept(worker.getLogger(), snomedRootNid, isaId);
+            FilterConcept filter = new FilterConcept(worker.getLogger(), snomedRootNid, isaId, context);
 
             ExecutorService executionService = Executors.newFixedThreadPool(6);
-            Future<Boolean> conceptFuture = executionService.submit(new ProcessConcepts(worker, rocket, filter, executionService));
+            Future<Boolean> conceptFuture = executionService.submit(new ProcessConcepts(worker, rocket, filter, executionService, context));
 
             conceptFuture.get();
 
@@ -566,37 +438,11 @@ public class LoadClassifyWrite extends AbstractTask {
 
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
 
-//            worker.getLogger().info("Starting get results. ");
-//            getClassifierResults(worker, rocket);
-//            worker.getLogger().info("Finished get results. ");
-//            worker.getLogger().info(
-//                    "Stated and inferred: " + statedAndInferredCount + " stated and subsumbed: " + statedAndSubsumedCount
-//                            + " inferred count: " + inferredRelCount);
-//
-//            tf.commit();
-//            worker.getLogger().info("Finished commit. ");
-
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
 
         return Condition.CONTINUE;
-    }
-
-    private void getClassifierResults(I_Work worker, I_SnorocketFactory rocket) throws Exception {
-        long startTime = System.currentTimeMillis();
-        version = tf.convertToThinVersion(startTime);
-        ExecutorService executionService = Executors.newFixedThreadPool(15);
-
-        Future<Boolean> resultFuture = executionService.submit(new ProcessResults(worker, rocket, executionService));
-        resultFuture.get();
-
-        worker.getLogger().info("LCW getResults time: " + (System.currentTimeMillis() - startTime));
-
-        executionService.shutdown();
-        startTime = System.currentTimeMillis();
-        executionService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        worker.getLogger().info("LCW termination time: " + (System.currentTimeMillis() - startTime));
     }
 
     public void complete(I_EncodeBusinessProcess arg0, I_Work arg1) throws TaskFailedException {
@@ -609,10 +455,6 @@ public class LoadClassifyWrite extends AbstractTask {
 
     public int[] getDataContainerIds() {
         return new int[] {};
-    }
-
-    private static int getNid(I_ConceptualizeUniversally concept) throws TerminologyException, IOException {
-        return tf.uuidToNative(concept.getUids());
     }
 
 }
