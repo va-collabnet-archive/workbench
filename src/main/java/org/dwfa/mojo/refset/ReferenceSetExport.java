@@ -373,9 +373,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			String releaseVersion = getReleaseVersion(refsetConcept);
 			
 			uuidRefsetWriter = new BufferedWriter(new FileWriter(
-					new File(uuidRefsetOutputDirectory, "UUID_" + refsetName + "_" + releaseVersion + "." + refsetType.getFileExtension())));
+					new File(uuidRefsetOutputDirectory, "UUID_" + refsetName + "_" + releaseVersion + refsetType.getFileExtension())));
 			sctIdRefsetWriter = new BufferedWriter(new FileWriter(
-					new File(sctidRefsetOutputDirectory, "SCTID_" + refsetName + "_" + releaseVersion + "." + refsetType.getFileExtension())));
+					new File(sctidRefsetOutputDirectory, "SCTID_" + refsetName + "_" + releaseVersion + refsetType.getFileExtension())));
 			
 			writerMap.put(refsetId + "UUID", uuidRefsetWriter);
 			writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);
