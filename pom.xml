@@ -1,10 +1,12 @@
-  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-      <groupId>org.dwfa</groupId>
-      <artifactId>dwfa-pom</artifactId>
-      <version>2.1</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.dwfa</groupId>
+    <artifactId>dwfa-pom</artifactId>
+    <version>2.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>vodb</artifactId>
   <version>1.23-SNAPSHOT</version>
@@ -13,19 +15,6 @@
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/vodb/site</url>
   <inceptionYear>2005</inceptionYear>
   <description>ACE editor toolkit and version-oriented database</description>
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>aceworkspace.net</id>
-      <name>aceworkspace.net</name>
-      <url>file:///ciweb/webapps/maven2</url>
-      <layout>default</layout>
-    </repository>
-    <site>
-      <id>aceworkspace.net</id>
-      <url>file:///ciweb/webapps/vodb/site</url>
-    </site>
-  </distributionManagement>
   <scm>
     <connection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</connection>
     <developerConnection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</developerConnection>
@@ -208,6 +197,13 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <useReleaseProfile>false</useReleaseProfile>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>
           <workspace>/eclipse/workspace</workspace>
@@ -224,22 +220,22 @@
       </plugin>
     </plugins>
   </build>
-    <repositories>
-      <repository>
-        <releases>
-          <enabled>true</enabled>
-          <updatePolicy>always</updatePolicy>
-          <checksumPolicy>warn</checksumPolicy>
-        </releases>
-        <snapshots>
-          <enabled>true</enabled>
-          <updatePolicy>never</updatePolicy>
-          <checksumPolicy>fail</checksumPolicy>
-        </snapshots>
-        <id>oracleReleases</id>
-        <name>Oracle Released Java Packages</name>
-        <url>http://download.oracle.com/maven</url>
-        <layout>default</layout>
-      </repository>
-    </repositories>
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <id>oracleReleases</id>
+      <name>Oracle Released Java Packages</name>
+      <url>http://download.oracle.com/maven</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
 </project>
