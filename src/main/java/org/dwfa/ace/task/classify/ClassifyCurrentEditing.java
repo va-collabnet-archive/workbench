@@ -33,6 +33,7 @@ import org.dwfa.util.bean.Spec;
 public class ClassifyCurrentEditing extends AbstractTask {
 
     private int definingCharacteristic = -1;
+    private int statedCharacteristic = -1;
 
     private Logger logger = null;
     
@@ -62,7 +63,7 @@ public class ClassifyCurrentEditing extends AbstractTask {
         try {
             logger  = worker.getLogger();
             definingCharacteristic = LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()).getConceptId();
-            
+            statedCharacteristic = LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getConceptId();
             // get uncommitted editing concept
             final I_HostConceptPlugins host =
                 (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
@@ -156,7 +157,7 @@ public class ClassifyCurrentEditing extends AbstractTask {
         if (null != sourceRels) {
             for (I_RelVersioned rel : sourceRels) {
                 final I_RelTuple lastTuple = rel.getLastTuple();
-                if (definingCharacteristic == lastTuple.getCharacteristicId()) {
+                if (definingCharacteristic == lastTuple.getCharacteristicId()||statedCharacteristic == lastTuple.getCharacteristicId()) {
                     logger.info("Add relationship: " + lastTuple.getC1Id() + " " + lastTuple.getRelTypeId() + " " + lastTuple.getC2Id());
                     rocket.addRelationship(lastTuple.getC1Id(), lastTuple.getRelTypeId(), lastTuple.getC2Id(), lastTuple.getGroup());
                 }

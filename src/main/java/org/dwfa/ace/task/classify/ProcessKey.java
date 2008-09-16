@@ -2,7 +2,7 @@ package org.dwfa.ace.task.classify;
 
 public enum ProcessKey {
 
-    SNOROCKET;
+    SNOROCKET,ClassificationResultString;
     
     public String getAttachmentKey() {
         return "A: " + this.name();
