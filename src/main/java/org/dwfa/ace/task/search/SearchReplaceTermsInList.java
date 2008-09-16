@@ -14,6 +14,7 @@ import javax.swing.*;
 import org.dwfa.ace.api.*;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.status.SetStatusUtil;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -70,13 +71,15 @@ public class SearchReplaceTermsInList extends AbstractTask {
 			
 			int currentUnreviewedId = termFactory.getConcept(
                     ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId();
-			FSN_UUID = termFactory.getConcept(
+            int retiredConceptId = termFactory.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
+            FSN_UUID = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 			PFT_UUID = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 			SYNONYM_UUID = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-			
+
 			try {
 				searchString = "" + process.readProperty(searchStringPropName);
 				replaceString = "" + process.readProperty(replaceStringPropName);
@@ -132,7 +135,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 		            List<I_DescriptionTuple> descriptionTuples =
 		                child.getDescriptionTuples(null, (searchAll ? null : descriptionTypesToCheck), positionsToCheck);
 					
-		            // For the current FSN and PT of this concept
+		            // For the current description of this concept
 					for (I_DescriptionTuple description : descriptionTuples) {
 
                         if (!processedDescriptions.contains(":" + description.getDescId() + ":")) {
@@ -161,12 +164,26 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
                                 for (I_Path path : paths) {
 
-                                    // update the description with the search/replace alternative
+                                    // retire the existing description
                                     I_DescriptionPart newPart = description.duplicatePart();
-                                    newPart.setPathId(path.getConceptId());
-                                    newPart.setText(finalDesc);
+                                    newPart.setPathId(path.getConceptId());                                    
                                     newPart.setVersion(Integer.MAX_VALUE);
+                                    newPart.setStatusId(retiredConceptId);
                                     description.getDescVersioned().addVersion(newPart);
+
+                                    // Create a new, cloned, description
+                                    I_DescriptionVersioned newDesc = termFactory.newDescription(
+                                            UUID.randomUUID(),
+                                            child,
+                                            description.getLang(),
+                                            finalDesc,
+                                            termFactory.getConcept(description.getTypeId()),
+                                            config);
+
+                                    // Set the status to that of the original, and path to the current
+                                    I_DescriptionTuple tuple = newDesc.getLastTuple();
+                                    tuple.setStatusId(description.getStatusId());
+                                    tuple.setPathId(path.getConceptId());
 
                                     termFactory.addUncommitted(child);
                                 }
