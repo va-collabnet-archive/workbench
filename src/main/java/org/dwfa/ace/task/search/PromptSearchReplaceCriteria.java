@@ -3,14 +3,11 @@ package org.dwfa.ace.task.search;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -24,21 +21,14 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ace/listview", type = BeanType.TASK_BEAN) })
 public class PromptSearchReplaceCriteria extends AbstractTask {
 
+	private static final long serialVersionUID = 1L;
+	
+	private static final int dataVersion = 1;
+
 	/**
 	 * 
 	 */
-	
-//	private I_TermFactory termFactory;
-//	private I_ConfigAceFrame config;
-	
-	// Variables from the UI
-	private String searchString = "";
-	private String replaceString = "";
-	private boolean caseSensitive = false;
-	private boolean searchAll = true;
-	private boolean searchFsn = true;
-	private boolean searchPft = true;
-	private boolean searchSynonym = true;
+		
 	
 	private String searchStringPropName = ProcessAttachmentKeys.FIND_TEXT.getAttachmentKey();
 	private String replaceStringPropName = ProcessAttachmentKeys.REPLACE_TEXT.getAttachmentKey();
@@ -48,7 +38,34 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 	private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
 	private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
 
-    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(searchStringPropName);
+		out.writeObject(replaceStringPropName);
+		out.writeObject(caseSensitivePropName);
+		out.writeObject(searchAllPropName);
+		out.writeObject(searchFsnPropName);
+		out.writeObject(searchPftPropName);
+		out.writeObject(searchSynonymPropName);
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion <= dataVersion) {
+			searchStringPropName = (String) in.readObject();
+			replaceStringPropName = (String) in.readObject();
+			caseSensitivePropName = (String) in.readObject();
+			searchAllPropName = (String) in.readObject();
+			searchFsnPropName = (String) in.readObject();
+			searchPftPropName = (String) in.readObject();
+			searchSynonymPropName = (String) in.readObject();
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+	public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
 			throws TaskFailedException {
 		// Nothing to do... I think
 	}
@@ -80,13 +97,13 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         }
 
         // Get the values from the dialog
-        searchString = dialog.getSearchString();
-        replaceString = dialog.getReplaceString();
-        caseSensitive = dialog.isCaseSensitive();
-        searchAll = dialog.isAll();
-        searchFsn = dialog.isFullySpecifiedName();
-        searchPft = dialog.isPreferredTerm();
-        searchSynonym = dialog.isSynonym();
+        String searchString = dialog.getSearchString();
+        String replaceString = dialog.getReplaceString();
+        boolean caseSensitive = dialog.isCaseSensitive();
+        boolean searchAll = dialog.isAll();
+        boolean searchFsn = dialog.isFullySpecifiedName();
+        boolean searchPft = dialog.isPreferredTerm();
+        boolean searchSynonym = dialog.isSynonym();
         
         dialog.dispose();
         dialog = null;
