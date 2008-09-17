@@ -32,6 +32,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.Svn;
@@ -79,6 +80,8 @@ public class AceRunner {
    @SuppressWarnings("unused")
    private Timer ipChangeTimer;
    private boolean listenForIpChanges = false;
+
+private File aceConfigFile;
 
    public AceRunner(final String[] args, final LifeCycle lc) {
       try {
@@ -192,28 +195,39 @@ public class AceRunner {
             
          }
 
-         File aceConfigFile = (File) config.getEntry(this.getClass().getName(), "aceConfigFile", File.class, new File(
+         aceConfigFile = (File) config.getEntry(this.getClass().getName(), "aceConfigFile", File.class, new File(
                "src/main/config/config.ace"));
 
          if (aceConfigFile.exists()) {
              
              
              
-            File profileDir = new File("profiles" + File.separator + "users");
-            if (profileDir.exists() == false) {
-               profileDir = new File("profiles");
-               if (profileDir.exists() == false) {
-                  profileDir.mkdirs();
-               }
-            }
             // Put up a dialog to select the config file...
-            aceConfigFile = FileDialogUtil.getExistingFile("Please select your user profile:", new FilenameFilter() {
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-               public boolean accept(File dir, String name) {
-                  return name.toLowerCase().endsWith(".ace");
-               }
-            }, profileDir);
+				public void run() {
+		            File profileDir = new File("profiles" + File.separator + "users");
+		            if (profileDir.exists() == false) {
+		               profileDir = new File("profiles");
+		               if (profileDir.exists() == false) {
+		                  profileDir.mkdirs();
+		               }
+		            }
+		            try {
+						aceConfigFile = FileDialogUtil.getExistingFile("Please select your user profile:", new FilenameFilter() {
+						    public boolean accept(File dir, String name) {
+						        return name.toLowerCase().endsWith(".ace");
+						     }
+						  }, profileDir);
+					} catch (TaskFailedException e) {
+				         AceLog.getAppLog().alertAndLogException(e);
+				         System.exit(0);
+					}
+				}
+            	
+            });
 
+ 
             ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(aceConfigFile)));
             AceConfig.config = (AceConfig) ois.readObject();
             AceConfig.config.setConfigFile(aceConfigFile);
