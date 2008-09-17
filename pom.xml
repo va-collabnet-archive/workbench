@@ -24,7 +24,7 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>ace-api</artifactId>
-      <version>1.20-SNAPSHOT</version>
+      <version>1.20</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
