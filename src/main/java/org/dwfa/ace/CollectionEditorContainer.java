@@ -53,10 +53,10 @@ public class CollectionEditorContainer extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			int option = JOptionPane.showConfirmDialog(
 					CollectionEditorContainer.this,
-					"Are you sure you want to erase the list?", "Erase the list?",
-					JOptionPane.YES_NO_OPTION);
+					"Are you sure you want to erase the list?",
+					"Erase the list?", JOptionPane.YES_NO_OPTION);
 			if (option == JOptionPane.YES_OPTION) {
-				((TerminologyListModel)list.getModel()).clear();
+				((TerminologyListModel) list.getModel()).clear();
 			}
 		}
 
@@ -185,14 +185,16 @@ public class CollectionEditorContainer extends JPanel {
 		showComponentActionListener = new ShowComponentActionListener();
 		showComponentView.setVisible(ACE.editMode);
 		showComponentView.addActionListener(showComponentActionListener);
-		showComponentView.setToolTipText("Show component view associated with list view");
+		showComponentView
+				.setToolTipText("Show component view associated with list view");
 		listEditorTopPanel.add(showComponentView, c);
 		c.gridx++;
 		showProcessBuilder = new Toggle32x32(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/cube_molecule.png")));
 		listEditorTopPanel.add(showProcessBuilder, c);
 		showProcessBuilder.setVisible(ACE.editMode);
-		showProcessBuilder.setToolTipText("Show process builder associated with list view");
+		showProcessBuilder
+				.setToolTipText("Show process builder associated with list view");
 		showProcessBuilder
 				.addActionListener(new ShowProcessBuilderActionListener());
 		c.gridx++;
@@ -224,29 +226,36 @@ public class CollectionEditorContainer extends JPanel {
 			c.weightx = 0.0;
 			c.fill = GridBagConstraints.NONE;
 			for (File f : plugins) {
-				FileInputStream fis = new FileInputStream(f);
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				BusinessProcess bp = (BusinessProcess) ois.readObject();
-				ois.close();
-				byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
-				if (iconBytes != null) {
-					ImageIcon icon = new ImageIcon(iconBytes);
-					JButton pluginButton = new Button32x32(icon);
-					pluginButton.setToolTipText(bp.getSubject());
-					pluginButton.addActionListener(new PluginListener(f));
-					c.gridx++;
-					listEditorTopPanel.add(pluginButton, c);
-					AceLog.getAppLog().info(
-							"adding collection plugin: " + f.getName());
-				} else {
-					JButton pluginButton = new Button32x32(bp.getName());
-					pluginButton.setToolTipText(bp.getSubject());
-					pluginButton.addActionListener(new PluginListener(f));
-					c.gridx++;
-					listEditorTopPanel.add(pluginButton, c);
-					AceLog.getAppLog().info(
-							"adding collection plugin: " + f.getName());
+				try {
+					FileInputStream fis = new FileInputStream(f);
+					BufferedInputStream bis = new BufferedInputStream(fis);
+					ObjectInputStream ois = new ObjectInputStream(bis);
+					BusinessProcess bp = (BusinessProcess) ois.readObject();
+					ois.close();
+					byte[] iconBytes = (byte[]) bp
+							.readAttachement("button_icon");
+					if (iconBytes != null) {
+						ImageIcon icon = new ImageIcon(iconBytes);
+						JButton pluginButton = new Button32x32(icon);
+						pluginButton.setToolTipText(bp.getSubject());
+						pluginButton.addActionListener(new PluginListener(f));
+						c.gridx++;
+						listEditorTopPanel.add(pluginButton, c);
+						AceLog.getAppLog().info(
+								"adding collection plugin: " + f.getName());
+					} else {
+						JButton pluginButton = new Button32x32(bp.getName());
+						pluginButton.setToolTipText(bp.getSubject());
+						pluginButton.addActionListener(new PluginListener(f));
+						c.gridx++;
+						listEditorTopPanel.add(pluginButton, c);
+						AceLog.getAppLog().info(
+								"adding collection plugin: " + f.getName());
+					}
+				} catch (IOException ex) {
+					AceLog.getAppLog().alertAndLogException(ex);
+				} catch (ClassNotFoundException ex) {
+					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
 		}
