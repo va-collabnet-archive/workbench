@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.dwfa</groupId>
     <artifactId>dwfa-pom</artifactId>
-    <version>2.1</version>
+    <version>2.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
@@ -10,11 +10,11 @@
   <version>1.24-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>ACE mojo</name>
-  <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/</url>
+  <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/</url>
   <scm>
-    <connection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</connection>
-    <developerConnection>scm:svn:https://term-mojo.aceworkspace.net/svn/term-mojo/trunk/dev</developerConnection>
-    <url>https://term-mojo.aceworkspace.net/source/browse/term-mojo/trunk/dev/</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk</developerConnection>
+    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=term-mojo&system=exsy1002]]></url>
   </scm>
   <organization>
     <name>Informatics, Inc.</name>
