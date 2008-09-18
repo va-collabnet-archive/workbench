@@ -12,9 +12,9 @@
   <name>ACE API</name>
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-api/site</url>
   <scm>
-    <connection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</connection>
-    <developerConnection>scm:svn:https://ace-api.aceworkspace.net/svn/ace-api/trunk/dev</developerConnection>
-    <url>https://ace-api.aceworkspace.net/source/browse/ace-api/trunk/dev/</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ace-api/trunk/dev</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ace-api/trunk/dev</developerConnection>
+    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/trunk/dev/?root=ace-api&system=exsy1002]]></url>
   </scm>
   <dependencies>
     <dependency>
