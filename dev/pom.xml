@@ -2,7 +2,7 @@
     <parent>
         <groupId>org.dwfa</groupId>
         <artifactId>dwfa-pom</artifactId>
-        <version>2.0</version>
+        <version>2.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
@@ -11,27 +11,10 @@
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/core/site/</url>
-    <issueManagement>
-        <system>Scarab</system>
-        <url>https://core.aceworkspace.net/servlets/Scarab</url>
-    </issueManagement>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>aceworkspace.net</id>
-            <name>aceworkspace.net</name>
-            <url>file:///ciweb/webapps/maven2</url>
-            <layout>default</layout>
-        </repository>
-        <site>
-            <id>aceworkspace.net</id>
-            <url>file:///ciweb/webapps/core/site</url>
-        </site>
-    </distributionManagement>
     <scm>
-        <connection>scm:svn:https://core.aceworkspace.net/svn/core/trunk/dev</connection>
-        <developerConnection>scm:svn:https://core.aceworkspace.net/svn/core/trunk/dev</developerConnection>
-        <url>https://core.aceworkspace.net/source/browse/core/trunk/dev/</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/core/trunk/dev</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/core/trunk/dev</developerConnection>
+        <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=core&system=exsy1002]]></url>
     </scm>
     <dependencies>
         <dependency>
