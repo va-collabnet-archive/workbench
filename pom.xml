@@ -12,8 +12,8 @@
   <name>ACE mojo</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/</url>
   <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk</developerConnection>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk/dev</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk/dev</developerConnection>
     <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=term-mojo&system=exsy1002]]></url>
   </scm>
   <organization>
