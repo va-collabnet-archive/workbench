@@ -14,9 +14,9 @@
   <inceptionYear>2005</inceptionYear>
   <description>ACE editor toolkit and version-oriented database</description>
   <scm>
-    <connection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</connection>
-    <developerConnection>scm:svn:https://vodb.aceworkspace.net/svn/vodb/trunk/dev</developerConnection>
-    <url>https://vodb.aceworkspace.net/source/browse/vodb/trunk/dev/</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</developerConnection>
+    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=vodb&system=exsy1002]]></url>
   </scm>
   <dependencies>
     <dependency>
