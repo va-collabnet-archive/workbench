@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.dwfa</groupId>
     <artifactId>dwfa-pom</artifactId>
-    <version>2.0</version>
+    <version>2.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
@@ -19,23 +19,10 @@
     <system>Scarab</system>
     <url>https://dwfa-mojo.aceworkspace.net/servlets/Scarab</url>
   </issueManagement>
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>aceworkspace.net</id>
-      <name>aceworkspace.net</name>
-      <url>file:///ciweb/webapps/maven2</url>
-      <layout>default</layout>
-    </repository>
-    <site>
-      <id>aceworkspace.net</id>
-      <url>file:///ciweb/webapps/dwfa-mojo/site</url>
-    </site>
-  </distributionManagement>
   <scm>
-    <connection>scm:svn:https://dwfa-mojo.aceworkspace.net/svn/dwfa-mojo/tags/dwfa-mojo-2.0.20</connection>
-    <developerConnection>scm:svn:https://dwfa-mojo.aceworkspace.net/svn/dwfa-mojo/tags/dwfa-mojo-2.0.20</developerConnection>
-    <url>https://dwfa-mojo.aceworkspace.net/source/browse/dwfa-mojo/tags/dwfa-mojo-2.0.20</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-mojo/trunk/dev</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-mojo/trunk/dev</developerConnection>
+    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=dwfa-mojo&system=exsy1002]]></url>
   </scm>
   <dependencies>
     <dependency>
