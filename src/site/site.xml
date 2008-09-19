@@ -27,8 +27,6 @@
     ${reports}
    </body>
   <poweredBy>
-    <logo name="Maven" href="http://maven.apache.org/"
-      img="http://maven.apache.org/images/logos/maven-feather.png"/>
     <logo name="Module Home" href="index.html"
       img="images/module.jpg"/>
   </poweredBy>
