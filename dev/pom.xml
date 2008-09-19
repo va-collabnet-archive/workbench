@@ -16,9 +16,13 @@
     bundles. </description>
   <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/dwfa-mojo/site</url>
   <issueManagement>
-    <system>Scarab</system>
-    <url>https://dwfa-mojo.aceworkspace.net/servlets/Scarab</url>
+    <system>Tracker</system>
+      <url>https://csfe.aceworkspace.net/sf/tracker/do/listTrackers/projects.dwfa/tracker</url>
   </issueManagement>
+    <ciManagement>
+        <system>continuum</system>
+        <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum</url>
+    </ciManagement>
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-mojo/trunk/dev</connection>
     <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-mojo/trunk/dev</developerConnection>
