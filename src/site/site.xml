@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="dwfa-mojo">
   <bannerLeft>
-    <src>images/module.jpg</src>
+    <name></name>
   </bannerLeft>
   <bannerRight>
-    <name>Informatics, Inc.</name>
-    <src>images/informatics-logo-small.gif</src>
-    <href>http://www.informatics.com/</href>
+    <name></name>
   </bannerRight>
   <body>
     <links>
@@ -28,4 +26,10 @@
     </menu>
     ${reports}
    </body>
+  <poweredBy>
+    <logo name="Module Home" href="index.html"
+      img="images/module.jpg"/>
+    <logo name="Maven" href="http://maven.apache.org/"
+      img="http://maven.apache.org/images/logos/maven-feather.png"/>
+  </poweredBy>
 </project>
