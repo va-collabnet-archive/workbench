@@ -120,7 +120,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
     * please let us know :-)
     */
    
-   private String[] allowedGoals = new String[] { "install" };
+   private String[] allowedGoals = new String[] { "install","deploy" };
 
    public void execute() throws MojoExecutionException, MojoFailureException {
       
