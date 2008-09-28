@@ -10,7 +10,7 @@
     <version>2.0.15-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
-    <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/core/site/</url>
+    <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/core/site/index.html</url>
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/core/trunk/dev</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/core/trunk/dev</developerConnection>
