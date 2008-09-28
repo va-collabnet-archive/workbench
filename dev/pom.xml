@@ -14,8 +14,12 @@
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/core/trunk/dev</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/core/trunk/dev</developerConnection>
-        <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=core&system=exsy1002]]></url>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
     </scm>
+  <ciManagement>
+    <system>continuum</system>
+    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/groupSummary.action</url>
+  </ciManagement>
     <dependencies>
         <dependency>
             <groupId>org.dwfa.jini</groupId>
