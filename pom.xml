@@ -14,8 +14,12 @@
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ace-api/trunk/dev</connection>
     <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ace-api/trunk/dev</developerConnection>
-    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/trunk/dev/?root=ace-api&system=exsy1002]]></url>
+    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
   </scm>
+  <ciManagement>
+    <system>continuum</system>
+    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/groupSummary.action</url>
+  </ciManagement>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
