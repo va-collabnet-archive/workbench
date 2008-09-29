@@ -66,7 +66,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
       SNOMED_EXTENSION};
       
       /**
-       * Taxonomies to export. Must be one or more of the Taxonomies provided in the <code>TAXONOMIES enum</enum> in this class.
+       * Taxonomies to export. Must be one or more of the Taxonomies provided in the <code>TAXONOMIES enum</code> in this class.
        * 
        * @parameter
        * @required

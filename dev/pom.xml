@@ -11,17 +11,17 @@
   <packaging>maven-plugin</packaging>
   <name>DWFA mojo</name>
   <inceptionYear>2004</inceptionYear>
-  <description>Maven plugins helpful in building DWFA projects with maven. Some example inclulde
-    custom processing of configuration files using maven pom files, and customizaiton of workflow
+  <description>Maven plugins helpful in building DWFA projects with maven. Some example include
+    custom processing of configuration files using maven pom files, and customization of workflow
     bundles. </description>
-  <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/dwfa-mojo/site/index.html</url>
+  <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/dwfa-mojo/site/index.html</url>
   <issueManagement>
     <system>Tracker</system>
       <url>https://csfe.aceworkspace.net/sf/tracker/do/listTrackers/projects.dwfa/tracker</url>
   </issueManagement>
     <ciManagement>
         <system>continuum</system>
-        <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum</url>
+        <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/projectView.action?projectId=4</url>
     </ciManagement>
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-mojo/trunk/dev</connection>

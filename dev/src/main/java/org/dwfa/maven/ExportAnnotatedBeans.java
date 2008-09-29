@@ -269,6 +269,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
         }
     }
 
+	@SuppressWarnings("unchecked")
     private void writeTaskBean(Class c, Spec spec) throws MojoExecutionException {
         try {
             String suffix = ".task";
@@ -282,6 +283,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
         }
     }
 
+	@SuppressWarnings("unchecked")
     private void writeDataBean(Class c, Spec spec) throws MojoExecutionException {
         try {
             String suffix = ".data";
@@ -292,6 +294,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
         }
     }
 
+	@SuppressWarnings("unchecked")
     private void writeGenericBean(Class c, Spec spec) throws MojoExecutionException {
         try {
             String suffix = ".bean";
@@ -314,6 +317,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      * @throws InvocationTargetException
      * @throws FileNotFoundException
      */
+	@SuppressWarnings("unchecked")
     private void writeBean(Class beanClass, Spec s, File rootDir, String suffix) throws IOException,
     ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
     InvocationTargetException, FileNotFoundException {

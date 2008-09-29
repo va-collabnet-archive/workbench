@@ -19,10 +19,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
-import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -31,8 +28,8 @@ import org.apache.maven.plugin.MojoFailureException;
  * Goal which writes tasks as java beans for the builder application.
  * 
  * @goal write-beans
-  * @requiresDependencyResolution compile
- * 
+ * @requiresDependencyResolution compile
+ * @deprecated use export-beans
  */
 public class WriteBeans extends AbstractMojo implements ExceptionListener {
 
@@ -57,18 +54,6 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
 	 * @required
 	 */
 	BeanSpec[] specs;
-
-	/**
-	 * @parameter expression="${project.dependencies}"
-	 * @required
-	 */
-	private List<Dependency> dependencies;
-
-	/**
-	 * @parameter expression="${settings.localRepository}"
-	 * @required
-	 */
-	private String localRepository;
 	
 	/**
 	 * @parameter
@@ -146,12 +131,10 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
      * @throws InvocationTargetException
      * @throws FileNotFoundException
      */
-    private void writeBean(BeanSpec spec, File rootDir, String suffix) throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, FileNotFoundException {
+    @SuppressWarnings("unchecked")
+	private void writeBean(BeanSpec spec, File rootDir, String suffix) throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, FileNotFoundException {
         rootDir.mkdirs();
-        URLClassLoader libLoader = MojoUtil.getProjectClassLoader(
-                dependencies, localRepository, this.outputDirectory
-                        + "/classes/");
-        Class beanClass = libLoader.loadClass(spec.getSourceName());
+        Class beanClass = this.getClass().getClassLoader().loadClass(spec.getSourceName());
         Object obj;
         if (beanClass.isEnum()) {
             Method m = beanClass.getMethod("valueOf", new Class[] { String.class});
@@ -186,16 +169,13 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
     }
 	
 
+	@SuppressWarnings("unchecked")
 	private void writeProcessBean(BeanSpec spec) throws MojoExecutionException {
 		try {
 			rootDir.mkdirs();
 
-			final URLClassLoader libLoader = MojoUtil.getProjectClassLoader(
-					dependencies, localRepository, this.outputDirectory
-							+ "/classes/");
 			ClassLoader origCl = Thread.currentThread().getContextClassLoader();
-			Thread.currentThread().setContextClassLoader(libLoader);
-			Class decoderClass = libLoader.loadClass("java.beans.XMLDecoder");
+			Class decoderClass = origCl.loadClass("java.beans.XMLDecoder");
 			Constructor decoderConstructor = decoderClass
 					.getConstructor(new Class[] { InputStream.class });
             File xmlSourceFile = new File(sourceDirectory

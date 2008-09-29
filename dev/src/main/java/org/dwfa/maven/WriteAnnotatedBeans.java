@@ -226,6 +226,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		}
  	}
 
+	@SuppressWarnings("unchecked")
 	private void writeTaskBean(Class c, Spec spec)
 			throws MojoExecutionException {
 		try {
@@ -240,6 +241,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void writeDataBean(Class c, Spec spec)
 			throws MojoExecutionException {
 		try {
@@ -251,6 +253,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void writeGenericBean(Class c, Spec spec)
 			throws MojoExecutionException {
 		try {
@@ -274,6 +277,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 	 * @throws InvocationTargetException
 	 * @throws FileNotFoundException
 	 */
+	@SuppressWarnings("unchecked")
 	private void writeBean(Class beanClass, Spec s, File rootDir, String suffix)
 			throws IOException, ClassNotFoundException, NoSuchMethodException,
 			InstantiationException, IllegalAccessException,
@@ -315,7 +319,7 @@ public class WriteAnnotatedBeans extends AbstractMojo implements
 		oos.close();
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unused", "unchecked" })
    private void writeProcessBean(BeanSpec spec) throws MojoExecutionException {
 		try {
 			File rootDir = new File(this.outputDirectory, "processes");
