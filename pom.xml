@@ -14,7 +14,7 @@
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk/dev</connection>
     <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk/dev</developerConnection>
-    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=term-mojo&system=exsy1002]]></url>
+    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
   </scm>
   <organization>
     <name>Informatics, Inc.</name>
@@ -29,8 +29,8 @@
   </licenses>
   <inceptionYear>2006</inceptionYear>
   <description>This project provides a set of maven goals that are used to
-    transform terminology data in 
-  preperation for importing into standard file formats used by the ACE version-orented database, and by other applications. 
+    transform terminology data in preparation for importing into standard file 
+    formats used by the ACE version-oriented database, and by other applications. 
   </description>
   <dependencies>
      <dependency>
