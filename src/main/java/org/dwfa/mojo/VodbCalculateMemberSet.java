@@ -1,18 +1,10 @@
 package org.dwfa.mojo;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -21,23 +13,12 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_GetExtensionData;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
  * Calculates the member set of a particular reference set.
@@ -105,7 +86,6 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
 				Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status,is_a, null, false);
 				for (I_GetConceptData refsetConcept : refsetChildren) {
-					I_IntSet purpose = termFactory.newIntSet();
 
 					Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 

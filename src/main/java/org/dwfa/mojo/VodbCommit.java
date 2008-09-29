@@ -1,6 +1,5 @@
 package org.dwfa.mojo;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -28,14 +27,7 @@ public class VodbCommit  extends AbstractMojo {
      */
     @SuppressWarnings("unused")
     private String outputDirectory;
-    /**
-     * The maven session
-     * 
-     * @parameter expression="${session}"
-     * @required
-     */
-    private MavenSession session;
-    
+     
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
         getLog().info("commiting: " + termFactory);        

@@ -11,7 +11,19 @@ import java.sql.DriverManager;
  */
 public class GenerateSnomedOpenBase extends GenerateSnomedJDBC {
 
-	public void setup() throws Exception {
+    /**
+     * Location of the directory to output data files to.
+     * KEC: I added this field, because the maven plugin plugin would 
+     * crash unless there was at least one commented field. This field is
+     * not actually used by the plugin. 
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    @SuppressWarnings("unused")
+    private String outputDirectory;
+
+    public void setup() throws Exception {
 
 		Class.forName("com.openbase.jdbc.ObDriver");
   		String url = "jdbc:openbase://g5-1.informatics.com/snomed";		// Set here your hostname and the database name 

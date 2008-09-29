@@ -24,7 +24,7 @@
       <item name="SNOMED Format Data Import" href="snomed-dataimport.html"/>
       <item name="Plugin Goals" href="plugin-info.html"/>
     </menu>
-    ${reports}
+    <menu ref="reports"/>
    </body>
   <poweredBy>
     <logo name="Module Home" href="index.html"
