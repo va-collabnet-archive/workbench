@@ -18,7 +18,7 @@
       <item name="VODB Home" href="index.html"/>
       <item name="Parent Module: DWFA Master" href="../../dwfa/site/index.html"/>
     </menu>
-    ${reports}
+    <menu ref="reports"/>
    </body>
   <poweredBy>
     <logo name="Module Home" href="index.html"
