@@ -9,22 +9,22 @@
   <artifactId>foundation</artifactId>
   <version>2.0.19-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Dwfa foundation module</name>
-  <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html/</url>
+  <name>DWFA foundation module</name>
+  <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html/</url>
   <inceptionYear>2004</inceptionYear>
   <organization>
     <name>Informatics, Inc.</name>
     <url>http://www.informatics.com</url>
   </organization>
-  <issueManagement>
-    <system>Issue Tracker</system>
-    <url>https://dwfa.aceworkspace.net/servlets/tracking</url>
-  </issueManagement>
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/trunk/dev</connection>
     <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/trunk/dev</developerConnection>
-    <url><![CDATA[https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/?root=foundation&system=exsy1002]]></url>
+    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
   </scm>
+  <ciManagement>
+    <system>continuum</system>
+    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/projectView.action?projectId=1</url>
+  </ciManagement>
   <dependencies>
     <dependency>
       <groupId>net.jini</groupId>

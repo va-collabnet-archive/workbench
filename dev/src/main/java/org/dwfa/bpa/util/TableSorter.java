@@ -90,7 +90,6 @@ public class TableSorter extends AbstractTableModel {
 
     @SuppressWarnings("unchecked")
     public static final Comparator COMPARABLE_COMAPRATOR = new Comparator() {
-        @SuppressWarnings("unchecked")
         public int compare(Object o1, Object o2) {
             return ((Comparable) o1).compareTo(o2);
         }
@@ -319,7 +318,6 @@ public class TableSorter extends AbstractTableModel {
             this.modelIndex = index;
         }
 
-        @SuppressWarnings("unchecked")
         public int compareTo(Object o) {
             int row1 = modelIndex;
             int row2 = ((Row) o).modelIndex;

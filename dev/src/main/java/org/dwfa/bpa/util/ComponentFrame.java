@@ -37,6 +37,10 @@ import com.sun.jini.start.LifeCycle;
 public abstract class ComponentFrame extends JFrame implements I_InitComponentMenus  {
     
     
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected static Logger logger = Logger.getLogger(ComponentFrame.class.getName());
 	protected ComponentFrameBean cfb;
 	protected final static int MENU_MASK = getMenuMask();
