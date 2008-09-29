@@ -18,7 +18,7 @@
     </scm>
   <ciManagement>
     <system>continuum</system>
-    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/groupSummary.action</url>
+    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/projectView.action?projectId=3</url>
   </ciManagement>
     <dependencies>
         <dependency>
