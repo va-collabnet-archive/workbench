@@ -30,9 +30,9 @@ public class ModifyAllSvnEntries extends AbstractAllSvnEntriesTask {
 	protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
 		
 		String existingRepoUrl = svd.getRepositoryUrlStr();
-
-		logger.info("newSvnRepoUrl= " + getRepoUrl());
-		logger.info("existingRepoUrl= " + existingRepoUrl);
+		
+		logger.info("The existing repo url in the profile is " + existingRepoUrl);
+		logger.info("Setting repo url in the profile to " + getRepoUrl());
 		
 		svd.setRepositoryUrlStr(getRepoUrl());		
 	}
