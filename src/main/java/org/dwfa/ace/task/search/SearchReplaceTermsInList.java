@@ -253,12 +253,13 @@ public class SearchReplaceTermsInList extends AbstractTask {
 									// and path to the current
 									I_DescriptionTuple tuple = newDesc
 											.getLastTuple();
-									tuple
-											.setStatusId(description
-													.getStatusId());
-									tuple.setPathId(path.getConceptId());
+									tuple.setStatusId(description
+											.getStatusId());
+                                    tuple.setInitialCaseSignificant(description
+                                            .getInitialCaseSignificant());                                                                        
+                                    tuple.setPathId(path.getConceptId());
 
-									termFactory.addUncommitted(child);
+                                    termFactory.addUncommitted(child);
 								}
 							}
 							processedDescriptions += ":"
