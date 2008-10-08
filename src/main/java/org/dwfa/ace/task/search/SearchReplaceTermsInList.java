@@ -172,7 +172,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
 					// get latest descriptions
 					List<I_DescriptionTuple> descriptionTuples = child
-							.getDescriptionTuples(null, (searchAll ? null
+							.getDescriptionTuples(config.getAllowedStatus(), (searchAll ? null
 									: descriptionTypesToCheck),
 									positionsToCheck);
 
@@ -254,11 +254,9 @@ public class SearchReplaceTermsInList extends AbstractTask {
 									I_DescriptionTuple tuple = newDesc
 											.getLastTuple();
 									tuple.setStatusId(description
-											.getStatusId());
-                                    tuple.setInitialCaseSignificant(description
-                                            .getInitialCaseSignificant());                                                                        
-                                    tuple.setPathId(path.getConceptId());
-
+													.getStatusId());
+									tuple.setInitialCaseSignificant(description.getInitialCaseSignificant());
+									tuple.setPathId(path.getConceptId());
                                     termFactory.addUncommitted(child);
 								}
 							}
