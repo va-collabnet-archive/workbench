@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -66,10 +67,10 @@ public class ExtractAndProcessFiles extends AbstractMojo {
      */
     private Set<Artifact> artifacts;
 	/**
-	 * @parameter expression="${settings.localRepository}"
+	 * @parameter expression="${localRepository}"
 	 * @required
 	 */
-	private String localRepository;
+	private DefaultArtifactRepository localRepository;
 
 	/**
 	 * @parameter
@@ -116,7 +117,7 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 					continue;
 				}
 
-				String dependencyPath = MojoUtil.artifactToPath(localRepository, d);
+				String dependencyPath = MojoUtil.artifactToPath(localRepository.getBasedir(), d);
 				File dependencyFile = new File(dependencyPath);
 				if (dependencyFile.exists()) {
 					try {

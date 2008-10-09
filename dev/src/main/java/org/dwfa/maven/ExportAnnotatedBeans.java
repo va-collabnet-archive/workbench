@@ -26,6 +26,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -88,11 +89,11 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      */
     private Set<Artifact> artifacts;
 
-    /**
-     * @parameter expression="${settings.localRepository}"
-     * @required
-     */
-    private String localRepository;
+	/**
+	 * @parameter expression="${localRepository}"
+	 * @required
+	 */
+	private DefaultArtifactRepository localRepository;
 
     /**
      * @parameter
@@ -197,7 +198,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                         continue;
                     }
 
-                    String dependencyPath = MojoUtil.dependencyToPath(localRepository, d);
+                    String dependencyPath = MojoUtil.dependencyToPath(localRepository.getBasedir(), d);
                     File dependencyFile = new File(dependencyPath);
                     if (dependencyFile.exists()) {
                         getLog().info("writing annotated beans for: " + dependencyPath);
@@ -430,14 +431,6 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
     public void setSession(MavenSession session) {
         this.session = session;
-    }
-
-    public String getLocalRepository() {
-        return localRepository;
-    }
-
-    public void setLocalRepository(String localRepository) {
-        this.localRepository = localRepository;
     }
 
 }

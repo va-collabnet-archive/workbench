@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -41,11 +42,11 @@ public class WriteDirectories extends AbstractMojo {
      */
     private List<Dependency> dependencies;
 
-    /**
-     * @parameter expression="${settings.localRepository}"
-     * @required
-     */
-    private String localRepository;
+	/**
+	 * @parameter expression="${localRepository}"
+	 * @required
+	 */
+	private DefaultArtifactRepository localRepository;
 
     /**
      * @parameter
@@ -77,7 +78,7 @@ public class WriteDirectories extends AbstractMojo {
             }
             l.info("Processing: " + d);
 
-            String dependencyPath = MojoUtil.dependencyToPath(localRepository, d);
+            String dependencyPath = MojoUtil.dependencyToPath(localRepository.getBasedir(), d);
             try {
 
                 FileInputStream fis = new FileInputStream(dependencyPath);
