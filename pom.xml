@@ -114,13 +114,6 @@
 			<version>1.4</version>
 			<scope>compile</scope>
 		</dependency>
-		<!--
-			<dependency> <groupId>org.dwfa</groupId>
-			<artifactId>log-dl</artifactId> <scope>compile</scope>
-			<version>2.0.1</version> </dependency> <dependency>
-			<groupId>org.dwfa</groupId> <artifactId>queue-dl</artifactId>
-			<scope>compile</scope> <version>2.0.1</version> </dependency>
-		-->
 		<dependency>
 			<groupId>org.dwfa.jini</groupId>
 			<artifactId>jsk-dl</artifactId>
