@@ -119,6 +119,7 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
+import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.JEVersion;
@@ -158,6 +159,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	private BdbEnv bdbEnv;
 
 	private static Long cacheSize;
+	
+	private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+
 
 	public void setup(Object envHome, boolean readOnly, Long cacheSize)
 			throws ToIoException {
@@ -1102,8 +1106,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 		public void processConceptAttributeEntry(DatabaseEntry key,
 				DatabaseEntry value) throws Exception {
+			
+			int conId = (Integer) intBinder.entryToObject(key);
+			@SuppressWarnings("unused")
 			I_ConceptAttributeVersioned conAttrVersioned = bdbEnv.conAttrEntryToObject(key, value);
-			ConceptBean bean = ConceptBean.get(conAttrVersioned.getConId());
+			ConceptBean bean = ConceptBean.get(conId);
 			processor.processConcept(bean);
 		}
 
