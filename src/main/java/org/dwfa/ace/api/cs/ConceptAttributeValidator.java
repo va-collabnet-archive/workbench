@@ -66,7 +66,7 @@ public class ConceptAttributeValidator extends SimpleValidator {
 					for (I_ConceptAttributePart conceptAttributePart: thinConAttr.getVersions()) {
 						failureReport.append("\n     existing part: " + conceptAttributePart);
 					}
-					
+					failureReport.append("\n\n");
 					return false; // test 2
 				}	
 			}
