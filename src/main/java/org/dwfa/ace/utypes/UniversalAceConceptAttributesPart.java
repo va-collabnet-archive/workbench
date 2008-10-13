@@ -2,6 +2,7 @@ package org.dwfa.ace.utypes;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 
 public class UniversalAceConceptAttributesPart implements Serializable {
@@ -64,7 +65,10 @@ public class UniversalAceConceptAttributesPart implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + " defined: " + defined + " status: " + conceptStatus + " path: " + pathId + " time: " + time;
+		return this.getClass().getSimpleName() + " defined: " + defined + 
+		" status: " + conceptStatus + 
+		" path: " + pathId + 
+		" time: " + time + " (" + new Date(time) + ")";
 	}
 
 	
