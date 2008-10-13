@@ -19,21 +19,22 @@ import org.dwfa.tapi.TerminologyException;
 public class ConceptAttributeValidator extends SimpleValidator {
 
 	private boolean timeLenient = false;
-	private String failureReport;
+	private StringBuffer failureReport;
 	
 	@Override
 	protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
 			throws IOException, TerminologyException {
 		
 		termFactory = tf;
-		failureReport = "";
+		failureReport = new StringBuffer();
 		
 		UniversalAceConceptAttributes conceptAttributes = bean.getConceptAttributes();
-		if (conceptAttributes == null) {
-			//for some reason this gets passed beans that have no conceptAttributes.
-			//have to assume that this means it matches?
-			AceLog.getEditLog().warning("UniversalAceBean has no conceptAttributes");
-			return true;
+		if (conceptAttributes == null && bean.getUncommittedConceptAttributes() != null) {
+			if (bean.getUncommittedConceptAttributes() != null) {
+				return true;
+			} 
+			AceLog.getEditLog().warning("UniversalAceBean has no conceptAttributes and no uncommitted concept attributes:\n" + bean);
+			return false;
 		}
 		
 		int startParts = 0;
@@ -46,31 +47,43 @@ public class ConceptAttributeValidator extends SimpleValidator {
 				for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getVersions()) {
 					if (conceptAttributePart.getConceptStatus() == getNativeId(part.getConceptStatus())
 							&& conceptAttributePart.getPathId() == getNativeId(part.getPathId())
-							&& (timeLenient || conceptAttributePart.getVersion() == part.getTime())) {
+							&& (timeLenient || conceptAttributePart.getVersion() == tf.convertToThinVersion(part.getTime()))) {
 						match = true;
 						break;
 					}
 				}
 					
 				if (!match) {
-					failureReport += "concept does not contain a concept attribute part match. \nnewPart was " + part + ", \nexisting versions " + thinConAttr.getVersions();
+					failureReport.append("\nConcept does not contain a concept attribute part match.");
+					I_ConceptAttributePart newConceptAttributePart = tf.newConceptAttributePart();
+					newConceptAttributePart.setConceptStatus(getNativeId(part.getConceptStatus()));
+					newConceptAttributePart.setDefined(part.isDefined());
+					newConceptAttributePart.setPathId(getNativeId(part.getPathId()));
+					newConceptAttributePart.setVersion(tf.convertToThinVersion(part.getTime()));
+					failureReport.append("\n   newPart is " + part );
+					failureReport.append(    "\n   new native part: " + newConceptAttributePart );
+					
+					for (I_ConceptAttributePart conceptAttributePart: thinConAttr.getVersions()) {
+						failureReport.append("\n     existing part: " + conceptAttributePart);
+					}
+					
 					return false; // test 2
 				}	
 			}
 			
 		}
 		if (startParts != thinConAttr.getVersions().size()) {
-			failureReport += "number of concept attribute parts is different for " + bean + " and " + thinConAttr.getVersions();
+			failureReport.append("number of concept attribute parts is different for " + bean + " and " + thinConAttr.getVersions());
 			return false; // test 3
 		}
 
-		// passed all tests for all descriptions
+		// passed all tests for all attributes
 		return true;
 	}
 
 	@Override
 	public String getFailureReport() {
-		return failureReport;
+		return failureReport.toString();
 	}
 	
 	public boolean isTimeLenient() {
