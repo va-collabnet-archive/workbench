@@ -226,38 +226,38 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
 								Set<I_Path> paths = config.getEditingPathSet();
 
+								// Create a new, cloned, description
+								I_DescriptionVersioned newDesc = termFactory
+										.newDescription(
+												UUID.randomUUID(),
+												child,
+												description.getLang(),
+												finalDesc,
+												termFactory
+														.getConcept(description
+																.getTypeId()),
+												config);
+								
+								I_DescriptionPart newLastPart = newDesc.getLastTuple().getPart();
 								for (I_Path path : paths) {
-
 									// retire the existing description
-									I_DescriptionPart newPart = description
+									I_DescriptionPart newRetiredPart = description
 											.duplicatePart();
-									newPart.setPathId(path.getConceptId());
-									newPart.setVersion(Integer.MAX_VALUE);
-									newPart.setStatusId(retiredConceptId);
+									newRetiredPart.setPathId(path.getConceptId());
+									newRetiredPart.setVersion(Integer.MAX_VALUE);
+									newRetiredPart.setStatusId(retiredConceptId);
 									description.getDescVersioned().addVersion(
-											newPart);
-
-									// Create a new, cloned, description
-									I_DescriptionVersioned newDesc = termFactory
-											.newDescription(
-													UUID.randomUUID(),
-													child,
-													description.getLang(),
-													finalDesc,
-													termFactory
-															.getConcept(description
-																	.getTypeId()),
-													config);
-
+											newRetiredPart);
 									// Set the status to that of the original,
 									// and path to the current
-									I_DescriptionTuple tuple = newDesc
-											.getLastTuple();
-									tuple.setStatusId(description
-													.getStatusId());
-									tuple.setInitialCaseSignificant(description.getInitialCaseSignificant());
-									tuple.setPathId(path.getConceptId());
+									if (newLastPart == null) {
+										newLastPart = newDesc.getLastTuple().getPart().duplicate();
+									}
+									newLastPart.setStatusId(description.getStatusId());
+									newLastPart.setInitialCaseSignificant(description.getInitialCaseSignificant());
+									newLastPart.setPathId(path.getConceptId());
                                     termFactory.addUncommitted(child);
+                                    newLastPart = null;
 								}
 							}
 							processedDescriptions += ":"

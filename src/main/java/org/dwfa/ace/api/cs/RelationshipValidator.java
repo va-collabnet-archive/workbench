@@ -1,10 +1,7 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
@@ -18,7 +15,7 @@ import org.dwfa.tapi.TerminologyException;
 public class RelationshipValidator extends SimpleValidator {
 
 	boolean timeLenient = false;
-	private String failureReport;
+	private StringBuffer failureReport;
     @Override
     protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
         throws IOException, TerminologyException {
@@ -41,14 +38,14 @@ public class RelationshipValidator extends SimpleValidator {
          */
 
         termFactory = tf;
-        failureReport = "";
+        failureReport = new StringBuffer();
 
         I_GetConceptData concept = tf.getConcept(tf.uuidToNative(bean.getId().getUIDs()));
         List<I_RelVersioned> databaseRelationships = concept.getSourceRels();
         List<UniversalAceRelationship> beanRelationships = bean.getSourceRels();
         
         if (databaseRelationships.size() > beanRelationships.size()) {
-			failureReport += "number of relationship doesn't match " + databaseRelationships + " and " + beanRelationships + "\nfor change bean " + bean;
+			failureReport.append("number of relationship doesn't match " + databaseRelationships + " and " + beanRelationships + "\nfor change bean " + bean);
             return false; // test 1
         }
 
@@ -69,8 +66,13 @@ public class RelationshipValidator extends SimpleValidator {
             }
 
             if (!foundMatch) {
-            	failureReport += "Failed to find matching relationship for " + beanRelationship + " in " + databaseRelationships + "\nfor bean" + bean;
+            	failureReport.append("Failed to find matching relationship for \n   " + beanRelationship);
+                for (I_RelVersioned databaseRelationship : databaseRelationships) {
+                	failureReport.append("\n   " + databaseRelationship);
+                }
                 relationshipMismatches++;
+               	failureReport.append("\nfor bean\n\n" + bean);
+               	failureReport.append("\n\n------\n\n");
             }
         }
         //if the database has the same number less versions than we found matches, then it is OK
@@ -81,17 +83,16 @@ public class RelationshipValidator extends SimpleValidator {
             I_RelVersioned databaseRelationship, int beanRelId, int beanC1Id, int beanC2Id)  throws IOException, TerminologyException {
 
         if (beanRelId != databaseRelationship.getRelId()) {
-            //System.out.println("rel ids different");
             return false; // Test 2
         }
 
         if (beanC1Id != databaseRelationship.getC1Id()) {
-            //System.out.println("c1 id diff");
+        	failureReport.append("Relationship ids equal, but c1 ids unequal: " + beanC1Id + " id in database: " + databaseRelationship.getC1Id());
             return false; // Test 3
          }
 
         if (beanC2Id != databaseRelationship.getC2Id()) {
-            //System.out.println("c2 id diff");
+        	failureReport.append("Relationship ids equal, but c2 ids unequal: " + beanC2Id + " id in database: " + databaseRelationship.getC2Id());
             return false; // Test 4
         }
 
@@ -108,7 +109,17 @@ public class RelationshipValidator extends SimpleValidator {
 
                 if (containsPart(databaseRelationship, newPart) == false) {
 
-					failureReport += "concept does not contain a relationship part match. \nnewPart was " + newPart + ", \nexisting versions " + databaseRelationship.getVersions() + "\n";
+					failureReport.append("concept does not contain a relationship part match. relId: ");
+					failureReport.append(beanRelId);
+					failureReport.append(" c1id: ");
+					failureReport.append(beanC2Id);
+					failureReport.append(" c2id: ");
+					failureReport.append(beanC2Id);
+					failureReport.append(    "\n newPart: " + newPart);
+					for (I_RelPart repPart: databaseRelationship.getVersions()) {
+						failureReport.append("\nexisting: " + repPart);
+					}
+					failureReport.append("\n\n");
                     return false; // Test 5
                 }
             }
@@ -118,7 +129,7 @@ public class RelationshipValidator extends SimpleValidator {
     }
     
     public String getFailureReport() {
-    	return failureReport;
+    	return failureReport.toString();
     }
 
 	private boolean containsPart(I_RelVersioned databaseRelationship,

@@ -1,11 +1,8 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -18,13 +15,13 @@ import org.dwfa.tapi.TerminologyException;
 public class DescriptionValidator extends SimpleValidator {
 
 	private boolean timeLenient = false;
-	private String failureReport;
+	private StringBuffer failureReport;
 	
 	@Override
 	protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
 			throws IOException, TerminologyException {
 		termFactory = tf;
-		failureReport = "";
+		failureReport = new StringBuffer();
 
 		/*
 		 * The universal bean descriptions must be converted and compared with a
@@ -38,7 +35,7 @@ public class DescriptionValidator extends SimpleValidator {
 			Set<I_DescriptionPart> startParts = new HashSet<I_DescriptionPart>();
 			I_DescriptionVersioned thinDesc = tf.getDescription(getNativeId(desc.getDescId()), getNativeId(desc.getConceptId()));
 			if (thinDesc.getConceptId() != getNativeId(desc.getConceptId())) {
-				failureReport += "description concept ids don't match " + thinDesc + " and " + desc;
+				failureReport.append("description concept ids don't match " + thinDesc + " and " + desc);
 				return false; // Test 1
 			}
 			for (UniversalAceDescriptionPart part : desc.getVersions()) {
@@ -56,13 +53,18 @@ public class DescriptionValidator extends SimpleValidator {
 					startParts.add(newPart);
 
 					if (!containsPart(thinDesc, newPart)) {
-						failureReport += "concept does not contain a description part match. \nnewPart was " + newPart + ", \nexisting versions " + thinDesc.getVersions() + "\n";
+						failureReport.append("concept does not contain a description part match.");
+						failureReport.append(    "\n       newPart: " + newPart);
+						for (I_DescriptionPart descPart: thinDesc.getVersions()) {
+							failureReport.append("\n existing part: " + descPart);
+						}
+						failureReport.append("\n\n");
 						return false; // test 2
 					}
 				}
 			}
 			if (startParts.size() != thinDesc.getVersions().size()) {
-				failureReport += "number of concept attribute parts is different for " + bean + " and " + thinDesc.getVersions();
+				failureReport.append("number of concept attribute parts is different for " + bean + " and " + thinDesc.getVersions());
 				return false; // test 3
 			}
 		}
@@ -97,7 +99,7 @@ public class DescriptionValidator extends SimpleValidator {
 
 	@Override
 	public String getFailureReport() {
-		return failureReport;
+		return failureReport.toString();
 	}
 
 	public boolean isTimeLenient() {

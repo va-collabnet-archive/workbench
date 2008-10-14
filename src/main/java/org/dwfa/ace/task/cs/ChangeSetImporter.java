@@ -127,8 +127,6 @@ public abstract class ChangeSetImporter implements ActionListener {
             next = readerSet.first();
         }
 
-        System.out.println("LONG.MAX_VALUE = " + Long.MAX_VALUE);
-
         if (next == null) {
             first.readUntil(Long.MAX_VALUE);
         } else {
