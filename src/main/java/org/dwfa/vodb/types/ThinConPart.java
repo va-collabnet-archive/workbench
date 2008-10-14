@@ -1,7 +1,10 @@
 package org.dwfa.vodb.types;
 
+import java.util.Date;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 
 public class ThinConPart implements I_ConceptAttributePart {
@@ -97,7 +100,10 @@ public class ThinConPart implements I_ConceptAttributePart {
 	}
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": defined " + defined + " status nid: " + conceptStatus + " pathId " + pathId + " version " + version;
+		return this.getClass().getSimpleName() + ": defined " + defined + 
+		" status nid: " + conceptStatus + 
+		" pathId " + pathId + 
+		" version " + version + " (" + new Date(ThinVersionHelper.convert(version)) + ")";
 	}
 	public int getStatusId() {
 		return conceptStatus;

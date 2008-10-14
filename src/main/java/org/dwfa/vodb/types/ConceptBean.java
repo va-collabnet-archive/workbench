@@ -428,14 +428,10 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					}
 					return desc.getVersions().get(0).getText();
 				} else {
-					AceLog.getEditLog().severe(
-							"Uuids: "
+					StringBuffer errorBuffer = new StringBuffer();
+					errorBuffer.append("No descriptions for concept. uuids: "
 									+ AceConfig.getVodb().getUids(conceptId)
-											.toString());
-					AceLog.getEditLog().severe(
-							"id: " + AceConfig.getVodb().getId(conceptId));
-					AceLog.getEditLog().severe(
-							"nid: "
+											.toString() + " nid: "
 									+ AceConfig.getVodb().uuidToNative(
 											getUids()));
 
@@ -443,7 +439,7 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 					String errString = conceptId
 							+ " (" + sequence + ") " + " has no descriptions " + getUids();
 					getDescriptions();
-					AceLog.getEditLog().severe(errString);
+					AceLog.getEditLog().severe(errorBuffer.toString());
 					return errString;
 				}
 

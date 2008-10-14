@@ -1,9 +1,11 @@
 package org.dwfa.vodb.types;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 
 public class ThinDescPart implements I_DescriptionPart {
@@ -114,10 +116,6 @@ public class ThinDescPart implements I_DescriptionPart {
 	}
    public String toString() {
       StringBuffer buff = new StringBuffer();
-      buff.append("ThinDescPart pathId: ");
-      buff.append(nidToString(pathId));
-      buff.append(" version: ");
-      buff.append(version);
       buff.append(" statusId: ");
       buff.append(nidToString(statusId));
       buff.append(" text: ");
@@ -128,6 +126,13 @@ public class ThinDescPart implements I_DescriptionPart {
       buff.append(initialCaseSignificant);
       buff.append(" lang: ");
       buff.append(lang);
+      buff.append(" pathId: ");
+      buff.append(nidToString(pathId));
+      buff.append(" version: ");
+      buff.append(version);
+      buff.append(" (");
+      buff.append(new Date(ThinVersionHelper.convert(version)));
+      buff.append(")");
       
       return buff.toString();
    }

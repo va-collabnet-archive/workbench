@@ -121,7 +121,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		HashSet<TimePathId> values = new HashSet<TimePathId>();
 		if (AceLog.getEditLog().isLoggable(Level.INFO)) {
 			AceLog.getEditLog().fine(
-					"Reading from log " + changeSetFile.getName() + " until " + new Date(endTime).toString());
+					"Reading from log " + changeSetFile.getName() + " until "
+							+ new Date(endTime).toString());
 		}
 		while (nextCommitTime() < endTime) {
 			try {
@@ -185,7 +186,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				AceLog.getEditLog().info("End of change set. ");
 				nextCommit = Long.MAX_VALUE;
 				getVodb().setProperty(
-				    FileIO.getNormalizedRelativePath(changeSetFile),
+						FileIO.getNormalizedRelativePath(changeSetFile),
 						Long.toString(changeSetFile.length()));
 			} catch (DatabaseException e) {
 				throw new ToIoException(e);
@@ -202,11 +203,11 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			throw new ToIoException(e);
 		}
 		AceLog.getAppLog().info(
-				"Change set " + changeSetFile.getName() + " contains " + count + " change objects. "
-						+ "\n unvalidated objects: " + unvalidated
-						+ "\n imported Concepts: " + conceptCount + " paths: "
-						+ pathCount + " refset members: " + refsetMemberCount
-						+ " idListCount:" + idListCount);
+				"Change set " + changeSetFile.getName() + " contains " + count
+						+ " change objects. " + "\n unvalidated objects: "
+						+ unvalidated + "\n imported Concepts: " + conceptCount
+						+ " paths: " + pathCount + " refset members: "
+						+ refsetMemberCount + " idListCount:" + idListCount);
 
 	}
 
@@ -217,13 +218,17 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 	@SuppressWarnings("unchecked")
 	private void lazyInit() throws FileNotFoundException, IOException,
 			ClassNotFoundException {
-		String lastImportSize = getVodb().getProperty(FileIO.getNormalizedRelativePath(changeSetFile));
+		String lastImportSize = getVodb().getProperty(
+				FileIO.getNormalizedRelativePath(changeSetFile));
 		if (lastImportSize != null) {
 			long lastSize = Long.parseLong(lastImportSize);
 			if (lastSize == changeSetFile.length()) {
-				AceLog.getAppLog().finer(
-						"Change set already fully read: "
-								+ FileIO.getNormalizedRelativePath(changeSetFile));
+				AceLog
+						.getAppLog()
+						.finer(
+								"Change set already fully read: "
+										+ FileIO
+												.getNormalizedRelativePath(changeSetFile));
 				// already imported, set to nothing to do...
 				nextCommit = Long.MAX_VALUE;
 				initialized = true;
@@ -252,9 +257,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				Class<I_ReadChangeSet> readerClass = (Class<I_ReadChangeSet>) ois
 						.readObject();
 				if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
-					AceLog.getEditLog().fine(
-							"Now reading change set with BinaryChangeSetReader: "
-									+ changeSetFile.getAbsolutePath());
+					AceLog
+							.getEditLog()
+							.fine(
+									"\n--------------------------\nNow initializing change set with BinaryChangeSetReader: "
+											+ changeSetFile.getName()
+											+ "\n--------------------------\n ");
 				} else {
 					AceLog
 							.getAppLog()
@@ -304,7 +312,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			}
 			UniversalAceIdentification uid = bean.getId();
 			if (uid.getUIDs().contains(
-					UUID.fromString("e11581f5-66c2-5faf-bf15-5e6da308b42d"))) {
+					UUID.fromString("3f669619-4a56-53e5-9ab8-770f50bcf8ee"))) {
 				AceLog.getAppLog().info("Found concept: " + bean);
 			}
 			// Do all the commiting...
@@ -412,66 +420,70 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 		// Do all the commiting...
 		for (UniversalAceIdentification id : list.getUncommittedIds()) {
 			try {
-			AceLog.getEditLog().fine("commitUncommittedIds: " + id);
-			ThinIdVersioned tid = null;
-			for (UniversalAceIdentificationPart part : id.getVersions()) {
-				I_Path path = getVodb().getPath(
-						getVodb().uuidToNative(part.getPathId()));
-				if (tid == null) {
-					try {
-						int nid = getNid(id.getUIDs());
-						AceLog.getEditLog().fine(
-								"Uncommitted id already exists: \n" + id);
-						tid = (ThinIdVersioned) getVodb().getId(nid);
-						AceLog.getEditLog().fine(
-								"found ThinIdVersioned: " + tid);
-					} catch (NoMappingException ex) {
-						/*
-						 * Generate on the ARCHITECTONIC_BRANCH for now, it
-						 * will get overwritten when the id is written to
-						 * the database, with the proper branch and version
-						 * values.
-						 */
-						int nid = getVodb().uuidToNativeWithGeneration(
-								id.getUIDs(), Integer.MAX_VALUE, path,
-								ThinVersionHelper.convert(time));
-						tid = new ThinIdVersioned(nid, id.getVersions()
-								.size());
-						AceLog.getEditLog().fine(
-								"created ThinIdVersioned: " + tid);
+				AceLog.getEditLog().fine("commitUncommittedIds: " + id);
+				ThinIdVersioned tid = null;
+				for (UniversalAceIdentificationPart part : id.getVersions()) {
+					I_Path path = getVodb().getPath(
+							getVodb().uuidToNative(part.getPathId()));
+					if (tid == null) {
+						try {
+							int nid = getNid(id.getUIDs());
+							AceLog.getEditLog().fine(
+									"Uncommitted id already exists: \n" + id);
+							tid = (ThinIdVersioned) getVodb().getId(nid);
+							AceLog.getEditLog().fine(
+									"found ThinIdVersioned: " + tid);
+						} catch (NoMappingException ex) {
+							/*
+							 * Generate on the ARCHITECTONIC_BRANCH for now, it
+							 * will get overwritten when the id is written to
+							 * the database, with the proper branch and version
+							 * values.
+							 */
+							int nid = getVodb().uuidToNativeWithGeneration(
+									id.getUIDs(), Integer.MAX_VALUE, path,
+									ThinVersionHelper.convert(time));
+							tid = new ThinIdVersioned(nid, id.getVersions()
+									.size());
+							AceLog.getEditLog().fine(
+									"created ThinIdVersioned: " + tid);
+						}
+					}
+					ThinIdPart newPart = new ThinIdPart();
+					newPart.setIdStatus(getNid(part.getIdStatus()));
+					newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
+					newPart.setSource(getNid(part.getSource()));
+					newPart.setSourceId(part.getSourceId());
+					if (part.getTime() == Long.MAX_VALUE) {
+						newPart.setVersion(ThinVersionHelper.convert(time));
+					} else {
+						newPart.setVersion(ThinVersionHelper.convert(part
+								.getTime()));
+					}
+					if (tid.getVersions().contains(newPart)) {
+						// Nothing changed...
+					} else {
+						values.add(new TimePathId(newPart.getVersion(), newPart
+								.getPathId()));
+						tid.addVersion(newPart);
+						AceLog.getEditLog().fine(" add version: " + newPart);
 					}
 				}
-				ThinIdPart newPart = new ThinIdPart();
-				newPart.setIdStatus(getNid(part.getIdStatus()));
-				newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
-				newPart.setSource(getNid(part.getSource()));
-				newPart.setSourceId(part.getSourceId());
-				if (part.getTime() == Long.MAX_VALUE) {
-					newPart.setVersion(ThinVersionHelper.convert(time));
-				} else {
-					newPart.setVersion(ThinVersionHelper.convert(part
-							.getTime()));
-				}
-				if (tid.getVersions().contains(newPart)) {
-					// Nothing changed...
-				} else {
-					values.add(new TimePathId(newPart.getVersion(), newPart
-							.getPathId()));
-					tid.addVersion(newPart);
-					AceLog.getEditLog().fine(" add version: " + newPart);
-				}
-			}
-			/*
-			 * The ARCHITECTONIC_BRANCH will be overridden here with the
-			 * proper branch and version values here...
-			 */
-			getVodb().writeId(tid);
+				/*
+				 * The ARCHITECTONIC_BRANCH will be overridden here with the
+				 * proper branch and version values here...
+				 */
+				getVodb().writeId(tid);
 			} catch (DatabaseException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"Database exception. Ignoring component, and continuing import." + id, e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"Database exception. Ignoring component, and continuing import."
+								+ id, e);
 			} catch (TerminologyException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"TerminologyException. Ignoring component, and continuing import." + id, e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"TerminologyException. Ignoring component, and continuing import."
+								+ id, e);
 			}
 
 		}
@@ -487,37 +499,43 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			throws DatabaseException, TerminologyException, IOException {
 		if (bean.getConceptAttributes() != null) {
 			try {
-			UniversalAceConceptAttributes attributes = bean
-					.getConceptAttributes();
-			ThinConVersioned thinAttributes = (ThinConVersioned) getVodb()
-					.getConceptAttributes(getNid(attributes.getConId()));
-			boolean changed = false;
-			for (UniversalAceConceptAttributesPart part : attributes
-					.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					ThinConPart newPart = new ThinConPart();
-					newPart.setPathId(getNid(part.getPathId()));
-					newPart.setConceptStatus(getNid(part.getConceptStatus()));
-					newPart.setDefined(part.isDefined());
-					newPart.setVersion(ThinVersionHelper.convert(time));
-					if (thinAttributes.getVersions().contains(newPart)) {
-						changed = false;
-					} else {
-						changed = true;
-						thinAttributes.addVersion(newPart);
-						values.add(new TimePathId(newPart.getVersion(), newPart
-								.getPathId()));
+				UniversalAceConceptAttributes attributes = bean
+						.getConceptAttributes();
+				ThinConVersioned thinAttributes = (ThinConVersioned) getVodb()
+						.getConceptAttributes(getNid(attributes.getConId()));
+				boolean changed = false;
+				for (UniversalAceConceptAttributesPart part : attributes
+						.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						ThinConPart newPart = new ThinConPart();
+						newPart.setPathId(getNid(part.getPathId()));
+						newPart
+								.setConceptStatus(getNid(part
+										.getConceptStatus()));
+						newPart.setDefined(part.isDefined());
+						newPart.setVersion(ThinVersionHelper.convert(time));
+						if (thinAttributes.getVersions().contains(newPart)) {
+							changed = false;
+						} else {
+							changed = true;
+							thinAttributes.addVersion(newPart);
+							values.add(new TimePathId(newPart.getVersion(),
+									newPart.getPathId()));
+						}
 					}
 				}
-			}
-			if (changed) {
-				getVodb().writeConceptAttributes(thinAttributes);
-				AceLog.getEditLog().fine(
-						"Importing changed attributes: \n" + thinAttributes);
-			}
+				if (changed) {
+					getVodb().writeConceptAttributes(thinAttributes);
+					AceLog.getEditLog()
+							.fine(
+									"Importing changed attributes: \n"
+											+ thinAttributes);
+				}
 			} catch (TerminologyException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"TerminologyException. Ignoring component, and continuing import." + bean.getConceptAttributes(), e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"TerminologyException. Ignoring component, and continuing import."
+								+ bean.getConceptAttributes(), e);
 			}
 		}
 	}
@@ -572,38 +590,42 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			TerminologyException, IOException {
 		for (UniversalAceImage image : bean.getImages()) {
 			try {
-			ThinImageVersioned thinImage = (ThinImageVersioned) getVodb()
-					.getImage(getNid(image.getImageId()));
-			boolean changed = false;
-			for (UniversalAceImagePart part : image.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					ThinImagePart newPart = new ThinImagePart();
-					newPart.setPathId(getNid(part.getPathId()));
-					newPart.setStatusId(getNid(part.getStatusId()));
-					newPart.setTextDescription(part.getTextDescription());
-					newPart.setTypeId(getNid(part.getTypeId()));
-					newPart.setVersion(ThinVersionHelper.convert(time));
-					if (thinImage.getVersions().contains(newPart)) {
-						changed = false;
-					} else {
-						changed = true;
-						thinImage.addVersion(newPart);
-						values.add(new TimePathId(newPart.getVersion(), newPart
-								.getPathId()));
+				ThinImageVersioned thinImage = (ThinImageVersioned) getVodb()
+						.getImage(getNid(image.getImageId()));
+				boolean changed = false;
+				for (UniversalAceImagePart part : image.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						ThinImagePart newPart = new ThinImagePart();
+						newPart.setPathId(getNid(part.getPathId()));
+						newPart.setStatusId(getNid(part.getStatusId()));
+						newPart.setTextDescription(part.getTextDescription());
+						newPart.setTypeId(getNid(part.getTypeId()));
+						newPart.setVersion(ThinVersionHelper.convert(time));
+						if (thinImage.getVersions().contains(newPart)) {
+							changed = false;
+						} else {
+							changed = true;
+							thinImage.addVersion(newPart);
+							values.add(new TimePathId(newPart.getVersion(),
+									newPart.getPathId()));
+						}
 					}
 				}
-			}
-			if (changed) {
-				getVodb().writeImage(thinImage);
-				AceLog.getEditLog().fine(
-						"Importing image changes: \n" + thinImage);
-			}
+				if (changed) {
+					getVodb().writeImage(thinImage);
+					AceLog.getEditLog().fine(
+							"Importing image changes: \n" + thinImage);
+				}
 			} catch (DatabaseException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"Database exception. Ignoring component, and continuing import." + image, e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"Database exception. Ignoring component, and continuing import."
+								+ image, e);
 			} catch (TerminologyException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"TerminologyException. Ignoring component, and continuing import." + image, e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"TerminologyException. Ignoring component, and continuing import."
+								+ image, e);
 			}
 		}
 	}
@@ -720,8 +742,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				ThinRelVersioned thinRel = (ThinRelVersioned) getVodb().getRel(
 						getNid(rel.getRelId()), getNid(rel.getC1Id()));
 				boolean changed = false;
-				for (UniversalAceRelationshipPart part : rel.getVersions()) {
-					if (part.getTime() == Long.MAX_VALUE) {
+				if (thinRel == null) {
+					changed = true;
+					thinRel = new ThinRelVersioned(getNid(rel.getRelId()),
+							getNid(rel.getC1Id()), getNid(rel.getC2Id()), rel
+									.getVersions().size());
+					for (UniversalAceRelationshipPart part : rel.getVersions()) {
 						ThinRelPart newPart = new ThinRelPart();
 						newPart.setCharacteristicId(getNid(part
 								.getCharacteristicId()));
@@ -731,7 +757,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 								.getRefinabilityId()));
 						newPart.setRelTypeId(getNid(part.getRelTypeId()));
 						newPart.setStatusId(getNid(part.getStatusId()));
-						newPart.setVersion(ThinVersionHelper.convert(time));
+						if (part.getTime() == Long.MAX_VALUE) {
+							newPart.setVersion(ThinVersionHelper.convert(time));
+						} else {
+							newPart.setVersion(ThinVersionHelper.convert(part
+									.getTime()));
+						}
 						if (thinRel.getVersions().contains(newPart)) {
 							changed = false;
 						} else {
@@ -741,17 +772,51 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 									newPart.getPathId()));
 						}
 					}
+					
+					AceLog.getEditLog()
+					.warning(
+							"Committed relationship missing from database: \n\n"
+									+ rel
+									+ "\n\nAdding missing relationship and continuing.");
+					
+				} else {
+					for (UniversalAceRelationshipPart part : rel.getVersions()) {
+						if (part.getTime() == Long.MAX_VALUE) {
+							ThinRelPart newPart = new ThinRelPart();
+							newPart.setCharacteristicId(getNid(part
+									.getCharacteristicId()));
+							newPart.setGroup(part.getGroup());
+							newPart.setPathId(getNid(part.getPathId()));
+							newPart.setRefinabilityId(getNid(part
+									.getRefinabilityId()));
+							newPart.setRelTypeId(getNid(part.getRelTypeId()));
+							newPart.setStatusId(getNid(part.getStatusId()));
+							newPart.setVersion(ThinVersionHelper.convert(time));
+							if (thinRel.getVersions().contains(newPart)) {
+								changed = false;
+							} else {
+								changed = true;
+								thinRel.addVersion(newPart);
+								values.add(new TimePathId(newPart.getVersion(),
+										newPart.getPathId()));
+							}
+						}
+					}
 				}
 				if (changed) {
 					getVodb().writeRel(thinRel);
 					AceLog.getEditLog().fine("Importing rel: \n" + thinRel);
 				}
 			} catch (DatabaseException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"Database exception. Ignoring component, and continuing import." + rel, e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"Database exception. Ignoring component, and continuing import."
+								+ rel, e);
 			} catch (TerminologyException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"TerminologyException. Ignoring component, and continuing import." + rel, e);
+				AceLog.getEditLog().alertAndLog(
+						Level.SEVERE,
+						"TerminologyException. Ignoring component, and continuing import."
+								+ rel, e);
 			}
 		}
 	}
@@ -760,51 +825,80 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			Set<TimePathId> values) throws DatabaseException,
 			TerminologyException, IOException {
 		for (UniversalAceDescription desc : bean.getDescriptions()) {
-			try {
-			ThinDescVersioned thinDesc;
-			try {
-				thinDesc = (ThinDescVersioned) getVodb().getDescription(
-						getNid(desc.getDescId()), getNid(desc.getConceptId()));
-			} catch (IOException e) {
-				AceLog.getAppLog().info("Description: " + desc.getDescId());
-				AceLog.getAppLog().info("Concept: " + desc.getConceptId());
-				AceLog.getAppLog().info("UniversalAceBean: " + bean);
-				AceLog.getAppLog().alertAndLog(Level.SEVERE,
-						"Processing " + desc, e);
-				throw e;
-			}
-			boolean changed = false;
-			for (UniversalAceDescriptionPart part : desc.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					ThinDescPart newPart = new ThinDescPart();
-					newPart.setInitialCaseSignificant(part
-							.getInitialCaseSignificant());
-					newPart.setLang(part.getLang());
-					newPart.setPathId(getNid(part.getPathId()));
-					newPart.setStatusId(getNid(part.getStatusId()));
-					newPart.setText(part.getText());
-					newPart.setTypeId(getNid(part.getTypeId()));
-					newPart.setVersion(ThinVersionHelper.convert(time));
-					if (thinDesc.getVersions().contains(newPart)) {
-						changed = false;
-					} else {
-						changed = true;
-						thinDesc.addVersion(newPart);
-						values.add(new TimePathId(newPart.getVersion(), newPart
-								.getPathId()));
+			if (desc.getVersions().size() == 0) {
+				AceLog.getAppLog().warning("Description has no parts: " + desc);
+			} else {
+				try {
+					try {
+
+						if (getVodb().hasDescription(getNid(desc.getDescId()),
+								getNid(desc.getConceptId()))) {
+
+							ThinDescVersioned thinDesc = (ThinDescVersioned) getVodb()
+									.getDescription(getNid(desc.getDescId()),
+											getNid(desc.getConceptId()));
+							boolean changed = false;
+							for (UniversalAceDescriptionPart part : desc
+									.getVersions()) {
+								if (part.getTime() == Long.MAX_VALUE) {
+									ThinDescPart newPart = new ThinDescPart();
+									newPart.setInitialCaseSignificant(part
+											.getInitialCaseSignificant());
+									newPart.setLang(part.getLang());
+									newPart.setPathId(getNid(part.getPathId()));
+									newPart.setStatusId(getNid(part
+											.getStatusId()));
+									newPart.setText(part.getText());
+									newPart.setTypeId(getNid(part.getTypeId()));
+									newPart.setVersion(ThinVersionHelper
+											.convert(time));
+									if (thinDesc.getVersions()
+											.contains(newPart)) {
+										changed = false;
+									} else {
+										changed = true;
+										thinDesc.addVersion(newPart);
+										values.add(new TimePathId(newPart
+												.getVersion(), newPart
+												.getPathId()));
+									}
+								}
+							}
+							if (changed) {
+								getVodb().writeDescription(thinDesc);
+								AceLog.getEditLog()
+										.fine(
+												"Importing desc changes: \n"
+														+ thinDesc);
+							}
+
+						} else {
+							commitNewDescription(time, values, desc);
+							AceLog
+									.getEditLog()
+									.warning(
+											"Committed description missing from database: \n\n"
+													+ desc
+													+ "\n\nAdding missing description and continuing.");
+						}
+					} catch (IOException e) {
+						AceLog.getAppLog().info(
+								"Description: " + desc.getDescId() + "\n      "
+										+ desc + "\n");
+						AceLog.getAppLog().info(
+								"Concept: " + desc.getConceptId());
+						AceLog.getAppLog().info("UniversalAceBean: " + bean);
+						AceLog.getAppLog().alertAndLog(Level.SEVERE,
+								"Processing " + desc, e);
+						throw e;
 					}
+				} catch (TerminologyException e) {
+					AceLog.getEditLog().alertAndLog(
+							Level.SEVERE,
+							"TerminologyException. Ignoring component, and continuing import."
+									+ desc, e);
 				}
 			}
-			if (changed) {
-				getVodb().writeDescription(thinDesc);
-				AceLog.getEditLog().fine(
-						"Importing desc changes: \n" + thinDesc);
-			}
-			} catch (TerminologyException e) {
-				AceLog.getEditLog().alertAndLog(Level.SEVERE,
-						"TerminologyException. Ignoring component, and continuing import." + desc, e);
-			}
-			
 		}
 	}
 
@@ -812,45 +906,50 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			UniversalAceBean bean, Set<TimePathId> values)
 			throws DatabaseException, TerminologyException, IOException {
 		for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
-			ThinDescVersioned thinDesc = new ThinDescVersioned(getNid(desc
-					.getDescId()), getNid(desc.getConceptId()), desc
-					.getVersions().size());
-			for (UniversalAceDescriptionPart part : desc.getVersions()) {
-				ThinDescPart newPart = new ThinDescPart();
-				newPart.setInitialCaseSignificant(part
-						.getInitialCaseSignificant());
-				newPart.setLang(part.getLang());
-				newPart.setPathId(getNid(part.getPathId()));
-				newPart.setStatusId(getNid(part.getStatusId()));
-				newPart.setText(part.getText());
-				newPart.setTypeId(getNid(part.getTypeId()));
-				newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
-				if (part.getTime() == Long.MAX_VALUE) {
-					newPart.setVersion(ThinVersionHelper.convert(time));
-				} else {
-					newPart.setVersion(ThinVersionHelper
-							.convert(part.getTime()));
-				}
-				values.add(new TimePathId(newPart.getVersion(), newPart
-						.getPathId()));
-				thinDesc.addVersion(newPart);
-			}
-			try {
-				ThinDescVersioned oldDescVersioned = (ThinDescVersioned) getVodb()
-						.getDescription(thinDesc.getDescId(),
-								thinDesc.getConceptId());
-				if (oldDescVersioned != null) {
-					oldDescVersioned.merge(thinDesc);
-					AceLog.getEditLog().fine(
-							"Merging desc with existing (should have been null): \n"
-									+ thinDesc + "\n\n" + oldDescVersioned);
-				}
-			} catch (IOException e) {
-				// expected exception...
-			}
-			getVodb().writeDescription(thinDesc);
-			AceLog.getEditLog().fine("Importing desc: \n" + thinDesc);
+			commitNewDescription(time, values, desc);
 		}
+	}
+
+	private void commitNewDescription(long time, Set<TimePathId> values,
+			UniversalAceDescription desc) throws TerminologyException,
+			IOException {
+		ThinDescVersioned thinDesc = new ThinDescVersioned(getNid(desc
+				.getDescId()), getNid(desc.getConceptId()), desc.getVersions()
+				.size());
+		for (UniversalAceDescriptionPart part : desc.getVersions()) {
+			ThinDescPart newPart = new ThinDescPart();
+			newPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
+			newPart.setLang(part.getLang());
+			newPart.setPathId(getNid(part.getPathId()));
+			newPart.setStatusId(getNid(part.getStatusId()));
+			newPart.setText(part.getText());
+			newPart.setTypeId(getNid(part.getTypeId()));
+			newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+			if (part.getTime() == Long.MAX_VALUE) {
+				newPart.setVersion(ThinVersionHelper.convert(time));
+			} else {
+				newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
+			}
+			values
+					.add(new TimePathId(newPart.getVersion(), newPart
+							.getPathId()));
+			thinDesc.addVersion(newPart);
+		}
+		try {
+			ThinDescVersioned oldDescVersioned = (ThinDescVersioned) getVodb()
+					.getDescription(thinDesc.getDescId(),
+							thinDesc.getConceptId());
+			if (oldDescVersioned != null) {
+				oldDescVersioned.merge(thinDesc);
+				AceLog.getEditLog().fine(
+						"Merging desc with existing (should have been null): \n"
+								+ thinDesc + "\n\n" + oldDescVersioned);
+			}
+		} catch (IOException e) {
+			// expected exception...
+		}
+		getVodb().writeDescription(thinDesc);
+		AceLog.getEditLog().fine("Importing desc: \n" + thinDesc);
 	}
 
 	private void commitUncommittedIds(long time, UniversalAceBean bean,
@@ -943,7 +1042,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			ClassNotFoundException {
 		lazyInit();
 		if (ois != null) {
-			return ois.available();			
+			return ois.available();
 		}
 		return 0;
 	}

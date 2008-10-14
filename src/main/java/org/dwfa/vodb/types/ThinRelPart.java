@@ -1,9 +1,11 @@
 package org.dwfa.vodb.types;
 
 import java.util.Arrays;
+import java.util.Date;
 
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 
 public class ThinRelPart implements I_RelPart {
@@ -115,10 +117,6 @@ public class ThinRelPart implements I_RelPart {
 	
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
-		buff.append("ThinRelPart pathId: ");
-		buff.append(pathId);
-		buff.append(" version: ");
-		buff.append(version);
 		buff.append(" statusId: ");
 		buff.append(statusId);
 		buff.append(" relTypeId: ");
@@ -129,6 +127,13 @@ public class ThinRelPart implements I_RelPart {
 		buff.append(refinabilityId);
 		buff.append(" group: ");
 		buff.append(group);
+		buff.append(" pathId: ");
+		buff.append(pathId);
+		buff.append(" version: ");
+		buff.append(version);
+		buff.append(" (");
+		buff.append(new Date(ThinVersionHelper.convert(version)));
+		buff.append(")");
 		
 		return buff.toString();
 	}
