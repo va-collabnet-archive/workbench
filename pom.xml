@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>vodb</artifactId>
-      <version>1.24</version>
+      <version>1.26</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>com.sleepycat</groupId>
       <artifactId>je</artifactId>
-      <version>3.3.62</version>
+      <version>3.3.69</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
