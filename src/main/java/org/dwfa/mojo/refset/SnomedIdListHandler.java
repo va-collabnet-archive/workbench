@@ -80,7 +80,7 @@ public class SnomedIdListHandler extends FileHandler<I_ThinExtByRefVersioned> {
 			int cnid = Integer.parseInt(doc.get("cnid"));
 			I_GetConceptData concept = termFactory.getConcept(cnid);
 			for (I_IdPart version : concept.getId().getVersions()) {
-				if (version.getSourceId().equals(snomedId)) {
+				if (snomedId.equals(version.getSourceId().toString())) {
 					return concept;
 				}
 			}
