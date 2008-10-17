@@ -187,10 +187,11 @@ public class ExportIterator implements I_ProcessConcepts {
 			I_IdTuple tuple = (I_IdTuple) obj;
 			I_IdPart part = tuple.getPart();
 			I_IdVersioned id = tuple.getIdVersioned();
-			if (allowedStatus.contains(part.getIdStatus()) && isExportable(ConceptBean.get(part.getSource()))) {
+			if (allowedStatus.contains(part.getIdStatus()) && isExportable(ConceptBean.get(part.getSource()))
+					&& validPosition(part.getPathId())) {
 
 				if (snomedSource(part) && !snomedId.equals(part.getSourceId())) {
-					snomedId = (String) part.getSourceId();
+					snomedId = part.getSourceId().toString();
 					idMapWriter.write(uuidString);
 					idMapWriter.write(System.getProperty("line.separator"));
 					idMapWriter.write(snomedId);
