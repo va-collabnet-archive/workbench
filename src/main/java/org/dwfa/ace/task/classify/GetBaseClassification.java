@@ -110,6 +110,7 @@ public class GetBaseClassification extends AbstractTask {
                 }
             }
             result = null == newRocket ? rocket.createExtension() : newRocket;
+            newRocket = null;	// ensure we don't attempt to use this instance more than once
             new Thread(new Runnable() {
                 public void run() {
                     newRocket = rocket.createExtension();
