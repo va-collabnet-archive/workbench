@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.dwfa</groupId>
 		<artifactId>dwfa-pom</artifactId>
@@ -17,9 +18,15 @@
 	<description>ACE editor toolkit and version-oriented database
 	</description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</developerConnection>
-		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
+		<connection>
+			scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev
+		</connection>
+		<developerConnection>
+			scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev
+		</developerConnection>
+		<url>
+			https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm
+		</url>
 	</scm>
 	<ciManagement>
 		<system>continuum</system>
@@ -37,7 +44,7 @@
 		<dependency>
 			<groupId>com.sleepycat</groupId>
 			<artifactId>je</artifactId>
-			<version>3.3.69</version>
+			<version>3.3.74</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dwfa</groupId>
