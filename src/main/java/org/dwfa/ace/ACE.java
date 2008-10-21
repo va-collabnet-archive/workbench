@@ -1695,7 +1695,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
 				conceptTabs, 4);
 		conceptPanels.add(c4panel);
-    conceptTabs.addTab("Empty", null, c4panel, "Unlinked");     
+		conceptTabs.addTab("Empty", null, c4panel, "Unlinked");     
 		conceptTabs.addTab("List", 
 					new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")), getConceptListEditor());
 
@@ -2805,15 +2805,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
-
-		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
-			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
-					Integer.MIN_VALUE, 0, false), true));
-		}
-		model.setRoot(root);
+		DefaultTreeModel model = setRoots();
 		/*
 		 * Since nodes are added dynamically in this application, the only true
 		 * leaf nodes are nodes that don't allow children to be added. (By
@@ -2864,6 +2856,19 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			}
 		}
 		return treeView;
+	}
+
+	private DefaultTreeModel setRoots() {
+		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
+
+		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
+			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
+					Integer.MIN_VALUE, 0, false), true));
+		}
+		model.setRoot(root);
+		return model;
 	}
 
 	protected void treeValueChanged(TreeSelectionEvent evt) {
@@ -3386,7 +3391,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			}
 		} else if (evt.getPropertyName().equals("roots")) {
 			try {
-				termTreeConceptSplit.setLeftComponent(getHierarchyPanel());
+				setRoots();
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
