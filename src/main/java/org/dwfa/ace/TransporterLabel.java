@@ -161,19 +161,22 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 
 		popup = new JPopupMenu();
 		JMenuItem menuItem = new JMenuItem("Show in taxonomy");
-	    menuItem.addActionListener(this);
 	    popup.add(menuItem);
+	    menuItem.addActionListener(this);
+	    menuItem = new JMenuItem("Put in Concept Tab L-1");
+	    popup.add(menuItem);
+	    menuItem.addActionListener(this);
 	    popup.addSeparator();
-	    menuItem = new JMenuItem("Put in tab 1");
+	    menuItem = new JMenuItem("Put in Concept Tab R-1");
 	    popup.add(menuItem);
 	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in tab 2");
+	    menuItem = new JMenuItem("Put in Concept Tab R-2");
 	    popup.add(menuItem);
 	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in tab 3");
+	    menuItem = new JMenuItem("Put in Concept Tab R-3");
 	    popup.add(menuItem);
 	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in tab 4");
+	    menuItem = new JMenuItem("Put in Concept Tab R-4");
 	    popup.add(menuItem);
 	    popup.addSeparator();
 	    menuItem.addActionListener(this);
@@ -251,16 +254,19 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 			} catch (IOException e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
-		} else if (e.getActionCommand().equals("Put in tab 1")) {
+		} else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
+			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(5);
+			viewer.setTermComponent(termComponent);
+		} else if (e.getActionCommand().equals("Put in Concept Tab R-1")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(1);
 			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in tab 2")) {
+		} else if (e.getActionCommand().equals("Put in Concept Tab R-2")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(2);
 			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in tab 3")) {
+		} else if (e.getActionCommand().equals("Put in Concept Tab R-3")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(3);
 			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in tab 4")) {
+		} else if (e.getActionCommand().equals("Put in Concept Tab R-4")) {
 			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(4);
 			viewer.setTermComponent(termComponent);
 		} else if (e.getActionCommand().equals("Add to list")) {
@@ -269,5 +275,4 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 	         model.addElement((I_GetConceptData) termComponent);
 		} 
 	}
-
 }

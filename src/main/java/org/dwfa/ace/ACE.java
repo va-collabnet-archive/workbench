@@ -1702,11 +1702,20 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		conceptTabs.setMinimumSize(new Dimension(0, 0));
 		c2Panel.setMinimumSize(new Dimension(0, 0));
 
+		
 		termTreeConceptSplit.setRightComponent(conceptTabs);
 		leftTabs.addTab(taxonomyTabLabel, termTree);
 		if (editMode) {
 			leftTabs.addTab(dataCheckTabLabel, getUncommittedList());
 		}
+
+		ConceptPanel c5panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
+				leftTabs, 3);
+		conceptPanels.add(c5panel);
+		leftTabs.addTab("Empty", null, c5panel, "Unlinked");     
+		leftTabs.setMinimumSize(new Dimension(0, 0));
+
+		
 		termTreeConceptSplit.setLeftComponent(leftTabs);
 		termTree.setMinimumSize(new Dimension(0, 0));
 		termTreeConceptSplit.setOneTouchExpandable(true);

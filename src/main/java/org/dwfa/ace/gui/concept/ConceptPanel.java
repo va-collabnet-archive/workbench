@@ -1089,7 +1089,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
+		return new Dimension(30,30);
 	}
 
 	public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
