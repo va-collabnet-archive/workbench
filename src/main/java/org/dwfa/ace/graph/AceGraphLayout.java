@@ -95,10 +95,10 @@ public class AceGraphLayout  extends SpringLayout {
 
 	public static void setRoot(Graph g) {
 		numRoots = 0;
-		Set verts = g.getVertices();
-		Iterator iter = verts.iterator();
+		Set<?> verts = g.getVertices();
+		Iterator<?> iter = verts.iterator();
 		Vertex v;
-		Set successors;
+		Set<?> successors;
 		while (iter.hasNext()) {
 			v = (Vertex) iter.next();
 			successors = v.getSuccessors();
@@ -130,8 +130,8 @@ public class AceGraphLayout  extends SpringLayout {
 
 	public static void propagateMinimumLevel(Vertex v) {
 		int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
-		Set predecessors = v.getPredecessors();
-		Iterator iter = predecessors.iterator();
+		Set<?> predecessors = v.getPredecessors();
+		Iterator<?> iter = predecessors.iterator();
 		Vertex child; // odd to use predecessors for child, isn't it. Sorry!
 		while (iter.hasNext()) {
 			child = (Vertex) iter.next();
@@ -176,7 +176,7 @@ public class AceGraphLayout  extends SpringLayout {
 	 * Had to override this one as well, to ensure that setRoot() is called.
 	 */
 	protected void initialize_local() {
-		for (Iterator iter = getGraph().getEdges().iterator();
+		for (Iterator<?> iter = getGraph().getEdges().iterator();
 			iter.hasNext();
 			) {
 			Edge e = (Edge) iter.next();
@@ -204,7 +204,7 @@ public class AceGraphLayout  extends SpringLayout {
 
 			// int showingNodes = 0;
 
-			for (Iterator i = getVisibleVertices().iterator(); i.hasNext();) {
+			for (Iterator<?> i = getVisibleVertices().iterator(); i.hasNext();) {
 				Vertex v = (Vertex) i.next();
 				if (isLocked(v))
 					continue;
@@ -307,7 +307,7 @@ public class AceGraphLayout  extends SpringLayout {
 	 */
 
 	protected void relaxEdges() {
-		for (Iterator i = getVisibleEdges().iterator(); i.hasNext();) {
+		for (Iterator<?> i = getVisibleEdges().iterator(); i.hasNext();) {
 			Edge e = (Edge) i.next();
 
 			Vertex v1 = getAVertex(e);

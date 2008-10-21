@@ -116,8 +116,6 @@ public class DescPopupListener extends MouseAdapter {
 						break;
 
 					default:
-						throw new Exception("Don't know how to handle: "
-								+ field);
 					}
 
 					model.referencedConcepts.put(newPart.getStatusId(),

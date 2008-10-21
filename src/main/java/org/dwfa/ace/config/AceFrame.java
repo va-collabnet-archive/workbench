@@ -196,8 +196,7 @@ public class AceFrame extends ComponentFrame {
 
 	public class NewAceFrame implements ActionListener {
 
-		@SuppressWarnings("unchecked")
-      public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e) {
 			try {
             MarshalledObject marshalledFrame = new MarshalledObject(cdePanel
                   .getAceFrameConfig());

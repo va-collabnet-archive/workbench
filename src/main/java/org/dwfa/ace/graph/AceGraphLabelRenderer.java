@@ -21,7 +21,6 @@ import javax.swing.border.Border;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.utils.UserData;
 import edu.uci.ics.jung.visualization.GraphLabelRenderer;
 
 
@@ -37,7 +36,12 @@ import edu.uci.ics.jung.visualization.GraphLabelRenderer;
 public class AceGraphLabelRenderer extends JLabel implements
 			GraphLabelRenderer, Serializable {
 
-    protected static Border noFocusBorder = BorderFactory.createRaisedBevelBorder(); 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	protected static Border noFocusBorder = BorderFactory.createRaisedBevelBorder(); 
    
     protected Color pickedVertexLabelColor = Color.black;
     protected Color pickedEdgeLabelColor = Color.BLUE;

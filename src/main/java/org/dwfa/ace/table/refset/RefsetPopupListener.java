@@ -527,10 +527,8 @@ public class RefsetPopupListener extends MouseAdapter {
 									((RefsetDefaultsMeasurement) preferences)
 											.getMeasurementValuePopupItems());
 							break;
-						default:							popup.add(changeMenu);
-							AceLog.getAppLog().alertAndLogException(
-									new Exception("Don't know how to handle: "
-											+ field));
+						default:							
+							popup.add(changeMenu);
 						}
 
 					}

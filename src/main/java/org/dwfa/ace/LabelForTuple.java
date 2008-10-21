@@ -12,6 +12,10 @@ import javax.swing.JLabel;
 public abstract class LabelForTuple extends JLabel implements
 		I_ImplementActiveLabel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Set<ActionListener> listeners = new HashSet<ActionListener>();
 	public void doubleClick() {
 		ActionEvent e = new ActionEvent(this, DOUBLE_CLICK, "doubleClick");

@@ -77,7 +77,6 @@ public class AceRunner {
 
    CheckIpAddressForChanges ipChangeListener = new CheckIpAddressForChanges();
 
-   @SuppressWarnings("unused")
    private Timer ipChangeTimer;
    private boolean listenForIpChanges = false;
 

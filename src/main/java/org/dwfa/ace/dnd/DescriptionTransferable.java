@@ -4,8 +4,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
