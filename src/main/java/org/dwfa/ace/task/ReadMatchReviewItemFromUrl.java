@@ -75,7 +75,7 @@ public class ReadMatchReviewItemFromUrl extends AbstractTask {
 
 			List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
 			String term = "";
-			String html = "";
+			String html = "<html>";
 
 			// worker.getLogger().info("file is: " + uuidFileName);
 			String inputFileName = (String) process
@@ -88,18 +88,19 @@ public class ReadMatchReviewItemFromUrl extends AbstractTask {
 				i++;
 				if (i == 1) {
 					term = line;
-					html += "<h2>" + term + "</h2>";
+					html += "<h3>" + term + "</h3><table>";
 					continue;
 				}
 				List<UUID> uuidList = new ArrayList<UUID>();
 				String[] fields = line.split("\t");
-				html += "<br>" + fields[0] + "<br>" + fields[1];
+				html += "<tr><td>" + fields[0] + "<td>" + fields[1] + "</tr>";
 				String uuidStr = fields[3];
 				worker.getLogger().info("uuidStrs: " + uuidStr);
 				UUID uuid = UUID.fromString(uuidStr);
 				uuidList.add(uuid);
 				uuidListOfLists.add(uuidList);
 			}
+			html += "</table>";
 
 			process.setProperty(this.uuidListListPropName, uuidListOfLists);
 			process.setProperty(this.htmlPropName, html);
