@@ -49,7 +49,6 @@ public class RelPopupListener extends MouseAdapter {
           I_RelPart newPart = selectedObject.getTuple().duplicatePart();
           newPart.setPathId(p.getConceptId());
           newPart.setVersion(Integer.MAX_VALUE);
-          newPart.setStatusId(config.getDefaultStatus().getConceptId());
           selectedObject.getTuple().getRelVersioned().getVersions().add(newPart);
 
           I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
@@ -105,8 +104,13 @@ public class RelPopupListener extends MouseAdapter {
       try {
         ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
         ConceptBean destBean = ConceptBean.get(selectedObject.getTuple().getC2Id());
+        I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
         for (I_Path p : config.getEditingPathSet()) {
-          I_RelPart newPart = selectedObject.getTuple().duplicatePart();
+            I_RelPart newPart = selectedObject.getTuple().getPart();
+        	if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
+                newPart = selectedObject.getTuple().duplicatePart();
+                srcRel.addVersion(newPart);
+        	}
           newPart.setPathId(p.getConceptId());
           newPart.setVersion(Integer.MAX_VALUE);
           switch (field) {
@@ -138,10 +142,8 @@ public class RelPopupListener extends MouseAdapter {
           model.referencedConcepts.put(newPart.getRelTypeId(),
               ConceptBean.get(newPart.getRelTypeId()));
 
-          I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
           I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
 
-          srcRel.addVersion(newPart);
           if (destRel != null && srcRel != destRel) {
             destRel.addVersion(newPart);
           } else {
@@ -260,11 +262,9 @@ public class RelPopupListener extends MouseAdapter {
         int column = table.columnAtPoint(e.getPoint());
         int row = table.rowAtPoint(e.getPoint());
         selectedObject = (StringWithRelTuple) table.getValueAt(row, column);
-        if (selectedObject.tuple.getVersion() != Integer.MAX_VALUE) {
-          makePopup(e);
-          if (popup != null) {
-            popup.show(e.getComponent(), e.getX(), e.getY());
-          }
+        makePopup(e);
+        if (popup != null) {
+          popup.show(e.getComponent(), e.getX(), e.getY());
         }
       } else {
         JOptionPane.showMessageDialog(table.getTopLevelAncestor(),

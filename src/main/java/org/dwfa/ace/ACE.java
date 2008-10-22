@@ -205,7 +205,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	         */
 	        public MenuProcessThread(String action) {
 	            super();
-	            // TODO Auto-generated constructor stub
 	            this.action = action;
 	        }
 
@@ -1111,8 +1110,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
 							if (showTreeButton.isSelected()) {
-								if (dividerLocation < 200) {
-									dividerLocation = 200;
+								if (dividerLocation < 250) {
+									dividerLocation = 250;
 								}
 								termTreeConceptSplit
 										.setDividerLocation(dividerLocation);
@@ -1134,8 +1133,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			} else if (e.getSource() == showTreeButton) {
 				if (showTreeButton.isSelected()) {
 					if (showComponentButton.isSelected()) {
-						if (dividerLocation < 200) {
-							dividerLocation = 200;
+						if (dividerLocation < 250) {
+							dividerLocation = 250;
 						}
 						termTreeConceptSplit
 								.setDividerLocation(dividerLocation);

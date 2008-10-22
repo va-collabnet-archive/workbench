@@ -53,7 +53,6 @@ public class DescPopupListener extends MouseAdapter {
 						.duplicatePart();
 				newPart.setPathId(p.getConceptId());
 				newPart.setVersion(Integer.MAX_VALUE);
-				newPart.setStatusId(config.getDefaultStatus().getConceptId());
 				selectedObject.getTuple().getDescVersioned().getVersions().add(
 						newPart);
 			}
@@ -93,14 +92,16 @@ public class DescPopupListener extends MouseAdapter {
 			this.field = field;
 		}
 
-		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent e) {
 			try {
 				ConceptBean sourceBean = ConceptBean.get(selectedObject
 						.getTuple().getConceptId());
 				for (I_Path p : config.getEditingPathSet()) {
-					I_DescriptionPart newPart = selectedObject.getTuple()
-							.duplicatePart();
+					I_DescriptionPart newPart = selectedObject.getTuple().getPart();
+		        	if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
+		                newPart = selectedObject.getTuple().duplicatePart();
+		                selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
+		        	}
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
 					switch (field) {
@@ -122,8 +123,6 @@ public class DescPopupListener extends MouseAdapter {
 							ConceptBean.get(newPart.getStatusId()));
 					model.referencedConcepts.put(newPart.getTypeId(),
 							ConceptBean.get(newPart.getTypeId()));
-					selectedObject.getTuple().getDescVersioned().getVersions()
-							.add(newPart);
 				}
 				ACE.addUncommitted(sourceBean);
 				model.allTuples = null;

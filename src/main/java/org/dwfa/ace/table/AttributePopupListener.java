@@ -51,9 +51,7 @@ public class AttributePopupListener extends MouseAdapter {
 							.duplicatePart();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setConceptStatus(config.getDefaultStatus()
-							.getConceptId());
-					sourceBean.getConceptAttributes().addVersion(newPart);
+					sourceBean.getConceptAttributes().getVersions().add(newPart);
 				}
 				ACE.addUncommitted(sourceBean);
 			} catch (IOException ex) {
@@ -102,8 +100,11 @@ public class AttributePopupListener extends MouseAdapter {
 				ConceptBean sourceBean = ConceptBean.get(selectedObject
 						.getTuple().getConId());
 				for (I_Path p : config.getEditingPathSet()) {
-					I_ConceptAttributePart newPart = selectedObject.getTuple()
-							.duplicatePart();
+					I_ConceptAttributePart newPart = selectedObject.getTuple().getPart();
+		        	if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
+		                newPart = selectedObject.getTuple().duplicatePart();
+		                selectedObject.getTuple().getConVersioned().getVersions().add(newPart);
+		        	}
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
 					switch (field) {
@@ -124,8 +125,6 @@ public class AttributePopupListener extends MouseAdapter {
 
 					model.referencedConcepts.put(newPart.getConceptStatus(),
 							ConceptBean.get(newPart.getConceptStatus()));
-					selectedObject.getTuple().getConVersioned().getVersions()
-							.add(newPart);
 				}
 				ACE.addUncommitted(sourceBean);
 			} catch (Exception ex) {
