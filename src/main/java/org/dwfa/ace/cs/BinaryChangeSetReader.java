@@ -120,11 +120,11 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			ClassNotFoundException {
 		HashSet<TimePathId> values = new HashSet<TimePathId>();
 		if (AceLog.getEditLog().isLoggable(Level.INFO)) {
-			AceLog.getEditLog().fine(
+			AceLog.getEditLog().info(
 					"Reading from log " + changeSetFile.getName() + " until "
 							+ new Date(endTime).toString());
 		}
-		while (nextCommitTime() < endTime) {
+		while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
 			try {
 				Object obj = ois.readObject();
 				count++;
@@ -183,7 +183,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				nextCommit = ois.readLong();
 			} catch (EOFException ex) {
 				ois.close();
-				AceLog.getEditLog().info("End of change set. ");
+				AceLog.getEditLog().info("\n  +++++----------------\n End of change set: " + 
+						changeSetFile.getName() + "\n  +++++---------------\n");
 				nextCommit = Long.MAX_VALUE;
 				getVodb().setProperty(
 						FileIO.getNormalizedRelativePath(changeSetFile),
@@ -312,10 +313,10 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			}
 			UniversalAceIdentification uid = bean.getId();
 			if (uid.getUIDs().contains(
-					UUID.fromString("3f669619-4a56-53e5-9ab8-770f50bcf8ee"))) {
+					UUID.fromString("a62998f4-b727-55a8-8af3-9967a4dcafe5"))) {
 				AceLog.getAppLog().info("Found concept: " + bean);
 			}
-			// Do all the commiting...
+			// Do all the committing...
 			commitUncommittedIds(time, bean, values);
 			commitUncommittedConceptAttributes(time, bean, values);
 			commitUncommittedDescriptions(time, bean, values);
