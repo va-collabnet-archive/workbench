@@ -8,8 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ShowActivity;
@@ -55,8 +57,8 @@ public abstract class ChangeSetImporter implements ActionListener {
                     }
                 }
                 readerSet.add(csr);
-                logger.info("Adding reader: " + csf.getAbsolutePath());
-                logger.info("This has nextCommitTime() of : " + csr.nextCommitTime());
+                logger.info("Adding reader: " + csf.getAbsolutePath() + 
+                		"\nThis has nextCommitTime() of : " + csr.nextCommitTime() + " (" + new Date(csr.nextCommitTime()) + ")");
             }
 
             int max = avaibleBytes(readerSet);
@@ -92,7 +94,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
                 try {
                     if (r1.nextCommitTime() == r2.nextCommitTime()) {
-                        return 0;
+                        return r1.getChangeSetFile().toURL().toString().compareTo(r2.getChangeSetFile().toURL().toString());
                     }
                     if (r1.nextCommitTime() > r2.nextCommitTime()) {
                         return 1;
@@ -119,9 +121,11 @@ public abstract class ChangeSetImporter implements ActionListener {
         }
         I_ReadChangeSet first = readerSet.first();
         readerSet.remove(first);
-        AceLog.getEditLog().info("\n--------------------------\nNow reading change set: " + 
-        		first.getChangeSetFile().getName() + 
-        		"\n--------------------------\n ");
+        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+            AceLog.getEditLog().info("\n--------------------------\nNow reading change set: " + 
+            		first.getChangeSetFile().getName() + " (" + readerSet.size() + " readers left)" +
+            		"\n--------------------------\n ");
+        }
         I_ReadChangeSet next = null;
         if (readerSet.size() > 0) {
             next = readerSet.first();
@@ -133,8 +137,15 @@ public abstract class ChangeSetImporter implements ActionListener {
             first.readUntil(next.nextCommitTime());
         }
         if (first.nextCommitTime() == Long.MAX_VALUE) {
+        	AceLog.getEditLog().info("\nFinished reader: " + first.getChangeSetFile().getName() + 
+            		" (" + readerSet.size() + " readers left)\n");
+
             //don't add back since it is complete.
         } else {
+        	if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+            	AceLog.getEditLog().fine("Adding back reader: " + first.getChangeSetFile().getName() + 
+                		"\nThis has nextCommitTime() of : " + first.nextCommitTime() + " (" + new Date(first.nextCommitTime()) + ")");
+        	}
             readerSet.add(first);
         }
         if (tf.getTransactional()) {
