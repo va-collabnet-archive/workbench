@@ -272,6 +272,12 @@ public class ConceptBean implements I_AmTermComponent, I_GetConceptData,
 			rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels,
 					addUncommitted);
 		}
+		if (addUncommitted) {
+			for (I_RelVersioned rel : getUncommittedSourceRels()) {
+				rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels,
+						addUncommitted);
+			}
+		}
 		return returnRels;
 	}
 
