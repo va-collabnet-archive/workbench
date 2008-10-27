@@ -213,7 +213,25 @@ public abstract class TupleAdder<V, W> {
 			matchingTuples.add(makeTuple(part, core));
 		}
 		for (I_AmPart part : uncommittedParts) {
-			matchingTuples.add(makeTuple(part, core));
+			boolean add = true;
+			
+			if (allowedTypes != null
+			&& allowedTypes.contains(((I_AmTypedPart) part).getTypeId()) == false) {
+				add = false;
+			}
+			/*
+			 * adding allowed status has some unanticipated effect in the GUI (not showing newly retired concepts prior to commit).
+			 * TODO expand API to allow the uncommitted to filter on status or not, and on type or not...
+			if (allowedStatus != null
+					&& allowedStatus.contains(part.getStatusId()) == false) {
+				add = false;
+				continue;
+			}
+			*/
+			if (add) {
+				matchingTuples.add(makeTuple(part, core));
+				
+			}
 		}
 	}
 	
