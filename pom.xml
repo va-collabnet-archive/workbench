@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.dwfa</groupId>
 		<artifactId>dwfa-pom</artifactId>
@@ -17,9 +18,15 @@
 	<description>ACE editor toolkit and version-oriented database
 	</description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</developerConnection>
-		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
+		<connection>
+			scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev
+		</connection>
+		<developerConnection>
+			scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev
+		</developerConnection>
+		<url>
+			https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm
+		</url>
 	</scm>
 	<ciManagement>
 		<system>continuum</system>
@@ -84,6 +91,20 @@
 			<groupId>org.tmatesoft.svnkit</groupId>
 			<artifactId>svnkit</artifactId>
 			<version>1.2.0.4949</version>
+		</dependency>
+		<dependency>
+			<!-- svnkit dependency -->
+			<groupId>com.sun.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>3.0.5</version>
+			<!--  <optional>true</optional>  -->
+		</dependency>
+		<dependency>
+			<!-- svnkit dependency -->
+			<groupId>com.trilead</groupId>
+			<artifactId>trilead-ssh2</artifactId>
+			<version>build213-svnkit-1.2-patch</version>
+			<!--  <optional>true</optional>  -->
 		</dependency>
 		<dependency>
 			<groupId>org.dwfa.jini</groupId>
