@@ -389,11 +389,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			int componentId, boolean addUncommitted) throws IOException {
 		List<I_ThinExtByRefVersioned> extensions = getAllExtensionsForComponent(componentId);
 
-		for (I_GetExtensionData wrapper : ExtensionByReferenceBean
-				.getNewExtensions(componentId)) {
-			extensions.add(wrapper.getExtension());
+		if (addUncommitted) {
+			for (I_GetExtensionData wrapper : ExtensionByReferenceBean
+					.getNewExtensions(componentId)) {
+				extensions.add(wrapper.getExtension());
+			}
 		}
-
 		return extensions;
 	}
 
