@@ -18,8 +18,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.NoMappingException;
 
 public class ExtensionValidator{
 
@@ -62,10 +62,8 @@ public class ExtensionValidator{
             I_IntSet allowedTypes = termFactory.newIntSet();
 
             // check that the SNOMED is-a exists in the current database before adding it
-            try {
+            if (termFactory.hasId(SNOMED.Concept.IS_A.getUids().iterator().next())) {
                 allowedTypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
-            } catch (RuntimeException e) {
-                // skip
             }
 
             allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
