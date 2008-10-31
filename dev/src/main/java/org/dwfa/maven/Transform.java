@@ -201,7 +201,8 @@ public class Transform extends AbstractMojo {
                         }
                         File inputFile = normalize(spec);
                         if (inputFile.length() == 0) {
-                        	throw new TerminologyException("unable to process 0 length file " + inputFile.getAbsolutePath());
+                        	logger.warn("skipping 0 length file " + inputFile);
+                        	continue;
                         }
                         FileInputStream fs = new FileInputStream(inputFile);
                         InputStreamReader isr = new InputStreamReader(fs, spec
