@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -51,9 +52,14 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 
 	private String instruction = "<html>Instruction";
+
+	private String term = "";
+
+	private String termPropName = ProcessAttachmentKeys.MESSAGE
+			.getAttachmentKey();
 
 	private transient Condition returnCondition;
 
@@ -68,14 +74,17 @@ public class InstructAndWaitDo extends AbstractTask {
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(instruction);
+		out.writeObject(termPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			// nothing to read...
+		if (objDataVersion >= 1) {
 			instruction = (String) in.readObject();
+			if (objDataVersion >= 2) {
+				termPropName = (String) in.readObject();
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -104,7 +113,7 @@ public class InstructAndWaitDo extends AbstractTask {
 							.showInputDialog(null, con.getInitialText(),
 									"Enter description",
 									JOptionPane.QUESTION_MESSAGE, null, null,
-									"foo descr");
+									InstructAndWaitDo.this.term);
 					if (newDescrString == null)
 						continue;
 					// SearchReplaceTermsInList
@@ -277,23 +286,27 @@ public class InstructAndWaitDo extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
-		this.done = false;
-		this.config = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-		this.host = (I_HostConceptPlugins) worker
-				.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
-						.name());
-		boolean builderVisible = config.isBuilderToggleVisible();
-		config.setBuilderToggleVisible(false);
-		boolean progressPanelVisible = config.isProgressToggleVisible();
-		config.setProgressToggleVisible(false);
-		// EKM - changed to subversion toggle
-		boolean subversionButtonVisible = config.isSubversionToggleVisible();
-		config.setSubversionToggleVisible(false);
-		boolean inboxButtonVisible = config.isInboxToggleVisible();
-		config.setInboxToggleVisible(true);
-		// When running from the queue we never see the task list
 		try {
+
+			this.term = (String) process.readProperty(termPropName);
+			this.done = false;
+			this.config = (I_ConfigAceFrame) worker
+					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
+							.name());
+			this.host = (I_HostConceptPlugins) worker
+					.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
+							.name());
+			boolean builderVisible = config.isBuilderToggleVisible();
+			config.setBuilderToggleVisible(true);
+			boolean progressPanelVisible = config.isProgressToggleVisible();
+			config.setProgressToggleVisible(false);
+			// EKM - changed to subversion toggle
+			boolean subversionButtonVisible = config
+					.isSubversionToggleVisible();
+			config.setSubversionToggleVisible(false);
+			boolean inboxButtonVisible = config.isInboxToggleVisible();
+			config.setInboxToggleVisible(true);
+			// When running from the queue we never see the task list
 			final JPanel workflowPanel = config.getWorkflowPanel();
 			SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -313,7 +326,8 @@ public class InstructAndWaitDo extends AbstractTask {
 					workflowPanel.add(new JPanel(), c); // Filler
 					c.gridx++;
 					c.weightx = 0.0;
-					workflowPanel.add(new JLabel(instruction), c);
+					workflowPanel.add(new JLabel("<html>" + term + ": "
+							+ instruction), c);
 					c.gridx++;
 					workflowPanel.add(new JLabel("  "), c);
 					c.gridx++;
@@ -378,16 +392,20 @@ public class InstructAndWaitDo extends AbstractTask {
 				}
 
 			});
+			config.setBuilderToggleVisible(builderVisible);
+			config.setProgressToggleVisible(progressPanelVisible);
+			config.setSubversionToggleVisible(subversionButtonVisible);
+			config.setInboxToggleVisible(inboxButtonVisible);
+			return returnCondition;
 		} catch (InterruptedException e) {
 			throw new TaskFailedException(e);
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException(e);
+		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
+		} catch (IntrospectionException e) {
+			throw new TaskFailedException(e);
 		}
-		config.setBuilderToggleVisible(builderVisible);
-		config.setProgressToggleVisible(progressPanelVisible);
-		config.setSubversionToggleVisible(subversionButtonVisible);
-		config.setInboxToggleVisible(inboxButtonVisible);
-		return returnCondition;
 	}
 
 	/**
@@ -420,6 +438,14 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	public void setInstruction(String instruction) {
 		this.instruction = instruction;
+	}
+
+	public String getTermPropName() {
+		return termPropName;
+	}
+
+	public void setTermPropName(String termPropName) {
+		this.termPropName = termPropName;
 	}
 
 	protected String getTrueImage() {
