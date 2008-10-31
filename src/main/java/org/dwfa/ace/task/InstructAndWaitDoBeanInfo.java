@@ -6,6 +6,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class InstructAndWaitDoBeanInfo extends SimpleBeanInfo {
 	   public PropertyDescriptor[] getPropertyDescriptors() {
@@ -17,7 +18,14 @@ public class InstructAndWaitDoBeanInfo extends SimpleBeanInfo {
 	            instruction.setDisplayName("<html><font color='green'>Instruction:");
 	            instruction.setShortDescription("Instructions to present to the user in the workflow panel. ");
 	            
-	            PropertyDescriptor rv[] = { instruction};
+				PropertyDescriptor termPropName = new PropertyDescriptor(
+						"termPropName", InstructAndWaitDo.class);
+				termPropName.setBound(true);
+				termPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+				termPropName.setDisplayName("<html><font color='green'>Term:");
+				termPropName.setShortDescription("Term");
+
+	            PropertyDescriptor rv[] = { instruction, termPropName };
 	            return rv;
 	        } catch (IntrospectionException e) {
 	             throw new Error(e.toString());

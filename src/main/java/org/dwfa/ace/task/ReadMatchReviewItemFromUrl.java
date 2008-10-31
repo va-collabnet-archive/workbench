@@ -44,21 +44,25 @@ public class ReadMatchReviewItemFromUrl extends AbstractTask {
 			.getAttachmentKey();
 	private String htmlPropName = ProcessAttachmentKeys.HTML_STR
 			.getAttachmentKey();
+	private String termPropName = ProcessAttachmentKeys.MESSAGE
+			.getAttachmentKey();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(uuidListListPropName);
 		out.writeObject(inputFileNamePropName);
 		out.writeObject(htmlPropName);
+		out.writeObject(termPropName);
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
+		if (objDataVersion >= 1) {
 			uuidListListPropName = (String) in.readObject();
 			inputFileNamePropName = (String) in.readObject();
 			htmlPropName = (String) in.readObject();
+			termPropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -104,6 +108,7 @@ public class ReadMatchReviewItemFromUrl extends AbstractTask {
 
 			process.setProperty(this.uuidListListPropName, uuidListOfLists);
 			process.setProperty(this.htmlPropName, html);
+			process.setProperty(this.termPropName, term);
 
 			return Condition.CONTINUE;
 		} catch (IllegalArgumentException e) {
@@ -151,6 +156,14 @@ public class ReadMatchReviewItemFromUrl extends AbstractTask {
 
 	public void setHtmlPropName(String htmlPropName) {
 		this.htmlPropName = htmlPropName;
+	}
+
+	public String getTermPropName() {
+		return termPropName;
+	}
+
+	public void setTermPropName(String termPropName) {
+		this.termPropName = termPropName;
 	}
 
 }

@@ -49,8 +49,15 @@ public class ReadMatchReviewItemFromUrlBeanInfo extends SimpleBeanInfo {
 			htmlPropName.setDisplayName("<html><font color='green'>HTML:");
 			htmlPropName.setShortDescription("HTML");
 
+			PropertyDescriptor termPropName = new PropertyDescriptor(
+					"termPropName", ReadMatchReviewItemFromUrl.class);
+			termPropName.setBound(true);
+			termPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+			termPropName.setDisplayName("<html><font color='green'>Term:");
+			termPropName.setShortDescription("Term");
+
 			PropertyDescriptor rv[] = { uuidListListPropName,
-					inputFileNamePropName, htmlPropName };
+					inputFileNamePropName, htmlPropName, termPropName };
 			return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());
