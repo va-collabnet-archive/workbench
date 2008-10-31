@@ -28,6 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.cement.PrimordialId;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 
 /**
@@ -41,7 +42,10 @@ import org.dwfa.util.io.FileIO;
 public class Transform extends AbstractMojo {
 
 
-    /**
+    private static final int PROGRESS_LOGGING_SIZE = 10000;
+
+
+	/**
      * @parameter
      * @required
      */
@@ -150,9 +154,14 @@ public class Transform extends AbstractMojo {
 
         // check to see if this goal has been executed previously
         if(!goalFile.exists()) {
+
+    		logger.info("goal has not run before");
             // hasn't been executed previously
             try {
                 for (OutputSpec outSpec: outputSpecs) {
+
+            		logger.info("processing " + outSpec);
+            		
                     I_TransformAndWrite[] writers = outSpec.getWriters();
 					for (I_TransformAndWrite tw: writers) {
                         File outputFile = new File(tw.getFileName());
@@ -191,6 +200,9 @@ public class Transform extends AbstractMojo {
                             }
                         }
                         File inputFile = normalize(spec);
+                        if (inputFile.length() == 0) {
+                        	throw new TerminologyException("unable to process 0 length file " + inputFile.getAbsolutePath());
+                        }
                         FileInputStream fs = new FileInputStream(inputFile);
                         InputStreamReader isr = new InputStreamReader(fs, spec
                                 .getInputEncoding());
@@ -263,6 +275,9 @@ public class Transform extends AbstractMojo {
                                     throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
                             }
                             rowCount++;
+                            if (rowCount % PROGRESS_LOGGING_SIZE == 0) {
+                            	logger.info("processed " + rowCount + " rows of file " + inputFile.getAbsolutePath());
+                            }
                             // Beginning of loop
                             tokenType = st.nextToken();
                         }
@@ -302,7 +317,8 @@ public class Transform extends AbstractMojo {
                     File outputFileLoc = new File(idFileLoc);
                     outputFileLoc.getParentFile().mkdirs();
 
-                    FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, "uuidToNative.txt"), appendIdFiles);
+                    File file = new File(outputFileLoc, "uuidToNative.txt");
+					FileOutputStream fos = new FileOutputStream(file, appendIdFiles);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
                     BufferedWriter bw = new BufferedWriter(osw);
                     if (includeHeader) {
@@ -311,12 +327,17 @@ public class Transform extends AbstractMojo {
                         bw.append("NID");
                         bw.append("\n");
                     }
+                    int rowcount = 0;
                     for (Iterator i = uuidToNativeMap.entrySet().iterator(); i.hasNext();) {
                         Map.Entry entry = (Entry) i.next();
                         bw.append(entry.getKey().toString());
                         bw.append(outputColumnDelimiter);
                         bw.append(entry.getValue().toString());
                         bw.append("\n");
+                        rowcount++;
+                        if (rowcount++ % PROGRESS_LOGGING_SIZE == 0) {
+                        	logger.info("processed " + rowcount + " rows of file " + file.getAbsolutePath());
+                        }
                     }
 
                     bw.close();
@@ -329,7 +350,8 @@ public class Transform extends AbstractMojo {
                     File outputFileLoc = new File(idFileLoc);
                     outputFileLoc.getParentFile().mkdirs();
 
-                    FileOutputStream fos = new FileOutputStream(new File(outputFileLoc, key + "ToUuid.txt"), appendIdFiles);
+                    File file = new File(outputFileLoc, key + "ToUuid.txt");
+					FileOutputStream fos = new FileOutputStream(file, appendIdFiles);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
                     BufferedWriter bw = new BufferedWriter(osw);
                     if (includeHeader) {
@@ -340,12 +362,17 @@ public class Transform extends AbstractMojo {
                     }
 
                     Map idMap = (Map) sourceToUuidMapMap.get(key);
+                    int rowcount = 0;
                     for (Iterator i = idMap.entrySet().iterator(); i.hasNext();) {
                         Map.Entry entry = (Entry) i.next();
                         bw.append(entry.getKey().toString());
                         bw.append(outputColumnDelimiter);
                         bw.append(entry.getValue().toString());
                         bw.append("\n");
+                        rowcount++;
+                        if (rowcount++ % PROGRESS_LOGGING_SIZE == 0) {
+                        	logger.info("processed " + rowcount + " rows of file " + file.getAbsolutePath());
+                        }
                     }
                     bw.close();
                 }
