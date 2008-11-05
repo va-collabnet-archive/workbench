@@ -134,7 +134,11 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 					I_GetConceptData concept = termFactory.getConcept(member.getComponentId());
 					System.out.println("getting versions for " + concept);
-					List<I_ThinExtByRefTuple> versions = member.getTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, false);
+					
+					// Get both current and retired version, if the latest is retired then should not be included
+					List<I_ThinExtByRefTuple> versions = member.getTuples(
+							getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.RETIRED), 
+							null, false);
 					System.out.println("done getting versions for " + concept + " they were " + versions);
 					
 					if (versions.size()>=1) {

@@ -48,19 +48,27 @@ public abstract class RefsetUtilities {
 		for (I_ThinExtByRefPart version : versions) {
 
 			if (latest == null) {
-				latest = version;
-			} else {
-				if (latest.getVersion()<version.getVersion()) {
+				if (version.getStatus() == currentStatusId) {
 					latest = version;
+				}
+			} else {
+				if (latest.getVersion() < version.getVersion()) {
+					if (version.getStatus() == retiredConceptId) {
+						// member has a later retirement so exclude 
+						latest = null;
+					} else {
+						latest = version;
+					}
 				}				
 			}			
 		}
 
-		I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) latest;
-		typeId = temp.getConceptId();
-		
+		if (latest != null) {
+			I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) latest;
+			typeId = temp.getConceptId();
+		}
 
-		System.out.println("getInclusionTypeForRefset resul " + temp);
+		System.out.println("getInclusionTypeForRefset result " + latest);
 
 		return typeId;
 	}
