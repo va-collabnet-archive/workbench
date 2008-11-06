@@ -69,7 +69,7 @@ public class InstructAndWaitDo extends AbstractTask {
 	private I_ConfigAceFrame config;
 	private I_HostConceptPlugins host;
 
-	private String language = "en";
+	private final String language = "en";
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -108,6 +108,9 @@ public class InstructAndWaitDo extends AbstractTask {
 				I_GetConceptData SYNONYM_UUID = termFactory
 						.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
 								.getUids());
+				I_GetConceptData descr_status_current = termFactory
+						.getConcept(ArchitectonicAuxiliary.Concept.CURRENT
+								.getUids());
 				for (I_GetConceptData con : cons) {
 					String newDescrString = (String) JOptionPane
 							.showInputDialog(null, con.getInitialText(),
@@ -116,6 +119,7 @@ public class InstructAndWaitDo extends AbstractTask {
 									InstructAndWaitDo.this.term);
 					if (newDescrString == null)
 						continue;
+					// System.out.println(">>>descr: " + newDescrString);
 					// SearchReplaceTermsInList
 					Set<I_Path> paths = config.getEditingPathSet();
 					I_DescriptionVersioned newDescr = termFactory
@@ -130,10 +134,56 @@ public class InstructAndWaitDo extends AbstractTask {
 							newLastPart = newDescr.getLastTuple().getPart()
 									.duplicate();
 						}
-						newLastPart.setStatusId(1);
+						//
+						// public int hashCode() {
+						// int bhash = 0;
+						// if (initialCaseSignificant) {
+						// bhash = 1;
+						// }
+						// return HashFunction.hashCode(new int[] {
+						// bhash, lang.hashCode(), pathId,
+						// statusId, text.hashCode(),
+						// typeId, version
+						// });
+						// }
+						//
+						// System.out.println(">>>descr init case: "
+						// + newLastPart.getInitialCaseSignificant());
+						// System.out.println(">>>descr lang: "
+						// + newLastPart.getLang());
+						// System.out.println(">>>descr path: "
+						// + newLastPart.getPathId());
+						// System.out.println(">>>descr status: "
+						// + newLastPart.getStatusId());
+						// System.out.println(">>>descr text: "
+						// + newLastPart.getText());
+						// System.out.println(">>>descr type: "
+						// + newLastPart.getTypeId());
+						// System.out.println(">>>descr version: "
+						// + newLastPart.getVersion());
+						// System.out.println(">>> language: "
+						// + language);
+						newLastPart.setLang(language);
+						newLastPart.setStatusId(descr_status_current
+								.getConceptId());
 						newLastPart.setInitialCaseSignificant(false);
 						newLastPart.setPathId(path.getConceptId());
+						newLastPart.setVersion(Integer.MAX_VALUE);
 						termFactory.addUncommitted(con);
+						// System.out.println(">>> descr init case: "
+						// + newLastPart.getInitialCaseSignificant());
+						// System.out.println(">>> descr lang: "
+						// + newLastPart.getLang());
+						// System.out.println(">>> descr path: "
+						// + newLastPart.getPathId());
+						// System.out.println(">>> descr status: "
+						// + newLastPart.getStatusId());
+						// System.out.println(">>> descr text: "
+						// + newLastPart.getText());
+						// System.out.println(">>> descr type: "
+						// + newLastPart.getTypeId());
+						// System.out.println(">>> descr version: "
+						// + newLastPart.getVersion());
 						newLastPart = null;
 					}
 				}
@@ -142,7 +192,6 @@ public class InstructAndWaitDo extends AbstractTask {
 			}
 
 		}
-
 	}
 
 	private class CloneActionListener implements ActionListener {
@@ -262,17 +311,17 @@ public class InstructAndWaitDo extends AbstractTask {
 	}
 
 	protected List<I_GetConceptData> getSelectedConcepts() throws IOException {
-		System.out.println("getSelectedCOncept");
+		// System.out.println(">>>getSelectedConcept");
 		JList conceptList = config.getBatchConceptList();
 		int[] selected = conceptList.getSelectedIndices();
 		I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList
 				.getModel();
-		for (int i = 0; i < model.getSize(); i++) {
-			I_GetConceptData concept = model.getElementAt(i);
-			I_DescriptionVersioned d = concept.getDescriptions().get(0);
-			System.out
-					.println(d + "\nStatus:" + d.getLastTuple().getStatusId());
-		}
+		// for (int i = 0; i < model.getSize(); i++) {
+		// I_GetConceptData concept = model.getElementAt(i);
+		// I_DescriptionVersioned d = concept.getDescriptions().get(0);
+		// System.out.println(">>>" + d + "\nStatus:"
+		// + d.getLastTuple().getStatusId());
+		// }
 		List<I_GetConceptData> ret = new ArrayList<I_GetConceptData>();
 		for (int i : selected) {
 			ret.add(model.getElementAt(i));
