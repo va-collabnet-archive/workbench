@@ -92,7 +92,8 @@ public class ReadMatchReviewItemFromUrl extends AbstractTask {
 				i++;
 				if (i == 1) {
 					term = line;
-					html += "<h3>" + term + "</h3><table>";
+					html += "<h3>" + term + "</h3><table border=\"1\">";
+					html += "<tr><th>" + "Description" + "<th>" + "Concept" + "</tr>";
 					continue;
 				}
 				List<UUID> uuidList = new ArrayList<UUID>();
