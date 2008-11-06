@@ -87,7 +87,14 @@ public class ExportDatabase extends AbstractMojo {
 	 */
 	private String errorLogFileName;
 
-	/**
+    /**
+	 * Whether to validate the positions
+	 *
+	 * @parameter expression=true
+	 */
+	private boolean validatePositions;
+
+    /**
 	 * The set of specifications used to determine if a concept should be
 	 * exported.
 	 * 
@@ -173,7 +180,8 @@ public class ExportDatabase extends AbstractMojo {
 					descriptionWriter, relationshipWriter, idsWriter, idMapWriter, errorWriter,
 					positions, statusValues, specs, getLog());
 			expItr.setReleaseDate(releaseDate);
-			LocalVersionedTerminology.get().iterateConcepts(expItr);
+            expItr.setValidatePositions(validatePositions);
+            LocalVersionedTerminology.get().iterateConcepts(expItr);
 
 			conceptWriter.close();
 			relationshipWriter.close();

@@ -67,7 +67,9 @@ public class ExportIterator implements I_ProcessConcepts {
 
 	private String releaseDate;
 
-	private ExportSpecification[] specs;
+    private boolean validatePositions = true;
+
+    private ExportSpecification[] specs;
 
 	private I_TermFactory termFactory;
 
@@ -82,8 +84,8 @@ public class ExportIterator implements I_ProcessConcepts {
 	private I_GetConceptData inactiveConcept;
 
 	private HashMap<Integer, String> pathReleaseVersions = new HashMap<Integer, String>();
-	
-	public ExportIterator(Writer concepts, Writer descriptions, Writer relationships, Writer idsWriter, Writer idMapWriter,
+
+    public ExportIterator(Writer concepts, Writer descriptions, Writer relationships, Writer idsWriter, Writer idMapWriter,
 						  Writer errorWriter, Set<I_Position> positions, I_IntSet allowedStatus, ExportSpecification[] specs, 
 						  Log log) 
 			throws IOException, TerminologyException {
@@ -188,7 +190,7 @@ public class ExportIterator implements I_ProcessConcepts {
 			I_IdPart part = tuple.getPart();
 			I_IdVersioned id = tuple.getIdVersioned();
 			if (allowedStatus.contains(part.getIdStatus()) && isExportable(ConceptBean.get(part.getSource()))
-					&& validPosition(part.getPathId())) {
+					&& (!validatePositions || validPosition(part.getPathId()))) {
 
 				if (snomedSource(part) && !snomedId.equals(part.getSourceId())) {
 					snomedId = part.getSourceId().toString();
@@ -277,7 +279,8 @@ public class ExportIterator implements I_ProcessConcepts {
 			
 			I_ConceptAttributeTuple latestAttrib = null;
 			for (I_ConceptAttributeTuple attribTup : matches) {
-				if (validPosition(attribTup.getPathId()) && (latestAttrib == null || attribTup.getVersion() >= latestAttrib.getVersion())) {
+				if ((!validatePositions || validPosition(attribTup.getPathId()))
+                        && (latestAttrib == null || attribTup.getVersion() >= latestAttrib.getVersion())) {
 					latestAttrib = attribTup;
 				}
 			}
@@ -326,14 +329,15 @@ public class ExportIterator implements I_ProcessConcepts {
 		}// End method getUuidBasedConceptDetaiils
 	}
 
-	private boolean validPosition(int pathId) {
-		for (I_Position position : positions) {
-			if (position.getPath().getConceptId() == pathId) {
-				return true;
-			}
-			
-		}
-		return false;
+	private boolean validPosition(int pathId) {                        
+
+        for (I_Position position : positions) {
+            if (position.getPath().getConceptId() == pathId) {
+                return true;
+            }
+
+        }                               
+        return false;
 	}
 
 	private void writeUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes) 
@@ -344,7 +348,7 @@ public class ExportIterator implements I_ProcessConcepts {
 		HashMap<Integer, I_RelTuple> latestRel = new HashMap<Integer, I_RelTuple>();
 		for (I_RelTuple tuple : tuples) {
 			
-			if (!validPosition(tuple.getPathId())) {
+			if (validatePositions && !validPosition(tuple.getPathId())) {
 				continue;
 			}
 			
@@ -520,7 +524,7 @@ public class ExportIterator implements I_ProcessConcepts {
 		HashMap<Integer, I_DescriptionTuple> latestDesc = new HashMap<Integer, I_DescriptionTuple>();
 		for (I_DescriptionTuple tuple : tuples) {
 			
-			if (!validPosition(tuple.getPathId())) {
+			if (validatePositions && !validPosition(tuple.getPathId())) {
 				continue;
 			}
 			
@@ -537,7 +541,8 @@ public class ExportIterator implements I_ProcessConcepts {
 		for (I_DescriptionTuple desc : latestDesc.values()) {
 			
 			I_DescriptionPart part = desc.getPart();
-			if (validPosition(part.getPathId()) && allowedStatus.contains(part.getStatusId()) && isExportable(ConceptBean.get(part.getTypeId()))) {
+			if ((!validatePositions || validPosition(part.getPathId()))
+                    && allowedStatus.contains(part.getStatusId()) && isExportable(ConceptBean.get(part.getTypeId()))) {
 	
 				if (descId != desc.getDescId()) {
 					descId = desc.getDescId();
@@ -640,4 +645,7 @@ public class ExportIterator implements I_ProcessConcepts {
 		this.releaseDate = releaseDate;
 	}
 
+    public void setValidatePositions(boolean validatePositions) {
+        this.validatePositions = validatePositions;        
+    }
 }
