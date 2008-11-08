@@ -67,7 +67,6 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	// EKM - seems a but easier than passing it around
 	private I_ConfigAceFrame config;
-	private I_HostConceptPlugins host;
 
 	private final String language = "en";
 
@@ -91,102 +90,169 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	}
 
-	private class DescrActionListener implements ActionListener {
+	protected void printDescriptionPart(I_DescriptionPart dp) {
+		//
+		// public int hashCode() {
+		// int bhash = 0;
+		// if (initialCaseSignificant) {
+		// bhash = 1;
+		// }
+		// return HashFunction.hashCode(new int[] {
+		// bhash, lang.hashCode(), pathId,
+		// statusId, text.hashCode(),
+		// typeId, version
+		// });
+		// }
+		//
+		System.out.println(">>>descr init case: "
+				+ dp.getInitialCaseSignificant());
+		System.out.println(">>>descr lang: " + dp.getLang());
+		System.out.println(">>>descr path: " + dp.getPathId());
+		System.out.println(">>>descr status: " + dp.getStatusId());
+		System.out.println(">>>descr text: " + dp.getText());
+		System.out.println(">>>descr type: " + dp.getTypeId());
+		System.out.println(">>>descr version: " + dp.getVersion());
+	}
 
+	private class DescrActionListener implements ActionListener {
 		/**
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
 			try {
-				List<I_GetConceptData> cons = getSelectedConcepts();
-				if (cons.size() == 0) {
-					JOptionPane.showMessageDialog(null,
-							"Please select a concept");
+				I_GetConceptData con = getSelectedConcept();
+				if (con == null)
 					return;
-				}
+				String newDescrString = (String) JOptionPane.showInputDialog(
+						null, "Add description to:\n" + con.getInitialText(),
+						"Enter description", JOptionPane.QUESTION_MESSAGE,
+						null, null, InstructAndWaitDo.this.term);
+				if (newDescrString == null)
+					return;
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
-				I_GetConceptData SYNONYM_UUID = termFactory
+				I_GetConceptData synonym_description_type = termFactory
 						.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
 								.getUids());
-				I_GetConceptData descr_status_current = termFactory
+				// See SearchReplaceTermsInList
+				Set<I_Path> paths = config.getEditingPathSet();
+				I_DescriptionVersioned newDescr = termFactory.newDescription(
+						UUID.randomUUID(), con, language, newDescrString,
+						synonym_description_type, config);
+				I_DescriptionPart newLastPart = newDescr.getLastTuple()
+						.getPart();
+				for (I_Path path : paths) {
+					if (newLastPart == null) {
+						newLastPart = newDescr.getLastTuple().getPart()
+								.duplicate();
+					}
+					// printDescriptionPart(newLastPart);
+					// System.out.println(">>> language: " + language);
+					newLastPart.setPathId(path.getConceptId());
+					newLastPart.setVersion(Integer.MAX_VALUE);
+					termFactory.addUncommitted(con);
+					newLastPart = null;
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	protected I_GetConceptData createNewConcept(String newDescrString)
+			throws Exception {
+		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		I_GetConceptData fully_specified_description_type = termFactory
+				.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+						.getUids());
+		I_GetConceptData preferred_description_type = termFactory
+				.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
+						.getUids());
+		I_GetConceptData newConcept = LocalVersionedTerminology.get()
+				.newConcept(UUID.randomUUID(), false, config);
+		termFactory.newDescription(UUID.randomUUID(), newConcept, language,
+				newDescrString + " (?????)", fully_specified_description_type,
+				config);
+		termFactory.newDescription(UUID.randomUUID(), newConcept, language,
+				newDescrString, preferred_description_type, config);
+		return newConcept;
+	}
+
+	private class CloneActionListener implements ActionListener {
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			try {
+				I_GetConceptData con = getSelectedConcept();
+				if (con == null)
+					return;
+				String newDescrString = (String) JOptionPane.showInputDialog(
+						null, "Clone:\n" + con.getInitialText(),
+						"Enter concept name", JOptionPane.QUESTION_MESSAGE,
+						null, null, InstructAndWaitDo.this.term);
+				if (newDescrString == null)
+					return;
+				I_GetConceptData newConcept = createNewConcept(newDescrString);
+				I_TermFactory termFactory = LocalVersionedTerminology.get();
+				Set<I_Position> clonePositions = new HashSet<I_Position>();
+				for (I_Path path : config.getEditingPathSet()) {
+					clonePositions.add(termFactory.newPosition(path,
+							Integer.MAX_VALUE));
+				}
+				for (I_RelTuple rel : con.getSourceRelTuples(config
+						.getAllowedStatus(), null, clonePositions, false)) {
+					termFactory.newRelationship(UUID.randomUUID(), newConcept,
+							termFactory.getConcept(rel.getRelTypeId()),
+							termFactory.getConcept(rel.getC2Id()), termFactory
+									.getConcept(rel.getCharacteristicId()),
+							termFactory.getConcept(rel.getRefinabilityId()),
+							termFactory.getConcept(rel.getStatusId()), rel
+									.getGroup(), config);
+				}
+				I_HostConceptPlugins lcv = config.getListConceptViewer();
+				lcv.setTermComponent(newConcept);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+		}
+
+	}
+
+	private class ChildActionListener implements ActionListener {
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			try {
+				I_GetConceptData con = getSelectedConcept();
+				if (con == null)
+					return;
+				String newDescrString = (String) JOptionPane.showInputDialog(
+						null, "Create a child of:\n" + con.getInitialText(),
+						"Enter concept name", JOptionPane.QUESTION_MESSAGE,
+						null, null, InstructAndWaitDo.this.term);
+				if (newDescrString == null)
+					return;
+				I_GetConceptData newConcept = createNewConcept(newDescrString);
+				I_TermFactory termFactory = LocalVersionedTerminology.get();
+				I_GetConceptData is_a_rel = termFactory
+						.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
+								.getUids());
+				I_GetConceptData defining_characteristic = termFactory
+						.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
+								.getUids());
+				I_GetConceptData optional_refinability = termFactory
+						.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
+								.getUids());
+				I_GetConceptData current_status = termFactory
 						.getConcept(ArchitectonicAuxiliary.Concept.CURRENT
 								.getUids());
-				for (I_GetConceptData con : cons) {
-					String newDescrString = (String) JOptionPane
-							.showInputDialog(null, con.getInitialText(),
-									"Enter description",
-									JOptionPane.QUESTION_MESSAGE, null, null,
-									InstructAndWaitDo.this.term);
-					if (newDescrString == null)
-						continue;
-					// System.out.println(">>>descr: " + newDescrString);
-					// SearchReplaceTermsInList
-					Set<I_Path> paths = config.getEditingPathSet();
-					I_DescriptionVersioned newDescr = termFactory
-							.newDescription(UUID.randomUUID(), con, language,
-									newDescrString, SYNONYM_UUID, config);
-					I_DescriptionPart newLastPart = newDescr.getLastTuple()
-							.getPart();
-					for (I_Path path : paths) {
-						// Set the status to that of the original,
-						// and path to the current
-						if (newLastPart == null) {
-							newLastPart = newDescr.getLastTuple().getPart()
-									.duplicate();
-						}
-						//
-						// public int hashCode() {
-						// int bhash = 0;
-						// if (initialCaseSignificant) {
-						// bhash = 1;
-						// }
-						// return HashFunction.hashCode(new int[] {
-						// bhash, lang.hashCode(), pathId,
-						// statusId, text.hashCode(),
-						// typeId, version
-						// });
-						// }
-						//
-						// System.out.println(">>>descr init case: "
-						// + newLastPart.getInitialCaseSignificant());
-						// System.out.println(">>>descr lang: "
-						// + newLastPart.getLang());
-						// System.out.println(">>>descr path: "
-						// + newLastPart.getPathId());
-						// System.out.println(">>>descr status: "
-						// + newLastPart.getStatusId());
-						// System.out.println(">>>descr text: "
-						// + newLastPart.getText());
-						// System.out.println(">>>descr type: "
-						// + newLastPart.getTypeId());
-						// System.out.println(">>>descr version: "
-						// + newLastPart.getVersion());
-						// System.out.println(">>> language: "
-						// + language);
-						newLastPart.setLang(language);
-						newLastPart.setStatusId(descr_status_current
-								.getConceptId());
-						newLastPart.setInitialCaseSignificant(false);
-						newLastPart.setPathId(path.getConceptId());
-						newLastPart.setVersion(Integer.MAX_VALUE);
-						termFactory.addUncommitted(con);
-						// System.out.println(">>> descr init case: "
-						// + newLastPart.getInitialCaseSignificant());
-						// System.out.println(">>> descr lang: "
-						// + newLastPart.getLang());
-						// System.out.println(">>> descr path: "
-						// + newLastPart.getPathId());
-						// System.out.println(">>> descr status: "
-						// + newLastPart.getStatusId());
-						// System.out.println(">>> descr text: "
-						// + newLastPart.getText());
-						// System.out.println(">>> descr type: "
-						// + newLastPart.getTypeId());
-						// System.out.println(">>> descr version: "
-						// + newLastPart.getVersion());
-						newLastPart = null;
-					}
-				}
+				termFactory.newRelationship(UUID.randomUUID(), newConcept,
+						is_a_rel, con, defining_characteristic,
+						optional_refinability, current_status, 0, config);
+				I_HostConceptPlugins lcv = config.getListConceptViewer();
+				lcv.setTermComponent(newConcept);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -194,67 +260,21 @@ public class InstructAndWaitDo extends AbstractTask {
 		}
 	}
 
-	private class CloneActionListener implements ActionListener {
-
+	private class NewActionListener implements ActionListener {
 		/**
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
 			try {
-				List<I_GetConceptData> cons = getSelectedConcepts();
-				if (cons.size() == 0) {
-					JOptionPane.showMessageDialog(null,
-							"Please select a concept");
+				String newDescrString = (String) JOptionPane.showInputDialog(
+						null, "Create a new concept", "Enter concept name",
+						JOptionPane.QUESTION_MESSAGE, null, null,
+						InstructAndWaitDo.this.term);
+				if (newDescrString == null)
 					return;
-				}
-				I_TermFactory termFactory = LocalVersionedTerminology.get();
-				I_GetConceptData fsn_uuid = termFactory
-						.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-								.getUids());
-
-				Set<I_Position> clonePositions = new HashSet<I_Position>();
-				for (I_Path path : config.getEditingPathSet()) {
-					clonePositions.add(termFactory.newPosition(path,
-							Integer.MAX_VALUE));
-				}
-
-				// I_HostConceptPlugins host = (I_HostConceptPlugins) worker
-				// .readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
-
-				// I_GetConceptData conceptToClone = (I_GetConceptData)
-				// host.getTermComponent();
-
-				for (I_GetConceptData con : cons) {
-					String newDescrString = (String) JOptionPane
-							.showInputDialog(null, con.getInitialText(),
-									"Enter description",
-									JOptionPane.QUESTION_MESSAGE, null, null,
-									"foo descr");
-					if (newDescrString == null)
-						continue;
-					I_GetConceptData newConcept = LocalVersionedTerminology
-							.get().newConcept(UUID.randomUUID(), false, config);
-
-					termFactory.newDescription(UUID.randomUUID(), newConcept,
-							language, newDescrString, fsn_uuid, config);
-
-					for (I_RelTuple rel : con.getSourceRelTuples(config
-							.getAllowedStatus(), null, clonePositions, false)) {
-						termFactory
-								.newRelationship(UUID.randomUUID(), newConcept,
-										termFactory.getConcept(rel
-												.getRelTypeId()), termFactory
-												.getConcept(rel.getC2Id()),
-										termFactory.getConcept(rel
-												.getCharacteristicId()),
-										termFactory.getConcept(rel
-												.getRefinabilityId()),
-										termFactory.getConcept(rel
-												.getStatusId()),
-										rel.getGroup(), config);
-					}
-					host.setTermComponent(newConcept);
-				}
+				I_GetConceptData newConcept = createNewConcept(newDescrString);
+				I_HostConceptPlugins lcv = config.getListConceptViewer();
+				lcv.setTermComponent(newConcept);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -329,6 +349,20 @@ public class InstructAndWaitDo extends AbstractTask {
 		return ret;
 	}
 
+	protected I_GetConceptData getSelectedConcept() throws IOException {
+		List<I_GetConceptData> cons = getSelectedConcepts();
+		if (cons.size() == 0) {
+			JOptionPane.showMessageDialog(null, "Please select a concept");
+			return null;
+		}
+		if (cons.size() != 1) {
+			JOptionPane.showMessageDialog(null,
+					"Please select only one concept");
+			return null;
+		}
+		return cons.get(0);
+	}
+
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
@@ -342,9 +376,9 @@ public class InstructAndWaitDo extends AbstractTask {
 			this.config = (I_ConfigAceFrame) worker
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 							.name());
-			this.host = (I_HostConceptPlugins) worker
-					.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
-							.name());
+			// this.host = (I_HostConceptPlugins) worker
+			// .readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
+			// .name());
 			boolean builderVisible = config.isBuilderToggleVisible();
 			config.setBuilderToggleVisible(true);
 			boolean progressPanelVisible = config.isProgressToggleVisible();
@@ -375,32 +409,38 @@ public class InstructAndWaitDo extends AbstractTask {
 					workflowPanel.add(new JPanel(), c); // Filler
 					c.gridx++;
 					c.weightx = 0.0;
-					workflowPanel.add(new JLabel("<html>" + term + ": "
-							+ instruction), c);
+					workflowPanel.add(new JLabel("<html><b>Matches for:</b> "
+							+ term), c);
 					c.gridx++;
 					workflowPanel.add(new JLabel("  "), c);
 					c.gridx++;
 					c.anchor = GridBagConstraints.SOUTHWEST;
 
 					JButton descrButton = new JButton("Descr");
+					descrButton
+							.setToolTipText("Add description to selected concept");
 					workflowPanel.add(descrButton, c);
 					c.gridx++;
 					descrButton.addActionListener(new DescrActionListener());
 
 					JButton cloneButton = new JButton("Clone");
+					cloneButton.setToolTipText("Clone selected concept");
 					workflowPanel.add(cloneButton, c);
 					c.gridx++;
 					cloneButton.addActionListener(new CloneActionListener());
 
 					JButton childButton = new JButton("Child");
+					childButton
+							.setToolTipText("Create a child of selected concept");
 					workflowPanel.add(childButton, c);
 					c.gridx++;
-					childButton.addActionListener(new StepActionListener());
+					childButton.addActionListener(new ChildActionListener());
 
 					JButton newButton = new JButton("New");
+					newButton.setToolTipText("Create a new concept");
 					workflowPanel.add(newButton, c);
 					c.gridx++;
-					newButton.addActionListener(new StepActionListener());
+					newButton.addActionListener(new NewActionListener());
 
 					JButton stepButton = new JButton("Done");
 					workflowPanel.add(stepButton, c);
