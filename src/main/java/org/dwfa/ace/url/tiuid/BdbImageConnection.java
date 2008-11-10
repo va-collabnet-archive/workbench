@@ -30,9 +30,11 @@ public class BdbImageConnection extends URLConnection {
 	      if (queryString.contains("$")) {
 	        String[] parts = queryString.split("$");
 	        String imageIdPart = parts[0];
-	        String conceptIdPart = parts[1];
+	        if (parts.length > 1) {
+		        String conceptIdPart = parts[1];
+		        Collection<UUID> conceptIdCollection = collectionFromString(conceptIdPart);
+	        }
 	        Collection<UUID> imageIdCollection = collectionFromString(imageIdPart);
-	        Collection<UUID> conceptIdCollection = collectionFromString(conceptIdPart);
 	        //int conceptId = AceConfig.getVodb().getConceptNid(conceptIdCollection);
 	        //int imageId = AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection, conceptId);
 	        //image = AceConfig.getVodb().getImage(imageId, conceptId);
