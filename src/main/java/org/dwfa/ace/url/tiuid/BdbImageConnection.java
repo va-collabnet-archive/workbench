@@ -33,6 +33,8 @@ public class BdbImageConnection extends URLConnection {
 	        if (parts.length > 1) {
 		        String conceptIdPart = parts[1];
 		        Collection<UUID> conceptIdCollection = collectionFromString(conceptIdPart);
+	        } else {
+	        	AceLog.getAppLog().warning("Query string with $ only has one part: " + queryString);
 	        }
 	        Collection<UUID> imageIdCollection = collectionFromString(imageIdPart);
 	        //int conceptId = AceConfig.getVodb().getConceptNid(conceptIdCollection);
