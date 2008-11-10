@@ -115,10 +115,23 @@ public class VodbCreateNewPath extends AbstractMojo {
 			
 			if (tf.hasId(pathUUID)) {
 				pathConcept = tf.getConcept(new UUID[] {pathUUID});
-			} else {
+
+                /**
+                 * This addresses a problem where a UUID has been specified
+                 * as a path in generated transform output files, without
+                 * the path explicitly being defined. In this case we end
+                 * up with a concept without descriptions. To handle this
+                 * we check for descriptions and create the path concept
+                 * anyway... as the existing concept is not complete/usable
+                 */
+                if (pathConcept.getDescriptions() == null
+                        || pathConcept.getDescriptions().isEmpty()) {
+                    pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);                    
+                }
+            } else {
 				pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
 			}
-
+                  
 			tf.newPath(pathOrigins, pathConcept);
 		} catch (TerminologyException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
@@ -173,7 +186,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 		}            
 //			need to do an immediate commit so that new concept will be available to path when read from changeset
 		tf.commit();
-		return pathConcept;
+        return pathConcept;
 	}
 
 	
