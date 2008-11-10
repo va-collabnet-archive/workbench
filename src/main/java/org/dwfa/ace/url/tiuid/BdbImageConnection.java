@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -21,45 +23,74 @@ public class BdbImageConnection extends URLConnection {
 		super(url);
 	}
 
-	@Override
-	public void connect() throws IOException {
-		try {
-			String queryString = url.getQuery();
-			if (queryString.startsWith("[")) {
-				queryString = queryString.substring(1, queryString.length()-2);
-				if (queryString.contains(",")) {
-					String[] ids = queryString.split(",");
-					for (String id: ids) {
-						try {
-							image = AceConfig.getVodb().getImage(UUID.fromString(id));
-							if (image != null) {
-								return;
-							}
-						} catch (RuntimeException ex) {
-							AceLog.getAppLog().alertAndLogException(ex);
-						} 
-					}
-				} else {
-					image = AceConfig.getVodb().getImage(UUID.fromString(queryString));
-				}
-			} else {
-                String id = url.getQuery();
-                if (id.length() == 36) {
-                    image = AceConfig.getVodb().getImage(UUID.fromString(url.getQuery()));
-                } else {
-                    image = AceConfig.getVodb().getImage(Integer.parseInt(id));
-                }
-			}
-		} catch (DatabaseException e) {
-			IOException ex = new IOException();
-			ex.initCause(e);
-			throw ex;
-		} catch (TerminologyException e) {
-			IOException ex = new IOException();
-			ex.initCause(e);
-			throw ex;
-		}
-	}
+	  @Override
+	  public void connect() throws IOException {
+	    try {
+	      String queryString = url.getQuery();
+	      if (queryString.contains("$")) {
+	        String[] parts = queryString.split("$");
+	        String imageIdPart = parts[0];
+	        String conceptIdPart = parts[1];
+	        Collection<UUID> imageIdCollection = collectionFromString(imageIdPart);
+	        Collection<UUID> conceptIdCollection = collectionFromString(conceptIdPart);
+	        //int conceptId = AceConfig.getVodb().getConceptNid(conceptIdCollection);
+	        //int imageId = AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection, conceptId);
+	        //image = AceConfig.getVodb().getImage(imageId, conceptId);
+	        image = AceConfig.getVodb().getImage(AceConfig.getVodb().uuidToNative(imageIdCollection));
+	      } else {
+	        if (queryString.startsWith("[")) {
+	          queryString = queryString.substring(1, queryString.length() - 2);
+	          if (queryString.contains(",")) {
+	            String[] ids = queryString.split(",");
+	            for (String id : ids) {
+	              try {
+	                image = AceConfig.getVodb().getImage(UUID.fromString(id));
+	                if (image != null) {
+	                  return;
+	                }
+	              } catch (RuntimeException ex) {
+	                AceLog.getAppLog().alertAndLogException(ex);
+	              }
+	            }
+	          } else {
+	            image = AceConfig.getVodb().getImage(UUID.fromString(queryString));
+	          }
+	        } else {
+	          String id = url.getQuery();
+	          if (id.length() == 36) {
+	            image = AceConfig.getVodb().getImage(UUID.fromString(url.getQuery()));
+	          } else {
+	            image = AceConfig.getVodb().getImage(Integer.parseInt(id));
+	          }
+	        }
+	      }
+	    } catch (DatabaseException e) {
+	      IOException ex = new IOException();
+	      ex.initCause(e);
+	      throw ex;
+	    } catch (TerminologyException e) {
+	      IOException ex = new IOException();
+	      ex.initCause(e);
+	      throw ex;
+	    }
+	  }
+
+
+	  private Collection<UUID> collectionFromString(String idString) {
+	    ArrayList<UUID> idList = new ArrayList<UUID>();
+	    if (idString.startsWith("[")) {
+	      idString = idString.substring(1, idString.length() - 2);
+	      if (idString.contains(",")) {
+	        String[] ids = idString.split(",");
+	        for (String id : ids) {
+	          idList.add(UUID.fromString(id));
+	        }
+	      } else {
+	        idList.add(UUID.fromString(idString));
+	      }
+	    }
+	    return idList;
+	  }
 
 	@Override
 	public String getContentType() {
