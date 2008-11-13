@@ -23,6 +23,7 @@ import java.util.List;
  * This plugin exports sql statements from release format files.
  * 
  * @goal export-release-format-sql
+ * @phase process-resources
  */
 public final class ExportSQLMojo extends AbstractMojo {
 

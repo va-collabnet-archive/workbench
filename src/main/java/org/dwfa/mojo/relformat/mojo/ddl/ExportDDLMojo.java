@@ -17,6 +17,7 @@ import java.io.File;
  * This plugin exports ddl statements (Schema) from a release format config file.
  *
  * @goal export-release-format-ddl
+ * @phase process-resources
  */
 public final class ExportDDLMojo extends AbstractMojo {
 
