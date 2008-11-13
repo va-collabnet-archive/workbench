@@ -10,6 +10,8 @@ import org.dwfa.maven.derby.LogFileCreatorImpl;
 import org.dwfa.maven.derby.SQLFileTransformationCopier;
 import org.dwfa.maven.derby.SQLFileTransformationCopierImpl;
 import org.dwfa.maven.derby.SQLSourceFinderImpl;
+import org.dwfa.maven.derby.BuildMarkerImpl;
+import org.dwfa.maven.derby.BuildMarker;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,12 +108,10 @@ public class Derby extends AbstractMojo {
 
         // calculate the SHA-1 hashcode for this mojo based on input
         String buildHashCode = generateHashForBuild();
-
-        File goalFileDirectory = new File("target" + File.separator + "completed-mojos");
-        File goalFile = new File(goalFileDirectory, buildHashCode);
+        BuildMarker buildMarker = new BuildMarkerImpl(buildHashCode);
 
         // check to see if this goal has been executed previously
-        if(!goalFile.exists()) {
+        if(!buildMarker.isMarked()) {
             // hasn't been executed previously
             try {
                 File sqlSrcDir = new File(sourceDirectory.getParentFile(), "sql");
@@ -122,8 +122,8 @@ public class Derby extends AbstractMojo {
                 copySQLFilesToTarget(copier, sqlSrcDir, sqlTargetDir);
                 File dbErrLog = createErrorLog(dbDir);
                 runScripts(sqlTargetDir, dbDir, dbErrLog);                
-                // create a new file to indicate this execution has completed
-                writeHashFile(goalFileDirectory, goalFile);
+
+                buildMarker.mark();
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             } 
@@ -156,11 +156,6 @@ public class Derby extends AbstractMojo {
         }
     }
 
-    private void writeHashFile(final File goalFileDirectory, final File goalFile) throws IOException {
-        goalFileDirectory.mkdirs();
-        goalFile.createNewFile();
-    }
-
     private File[] findSources(final File sqlTargetDir) {
         return new SQLSourceFinderImpl().find(sqlTargetDir, sources, sqlLocations);
     }
@@ -178,6 +173,6 @@ public class Derby extends AbstractMojo {
                 withSourceRoots(sourceRoots).
                 withSources(sources).
                 withSQLLocations(sqlLocations).
-                build();        
+                build();
     }
 }
