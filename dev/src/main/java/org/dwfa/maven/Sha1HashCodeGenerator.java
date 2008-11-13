@@ -47,6 +47,7 @@ public class Sha1HashCodeGenerator {
 		for(int i = 0; i < digest.length; i++) {
 			result = result + digest[i];
 		}
-		return result;
+
+        return result;
 	}
 }

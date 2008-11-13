@@ -1,30 +1,19 @@
 package org.dwfa.maven;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Iterator;
-import java.security.NoSuchAlgorithmException;
-
-import org.apache.derby.tools.ij;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.plexus.util.StringInputStream;
-import org.dwfa.util.io.FileIO;
+import org.dwfa.maven.derby.DerbyClient;
+import org.dwfa.maven.derby.DerbyClientImpl;
+import org.dwfa.maven.derby.DerbyHashBuilder;
+import org.dwfa.maven.derby.LogFileCreatorImpl;
+import org.dwfa.maven.derby.SQLFileTransformationCopier;
+import org.dwfa.maven.derby.SQLFileTransformationCopierImpl;
+import org.dwfa.maven.derby.SQLSourceFinderImpl;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -53,6 +42,7 @@ public class Derby extends AbstractMojo {
     private File sourceDirectory;
 
     /**
+     * Specify the plugin version.
      *
      * @parameter expression="${project.version}"
      * @required
@@ -60,20 +50,46 @@ public class Derby extends AbstractMojo {
     private String version;
 
     /**
+     * The name of the database to create. All sql inserts will be against this database.
+     *
      * @parameter
      * @required
      */
     private String dbName;
 
     /**
+     * Specifies a list of source sql files.
+     *
      * @parameter
      */
-    private String[] sources;
+    private String[] sources = {};
 
     /**
+     * Specifies whether to replace the "/" with a platform specific version.
+     *
      * @parameter
      */
     private boolean replaceForwardSlash = true;
+
+    /**
+     * Specifies the direct location of sql files. No copying is down between sourceDirectory and the target directory.
+     * When this is specified:
+     * sourceDirectory,
+     * sources and 
+     * replaceForwardSlash is ignored.
+     *
+     * @parameter
+     */
+    private String[] sqlLocations = {};
+
+    /**
+     * Turns verbose on|off. The default is false.
+     * Be careful when running with verbose on. If the sql file size is very large it could lead to OutOfMemoryErrors. 
+     *
+     * @parameter
+     */
+    private boolean verbose = false;
+
 
     /**
     * List of source roots containing non-test code.
@@ -84,126 +100,84 @@ public class Derby extends AbstractMojo {
     private List sourceRoots;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        
+        SQLFileTransformationCopier copier = new SQLFileTransformationCopierImpl(getLog(), outputDirectory,
+                replaceForwardSlash);
 
         // calculate the SHA-1 hashcode for this mojo based on input
-        Sha1HashCodeGenerator generator;
-        String hashCode = "";
-        try {
-            generator = new Sha1HashCodeGenerator();
-            generator.add(outputDirectory);
-            generator.add(sourceDirectory);
-            generator.add(version);
-            generator.add(dbName);
+        String buildHashCode = generateHashForBuild();
 
-            for(int i = 0; i < sources.length; i++) {
-                generator.add(sources[i]);
-            }
-            Iterator iter = sourceRoots.iterator();
-
-            while(iter.hasNext()) {
-                generator.add(iter.next());
-            }
-
-            hashCode = generator.getHashCode();
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println(e);
-        }
-
-        File goalFileDirectory = new File("target" + File.separator
-                + "completed-mojos");
-        File goalFile = new File(goalFileDirectory, hashCode);
+        File goalFileDirectory = new File("target" + File.separator + "completed-mojos");
+        File goalFile = new File(goalFileDirectory, buildHashCode);
 
         // check to see if this goal has been executed previously
         if(!goalFile.exists()) {
             // hasn't been executed previously
             try {
-
                 File sqlSrcDir = new File(sourceDirectory.getParentFile(), "sql");
                 File sqlTargetDir = new File(outputDirectory, "sql");
                 sqlTargetDir.mkdirs();
-                for (File f: sqlSrcDir.listFiles(new FileFilter() {
-                    public boolean accept(File f) {
-                        return f.getName().endsWith(".sql");
-                    }})) {
-                    RegexReplace replacer = new RegexReplace("\\$\\{project.build.directory\\}", outputDirectory.getCanonicalPath().replace('\\', '/'));
-                    getLog().info("Transforming: " + f.getName());
-                    Reader is = new FileReader(f);
-                    String input = FileIO.readerToString(is);
-                    String sqlScript = replacer.execute(input);
-                    if (replaceForwardSlash) {
-                        sqlScript = sqlScript.replace('/', File.separatorChar);
-                    }
-                    FileIO.copyFile(new StringInputStream(sqlScript), new FileOutputStream(new File(sqlTargetDir, f.getName())), true);
-
-                }
                 File dbDir = new File(outputDirectory, dbName.replace('/', File.separatorChar));
-                File dbErrLog = new File(dbDir.getParentFile(), "derbyErr.log");
-                dbErrLog.getParentFile().mkdirs();
-                FileWriter fw = new FileWriter(dbErrLog);
-                fw.append("Created by DWFA derby plugin version: " + version + "\n");
-                fw.close();
-                System.getProperties().setProperty("derby.infolog.append", "true");
-                System.getProperties().setProperty("derby.stream.error.file", dbErrLog.getCanonicalPath());
-                System.setProperty("derby.system.home", "./target");                
-                Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 
-                Connection conn = DriverManager.getConnection("jdbc:derby:directory:" + dbDir.getCanonicalPath() +
-                        ";create=true;");
-
-                File[] sqlSources;
-                if (sources == null) {
-                    sqlSources = sqlTargetDir.listFiles(new FileFilter() {
-                        public boolean accept(File f) {
-                            return f.getName().endsWith(".sql");
-                        }});
-                } else {
-                    sqlSources = new File[sources.length];
-                    for (int i = 0; i < sources.length; i++) {
-                        sqlSources[i] = new File(sqlTargetDir, sources[i]);
-                    }
-                }
-                for (File f: sqlSources) {
-                    getLog().info("Executing: " + f.getName());
-
-                    Reader is = new FileReader(f);
-                    String sqlScript = FileIO.readerToString(is);
-                    InputStream sqlIn = new StringInputStream(sqlScript);
-
-                    String inputEncoding = "US-ASCII";
-                    OutputStream sqlOut = new ByteArrayOutputStream();
-                    String outputEncoding = null;
-                    int errors = ij.runScript(conn, sqlIn, inputEncoding, sqlOut, outputEncoding);
-                    getLog().info(sqlOut.toString());
-                    if (errors > 0) {
-                        throw new MojoExecutionException("Execution errors: " + errors);
-                    }
-                }
-                conn.close();
-
+                copySQLFilesToTarget(copier, sqlSrcDir, sqlTargetDir);
+                File dbErrLog = createErrorLog(dbDir);
+                runScripts(sqlTargetDir, dbDir, dbErrLog);                
                 // create a new file to indicate this execution has completed
-                goalFileDirectory.mkdirs();
-                goalFile.createNewFile();
-
-                try {
-                    DriverManager.getConnection("jdbc:derby:;shutdown=true");
-                } catch (SQLException e) {
-                    getLog().info(e.getMessage());
-                }
-            } catch (ClassNotFoundException e) {
+                writeHashFile(goalFileDirectory, goalFile);
+            } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
-            } catch (SQLException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            } catch (UnsupportedEncodingException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            } catch (FileNotFoundException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            } catch (IOException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
+            } 
         } else {
             // skip execution as it has already been done previously
-            getLog().info("Skipping goal - executed previously.");
+            getLog().warn("Skipping goal - executed previously.");
         }
     }
 
+    private void runScripts(final File sqlTargetDir, final File dbDir, final File dbErrLog) throws IOException {
+        DerbyClient derbyClient = new DerbyClientImpl(dbDir.getCanonicalPath(), dbErrLog.getCanonicalPath(),
+                getLog());
+        derbyClient.openConnection();
+        runScripts(derbyClient, sqlTargetDir);
+        derbyClient.closeConnection();
+    }
+
+    private void copySQLFilesToTarget(final SQLFileTransformationCopier copier, final File sqlSrcDir,
+                                      final File sqlTargetDir) {
+        if (sqlLocations.length == 0) {
+            copier.copySQLFilesToTarget(sqlSrcDir, sqlTargetDir);
+        }
+    }
+
+    private void runScripts(final DerbyClient derbyClient, final File sqlTargetDir) throws IOException {
+        File[] sqlSources = findSources(sqlTargetDir);
+        for (File file : sqlSources) {
+            getLog().info("Executing: " + file.getName());
+            derbyClient.executeScript(file.getCanonicalPath(), verbose);
+        }
+    }
+
+    private void writeHashFile(final File goalFileDirectory, final File goalFile) throws IOException {
+        goalFileDirectory.mkdirs();
+        goalFile.createNewFile();
+    }
+
+    private File[] findSources(final File sqlTargetDir) {
+        return new SQLSourceFinderImpl().find(sqlTargetDir, sources, sqlLocations);
+    }
+
+    private File createErrorLog(final File dbDir) throws IOException {
+        return new LogFileCreatorImpl().createLog(dbDir.getParentFile(), "derbyErr.log", version);
+    }
+
+    private String generateHashForBuild() {
+        return new DerbyHashBuilder(getLog()).
+                withOutputDirectory(outputDirectory).
+                withSourceDirectory(sourceDirectory).
+                withVersion(version).
+                withDatabaseName(dbName).
+                withSourceRoots(sourceRoots).
+                withSources(sources).
+                withSQLLocations(sqlLocations).
+                build();        
+    }
 }
