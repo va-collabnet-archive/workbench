@@ -35,7 +35,7 @@ public final class LineValueToSQLTypeConverterImpl implements LineValueToSQLType
 
         for (int index=0; index < values.length; index++) {
             String value = values[index];
-            convertedValues[index] = (value.isEmpty()) ? NULL : getConverter(table, index).convert(value);
+            convertedValues[index] = (value.length() == 0) ? NULL : getConverter(table, index).convert(value);
         }
 
         return convertedValues;

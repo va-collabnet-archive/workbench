@@ -9,7 +9,7 @@ public final class StringArrayCleanerImpl implements StringArrayCleaner {
         List<String> cleanedValues = new ArrayList<String>();
 
         for (String value : array) {
-            if (!value.trim().isEmpty()) {
+            if (value.trim().length() != 0) {
                 cleanedValues.add(value.trim());
             }
         }
