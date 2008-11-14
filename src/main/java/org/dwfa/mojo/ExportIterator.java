@@ -255,7 +255,12 @@ public class ExportIterator implements I_ProcessConcepts {
 	private boolean writeUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) 
 			throws Exception {
 
-		I_DescriptionTuple descForConceptFile = concept.getDescTuple(nameOrder, null, positions);
+		I_IntSet descStatus = termFactory.newIntSet();
+		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
+		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId());
+		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
+		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId());
+		I_DescriptionTuple descForConceptFile = concept.getDescTuple(nameOrder, descStatus, positions);
 		if (descForConceptFile == null) {
 			errorWriter.append("\n\nnull desc for: " + concept.getUids() + " " + concept.getDescriptions());
 			return false;			
