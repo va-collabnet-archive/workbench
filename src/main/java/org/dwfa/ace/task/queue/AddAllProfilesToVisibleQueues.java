@@ -54,7 +54,7 @@ public class AddAllProfilesToVisibleQueues extends AbstractTask {
         try {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            File profiles = new File("profiles/users");
+            File profiles = new File("profiles");
             for (File profile: profiles.listFiles(new FileFilter() {
 
                 public boolean accept(File f) {
