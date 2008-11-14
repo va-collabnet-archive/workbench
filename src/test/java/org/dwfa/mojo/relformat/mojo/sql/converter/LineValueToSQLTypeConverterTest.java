@@ -1,5 +1,6 @@
 package org.dwfa.mojo.relformat.mojo.sql.converter;
 
+import org.dwfa.mojo.relformat.mojo.sql.builder.LineValueToSQLTypeConverterBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.hamcrest.core.IsEqual;
 import static org.junit.Assert.assertThat;
@@ -12,7 +13,7 @@ public final class LineValueToSQLTypeConverterTest {
 
     @Before
     public void setup() {
-        converter = new LineValueToSQLTypeConverterImpl();
+        converter = new LineValueToSQLTypeConverterBuilder().build();
     }
 
     @Test

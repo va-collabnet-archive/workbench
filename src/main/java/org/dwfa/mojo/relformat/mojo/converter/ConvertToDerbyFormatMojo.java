@@ -1,9 +1,11 @@
-package org.dwfa.mojo.relformat.mojo.sql;
+package org.dwfa.mojo.relformat.mojo.converter;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.relformat.mojo.sql.builder.LineToSQLConverterBuilder;
+import org.dwfa.mojo.relformat.mojo.converter.builder.FileNameExtractorBuilder;
+import org.dwfa.mojo.relformat.mojo.converter.builder.LineToDerbyLineConverterBuilder;
+import org.dwfa.mojo.relformat.mojo.sql.TableCache;
 import org.dwfa.mojo.relformat.mojo.sql.builder.SQLFileWriterBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.builder.TableCacheBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.converter.LineToSQLConverter;
@@ -22,12 +24,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This plugin exports sql statements from release format files.
- * 
- * @goal export-release-format-sql
+ * This plugin processes files from au-ct-release and converts them into a derby-edible format.
+ *
+ * @goal convert-to-derby-format
  * @phase process-resources
  */
-public final class ExportSQLMojo extends AbstractMojo {
+public final class ConvertToDerbyFormatMojo extends AbstractMojo {
 
     //Skip refsets-no-marked-parents by default.
     //We could make this into an attribute of Format such as List<String> excludes, with a default value if need be.
@@ -74,11 +76,15 @@ public final class ExportSQLMojo extends AbstractMojo {
 
     private final FileUtil fileUtil = new FileUtilImpl();
 
-    private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).withDefaults().build();
+    private final FileNameExtractorBuilder fileNameExtractorBuilder =
+            new FileNameExtractorBuilder().withExtension(".derb");
 
-    private final LineToSQLConverter lineToSQLConverter = new LineToSQLConverterBuilder().build();
+    private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).
+            withFileNameExtractor(fileNameExtractorBuilder).build();
 
     private final TableCache tableCache = new TableCacheBuilder().build();
+
+    private final LineToSQLConverter lineToDerbyLineConverter = new LineToDerbyLineConverterBuilder().build();
 
     private final ReleaseConfigReader configReader = new ReleaseConfigReaderImpl();
     private FileLister fileLister = new FileListerImpl(new FileMatcherImpl());
@@ -97,7 +103,7 @@ public final class ExportSQLMojo extends AbstractMojo {
 
                 for (File aFile : matchingFiles) {
                   logInfo("processing file", aFile);
-                  sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToSQLConverter);
+                  sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToDerbyLineConverter);
                 }
             } catch (Exception e) {
                 getLog().error(e); //if a format fails, log and keep going to the next.

@@ -37,4 +37,8 @@ public final class Table {
     public String getCompositeKey() {
         return compositeKey;
     }
+
+    public static Table nullTable() {
+        return new Table("");
+    }
 }

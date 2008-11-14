@@ -14,18 +14,16 @@ import java.io.PrintWriter;
 
 public final class SQLFileWriterImpl implements SQLFileWriter {
 
-    private final LineToSQLConverter lineToSQLConverter;
     private final FileNameExtractor fileNameExtractor;
     private final FileUtil fileUtil;
 
-    public SQLFileWriterImpl(final LineToSQLConverter lineToSQLConverter, final FileNameExtractor fileNameExtractor,
-                             final FileUtil fileUtil) {
-        this.lineToSQLConverter = lineToSQLConverter;
+    public SQLFileWriterImpl(final FileNameExtractor fileNameExtractor, final FileUtil fileUtil) {
         this.fileNameExtractor = fileNameExtractor;
         this.fileUtil = fileUtil;
     }
 
-    public void writer(final File file, final Table table, final String outputDirectory) {
+    public void writer(final File file, final Table table, final String outputDirectory,
+                       final LineToSQLConverter lineToSQLConverter) {
         BufferedReader reader = null;
         PrintWriter writer = null;
 

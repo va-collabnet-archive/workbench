@@ -13,7 +13,7 @@ public final class FileNameExtractorTest {
 
     @Before
     public void setup() {
-        extractor = new FileNameExtractorImpl();
+        extractor = new FileNameExtractorImpl(".sql");
     }
 
     @Test
@@ -44,6 +44,5 @@ public final class FileNameExtractorTest {
                         "Australian Extension_20081031T000000Z.concept.refset"));
         assertThat(fileName, equalTo("UUID_Result test name member reference set_SNOMED Clinical Terms Australian " +
                 "Extension_20081031T000000Z.concept-2.sql"));
-
-    }
+    }    
 }

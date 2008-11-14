@@ -4,9 +4,12 @@ import java.io.File;
 
 public final class FileNameExtractorImpl implements FileNameExtractor {
 
-    private static final String SQL_EXTENTION = ".sql";
-
     private int count = 1;
+    private final String extention;
+
+    public FileNameExtractorImpl(final String extention) {
+        this.extention = extention;
+    }
 
     public String extractFileName(final File file) {
         String name = file.getName();
@@ -14,6 +17,6 @@ public final class FileNameExtractorImpl implements FileNameExtractor {
         return new StringBuilder().
                 append(name.substring(0, name.lastIndexOf("."))).
                 append("-").append(count++).
-                append(SQL_EXTENTION).toString();
+                append(extention).toString();
     }
 }

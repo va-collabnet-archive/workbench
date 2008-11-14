@@ -1,9 +1,8 @@
 package org.dwfa.mojo.relformat.mojo.sql.converter;
 
-import org.dwfa.mojo.relformat.mojo.sql.SQLCreatorImpl;
 import org.dwfa.mojo.relformat.mojo.sql.SQLLineBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.TableBuilder;
-import org.dwfa.mojo.relformat.mojo.sql.extractor.LineToValuesExtractorImpl;
+import org.dwfa.mojo.relformat.mojo.sql.builder.LineToSQLConverterBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -16,8 +15,7 @@ public final class LineToSQLConverterTest {
 
     @Before
     public void setup() {
-        converter = new LineToSQLConverterImpl(new LineToValuesExtractorImpl(),
-                new LineValueToSQLTypeConverterImpl(), new SQLCreatorImpl());
+        converter = new LineToSQLConverterBuilder().build();
     }
 
     @Test
