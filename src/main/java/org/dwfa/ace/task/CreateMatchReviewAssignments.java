@@ -10,12 +10,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_RenderMessage;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
@@ -25,7 +27,8 @@ import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
 
 /**
- * Reads match review item from URL/File
+ * Reads match review item from URL/File and attaches the components to the
+ * business process
  * 
  * @author Eric Mays (EKM)
  * 
@@ -70,7 +73,7 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
-
+			System.out.println("F:" + new File("./").getAbsolutePath());
 			String bpFileName = (String) process
 					.readProperty(bpFileNamePropName);
 			String inputFileName = (String) process
@@ -86,15 +89,20 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 						new BufferedInputStream(new FileInputStream(bp_file)));
 				BusinessProcess bp = (BusinessProcess) ois.readObject();
 				ois.close();
-				BufferedReader br = new BufferedReader(new FileReader(ff));
-				String file_str = FileIO.readerToString(br);
-				bp
-						.writeAttachment(
-								ReadMatchReviewItemFromAttachment.KEY_MATCH_REVIEW_CONTENTS,
-								file_str);
-				String bp_name = ff.getName().replace(".", "_");
-				bp.setName(bp_name);
-				bp.setSubject(bp_name);
+				MatchReviewItem mri = new MatchReviewItem();
+				mri.createFromFile(ff.getPath());
+				bp.writeAttachment(MatchReviewItem.AttachmentKeys.TERM
+						.getAttachmentKey(), mri.getTerm());
+				bp.writeAttachment(
+						MatchReviewItem.AttachmentKeys.UUID_LIST_LIST
+								.getAttachmentKey(), mri.getUuidListList());
+				bp.writeAttachment(MatchReviewItem.AttachmentKeys.HTML_DETAIL
+						.getAttachmentKey(), mri.getHtml());
+				bp.writeAttachment(MatchReviewItem.AttachmentKeys.HTML_DETAIL
+						.toString(), mri.getHtml());
+				String bp_name = ff.getName().replace(".txt", "");
+				bp.setName("Review Match");
+				bp.setSubject(mri.getTerm());
 				ObjectOutputStream oos = new ObjectOutputStream(
 						new FileOutputStream(f.getParent() + "/" + bp_name
 								+ ".bp"));

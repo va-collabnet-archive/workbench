@@ -1,0 +1,96 @@
+package org.dwfa.ace.task;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.dwfa.util.id.Type3UuidFactory;
+
+/**
+ * A MatchReviewItem is an input term and a list of description and concept
+ * matches. <br>
+ * There are three lists. The description string, the concept string, and the
+ * concept id.
+ * 
+ * @author Eric Mays (EKM)
+ * 
+ */
+public class MatchReviewItem {
+
+	private String term;
+
+	private List<String> descriptions;
+
+	private List<String> concepts;
+
+	private List<Long> concept_ids;
+
+	public String getTerm() {
+		return term;
+	}
+
+	public enum AttachmentKeys {
+		UUID_LIST_LIST, HTML_DETAIL, TERM;
+
+		public String getAttachmentKey() {
+			return "A: " + this.name();
+		}
+	}
+
+	public void createFromString(String str) throws Exception {
+		BufferedReader br = new BufferedReader(new StringReader(str));
+		this.createFromReader(br);
+	}
+
+	public void createFromFile(String file_name) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(file_name));
+		this.createFromReader(br);
+	}
+
+	protected void createFromReader(BufferedReader br) throws Exception {
+		descriptions = new ArrayList<String>();
+		concepts = new ArrayList<String>();
+		concept_ids = new ArrayList<Long>();
+		String line;
+		int i = 0;
+		while ((line = br.readLine()) != null) {
+			i++;
+			if (i == 1) {
+				term = line;
+				continue;
+			}
+			String[] fields = line.split("\t");
+			descriptions.add(fields[0]);
+			concepts.add(fields[1]);
+			concept_ids.add(Long.parseLong(fields[2]));
+		}
+	}
+
+	public List<List<UUID>> getUuidListList() {
+		List<List<UUID>> uuid_list_list = new ArrayList<List<UUID>>();
+		for (long concept_id : this.concept_ids) {
+			List<UUID> uuids = new ArrayList<UUID>();
+			UUID uuid = Type3UuidFactory.fromSNOMED(concept_id);
+			uuids.add(uuid);
+			uuid_list_list.add(uuids);
+		}
+		return uuid_list_list;
+	}
+
+	public String getHtml() {
+		String html = "";
+		html += "<html>";
+		html += "<h3>" + this.term + "</h3><table border=\"1\">";
+		html += "<tr><th>" + "Description" + "<th>" + "Concept" + "</tr>";
+		for (int i = 0; i < this.descriptions.size(); i++) {
+			html += "<tr><td>" + descriptions.get(i) + "<td>" + concepts.get(i)
+					+ "</tr>";
+		}
+		html += "</table>";
+		return html;
+	}
+
+}

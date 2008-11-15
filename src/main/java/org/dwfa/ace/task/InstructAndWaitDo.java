@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -158,8 +159,11 @@ public class InstructAndWaitDo extends AbstractTask {
 		}
 	}
 
-	protected I_GetConceptData createNewConcept(String newDescrString)
-			throws Exception {
+	protected I_GetConceptData createNewConcept(String newDescrString,
+			String semantic_tag) throws Exception {
+		System.out.println("ST: |" + semantic_tag + "|");
+		if (semantic_tag == null)
+			semantic_tag = "(?????)";
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		I_GetConceptData fully_specified_description_type = termFactory
 				.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
@@ -170,11 +174,39 @@ public class InstructAndWaitDo extends AbstractTask {
 		I_GetConceptData newConcept = LocalVersionedTerminology.get()
 				.newConcept(UUID.randomUUID(), false, config);
 		termFactory.newDescription(UUID.randomUUID(), newConcept, language,
-				newDescrString + " (?????)", fully_specified_description_type,
-				config);
+				newDescrString + " " + semantic_tag,
+				fully_specified_description_type, config);
 		termFactory.newDescription(UUID.randomUUID(), newConcept, language,
 				newDescrString, preferred_description_type, config);
 		return newConcept;
+	}
+
+	private String getSemanticTag(I_GetConceptData con) throws Exception {
+		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		I_GetConceptData current_status = termFactory
+				.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+		I_GetConceptData fully_specified_description_type = termFactory
+				.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+						.getUids());
+		Set<I_Position> clonePositions = new HashSet<I_Position>();
+		for (I_Path path : config.getEditingPathSet()) {
+			clonePositions
+					.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+		}
+		for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null,
+				clonePositions)) {
+			if (desc.getStatusId() != current_status.getConceptId())
+				continue;
+			if (desc.getTypeId() != fully_specified_description_type
+					.getConceptId())
+				continue;
+			String fsn = desc.getText();
+			int lp = fsn.lastIndexOf("(");
+			if (lp == -1)
+				return null;
+			return fsn.substring(lp);
+		}
+		return null;
 	}
 
 	private class CloneActionListener implements ActionListener {
@@ -192,7 +224,8 @@ public class InstructAndWaitDo extends AbstractTask {
 						null, null, InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
-				I_GetConceptData newConcept = createNewConcept(newDescrString);
+				I_GetConceptData newConcept = createNewConcept(newDescrString,
+						getSemanticTag(con));
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
 				Set<I_Position> clonePositions = new HashSet<I_Position>();
 				for (I_Path path : config.getEditingPathSet()) {
@@ -234,7 +267,8 @@ public class InstructAndWaitDo extends AbstractTask {
 						null, null, InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
-				I_GetConceptData newConcept = createNewConcept(newDescrString);
+				I_GetConceptData newConcept = createNewConcept(newDescrString,
+						getSemanticTag(con));
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
 				I_GetConceptData is_a_rel = termFactory
 						.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
@@ -272,7 +306,8 @@ public class InstructAndWaitDo extends AbstractTask {
 						InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
-				I_GetConceptData newConcept = createNewConcept(newDescrString);
+				I_GetConceptData newConcept = createNewConcept(newDescrString,
+						null);
 				I_HostConceptPlugins lcv = config.getListConceptViewer();
 				lcv.setTermComponent(newConcept);
 			} catch (Exception ex) {

@@ -39,13 +39,13 @@ public class ReadMatchReviewItemFromAttachment extends AbstractTask {
 
 	private static final int dataVersion = 1;
 
-	private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST
+	private String uuidListListPropName = MatchReviewItem.AttachmentKeys.UUID_LIST_LIST
 			.getAttachmentKey();
 	public static final String KEY_MATCH_REVIEW_CONTENTS = "MATCH_REVIEW_CONTENTS";
 	private String inputFileNamePropName = "A: " + KEY_MATCH_REVIEW_CONTENTS;
-	private String htmlPropName = ProcessAttachmentKeys.HTML_STR
+	private String htmlPropName = MatchReviewItem.AttachmentKeys.HTML_DETAIL
 			.getAttachmentKey();
-	private String termPropName = ProcessAttachmentKeys.MESSAGE
+	private String termPropName = MatchReviewItem.AttachmentKeys.TERM
 			.getAttachmentKey();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
@@ -78,53 +78,29 @@ public class ReadMatchReviewItemFromAttachment extends AbstractTask {
 			throws TaskFailedException {
 		try {
 
-			List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
-			String term = "";
-			String html = "<html>";
+			// String inputFileName = (String) process
+			// .readProperty(inputFileNamePropName);
+			List<List<UUID>> uuidListOfLists = (List<List<UUID>>) process
+					.readAttachement(MatchReviewItem.AttachmentKeys.UUID_LIST_LIST
+							.getAttachmentKey());
+			System.out.println("U:" + uuidListOfLists.size());
+			String term = (String) process
+					.readAttachement(MatchReviewItem.AttachmentKeys.TERM
+							.getAttachmentKey());
+			System.out.println("T: " + term);
+			String html = (String) process
+					.readAttachement(MatchReviewItem.AttachmentKeys.HTML_DETAIL
+							.getAttachmentKey());
+			System.out.println("H: " + html);
 
 			// worker.getLogger().info("file is: " + uuidFileName);
-			String inputFileName = (String) process
-					.readProperty(inputFileNamePropName);
-			BufferedReader br = new BufferedReader(new StringReader(
-					inputFileName));
-			String line;
-			int i = 0;
-			while ((line = br.readLine()) != null) {
-				i++;
-				if (i == 1) {
-					term = line;
-					html += "<h3>" + term + "</h3><table border=\"1\">";
-					html += "<tr><th>" + "Description" + "<th>" + "Concept"
-							+ "</tr>";
-					continue;
-				}
-				List<UUID> uuidList = new ArrayList<UUID>();
-				String[] fields = line.split("\t");
-				html += "<tr><td>" + fields[0] + "<td>" + fields[1] + "</tr>";
-				String uuidStr = fields[3];
-				worker.getLogger().info("uuidStrs: " + uuidStr);
-				UUID uuid = UUID.fromString(uuidStr);
-				uuidList.add(uuid);
-				uuidListOfLists.add(uuidList);
-			}
-			html += "</table>";
 
 			process.setProperty(this.uuidListListPropName, uuidListOfLists);
 			process.setProperty(this.htmlPropName, html);
 			process.setProperty(this.termPropName, term);
 
 			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (FileNotFoundException e) {
-			throw new TaskFailedException(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
 	}
