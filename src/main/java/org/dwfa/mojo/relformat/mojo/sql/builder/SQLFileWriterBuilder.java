@@ -19,11 +19,6 @@ public final class SQLFileWriterBuilder {
         return this;
     }
 
-    public SQLFileWriterBuilder withDefaults() {
-        fileNameExtractorBuilder = new FileNameExtractorBuilder().withExtension(".sql");
-        return this;
-    }
-
     public SQLFileWriter build() {
         return new SQLFileWriterImpl(fileNameExtractorBuilder.build(), fileUtil);
     }

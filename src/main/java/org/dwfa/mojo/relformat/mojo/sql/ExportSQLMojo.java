@@ -3,6 +3,7 @@ package org.dwfa.mojo.relformat.mojo.sql;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.mojo.relformat.mojo.converter.builder.FileNameExtractorBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.builder.LineToSQLConverterBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.builder.SQLFileWriterBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.builder.TableCacheBuilder;
@@ -74,7 +75,11 @@ public final class ExportSQLMojo extends AbstractMojo {
 
     private final FileUtil fileUtil = new FileUtilImpl();
 
-    private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).withDefaults().build();
+    private final FileNameExtractorBuilder fileNameExtractorBuilder = new FileNameExtractorBuilder().
+            withExtension(".sql").withGenericExporter();
+
+    private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).
+            withFileNameExtractor(fileNameExtractorBuilder).build();
 
     private final LineToSQLConverter lineToSQLConverter = new LineToSQLConverterBuilder().build();
 

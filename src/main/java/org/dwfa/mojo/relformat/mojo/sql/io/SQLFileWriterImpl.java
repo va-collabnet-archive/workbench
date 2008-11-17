@@ -26,11 +26,11 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
                        final LineToSQLConverter lineToSQLConverter) {
         BufferedReader reader = null;
         PrintWriter writer = null;
-
+        
         try {
             fileUtil.createDirectoriesIfNeeded(new Directory(outputDirectory));
             reader = openReader(file);
-            writer = openWriter(file, outputDirectory);
+            writer = openWriter(table, file, outputDirectory);
 
             String line = reader.readLine();//skip the header line.
 
@@ -44,8 +44,8 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
         }
     }
 
-    private PrintWriter openWriter(final File file, final String outputDirectory) throws FileNotFoundException {
-        String fileName = resolveFileName(file, outputDirectory);
+    private PrintWriter openWriter(final Table table, final File file, final String outputDirectory) throws FileNotFoundException {
+        String fileName = resolveFileName(table, file, outputDirectory);
         return new PrintWriter(fileName);
     }
 
@@ -53,8 +53,8 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
         return new BufferedReader(new FileReader(file));
     }
 
-    private String resolveFileName(final File file, final String outputDirectory) {
-        return fileUtil.createPath(outputDirectory, fileNameExtractor.extractFileName(file));
+    private String resolveFileName(final Table table, final File file, final String outputDirectory) {
+        return fileUtil.createPath(outputDirectory, fileNameExtractor.extractFileName(table, file));
     }
 
     private void close(final BufferedReader reader, final PrintWriter writer) {

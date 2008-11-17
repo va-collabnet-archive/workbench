@@ -77,7 +77,7 @@ public final class ConvertToDerbyFormatMojo extends AbstractMojo {
     private final FileUtil fileUtil = new FileUtilImpl();
 
     private final FileNameExtractorBuilder fileNameExtractorBuilder =
-            new FileNameExtractorBuilder().withExtension(".derb");
+            new FileNameExtractorBuilder().withExtension(".derb").withDerbyExporter();
 
     private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).
             withFileNameExtractor(fileNameExtractorBuilder).build();
