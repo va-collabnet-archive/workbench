@@ -3,15 +3,14 @@ package org.dwfa.maven;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.maven.derby.BuildMarker;
+import org.dwfa.maven.derby.BuildMarkerImpl;
 import org.dwfa.maven.derby.DerbyClient;
 import org.dwfa.maven.derby.DerbyClientImpl;
 import org.dwfa.maven.derby.DerbyHashBuilder;
 import org.dwfa.maven.derby.LogFileCreatorImpl;
-import org.dwfa.maven.derby.SQLFileTransformationCopier;
 import org.dwfa.maven.derby.SQLFileTransformationCopierImpl;
 import org.dwfa.maven.derby.SQLSourceFinderImpl;
-import org.dwfa.maven.derby.BuildMarkerImpl;
-import org.dwfa.maven.derby.BuildMarker;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,33 +101,19 @@ public class Derby extends AbstractMojo {
     private List sourceRoots;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        
-        SQLFileTransformationCopier copier = new SQLFileTransformationCopierImpl(getLog(), outputDirectory,
-                replaceForwardSlash);
-
-        // calculate the SHA-1 hashcode for this mojo based on input
         String buildHashCode = generateHashForBuild();
         BuildMarker buildMarker = new BuildMarkerImpl(buildHashCode);
 
-        // check to see if this goal has been executed previously
         if(!buildMarker.isMarked()) {
-            // hasn't been executed previously
             try {
-                File sqlSrcDir = new File(sourceDirectory.getParentFile(), "sql");
-                File sqlTargetDir = new File(outputDirectory, "sql");
-                sqlTargetDir.mkdirs();
-                File dbDir = new File(outputDirectory, dbName.replace('/', File.separatorChar));
-
-                copySQLFilesToTarget(copier, sqlSrcDir, sqlTargetDir);
-                File dbErrLog = createErrorLog(dbDir);
-                runScripts(sqlTargetDir, dbDir, dbErrLog);                
-
+                FileLocationConfigurer flc = new FileLocationConfigurerImpl(sourceDirectory, outputDirectory, dbName);
+                copySQLFilesToTarget(flc.getSqlSourceDir(), flc.getSqlTargetDir());
+                runScripts(flc.getSqlTargetDir(), flc.getDbDir(), createErrorLog(flc.getDbDir()));
                 buildMarker.mark();
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             } 
         } else {
-            // skip execution as it has already been done previously
             getLog().warn("Skipping goal - executed previously.");
         }
     }
@@ -141,10 +126,10 @@ public class Derby extends AbstractMojo {
         derbyClient.closeConnection();
     }
 
-    private void copySQLFilesToTarget(final SQLFileTransformationCopier copier, final File sqlSrcDir,
-                                      final File sqlTargetDir) {
+    private void copySQLFilesToTarget(final File sqlSrcDir, final File sqlTargetDir) {
         if (sqlLocations.length == 0) {
-            copier.copySQLFilesToTarget(sqlSrcDir, sqlTargetDir);
+            new SQLFileTransformationCopierImpl(getLog(), outputDirectory, replaceForwardSlash).
+                    copySQLFilesToTarget(sqlSrcDir, sqlTargetDir);
         }
     }
 
