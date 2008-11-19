@@ -9,7 +9,7 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class TestForFullySpecifiedNameBeanInfo extends
-		TestForUneditableMembersetBeanInfo {
+		TestForUneditedDefaultsBeanInfo {
 
 	/**
 	 * @see java.beans.BeanInfo#getBeanDescriptor()
