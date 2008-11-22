@@ -836,14 +836,20 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
      */
     public Collection<ExecutionRecord> getExecutionRecords() {
         List<ExecutionRecord> records = new ArrayList<ExecutionRecord>();
-        for (Iterator<TaskInfo> allInfoItr = this.taskInfoList.iterator(); allInfoItr
-                .hasNext();) {
-            TaskInfo ti = allInfoItr.next();
-            if (ti != null) {
+        for (TaskInfo ti: this.taskInfoList) {
+             if (ti != null) {
                 records.addAll(ti.getExecutionRecords());
             }
         }
         return records;
+    }
+    
+    public void clearExecutionRecords() {
+        for (TaskInfo ti: this.taskInfoList) {
+            if (ti != null) {
+               ti.clearExecutionRecords();
+           }
+       }   	
     }
 
     /**

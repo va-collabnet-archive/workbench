@@ -152,6 +152,10 @@ public class TaskInfo implements Serializable {
 		}
 		return Collections.unmodifiableList(executionRecords);
 	}
+	
+	public void clearExecutionRecords() {
+		this.executionRecords = null;
+	}
 
 	/**
 	 * @param executionRecords

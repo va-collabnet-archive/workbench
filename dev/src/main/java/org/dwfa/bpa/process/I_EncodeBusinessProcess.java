@@ -135,6 +135,11 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * @return All execution records for the identified task. 
      */
     public Collection<ExecutionRecord> getExecutionRecords(int taskId);
+    
+    /**
+     * Clear the list of execution records. 
+     */
+    public void clearExecutionRecords();
 
     /**
      * Initiates execution of this business process, and will continue until 
