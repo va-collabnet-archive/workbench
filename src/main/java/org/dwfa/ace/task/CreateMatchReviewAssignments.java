@@ -74,6 +74,7 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			System.out.println("F:" + new File("./").getAbsolutePath());
+			String out_dir = "../../src/main/profiles/aao_inbox/";
 			String bpFileName = (String) process
 					.readProperty(bpFileNamePropName);
 			String inputFileName = (String) process
@@ -81,8 +82,10 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 			File f = new File(inputFileName);
 			int i = 0;
 			for (File ff : new File(f.getParent()).listFiles()) {
-				if (++i == 5)
-					break;
+				if (!ff.toString().endsWith(".txt"))
+					continue;
+				// if (++i == 5)
+				// break;
 				System.out.println("FF: " + ff);
 				File bp_file = new File(bpFileName);
 				ObjectInputStream ois = new ObjectInputStream(
@@ -102,10 +105,13 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 						.toString(), mri.getHtml());
 				String bp_name = ff.getName().replace(".txt", "");
 				bp.setName("Review Match");
-				bp.setSubject(mri.getTerm());
+				String bp_id = bp_name.replace("tm", "");
+				while (bp_id.length() < 4) {
+					bp_id = "0" + bp_id;
+				}
+				bp.setSubject(bp_id + ": " + mri.getTerm());
 				ObjectOutputStream oos = new ObjectOutputStream(
-						new FileOutputStream(f.getParent() + "/" + bp_name
-								+ ".bp"));
+						new FileOutputStream(out_dir + bp_name + ".bp"));
 				oos.writeObject(bp);
 				oos.close();
 			}
