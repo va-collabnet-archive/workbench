@@ -57,13 +57,10 @@ public final class DerbyDirectImportMojo extends AbstractMojo {
 
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        DerbyFileRunner runner = new DerbyFileRunnerImpl("org.apache.derby.jdbc.EmbeddedDriver");
-        String URL = "jdbc:derby:" + databaseName + ";create=true;";
-        runner.connect(URL);
-        record(URL);
+        DerbyFileRunner runner = new DerbyFileRunnerImpl(getLog(), verbose);
+        runner.connect(databaseName);        
 
-        List<File> derbyFiles = fileLister.list(locationOfDerbyFiles, Arrays.asList("^(.)*\\.derb$"),
-                Arrays.<String>asList());
+        List<File> derbyFiles = getDerbyFiles();
         record("processing files: " + derbyFiles.toString());
 
         for (File derbyFile : derbyFiles) {
@@ -82,6 +79,11 @@ public final class DerbyDirectImportMojo extends AbstractMojo {
         }
 
         runner.disconnect();
+    }
+
+    private List<File> getDerbyFiles() {
+        return fileLister.list(locationOfDerbyFiles, Arrays.asList("^(.)*\\.derb$"),
+                Arrays.<String>asList());
     }
 
     private void record(final String message) {
