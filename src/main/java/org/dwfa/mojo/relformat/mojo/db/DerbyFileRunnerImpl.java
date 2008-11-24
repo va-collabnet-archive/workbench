@@ -55,6 +55,7 @@ public final class DerbyFileRunnerImpl implements DerbyFileRunner {
     public void disconnect() {
         try {
             statement.close();
+            connection.close();
             DriverManager.getConnection("jdbc:derby:;shutdown=true");
         } catch (SQLException e) {
             logger.info(e.getMessage());
