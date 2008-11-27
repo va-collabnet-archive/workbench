@@ -26,7 +26,7 @@ import org.dwfa.bpa.process.I_ContainData;
 
 /**
  * @author kec
- *
+ * @deprecated use attachments instead
  */
 public abstract class DataContainer implements I_ContainData {
 

@@ -73,7 +73,6 @@ import org.dwfa.bpa.BusinessProcessPersistenceDelegate;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.TaskInfo;
 import org.dwfa.bpa.TaskInfoPersistenceDelegate;
-import org.dwfa.bpa.data.DataContainer;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.ConditionPersistenceDelegate;
 import org.dwfa.bpa.process.I_DefineTask;
@@ -88,7 +87,17 @@ import org.dwfa.util.LogWithAlerts;
  */
 public class ProcessBuilderPanel extends JPanel implements ActionListener {
     
-    public class CancelProcessListener implements ActionListener {
+    public class ClearExecutionRecordsActionListener implements ActionListener {
+        /**
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        public void actionPerformed(ActionEvent e) {
+     	   processPanel.getProcess().clearExecutionRecords();
+        }
+
+     }
+
+	public class CancelProcessListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             worker.flagExecutionStop();
@@ -168,22 +177,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
 
    }
 
-   private class ChangeToDataActionListener implements ActionListener {
-
-      /**
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      public void actionPerformed(ActionEvent e) {
-         try {
-            int dividerLocation = splitPane.getDividerLocation();
-            splitPane.setLeftComponent(setupDataPanel(worker));
-            splitPane.setDividerLocation(dividerLocation);
-         } catch (Exception e1) {
-            logger.log(Level.SEVERE, e1.getMessage(), e1);
-         }
-      }
-
-   }
 
    private class ChangeToTaskActionListener implements ActionListener {
 
@@ -512,6 +505,8 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
 
    private SaveProcessActionListener saveProcessActionListener = new SaveProcessActionListener();
 
+   private ClearExecutionRecordsActionListener clearExecutionRecordsActionListener = new ClearExecutionRecordsActionListener();
+
    private ReadProcessActionListener openProcessActionListener = new ReadProcessActionListener();
 
    private TakeProcessNoTranActionListener takeProcessNoTranActionListener = new TakeProcessNoTranActionListener();
@@ -553,7 +548,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
    private String defaultOrigin;
    
    protected I_EncodeBusinessProcess executingProcess;
-
 
    /**
     * 
@@ -862,7 +856,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
       panel.add(new JLabel("   "), c);
 
       c.gridx = 2;
-      String[] panelTypes = { "tasks", "data", "properties" };
+      String[] panelTypes = { "tasks", "properties" };
 
       JComboBox panelTypeComboBox = new JComboBox(panelTypes);
       panelTypeComboBox.setSelectedIndex(0);
@@ -874,8 +868,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
    private class ActionListenerAdaptor implements ActionListener {
       ChangeToTaskActionListener changeToTask = new ChangeToTaskActionListener();
 
-      ChangeToDataActionListener changeToData = new ChangeToDataActionListener();
-
       ChangeToPropActionListener changeToProp = new ChangeToPropActionListener();
 
       public void actionPerformed(ActionEvent evt) {
@@ -883,8 +875,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
          String action = (String) cb.getSelectedItem();
          if (action.equals("tasks")) {
             this.changeToTask.actionPerformed(evt);
-         } else if (action.equals("data")) {
-            this.changeToData.actionPerformed(evt);
          } else if (action.equals("properties")) {
             this.changeToProp.actionPerformed(evt);
          }
@@ -936,65 +926,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
       c.gridy++;
    }
 
-   private JScrollPane setupDataPanel(I_Work worker) throws RemoteException, PropertyVetoException,
-         ClassNotFoundException, SecurityException, NoSuchMethodException {
-      JPanel dataPanel = new JPanel();
-      dataPanel.setLayout(new GridBagLayout());
-      GridBagConstraints c = new GridBagConstraints();
-      c.anchor = GridBagConstraints.NORTHWEST;
-      c.fill = GridBagConstraints.BOTH;
-      c.weightx = 0.001;
-      c.weighty = 0.001;
-      c.gridx = 0;
-      c.gridy = 0;
-      JScrollPane dataScroller = new JScrollPane(dataPanel);
-      File[] dataBeanDirFile = new File("data").listFiles();
-      if (dataBeanDirFile != null) {
-         for (File f : dataBeanDirFile) {
-            if (f.getName().endsWith(".data")) {
-               try {
-                  FileInputStream fis = new FileInputStream(f);
-                  BufferedInputStream bis = new BufferedInputStream(fis);
-                  ObjectInputStream ois = new ObjectInputStream(bis);
-                  DataContainer data = (DataContainer) ois.readObject();
-                  ois.close();
-                  createDataPanelAndAdd(worker, dataPanel, c, data);
-               } catch (Exception ex) {
-                  logger.log(Level.WARNING, "Exception processing " + f + " (" + ex.toString() + ")", ex);
-               }
-            }
-         }
-      }
-      c.weighty = 1;
-      dataPanel.add(new JPanel(), c);
-
-      return dataScroller;
-   }
-
-   /**
-    * 
-    * @param worker
-    * @param dataPanel
-    * @param c
-    * @param container
-    * @throws PropertyVetoException
-    * @throws Exception
-    */
- 
-   private void createDataPanelAndAdd(I_Work worker, JPanel dataPanel, GridBagConstraints c, DataContainer container)
-         throws PropertyVetoException, Exception {
-      DataContainerPanel dp;
-      try {
-         dp = new DataContainerPanel(container, true, true, null, worker);
-         dp.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-         dataPanel.add(dp, c);
-      } catch (Exception e) {
-         logger.log(Level.SEVERE, e.getMessage(), e);
-         dataPanel.add(new JLabel("<html><font color='red'>Error: see log"));
-      }
-      c.gridy++;
-   }
-
    /**
     * @return Returns the newProcessActionListener.
     */
@@ -1016,6 +947,10 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener {
       return saveProcessActionListener;
    }
 
+   public ClearExecutionRecordsActionListener getClearExecutionRecordsActionListener() {
+	      return clearExecutionRecordsActionListener;
+	}
+   
    /**
     * @return
     */

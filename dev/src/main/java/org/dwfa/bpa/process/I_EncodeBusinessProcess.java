@@ -58,7 +58,7 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * @return A set of environmental prerequsites the environment must meet 
      * before it can execute this business process. 
      */
-    public Set getPrerequisites();
+    public Set<?> getPrerequisites();
     
     
     /**
@@ -220,20 +220,24 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * @param data The data container. 
      * @return The data container with its identifier set by the business process. 
      * @throws PropertyVetoException
+     * @deprecated use attachments instead. 
      */
     public I_ContainData addDataContainer(I_ContainData data) throws PropertyVetoException;
     /**
      * @param id identifier for the data container requested. 
      * @return A data container corresponding to the requested id. 
+     * @deprecated use attachments instead. 
      */
     public I_ContainData getDataContainer(int id);
     /**
      * @return All the data containers in this process. 
+     * @deprecated use attachments instead. 
      */
     public List<I_ContainData> getDataContainers();
     /**
      * @param id The identifier for the data container for which the bounds specified. 
      * @param bounds The bounds of the specified data container. 
+     * @deprecated use attachments instead.
      */
     public void setDataContainerBounds(int id, Rectangle bounds);
     

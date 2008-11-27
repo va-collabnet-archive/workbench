@@ -568,7 +568,6 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
      * @see org.dwfa.bpa.process.I_EncodeBusinessProcess#execute(org.dwfa.bpa.process.I_Work)
      */
     public Condition execute(I_Work worker) throws TaskFailedException {
-        @SuppressWarnings("unused")
         Condition condition = this.evaluate(this, worker);
         this.complete(this, worker);
         return condition;
@@ -594,29 +593,31 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
             if (worker.isExecutionStopFlagged()) {
                 return Condition.ITEM_CANCELED;
             }
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine(process.getProcessID() + ": " + process.getCurrentTaskId()
-                		+ "/" + currentTask.getId()
-                        + " " + currentTask.getName() + " start");
-
-            }
+            if (logger.isLoggable(Level.FINE)) { fineLogProcessAndTask(process, currentTask, "start"); }
             try {
+            	List<String> attachmentSyncList = new ArrayList<String>();
+            	if (I_EncodeBusinessProcess.class.isAssignableFrom(currentTask.getClass())) {
+            		worker.getLogger().info("Task is process");
+            		I_EncodeBusinessProcess bpAsTask = (I_EncodeBusinessProcess) currentTask;
+            		for (PropertyDescriptor pd: bpAsTask.getBeanInfo().getPropertyDescriptors()) {
+            			if (pd.getPropertyType().equals(String.class) && PropertyDescriptorWithTarget.class.isAssignableFrom(pd.getClass())) {
+            				PropertyDescriptorWithTarget pdt = (PropertyDescriptorWithTarget) pd;
+            				String propertyValue = (String) pd.getReadMethod().invoke(pdt.getTarget(), (Object[]) null);
+                			if (propertyValue.startsWith("A: ")) {
+                				//Synchronize attachment here...
+                				String attachmentName = propertyValue.substring("A: ".length());
+                				attachmentSyncList.add(attachmentName);
+                				bpAsTask.writeAttachment(attachmentName, process.readAttachement(attachmentName));
+                			}
+            				
+            			}
+            		}          		
+            	}
                 condition = currentTask.evaluate(this, worker);
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine(process.getProcessID() + ": " 
-                            + process.getCurrentTaskId()
-                    		+ "/" + currentTask.getId() + " " + currentTask.getName()
-                            + " evaluate: " + condition);
-
-                }
+                if (logger.isLoggable(Level.FINE)) { fineLogProcessAndTask(process, currentTask, "evaluate: " + condition); }
                 if (continueUntilComplete) {
                 	 if (condition.equals(Condition.STOP_THEN_REPEAT)) {
-                         if (logger.isLoggable(Level.FINE)) {
-                             logger.fine(process.getProcessID() + ": " 
-                                     + process.getCurrentTaskId()
-                             		+ "/" + currentTask.getId() + " " + currentTask.getName()
-                                     + " Continue for Stop then Repeat ");
-                         }
+                		 if (logger.isLoggable(Level.FINE)) { fineLogProcessAndTask(process, currentTask, "Continue for Stop then Repeat "); }
                 		 condition = Condition.CONTINUE;
                 	 }
                 }
@@ -641,6 +642,12 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
                 TaskInfo info = this.taskInfoList.get(currentTask.getId());
                 info.addExecutionRecord(er);
                 currentTask.complete(this, worker);
+                if (I_EncodeBusinessProcess.class.isAssignableFrom(currentTask.getClass())) { 
+            		I_EncodeBusinessProcess bpAsTask = (I_EncodeBusinessProcess) currentTask;
+                    for (String attachmentName: attachmentSyncList) {
+           				process.writeAttachment(attachmentName, bpAsTask.readAttachement(attachmentName));
+                    }
+                }
                 if (logger.isLoggable(Level.INFO)) {
                     logger.info(worker.getWorkerDesc() + "; process: "
                             + process.getName() + " (" + process.getProcessID()
@@ -687,6 +694,15 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
         }
         return Condition.STOP_THEN_REPEAT;
     }
+
+	private void fineLogProcessAndTask(I_EncodeBusinessProcess process,
+			I_DefineTask currentTask, String logMsg) {
+		logger.fine(process.getProcessID() + ": " 
+				+ process.getCurrentTaskId()
+				+ "/" + currentTask.getId()
+		        + " " + currentTask.getName() + " " +
+		        logMsg);
+	}
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
