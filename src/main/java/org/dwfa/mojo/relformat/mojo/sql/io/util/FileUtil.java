@@ -13,6 +13,10 @@ public interface FileUtil {
     String createPath(final String directory, final String fileName);
 
     void closeSilently(final Reader reader);
-    
+
     void closeSilently(final Writer writer);
+
+    void createDirectoriesIfNeeded(String fileName);
+
+    String changeExtension(String fileName, String extension);
 }

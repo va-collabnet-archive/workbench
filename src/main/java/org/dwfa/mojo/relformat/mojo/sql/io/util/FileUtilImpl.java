@@ -13,12 +13,22 @@ public final class FileUtilImpl implements FileUtil {
         }
     }
 
+    public void createDirectoriesIfNeeded(final String fileName) {
+        createDirectoriesIfNeeded(new File(fileName));
+    }
+
     public void createDirectoriesIfNeeded(final Directory directory) {
         directory.mkdirs();
     }
 
     public String createPath(final String directory, final String fileName) {
         return directory + File.separator + fileName;
+    }
+
+    public String changeExtension(final String fileName, final String extension) {
+        return new StringBuilder().
+                    append(fileName.substring(0, (fileName.lastIndexOf('.') + 1))).
+                    append(extension).toString();
     }
 
     public void closeSilently(final Reader reader) {
