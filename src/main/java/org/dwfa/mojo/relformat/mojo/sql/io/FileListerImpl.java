@@ -15,7 +15,7 @@ public final class FileListerImpl implements FileLister {
     }
 
     public List<File> list(final File inputFile, final List<String> filters, final List<String> excludes) {
-        File[] files = inputFile.listFiles();
+        File[] files = getFiles(inputFile);
         List<File> resolvedFiles = new ArrayList<File>();
 
         for (File file : files) {
@@ -32,6 +32,11 @@ public final class FileListerImpl implements FileLister {
         }
 
         return resolvedFiles;
+    }
+
+    private File[] getFiles(final File inputFile) {
+        File[] files = inputFile.listFiles();
+        return (files == null) ? new File[0] : files;
     }
 
     private boolean isValid(final File file, final List<String> excludes) {

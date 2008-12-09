@@ -33,7 +33,7 @@ public final class CmrscsChangeSetBuilder implements ChangeSetBuilder {
     }
 
     public CmrscsRefSetBuilder openRefset() {
-        return new CmrscsRefSetBuilder(this);
+        return new CmrscsRefSetBuilder(refSetNameRetriever, this);
     }
 
     public CmrscsResultBuilder closeChangeSet() {

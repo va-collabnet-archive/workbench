@@ -7,10 +7,7 @@ public final class CmrscsResultToXMLConverterImpl implements CmrscsResultToXMLCo
     private final XStream xStream;
 
     public CmrscsResultToXMLConverterImpl() {
-        xStream = new XStream();
-        xStream.alias("cmrscsResult", CmrscsResultImpl.class);
-        xStream.alias("changeSet", ChangeSet.class);
-        xStream.alias("refSet", RefSet.class);
+        xStream = new CmrscsResultXStreamConfigImpl().configure();
     }
 
     public String convert(final CmrscsResult cmrscsResult) {

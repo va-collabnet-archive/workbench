@@ -23,12 +23,10 @@ public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
             I_IntSet fsn = createFullySpecifiedUUIDs(termFactory);
             List<I_DescriptionTuple> descriptions =
                     termFactory.getConcept(new UUID[]{uuid}).getDescriptionTuples(status, fsn, null);
-            System.out.println("descriptions: " + descriptions);
-            String desc = descriptions.get(0).getText();
-            System.out.println("Retrieved: " + desc);
-            return desc;            
+            //TODO: may have to check for this.
+            return descriptions.get(0).getText();
         } catch (Exception e) {
-            throw new RefSetNameRetrieverException(e);
+            return "N/A";
         }
     }
 

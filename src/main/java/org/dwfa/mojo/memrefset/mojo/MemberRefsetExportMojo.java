@@ -61,6 +61,10 @@ public final class MemberRefsetExportMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<File> files = fileLister.list(sourceDirectory, getInputFiles(), Arrays.<String>asList());
+        if (files.isEmpty()) {
+            getLog().warn("No files to process in " + sourceDirectory);
+        }
+
         for (File file : files) {
             try {
                 String inputFileName = file.getCanonicalPath();

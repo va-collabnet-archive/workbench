@@ -30,9 +30,9 @@ public final class TextFileWriterImpl implements TextFileWriter {
         }
     }
 
-    private void write(final Writer writer, final String xml) {
+    private void write(final Writer writer, final String content) {
         try {
-            writer.write(xml);
+            writer.write(content);
         } catch (IOException e) {
             throw new CmrscsResultWriterException(e);
         }
