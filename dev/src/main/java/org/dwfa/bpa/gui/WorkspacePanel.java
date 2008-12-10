@@ -37,7 +37,6 @@ import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -198,25 +197,6 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
             this.commit.setText("commit");
             this.commit.setEnabled(false);
         }
-    }
-
-    /**
-     * @param configSide
-     */
-    private void setupConfigSide(JPanel configSide) {
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridx = 0;
-        c.gridy = 0;
-        JScrollPane listScroller = new JScrollPane(panelList);
-        configSide.add(listScroller, c);
-        this.changePanelProperties.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        c.weighty = 0.001;
-        c.gridy = 1;
-        configSide.add(this.changePanelProperties, c);
     }
 
     /**

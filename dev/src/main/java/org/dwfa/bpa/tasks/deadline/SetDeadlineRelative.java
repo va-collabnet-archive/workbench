@@ -109,11 +109,4 @@ public class SetDeadlineRelative extends AbstractTask {
         return CONTINUE_CONDITION;
     }
 
-    /**
-     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-     */
-    public int[] getDataContainerIds() {
-        return new int[] {};
-    }
-
 }

@@ -70,8 +70,8 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
             throws TaskFailedException {
 		try {
 			String msg = (String) process.readProperty(messagePropertyName);
-		       JOptionPane.showMessageDialog(new JFrame(), msg);
-		        return Condition.CONTINUE;
+		    JOptionPane.showMessageDialog(new JFrame(), msg);
+		    return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}

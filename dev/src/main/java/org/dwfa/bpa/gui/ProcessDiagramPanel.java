@@ -57,10 +57,10 @@ import org.dwfa.bpa.dnd.DataContainerTransferable;
 import org.dwfa.bpa.dnd.I_DoDragAndDrop;
 import org.dwfa.bpa.dnd.I_SupportDragAndDrop;
 import org.dwfa.bpa.dnd.TaskTransferable;
-import org.dwfa.bpa.process.I_ContainData;
 import org.dwfa.bpa.process.I_DefineTask;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.tapi.NoMappingException;
 
 
 /**
@@ -87,13 +87,12 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 
     private Map<Integer, TaskPanel> taskPanels = new HashMap<Integer, TaskPanel>();
 
-    private Map<Integer, DataContainerPanel> dataPanels = new HashMap<Integer, DataContainerPanel>();
-
     private I_Work worker;
     private Set<ActionListener> taskAddedActionListeners = new HashSet<ActionListener>();
     
     private int indexSpacer = 10;
 
+    I_HandleDoubleClickInTaskProcess doubleClickHandler;
 
     /**
      * @throws IntrospectionException
@@ -111,12 +110,13 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
      * @throws SecurityException 
      *  
      */
-    public ProcessDiagramPanel(I_EncodeBusinessProcess process, I_Work worker)
+    public ProcessDiagramPanel(I_EncodeBusinessProcess process, I_Work worker, I_HandleDoubleClickInTaskProcess doubleClickHandler)
             throws PropertyVetoException, Exception {
         super();
+        this.doubleClickHandler = doubleClickHandler;
         this.setLayout(null);
         this.dndBean = new BpaDragAndDropBean("ProcessDiagram", this, true,
-                false, Object.class);
+                false);
         this.process = process;
         this.worker = worker;
         this.process.addPropertyChangeListener("currentTaskId", this);
@@ -148,14 +148,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
         while (taskItr.hasNext()) {
             I_DefineTask task = taskItr.next();
             if (task != null) {
-            		addTaskPanel(task);
-            }
-        }
-        Iterator<I_ContainData> dataItr = this.process.getDataContainers().iterator();
-        while (dataItr.hasNext()) {
-            I_ContainData data = dataItr.next();
-            if (data != null) {
-            		this.addDataContainerPanel(data, worker);
+            		addTaskPanel(task, doubleClickHandler);
             }
         }
         updatePreferredSize();
@@ -166,7 +159,6 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
      */
     protected void paintComponent(Graphics g) {
         Map<Integer, Map<MinAndMaxPoint, Point>> verticalRunXs = new HashMap<Integer, Map<MinAndMaxPoint, Point>>();
-        Map destinationForXs = new HashMap();
         Shape clip = g.getClip();
         g.setClip(this.getVisibleRect());
         g.setColor(getBackground());
@@ -189,118 +181,11 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
             Iterator<Branch> branchItr = this.process.getBranches(originTask.getTask())
                     .iterator();
             while (branchItr.hasNext()) {
-                drawBranch(g2, originTask, branchItr, verticalRunXs, destinationForXs);
-            }
-            int[] dataContainerIds = originTask.getTask().getDataContainerIds();
-            for (int i = 0; i < dataContainerIds.length; i++) {
-                int dataId = dataContainerIds[i];
-                if (dataId != -1) {
-                    DataContainerPanel dataPanel = this.dataPanels
-                            .get(new Integer(dataId));
-                    drawDataLink(g2, originTask, dataPanel, verticalRunXs, destinationForXs);
-                }
+                drawBranch(g2, originTask, branchItr, verticalRunXs);
             }
         }
 
     }
-
-    /**
-     * @param g2
-     * @param originTask
-     * @param branchItr
-     */
-    private void drawDataLink(Graphics2D g2, TaskPanel originTask,
-            DataContainerPanel dataPanel, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Map destinationForXs) {
-        Stroke origStroke = g2.getStroke();
-        g2.setColor(Color.ORANGE);
-        //g2.drawRect(x, y, width, height);
-        Point originPt = dataPanel.getBranchEntrancePoint();
-        Iterator<Point> endPointItr = originTask.getDataEntrancePoints(
-                dataPanel.getId()).iterator();
-        while (endPointItr.hasNext()) {
-
-            Point destinationPt = endPointItr.next();
-            destinationPt.x = destinationPt.x - 2;
-            g2.setStroke(new BasicStroke(2.0f));
-
-            GeneralPath polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
-
-            int verticalRunX = Math.max(originPt.x - 10, destinationPt.x - 10);
-            int minY = Math.min(originPt.y, destinationPt.y);
-            int maxY = Math.max(originPt.y, destinationPt.y);
-            int pointsPerLine = 6;
-            MinAndMaxPoint ySpan = new MinAndMaxPoint(minY, maxY);
-            Integer key = new Integer(verticalRunX / pointsPerLine);
-            while (verticalRuns.containsKey(key)) {
-                // will they cross?
-                Map entries = verticalRuns.get(key);
-                boolean crosses = false;
-    		    for (Iterator itr = entries.entrySet().iterator(); itr.hasNext();) {
-		    		Map.Entry entry = (Map.Entry) itr.next();
-		        MinAndMaxPoint existingSpan = (MinAndMaxPoint) entry.getKey();
-		        Point existingDest = (Point) entry.getValue();
-		        if (existingDest.equals(destinationPt)) {
-		        		break;
-		        } else if (existingSpan.crosses(ySpan)) {
-		            crosses = true;
-		            break;
-		        }
-		    }
-                if (crosses) {
-                    verticalRunX = verticalRunX - indexSpacer;
-                    key = new Integer(verticalRunX / pointsPerLine);
-                } else {
-                    break;
-                }
-            }
-
-
-    		if (verticalRuns.containsKey(key)) {
-    			Map<MinAndMaxPoint, Point> entries = verticalRuns.get(key);
-    		    entries.put(ySpan, destinationPt);
-    		} else {
-    		    Map<MinAndMaxPoint, Point> entries = new HashMap<MinAndMaxPoint, Point>();
-    		    entries.put(ySpan, destinationPt);
-    		    verticalRuns.put(key, entries);
-    		}
-            polyline.moveTo(originPt.x, originPt.y);
-            polyline.lineTo(verticalRunX, originPt.y);
-            polyline.lineTo(verticalRunX, destinationPt.y);
-            polyline.lineTo(destinationPt.x - 4, destinationPt.y);
-
-            g2.draw(polyline);
-            g2.setStroke(new BasicStroke(1.0f));
-            int arrowLength = 5;
-            int arrowWidth = 5;
-            polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
-            polyline.moveTo(destinationPt.x - 1, destinationPt.y);
-            polyline.lineTo(destinationPt.x - arrowLength, destinationPt.y
-                    - arrowWidth);
-            polyline.lineTo(destinationPt.x - arrowWidth, destinationPt.y);
-            polyline.lineTo(destinationPt.x - arrowLength, destinationPt.y
-                    + arrowWidth);
-            polyline.lineTo(destinationPt.x - 1, destinationPt.y);
-            g2.fill(polyline);
-        }
-
-        g2.setStroke(origStroke);
-
-    }
-    
-    
-    
-    private void invalidateDataRegions(TaskPanel originTask,
-            DataContainerPanel dataPanel) {
-        int x = Math.min(originTask.getX() - 50, dataPanel.getX() - 50);
-        int y = Math.min(originTask.getY(), dataPanel.getY());
-        int w = Math.max(originTask.getX() + originTask.getWidth(), dataPanel.getX() + dataPanel.getWidth());
-        int h = Math.max(originTask.getY() + originTask.getHeight(), dataPanel.getY() + dataPanel.getHeight());
-        
-        this.repaint(x, y, w, h);
-
-
-    }
-
 
     private class MinAndMaxPoint {
         int minPt;
@@ -356,7 +241,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
      * @param branchItr
      */
     private void drawBranch(Graphics2D g2, TaskPanel originTask,
-            Iterator<Branch> branchItr, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Map destinationForXs) {
+            Iterator<Branch> branchItr, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns) {
         I_Branch branch = branchItr.next();
         TaskPanel destinationTask = this.taskPanels
                 .get(new Integer(branch.getDestinationId()));
@@ -366,22 +251,20 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
             Point originPt = originTask.getBranchExitPoint(branch);
             Point destinationPt = destinationTask.getBranchEntrancePoint();
             if (destinationTask.getLocation().y > originPt.y) {
-            		drawBranchBelow(g2, verticalRuns, originPt, destinationPt, 
-            				destinationForXs);
+            		drawBranchBelow(g2, verticalRuns, originPt, destinationPt);
             } else {
             		if (destinationTask.equals(originTask)) {
-                		drawBranchBelow(g2, verticalRuns, originPt, destinationPt, 
-                				destinationForXs);
+                		drawBranchBelow(g2, verticalRuns, originPt, destinationPt);
             		} else if (destinationTask.getLocation().x > originPt.x) {
                 		    drawBranchAboveRight(g2, verticalRuns, originPt, destinationPt, 
-                		    		destinationTask, destinationForXs);
+                		    		destinationTask);
             				
             		} else {
             			if (originPt.x < 
             					destinationTask.getLocation().x + destinationTask.getWidth() 
             					+ indexSpacer) {
                 		    drawBranchAboveMiddle(g2, verticalRuns, originPt, destinationPt, 
-                		    		destinationTask, destinationForXs);
+                		    		destinationTask);
             				
             			} else if (
         					 (originPt.x > destinationTask.getBranchEntrancePoint().x 
@@ -389,11 +272,11 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
         					  (destinationTask.getBranchEntrancePoint().x > originTask.getLocation().x 
         					  ))) {
             		    drawBranchAboveMiddle(g2, verticalRuns, originPt, destinationPt, 
-            		    		destinationTask, destinationForXs);
+            		    		destinationTask);
         				
         			} else{
            				 drawBranchAboveLeft(g2, verticalRuns, originPt, destinationPt, 
-              		    		originTask, destinationForXs);
+              		    		originTask);
             			}
             		   
             		}
@@ -409,7 +292,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 	 * @param destinationPt
 	 */
 	private void drawBranchAboveRight(Graphics2D g2, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Point originPt, 
-			Point destinationPt, TaskPanel destinationTask, Map destinationForXs) {
+			Point destinationPt, TaskPanel destinationTask) {
 		Stroke origStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 		if (colorForDebug) {
@@ -430,19 +313,18 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		Integer key = new Integer(verticalRunX / pointsPerLine);
 		while (verticalRuns.containsKey(key)) {
 		    // will they cross?
-		    Map entries = verticalRuns.get(key);
+		    Map<MinAndMaxPoint, Point> entries = verticalRuns.get(key);
 		    boolean crosses = false;
-		    for (Iterator itr = entries.entrySet().iterator(); itr.hasNext();) {
-	    		Map.Entry entry = (Map.Entry) itr.next();
-	        MinAndMaxPoint existingSpan = (MinAndMaxPoint) entry.getKey();
-	        Point existingDest = (Point) entry.getValue();
-	        if (existingDest.equals(destinationPt)) {
-	        		break;
-	        } else if (existingSpan.crosses(ySpan)) {
-	            crosses = true;
-	            break;
-	        }
-	    }
+		    for (Map.Entry<MinAndMaxPoint, Point> entry: entries.entrySet()) {
+		        MinAndMaxPoint existingSpan = entry.getKey();
+		        Point existingDest = entry.getValue();
+		        if (existingDest.equals(destinationPt)) {
+		        		break;
+		        } else if (existingSpan.crosses(ySpan)) {
+		            crosses = true;
+		            break;
+		        }
+		    }
 		    if (crosses) {
 		        verticalRunX = verticalRunX - indexSpacer;
 		        key = new Integer(verticalRunX / pointsPerLine);
@@ -467,8 +349,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		g2.draw(polyline);
 
 		g2.setStroke(origStroke);
-		drawBranchBelow(g2, verticalRuns, intermediatePoint, destinationPt
-				, destinationForXs);
+		drawBranchBelow(g2, verticalRuns, intermediatePoint, destinationPt);
 	}
 	
 	/**
@@ -478,7 +359,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 	 * @param destinationPt
 	 */
 	private void drawBranchAboveLeft(Graphics2D g2, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Point originPt, 
-			Point destinationPt, TaskPanel originTask, Map destinationForXs) {
+			Point destinationPt, TaskPanel originTask) {
 		Stroke origStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 		if (colorForDebug) {
@@ -499,12 +380,11 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		Integer key = new Integer(verticalRunX / pointsPerLine);
 		while (verticalRuns.containsKey(key)) {
 		    // will they cross?
-		    Map entries = verticalRuns.get(key);
+		    Map<MinAndMaxPoint, Point> entries = verticalRuns.get(key);
 		    boolean crosses = false;
-		    for (Iterator itr = entries.entrySet().iterator(); itr.hasNext();) {
-	    		Map.Entry entry = (Map.Entry) itr.next();
-	        MinAndMaxPoint existingSpan = (MinAndMaxPoint) entry.getKey();
-	        Point existingDest = (Point) entry.getValue();
+		    for (Map.Entry<MinAndMaxPoint, Point> entry: entries.entrySet()) {
+	        MinAndMaxPoint existingSpan = entry.getKey();
+	        Point existingDest = entry.getValue();
 	        if (existingDest.equals(destinationPt)) {
 	        		break;
 	        } else if (existingSpan.crosses(ySpan)) {
@@ -537,8 +417,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		g2.draw(polyline);
 
 		g2.setStroke(origStroke);
-		drawBranchAbove(g2, verticalRuns, intermediatePoint, destinationPt, 
-				destinationForXs);
+		drawBranchAbove(g2, verticalRuns, intermediatePoint, destinationPt);
 	}
 	
 	/**
@@ -548,7 +427,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 	 * @param destinationPt
 	 */
 	private void drawBranchAboveMiddle(Graphics2D g2, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Point originPt, 
-			Point destinationPt, TaskPanel originTask, Map destinationForXs) {
+			Point destinationPt, TaskPanel originTask) {
 		Stroke origStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 		if (colorForDebug) {
@@ -569,12 +448,11 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		Integer key = new Integer(verticalRunX / pointsPerLine);
 		while (verticalRuns.containsKey(key)) {
 		    // will they cross?
-		    Map entries = verticalRuns.get(key);
+		    Map<MinAndMaxPoint, Point> entries = verticalRuns.get(key);
 		    boolean crosses = false;
-		    for (Iterator itr = entries.entrySet().iterator(); itr.hasNext();) {
-	    		Map.Entry entry = (Map.Entry) itr.next();
-	        MinAndMaxPoint existingSpan = (MinAndMaxPoint) entry.getKey();
-	        Point existingDest = (Point) entry.getValue();
+		    for (Map.Entry<MinAndMaxPoint, Point> entry: entries.entrySet()) {
+	        MinAndMaxPoint existingSpan = entry.getKey();
+	        Point existingDest = entry.getValue();
 	        if (existingDest.equals(destinationPt)) {
 	        		break;
 	        } else if (existingSpan.crosses(ySpan)) {
@@ -609,8 +487,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		g2.draw(polyline);
 
 		g2.setStroke(origStroke);
-		drawBranchBelow(g2, verticalRuns, intermediatePoint, destinationPt, 
-				destinationForXs);
+		drawBranchBelow(g2, verticalRuns, intermediatePoint, destinationPt);
 	}
 	/**
 	 * @param g2
@@ -619,7 +496,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 	 * @param destinationPt
 	 */
 	private void drawBranchBelow(Graphics2D g2, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Point originPt, 
-			Point destinationPt, Map destinationForXs) {
+			Point destinationPt) {
 		Stroke origStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 		if (colorForDebug) {
@@ -637,12 +514,11 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		Integer key = new Integer(verticalRunX / pointsPerLine);
 		while (verticalRuns.containsKey(key)) {
 		    // will they cross?
-		    Map entries = verticalRuns.get(key);
+		    Map<MinAndMaxPoint, Point> entries = verticalRuns.get(key);
 		    boolean crosses = false;
-		    for (Iterator itr = entries.entrySet().iterator(); itr.hasNext();) {
-	    		Map.Entry entry = (Map.Entry) itr.next();
-	        MinAndMaxPoint existingSpan = (MinAndMaxPoint) entry.getKey();
-	        Point existingDest = (Point) entry.getValue();
+		    for (Map.Entry<MinAndMaxPoint, Point> entry: entries.entrySet()) {
+	        MinAndMaxPoint existingSpan = entry.getKey();
+	        Point existingDest = entry.getValue();
 	        if (existingDest.equals(destinationPt)) {
 	        		break;
 	        } else if (existingSpan.crosses(ySpan)) {
@@ -696,7 +572,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 	 * @param destinationPt
 	 */
 	private void drawBranchAbove(Graphics2D g2, Map<Integer, Map<MinAndMaxPoint, Point>> verticalRuns, Point originPt, 
-			Point destinationPt, Map destinationForXs) {
+			Point destinationPt) {
 		Stroke origStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(2.0f));
 		if (colorForDebug) {
@@ -713,12 +589,11 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
 		Integer key = new Integer(verticalRunX / pointsPerLine);
 		while (verticalRuns.containsKey(key)) {
 		    // will they cross?
-		    Map entries = verticalRuns.get(key);
+		    Map<MinAndMaxPoint, Point> entries = verticalRuns.get(key);
 		    boolean crosses = false;
-		    for (Iterator itr = entries.entrySet().iterator(); itr.hasNext();) {
-		    		Map.Entry entry = (Map.Entry) itr.next();
-		        MinAndMaxPoint existingSpan = (MinAndMaxPoint) entry.getKey();
-		        Point existingDest = (Point) entry.getValue();
+		    for (Map.Entry<MinAndMaxPoint, Point> entry: entries.entrySet()) {
+		        MinAndMaxPoint existingSpan = entry.getKey();
+		        Point existingDest = entry.getValue();
 		        if (existingDest.equals(destinationPt)) {
 		        		break;
 		        } else if (existingSpan.crosses(ySpan)) {
@@ -862,16 +737,9 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
             if (I_DefineTask.class.isAssignableFrom(obj.getClass())) {
                 I_DefineTask task = (I_DefineTask) obj;
                 this.process.addTask(task);
-                TaskPanel tp = addTaskPanel(task);
+                TaskPanel tp = addTaskPanel(task, doubleClickHandler);
                 tp.setLocation(location);
                 this.process.setTaskBounds(tp.getId(), tp.getBounds());
-            } else if (I_ContainData.class.isAssignableFrom(obj.getClass())) {
-                I_ContainData data = (I_ContainData) obj;
-                this.process.addDataContainer(data);
-                DataContainerPanel dp = addDataContainerPanel(data, this.worker);
-                dp.setLocation(location);
-                this.process.setDataContainerBounds(data.getId(), dp
-                        .getBounds());
             }
             updatePreferredSize();
             notifyTaskAdded();
@@ -915,10 +783,10 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    private TaskPanel addTaskPanel(I_DefineTask task)
+    private TaskPanel addTaskPanel(I_DefineTask task, I_HandleDoubleClickInTaskProcess doubleClickHandler)
             throws ClassNotFoundException, IntrospectionException,
             InvocationTargetException, IllegalAccessException {
-        TaskPanel tp = new TaskPanel(task, true, false, this.process, null, worker);
+        TaskPanel tp = new TaskPanel(task, true, false, this.process, null, worker, doubleClickHandler);
         tp.addPropertyChangeListener("branch", this);
         tp.addPropertyChangeListener("taskLocation", this);
         this.taskPanels.put(new Integer(tp.getId()), tp);
@@ -941,32 +809,6 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
         return tp;
     }
 
-    /**
-     * @param data
-     * @return
-     * @throws PropertyVetoException
-     * @throws ClassNotFoundException
-     * @throws QueryException
-     * @throws InvalidComponentException
-     * @throws ValidationException
-     * @throws IdentifierIsNotNativeException
-     * @throws NoMappingException
-     * @throws RemoteException
-     * @throws NoSuchMethodException 
-     * @throws SecurityException 
-     */
-    private DataContainerPanel addDataContainerPanel(I_ContainData data,
-            I_Work worker) throws PropertyVetoException, Exception {
-        DataContainerPanel dp = new DataContainerPanel(data, true, false,
-                this.process, worker);
-        dp.addPropertyChangeListener("dataLocation", this);
-        this.dataPanels.put(new Integer(dp.getId()), dp);
-        this.add(dp);
-        dp.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        dp.setSize(dp.getPreferredSize());
-
-        return dp;
-    }
 
     /**
      *  
@@ -1061,21 +903,6 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
             repaintConnectors(tp);
 
             this.updatePreferredSize();
-        } else if (evt.getPropertyName().equals("dataLocation")) {
-            DataContainerPanel dp = (DataContainerPanel) evt.getSource();
-            int dataId = dp.getData().getId();
-            for (Iterator<TaskPanel> itr = taskPanels.values().iterator(); itr.hasNext(); ) {
-                TaskPanel tp = itr.next();
-                int[] dataIds = tp.getTask().getDataContainerIds();
-                for (int i = 0; i < dataIds.length; i++) {
-                    if (dataIds[i] == dataId) {
-                        repaintConnectors(tp);
-                    }
-                }
-            }
-            this.updatePreferredSize();
-            
-            
         } else if (evt.getPropertyName().equals("currentTaskId")) {
             TaskPanel oldCurrentTaskPanel = this.taskPanels.get(evt
                     .getOldValue());
@@ -1146,18 +973,7 @@ public class ProcessDiagramPanel extends JPanel implements I_DoDragAndDrop,
                 }
             }
          }        
-        
-        
-        int[] dataContainerIds = tp.getTask().getDataContainerIds();
-        for (int i = 0; i < dataContainerIds.length; i++) {
-            int dataId = dataContainerIds[i];
-            if (dataId != -1) {
-                DataContainerPanel dataPanel = this.dataPanels
-                        .get(new Integer(dataId));
-                invalidateDataRegions(tp, dataPanel);
-            }
-        }
-    }
+     }
 
     /**
      * @see org.dwfa.bpa.dnd.I_DoDragAndDrop#getLocalFlavors()

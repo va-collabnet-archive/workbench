@@ -275,6 +275,16 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * @return The attachment associated with the key. 
      */
     public Object takeAttachment(String key);
+    
+    /**
+     * Renames an attachment's key, and ensures that all corresponding information (property descriptors, externalization, etc) is 
+     * properly renamed as well. 
+     * @param oldKey the old key for the attachment
+     * @param newKey the new key for the attachment
+     * @throws PropertyVetoException Thrown if the newKey is already used. 
+     */
+    public void renameAttachment(String oldKey, String newKey) throws PropertyVetoException;
+    
     /**
      * @return Collection of all the keys associated with attachments. 
      */
@@ -291,6 +301,8 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
     public void setSubject(String subject) throws PropertyVetoException;
     
     public boolean isPropertyExternal(PropertySpec spec);
+    
+    public PropertySpec getExternalSpec(PropertySpec key);
     
     public void setPropertyExternal(PropertySpec spec, boolean external);
 
@@ -336,6 +348,13 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
     
     public void setMessageRenderer(I_RenderMessage renderer);
     public I_RenderMessage getMessageRenderer();
+    
+    public String getProcessDocumentation(I_RenderDocumentation renderer) throws Exception;
 
+    public String getProcessDocumentation()  throws Exception;
+
+	public String getProcessDocumentationSource();
+	
+	public void setProcessDocumentationSource(String docSource);
 
 }

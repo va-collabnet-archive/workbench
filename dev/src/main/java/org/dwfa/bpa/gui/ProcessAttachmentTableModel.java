@@ -5,6 +5,7 @@
  */
 package org.dwfa.bpa.gui;
 
+import java.beans.PropertyVetoException;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -125,19 +126,22 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int row, int col) {
         if (col == NAME) {
             String oldName = (String) this.getValueAt(row, NAME);
-            Object obj = this.process.takeAttachment(oldName);
-            this.process.writeAttachment((String) value, obj);
+            String newName = (String) value;
+            try {
+				this.process.renameAttachment(oldName, newName);
+			} catch (PropertyVetoException e) {
+				//rename failed, nothing to do. ;
+			}
         } else if (col == VALUE) {
             String name = (String) this.getValueAt(row, NAME);
             Object obj = this.process.takeAttachment(name);
             try {
-                Constructor c = obj.getClass().getConstructor(new Class[] { String.class });
+                Constructor<?> c = obj.getClass().getConstructor(new Class[] { String.class });
                 Object newObj = c.newInstance(new Object[] { value });
                 this.process.writeAttachment(name, newObj);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
             } 
-            
         }
         this.fireTableDataChanged();
     }

@@ -1,8 +1,3 @@
-/*
- * Created on Jan 12, 2006
- *
- * Copyright 2006 by Informatics, Inc. 
- */
 package org.dwfa.bpa.tasks.editor;
 
 import java.awt.Component;
@@ -16,35 +11,38 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
-import org.dwfa.bpa.gui.DataIdPanel;
-import org.dwfa.bpa.gui.TargetAndProcessForEditor;
+import org.dwfa.bpa.gui.DnDropTextLabel;
 
-public class DataIdEditor implements PropertyEditor,
+public class AttachmentNameReadOnlyEditor implements PropertyEditor,
         PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(DataIdEditor.class
+    private static Logger logger = Logger.getLogger(PropertyNameLabelEditor.class
             .getName());
 
-    DataIdPanel dataIdPanel;
+    private JLabel propertyName;
     
     public Class<?> getAcceptableClass() {
         return Object.class;
     }
 
-    public DataIdEditor(Object obj) throws ClassNotFoundException {
-        TargetAndProcessForEditor tpfe = (TargetAndProcessForEditor) obj;
-        this.dataIdPanel = new DataIdPanel(-1, tpfe.getProcess(), getAcceptableClass());
-        this.dataIdPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-        this.dataIdPanel.addPropertyChangeListener("id", this);
+    public AttachmentNameReadOnlyEditor(Object obj) throws ClassNotFoundException {
+    	System.out.println("Creating AttachmentNameReadOnlyEditor for " + obj);
+        //TargetAndProcessForEditor tpfe = (TargetAndProcessForEditor) obj;
+        this.propertyName = new DnDropTextLabel();
+        this.propertyName.setBorder(BorderFactory.createLoweredBevelBorder());
+        this.propertyName.addPropertyChangeListener("text", this);
+        this.setFrozen(true);
     }
 
     /**
      * @return true or false
      * @see java.beans.PropertyEditor#getValue()
      */
-    public Integer getValue() {
-        return dataIdPanel.getId();
+    public String getValue() {
+        return this.propertyName.getText();
     }
 
     /**
@@ -52,11 +50,11 @@ public class DataIdEditor implements PropertyEditor,
      * 
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
-    public void setValue(Integer value) {
+    public void setValue(String value) {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("DataIdEditor setValue: " + value);
+            logger.fine("AttachmentNameLabelEditor setValue: " + value);
         }
-        this.dataIdPanel.setId(value);
+        this.propertyName.setText(value);
         this.firePropertyChange();
     }
 
@@ -74,15 +72,15 @@ public class DataIdEditor implements PropertyEditor,
      *      java.awt.Rectangle)
      */
     public void paintValue(Graphics gfx, Rectangle box) {
-        this.dataIdPanel.setBounds(box);
-        this.dataIdPanel.paintAll(gfx);
+        this.propertyName.setBounds(box);
+        this.propertyName.paintAll(gfx);
     }
 
     /**
      * @see java.beans.PropertyEditor#getJavaInitializationString()
      */
     public String getJavaInitializationString() {
-        return "new Integer(" + this.getValue().toString() + ")";
+        return "new String(\"" + this.getValue().toString() + "\")";
     }
 
     /**
@@ -96,7 +94,7 @@ public class DataIdEditor implements PropertyEditor,
      * @see java.beans.PropertyEditor#setAsText(java.lang.String)
      */
     public void setAsText(String text) throws IllegalArgumentException {
-        this.setValue(new Integer(text));
+        this.setValue(text);
     }
 
     /**
@@ -114,7 +112,7 @@ public class DataIdEditor implements PropertyEditor,
      * @see java.beans.PropertyEditor#getCustomEditor()
      */
     public Component getCustomEditor() {
-        return this.dataIdPanel;
+        return this.propertyName;
     }
 
     /**
@@ -126,10 +124,30 @@ public class DataIdEditor implements PropertyEditor,
         return true;
     }
 
+    private static String defaultText = null;
+
     public void propertyChange(PropertyChangeEvent evt) {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Property changed for DataIdEditor: " + evt);
+            logger.fine("Property changed for PropertyNameLabelEditor: " + evt);
         }
+    	if (defaultText == null) {
+    		try {
+				defaultText = new DnDropTextLabel().getText();
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+    	}
+    	if (isFrozen() && (getValue() != null) && 
+    			((evt.getOldValue() != null) && evt.getOldValue().equals(defaultText) == false)) {
+            logger.info("Cannot change property for embededded process to: " + 
+            		evt.getNewValue() + " from " + evt.getOldValue());
+            JOptionPane.showMessageDialog(propertyName, "Cannot change property for embededded process to: " + 
+            		evt.getNewValue() + " from " + evt.getOldValue());
+            propertyName.removePropertyChangeListener("text", this);
+            propertyName.setText(evt.getOldValue().toString());
+            propertyName.addPropertyChangeListener("text", this);
+    		return;
+    	}
         this.firePropertyChange();
     }
 
@@ -176,7 +194,7 @@ public class DataIdEditor implements PropertyEditor,
             targets = new Vector<PropertyChangeListener>(listeners);
         }
         // Tell our listeners that "everything" has changed.
-        PropertyChangeEvent evt = new PropertyChangeEvent(this.dataIdPanel, "value", null, null);
+        PropertyChangeEvent evt = new PropertyChangeEvent(this.propertyName, "value", null, null);
 
         for (PropertyChangeListener l: targets) {
             l.propertyChange(evt);
@@ -185,8 +203,19 @@ public class DataIdEditor implements PropertyEditor,
 
     private java.util.Vector<PropertyChangeListener> listeners;
 
-    public void setValue(Object value) {
-        this.setValue((Integer)value);
+     public void setValue(Object value) {
+        this.setValue((String)value);
+        this.firePropertyChange();
     }
+    
+    private boolean frozen;
+
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
+	}
 
 }

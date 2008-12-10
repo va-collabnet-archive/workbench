@@ -35,12 +35,14 @@ public class AttachmentPanel extends JPanel implements ActionListener {
     private String key;
     private I_EncodeBusinessProcess process;
     private JButton openButton = new JButton("open");
+    private I_HandleDoubleClickInTaskProcess doubleClickHandler;
 	/**
 	 * @param key
 	 * @param process
 	 */
-	public AttachmentPanel(String key, I_EncodeBusinessProcess process) {
+	public AttachmentPanel(String key, I_EncodeBusinessProcess process, I_HandleDoubleClickInTaskProcess doubleClickHandler) {
         this.setLayout(new GridBagLayout());
+        this.doubleClickHandler = doubleClickHandler;
         GridBagConstraints c = new GridBagConstraints();
 		this.key = key;
         this.process = process;
@@ -87,7 +89,7 @@ public class AttachmentPanel extends JPanel implements ActionListener {
         } else if (I_EncodeBusinessProcess.class.isAssignableFrom(object.getClass())) {
             I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) object;
             try {
-                ProcessPanel panel = new ProcessPanel(process, null);
+                ProcessPanel panel = new ProcessPanel(process, null, doubleClickHandler);
                 new FrameWithOpenFramesListener("Attached Process: " + process.getName(), "Attachment", new JScrollPane(panel));
             } catch (Exception e) {
                 e.printStackTrace();

@@ -1,10 +1,9 @@
+package org.dwfa.bpa.data;
 /*
  * Created on Mar 9, 2005
  *
  * Copyright 2005 by Informatics, Inc. 
  */
-package org.dwfa.bpa.data;
-
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;

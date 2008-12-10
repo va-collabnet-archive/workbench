@@ -219,7 +219,7 @@ public class JTextFieldEditorOneLine implements PropertyEditor, ItemListener {
 
       public void run() {
         PropertyChangeEvent evt = new PropertyChangeEvent(editor, "value",
-            null, null);
+            null, editor.getText());
 
         for (PropertyChangeListener l : targets) {
           l.propertyChange(evt);

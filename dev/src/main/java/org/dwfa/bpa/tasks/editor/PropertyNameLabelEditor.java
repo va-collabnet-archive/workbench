@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import org.dwfa.bpa.gui.DnDropTextLabel;
 
@@ -126,10 +127,30 @@ public class PropertyNameLabelEditor implements PropertyEditor,
         return true;
     }
 
+    private static String defaultText = null;
+
     public void propertyChange(PropertyChangeEvent evt) {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Property changed for PropertyNameLabelEditor: " + evt);
         }
+    	if (defaultText == null) {
+    		try {
+				defaultText = new DnDropTextLabel().getText();
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+    	}
+    	if (isFrozen() && (getValue() != null) && 
+    			((evt.getOldValue() != null) && evt.getOldValue().equals(defaultText) == false)) {
+            logger.info("Cannot change property for embededded process to: " + 
+            		evt.getNewValue() + " from " + evt.getOldValue());
+            JOptionPane.showMessageDialog(propertyName, "Cannot change property for embededded process to: " + 
+            		evt.getNewValue() + " from " + evt.getOldValue());
+            propertyName.removePropertyChangeListener("text", this);
+            propertyName.setText(evt.getOldValue().toString());
+            propertyName.addPropertyChangeListener("text", this);
+    		return;
+    	}
         this.firePropertyChange();
     }
 
@@ -185,9 +206,19 @@ public class PropertyNameLabelEditor implements PropertyEditor,
 
     private java.util.Vector<PropertyChangeListener> listeners;
 
-    public void setValue(Object value) {
+     public void setValue(Object value) {
         this.setValue((String)value);
         this.firePropertyChange();
     }
+    
+    private boolean frozen;
+
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
+	}
 
 }

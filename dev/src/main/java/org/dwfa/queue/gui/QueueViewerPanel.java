@@ -412,7 +412,7 @@ public class QueueViewerPanel extends JPanel {
                         processEntryID = processMeta.getEntryID();
                         try {
                             process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
-                            ProcessPanel processPanel = new ProcessPanel(process, worker);
+                            ProcessPanel processPanel = new ProcessPanel(process, worker, null);
                             int dividerLoc = queueContentsSplitPane.getDividerLocation();
                             queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
                             queueContentsSplitPane.setDividerLocation(dividerLoc);
@@ -550,7 +550,8 @@ public class QueueViewerPanel extends JPanel {
      * @throws PrivilegedActionException
      * @throws ConfigurationException
      */
-    private void getQueues(I_Work worker) throws InterruptedException, RemoteException, PrivilegedActionException,
+    @SuppressWarnings("unchecked")
+	private void getQueues(I_Work worker) throws InterruptedException, RemoteException, PrivilegedActionException,
             ConfigurationException {
         worker.doAsPrivileged(getQueuesAction, null);
     }
@@ -568,7 +569,8 @@ public class QueueViewerPanel extends JPanel {
      * @throws PrivilegedActionException
      * @throws ConfigurationException
      */
-    private class GetQueuesAsWorker implements PrivilegedExceptionAction {
+    @SuppressWarnings("unchecked")
+	private class GetQueuesAsWorker implements PrivilegedExceptionAction {
 
         public Object run() throws Exception {
             ServiceTemplate template = new ServiceTemplate(null, new Class[] { I_QueueProcesses.class }, null);

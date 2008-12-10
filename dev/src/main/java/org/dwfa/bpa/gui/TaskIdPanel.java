@@ -56,9 +56,9 @@ public class TaskIdPanel extends JLabel implements I_DoDragAndDrop, PropertyChan
         super();
         this.process = process;
         if (processOnly) {
-            this.dndBean = new BpaDragAndDropBean("TaskId", this, true, false, I_EncodeBusinessProcess.class);
+            this.dndBean = new BpaDragAndDropBean("TaskId", this, true, false);
         } else {
-            this.dndBean = new BpaDragAndDropBean("TaskId", this, true, false, I_DefineTask.class);
+            this.dndBean = new BpaDragAndDropBean("TaskId", this, true, false);
         }    
         this.setId(id);
         this.updateTextAndTooltip();

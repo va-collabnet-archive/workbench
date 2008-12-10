@@ -1,17 +1,14 @@
 package org.dwfa.bpa.worker.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;

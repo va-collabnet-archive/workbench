@@ -391,4 +391,11 @@ public abstract class AbstractTask  implements I_DefineTask {
         return Introspector.getBeanInfo(this.getClass());
     }
 
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        throw new UnsupportedOperationException();
+    }
+
 }

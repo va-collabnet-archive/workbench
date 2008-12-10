@@ -84,6 +84,7 @@ public interface I_DefineTask extends I_ManageProperties, I_ManageVetoableProper
     /**
      * @return The data container identifiers used by this task. 
      * @model
+     * @deprecated
      */
     public int[] getDataContainerIds();
     /**

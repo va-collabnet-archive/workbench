@@ -6,7 +6,6 @@
 package org.dwfa.bpa.gui;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Vector;
@@ -28,7 +27,7 @@ public class PropertyTableModel extends AbstractTableModel {
 
 	private String[] columnNames = { "Task/Property", "Export" };
 
-	private Vector<PropertyDescriptor> rowData = new Vector<PropertyDescriptor>();
+	private Vector<PropertyDescriptorWithTarget> rowData = new Vector<PropertyDescriptorWithTarget>();
 
 	private I_EncodeBusinessProcess process;
 
@@ -42,7 +41,7 @@ public class PropertyTableModel extends AbstractTableModel {
 			throws RemoteException, IOException, IntrospectionException {
 		super();
 		this.process = process;
-		PropertyDescriptor properties[] = this.process.getAllPropertiesBeanInfo()
+		PropertyDescriptorWithTarget properties[] = (PropertyDescriptorWithTarget[]) this.process.getAllPropertiesBeanInfo()
 				.getPropertyDescriptors();
 		if (properties != null) {
 			for (int i = 0; i < properties.length; i++) {
@@ -101,6 +100,9 @@ public class PropertyTableModel extends AbstractTableModel {
 		fireTableCellUpdated(row, col);
 	}
 
+	public PropertyDescriptorWithTarget getPropertyDescriptor(int row) {
+		return rowData.get(row);
+	}
 	public Class<?> getColumnClass(int c) {
 		switch (c) {
 		case 0:

@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.dwfa.bpa.data.DataContainer;
-
 public class BpaTargetListener implements DropTargetListener {
 
     private static Logger logger = Logger.getLogger("org.dwfa.bpa.dnd");
@@ -26,8 +24,6 @@ public class BpaTargetListener implements DropTargetListener {
     
     private boolean dropHighlight = false;
     
-    private Class<?> acceptableClass = Object.class;
-
     /**
      * @param targetComponent
      * @param prefix
@@ -36,11 +32,10 @@ public class BpaTargetListener implements DropTargetListener {
      * @throws ClassNotFoundException
      */    
     public BpaTargetListener(I_DoDragAndDrop targetComponent,
-            String prefix, Class<?> acceptableClass) throws ClassNotFoundException {
+            String prefix) throws ClassNotFoundException {
         super();
         this.targetComponent = targetComponent;
         this.prefix = prefix;
-        this.acceptableClass = acceptableClass;
     }
 
     /**
@@ -172,7 +167,6 @@ public class BpaTargetListener implements DropTargetListener {
 
     }
 
-    @SuppressWarnings("unchecked")
 	private boolean isDragOk(DropTargetDragEvent ev) {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Target " + this.prefix + " isDragOk targetComponent"
@@ -215,23 +209,6 @@ public class BpaTargetListener implements DropTargetListener {
             return false;
         }
         
-        try {
-            Object t = ev.getTransferable().getTransferData(chosen);
-            if (DataContainer.class.isAssignableFrom(t.getClass())) {
-                DataContainer dc = (DataContainer) t;
-                boolean acceptableSubclass = acceptableClass.isAssignableFrom(dc.getElementClass());
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Acceptable: " + acceptableSubclass + " acceptableClass " + this.acceptableClass + " elementClass"
-                            + dc.getElementClass());
-                }
-                if (acceptableSubclass == false) {
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, e.getMessage(), e);
-            return false;
-        }
         return true;
     }
 }

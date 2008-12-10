@@ -190,7 +190,8 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
     /**
      * @see java.lang.Runnable#run()
      */
-    public void run() {
+    @SuppressWarnings("unchecked")
+	public void run() {
         this.worker.doAsPrivileged(new PrivilegedAction() {
 
             public Object run() {

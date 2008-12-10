@@ -291,8 +291,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
         this.originalBorder = this.getBorder();
         this.highlightForDrop(false);
 
-        this.dtListener = new BpaTargetListener(this, prefix,
-                String.class);
+        this.dtListener = new BpaTargetListener(this, prefix);
         this.dropTarget = new DropTarget(this,
                 this.acceptableActions, this.dtListener, true);
 

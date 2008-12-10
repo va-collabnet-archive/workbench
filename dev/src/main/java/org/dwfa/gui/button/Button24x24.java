@@ -46,15 +46,6 @@ public class Button24x24 extends JButton {
       super(arg0);
       setSize(this, getPixels());
    }
-   @Override
-   public void resize(Dimension arg0) {
-      super.resize(getPixelDim());
-   }
-
-   @Override
-   public void resize(int arg0, int arg1) {
-      super.resize(getPixels(), getPixels());
-   }
 
    @Override
    public void setBounds(int x, int y, int width, int height) {
