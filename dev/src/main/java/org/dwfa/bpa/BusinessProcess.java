@@ -124,16 +124,18 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 			for (PropertyDescriptor d : super.getPropertyDescriptors()) {
 				PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
 				if (PropertyNameLabelEditor.class.isAssignableFrom(d.getPropertyEditorClass())) {
-					d.setPropertyEditorClass(AttachmentNameReadOnlyEditor.class);
-					AttachmentGlue ag = (AttachmentGlue) dwt.getTarget();
-					try {
-						d.setReadMethod(ag.getClass().getMethod("getAttachmentKey", new Class[] {}));
-					} catch (SecurityException e) {
-						throw new RuntimeException(e);
-					} catch (IntrospectionException e) {
-						throw new RuntimeException(e);
-					} catch (NoSuchMethodException e) {
-						throw new RuntimeException(e);
+					if (AttachmentGlue.class.isAssignableFrom(dwt.getTarget().getClass())) {
+						d.setPropertyEditorClass(AttachmentNameReadOnlyEditor.class);
+						AttachmentGlue ag = (AttachmentGlue) dwt.getTarget();
+						try {
+							d.setReadMethod(ag.getClass().getMethod("getAttachmentKey", new Class[] {}));
+						} catch (SecurityException e) {
+							throw new RuntimeException(e);
+						} catch (IntrospectionException e) {
+							throw new RuntimeException(e);
+						} catch (NoSuchMethodException e) {
+							throw new RuntimeException(e);
+						}
 					}
 				}
 				PropertySpec propSpec = PropertySpec.make(dwt, dwt.getTarget());
