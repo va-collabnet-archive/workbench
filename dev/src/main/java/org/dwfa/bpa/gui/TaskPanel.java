@@ -211,7 +211,7 @@ public class TaskPanel extends JPanel implements I_DoDragAndDrop,
 						TaskPanel.this.process.removeTask(TaskPanel.this.task);
 					}
 				} catch (PropertyVetoException e) {
-					logger.log(Level.WARNING, e.toString(), e);
+					ProcessBuilderPanel.getLogWithAlerts().alertAndLogException(e);
 				}
 			}
 		}
