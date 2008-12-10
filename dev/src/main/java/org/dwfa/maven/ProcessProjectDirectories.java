@@ -157,7 +157,6 @@ public class ProcessProjectDirectories extends AbstractMojo {
                                 BufferedInputStream bis = new BufferedInputStream(fis);
                                 ObjectInputStream ois = new ObjectInputStream(bis);
                                 Object obj = ois.readObject();
-                                getLog().info("Read object: " + obj.getClass().toString());
                                 if (MarshalledObject.class.isAssignableFrom(obj.getClass())) {
                                     MarshalledObject mo = (MarshalledObject) obj;
                                     obj = mo.get();
