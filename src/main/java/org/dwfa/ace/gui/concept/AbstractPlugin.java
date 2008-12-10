@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JToggleButton;
@@ -21,8 +22,22 @@ import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.log.AceLog;
 
 public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
-
+   private int lastSelectedIndex = -1;
+   private int pluginId = pluginSequence++;
+   private static int pluginSequence = 0;
+	
+   public int getLastSelectedIndex() {
+		return lastSelectedIndex;
+	}
+   
    public void valueChanged(ListSelectionEvent evt) {
+       // Ignore extra messages.
+       if (evt.getValueIsAdjusting()) {
+           return;
+       }
+       DefaultListSelectionModel lsm = (DefaultListSelectionModel) evt.getSource();
+	  lastSelectedIndex = lsm.getMinSelectionIndex();
+	   AceLog.getAppLog().info("New selection ("+ pluginId + "): " + lastSelectedIndex);
       for (I_HoldRefsetData l: refSetListeners) {
          try {
             l.setComponentId(getComponentId());

@@ -151,9 +151,6 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 					getProgress().getProgressBar().setMaximum(conceptsToFetch.size());
 				}
 			}
-			if (stopWork) {
-				return;
-			}
 			try {
 				get();
 			} catch (InterruptedException e) {
@@ -185,7 +182,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 	Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 
 	I_HostConceptPlugins host;
-	
+
 	public DescriptionsForConceptTableModel(DESC_FIELD[] columns,
 			I_HostConceptPlugins host) {
 		super(columns, host.getConfig());

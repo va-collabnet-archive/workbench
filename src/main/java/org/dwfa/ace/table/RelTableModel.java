@@ -141,11 +141,6 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				}
 				progress.setEnabled(false);
 			}
-			if (stopWork) {
-				updator.normalCompletionForUpdator();
-				fireTableDataChanged();
-				return;
-			}
 			try {
 				referencedConcepts = get();
 			} catch (InterruptedException ex) {

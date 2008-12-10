@@ -3,47 +3,62 @@ package org.dwfa.ace;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.beans.IntrospectionException;
 import java.beans.PropertyVetoException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.security.PrivilegedActionException;
 
-import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.bpa.gui.I_HandleDoubleClickInTaskProcess;
 import org.dwfa.bpa.gui.ProcessBuilderPanel;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.worker.MasterWorker;
 
-public class ProcessBuilderContainer extends JPanel {
+public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleClickInTaskProcess {
 
+	public enum ContainerType { TOP_LEVEL, EMBEDDED_TASK };
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private Configuration config;
+	
+	private I_ConfigAceFrame aceFrameConfig;
+
+	private MasterWorker processWorker;
+
+	private ProcessBuilderPanel processBuilderPanel;
+
 	public ProcessBuilderContainer(Configuration config, I_ConfigAceFrame aceFrameConfig)
-			throws ConfigurationException, LoginException, IOException,
-			PrivilegedActionException, IntrospectionException,
-			InvocationTargetException, IllegalAccessException,
-			PropertyVetoException, ClassNotFoundException,
-			NoSuchMethodException {
+	throws Exception {
+		this(config, aceFrameConfig, ContainerType.TOP_LEVEL);
+	}
+	public ProcessBuilderContainer(Configuration config, I_ConfigAceFrame aceFrameConfig, 
+			ContainerType type)
+			throws Exception {
 		super(new GridBagLayout());
-		MasterWorker processWorker = new MasterWorker(config);
+		this.config = config;
+		this.aceFrameConfig = aceFrameConfig;
+		processWorker = new MasterWorker(config);
 		if (aceFrameConfig == null) {
 			throw new NullPointerException("aceFrameConfig cannot be null...");
 		}
 		processWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
 
-		ProcessBuilderPanel processBuilderPanel = new ProcessBuilderPanel(
+		processBuilderPanel = new ProcessBuilderPanel(
 				config, processWorker);
+		processBuilderPanel.setDoubleClickHandler(this);
+		processBuilderPanel.newProcess();
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -52,14 +67,15 @@ public class ProcessBuilderContainer extends JPanel {
 		c.weighty = 0;
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		add(getProcessBuilderTopPanel(processBuilderPanel), c);
+		add(getProcessBuilderTopPanel(processBuilderPanel, type), c);
 		c.gridy++;
 		c.weighty = 1;
 		c.fill = GridBagConstraints.BOTH;
 		add(processBuilderPanel, c);
 
 	}
-	private static JPanel getProcessBuilderTopPanel(ProcessBuilderPanel processBuilderPanel) {
+	private static JPanel getProcessBuilderTopPanel(ProcessBuilderPanel processBuilderPanel, 
+			ContainerType type) {
 		JPanel listEditorTopPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -68,6 +84,7 @@ public class ProcessBuilderContainer extends JPanel {
 		c.weighty = 0;
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
+		if (type.equals(ContainerType.TOP_LEVEL)) {
 		addActionButton(processBuilderPanel.getNewProcessActionListener(), 
 				"/24x24/plain/cube_molecule_new.png",
 				"new process",
@@ -81,15 +98,27 @@ public class ProcessBuilderContainer extends JPanel {
 				"/24x24/plain/outbox_out.png",
 				"take process (no transaction)",
 				listEditorTopPanel, c);
-		
+		}
 		addActionButton(processBuilderPanel.getSaveProcessActionListener(), 
 				"/24x24/plain/save_to_disk.png",
 				"save process",
 				listEditorTopPanel, c);
-		
+		if (type.equals(ContainerType.TOP_LEVEL)) {
+
 		addActionButton(processBuilderPanel.getSaveForLauncherQueueActionListener(), 
 				"/24x24/plain/inbox_into.png",
 				"save for queue",
+				listEditorTopPanel, c);
+		}
+		if (type.equals(ContainerType.EMBEDDED_TASK)) {
+		addActionButton(processBuilderPanel.getWriteAttachmentActionListener(), 
+				"/24x24/plain/mail_attachment.png",
+				"write attachment",
+				listEditorTopPanel, c);
+		}
+		addActionButton(processBuilderPanel.getClearExecutionRecordsActionListener(), 
+				"/24x24/plain/history_delete.png",
+				"remove history",
 				listEditorTopPanel, c);
 		/*
 		addActionButton(processBuilderPanel.getSaveAsXmlActionListener(), 
@@ -115,6 +144,22 @@ public class ProcessBuilderContainer extends JPanel {
 		newProcess.addActionListener(actionListener);
 		topPanel.add(newProcess, c);
 		c.gridx++;
+	}
+	public void handle(I_EncodeBusinessProcess process, I_Work worker, I_EncodeBusinessProcess parent) {
+		try {
+			ProcessBuilderContainer pbc = new ProcessBuilderContainer(config, aceFrameConfig, 
+					ContainerType.EMBEDDED_TASK);
+			pbc.processBuilderPanel.setStatusPanelVisible(false);
+			pbc.processBuilderPanel.setDoubleClickHandler(pbc);
+			pbc.processBuilderPanel.setProcess(process);
+			pbc.processBuilderPanel.setParentProcess(parent);
+			new FrameWithOpenFramesListener("Embedded Process Editor: "
+					+ process.getName(), "Workflow Bundle", new JScrollPane(pbc));
+		} catch (PropertyVetoException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
 	}
 
 }

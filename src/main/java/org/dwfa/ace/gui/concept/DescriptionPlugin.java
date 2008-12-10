@@ -22,6 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -36,6 +37,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddDescription;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsForConceptTableModel;
@@ -56,6 +58,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	private boolean idToggleState = false;
 	protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
 	private IdPlugin idPlugin;
+	private I_GetConceptData lastSelectedConcept;
 
 	public DescriptionPlugin() {
 		super(true);
@@ -70,7 +73,9 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	@Override
 	public void update() throws IOException {
 		if (host != null) {
-			
+			int lastSelectedRowCount = descTable.getRowCount();
+			int lastSelectedRow = descTable.getSelectedRow();
+			AceLog.getAppLog().info("desc rowcount: " + lastSelectedRowCount + " selected row: " + lastSelectedRow);
 			if (idPlugin != null) {
 				idPlugin.update();
 			}
@@ -95,7 +100,36 @@ public class DescriptionPlugin extends AbstractPlugin implements
 			}
 			setupEditorsAndRenderers(host);
 			descTableModel.propertyChange(evt);
+			
+			if (lastSelectedConcept == host.getTermComponent()) {
+				SwingUtilities.invokeLater(new ReselectRow(lastSelectedRowCount, lastSelectedRow));
+			}
+			lastSelectedConcept = (I_GetConceptData) host.getTermComponent();
 		}
+	}
+	
+	private class ReselectRow implements Runnable {
+
+		int lastSelectedRowCount;
+		int lastSelectedRow;
+
+
+		public ReselectRow(int lastSelectedRowCount, int lastSelectedRow) {
+			super();
+			this.lastSelectedRowCount = lastSelectedRowCount;
+			this.lastSelectedRow = lastSelectedRow;
+		}
+
+
+		public void run() {
+			if (lastSelectedRowCount == descTable.getRowCount()) {
+				descTable.getSelectionModel().setSelectionInterval(lastSelectedRow, lastSelectedRow);
+				AceLog.getAppLog().info("reselecting: " + lastSelectedRow);
+			} else {
+				AceLog.getAppLog().info("rowcount changed to: " + descTable.getRowCount());
+			}
+		}
+		
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {

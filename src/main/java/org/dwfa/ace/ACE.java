@@ -1403,27 +1403,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					aceFrameConfig);
 			descListProcessBuilderPanel = new ProcessBuilderContainer(config,
 					aceFrameConfig);
-		} catch (LoginException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
-		} catch (ConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (PrivilegedActionException e) {
-			throw new RuntimeException(e);
-		} catch (IntrospectionException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (PropertyVetoException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
+		} 
 		searchPanel = new SearchPanel(aceFrameConfig);
 		searchPanel.addComponentListener(new ResizePalettesListener());
 		GridBagConstraints c = new GridBagConstraints();

@@ -1372,33 +1372,41 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             switch (columns[col]) {
             case REFSET_ID:
                 Integer refsetId = (Integer) value;
-                extTuple.getCore().setRefsetId(refsetId);
-                referencedConcepts.put(refsetId, ConceptBean.get(refsetId));
-				changed = true;
-                break;
+                if (refsetId != extTuple.getCore().getRefsetId()) {
+                    extTuple.getCore().setRefsetId(refsetId);
+                    referencedConcepts.put(refsetId, ConceptBean.get(refsetId));
+    				changed = true;
+                }
+                 break;
             case MEMBER_ID:
                 break;
             case COMPONENT_ID:
                 break;
             case STATUS:
                 Integer statusId = (Integer) value;
-                extTuple.setStatus(statusId);
-                referencedConcepts.put(statusId, ConceptBean.get(statusId));
-				changed = true;
-				break;
+                if (statusId != extTuple.getStatus()) {
+                	extTuple.setStatus(statusId);
+                    referencedConcepts.put(statusId, ConceptBean.get(statusId));
+    				changed = true;
+                }
+ 				break;
             case VERSION:
                 break;
             case PATH:
                 break;
             case BOOLEAN_VALUE:
                 Boolean booleanValue = (Boolean) value;
-                ((I_ThinExtByRefPartBoolean) extTuple.getPart()).setValue(booleanValue);
-				changed = true;
+                if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getPart()).getValue()) {
+                    ((I_ThinExtByRefPartBoolean) extTuple.getPart()).setValue(booleanValue);
+    				changed = true;
+                }
                 break;
             case STRING_VALUE:
                 String stringValue = (String) value;
-                ((I_ThinExtByRefPartString) extTuple.getPart()).setStringValue(stringValue);
-				changed = true;
+                if (stringValue.equals(((I_ThinExtByRefPartString) extTuple.getPart()).getStringValue()) == false) {
+                    ((I_ThinExtByRefPartString) extTuple.getPart()).setStringValue(stringValue);
+    				changed = true;
+                }
                 break;
             case CONCEPT_ID:
                 Integer conceptId = (Integer) value;
@@ -1417,6 +1425,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 break;
             case ACCEPTABILITY:
                 Integer acceptabilityId = (Integer) value;
+                // TODO finish the conditional tests...
                 ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setAcceptabilityId(acceptabilityId);
                 referencedConcepts.put(acceptabilityId, ConceptBean.get(acceptabilityId));
 				changed = true;
@@ -1462,8 +1471,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 				changed = true;
                 break;
             }
-            fireTableDataChanged();
 			if (changed) {
+	            fireTableDataChanged();
 				AceLog.getAppLog().info("refset table changed");
 				updateDataAlerts(row);
 			}

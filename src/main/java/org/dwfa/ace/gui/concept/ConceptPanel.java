@@ -77,8 +77,10 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
@@ -279,7 +281,17 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	
 	private GraphPlugin lineageGraphPlugin = new GraphPlugin();
 
-	ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
+	private ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
+	
+	private LanguageRefsetDisplayPlugin auDialectPlugin;
+
+	private LanguageRefsetDisplayPlugin ukDialectPlugin;
+
+	private LanguageRefsetDisplayPlugin usaDialectPlugin;
+
+	private LanguageRefsetDisplayPlugin nzDialectPlugin;
+	
+	private LanguageRefsetDisplayPlugin caDialectPlugin;
 
 	private List<I_PluginToConceptPanel> plugins;
 
@@ -441,6 +453,24 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		super(new GridBagLayout());
 		this.ace = ace;
 		this.panelId = panelId;
+		try {
+			auDialectPlugin = new LanguageRefsetDisplayPlugin(
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids()), false);
+			ukDialectPlugin = new LanguageRefsetDisplayPlugin(
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids()), false);
+			usaDialectPlugin = new LanguageRefsetDisplayPlugin(
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids()), false);
+			nzDialectPlugin = new LanguageRefsetDisplayPlugin(
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids()), false);
+			caDialectPlugin = new LanguageRefsetDisplayPlugin(
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids()), false);
+		} catch (TerminologyException e) {
+			throw new ToIoException(e);
+		}
+
+
+
+
 		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get("tab " + panelId);
 		if (this.tabHistoryList == null) {
 			this.tabHistoryList = new LinkedList<I_GetConceptData>();
@@ -449,16 +479,25 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		UpdateTogglesPropertyChangeListener updateListener = new UpdateTogglesPropertyChangeListener();
 		this.ace.getAceFrameConfig().addPropertyChangeListener(
 				"visibleComponentToggles", updateListener);
+
+		
+		
+		
 		if (ACE.editMode) {
 			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
 					.asList(new I_PluginToConceptPanel[] { idPlugin,
-							conceptAttributePlugin, descPlugin, srcRelPlugin,
+							conceptAttributePlugin, 
+							auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
+							nzDialectPlugin, caDialectPlugin,
+							descPlugin, srcRelPlugin,
 							destRelPlugin, lineagePlugin, lineageGraphPlugin, imagePlugin,
 							conflictPlugin }));
 		} else {
 			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
 					.asList(new I_PluginToConceptPanel[] { idPlugin,
-							conceptAttributePlugin, descPlugin, srcRelPlugin,
+							conceptAttributePlugin, auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
+							nzDialectPlugin, caDialectPlugin,
+							descPlugin, srcRelPlugin,
 							destRelPlugin, lineagePlugin, lineageGraphPlugin}));
 		}
 		ace.getAceFrameConfig().addPropertyChangeListener("uncommitted",
@@ -559,11 +598,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
 		for (I_PluginToConceptPanel plugin : plugins) {
-			for (JComponent component : plugin.getToggleBarComponents()) {
-
-				leftTogglePane.add(component);
+			if (plugin != null) {
+				if (plugin.getToggleBarComponents() != null) {
+					for (JComponent component : plugin.getToggleBarComponents()) {
+						leftTogglePane.add(component);
+					}
+					plugin.addShowComponentListener(l);
+				} else {
+					AceLog.getAppLog().warning(plugin + " has null components");
+				}
+			} else {
+				AceLog.getAppLog().warning(plugin + " is null: " + plugins);
 			}
-			plugin.addShowComponentListener(l);
 		}
 		fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
 
@@ -672,13 +718,19 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 						.showMessageDialog(this, exceptionMessage.toString());
 			}
 		}
+
 		pluginMap.put(TOGGLES.ID, idPlugin);
 		pluginMap.put(TOGGLES.ATTRIBUTES, conceptAttributePlugin);
+		pluginMap.put(TOGGLES.AU_DIALECT, auDialectPlugin);
+		pluginMap.put(TOGGLES.UK_DIALECT, ukDialectPlugin);
+		pluginMap.put(TOGGLES.USA_DIALECT, usaDialectPlugin);
+		pluginMap.put(TOGGLES.NZ_DIALECT, nzDialectPlugin);
+		pluginMap.put(TOGGLES.CA_DIALECT, caDialectPlugin);
 		pluginMap.put(TOGGLES.DESCRIPTIONS, descPlugin);
 		pluginMap.put(TOGGLES.SOURCE_RELS, srcRelPlugin);
 		pluginMap.put(TOGGLES.DEST_RELS, destRelPlugin);
-    pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
-    pluginMap.put(TOGGLES.LINEAGE_GRAPH, lineageGraphPlugin);
+		pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
+		pluginMap.put(TOGGLES.LINEAGE_GRAPH, lineageGraphPlugin);
 		pluginMap.put(TOGGLES.IMAGE, imagePlugin);
 		pluginMap.put(TOGGLES.CONFLICT, conflictPlugin);
 
