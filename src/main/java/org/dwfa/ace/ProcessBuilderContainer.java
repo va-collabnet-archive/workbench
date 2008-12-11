@@ -149,7 +149,7 @@ public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleCli
 		try {
 			ProcessBuilderContainer pbc = new ProcessBuilderContainer(config, aceFrameConfig, 
 					ContainerType.EMBEDDED_TASK);
-			pbc.processBuilderPanel.setStatusPanelVisible(false);
+			pbc.processBuilderPanel.setExecutionButtonsVisible(false);
 			pbc.processBuilderPanel.setDoubleClickHandler(pbc);
 			pbc.processBuilderPanel.setProcess(process);
 			pbc.processBuilderPanel.setParentProcess(parent);
