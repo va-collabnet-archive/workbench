@@ -372,6 +372,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 								+ process.getName(), "Attachment", new JScrollPane(
 								panel));
 					} else {
+						I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) object;
 						doubleClickHandler.handle(process, worker, ProcessPanel.this.process);
 					}
 				} else if (byte[].class.isAssignableFrom(object.getClass())) {

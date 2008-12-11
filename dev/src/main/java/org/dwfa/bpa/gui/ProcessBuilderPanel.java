@@ -729,8 +729,10 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener,
 		tree.setSelectionRow(0);
 	}
 	
-	public void setStatusPanelVisible(boolean visible) {
-		this.statusPanel.setVisible(visible);
+	public void setExecutionButtonsVisible(boolean visible) {
+		this.execute.setVisible(visible);
+		this.cancel.setVisible(visible);
+		this.launch.setVisible(visible);
 	}
 
 	/**
