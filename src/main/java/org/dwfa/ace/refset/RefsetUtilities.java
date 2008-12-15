@@ -32,7 +32,7 @@ public abstract class RefsetUtilities {
 	
 	protected I_GetConceptData pathConcept;
 
-	private I_TermFactory termFactory;
+	protected I_TermFactory termFactory;
 
 	protected int retiredConceptId;
 	protected int currentStatusId;
@@ -143,8 +143,6 @@ public abstract class RefsetUtilities {
 	public List<Integer> getSpecificationRefsets() throws Exception {
 
 		List<Integer> allowedRefsets = new ArrayList<Integer>();
-
-		termFactory = LocalVersionedTerminology.get();
 
 		I_IntSet status = termFactory.newIntSet();
 		status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
@@ -444,4 +442,11 @@ public abstract class RefsetUtilities {
 		return concept;
 	}
 	
+	public String getConceptName(int id) throws TerminologyException, IOException {
+		StringBuffer name = new StringBuffer();
+		I_GetConceptData conceptData = getConcept(id);
+		name.append("Concept[").append(conceptData.getUids().iterator().next());
+		name.append(",\"").append(conceptData).append("\"]");
+		return name.toString();
+	}
 }

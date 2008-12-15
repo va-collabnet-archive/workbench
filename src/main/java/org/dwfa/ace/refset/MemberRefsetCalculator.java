@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -25,9 +24,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * 
- * @author Tore Fjellheim
- *
+ * Generates the corresponding member refsets for the specification refsets. 
  */
 public class MemberRefsetCalculator extends RefsetUtilities {
 
@@ -42,7 +39,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private boolean validateOnly = true;
 	private boolean markParents = true;
 
-	protected I_TermFactory termFactory;
 
 	/**
 	 * The ids of the concepts which may be included in the member set (due to lineage).
@@ -94,6 +90,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		termFactory = LocalVersionedTerminology.get();
 		
 		try {
+
+			setUp();
 			
 			if (useNonTxInterface) {
 				assert changeSetOutputDirectory != null;
@@ -104,7 +102,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 			if (allowedRefsets.size()==0) {
 				allowedRefsets = getSpecificationRefsets();				
 			}
-			setUp();
 
 			/*
 			 * Iterate over the concepts in the specification refset
@@ -341,6 +338,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 
 	private void setUp() throws TerminologyException, IOException {
+		termFactory = LocalVersionedTerminology.get();
+		
 		typeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
 		includeLineage = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_LINEAGE.getUids().iterator().next());
 		includeIndividual = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
@@ -399,6 +398,11 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		}
 
 
+		System.out.println("id for lineage include is " + this.includeLineage);
+		System.out.println("id for lineage exclude is " + this.excludeLineage);
+		System.out.println("id for individual include is " + this.includeIndividual);
+		System.out.println("id for individual exclude is " + this.excludeIndividual);
+		
 		for (Integer refset : newRefsetMembers.keySet()) {
 			ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
 
@@ -415,20 +419,40 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				for (Integer key : keySet) {
 					ConceptRefsetInclusionDetails newMember = newMembers.get(key);
 					ConceptRefsetInclusionDetails old = oldMembers.get(key);
-					if (newMember.getDistance() > old.getDistance()) {
-						conflictWriter.write("Resolving to exclusion: ");
-						newMembersToBeRemoved.add(newMember);
-					} else if (newMember.getDistance() < old.getDistance()) {
+
+					
+					if ((old.getInclusionTypeId() == this.excludeLineage) &&
+							((newMember.getInclusionTypeId() == this.includeLineage) || 
+							 (newMember.getInclusionTypeId() == this.includeIndividual))) {
+						// Resolve the inclusion on the new member
 						conflictWriter.write("Resolving to inclusion: ");
 						oldMembersToBeRemoved.add(old);
-					} else if (newMember.getDistance() == old.getDistance()) {
-						//this is a concept conflicting with itself!
-						conflictWriter.write("Distance to instructions is equal at " + newMember.getDistance() + ", resolving to exclude: ");
+					} else if ((newMember.getInclusionTypeId() == this.excludeLineage) &&
+							((old.getInclusionTypeId() == this.includeLineage) || 
+							 (old.getInclusionTypeId() == this.includeIndividual))) {
+						// Resolve to the inclusion on the old member
+						conflictWriter.write("Resolving to inclusion: ");
 						newMembersToBeRemoved.add(newMember);
+					} else if (newMember.getInclusionTypeId() == this.excludeIndividual) {
+						// Resolve to the exclusion on the new member
+						conflictWriter.write("Resolving to exclusion: ");
+						newMembersToBeRemoved.add(newMember);
+					} else if (old.getInclusionTypeId() == this.excludeIndividual) {
+						// Resolve to the exclusion on the old member
+						conflictWriter.write("Resolving to exclusion: ");
+						oldMembersToBeRemoved.add(newMember);
+					} else {
+						throw new RuntimeException(
+								"Unable to resolve conflict due to unhandled inclusion types! (" 
+								+ getConceptName(newMember.getInclusionTypeId()) + " and " 
+								+ getConceptName(old.getInclusionTypeId()) + ")");
 					}
-					conflictWriter.write(getConcept(newMember.getConceptId()).toString());
-					conflictWriter.write(" because of " + getConcept(newMember.getInclusionReasonId()).toString());
-					conflictWriter.write(" conflicts with " +getConcept(old.getInclusionReasonId()).toString());
+					
+					conflictWriter.write("\"" + getConcept(newMember.getConceptId()));
+					conflictWriter.write("\" because of \"" + getConcept(newMember.getInclusionReasonId()));
+					conflictWriter.write("\" [" + getConcept(newMember.getInclusionTypeId()) + "]");
+					conflictWriter.write(" conflicts with \"" +getConcept(old.getInclusionReasonId()));
+					conflictWriter.write("\" [" + getConcept(old.getInclusionTypeId()) + "]");
 					conflictWriter.newLine();
 				}
 			}
@@ -656,7 +680,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	public void setAllowedRefsets(List<Integer> allowedRefsets) {
 		this.allowedRefsets = allowedRefsets;
 	}
-
 
 	public boolean isMarkParents() {
 		return markParents;
