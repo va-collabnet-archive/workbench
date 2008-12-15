@@ -1,6 +1,8 @@
 package org.dwfa.mojo.refset;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -54,18 +56,34 @@ public class CreateMemberRefset extends AbstractMojo {
 	 */
 	private File changeSetOutputDirectory;
 	
+	/**
+	 * Specification refsets to be processed.
+	 * @parameter
+	 */
+	ConceptDescriptor[] specRefsets = null;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
 			MemberRefsetCalculator calc = new MemberRefsetCalculator();
+			
 			calc.setOutputDirectory(outputDirectory);
 			calc.setChangeSetOutputDirectory(changeSetOutputDirectory);
 			calc.setPathConcept(memberSetPathDescriptor.getVerifiedConcept());
 			calc.setValidateOnly(false);
 			calc.setCommitSize(commitSize);
 			calc.setUseNonTxInterface(useNonTxInterface);
+
+			if (specRefsets != null) {
+		        List<Integer> allowedRefsets = new ArrayList<Integer>();
+		        for (ConceptDescriptor conceptDesc : specRefsets) {
+			        allowedRefsets.add(conceptDesc.getVerifiedConcept().getConceptId());
+		        }
+		        calc.setAllowedRefsets(allowedRefsets);			
+			}
+			
 			calc.run();
+			
 		} catch (Exception e) {
 			throw new MojoExecutionException("member refset calculation failed with exception", e);
 		}
