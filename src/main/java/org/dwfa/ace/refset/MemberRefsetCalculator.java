@@ -22,6 +22,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import static org.dwfa.ace.refset.ConflictReportWriter.RESOLUTION;
 
 /**
  * Generates the corresponding member refsets for the specification refsets. 
@@ -75,8 +76,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private int excludeLineage;
 	private int excludeIndividual;
 
-	private File conflictFile = null;
-	private BufferedWriter conflictWriter = null;
 	private File reportFile = null;
 	private BufferedWriter reportWriter = null;
 
@@ -328,7 +327,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 
 	private void shutDown() throws Exception {
-		conflictWriter.close();
 		reportWriter.close();
 		if (useNonTxInterface) {
 			nonTxWriter.close();
@@ -349,12 +347,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
 		currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 
-		conflictFile = new File(outputDirectory.getAbsolutePath()+File.separatorChar+"reports","conflicts.txt");	
 		reportFile = new File(outputDirectory.getAbsolutePath()+File.separatorChar+"classes","conceptsAddedToRefset.txt");
 		reportFile.getParentFile().mkdirs();
-		conflictFile.getParentFile().mkdirs();
 
-		conflictWriter = new BufferedWriter(new FileWriter(conflictFile));
 		reportWriter = new BufferedWriter(new FileWriter(reportFile));
 
 	}
@@ -406,8 +401,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		for (Integer refset : newRefsetMembers.keySet()) {
 			ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
 
-			conflictWriter.write("\n\nConflicts in refset " + getConcept(refset) + " are: ");
-			conflictWriter.newLine();
+			ConflictReportWriter conflictWriter = 
+				new ConflictReportWriter(outputDirectory.getAbsolutePath() + File.separatorChar + "reports", getConcept(refset));
+
+			// Share the concept cache for quicker lookups 
+			conflictWriter.setConceptCache(conceptCache);
+			
 			ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
 			ClosestDistanceHashSet oldMembers = newRefsetExclusion.get(refset);
 			ClosestDistanceHashSet newMembersToBeRemoved = new ClosestDistanceHashSet();
@@ -420,40 +419,48 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					ConceptRefsetInclusionDetails newMember = newMembers.get(key);
 					ConceptRefsetInclusionDetails old = oldMembers.get(key);
 
+					RESOLUTION resolvedTo = null;
 					
 					if ((old.getInclusionTypeId() == this.excludeLineage) &&
 							((newMember.getInclusionTypeId() == this.includeLineage) || 
 							 (newMember.getInclusionTypeId() == this.includeIndividual))) {
 						// Resolve the inclusion on the new member
-						conflictWriter.write("Resolving to inclusion: ");
 						oldMembersToBeRemoved.add(old);
+						resolvedTo = RESOLUTION.INCLUDE;
+						
 					} else if ((newMember.getInclusionTypeId() == this.excludeLineage) &&
 							((old.getInclusionTypeId() == this.includeLineage) || 
 							 (old.getInclusionTypeId() == this.includeIndividual))) {
 						// Resolve to the inclusion on the old member
-						conflictWriter.write("Resolving to inclusion: ");
 						newMembersToBeRemoved.add(newMember);
+						resolvedTo = RESOLUTION.INCLUDE;
+						
 					} else if (newMember.getInclusionTypeId() == this.excludeIndividual) {
 						// Resolve to the exclusion on the new member
-						conflictWriter.write("Resolving to exclusion: ");
 						newMembersToBeRemoved.add(newMember);
+						resolvedTo = RESOLUTION.EXCLUDE;
+						
 					} else if (old.getInclusionTypeId() == this.excludeIndividual) {
 						// Resolve to the exclusion on the old member
-						conflictWriter.write("Resolving to exclusion: ");
 						oldMembersToBeRemoved.add(newMember);
+						resolvedTo = RESOLUTION.EXCLUDE;
+						
 					} else {
 						throw new RuntimeException(
 								"Unable to resolve conflict due to unhandled inclusion types! (" 
 								+ getConceptName(newMember.getInclusionTypeId()) + " and " 
 								+ getConceptName(old.getInclusionTypeId()) + ")");
 					}
-					
-					conflictWriter.write("\"" + getConcept(newMember.getConceptId()));
-					conflictWriter.write("\" because of \"" + getConcept(newMember.getInclusionReasonId()));
-					conflictWriter.write("\" [" + getConcept(newMember.getInclusionTypeId()) + "]");
-					conflictWriter.write(" conflicts with \"" +getConcept(old.getInclusionReasonId()));
-					conflictWriter.write("\" [" + getConcept(old.getInclusionTypeId()) + "]");
-					conflictWriter.newLine();
+
+					// check for conflict with self and if it is an individual include or exclude - if so suppress conflict from the report
+					if ((newMember.getConceptId() == newMember.getInclusionReasonId() && isIndividualType(newMember.getInclusionTypeId())) ||
+					    (newMember.getConceptId() == old.getInclusionReasonId() && isIndividualType(old.getInclusionTypeId()))) {
+						resolvedTo = null;
+					} else {
+						conflictWriter.addConflict(newMember.getConceptId(), 
+								newMember.getInclusionReasonId(), newMember.getInclusionTypeId(), 
+						        old.getInclusionReasonId(), old.getInclusionTypeId(), resolvedTo);
+					}
 				}
 			}
 
@@ -603,6 +610,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 
 			}
+			
+			new Thread(conflictWriter).start();
 		} 
 	}
 
@@ -690,17 +699,6 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		this.markParents = markParents;
 	}
 
-
-	public File getConflictFile() {
-		return conflictFile;
-	}
-
-
-	public void setConflictFile(File conflictFile) {
-		this.conflictFile = conflictFile;
-	}
-
-
 	public File getReportFile() {
 		return reportFile;
 	}
@@ -740,4 +738,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 		this.changeSetOutputDirectory = changeSetOutputDirectory;
 	}
 
+	private boolean isIndividualType(int typeId) {
+		return ((typeId == this.includeIndividual) || (typeId == this.excludeIndividual));
+	}
 }
