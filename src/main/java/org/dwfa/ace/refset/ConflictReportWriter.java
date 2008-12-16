@@ -23,7 +23,7 @@ public class ConflictReportWriter implements Runnable {
 
 	private static enum FIELD_NAME { INCL_TYPE_A, INCL_TYPE_B, RESOLUTION };
 
-	private static final String reportFilePrefix = "conflicts.";
+	private static final String reportFilePrefix = "conflicts-";
 	private static final String reportFilePostfix = ".txt";
 
 	private File reportFile;
@@ -39,7 +39,7 @@ public class ConflictReportWriter implements Runnable {
 	
 	public ConflictReportWriter(String parentDir, I_GetConceptData refsetConcept) {
 		this.refset = refsetConcept;
-		reportFile = new File(parentDir, reportFilePrefix + refset + reportFilePostfix);
+		reportFile = new File(parentDir, prepareFilename(refset.toString()));
 		reportFile.getParentFile().mkdirs();
 		termFactory = LocalVersionedTerminology.get();
 	}
@@ -149,6 +149,10 @@ public class ConflictReportWriter implements Runnable {
 			conceptCache.put(id, concept);
 		}
 		return concept;
+	}
+	
+	private String prepareFilename(String refsetname) {
+		return reportFilePrefix + refsetname.replace(' ', '-').replace(File.separatorChar, '-') + reportFilePostfix;
 	}
 	
 	/** 
