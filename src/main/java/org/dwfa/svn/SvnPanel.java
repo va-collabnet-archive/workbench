@@ -5,6 +5,10 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
@@ -20,8 +24,10 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.log.HtmlHandler;
 import org.dwfa.queue.ObjectServerCore;
 import org.tigris.subversion.javahl.ClientException;
+import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.Status;
+import org.tigris.subversion.javahl.StatusCallback;
 import org.tigris.subversion.javahl.StatusKind;
 
 public class SvnPanel extends JPanel {
@@ -224,26 +230,7 @@ public class SvnPanel extends JPanel {
 		this.add(new JScrollPane(logOut), c);
 		
 	}
-	
-	private static void logDetails(SubversionData svd) throws ClientException {
-		if (SvnLog.isLoggable(Level.FINE)) {
-			SvnLog.fine("working copy Author: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getAuthor());
-			SvnLog.fine("working copy CopyRev: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getCopyRev());
-			SvnLog.fine("working copy CopyUrl: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getCopyUrl());
-			SvnLog.fine("working copy LastChangedRevision: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastChangedRevision());
-			SvnLog.fine("working copy Name: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getName());
-			SvnLog.fine("working copy NodeKind: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getNodeKind());
-			SvnLog.fine("working copy Repository: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getRepository());
-			SvnLog.fine("working copy Revision: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getRevision());
-			SvnLog.fine("working copy Schedule: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getSchedule());
-			SvnLog.fine("working copy Url: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getUrl());
-			SvnLog.fine("working copy Uuid: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getUuid());
-			SvnLog.fine("working copy LastChangedDate: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastChangedDate());
-			SvnLog.fine("working copy LastChangedRevision: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastChangedRevision());
-			SvnLog.fine("working copy LastDatePropsUpdate: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastDatePropsUpdate());
-			SvnLog.fine("working copy LastDateTextUpdate: " + Svn.getSvnClient().info(svd.getWorkingCopyStr()).getLastDateTextUpdate());
-		}
-	}
+		
 	public static Status[] status(SubversionData svd, SvnPrompter authenticator) {
         Status[] status = null;
         String workingCopy = svd.getWorkingCopyStr();
@@ -254,11 +241,23 @@ public class SvnPanel extends JPanel {
                     ", absolute file:" +new File(workingCopy).getAbsoluteFile());
 		try {
 			handleAuthentication(authenticator);
-			status = Svn.getSvnClient().status(workingCopy, true, false, false);
-			for (Status s: status) {
+			int depth = Depth.unknown;
+            boolean onServer = false;
+            boolean getAll = false;
+            boolean noIgnore = false;
+            boolean ignoreExternals = false;
+            String[] changelists = null;
+            HandleStatus statusHandler = new HandleStatus();
+			Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth,
+		            onServer,
+		            getAll,
+		            noIgnore,
+		            ignoreExternals,
+		            changelists,
+		            statusHandler);
+			for (Status s: statusHandler.getStatusList()) {
 				SvnLog.info("Managed: " + s.isManaged() + " status: " + s.getTextStatusDescription() + " " + s.getPath());	
 			}
-			logDetails(svd);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
@@ -270,7 +269,6 @@ public class SvnPanel extends JPanel {
 		try {
 			handleAuthentication(authenticator);
 			Svn.getSvnClient().cleanup(svd.getWorkingCopyStr());
-			logDetails(svd);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
@@ -290,14 +288,25 @@ public class SvnPanel extends JPanel {
 			for (Status s: status) {
                 if (s.isManaged()) {
                     if (s.getTextStatusDescription().equalsIgnoreCase("missing") ) {
-                        Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", true);
+                    	boolean force = true;
+                        boolean keepLocal = false;
+                        Map<String, String> revpropTable = new HashMap<String, String>();
+                        Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", force,
+                        		keepLocal, revpropTable);
                         SvnLog.info("Removing: " + s.getPath());
                         deletedFiles++;
                     } else if (s.getTextStatusDescription().equalsIgnoreCase("modified") ) {
                         modifiedFiles++;
                     }
                 } else if (s.isIgnored() == false) {
-                    Svn.getSvnClient().add(s.getPath(), true);
+                    int depth = Depth.unknown;
+                    boolean force = false;
+                    boolean noIgnores = false;
+                    boolean addParents = true;
+                    Svn.getSvnClient().add(s.getPath(), depth,
+                            force,
+                            noIgnores,
+                            addParents);
                     SvnLog.info("Adding: " + s.getPath());
                     newFiles++;
 				} else {
@@ -311,30 +320,67 @@ public class SvnPanel extends JPanel {
                 String commitMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), "commit message: ", 
                                                                  defalutMessage, true);
                 handleAuthentication(authenticator);
-                Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, true);
-                logDetails(svd);
-            }
+                int depth = Depth.unknown;
+                boolean noUnlock = true;
+                boolean keepChangelist = false;
+                String[] changelists = null;
+                Map<String, String> revpropTable = new HashMap<String, String>();
+                Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, 
+                		depth,
+                        noUnlock,
+                        keepChangelist,
+                        changelists,
+                        revpropTable);
+             }
 			
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
 		SvnLog.info("finished commit");
 	}
+	
+	private static class HandleStatus implements StatusCallback {
+		List<Status> statusList = new ArrayList<Status>();
+		public List<Status> getStatusList() {
+			return statusList;
+		}
+		public void doStatus(Status s) {
+			statusList.add(s);
+		}
+	}
+	
 	public static void purge(SubversionData svd, SvnPrompter authenticator) {
 		SvnLog.info("Starting purge");
 		try {
 			handleAuthentication(authenticator);
-			Status[] status = Svn.getSvnClient().status(svd.getWorkingCopyStr(), false, false, false);
-			for (Status s: status) {
+			int depth = Depth.unknown;
+            boolean onServer = false;
+            boolean getAll = false;
+            boolean noIgnore = false;
+            boolean ignoreExternals = false;
+            String[] changelists = null;
+            HandleStatus statusHandler = new HandleStatus();
+			Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth,
+		            onServer,
+		            getAll,
+		            noIgnore,
+		            ignoreExternals,
+		            changelists,
+		            statusHandler);
+			for (Status s: statusHandler.getStatusList()) {
 				if (s.isManaged() == true) {
 					if (s.getTextStatus() == StatusKind.missing) {
-						String purgeMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), s.getPath() + " purge message: ", true);
-						Svn.getSvnClient().remove(new String[] {s.getPath() }, purgeMessage, true);
+						String purgeMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), s.getPath() + 
+								" purge message: ", true);
+						boolean force = true;
+						boolean keepLocal = false;
+						Map<String, String> revisionPropMap = new HashMap<String, String>();
+						Svn.getSvnClient().remove(new String[] {s.getPath() }, 
+								purgeMessage, force, keepLocal, revisionPropMap);
 						SvnLog.info("removed: " + s.getPath());
 					}
 				}
 			}
-			logDetails(svd);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
@@ -346,8 +392,16 @@ public class SvnPanel extends JPanel {
 		SvnLog.info("starting update");
 		try {
 			handleAuthentication(authenticator);
-			Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, true);
-			logDetails(svd);
+			int depth = Depth.unknown;
+			boolean depthIsSticky = false;
+			boolean ignoreExternals = false;
+			boolean allowUnverObstructions = false;
+			Svn.getSvnClient().update(svd.getWorkingCopyStr(),
+					Revision.HEAD,
+		            depth,
+		            depthIsSticky,
+		            ignoreExternals,
+		            allowUnverObstructions);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
@@ -359,9 +413,15 @@ public class SvnPanel extends JPanel {
 		SvnLog.info("starting get");
 		try {
 			handleAuthentication(authenticator);
+			Revision revision = Revision.HEAD;
+			Revision pegRevision = Revision.HEAD;
+			int depth = Depth.infinity;
+			boolean ignoreExternals = false;
+			boolean allowUnverObstructions = false;
 			Svn.getSvnClient().checkout(svd.getRepositoryUrlStr(),
-					svd.getWorkingCopyStr(), Revision.HEAD, true);
-			logDetails(svd);
+					svd.getWorkingCopyStr(), revision,
+					pegRevision, depth, ignoreExternals,
+					allowUnverObstructions);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}

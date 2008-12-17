@@ -11,15 +11,19 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import net.jini.config.Configuration;
+import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
@@ -38,303 +42,513 @@ import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.vodb.VodbEnv;
+import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
 
 import com.sun.jini.start.LifeCycle;
 
 public class AceRunner {
 
-   private class CheckIpAddressForChanges implements ActionListener {
+	private class CheckIpAddressForChanges implements ActionListener {
+		InetAddress startupLocalHost;
 
-      public void actionPerformed(ActionEvent arg0) {
-         try {
-            InetAddress currentLocalHost = InetAddress.getLocalHost();
-            if (currentLocalHost.equals(startupLocalHost)) {
-               // all ok
-            } else {
-               JOptionPane.showMessageDialog(null, "<html>Your ip address (" + currentLocalHost.toString()
-                     + ") <br> has changed since startup (" + startupLocalHost.toString()
-                     + ") <br> please restart your application.");
-            }
-         } catch (UnknownHostException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-         }
-      }
+		public CheckIpAddressForChanges() throws UnknownHostException {
+			super();
+			startupLocalHost = InetAddress.getLocalHost();
+		}
 
-   }
+		public void actionPerformed(ActionEvent arg0) {
+			try {
+				InetAddress currentLocalHost = InetAddress.getLocalHost();
+				if (currentLocalHost.equals(startupLocalHost)) {
+					// all ok
+				} else {
+					JOptionPane
+							.showMessageDialog(null, "<html>Your ip address ("
+									+ currentLocalHost.toString()
+									+ ") <br> has changed since startup ("
+									+ startupLocalHost.toString()
+									+ ") <br> please restart your application.");
+				}
+			} catch (UnknownHostException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		}
 
-   @SuppressWarnings("unused")
-   private String[] args;
+	}
 
-   @SuppressWarnings("unused")
-   private LifeCycle lc;
+	private String[] args;
+	private LifeCycle lc;
+	/**
+	 * The jini configuration provider
+	 */
+	protected Configuration jiniConfig;
 
-   protected Configuration config;
+	private static boolean firstStartup = true;
 
-   private InetAddress startupLocalHost;
+	private File aceConfigFile;
 
-   private static boolean firstStartup = true;
+	public AceRunner(String[] args, LifeCycle lc) {
+		try {
+			this.args = args;
+			this.lc = lc;
 
-   CheckIpAddressForChanges ipChangeListener = new CheckIpAddressForChanges();
+			ActivityViewer.setHeadless(false);
 
-   private Timer ipChangeTimer;
-   private boolean listenForIpChanges = false;
+			setupCustomProtocolHandler();
 
-private File aceConfigFile;
+			AceLog.getAppLog().info(
+					"\n*******************\n" + "\n Starting "
+							+ this.getClass().getSimpleName()
+							+ "\n with config file: " + getArgString(args)
+							+ "\n\n******************\n");
 
-   public AceRunner(final String[] args, final LifeCycle lc) {
-      try {
-         ActivityViewer.setHeadless(false);
-         this.args = args;
-         this.lc = lc;
-         AceLog.getAppLog().info("java.protocol.handler.pkgs: " + System.getProperty("java.protocol.handler.pkgs"));
-         URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
-         String argsStr;
-         if (args == null) {
-            argsStr = "null";
-         } else {
-            argsStr = Arrays.asList(args).toString();
-         }
-         AceLog.getAppLog().info(
-               "\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: " + argsStr
-                     + "\n\n******************\n");
-         startupLocalHost = InetAddress.getLocalHost();
-         
-         config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
-         VodbEnv.setTransactional(true);
-         VodbEnv.setTxnNoSync(false);
-         VodbEnv.setDeferredWrite(false);   
+			jiniConfig = ConfigurationProvider.getInstance(args, getClass()
+					.getClassLoader());
 
-         
-         Boolean logTimingInfo = (Boolean) config.getEntry(this.getClass().getName(), "logTimingInfo",
-                                                                 Boolean.class, null);
-         if (logTimingInfo != null) {
-             ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
-         }
-         AceLog.getAppLog().info("logTimingInfo " + logTimingInfo);
-         
-         Long cacheSize = (Long) config.getEntry(this.getClass().getName(), "cacheSize", Long.class, null);
-         AceLog.getAppLog().info("cacheSize " + cacheSize);
-         if (cacheSize != null) {
-             VodbEnv.setCacheSize(cacheSize);
-         }
+			setupLookAndFeel();
+			setupSwingExpansionTimerLogging();
+			setupIpChangeListener();
+			setBerkeleyDbAsTransactional();
 
-         if (listenForIpChanges) {
-             ipChangeTimer = new Timer(2 * 60 * 1000, ipChangeListener);
-             ipChangeTimer.start();
-         }
- 
-         String lookAndFeelClassName = (String) config.getEntry(this.getClass().getName(), "lookAndFeelClassName",
-               String.class, UIManager.getSystemLookAndFeelClassName());
+			Long cacheSize = setBerkeleyDbCacheSize();
 
-         UIManager.setLookAndFeel(lookAndFeelClassName);
+			initialSubversionOperationsAndChangeSetImport(cacheSize);
 
-         String[] svnCheckoutOnStart = (String[]) config.getEntry(this.getClass().getName(), "svnCheckoutOnStart",
-               String[].class, new String[] {});
-         if (svnCheckoutOnStart != null) {
-            for (String svnSpec : svnCheckoutOnStart) {
-               AceLog.getAppLog().info("Got svn spec: " + svnSpec);
-               String[] specParts = new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
-                     svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
-               int server = 0;
-               int local = 1;
-               specParts[local] = specParts[local].replace('/', File.separatorChar);
-               File checkoutLocation = new File(specParts[local]);
-               if (checkoutLocation.exists()) {
-                  // already checked out
-                  AceLog.getAppLog().info(specParts[server] + " already checked out to: " + specParts[local]);
-               } else {
-                  int n = JOptionPane.showConfirmDialog(null,
-                        "Would you like to connect over the network to Subversion?", "Confirm network operation",
-                        JOptionPane.YES_NO_OPTION);
+			aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
+					.getName(), "aceConfigFile", File.class, new File(
+					"src/main/config/config.ace"));
 
-                  if (n == JOptionPane.YES_OPTION) {
-                     try {
-                        // do the checkout...
-                        AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
-                        Svn.getSvnClient().checkout(specParts[server], specParts[local], Revision.HEAD, true);
-                        
-                        // import any change sets that may be downloaded from svn...
-                        File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
-                        "target/berkeley-db"));
-                        
-                        final VodbEnv stealthVodb = new VodbEnv(true);
-                        AceConfig.stealthVodb = stealthVodb;
-                        LocalVersionedTerminology.setStealthfactory(stealthVodb);
-                        stealthVodb.setup(dbFolder, false, cacheSize);
-                        
-                        ChangeSetImporter jcsImporter = new ChangeSetImporter() {
+			if (aceConfigFile.exists()) {
 
-							@Override
-							public I_ReadChangeSet getChangeSetReader(File csf) {
-								BinaryChangeSetReader csr = new BinaryChangeSetReader();
-	                            csr.setChangeSetFile(csf);
-	                            csr.setVodb(stealthVodb);
-	                            return csr;
+				// Put up a dialog to select the configuration file...
+				SwingUtilities.invokeAndWait(new Runnable() {
+
+					public void run() {
+						File profileDir = new File("profiles" + File.separator
+								+ "users");
+						if (profileDir.exists() == false) {
+							profileDir = new File("profiles");
+							if (profileDir.exists() == false) {
+								profileDir.mkdirs();
 							}
-                        	
-                        };
-                        
-                        jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, 
-                        		checkoutLocation.getAbsolutePath(), false, ".jcs");
-                        
-                        stealthVodb.close();
-                        AceConfig.stealthVodb = null;
-                        LocalVersionedTerminology.setStealthfactory(null);
-                        
-                     } catch (Exception e) {
-                         AceConfig.stealthVodb = null;
-                         LocalVersionedTerminology.setStealthfactory(null);
-                        AceLog.getAppLog().alertAndLogException(e);
-                     }
-                  }
-               }
-            }
-            
-            
-         }
+						}
+						try {
+							aceConfigFile = FileDialogUtil.getExistingFile(
+									"Please select your user profile:",
+									new FilenameFilter() {
+										public boolean accept(File dir,
+												String name) {
+											return name.toLowerCase().endsWith(
+													".ace");
+										}
+									}, profileDir);
+						} catch (TaskFailedException e) {
+							AceLog.getAppLog().alertAndLogException(e);
+							System.exit(0);
+						}
+					}
 
-         aceConfigFile = (File) config.getEntry(this.getClass().getName(), "aceConfigFile", File.class, new File(
-               "src/main/config/config.ace"));
+				});
 
-         if (aceConfigFile.exists()) {
-             
-             
-             
-            // Put up a dialog to select the config file...
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-				public void run() {
-		            File profileDir = new File("profiles" + File.separator + "users");
-		            if (profileDir.exists() == false) {
-		               profileDir = new File("profiles");
-		               if (profileDir.exists() == false) {
-		                  profileDir.mkdirs();
-		               }
-		            }
-		            try {
-						aceConfigFile = FileDialogUtil.getExistingFile("Please select your user profile:", new FilenameFilter() {
-						    public boolean accept(File dir, String name) {
-						        return name.toLowerCase().endsWith(".ace");
-						     }
-						  }, profileDir);
-					} catch (TaskFailedException e) {
-				         AceLog.getAppLog().alertAndLogException(e);
-				         System.exit(0);
+				ObjectInputStream ois = new ObjectInputStream(
+						new BufferedInputStream(new FileInputStream(
+								aceConfigFile)));
+				AceConfig.config = (AceConfig) ois.readObject();
+				AceConfig.config.setConfigFile(aceConfigFile);
+				setupDatabase(AceConfig.config);
+			} else {
+				File dbFolder = (File) jiniConfig.getEntry(this.getClass()
+						.getName(), "dbFolder", File.class, new File(
+						"target/berkeley-db"));
+				AceLog.getAppLog().info(
+						"Cache size in config file: " + cacheSize);
+				AceConfig.config = new AceConfig(dbFolder);
+				AceConfig.config.setConfigFile(aceConfigFile);
+				setupDatabase(AceConfig.config);
+				AceConfig.setupAceConfig(AceConfig.config, aceConfigFile,
+						cacheSize, false);
+			}
+			ACE.setAceConfig(AceConfig.config);
+			AceConfig.config.addChangeSetWriters();
+			int successCount = 0;
+			int frameCount = 0;
+			SvnPrompter prompter = new SvnPrompter();
+			for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
+				frameCount++;
+				if (ace.isActive()) {
+					AceFrameConfig afc = (AceFrameConfig) ace;
+					afc.setMasterConfig(AceConfig.config);
+					boolean login = true;
+					while (login) {
+						if (ace.getUsername().equals(prompter.getUsername()) == false
+								|| ace.getPassword().equals(
+										prompter.getPassword()) == false) {
+							prompter.prompt("Please authenticate for: "
+									+ ace.getFrameName(), ace.getUsername());
+						}
+						if (ace.getUsername().equals(prompter.getUsername())
+								&& ace.getPassword().equals(
+										prompter.getPassword())) {
+							if (ace.isAdministrative()) {
+								login = false;
+								successCount++;
+								handleAdministrativeFrame(prompter, ace);
+								
+							} else {
+								login = false;
+								successCount++;
+								handleNormalFrame(ace);
+							}
+						} else {
+							login = false;
+							int n = JOptionPane.showConfirmDialog(null,
+									"Would you like to try again?",
+									"Login failed", JOptionPane.YES_NO_OPTION);
+							if (n == JOptionPane.YES_OPTION) {
+								login = true;
+							}
+						}
 					}
 				}
-            	
-            });
+			}
+			// Execute startup processes here...
 
- 
-            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(aceConfigFile)));
-            AceConfig.config = (AceConfig) ois.readObject();
-            AceConfig.config.setConfigFile(aceConfigFile);
-            setupDatabase(AceConfig.config);
-         } else {
-            File dbFolder = (File) config.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
-                  "target/berkeley-db"));
-            AceLog.getAppLog().info("Cache size in config file: " + cacheSize);
-            AceConfig.config = new AceConfig(dbFolder);
-            AceConfig.config.setConfigFile(aceConfigFile);
-            setupDatabase(AceConfig.config);
-            AceConfig.setupAceConfig(AceConfig.config, aceConfigFile, cacheSize, false);
-         }
-         ACE.setAceConfig(AceConfig.config);
-         AceConfig.config.addChangeSetWriters();
-         int successCount = 0;
-         int frameCount = 0;
-         SvnPrompter prompter = new SvnPrompter();
-         for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
-            frameCount++;
-            if (ace.isActive()) {
-               AceFrameConfig afc = (AceFrameConfig) ace;
-               afc.setMasterConfig(AceConfig.config);
-               boolean login = true;
-               while (login) {
-                  if (ace.getUsername().equals(prompter.getUsername()) == false
-                        || ace.getPassword().equals(prompter.getPassword()) == false) {
-                     prompter.prompt("Please authenticate for: " + ace.getFrameName(), ace.getUsername());
-                  }
-                  if (ace.getUsername().equals(prompter.getUsername())
-                        && ace.getPassword().equals(prompter.getPassword())) {
-                     login = false;
-                     successCount++;
-                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                           try {
-                              boolean startup = firstStartup;
-                              firstStartup = false;
-                              AceFrame af = new AceFrame(args, lc, ace, startup);
-                              af.setVisible(true);
-                           } catch (Exception e) {
-                              AceLog.getAppLog().alertAndLogException(e);
-                           }
-                        }
+			if (successCount == 0) {
+				JOptionPane.showMessageDialog(null,
+						"No frames where opened. Now exiting.",
+						"No successful logins...", JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
+			}
+			File directory = AceConfig.config.getConfigFile().getParentFile();
 
-                     });
-                  } else {
-                     login = false;
-                     int n = JOptionPane.showConfirmDialog(null, "Would you like to try again?", "Login failed",
-                           JOptionPane.YES_NO_OPTION);
-                     if (n == JOptionPane.YES_OPTION) {
-                        login = true;
-                     }
-                  }
-               }
+			if (directory.listFiles() != null) {
+				for (File dir : directory.listFiles()) {
+					processFile(dir, lc);
+				}
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+			System.exit(0);
+		}
+	}
 
-            }
-         }
-         // Execute startup processes here...
+	private void handleNormalFrame(final I_ConfigAceFrame ace) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					boolean startup = firstStartup;
+					firstStartup = false;
+					AceFrame af = new AceFrame(
+							AceRunner.this.args,
+							AceRunner.this.lc, ace, startup);
+					af.setVisible(true);
+				} catch (Exception e) {
+					AceLog.getAppLog()
+							.alertAndLogException(e);
+				}
+			}
 
-         if (successCount == 0) {
-            JOptionPane.showMessageDialog(null, "No frames where opened. Now exiting.", "No successful logins...",
-                  JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
-         }
-         File directory = AceConfig.config.getConfigFile().getParentFile();
+		});
+	}
 
-         if (directory.listFiles() != null) {
-            for (File dir : directory.listFiles()) {
-               processFile(dir, lc);
-            }
-         }
-      } catch (Exception e) {
-         AceLog.getAppLog().alertAndLogException(e);
-         System.exit(0);
-      }
-   }
+	private void handleAdministrativeFrame(SvnPrompter prompter,
+			final I_ConfigAceFrame ace) {
+		String username = prompter.getUsername();
+		String password = prompter.getPassword();
+		boolean tryAgain = true;
+		prompter.setUsername(ace.getAdminUsername());
+		prompter.setPassword("");
+		while (tryAgain) {
+			prompter.prompt(
+							"Please authenticate as an administrative user:",
+							ace.getAdminUsername());
+			if (ace.getAdminUsername().equals(prompter.getUsername())
+					&& ace.getAdminPassword().equals(prompter.getPassword())) {
+				SwingUtilities
+						.invokeLater(new Runnable() {
+							public void run() {
+								try {
+									boolean startup = firstStartup;
+									firstStartup = false;
+									String regularPluginRoot = AceFrame.getPluginRoot();
+									AceFrame.setPluginRoot(AceFrame.getAdminPluginRoot());
+									AceFrame newFrame = new AceFrame(
+											AceRunner.this.args,
+											AceRunner.this.lc,
+											ace,
+											startup);
+									AceFrame.setPluginRoot(regularPluginRoot);
+									ace.setSubversionToggleVisible(true);
+									newFrame.setTitle(newFrame.getTitle().replace(
+															"Editor",
+															"Administrator"));
+									newFrame.setVisible(true);
+								} catch (Exception e) {
+									AceLog.getAppLog().alertAndLogException(e);
+								}
+							}
+						});
 
-   private void setupDatabase(AceConfig aceConfig) throws IOException {
-      if (aceConfig.isDbCreated() == false) {
-         int n = JOptionPane.showConfirmDialog(new JFrame(),
-               "Would you like to extract the db from your maven repository?", "DB does not exist",
-               JOptionPane.YES_NO_OPTION);
-         if (n == JOptionPane.YES_OPTION) {
-            AceConfig.extractMavenLib(aceConfig);
-         } else {
-            AceLog.getAppLog().info("Exiting, user did not want to extract the DB from maven.");
-            return;
-         }
-      }
-   }
+				tryAgain = false;
+				prompter.setPassword("");
+			} else {
+				int n = JOptionPane
+						.showConfirmDialog(
+								null,
+								"Would you like to try again?",
+								"Administrative authentication failed",
+								JOptionPane.YES_NO_OPTION);
+				if (n == JOptionPane.YES_OPTION) {
+					tryAgain = true;
+				} else {
+					tryAgain = false;
+				}
+			}
+		}
+		prompter.setUsername(username);
+		prompter.setPassword(password);
+	}
 
-   private void processFile(File file, LifeCycle lc) throws Exception {
-      if (file.isDirectory() == false) {
-         if (file.getName().equalsIgnoreCase("queue.config") && QueueServer.started(file) == false) {
-            AceLog.getAppLog().info("Found user queue: " + file.getCanonicalPath());
-            new QueueServer(new String[] { file.getCanonicalPath() }, lc);
-         }
-      } else {
-         String fileName = file.getName();
-         if (fileName.equals("queues-maven")) {
-            // ignore these queue directories.
-         } else {
-            for (File f : file.listFiles()) {
-               processFile(f, lc);
-            }
-         }
-      }
-   }
+	private void initialSubversionOperationsAndChangeSetImport(Long cacheSize)
+			throws ConfigurationException {
+		String[] svnCheckoutOnStart = (String[]) jiniConfig.getEntry(this
+				.getClass().getName(), "svnCheckoutOnStart", String[].class,
+				new String[] {});
+		String[] svnUpdateOnStart = (String[]) jiniConfig.getEntry(this
+				.getClass().getName(), "svnUpdateOnStart", String[].class,
+				new String[] {});
+		List<File> changeLocations = new ArrayList<File>();
+		boolean connectToSubversion = false;
+		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
+				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)) {
+			connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
+					.showConfirmDialog(
+							null,
+							"Would you like to connect over the network to Subversion?",
+							"Confirm network operation",
+							JOptionPane.YES_NO_OPTION));
+		}
+
+		if (connectToSubversion) {
+			if (svnCheckoutOnStart != null) {
+				for (String svnSpec : svnCheckoutOnStart) {
+					handleSvnCheckout(changeLocations, svnSpec);
+				}
+			}
+
+			if (svnUpdateOnStart != null) {
+				for (String svnSpec : svnUpdateOnStart) {
+					handleSvnUpdate(changeLocations, svnSpec);
+				}
+			}
+
+			if (changeLocations.size() > 0) {
+				doStealthChangeSetImport(cacheSize, changeLocations);
+			}
+		}
+	}
+
+	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) {
+		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
+		String[] specParts = new String[] {
+				svnSpec.substring(0, svnSpec.lastIndexOf("|")),
+				svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
+		int server = 0;
+		int local = 1;
+		specParts[local] = specParts[local].replace('/', File.separatorChar);
+		File checkoutLocation = new File(specParts[local]);
+		if (checkoutLocation.exists()) {
+			// already checked out
+			AceLog.getAppLog().info(
+					specParts[server] + " already checked out to: "
+							+ specParts[local]);
+		} else {
+
+			try {
+				// do the checkout...
+				AceLog.getAppLog().info(
+						"svn checkout " + specParts[server] + " to: "
+								+ specParts[local]);
+				String moduleName = specParts[server];
+				String destPath = specParts[local];
+				Revision revision = Revision.HEAD;
+				Revision pegRevision = Revision.HEAD;
+				int depth = Depth.infinity;
+				boolean ignoreExternals = false;
+				boolean allowUnverObstructions = false;
+				Svn.getSvnClient().checkout(moduleName, destPath, revision,
+						pegRevision, depth, ignoreExternals,
+						allowUnverObstructions);
+				changeLocations.add(checkoutLocation);
+			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		}
+	}
+
+	private void handleSvnUpdate(List<File> changeLocations, String path) {
+		AceLog.getAppLog().info("Got svn update spec: " + path);
+		try {
+			Revision revision = Revision.HEAD;
+			int depth = Depth.unknown;
+			boolean depthIsSticky = false;
+			boolean ignoreExternals = false;
+			boolean allowUnverObstructions = false;
+			Svn.getSvnClient().update(path, revision, depth, depthIsSticky,
+					ignoreExternals, allowUnverObstructions);
+			changeLocations.add(new File(path));
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+	}
+
+	private void doStealthChangeSetImport(Long cacheSize,
+			List<File> changeLocations) {
+		// import any change sets that may be downloaded
+		// from svn...
+		try {
+			File dbFolder = (File) jiniConfig.getEntry(this.getClass()
+					.getName(), "dbFolder", File.class, new File(
+					"target/berkeley-db"));
+
+			final VodbEnv stealthVodb = new VodbEnv(true);
+			AceConfig.stealthVodb = stealthVodb;
+			LocalVersionedTerminology.setStealthfactory(stealthVodb);
+			stealthVodb.setup(dbFolder, false, cacheSize);
+
+			ChangeSetImporter jcsImporter = new ChangeSetImporter() {
+
+				@Override
+				public I_ReadChangeSet getChangeSetReader(File csf) {
+					BinaryChangeSetReader csr = new BinaryChangeSetReader();
+					csr.setChangeSetFile(csf);
+					csr.setVodb(stealthVodb);
+					return csr;
+				}
+
+			};
+
+			for (File checkoutLocation : changeLocations) {
+				jcsImporter
+						.importAllChangeSets(AceLog.getAppLog().getLogger(),
+								null, checkoutLocation.getAbsolutePath(),
+								false, ".jcs");
+			}
+
+			stealthVodb.close();
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		AceConfig.stealthVodb = null;
+		LocalVersionedTerminology.setStealthfactory(null);
+	}
+
+	private Long setBerkeleyDbCacheSize() throws ConfigurationException {
+		Long cacheSize = (Long) jiniConfig.getEntry(this.getClass().getName(),
+				"cacheSize", Long.class, null);
+		AceLog.getAppLog().info("cacheSize " + cacheSize);
+		if (cacheSize != null) {
+			VodbEnv.setCacheSize(cacheSize);
+		}
+		return cacheSize;
+	}
+
+	private void setupLookAndFeel() throws ConfigurationException,
+			ClassNotFoundException, InstantiationException,
+			IllegalAccessException, UnsupportedLookAndFeelException {
+		String lookAndFeelClassName = (String) jiniConfig.getEntry(this
+				.getClass().getName(), "lookAndFeelClassName", String.class,
+				UIManager.getSystemLookAndFeelClassName());
+
+		UIManager.setLookAndFeel(lookAndFeelClassName);
+	}
+
+	private void setBerkeleyDbAsTransactional() {
+		VodbEnv.setTransactional(true);
+		VodbEnv.setTxnNoSync(false);
+		VodbEnv.setDeferredWrite(false);
+	}
+
+	private void setupIpChangeListener() throws ConfigurationException,
+			UnknownHostException {
+		Boolean listenForIpChanges = (Boolean) jiniConfig.getEntry(this
+				.getClass().getName(), "listenForIpChanges", Boolean.class,
+				null);
+		if (listenForIpChanges != null) {
+			if (listenForIpChanges) {
+				Timer ipChangeTimer = new Timer(2 * 60 * 1000,
+						new CheckIpAddressForChanges());
+				ipChangeTimer.start();
+			}
+		}
+	}
+
+	private void setupSwingExpansionTimerLogging()
+			throws ConfigurationException {
+		Boolean logTimingInfo = (Boolean) jiniConfig.getEntry(this.getClass()
+				.getName(), "logTimingInfo", Boolean.class, null);
+		if (logTimingInfo != null) {
+			ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
+		}
+		AceLog.getAppLog().info(
+				"Swing expansion logTimingInfo " + logTimingInfo);
+	}
+
+	private String getArgString(final String[] args) {
+		String argsStr;
+		if (args == null) {
+			argsStr = "null";
+		} else {
+			argsStr = Arrays.asList(args).toString();
+		}
+		return argsStr;
+	}
+
+	private void setupCustomProtocolHandler() {
+		AceLog.getAppLog().info(
+				"java.protocol.handler.pkgs: "
+						+ System.getProperty("java.protocol.handler.pkgs"));
+		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
+	}
+
+	private void setupDatabase(AceConfig aceConfig) throws IOException {
+		if (aceConfig.isDbCreated() == false) {
+			int n = JOptionPane
+					.showConfirmDialog(
+							new JFrame(),
+							"Would you like to extract the db from your maven repository?",
+							"DB does not exist", JOptionPane.YES_NO_OPTION);
+			if (n == JOptionPane.YES_OPTION) {
+				AceConfig.extractMavenLib(aceConfig);
+			} else {
+				AceLog
+						.getAppLog()
+						.info(
+								"Exiting, user did not want to extract the DB from maven.");
+				return;
+			}
+		}
+	}
+
+	private void processFile(File file, LifeCycle lc) throws Exception {
+		if (file.isDirectory() == false) {
+			if (file.getName().equalsIgnoreCase("queue.config")
+					&& QueueServer.started(file) == false) {
+				AceLog.getAppLog().info(
+						"Found user queue: " + file.getCanonicalPath());
+				new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+			}
+		} else {
+			String fileName = file.getName();
+			if (fileName.equals("queues-maven")) {
+				// ignore these queue directories.
+			} else {
+				for (File f : file.listFiles()) {
+					processFile(f, lc);
+				}
+			}
+		}
+	}
 
 }

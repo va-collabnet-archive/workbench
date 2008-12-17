@@ -48,6 +48,14 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+	public boolean isAdministrative() {
+		return baseFrame.isAdministrative();
+	}
+
+	public void setAdministrative(boolean isAdministrative) {
+		baseFrame.setAdministrative(isAdministrative);
+	}
+
 	Set<I_Position> viewPositionSet;
 
 	I_IntSet allowedStatus;

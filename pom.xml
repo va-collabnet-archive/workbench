@@ -85,12 +85,12 @@
 		<dependency>
 			<groupId>org.tmatesoft.svnkit</groupId>
 			<artifactId>svnkit-javahl</artifactId>
-			<version>1.2.0.4949</version>
+			<version>1.2.1.5297</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tmatesoft.svnkit</groupId>
 			<artifactId>svnkit</artifactId>
-			<version>1.2.0.4949</version>
+			<version>1.2.1.5297</version>
 		</dependency>
 		<dependency>
 			<!-- svnkit dependency -->

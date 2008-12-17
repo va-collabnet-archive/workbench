@@ -213,7 +213,7 @@ public class CollectionEditorContainer extends JPanel {
 		c.gridx++;
 		c.weightx = 0.0;
 
-		File componentPluginDir = new File("plugins" + File.separator + "list");
+		File componentPluginDir = new File(ace.getPluginRoot() + File.separator + "list");
 		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String fileName) {
 				return fileName.toLowerCase().endsWith(".bp");

@@ -78,7 +78,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 31;
+    private static final int dataVersion = 32;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -224,8 +224,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     // 31
     private Map<String, List<I_GetConceptData>> tabHistoryMap = new TreeMap<String, List<I_GetConceptData>>();
+    
+    // 32
+    private boolean isAdministrative = false;
 
-    // transient
+
+	// transient
     private transient MasterWorker worker;
 
     private transient String statusMessage;
@@ -376,6 +380,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             IntList.writeIntList(out, il);
          }
+        
+        // 32
+        out.writeBoolean(isAdministrative);
     }
 
     @SuppressWarnings("unchecked")
@@ -658,6 +665,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             		tabHistoryMap.put(mapId, tabHistoryList);
             	}
             } 
+            if (objDataVersion >= 32) {
+            	isAdministrative = in.readBoolean();
+            } else {
+            	isAdministrative = false;
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -690,6 +702,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         super();
         addListeners();
     }
+    
+    public boolean isAdministrative() {
+		return isAdministrative;
+	}
+
+	public void setAdministrative(boolean isAdministrative) {
+		this.isAdministrative = isAdministrative;
+	}
+
 
     private void addListeners() {
         addRootListener();

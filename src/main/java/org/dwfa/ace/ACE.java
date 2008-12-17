@@ -1305,7 +1305,15 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					+ topPanel.getHeight() + getMenuSpacer() + 1);
 		}
 	}
+	
+	private String pluginRoot;
+	public String getPluginRoot() {
+		return pluginRoot;
+	}
 
+	public ACE(Configuration config) {
+		this(config, "plugins");
+	}
 	/**
 	 * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
 	 * 
@@ -1318,8 +1326,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	 * 
 	 * @throws DatabaseException
 	 */
-	public ACE(Configuration config) {
+	public ACE(Configuration config, String pluginRoot) {
 		super(new GridBagLayout());
+		this.pluginRoot = pluginRoot;
 		try {
 			menuWorker = new MasterWorker(config);
 
@@ -1340,7 +1349,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	private void loadTests(String directory, List<I_TestDataConstraints> list) {
-		File componentPluginDir = new File("plugins" + File.separator
+		File componentPluginDir = new File(getPluginRoot() + File.separator
 				+ directory);
 		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String fileName) {
@@ -1464,7 +1473,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	public void addProcessMenus(JMenuBar menuBar) throws FileNotFoundException,
 			IOException, ClassNotFoundException {
 
-		File menuDir = new File("plugins/menu");
+		File menuDir = new File(pluginRoot + File.separator + "menu");
 		if (menuDir.listFiles() != null) {
 			addProcessMenuItems(menuBar, menuDir);
 		}
@@ -3070,7 +3079,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		// topPanel.add(getComponentToggles2(), c);
 		// c.gridx++;
 
-		File componentPluginDir = new File("plugins" + File.separator
+		File componentPluginDir = new File(getPluginRoot() + File.separator
 				+ "viewer");
 		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String fileName) {

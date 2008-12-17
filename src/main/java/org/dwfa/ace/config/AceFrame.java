@@ -34,6 +34,7 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sun.jini.start.LifeCycle;
@@ -41,7 +42,7 @@ import com.sun.jini.start.LifeCycle;
 public class AceFrame extends ComponentFrame {
 
 	private ACE cdePanel;
-   private AceFrameConfig frameConfig;
+	private AceFrameConfig frameConfig;
 
 	private class AceWindowActionListener implements WindowListener {
 
@@ -50,28 +51,18 @@ public class AceFrame extends ComponentFrame {
 		}
 
 		public void windowClosed(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void windowClosing(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void windowDeactivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void windowDeiconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void windowIconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void windowOpened(WindowEvent e) {
@@ -80,18 +71,33 @@ public class AceFrame extends ComponentFrame {
 
 	}
 
+	private static String pluginRoot = "plugins";
+	public static String getPluginRoot() {
+		return pluginRoot;
+	}
+
+	public static void setPluginRoot(String pluginRoot) {
+		AceFrame.pluginRoot = pluginRoot;
+	}
+
+	public static String getAdminPluginRoot() {
+		return adminPluginRoot;
+	}
+
+	private static String adminPluginRoot = "plugins" + File.separator + "admin";
+	
 	public AceFrame(String[] args, LifeCycle lc, I_ConfigAceFrame frameConfig,
 			boolean executeStartupProcesses) throws Exception {
 		super(args, lc);
-      this.frameConfig = (AceFrameConfig) frameConfig;
-      setTitle(getFrameName());
+		this.frameConfig = (AceFrameConfig) frameConfig;
+		setTitle(getFrameName());
 		((AceFrameConfig) frameConfig).setAceFrame(this);
 		getCdePanel().setup(frameConfig);
 		setContentPane(cdePanel);
-      Rectangle defaultBounds = getDefaultFrameSize();
-      Rectangle bounds = frameConfig.getBounds();
-      bounds.width = Math.min(bounds.width, defaultBounds.width);
-      bounds.height = Math.min(bounds.height, defaultBounds.height);
+		Rectangle defaultBounds = getDefaultFrameSize();
+		Rectangle bounds = frameConfig.getBounds();
+		bounds.width = Math.min(bounds.width, defaultBounds.width);
+		bounds.height = Math.min(bounds.height, defaultBounds.height);
 		setBounds(bounds);
 		doWindowActivation();
 		getQuitList().add(cdePanel);
@@ -101,7 +107,8 @@ public class AceFrame extends ComponentFrame {
 		if (executeStartupProcesses) {
 			File configFile = ((AceFrameConfig) frameConfig).getMasterConfig()
 					.getConfigFile();
-			File startupFolder = new File(configFile.getParentFile().getParentFile(), "startup");
+			File startupFolder = new File(configFile.getParentFile()
+					.getParentFile(), "startup");
 			executeStartupProcesses(worker, startupFolder);
 			startupFolder = new File(configFile.getParentFile(), "startup");
 			executeStartupProcesses(worker, startupFolder);
@@ -111,13 +118,12 @@ public class AceFrame extends ComponentFrame {
 	private void executeStartupProcesses(MasterWorker worker, File startupFolder) {
 		if (startupFolder.exists()) {
 			AceLog.getAppLog().info("Startup folder exists: " + startupFolder);
-			File[] startupFiles = startupFolder
-					.listFiles(new FilenameFilter() {
+			File[] startupFiles = startupFolder.listFiles(new FilenameFilter() {
 
-						public boolean accept(File dir, String name) {
-							return name.endsWith(".bp");
-						}
-					});
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".bp");
+				}
+			});
 			if (startupFiles != null) {
 				Arrays.sort(startupFiles);
 				for (int i = 0; i < startupFiles.length; i++) {
@@ -127,8 +133,7 @@ public class AceFrame extends ComponentFrame {
 										+ startupFiles[i]);
 						FileInputStream fis = new FileInputStream(
 								startupFiles[i]);
-						BufferedInputStream bis = new BufferedInputStream(
-								fis);
+						BufferedInputStream bis = new BufferedInputStream(fis);
 						ObjectInputStream ois = new ObjectInputStream(bis);
 						I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
 								.readObject();
@@ -149,7 +154,8 @@ public class AceFrame extends ComponentFrame {
 								+ startupFolder.exists());
 			}
 		} else {
-			AceLog.getAppLog().info("NO startup folder exists: " + startupFolder);
+			AceLog.getAppLog().info(
+					"NO startup folder exists: " + startupFolder);
 		}
 	}
 
@@ -194,16 +200,71 @@ public class AceFrame extends ComponentFrame {
 
 	private static int count = 0;
 
+	public class NewAceAdminFrame implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+				MarshalledObject marshalledFrame = new MarshalledObject(
+						cdePanel.getAceFrameConfig());
+				AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame
+						.get();
+				newFrameConfig.setMasterConfig((AceConfig) cdePanel
+						.getAceFrameConfig().getDbConfig());
+				newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
+				SvnPrompter prompter = new SvnPrompter();
+				boolean tryAgain = true;
+				while (tryAgain) {
+					prompter.prompt(
+							"Please authenticate as an administrative user:",
+							newFrameConfig.getAdminUsername());
+					if (newFrameConfig.getAdminUsername().equals(
+							prompter.getUsername())
+							&& newFrameConfig.getAdminPassword().equals(
+									prompter.getPassword())) {
+						String regularPluginRoot = pluginRoot;
+						pluginRoot = adminPluginRoot;
+						AceFrame newFrame = new AceFrame(getArgs(), getLc(),
+								newFrameConfig, false);
+						pluginRoot = regularPluginRoot;
+						newFrameConfig.setSubversionToggleVisible(true);
+						newFrameConfig.setAdministrative(true);
+						newFrame.setTitle(newFrame.getTitle().replace("Editor", "Administrator"));
+						newFrame.setVisible(true);
+						tryAgain = false;
+						prompter.setPassword("");
+					} else {
+						int n = JOptionPane.showConfirmDialog(null,
+								"Would you like to try again?",
+								"Administrative authentication failed", JOptionPane.YES_NO_OPTION);
+						if (n == JOptionPane.YES_OPTION) {
+							tryAgain = true;
+						} else {
+							tryAgain = false;
+						}
+					}
+				}
+			} catch (Exception e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+
+		}
+
+	}
+
 	public class NewAceFrame implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
 			try {
-            MarshalledObject marshalledFrame = new MarshalledObject(cdePanel
-                  .getAceFrameConfig());
-            AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
-            newFrameConfig.setMasterConfig((AceConfig) cdePanel.getAceFrameConfig().getDbConfig());
-            newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
-				AceFrame newFrame = new AceFrame(getArgs(), getLc(), newFrameConfig, false);
+				MarshalledObject marshalledFrame = new MarshalledObject(
+						cdePanel.getAceFrameConfig());
+				AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame
+						.get();
+				newFrameConfig.setMasterConfig((AceConfig) cdePanel
+						.getAceFrameConfig().getDbConfig());
+				newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
+
+				AceFrame newFrame = new AceFrame(getArgs(), getLc(),
+						newFrameConfig, false);
 				newFrame.setVisible(true);
 			} catch (Exception e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
@@ -214,43 +275,61 @@ public class AceFrame extends ComponentFrame {
 	}
 
 	public JMenuItem getNewWindowMenu() {
-		JMenuItem newWindow = new JMenuItem("Ace Viewer");
-		newWindow.addActionListener(new NewAceFrame());
-		return newWindow;
+		if (ACE.editMode) {
+			JMenu newAceFrameMenu = new JMenu("ACE Frame");
+			JMenuItem newViewer = new JMenuItem("Ace Editor Frame");
+			newViewer.addActionListener(new NewAceFrame());
+			newAceFrameMenu.add(newViewer);
+			JMenuItem newAdministrator = new JMenuItem(
+					"Ace Administrator Frame");
+			newAdministrator.addActionListener(new NewAceAdminFrame());
+			newAceFrameMenu.add(newAdministrator);
+			return newAceFrameMenu;
+		} else {
+			JMenuItem newViewer = new JMenuItem("Ace Viewer Frame");
+			newViewer.addActionListener(new NewAceFrame());
+			return newViewer;
+		}
 	}
 
-   public String getNextFrameName() throws ConfigurationException {
-      String title = (String) config.getEntry(this.getClass().getName(),
-            "frameName", String.class, "Ace Viewer");
-      if (frameConfig != null) {
-         if (count > 0) {
-            title = "User: " + this.frameConfig.getUsername() + "; Window "+ count;
-         } else {
-            title = "User: " + this.frameConfig.getUsername();
-         }
-         count++;
-      }
-      return title;
-   }
+	public String getNextFrameName() throws ConfigurationException {
+		String title = (String) config.getEntry(this.getClass().getName(),
+				"frameName", String.class, "Ace Viewer");
+		if (ACE.editMode) {
+			title.replace("Viewer", "Editor");
+			title.replace("viewer", "editor");
+		}
+		if (frameConfig != null) {
+			if (count > 0) {
+				title = title + "          User: " + this.frameConfig.getUsername()
+						+ "; Window " + count;
+			} else {
+				title = title + "          User: " + this.frameConfig.getUsername();
+			}
+			count++;
+		}
+		return title;
+	}
 
-   public String getFrameName()  {
-      String title = "Ace Editor";
-         if (count > 0) {
-            title = "User: " + this.frameConfig.getUsername() + "; Window "+ count;
-         } else {
-            title = "User: " + this.frameConfig.getUsername();
-         }
-         if (title.equals(this.getTitle())) {
-            // no increment, redundant call
-         } else {
-            count++;
-         }
-      return title;
-   }
+	public String getFrameName() {
+		String title = "Ace Editor";
+		if (count > 0) {
+			title = title + "          User: " + this.frameConfig.getUsername() + "; Window "
+					+ count;
+		} else {
+			title = title + "          User: " + this.frameConfig.getUsername();
+		}
+		if (title.equals(this.getTitle())) {
+			// no increment, redundant call
+		} else {
+			count++;
+		}
+		return title;
+	}
 
 	public ACE getCdePanel() {
 		if (cdePanel == null) {
-			cdePanel = new ACE(config);
+			cdePanel = new ACE(config, pluginRoot);
 		}
 		return cdePanel;
 	}
@@ -259,14 +338,13 @@ public class AceFrame extends ComponentFrame {
 		return getCdePanel().getBatchConceptList();
 	}
 
-	public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
+	public void performLuceneSearch(String query,
+			List<I_TestSearchResults> extraCriterion) {
 		getCdePanel().performLuceneSearch(query, extraCriterion);
-
 	}
 
 	public void setShowAddresses(boolean show) {
 		getCdePanel().setShowAddresses(show);
-
 	}
 
 	public void setShowComponentView(boolean show) {
@@ -275,7 +353,6 @@ public class AceFrame extends ComponentFrame {
 
 	public void setShowHierarchyView(boolean show) {
 		getCdePanel().setShowHierarchyView(show);
-
 	}
 
 	public void setShowHistory(boolean show) {
@@ -284,12 +361,10 @@ public class AceFrame extends ComponentFrame {
 
 	public void setShowPreferences(boolean show) {
 		getCdePanel().setShowPreferences(show);
-
 	}
 
 	public void setShowSearch(boolean show) {
 		getCdePanel().setShowSearch(show);
-
 	}
 
 	public void showListView() {
@@ -332,26 +407,27 @@ public class AceFrame extends ComponentFrame {
 		return getCdePanel().getListConceptViewer();
 	}
 
-   @Override
-   public boolean okToClose() {
-      if (frameConfig.getMasterConfig().aceFrames.size() > 1) {
-         if (frameConfig.getMasterConfig().aceFrames.contains(this.frameConfig)) {
-            frameConfig.getMasterConfig().aceFrames.remove(this.frameConfig);
-            getQuitList().remove(cdePanel);
-            return true;
-         } else {
-            JOptionPane.showMessageDialog(this, "<html>Cannot close. <br>Ace config is missing the window profile. ");
-            return false;
-         }
-      }
-      if (cfb.quit()) {
-         this.setVisible(false);
-         System.exit(0);
-      }
-      return false;
-      
-   }
-   
-   
+	@Override
+	public boolean okToClose() {
+		if (frameConfig.getMasterConfig().aceFrames.size() > 1) {
+			if (frameConfig.getMasterConfig().aceFrames
+					.contains(this.frameConfig)) {
+				frameConfig.getMasterConfig().aceFrames
+						.remove(this.frameConfig);
+				getQuitList().remove(cdePanel);
+				return true;
+			} else {
+				JOptionPane
+						.showMessageDialog(this,
+								"<html>Cannot close. <br>Ace config is missing the window profile. ");
+				return false;
+			}
+		}
+		if (cfb.quit()) {
+			this.setVisible(false);
+			System.exit(0);
+		}
+		return false;
+	}
 
 }

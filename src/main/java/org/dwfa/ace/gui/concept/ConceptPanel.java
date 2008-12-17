@@ -657,7 +657,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.fill = GridBagConstraints.HORIZONTAL;
 		toggleBar.add(new JPanel(), c);
 
-		File componentPluginDir = new File("plugins" + File.separator
+		File componentPluginDir = new File(ace.getPluginRoot() + File.separator
 				+ "component");
 		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String fileName) {
