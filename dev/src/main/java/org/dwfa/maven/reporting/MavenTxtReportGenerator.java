@@ -155,7 +155,7 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 
 		BufferedReader reader = null;
 		int i = -1;
-		String addition = "";
+		StringBuilder addition = new StringBuilder();
 		try {
 			reader = new BufferedReader(new FileReader(f));
 			String line = reader.readLine();
@@ -173,7 +173,7 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 						header = formatline.substring(formatline.indexOf("header: ")+8); 
 					}
 				}
-				addition = addition + "<tr>";
+				addition.append("<tr>");
 				
 				if (line==null && format.exists()) {
 					if (header ==  null) {
@@ -182,21 +182,19 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 					headerdata.put(f.getName().replaceAll(".txt", ".html"),header);	
 				} else {
 					for (String s: fields) {
-						addition = addition + "<td>";
+						addition.append("<td>");
 						try {
-							addition = addition + transform.transform(s);
-							addition = addition.replaceAll(":::", "<");
-							addition = addition.replaceAll("::", ">");
+							addition.append(transform.transform(s).replaceAll(":::", "<").replaceAll("::", ">"));
 						} catch (Exception e) {
 							getLog().info("Cannot transform data to XML compliant text");
 						}						
-						addition = addition + "</td>";
+						addition.append("</td>");
 					}
 				}
-				addition = addition + "</tr>";
+				addition.append("</tr>");
 			}
 
-			createXDoc(filename,f.getName().substring(0,f.getName().lastIndexOf(".")),addition);
+			createXDoc(filename,f.getName().substring(0,f.getName().lastIndexOf(".")),addition.toString());
 		} catch (IOException e) {
 			System.out.println("no report file");
 		}
