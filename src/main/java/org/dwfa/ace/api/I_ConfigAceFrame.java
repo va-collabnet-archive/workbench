@@ -27,6 +27,10 @@ public interface I_ConfigAceFrame {
 	public boolean isActive();
 
 	public void setActive(boolean active);
+	
+    public boolean isAdministrative();
+
+	public void setAdministrative(boolean isAdministrative);
 
 	public I_IntSet getAllowedStatus();
 
