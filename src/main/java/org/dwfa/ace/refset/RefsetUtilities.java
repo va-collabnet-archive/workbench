@@ -28,7 +28,9 @@ import org.dwfa.tapi.spec.ConceptSpec;
 
 public abstract class RefsetUtilities {
 
-	public final int ID_NOT_FOUND = 0;
+	public final int ID_NOT_FOUND = 0;    
+
+    protected I_GetConceptData altIsA = null;
 	
 	protected I_GetConceptData pathConcept;
 
@@ -77,10 +79,10 @@ public abstract class RefsetUtilities {
 
 		Set<Integer> parents = new HashSet<Integer>();
 
-		I_GetConceptData concept = getConcept(conceptId);
+        I_GetConceptData concept = getConcept(conceptId);
 		List<I_RelTuple> parenttuples = concept.getSourceRelTuples(
-				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
-				getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
+				getStatuses(), 
+				(this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
 
 		/*
 		 * Iterate over children
@@ -89,8 +91,7 @@ public abstract class RefsetUtilities {
 
 			List<I_ConceptAttributeTuple> atts = getConcept(parent.getC2Id()).getConceptAttributeTuples(null, null);
 			I_ConceptAttributeTuple att = getLatestAttribute(atts);
-			if (att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
-				att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId()) {
+			if (isValidStatus(att)) {
 				parents.add(parent.getC2Id());				
 			}
 		}
@@ -98,7 +99,22 @@ public abstract class RefsetUtilities {
 		return parents;
 	}
 
-	public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) throws IOException, Exception {
+    private I_IntSet getStatuses() throws Exception {
+        return getIntSet(ArchitectonicAuxiliary.Concept.CURRENT,
+                ArchitectonicAuxiliary.Concept.PENDING_MOVE, 
+                ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED,
+                ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE);
+    }
+
+
+    private boolean isValidStatus(I_ConceptAttributeTuple att) throws TerminologyException, IOException {
+        return att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
+            att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId() ||
+                att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId() ||
+                att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId();
+    }
+
+    public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) throws IOException, Exception {
 
 		Set<Integer> allParents = new HashSet<Integer>();
 
@@ -112,7 +128,6 @@ public abstract class RefsetUtilities {
 		return allParents;
 	}
 
-
 	public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
 
 		List<Integer> children = new ArrayList<Integer>();
@@ -122,8 +137,8 @@ public abstract class RefsetUtilities {
 		 * Find all children
 		 **/
 		List<I_RelTuple> childrentuples = concept.getDestRelTuples(
-				getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE), 
-				getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
+				getStatuses(),
+				(this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
 
 		/*
 		 * Iterate over children
@@ -132,15 +147,15 @@ public abstract class RefsetUtilities {
 
 			List<I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(null, null);
 			I_ConceptAttributeTuple att = getLatestAttribute(atts);
-			if (att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
-				att.getConceptStatus()==termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId()) {
+			if (isValidStatus(att)) {
 				children.add(child.getC1Id());				
 			}
 		} 
 		return children;
 	}
 
-	public List<Integer> getSpecificationRefsets() throws Exception {
+
+    public List<Integer> getSpecificationRefsets() throws Exception {
 
 		List<Integer> allowedRefsets = new ArrayList<Integer>();
 
@@ -148,8 +163,12 @@ public abstract class RefsetUtilities {
 		status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
 
 		I_IntSet is_a = termFactory.newIntSet();
-		is_a.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
-		is_a.add(termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getUids()).getConceptId());
+        if (this.altIsA == null) {
+            is_a.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+		    is_a.add(termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getUids()).getConceptId());
+        } else {
+            is_a.add(this.altIsA.getConceptId());
+        }
 
 		I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
@@ -199,6 +218,16 @@ public abstract class RefsetUtilities {
 			status.add(concept.localize().getNid());
 		}
 
+		return status;
+	}
+
+    protected I_IntSet getIntSet(I_GetConceptData... concepts) throws Exception {
+		I_IntSet status = termFactory.newIntSet();
+
+		for (I_GetConceptData concept : concepts) {
+			status.add(concept.getConceptId());
+		}
+		assert status.getSetValues().length > 0: "getIntSet returns an empty set";
 		return status;
 	}
 
@@ -441,7 +470,11 @@ public abstract class RefsetUtilities {
 		}
 		return concept;
 	}
-	
+
+    public void setAltIsA(I_GetConceptData altIsA) {
+        this.altIsA = altIsA;
+    }
+
 	public String getConceptName(int id) throws TerminologyException, IOException {
 		StringBuffer name = new StringBuffer();
 		I_GetConceptData conceptData = getConcept(id);

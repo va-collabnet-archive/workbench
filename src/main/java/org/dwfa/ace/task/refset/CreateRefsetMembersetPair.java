@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.ConceptConstants;
@@ -26,7 +24,6 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -37,7 +34,7 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 	
 	private I_ConfigAceFrame config;
 	private I_TermFactory termFactory;
@@ -47,22 +44,29 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 	private I_GetConceptData newMembersetConcept = null;
 	
 	private I_GetConceptData selectedConcept = null;
-	
+    private I_GetConceptData isAConcept = null;
+
     private enum SetType{REFSET,MEMBERSET};
 	
     private String propName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
+    private String altIsA = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
     
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(propName);
+        out.writeObject(altIsA);        
 	}//End method writeObject
 
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
+        if (objDataVersion == dataVersion) {
+            propName = (String) in.readObject();
+            altIsA = (String) in.readObject();
+        } else if (objDataVersion == 1) {
 			propName = (String) in.readObject();
+            altIsA = null;
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -76,8 +80,16 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 	public void setPropName(String propName) {
 		this.propName = propName;
 	}
-		
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
+
+    public String getAltIsA() {
+        return altIsA;
+    }
+
+    public void setAltIsA(String altIsA) {
+        this.altIsA = altIsA;
+    }
+
+    public void complete(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		// Nothing to do...
 	}//End method complete
@@ -92,7 +104,13 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 		
 		try{
 			selectedConcept = config.getHierarchySelection();
-			
+			String altIsAUuid = process.readProperty(altIsA) != null ? (String) process.readProperty(altIsA) : null;
+            if (altIsAUuid != null) {
+                this.isAConcept = termFactory.getConcept(new UUID[] { UUID.fromString(altIsAUuid) });
+            } else {
+                this.isAConcept = termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getNid()); //rel type
+            }
+
 			if(isValidParent()){
 				/*
 				 * Create a new concept for the Memberset
@@ -226,13 +244,13 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 			I_GetConceptData relChar = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid());
 			I_GetConceptData refinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
 			I_GetConceptData relStat = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-			
+
 			/*
 			 * Create default "is a" relationship
 			 */
 			termFactory.newRelationship(UUID.randomUUID()
 					, concept
-					, termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getNid()) //rel type
+					, this.isAConcept //rel type
 					, selectedConcept //dest concept
 					, relChar
 					, refinability
@@ -284,7 +302,7 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 			 */
 			termFactory.newRelationship(UUID.randomUUID()
 					, concept
-					, termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getNid()) //rel type
+					, this.isAConcept //rel type
 					, selectedConcept //dest concept
 					, relChar
 					, refinability

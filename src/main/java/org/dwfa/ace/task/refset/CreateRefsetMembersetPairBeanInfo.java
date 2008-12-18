@@ -20,8 +20,15 @@ public class CreateRefsetMembersetPairBeanInfo extends SimpleBeanInfo{
     		propName.setPropertyEditorClass(PropertyNameLabelEditor.class);
     		propName.setDisplayName("<html><font color='green'>Concept property:");
     		propName.setShortDescription("Name of the property containing the concept. ");
+
+            PropertyDescriptor altIsAUuid =
+    			new PropertyDescriptor("altIsA", CreateRefsetMembersetPair.class);
+    		altIsAUuid.setBound(true);
+    		altIsAUuid.setPropertyEditorClass(PropertyNameLabelEditor.class);
+    		altIsAUuid.setDisplayName("<html><font color='green'>Alt IS_A (optional):");
+    		altIsAUuid.setShortDescription("An alternate 'is a' relationship UUID (default = SNOMED 'Is a')");
     	
-    		PropertyDescriptor rv[] = {propName};
+    		PropertyDescriptor rv[] = {propName, altIsAUuid};
     		return rv;
     	} catch (IntrospectionException e) {
     		throw new Error(e.toString());
