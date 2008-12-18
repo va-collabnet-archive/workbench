@@ -48,6 +48,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+	public void svnCompleteRepoInfo(SubversionData svd) {
+		baseFrame.svnCompleteRepoInfo(svd);
+	}
+
 	public boolean isAdministrative() {
 		return baseFrame.isAdministrative();
 	}

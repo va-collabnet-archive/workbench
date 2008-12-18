@@ -975,21 +975,19 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private class SubversionPaletteActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (subversionPalette == null) {
-				try {
-					makeSubversionPalette();
-				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
+			try {
+				updateSvnPalette();
+				setInitialSvnPosition();
+				if (showSubversionButton.isSelected()) {
+					subversionPalette.setVisible(true);
+					getRootPane().getLayeredPane().moveToFront(subversionPalette);
+					deselectOthers(showSubversionButton);
 				}
+				subversionPalette.togglePalette(((JToggleButton) e.getSource())
+						.isSelected());
+			} catch (Exception e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
 			}
-			setInitialSvnPosition();
-			if (showSubversionButton.isSelected()) {
-				subversionPalette.setVisible(true);
-				getRootPane().getLayeredPane().moveToFront(subversionPalette);
-				deselectOthers(showSubversionButton);
-			}
-			subversionPalette.togglePalette(((JToggleButton) e.getSource())
-					.isSelected());
 		}
 
 	}
@@ -1793,6 +1791,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private QueuesPaletteActionListener showQueuesActionListener;
 
 	private JToggleButton showSignpostPanelToggle;
+	private JTabbedPane svnTabs;
 
 	private static boolean runShutdownProcesses = true;
 
@@ -1889,12 +1888,14 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	}
 
-	private void makeSubversionPalette() throws Exception {
+	private void updateSvnPalette() throws Exception {
 		if (subversionPalette == null) {
 			JLayeredPane layers = getRootPane().getLayeredPane();
 			subversionPalette = new CdePalette(new BorderLayout(),
 					new RightPalettePoint());
-			JTabbedPane svnTabs = new JTabbedPane();
+			if (svnTabs == null) {
+				svnTabs = new JTabbedPane();
+			}
 			AceLog.getAppLog().info(
 					"Subversion entries: "
 							+ aceFrameConfig.getSubversionMap().keySet());
@@ -1909,6 +1910,19 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					.setBorder(BorderFactory.createRaisedBevelBorder());
 
 			subversionPalette.setVisible(false);
+		} else {
+			HashSet<String> tabTitles = new HashSet<String>();
+			if (svnTabs.getTabCount() != aceFrameConfig.getSubversionMap().keySet().size()) {
+				for (int i = 0; i < svnTabs.getTabCount(); i++) {
+					tabTitles.add(svnTabs.getTitleAt(i));
+				}
+				for (String key : aceFrameConfig.getSubversionMap().keySet()) {
+					if (tabTitles.contains(key) == false) {
+						SvnPanel svnTable = new SvnPanel(aceFrameConfig, key);
+						svnTabs.addTab(key, svnTable);
+					}
+				}
+			}
 		}
 	}
 
@@ -3522,7 +3536,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public void setupSvn() {
 		try {
-			makeSubversionPalette();
+			updateSvnPalette();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}

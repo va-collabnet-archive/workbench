@@ -25,6 +25,8 @@ import org.dwfa.log.HtmlHandler;
 import org.dwfa.queue.ObjectServerCore;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
+import org.tigris.subversion.javahl.Info2;
+import org.tigris.subversion.javahl.InfoCallback;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.Status;
 import org.tigris.subversion.javahl.StatusCallback;
@@ -437,5 +439,36 @@ public class SvnPanel extends JPanel {
     public SvnPrompter getAuthenticator() {
         return authenticator;
     }
+
+    private static class HandleInfo implements InfoCallback {
+    	Info2 info;
+		public Info2 getInfo() {
+			return info;
+		}
+		public void singleInfo(Info2 info) {
+			this.info = info;
+		}
+    	
+    }
+	public static void completeRepoInfo(SubversionData svd) {
+		try {
+            String pathOrUrl = svd.getWorkingCopyStr();
+            Revision revision = Revision.HEAD;
+            Revision pegRevision  = Revision.HEAD;
+            int depth = Depth.unknown;
+            String[] changelists = null;
+            HandleInfo callback = new HandleInfo();
+			Svn.getSvnClient().info2(pathOrUrl,
+			           revision,
+			           pegRevision,
+			           depth,
+			           changelists,
+			           callback);
+			svd.setRepositoryUrlStr(callback.info.getUrl());
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+		}
+		
+	}
 	
 }

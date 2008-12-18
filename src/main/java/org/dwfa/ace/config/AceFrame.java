@@ -301,10 +301,9 @@ public class AceFrame extends ComponentFrame {
 		}
 		if (frameConfig != null) {
 			if (count > 0) {
-				title = title + "          User: " + this.frameConfig.getUsername()
-						+ "; Window " + count;
+				title = title + "; User: " + this.frameConfig.getUsername() + "; # " + count;
 			} else {
-				title = title + "          User: " + this.frameConfig.getUsername();
+				title = title + "; User: " + this.frameConfig.getUsername();
 			}
 			count++;
 		}
@@ -314,10 +313,9 @@ public class AceFrame extends ComponentFrame {
 	public String getFrameName() {
 		String title = "Ace Editor";
 		if (count > 0) {
-			title = title + "          User: " + this.frameConfig.getUsername() + "; Window "
-					+ count;
+			title = title + "; User: " + this.frameConfig.getUsername() + "; # " + count;
 		} else {
-			title = title + "          User: " + this.frameConfig.getUsername();
+			title = title + "; User: " + this.frameConfig.getUsername();
 		}
 		if (title.equals(this.getTitle())) {
 			// no increment, redundant call
