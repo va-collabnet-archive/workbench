@@ -1,13 +1,13 @@
 package org.dwfa.ace.task.svn;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -39,9 +39,14 @@ public class AddSubversionEntryForUser extends AddSubversionEntry {
         }
 
     }
-
-    protected void addUserInfo(I_EncodeBusinessProcess process) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException {
-        String username = (String) process.readProperty(usernameProperty);
+    @Override
+    protected void addUserInfo(I_EncodeBusinessProcess process, I_ConfigAceFrame config) throws TaskFailedException {
+        String username;
+		try {
+			username = (String) process.readProperty(usernameProperty);
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		} 
         String repoUrl = this.getRepoUrl();
         if (repoUrl.endsWith("/")) {
             this.setRepoUrl(repoUrl + username);

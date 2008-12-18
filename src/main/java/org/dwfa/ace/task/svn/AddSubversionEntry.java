@@ -1,10 +1,8 @@
 package org.dwfa.ace.task.svn;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import javax.swing.JFrame;
@@ -81,37 +79,32 @@ public class AddSubversionEntry extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            addUserInfo(process);
             I_ConfigAceFrame config = (I_ConfigAceFrame) process
-                .readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
+            	.readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
+            addUserInfo(process, config);
             SubversionData svd = config.getSubversionMap().get(keyName);
             if (svd == null) {
                 svd = new SubversionData(repoUrl, workingCopy);
             }
             
             Prompter p = new Prompter();
-            p.prompt(prompt, svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(),
+            p.prompt(prompt, keyName, svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(),
                      svd.getUsername(), svd.getPassword());
             svd.setWorkingCopyStr(p.getWorkingCopyStr());
             svd.setRepositoryUrlStr(p.getRepositoryUrlStr());
             svd.setPassword(p.getPassword());
             svd.setUsername(p.getUsername());
+            keyName = p.getRepoKey();
            
             config.getSubversionMap().put(keyName, svd);
              return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
         }
     }
     
 
-    protected void addUserInfo(I_EncodeBusinessProcess process) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException {
+    protected void addUserInfo(I_EncodeBusinessProcess process, I_ConfigAceFrame config) throws TaskFailedException {
         // subclass may override to include user info, for this task, we make no modifications...
         
     }
@@ -140,7 +133,9 @@ public class AddSubversionEntry extends AbstractTask {
         this.keyName = keyName;
     }
     private static class Prompter {
-        private String username;
+        private String repoKey;
+
+		private String username;
 
         private String password;
 
@@ -148,11 +143,16 @@ public class AddSubversionEntry extends AbstractTask {
         
         private String workingCopyStr;
 
-        public void prompt(String prompt, String repositoryUrlStr, String workingCopyStr,
+        public void prompt(String prompt, String repoKey, String repositoryUrlStr, String workingCopyStr,
             String username, String password) throws TaskFailedException {
             JFrame parentFrame = new JFrame();
             JPanel promptPane = new JPanel(new SpringLayout());
             parentFrame.getContentPane().add(promptPane);
+            
+            promptPane.add(new JLabel("key:", JLabel.RIGHT));
+            JTextField keyField = new JTextField(30);
+            keyField.setText(repoKey);
+            promptPane.add(keyField);
             
             promptPane.add(new JLabel("repository url:", JLabel.RIGHT));
             JTextField repoUrlField = new JTextField(30);
@@ -173,7 +173,7 @@ public class AddSubversionEntry extends AbstractTask {
             JPasswordField pwd = new JPasswordField(30);
             pwd.setText(password);
             promptPane.add(pwd);
-            SpringUtilities.makeCompactGrid(promptPane, 4, 2, 6, 6, 6, 6);
+            SpringUtilities.makeCompactGrid(promptPane, 5, 2, 6, 6, 6, 6);
             userTextField.requestFocusInWindow();
             userTextField.setSelectionStart(0);
             userTextField.setSelectionEnd(Integer.MAX_VALUE);
@@ -181,6 +181,7 @@ public class AddSubversionEntry extends AbstractTask {
             if (action == JOptionPane.CANCEL_OPTION) {
                 throw new TaskFailedException("User canceled operation.");
             }
+            this.repoKey = keyField.getText();
             this.username = userTextField.getText();
             this.password = new String(pwd.getPassword());
             this.repositoryUrlStr = repoUrlField.getText();
@@ -218,18 +219,14 @@ public class AddSubversionEntry extends AbstractTask {
         public void setWorkingCopyStr(String workingCopyStr) {
             this.workingCopyStr = workingCopyStr;
         }
-    }
-    public static void main(String[] args) {
-        Prompter p = new Prompter();
-        try {
-            p.prompt("enter svn info", "https://amt.au-ct.org/svn/amt/trunk/docs", "queue/m1",
-                     "testuser", "testpwd");
-            System.out.println("username: " + p.getUsername());
-            System.out.println("password: " + p.getPassword());
-        } catch (TaskFailedException e) {
-             e.printStackTrace();
-        }
-        System.exit(0);
+
+        public String getRepoKey() {
+			return repoKey;
+		}
+
+		public void setRepoKey(String repoKey) {
+			this.repoKey = repoKey;
+		}
     }
 
     public String getRepoUrl() {

@@ -231,6 +231,7 @@ public interface I_ConfigAceFrame {
     
     public void svnCheckout(SubversionData svd);
     public void svnCommit(SubversionData svd);
+	public void svnCompleteRepoInfo(SubversionData svd);
     public void svnCleanup(SubversionData svd);
     public void svnStatus(SubversionData svd);
     public void svnPurge(SubversionData svd);
@@ -358,4 +359,5 @@ public interface I_ConfigAceFrame {
      * @return
      */
     public Map<String, List<I_GetConceptData>> getTabHistoryMap();
+
 }
