@@ -1,30 +1,22 @@
 package org.dwfa.maven.reporting;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Calendar;
-import java.util.TimeZone;
-import java.util.GregorianCalendar;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
-import org.apache.maven.reporting.sink.SinkFactory;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.dwfa.maven.transform.IdentityTransformWithXMLCompliantMarkers;
@@ -39,6 +31,8 @@ import org.dwfa.maven.transform.IdentityTransformWithXMLCompliantMarkers;
  */
 
 public class MavenTxtReportGenerator extends AbstractMavenReport {
+
+	private static final String XHTML_TAB = "&#160;&#160;&#160;&#160;&#160;";
 
 	/**
 	 * The Maven Project Object
@@ -173,7 +167,7 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 						header = formatline.substring(formatline.indexOf("header: ")+8); 
 					}
 				}
-				addition.append("<tr>");
+				addition.append("<tr>");				
 				
 				if (line==null && format.exists()) {
 					if (header ==  null) {
@@ -184,7 +178,7 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 					for (String s: fields) {
 						addition.append("<td>");
 						try {
-							addition.append(transform.transform(s).replaceAll(":::", "<").replaceAll("::", ">"));
+							addition.append(transform.transform(s).replaceAll(":::", "<").replaceAll("::", ">").replaceAll("\t", XHTML_TAB));
 						} catch (Exception e) {
 							getLog().info("Cannot transform data to XML compliant text");
 						}						
@@ -206,9 +200,8 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 		Sink sink = getSink();
 
 		List<File> filelist = findFiles(opsDirectory);
-		Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("Australia/Brisbane"));
 
-		reportDate = "Reports (" + cal.get(Calendar.HOUR_OF_DAY) + ":"+ cal.get(Calendar.MINUTE) + ":"+ cal.get(Calendar.SECOND) + " - " + cal.get(Calendar.DAY_OF_MONTH)+"/"+(cal.get(Calendar.MONTH)+1)+"/"+ cal.get(Calendar.YEAR) + ")";
+		reportDate = new Date().toString();
 		
 		sink.head();
 		sink.title();
