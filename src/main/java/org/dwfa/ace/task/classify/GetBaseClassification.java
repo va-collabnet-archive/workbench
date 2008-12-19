@@ -84,6 +84,7 @@ public class GetBaseClassification extends AbstractTask {
                 return Condition.FALSE;
             }
             
+            worker.getLogger().info("New Snorocket Classifier instance is " + rocket);
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
         } catch (RuntimeException e) {
             throw new TaskFailedException(e);
