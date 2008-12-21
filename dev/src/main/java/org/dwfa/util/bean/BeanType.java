@@ -1,7 +1,7 @@
 package org.dwfa.util.bean;
 
 public enum BeanType {
-	TASK_BEAN(".task"), DATA_BEAN(".data"), GENERIC_BEAN(".bean");
+	TASK_BEAN(".task"), GENERIC_BEAN(".bean");
 	
 	private String suffix;
 
