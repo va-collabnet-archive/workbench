@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.dwfa</groupId>
             <artifactId>foundation</artifactId>
-            <version>2.0.19</version>
+            <version>2.0.20</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -113,22 +113,6 @@
                                 </beanSpec>
                                 <beanSpec>
                                     <sourceName>Break Password</sourceName>
-                                    <dirName>queue/static/Launcher</dirName>
-                                    <type>process</type>
-                                    <format>queue</format>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>MoveRootSafely</sourceName>
-                                    <dirName>processes/queue/failsafe tasks</dirName>
-                                    <type>process</type>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>MoveRootSafely</sourceName>
-                                    <dirName>tasks/queue tasks/failsafe</dirName>
-                                    <type>process</type>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>Test Failsafe</sourceName>
                                     <dirName>queue/static/Launcher</dirName>
                                     <type>process</type>
                                     <format>queue</format>
