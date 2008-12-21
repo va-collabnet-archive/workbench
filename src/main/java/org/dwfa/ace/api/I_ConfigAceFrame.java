@@ -236,7 +236,8 @@ public interface I_ConfigAceFrame {
     public void svnStatus(SubversionData svd);
     public void svnPurge(SubversionData svd);
     public void svnUpdate(SubversionData svd);
-	
+    public List<String> svnList(SubversionData svd);
+    
 	public void setShowHierarchyView(boolean shown);
 	
 	public void showListView();
