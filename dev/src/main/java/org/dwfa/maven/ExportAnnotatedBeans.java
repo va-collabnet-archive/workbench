@@ -238,12 +238,12 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                                     new Class[] { BeanList.class },
                                                     new GenericInvocationHandler(a));
                                             for (Spec s : bl.specs()) {
-                                                if (s.type().equals(BeanType.DATA_BEAN)) {
-                                                    writeDataBean(c, s);
-                                                } else if (s.type().equals(BeanType.GENERIC_BEAN)) {
+                                                if (s.type().equals(BeanType.GENERIC_BEAN)) {
                                                     writeGenericBean(c, s);
                                                 } else if (s.type().equals(BeanType.TASK_BEAN)) {
                                                     writeTaskBean(c, s);
+                                                } else {
+                                                    throw new UnsupportedOperationException("Data beans are deprecated. " + s);
                                                 }
                                             }
                                         }
@@ -281,17 +281,6 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             } else {
                 e.printStackTrace();
             }
-        }
-    }
-
-	@SuppressWarnings("unchecked")
-    private void writeDataBean(Class c, Spec spec) throws MojoExecutionException {
-        try {
-            String suffix = ".data";
-            writeBean(c, spec, rootDir, suffix);
-
-        } catch (Exception e) {
-            throw new MojoExecutionException("Problem writing bean: " + spec, e);
         }
     }
 

@@ -76,13 +76,10 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
 			rootDir = outputDirectory;
 		}
 		for (int i = 0; i < specs.length; i++) {
-			//System.out.println(specs[i]);
 			if (specs[i].getType().equalsIgnoreCase("task")) {
 				writeTaskBean(specs[i]);
 			} else if (specs[i].getType().equalsIgnoreCase("bean")) {
                 writeGenericBean(specs[i]);
-            } else if (specs[i].getType().equalsIgnoreCase("data")) {
-                writeDataBean(specs[i]);
             } else {
                 writeProcessBean(specs[i]);
             }
@@ -94,16 +91,6 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
         try {
             String suffix = ".task";
             writeBean(spec, rootDir, suffix);
-        } catch (Exception e) {
-            throw new MojoExecutionException("Problem loading class: "
-                    + spec.getSourceName(), e);
-        }
-    }
-    private void writeDataBean(BeanSpec spec) throws MojoExecutionException {
-        try {
-            String suffix = ".data";
-            writeBean(spec, rootDir, suffix);
-
         } catch (Exception e) {
             throw new MojoExecutionException("Problem loading class: "
                     + spec.getSourceName(), e);
@@ -183,6 +170,7 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
                     + "/../process/"
                     + spec.getSourceName()
                     + ".xml");
+			getLog().info("Reading: " + xmlSourceFile);
 			final XMLDecoder d = (XMLDecoder) decoderConstructor
 					.newInstance(new Object[] { new BufferedInputStream(
 							new FileInputStream(xmlSourceFile)) });
