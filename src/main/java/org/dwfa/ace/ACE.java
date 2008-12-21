@@ -2878,7 +2878,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
 			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
-					Integer.MIN_VALUE, 0, false), true));
+					Integer.MIN_VALUE, 0, false, aceFrameConfig), true));
 		}
 		model.setRoot(root);
 		return model;

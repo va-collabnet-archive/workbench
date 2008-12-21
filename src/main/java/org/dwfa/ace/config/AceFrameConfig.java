@@ -1648,6 +1648,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         SvnPanel.completeRepoInfo(svd);
 	}
 
+	public List<String> svnList(SubversionData svd) {
+        aceFrame.setupSvn();
+        return SvnPanel.list(svd);
+	}
+
 
     public class QueueFilter implements ServiceItemFilter {
 
@@ -1967,6 +1972,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public Map<String, List<I_GetConceptData>> getTabHistoryMap() {
 		return tabHistoryMap;
 	}
+
 
 
 }

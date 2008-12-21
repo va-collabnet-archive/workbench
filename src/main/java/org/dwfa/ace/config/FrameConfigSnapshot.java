@@ -48,6 +48,11 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+
+	public List<String> svnList(SubversionData svd) {
+		return baseFrame.svnList(svd);
+	}
+
 	public void svnCompleteRepoInfo(SubversionData svd) {
 		baseFrame.svnCompleteRepoInfo(svd);
 	}

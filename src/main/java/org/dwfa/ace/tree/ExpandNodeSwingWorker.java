@@ -185,7 +185,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 				DefaultMutableTreeNode child = null;
 				if (checkContinueWork("checking in add child worker")) {
 					I_GetConceptData cb = ConceptBeanForTree.get(conceptId, relId, 0,
-							false);
+							false, ExpandNodeSwingWorker.this.config);
 					boolean leaf = false;
 					if ((config.getDestRelTypes()
 							.getSetValues().length == 0)
@@ -414,7 +414,6 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			DefaultMutableTreeNode node,
 			Comparator<I_GetConceptDataForTree> conceptBeanComparator, ACE acePanel, I_ConfigAceFrame config) {
 		super();
-		ConceptBeanForTree.setConfig(config);
         expansionStart = System.currentTimeMillis();
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("ExpandNodeSwingWorker " + workerId + " starting.");

@@ -99,7 +99,7 @@ public class TreeMouseListener implements MouseListener {
 					
 					ConceptBeanForTree extraParentBean = ConceptBeanForTree
 							.get(t.getC2Id(), t.getRelId(), treeBean
-									.getParentDepth() + 1, true);
+									.getParentDepth() + 1, true, this.aceConfig);
 					DefaultMutableTreeNode extraParentNode = new DefaultMutableTreeNode(
 							extraParentBean);
 					extraParentNode.setAllowsChildren(false);

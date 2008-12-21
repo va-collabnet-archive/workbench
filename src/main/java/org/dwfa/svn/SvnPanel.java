@@ -25,8 +25,11 @@ import org.dwfa.log.HtmlHandler;
 import org.dwfa.queue.ObjectServerCore;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
+import org.tigris.subversion.javahl.DirEntry;
 import org.tigris.subversion.javahl.Info2;
 import org.tigris.subversion.javahl.InfoCallback;
+import org.tigris.subversion.javahl.ListCallback;
+import org.tigris.subversion.javahl.Lock;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.Status;
 import org.tigris.subversion.javahl.StatusCallback;
@@ -470,5 +473,26 @@ public class SvnPanel extends JPanel {
 		}
 		
 	}
-	
+	private static class ListHandler implements ListCallback {
+		List<String> dirList = new ArrayList<String>();
+		public void doEntry(DirEntry dirent, Lock lock) {
+			dirList.add(dirent.getAbsPath() + "/" + dirent.getPath());
+		}
+		
+	}
+	public static List<String> list(SubversionData svd) {
+		String url = svd.getRepositoryUrlStr(); 
+		Revision revision = Revision.HEAD; 
+		Revision pegRevision = Revision.HEAD; 
+		int depth = Depth.infinity; 
+		int direntFields = DirEntry.Fields.all; 
+		boolean fetchLocks = false; 
+		ListHandler callback = new ListHandler();
+		try {
+			Svn.getSvnClient().list(url, revision, pegRevision, depth, direntFields, fetchLocks, callback);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+		}
+		return callback.dirList;
+	}
 }

@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,7 +15,12 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -30,6 +37,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.log.AceLog;
@@ -37,11 +45,15 @@ import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.SelectObjectDialog;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.Svn;
+import org.dwfa.svn.SvnPanel;
 import org.dwfa.svn.SvnPrompter;
+import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.VodbEnv;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
 
@@ -113,7 +125,14 @@ public class AceRunner {
 
 			Long cacheSize = setBerkeleyDbCacheSize();
 
-			initialSubversionOperationsAndChangeSetImport(cacheSize);
+			File acePropertiesFile = new File("config","ace.properties");
+			if (acePropertiesFile.exists() == false) {
+				initialSubversionOperationsAndChangeSetImport(cacheSize, acePropertiesFile);
+			}
+			final Properties aceProperties = new Properties();
+			if (acePropertiesFile.exists()) {
+				aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+			}
 
 			aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
 					.getName(), "aceConfigFile", File.class, new File(
@@ -133,6 +152,7 @@ public class AceRunner {
 								profileDir.mkdirs();
 							}
 						}
+						File lastProfileDir = new File(aceProperties.getProperty("last-profile-dir"));
 						try {
 							aceConfigFile = FileDialogUtil.getExistingFile(
 									"Please select your user profile:",
@@ -142,7 +162,8 @@ public class AceRunner {
 											return name.toLowerCase().endsWith(
 													".ace");
 										}
-									}, profileDir);
+									}, lastProfileDir);
+							aceProperties.setProperty("last-profile-dir", FileIO.getRelativePath(aceConfigFile));
 						} catch (TaskFailedException e) {
 							AceLog.getAppLog().alertAndLogException(e);
 							System.exit(0);
@@ -169,6 +190,7 @@ public class AceRunner {
 				AceConfig.setupAceConfig(AceConfig.config, aceConfigFile,
 						cacheSize, false);
 			}
+			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			ACE.setAceConfig(AceConfig.config);
 			AceConfig.config.addChangeSetWriters();
 			int successCount = 0;
@@ -220,6 +242,7 @@ public class AceRunner {
 						"No successful logins...", JOptionPane.ERROR_MESSAGE);
 				System.exit(0);
 			}
+			
 			File directory = AceConfig.config.getConfigFile().getParentFile();
 
 			if (directory.listFiles() != null) {
@@ -310,8 +333,17 @@ public class AceRunner {
 		prompter.setPassword(password);
 	}
 
-	private void initialSubversionOperationsAndChangeSetImport(Long cacheSize)
-			throws ConfigurationException {
+	private void initialSubversionOperationsAndChangeSetImport(Long cacheSize, File acePropertiesFile)
+			throws ConfigurationException, FileNotFoundException, IOException {
+		Properties aceProperties = new Properties();
+		aceProperties.setProperty("initial-svn-checkout", "true");
+		
+		
+		String svnCheckoutProfileOnStart = (String) jiniConfig.getEntry(this
+				.getClass().getName(), "svnCheckoutProfileOnStart", String.class,
+				"");
+		
+		
 		String[] svnCheckoutOnStart = (String[]) jiniConfig.getEntry(this
 				.getClass().getName(), "svnCheckoutOnStart", String[].class,
 				new String[] {});
@@ -321,7 +353,8 @@ public class AceRunner {
 		List<File> changeLocations = new ArrayList<File>();
 		boolean connectToSubversion = false;
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
-				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)) {
+				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
+				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
 			connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
 					.showConfirmDialog(
 							null,
@@ -331,13 +364,21 @@ public class AceRunner {
 		}
 
 		if (connectToSubversion) {
-			if (svnCheckoutOnStart != null) {
+			if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
+				try {
+					handleSvnProfileCheckout(changeLocations, svnCheckoutProfileOnStart, aceProperties);
+				} catch (ClientException e) {
+					throw new ConfigurationException("Cannot checkout selected profile", e);
+				}
+			}
+			
+			if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
 				for (String svnSpec : svnCheckoutOnStart) {
 					handleSvnCheckout(changeLocations, svnSpec);
 				}
 			}
 
-			if (svnUpdateOnStart != null) {
+			if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
 				for (String svnSpec : svnUpdateOnStart) {
 					handleSvnUpdate(changeLocations, svnSpec);
 				}
@@ -346,9 +387,66 @@ public class AceRunner {
 			if (changeLocations.size() > 0) {
 				doStealthChangeSetImport(cacheSize, changeLocations);
 			}
+			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 		}
 	}
 
+	private void handleSvnProfileCheckout(List<File> changeLocations, String svnSpec, Properties aceProperties) throws ClientException {
+		SubversionData svd = new SubversionData(svnSpec, null);
+		List<String> listing = SvnPanel.list(svd);
+		Map<String, String> profileMap = new HashMap<String, String>();
+		for (String item: listing) {
+			if (item.endsWith(".ace")) {
+				profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
+			}
+		}
+		SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
+		JFrame emptyFrame = new JFrame();
+		String selectedProfile = (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, 
+				"Select profile to checkout:",
+		          "Checkout profile:", sortedProfiles.toArray(), null, null);
+		String selectedPath = profileMap.get(selectedProfile);
+		if (selectedPath.startsWith("/")) {
+			selectedPath = selectedPath.substring(1);
+		}
+		String[] pathParts = selectedPath.split("/");
+		String[] specParts = svnSpec.split("/");
+		int matchStart = 0;
+		for (int i = 0; i < specParts.length; i++) {
+			if (specParts[i].equals(pathParts[i-matchStart])) {
+				
+			} else {
+				matchStart = i+1;
+			}
+		}
+		List<String> specList = new ArrayList<String>();
+		for (int i = 0; i < matchStart; i++) {
+			specList.add(specParts[i]);
+		}
+		for (String pathPart: pathParts) {
+			specList.add(pathPart);
+		}
+		StringBuffer checkoutBuffer = new StringBuffer();
+		for (int i = 0; i < specList.size() -1; i++) {
+			checkoutBuffer.append(specList.get(i));
+			checkoutBuffer.append("/");
+		}
+		String svnProfilePath = checkoutBuffer.toString();
+		SubversionData svnCheckoutData = new SubversionData(svnProfilePath, "profiles/" + selectedProfile);
+		aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
+		String moduleName = svnCheckoutData.getRepositoryUrlStr();
+		String destPath = svnCheckoutData.getWorkingCopyStr();
+		Revision revision = Revision.HEAD;
+		Revision pegRevision = Revision.HEAD;
+		int depth = Depth.infinity;
+		boolean ignoreExternals = false;
+		boolean allowUnverObstructions = false;
+		Svn.getSvnClient().checkout(moduleName, destPath, revision,
+				pegRevision, depth, ignoreExternals,
+				allowUnverObstructions);
+		changeLocations.add(new File(destPath));
+	}
+	
 	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) {
 		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
 		String[] specParts = new String[] {
