@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>foundation</artifactId>
-  <version>2.0.20</version>
+  <version>2.0.21-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>DWFA foundation module</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html</url>
@@ -17,9 +17,9 @@
     <url>http://www.informatics.com</url>
   </organization>
   <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/tags/foundation-2.0.20</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/tags/foundation-2.0.20</developerConnection>
-    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm/tags/foundation-2.0.20</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/trunk/dev</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/trunk/dev</developerConnection>
+    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
   </scm>
   <ciManagement>
     <system>continuum</system>
