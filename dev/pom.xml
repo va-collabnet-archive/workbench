@@ -133,32 +133,6 @@
                                     <type>process</type>
                                     <format>queue</format>
                                 </beanSpec>
-
-                                <beanSpec>
-                                    <sourceName>org.dwfa.bpa.data.IntegerElement</sourceName>
-                                    <dirName>data</dirName>
-                                    <type>data</type>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>org.dwfa.bpa.data.SetDataContainer</sourceName>
-                                    <dirName>data</dirName>
-                                    <type>data</type>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>org.dwfa.bpa.data.StringElement</sourceName>
-                                    <dirName>data</dirName>
-                                    <type>data</type>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>org.dwfa.bpa.data.StringList</sourceName>
-                                    <dirName>data</dirName>
-                                    <type>data</type>
-                                </beanSpec>
-                                <beanSpec>
-                                    <sourceName>org.dwfa.bpa.data.ProcessContainer</sourceName>
-                                    <dirName>data</dirName>
-                                    <type>data</type>
-                                </beanSpec>
                             </specs>
                         </configuration>
                     </execution>
