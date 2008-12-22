@@ -152,7 +152,10 @@ public class AceRunner {
 								profileDir.mkdirs();
 							}
 						}
-						File lastProfileDir = new File(aceProperties.getProperty("last-profile-dir"));
+						File lastProfileDir = profileDir;
+						if (aceProperties.getProperty("last-profile-dir") == null) {
+							lastProfileDir = new File(aceProperties.getProperty("last-profile-dir"));
+						}
 						try {
 							aceConfigFile = FileDialogUtil.getExistingFile(
 									"Please select your user profile:",
