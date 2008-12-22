@@ -153,6 +153,7 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 		try {
 			reader = new BufferedReader(new FileReader(f));
 			String line = reader.readLine();
+			boolean empty = (line == null);
 			while (line != null) {
 				String thisline = line;
 				String[] fields = thisline.split("@");
@@ -185,7 +186,8 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 						addition.append("</td>");
 					}
 				}
-				addition.append("</tr>");
+				if (!empty)
+					addition.append("</tr>");
 			}
 
 			createXDoc(filename,f.getName().substring(0,f.getName().lastIndexOf(".")),addition.toString());
