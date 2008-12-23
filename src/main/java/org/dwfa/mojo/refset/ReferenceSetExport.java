@@ -92,6 +92,13 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 	 */
 	File readWriteMapDirectory;
 
+    /**
+	 * Release version used to embed in the refset file names - if not specified
+     * then the "path version" reference set is used to determine the version
+	 * @parameter
+	 */
+    String releaseVersion;
+
 	private I_TermFactory tf = LocalVersionedTerminology.get();
 
 	private I_IntSet allowedStatuses;
@@ -103,8 +110,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 	private HashMap<Integer, RefsetType> refsetTypeMap = new HashMap<Integer, RefsetType>();
 
 	private HashMap<Integer, String> pathReleaseVersions = new HashMap<Integer, String>();
-	
-	public void execute() throws MojoExecutionException, MojoFailureException {
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		if (!fixedMapDirectory.exists() || !fixedMapDirectory.isDirectory() || !fixedMapDirectory.canRead()) {
 			throw new MojoExecutionException("Cannot proceed, fixedMapDirectory must exist and be readable");
 		}
@@ -369,9 +376,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 			//TODO this is not the best way, but it works for now.
 			refsetName = refsetName.replace("/", "-");
 			refsetName = refsetName.replace("'", "_");
-			
-			String releaseVersion = getReleaseVersion(refsetConcept);
-			
+
+            if (releaseVersion == null) {
+                releaseVersion = getReleaseVersion(refsetConcept);
+            }
+
 			uuidRefsetWriter = new BufferedWriter(new FileWriter(
 					new File(uuidRefsetOutputDirectory, "UUID_" + refsetName + "_" + releaseVersion + refsetType.getFileExtension())));
 			sctIdRefsetWriter = new BufferedWriter(new FileWriter(
