@@ -35,6 +35,7 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**
  * Implements I_ConfigAceFrame with only the properties needed for search, and
@@ -48,6 +49,37 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+
+
+	public void svnCheckout(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		baseFrame.svnCheckout(svd, authenticator, interactive);
+	}
+
+	public void svnCleanup(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		baseFrame.svnCleanup(svd, authenticator, interactive);
+	}
+
+	public void svnCommit(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		baseFrame.svnCommit(svd, authenticator, interactive);
+	}
+
+	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator,
+			boolean interactive) {
+		baseFrame.svnPurge(svd, authenticator, interactive);
+	}
+
+	public void svnStatus(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		baseFrame.svnStatus(svd, authenticator, interactive);
+	}
+
+	public void svnUpdate(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		baseFrame.svnUpdate(svd, authenticator, interactive);
+	}
 
 	public List<String> svnList(SubversionData svd) {
 		return baseFrame.svnList(svd);

@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -79,6 +80,7 @@ import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
+import org.dwfa.svn.Svn;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
@@ -1663,5 +1665,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
   public void removeChangeSetReader(I_ReadChangeSet reader) {
     ACE.getCsReaders().remove(reader);
   }
-		
+
+  public I_HandleSubversion getSvnHandler() {
+	return new Svn();
+  }
+
 }

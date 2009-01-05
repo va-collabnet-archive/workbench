@@ -58,7 +58,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.jini.TermEntry;
-import org.dwfa.svn.SvnPanel;
+import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
@@ -69,6 +69,7 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.tigris.subversion.javahl.PromptUserPassword3;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -1608,7 +1609,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void svnCheckout(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.checkout(svd, getAuthenticator(svd));
+        Svn.checkout(svd, getAuthenticator(svd), true);
     }
 
     private SvnPrompter getAuthenticator(SubversionData svd) {
@@ -1620,37 +1621,37 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void svnCleanup(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.cleanup(svd, getAuthenticator(svd));
+        Svn.cleanup(svd, getAuthenticator(svd), true);
     }
 
     public void svnCommit(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.commit(svd, getAuthenticator(svd));
+        Svn.commit(svd, getAuthenticator(svd), true);
     }
 
     public void svnPurge(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.purge(svd, getAuthenticator(svd));
+        Svn.purge(svd, getAuthenticator(svd), true);
     }
 
     public void svnStatus(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.status(svd, getAuthenticator(svd));
+        Svn.status(svd, getAuthenticator(svd), true);
     }
 
     public void svnUpdate(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.update(svd, getAuthenticator(svd));
+        Svn.update(svd, getAuthenticator(svd), true);
     }
     
 	public void svnCompleteRepoInfo(SubversionData svd) {
         aceFrame.setupSvn();
-        SvnPanel.completeRepoInfo(svd);
+        Svn.completeRepoInfo(svd);
 	}
 
 	public List<String> svnList(SubversionData svd) {
         aceFrame.setupSvn();
-        return SvnPanel.list(svd);
+        return Svn.list(svd);
 	}
 
 
@@ -1973,6 +1974,34 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		return tabHistoryMap;
 	}
 
+	public void svnCheckout(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.checkout(svd, authenticator, interactive);
+	}
 
+	public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.cleanup(svd, authenticator, interactive);
+	}
 
+	public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.commit(svd, authenticator, interactive);
+	}
+
+	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.purge(svd, authenticator, interactive);
+	}
+
+	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.status(svd, authenticator, interactive);
+	}
+
+	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.update(svd, authenticator, interactive);
+	}
 }

@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>2.3.2</version>
+			<version>2.4.0</version>
 		</dependency>
 		<!--
 			<dependency> <groupId>org.apache.lucene</groupId>
@@ -74,11 +74,6 @@
 			<groupId>org.dwfa</groupId>
 			<artifactId>icons</artifactId>
 			<version>1.12</version>
-		</dependency>
-		<dependency>
-			<groupId>org.tmatesoft.svnkit</groupId>
-			<artifactId>svnkit-javahl</artifactId>
-			<version>1.2.1.5297</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tmatesoft.svnkit</groupId>

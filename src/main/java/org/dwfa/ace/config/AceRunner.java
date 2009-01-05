@@ -49,7 +49,6 @@ import org.dwfa.bpa.util.SelectObjectDialog;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.Svn;
-import org.dwfa.svn.SvnPanel;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.VodbEnv;
@@ -180,7 +179,7 @@ public class AceRunner {
 								aceConfigFile)));
 				AceConfig.config = (AceConfig) ois.readObject();
 				AceConfig.config.setConfigFile(aceConfigFile);
-				setupDatabase(AceConfig.config);
+				setupDatabase(AceConfig.config, aceConfigFile);
 			} else {
 				File dbFolder = (File) jiniConfig.getEntry(this.getClass()
 						.getName(), "dbFolder", File.class, new File(
@@ -189,7 +188,7 @@ public class AceRunner {
 						"Cache size in config file: " + cacheSize);
 				AceConfig.config = new AceConfig(dbFolder);
 				AceConfig.config.setConfigFile(aceConfigFile);
-				setupDatabase(AceConfig.config);
+				setupDatabase(AceConfig.config, aceConfigFile);
 				AceConfig.setupAceConfig(AceConfig.config, aceConfigFile,
 						cacheSize, false);
 			}
@@ -396,7 +395,7 @@ public class AceRunner {
 
 	private void handleSvnProfileCheckout(List<File> changeLocations, String svnSpec, Properties aceProperties) throws ClientException {
 		SubversionData svd = new SubversionData(svnSpec, null);
-		List<String> listing = SvnPanel.list(svd);
+		List<String> listing = Svn.list(svd);
 		Map<String, String> profileMap = new HashMap<String, String>();
 		for (String item: listing) {
 			if (item.endsWith(".ace")) {
@@ -613,7 +612,7 @@ public class AceRunner {
 		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
 	}
 
-	private void setupDatabase(AceConfig aceConfig) throws IOException {
+	private void setupDatabase(AceConfig aceConfig, File configFileFile) throws IOException {
 		if (aceConfig.isDbCreated() == false) {
 			int n = JOptionPane
 					.showConfirmDialog(
@@ -629,6 +628,12 @@ public class AceRunner {
 								"Exiting, user did not want to extract the DB from maven.");
 				return;
 			}
+		}
+		
+		File jeUserPropertiesFile = new File(configFileFile.getParentFile(), "je.properties");
+		if (jeUserPropertiesFile.exists()) {
+			File jeDbPropertiesFile = new File(aceConfig.getDbFolder(), "je.properties");
+			FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
 		}
 	}
 
