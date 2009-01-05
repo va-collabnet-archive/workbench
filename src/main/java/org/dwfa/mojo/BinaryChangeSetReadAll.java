@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.ComponentValidator;
 import org.dwfa.ace.task.cs.ImportAllChangeSets;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -54,7 +52,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-        
+        getLog().info("importing change sets in: " + changeSetDir);
         ImportAllChangeSets importAllChangeSetsTask = new ImportAllChangeSets();
         importAllChangeSetsTask.setValidateChangeSets(validate);
         String validatorString = "";

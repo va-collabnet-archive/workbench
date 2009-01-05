@@ -78,6 +78,7 @@ public class VodbOpen extends AbstractMojo {
             if (dbSetupConfig == null) {
                 dbSetupConfig = new DatabaseSetupConfig();
             }
+            getLog().info("vodb dir: " + vodbDirectory);
             LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
         } catch (InstantiationException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
