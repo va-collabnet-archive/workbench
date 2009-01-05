@@ -306,4 +306,6 @@ public interface I_TermFactory {
 	
 	public I_ShowActivity newActivityPanel();
 	
+	public I_HandleSubversion getSvnHandler();
+	
 }

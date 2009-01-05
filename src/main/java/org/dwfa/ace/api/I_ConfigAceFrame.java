@@ -22,7 +22,7 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_ConfigAceFrame {
+public interface I_ConfigAceFrame extends I_HandleSubversion {
 
 	public boolean isActive();
 
@@ -228,16 +228,7 @@ public interface I_ConfigAceFrame {
 	public List<String> getSelectedAddresses();
 	
 	public Map<String, SubversionData> getSubversionMap();
-    
-    public void svnCheckout(SubversionData svd);
-    public void svnCommit(SubversionData svd);
-	public void svnCompleteRepoInfo(SubversionData svd);
-    public void svnCleanup(SubversionData svd);
-    public void svnStatus(SubversionData svd);
-    public void svnPurge(SubversionData svd);
-    public void svnUpdate(SubversionData svd);
-    public List<String> svnList(SubversionData svd);
-    
+        
 	public void setShowHierarchyView(boolean shown);
 	
 	public void showListView();
