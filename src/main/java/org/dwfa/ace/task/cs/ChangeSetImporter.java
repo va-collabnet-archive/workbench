@@ -123,18 +123,24 @@ public abstract class ChangeSetImporter implements ActionListener {
         readerSet.remove(first);
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
             AceLog.getEditLog().info("\n--------------------------\nNow reading change set: " + 
-            		first.getChangeSetFile().getName() + " (" + readerSet.size() + " readers left)" +
+            		first.getChangeSetFile().getName() + 
+            		"; " + new Date(first.nextCommitTime()) +
+            		"; available bytes: " + first.availableBytes() +
+            		" (" + readerSet.size() + " readers left)" +
             		"\n--------------------------\n ");
         }
-        I_ReadChangeSet next = null;
-        if (readerSet.size() > 0) {
-            next = readerSet.first();
+        Long nextCommitTime = null;
+        for (I_ReadChangeSet reader: readerSet) {
+        	if (reader.nextCommitTime() > first.nextCommitTime()) {
+        		nextCommitTime = reader.nextCommitTime();
+        		break;
+        	}
         }
 
-        if (next == null) {
+        if (nextCommitTime == null) {
             first.readUntil(Long.MAX_VALUE);
         } else {
-            first.readUntil(next.nextCommitTime());
+            first.readUntil(nextCommitTime);
         }
         if (first.nextCommitTime() == Long.MAX_VALUE) {
         	AceLog.getEditLog().info("\nFinished reader: " + first.getChangeSetFile().getName() + 
