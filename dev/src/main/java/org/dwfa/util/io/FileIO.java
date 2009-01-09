@@ -58,6 +58,30 @@ public class FileIO {
 		destinationChannel.close();
 	}
 	
+	public static void recursiveCopy(File from, File to, boolean copyInvisibles) throws IOException {
+		if (from.isDirectory()) {
+			to.mkdirs();
+			for (File f: from.listFiles()) {
+				if (copyInvisibles == true || f.isHidden() == false) {
+					File childTo = new File(to, f.getName());
+					recursiveCopy(f, childTo, copyInvisibles);
+				}
+			}
+		} else {
+			copyFile(from, to);
+		}
+	}
+	
+	public static void recursiveDelete(File from) throws IOException {
+		if (from.isDirectory()) {
+			for (File f: from.listFiles()) {
+				recursiveDelete(f);
+			}
+		} 
+		from.delete();
+	}
+	
+	
 	public static class FileAndObject {
 		private Object obj;
 
