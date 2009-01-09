@@ -104,10 +104,14 @@ public class CreateRefsetMembersetPair extends AbstractTask{
 		
 		try{
 			selectedConcept = config.getHierarchySelection();
-			String altIsAUuid = process.readProperty(altIsA) != null ? (String) process.readProperty(altIsA) : null;
-            if (altIsAUuid != null) {
-                this.isAConcept = termFactory.getConcept(new UUID[] { UUID.fromString(altIsAUuid) });
-            } else {
+			if (altIsA != null) {
+				String altIsAUuid = (String) process.readProperty(altIsA);
+				if (altIsAUuid != null) {
+					this.isAConcept = termFactory.getConcept(new UUID[] { UUID.fromString(altIsAUuid) });
+				}
+            }
+			
+			if (this.isAConcept == null) {
                 this.isAConcept = termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getNid()); //rel type
             }
 
