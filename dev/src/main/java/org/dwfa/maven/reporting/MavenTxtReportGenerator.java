@@ -349,7 +349,7 @@ public class MavenTxtReportGenerator extends AbstractMavenReport {
 	public void createXDoc(String fileName, String siteTitle, String table)  {
 		 StringBuilder xdocXML = new StringBuilder();
 
-		 xdocXML.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
+		 xdocXML.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		 xdocXML.append("<document>");
 		 xdocXML.append("<properties>");
 		 xdocXML.append("<author email=\"NEHTA.AT.NEHTA.DOT.com.DOT.au\">NEHTA</author>");
