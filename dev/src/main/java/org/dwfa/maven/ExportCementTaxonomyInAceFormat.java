@@ -1,12 +1,5 @@
 package org.dwfa.maven;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,6 +16,14 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.dwfa.tapi.spec.TaxonomySpec;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize Terminology) taxonomies in
  * the ACE format (with branch ids and effective dates for standard components--concepts, descriptions, relationships).
@@ -32,8 +33,8 @@ import org.dwfa.tapi.spec.TaxonomySpec;
  */
 
 public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
-   
-   /**
+
+    /**
     * An enumeration of the taxonomies that can be exported via this maven plugin goal. 
     * @author kec
     *
@@ -122,6 +123,14 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
    
    private String[] allowedGoals = new String[] { "install","deploy" };
 
+    /**
+     * Specifies whether to create new files (default) or append to existing files.
+     *
+     * @parameter default-value=false
+     * @required
+     */
+   private boolean append;
+
    public void execute() throws MojoExecutionException, MojoFailureException {
       
       if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
@@ -190,26 +199,26 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
             mts.setGenerateIds(false);
             mts.setExclusions(exclusions);
 
-            Writer altIdWriter = new FileWriter(altIdFile);
+             Writer altIdWriter = createWriter(altIdFile);
 
-            Writer conceptWriter = new FileWriter(conceptFile);
-            mts.writeConcepts(conceptWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
+             Writer conceptWriter = createWriter(conceptFile);
+             mts.writeConcepts(conceptWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
             conceptWriter.close();
 
-            Writer descWriter = new FileWriter(descFile);
-            mts.writeDescriptions(descWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
+             Writer descWriter = createWriter(descFile);
+             mts.writeDescriptions(descWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
             descWriter.close();
 
-            Writer relWriter = new FileWriter(relFile);
-            mts.writeRelationships(relWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
+             Writer relWriter = createWriter(relFile);
+             mts.writeRelationships(relWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
             relWriter.close();
 
-            Writer rootsWriter = new FileWriter(rootsFile);
-            mts.writeRoots(rootsWriter, MemoryTermServer.FILE_FORMAT.ACE);
+             Writer rootsWriter = createWriter(rootsFile);
+             mts.writeRoots(rootsWriter, MemoryTermServer.FILE_FORMAT.ACE);
             rootsWriter.close();
 
-            Writer extensionTypeWriter = new FileWriter(extTypeFile);
-            mts.writeExtensionTypes(extensionTypeWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
+             Writer extensionTypeWriter = createWriter(extTypeFile);
+             mts.writeExtensionTypes(extensionTypeWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
             extensionTypeWriter.close();
 
             I_ConceptualizeLocally[] descTypeOrder = new I_ConceptualizeLocally[] {
@@ -219,7 +228,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
             for (I_ConceptualizeLocally extensionType: mts.getExtensionTypes()) {
                 I_DescribeConceptLocally typeDesc = extensionType.getDescription(descTypePriorityList);
                 File extensionFile = new File(directory, typeDesc.getText() + ".txt");
-                Writer extensionWriter = new FileWriter(extensionFile);
+                Writer extensionWriter = createWriter(extensionFile);
                 mts.writeExtension(extensionType, extensionWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
                 extensionWriter.close();
             }
@@ -228,6 +237,8 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
          }
       }
    }
-   
- 
+
+    private Writer createWriter(final File conceptFile) throws IOException {
+        return new FileWriter(conceptFile, append);
+    }
 }
