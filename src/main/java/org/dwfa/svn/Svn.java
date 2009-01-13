@@ -137,9 +137,6 @@ public class Svn implements I_HandleSubversion {
 		SvnLog.info("starting status for working copy: " + workingCopy
 				+ ", absolute file:" + new File(workingCopy).getAbsoluteFile());
 		try {
-			if (interactive) {
-				handleAuthentication(authenticator);
-			}
 			int depth = Depth.unknown;
 			boolean onServer = false;
 			boolean getAll = false;
@@ -168,9 +165,6 @@ public class Svn implements I_HandleSubversion {
 		SvnLog.info("starting cleanup");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
-			if (interactive) {
-				handleAuthentication(authenticator);
-			}
 			Svn.getSvnClient().cleanup(svd.getWorkingCopyStr());
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
@@ -233,6 +227,7 @@ public class Svn implements I_HandleSubversion {
 				if (interactive) {
 					handleAuthentication(authenticator);
 				}
+				switchToReadWriteRepository(svd);
 				int depth = Depth.unknown;
 				boolean noUnlock = true;
 				boolean keepChangelist = false;
@@ -267,9 +262,6 @@ public class Svn implements I_HandleSubversion {
 		SvnLog.info("Starting purge");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
-			if (interactive) {
-				handleAuthentication(authenticator);
-			}
 			int depth = Depth.unknown;
 			boolean onServer = false;
 			boolean getAll = false;
@@ -313,6 +305,7 @@ public class Svn implements I_HandleSubversion {
 			if (interactive) {
 				handleAuthentication(authenticator);
 			}
+			switchToReadOnlyMirror(svd);
 			int depth = Depth.unknown;
 			boolean depthIsSticky = false;
 			boolean ignoreExternals = false;
@@ -336,6 +329,7 @@ public class Svn implements I_HandleSubversion {
 			if (interactive) {
 				handleAuthentication(authenticator);
 			}
+			switchToReadOnlyMirror(svd);
 			Revision revision = Revision.HEAD;
 			Revision pegRevision = Revision.HEAD;
 			int depth = Depth.infinity;
@@ -357,7 +351,7 @@ public class Svn implements I_HandleSubversion {
 		Svn.getSvnClient().setPrompt(authenticator);
 	}
 
-	private static class HandleInfo implements InfoCallback {
+	private static class HandleSingleInfo implements InfoCallback {
 		Info2 info;
 
 		public Info2 getInfo() {
@@ -369,22 +363,34 @@ public class Svn implements I_HandleSubversion {
 		}
 
 	}
+	private static class HandleInfo implements InfoCallback {
+		List<Info2> infoList = new ArrayList<Info2>();
+
+		public void singleInfo(Info2 info) {
+			infoList.add(info);
+		}
+
+	}
 
 	public static void completeRepoInfo(SubversionData svd) {
 		try {
-			String pathOrUrl = svd.getWorkingCopyStr();
-			Revision revision = Revision.HEAD;
-			Revision pegRevision = Revision.HEAD;
-			int depth = Depth.unknown;
-			String[] changelists = null;
-			HandleInfo callback = new HandleInfo();
-			Svn.getSvnClient().info2(pathOrUrl, revision, pegRevision, depth,
-					changelists, callback);
-			svd.setRepositoryUrlStr(callback.info.getUrl());
+			svd.setRepositoryUrlStr(getRepoInfo(svd).getUrl());
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
+	}
 
+	private static Info2 getRepoInfo(SubversionData svd)
+			throws ClientException {
+		String pathOrUrl = svd.getWorkingCopyStr();
+		Revision revision = Revision.HEAD;
+		Revision pegRevision = Revision.HEAD;
+		int depth = Depth.unknown;
+		String[] changelists = null;
+		HandleSingleInfo callback = new HandleSingleInfo();
+		Svn.getSvnClient().info2(pathOrUrl, revision, pegRevision, depth,
+				changelists, callback);
+		return callback.info;
 	}
 
 	private static class ListHandler implements ListCallback {
@@ -405,12 +411,28 @@ public class Svn implements I_HandleSubversion {
 		boolean fetchLocks = false;
 		ListHandler callback = new ListHandler();
 		try {
+			switchToReadOnlyMirror(svd);
 			Svn.getSvnClient().list(url, revision, pegRevision, depth,
 					direntFields, fetchLocks, callback);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
 		return callback.dirList;
+	}
+	public static List<Info2> info(SubversionData svd) {
+		String path = svd.getWorkingCopyStr();
+		Revision revision = Revision.HEAD;
+		Revision pegRevision = Revision.HEAD;
+		int depth = Depth.infinity;
+		String[] changeLists = null;
+		HandleInfo callback = new HandleInfo();
+		try {
+			Svn.getSvnClient().info2(path, revision, pegRevision, depth,
+					changeLists, callback);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+		}
+		return callback.infoList;
 	}
 
 	public void svnCheckout(SubversionData svd,
@@ -474,4 +496,116 @@ public class Svn implements I_HandleSubversion {
 	public List<String> svnList(SubversionData svd) {
 		return list(svd);
 	}
+
+	public boolean svnLock(SubversionData svd, File toLock) {
+		return svnLock(svd, toLock, prompter, true);
+	}
+
+	public boolean svnUnlock(SubversionData svd, File toUnLock) {
+		return svnUnlock(svd, toUnLock, prompter, true);
+	}
+
+	public boolean svnUnlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		return unlock(svd, toUnlock, authenticator, interactive);
+	}
+
+	public static boolean unlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		SvnLog.info("Starting unlock");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+
+			if (interactive) {
+				handleAuthentication(authenticator);
+			}
+			switchToReadWriteRepository(svd);
+			Svn.getSvnClient().lock(
+					new String[] { toUnlock.getAbsolutePath() },
+					svd.getUsername(), false);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("finished unlock with exception: " + e.toString());
+			return false;
+		}
+		SvnLog.info("finished unlock");
+		return true;
+	}
+
+	public boolean svnLock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		return false;
+	}
+
+	public static boolean lock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		SvnLog.info("Starting lock");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+
+			if (interactive) {
+				handleAuthentication(authenticator);
+			}
+			switchToReadWriteRepository(svd);
+			Svn.getSvnClient().lock(new String[] { toLock.getAbsolutePath() },
+					svd.getUsername(), false);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("finished lock with exception: " + e.toString());
+			return false;
+		}
+		SvnLog.info("finished lock");
+		return true;
+	}
+
+	private static void switchToReadOnlyMirror(SubversionData svd) {
+		SvnLog.info("Starting switch to read only");
+		try {
+			if (getRepoInfo(svd).getUrl().equals(svd.getPreferredReadRepository())) {
+				SvnLog.info("Finised switch to read only: no change necessary");
+				return;
+			}
+			String path = svd.getWorkingCopyStr();
+			String url = svd.getPreferredReadRepository();
+			Revision revision = Revision.HEAD;
+			Revision pegRevision = Revision.HEAD;
+			int depth = Depth.infinity;
+			boolean depthIsSticky = true;
+			boolean ignoreExternals = true;
+			boolean allowUnverObstructions = false;
+			long version = Svn.getSvnClient().doSwitch(path, url, revision,
+					pegRevision, depth, depthIsSticky, ignoreExternals,
+					allowUnverObstructions);
+			SvnLog.info("Finished switch to read only at version: " + version);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("Finished switch to read only: " + e.toString());
+		}
+	}
+
+	private static void switchToReadWriteRepository(SubversionData svd) {
+		SvnLog.info("Starting switch to read/write");
+		try {
+			if (getRepoInfo(svd).getUrl().equals(svd.getRepositoryUrlStr())) {
+				SvnLog.info("Finished switch to read/write: no change necessary");
+				return;
+			}
+			String path = svd.getWorkingCopyStr();
+			String url = svd.getRepositoryUrlStr();
+			Revision revision = Revision.HEAD;
+			Revision pegRevision = Revision.HEAD;
+			int depth = Depth.infinity;
+			boolean depthIsSticky = true;
+			boolean ignoreExternals = true;
+			boolean allowUnverObstructions = false;
+			long version = Svn.getSvnClient().doSwitch(path, url, revision,
+					pegRevision, depth, depthIsSticky, ignoreExternals,
+					allowUnverObstructions);
+			SvnLog.info("Finished switch to read/write at version: " + version);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("Finished switch to read/write: " + e.toString());
+		}
+	}
+
 }

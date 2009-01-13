@@ -3,6 +3,7 @@ package org.dwfa.ace.config;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,6 +51,24 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	I_ConfigAceFrame baseFrame;
 
 
+
+	public boolean svnLock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		return baseFrame.svnLock(svd, toLock, authenticator, interactive);
+	}
+
+	public boolean svnLock(SubversionData svd, File toLock) {
+		return baseFrame.svnLock(svd, toLock);
+	}
+
+	public boolean svnUnlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		return baseFrame.svnUnlock(svd, toUnlock, authenticator, interactive);
+	}
+
+	public boolean svnUnlock(SubversionData svd, File toUnLock) {
+		return baseFrame.svnUnlock(svd, toUnLock);
+	}
 
 	public void svnCheckout(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) {

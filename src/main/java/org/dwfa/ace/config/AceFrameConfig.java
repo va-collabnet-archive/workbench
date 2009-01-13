@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeSupport;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -1655,7 +1656,30 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 
-    public class QueueFilter implements ServiceItemFilter {
+    public boolean svnLock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        return Svn.lock(svd, toLock, authenticator, interactive);
+	}
+
+	public boolean svnLock(SubversionData svd, File toLock) {
+	       aceFrame.setupSvn();
+	        return Svn.lock(svd, toLock, getAuthenticator(svd), true);
+	}
+
+	public boolean svnUnlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) {
+	       aceFrame.setupSvn();
+	        return Svn.unlock(svd, toUnlock, authenticator, interactive);
+	}
+
+	public boolean svnUnlock(SubversionData svd, File toUnlock) {
+	       aceFrame.setupSvn();
+	        return Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
+	}
+
+
+	public class QueueFilter implements ServiceItemFilter {
 
         public boolean check(ServiceItem item) {
             if (showAllQueues) {
