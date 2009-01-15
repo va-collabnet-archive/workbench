@@ -603,6 +603,7 @@ public class Svn implements I_HandleSubversion {
 			boolean ignoreExternals = true;
 			boolean allowUnverObstructions = false;
 			SvnLog.info("5");
+			SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl() + " to: " + url);
 			long version = Svn.getSvnClient().doSwitch(path, url, revision,
 					pegRevision, depth, depthIsSticky, ignoreExternals,
 					allowUnverObstructions);
