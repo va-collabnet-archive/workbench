@@ -561,8 +561,10 @@ public class Svn implements I_HandleSubversion {
 	private static void switchToReadOnlyMirror(SubversionData svd) {
 		SvnLog.info("Starting switch to read only");
 		try {
-			if (getRepoInfo(svd).getUrl().equals(svd.getPreferredReadRepository())) {
-				SvnLog.info("Finised switch to read only: no change necessary");
+			String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
+			String newRepo = normalizeEnding(svd.getPreferredReadRepository());
+			if (currentRepo.equals(newRepo)) {
+				SvnLog.info("Finished switch to read only: no change necessary");
 				return;
 			}
 			String path = svd.getWorkingCopyStr();
@@ -573,6 +575,7 @@ public class Svn implements I_HandleSubversion {
 			boolean depthIsSticky = true;
 			boolean ignoreExternals = true;
 			boolean allowUnverObstructions = false;
+			SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl() + " to: " + url);
 			long version = Svn.getSvnClient().doSwitch(path, url, revision,
 					pegRevision, depth, depthIsSticky, ignoreExternals,
 					allowUnverObstructions);
@@ -583,27 +586,31 @@ public class Svn implements I_HandleSubversion {
 		}
 	}
 
+	private static String normalizeEnding(String currentRepo) {
+		if (currentRepo.endsWith("/")) {
+			currentRepo = currentRepo.substring(0, currentRepo.length() - 1);
+		}
+		return currentRepo;
+	}
+
 	private static void switchToReadWriteRepository(SubversionData svd) {
 		SvnLog.info("Starting switch to read/write");
 		try {
-			if (getRepoInfo(svd).getUrl().equals(svd.getRepositoryUrlStr())) {
+			String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
+			String newRepo = normalizeEnding(svd.getRepositoryUrlStr());
+			if (currentRepo.equals(newRepo)) {
 				SvnLog.info("Finished switch to read/write: no change necessary");
 				return;
 			}
-			SvnLog.info("1");
 			String path = svd.getWorkingCopyStr();
-			SvnLog.info("2");
 			String url = svd.getRepositoryUrlStr();
-			SvnLog.info("3");
 			Revision revision = Revision.HEAD;
-			SvnLog.info("4");
 			Revision pegRevision = Revision.HEAD;
 			int depth = Depth.infinity;
 			boolean depthIsSticky = true;
 			boolean ignoreExternals = true;
 			boolean allowUnverObstructions = false;
-			SvnLog.info("5");
-			SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl() + " to: " + url);
+			SvnLog.info(" switching from: " + currentRepo + " to: " + url);
 			long version = Svn.getSvnClient().doSwitch(path, url, revision,
 					pegRevision, depth, depthIsSticky, ignoreExternals,
 					allowUnverObstructions);
