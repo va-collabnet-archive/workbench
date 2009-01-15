@@ -590,14 +590,19 @@ public class Svn implements I_HandleSubversion {
 				SvnLog.info("Finished switch to read/write: no change necessary");
 				return;
 			}
+			SvnLog.info("1");
 			String path = svd.getWorkingCopyStr();
+			SvnLog.info("2");
 			String url = svd.getRepositoryUrlStr();
+			SvnLog.info("3");
 			Revision revision = Revision.HEAD;
+			SvnLog.info("4");
 			Revision pegRevision = Revision.HEAD;
 			int depth = Depth.infinity;
 			boolean depthIsSticky = true;
 			boolean ignoreExternals = true;
 			boolean allowUnverObstructions = false;
+			SvnLog.info("5");
 			long version = Svn.getSvnClient().doSwitch(path, url, revision,
 					pegRevision, depth, depthIsSticky, ignoreExternals,
 					allowUnverObstructions);

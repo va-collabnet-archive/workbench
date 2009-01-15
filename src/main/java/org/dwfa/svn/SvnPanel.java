@@ -19,6 +19,19 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.log.HtmlHandler;
 
 public class SvnPanel extends JPanel {
+	private class PreferredReadOnlyListener implements ActionListener {
+		SubversionData svd;
+		
+		public PreferredReadOnlyListener(SubversionData svd) {
+			this.svd = svd;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			JComboBox cb = (JComboBox) e.getSource();
+	        String preferredReadRepository = (String) cb.getSelectedItem();
+			svd.setPreferredReadRepository(preferredReadRepository);
+		}
+	}
 	private class PurgeListener implements ActionListener {
 
 		SubversionData svd;
@@ -144,6 +157,8 @@ public class SvnPanel extends JPanel {
 		this.add(new JLabel("Repository: "), c);
 		c.gridy++;
 		this.add(new JLabel("Working copy: "), c);
+		c.gridy++;
+		this.add(new JLabel("Readonly Mirror: "), c);
 		c.gridx = 1;
 		c.gridy = 0;
 		c.weightx = 1;
@@ -157,6 +172,11 @@ public class SvnPanel extends JPanel {
 		JTextField workingCopy = new JTextField(svd.getWorkingCopyStr());
 		workingCopy.setEditable(false);
 		this.add(workingCopy, c);
+		c.gridy++;
+		JComboBox preferredReadOnly = new JComboBox(svd.getReadOnlyUrlMirrors().toArray());
+		preferredReadOnly.setSelectedItem(svd.getPreferredReadRepository());
+		preferredReadOnly.addActionListener(new PreferredReadOnlyListener(svd));
+		this.add(preferredReadOnly, c);
 		c.gridwidth = 1;
 		c.gridy++;
 		c.gridx++;
