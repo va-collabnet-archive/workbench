@@ -3,8 +3,10 @@ package org.dwfa.mojo.file.mappingfile;
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,11 +62,24 @@ public class MappingFileGeneratorTest {
 		
 		validateFilesEquivalent(outputFile, conceptsResultFile, expectedExtraTestFileLines, expectedExtraResultSetLines);
 	}
-	
+
 	@Test 
 	public void testConceptsFileAppend() throws MojoExecutionException, MojoFailureException, IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(appendTest));
+		File outputFile = new File(appendTest.getAbsoluteFile() + ".appended_output_file.txt");
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile, false));
+		
+		String line;
+		while ((line = reader.readLine()) != null) {
+			writer.write(line);
+			writer.newLine();
+		}
+		
+		reader.close();
+		writer.close();
+		
 		generator.setInputFile(conceptsInputFile);
-		generator.setOutputFile(appendTest);
+		generator.setOutputFile(outputFile);
 		generator.setDate("2007-10-19 00:00:00");
 		generator.append = true;
 		generator.execute();
@@ -72,10 +87,8 @@ public class MappingFileGeneratorTest {
 		Collection<String> expectedExtraTestFileLines = new ArrayList<String>();
 		expectedExtraTestFileLines.add("46bccdc4-8fb6-11db-b606-0800200c9a66+116680003");
 		
-		validateFilesEquivalent(appendTest, conceptsResultFile, expectedExtraTestFileLines, new HashSet<String>());
+		validateFilesEquivalent(outputFile, conceptsResultFile, expectedExtraTestFileLines, new HashSet<String>()); 
 	}
-
-
 
 	@Test 
 	public void testDescriptionsFile() throws MojoExecutionException, MojoFailureException, IOException {
