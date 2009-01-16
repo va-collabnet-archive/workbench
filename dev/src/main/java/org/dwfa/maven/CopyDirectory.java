@@ -44,7 +44,8 @@ public class CopyDirectory extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Log l = getLog();
-            l.info("Now executing ProcessProjectDirectories");
+            l.info("Now executing CopyDirectory from: " + inputDirectory + 
+            		" to: " + outputDirectory + " invisibles: " + copyInvisibles);
 
             // calculate the SHA-1 hashcode for this mojo based on input
             if (MojoUtil.alreadyRun(l, inputDirectory.getAbsolutePath() + outputDirectory.getAbsolutePath())) {
