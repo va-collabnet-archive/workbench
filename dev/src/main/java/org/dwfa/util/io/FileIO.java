@@ -39,7 +39,7 @@ public class FileIO {
 
 	/*
 	 * Comment by Tore
-	 * I changed the copy File method because on windows platforms the nio trnasferTo method
+	 * I changed the copy File method because on windows platforms the nio transferTo method
 	 * cannot handle > 64MB files.
 	 * please see: http://www.rgagnon.com/javadetails/java-0064.html
 	 * */
@@ -62,7 +62,8 @@ public class FileIO {
 		if (from.isDirectory()) {
 			to.mkdirs();
 			for (File f: from.listFiles()) {
-				if (copyInvisibles == true || f.isHidden() == false) {
+				if (f.isHidden() == false || 
+						((copyInvisibles == true) && (f.getName().endsWith(".DS_Store") == false))) {
 					File childTo = new File(to, f.getName());
 					recursiveCopy(f, childTo, copyInvisibles);
 				}
