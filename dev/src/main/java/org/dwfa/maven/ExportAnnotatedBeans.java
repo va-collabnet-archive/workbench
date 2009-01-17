@@ -26,9 +26,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -68,11 +66,6 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      */
     private File sourceDirectory;
 
-    /**
-     * @parameter expression="${project.dependencies}"
-     * @required
-     */
-    private List<Dependency> dependencies;
 
     /**
      * The dependency artifacts of this project, for resolving
@@ -89,12 +82,6 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      */
     private Set<Artifact> artifacts;
 
-	/**
-	 * @parameter expression="${localRepository}"
-	 * @required
-	 */
-	private DefaultArtifactRepository localRepository;
-
     /**
      * @parameter
      */
@@ -103,7 +90,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     /**
      * @parameter
      */
-    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta","au.com.ncch" };
+    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta","au.com.ncch", "org.aao" };
 
     /**
      * @parameter
@@ -142,39 +129,28 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                 return;
             }
         } catch (NoSuchAlgorithmException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            throw new MojoFailureException(e1.getLocalizedMessage(), e1);
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            throw new MojoFailureException(e1.getLocalizedMessage(), e1);
         }
 
-        getLog().info(" dependencies: " + dependencies);
         getLog().info(" artifacts: " + artifacts);
 
         String classNameNoDotClass = "";
-        /*
-         * getLog().info("java.class.version: " +
-         * System.getProperty("java.class.version"));
-         * getLog().info("java.vendor: " + System.getProperty("java.vendor"));
-         * getLog().info("java.version: " + System.getProperty("java.version"));
-         * getLog().info("os.arch: " + System.getProperty("os.arch"));
-         * getLog().info("os.name: " + System.getProperty("os.name"));
-         * getLog().info("java.home: " + System.getProperty("java.home"));
-         */
+
         if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
-            List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
-            for (Dependency d : dependencies) {
-                if (d.getScope().equals("provided")) {
+            List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
+            for (Artifact a : artifacts) {
+                if (a.getScope().equals("provided")) {
                     // don't add
-                } else if (d.getGroupId().endsWith("jini")) {
+                } else if (a.getGroupId().endsWith("jini")) {
                     // don't add
                     // getLog().info("Skipping: " + d);
                 } else {
-                    if (d.getScope().equals("system")) {
-                        getLog().info("System dependency: " + d);
+                    if (a.getScope().equals("system")) {
+                        getLog().info("System dependency: " + a);
                     }
-                    dependencyWithoutProvided.add(d);
+                    dependencyWithoutProvided.add(a);
                 }
             }
 
@@ -185,24 +161,23 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                     rootDir = this.outputDirectory;
 
                 }
-                for (Dependency d : dependencyWithoutProvided) {
-                    if (d.getScope().equals("provided")) {
+                for (Artifact artifact : artifacts) {
+                    if (artifact.getScope().equals("provided")) {
                         continue;
                     }
 
-                    if (d.getScope().equals("runtime-directory")) {
+                    if (artifact.getScope().equals("runtime-directory")) {
                         continue;
                     }
 
-                    if (d.getScope().equals("system")) {
+                    if (artifact.getScope().equals("system")) {
                         continue;
                     }
 
-                    String dependencyPath = MojoUtil.dependencyToPath(localRepository.getBasedir(), d);
-                    File dependencyFile = new File(dependencyPath);
+                     File dependencyFile = artifact.getFile();
                     if (dependencyFile.exists()) {
-                        getLog().info("writing annotated beans for: " + dependencyPath);
-                        JarFile jf = new JarFile(dependencyPath);
+                        getLog().info("writing annotated beans for: " + dependencyFile.getAbsolutePath());
+                        JarFile jf = new JarFile(dependencyFile);
                         Enumeration<JarEntry> jarEnum = jf.entries();
                         while (jarEnum.hasMoreElements()) {
                             JarEntry je = jarEnum.nextElement();
@@ -214,7 +189,6 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                         allowed = true;
                                         for (String forbidden : forbiddenRoots) {
                                             if (className.startsWith(forbidden)) {
-                                                getLog().info("forbidden: " + je.getName());
                                                 allowed = false;
                                                 break;
                                             }
@@ -228,7 +202,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                     classNameNoDotClass = className.substring(0, className.length() - 6);
                                     try {
                                         Class c = Class.forName(classNameNoDotClass);
-                                        Annotation a = c.getAnnotation(BeanList.class);
+                                        Annotation annotation = c.getAnnotation(BeanList.class);
                                         if (c.getAnnotation(BeanList.class) != null) {
                                             // getLog().info("Writing annotation
                                                     // for: " + c.getCanonicalName());
@@ -236,7 +210,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                             BeanList bl = (BeanList) Proxy
                                             .newProxyInstance(c.getClassLoader(),
                                                     new Class[] { BeanList.class },
-                                                    new GenericInvocationHandler(a));
+                                                    new GenericInvocationHandler(annotation));
                                             for (Spec s : bl.specs()) {
                                                 if (s.type().equals(BeanType.GENERIC_BEAN)) {
                                                     writeGenericBean(c, s);
@@ -257,7 +231,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                             }
                         }
                     } else {
-                        getLog().info("Warning. Dependency file does not exist: " + dependencyPath);
+                        getLog().info("Warning. Dependency file does not exist: " + dependencyFile.getAbsolutePath());
                     }
 
                 }
