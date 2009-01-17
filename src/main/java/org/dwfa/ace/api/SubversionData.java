@@ -30,6 +30,7 @@ public class SubversionData implements Serializable {
 
 	public void setPreferredReadRepository(String preferredReadRepository) {
 		this.preferredReadRepository = preferredReadRepository;
+		getReadOnlyUrlMirrors().add(preferredReadRepository);
 	}
 
 	public SubversionData() {
@@ -40,6 +41,8 @@ public class SubversionData implements Serializable {
 		super();
 		this.repositoryUrlStr = repositoryUrlStr;
 		this.workingCopyStr = workingCopyStr;
+		this.preferredReadRepository = repositoryUrlStr;
+		getReadOnlyUrlMirrors().add(repositoryUrlStr);
 	}
 	
 	public Set<String> getReadOnlyUrlMirrors() {
@@ -50,15 +53,13 @@ public class SubversionData implements Serializable {
 		return readOnlyUrlMirrors;
 	}
 
-	public void addReadOnlyUrlStr(String readOnlyUrlStr) {
-		getReadOnlyUrlMirrors().add(readOnlyUrlStr);
-	}
-
 	public String getRepositoryUrlStr() {
 		return repositoryUrlStr;
 	}
 	public void setRepositoryUrlStr(String repositoryUrlStr) {
+		getReadOnlyUrlMirrors().remove(this.repositoryUrlStr);
 		this.repositoryUrlStr = repositoryUrlStr;
+		getReadOnlyUrlMirrors().add(repositoryUrlStr);
 	}
 	public String getWorkingCopyStr() {
 		return workingCopyStr;
