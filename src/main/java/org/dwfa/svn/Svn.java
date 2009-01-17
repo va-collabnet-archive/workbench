@@ -559,6 +559,9 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	private static void switchToReadOnlyMirror(SubversionData svd) {
+		if (svd.getWorkingCopyStr() == null) {
+			return;
+		}
 		SvnLog.info("Starting switch to read only");
 		try {
 			String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
