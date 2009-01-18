@@ -18,6 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.swing.SwingUtilities;
+
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.ACE;
@@ -70,7 +72,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.config.AceRunner;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
@@ -1277,6 +1281,35 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	public I_ConfigAceFrame newAceFrameConfig() throws TerminologyException,
 			IOException {
 		return new AceFrameConfig();
+	}
+	
+	public static class MakeNewAceFrame implements Runnable {
+		I_ConfigAceFrame frameConfig;
+		Exception ex;
+		public MakeNewAceFrame(I_ConfigAceFrame frameConfig) {
+			super();
+			this.frameConfig = frameConfig;
+		}
+		public void run() {
+			try {
+				AceFrame newFrame = new AceFrame(AceRunner.args, AceRunner.lc,
+						frameConfig, false);
+				newFrame.setVisible(true);
+			} catch (Exception e) {
+				ex = e;
+			}
+		}
+		
+		public void check() throws Exception {
+			if (ex != null) {
+				throw ex;
+			}
+ 		}
+	}
+	public void newAceFrame(final I_ConfigAceFrame frameConfig) throws Exception {
+		MakeNewAceFrame maker = new MakeNewAceFrame(frameConfig);
+		SwingUtilities.invokeAndWait(maker);
+		maker.check();
 	}
 
 	I_ConfigAceFrame activeAceFrameConfig;

@@ -88,8 +88,8 @@ public class AceRunner {
 
 	}
 
-	private String[] args;
-	private LifeCycle lc;
+	public static String[] args;
+	public static LifeCycle lc;
 	/**
 	 * The jini configuration provider
 	 */
@@ -101,8 +101,8 @@ public class AceRunner {
 
 	public AceRunner(String[] args, LifeCycle lc) {
 		try {
-			this.args = args;
-			this.lc = lc;
+			AceRunner.args = args;
+			AceRunner.lc = lc;
 
 			ActivityViewer.setHeadless(false);
 
