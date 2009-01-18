@@ -75,6 +75,8 @@ public abstract class AbstractTask  implements I_DefineTask {
     private static final Condition[] stopConditionArray = { Condition.STOP };
     private static final Condition[] completeConditionArray = { Condition.PROCESS_COMPLETE };
     private static final Condition[] waitForWebFormArray = { Condition.WAIT_FOR_WEB_FORM };
+    private static final Condition[] prevContinueCancelArray = { Condition.PREVIOUS, Condition.CONTINUE, 
+    	Condition.ITEM_CANCELED };
 
     public static final List<Condition> CONTINUE_CONDITION = Collections.unmodifiableList(Arrays
             .asList(contiueConditionArray));
@@ -93,6 +95,9 @@ public abstract class AbstractTask  implements I_DefineTask {
 
     public static final List<Condition> WAIT_FOR_WEB_FORM_CONDITION = Collections.unmodifiableList(Arrays
             .asList(waitForWebFormArray));
+
+    public static final List<Condition> PREVIOUS_CONTINUE_CANCEL = Collections.unmodifiableList(Arrays
+            .asList(prevContinueCancelArray));
 
     private static final long serialVersionUID = 1;
 

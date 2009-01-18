@@ -22,11 +22,13 @@ public enum Condition  {
     STOP("Stop", true),
     PROCESS_COMPLETE("The End", false),
     STOP_THEN_REPEAT("Stop then Repeat", false),
-    WAIT_FOR_WEB_FORM("Web Post", true);
+    WAIT_FOR_WEB_FORM("Web Post", true),
+    PREVIOUS("Previous", true);
 
 	public String toString() {
 		return description;
 	}
+	
     public boolean isBranchCondition() {
      return branchCondition;   
     }
