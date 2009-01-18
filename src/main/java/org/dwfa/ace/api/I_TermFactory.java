@@ -46,6 +46,8 @@ public interface I_TermFactory {
             throws TerminologyException, IOException;
 
     public I_ConfigAceFrame newAceFrameConfig() throws TerminologyException, IOException;
+    
+    public void newAceFrame(I_ConfigAceFrame frameConfig) throws Exception;
 
     public I_ConfigAceFrame getActiveAceFrameConfig() throws TerminologyException, IOException;
 
