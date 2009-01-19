@@ -250,9 +250,7 @@ public class AceFrame extends ComponentFrame {
 			} catch (Exception e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
-
 		}
-
 	}
 
 	public class NewAceFrame implements ActionListener {

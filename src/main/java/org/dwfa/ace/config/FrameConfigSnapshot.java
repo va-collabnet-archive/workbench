@@ -52,6 +52,14 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 
 
+	public void closeFrame() {
+		baseFrame.closeFrame();
+	}
+
+	public void setFrameVisible(boolean visible) throws Exception {
+		baseFrame.setFrameVisible(visible);
+	}
+
 	public void setDbConfig(I_ConfigAceDb dbConfig) {
 		baseFrame.setDbConfig(dbConfig);
 	}

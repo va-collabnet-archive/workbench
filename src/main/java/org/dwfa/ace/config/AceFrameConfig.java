@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +26,7 @@ import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -2033,4 +2035,39 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Svn.update(svd, authenticator, interactive);
 	}
 
+	public void closeFrame() {
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+
+				public void run() {
+					if (aceFrame != null) {
+						aceFrame.setVisible(false);
+						aceFrame.dispose();
+						aceFrame = null;
+					}
+				}});
+		} catch (InterruptedException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (InvocationTargetException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+	}
+
+	public void setFrameVisible(final boolean visible) throws Exception {
+		SwingUtilities.invokeAndWait(new Runnable() {
+
+			public void run() {
+				if (aceFrame != null) {
+					aceFrame.setVisible(visible);
+				} else if (visible == true) {
+					try {
+						aceFrame = new AceFrame(new String[] { masterConfig.getAceRiverConfigFile() }, null,
+								AceFrameConfig.this, false);
+					} catch (Exception e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					}
+				}
+			}});
+
+	}
 }
