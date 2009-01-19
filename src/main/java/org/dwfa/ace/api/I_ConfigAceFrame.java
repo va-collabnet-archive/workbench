@@ -348,9 +348,13 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList();
     
     /**
-     * For storing history of concepts viewed by each component viewier. 
+     * For storing history of concepts viewed by each component viewer. 
      * @return
      */
     public Map<String, List<I_GetConceptData>> getTabHistoryMap();
+    
+    public void setFrameVisible(boolean visible) throws Exception;
+    
+    public void closeFrame();
 
 }
