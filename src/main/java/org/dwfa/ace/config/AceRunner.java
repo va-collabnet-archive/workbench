@@ -178,7 +178,7 @@ public class AceRunner {
 						new BufferedInputStream(new FileInputStream(
 								aceConfigFile)));
 				AceConfig.config = (AceConfig) ois.readObject();
-				AceConfig.config.setConfigFile(aceConfigFile);
+				AceConfig.config.setProfileFile(aceConfigFile);
 				setupDatabase(AceConfig.config, aceConfigFile);
 			} else {
 				File dbFolder = (File) jiniConfig.getEntry(this.getClass()
@@ -187,7 +187,7 @@ public class AceRunner {
 				AceLog.getAppLog().info(
 						"Cache size in config file: " + cacheSize);
 				AceConfig.config = new AceConfig(dbFolder);
-				AceConfig.config.setConfigFile(aceConfigFile);
+				AceConfig.config.setProfileFile(aceConfigFile);
 				setupDatabase(AceConfig.config, aceConfigFile);
 				AceConfig.setupAceConfig(AceConfig.config, aceConfigFile,
 						cacheSize, false);
@@ -245,7 +245,7 @@ public class AceRunner {
 				System.exit(0);
 			}
 			
-			File directory = AceConfig.config.getConfigFile().getParentFile();
+			File directory = AceConfig.config.getProfileFile().getParentFile();
 
 			if (directory.listFiles() != null) {
 				for (File dir : directory.listFiles()) {

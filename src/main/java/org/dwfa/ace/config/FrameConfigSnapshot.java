@@ -52,6 +52,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 
 
+	public void setDbConfig(I_ConfigAceDb dbConfig) {
+		baseFrame.setDbConfig(dbConfig);
+	}
+
 	public boolean svnLock(SubversionData svd, File toLock,
 			PromptUserPassword3 authenticator, boolean interactive) {
 		return baseFrame.svnLock(svd, toLock, authenticator, interactive);

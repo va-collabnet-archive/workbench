@@ -3593,7 +3593,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 		if (runShutdownProcesses) {
 			runShutdownProcesses = false;
-			File configFile = aceFrameConfig.getMasterConfig().getConfigFile();
+			File configFile = aceFrameConfig.getMasterConfig().getProfileFile();
 			File shutdownFolder = new File(configFile.getParentFile()
 					.getParentFile(), "shutdown");
 			executeShutdownProcesses(shutdownFolder);

@@ -88,13 +88,12 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	// 4
 	private String username;
 
-	private String password;
     
     // 5
     private File changeSetRoot;
     private String changeSetWriterFileName;
     
-    private transient File configFile;
+    private transient File profileFile;
 
 	public AceConfig() throws DatabaseException {
 		super();
@@ -119,7 +118,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(username);
-		out.writeObject(password);
+		out.writeObject(null); //for historic password...
 		out.writeObject(dbFolder);
 		out.writeBoolean(readOnly);
 		out.writeObject(cacheSize);
@@ -138,10 +137,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		if (objDataVersion <= dataVersion) {
 			if (objDataVersion >= 4) {
 				username = (String) in.readObject();
-				password = (String) in.readObject();
+				in.readObject(); // for historic password
 			} else {
 				username = null;
-				password = null;
 			}
 			if (objDataVersion >= 1) {
 				dbFolder = (File) in.readObject();
@@ -363,8 +361,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		}
 		SvnPrompter prompter = new SvnPrompter();
 		prompter.prompt("config file", "username");
-		config.setUsername(prompter.getUsername());
-		config.setPassword(prompter.getPassword());
 
 		I_ConfigAceFrame profile = NewDefaultProfile.newProfile(prompter.getUsername(), prompter.getPassword(), 
 				"admin", "visit.bend");
@@ -490,15 +486,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		this.aceRiverConfigFile = aceRiverConfigFile;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		Object old = this.password;
-		this.password = password;
-		this.changeSupport.firePropertyChange("password", old, password);
-	}
 
 	public String getUsername() {
 		return username;
@@ -538,16 +525,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         this.dbFolder = dbFolder;
     }
 
-    public File getConfigFile() {
-        return configFile;
-    }
-
-    public void setConfigFile(File configFile) {
-        this.configFile = configFile;
-    }
-    
     public void save() throws IOException {
-        if (configFile == null) {
+        if (profileFile == null) {
             throw new IOException("configFile is null. Please set before saving. ");
         } 
         File changeSetFile = new File(getChangeSetRoot(), getChangeSetWriterFileName());
@@ -562,7 +541,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                     " bytes. Incrementing file to: " + getChangeSetWriterFileName());
            }
         }
-        FileOutputStream fos = new FileOutputStream(configFile);
+        FileOutputStream fos = new FileOutputStream(profileFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(this);
@@ -586,7 +565,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     }
 
 	public File getProfileFile() {
-		return configFile;
+		return profileFile;
 	}
+
+    public void setProfileFile(File profileFile) {
+        this.profileFile = profileFile;
+    }
 
 }

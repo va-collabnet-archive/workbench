@@ -1756,6 +1756,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return getMasterConfig();
     }
 
+	public void setDbConfig(I_ConfigAceDb dbConfig) {
+		setMasterConfig((AceConfig) dbConfig);
+	}
+
     public I_GetConceptData getDefaultImageType() {
         return defaultImageType;
     }
@@ -2028,4 +2032,5 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.setupSvn();
         Svn.update(svd, authenticator, interactive);
 	}
+
 }

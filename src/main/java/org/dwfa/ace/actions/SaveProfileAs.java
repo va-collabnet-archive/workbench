@@ -14,7 +14,7 @@ public class SaveProfileAs implements ActionListener {
         try {
             File outFile = FileDialogUtil.getNewFile("Save profile as...",
                                                      new File("profiles/default.ace"));
-            AceConfig.config.setConfigFile(outFile);
+            AceConfig.config.setProfileFile(outFile);
             AceConfig.config.save();
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);

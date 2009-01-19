@@ -12,9 +12,9 @@ public class SaveProfile implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		try {
-            if (AceConfig.config.getConfigFile() == null) {
+            if (AceConfig.config.getProfileFile() == null) {
                 File outFile = FileDialogUtil.getNewFile("Save to profile...", new File("profiles/profile.ace"));
-                AceConfig.config.setConfigFile(outFile);
+                AceConfig.config.setProfileFile(outFile);
             } 
             AceConfig.config.save();
 		} catch (Exception e1) {
