@@ -268,6 +268,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setSignpostToggleIcon(ImageIcon icon);
     
     public I_ConfigAceDb getDbConfig();
+    public void setDbConfig(I_ConfigAceDb dbConfig);
     
     public void setPreferencesToggleVisible(boolean visible);
     public boolean isPreferencesToggleVisible();

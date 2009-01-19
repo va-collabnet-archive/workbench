@@ -1,4 +1,4 @@
-package org.dwfa.ace.task;
+package org.dwfa.ace.task.wfpanel;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -7,14 +7,11 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/instruct", type = BeanType.TASK_BEAN),
-		@Spec(directory = "tasks/ace/wfpanel", type = BeanType.TASK_BEAN) })
-public class InstructAndWaitTrueOrFalse extends InstructAndWaitStepOrCancel {
-
+@BeanList(specs = { @Spec(directory = "tasks/ace/wfpanel", type = BeanType.TASK_BEAN) })
+public class SetUserAndPwdNC extends SetUserAndPwdPNC {
 	private static final long serialVersionUID = 1;
-
 	private static final int dataVersion = 1;
-
+	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 	}
@@ -27,16 +24,10 @@ public class InstructAndWaitTrueOrFalse extends InstructAndWaitStepOrCancel {
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
-
 	}
 
-	
-	protected String getTrueImage() {
-		return "/16x16/plain/check.png";
+	@Override
+	protected boolean showPrevious() {
+		return false;
 	}
-
-	protected String getFalseImage() {
-		return "/16x16/plain/delete.png";
-	}
-
 }

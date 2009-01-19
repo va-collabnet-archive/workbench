@@ -58,6 +58,14 @@ public class NewDefaultProfile extends NewProfile {
 			throws TerminologyException, IOException {
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		I_ConfigAceFrame activeConfig = tf.newAceFrameConfig();
+		
+		if (username == null || username.length() < 2) {
+			username = "username";
+		}
+		if (adminUsername == null || adminUsername.length() < 2) {
+			adminUsername = "admin";
+			adminPassword = "visit.bend";
+		}
 
 		activeConfig.setUsername(username);
 		activeConfig.setPassword(password);

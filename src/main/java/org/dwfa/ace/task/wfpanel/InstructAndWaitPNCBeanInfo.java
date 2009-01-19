@@ -6,11 +6,19 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class InstructAndWaitPrevNextCancelBeanInfo extends SimpleBeanInfo {
+public class InstructAndWaitPNCBeanInfo extends SimpleBeanInfo {
 	public PropertyDescriptor[] getPropertyDescriptors() {
 		try {
-			PropertyDescriptor instruction = new PropertyDescriptor(
+            PropertyDescriptor profilePropName =
+                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+            profilePropName.setBound(true);
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that will contain the profile this task uses and/or modifies.");
+
+            PropertyDescriptor instruction = new PropertyDescriptor(
 					"instruction", getBeanDescriptor().getBeanClass());
 			instruction.setBound(true);
 			instruction.setPropertyEditorClass(JTextFieldEditor.class);
@@ -19,7 +27,7 @@ public class InstructAndWaitPrevNextCancelBeanInfo extends SimpleBeanInfo {
 			instruction
 					.setShortDescription("Instructions to present to the user in the workflow panel. ");
 
-			PropertyDescriptor rv[] = { instruction };
+			PropertyDescriptor rv[] = { profilePropName, instruction };
 			return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());
@@ -31,8 +39,8 @@ public class InstructAndWaitPrevNextCancelBeanInfo extends SimpleBeanInfo {
 	 */
 	public BeanDescriptor getBeanDescriptor() {
 		BeanDescriptor bd = new BeanDescriptor(
-				InstructAndWaitPrevNextCancel.class);
-		bd.setDisplayName("<html><font color='green'><center>Instruct and Wait<br>prev,next,cancel");
+				InstructAndWaitPNC.class);
+		bd.setDisplayName("<html><font color='green'><center>Instruct and Wait<br>Prev, Next, or Cancel");
 		return bd;
 	}
 }
