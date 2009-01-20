@@ -265,8 +265,8 @@ public class AceRunner {
 					boolean startup = firstStartup;
 					firstStartup = false;
 					AceFrame af = new AceFrame(
-							AceRunner.this.args,
-							AceRunner.this.lc, ace, startup);
+							AceRunner.args,
+							AceRunner.lc, ace, startup);
 					af.setVisible(true);
 				} catch (Exception e) {
 					AceLog.getAppLog()
@@ -299,8 +299,8 @@ public class AceRunner {
 									String regularPluginRoot = AceFrame.getPluginRoot();
 									AceFrame.setPluginRoot(AceFrame.getAdminPluginRoot());
 									AceFrame newFrame = new AceFrame(
-											AceRunner.this.args,
-											AceRunner.this.lc,
+											AceRunner.args,
+											AceRunner.lc,
 											ace,
 											startup);
 									AceFrame.setPluginRoot(regularPluginRoot);
