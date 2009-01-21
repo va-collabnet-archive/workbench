@@ -10,6 +10,7 @@ public interface I_HandleSubversion {
     public void svnCheckout(SubversionData svd);
     public void svnCleanup(SubversionData svd);
     public void svnCommit(SubversionData svd);
+    public void svnImport(SubversionData svd);
     public void svnPurge(SubversionData svd);
     public void svnStatus(SubversionData svd);
     public void svnUpdate(SubversionData svd);
@@ -22,6 +23,7 @@ public interface I_HandleSubversion {
 	public void svnCheckout(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
+	public void svnImport(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);

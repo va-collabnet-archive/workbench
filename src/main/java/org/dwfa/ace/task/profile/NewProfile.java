@@ -87,7 +87,7 @@ public abstract class NewProfile extends AbstractTask {
 			if (newProfile.getAddressesList().contains(username) == false) {
 				newProfile.getAddressesList().add(username);
 			}
-			if (newProfile.getQueueAddressesToShow().contains(username) == false) {
+			if (username != null && newProfile.getQueueAddressesToShow().contains(username) == false) {
 				newProfile.getQueueAddressesToShow().add(username);
 			}
 			process.setProperty(profilePropName, newProfile);

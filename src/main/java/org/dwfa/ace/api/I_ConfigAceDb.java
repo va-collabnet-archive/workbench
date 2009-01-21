@@ -1,6 +1,7 @@
 package org.dwfa.ace.api;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 public interface I_ConfigAceDb {
@@ -26,6 +27,8 @@ public interface I_ConfigAceDb {
 
     public File getProfileFile();
     public void setProfileFile(File profileFile);
+    
+    public Collection<String> getQueues();
     
 	public String getUsername();
 	public void setUsername(String username);

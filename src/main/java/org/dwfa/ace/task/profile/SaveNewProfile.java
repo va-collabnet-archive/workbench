@@ -15,8 +15,10 @@ import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.svn.AddSubversionEntry;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -25,6 +27,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.util.io.FileIO;
 
 @BeanList(specs = { @Spec(directory = "tasks/ace/profile", type = BeanType.TASK_BEAN) })
 public class SaveNewProfile extends AbstractTask {
@@ -60,14 +63,23 @@ public class SaveNewProfile extends AbstractTask {
         try {
             I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
+            File creatorsProfileFile = currentDbProfile.getProfileFile();
+            String repositoryUrlStr = null;
+            String workingCopyStr = FileIO.getNormalizedRelativePath(creatorsProfileFile);
+            SubversionData creatorSvd = new SubversionData(repositoryUrlStr, workingCopyStr);
+            currentProfile.svnCompleteRepoInfo(creatorSvd);
+            String sequenceToFind = "src/main/profiles/";
+            int sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+            int sequenceEnd = sequenceLocation + sequenceToFind.length();
             
             I_ImplementTermFactory termFactory = (I_ImplementTermFactory) LocalVersionedTerminology.get();
             
             I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            String repoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd) + profileToSave.getUsername();
             I_ConfigAceDb newDbProfile = termFactory.newAceDbConfig();
             profileToSave.setDbConfig(newDbProfile);
-
-            File userDir = new File("profiles" + File.separator  + profileToSave.getUsername());
+            String userDirStr = "profiles" + File.separator  + profileToSave.getUsername();
+            File userDir = new File(userDirStr);
             File changeSetRoot = new File(userDir, "changesets");
             changeSetRoot.mkdirs();
             File profileFile = new File(userDir, profileToSave.getUsername() + ".ace");
@@ -82,11 +94,29 @@ public class SaveNewProfile extends AbstractTask {
             newDbProfile.setProfileFile(profileFile);
             newDbProfile.setUsername(profileToSave.getUsername());
             
+            // Create a new svn profile for the user
+            
+            AddSubversionEntry addEntryTask = new AddSubversionEntry();
+            addEntryTask.setKeyName("profile");
+            addEntryTask.setProfilePropName(profilePropName);
+            addEntryTask.setPrompt("verify subversion settings for user profile: ");
+            addEntryTask.setRepoUrl(repoUrl);
+            addEntryTask.setWorkingCopy(userDirStr);
+            addEntryTask.evaluate(process, worker);
+            
+            // write to disk
             FileOutputStream fos = new FileOutputStream(profileFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(newDbProfile);
             oos.close();
+              
+            // import, delete, then checkout...
+            SubversionData userSvd = new SubversionData(repoUrl, userDirStr);
+            currentProfile.svnImport(userSvd);
+            //
+            FileIO.recursiveDelete(new File(userDirStr));
+            currentProfile.svnCheckout(userSvd);
             
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
