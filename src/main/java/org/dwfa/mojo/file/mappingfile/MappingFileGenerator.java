@@ -27,155 +27,197 @@ import org.apache.maven.plugin.MojoFailureException;
  * 
  */
 public class MappingFileGenerator extends AbstractMojo {
-	private static final String CONCEPTS_HEADER = "CONCEPTID	CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITVE	CONCEPTUUID	CONCEPTSTATUSUUID	EFFECTIVETIME";
+    private static final String CONCEPTS_HEADER = "CONCEPTID	CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITVE	CONCEPTUUID	CONCEPTSTATUSUUID	EFFECTIVETIME";
 
-	private static final String DESCRIPTIONS_HEADER = "DESCRIPTIONID	DESCRIPTIONSTATUS	CONCEPTID	TERM	INITIALCAPITALSTATUS	DESCRIPTIONTYPE	LANGUAGECODE	DESCRIPTIONUUID	DESCRIPTIONSTATUSUUID	DESCRIPTIONTYPEUUID	CONCEPTUUID	LANGUAGEUUID	CASESENSITIVITY	EFFECTIVETIME";
+    private static final String DESCRIPTIONS_HEADER = "DESCRIPTIONID	DESCRIPTIONSTATUS	CONCEPTID	TERM	INITIALCAPITALSTATUS	DESCRIPTIONTYPE	LANGUAGECODE	DESCRIPTIONUUID	DESCRIPTIONSTATUSUUID	DESCRIPTIONTYPEUUID	CONCEPTUUID	LANGUAGEUUID	CASESENSITIVITY	EFFECTIVETIME";
 
-	private static final String RELATIONSHIPS_HEADER = "RELATIONSHIPID	CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP	RELATIONSHIPUUID	CONCEPTUUID1	RELATIONSHIPTYPEUUID	CONCEPTUUID2	CHARACTERISTICTYPEUUID	REFINABILITYUUID	RELATIONSHIPSTATUSUUID	EFFECTIVETIME";
+    private static final String RELATIONSHIPS_HEADER = "RELATIONSHIPID	CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP	RELATIONSHIPUUID	CONCEPTUUID1	RELATIONSHIPTYPEUUID	CONCEPTUUID2	CHARACTERISTICTYPEUUID	REFINABILITYUUID	RELATIONSHIPSTATUSUUID	EFFECTIVETIME";
 
-	/**
-	 * The file to convert to a mapping file - must be a concepts, descriptions or relationships file
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	File inputFile;
-	
-	/**
-	 * The output mapping file - if it exists it will be overwritten!
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	File outputFile;
-	
-	/**
-	 * Indicates if data should be appended to the output file - default is not to overwrite
-	 * 
-	 * @parameter
-	 */
-	boolean append = false;
-	
-	/**
-	 * Date to put in the mapping file - defaults to 2007-01-01 00:00:00
-	 * 
-	 * @parameter expression="2007-01-01 00:00:00"
-	 */
-	String date;
-	
-	private BufferedReader reader;
+    /**
+     * The file to convert to a mapping file - must be a concepts, descriptions or relationships file
+     * 
+     * @parameter
+     * @required
+     */
+    File inputFile;
+    
+    /**
+     * The output mapping file - if it exists it will be overwritten!
+     * 
+     * @parameter
+     * @required
+     */
+    File outputFile;
+    
+    /**
+     * Indicates if data should be appended to the output file - default is not to overwrite
+     * 
+     * @parameter
+     */
+    boolean append = false;
+    
+    /**
+     * Indicates if the generated mapping file is in "Legacy Map" format - default is not "Legacy Map" format
+     * 
+     * @parameter
+     */
+    boolean isLegacy = false;
 
-	private BufferedWriter writer;
+    /**
+     * Date to put in the mapping file - defaults to 2007-01-01 00:00:00
+     * 
+     * @parameter expression="2007-01-01 00:00:00"
+     */
+    String date;
+    
+    private BufferedReader reader;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		openFiles();
-		
-		String header = getInputLine();
-		
-		if (header.equals(CONCEPTS_HEADER)) {
-			processConceptsFile();
-		} else if (header.equals(DESCRIPTIONS_HEADER)) {
-			processDescriptionsFile();
-		} else if (header.equals(RELATIONSHIPS_HEADER)) {
-			processRelationshipsFile();
-		} else {
-			throw new MojoExecutionException("cannot process file " + inputFile + " file is not a concepts, description or relationships file");
-		}
-	}
+    private BufferedWriter writer;
 
-	private void processRelationshipsFile() throws MojoExecutionException {
-		writeTokenByIndex(0, 7);
-	}
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        openFiles();
+        
+        String header = getInputLine();
+        
+        if (header.equals(CONCEPTS_HEADER)) {
+            processConceptsFile();
+        } else if (header.equals(DESCRIPTIONS_HEADER) && !isLegacy) {
+            processDescriptionsFile();
+        } else if (header.equals(RELATIONSHIPS_HEADER) && !isLegacy) {
+            processRelationshipsFile();
+        } else {
+            throw new MojoExecutionException("cannot process file " + inputFile + " file is not a concepts, description or relationships file");
+        }
+    }
 
-	private void processDescriptionsFile() throws MojoExecutionException {
-		writeTokenByIndex(0, 7);
-	}
+    private void processRelationshipsFile() throws MojoExecutionException {
+        writeTokenByIndex(0, 7);
+    }
 
-	private void processConceptsFile() throws MojoExecutionException {
-		writeTokenByIndex(0, 6);
-	}
+    private void processDescriptionsFile() throws MojoExecutionException {
+        writeTokenByIndex(0, 7);
+    }
 
-	private void writeTokenByIndex(int sctid, int uuid) throws MojoExecutionException {
-		Pattern pattern = Pattern.compile("\\t");
-		String[] tokens;
-		try {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				tokens = pattern.split(line);
-				writeToOutput(tokens[sctid], tokens[uuid]);
-			}
-			writer.close();
-		} catch (IOException e) {
-			throw new MojoExecutionException("cannot read from input file " + inputFile, e);
-		}
-	}
-	
-	private void writeToOutput(String sctid, String uuid) throws MojoExecutionException {
-		try {
-			writer.write(uuid);
-			writer.newLine();
-			writer.write(sctid);
-			writer.write("\t");
-			writer.write(date);
-			writer.newLine();
-		} catch (IOException e) {
-			throw new MojoExecutionException("failed writing to output file " + outputFile, e);
-		}
-	}
-	
-	private String getInputLine() throws MojoExecutionException {
-		try {
-			String line = reader.readLine();
-			
-			if (line == null) {
-				reader.close();
-			}
-			
-			return line;
-		} catch (IOException e) {
-			throw new MojoExecutionException("failed reading input file " + inputFile, e);
-		}
-	}
+    private void processConceptsFile() throws MojoExecutionException {
+        if (isLegacy)
+        {
+            writeLegacyHeader();
+            writeTokenByIndex(6, 2);
+        }
+        else
+        {
+            writeTokenByIndex(0, 6);
+        }
+    }
 
-	private void openFiles() throws MojoExecutionException {
-		try {
-			reader = new BufferedReader(new FileReader(inputFile));
-		} catch (FileNotFoundException e) {
-			throw new MojoExecutionException("cannot execute - input file must exist, be readable and not be empty", e);
-		}
-		
-		if (outputFile.exists()) {
-			getLog().warn("existing output file " + outputFile + " will be overwritten");
-		}	
-		
-		try {
-			writer = new BufferedWriter(new FileWriter(outputFile, append));
-		} catch (IOException e) {
-			throw new MojoExecutionException("cannot execute - input file must exist, be readable and not be empty", e);
-		}
-	}
+    private void writeLegacyHeader() throws MojoExecutionException {
+        try {
+            writer.write("CONCEPTUUID\tFULLYSPECIFIEDNAME");
+            writer.newLine();
+        } catch (IOException e) {
+            throw new MojoExecutionException("failed writing to output file " + outputFile, e);
+        }
+    }
+    
+    private void writeTokenByIndex(int sctid, int uuid) throws MojoExecutionException {
+        Pattern pattern = Pattern.compile("\\t");
+        String[] tokens;
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                tokens = pattern.split(line);
+                if (isLegacy)
+                {
+                    writeToLegacyOutput(tokens[sctid], tokens[uuid]);
+                }
+                else
+                {
+                    writeToOutput(tokens[sctid], tokens[uuid]);
+                }
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new MojoExecutionException("cannot read from input file " + inputFile, e);
+        }
+    }
+    
+    private void writeToOutput(String sctid, String uuid) throws MojoExecutionException {
+        try {
+            writer.write(uuid);
+            writer.newLine();
+            writer.write(sctid);
+            writer.write("\t");
+            writer.write(date);
+            writer.newLine();
+        } catch (IOException e) {
+            throw new MojoExecutionException("failed writing to output file " + outputFile, e);
+        }
+    }
+    
+    private void writeToLegacyOutput(String uuid, String fsn) throws MojoExecutionException {
+        try {
+            writer.write(uuid);
+            writer.write("\t");
+            writer.write(fsn);
+            writer.newLine();
+        } catch (IOException e) {
+            throw new MojoExecutionException("failed writing to output file " + outputFile, e);
+        }
+    }
+    
+    private String getInputLine() throws MojoExecutionException {
+        try {
+            String line = reader.readLine();
+            
+            if (line == null) {
+                reader.close();
+            }
+            
+            return line;
+        } catch (IOException e) {
+            throw new MojoExecutionException("failed reading input file " + inputFile, e);
+        }
+    }
 
-	public File getInputFile() {
-		return inputFile;
-	}
+    private void openFiles() throws MojoExecutionException {
+        try {
+            reader = new BufferedReader(new FileReader(inputFile));
+        } catch (FileNotFoundException e) {
+            throw new MojoExecutionException("cannot execute - input file must exist, be readable and not be empty", e);
+        }
+        
+        if (outputFile.exists()) {
+            getLog().warn("existing output file " + outputFile + " will be overwritten");
+        }	
+        
+        try {
+            writer = new BufferedWriter(new FileWriter(outputFile, append));
+        } catch (IOException e) {
+            throw new MojoExecutionException("cannot execute - input file must exist, be readable and not be empty", e);
+        }
+    }
 
-	public void setInputFile(File inputFile) {
-		this.inputFile = inputFile;
-	}
+    public File getInputFile() {
+        return inputFile;
+    }
 
-	public File getOutputFile() {
-		return outputFile;
-	}
+    public void setInputFile(File inputFile) {
+        this.inputFile = inputFile;
+    }
 
-	public void setOutputFile(File outputFile) {
-		this.outputFile = outputFile;
-	}
+    public File getOutputFile() {
+        return outputFile;
+    }
 
-	public String getDate() {
-		return date;
-	}
+    public void setOutputFile(File outputFile) {
+        this.outputFile = outputFile;
+    }
 
-	public void setDate(String date) {
-		this.date = date;
-	}
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 }
