@@ -323,7 +323,7 @@ public class Svn implements I_HandleSubversion {
 
 	public static void checkout(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) {
-		SvnLog.info("starting get");
+		SvnLog.info("starting checkout");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
 			if (interactive) {
@@ -341,7 +341,7 @@ public class Svn implements I_HandleSubversion {
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 		}
-		SvnLog.info("finished get");
+		SvnLog.info("finished checkout");
 		ObjectServerCore.refreshServers();
 		SvnLog.info("refreshed Object Servers");
 	}
@@ -363,6 +363,7 @@ public class Svn implements I_HandleSubversion {
 		}
 
 	}
+
 	private static class HandleInfo implements InfoCallback {
 		List<Info2> infoList = new ArrayList<Info2>();
 
@@ -380,8 +381,7 @@ public class Svn implements I_HandleSubversion {
 		}
 	}
 
-	private static Info2 getRepoInfo(SubversionData svd)
-			throws ClientException {
+	private static Info2 getRepoInfo(SubversionData svd) throws ClientException {
 		String pathOrUrl = svd.getWorkingCopyStr();
 		Revision revision = Revision.HEAD;
 		Revision pegRevision = Revision.HEAD;
@@ -419,6 +419,7 @@ public class Svn implements I_HandleSubversion {
 		}
 		return callback.dirList;
 	}
+
 	public static List<Info2> info(SubversionData svd) {
 		String path = svd.getWorkingCopyStr();
 		Revision revision = Revision.HEAD;
@@ -449,6 +450,10 @@ public class Svn implements I_HandleSubversion {
 			PromptUserPassword3 authenticator, boolean interactive) {
 		commit(svd, authenticator, interactive);
 	}
+	public void svnImport(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		doImport(svd, authenticator, interactive);
+	}
 
 	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator,
 			boolean interactive) {
@@ -475,6 +480,10 @@ public class Svn implements I_HandleSubversion {
 
 	public void svnCommit(SubversionData svd) {
 		svnCommit(svd, prompter, true);
+	}
+
+	public void svnImport(SubversionData svd) {
+		svnImport(svd, prompter, true);
 	}
 
 	public void svnPurge(SubversionData svd) {
@@ -558,31 +567,70 @@ public class Svn implements I_HandleSubversion {
 		return true;
 	}
 
+	public static void doImport(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		SvnLog.info("Starting import");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+			String message = "Importing " + svd.getRepositoryUrlStr();
+			if (interactive
+					&& SvnPrompter.class.isAssignableFrom(authenticator
+							.getClass())) {
+				SvnPrompter p = (SvnPrompter) authenticator;
+				message = p.askQuestion(svd.getRepositoryUrlStr(),
+						"import message: ", message, true);
+			}
+			if (interactive) {
+				handleAuthentication(authenticator);
+			}
+			String path = svd.getWorkingCopyStr();
+			String url = svd.getRepositoryUrlStr();
+			int depth = Depth.infinity;
+			boolean noIgnore = false;
+			boolean ignoreUnknownNodeTypes = false;
+			Map<?,?> revpropTable = null;
+			Svn.getSvnClient().doImport(path, url, message, depth, noIgnore,
+					ignoreUnknownNodeTypes, revpropTable);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("finished import with exception: " + e.toString());
+		}
+		SvnLog.info("finished import");
+	}
+
 	private static void switchToReadOnlyMirror(SubversionData svd) {
 		if (svd.getWorkingCopyStr() == null) {
 			return;
 		}
 		SvnLog.info("Starting switch to read only");
 		try {
-			String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
-			String newRepo = normalizeEnding(svd.getPreferredReadRepository());
-			if (currentRepo.equals(newRepo)) {
-				SvnLog.info("Finished switch to read only: no change necessary");
-				return;
+			File workingDir = new File(svd.getWorkingCopyStr());
+			File svnDir = new File(workingDir, ".svn");
+			if (svnDir.exists()) {
+				String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
+				String newRepo = normalizeEnding(svd.getPreferredReadRepository());
+				if (currentRepo.equals(newRepo)) {
+					SvnLog.info("Finished switch to read only: no change necessary");
+					return;
+				}
+				String path = svd.getWorkingCopyStr();
+				String url = svd.getPreferredReadRepository();
+				Revision revision = Revision.HEAD;
+				Revision pegRevision = Revision.HEAD;
+				int depth = Depth.infinity;
+				boolean depthIsSticky = true;
+				boolean ignoreExternals = true;
+				boolean allowUnverObstructions = false;
+				SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl()
+						+ " to: " + url);
+				long version = Svn.getSvnClient().doSwitch(path, url, revision,
+						pegRevision, depth, depthIsSticky, ignoreExternals,
+						allowUnverObstructions);
+				SvnLog.info("Finished switch to read only at version: " + version);
+			} else {
+				SvnLog.info("Finished switch to read only: Not a working directory: " + workingDir);
 			}
-			String path = svd.getWorkingCopyStr();
-			String url = svd.getPreferredReadRepository();
-			Revision revision = Revision.HEAD;
-			Revision pegRevision = Revision.HEAD;
-			int depth = Depth.infinity;
-			boolean depthIsSticky = true;
-			boolean ignoreExternals = true;
-			boolean allowUnverObstructions = false;
-			SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl() + " to: " + url);
-			long version = Svn.getSvnClient().doSwitch(path, url, revision,
-					pegRevision, depth, depthIsSticky, ignoreExternals,
-					allowUnverObstructions);
-			SvnLog.info("Finished switch to read only at version: " + version);
+			
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
 			SvnLog.info("Finished switch to read only: " + e.toString());
@@ -602,7 +650,8 @@ public class Svn implements I_HandleSubversion {
 			String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
 			String newRepo = normalizeEnding(svd.getRepositoryUrlStr());
 			if (currentRepo.equals(newRepo)) {
-				SvnLog.info("Finished switch to read/write: no change necessary");
+				SvnLog
+						.info("Finished switch to read/write: no change necessary");
 				return;
 			}
 			String path = svd.getWorkingCopyStr();

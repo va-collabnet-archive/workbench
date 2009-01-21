@@ -202,7 +202,7 @@ public class SvnPanel extends JPanel {
 		cleanup.addActionListener(new CleanupListener(svd));
 		this.add(cleanup, c);
 		c.gridx++;
-		JButton checkout = new JButton("get");
+		JButton checkout = new JButton("checkout");
 		checkout.addActionListener(new CheckoutListener(svd));
 		this.add(checkout, c);
 		c.gridx++;
@@ -220,9 +220,9 @@ public class SvnPanel extends JPanel {
 		c.gridx++;
 		JButton clear = new JButton("clear log");
 		this.add(clear, c);
-		c.gridy = 4;
+		c.gridy = 5;
 		c.gridx = 0;
-		c.gridwidth = 8;
+		c.gridwidth = 9;
 		c.gridheight = 10;
 		c.weighty = 1;
 		c.weightx = 0;

@@ -554,10 +554,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 20) {
                 showAllQueues = in.readBoolean();
                 queueAddressesToShow = new SortedSetModel<String>((Collection<String>) in.readObject());
+                for (String s: queueAddressesToShow) {
+                	if (s == null) {
+                		queueAddressesToShow.clear();
+                		break;
+                	}
+                }
             } else {
                 showAllQueues = false;
                 queueAddressesToShow = new SortedSetModel<String>();
-                queueAddressesToShow.add(username);
+                if (username != null) {
+                    queueAddressesToShow.add(username);
+                }
             }
             if (objDataVersion >= 21) {
                 try {
@@ -1632,6 +1640,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Svn.commit(svd, getAuthenticator(svd), true);
     }
 
+    public void svnImport(SubversionData svd) {
+        aceFrame.setupSvn();
+        Svn.doImport(svd, getAuthenticator(svd), true);
+    }
+    
+    public void svnImport(SubversionData svd,
+    		PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+        Svn.doImport(svd, authenticator, interactive);
+    }
     public void svnPurge(SubversionData svd) {
         aceFrame.setupSvn();
         Svn.purge(svd, getAuthenticator(svd), true);

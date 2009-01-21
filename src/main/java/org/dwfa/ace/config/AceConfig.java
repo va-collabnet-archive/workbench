@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -60,7 +62,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 5;
+	private static final int dataVersion = 6;
 
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
@@ -93,6 +95,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     private File changeSetRoot;
     private String changeSetWriterFileName;
     
+    // 6
+    private Collection<String> queueFolders = new HashSet<String>();
+    
+    // transient
     private transient File profileFile;
 
 	public AceConfig() throws DatabaseException {
@@ -126,6 +132,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         out.writeObject(loggerRiverConfigFile);
         out.writeObject(changeSetRoot);
         out.writeObject(changeSetWriterFileName);
+        out.writeObject(queueFolders);
 	}
 
 	private static final String authFailureMsg = "Username and password do not match.";
@@ -182,6 +189,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             } else {
                 changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + username);
                 changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
+            }
+            if (objDataVersion >= 6) {
+            	queueFolders = (Collection<String>) in.readObject();
+            } else {
+            	queueFolders = new HashSet<String>();
             }
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -572,4 +584,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         this.profileFile = profileFile;
     }
 
+	public Collection<String> getQueues() {
+		return queueFolders;
+	}
 }

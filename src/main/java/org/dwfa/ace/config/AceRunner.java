@@ -236,7 +236,6 @@ public class AceRunner {
 					}
 				}
 			}
-			// Execute startup processes here...
 
 			if (successCount == 0) {
 				JOptionPane.showMessageDialog(null,
@@ -245,6 +244,8 @@ public class AceRunner {
 				System.exit(0);
 			}
 			
+			// Startup queues in profile sub-directories here...
+
 			File directory = AceConfig.config.getProfileFile().getParentFile();
 
 			if (directory.listFiles() != null) {
@@ -252,6 +253,17 @@ public class AceRunner {
 					processFile(dir, lc);
 				}
 			}
+			
+			// Startup other queues here...
+           for (String queue: AceConfig.config.getQueues()) {
+        	   File queueFile = new File(queue);
+            	AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
+            	if (QueueServer.started(queueFile)) {
+                	AceLog.getAppLog().info("Queue already started: " + queueFile.toURI().toURL().toExternalForm());
+            	} else {
+                    new QueueServer(new String[] { queueFile.getCanonicalPath() }, lc);
+            	}
+            }			
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			System.exit(0);
