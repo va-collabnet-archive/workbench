@@ -56,7 +56,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
     public enum Concept implements I_ConceptualizeUniversally {
 
-        ARCHITECTONIC_ROOT_CONCEPT("ACE Auxiliary concept", getArchitectonicText(),
+        ARCHITECTONIC_ROOT_CONCEPT("Workbench Auxiliary concept", getArchitectonicText(),
             new I_ConceptualizeUniversally[] { }),
         DEFINITION_TYPE("definition type",
                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
@@ -360,7 +360,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                                 new I_ConceptualizeUniversally[] { SNOMED_CORE }),
                         SNOMED_20050131("SNOMED 2005-01-31",
                                 new I_ConceptualizeUniversally[] { SNOMED_CORE }),
-                ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"ACE Auxiliary"}, null,
+                ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"Workbench Auxiliary"}, null,
                         new I_ConceptualizeUniversally[] { PATH }),
         TEST("test",
                 new I_ConceptualizeUniversally[] { PATH }),
