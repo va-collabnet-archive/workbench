@@ -1665,6 +1665,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Svn.update(svd, getAuthenticator(svd), true);
     }
     
+	public void svnUpdateDatabase(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+        aceFrame.setupSvn();
+		Svn.updateDatabase(svd, authenticator, interactive);
+	}
+
+	public void svnUpdateDatabase(SubversionData svd) {
+        aceFrame.setupSvn();
+		Svn.updateDatabase(svd, getAuthenticator(svd), true);
+	}
+
 	public void svnCompleteRepoInfo(SubversionData svd) {
         aceFrame.setupSvn();
         Svn.completeRepoInfo(svd);
@@ -1674,7 +1685,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.setupSvn();
         return Svn.list(svd);
 	}
-
 
     public boolean svnLock(SubversionData svd, File toLock,
 			PromptUserPassword3 authenticator, boolean interactive) {

@@ -84,15 +84,12 @@ public class Svn implements I_HandleSubversion {
 									.getLockState());
 							String action = convertAction(info.getAction());
 
-							SvnLog.info("svn onNotify: " + " path: " + path
-									+ "\n" + " kind: " + nodeKindName + " "
-									+ " content state: " + contentStateName
+							SvnLog.info("svn onNotify: path: " + path
+									+ "\n kind: " + nodeKindName + " content state: " + contentStateName
 									+ " prop state: " + propertyStateName
-									+ " \n" + " err msg: " + errorMsg + " "
-									+ " mime : " + mimeType + " "
-									+ " revision: " + revision + " \n"
-									+ " lock: " + lock + " " + " lock state: "
-									+ lockState + " " + " action: " + action);
+									+ "\n err msg: " + errorMsg + " mime : " + mimeType
+									+ " revision: " + revision + "\n lock: " + lock + " lock state: "
+									+ lockState + " action: " + action);
 						}
 					} catch (Throwable t) {
 						AceLog.getAppLog().alertAndLogException(t);
@@ -497,6 +494,10 @@ public class Svn implements I_HandleSubversion {
 	public void svnUpdateDatabase(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) {
 		updateDatabase(svd, authenticator, interactive);
+	}
+
+	public void svnUpdateDatabase(SubversionData svd) {
+		updateDatabase(svd, prompter, true);
 	}
 
 	public void svnCheckout(SubversionData svd) {

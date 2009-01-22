@@ -50,6 +50,15 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+	public void svnUpdateDatabase(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		baseFrame.svnUpdateDatabase(svd, authenticator, interactive);
+	}
+
+	public void svnUpdateDatabase(SubversionData svd) {
+		baseFrame.svnUpdateDatabase(svd);
+	}
+
 	public void svnImport(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) {
 		baseFrame.svnImport(svd, authenticator, interactive);
