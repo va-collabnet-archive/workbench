@@ -187,14 +187,6 @@ import com.sleepycat.je.DatabaseException;
 public class ACE extends JPanel implements PropertyChangeListener,
 		I_DoQuitActions {
 
-	private static ImageIcon errorIcon = new ImageIcon(ACE.class
-			.getResource("/24x24/plain/forbidden.png"));
-	private static ImageIcon warningIcon = new ImageIcon(ACE.class
-			.getResource("/24x24/plain/warning.png"));
-	private static ImageIcon informationalIcon = new ImageIcon(ACE.class
-			.getResource("/24x24/plain/information.png"));
-	private static ImageIcon resolvedIcon = new ImageIcon(ACE.class
-			.getResource("/24x24/plain/transform.png"));
 
 	private List<TermComponentDataCheckSelectionListener> dataCheckListeners = new ArrayList<TermComponentDataCheckSelectionListener>();
 
@@ -340,15 +332,15 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				label.setText(alert.getAlertMessage());
 				switch (alert.getAlertType()) {
 				case ERROR:
-					label.setIcon(errorIcon);
+					label.setIcon(AceImages.errorIcon);
 				case INFORMATIONAL:
-					label.setIcon(informationalIcon);
+					label.setIcon(AceImages.errorIcon);
 					break;
 				case RESOLVED:
-					label.setIcon(resolvedIcon);
+					label.setIcon(AceImages.errorIcon);
 					break;
 				case WARNING:
-					label.setIcon(warningIcon);
+					label.setIcon(AceImages.errorIcon);
 					break;
 				}
 
