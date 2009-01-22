@@ -11,6 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.UUID;
 
+import javax.swing.JOptionPane;
+
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ImplementTermFactory;
@@ -75,7 +77,8 @@ public class SaveNewProfile extends AbstractTask {
             I_ImplementTermFactory termFactory = (I_ImplementTermFactory) LocalVersionedTerminology.get();
             
             I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            String repoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd) + profileToSave.getUsername();
+            String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd);
+            String userDirRepoUrl = profileDirRepoUrl + profileToSave.getUsername();
             I_ConfigAceDb newDbProfile = termFactory.newAceDbConfig();
             profileToSave.setDbConfig(newDbProfile);
             String userDirStr = "profiles" + File.separator  + profileToSave.getUsername();
@@ -94,15 +97,58 @@ public class SaveNewProfile extends AbstractTask {
             newDbProfile.setProfileFile(profileFile);
             newDbProfile.setUsername(profileToSave.getUsername());
             
-            // Create a new svn profile for the user
+          //Custom button text
+            Object[] options = {"Synchronize profile directory", // yes option
+                                "Synchronize only user profile", // no option
+                                "Cancel"}; // cancel option
+            int n = JOptionPane.showOptionDialog(null,
+                "Would you like some green eggs to go "
+                + "with that ham?",
+                "Select Subversion setup for profiles",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[2]);
             
-            AddSubversionEntry addEntryTask = new AddSubversionEntry();
-            addEntryTask.setKeyName("profile");
-            addEntryTask.setProfilePropName(profilePropName);
-            addEntryTask.setPrompt("verify subversion settings for user profile: ");
-            addEntryTask.setRepoUrl(repoUrl);
-            addEntryTask.setWorkingCopy(userDirStr);
-            addEntryTask.evaluate(process, worker);
+            if (n == JOptionPane.YES_OPTION) {
+            	
+                AddSubversionEntry addUserProfileTask = new AddSubversionEntry();
+                addUserProfileTask.setKeyName("profile");
+                addUserProfileTask.setProfilePropName(profilePropName);
+                addUserProfileTask.setPrompt("verify subversion settings for profile directory: ");
+                addUserProfileTask.setRepoUrl(profileDirRepoUrl);
+                addUserProfileTask.setWorkingCopy("profiles" + File.separator);
+                addUserProfileTask.evaluate(process, worker);
+            	
+            } else if (n == JOptionPane.NO_OPTION) {
+                // Create a new svn profile for the user
+                
+                AddSubversionEntry addUserProfileTask = new AddSubversionEntry();
+                addUserProfileTask.setKeyName("profile");
+                addUserProfileTask.setProfilePropName(profilePropName);
+                addUserProfileTask.setPrompt("verify subversion settings for user profile: ");
+                addUserProfileTask.setRepoUrl(userDirRepoUrl);
+                addUserProfileTask.setWorkingCopy(userDirStr);
+                addUserProfileTask.evaluate(process, worker);
+                
+            } else {
+            	throw new TaskFailedException("user canceled operation");
+            }
+            
+            // Crate a new svn profile for the database if it has a .svn folder
+            File databaseSvn = new File(currentDbProfile.getDbFolder(), ".svn");
+            if (databaseSvn.exists()) {
+                SubversionData databaseSvd = new SubversionData(repositoryUrlStr, FileIO.getNormalizedRelativePath(currentDbProfile.getDbFolder()));
+                currentProfile.svnCompleteRepoInfo(databaseSvd);
+                AddSubversionEntry addDatabaseProfileTask = new AddSubversionEntry();
+                addDatabaseProfileTask.setKeyName("database");
+                addDatabaseProfileTask.setProfilePropName(profilePropName);
+                addDatabaseProfileTask.setPrompt("verify subversion settings for database: ");
+                addDatabaseProfileTask.setRepoUrl(databaseSvd.getRepositoryUrlStr());
+                addDatabaseProfileTask.setWorkingCopy(databaseSvd.getWorkingCopyStr());
+                addDatabaseProfileTask.evaluate(process, worker);
+            }
             
             // write to disk
             FileOutputStream fos = new FileOutputStream(profileFile);
@@ -112,7 +158,7 @@ public class SaveNewProfile extends AbstractTask {
             oos.close();
               
             // import, delete, then checkout...
-            SubversionData userSvd = new SubversionData(repoUrl, userDirStr);
+            SubversionData userSvd = new SubversionData(userDirRepoUrl, userDirStr);
             currentProfile.svnImport(userSvd);
             //
             FileIO.recursiveDelete(new File(userDirStr));
