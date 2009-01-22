@@ -67,6 +67,17 @@ public class SvnPanel extends JPanel {
 			Svn.update(svd, authenticator, true);
 		}
 	}
+	private class UpdateDatabaseListener implements ActionListener {
+
+		SubversionData svd;
+		public UpdateDatabaseListener(SubversionData svd) {
+			super();
+			this.svd = svd;
+		}
+		public void actionPerformed(ActionEvent arg0) {
+			Svn.updateDatabase(svd, authenticator, true);
+		}
+	}
 	private class CommitListener implements ActionListener {
 
 		SubversionData svd;
@@ -131,8 +142,9 @@ public class SvnPanel extends JPanel {
 			SvnLog.setLevel(logHandler.getLevel());
 			SvnLog.info("Level set to: " + logHandler.getLevel());
 		}
-
 	}
+	
+	boolean database = false;
 
 	/**
 	 * 
@@ -142,6 +154,7 @@ public class SvnPanel extends JPanel {
 	
 	public SvnPanel(I_ConfigAceFrame aceFrameConfig, String tabName) throws Exception {
 		super(new GridBagLayout());
+		database = tabName.equalsIgnoreCase("database");
 		authenticator = new SvnPrompter();
 		authenticator.setParentContainer(this);
 		authenticator.setUsername(aceFrameConfig.getUsername());
@@ -190,25 +203,43 @@ public class SvnPanel extends JPanel {
 		status.addActionListener(new StatusListener(svd));
 		this.add(status, c);
 		c.gridx++;
-		JButton commit = new JButton("commit");
-		commit.addActionListener(new CommitListener(svd));
-		this.add(commit, c);
-		c.gridx++;
-		JButton update = new JButton("update");
-		update.addActionListener(new UpdateListener(svd));
-		this.add(update, c);
-		c.gridx++;
-		JButton cleanup = new JButton("cleanup");
-		cleanup.addActionListener(new CleanupListener(svd));
-		this.add(cleanup, c);
-		c.gridx++;
-		JButton checkout = new JButton("checkout");
-		checkout.addActionListener(new CheckoutListener(svd));
-		this.add(checkout, c);
-		c.gridx++;
-		JButton purge = new JButton("purge");
-		purge.addActionListener(new PurgeListener(svd));
-		this.add(purge, c);
+		if (database) {
+			JButton update = new JButton("update database");
+			update.addActionListener(new UpdateDatabaseListener(svd));
+			this.add(update, c);
+			c.gridx++;
+			JButton cleanup = new JButton("cleanup");
+			cleanup.addActionListener(new CleanupListener(svd));
+			this.add(cleanup, c);
+			c.gridx++;
+			JButton checkout = new JButton("checkout");
+			checkout.addActionListener(new CheckoutListener(svd));
+			this.add(checkout, c);
+			c.gridx++;
+			JButton purge = new JButton("purge");
+			purge.addActionListener(new PurgeListener(svd));
+			this.add(purge, c);
+		} else {
+			JButton commit = new JButton("commit");
+			commit.addActionListener(new CommitListener(svd));
+			this.add(commit, c);
+			c.gridx++;
+			JButton update = new JButton("update");
+			update.addActionListener(new UpdateListener(svd));
+			this.add(update, c);
+			c.gridx++;
+			JButton cleanup = new JButton("cleanup");
+			cleanup.addActionListener(new CleanupListener(svd));
+			this.add(cleanup, c);
+			c.gridx++;
+			JButton checkout = new JButton("checkout");
+			checkout.addActionListener(new CheckoutListener(svd));
+			this.add(checkout, c);
+			c.gridx++;
+			JButton purge = new JButton("purge");
+			purge.addActionListener(new PurgeListener(svd));
+			this.add(purge, c);
+		}
 		c.gridx = 0;
 		c.gridy++;
 		this.add(new JLabel("log level:"), c);

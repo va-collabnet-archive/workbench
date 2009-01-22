@@ -1657,6 +1657,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			menuItem.addActionListener(new ImportJavaChangeset(config));
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
+			/*
 			menuItem = new JMenuItem("Import Changeset Jar...");
 			menuItem.addActionListener(new ImportChangesetJar(config));
 			fileMenu.add(menuItem);
@@ -1664,6 +1665,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			menuItem.addActionListener(new ImportBaselineJar(config));
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
+			*/
 			menuItem = new JMenuItem("Change Password...");
 			menuItem.addActionListener(new ChangeFramePassword(this));
 			fileMenu.add(menuItem);

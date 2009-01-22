@@ -321,6 +321,30 @@ public class Svn implements I_HandleSubversion {
 		SvnLog.info("refreshed Object Servers");
 	}
 
+	public static void updateDatabase(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		SvnLog.info("starting database update");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+			Svn.getSvnClient().revert(svd.getWorkingCopyStr(), Depth.infinity, null);
+			SvnLog.info(" reverted: " + svd.getWorkingCopyStr());
+			if (interactive) {
+				handleAuthentication(authenticator);
+			}
+			switchToReadOnlyMirror(svd);
+			int depth = Depth.unknown;
+			boolean depthIsSticky = false;
+			boolean ignoreExternals = false;
+			boolean allowUnverObstructions = false;
+			Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD,
+					depth, depthIsSticky, ignoreExternals,
+					allowUnverObstructions);
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+		}
+		SvnLog.info("finished database update");
+	}
+
 	public static void checkout(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) {
 		SvnLog.info("starting checkout");
@@ -468,6 +492,11 @@ public class Svn implements I_HandleSubversion {
 	public void svnUpdate(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) {
 		update(svd, authenticator, interactive);
+	}
+
+	public void svnUpdateDatabase(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) {
+		updateDatabase(svd, authenticator, interactive);
 	}
 
 	public void svnCheckout(SubversionData svd) {
