@@ -1,8 +1,6 @@
 package org.dwfa.vodb;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -223,8 +221,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	public void setup(File envHome, boolean readOnly, Long cacheSize,
 			DatabaseSetupConfig dbSetupConfig) throws IOException {
 		   try {
-			      Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-			    } catch (HeadlessException e) {
+			   headless = GraphicsEnvironment.isHeadless();
+			    } catch (Throwable e) {
 			      headless = true;
 			    }
 
