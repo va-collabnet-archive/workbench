@@ -1,6 +1,7 @@
 package org.dwfa.vodb;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -170,7 +171,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	
 	private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
-	private boolean headless = false;
+	public static boolean headless = false;
 
 	public void setup(Object envHome, boolean readOnly, Long cacheSize)
 			throws ToIoException {
@@ -222,9 +223,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			DatabaseSetupConfig dbSetupConfig) throws IOException {
 		   try {
 			   headless = GraphicsEnvironment.isHeadless();
-			    } catch (Throwable e) {
-			      headless = true;
-			    }
+			   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+			} catch (Throwable e) {
+			   headless = true;
+			}
 
 		try {
 			if (envHome.exists() == false) {
