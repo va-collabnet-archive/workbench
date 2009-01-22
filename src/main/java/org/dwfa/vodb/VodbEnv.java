@@ -1,6 +1,8 @@
 package org.dwfa.vodb;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -170,6 +172,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	
 	private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
+	private boolean headless = false;
 
 	public void setup(Object envHome, boolean readOnly, Long cacheSize)
 			throws ToIoException {
@@ -219,6 +222,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void setup(File envHome, boolean readOnly, Long cacheSize,
 			DatabaseSetupConfig dbSetupConfig) throws IOException {
+		   try {
+			      Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+			    } catch (HeadlessException e) {
+			      headless = true;
+			    }
+
 		try {
 			if (envHome.exists() == false) {
 				if (dbSetupConfig == null) {
@@ -233,7 +242,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			} else {
 				cacheSize = VodbEnv.cacheSize;
 			}
-			if (GraphicsEnvironment.isHeadless()) {
+			if (headless) {
 				activityFrame = new UpperInfoOnlyConsoleMonitor();
 			} else {
 				activityFrame = new ActivityPanel(true, true);
