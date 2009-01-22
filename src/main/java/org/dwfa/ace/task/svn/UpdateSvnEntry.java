@@ -36,8 +36,12 @@ public class UpdateSvnEntry extends AbstractSvnEntryTask {
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
-        config.svnUpdate(svd);
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey) {
+    	if (svnEntryKey.equalsIgnoreCase("database")) {
+            config.svnUpdateDatabase(svd);
+    	} else {
+            config.svnUpdate(svd);
+    	}
     }
 
 }

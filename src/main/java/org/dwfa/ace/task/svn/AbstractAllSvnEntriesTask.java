@@ -53,8 +53,9 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
             if (worker.getLogger().isLoggable(Level.INFO)) {
             	worker.getLogger().info("java.library.path: " + System.getProperty("java.library.path"));
             }
-            for (SubversionData svd: config.getSubversionMap().values()) {
-                doSvnTask(config, svd);  
+            for (String key: config.getSubversionMap().keySet()) {
+            	SubversionData svd =  config.getSubversionMap().get(key);
+                doSvnTask(config, svd, key);  
             }
              return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -62,7 +63,7 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
         }
     }
 
-    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd);
+    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String key);
     
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

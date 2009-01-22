@@ -36,8 +36,12 @@ public class PurgeAllSvnEntries extends AbstractAllSvnEntriesTask {
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
-        config.svnPurge(svd);
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
+       	if (taskKey.equalsIgnoreCase("database")) {
+            // don't purge database changes;
+    	} else {
+            config.svnPurge(svd);
+    	}
     }
 
 }

@@ -36,7 +36,7 @@ public class CleanupAllSvnEntries extends AbstractAllSvnEntriesTask {
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
         config.svnCleanup(svd);
     }
 

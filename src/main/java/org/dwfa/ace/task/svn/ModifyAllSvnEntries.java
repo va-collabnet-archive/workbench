@@ -27,8 +27,7 @@ public class ModifyAllSvnEntries extends AbstractAllSvnEntriesTask {
 		"https://au-ct.au-ct.org/svn/au-ct/branches/test-1.0/au-ct-edit-bundle/src/main/profiles/users";
 	
 	@Override
-	protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
-		
+	protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
 		String existingRepoUrl = svd.getRepositoryUrlStr();
 		
 		logger.info("The existing repo url in the profile is " + existingRepoUrl);

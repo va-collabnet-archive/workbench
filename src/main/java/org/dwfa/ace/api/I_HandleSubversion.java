@@ -14,6 +14,7 @@ public interface I_HandleSubversion {
     public void svnPurge(SubversionData svd);
     public void svnStatus(SubversionData svd);
     public void svnUpdate(SubversionData svd);
+	public void svnUpdateDatabase(SubversionData svd);
     public boolean svnLock(SubversionData svd, File toLock);
     public boolean svnUnlock(SubversionData svd, File toUnLock);
 
@@ -27,7 +28,8 @@ public interface I_HandleSubversion {
 	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
 	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
-    public boolean svnLock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive);
+	public void svnUpdateDatabase(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive);
+	public boolean svnLock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive);
     public boolean svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive);
 	
 }

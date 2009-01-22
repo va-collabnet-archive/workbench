@@ -53,14 +53,14 @@ public abstract class AbstractSvnEntryTask extends AbstractTask {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             SubversionData svd = config.getSubversionMap().get(svnEntryString);
-            doSvnTask(config, svd);  
+            doSvnTask(config, svd, svnEntryString);  
              return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
     }
 
-    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd);
+    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey);
     
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

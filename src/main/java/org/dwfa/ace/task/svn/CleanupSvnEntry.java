@@ -36,7 +36,7 @@ public class CleanupSvnEntry extends AbstractSvnEntryTask {
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey) {
         config.svnCleanup(svd);
     }
 

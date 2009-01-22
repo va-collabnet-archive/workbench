@@ -32,12 +32,14 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
-        config.svnCommit(svd);
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
+       	if (taskKey.equalsIgnoreCase("database")) {
+            // don't commit database changes;
+    	} else {
+            config.svnCommit(svd);
+    	}
     }
-
 }

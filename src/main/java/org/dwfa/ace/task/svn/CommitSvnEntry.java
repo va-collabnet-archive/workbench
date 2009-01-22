@@ -36,8 +36,12 @@ public class CommitSvnEntry extends AbstractSvnEntryTask {
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
-        config.svnCommit(svd);
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey) {
+    	if (svnEntryKey.equalsIgnoreCase("database")) {
+            //Don't commit the database. ;
+    	} else {
+            config.svnCommit(svd);
+    	}
     }
 
 }

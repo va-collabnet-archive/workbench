@@ -32,11 +32,9 @@ public class CheckoutAllSvnEntries extends AbstractAllSvnEntriesTask {
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
     }
 
-
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd) {
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
         config.svnCheckout(svd);
     }
 
