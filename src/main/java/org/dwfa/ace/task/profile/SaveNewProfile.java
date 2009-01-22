@@ -11,8 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.UUID;
 
-import javax.swing.JOptionPane;
-
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ImplementTermFactory;
@@ -97,33 +95,20 @@ public class SaveNewProfile extends AbstractTask {
             newDbProfile.setProfileFile(profileFile);
             newDbProfile.setUsername(profileToSave.getUsername());
             
-          //Custom button text
-            Object[] options = {"Synchronize profile directory", // yes option
-                                "Synchronize only user profile", // no option
-                                "Cancel"}; // cancel option
-            int n = JOptionPane.showOptionDialog(null,
-                "Would you like some green eggs to go "
-                + "with that ham?",
-                "Select Subversion setup for profiles",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[2]);
+
+            File profileDirSvn = new File("profiles" + File.separator + ".svn");
             
-            if (n == JOptionPane.YES_OPTION) {
-            	
+            if (profileDirSvn.exists()) {
+                // Create a new svn profile for the profile directory
                 AddSubversionEntry addUserProfileTask = new AddSubversionEntry();
                 addUserProfileTask.setKeyName("profile");
                 addUserProfileTask.setProfilePropName(profilePropName);
                 addUserProfileTask.setPrompt("verify subversion settings for profile directory: ");
                 addUserProfileTask.setRepoUrl(profileDirRepoUrl);
                 addUserProfileTask.setWorkingCopy("profiles" + File.separator);
-                addUserProfileTask.evaluate(process, worker);
-            	
-            } else if (n == JOptionPane.NO_OPTION) {
+                addUserProfileTask.evaluate(process, worker);           	
+            } else {
                 // Create a new svn profile for the user
-                
                 AddSubversionEntry addUserProfileTask = new AddSubversionEntry();
                 addUserProfileTask.setKeyName("profile");
                 addUserProfileTask.setProfilePropName(profilePropName);
@@ -131,9 +116,6 @@ public class SaveNewProfile extends AbstractTask {
                 addUserProfileTask.setRepoUrl(userDirRepoUrl);
                 addUserProfileTask.setWorkingCopy(userDirStr);
                 addUserProfileTask.evaluate(process, worker);
-                
-            } else {
-            	throw new TaskFailedException("user canceled operation");
             }
             
             // Crate a new svn profile for the database if it has a .svn folder
