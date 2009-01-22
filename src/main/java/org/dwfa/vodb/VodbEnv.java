@@ -1,5 +1,6 @@
 package org.dwfa.vodb;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,6 +26,7 @@ import org.apache.lucene.search.Hits;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -158,7 +160,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	private static long transactionTimeout = 0; 
 
-	private ActivityPanel activityFrame;
+	private I_ShowActivity activityFrame;
 
 	private File envHome;
 
@@ -231,7 +233,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			} else {
 				cacheSize = VodbEnv.cacheSize;
 			}
-			activityFrame = new ActivityPanel(true, true);
+			if (GraphicsEnvironment.isHeadless()) {
+				activityFrame = new UpperInfoOnlyConsoleMonitor();
+			} else {
+				activityFrame = new ActivityPanel(true, true);
+			}
 
 			AceLog.getAppLog().info("Setting up db: " + envHome);
 			activityFrame.setIndeterminate(true);
@@ -1593,7 +1599,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return bdbEnv.getStats();
 	}
 
-	public ActivityPanel getActivityFrame() {
+	public I_ShowActivity getActivityFrame() {
 		return activityFrame;
 	}
 
