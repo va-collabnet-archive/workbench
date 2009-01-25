@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -36,7 +37,7 @@ public class UpdateAllSvnEntries extends AbstractAllSvnEntriesTask {
     }
 
 
-    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
+    protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) throws TaskFailedException {
     	if (taskKey.equalsIgnoreCase("database")) {
             config.svnUpdateDatabase(svd);
     	} else {

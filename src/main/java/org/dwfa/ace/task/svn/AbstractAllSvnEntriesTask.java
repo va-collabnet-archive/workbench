@@ -63,7 +63,7 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
         }
     }
 
-    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String key);
+    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String key) throws TaskFailedException;
     
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

@@ -51,6 +51,7 @@ public class AddSubversionEntryFromDirectory extends AddSubversionEntry {
 			SwingUtilities.invokeAndWait(new Runnable() {
 
 				public void run() {
+					try {
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					chooser.setDialogTitle("Select subversion working directory:");
@@ -68,6 +69,9 @@ public class AddSubversionEntryFromDirectory extends AddSubversionEntry {
 					} else {
 						ex = new TaskFailedException("User canceled operation");
 					}
+				} catch (TaskFailedException e) {
+					ex = e;
+				}
 				}
 			});
 		} catch (InterruptedException e) {

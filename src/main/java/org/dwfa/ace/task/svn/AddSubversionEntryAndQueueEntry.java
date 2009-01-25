@@ -70,27 +70,41 @@ public class AddSubversionEntryAndQueueEntry extends AddSubversionEntry {
 					if (dialog.getFile() == null) {
 						ex = new TaskFailedException("User canceled operation");
 					} else {
-						File queueFile = new File(dialog.getDirectory(),dialog.getFile());
-						String workingCopy = FileIO.getRelativePath(queueFile.getParentFile().getAbsoluteFile());
-						SubversionData svd = new SubversionData(null, workingCopy);
-						config.svnCompleteRepoInfo(svd);
-						AddSubversionEntryAndQueueEntry.this.setWorkingCopy(workingCopy);
-						AddSubversionEntryAndQueueEntry.this.setRepoUrl(svd.getRepositoryUrlStr());
-						AddSubversionEntryAndQueueEntry.this.setKeyName(workingCopy);
-						config.getDbConfig().getQueues().add(FileIO.getRelativePath(queueFile));
 						try {
-							Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { queueFile.getAbsolutePath() });
-				            Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries", 
-				            		Entry[].class, new Entry[] {});
-				            for (Entry entry: entries) {
-				            	if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
-				            		ElectronicAddress ea = (ElectronicAddress) entry;
-									config.getQueueAddressesToShow().add(ea.address);	
+							File queueFile = new File(dialog.getDirectory(),
+									dialog.getFile());
+							String workingCopy = FileIO.getRelativePath(queueFile.getParentFile()
+											.getAbsoluteFile());
+							SubversionData svd = new SubversionData(null,
+									workingCopy);
+							config.svnCompleteRepoInfo(svd);
+							AddSubversionEntryAndQueueEntry.this
+									.setWorkingCopy(workingCopy);
+							AddSubversionEntryAndQueueEntry.this.setRepoUrl(svd
+									.getRepositoryUrlStr());
+							AddSubversionEntryAndQueueEntry.this
+									.setKeyName(workingCopy);
+							config.getDbConfig().getQueues().add(
+									FileIO.getRelativePath(queueFile));
+							Configuration queueConfig = ConfigurationProvider
+									.getInstance(new String[] { queueFile
+											.getAbsolutePath() });
+							Entry[] entries = (Entry[]) queueConfig.getEntry(
+									"org.dwfa.queue.QueueServer", "entries",
+									Entry[].class, new Entry[] {});
+							for (Entry entry : entries) {
+								if (ElectronicAddress.class
+										.isAssignableFrom(entry.getClass())) {
+									ElectronicAddress ea = (ElectronicAddress) entry;
+									config.getQueueAddressesToShow().add(
+											ea.address);
 									break;
-				            	}
-				            }
+								}
+							}
 						} catch (ConfigurationException e) {
 							ex = new TaskFailedException(e);
+						} catch (TaskFailedException e) {
+							ex = e;
 						}
 					}
 				}
@@ -99,7 +113,7 @@ public class AddSubversionEntryAndQueueEntry extends AddSubversionEntry {
 			throw new TaskFailedException(e);
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException(e);
-		} 
+		}
 		if (ex != null) {
 			throw ex;
 		}
