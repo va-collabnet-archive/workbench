@@ -28,11 +28,14 @@ public class BdbImageConnection extends URLConnection {
 	    try {
 	      String queryString = url.getQuery();
 	      if (queryString.contains("$")) {
-	        String[] parts = queryString.split("$");
+		    String[] parts = new String[2];
+		    parts[0] = queryString.substring(0, queryString.indexOf('$') - 1);
+		    parts[1] = queryString.substring(queryString.indexOf('$') + 1);;
 	        String imageIdPart = parts[0];
+	        Collection<UUID> conceptIdCollection = new ArrayList<UUID>();
 	        if (parts.length > 1) {
 		        String conceptIdPart = parts[1];
-		        Collection<UUID> conceptIdCollection = collectionFromString(conceptIdPart);
+		        conceptIdCollection = collectionFromString(conceptIdPart);
 	        } else {
 	        	AceLog.getAppLog().warning("Query string with $ only has one part: " + queryString);
 	        }
@@ -41,6 +44,16 @@ public class BdbImageConnection extends URLConnection {
 	        //int imageId = AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection, conceptId);
 	        //image = AceConfig.getVodb().getImage(imageId, conceptId);
 	        image = AceConfig.getVodb().getImage(AceConfig.getVodb().uuidToNative(imageIdCollection));
+	        
+	        if (image == null) {
+	        	AceLog.getAppLog().warning("Image is null for queryString:" + queryString + 
+	        			"\n imageIdCollection: " + imageIdCollection + 
+	        			"\n conceptIdCollection: " + conceptIdCollection);
+	        } else {
+	        	AceLog.getAppLog().warning("Found image for queryString:" + queryString + 
+	        			"\n imageIdCollection: " + imageIdCollection + 
+	        			"\n conceptIdCollection: " + conceptIdCollection);
+	        }
 	      } else {
 	        if (queryString.startsWith("[")) {
 	          queryString = queryString.substring(1, queryString.length() - 2);

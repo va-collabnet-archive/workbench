@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.queue.ObjectServerCore;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
@@ -124,7 +125,7 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	public static Status[] status(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		Status[] status = null;
 		Svn.getSvnClient().setPrompt(authenticator);
 		String workingCopy = svd.getWorkingCopyStr();
@@ -152,19 +153,25 @@ public class Svn implements I_HandleSubversion {
 					.toArray(new Status[statusHandler.statusList.size()]);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished status for working copy: " + workingCopy + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished status for working copy: " + workingCopy);
 		return status;
 	}
 
 	public static void cleanup(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("starting cleanup");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
 			Svn.getSvnClient().cleanup(svd.getWorkingCopyStr());
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished cleanup for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished cleanup");
 		ObjectServerCore.refreshServers();
@@ -172,7 +179,7 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	public static void commit(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("Starting Commit");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -238,6 +245,9 @@ public class Svn implements I_HandleSubversion {
 
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished commit");
 	}
@@ -255,7 +265,7 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	public static void purge(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("Starting purge");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -288,6 +298,9 @@ public class Svn implements I_HandleSubversion {
 			}
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished purge for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished purge");
 		ObjectServerCore.refreshServers();
@@ -295,7 +308,7 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	public static void update(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("starting update");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -312,6 +325,9 @@ public class Svn implements I_HandleSubversion {
 					allowUnverObstructions);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished update for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished update");
 		ObjectServerCore.refreshServers();
@@ -319,7 +335,7 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	public static void updateDatabase(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("starting database update");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -338,12 +354,15 @@ public class Svn implements I_HandleSubversion {
 					allowUnverObstructions);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished database update for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished database update");
 	}
 
 	public static void checkout(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("starting checkout");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -361,6 +380,9 @@ public class Svn implements I_HandleSubversion {
 					ignoreExternals, allowUnverObstructions);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			SvnLog.info("finished checkout for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished checkout");
 		ObjectServerCore.refreshServers();
@@ -423,7 +445,7 @@ public class Svn implements I_HandleSubversion {
 
 	}
 
-	public static List<String> list(SubversionData svd) {
+	public static List<String> list(SubversionData svd) throws TaskFailedException {
 		String url = svd.getRepositoryUrlStr();
 		Revision revision = Revision.HEAD;
 		Revision pegRevision = Revision.HEAD;
@@ -437,11 +459,12 @@ public class Svn implements I_HandleSubversion {
 					direntFields, fetchLocks, callback);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			throw new TaskFailedException(e);
 		}
 		return callback.dirList;
 	}
 
-	public static List<Info2> info(SubversionData svd) {
+	public static List<Info2> info(SubversionData svd) throws TaskFailedException {
 		String path = svd.getWorkingCopyStr();
 		Revision revision = Revision.HEAD;
 		Revision pegRevision = Revision.HEAD;
@@ -453,78 +476,79 @@ public class Svn implements I_HandleSubversion {
 					changeLists, callback);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
+			throw new TaskFailedException(e);
 		}
 		return callback.infoList;
 	}
 
 	public void svnCheckout(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		checkout(svd, authenticator, interactive);
 	}
 
 	public void svnCleanup(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		cleanup(svd, authenticator, interactive);
 	}
 
 	public void svnCommit(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		commit(svd, authenticator, interactive);
 	}
 	public void svnImport(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		doImport(svd, authenticator, interactive);
 	}
 
 	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator,
-			boolean interactive) {
+			boolean interactive) throws TaskFailedException {
 		purge(svd, authenticator, interactive);
 	}
 
 	public void svnStatus(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		status(svd, authenticator, interactive);
 	}
 
 	public void svnUpdate(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		update(svd, authenticator, interactive);
 	}
 
 	public void svnUpdateDatabase(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		updateDatabase(svd, authenticator, interactive);
 	}
 
-	public void svnUpdateDatabase(SubversionData svd) {
+	public void svnUpdateDatabase(SubversionData svd) throws TaskFailedException {
 		updateDatabase(svd, prompter, true);
 	}
 
-	public void svnCheckout(SubversionData svd) {
+	public void svnCheckout(SubversionData svd) throws TaskFailedException {
 		svnCheckout(svd, prompter, true);
 	}
 
-	public void svnCleanup(SubversionData svd) {
+	public void svnCleanup(SubversionData svd) throws TaskFailedException {
 		svnCleanup(svd, prompter, true);
 	}
 
-	public void svnCommit(SubversionData svd) {
+	public void svnCommit(SubversionData svd) throws TaskFailedException {
 		svnCommit(svd, prompter, true);
 	}
 
-	public void svnImport(SubversionData svd) {
+	public void svnImport(SubversionData svd) throws TaskFailedException {
 		svnImport(svd, prompter, true);
 	}
 
-	public void svnPurge(SubversionData svd) {
+	public void svnPurge(SubversionData svd) throws TaskFailedException {
 		svnPurge(svd, prompter, true);
 	}
 
-	public void svnStatus(SubversionData svd) {
+	public void svnStatus(SubversionData svd) throws TaskFailedException {
 		svnStatus(svd, prompter, true);
 	}
 
-	public void svnUpdate(SubversionData svd) {
+	public void svnUpdate(SubversionData svd) throws TaskFailedException {
 		svnUpdate(svd, prompter, true);
 	}
 
@@ -532,25 +556,25 @@ public class Svn implements I_HandleSubversion {
 		completeRepoInfo(svd);
 	}
 
-	public List<String> svnList(SubversionData svd) {
+	public List<String> svnList(SubversionData svd) throws TaskFailedException {
 		return list(svd);
 	}
 
-	public boolean svnLock(SubversionData svd, File toLock) {
-		return svnLock(svd, toLock, prompter, true);
+	public void svnLock(SubversionData svd, File toLock) throws TaskFailedException {
+		svnLock(svd, toLock, prompter, true);
 	}
 
-	public boolean svnUnlock(SubversionData svd, File toUnLock) {
-		return svnUnlock(svd, toUnLock, prompter, true);
+	public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+		svnUnlock(svd, toUnLock, prompter, true);
 	}
 
-	public boolean svnUnlock(SubversionData svd, File toUnlock,
-			PromptUserPassword3 authenticator, boolean interactive) {
-		return unlock(svd, toUnlock, authenticator, interactive);
+	public void svnUnlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException  {
+		unlock(svd, toUnlock, authenticator, interactive);
 	}
 
-	public static boolean unlock(SubversionData svd, File toUnlock,
-			PromptUserPassword3 authenticator, boolean interactive) {
+	public static void unlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("Starting unlock");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -564,20 +588,20 @@ public class Svn implements I_HandleSubversion {
 					svd.getUsername(), false);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
-			SvnLog.info("finished unlock with exception: " + e.toString());
-			return false;
+			SvnLog.info("finished unlock for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished unlock");
-		return true;
 	}
 
-	public boolean svnLock(SubversionData svd, File toLock,
-			PromptUserPassword3 authenticator, boolean interactive) {
-		return false;
+	public void svnLock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+		Svn.lock(svd, toLock, authenticator, interactive);
 	}
 
-	public static boolean lock(SubversionData svd, File toLock,
-			PromptUserPassword3 authenticator, boolean interactive) {
+	public static void lock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("Starting lock");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -590,15 +614,15 @@ public class Svn implements I_HandleSubversion {
 					svd.getUsername(), false);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
-			SvnLog.info("finished lock with exception: " + e.toString());
-			return false;
+			SvnLog.info("finished lock for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished lock");
-		return true;
 	}
 
 	public static void doImport(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("Starting import");
 		Svn.getSvnClient().setPrompt(authenticator);
 		try {
@@ -623,12 +647,14 @@ public class Svn implements I_HandleSubversion {
 					ignoreUnknownNodeTypes, revpropTable);
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
-			SvnLog.info("finished import with exception: " + e.toString());
+			SvnLog.info("finished import for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 		SvnLog.info("finished import");
 	}
 
-	private static void switchToReadOnlyMirror(SubversionData svd) {
+	private static void switchToReadOnlyMirror(SubversionData svd) throws TaskFailedException {
 		if (svd.getWorkingCopyStr() == null) {
 			return;
 		}
@@ -663,7 +689,9 @@ public class Svn implements I_HandleSubversion {
 			
 		} catch (ClientException e) {
 			SvnLog.alertAndLog(e);
-			SvnLog.info("Finished switch to read only: " + e.toString());
+			SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
 		}
 	}
 

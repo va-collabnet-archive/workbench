@@ -126,7 +126,12 @@ public class AceRunner {
 
 			File acePropertiesFile = new File("config","ace.properties");
 			if (acePropertiesFile.exists() == false) {
-				initialSubversionOperationsAndChangeSetImport(cacheSize, acePropertiesFile);
+				try {
+					initialSubversionOperationsAndChangeSetImport(cacheSize, acePropertiesFile);
+				} catch (Exception ex) {
+					AceLog.getAppLog().alertAndLogException(ex);
+					System.exit(0);
+				}
 			}
 			final Properties aceProperties = new Properties();
 			if (acePropertiesFile.exists()) {
@@ -348,7 +353,7 @@ public class AceRunner {
 	}
 
 	private void initialSubversionOperationsAndChangeSetImport(Long cacheSize, File acePropertiesFile)
-			throws ConfigurationException, FileNotFoundException, IOException {
+			throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
 		Properties aceProperties = new Properties();
 		aceProperties.setProperty("initial-svn-checkout", "true");
 		
@@ -376,14 +381,9 @@ public class AceRunner {
 							"Confirm network operation",
 							JOptionPane.YES_NO_OPTION));
 		}
-
 		if (connectToSubversion) {
 			if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-				try {
-					handleSvnProfileCheckout(changeLocations, svnCheckoutProfileOnStart, aceProperties);
-				} catch (ClientException e) {
-					throw new ConfigurationException("Cannot checkout selected profile", e);
-				}
+				handleSvnProfileCheckout(changeLocations, svnCheckoutProfileOnStart, aceProperties);
 			}
 			
 			if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
@@ -402,10 +402,12 @@ public class AceRunner {
 				doStealthChangeSetImport(cacheSize, changeLocations);
 			}
 			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
+		} else {
+			throw new TaskFailedException("User did not want to connect to Subversion.");
 		}
 	}
 
-	private void handleSvnProfileCheckout(List<File> changeLocations, String svnSpec, Properties aceProperties) throws ClientException {
+	private void handleSvnProfileCheckout(List<File> changeLocations, String svnSpec, Properties aceProperties) throws ClientException, TaskFailedException {
 		SubversionData svd = new SubversionData(svnSpec, null);
 		List<String> listing = Svn.list(svd);
 		Map<String, String> profileMap = new HashMap<String, String>();
@@ -461,7 +463,7 @@ public class AceRunner {
 		changeLocations.add(new File(destPath));
 	}
 	
-	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) {
+	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException, ClientException {
 		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
 		String[] specParts = new String[] {
 				svnSpec.substring(0, svnSpec.lastIndexOf("|")),
@@ -477,7 +479,6 @@ public class AceRunner {
 							+ specParts[local]);
 		} else {
 
-			try {
 				// do the checkout...
 				AceLog.getAppLog().info(
 						"svn checkout " + specParts[server] + " to: "
@@ -493,9 +494,6 @@ public class AceRunner {
 						pegRevision, depth, ignoreExternals,
 						allowUnverObstructions);
 				changeLocations.add(checkoutLocation);
-			} catch (Exception e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
 		}
 	}
 

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -75,7 +76,9 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		if (host != null) {
 			int lastSelectedRowCount = descTable.getRowCount();
 			int lastSelectedRow = descTable.getSelectedRow();
-			AceLog.getAppLog().info("desc rowcount: " + lastSelectedRowCount + " selected row: " + lastSelectedRow);
+			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				AceLog.getAppLog().fine("desc rowcount: " + lastSelectedRowCount + " selected row: " + lastSelectedRow);
+			}
 			if (idPlugin != null) {
 				idPlugin.update();
 			}
@@ -124,9 +127,13 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		public void run() {
 			if (lastSelectedRowCount == descTable.getRowCount()) {
 				descTable.getSelectionModel().setSelectionInterval(lastSelectedRow, lastSelectedRow);
-				AceLog.getAppLog().info("reselecting: " + lastSelectedRow);
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					AceLog.getAppLog().fine("reselecting: " + lastSelectedRow);
+				}
 			} else {
-				AceLog.getAppLog().info("rowcount changed to: " + descTable.getRowCount());
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					AceLog.getAppLog().info("rowcount changed to: " + descTable.getRowCount());
+				}
 			}
 		}
 		

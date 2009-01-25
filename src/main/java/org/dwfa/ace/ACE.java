@@ -96,8 +96,6 @@ import net.jini.lookup.ServiceItemFilter;
 import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.ChangeFramePassword;
 import org.dwfa.ace.actions.Commit;
-import org.dwfa.ace.actions.ImportBaselineJar;
-import org.dwfa.ace.actions.ImportChangesetJar;
 import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
@@ -1864,8 +1862,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
 		int height = getHeight() - topPanel.getHeight();
 		Rectangle topBounds = topPanel.getBounds();
+		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+
 		processPalette.setSize(width, height);
 
+		
 		processPalette.setLocation(new Point(topBounds.x + topBounds.width,
 				topBounds.y + topBounds.height + 1));
 		processPalette.setOpaque(true);
@@ -1890,6 +1891,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
 		int height = getHeight() - topPanel.getHeight();
 		Rectangle topBounds = topPanel.getBounds();
+		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane()); 
 		queuePalette.setSize(width, height);
 
 		queuePalette.setLocation(new Point(topBounds.x + topBounds.width,
@@ -1996,6 +1998,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			int width = 750;
 			int height = 550;
 			Rectangle topBounds = topPanel.getBounds();
+			SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
 			subversionPalette.setSize(width, height);
 
 			subversionPalette.setLocation(new Point(topBounds.x
@@ -2031,6 +2034,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		preferencesPalette.setSize(width, height);
 
 		Rectangle topBounds = topPanel.getBounds();
+		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+		
 		preferencesPalette.setLocation(new Point(topBounds.x + topBounds.width,
 				topBounds.y + topBounds.height + 1));
 		preferencesPalette.setOpaque(true);
@@ -2825,7 +2830,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
 		int width = 400;
 		int height = 500;
-		Rectangle topBounds = topPanel.getBounds();
+		Rectangle topBounds = topPanel.getBounds(); 		
+		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
 		historyPalette.setSize(width, height);
 
 		historyPalette.setLocation(new Point(topBounds.x - width, topBounds.y
@@ -2847,6 +2853,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		int width = 400;
 		int height = 500;
 		Rectangle topBounds = topPanel.getBounds();
+		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
 		addressPalette.setSize(width, height);
 
 		addressPalette.setLocation(new Point(topBounds.x - width, topBounds.y

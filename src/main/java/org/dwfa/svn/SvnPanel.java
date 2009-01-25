@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.log.HtmlHandler;
 
 public class SvnPanel extends JPanel {
@@ -40,7 +42,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.purge(svd, authenticator, true);
+			try {
+				Svn.purge(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 
 	}
@@ -52,7 +58,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.checkout(svd, authenticator, true);
+			try {
+				Svn.checkout(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 
 	}
@@ -64,7 +74,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.update(svd, authenticator, true);
+			try {
+				Svn.update(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 	}
 	private class UpdateDatabaseListener implements ActionListener {
@@ -75,7 +89,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.updateDatabase(svd, authenticator, true);
+			try {
+				Svn.updateDatabase(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 	}
 	private class CommitListener implements ActionListener {
@@ -86,7 +104,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.commit(svd, authenticator, true);
+			try {
+				Svn.commit(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 	}
 	private class CleanupListener implements ActionListener {
@@ -97,7 +119,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.cleanup(svd, authenticator, true);
+			try {
+				Svn.cleanup(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 
 	}
@@ -109,7 +135,11 @@ public class SvnPanel extends JPanel {
 			this.svd = svd;
 		}
 		public void actionPerformed(ActionEvent arg0) {
-			Svn.status(svd, authenticator, true);
+			try {
+				Svn.status(svd, authenticator, true);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 
 	}

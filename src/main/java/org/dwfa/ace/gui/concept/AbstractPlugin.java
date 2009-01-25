@@ -37,7 +37,9 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
        }
        DefaultListSelectionModel lsm = (DefaultListSelectionModel) evt.getSource();
 	  lastSelectedIndex = lsm.getMinSelectionIndex();
-	   AceLog.getAppLog().info("New selection ("+ pluginId + "): " + lastSelectedIndex);
+	  if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+		   AceLog.getAppLog().fine("New selection ("+ pluginId + "): " + lastSelectedIndex);
+	  }
       for (I_HoldRefsetData l: refSetListeners) {
          try {
             l.setComponentId(getComponentId());

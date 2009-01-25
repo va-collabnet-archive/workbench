@@ -57,6 +57,7 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.search.IsChildOf;
 import org.dwfa.bpa.data.SortedSetModel;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
@@ -1618,7 +1619,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.showListView();
     }
 
-    public void svnCheckout(SubversionData svd) {
+    public void svnCheckout(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.checkout(svd, getAuthenticator(svd), true);
     }
@@ -1630,48 +1631,48 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return authenticator;
     }
 
-    public void svnCleanup(SubversionData svd) {
+    public void svnCleanup(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.cleanup(svd, getAuthenticator(svd), true);
     }
 
-    public void svnCommit(SubversionData svd) {
+    public void svnCommit(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.commit(svd, getAuthenticator(svd), true);
     }
 
-    public void svnImport(SubversionData svd) {
+    public void svnImport(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.doImport(svd, getAuthenticator(svd), true);
     }
     
     public void svnImport(SubversionData svd,
-    		PromptUserPassword3 authenticator, boolean interactive) {
+    		PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.doImport(svd, authenticator, interactive);
     }
-    public void svnPurge(SubversionData svd) {
+    public void svnPurge(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.purge(svd, getAuthenticator(svd), true);
     }
 
-    public void svnStatus(SubversionData svd) {
+    public void svnStatus(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.status(svd, getAuthenticator(svd), true);
     }
 
-    public void svnUpdate(SubversionData svd) {
+    public void svnUpdate(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.update(svd, getAuthenticator(svd), true);
     }
     
 	public void svnUpdateDatabase(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
 		Svn.updateDatabase(svd, authenticator, interactive);
 	}
 
-	public void svnUpdateDatabase(SubversionData svd) {
+	public void svnUpdateDatabase(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
 		Svn.updateDatabase(svd, getAuthenticator(svd), true);
 	}
@@ -1681,31 +1682,31 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Svn.completeRepoInfo(svd);
 	}
 
-	public List<String> svnList(SubversionData svd) {
+	public List<String> svnList(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         return Svn.list(svd);
 	}
 
-    public boolean svnLock(SubversionData svd, File toLock,
-			PromptUserPassword3 authenticator, boolean interactive) {
+    public void svnLock(SubversionData svd, File toLock,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
-        return Svn.lock(svd, toLock, authenticator, interactive);
+        Svn.lock(svd, toLock, authenticator, interactive);
 	}
 
-	public boolean svnLock(SubversionData svd, File toLock) {
+	public void svnLock(SubversionData svd, File toLock) throws TaskFailedException {
 	       aceFrame.setupSvn();
-	        return Svn.lock(svd, toLock, getAuthenticator(svd), true);
+	        Svn.lock(svd, toLock, getAuthenticator(svd), true);
 	}
 
-	public boolean svnUnlock(SubversionData svd, File toUnlock,
-			PromptUserPassword3 authenticator, boolean interactive) {
+	public void svnUnlock(SubversionData svd, File toUnlock,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 	       aceFrame.setupSvn();
-	        return Svn.unlock(svd, toUnlock, authenticator, interactive);
+	       Svn.unlock(svd, toUnlock, authenticator, interactive);
 	}
 
-	public boolean svnUnlock(SubversionData svd, File toUnlock) {
+	public void svnUnlock(SubversionData svd, File toUnlock) throws TaskFailedException {
 	       aceFrame.setupSvn();
-	        return Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
+	       Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
 	}
 
 
@@ -2033,32 +2034,32 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 	public void svnCheckout(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) {
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.checkout(svd, authenticator, interactive);
 	}
 
-	public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+	public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.cleanup(svd, authenticator, interactive);
 	}
 
-	public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+	public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.commit(svd, authenticator, interactive);
 	}
 
-	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.purge(svd, authenticator, interactive);
 	}
 
-	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.status(svd, authenticator, interactive);
 	}
 
-	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) {
+	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.update(svd, authenticator, interactive);
 	}
