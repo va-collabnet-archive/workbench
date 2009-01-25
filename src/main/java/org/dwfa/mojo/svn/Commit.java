@@ -10,6 +10,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.util.io.FileIO;
 import org.tigris.subversion.javahl.PromptUserPassword3;
@@ -58,11 +59,6 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + workingCopyStr + repositoryUrlStr)) {
                 return;
             }
-        } catch (NoSuchAlgorithmException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }
         if (workingCopyStr != null && workingCopyStr.length() > 1) {
             workingCopyStr = FileIO.getNormalizedRelativePath(new File(workingCopyStr));
         } else {
@@ -73,6 +69,13 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
 		svd.setUsername(username);
 		svd.setPassword(password);
 		svn.svnCommit(svd, this, false);
+        } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (TaskFailedException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+		}
     }
 
 
