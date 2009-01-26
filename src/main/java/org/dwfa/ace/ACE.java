@@ -1861,8 +1861,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		processPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
 		int height = getHeight() - topPanel.getHeight();
-		Rectangle topBounds = topPanel.getBounds();
-		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+		Rectangle topBounds = getTopBoundsForPalette();
 
 		processPalette.setSize(width, height);
 
@@ -1874,6 +1873,25 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		addComponentListener(processPalette);
 		processPalette.setVisible(true);
 
+	}
+
+	private Rectangle getTopBoundsForPalette() {
+		Rectangle topBounds = topPanel.getBounds();
+		Point topLocation = topPanel.getLocation();
+		AceLog.getAppLog().info(" topBounds :\n   " + topPanel.getBounds() +
+				"\ntopLocation:\n   " + topLocation + "\nos.name: " + System.getProperty("os.name"));
+		topBounds.y = topBounds.y + topLocation.y;
+		AceLog.getAppLog().info(" after adding top location:\n   " + topBounds);
+		
+		/*
+		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			// this did seem to work, so I'll hard code in 20 pixels...
+			//topBounds.y = topBounds.y + getRootPane().getJMenuBar().getSize().height;
+			topBounds.y = topBounds.y + 20;
+			AceLog.getAppLog().info(" added 20 for windows:\n   " + topBounds);
+		}
+		*/
+		return topBounds;
 	}
 
 	private void makeQueuePalette() throws Exception {
@@ -1890,8 +1908,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		queuePalette.setBorder(BorderFactory.createRaisedBevelBorder());
 		int width = getWidth() - termTreeConceptSplit.getDividerLocation();
 		int height = getHeight() - topPanel.getHeight();
-		Rectangle topBounds = topPanel.getBounds();
-		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane()); 
+		Rectangle topBounds = getTopBoundsForPalette();
 		queuePalette.setSize(width, height);
 
 		queuePalette.setLocation(new Point(topBounds.x + topBounds.width,
@@ -1997,8 +2014,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			svnPositionSet = true;
 			int width = 750;
 			int height = 550;
-			Rectangle topBounds = topPanel.getBounds();
-			SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+			Rectangle topBounds = getTopBoundsForPalette();
 			subversionPalette.setSize(width, height);
 
 			subversionPalette.setLocation(new Point(topBounds.x
@@ -2033,8 +2049,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		int height = 550;
 		preferencesPalette.setSize(width, height);
 
-		Rectangle topBounds = topPanel.getBounds();
-		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+		Rectangle topBounds = getTopBoundsForPalette();
 		
 		preferencesPalette.setLocation(new Point(topBounds.x + topBounds.width,
 				topBounds.y + topBounds.height + 1));
@@ -2830,8 +2845,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		layers.add(historyPalette, JLayeredPane.PALETTE_LAYER);
 		int width = 400;
 		int height = 500;
-		Rectangle topBounds = topPanel.getBounds(); 		
-		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+		Rectangle topBounds = getTopBoundsForPalette();
 		historyPalette.setSize(width, height);
 
 		historyPalette.setLocation(new Point(topBounds.x - width, topBounds.y
@@ -2852,8 +2866,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		layers.add(addressPalette, JLayeredPane.PALETTE_LAYER);
 		int width = 400;
 		int height = 500;
-		Rectangle topBounds = topPanel.getBounds();
-		SwingUtilities.convertRectangle(topPanel, topBounds, getRootPane().getLayeredPane());
+		Rectangle topBounds = getTopBoundsForPalette();
 		addressPalette.setSize(width, height);
 
 		addressPalette.setLocation(new Point(topBounds.x - width, topBounds.y

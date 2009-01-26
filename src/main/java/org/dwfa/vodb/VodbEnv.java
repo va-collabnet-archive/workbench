@@ -221,12 +221,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void setup(File envHome, boolean readOnly, Long cacheSize,
 			DatabaseSetupConfig dbSetupConfig) throws IOException {
-		   try {
-			   headless = GraphicsEnvironment.isHeadless();
-			   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-			} catch (Throwable e) {
-			   headless = true;
-			}
+		   testIfHeadless();
 
 		try {
 			if (envHome.exists() == false) {
@@ -291,6 +286,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
+	}
+
+	private void testIfHeadless() {
+		try {
+			   headless = GraphicsEnvironment.isHeadless();
+			   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+			} catch (Throwable e) {
+			   headless = true;
+			}
 	}
 
 
@@ -1686,16 +1690,21 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	}
 
 	public I_ShowActivity newActivityPanel() {
-		ActivityPanel ap = new ActivityPanel(true, true);
-		ap.setIndeterminate(true);
-		ap.setProgressInfoUpper("New activty");
-		ap.setProgressInfoLower("");
-		try {
-			ActivityViewer.addActivity(ap);
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
+		testIfHeadless();
+		if (headless) {
+			return new UpperInfoOnlyConsoleMonitor();
+		} else {
+			ActivityPanel ap = new ActivityPanel(true, true);
+			ap.setIndeterminate(true);
+			ap.setProgressInfoUpper("New activty");
+			ap.setProgressInfoLower("");
+			try {
+				ActivityViewer.addActivity(ap);
+			} catch (Exception e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+			return ap;
 		}
-		return ap;
 	}
 
   public Collection<I_WriteChangeSet> getChangeSetWriters() {
