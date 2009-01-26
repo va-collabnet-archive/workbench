@@ -389,10 +389,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         config.addChangeSetWriters();
 
         if (configFile == null) {
-        	configFile = new File("profiles" + File.separator 
-        			+ profile.getUsername() + File.separator + profile.getUsername() + ".ace");
+        	File profileDir = new File("profiles");
+        	File userDir = new File(profileDir, profile.getUsername());
+        	userDir.mkdirs();
+        	configFile = new File(userDir, profile.getUsername() + ".ace");
         }
-		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(config);
