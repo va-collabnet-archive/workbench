@@ -388,7 +388,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         config.changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + config.getUsername());
         config.addChangeSetWriters();
 
- 
+        if (configFile == null) {
+        	configFile = new File("profiles" + File.separator 
+        			+ profile.getUsername() + File.separator + profile.getUsername() + ".ace");
+        }
 		configFile.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(configFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
