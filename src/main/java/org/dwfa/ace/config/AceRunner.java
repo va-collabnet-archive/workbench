@@ -370,40 +370,39 @@ public class AceRunner {
 				.getClass().getName(), "svnUpdateOnStart", String[].class,
 				new String[] {});
 		List<File> changeLocations = new ArrayList<File>();
-		boolean connectToSubversion = false;
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
 				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-			connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
+			boolean connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
 					.showConfirmDialog(
 							null,
 							"Would you like to connect over the network to Subversion?",
 							"Confirm network operation",
 							JOptionPane.YES_NO_OPTION));
-		}
-		if (connectToSubversion) {
-			if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-				handleSvnProfileCheckout(changeLocations, svnCheckoutProfileOnStart, aceProperties);
-			}
-			
-			if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
-				for (String svnSpec : svnCheckoutOnStart) {
-					handleSvnCheckout(changeLocations, svnSpec);
+			if (connectToSubversion) {
+				if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
+					handleSvnProfileCheckout(changeLocations, svnCheckoutProfileOnStart, aceProperties);
 				}
-			}
-
-			if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
-				for (String svnSpec : svnUpdateOnStart) {
-					handleSvnUpdate(changeLocations, svnSpec);
+				
+				if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
+					for (String svnSpec : svnCheckoutOnStart) {
+						handleSvnCheckout(changeLocations, svnSpec);
+					}
 				}
-			}
 
-			if (changeLocations.size() > 0) {
-				doStealthChangeSetImport(cacheSize, changeLocations);
+				if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
+					for (String svnSpec : svnUpdateOnStart) {
+						handleSvnUpdate(changeLocations, svnSpec);
+					}
+				}
+
+				if (changeLocations.size() > 0) {
+					doStealthChangeSetImport(cacheSize, changeLocations);
+				}
+				aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
+			} else {
+				throw new TaskFailedException("User did not want to connect to Subversion.");
 			}
-			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
-		} else {
-			throw new TaskFailedException("User did not want to connect to Subversion.");
 		}
 	}
 
