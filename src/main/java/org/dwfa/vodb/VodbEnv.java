@@ -172,6 +172,16 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
 	public static boolean headless = false;
+	
+	static {
+		try {
+			   headless = GraphicsEnvironment.isHeadless();
+			   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+			} catch (Throwable e) {
+			   headless = true;
+			}		
+	}
+
 
 	public void setup(Object envHome, boolean readOnly, Long cacheSize)
 			throws ToIoException {
@@ -221,8 +231,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void setup(File envHome, boolean readOnly, Long cacheSize,
 			DatabaseSetupConfig dbSetupConfig) throws IOException {
-		   testIfHeadless();
-
 		try {
 			if (envHome.exists() == false) {
 				if (dbSetupConfig == null) {
@@ -286,15 +294,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
-	}
-
-	private void testIfHeadless() {
-		try {
-			   headless = GraphicsEnvironment.isHeadless();
-			   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-			} catch (Throwable e) {
-			   headless = true;
-			}
 	}
 
 
@@ -1690,7 +1689,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	}
 
 	public I_ShowActivity newActivityPanel() {
-		testIfHeadless();
 		if (headless) {
 			return new UpperInfoOnlyConsoleMonitor();
 		} else {
