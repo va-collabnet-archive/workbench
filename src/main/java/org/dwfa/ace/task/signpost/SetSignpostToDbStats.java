@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -93,6 +94,8 @@ public class SetSignpostToDbStats extends AbstractTask {
                     c.weightx = 1.0;
                     c.weighty = 1.0;
                     c.anchor = GridBagConstraints.NORTHWEST;
+                    JEditorPane htmlPane = new JEditorPane("text/html", htmlStr);
+                    htmlPane.setEditable(false);
                     signpostPanel.add(new JScrollPane(new JLabel(htmlStr)), c);
                     signpostPanel.validate();
                     Container cont = signpostPanel;
