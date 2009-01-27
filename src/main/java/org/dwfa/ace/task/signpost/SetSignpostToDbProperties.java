@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -91,7 +90,7 @@ public class SetSignpostToDbProperties extends AbstractTask {
                     c.anchor = GridBagConstraints.NORTHWEST;
                     JEditorPane htmlPane = new JEditorPane("text/html", htmlStr);
                     htmlPane.setEditable(false);
-                    signpostPanel.add(new JScrollPane(new JLabel(htmlStr)), c);
+                    signpostPanel.add(new JScrollPane(htmlPane), c);
                     signpostPanel.validate();
                     Container cont = signpostPanel;
                     while (cont != null) {
