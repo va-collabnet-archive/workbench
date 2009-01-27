@@ -393,6 +393,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         	File userDir = new File(profileDir, profile.getUsername());
         	userDir.mkdirs();
         	configFile = new File(userDir, profile.getUsername() + ".ace");
+    		config.setProfileFile(configFile);
         }
 		FileOutputStream fos = new FileOutputStream(configFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);

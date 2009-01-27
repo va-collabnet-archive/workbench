@@ -193,8 +193,7 @@ public class AceRunner {
 						"Cache size in config file: " + cacheSize);
 				AceConfig.config = new AceConfig(dbFolder);
 				AceConfig.config.setProfileFile(aceConfigFile);
-				setupDatabase(AceConfig.config, aceConfigFile);
-				AceConfig.setupAceConfig(AceConfig.config, aceConfigFile,
+				AceConfig.setupAceConfig(AceConfig.config, null,
 						cacheSize, false);
 			}
 			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
