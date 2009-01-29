@@ -1,570 +1,583 @@
 package org.dwfa.mojo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
-import org.dwfa.ace.api.I_ImagePart;
-import org.dwfa.ace.api.I_ImageTuple;
-import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_WriteDirectToDb;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.*;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
+import java.io.IOException;
+import java.util.*;
+
 /**
  * Copies from all the specified paths and their children to the new path. Note that this
  * mojo will only copy content that is explicitly on the origin paths, not inherited from
  * a parent path.
- * 
+ *
  * @goal copy-from-path-to-path
- * 
  */
 public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcepts {
 
-	/**
-	 * Paths to copy the data from
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	ConceptDescriptor[] fromPaths;
+    /**
+     * Paths to copy the data from
+     *
+     * @parameter
+     * @required
+     */
+    ConceptDescriptor[] fromPaths;
 
-	/**
-	 * Path to copy the data to
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	ConceptDescriptor toPath;
-	
-	/**
-	 * This status will be used to change all content to if set, otherwise the status of the
-	 * components on the origin path will be used
-	 * @parameter
-	 */
-	ConceptDescriptor status = null;
-	
-	/**
-	 * The release time to stamp all copies with, otherwise NOW will be used
-	 * 
-	 * @parameter
-	 */
-	Date releaseTime = null;
-	
-	/**
-	 * Indicate if all history or only the latest state of the objects should be copied - defaults to false
-	 * 
-	 * @parameter
-	 */
-	boolean copyOnlyLatestState = false;
-	
-	/**
-	 * Indicates whether to read all parts of the object and copy any found, or only the very latest part in time sequence across all paths
-	 * @parameter
-	 */
-	boolean readLatestPartOnly = false;
-	
-	private I_IntSet fromPathIds;
-	private int toPathId;
-	private int versionTime;
-	private int statusId = 0;
-	private I_TermFactory tf;
+    /**
+     * Path to copy the data to
+     *
+     * @parameter
+     * @required
+     */
+    ConceptDescriptor toPath;
 
-	private I_WriteDirectToDb directInterface;
+    /**
+     * This status will be used to change all content to if set, otherwise the status of the
+     * components on the origin path will be used
+     *
+     * @parameter
+     */
+    ConceptDescriptor status = null;
 
-	private int conceptAttributeCount;
+    /**
+     * The release time to stamp all copies with, otherwise NOW will be used
+     *
+     * @parameter
+     */
+    Date releaseTime = null;
 
-	private int descriptionCount;
+    /**
+     * Indicate if all history or only the latest state of the objects should be copied - defaults to false
+     *
+     * @parameter
+     */
+    boolean copyOnlyLatestState = false;
 
-	private int extCount;
+    /**
+     * Indicates whether to read all parts of the object and copy any found, or only the very latest part in time sequence across all paths
+     *
+     * @parameter
+     */
+    boolean readLatestPartOnly = false;
 
-	private int idCount;
+    /**
+     * Indicates whether to include child paths
+     *
+     * @parameter
+     */
+    boolean includeChildPaths = false;
 
-	private int imageCount;
+    /**
+     * Indicates whether to include the SNOMED Is A
+     *
+     * @parameter
+     */
+    boolean includeSnomedIsA = true;
 
-	private int relCount;
+    /**
+     * Indicates whether to require a a concept to have attributes
+     *
+     * @parameter
+     */
+    boolean validate = true;
 
-	private int conceptCount;
+    private I_IntSet fromPathIds;
+    private int toPathId;
+    private int versionTime;
+    private int statusId = 0;
+    private I_TermFactory tf;
+
+    private I_WriteDirectToDb directInterface;
+
+    private int conceptAttributeCount;
+
+    private int descriptionCount;
+
+    private int extCount;
+
+    private int idCount;
+
+    private int imageCount;
+
+    private int relCount;
+
+    private int conceptCount;
 
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		tf = LocalVersionedTerminology.get();
-		try {
-			List<I_GetConceptData> fromPathConcepts = new ArrayList<I_GetConceptData>();
-			for (ConceptDescriptor fromPath : fromPaths) {
-				fromPathConcepts.add(fromPath.getVerifiedConcept());
-			}
-			
-			fromPathIds = tf.newIntSet();
-			getFromPathIds(fromPathConcepts);
-			
-			toPathId = toPath.getVerifiedConcept().getConceptId();
-			
-			if (status != null) {
-				statusId = status.getVerifiedConcept().getConceptId();
-			}
-			
-			if (releaseTime != null) {
-				versionTime = tf.convertToThinVersion(releaseTime.getTime());
-			} else {
-				versionTime = tf.convertToThinVersion(System.currentTimeMillis());
-			}
-			
-			directInterface = tf.getDirectInterface();
-			
-			getLog().info("Starting to iterate concept attributes to copy from " + fromPaths + " to " + toPath);
-			tf.iterateConcepts(this);
-			
-		} catch (Exception e) {
-			throw new MojoExecutionException("failed copying from paths "
-					+ fromPaths + " to path " + toPath, e);
-		}
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        tf = LocalVersionedTerminology.get();
+        try {
+            List<I_GetConceptData> fromPathConcepts = new ArrayList<I_GetConceptData>();
+            for (ConceptDescriptor fromPath : fromPaths) {
+                addToFromPaths(fromPathConcepts, fromPath.getVerifiedConcept());
+            }
 
-	}
-	
-	public void processConcept(I_GetConceptData arg0) throws Exception {
-		if (++conceptCount % 1000 == 0) {
-			getLog().info("processed concept " + conceptCount);
-		}
-		
-		processConceptAttributes(arg0.getConceptAttributes());
-		processDescription(arg0.getDescriptions());
-		for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(arg0.getConceptId())) {
-			processExtensionByReference(extension);
-		}
-		processId(arg0.getId());
-		processImages(arg0.getImages());
-		processRelationship(arg0.getSourceRels());
-	}
+            fromPathIds = tf.newIntSet();
+            getFromPathIds(fromPathConcepts);
 
-	private void getFromPathIds(Collection<I_GetConceptData> pathDescriptors) throws Exception {
-		for (I_GetConceptData fromPath : pathDescriptors) {
-			fromPathIds.add(fromPath.getConceptId());
-			
-			I_IntSet isAIntSet = tf.newIntSet();
-			isAIntSet.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
-			isAIntSet.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-			getFromPathIds(fromPath.getSourceRelTargets(null, isAIntSet, null, true));
-		}
-	}
+            toPathId = toPath.getVerifiedConcept().getConceptId();
 
-	public void processConceptAttributes(
-			I_ConceptAttributeVersioned conceptAttributeVersioned)
-			throws Exception {
-		
-		if (++conceptAttributeCount % 1000 == 0) {
-			getLog().info("processed concept attribute " + conceptAttributeCount);
-		}
-		
-		boolean datachanged = false;
-		I_ConceptAttributeTuple latestPart = null;
-		
-		Collection<I_ConceptAttributeTuple> conceptAttributes;
-		if (readLatestPartOnly) {
-			conceptAttributes = new ArrayList<I_ConceptAttributeTuple>();
-			conceptAttributes.add(getLatestAttributes(conceptAttributeVersioned.getTuples()));
-		} else {
-			conceptAttributes = conceptAttributeVersioned.getTuples();
-		}
-		
-		for (I_ConceptAttributeTuple t : conceptAttributes) {
-			if (fromPathIds.contains(t.getPathId())) {
-				if (copyOnlyLatestState) {
-					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
-						latestPart = t;
-					}
-				} else {
-					duplicateConceptAttributeTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		if (copyOnlyLatestState && latestPart != null) {
-			duplicateConceptAttributeTuple(latestPart);
-			datachanged = true;
-		}
-		if (datachanged) {
-			directInterface.writeConceptAttributes(conceptAttributeVersioned);
-		}
-	}
+            if (status != null) {
+                statusId = status.getVerifiedConcept().getConceptId();
+            }
 
-	private I_ConceptAttributeTuple getLatestAttributes(
-			List<I_ConceptAttributeTuple> tuples) {
-		I_ConceptAttributeTuple latest = null;
-		for (I_ConceptAttributeTuple conceptAttributeTuple : tuples) {
-			if (latest == null || latest.getVersion() < conceptAttributeTuple.getVersion()) {
-				latest = conceptAttributeTuple;
-			}
-		}
-		return latest;
-	}
+            if (releaseTime != null) {
+                versionTime = tf.convertToThinVersion(releaseTime.getTime());
+            } else {
+                versionTime = tf.convertToThinVersion(System.currentTimeMillis());
+            }
 
-	private void duplicateConceptAttributeTuple(
-			I_ConceptAttributeTuple latestPart) {
-		I_ConceptAttributePart newPart = latestPart.duplicatePart();
-		newPart.setPathId(toPathId);
-		newPart.setVersion(versionTime);
-		if (statusId != 0) {
-			newPart.setConceptStatus(statusId);
-		}
-		latestPart.getConVersioned().addVersion(newPart);
-	}
+            directInterface = tf.getDirectInterface();
 
-	private void processDescription(List<I_DescriptionVersioned> descriptions) throws Exception {
-		for (I_DescriptionVersioned descriptionVersioned : descriptions) {
-			processDescription(descriptionVersioned);
-			for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(descriptionVersioned.getDescId())) {
-				processExtensionByReference(extension);
-			}
-		}
-	}
-	
-	public void processDescription(I_DescriptionVersioned descriptionVersioned)
-			throws Exception {
-		
-		if (++descriptionCount % 1000 == 0) {
-			getLog().info("processed description " + descriptionCount);
-		}
-		
-		Collection<I_DescriptionTuple> descriptions;
-		if (readLatestPartOnly) {
-			descriptions = getLatestDescriptions(descriptionVersioned.getTuples());
-		} else {
-			descriptions = descriptionVersioned.getTuples();
-		}
-		
-		boolean datachanged = false;
-		I_DescriptionTuple latestPart = null;
-		for (I_DescriptionTuple t : descriptions) {
+            getLog().info("Starting to iterate concept attributes to copy from " + fromPaths + " to " + toPath);
+            tf.iterateConcepts(this);
 
-			if (fromPathIds.contains(t.getPathId())) {
-				if (copyOnlyLatestState) {
-					if (latestPart  == null || t.getVersion() > latestPart.getVersion()) {
-						latestPart = t;
-					}
-				} else {
-					duplicateDescriptionTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		if (copyOnlyLatestState && latestPart != null) {
-			duplicateDescriptionTuple(latestPart);
-			datachanged = true;
-		}
+        } catch (Exception e) {
+            throw new MojoExecutionException("failed copying from paths "
+                    + fromPaths + " to path " + toPath, e);
+        }
 
-		if (datachanged) {
-			directInterface.writeDescription(descriptionVersioned);
-		}
-	}
+    }
 
-	private Collection<I_DescriptionTuple> getLatestDescriptions(List<I_DescriptionTuple> tuples) {
-		Map<Integer, I_DescriptionTuple> map = new HashMap<Integer, I_DescriptionTuple>();
-		for (I_DescriptionTuple description : tuples) {
-			if (map.containsKey(description.getDescId())) {
-				if (map.get(description.getDescId()).getVersion() < description.getVersion()) {
-					map.put(description.getDescId(), description);
-				}
-			} else {
-				map.put(description.getDescId(), description);
-			}
-		}
-		return map.values();
-	}
+    private void addToFromPaths(List<I_GetConceptData> fromPathConcepts, I_GetConceptData verifiedConcept) throws IOException {
+        fromPathConcepts.add(verifiedConcept);
 
-	private void duplicateDescriptionTuple(I_DescriptionTuple t) {
-		I_DescriptionPart newPart = t.duplicatePart();
-		newPart.setPathId(toPathId);
-		newPart.setVersion(versionTime);
-		if (statusId != 0) {
-			newPart.setStatusId(statusId);
-		}
-		t.getDescVersioned().addVersion(newPart);
-	}
+        Set<I_GetConceptData> children = verifiedConcept.getDestRelOrigins(null, null, null, false);
+        if (includeChildPaths) {
+            for (I_GetConceptData concept : children) {
+                addToFromPaths(fromPathConcepts, concept);
+            }
+        }
+    }
 
-	public void processExtensionByReference(I_ThinExtByRefVersioned extByRef)
-			throws Exception {
+    public void processConcept(I_GetConceptData arg0) throws Exception {
+        if (++conceptCount % 1000 == 0) {
+            getLog().info("processed concept " + conceptCount);
+        }
 
-		if (++extCount % 1000 == 0) {
-			getLog().info("processed extension " + extCount);
-		}
-		
-		Collection<I_ThinExtByRefTuple> extensions;
-		if (readLatestPartOnly) {
-			extensions = getLatestExtensions(extByRef.getTuples(null, null, true));
-		} else {
-			extensions = extByRef.getTuples(null, null, true);
-		}
-		
-		boolean datachanged = false;
-		I_ThinExtByRefTuple latestPart = null;
-		for (I_ThinExtByRefTuple t : extensions) {
-			if (fromPathIds.contains(t.getPathId())) {
-				if (copyOnlyLatestState) {
-					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
-						latestPart = t;
-					}
-				} else {
-					duplicateExtensionTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		if (copyOnlyLatestState && latestPart != null) {
-			duplicateExtensionTuple(latestPart);
-			datachanged = true;
-		}
-		
-		if (datachanged) {
-			directInterface.writeExt(extByRef);
-		}
-	}
+        if (validate) {
+            processConceptAttributes(arg0.getConceptAttributes());
+        }
+        processDescription(arg0.getDescriptions());
+        for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(arg0.getConceptId())) {
+            processExtensionByReference(extension);
+        }
+        processId(arg0.getId());
+        processImages(arg0.getImages());
+        processRelationship(arg0.getSourceRels());
+    }
 
-	private Collection<I_ThinExtByRefTuple> getLatestExtensions(List<I_ThinExtByRefTuple> tuples) {
-		Map<Integer, I_ThinExtByRefTuple> map = new HashMap<Integer, I_ThinExtByRefTuple>();
-		for (I_ThinExtByRefTuple extension : tuples) {
-			if (map.containsKey(extension.getMemberId())) {
-				if (map.get(extension.getMemberId()).getVersion() < extension.getVersion()) {
-					map.put(extension.getMemberId(), extension);
-				}
-			} else {
-				map.put(extension.getMemberId(), extension);
-			}
-		}
-		return map.values();
-	}
+    private void getFromPathIds(Collection<I_GetConceptData> pathDescriptors) throws Exception {
+        for (I_GetConceptData fromPath : pathDescriptors) {
+            fromPathIds.add(fromPath.getConceptId());
 
-	private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
-		I_ThinExtByRefPart newPart = t.duplicatePart();
-		newPart.setPathId(toPathId);
-		newPart.setVersion(versionTime);
-		if (statusId != 0) {
-			newPart.setStatus(statusId);
-		}
-		t.getCore().addVersion(newPart);
-	}
+            I_IntSet isAIntSet = tf.newIntSet();
+            if (includeSnomedIsA) {
+                isAIntSet.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+            }
+            isAIntSet.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+            getFromPathIds(fromPath.getSourceRelTargets(null, isAIntSet, null, true));
+        }
+    }
 
-	public void processId(I_IdVersioned idVersioned) throws Exception {
+    public void processConceptAttributes(
+            I_ConceptAttributeVersioned conceptAttributeVersioned)
+            throws Exception {
 
-		if (++idCount % 1000 == 0) {
-			getLog().info("processed id " + idCount);
-		}
-		
-		Collection<I_IdTuple> ids;
-		if (readLatestPartOnly) {
-			ids = getLatest(idVersioned.getTuples());
-		} else {
-			ids = idVersioned.getTuples();
-		}
-		
-		boolean datachanged = false;
-		I_IdTuple latestPart = null;
-		for (I_IdTuple t : ids) {
+        if (++conceptAttributeCount % 1000 == 0) {
+            getLog().info("processed concept attribute " + conceptAttributeCount);
+        }
 
-			if (fromPathIds.contains(t.getPathId())) {
-				if (copyOnlyLatestState) {
-					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
-						latestPart = t;
-					}
-				} else {
-					duplicateIdTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		if (copyOnlyLatestState && latestPart != null) {
-			duplicateIdTuple(latestPart);
-			datachanged = true;
-		}
+        boolean datachanged = false;
+        I_ConceptAttributeTuple latestPart = null;
 
-		if (datachanged) {
-			directInterface.writeId(idVersioned);
-		}
-	}
+        Collection<I_ConceptAttributeTuple> conceptAttributes;
+        if (readLatestPartOnly) {
+            conceptAttributes = new ArrayList<I_ConceptAttributeTuple>();
+            conceptAttributes.add(getLatestAttributes(conceptAttributeVersioned.getTuples()));
+        } else {
+            conceptAttributes = conceptAttributeVersioned.getTuples();
+        }
 
-	private Collection<I_IdTuple> getLatest(List<I_IdTuple> tuples) {
-		Map<Integer, I_IdTuple> map = new HashMap<Integer, I_IdTuple>();
-		for (I_IdTuple ids : tuples) {
-			if (map.containsKey(ids.getNativeId())) {
-				if (map.get(ids.getNativeId()).getVersion() < ids.getVersion()) {
-					map.put(ids.getNativeId(), ids);
-				}
-			} else {
-				map.put(ids.getNativeId(), ids);
-			}
-		}
-		return map.values();
-	}
+        for (I_ConceptAttributeTuple t : conceptAttributes) {
+            if (fromPathIds.contains(t.getPathId())) {
+                if (copyOnlyLatestState) {
+                    if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
+                        latestPart = t;
+                    }
+                } else {
+                    duplicateConceptAttributeTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        if (copyOnlyLatestState && latestPart != null) {
+            duplicateConceptAttributeTuple(latestPart);
+            datachanged = true;
+        }
+        if (datachanged) {
+            directInterface.writeConceptAttributes(conceptAttributeVersioned);
+        }
+    }
 
-	private void duplicateIdTuple(I_IdTuple t) {
-		I_IdPart newPart = t.duplicatePart();
-		newPart.setPathId(toPathId);
-		newPart.setVersion(versionTime);
-		if (statusId != 0) {
-			newPart.setIdStatus(statusId);
-		}
-		t.getIdVersioned().addVersion(newPart);
-	}
+    private I_ConceptAttributeTuple getLatestAttributes(
+            List<I_ConceptAttributeTuple> tuples) {
+        I_ConceptAttributeTuple latest = null;
+        for (I_ConceptAttributeTuple conceptAttributeTuple : tuples) {
+            if (latest == null || latest.getVersion() < conceptAttributeTuple.getVersion()) {
+                latest = conceptAttributeTuple;
+            }
+        }
+        return latest;
+    }
 
-	private void processImages(List<I_ImageVersioned> images) throws Exception {
-		for (I_ImageVersioned imageVersioned : images) {
-			processImages(imageVersioned);
-		}
-	}
-	
-	public void processImages(I_ImageVersioned imageVersioned) throws Exception {
+    private void duplicateConceptAttributeTuple(
+            I_ConceptAttributeTuple latestPart) {
+        I_ConceptAttributePart newPart = latestPart.duplicatePart();
+        newPart.setPathId(toPathId);
+        newPart.setVersion(versionTime);
+        if (statusId != 0) {
+            newPart.setConceptStatus(statusId);
+        }
+        latestPart.getConVersioned().addVersion(newPart);
+    }
 
-		if (++imageCount % 1000 == 0) {
-			getLog().info("processed image " + imageCount);
-		}
-		
-		Collection<I_ImageTuple> images;
-		if (readLatestPartOnly) {
-			images = getLatest(imageVersioned.getTuples());
-		} else {
-			images = imageVersioned.getTuples();
-		}
-		
-		boolean datachanged = false;
-		I_ImageTuple latestPart = null;
-		for (I_ImageTuple t : images) {
+    private void processDescription(List<I_DescriptionVersioned> descriptions) throws Exception {
+        for (I_DescriptionVersioned descriptionVersioned : descriptions) {
+            processDescription(descriptionVersioned);
+            for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(descriptionVersioned.getDescId())) {
+                processExtensionByReference(extension);
+            }
+        }
+    }
 
-			if (fromPathIds.contains(t.getPathId())) {
-				if (copyOnlyLatestState) {
-					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
-						latestPart = t;
-					}
-				} else {
-					duplicateImageTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		if (copyOnlyLatestState && latestPart != null) {
-			duplicateImageTuple(latestPart);
-			datachanged = true;
-		}
+    public void processDescription(I_DescriptionVersioned descriptionVersioned)
+            throws Exception {
 
-		if (datachanged) {
-			directInterface.writeImage(imageVersioned);
-		}
-	}
+        if (++descriptionCount % 1000 == 0) {
+            getLog().info("processed description " + descriptionCount);
+        }
 
-	private Collection<I_ImageTuple> getLatest(Collection<I_ImageTuple> tuples) {
-		Map<Integer, I_ImageTuple> map = new HashMap<Integer, I_ImageTuple>();
-		for (I_ImageTuple image : tuples) {
-			if (map.containsKey(image.getImageId())) {
-				if (map.get(image.getImageId()).getVersion() < image.getVersion()) {
-					map.put(image.getImageId(), image);
-				}
-			} else {
-				map.put(image.getImageId(), image);
-			}
-		}
-		return map.values();
-	}
+        Collection<I_DescriptionTuple> descriptions;
+        if (readLatestPartOnly) {
+            descriptions = getLatestDescriptions(descriptionVersioned.getTuples());
+        } else {
+            descriptions = descriptionVersioned.getTuples();
+        }
 
-	private void duplicateImageTuple(I_ImageTuple t) {
-		I_ImagePart newPart = t.duplicatePart();
-		newPart.setPathId(toPathId);
-		newPart.setVersion(versionTime);
-		if (statusId != 0) {
-			newPart.setStatusId(statusId);
-		}
-		t.getVersioned().addVersion(newPart);
-	}
+        boolean datachanged = false;
+        I_DescriptionTuple latestPart = null;
+        for (I_DescriptionTuple t : descriptions) {
 
-	private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
-		for (I_RelVersioned relVersioned : sourceRels) {
-			processRelationship(relVersioned);
-			for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(relVersioned.getRelId())) {
-				processExtensionByReference(extension);
-			}
-		}
-	}
-	
-	public void processRelationship(I_RelVersioned relVersioned)
-			throws Exception {
+            if (fromPathIds.contains(t.getPathId())) {
+                if (copyOnlyLatestState) {
+                    if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
+                        latestPart = t;
+                    }
+                } else {
+                    duplicateDescriptionTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        if (copyOnlyLatestState && latestPart != null) {
+            duplicateDescriptionTuple(latestPart);
+            datachanged = true;
+        }
 
-		if (++relCount % 1000 == 0) {
-			getLog().info("processed relationship " + relCount);
-		}
-		
-		Collection<I_RelTuple> rels;
-		if (readLatestPartOnly) {
-			rels = getLatestRelationships(relVersioned.getTuples());
-		} else {
-			rels = relVersioned.getTuples();
-		}
-		
-		boolean datachanged = false;
-		I_RelTuple latestPart = null;
-		for (I_RelTuple t : rels) {
+        if (datachanged) {
+            directInterface.writeDescription(descriptionVersioned);
+        }
+    }
 
-			if (fromPathIds.contains(t.getPathId())) {
-				if (copyOnlyLatestState) {
-					if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
-						latestPart = t;
-					}
-				} else {
-					duplicateRelationshipTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		if (copyOnlyLatestState && latestPart != null) {
-			duplicateRelationshipTuple(latestPart);
-			datachanged = true;
-		}
+    private Collection<I_DescriptionTuple> getLatestDescriptions(List<I_DescriptionTuple> tuples) {
+        Map<Integer, I_DescriptionTuple> map = new HashMap<Integer, I_DescriptionTuple>();
+        for (I_DescriptionTuple description : tuples) {
+            if (map.containsKey(description.getDescId())) {
+                if (map.get(description.getDescId()).getVersion() < description.getVersion()) {
+                    map.put(description.getDescId(), description);
+                }
+            } else {
+                map.put(description.getDescId(), description);
+            }
+        }
+        return map.values();
+    }
 
-		if (datachanged) {
-			directInterface.writeRel(relVersioned);
-		}
-	}
+    private void duplicateDescriptionTuple(I_DescriptionTuple t) {
+        I_DescriptionPart newPart = t.duplicatePart();
+        newPart.setPathId(toPathId);
+        newPart.setVersion(versionTime);
+        if (statusId != 0) {
+            newPart.setStatusId(statusId);
+        }
+        t.getDescVersioned().addVersion(newPart);
+    }
 
-	private Collection<I_RelTuple> getLatestRelationships(List<I_RelTuple> tuples) {
-		Map<Integer, I_RelTuple> map = new HashMap<Integer, I_RelTuple>();
-		for (I_RelTuple rel : tuples) {
-			if (map.containsKey(rel.getRelId())) {
-				if (map.get(rel.getRelId()).getVersion() < rel.getVersion()) {
-					map.put(rel.getRelId(), rel);
-				}
-			} else {
-				map.put(rel.getRelId(), rel);
-			}
-		}
-		return map.values();
-	}
+    public void processExtensionByReference(I_ThinExtByRefVersioned extByRef)
+            throws Exception {
 
-	private void duplicateRelationshipTuple(I_RelTuple t) {
-		I_RelPart newPart = t.duplicatePart();
-		newPart.setPathId(toPathId);
-		newPart.setVersion(versionTime);
+        if (++extCount % 1000 == 0) {
+            getLog().info("processed extension " + extCount);
+        }
+
+        Collection<I_ThinExtByRefTuple> extensions;
+        if (readLatestPartOnly) {
+            extensions = getLatestExtensions(extByRef.getTuples(null, null, true));
+        } else {
+            extensions = extByRef.getTuples(null, null, true);
+        }
+
+        boolean datachanged = false;
+        I_ThinExtByRefTuple latestPart = null;
+        for (I_ThinExtByRefTuple t : extensions) {
+            if (fromPathIds.contains(t.getPathId())) {
+                if (copyOnlyLatestState) {
+                    if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
+                        latestPart = t;
+                    }
+                } else {
+                    duplicateExtensionTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        if (copyOnlyLatestState && latestPart != null) {
+            duplicateExtensionTuple(latestPart);
+            datachanged = true;
+        }
+
+        if (datachanged) {
+            directInterface.writeExt(extByRef);
+        }
+    }
+
+    private Collection<I_ThinExtByRefTuple> getLatestExtensions(List<I_ThinExtByRefTuple> tuples) {
+        Map<Integer, I_ThinExtByRefTuple> map = new HashMap<Integer, I_ThinExtByRefTuple>();
+        for (I_ThinExtByRefTuple extension : tuples) {
+            if (map.containsKey(extension.getMemberId())) {
+                if (map.get(extension.getMemberId()).getVersion() < extension.getVersion()) {
+                    map.put(extension.getMemberId(), extension);
+                }
+            } else {
+                map.put(extension.getMemberId(), extension);
+            }
+        }
+        return map.values();
+    }
+
+    private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
+        I_ThinExtByRefPart newPart = t.duplicatePart();
+        newPart.setPathId(toPathId);
+        newPart.setVersion(versionTime);
+        if (statusId != 0) {
+            newPart.setStatus(statusId);
+        }
+        t.getCore().addVersion(newPart);
+    }
+
+    public void processId(I_IdVersioned idVersioned) throws Exception {
+
+        if (++idCount % 1000 == 0) {
+            getLog().info("processed id " + idCount);
+        }
+
+        Collection<I_IdTuple> ids;
+        if (readLatestPartOnly) {
+            ids = getLatest(idVersioned.getTuples());
+        } else {
+            ids = idVersioned.getTuples();
+        }
+
+        boolean datachanged = false;
+        I_IdTuple latestPart = null;
+        for (I_IdTuple t : ids) {
+
+            if (fromPathIds.contains(t.getPathId())) {
+                if (copyOnlyLatestState) {
+                    if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
+                        latestPart = t;
+                    }
+                } else {
+                    duplicateIdTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        if (copyOnlyLatestState && latestPart != null) {
+            duplicateIdTuple(latestPart);
+            datachanged = true;
+        }
+
+        if (datachanged) {
+            directInterface.writeId(idVersioned);
+        }
+    }
+
+    private Collection<I_IdTuple> getLatest(List<I_IdTuple> tuples) {
+        Map<Integer, I_IdTuple> map = new HashMap<Integer, I_IdTuple>();
+        for (I_IdTuple ids : tuples) {
+            if (map.containsKey(ids.getNativeId())) {
+                if (map.get(ids.getNativeId()).getVersion() < ids.getVersion()) {
+                    map.put(ids.getNativeId(), ids);
+                }
+            } else {
+                map.put(ids.getNativeId(), ids);
+            }
+        }
+        return map.values();
+    }
+
+    private void duplicateIdTuple(I_IdTuple t) {
+        I_IdPart newPart = t.duplicatePart();
+        newPart.setPathId(toPathId);
+        newPart.setVersion(versionTime);
+        if (statusId != 0) {
+            newPart.setIdStatus(statusId);
+        }
+        t.getIdVersioned().addVersion(newPart);
+    }
+
+    private void processImages(List<I_ImageVersioned> images) throws Exception {
+        for (I_ImageVersioned imageVersioned : images) {
+            processImages(imageVersioned);
+        }
+    }
+
+    public void processImages(I_ImageVersioned imageVersioned) throws Exception {
+
+        if (++imageCount % 1000 == 0) {
+            getLog().info("processed image " + imageCount);
+        }
+
+        Collection<I_ImageTuple> images;
+        if (readLatestPartOnly) {
+            images = getLatest(imageVersioned.getTuples());
+        } else {
+            images = imageVersioned.getTuples();
+        }
+
+        boolean datachanged = false;
+        I_ImageTuple latestPart = null;
+        for (I_ImageTuple t : images) {
+
+            if (fromPathIds.contains(t.getPathId())) {
+                if (copyOnlyLatestState) {
+                    if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
+                        latestPart = t;
+                    }
+                } else {
+                    duplicateImageTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        if (copyOnlyLatestState && latestPart != null) {
+            duplicateImageTuple(latestPart);
+            datachanged = true;
+        }
+
+        if (datachanged) {
+            directInterface.writeImage(imageVersioned);
+        }
+    }
+
+    private Collection<I_ImageTuple> getLatest(Collection<I_ImageTuple> tuples) {
+        Map<Integer, I_ImageTuple> map = new HashMap<Integer, I_ImageTuple>();
+        for (I_ImageTuple image : tuples) {
+            if (map.containsKey(image.getImageId())) {
+                if (map.get(image.getImageId()).getVersion() < image.getVersion()) {
+                    map.put(image.getImageId(), image);
+                }
+            } else {
+                map.put(image.getImageId(), image);
+            }
+        }
+        return map.values();
+    }
+
+    private void duplicateImageTuple(I_ImageTuple t) {
+        I_ImagePart newPart = t.duplicatePart();
+        newPart.setPathId(toPathId);
+        newPart.setVersion(versionTime);
+        if (statusId != 0) {
+            newPart.setStatusId(statusId);
+        }
+        t.getVersioned().addVersion(newPart);
+    }
+
+    private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
+        for (I_RelVersioned relVersioned : sourceRels) {
+            processRelationship(relVersioned);
+            for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(relVersioned.getRelId())) {
+                processExtensionByReference(extension);
+            }
+        }
+    }
+
+    public void processRelationship(I_RelVersioned relVersioned)
+            throws Exception {
+
+        if (++relCount % 1000 == 0) {
+            getLog().info("processed relationship " + relCount);
+        }
+
+        Collection<I_RelTuple> rels;
+        if (readLatestPartOnly) {
+            rels = getLatestRelationships(relVersioned.getTuples());
+        } else {
+            rels = relVersioned.getTuples();
+        }
+
+        boolean datachanged = false;
+        I_RelTuple latestPart = null;
+        for (I_RelTuple t : rels) {
+
+            if (fromPathIds.contains(t.getPathId())) {
+                if (copyOnlyLatestState) {
+                    if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
+                        latestPart = t;
+                    }
+                } else {
+                    duplicateRelationshipTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        if (copyOnlyLatestState && latestPart != null) {
+            duplicateRelationshipTuple(latestPart);
+            datachanged = true;
+        }
+
+        if (datachanged) {
+            directInterface.writeRel(relVersioned);
+        }
+    }
+
+    private Collection<I_RelTuple> getLatestRelationships(List<I_RelTuple> tuples) {
+        Map<Integer, I_RelTuple> map = new HashMap<Integer, I_RelTuple>();
+        for (I_RelTuple rel : tuples) {
+            if (map.containsKey(rel.getRelId())) {
+                if (map.get(rel.getRelId()).getVersion() < rel.getVersion()) {
+                    map.put(rel.getRelId(), rel);
+                }
+            } else {
+                map.put(rel.getRelId(), rel);
+            }
+        }
+        return map.values();
+    }
+
+    private void duplicateRelationshipTuple(I_RelTuple t) {
+        I_RelPart newPart = t.duplicatePart();
+        newPart.setPathId(toPathId);
+        newPart.setVersion(versionTime);
 		if (statusId != 0) {
 			newPart.setStatusId(statusId);
 		}
