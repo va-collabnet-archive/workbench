@@ -51,7 +51,6 @@ public class TestPropertyEqualsText extends AbstractTask {
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
     }
 
     public TestPropertyEqualsText() {
