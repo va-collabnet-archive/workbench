@@ -817,9 +817,16 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                     Object obj = ois.readObject();
                     ois.close();
                     String[] idParts = files[i].getName().split("[.]");
-                    EntryID entryID = new EntryID(UUID.fromString(idParts[1]));
-
-                    T info = getObjectDescription(obj, entryID);
+                    T info;
+                    if (idParts[1].length() != 36) {
+                        EntryID entryID = new EntryID(UUID.randomUUID());
+                        info = getObjectDescription(obj, entryID);
+                        files[i].renameTo(new File(files[i].getParent(), info.getObjectID() + "." + 
+                        		entryID + getFileSuffix()));
+                    } else {
+                        EntryID entryID = new EntryID(UUID.fromString(idParts[1]));
+                        info = getObjectDescription(obj, entryID);
+                    }
                     this.objectInfoSortedSet.add(info);
                 } catch (Exception ex) {
                     getLogger().log(
