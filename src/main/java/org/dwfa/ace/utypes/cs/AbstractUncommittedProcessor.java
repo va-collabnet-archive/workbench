@@ -54,9 +54,11 @@ public abstract class AbstractUncommittedProcessor implements
 		if (time == Long.MAX_VALUE) {
 			throw new IOException("commit time = Long.MAX_VALUE");
 		}
-		for (UniversalAceExtByRefPart part : bean.getVersions()) {
-			if (part.getTime() == Long.MAX_VALUE) {
-				processUncommittedUniversalAceExtByRefPart(part);
+		if (bean.getVersions() != null) {
+			for (UniversalAceExtByRefPart part : bean.getVersions()) {
+				if (part.getTime() == Long.MAX_VALUE) {
+					processUncommittedUniversalAceExtByRefPart(part);
+				}
 			}
 		}
 	}
@@ -70,11 +72,13 @@ public abstract class AbstractUncommittedProcessor implements
 			throw new IOException("commit time = Long.MAX_VALUE");
 		}
 		// Do all the commiting...
-		for (UniversalAceIdentification id : list.getUncommittedIds()) {
-			AceLog.getEditLog().fine("processUncommittedIds: " + id);
-			for (UniversalAceIdentificationPart part : id.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceIdentificationPart(part);
+		if (list.getUncommittedIds() != null) {
+			for (UniversalAceIdentification id : list.getUncommittedIds()) {
+				AceLog.getEditLog().fine("processUncommittedIds: " + id);
+				for (UniversalAceIdentificationPart part : id.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceIdentificationPart(part);
+					}
 				}
 			}
 		}
@@ -88,10 +92,12 @@ public abstract class AbstractUncommittedProcessor implements
 		if (bean.getConceptAttributes() != null) {
 			UniversalAceConceptAttributes attributes = bean
 					.getConceptAttributes();
-			for (UniversalAceConceptAttributesPart part : attributes
-					.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceConceptAttributesPart(part);
+			if (attributes.getVersions() != null) {
+				for (UniversalAceConceptAttributesPart part : attributes
+						.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceConceptAttributesPart(part);
+					}
 				}
 			}
 		}
@@ -104,7 +110,7 @@ public abstract class AbstractUncommittedProcessor implements
 			UniversalAceBean bean) throws IOException {
 		if (bean.getUncommittedConceptAttributes() != null) {
 			for (UniversalAceConceptAttributesPart part : bean
-					.getConceptAttributes().getVersions()) {
+					.getUncommittedConceptAttributes().getVersions()) {
 				if (part.getTime() == Long.MAX_VALUE) {
 					processUncommittedUniversalAceConceptAttributesPart(part);
 				}
@@ -114,10 +120,12 @@ public abstract class AbstractUncommittedProcessor implements
 
 	private void processImageChanges(long time, UniversalAceBean bean)
 			throws IOException {
-		for (UniversalAceImage image : bean.getImages()) {
-			for (UniversalAceImagePart part : image.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceImagePart(part);
+		if (bean.getImages() != null) {
+			for (UniversalAceImage image : bean.getImages()) {
+				for (UniversalAceImagePart part : image.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceImagePart(part);
+					}
 				}
 			}
 		}
@@ -128,10 +136,12 @@ public abstract class AbstractUncommittedProcessor implements
 
 	private void processUncommittedImages(long time, UniversalAceBean bean)
 			throws IOException {
-		for (UniversalAceImage image : bean.getUncommittedImages()) {
-			for (UniversalAceImagePart part : image.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceImagePart(part);
+		if (bean.getUncommittedImages() != null) {
+			for (UniversalAceImage image : bean.getUncommittedImages()) {
+				for (UniversalAceImagePart part : image.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceImagePart(part);
+					}
 				}
 			}
 		}
@@ -139,10 +149,12 @@ public abstract class AbstractUncommittedProcessor implements
 
 	private void processUncommittedRelationships(long time,
 			UniversalAceBean bean) throws IOException {
-		for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
-			for (UniversalAceRelationshipPart part : rel.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceRelationshipPart(part);
+		if (bean.getUncommittedSourceRels() != null) {
+			for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
+				for (UniversalAceRelationshipPart part : rel.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceRelationshipPart(part);
+					}
 				}
 			}
 		}
@@ -153,10 +165,12 @@ public abstract class AbstractUncommittedProcessor implements
 
 	private void processRelationshipChanges(long time, UniversalAceBean bean)
 			throws IOException {
-		for (UniversalAceRelationship rel : bean.getSourceRels()) {
-			for (UniversalAceRelationshipPart part : rel.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceRelationshipPart(part);
+		if (bean.getSourceRels() != null) {
+			for (UniversalAceRelationship rel : bean.getSourceRels()) {
+				for (UniversalAceRelationshipPart part : rel.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceRelationshipPart(part);
+					}
 				}
 			}
 		}
@@ -164,27 +178,33 @@ public abstract class AbstractUncommittedProcessor implements
 
 	private void processDescriptionChanges(long time, UniversalAceBean bean)
 			throws IOException {
-		for (UniversalAceDescription desc : bean.getDescriptions()) {
-			if (desc.getVersions().size() == 0) {
-				AceLog.getAppLog().warning("Description has no parts: " + desc);
-			} else {
-				processDescription(time, desc);
+		if (bean.getDescriptions() != null) {
+			for (UniversalAceDescription desc : bean.getDescriptions()) {
+				if (desc.getVersions().size() == 0) {
+					AceLog.getAppLog().warning("Description has no parts: " + desc);
+				} else {
+					processDescription(time, desc);
+				}
 			}
 		}
 	}
 
 	private void processUncommittedDescriptions(long time, UniversalAceBean bean)
 			throws IOException {
-		for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
-			processDescription(time, desc);
+		if (bean.getUncommittedDescriptions() != null) {
+			for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
+				processDescription(time, desc);
+			}
 		}
 	}
 
 	private void processDescription(long time, UniversalAceDescription desc)
 			throws IOException {
-		for (UniversalAceDescriptionPart part : desc.getVersions()) {
-			if (part.getTime() == Long.MAX_VALUE) {
-				processUncommittedUniversalAceDescriptionPart(part);
+		if (desc.getVersions() != null) {
+			for (UniversalAceDescriptionPart part : desc.getVersions()) {
+				if (part.getTime() == Long.MAX_VALUE) {
+					processUncommittedUniversalAceDescriptionPart(part);
+				}
 			}
 		}
 	}
@@ -194,11 +214,13 @@ public abstract class AbstractUncommittedProcessor implements
 
 	private void processUncommittedIds(long time, UniversalAceBean bean)
 			throws IOException {
-		for (UniversalAceIdentification id : bean.getUncommittedIds()) {
-			AceLog.getEditLog().fine("processUncommittedIds: " + id);
-			for (UniversalAceIdentificationPart part : id.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					processUncommittedUniversalAceIdentificationPart(part);
+		if (bean.getUncommittedIds() != null) {
+			for (UniversalAceIdentification id : bean.getUncommittedIds()) {
+				AceLog.getEditLog().fine("processUncommittedIds: " + id);
+				for (UniversalAceIdentificationPart part : id.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						processUncommittedUniversalAceIdentificationPart(part);
+					}
 				}
 			}
 		}
