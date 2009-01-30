@@ -1554,7 +1554,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 							JMenu submenu = new JMenu(processFile.getName());
 							newMenu.add(submenu);
 							addSubmenMenuItems(submenu, processFile);
-						} else {
+						} else if (processFile.getName().toLowerCase().endsWith(".bp")) {
 							try {
 								ActionListener processMenuListener = new ProcessMenuActionListener(
 										processFile, menuWorker);
