@@ -55,7 +55,8 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
             }
             for (String key: config.getSubversionMap().keySet()) {
             	SubversionData svd =  config.getSubversionMap().get(key);
-                doSvnTask(config, svd, key);  
+            	worker.getLogger().info(" processing: " + key);
+                doSvnTask(config, svd, key);
             }
              return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
