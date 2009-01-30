@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,7 +147,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
-    public static int getObjectSize(Object object) {
+ 	public static int getObjectSize(Object object) {
         if (object == null) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Object is null. Cannot measure.");
@@ -154,7 +155,20 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
             return -1;
         }
         try {
+        	Boolean canSerialize = false;
         	if (Serializable.class.isAssignableFrom(object.getClass())) {
+        		canSerialize = true;
+        		if (Collection.class.isAssignableFrom(object.getClass())) {
+        			Collection<?> c = (Collection<?>) object;
+        			for (Object item: c) {
+        				if (Serializable.class.isAssignableFrom(item.getClass()) == false) {
+        					canSerialize = false;
+        					break;
+        				}
+        			}
+        		}
+        	} 
+        	if (canSerialize) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
                 oos.writeObject(object);
@@ -162,7 +176,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
                 oos.close();
                 baos.close();
                 return bytes.length;
-        	} 
+        	}
         	return -2;
          } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
