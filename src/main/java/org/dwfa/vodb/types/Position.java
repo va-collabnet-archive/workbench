@@ -202,7 +202,7 @@ public class Position implements I_Position {
 		try {
 			pathConceptId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
 		} catch (TerminologyException e) {
-			IOException newEx = new IOException();
+			IOException newEx = new IOException(e.getLocalizedMessage());
 			newEx.initCause(e);
 			throw newEx;
 		}
@@ -222,8 +222,8 @@ public class Position implements I_Position {
          try {
             positions.add(readPosition(in));
          } catch (IOException ex) {
-            if (NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
-               AceLog.getAppLog().alertAndLogException(ex);
+            if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+               AceLog.getAppLog().alertAndLogException(ex.getCause());
             } else {
                throw ex;
             }
