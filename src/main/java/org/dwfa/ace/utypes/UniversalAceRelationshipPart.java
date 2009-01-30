@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.UUID;
 
-public class UniversalAceRelationshipPart implements Serializable {
+public class UniversalAceRelationshipPart implements Serializable, I_VersionComponent {
 	/**
 	 * 
 	 */

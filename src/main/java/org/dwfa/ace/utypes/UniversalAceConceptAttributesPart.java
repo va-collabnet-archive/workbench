@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
-public class UniversalAceConceptAttributesPart implements Serializable {
+public class UniversalAceConceptAttributesPart implements Serializable, I_VersionComponent {
 	/**
 	 * 
 	 */
@@ -69,6 +69,12 @@ public class UniversalAceConceptAttributesPart implements Serializable {
 		" status: " + conceptStatus + 
 		" path: " + pathId + 
 		" time: " + time + " (" + new Date(time) + ")";
+	}
+	public Collection<UUID> getStatusId() {
+		return getConceptStatus();
+	}
+	public void setStatusId(Collection<UUID> status) {
+		setConceptStatus(status);
 	}
 
 	

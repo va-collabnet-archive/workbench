@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.UUID;
 
-public class UniversalAceImagePart implements Serializable {
+public class UniversalAceImagePart implements Serializable, I_VersionComponent {
 	/**
 	 * 
 	 */

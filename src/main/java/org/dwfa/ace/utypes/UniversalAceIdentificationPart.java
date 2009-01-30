@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.UUID;
 
-public class UniversalAceIdentificationPart implements Serializable {
+public class UniversalAceIdentificationPart implements Serializable, I_VersionComponent {
 	/**
 	 * 
 	 */
@@ -81,6 +81,12 @@ public class UniversalAceIdentificationPart implements Serializable {
 	 */
 	public void setTime(long version) {
 		this.time = version;
+	}
+	public Collection<UUID> getStatusId() {
+		return getIdStatus();
+	}
+	public void setStatusId(Collection<UUID> status) {
+		setStatusId(status);
 	}
 
 }
