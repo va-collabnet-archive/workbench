@@ -11,6 +11,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -155,13 +157,23 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
             return -1;
         }
         try {
-        	Boolean canSerialize = false;
+        	boolean canSerialize = false;
         	if (Serializable.class.isAssignableFrom(object.getClass())) {
         		canSerialize = true;
         		if (Collection.class.isAssignableFrom(object.getClass())) {
         			Collection<?> c = (Collection<?>) object;
         			for (Object item: c) {
         				if (Serializable.class.isAssignableFrom(item.getClass()) == false) {
+        					canSerialize = false;
+        					break;
+        				}
+        			}
+        		}
+        		if (Map.class.isAssignableFrom(object.getClass())) {
+        			Map<?, ?> m = (Map<?, ?>) object;
+        			for (Entry<?, ?> item: m.entrySet()) {
+        				if (Serializable.class.isAssignableFrom(item.getKey().getClass()) == false ||
+        						Serializable.class.isAssignableFrom(item.getValue().getClass()) == false) {
         					canSerialize = false;
         					break;
         				}
