@@ -311,11 +311,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			if (time == Long.MAX_VALUE) {
 				throw new IOException("commit time = Long.MAX_VALUE");
 			}
-			UniversalAceIdentification uid = bean.getId();
-			if (uid.getUIDs().contains(
-					UUID.fromString("a62998f4-b727-55a8-8af3-9967a4dcafe5"))) {
-				AceLog.getAppLog().info("Found concept: " + bean);
-			}
 			// Do all the committing...
 			commitUncommittedIds(time, bean, values);
 			commitUncommittedConceptAttributes(time, bean, values);
