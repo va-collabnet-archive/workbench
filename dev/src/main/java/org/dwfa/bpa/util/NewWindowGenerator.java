@@ -55,10 +55,10 @@ public class NewWindowGenerator implements I_InitComponentMenus {
                 "frameArgs", String[].class);
         OpenFrames.addNewWindowMenuItemGenerator(this);
     }
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem(this.title);
         newWindow.addActionListener(new NewFrame());
-        return newWindow;
+        return new JMenuItem[] { newWindow };
     }
 
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {

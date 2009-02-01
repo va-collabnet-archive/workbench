@@ -20,5 +20,5 @@ public interface I_InitComponentMenus {
     
     public void addInternalFrames(JMenu menu);
     
-    public JMenuItem getNewWindowMenu();
+    public JMenuItem[] getNewWindowMenu();
 }

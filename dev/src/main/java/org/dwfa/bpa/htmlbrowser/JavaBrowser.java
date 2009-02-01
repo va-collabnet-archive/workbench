@@ -198,7 +198,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
 	public void addInternalFrames(JMenu menu) {
 
 	}
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         return null;
     }
 

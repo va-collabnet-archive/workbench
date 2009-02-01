@@ -140,9 +140,11 @@ public class OpenFrames implements PropertyChangeListener {
     public static Collection<JMenuItem> getNewWindowMenuItems() { 
         TreeSet<JMenuItem> items = new TreeSet<JMenuItem>(new MenuComparator());
         for (I_InitComponentMenus generator: singleton.newWindowMenuItemGenerators) {
-            JMenuItem item = generator.getNewWindowMenu();
-            if (item != null) {
-                items.add(item);
+            JMenuItem[] newMenuItems = generator.getNewWindowMenu();
+            if (newMenuItems != null) {
+            	for (JMenuItem item: newMenuItems) {
+                    items.add(item);
+            	}
             }
         }
         return items;

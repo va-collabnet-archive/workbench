@@ -56,7 +56,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
     public enum Concept implements I_ConceptualizeUniversally {
 
-        ARCHITECTONIC_ROOT_CONCEPT("Workbench Auxiliary concept", getArchitectonicText(),
+        ARCHITECTONIC_ROOT_CONCEPT("Terminology Auxiliary concept", getArchitectonicText(),
             new I_ConceptualizeUniversally[] { }),
         DEFINITION_TYPE("definition type",
                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),

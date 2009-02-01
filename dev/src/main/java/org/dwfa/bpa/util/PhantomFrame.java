@@ -46,7 +46,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
     return fileMenu;
   }
 
-  public JMenuItem getNewWindowMenu() {
+  public JMenuItem[] getNewWindowMenu() {
     return null;
   }
 

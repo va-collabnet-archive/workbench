@@ -137,7 +137,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     
     public abstract JMenu getQuitMenu();
     
-    public abstract JMenuItem getNewWindowMenu();
+    public abstract JMenuItem[] getNewWindowMenu();
     
     public abstract String getNextFrameName() throws ConfigurationException;
 
