@@ -276,27 +276,24 @@ public class AceFrame extends ComponentFrame {
 
 	}
 
-	public JMenuItem getNewWindowMenu() {
+	public JMenuItem[] getNewWindowMenu() {
 		if (ACE.editMode) {
-			JMenu newAceFrameMenu = new JMenu("ACE Frame");
-			JMenuItem newViewer = new JMenuItem("Ace Editor Frame");
+			JMenuItem newViewer = new JMenuItem("Editor Window");
 			newViewer.addActionListener(new NewAceFrame());
-			newAceFrameMenu.add(newViewer);
 			JMenuItem newAdministrator = new JMenuItem(
-					"Ace Administrator Frame");
+					"Administrator Window");
 			newAdministrator.addActionListener(new NewAceAdminFrame());
-			newAceFrameMenu.add(newAdministrator);
-			return newAceFrameMenu;
+			return new JMenuItem[] { newViewer, newAdministrator };
 		} else {
-			JMenuItem newViewer = new JMenuItem("Ace Viewer Frame");
+			JMenuItem newViewer = new JMenuItem("Viewer Window");
 			newViewer.addActionListener(new NewAceFrame());
-			return newViewer;
+			return new JMenuItem[] { newViewer };
 		}
 	}
 
 	public String getNextFrameName() throws ConfigurationException {
 		String title = (String) config.getEntry(this.getClass().getName(),
-				"frameName", String.class, "Ace Viewer");
+				"frameName", String.class, "Viewer");
 		if (ACE.editMode) {
 			title.replace("Viewer", "Editor");
 			title.replace("viewer", "editor");
@@ -314,7 +311,7 @@ public class AceFrame extends ComponentFrame {
 	}
 
 	public String getFrameName() {
-		String title = "Ace Editor";
+		String title = "Editor";
 		if (count > 0) {
 			title = title + "; User: " + this.frameConfig.getUsername()
 					+ "; # " + count;

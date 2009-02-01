@@ -54,7 +54,7 @@ public class ActivityViewer {
 		}
 
 		@Override
-		public JMenuItem getNewWindowMenu() {
+		public JMenuItem[] getNewWindowMenu() {
 			return null;
 		}
 

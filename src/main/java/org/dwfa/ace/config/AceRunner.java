@@ -516,6 +516,7 @@ public class AceRunner {
 		// import any change sets that may be downloaded
 		// from svn...
 		try {
+			AceLog.getAppLog().info("Starting stealth import");
 			File dbFolder = (File) jiniConfig.getEntry(this.getClass()
 					.getName(), "dbFolder", File.class, new File(
 					"target/berkeley-db"));
@@ -541,10 +542,18 @@ public class AceRunner {
 				jcsImporter
 						.importAllChangeSets(AceLog.getAppLog().getLogger(),
 								null, checkoutLocation.getAbsolutePath(),
+								false, ".jcs", "bootstrap.init");
+			}
+
+			for (File checkoutLocation : changeLocations) {
+				jcsImporter
+						.importAllChangeSets(AceLog.getAppLog().getLogger(),
+								null, checkoutLocation.getAbsolutePath(),
 								false, ".jcs");
 			}
 
 			stealthVodb.close();
+			AceLog.getAppLog().info("Finished stealth import");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
