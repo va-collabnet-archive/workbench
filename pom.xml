@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dwfa</groupId>
 	<artifactId>vodb</artifactId>
-	<version>1.33-SNAPSHOT</version>
+	<version>1.33</version>
 	<packaging>jar</packaging>
 	<name>Versioned Object Database</name>
 	<url>
@@ -17,9 +17,9 @@
 	<description>ACE editor toolkit and version-oriented database
 	</description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</developerConnection>
-		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/tags/vodb-1.33</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/tags/vodb-1.33</developerConnection>
+		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/vodb-1.33</url>
 	</scm>
 	<ciManagement>
 		<system>continuum</system>
