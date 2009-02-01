@@ -7,7 +7,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/wfpanel", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
 public class SetUserAndPwdNC extends SetUserAndPwdPNC {
 	private static final long serialVersionUID = 1;
 	private static final int dataVersion = 1;

@@ -30,7 +30,7 @@ import org.dwfa.util.bean.Spec;
  * Place of issue tracking: need to be specified.
  */
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class BuildClassificationResultString extends AbstractTask {
 
 	private static final long serialVersionUID = 1L;

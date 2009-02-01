@@ -33,7 +33,7 @@ import org.dwfa.util.bean.Spec;
  * @author kec
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/search", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN) })
 public class IterateConcepts extends AbstractTask {
 
     private transient Iterator<I_GetConceptData> conIt;

@@ -28,7 +28,7 @@ import org.dwfa.util.bean.Spec;
  *
  * @created 18/01/2008
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/path", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class SetEditPathFromDescription extends AbstractTask {
 
     /**

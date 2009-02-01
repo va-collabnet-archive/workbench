@@ -31,7 +31,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/conflict", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/conflict", type = BeanType.TASK_BEAN) })
 public class PutCompletedConceptsWithConflictsInListView extends AbstractTask {
 
    /**

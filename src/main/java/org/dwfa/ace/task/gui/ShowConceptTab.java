@@ -20,7 +20,7 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
  * Task which shows the list view.
  * @author Christine Hill
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/gui/component", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/gui/component", type = BeanType.TASK_BEAN) })
 public class ShowConceptTab extends AbstractTask {
 
     /**

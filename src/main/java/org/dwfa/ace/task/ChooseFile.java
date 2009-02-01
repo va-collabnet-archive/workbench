@@ -26,7 +26,7 @@ import org.dwfa.util.bean.Spec;
  * @author Christine Hill
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/file", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
 public class ChooseFile extends AbstractTask {
 
     /**

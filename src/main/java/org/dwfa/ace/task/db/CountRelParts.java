@@ -19,7 +19,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/ace/db", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/ide/db", type = BeanType.TASK_BEAN)})
 public class CountRelParts extends AbstractTask implements I_ProcessRelationships {
 
 	   private static final long serialVersionUID = 1;

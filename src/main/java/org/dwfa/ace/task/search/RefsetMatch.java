@@ -28,7 +28,7 @@ import org.dwfa.util.bean.Spec;
  * 
  * @author Dion McMurtrie
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/search", type = BeanType.TASK_BEAN),
+@BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
         @Spec(directory = "search", type = BeanType.TASK_BEAN) })
 public class RefsetMatch extends AbstractSearchTest {
 

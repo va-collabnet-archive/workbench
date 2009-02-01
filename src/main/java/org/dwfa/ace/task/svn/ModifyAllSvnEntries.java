@@ -14,7 +14,7 @@ import org.dwfa.util.bean.Spec;
 /**
  * Modify the config for each SVN entry 
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/svn", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/svn", type = BeanType.TASK_BEAN) })
 public class ModifyAllSvnEntries extends AbstractAllSvnEntriesTask {
 
 	private static final long serialVersionUID = 5226090220893610305L;

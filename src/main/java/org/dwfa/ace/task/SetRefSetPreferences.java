@@ -41,7 +41,7 @@ import org.dwfa.util.bean.Spec;
  * @author PeterVawser
  * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/gui/signpost", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/gui/signpost", type = BeanType.TASK_BEAN) })
 public class SetRefSetPreferences extends AbstractTask {
 	
 	private static final long serialVersionUID = 1;

@@ -20,7 +20,7 @@ import org.dwfa.util.bean.Spec;
 /**
  * Sets the list of reference sets to show in the taxonomy view to the reference set specified
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/refset", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/refset", type = BeanType.TASK_BEAN) })
 public class SetRefsetToShowInTaxonomyView extends AbstractTask {
 	
 	private static final long serialVersionUID = 0;

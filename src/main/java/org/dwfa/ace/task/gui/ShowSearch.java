@@ -21,7 +21,7 @@ import org.dwfa.util.bean.Spec;
  * 
  * @author susan
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/gui", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/gui", type = BeanType.TASK_BEAN) })
 public class ShowSearch extends AbstractTask {
 
 		/**

@@ -24,7 +24,7 @@ import org.dwfa.util.bean.Spec;
  * @author Dion
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/developer", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/developer", type = BeanType.TASK_BEAN) })
 public class ConceptFromNid extends AbstractTask{
 	
 	private static final long serialVersionUID = 1L;

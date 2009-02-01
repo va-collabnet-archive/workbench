@@ -46,7 +46,7 @@ High values for nRepeatFaultReads and nRepeatIteratorReads may indicate non-opti
  * @author kec
  * @see http://www.oracle.com/technology/products/berkeley-db/faq/je_faq.html
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/gui/signpost", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/gui/signpost", type = BeanType.TASK_BEAN) })
 public class SetSignpostToDbStats extends AbstractTask {
     private static final long serialVersionUID = 1;
 

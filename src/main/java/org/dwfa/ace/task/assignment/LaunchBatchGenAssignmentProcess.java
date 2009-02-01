@@ -38,7 +38,7 @@ import org.dwfa.util.bean.Spec;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 
 public class LaunchBatchGenAssignmentProcess extends AbstractTask {
 

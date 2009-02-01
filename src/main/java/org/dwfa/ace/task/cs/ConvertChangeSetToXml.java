@@ -21,7 +21,7 @@ import org.dwfa.util.bean.Spec;
  * @author Dion McMurtrie
  * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/change sets", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class ConvertChangeSetToXml extends AbstractTask {
 
 	private String outputSuffix = ".xml";

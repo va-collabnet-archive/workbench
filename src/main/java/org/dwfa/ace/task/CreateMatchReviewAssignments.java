@@ -33,7 +33,7 @@ import org.dwfa.util.io.FileIO;
  * @author Eric Mays (EKM)
  * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class CreateMatchReviewAssignments extends AbstractTask {
 
 	/**

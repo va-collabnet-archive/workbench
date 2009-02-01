@@ -25,7 +25,7 @@ import org.dwfa.util.bean.Spec;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/address", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/address", type = BeanType.TASK_BEAN) })
 
 public class GetSelectedAddresses extends AbstractTask {
 

@@ -54,7 +54,7 @@ import org.dwfa.util.bean.Spec;
  * 
  */
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class LoadClassifyWrite extends AbstractTask {
 
     final static Object LOCK = new Object();

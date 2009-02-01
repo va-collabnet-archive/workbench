@@ -19,7 +19,7 @@ import org.dwfa.util.bean.Spec;
 
 import com.sun.jini.start.LifeCycle;
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/queue", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/queue", type = BeanType.TASK_BEAN) })
 public class OpenAllInboxes extends AbstractTask {
 
     /**

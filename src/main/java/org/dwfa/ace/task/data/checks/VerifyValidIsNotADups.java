@@ -46,7 +46,7 @@ import org.dwfa.util.bean.Spec;
  * @author PeterVawser
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/data checks", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/data checks", type = BeanType.TASK_BEAN) })
 public class VerifyValidIsNotADups extends AbstractTask {
 	
 	/*

@@ -27,7 +27,7 @@ import org.dwfa.util.io.FileIO;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class ChooseBusinessProcessFile extends AbstractTask {
 
     /**

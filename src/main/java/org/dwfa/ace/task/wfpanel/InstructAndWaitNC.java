@@ -8,8 +8,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = {
-		@Spec(directory = "tasks/ace/instruct", type = BeanType.TASK_BEAN),
-		@Spec(directory = "tasks/ace/wfpanel", type = BeanType.TASK_BEAN) })
+		@Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
+		@Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
 public class InstructAndWaitNC extends InstructAndWaitPNC {
 
 	private static final long serialVersionUID = 1;

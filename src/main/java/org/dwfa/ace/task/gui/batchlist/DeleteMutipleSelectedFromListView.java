@@ -42,7 +42,7 @@ import org.dwfa.util.bean.Spec;
  * 
  * This task will delete the mutiple selected concepts from listview
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/listview", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class DeleteMutipleSelectedFromListView extends AbstractTask {
 
 	private static final long serialVersionUID = 1L;

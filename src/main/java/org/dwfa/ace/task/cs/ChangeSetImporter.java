@@ -30,8 +30,13 @@ public abstract class ChangeSetImporter implements ActionListener {
         continueImport = false;
     }
 
-    @SuppressWarnings("unchecked")
     public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, String suffix) throws TaskFailedException {
+    	importAllChangeSets(logger, validators, rootDirStr, validateChangeSets, suffix, null);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, 
+    		String suffix, String prefix) throws TaskFailedException {
         try {
             I_TermFactory tf = LocalVersionedTerminology.get();
             I_ShowActivity activity = tf.newActivityPanel();
@@ -46,7 +51,7 @@ public abstract class ChangeSetImporter implements ActionListener {
 
             File rootFile = new File(rootDirStr);
             List<File> changeSetFiles = new ArrayList<File>();
-            addAllChangeSetFiles(rootFile, changeSetFiles, suffix);
+            addAllChangeSetFiles(rootFile, changeSetFiles, suffix, prefix);
             TreeSet<I_ReadChangeSet> readerSet = getSortedReaderSet();
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = getChangeSetReader(csf);
@@ -77,6 +82,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             throw new TaskFailedException(e);
         }
     }
+
 
     public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException, ClassNotFoundException {
         int available = 0;
@@ -160,6 +166,10 @@ public abstract class ChangeSetImporter implements ActionListener {
     }
 
     public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix) {
+    	addAllChangeSetFiles(rootFile, changeSetFiles, suffix, null);
+    }
+
+    public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix, final String prefix) {
         File[] children = rootFile.listFiles(new FileFilter() {
 
             public boolean accept(File child) {
@@ -169,13 +179,17 @@ public abstract class ChangeSetImporter implements ActionListener {
                 if (child.isDirectory()) {
                     return true;
                 }
-                return child.getName().endsWith(suffix);
-            }
+                if (prefix != null && prefix.length() > 1) {
+                    return child.getName().endsWith(suffix) && child.getName().startsWith(prefix);
+                } else {
+                    return child.getName().endsWith(suffix);
+                }
+           }
         });
         if (children != null) {
             for (File child : children) {
                 if (child.isDirectory()) {
-                    addAllChangeSetFiles(child, changeSetFiles, suffix);
+                    addAllChangeSetFiles(child, changeSetFiles, suffix, prefix);
                 } else {
                     changeSetFiles.add(child);
                 }

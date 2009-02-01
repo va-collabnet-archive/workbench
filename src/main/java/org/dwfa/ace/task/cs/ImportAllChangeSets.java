@@ -22,7 +22,7 @@ import org.dwfa.util.bean.Spec;
  * @author kec
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/change sets", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class ImportAllChangeSets extends AbstractTask {
 
     private String rootDirStr = "profiles/";

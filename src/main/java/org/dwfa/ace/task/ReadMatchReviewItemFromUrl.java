@@ -28,7 +28,7 @@ import org.dwfa.util.bean.Spec;
  * @author Eric Mays (EKM)
  * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class ReadMatchReviewItemFromUrl extends AbstractTask {
 
 	/**

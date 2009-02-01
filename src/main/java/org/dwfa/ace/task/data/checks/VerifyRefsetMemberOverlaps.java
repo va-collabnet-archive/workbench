@@ -20,7 +20,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 
-@BeanList(specs = { @Spec(directory = "tasks/ace/data checks", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/data checks", type = BeanType.TASK_BEAN) })
 public class VerifyRefsetMemberOverlaps extends AbstractTask{
 		
 

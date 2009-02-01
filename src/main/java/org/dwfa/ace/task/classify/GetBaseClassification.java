@@ -23,7 +23,7 @@ import org.dwfa.util.bean.Spec;
  * @author law223
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/classify", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class GetBaseClassification extends AbstractTask {
     
     /**

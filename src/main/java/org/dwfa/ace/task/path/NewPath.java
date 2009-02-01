@@ -37,7 +37,7 @@ import org.dwfa.util.id.Type5UuidFactory;
  *
  * @created 15/01/2008
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace/path", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 
 /*This task has the same function with the "new path" in the preference panel */
 public class NewPath extends AbstractTask {

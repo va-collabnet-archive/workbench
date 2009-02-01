@@ -18,7 +18,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = 
-{ @Spec(directory = "tasks/ace/assignments", type = BeanType.TASK_BEAN)})
+{ @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN)})
 /**
  * Get the potential duplicate detail Html file directory, and potential dup uuid from properties and set detail uuid file name property
  * @author Susan Castillo
