@@ -176,10 +176,10 @@ public class ProcessBuilderFrame extends ComponentFrame {
 
 	}
 
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem("Process Builder");
         newWindow.addActionListener(new NewFrame(this.getArgs(), this.getLc()));
-        return newWindow;
+        return new JMenuItem[] { newWindow };
     }
 
     /**

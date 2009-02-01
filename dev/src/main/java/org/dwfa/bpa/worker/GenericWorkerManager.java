@@ -333,10 +333,10 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
 
     }
 
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem("Generic Worker Manager");
         newWindow.addActionListener(new NewFrame(this.getArgs(), this.getLc()));
-        return newWindow;
+        return new JMenuItem[] { newWindow };
     }
 
     /**

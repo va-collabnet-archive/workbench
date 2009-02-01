@@ -208,10 +208,10 @@ public class QueueViewerFrame extends ComponentFrame {
 	public void addInternalFrames(JMenu menu) {
 
 	}
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem("Queue Viewer");
         newWindow.addActionListener(new NewFrame(this.getArgs(), this.getLc()));
-        return newWindow;
+        return new JMenuItem[] { newWindow };
     }
     /**
      * @throws ConfigurationException 

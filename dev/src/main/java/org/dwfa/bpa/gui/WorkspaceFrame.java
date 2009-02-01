@@ -271,7 +271,7 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
         return this.fileMenu;
     }
 
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         return null;
     }
 

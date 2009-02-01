@@ -116,10 +116,10 @@ public class BrowserAdaptor extends Browser implements I_InitComponentMenus {
 	public void addInternalFrames(JMenu menu) {
 
 	}
-    public JMenuItem getNewWindowMenu() {
+    public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem("Service Browser");
         newWindow.addActionListener(new NewFrame(this.args, this.lc));
-        return newWindow;
+        return new JMenuItem[] { newWindow };
     }
     private static int count = 0;
 
