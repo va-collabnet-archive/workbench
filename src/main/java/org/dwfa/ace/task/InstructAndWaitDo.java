@@ -48,6 +48,23 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/*
+ * This class was constructed for the specific purpose of taking actions on a match
+ * review item, though it could likely be adapted for similar tasks. 
+ * <br>
+ * It places a control in the toolbar which facilitates editing based on the selection in the display
+ * <br>
+ * The actions are:
+ * <br>
+ * Create a new concept
+ * <br>
+ * Clone a existing concept
+ * <br>
+ * Add a synonym to an existing concept
+ * <br>
+ * Exit and mark as completed
+ * <br> Exit but leave as a to do item
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN) })
 public class InstructAndWaitDo extends AbstractTask {
 
@@ -115,21 +132,28 @@ public class InstructAndWaitDo extends AbstractTask {
 		System.out.println(">>>descr version: " + dp.getVersion());
 	}
 
+	/*
+	 * Add a description to an existing concept
+	 */
 	private class DescrActionListener implements ActionListener {
 		/**
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
 			try {
+				// Get the selected concept
 				I_GetConceptData con = getSelectedConcept();
 				if (con == null)
 					return;
+				// Prompt for the description using the input term as the
+				// initial text
 				String newDescrString = (String) JOptionPane.showInputDialog(
 						null, "Add description to:\n" + con.getInitialText(),
 						"Enter description", JOptionPane.QUESTION_MESSAGE,
 						null, null, InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
+				// Here's the drill for adding a description
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
 				I_GetConceptData synonym_description_type = termFactory
 						.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
@@ -159,6 +183,13 @@ public class InstructAndWaitDo extends AbstractTask {
 		}
 	}
 
+	/*
+	 * Create a new concept
+	 * 
+	 * @param newDescrString - the FSN and preferred term for the new concept
+	 * 
+	 * @param semantic_tag - the semantic tag, may be null
+	 */
 	protected I_GetConceptData createNewConcept(String newDescrString,
 			String semantic_tag) throws Exception {
 		System.out.println("ST: |" + semantic_tag + "|");
@@ -173,14 +204,24 @@ public class InstructAndWaitDo extends AbstractTask {
 						.getUids());
 		I_GetConceptData newConcept = LocalVersionedTerminology.get()
 				.newConcept(UUID.randomUUID(), false, config);
+		// Install the FSN
 		termFactory.newDescription(UUID.randomUUID(), newConcept, language,
 				newDescrString + " " + semantic_tag,
 				fully_specified_description_type, config);
+		// Install the preferred term
 		termFactory.newDescription(UUID.randomUUID(), newConcept, language,
 				newDescrString, preferred_description_type, config);
 		return newConcept;
 	}
 
+	/*
+	 * Get the semantic tag from the concept's FSN <br> The semantic tag is the
+	 * substring starting at the last left paren
+	 * 
+	 * @param con - the concept
+	 * 
+	 * @return the semantic tag, null if none exists
+	 */
 	private String getSemanticTag(I_GetConceptData con) throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		I_GetConceptData current_status = termFactory
@@ -195,37 +236,50 @@ public class InstructAndWaitDo extends AbstractTask {
 		}
 		for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null,
 				clonePositions)) {
+			// Description is current
 			if (desc.getStatusId() != current_status.getConceptId())
 				continue;
+			// Description is FSN
 			if (desc.getTypeId() != fully_specified_description_type
 					.getConceptId())
 				continue;
+			// Get the substring starting at the last left paren
 			String fsn = desc.getText();
 			int lp = fsn.lastIndexOf("(");
+			// Return null if not found
 			if (lp == -1)
 				return null;
+			// Otherwise return the substring
 			return fsn.substring(lp);
 		}
 		return null;
 	}
 
+	/*
+	 * Create a new concept as a clone of an existing concept
+	 */
 	private class CloneActionListener implements ActionListener {
 		/**
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
 			try {
+				// Get the selected concept
 				I_GetConceptData con = getSelectedConcept();
 				if (con == null)
 					return;
+				// Prompt for the name using the input term as initial text
 				String newDescrString = (String) JOptionPane.showInputDialog(
 						null, "Clone:\n" + con.getInitialText(),
 						"Enter concept name", JOptionPane.QUESTION_MESSAGE,
 						null, null, InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
+				// Create the new concept, using the semantic tag of the
+				// selected concept
 				I_GetConceptData newConcept = createNewConcept(newDescrString,
 						getSemanticTag(con));
+				// Now copy the rels from the exiting to the new
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
 				Set<I_Position> clonePositions = new HashSet<I_Position>();
 				for (I_Path path : config.getEditingPathSet()) {
@@ -252,23 +306,31 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	}
 
+	/*
+	 * Create a new concept as a child
+	 */
 	private class ChildActionListener implements ActionListener {
 		/**
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
 			try {
+				// Get the selected concept
 				I_GetConceptData con = getSelectedConcept();
 				if (con == null)
 					return;
+				// Prompt for name using input term as initial text
 				String newDescrString = (String) JOptionPane.showInputDialog(
 						null, "Create a child of:\n" + con.getInitialText(),
 						"Enter concept name", JOptionPane.QUESTION_MESSAGE,
 						null, null, InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
+				// Create the new concept, using the semantic tag of the
+				// selected concept
 				I_GetConceptData newConcept = createNewConcept(newDescrString,
 						getSemanticTag(con));
+				// Now make the selected concept the parent of the new concept
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
 				I_GetConceptData is_a_rel = termFactory
 						.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
@@ -294,18 +356,24 @@ public class InstructAndWaitDo extends AbstractTask {
 		}
 	}
 
+	/*
+	 * Create a new concept, not using an existing
+	 */
 	private class NewActionListener implements ActionListener {
 		/**
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
 			try {
+				// Prompt for name using input term as initial text
 				String newDescrString = (String) JOptionPane.showInputDialog(
 						null, "Create a new concept", "Enter concept name",
 						JOptionPane.QUESTION_MESSAGE, null, null,
 						InstructAndWaitDo.this.term);
 				if (newDescrString == null)
 					return;
+				// Create the new concept, but since it's not based on an
+				// existing concept the semantic tag is null
 				I_GetConceptData newConcept = createNewConcept(newDescrString,
 						null);
 				I_HostConceptPlugins lcv = config.getListConceptViewer();
@@ -318,6 +386,9 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	}
 
+	/*
+	 * Set the state to done and the condition to complete
+	 */
 	private class StepActionListener implements ActionListener {
 
 		/**
@@ -334,6 +405,9 @@ public class InstructAndWaitDo extends AbstractTask {
 
 	}
 
+	/*
+	 * Set the state to done and the condition to canceled
+	 */
 	private class StopActionListener implements ActionListener {
 
 		/**
@@ -365,6 +439,9 @@ public class InstructAndWaitDo extends AbstractTask {
 		return this.done;
 	}
 
+	/*
+	 * Get the selected elements from the control as concepts
+	 */
 	protected List<I_GetConceptData> getSelectedConcepts() throws IOException {
 		// System.out.println(">>>getSelectedConcept");
 		JList conceptList = config.getBatchConceptList();
@@ -384,6 +461,10 @@ public class InstructAndWaitDo extends AbstractTask {
 		return ret;
 	}
 
+	/*
+	 * We only deal with one concept at a time. This alerts the user in case
+	 * they did multi
+	 */
 	protected I_GetConceptData getSelectedConcept() throws IOException {
 		List<I_GetConceptData> cons = getSelectedConcepts();
 		if (cons.size() == 0) {
@@ -399,21 +480,21 @@ public class InstructAndWaitDo extends AbstractTask {
 	}
 
 	/**
+	 * Build the control and set up the listeners
+	 * 
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
 		try {
-
+			// The input term
 			this.term = (String) process.readProperty(termPropName);
 			this.done = false;
 			this.config = (I_ConfigAceFrame) worker
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 							.name());
-			// this.host = (I_HostConceptPlugins) worker
-			// .readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS
-			// .name());
+			// Get some space
 			boolean builderVisible = config.isBuilderToggleVisible();
 			config.setBuilderToggleVisible(true);
 			boolean progressPanelVisible = config.isProgressToggleVisible();
@@ -433,6 +514,7 @@ public class InstructAndWaitDo extends AbstractTask {
 					for (int i = 0; i < components.length; i++) {
 						workflowPanel.remove(components[i]);
 					}
+					// Simple layout - label and buttons
 					workflowPanel.setLayout(new GridBagLayout());
 					GridBagConstraints c = new GridBagConstraints();
 					c.fill = GridBagConstraints.BOTH;
@@ -451,6 +533,7 @@ public class InstructAndWaitDo extends AbstractTask {
 					c.gridx++;
 					c.anchor = GridBagConstraints.SOUTHWEST;
 
+					// Add description
 					JButton descrButton = new JButton("Descr");
 					descrButton
 							.setToolTipText("Add description to selected concept");
@@ -458,12 +541,14 @@ public class InstructAndWaitDo extends AbstractTask {
 					c.gridx++;
 					descrButton.addActionListener(new DescrActionListener());
 
+					// Clone concept
 					JButton cloneButton = new JButton("Clone");
 					cloneButton.setToolTipText("Clone selected concept");
 					workflowPanel.add(cloneButton, c);
 					c.gridx++;
 					cloneButton.addActionListener(new CloneActionListener());
 
+					// Make child of concept
 					JButton childButton = new JButton("Child");
 					childButton
 							.setToolTipText("Create a child of selected concept");
@@ -471,17 +556,20 @@ public class InstructAndWaitDo extends AbstractTask {
 					c.gridx++;
 					childButton.addActionListener(new ChildActionListener());
 
+					// Completely new concept
 					JButton newButton = new JButton("New");
 					newButton.setToolTipText("Create a new concept");
 					workflowPanel.add(newButton, c);
 					c.gridx++;
 					newButton.addActionListener(new NewActionListener());
 
+					// Done - bp will move to queue
 					JButton stepButton = new JButton("Done");
 					workflowPanel.add(stepButton, c);
 					c.gridx++;
 					stepButton.addActionListener(new StepActionListener());
 
+					// Todo - bp will move to queue
 					JButton stopButton = new JButton("Todo");
 					workflowPanel.add(stopButton, c);
 					stopButton.addActionListener(new StopActionListener());
@@ -516,6 +604,7 @@ public class InstructAndWaitDo extends AbstractTask {
 				}
 
 			});
+			// Restore to initial state
 			config.setBuilderToggleVisible(builderVisible);
 			config.setProgressToggleVisible(progressPanelVisible);
 			config.setSubversionToggleVisible(subversionButtonVisible);
