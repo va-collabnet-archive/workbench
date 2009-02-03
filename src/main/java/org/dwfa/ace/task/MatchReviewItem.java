@@ -40,16 +40,25 @@ public class MatchReviewItem {
 		}
 	}
 
+	/*
+	 * Create from a string
+	 */
 	public void createFromString(String str) throws Exception {
 		BufferedReader br = new BufferedReader(new StringReader(str));
 		this.createFromReader(br);
 	}
 
+	/*
+	 * Create from a file
+	 */
 	public void createFromFile(String file_name) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(file_name));
 		this.createFromReader(br);
 	}
 
+	/*
+	 * The string a file methods call this once they've constructed the reader
+	 */
 	protected void createFromReader(BufferedReader br) throws Exception {
 		descriptions = new ArrayList<String>();
 		concepts = new ArrayList<String>();
@@ -58,10 +67,13 @@ public class MatchReviewItem {
 		int i = 0;
 		while ((line = br.readLine()) != null) {
 			i++;
+			// The first line is the input term
 			if (i == 1) {
 				term = line;
 				continue;
 			}
+			// The remaining lines are description and SCTID pairs. Tab
+			// seperated.
 			String[] fields = line.split("\t");
 			descriptions.add(fields[0]);
 			concepts.add(fields[1]);
@@ -69,6 +81,11 @@ public class MatchReviewItem {
 		}
 	}
 
+	/*
+	 * Get the concepts in the match review as UUIDs
+	 * 
+	 * @return A list of list of UUIDs
+	 */
 	public List<List<UUID>> getUuidListList() {
 		List<List<UUID>> uuid_list_list = new ArrayList<List<UUID>>();
 		for (long concept_id : this.concept_ids) {
@@ -80,6 +97,13 @@ public class MatchReviewItem {
 		return uuid_list_list;
 	}
 
+	/*
+	 * Construct the HTML for this item. Will be displayed in the queue message
+	 * and signpost. Contains the inout term followed by a table of matching
+	 * descriptions and concepts
+	 * 
+	 * @return the HTML for the item
+	 */
 	public String getHtml() {
 		String html = "";
 		html += "<html>";
