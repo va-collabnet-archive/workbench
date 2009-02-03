@@ -70,39 +70,61 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 		// Nothing to do
 	}
 
+	/*
+	 * Reads two properties: <br> inputFileNamePropName - the directory
+	 * containing the match review assignments <br> bpFileNamePropName - the
+	 * file containing the match review business process <br> The resulting
+	 * business processes are written into profiles/aao_inbox <br> (non-Javadoc)
+	 * 
+	 * @seeorg.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.
+	 * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+	 */
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
 			System.out.println("F:" + new File("./").getAbsolutePath());
+			// Write to this directory
 			String out_dir = "../../src/main/profiles/aao_inbox/";
+			// Get the business process
 			String bpFileName = (String) process
 					.readProperty(bpFileNamePropName);
+			// Get the directory containing the match review items
 			String inputFileName = (String) process
 					.readProperty(inputFileNamePropName);
 			File f = new File(inputFileName);
 			int i = 0;
+			// Process match review item in the directory
 			for (File ff : new File(f.getParent()).listFiles()) {
+				// Just in case there's some other stuff lingering
 				if (!ff.toString().endsWith(".txt"))
 					continue;
 				// if (++i == 5)
 				// break;
 				System.out.println("FF: " + ff);
+				// Read the business process
 				File bp_file = new File(bpFileName);
 				ObjectInputStream ois = new ObjectInputStream(
 						new BufferedInputStream(new FileInputStream(bp_file)));
 				BusinessProcess bp = (BusinessProcess) ois.readObject();
 				ois.close();
+				// Read the match review item
 				MatchReviewItem mri = new MatchReviewItem();
 				mri.createFromFile(ff.getPath());
+				// Attach the input term
 				bp.writeAttachment(MatchReviewItem.AttachmentKeys.TERM
 						.getAttachmentKey(), mri.getTerm());
+				// Attach the matches
 				bp.writeAttachment(
 						MatchReviewItem.AttachmentKeys.UUID_LIST_LIST
 								.getAttachmentKey(), mri.getUuidListList());
+				// Attach the HTML for the message
 				bp.writeAttachment(MatchReviewItem.AttachmentKeys.HTML_DETAIL
 						.getAttachmentKey(), mri.getHtml());
+				// Attach the HTML for the signpost
 				bp.writeAttachment(MatchReviewItem.AttachmentKeys.HTML_DETAIL
 						.toString(), mri.getHtml());
+				// Create a file name and subject for the business process so
+				// that the sort order preserves the order in the original file
 				String bp_name = ff.getName().replace(".txt", "");
 				bp.setName("Review Match");
 				String bp_id = bp_name.replace("tm", "");
@@ -110,6 +132,7 @@ public class CreateMatchReviewAssignments extends AbstractTask {
 					bp_id = "0" + bp_id;
 				}
 				bp.setSubject(bp_id + ": " + mri.getTerm());
+				// Write the business process
 				ObjectOutputStream oos = new ObjectOutputStream(
 						new FileOutputStream(out_dir + bp_name + ".bp"));
 				oos.writeObject(bp);
