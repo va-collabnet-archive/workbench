@@ -10,8 +10,17 @@ public interface I_ConfigAceDb {
     public String getAceRiverConfigFile();
 	public void setAceRiverConfigFile(String aceRiverConfigFile);
 	
-    public Long getCacheSize();
-    public void setCacheSize(Long cacheSize);
+	/**
+	 * Currently non-functional stub. 
+	 * @deprecated
+	 */
+	public Long getCacheSize();
+
+	/**
+	 * Currently non-functional stub. 
+	 * @deprecated
+	 */
+	public void setCacheSize(Long cacheSize);
     
     public File getDbFolder();
     public void setDbFolder(File dbFolder);

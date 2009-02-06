@@ -87,7 +87,6 @@ public class SaveNewProfile extends AbstractTask {
             
             newDbProfile.getAceFrames().clear();
             newDbProfile.getAceFrames().add(profileToSave);
-            newDbProfile.setCacheSize(currentDbProfile.getCacheSize());
             newDbProfile.setChangeSetRoot(changeSetRoot);
             newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "." + 
             		UUID.randomUUID().toString() + ".jcs");
