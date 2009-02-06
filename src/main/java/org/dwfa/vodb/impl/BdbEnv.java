@@ -167,19 +167,6 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		envConfig.setTxnTimeout(VodbEnv.getTransactionTimeout());
 		VodbEnv.setTransactionTimeout(envConfig.getTxnTimeout());
 
-		if (VodbEnv.getCacheSize() != null) {
-			envConfig.setCacheSize(VodbEnv.getCacheSize());
-			AceLog.getAppLog().info(
-					"Setting cache size to: " + VodbEnv.getCacheSize());
-			AceLog.getAppLog().info(
-					"Cache size is: " + envConfig.getCacheSize());
-			AceLog.getAppLog().info(
-					"Cache percent: " + envConfig.getCachePercent());
-
-			vodb.getActivityFrame().setProgressInfoLower(
-					"Setting cache size to: " + VodbEnv.getCacheSize());
-		}
-
 		envConfig.setReadOnly(readOnly);
 		envConfig.setAllowCreate(!readOnly);
 		env = new Environment(envHome, envConfig);
@@ -820,8 +807,6 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 					.append("<br>");
 			sb.append("bufferBytes=").append(f.format(s.getBufferBytes()))
 					.append("<br>");
-			sb.append("cacheDataBytes=")
-					.append(f.format(s.getCacheDataBytes())).append("<br>");
 			sb.append("adminBytes=").append(f.format(s.getAdminBytes()))
 					.append("<br>");
 			sb.append("lockBytes=").append(f.format(s.getLockBytes())).append(

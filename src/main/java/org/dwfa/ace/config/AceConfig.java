@@ -85,7 +85,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	private boolean readOnly = false;
 
-	private Long cacheSize = null;
+	//private Long cacheSize = null; removed cacheSize...
 
 	// 4
 	private String username;
@@ -114,11 +114,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	}
 
 
-	public AceConfig(File dbFolder, boolean readOnly, Long cacheSize) {
+	public AceConfig(File dbFolder, boolean readOnly) {
         super();
         this.dbFolder = dbFolder;
         this.readOnly = readOnly;
-        this.cacheSize = cacheSize;
     }
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
@@ -127,7 +126,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		out.writeObject(null); //for historic password...
 		out.writeObject(dbFolder);
 		out.writeBoolean(readOnly);
-		out.writeObject(cacheSize);
+		out.writeObject(null); // was cacheSize
 		out.writeObject(aceFrames);
         out.writeObject(loggerRiverConfigFile);
         out.writeObject(changeSetRoot);
@@ -155,15 +154,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 				}
 				readOnly = in.readBoolean();
 				if (objDataVersion >= 3) {
-					cacheSize = (Long) in.readObject();
-				} else {
-					cacheSize = null;
-				}
+					in.readObject(); // was cacheSize
+				} 
 				try {
 					if (AceConfig.getVodb() == null) {
 						new VodbEnv();
 					}
-					AceConfig.getVodb().setup(dbFolder, readOnly, cacheSize);
+					AceConfig.getVodb().setup(dbFolder, readOnly);
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				} catch (Exception e) {
@@ -526,14 +523,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         return aceFrames;
     }
 
-    public Long getCacheSize() {
-        return cacheSize;
-    }
-
-    public void setCacheSize(Long cacheSize) {
-        this.cacheSize = cacheSize;
-    }
-
     public File getDbFolder() {
         return dbFolder;
     }
@@ -591,5 +580,20 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public Collection<String> getQueues() {
 		return queueFolders;
+	}
+
+	/**
+	 * Currently non-functional stub. 
+	 * @deprecated
+	 */
+	public Long getCacheSize() {
+		return null;
+	}
+
+	/**
+	 * Currently non-functional stub. 
+	 * @deprecated
+	 */
+	public void setCacheSize(Long cacheSize) {
 	}
 }

@@ -122,12 +122,10 @@ public class AceRunner {
 			setupIpChangeListener();
 			setBerkeleyDbAsTransactional();
 
-			Long cacheSize = setBerkeleyDbCacheSize();
-
 			File acePropertiesFile = new File("config","ace.properties");
 			if (acePropertiesFile.exists() == false) {
 				try {
-					initialSubversionOperationsAndChangeSetImport(cacheSize, acePropertiesFile);
+					initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
 					System.exit(0);
@@ -189,12 +187,9 @@ public class AceRunner {
 				File dbFolder = (File) jiniConfig.getEntry(this.getClass()
 						.getName(), "dbFolder", File.class, new File(
 						"target/berkeley-db"));
-				AceLog.getAppLog().info(
-						"Cache size in config file: " + cacheSize);
 				AceConfig.config = new AceConfig(dbFolder);
 				AceConfig.config.setProfileFile(aceConfigFile);
-				AceConfig.setupAceConfig(AceConfig.config, null,
-						cacheSize, false);
+				AceConfig.setupAceConfig(AceConfig.config, null, null, false);
 			}
 			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			ACE.setAceConfig(AceConfig.config);
@@ -351,7 +346,7 @@ public class AceRunner {
 		prompter.setPassword(password);
 	}
 
-	private void initialSubversionOperationsAndChangeSetImport(Long cacheSize, File acePropertiesFile)
+	private void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile)
 			throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
 		Properties aceProperties = new Properties();
 		aceProperties.setProperty("initial-svn-checkout", "true");
@@ -396,7 +391,7 @@ public class AceRunner {
 				}
 
 				if (changeLocations.size() > 0) {
-					doStealthChangeSetImport(cacheSize, changeLocations);
+					doStealthChangeSetImport(changeLocations);
 				}
 				aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			} else {
@@ -511,8 +506,7 @@ public class AceRunner {
 		}
 	}
 
-	private void doStealthChangeSetImport(Long cacheSize,
-			List<File> changeLocations) {
+	private void doStealthChangeSetImport(List<File> changeLocations) {
 		// import any change sets that may be downloaded
 		// from svn...
 		try {
@@ -524,7 +518,7 @@ public class AceRunner {
 			final VodbEnv stealthVodb = new VodbEnv(true);
 			AceConfig.stealthVodb = stealthVodb;
 			LocalVersionedTerminology.setStealthfactory(stealthVodb);
-			stealthVodb.setup(dbFolder, false, cacheSize);
+			stealthVodb.setup(dbFolder, false);
 
 			ChangeSetImporter jcsImporter = new ChangeSetImporter() {
 
@@ -561,15 +555,6 @@ public class AceRunner {
 		LocalVersionedTerminology.setStealthfactory(null);
 	}
 
-	private Long setBerkeleyDbCacheSize() throws ConfigurationException {
-		Long cacheSize = (Long) jiniConfig.getEntry(this.getClass().getName(),
-				"cacheSize", Long.class, null);
-		AceLog.getAppLog().info("cacheSize " + cacheSize);
-		if (cacheSize != null) {
-			VodbEnv.setCacheSize(cacheSize);
-		}
-		return cacheSize;
-	}
 
 	private void setupLookAndFeel() throws ConfigurationException,
 			ClassNotFoundException, InstantiationException,

@@ -167,8 +167,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	private BdbEnv bdbEnv;
 
-	private static Long cacheSize;
-	
 	private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
 	public static boolean headless = false;
@@ -229,6 +227,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		setup(envHome, readOnly, cacheSize, null);
 	}
 
+	public void setup(File envHome, boolean readOnly)
+	throws Exception {
+		setup(envHome, readOnly, null, null);
+	}
+
 	public void setup(File envHome, boolean readOnly, Long cacheSize,
 			DatabaseSetupConfig dbSetupConfig) throws IOException {
 		try {
@@ -240,11 +243,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			Runtime.getRuntime().addShutdownHook(new ShutdownThread());
 			long startTime = System.currentTimeMillis();
 			this.envHome = envHome;
-			if (VodbEnv.cacheSize == null) {
-				VodbEnv.cacheSize = cacheSize;
-			} else {
-				cacheSize = VodbEnv.cacheSize;
-			}
 			if (headless) {
 				activityFrame = new UpperInfoOnlyConsoleMonitor();
 			} else {
@@ -285,7 +283,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 					"Berkeley DB info: "
 							+ JEVersion.CURRENT_VERSION.getVersionString());
 			
-			bdbEnv = new BdbEnv(this, envHome, readOnly, cacheSize, luceneDir, dbSetupConfig);
+			bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
 			
 			activityFrame.setProgressInfoLower("complete");
 			activityFrame.complete();
@@ -1343,7 +1341,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	}
 
 	public I_ConfigAceDb newAceDbConfig() {
-		return new AceConfig(envHome, readOnly, cacheSize);
+		return new AceConfig(envHome, readOnly);
 	}
 
 	public long convertToThickVersion(int version) {
@@ -1369,14 +1367,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public void suspendChangeSetWriters() {
 		ACE.suspendChangeSetWriters();
-	}
-
-	public static Long getCacheSize() {
-		return cacheSize;
-	}
-
-	public static void setCacheSize(Long cacheSize) {
-		VodbEnv.cacheSize = cacheSize;
 	}
 
 	public I_ConceptAttributePart newConceptAttributePart() {
