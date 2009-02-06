@@ -161,7 +161,9 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed concept " + conceptCount);
         }
 
-        if (validate) {
+        if (validate ||
+                (arg0.getConceptAttributes() != null &&
+                arg0.getConceptAttributes().versionCount() > 0)) {
             processConceptAttributes(arg0.getConceptAttributes());
         }
         processDescription(arg0.getDescriptions());
