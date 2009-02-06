@@ -100,10 +100,10 @@ public class GenerateScripts extends AbstractMojo {
 	        startAllScript(jars, "startJehriAuthoring", "start-jehri-authoring.config", "500m", "500m", "Jehri Authoring Bundle", true, false, false, false);
 	        startAllScript(jars, "startJehriCentral", "start-jehri-central.config", "500m", "500m", "Jehri Central Bundle", true, false, false, false);
 	        startAllScript(jars, "startJehriSatellite", "start-jehri-satellite.config", "500m", "500m", "Jehri Satellite Bundle", true, false, false, false);
-	        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle", true, false, false, false);
-	        startAllScript(jars, "ace", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false, false, false);
-	        startAllScript(jars, "dAce", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false, true, false);
-	        startAllScript(jars, "pAce", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false, false, true);
+	        startAllScript(jars, "startAce", "start-ace.config", "700m", "1400m", "Ace Bundle", true, false, false, false);
+	        startAllScript(jars, "ace", "start-ace-local.config", "700m", "1400m", "Ace Bundle", true, false, false, false);
+	        startAllScript(jars, "dAce", "start-ace-local.config", "700m", "1400m", "Ace Bundle", true, false, true, false);
+	        startAllScript(jars, "pAce", "start-ace-local.config", "700m", "1400m", "Ace Bundle", true, false, false, true);
 	        startAllScript(jars, "dStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false, true, false);
 	        startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false, false, true);
 			configureScript(jars);
@@ -114,14 +114,14 @@ public class GenerateScripts extends AbstractMojo {
 				} else if (name.equalsIgnoreCase("startJehri")) {
 			        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false, false, false);
 				} else if (name.equalsIgnoreCase("startAce")) {
-			        startAllScript(jars, "startAce", "start-ace.config", "1400m", "1400m", "Ace Bundle", true, false, false, false);
-                 startAllScript(jars, "startAceNoNet", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false, false, false);
+			        startAllScript(jars, "startAce", "start-ace.config", "700m", "1400m", "Ace Bundle", true, false, false, false);
+                 startAllScript(jars, "startAceNoNet", "start-ace-local.config", "700m", "1400m", "Ace Bundle", true, false, false, false);
 				} else if (name.equalsIgnoreCase("amtViewer")) {
-                 startAllScript(jars, "amtViewer", "start-ace.config", "1400m", "1400m", "AMT Viewer", true, true, false, false);
+                 startAllScript(jars, "amtViewer", "start-ace.config", "700m", "1400m", "AMT Viewer", true, true, false, false);
 				} else if (name.equalsIgnoreCase("dAce")) {
-			        startAllScript(jars, "dAce", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false, true, false);
+			        startAllScript(jars, "dAce", "start-ace-local.config", "700m", "1400m", "Ace Bundle", true, false, true, false);
 				} else if (name.equalsIgnoreCase("pAce")) {
-			        startAllScript(jars, "pAce", "start-ace-local.config", "1400m", "1400m", "Ace Bundle", true, false, false, true);
+			        startAllScript(jars, "pAce", "start-ace-local.config", "700m", "1400m", "Ace Bundle", true, false, false, true);
 				} else if (name.equalsIgnoreCase("dStartJehri")) {
 			        startAllScript(jars, "dStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false, true, false);
 				} else if (name.equalsIgnoreCase("pStartJehri")) {
