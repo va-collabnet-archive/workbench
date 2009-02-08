@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -45,12 +46,6 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 	 * @required
 	 */
 	private File outputDirectory;
-
-	/**
-	 * @parameter expression="${project.dependencies}"
-	 * @required
-	 */
-	//private List<Dependency> dependencies;
 
     /**
      * The dependency artifacts of this project, for resolving
@@ -77,21 +72,19 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 	 * @required
 	 */
 	ExtractAndProcessSpec[] specs;
+	
+    /**
+     * The execution information for this commit operation. 
+     * @parameter expression="${mojoExecution}"
+     */
+    private MojoExecution execution;
+
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Log l = getLog();
 
-		l.info("Now executing ExtractAndProcessFiles");
-		StringBuffer listbuffer = new StringBuffer();
-		for (Object obj : specs) {
-			listbuffer.append("\n");
-			listbuffer.append(obj);
-		}
-		String input = listbuffer.toString();
-		// l.info(input);
-		// calculate the SHA-1 hashcode for this mojo based on input
 		try {
-			if (MojoUtil.alreadyRun(l, input)) {
+			if (MojoUtil.alreadyRun(l, execution.getExecutionId())) {
 				return;
 			}
 		} catch (NoSuchAlgorithmException e1) {
@@ -99,6 +92,7 @@ public class ExtractAndProcessFiles extends AbstractMojo {
 		} catch (IOException e1) {
 			throw new MojoExecutionException(e1.getMessage(), e1);
 		}
+
 		UUID randomId = UUID.randomUUID();
 		for (ExtractAndProcessSpec spec : specs) {
 			Pattern filePattern = Pattern.compile(spec.getFilePatternStr());

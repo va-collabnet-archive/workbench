@@ -79,7 +79,6 @@ public class MojoUtil {
 			List<Dependency> dependencies, String localRepository)
 			throws IOException {
 		List<URL> libs = addDependencies(dependencies, localRepository);
-		// System.out.println("URLClassLoader libs: " + libs);
 		return new URLClassLoader(libs.toArray(new URL[libs.size()]));
 	}
 
@@ -119,7 +118,6 @@ public class MojoUtil {
 			String classesDir) throws IOException {
 		List<URL> libs = addDependencies(dependencies, localRepository);
 		libs.add(new File(classesDir).toURI().toURL());
-		// System.out.println("URLClassLoader libs: " + libs);
 		return new URLClassLoader(libs.toArray(new URL[libs.size()]));
 	}
 
@@ -143,7 +141,7 @@ public class MojoUtil {
 				localRepository, classesDir);
 	}
 
-	public static boolean allowedGoal(Log log, List sessionGoals,
+	public static boolean allowedGoal(Log log, List<String> sessionGoals,
 			String[] allowedGoals) {
 		boolean allowedGoal = false;
 		for (String goal : allowedGoals) {

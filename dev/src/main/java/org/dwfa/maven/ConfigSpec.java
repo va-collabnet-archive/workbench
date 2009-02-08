@@ -9,7 +9,6 @@ public class ConfigSpec {
 
     public ConfigSpec() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     private String className;

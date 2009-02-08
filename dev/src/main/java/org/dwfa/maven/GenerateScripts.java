@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
@@ -51,11 +53,26 @@ public class GenerateScripts extends AbstractMojo {
 	 */
 	private String[] scriptNames;
 
+    /**
+     * The execution information for this commit operation. 
+     * @parameter expression="${mojoExecution}"
+     */
+    private MojoExecution execution;
+
 
 	private static final String fileSep = System.getProperty("file.separator","/");
 
 	public void execute() throws MojoExecutionException {
 		Log l = getLog();
+		try {
+			if (MojoUtil.alreadyRun(l, execution.getExecutionId())) {
+				return;
+			}
+		} catch (NoSuchAlgorithmException e1) {
+			throw new MojoExecutionException(e1.getMessage(), e1);
+		} catch (IOException e1) {
+			throw new MojoExecutionException(e1.getMessage(), e1);
+		}
 		if (scriptOutputDir == null) {
 			if (libDir == null) {
 				l.info("Skipping generate scripts. scriptOutputDir and libDir are null");
