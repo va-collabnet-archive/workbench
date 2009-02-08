@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.rmi.MarshalledObject;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -51,6 +53,12 @@ public class ProcessProjectDirectories extends AbstractMojo {
      */
     ExtractAndProcessSpec[] specs;
 
+    /**
+     * The execution information for this commit operation. 
+     * @parameter expression="${mojoExecution}"
+     */
+    private MojoExecution execution;
+
     private void addFileMatches(File root, Pattern filePattern, List<File> matches) throws IOException {
         if (root.isDirectory() && (root.getName().equals("target") == false)
                 && (root.getName().equals(".svn") == false)) {
@@ -68,19 +76,16 @@ public class ProcessProjectDirectories extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Log l = getLog();
-            l.info("Now executing ProcessProjectDirectories");
+    		try {
+    			if (MojoUtil.alreadyRun(l, execution.getExecutionId())) {
+    				return;
+    			}
+    		} catch (NoSuchAlgorithmException e1) {
+    			throw new MojoExecutionException(e1.getMessage(), e1);
+    		} catch (IOException e1) {
+    			throw new MojoExecutionException(e1.getMessage(), e1);
+    		}
             UUID randomId = UUID.randomUUID();
-            StringBuffer listbuffer = new StringBuffer();
-            for (Object obj : specs) {
-                listbuffer.append("\n");
-                listbuffer.append(obj);
-            }
-            String input = listbuffer.toString();
-            // l.info(input);
-            // calculate the SHA-1 hashcode for this mojo based on input
-            if (MojoUtil.alreadyRun(l, input)) {
-                return;
-            }
 
             for (ExtractAndProcessSpec spec : specs) {
                 Pattern filePattern = Pattern.compile(spec.getFilePatternStr());

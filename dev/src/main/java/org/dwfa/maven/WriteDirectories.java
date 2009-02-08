@@ -64,7 +64,6 @@ public class WriteDirectories extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Log l = getLog();
-		l.info("Now executing WriteDirectories: ");
 		try {
 			if (MojoUtil.alreadyRun(getLog(), this.getClass()
 					.getCanonicalName()
