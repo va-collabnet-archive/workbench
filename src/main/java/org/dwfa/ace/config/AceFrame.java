@@ -311,12 +311,22 @@ public class AceFrame extends ComponentFrame {
 	}
 
 	public String getFrameName() {
-		String title = "Editor";
-		if (count > 0) {
-			title = title + "; User: " + this.frameConfig.getUsername()
-					+ "; # " + count;
+		String title = "Viewer Window";
+		if (ACE.editMode) {
+			title = "Editor Window";
+			if (count > 0) {
+				title = title + "; User: " + this.frameConfig.getUsername()
+						+ "; # " + count;
+			} else {
+				title = title + "; User: " + this.frameConfig.getUsername();
+			}
 		} else {
-			title = title + "; User: " + this.frameConfig.getUsername();
+			if (count > 0) {
+				title = title + "; " + this.frameConfig.getUsername()
+						+ "; # " + count;
+			} else {
+				title = title + "; " + this.frameConfig.getUsername();
+			}
 		}
 		if (title.equals(this.getTitle())) {
 			// no increment, redundant call
