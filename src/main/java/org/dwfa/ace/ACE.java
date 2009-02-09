@@ -797,10 +797,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					"Finished commit: " + version + " (" + now.getTime() + ")");
 			if (aceConfig != null && VodbEnv.headless == false) {
 				for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-					frameConfig.setCommitEnabled(true);
-					ACE aceInstance = ((AceFrameConfig) frameConfig)
-							.getAceFrame().getCdePanel();
-					aceInstance.getUncommittedListModel().clear();
+					if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
+						frameConfig.setCommitEnabled(true);
+						ACE aceInstance = ((AceFrameConfig) frameConfig)
+								.getAceFrame().getCdePanel();
+						aceInstance.getUncommittedListModel().clear();
+					}
 				}
 			}
 		}
