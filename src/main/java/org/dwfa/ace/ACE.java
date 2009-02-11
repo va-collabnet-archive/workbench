@@ -184,7 +184,6 @@ import com.sleepycat.je.DatabaseException;
 public class ACE extends JPanel implements PropertyChangeListener,
 		I_DoQuitActions {
 
-
 	private List<TermComponentDataCheckSelectionListener> dataCheckListeners = new ArrayList<TermComponentDataCheckSelectionListener>();
 
 	public void addDataCheckListener(TermComponentDataCheckSelectionListener l) {
@@ -606,25 +605,27 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	public static void updateAlerts(I_ConfigAceFrame frameConfig) {
-		ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame()
-				.getCdePanel();
-		aceInstance.getUncommittedListModel().clear();
+		if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
+			ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame()
+					.getCdePanel();
+			aceInstance.getUncommittedListModel().clear();
 
-		for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap
-				.values()) {
-			aceInstance.getUncommittedListModel().addAll(alerts);
-		}
-		if (aceInstance.getUncommittedListModel().size() > 0) {
-			for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
-				if (aceInstance.leftTabs.getTitleAt(i)
-						.equals(dataCheckTabLabel)) {
-					aceInstance.leftTabs.setSelectedIndex(i);
-					break;
-				}
+			for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap
+					.values()) {
+				aceInstance.getUncommittedListModel().addAll(alerts);
 			}
-		} else {
-			for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
-				l.setSelection(null);
+			if (aceInstance.getUncommittedListModel().size() > 0) {
+				for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
+					if (aceInstance.leftTabs.getTitleAt(i).equals(
+							dataCheckTabLabel)) {
+						aceInstance.leftTabs.setSelectedIndex(i);
+						break;
+					}
+				}
+			} else {
+				for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
+					l.setSelection(null);
+				}
 			}
 		}
 	}
@@ -925,18 +926,24 @@ public class ACE extends JPanel implements PropertyChangeListener,
 						if (ElectronicAddress.class.isAssignableFrom(entry
 								.getClass())) {
 							ElectronicAddress ea = (ElectronicAddress) entry;
-							aceFrameConfig.getQueueAddressesToShow().add(ea.address);
-							aceFrameConfig.getSubversionMap().put(ea.address, svd);
+							aceFrameConfig.getQueueAddressesToShow().add(
+									ea.address);
+							aceFrameConfig.getSubversionMap().put(ea.address,
+									svd);
 							break;
 						}
 					}
-	            	if (QueueServer.started(queueFile)) {
-	                	AceLog.getAppLog().info("Queue already started: " + queueFile.toURI().toURL().toExternalForm());
-	            	} else {
-	                    new QueueServer(new String[] { queueFile.getCanonicalPath() }, null);
-	            	}
+					if (QueueServer.started(queueFile)) {
+						AceLog.getAppLog().info(
+								"Queue already started: "
+										+ queueFile.toURI().toURL()
+												.toExternalForm());
+					} else {
+						new QueueServer(new String[] { queueFile
+								.getCanonicalPath() }, null);
+					}
 				}
-				
+
 				queueViewer.refreshQueues();
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
@@ -1556,7 +1563,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 							JMenu submenu = new JMenu(processFile.getName());
 							newMenu.add(submenu);
 							addSubmenMenuItems(submenu, processFile);
-						} else if (processFile.getName().toLowerCase().endsWith(".bp")) {
+						} else if (processFile.getName().toLowerCase()
+								.endsWith(".bp")) {
 							try {
 								ActionListener processMenuListener = new ProcessMenuActionListener(
 										processFile, menuWorker);
@@ -1660,14 +1668,13 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
 			/*
-			menuItem = new JMenuItem("Import Changeset Jar...");
-			menuItem.addActionListener(new ImportChangesetJar(config));
-			fileMenu.add(menuItem);
-			menuItem = new JMenuItem("Import Baseline Jar...");
-			menuItem.addActionListener(new ImportBaselineJar(config));
-			fileMenu.add(menuItem);
-			fileMenu.addSeparator();
-			*/
+			 * menuItem = new JMenuItem("Import Changeset Jar...");
+			 * menuItem.addActionListener(new ImportChangesetJar(config));
+			 * fileMenu.add(menuItem); menuItem = new
+			 * JMenuItem("Import Baseline Jar...");
+			 * menuItem.addActionListener(new ImportBaselineJar(config));
+			 * fileMenu.add(menuItem); fileMenu.addSeparator();
+			 */
 			menuItem = new JMenuItem("Change Password...");
 			menuItem.addActionListener(new ChangeFramePassword(this));
 			fileMenu.add(menuItem);
@@ -1869,7 +1876,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 		processPalette.setSize(width, height);
 
-		
 		processPalette.setLocation(new Point(topBounds.x + topBounds.width,
 				topBounds.y + topBounds.height + 1));
 		processPalette.setOpaque(true);
@@ -1882,19 +1888,21 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private Rectangle getTopBoundsForPalette() {
 		Rectangle topBounds = topPanel.getBounds();
 		Point topLocation = topPanel.getLocation();
-		AceLog.getAppLog().info(" topBounds :\n   " + topPanel.getBounds() +
-				"\ntopLocation:\n   " + topLocation + "\nos.name: " + System.getProperty("os.name"));
+		AceLog.getAppLog().info(
+				" topBounds :\n   " + topPanel.getBounds()
+						+ "\ntopLocation:\n   " + topLocation + "\nos.name: "
+						+ System.getProperty("os.name"));
 		topBounds.y = topBounds.y + topLocation.y;
 		AceLog.getAppLog().info(" after adding top location:\n   " + topBounds);
-		
+
 		/*
-		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-			// this did seem to work, so I'll hard code in 20 pixels...
-			//topBounds.y = topBounds.y + getRootPane().getJMenuBar().getSize().height;
-			topBounds.y = topBounds.y + 20;
-			AceLog.getAppLog().info(" added 20 for windows:\n   " + topBounds);
-		}
-		*/
+		 * if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+		 * // this did seem to work, so I'll hard code in 20 pixels...
+		 * //topBounds.y = topBounds.y +
+		 * getRootPane().getJMenuBar().getSize().height; topBounds.y =
+		 * topBounds.y + 20;
+		 * AceLog.getAppLog().info(" added 20 for windows:\n   " + topBounds); }
+		 */
 		return topBounds;
 	}
 
@@ -2054,7 +2062,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		preferencesPalette.setSize(width, height);
 
 		Rectangle topBounds = getTopBoundsForPalette();
-		
+
 		preferencesPalette.setLocation(new Point(topBounds.x + topBounds.width,
 				topBounds.y + topBounds.height + 1));
 		preferencesPalette.setOpaque(true);
