@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -16,8 +17,10 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -371,7 +374,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		if (sctIdRefsetWriter == null) {
 			//must not have written to this file yet
 			I_GetConceptData refsetConcept = tf.getConcept(refsetId);
-			String refsetName = refsetConcept.getInitialText();
+			String refsetName = getPreferredTerm(refsetConcept);
 			
 			//TODO this is not the best way, but it works for now.
 			refsetName = refsetName.replace("/", "-");
@@ -439,7 +442,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 							org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getDescription());					 
 				}
 
-				String releaseVersion = tf.getConcept(pathid).getInitialText() + "_" + pathVersion;
+				String releaseVersion = getPreferredTerm(tf.getConcept(pathid)) + "_" + pathVersion;
 				pathReleaseVersions.put(refsetConcept.getConceptId(), releaseVersion);
 				return releaseVersion;
 				
@@ -483,5 +486,23 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 		return false;
 	}
 
-
+	private String getPreferredTerm(I_GetConceptData conceptData) throws Exception {
+        I_IntList descTypeList = tf.newIntList();
+        descTypeList.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());      
+        
+        I_IntSet statusSet = tf.newIntSet();
+        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        
+        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, statusSet, positions);
+        if (descTuple == null) {
+        	UUID conceptUuid = conceptData.getUids().iterator().next();
+        	throw new MojoExecutionException("Unable to obtain preferred term for concept " + conceptUuid.toString());
+        }
+        
+		return descTuple.getText();
+	}
+	
+	
+	
 }
