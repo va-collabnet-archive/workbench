@@ -60,4 +60,12 @@ public class VodbSetEditPaths extends AbstractMojo {
 		}
     }
 
+	public List<ConceptDescriptor> getEditPaths() {
+		return editPaths;
+	}
+
+	public void setEditPaths(List<ConceptDescriptor> editPaths) {
+		this.editPaths = editPaths;
+	}
+
 }
