@@ -33,7 +33,7 @@ import org.dwfa.util.bean.Spec;
  * <h1>SetRefSetPreferences</h1>
  * <br>
  * <p>The <code>SetRefSetPreferences</code> class turns on various refSet options as specified by passed parameters.</p>
- * <p>It is added as a task under tasks/ace/gui/signpost, which enables it to be added to a business process.</P>
+ * <p>It is added as a task under tasks/ide/gui/signpost, which enables it to be added to a business process.</P>
  * 
  * <br>
  * <br>

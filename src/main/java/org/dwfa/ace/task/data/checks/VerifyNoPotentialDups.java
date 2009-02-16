@@ -32,7 +32,7 @@ import org.dwfa.util.bean.Spec;
  * <br>
  * <p>The <code>VerifyNoPotentialDups</code> class checks the users view paths for any source </p>
  * <p>concepts that have a status of <code>IS_POT_DUP_REL</code>.</p>
- * <p>It is added as a task under tasks/ace/data checks, which enables it to be added to a business process.</P>
+ * <p>It is added as a task under tasks/ide/data checks, which enables it to be added to a business process.</P>
  * 
  * <br>
  * <br>

@@ -27,7 +27,7 @@ import org.dwfa.util.bean.Spec;
  * @author Christine Hill
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ace", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class NewAttachmentListFromChosenFile extends AbstractTask {
 
     /**

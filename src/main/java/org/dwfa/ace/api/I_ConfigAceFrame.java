@@ -17,6 +17,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -356,5 +357,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setFrameVisible(boolean visible) throws Exception;
     
     public void closeFrame();
+    
+    public Set<TopToggleTypes> getHiddenTopToggles();
 
 }

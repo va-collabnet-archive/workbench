@@ -38,7 +38,7 @@ import org.dwfa.util.bean.Spec;
  * <p>concepts that have a status of <code>IS_NOT_A_DUP_REL</code>.</p>
  * <p>If the concept has a <code>IS_NOT_A_DUP_REL</code> relationship, then check to ensure that</p>
  * <p>either the source or destination concept does NOT have a status of <code>DUPLICATE_PENDING_RETIREMENT</code>.</p>
- * <p>It is added as a task under tasks/ace/data checks, which enables it to be added to a business process.</P>
+ * <p>It is added as a task under tasks/ide/data checks, which enables it to be added to a business process.</P>
  * 
  * <br>
  * <br>
