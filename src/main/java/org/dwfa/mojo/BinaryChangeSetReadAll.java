@@ -72,4 +72,28 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 	        throw new MojoExecutionException(e.getLocalizedMessage(), e);
 	    }
     }
+
+	public String getChangeSetDir() {
+		return changeSetDir;
+	}
+
+	public void setChangeSetDir(String changeSetDir) {
+		this.changeSetDir = changeSetDir;
+	}
+
+	public String[] getValidators() {
+		return validators;
+	}
+
+	public void setValidators(String[] validators) {
+		this.validators = validators;
+	}
+
+	public boolean isValidate() {
+		return validate;
+	}
+
+	public void setValidate(boolean validate) {
+		this.validate = validate;
+	}
 }

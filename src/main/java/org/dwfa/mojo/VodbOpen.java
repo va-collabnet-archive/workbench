@@ -92,4 +92,52 @@ public class VodbOpen extends AbstractMojo {
 		
 	}
 
+	public File getVodbDirectory() {
+		return vodbDirectory;
+	}
+
+	public void setVodbDirectory(File vodbDirectory) {
+		this.vodbDirectory = vodbDirectory;
+	}
+
+	public Boolean getReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(Boolean readOnly) {
+		this.readOnly = readOnly;
+	}
+
+	public Long getCacheSize() {
+		return cacheSize;
+	}
+
+	public void setCacheSize(Long cacheSize) {
+		this.cacheSize = cacheSize;
+	}
+
+	public boolean isUseExistingDb() {
+		return useExistingDb;
+	}
+
+	public void setUseExistingDb(boolean useExistingDb) {
+		this.useExistingDb = useExistingDb;
+	}
+
+	public boolean isForceRerun() {
+		return forceRerun;
+	}
+
+	public void setForceRerun(boolean forceRerun) {
+		this.forceRerun = forceRerun;
+	}
+
+	public DatabaseSetupConfig getDbSetupConfig() {
+		return dbSetupConfig;
+	}
+
+	public void setDbSetupConfig(DatabaseSetupConfig dbSetupConfig) {
+		this.dbSetupConfig = dbSetupConfig;
+	}
+
 }

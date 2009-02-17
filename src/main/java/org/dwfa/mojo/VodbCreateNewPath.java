@@ -189,5 +189,45 @@ public class VodbCreateNewPath extends AbstractMojo {
         return pathConcept;
 	}
 
+	public SimpleUniversalAcePosition[] getOrigins() {
+		return origins;
+	}
+
+	public void setOrigins(SimpleUniversalAcePosition[] origins) {
+		this.origins = origins;
+	}
+
+	public ConceptDescriptor getPathParent() {
+		return pathParent;
+	}
+
+	public void setPathParent(ConceptDescriptor pathParent) {
+		this.pathParent = pathParent;
+	}
+
+	public ConceptDescriptor getStatus() {
+		return status;
+	}
+
+	public void setStatus(ConceptDescriptor status) {
+		this.status = status;
+	}
+
+	public String getPathFsDesc() {
+		return pathFsDesc;
+	}
+
+	public void setPathFsDesc(String pathFsDesc) {
+		this.pathFsDesc = pathFsDesc;
+	}
+
+	public String getPathPrefDesc() {
+		return pathPrefDesc;
+	}
+
+	public void setPathPrefDesc(String pathPrefDesc) {
+		this.pathPrefDesc = pathPrefDesc;
+	}
+
 	
 }
