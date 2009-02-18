@@ -120,7 +120,7 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
 		config.setBuilderToggleVisible(false);
 		boolean progressPanelVisible = config.isProgressToggleVisible();
 		config.setProgressToggleVisible(false);
-		boolean subversionButtonVisible = config.isBuilderToggleVisible();
+		boolean subversionButtonVisible = config.isSubversionToggleVisible();
 		config.setSubversionToggleVisible(false);
 		boolean inboxButtonVisible = config.isInboxToggleVisible();
 		config.setInboxToggleVisible(false);
