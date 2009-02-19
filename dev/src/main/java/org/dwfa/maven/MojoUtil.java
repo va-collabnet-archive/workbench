@@ -159,12 +159,12 @@ public class MojoUtil {
 		}
 		return allowedGoal;
 	}
-    public static boolean alreadyRun(Log l, String input) throws NoSuchAlgorithmException, IOException {
+    public static boolean alreadyRun(Log l, String input, File targetDir) throws NoSuchAlgorithmException, IOException {
         Sha1HashCodeGenerator generator = new Sha1HashCodeGenerator();
         generator.add(input);
         String hashCode = generator.getHashCode();
 
-        File goalFileDirectory = new File("target" + File.separator + "completed-mojos");
+        File goalFileDirectory = new File(targetDir, "completed-mojos");
         File goalFile = new File(goalFileDirectory, hashCode);
 
         // check to see if this goal has been executed previously
@@ -176,7 +176,6 @@ public class MojoUtil {
             l.info("Previously executed: "+goalFile.getAbsolutePath() + "\nNow stopping.");
             StringOutputStream sos = new StringOutputStream();
             PrintStream ps = new PrintStream(sos);
-            System.getProperties().list(ps);
             l.info("Properties: " + sos.toString());
             return true;
         }

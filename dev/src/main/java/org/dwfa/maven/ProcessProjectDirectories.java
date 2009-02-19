@@ -58,6 +58,16 @@ public class ProcessProjectDirectories extends AbstractMojo {
      * @parameter expression="${mojoExecution}"
      */
     private MojoExecution execution;
+    
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+
 
     private void addFileMatches(File root, Pattern filePattern, List<File> matches) throws IOException {
         if (root.isDirectory() && (root.getName().equals("target") == false)
@@ -77,7 +87,7 @@ public class ProcessProjectDirectories extends AbstractMojo {
         try {
             Log l = getLog();
     		try {
-    			if (MojoUtil.alreadyRun(l, execution.getExecutionId())) {
+    			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), targetDirectory)) {
     				return;
     			}
     		} catch (NoSuchAlgorithmException e1) {

@@ -117,6 +117,14 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
     private String[] allowedGoals = new String[] { "install", "deploy", "export-beans" };
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public ExportAnnotatedBeans() {
         super();
     }
@@ -125,7 +133,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
-            if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots)+Arrays.toString(forbiddenRoots))) {
+            if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots)+Arrays.toString(forbiddenRoots), 
+            		targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e1) {

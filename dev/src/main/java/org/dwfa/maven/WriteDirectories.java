@@ -62,12 +62,21 @@ public class WriteDirectories extends AbstractMojo {
 	 */
 	private String targetSubDir;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Log l = getLog();
 		try {
 			if (MojoUtil.alreadyRun(getLog(), this.getClass()
 					.getCanonicalName()
-					+ dependencies + outputDirectory.getCanonicalPath())) {
+					+ dependencies + outputDirectory.getCanonicalPath(), targetDirectory)) {
 				return;
 			}
 		} catch (NoSuchAlgorithmException e) {

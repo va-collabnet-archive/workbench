@@ -79,12 +79,20 @@ public class ExtractAndProcessFiles extends AbstractMojo {
      */
     private MojoExecution execution;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Log l = getLog();
 
 		try {
-			if (MojoUtil.alreadyRun(l, execution.getExecutionId())) {
+			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), targetDirectory)) {
 				return;
 			}
 		} catch (NoSuchAlgorithmException e1) {

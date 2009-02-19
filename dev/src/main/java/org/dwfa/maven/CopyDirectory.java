@@ -41,6 +41,14 @@ public class CopyDirectory extends AbstractMojo {
      */
     private Boolean copyInvisibles;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Log l = getLog();
@@ -48,7 +56,8 @@ public class CopyDirectory extends AbstractMojo {
             		" to: " + outputDirectory + " invisibles: " + copyInvisibles);
 
             // calculate the SHA-1 hashcode for this mojo based on input
-            if (MojoUtil.alreadyRun(l, inputDirectory.getAbsolutePath() + outputDirectory.getAbsolutePath())) {
+            if (MojoUtil.alreadyRun(l, inputDirectory.getAbsolutePath() + outputDirectory.getAbsolutePath(), 
+            		targetDirectory)) {
                 return;
             }
             FileIO.recursiveCopy(inputDirectory, outputDirectory, copyInvisibles);
