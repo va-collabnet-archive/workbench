@@ -53,14 +53,22 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 	 */
 	private boolean splitFiles = false;
 	
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		if (addTimestampToFileName) {
 			changeSetFileName = changeSetFileName.replaceAll(".jcs", "." + System.currentTimeMillis() + ".jcs");
 		}
 		
 		try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), changeSetFileName)) {
+                if (MojoUtil.alreadyRun(getLog(), changeSetFileName, targetDirectory)) {
                 	
                     return;
                 }

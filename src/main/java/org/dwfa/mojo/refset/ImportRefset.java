@@ -1,5 +1,6 @@
 package org.dwfa.mojo.refset;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -32,14 +33,23 @@ public class ImportRefset extends ImportFromFile {
 	/** An internal cache of the new uncommitted extensions, indexed by the member id */ 
 	private HashMap<Integer, I_ThinExtByRefVersioned> extensions = new HashMap<Integer, I_ThinExtByRefVersioned>();
 
-	/*
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    /*
 	 * Mojo execution method.
 	 * @see org.apache.maven.plugin.AbstractMojo#execute()
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
 		try {
-			if (MojoUtil.alreadyRun(getLog(), fileHandler.getSourceFile().toString())) {
+			if (MojoUtil.alreadyRun(getLog(), fileHandler.getSourceFile().toString(), 
+					targetDirectory)) {
 				return;
 			}
 

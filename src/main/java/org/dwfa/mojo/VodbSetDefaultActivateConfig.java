@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -34,10 +35,18 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
     @SuppressWarnings("unused")
     private String outputDirectory;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
        try {
     	   try {
-               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), targetDirectory)) {
                    return;
                }
            } catch (NoSuchAlgorithmException e) {

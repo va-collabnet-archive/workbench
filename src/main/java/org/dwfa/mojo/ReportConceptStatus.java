@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
@@ -82,6 +83,14 @@ public class ReportConceptStatus extends AbstractMojo{
     
     private HashMap<String, DataObject> mappedReportStatus = new HashMap<String, DataObject>();
         
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     private class CheckConceptStatus implements I_ProcessConcepts{
 		I_TermFactory termFactory;
 		I_IntSet statusTypeSet;
@@ -209,7 +218,8 @@ public class ReportConceptStatus extends AbstractMojo{
 		 try{
 			 
 			 try {
-	               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+	               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(),
+	            		   targetDirectory)) {
 	                   return;
 	               }
 	           } catch (NoSuchAlgorithmException e) {

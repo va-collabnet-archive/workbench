@@ -168,13 +168,20 @@ public class VodbFindDuplicates extends AbstractMojo {
     private Set<Collection<UUID>> dupUuidCollectionSet = new HashSet<Collection<UUID>>();
     private Set<Collection<UUID>> notDupSet = new HashSet<Collection<UUID>>();
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
 
 
 
     public void execute() throws MojoExecutionException, MojoFailureException {
            try {
                 if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath() +
-                        searchRootDescriptor.getDescription())) {
+                        searchRootDescriptor.getDescription(), targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

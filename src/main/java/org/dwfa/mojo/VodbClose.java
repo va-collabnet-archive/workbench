@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -19,21 +20,18 @@ import org.dwfa.maven.MojoUtil;
 public class VodbClose extends AbstractMojo {
 
     /**
-     * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would 
-     * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin. 
-     * 
+     * Location of the build directory.
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
-    @SuppressWarnings("unused")
-    private String outputDirectory;
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology.get();
 		try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), "VodbClose")) {
+                if (MojoUtil.alreadyRun(getLog(), "VodbClose", targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

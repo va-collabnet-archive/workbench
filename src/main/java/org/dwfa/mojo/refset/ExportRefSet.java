@@ -124,13 +124,21 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 
 	HashMap<Integer,List<I_ThinExtByRefVersioned>> members = new HashMap<Integer,List<I_ThinExtByRefVersioned>>();
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
 		termFactory = LocalVersionedTerminology.get(); 
 		try {
 			
 			try {
-                if (MojoUtil.alreadyRun(getLog(), "ExportRefSet")) {
+                if (MojoUtil.alreadyRun(getLog(), "ExportRefSet", targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

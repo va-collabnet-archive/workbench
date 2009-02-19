@@ -33,7 +33,15 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 	 */
 	private File luceneDir;
 	
-	private class Indexer implements I_ProcessDescriptions {
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    private class Indexer implements I_ProcessDescriptions {
 
 		
 		
@@ -88,7 +96,8 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 	}
 	public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath())) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath(),
+            		targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {

@@ -51,10 +51,18 @@ public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
     */
    private String fileEncoding = "UTF8";
 
+   /**
+    * Location of the build directory.
+    *
+    * @parameter expression="${project.build.directory}"
+    * @required
+    */
+   private File targetDirectory;
+
    public void execute() throws MojoExecutionException {
       if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
          try {
-            if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath())) {
+            if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath(), targetDirectory)) {
                return;
             }
             LocalVersionedTerminology.get().loadFromDirectory(dataDirectory, fileEncoding);

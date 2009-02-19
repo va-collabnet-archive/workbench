@@ -69,6 +69,13 @@ public class VodbValidateRefSet extends AbstractMojo {
 	 */
 	private int commitSize = 1000;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
    
     /**
      * Iterates over each concept and calculates the member set.
@@ -77,7 +84,8 @@ public class VodbValidateRefSet extends AbstractMojo {
     	
     	try{
     		try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), 
+						targetDirectory)) {
 					return;
 	            }
 	        } catch (NoSuchAlgorithmException e) {

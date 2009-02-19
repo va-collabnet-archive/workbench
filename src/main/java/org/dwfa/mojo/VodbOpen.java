@@ -59,6 +59,14 @@ public class VodbOpen extends AbstractMojo {
      */
     private DatabaseSetupConfig dbSetupConfig;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (useExistingDb && LocalVersionedTerminology.get() != null) {
@@ -67,7 +75,7 @@ public class VodbOpen extends AbstractMojo {
 
             if (!forceRerun) {
                 try {
-                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath())) {
+                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(), targetDirectory)) {
                         return;
                     }
                 } catch (NoSuchAlgorithmException e) {

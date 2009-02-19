@@ -37,9 +37,18 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
      */
     String changeSetSuffix;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDirStr + changeSetSuffix)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDirStr + changeSetSuffix,
+            		targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {

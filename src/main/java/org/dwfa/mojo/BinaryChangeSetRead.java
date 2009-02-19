@@ -45,9 +45,19 @@ public class BinaryChangeSetRead extends AbstractMojo {
      */
     boolean validate = false;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir.getCanonicalPath() + changeSetFileName)) {
+            if (MojoUtil.alreadyRun(getLog(), 
+            		this.getClass().getCanonicalName() + changeSetDir.getCanonicalPath() + changeSetFileName,
+            		targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {

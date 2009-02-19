@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -49,12 +50,20 @@ public class VodbCreateNewPathFromParentConcept extends AbstractMojo {
 	 */
 	private ConceptDescriptor pathConcept;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		// Use the architectonic branch for all path editing.
 		try {
 			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() +  pathConcept.getDescription())) {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() +  pathConcept.getDescription(),
+						targetDirectory)) {
 					return;
 				}
 			} catch (NoSuchAlgorithmException e) {

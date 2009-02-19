@@ -48,6 +48,13 @@ public class VodbValidateRefsetOverlaps extends AbstractMojo {
 	 */
 	private File overlapFile;
 	
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
 	
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -56,7 +63,7 @@ public class VodbValidateRefsetOverlaps extends AbstractMojo {
 			System.out.println("vodb-validate-refset-overlaps...........................................");
 			
     		try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName())) {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), targetDirectory)) {
 					return;
 	            }
 	        } catch (NoSuchAlgorithmException e) {

@@ -126,12 +126,21 @@ public class ExportDatabase extends AbstractMojo {
      */
      private File buildDirectory;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+     /**
+      * Location of the build directory.
+      *
+      * @parameter expression="${project.build.directory}"
+      * @required
+      */
+     private File targetDirectory;
+
+     public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
 			if (MojoUtil.alreadyRun(getLog(), outputDirectory
 					+ conceptDataFileName + descriptionsDataFileName
-					+ relationshipsDataFileName)) {
+					+ relationshipsDataFileName, 
+					targetDirectory)) {
 				return;
 			}
 

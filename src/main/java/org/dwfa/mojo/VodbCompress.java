@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -34,9 +35,18 @@ public class VodbCompress extends AbstractMojo {
     */
     private org.apache.maven.plugin.MojoExecution execution;
     
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-			if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId())) {
+			if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId(),
+					targetDirectory)) {
 			    return;
 			}
 		} catch (NoSuchAlgorithmException e1) {

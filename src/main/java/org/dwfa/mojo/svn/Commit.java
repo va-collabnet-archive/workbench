@@ -53,10 +53,19 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
      */
     String password;
     
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
 
+    
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + workingCopyStr + repositoryUrlStr)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + workingCopyStr + repositoryUrlStr,
+            		targetDirectory)) {
                 return;
             }
         if (workingCopyStr != null && workingCopyStr.length() > 1) {

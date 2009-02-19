@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -27,9 +28,18 @@ public class VodbCommit  extends AbstractMojo {
      */
     MojoExecution execution;
      
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + execution.getExecutionId())) {
+			if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + execution.getExecutionId(),
+					targetDirectory)) {
 				return;
 			}
 		} catch (NoSuchAlgorithmException e) {

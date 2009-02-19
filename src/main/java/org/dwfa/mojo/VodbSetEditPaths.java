@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -31,10 +32,19 @@ public class VodbSetEditPaths extends AbstractMojo {
      */
     private List<ConceptDescriptor> editPaths;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
      	   try {
-               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths)) {
+               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths,
+            		   targetDirectory)) {
                    return;
                }
            } catch (NoSuchAlgorithmException e) {

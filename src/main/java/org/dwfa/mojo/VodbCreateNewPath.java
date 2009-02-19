@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -85,11 +86,19 @@ public class VodbCreateNewPath extends AbstractMojo {
 	 */
 	String pathPrefDesc;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		// Use the architectonic branch for all path editing.
 		try {
 			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc)) {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc, targetDirectory)) {
 					return;
 				}
 			} catch (NoSuchAlgorithmException e) {

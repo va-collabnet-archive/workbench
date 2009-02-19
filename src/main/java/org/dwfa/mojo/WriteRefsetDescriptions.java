@@ -58,11 +58,19 @@ I_ProcessExtByRef {
 	private BufferedWriter noDescriptionWriter;
 	private Map<String, Integer> progressMap = new HashMap<String, Integer>();
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
 			if (MojoUtil
-					.alreadyRun(getLog(), outputDirectory.getAbsolutePath())) {
+					.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), targetDirectory)) {
 				return;
 			}
 

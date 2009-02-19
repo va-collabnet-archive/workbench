@@ -1,5 +1,6 @@
 package org.dwfa.mojo;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -28,9 +29,18 @@ public class MemberRefsetChangeSetReadAll extends AbstractMojo {
      */
     String changeSetDir;
 
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir,
+            		targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
