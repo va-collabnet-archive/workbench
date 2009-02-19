@@ -7,6 +7,7 @@ package org.dwfa.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -21,6 +22,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.StringOutputStream;
 
 public class MojoUtil {
 
@@ -172,6 +174,10 @@ public class MojoUtil {
                 goalFile.createNewFile();
         } else {
             l.info("Previously executed: "+goalFile.getAbsolutePath() + "\nNow stopping.");
+            StringOutputStream sos = new StringOutputStream();
+            PrintStream ps = new PrintStream(sos);
+            System.getProperties().list(ps);
+            l.info("Properties: " + sos.toString());
             return true;
         }
         return false;
