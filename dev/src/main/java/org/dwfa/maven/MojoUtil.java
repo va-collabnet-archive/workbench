@@ -171,7 +171,7 @@ public class MojoUtil {
                 goalFileDirectory.mkdirs();
                 goalFile.createNewFile();
         } else {
-            l.info("Previously executed. Now stopping.");
+            l.info("Previously executed: "+goalFile.getAbsolutePath() + "\nNow stopping.");
             return true;
         }
         return false;
