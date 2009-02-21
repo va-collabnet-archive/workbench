@@ -199,10 +199,15 @@ public class Transform extends AbstractMojo {
                                 tw.addTransform(t);
                             }
                         }
+                        
                         File inputFile = normalize(spec);
-                        if (inputFile.length() == 0) {
-                        	logger.warn("skipping 0 length file " + inputFile);
-                        	continue;
+                        if (inputFile != null) {
+                            if (inputFile.length() == 0) {
+                            	logger.warn("skipping 0 length file " + inputFile);
+                            	continue;
+                            }
+                        } else {
+                        	throw new MojoFailureException("Spec cannot be normalized. Does the input file exist?");
                         }
                         FileInputStream fs = new FileInputStream(inputFile);
                         InputStreamReader isr = new InputStreamReader(fs, spec
