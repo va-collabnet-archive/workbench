@@ -48,7 +48,7 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDirStr + changeSetSuffix,
-            		targetDirectory)) {
+            		this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {

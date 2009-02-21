@@ -181,7 +181,8 @@ public class VodbFindDuplicates extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
            try {
                 if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath() +
-                        searchRootDescriptor.getDescription(), targetDirectory)) {
+                        searchRootDescriptor.getDescription(), 
+                        this.getClass(), targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

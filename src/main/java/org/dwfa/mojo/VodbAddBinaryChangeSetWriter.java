@@ -68,7 +68,8 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 		
 		try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), changeSetFileName, targetDirectory)) {
+                if (MojoUtil.alreadyRun(getLog(), changeSetFileName, 
+                		this.getClass(), targetDirectory)) {
                 	
                     return;
                 }

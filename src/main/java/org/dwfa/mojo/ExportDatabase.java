@@ -140,7 +140,7 @@ public class ExportDatabase extends AbstractMojo {
 			if (MojoUtil.alreadyRun(getLog(), outputDirectory
 					+ conceptDataFileName + descriptionsDataFileName
 					+ relationshipsDataFileName, 
-					targetDirectory)) {
+					this.getClass(), targetDirectory)) {
 				return;
 			}
 

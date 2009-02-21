@@ -70,7 +70,8 @@ I_ProcessExtByRef {
 		try {
 
 			if (MojoUtil
-					.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), targetDirectory)) {
+					.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), 
+							this.getClass(), targetDirectory)) {
 				return;
 			}
 

@@ -62,7 +62,8 @@ public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
    public void execute() throws MojoExecutionException {
       if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
          try {
-            if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath(), 
+            		this.getClass(), targetDirectory)) {
                return;
             }
             LocalVersionedTerminology.get().loadFromDirectory(dataDirectory, fileEncoding);

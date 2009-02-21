@@ -97,7 +97,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath(),
-            		targetDirectory)) {
+            		this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {

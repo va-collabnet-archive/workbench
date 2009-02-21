@@ -46,7 +46,8 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
        try {
     	   try {
-               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), targetDirectory)) {
+               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), 
+            		   this.getClass(), targetDirectory)) {
                    return;
                }
            } catch (NoSuchAlgorithmException e) {

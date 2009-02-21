@@ -47,7 +47,7 @@ public class ValidateExtensionDetails extends AbstractMojo {
 		try {
 			try {
 				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), 
-						targetDirectory)) {
+						this.getClass(), targetDirectory)) {
 					return;
 	            }
 	        } catch (NoSuchAlgorithmException e) {

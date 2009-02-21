@@ -63,7 +63,7 @@ public class VodbCreateNewPathFromParentConcept extends AbstractMojo {
 		try {
 			try {
 				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() +  pathConcept.getDescription(),
-						targetDirectory)) {
+						this.getClass(), targetDirectory)) {
 					return;
 				}
 			} catch (NoSuchAlgorithmException e) {

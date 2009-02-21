@@ -138,7 +138,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 		try {
 			
 			try {
-                if (MojoUtil.alreadyRun(getLog(), "ExportRefSet", targetDirectory)) {
+                if (MojoUtil.alreadyRun(getLog(), "ExportRefSet", this.getClass(), targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

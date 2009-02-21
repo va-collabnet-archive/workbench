@@ -75,7 +75,8 @@ public class VodbOpen extends AbstractMojo {
 
             if (!forceRerun) {
                 try {
-                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(), targetDirectory)) {
+                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(), 
+                    		this.getClass(), targetDirectory)) {
                         return;
                     }
                 } catch (NoSuchAlgorithmException e) {

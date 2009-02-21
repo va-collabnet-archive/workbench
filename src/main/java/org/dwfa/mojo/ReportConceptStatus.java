@@ -219,7 +219,7 @@ public class ReportConceptStatus extends AbstractMojo{
 			 
 			 try {
 	               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(),
-	            		   targetDirectory)) {
+	            		   this.getClass(), targetDirectory)) {
 	                   return;
 	               }
 	           } catch (NoSuchAlgorithmException e) {

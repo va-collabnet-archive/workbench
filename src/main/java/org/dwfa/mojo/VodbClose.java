@@ -31,7 +31,8 @@ public class VodbClose extends AbstractMojo {
 		I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology.get();
 		try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), "VodbClose", targetDirectory)) {
+                if (MojoUtil.alreadyRun(getLog(), "VodbClose", 
+                		this.getClass(), targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

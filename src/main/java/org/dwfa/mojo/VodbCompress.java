@@ -46,7 +46,7 @@ public class VodbCompress extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
 			if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId(),
-					targetDirectory)) {
+					this.getClass(), targetDirectory)) {
 			    return;
 			}
 		} catch (NoSuchAlgorithmException e1) {

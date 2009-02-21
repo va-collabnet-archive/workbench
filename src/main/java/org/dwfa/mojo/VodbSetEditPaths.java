@@ -44,7 +44,7 @@ public class VodbSetEditPaths extends AbstractMojo {
         try {
      	   try {
                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths,
-            		   targetDirectory)) {
+            		   this.getClass(), targetDirectory)) {
                    return;
                }
            } catch (NoSuchAlgorithmException e) {

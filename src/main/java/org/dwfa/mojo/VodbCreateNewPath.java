@@ -98,7 +98,8 @@ public class VodbCreateNewPath extends AbstractMojo {
 		// Use the architectonic branch for all path editing.
 		try {
 			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc, targetDirectory)) {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc, 
+						this.getClass(), targetDirectory)) {
 					return;
 				}
 			} catch (NoSuchAlgorithmException e) {

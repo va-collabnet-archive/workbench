@@ -63,7 +63,8 @@ public class VodbValidateRefsetOverlaps extends AbstractMojo {
 			System.out.println("vodb-validate-refset-overlaps...........................................");
 			
     		try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), targetDirectory)) {
+				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), 
+						this.getClass(), targetDirectory)) {
 					return;
 	            }
 	        } catch (NoSuchAlgorithmException e) {

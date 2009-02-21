@@ -49,7 +49,7 @@ public class ImportRefset extends ImportFromFile {
 		
 		try {
 			if (MojoUtil.alreadyRun(getLog(), fileHandler.getSourceFile().toString(), 
-					targetDirectory)) {
+					this.getClass(), targetDirectory)) {
 				return;
 			}
 
