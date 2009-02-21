@@ -163,6 +163,7 @@ public class MojoUtil {
         Sha1HashCodeGenerator generator = new Sha1HashCodeGenerator();
         if (input == null) {
         	input = targetClass.getName();
+        	l.warn("Input is NULL. Using mojo class name instead...");
         } 
         generator.add(input);
         String hashCode = generator.getHashCode();
