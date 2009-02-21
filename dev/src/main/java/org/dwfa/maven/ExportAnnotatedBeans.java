@@ -134,7 +134,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
         try {
             if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots)+Arrays.toString(forbiddenRoots), 
-            		targetDirectory)) {
+            		this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e1) {

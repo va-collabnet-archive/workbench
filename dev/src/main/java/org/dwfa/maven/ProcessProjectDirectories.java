@@ -87,7 +87,7 @@ public class ProcessProjectDirectories extends AbstractMojo {
         try {
             Log l = getLog();
     		try {
-    			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), targetDirectory)) {
+    			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), this.getClass(), targetDirectory)) {
     				return;
     			}
     		} catch (NoSuchAlgorithmException e1) {

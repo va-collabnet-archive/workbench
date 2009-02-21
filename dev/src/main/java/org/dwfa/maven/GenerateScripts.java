@@ -73,7 +73,7 @@ public class GenerateScripts extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		Log l = getLog();
 		try {
-			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), targetDirectory)) {
+			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), this.getClass(), targetDirectory)) {
 				return;
 			}
 		} catch (NoSuchAlgorithmException e1) {

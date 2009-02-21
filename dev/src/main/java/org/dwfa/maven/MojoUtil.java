@@ -159,8 +159,11 @@ public class MojoUtil {
 		}
 		return allowedGoal;
 	}
-    public static boolean alreadyRun(Log l, String input, File targetDir) throws NoSuchAlgorithmException, IOException {
+    public static boolean alreadyRun(Log l, String input, Class<?> targetClass, File targetDir) throws NoSuchAlgorithmException, IOException {
         Sha1HashCodeGenerator generator = new Sha1HashCodeGenerator();
+        if (input == null) {
+        	input = targetClass.getName();
+        } 
         generator.add(input);
         String hashCode = generator.getHashCode();
 

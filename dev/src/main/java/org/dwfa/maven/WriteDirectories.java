@@ -76,7 +76,8 @@ public class WriteDirectories extends AbstractMojo {
 		try {
 			if (MojoUtil.alreadyRun(getLog(), this.getClass()
 					.getCanonicalName()
-					+ dependencies + outputDirectory.getCanonicalPath(), targetDirectory)) {
+					+ dependencies + outputDirectory.getCanonicalPath(), 
+					this.getClass(), targetDirectory)) {
 				return;
 			}
 		} catch (NoSuchAlgorithmException e) {

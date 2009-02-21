@@ -57,7 +57,7 @@ public class CopyDirectory extends AbstractMojo {
 
             // calculate the SHA-1 hashcode for this mojo based on input
             if (MojoUtil.alreadyRun(l, inputDirectory.getAbsolutePath() + outputDirectory.getAbsolutePath(), 
-            		targetDirectory)) {
+            		this.getClass(), targetDirectory)) {
                 return;
             }
             FileIO.recursiveCopy(inputDirectory, outputDirectory, copyInvisibles);
