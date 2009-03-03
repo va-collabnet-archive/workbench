@@ -13,7 +13,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.maven.MojoUtil;
 
 /**
- * Read all binary change set under a specified directory hierarchy, and apply the results of 
+ * Read all binary change set under a specified directory hierarchy, and apply the results of
  * that change set to the open database.
  * @goal bcs-read-all
  *
@@ -29,16 +29,16 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
      * @parameter default-value="${project.build.directory}/generated-resources/changesets/"
      */
     String changeSetDir;
-    
+
     /**
      * List of validators to use when validating change sets if validate = true
-     * 
+     *
      * @parameter
      */
     private String[] validators = new String[]{ComponentValidator.class.getName()};
 
     /**
-     * Whether to validate the change set first or not. Default value is true; 
+     * Whether to validate the change set first or not. Default value is true;
      * @parameter
      */
     boolean validate = true;
@@ -54,7 +54,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir,
-            		this.getClass(), targetDirectory)) {
+                    this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -67,43 +67,51 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         importAllChangeSetsTask.setValidateChangeSets(validate);
         String validatorString = "";
         for (int i = 0; i < validators.length; i++) {
-			validatorString += validators[i];
-			if (i != validators.length - 1) {
-				//if not the last element
-				validatorString += ",";
-			}
-		}
-        
+            validatorString += validators[i];
+            if (i != validators.length - 1) {
+                //if not the last element
+                validatorString += ",";
+            }
+        }
+
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
         try {
-        	importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
-	    } catch (TaskFailedException e) {
-	        throw new MojoExecutionException(e.getLocalizedMessage(), e);
-	    }
+            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
+        } catch (TaskFailedException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
     }
 
-	public String getChangeSetDir() {
-		return changeSetDir;
-	}
+    public String getChangeSetDir() {
+        return changeSetDir;
+    }
 
-	public void setChangeSetDir(String changeSetDir) {
-		this.changeSetDir = changeSetDir;
-	}
+    public void setChangeSetDir(String changeSetDir) {
+        this.changeSetDir = changeSetDir;
+    }
 
-	public String[] getValidators() {
-		return validators;
-	}
+    public String[] getValidators() {
+        return validators;
+    }
 
-	public void setValidators(String[] validators) {
-		this.validators = validators;
-	}
+    public void setValidators(String[] validators) {
+        this.validators = validators;
+    }
 
-	public boolean isValidate() {
-		return validate;
-	}
+    public boolean isValidate() {
+        return validate;
+    }
 
-	public void setValidate(boolean validate) {
-		this.validate = validate;
-	}
+    public void setValidate(boolean validate) {
+        this.validate = validate;
+    }
+
+    public File getTargetDirectory() {
+        return targetDirectory;
+    }
+
+    public void setTargetDirectory(File targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
 }

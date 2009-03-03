@@ -32,59 +32,59 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * 
+ *
  * @goal vodb-create-new-path
- * 
+ *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
 public class VodbCreateNewPath extends AbstractMojo {
 
-	/**
-	 * Path origins
-	 * 
-	 * @parameter
-	 */
-	SimpleUniversalAcePosition[] origins;
+    /**
+     * Path origins
+     *
+     * @parameter
+     */
+    SimpleUniversalAcePosition[] origins;
 
-	/**
-	 * Path UUID
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	//String parentUUID;
+    /**
+     * Path UUID
+     *
+     * @parameter
+     * @required
+     */
+    //String parentUUID;
 
-	/**
-	 * Parent of the new path.
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private ConceptDescriptor pathParent;
+    /**
+     * Parent of the new path.
+     *
+     * @parameter
+     * @required
+     */
+    private ConceptDescriptor pathParent;
 
-	/**
-	 * Parent of the new path.
-	 * 
-	 * @parameter
-	 */
-	private ConceptDescriptor status;
+    /**
+     * Parent of the new path.
+     *
+     * @parameter
+     */
+    private ConceptDescriptor status;
 
-	/**
-	 * Path Description
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	String pathFsDesc;
+    /**
+     * Path Description
+     *
+     * @parameter
+     * @required
+     */
+    String pathFsDesc;
 
-	/**
-	 * Path Description
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	String pathPrefDesc;
+    /**
+     * Path Description
+     *
+     * @parameter
+     * @required
+     */
+    String pathPrefDesc;
 
     /**
      * Location of the build directory.
@@ -95,36 +95,36 @@ public class VodbCreateNewPath extends AbstractMojo {
     private File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		// Use the architectonic branch for all path editing.
-		try {
-			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc, 
-						this.getClass(), targetDirectory)) {
-					return;
-				}
-			} catch (NoSuchAlgorithmException e) {
-				throw new MojoExecutionException(e.getLocalizedMessage(), e);
-			} 
-			I_TermFactory tf = LocalVersionedTerminology.get();
-			I_ConfigAceFrame activeConfig = tf.getActiveAceFrameConfig();
-			Set<I_Position> pathOrigins = null;
-			if (origins != null) {
-				pathOrigins = new HashSet<I_Position>(origins.length);
-				for (SimpleUniversalAcePosition pos : origins) {
-					I_Path originPath = tf.getPath(pos.getPathId());
-					pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
-				}
-			}
+        // Use the architectonic branch for all path editing.
+        try {
+            try {
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc,
+                        this.getClass(), targetDirectory)) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ConfigAceFrame activeConfig = tf.getActiveAceFrameConfig();
+            Set<I_Position> pathOrigins = null;
+            if (origins != null) {
+                pathOrigins = new HashSet<I_Position>(origins.length);
+                for (SimpleUniversalAcePosition pos : origins) {
+                    I_Path originPath = tf.getPath(pos.getPathId());
+                    pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
+                }
+            }
 
-			I_GetConceptData parent = pathParent.getVerifiedConcept();
-			activeConfig.setHierarchySelection(parent);
+            I_GetConceptData parent = pathParent.getVerifiedConcept();
+            activeConfig.setHierarchySelection(parent);
 
-			UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
+            UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
 
-			I_GetConceptData pathConcept;
-			
-			if (tf.hasId(pathUUID)) {
-				pathConcept = tf.getConcept(new UUID[] {pathUUID});
+            I_GetConceptData pathConcept;
+
+            if (tf.hasId(pathUUID)) {
+                pathConcept = tf.getConcept(new UUID[] {pathUUID});
 
                 /**
                  * This addresses a problem where a UUID has been specified
@@ -136,108 +136,116 @@ public class VodbCreateNewPath extends AbstractMojo {
                  */
                 if (pathConcept.getDescriptions() == null
                         || pathConcept.getDescriptions().isEmpty()) {
-                    pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);                    
+                    pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
                 }
             } else {
-				pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
-			}
-                  
-			tf.newPath(pathOrigins, pathConcept);
-		} catch (TerminologyException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (ParseException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
+                pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
+            }
 
-	private I_GetConceptData createNewPathConcept(I_TermFactory tf,
-			I_ConfigAceFrame activeConfig, UUID pathUUID)
-			throws TerminologyException, IOException, Exception,
-			NoSuchAlgorithmException, UnsupportedEncodingException {
-		I_GetConceptData pathConcept = tf
-		.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
+            tf.newPath(pathOrigins, pathConcept);
+        } catch (TerminologyException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (ParseException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
 
-		I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
-		if (status!=null) {
-			SetStatusUtil.setStatusOfConceptInfo(status.getVerifiedConcept(),cav.getTuples());
-		}
+    private I_GetConceptData createNewPathConcept(I_TermFactory tf,
+            I_ConfigAceFrame activeConfig, UUID pathUUID)
+            throws TerminologyException, IOException, Exception,
+            NoSuchAlgorithmException, UnsupportedEncodingException {
+        I_GetConceptData pathConcept = tf
+        .newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
 
-		UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-				pathUUID.toString() + 
-				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + 
-				pathFsDesc);
+        I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
+        if (status!=null) {
+            SetStatusUtil.setStatusOfConceptInfo(status.getVerifiedConcept(),cav.getTuples());
+        }
 
-		I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
-				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
-		if (status!=null) {
-			SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idv.getTuples());
-		}
-		UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-				pathUUID.toString() + 
-				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + 
-				pathPrefDesc);
+        UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                pathUUID.toString() +
+                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() +
+                pathFsDesc);
 
-		I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
-				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
-		if (status!=null) {
-			SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idvpt.getTuples());
-		}
+        I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
+                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
+        if (status!=null) {
+            SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idv.getTuples());
+        }
+        UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                pathUUID.toString() +
+                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() +
+                pathPrefDesc);
 
-		UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-				pathUUID.toString() + fsDescUuid + prefDescUuid);
+        I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
+                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
+        if (status!=null) {
+            SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idvpt.getTuples());
+        }
 
-		I_RelVersioned rel = tf.newRelationship(relUuid, pathConcept, activeConfig);
-		if (status!=null) {
-			SetStatusUtil.setStatusOfRelInfo(status.getVerifiedConcept(),rel.getTuples());
-		}            
-//			need to do an immediate commit so that new concept will be available to path when read from changeset
-		tf.commit();
+        UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                pathUUID.toString() + fsDescUuid + prefDescUuid);
+
+        I_RelVersioned rel = tf.newRelationship(relUuid, pathConcept, activeConfig);
+        if (status!=null) {
+            SetStatusUtil.setStatusOfRelInfo(status.getVerifiedConcept(),rel.getTuples());
+        }
+//            need to do an immediate commit so that new concept will be available to path when read from changeset
+        tf.commit();
         return pathConcept;
-	}
+    }
 
-	public SimpleUniversalAcePosition[] getOrigins() {
-		return origins;
-	}
+    public SimpleUniversalAcePosition[] getOrigins() {
+        return origins;
+    }
 
-	public void setOrigins(SimpleUniversalAcePosition[] origins) {
-		this.origins = origins;
-	}
+    public void setOrigins(SimpleUniversalAcePosition[] origins) {
+        this.origins = origins;
+    }
 
-	public ConceptDescriptor getPathParent() {
-		return pathParent;
-	}
+    public ConceptDescriptor getPathParent() {
+        return pathParent;
+    }
 
-	public void setPathParent(ConceptDescriptor pathParent) {
-		this.pathParent = pathParent;
-	}
+    public void setPathParent(ConceptDescriptor pathParent) {
+        this.pathParent = pathParent;
+    }
 
-	public ConceptDescriptor getStatus() {
-		return status;
-	}
+    public ConceptDescriptor getStatus() {
+        return status;
+    }
 
-	public void setStatus(ConceptDescriptor status) {
-		this.status = status;
-	}
+    public void setStatus(ConceptDescriptor status) {
+        this.status = status;
+    }
 
-	public String getPathFsDesc() {
-		return pathFsDesc;
-	}
+    public String getPathFsDesc() {
+        return pathFsDesc;
+    }
 
-	public void setPathFsDesc(String pathFsDesc) {
-		this.pathFsDesc = pathFsDesc;
-	}
+    public void setPathFsDesc(String pathFsDesc) {
+        this.pathFsDesc = pathFsDesc;
+    }
 
-	public String getPathPrefDesc() {
-		return pathPrefDesc;
-	}
+    public String getPathPrefDesc() {
+        return pathPrefDesc;
+    }
 
-	public void setPathPrefDesc(String pathPrefDesc) {
-		this.pathPrefDesc = pathPrefDesc;
-	}
+    public void setPathPrefDesc(String pathPrefDesc) {
+        this.pathPrefDesc = pathPrefDesc;
+    }
 
-	
+    public File getTargetDirectory() {
+        return targetDirectory;
+    }
+
+    public void setTargetDirectory(File targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
+
+
 }

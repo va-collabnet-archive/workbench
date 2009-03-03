@@ -16,9 +16,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * 
+ *
  * @goal vodb-set-edit-paths
- * 
+ *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -26,7 +26,7 @@ public class VodbSetEditPaths extends AbstractMojo {
 
     /**
      * Editing path UUIDs
-     * 
+     *
      * @parameter
      * @required
      */
@@ -42,23 +42,23 @@ public class VodbSetEditPaths extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-     	   try {
+            try {
                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths,
-            		   this.getClass(), targetDirectory)) {
+                       this.getClass(), targetDirectory)) {
                    return;
                }
            } catch (NoSuchAlgorithmException e) {
                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-           } 
+           }
             I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
             I_TermFactory tf = LocalVersionedTerminology.get();
 
             activeConfig.getEditingPathSet().clear();
             for (ConceptDescriptor pathConcept : editPaths) {
-            	if (pathConcept.getUuid() == null) {
-            		pathConcept.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-            				pathConcept.getDescription()).toString());
-            	}
+                if (pathConcept.getUuid() == null) {
+                    pathConcept.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            pathConcept.getDescription()).toString());
+                }
                 activeConfig.addEditingPath(tf.getPath(pathConcept.getVerifiedConcept().getUids()));
             }
         } catch (TerminologyException e) {
@@ -67,15 +67,23 @@ public class VodbSetEditPaths extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
+        }
     }
 
-	public List<ConceptDescriptor> getEditPaths() {
-		return editPaths;
-	}
+    public List<ConceptDescriptor> getEditPaths() {
+        return editPaths;
+    }
 
-	public void setEditPaths(List<ConceptDescriptor> editPaths) {
-		this.editPaths = editPaths;
-	}
+    public void setEditPaths(List<ConceptDescriptor> editPaths) {
+        this.editPaths = editPaths;
+    }
+
+    public File getTargetDirectory() {
+        return targetDirectory;
+    }
+
+    public void setTargetDirectory(File targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
 
 }

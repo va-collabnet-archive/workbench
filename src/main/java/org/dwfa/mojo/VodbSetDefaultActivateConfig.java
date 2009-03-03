@@ -15,9 +15,9 @@ import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * 
+ *
  * @goal vodb-set-default-config
- * 
+ *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -25,10 +25,10 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
 
     /**
      * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would 
+     * KEC: I added this field, because the maven plugin plugin would
      * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin. 
-     * 
+     * not actually used by the plugin.
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -45,14 +45,14 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
        try {
-    	   try {
-               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), 
-            		   this.getClass(), targetDirectory)) {
+           try {
+               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(),
+                       this.getClass(), targetDirectory)) {
                    return;
                }
            } catch (NoSuchAlgorithmException e) {
                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-           } 
+           }
            I_TermFactory tf = LocalVersionedTerminology.get();
            I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null);
 
@@ -63,6 +63,14 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
 
+    }
+
+    public File getTargetDirectory() {
+        return targetDirectory;
+    }
+
+    public void setTargetDirectory(File targetDirectory) {
+        this.targetDirectory = targetDirectory;
     }
 
  }

@@ -75,15 +75,15 @@ public class VodbOpen extends AbstractMojo {
 
             if (!forceRerun) {
                 try {
-                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(), 
-                    		this.getClass(), targetDirectory)) {
+                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(),
+                            this.getClass(), targetDirectory)) {
                         return;
                     }
                 } catch (NoSuchAlgorithmException e) {
                     throw new MojoExecutionException(e.getLocalizedMessage(), e);
                 }
             }
-            
+
             if (dbSetupConfig == null) {
                 dbSetupConfig = new DatabaseSetupConfig();
             }
@@ -97,56 +97,64 @@ public class VodbOpen extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-		
-	}
+        }
 
-	public File getVodbDirectory() {
-		return vodbDirectory;
-	}
+    }
 
-	public void setVodbDirectory(File vodbDirectory) {
-		this.vodbDirectory = vodbDirectory;
-	}
+    public File getVodbDirectory() {
+        return vodbDirectory;
+    }
 
-	public Boolean getReadOnly() {
-		return readOnly;
-	}
+    public void setVodbDirectory(File vodbDirectory) {
+        this.vodbDirectory = vodbDirectory;
+    }
 
-	public void setReadOnly(Boolean readOnly) {
-		this.readOnly = readOnly;
-	}
+    public Boolean getReadOnly() {
+        return readOnly;
+    }
 
-	public Long getCacheSize() {
-		return cacheSize;
-	}
+    public void setReadOnly(Boolean readOnly) {
+        this.readOnly = readOnly;
+    }
 
-	public void setCacheSize(Long cacheSize) {
-		this.cacheSize = cacheSize;
-	}
+    public Long getCacheSize() {
+        return cacheSize;
+    }
 
-	public boolean isUseExistingDb() {
-		return useExistingDb;
-	}
+    public void setCacheSize(Long cacheSize) {
+        this.cacheSize = cacheSize;
+    }
 
-	public void setUseExistingDb(boolean useExistingDb) {
-		this.useExistingDb = useExistingDb;
-	}
+    public boolean isUseExistingDb() {
+        return useExistingDb;
+    }
 
-	public boolean isForceRerun() {
-		return forceRerun;
-	}
+    public void setUseExistingDb(boolean useExistingDb) {
+        this.useExistingDb = useExistingDb;
+    }
 
-	public void setForceRerun(boolean forceRerun) {
-		this.forceRerun = forceRerun;
-	}
+    public boolean isForceRerun() {
+        return forceRerun;
+    }
 
-	public DatabaseSetupConfig getDbSetupConfig() {
-		return dbSetupConfig;
-	}
+    public void setForceRerun(boolean forceRerun) {
+        this.forceRerun = forceRerun;
+    }
 
-	public void setDbSetupConfig(DatabaseSetupConfig dbSetupConfig) {
-		this.dbSetupConfig = dbSetupConfig;
-	}
+    public DatabaseSetupConfig getDbSetupConfig() {
+        return dbSetupConfig;
+    }
+
+    public void setDbSetupConfig(DatabaseSetupConfig dbSetupConfig) {
+        this.dbSetupConfig = dbSetupConfig;
+    }
+
+    public File getTargetDirectory() {
+        return targetDirectory;
+    }
+
+    public void setTargetDirectory(File targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
 
 }
