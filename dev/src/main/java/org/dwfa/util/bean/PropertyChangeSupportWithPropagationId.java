@@ -6,7 +6,7 @@ import java.beans.PropertyChangeSupport;
 public class PropertyChangeSupportWithPropagationId extends
 		PropertyChangeSupport {
 
-	private long propagationId = 0;
+	private static long propagationId = 0;
 	public PropertyChangeSupportWithPropagationId(Object sourceBean) {
 		super(sourceBean);
 	}
