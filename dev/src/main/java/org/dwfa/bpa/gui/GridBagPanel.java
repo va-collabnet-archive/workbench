@@ -15,6 +15,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 import org.dwfa.bpa.process.I_Workspace;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 /**
  * @author kec
@@ -97,7 +98,7 @@ public class GridBagPanel extends JPanel {
     public GridBagPanel(LayoutManager layout, String title, I_Workspace workspace) {
         super(layout);
         this.workspace = workspace;
-        gridBagPropertySupport = new PropertyChangeSupport(this);
+        gridBagPropertySupport = new PropertyChangeSupportWithPropagationId(this);
         this.setTitle(title);
         this.setName(title);
         this.setOpaque(true);
