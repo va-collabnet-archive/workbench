@@ -67,6 +67,7 @@ import org.dwfa.bpa.tasks.editor.AttachmentNameReadOnlyEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelFrozenEditor;
 import org.dwfa.bpa.tasks.util.ChangeProcessInstanceId;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 /**
  * @author kec
@@ -327,7 +328,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 
 	protected List<TaskInfo> taskInfoList = new ArrayList<TaskInfo>();
 
-	private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(
+	private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(
 			this);
 
 	private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(
@@ -427,7 +428,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		if ((objDataVersion > 0) && (objDataVersion <= dataVersion)) {
 			this.taskInfoList = (List<TaskInfo>) in.readObject();
 			in.readObject(); // was data container list
-			this.changeSupport = new PropertyChangeSupport(this);
+			this.changeSupport = new PropertyChangeSupportWithPropagationId(this);
 			this.vetoSupport = new VetoableChangeSupport(this);
 			this.exitCondition = (Condition) in.readObject();
 			this.values = new Condition[] { exitCondition };

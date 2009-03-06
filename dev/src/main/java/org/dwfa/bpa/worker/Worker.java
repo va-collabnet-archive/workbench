@@ -69,6 +69,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.clock.I_KeepTime;
 import org.dwfa.clock.SystemTime;
 import org.dwfa.jini.JiniManager;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 /**
  * @author kec
@@ -121,7 +122,7 @@ public abstract class Worker implements I_Work {
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss.SSS");
 
-	private PropertyChangeSupport propChangeSupport = new PropertyChangeSupport(
+	private PropertyChangeSupport propChangeSupport = new PropertyChangeSupportWithPropagationId(
 			this);
 
 	private Stack<I_EncodeBusinessProcess> processStack = new Stack<I_EncodeBusinessProcess>();

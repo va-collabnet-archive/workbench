@@ -54,6 +54,7 @@ import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.bpa.gui.GridBagPanel.GridBagPanelConstraints;
 import org.dwfa.bpa.process.I_Workspace;
 import org.dwfa.bpa.process.NoMatchingEntryException;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 /**
  * @author kec
@@ -81,7 +82,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
 
     private HashMap<String, Object> attachments = new HashMap<String, Object>();
     
-    private PropertyChangeSupport propChangeSupport = new PropertyChangeSupport(this);
+    private PropertyChangeSupport propChangeSupport = new PropertyChangeSupportWithPropagationId(this);
 
 
 

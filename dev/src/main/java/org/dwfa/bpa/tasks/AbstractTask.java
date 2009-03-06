@@ -41,6 +41,7 @@ import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_DefineTask;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 
 /**
@@ -108,7 +109,7 @@ public abstract class AbstractTask  implements I_DefineTask {
     private static final int dataVersion = 1;
 
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(this);
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -121,7 +122,7 @@ public abstract class AbstractTask  implements I_DefineTask {
         if (objDataVersion == 1) {
             this.id = in.readInt();            
             this.vetoSupport = new VetoableChangeSupport(this);
-            this.changeSupport = new PropertyChangeSupport(this);
+            this.changeSupport = new PropertyChangeSupportWithPropagationId(this);
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
