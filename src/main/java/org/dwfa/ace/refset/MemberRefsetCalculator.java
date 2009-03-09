@@ -40,7 +40,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private boolean validateOnly = true;
 	private boolean markParents = true;
 
-
+	private boolean additionalLogging = false;
+	
 	/**
 	 * The ids of the concepts which may be included in the member set (due to lineage).
 	 * These may be excluded if they explicitly state a refset exclusion.
@@ -173,7 +174,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 				
 				System.out.println("Done calcuating for refset " + memberSet + " - commencing update");
 				
-				conceptsWithDirectInclusion.put(memberSetId, conceptsWithInclusion);
+				conceptsWithDirectInclusion.put(memberSetId, conceptsWithInclusion);				
 				conceptsWithDirectExclusion.put(memberSetId, conceptsWithExclusion);
 				
 				for (Integer member : conceptsWithInclusion) {
@@ -281,13 +282,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	private void removeFromRefsetExclusion(int componentId, int refsetId) {
 		ClosestDistanceHashSet members = newRefsetExclusion.get(refsetId);
 		if (members!=null) {
-			members.remove(new ConceptRefsetInclusionDetails(componentId,includeLineage,0,0));			
+			members.remove(componentId);			
 		}
 	}
 	private void removeFromRefsetInclusion(int componentId, int refsetId) {
 		ClosestDistanceHashSet members = newRefsetMembers.get(refsetId);
 		if (members!=null) {
-			members.remove(new ConceptRefsetInclusionDetails(componentId,includeLineage,0,0));
+			members.remove(componentId);
 		}
 	}
 
@@ -315,12 +316,16 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 	}
 
 	public void addToRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
-		//System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" + conceptDetails.getConceptId());
+		if (isAdditionalLogging()) {
+			System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" + conceptDetails.getConceptId());
+		}
 		addToNestedSet(newRefsetMembers,conceptDetails,refset);
 	}
 
 	public void addToRefsetExclusion(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
-		//System.out.println("*** addToRefsetExclusion refset=" + refset + " concept=" + conceptDetails.getConceptId());
+		if (isAdditionalLogging()) {
+			System.out.println("*** addToRefsetExclusion refset=" + refset + " concept=" + conceptDetails.getConceptId());
+		}
 		addToNestedSet(newRefsetExclusion,conceptDetails,refset);		
 	}
 
@@ -639,14 +644,18 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 					sysTime = System.currentTimeMillis();
 				}
 				
-				//String conceptUuid = termFactory.getUids(conceptId.getConceptId()).iterator().next().toString();
-				//System.out.println("* concept " + conceptUuid + " (" + conceptId.getConceptId() + ")");
-				
+				if (isAdditionalLogging()) {
+					String conceptUuid = termFactory.getUids(conceptId.getConceptId()).iterator().next().toString();
+					System.out.println("* concept " + conceptUuid + " (" + conceptId.getConceptId() + ")");
+				}
+						
 				Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId(), concepts);
 				for (Integer parentId: parents) {
 					
-					//String parentUuid = termFactory.getUids(parentId).iterator().next().toString();					
-					//System.out.println("    parent " + parentUuid + " (" + parentId + ")");
+					if (isAdditionalLogging()) {
+						String parentUuid = termFactory.getUids(parentId).iterator().next().toString();					
+						System.out.println("    parent " + parentUuid + " (" + parentId + ")");
+					}			
 					
 					ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId,0,0,0);
 					if (!concepts.containsKey(parent.getConceptId())) {
@@ -740,5 +749,15 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
 	private boolean isIndividualType(int typeId) {
 		return ((typeId == this.includeIndividual) || (typeId == this.excludeIndividual));
+	}
+
+
+	public boolean isAdditionalLogging() {
+		return additionalLogging;
+	}
+
+
+	public void setAdditionalLogging(boolean additionalLogging) {
+		this.additionalLogging = additionalLogging;
 	}
 }
