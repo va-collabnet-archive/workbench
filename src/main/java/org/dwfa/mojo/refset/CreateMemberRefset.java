@@ -66,6 +66,12 @@ public class CreateMemberRefset extends AbstractMojo {
 	 */
 	private File changeSetOutputDirectory;
 
+	/**
+	 * @parameter
+	 * Generate additional log output (defaults to false)
+	 */
+	private boolean additionalLogging = false;
+	
     protected I_TermFactory termFactory;
 
 	/**
@@ -91,6 +97,7 @@ public class CreateMemberRefset extends AbstractMojo {
 			calc.setCommitSize(commitSize);
 			calc.setUseNonTxInterface(useNonTxInterface);
             calc.setAltIsA(altIsAConcept);
+            calc.setAdditionalLogging(additionalLogging);
 
 			if (specRefsets != null) {
 		        List<Integer> allowedRefsets = new ArrayList<Integer>();
