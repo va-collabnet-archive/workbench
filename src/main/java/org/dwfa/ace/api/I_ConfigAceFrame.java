@@ -179,6 +179,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public I_GetConceptData getHierarchySelection();
 
 	public void setHierarchySelection(I_GetConceptData hierarchySelection);
+	public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException;
 
 	public MasterWorker getWorker();
 
@@ -359,5 +360,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void closeFrame();
     
     public Set<TopToggleTypes> getHiddenTopToggles();
+    
+    public void setContext(I_GetConceptData context);
+    public I_GetConceptData getContext();
 
 }
