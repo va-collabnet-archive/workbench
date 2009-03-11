@@ -35,7 +35,6 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_Refse
       out.writeObject(measurementValuePopupItems);
    }
 
-   @SuppressWarnings("unchecked")
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {

@@ -8,6 +8,10 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public abstract class AceTableRenderer extends DefaultTableCellRenderer {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static Color IVORY = new Color(0xFFFFF0);
 	public static Color KAHAKI = new Color(0xF0E68C);
 	public static Color LEMON_CHIFFON = new Color(0xFFFACD);

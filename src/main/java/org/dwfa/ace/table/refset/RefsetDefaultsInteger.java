@@ -32,7 +32,6 @@ public class RefsetDefaultsInteger extends RefsetDefaults implements I_RefsetDef
       out.writeObject(integerPopupItems);
    }
 
-   @SuppressWarnings("unchecked")
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {

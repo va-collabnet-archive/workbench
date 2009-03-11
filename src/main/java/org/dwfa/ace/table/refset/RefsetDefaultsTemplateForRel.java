@@ -96,7 +96,6 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
 
      }
 
-     @SuppressWarnings("unchecked")
      private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {

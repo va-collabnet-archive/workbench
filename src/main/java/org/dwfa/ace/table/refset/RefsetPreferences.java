@@ -72,7 +72,6 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(stringPreferences);
     }
 
-    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {

@@ -41,7 +41,6 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
       out.writeObject(priorityPopupItems);
    }
 
-   @SuppressWarnings("unchecked")
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {

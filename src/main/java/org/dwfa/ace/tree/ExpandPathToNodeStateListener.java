@@ -53,7 +53,6 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 			tree.collapsePath(new TreePath(termRoot.getPath()));
 		}
 		for (I_GetConceptData child: ancestors) {
-			boolean found = false;
 			for (int i = 0; i < rootNode.getChildCount(); i++) {
 				DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) rootNode.getChildAt(i);
 				ConceptBeanForTree dbft = (ConceptBeanForTree) childNode.getUserObject();
@@ -65,7 +64,6 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 						tree.expandPath(lastPath);
 					}
 					rootNode = childNode;
-					found = true;
 					break;
 				}
 			}

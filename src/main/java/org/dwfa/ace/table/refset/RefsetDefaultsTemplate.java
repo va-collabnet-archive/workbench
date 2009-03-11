@@ -31,7 +31,6 @@ public class RefsetDefaultsTemplate extends RefsetDefaultsTemplateForRel impleme
        IntList.writeIntList(out, attributePopupIds);
     }
 
-    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
        int objDataVersion = in.readInt();
        if (objDataVersion == dataVersion) {

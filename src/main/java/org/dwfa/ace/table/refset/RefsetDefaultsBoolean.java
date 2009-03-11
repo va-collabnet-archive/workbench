@@ -26,7 +26,6 @@ public class RefsetDefaultsBoolean extends RefsetDefaults implements I_RefsetDef
       out.writeBoolean(defaultForBooleanRefset);
    }
 
-   @SuppressWarnings("unchecked")
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {

@@ -48,8 +48,7 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
         IntList.writeIntList(out, statusPopupIds);
     }
 
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultRefset = readConcept(in);

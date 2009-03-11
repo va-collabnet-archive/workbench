@@ -93,7 +93,6 @@ public class ImagePopupListener extends MouseAdapter {
 			this.field = field;
 		}
 
-		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent e) {
 			try {
 				ConceptBean sourceBean = ConceptBean.get(selectedObject

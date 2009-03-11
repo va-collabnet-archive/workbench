@@ -41,7 +41,6 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
       IntList.writeIntList(out, degreeOfSynonymyPopupIds);
    }
 
-   @SuppressWarnings("unchecked")
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {

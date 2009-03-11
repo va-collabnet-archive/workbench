@@ -14,7 +14,7 @@ import com.sleepycat.je.SecondaryKeyCreator;
 
 public class C1KeyForRelCreator implements SecondaryKeyCreator {
 	ThinRelVersionedBinding relBinding;
-	EntryBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+	EntryBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 	
 	public static class RelAndC1Id {
 		int relId;

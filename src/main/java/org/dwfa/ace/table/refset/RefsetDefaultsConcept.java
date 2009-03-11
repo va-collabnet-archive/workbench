@@ -31,7 +31,6 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements I_RefsetDef
       IntList.writeIntList(out, conceptPopupIds);
    }
 
-   @SuppressWarnings("unchecked")
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
       if (objDataVersion == dataVersion) {

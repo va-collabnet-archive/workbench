@@ -43,7 +43,6 @@ public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel impleme
        IntList.writeIntList(out, mapStatusPopupIds);
     }
 
-    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
        int objDataVersion = in.readInt();
        if (objDataVersion == dataVersion) {
