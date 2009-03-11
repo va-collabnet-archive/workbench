@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -50,6 +51,23 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
+
+	public I_GetConceptData getContext() {
+		return baseFrame.getContext();
+	}
+
+	public Set<TopToggleTypes> getHiddenTopToggles() {
+		return baseFrame.getHiddenTopToggles();
+	}
+
+	public void setContext(I_GetConceptData context) {
+		baseFrame.setContext(context);
+	}
+
+	public void setHierarchySelectionAndExpand(
+			I_GetConceptData hierarchySelection) throws IOException {
+		baseFrame.setHierarchySelectionAndExpand(hierarchySelection);
+	}
 
 	public void svnUpdateDatabase(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {

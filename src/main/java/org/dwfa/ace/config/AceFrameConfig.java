@@ -46,6 +46,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -54,8 +55,10 @@ import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.search.IsChildOf;
+import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -66,6 +69,7 @@ import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
@@ -83,13 +87,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 32;
+    private static final int dataVersion = 33;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
 
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(this);
 
     private boolean active = true;
 
@@ -232,6 +236,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     // 32
     private boolean isAdministrative = false;
+    
+    // 33
+    private Set<TopToggleTypes> hiddenTopToggles = new HashSet<TopToggleTypes>();
+    
+    //34
+    private I_GetConceptData context;
 
 
 	// transient
@@ -388,15 +398,33 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         // 32
         out.writeBoolean(isAdministrative);
+        
+        // 33
+        out.writeObject(hiddenTopToggles);
+        
+        // 34
+        IntList contextIntList = new IntList();
+        if (context != null) {
+            contextIntList.add(context.getConceptId());
+        }
+        IntList.writeIntList(out, contextIntList);
     }
 
-    @SuppressWarnings("unchecked")
+    public I_GetConceptData getContext() {
+		return context;
+	}
+
+	public void setContext(I_GetConceptData context) {
+		this.context = context;
+	}
+
+	@SuppressWarnings("unchecked")
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         commitEnabled = false;
         int objDataVersion = in.readInt();
         if (objDataVersion >= 1) {
             this.vetoSupport = new VetoableChangeSupport(this);
-            this.changeSupport = new PropertyChangeSupport(this);
+            this.changeSupport = new PropertyChangeSupportWithPropagationId(this);
             active = in.readBoolean();
             frameName = (String) in.readObject();
             sourceRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
@@ -683,6 +711,27 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
             	isAdministrative = false;
             }
+            
+            if (objDataVersion >= 33) {
+            	hiddenTopToggles = (Set<TopToggleTypes>) in.readObject();
+            } else {
+            	hiddenTopToggles = new HashSet<TopToggleTypes>();
+            }
+
+            if (objDataVersion >= 34) {
+            	IntList contextIntList = IntList.readIntListIgnoreMapErrors(in);
+            	if (contextIntList.size() != 1) {
+                   	context = null;
+            	}
+            	try {
+					context = LocalVersionedTerminology.get().getConcept(contextIntList.getListArray()[0]);
+				} catch (TerminologyException e) {
+					throw new ToIoException(e);
+				}
+            } else {
+            	context = null;
+            } 
+        
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -826,6 +875,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setViewPositions(java.util.Set)
      */
     public void setViewPositions(Set<I_Position> positions) {
+    	if (positions == this.viewPositions) {
+    		return;
+    	}
+    	if (positions != null) {
+    		if (this.viewPositions != null) {
+    			if (positions.equals(this.viewPositions)) {
+    				return;
+    			}
+    		}
+    	}
         this.viewPositions = positions;
         this.changeSupport.firePropertyChange("viewPositions", null, positions);
     }
@@ -946,6 +1005,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#addViewPosition(org.dwfa.ace.api.I_Position)
      */
     public void addViewPosition(I_Position p) {
+    	if (viewPositions.contains(p)) {
+    		return;
+    	}
         viewPositions.add(p);
         this.changeSupport.firePropertyChange("viewPositions", null, p);
     }
@@ -956,6 +1018,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#removeViewPosition(org.dwfa.ace.api.I_Position)
      */
     public void removeViewPosition(I_Position p) {
+    	if (viewPositions.contains(p) == false) {
+    		return;
+    	}
         viewPositions.remove(p);
         this.changeSupport.firePropertyChange("viewPositions", p, null);
     }
@@ -967,6 +1032,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *      org.dwfa.ace.api.I_Position)
      */
     public void replaceViewPosition(I_Position oldPosition, I_Position newPosition) {
+    	if (oldPosition.equals(newPosition)) {
+    		return;
+    	}
         this.viewPositions.remove(oldPosition);
         this.viewPositions.add(newPosition);
         this.changeSupport.firePropertyChange("viewPositions", oldPosition, newPosition);
@@ -1366,6 +1434,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.hierarchySelection = hierarchySelection;
         this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
     }
+
+	public void setHierarchySelectionAndExpand(
+			I_GetConceptData hierarchySelection) throws IOException {
+		setHierarchySelection(hierarchySelection);
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
+				try {
+					new ExpandPathToNodeStateListener(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this, 
+							getHierarchySelection());
+				} catch (IOException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			}});
+	}
 
     /*
      * (non-Javadoc)
@@ -1851,38 +1934,83 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void setAddressToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setAddressToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.ADDRESS);
+        }
     }
 
     public void setBuilderToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setBuilderToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.BUILDER);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.BUILDER);
+        }
     }
 
     public void setComponentToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setComponentToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.COMPONENT);
+        }
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
+        }
     }
 
     public void setHistoryToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setHistoryToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.HISTORY);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.HISTORY);
+        }
     }
 
     public void setInboxToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setInboxToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.INBOX);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.INBOX);
+        }
     }
 
     public void setPreferencesToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
+        }
     }
 
     public void setProgressToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setProgressToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.TREE_PROGRESS);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.TREE_PROGRESS);
+        }
     }
 
     public void setSubversionToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setSubversionToggleVisible(visible);
+        if (visible) {
+        	hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
+        } else {
+        	hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
+        }
     }
 
     public Set<EXT_TYPE> getEnabledConceptExtTypes() {
@@ -2099,4 +2227,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 			}});
 
 	}
+
+	public Set<TopToggleTypes> getHiddenTopToggles() {
+		return hiddenTopToggles;
+	}
+
+	public void setHiddenTopToggles(Set<TopToggleTypes> hiddenTopToggles) {
+		this.hiddenTopToggles = hiddenTopToggles;
+	}
+
 }
