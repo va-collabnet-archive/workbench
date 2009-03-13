@@ -23,6 +23,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import net.jini.config.ConfigurationException;
 
@@ -54,6 +55,7 @@ public class AceFrame extends ComponentFrame {
 		}
 
 		public void windowClosing(WindowEvent e) {
+
 		}
 
 		public void windowDeactivated(WindowEvent e) {
@@ -115,6 +117,7 @@ public class AceFrame extends ComponentFrame {
 			startupFolder = new File(configFile.getParentFile(), "startup");
 			executeStartupProcesses(worker, startupFolder);
 		}
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	}
 
 	private void executeStartupProcesses(MasterWorker worker, File startupFolder) {
@@ -418,6 +421,9 @@ public class AceFrame extends ComponentFrame {
 
 	@Override
 	public boolean okToClose() {
+		if (cdePanel.okToClose() == false) {
+			return false;
+		}
 		if (frameConfig.getMasterConfig() != null) {
 			if (frameConfig.getMasterConfig().aceFrames.size() > 1) {
 				if (frameConfig.getMasterConfig().aceFrames

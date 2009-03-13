@@ -3661,32 +3661,22 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	public boolean quit() {
 
 		if (editMode) {
-			if (uncommitted.size() > 0) {
-				AceLog.getAppLog().info("Uncommitted: " + uncommitted);
-				if (aceConfig != null) {
-					for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-						frameConfig.setCommitEnabled(true);
+			if (okToClose()) {
+				int option = JOptionPane.showConfirmDialog(this,
+						"Save profile before quitting?", "Save profile?",
+						JOptionPane.YES_NO_OPTION);
+				if (option == JOptionPane.YES_OPTION) {
+					try {
+						AceConfig.config.save();
+					} catch (IOException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+						return false;
 					}
 				}
-
-				JOptionPane
-						.showMessageDialog(
-								this,
-								"<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
+			} else {
 				return false;
 			}
 
-			int option = JOptionPane.showConfirmDialog(this,
-					"Save profile before quitting?", "Save profile?",
-					JOptionPane.YES_NO_OPTION);
-			if (option == JOptionPane.YES_OPTION) {
-				try {
-					AceConfig.config.save();
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-					return false;
-				}
-			}
 		}
 
 		if (runShutdownProcesses) {
@@ -3699,6 +3689,24 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			executeShutdownProcesses(shutdownFolder);
 		}
 
+		return true;
+	}
+
+	public boolean okToClose() {
+		if (uncommitted.size() > 0) {
+			AceLog.getAppLog().info("Uncommitted: " + uncommitted);
+			if (aceConfig != null) {
+				for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+					frameConfig.setCommitEnabled(true);
+				}
+			}
+
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
+			return false;
+		}
 		return true;
 	}
 
