@@ -231,11 +231,11 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		I_ConfigAceFrame config;
 
 		private CountDownLatch descLatch;
-		
+
 		Semaphore checkSemaphore;
 
-		public CheckAndProcessRegexMatch(CountDownLatch descLatch, Semaphore checkSemaphore,
-				Pattern p,
+		public CheckAndProcessRegexMatch(CountDownLatch descLatch,
+				Semaphore checkSemaphore, Pattern p,
 				Collection<I_DescriptionVersioned> matches,
 				I_DescriptionVersioned descV,
 				List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
@@ -281,16 +281,18 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 
 	}
-	public class ConDescRelBinding extends TupleBinding implements I_BindConDescRel {
-		
+
+	public class ConDescRelBinding extends TupleBinding implements
+			I_BindConDescRel {
+
 		private ConCoreBdb conPartBdb;
 
 		private DescCoreBdb descCoreBdb;
 
 		private I_StoreRelParts<Integer> relPartBdb;
 
-
-		public ConDescRelBinding(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
+		public ConDescRelBinding(Environment env, DatabaseConfig dbConfig)
+				throws DatabaseException {
 			super();
 			conPartBdb = new ConCoreBdb(env, dbConfig);
 			descCoreBdb = new DescCoreBdb(env, dbConfig);
@@ -462,7 +464,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					if (conceptBean.getRelOrigins() == null) {
 						to.writeInt(0);
 					} else {
-						to.writeInt(conceptBean.getRelOrigins()
+						to
+								.writeInt(conceptBean.getRelOrigins()
 										.getSetValues().length);
 						for (int i : conceptBean.getRelOrigins().getSetValues()) {
 							to.writeInt(i);
@@ -505,28 +508,33 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	protected static class DescriptionMap implements Callable<Boolean> {
-		
+
 		private short nextId = Short.MIN_VALUE;
 		private HashMap<String, Short> textMap = new HashMap<String, Short>();
 		private HashMap<Short, String> idMap = new HashMap<Short, String>();
 		private byte[] inputBytes;
-		
-		public DescriptionMap(List<I_DescriptionVersioned> descriptions) throws UnsupportedEncodingException, DataFormatException {
+
+		public DescriptionMap(List<I_DescriptionVersioned> descriptions)
+				throws UnsupportedEncodingException, DataFormatException {
 			super();
 			if (descriptions != null && descriptions.size() > 0) {
-				for (I_DescriptionVersioned desc: descriptions) {
-					for (I_DescriptionPart part: desc.getVersions()) {
+				for (I_DescriptionVersioned desc : descriptions) {
+					for (I_DescriptionPart part : desc.getVersions()) {
 						addToMap(part.getText());
 					}
 				}
 			}
 		}
-		public DescriptionMap(byte[] inputBytes) throws DataFormatException, UnsupportedEncodingException {
+
+		public DescriptionMap(byte[] inputBytes) throws DataFormatException,
+				UnsupportedEncodingException {
 			super();
 			this.inputBytes = inputBytes;
-			
+
 		}
-		public Boolean call() throws DataFormatException, UnsupportedEncodingException {
+
+		public Boolean call() throws DataFormatException,
+				UnsupportedEncodingException {
 			if (inputBytes == null) {
 				return true;
 			}
@@ -535,7 +543,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				if (inputBytes[i] == '\0') {
 					int length = i - startIndex;
 					byte[] textBytes = new byte[length];
-					System.arraycopy(inputBytes, startIndex, textBytes, 0, length);
+					System.arraycopy(inputBytes, startIndex, textBytes, 0,
+							length);
 					String text = new String(textBytes, "UTF-8");
 					addToMap(text);
 					startIndex = i + 1;
@@ -545,15 +554,19 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			return true;
 		}
 
-		public short getId(String text) throws UnsupportedEncodingException, DataFormatException {
+		public short getId(String text) throws UnsupportedEncodingException,
+				DataFormatException {
 			if (textMap.containsKey(text)) {
 				return textMap.get(text);
 			}
 			return addToMap(text);
 		}
-		private short addToMap(String text) throws UnsupportedEncodingException, DataFormatException {
+
+		private short addToMap(String text)
+				throws UnsupportedEncodingException, DataFormatException {
 			if (text == null) {
-				AceLog.getAppLog().info("Attempting to add null text to map. " + textMap);
+				AceLog.getAppLog().info(
+						"Attempting to add null text to map. " + textMap);
 			}
 			short returnId = nextId;
 			nextId++;
@@ -561,16 +574,20 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			idMap.put(returnId, text);
 			return returnId;
 		}
-		public String getText(short id) throws UnsupportedEncodingException, DataFormatException {
+
+		public String getText(short id) throws UnsupportedEncodingException,
+				DataFormatException {
 			return idMap.get(id);
 		}
-		
-		public byte[] getBytes() throws UnsupportedEncodingException, IOException {
+
+		public byte[] getBytes() throws UnsupportedEncodingException,
+				IOException {
 			if (textMap.size() == 0) {
 				return new byte[0];
 			}
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			for (short id = Short.MIN_VALUE; id < (Short.MIN_VALUE + idMap.size()); id++) {
+			for (short id = Short.MIN_VALUE; id < (Short.MIN_VALUE + idMap
+					.size()); id++) {
 				baos.write(idMap.get(id).getBytes("UTF-8"));
 				baos.write('\0');
 			}
@@ -578,29 +595,36 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 	}
 
-	protected static class DescriptionCompressionMap implements Callable<Boolean> {
-		
+	protected static class DescriptionCompressionMap implements
+			Callable<Boolean> {
+
 		private short nextId = Short.MIN_VALUE;
 		private HashMap<String, Short> textMap = new HashMap<String, Short>();
 		private HashMap<Short, String> idMap = new HashMap<Short, String>();
 		private byte[] inputBytes;
-		
-		public DescriptionCompressionMap(List<I_DescriptionVersioned> descriptions) throws UnsupportedEncodingException, DataFormatException {
+
+		public DescriptionCompressionMap(
+				List<I_DescriptionVersioned> descriptions)
+				throws UnsupportedEncodingException, DataFormatException {
 			super();
 			if (descriptions != null && descriptions.size() > 0) {
-				for (I_DescriptionVersioned desc: descriptions) {
-					for (I_DescriptionPart part: desc.getVersions()) {
+				for (I_DescriptionVersioned desc : descriptions) {
+					for (I_DescriptionPart part : desc.getVersions()) {
 						addToMap(part.getText());
 					}
 				}
 			}
 		}
-		public DescriptionCompressionMap(byte[] inputBytes) throws DataFormatException, UnsupportedEncodingException {
+
+		public DescriptionCompressionMap(byte[] inputBytes)
+				throws DataFormatException, UnsupportedEncodingException {
 			super();
 			this.inputBytes = inputBytes;
-			
+
 		}
-		public Boolean call() throws DataFormatException, UnsupportedEncodingException {
+
+		public Boolean call() throws DataFormatException,
+				UnsupportedEncodingException {
 			if (inputBytes == null) {
 				return true;
 			}
@@ -619,7 +643,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				if (outputBytes[i] == '\0') {
 					int length = i - startIndex;
 					byte[] textBytes = new byte[length];
-					System.arraycopy(outputBytes, startIndex, textBytes, 0, length);
+					System.arraycopy(outputBytes, startIndex, textBytes, 0,
+							length);
 					String text = new String(textBytes, "UTF-8");
 					addToMap(text);
 					startIndex = i + 1;
@@ -629,15 +654,19 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			return true;
 		}
 
-		public short getId(String text) throws UnsupportedEncodingException, DataFormatException {
+		public short getId(String text) throws UnsupportedEncodingException,
+				DataFormatException {
 			if (textMap.containsKey(text)) {
 				return textMap.get(text);
 			}
 			return addToMap(text);
 		}
-		private short addToMap(String text) throws UnsupportedEncodingException, DataFormatException {
+
+		private short addToMap(String text)
+				throws UnsupportedEncodingException, DataFormatException {
 			if (text == null) {
-				AceLog.getAppLog().info("Attempting to add null text to map. " + textMap);
+				AceLog.getAppLog().info(
+						"Attempting to add null text to map. " + textMap);
 			}
 			short returnId = nextId;
 			nextId++;
@@ -645,56 +674,63 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			idMap.put(returnId, text);
 			return returnId;
 		}
-		public String getText(short id) throws UnsupportedEncodingException, DataFormatException {
+
+		public String getText(short id) throws UnsupportedEncodingException,
+				DataFormatException {
 			return idMap.get(id);
 		}
-		
-		public byte[] getBytes() throws UnsupportedEncodingException, IOException {
+
+		public byte[] getBytes() throws UnsupportedEncodingException,
+				IOException {
 			if (textMap.size() == 0) {
 				return new byte[0];
 			}
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			for (short id = Short.MIN_VALUE; id < (Short.MIN_VALUE + idMap.size()); id++) {
+			for (short id = Short.MIN_VALUE; id < (Short.MIN_VALUE + idMap
+					.size()); id++) {
 				baos.write(idMap.get(id).getBytes("UTF-8"));
 				baos.write('\0');
 			}
 			ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
-			DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut, new Deflater(Deflater.BEST_COMPRESSION));
+			DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut,
+					new Deflater(Deflater.BEST_COMPRESSION));
 			dout.write(baos.toByteArray());
 			dout.close();
 			return compressedOut.toByteArray();
 		}
 	}
 
-	public class ConDescRelBindingWithDescCompression extends TupleBinding implements I_BindConDescRel {
-		   private ExecutorService exec = Executors.newFixedThreadPool(2);
+	public class ConDescRelBindingWithDescCompression extends TupleBinding
+			implements I_BindConDescRel {
+		private ExecutorService exec = Executors.newFixedThreadPool(2);
 
+		private ConCoreBdb conPartBdb;
 
-			private ConCoreBdb conPartBdb;
+		private DescCoreBdb descCoreBdb;
 
-			private DescCoreBdb descCoreBdb;
+		private I_StoreRelParts<Short> relPartBdb;
 
-			private I_StoreRelParts<Short> relPartBdb;
-
-
-			public ConDescRelBindingWithDescCompression(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
-				super();
-				conPartBdb = new ConCoreBdb(env, dbConfig);
-				descCoreBdb = new DescCoreBdb(env, dbConfig);
-				relPartBdb = new RelPartBdbEphMapShortKey(env, dbConfig);
-			}
+		public ConDescRelBindingWithDescCompression(Environment env,
+				DatabaseConfig dbConfig) throws DatabaseException {
+			super();
+			conPartBdb = new ConCoreBdb(env, dbConfig);
+			descCoreBdb = new DescCoreBdb(env, dbConfig);
+			relPartBdb = new RelPartBdbEphMapShortKey(env, dbConfig);
+		}
 
 		public ConceptBean entryToObject(TupleInput ti) {
 			throw new UnsupportedOperationException();
 		}
 
-		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) throws DataFormatException, IOException {
+		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean)
+				throws DataFormatException, IOException {
 			try {
 				synchronized (conceptBean) {
 					int descMapByteSize = ti.readInt();
 					byte[] descMapBytes = new byte[descMapByteSize];
 					ti.readFast(descMapBytes);
-					DescriptionCompressionMap descMap = new DescriptionCompressionMap(descMapBytes);
+					DescriptionCompressionMap descMap = new DescriptionCompressionMap(
+							descMapBytes);
 					Future<Boolean> descMapFuture = exec.submit(descMap);
 					int conceptNid = conceptBean.getConceptId();
 					int attributeParts = ti.readShort();
@@ -740,7 +776,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					} else {
 						conceptBean.setRelOrigins(new IntSet());
 					}
-					
+
 					int descCount = ti.readShort();
 					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
 							descCount);
@@ -755,8 +791,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							ThinDescPartCore descCore = descCoreBdb
 									.getDescPartCore(ti.readInt());
 							String text = descMap.getText(ti.readShort());
-							descV.addVersion(new ThinDescPartWithCoreDelegate(text,
-									descCore));
+							descV.addVersion(new ThinDescPartWithCoreDelegate(
+									text, descCore));
 						}
 					}
 					return conceptBean;
@@ -774,7 +810,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			try {
 				ConceptBean conceptBean = (ConceptBean) obj;
 				synchronized (conceptBean) {
-					DescriptionCompressionMap descMap = new DescriptionCompressionMap(conceptBean.descriptions);
+					DescriptionCompressionMap descMap = new DescriptionCompressionMap(
+							conceptBean.descriptions);
 					byte[] descMapBytes = descMap.getBytes();
 					to.writeInt(descMapBytes.length);
 					to.writeFast(descMapBytes);
@@ -799,7 +836,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							to.writeShort(rel.versionCount());
 							for (I_RelPart part : rel.getVersions()) {
 								try {
-									to.writeShort(relPartBdb.getRelPartId(part));
+									to
+											.writeShort(relPartBdb
+													.getRelPartId(part));
 								} catch (DatabaseException e) {
 									throw new RuntimeException(e);
 								}
@@ -828,7 +867,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 								try {
 									to.writeInt(descCoreBdb
 											.getDescPartCoreId(part));
-									to.writeShort(descMap.getId(part.getText()));
+									to
+											.writeShort(descMap.getId(part
+													.getText()));
 								} catch (DatabaseException e) {
 									throw new RuntimeException(e);
 								}
@@ -844,7 +885,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				throw new RuntimeException(e);
 			}
 		}
-		
+
 		public void close() throws DatabaseException {
 			if (conPartBdb != null) {
 				conPartBdb.close();
@@ -872,19 +913,19 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			}
 		}
 	}
-	
-	public class ConDescRelBindingWithDescMap extends TupleBinding implements I_BindConDescRel {
-		   private ExecutorService exec = Executors.newFixedThreadPool(2);
 
+	public class ConDescRelBindingWithDescMap extends TupleBinding implements
+			I_BindConDescRel {
+		private ExecutorService exec = Executors.newFixedThreadPool(2);
 
-			private ConCoreBdb conPartBdb;
+		private ConCoreBdb conPartBdb;
 
-			private DescCoreBdb descCoreBdb;
+		private DescCoreBdb descCoreBdb;
 
-			private I_StoreRelParts<Short> relPartBdb;
+		private I_StoreRelParts<Short> relPartBdb;
 
-
-		public ConDescRelBindingWithDescMap(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
+		public ConDescRelBindingWithDescMap(Environment env,
+				DatabaseConfig dbConfig) throws DatabaseException {
 			super();
 			conPartBdb = new ConCoreBdb(env, dbConfig);
 			descCoreBdb = new DescCoreBdb(env, dbConfig);
@@ -895,7 +936,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			throw new UnsupportedOperationException();
 		}
 
-		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) throws DataFormatException, IOException {
+		public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean)
+				throws DataFormatException, IOException {
 			try {
 				synchronized (conceptBean) {
 					int descMapByteSize = ti.readInt();
@@ -947,7 +989,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					} else {
 						conceptBean.setRelOrigins(new IntSet());
 					}
-					
+
 					int descCount = ti.readShort();
 					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
 							descCount);
@@ -962,8 +1004,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							ThinDescPartCore descCore = descCoreBdb
 									.getDescPartCore(ti.readInt());
 							String text = descMap.getText(ti.readShort());
-							descV.addVersion(new ThinDescPartWithCoreDelegate(text,
-									descCore));
+							descV.addVersion(new ThinDescPartWithCoreDelegate(
+									text, descCore));
 						}
 					}
 					return conceptBean;
@@ -976,115 +1018,121 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				throw new RuntimeException(e);
 			}
 		}
-	public void objectToEntry(Object obj, TupleOutput to) {
-		try {
-			ConceptBean conceptBean = (ConceptBean) obj;
-			synchronized (conceptBean) {
-				DescriptionMap descMap = new DescriptionMap(conceptBean.descriptions);
-				byte[] descMapBytes = descMap.getBytes();
-				to.writeInt(descMapBytes.length);
-				to.writeFast(descMapBytes);
-				if (conceptBean.conceptAttributes == null) {
-					to.writeShort(0);
-				} else {
-					to.writeShort(conceptBean.conceptAttributes
-							.versionCount());
-					for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes
-							.getVersions()) {
-						to.writeInt(conPartBdb.getConPartId(conAttrPart));
-					}
-				}
-				if ((conceptBean.sourceRels == null)
-						|| (conceptBean.sourceRels.size() == 0)) {
-					to.writeInt(0);
-				} else {
-					to.writeInt(conceptBean.sourceRels.size());
-					for (I_RelVersioned rel : conceptBean.sourceRels) {
-						to.writeInt(rel.getRelId());
-						to.writeInt(rel.getC2Id());
-						to.writeShort(rel.versionCount());
-						for (I_RelPart part : rel.getVersions()) {
-							try {
-								to.writeShort(relPartBdb.getRelPartId(part));
-							} catch (DatabaseException e) {
-								throw new RuntimeException(e);
-							}
-						}
-					}
-				}
-				if (conceptBean.getRelOrigins() == null) {
-					to.writeInt(0);
-				} else {
-					to
-							.writeInt(conceptBean.getRelOrigins()
-									.getSetValues().length);
-					for (int i : conceptBean.getRelOrigins().getSetValues()) {
-						to.writeInt(i);
-					}
-				}
-				if (conceptBean.descriptions == null) {
-					to.writeShort(0);
-				} else {
-					int descSize = conceptBean.getDescriptions().size();
-					to.writeShort(descSize);
-					for (I_DescriptionVersioned desc : conceptBean.descriptions) {
-						to.writeInt(desc.getDescId());
-						to.writeShort(desc.versionCount());
-						for (I_DescriptionPart part : desc.getVersions()) {
-							try {
-								to.writeInt(descCoreBdb
-										.getDescPartCoreId(part));
-								to.writeShort(descMap.getId(part.getText()));
-							} catch (DatabaseException e) {
-								throw new RuntimeException(e);
-							}
-						}
-					}
-				}
-			}
-		} catch (DatabaseException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (DataFormatException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	public void close() throws DatabaseException {
-		if (conPartBdb != null) {
-			conPartBdb.close();
-			conPartBdb = null;
-		}
-		if (descCoreBdb != null) {
-			descCoreBdb.close();
-			descCoreBdb = null;
-		}
-		if (relPartBdb != null) {
-			relPartBdb.close();
-			relPartBdb = null;
-		}
-	}
 
-	public void sync() throws DatabaseException {
-		if (conPartBdb != null) {
-			conPartBdb.sync();
+		public void objectToEntry(Object obj, TupleOutput to) {
+			try {
+				ConceptBean conceptBean = (ConceptBean) obj;
+				synchronized (conceptBean) {
+					DescriptionMap descMap = new DescriptionMap(
+							conceptBean.descriptions);
+					byte[] descMapBytes = descMap.getBytes();
+					to.writeInt(descMapBytes.length);
+					to.writeFast(descMapBytes);
+					if (conceptBean.conceptAttributes == null) {
+						to.writeShort(0);
+					} else {
+						to.writeShort(conceptBean.conceptAttributes
+								.versionCount());
+						for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes
+								.getVersions()) {
+							to.writeInt(conPartBdb.getConPartId(conAttrPart));
+						}
+					}
+					if ((conceptBean.sourceRels == null)
+							|| (conceptBean.sourceRels.size() == 0)) {
+						to.writeInt(0);
+					} else {
+						to.writeInt(conceptBean.sourceRels.size());
+						for (I_RelVersioned rel : conceptBean.sourceRels) {
+							to.writeInt(rel.getRelId());
+							to.writeInt(rel.getC2Id());
+							to.writeShort(rel.versionCount());
+							for (I_RelPart part : rel.getVersions()) {
+								try {
+									to
+											.writeShort(relPartBdb
+													.getRelPartId(part));
+								} catch (DatabaseException e) {
+									throw new RuntimeException(e);
+								}
+							}
+						}
+					}
+					if (conceptBean.getRelOrigins() == null) {
+						to.writeInt(0);
+					} else {
+						to
+								.writeInt(conceptBean.getRelOrigins()
+										.getSetValues().length);
+						for (int i : conceptBean.getRelOrigins().getSetValues()) {
+							to.writeInt(i);
+						}
+					}
+					if (conceptBean.descriptions == null) {
+						to.writeShort(0);
+					} else {
+						int descSize = conceptBean.getDescriptions().size();
+						to.writeShort(descSize);
+						for (I_DescriptionVersioned desc : conceptBean.descriptions) {
+							to.writeInt(desc.getDescId());
+							to.writeShort(desc.versionCount());
+							for (I_DescriptionPart part : desc.getVersions()) {
+								try {
+									to.writeInt(descCoreBdb
+											.getDescPartCoreId(part));
+									to
+											.writeShort(descMap.getId(part
+													.getText()));
+								} catch (DatabaseException e) {
+									throw new RuntimeException(e);
+								}
+							}
+						}
+					}
+				}
+			} catch (DatabaseException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (DataFormatException e) {
+				throw new RuntimeException(e);
+			}
 		}
-		if (descCoreBdb != null) {
-			descCoreBdb.sync();
+
+		public void close() throws DatabaseException {
+			if (conPartBdb != null) {
+				conPartBdb.close();
+				conPartBdb = null;
+			}
+			if (descCoreBdb != null) {
+				descCoreBdb.close();
+				descCoreBdb = null;
+			}
+			if (relPartBdb != null) {
+				relPartBdb.close();
+				relPartBdb = null;
+			}
 		}
-		if (relPartBdb != null) {
-			relPartBdb.sync();
+
+		public void sync() throws DatabaseException {
+			if (conPartBdb != null) {
+				conPartBdb.sync();
+			}
+			if (descCoreBdb != null) {
+				descCoreBdb.sync();
+			}
+			if (relPartBdb != null) {
+				relPartBdb.sync();
+			}
 		}
 	}
-}
 
 	private I_BindConDescRel conDescRelBinding;
-	
+
 	private TupleBinding intBinder = TupleBinding
 			.getPrimitiveBinding(Integer.class);
 
 	private Database conDescRelDb;
-
 
 	private File luceneDir;
 
@@ -1093,21 +1141,23 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	private IndexSearcher luceneSearcher = null;
 
 	public ConDescRelBdb(Environment env, DatabaseConfig dbConfig,
-			File luceneDir, I_StoreIdentifiers identifierDb, DatabaseSetupConfig.CORE_DB_TYPE type) throws DatabaseException {
+			File luceneDir, I_StoreIdentifiers identifierDb,
+			DatabaseSetupConfig.CORE_DB_TYPE type) throws DatabaseException {
 		super();
 		this.luceneDir = luceneDir;
-		
+
 		switch (type) {
 		case CON_COMPDESC_REL:
-			conDescRelBinding = new ConDescRelBindingWithDescCompression(env, dbConfig);
+			conDescRelBinding = new ConDescRelBindingWithDescCompression(env,
+					dbConfig);
 			break;
 		case CON_DESC_REL:
 			conDescRelBinding = new ConDescRelBinding(env, dbConfig);
 			break;
-		case CON_DESCMAP_REL: 
+		case CON_DESCMAP_REL:
 			conDescRelBinding = new ConDescRelBindingWithDescMap(env, dbConfig);
 			break;
-			
+
 		default:
 			throw new DatabaseException("Unsupported CORE_DB_TYPE: " + type);
 		}
@@ -1123,7 +1173,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#writeConceptAttributes(org.dwfa.ace.api.I_ConceptAttributeVersioned)
+	 * @see
+	 * org.dwfa.vodb.impl.I_StoreConceptAttributes#writeConceptAttributes(org
+	 * .dwfa.ace.api.I_ConceptAttributeVersioned)
 	 */
 	public void writeConceptAttributes(
 			I_ConceptAttributeVersioned conceptAttributes)
@@ -1168,7 +1220,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptAttributes(int)
+	 * @see
+	 * org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptAttributes(int)
 	 */
 	public I_ConceptAttributeVersioned getConceptAttributes(int conceptId)
 			throws IOException {
@@ -1188,7 +1241,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#iterateConceptAttributeEntries(org.dwfa.vodb.types.I_ProcessConceptAttributeEntries)
+	 * @see
+	 * org.dwfa.vodb.impl.I_StoreConceptAttributes#iterateConceptAttributeEntries
+	 * (org.dwfa.vodb.types.I_ProcessConceptAttributeEntries)
 	 */
 	public void iterateConceptAttributeEntries(
 			I_ProcessConceptAttributeEntries processor) throws Exception {
@@ -1577,6 +1632,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	private Integer descCount = null;
+
 	public int countDescriptions() throws DatabaseException, IOException {
 		if (descCount == null) {
 			int count = 0;
@@ -1595,58 +1651,65 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			CountDownLatch latch, List<I_TestSearchResults> checkList,
 			I_ConfigAceFrame config, LuceneProgressUpdator updater)
 			throws DatabaseException, IOException, ParseException {
-		Stopwatch timer = null;
-		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-			timer = new Stopwatch();
-			timer.start();
-		}
-		if (luceneDir.exists() == false) {
-			updater
-					.setProgressInfo("Making lucene index -- this may take a while...");
-			createLuceneDescriptionIndex();
-		}
-		updater.setIndeterminate(true);
-		if (luceneSearcher == null) {
-			updater.setProgressInfo("Opening search index...");
-			luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
-		}
-		updater.setProgressInfo("Starting lucene query...");
-		long startTime = System.currentTimeMillis();
-		Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
-		updater.setProgressInfo("Query complete in "
-				+ Long.toString(System.currentTimeMillis() - startTime)
-				+ " ms.");
-		Hits hits = luceneSearcher.search(q);
-		updater.setProgressInfo("Query complete in "
-				+ Long.toString(System.currentTimeMillis() - startTime)
-				+ " ms. Hits: " + hits.length());
-
-		CountDownLatch hitLatch = new CountDownLatch(hits.length());
-		updater.setHits(hits.length());
-		updater.setIndeterminate(false);
-
-		for (int i = 0; i < hits.length(); i++) {
-			Document doc = hits.doc(i);
-			float score = hits.score(i);
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
+		Stopwatch timer = new Stopwatch();;
+		timer.start();
+		try {
+			Query q = new QueryParser("desc", new StandardAnalyzer())
+				.parse(query);
+			if (luceneDir.exists() == false) {
+				updater
+						.setProgressInfo("Making lucene index -- this may take a while...");
+				createLuceneDescriptionIndex();
 			}
+			updater.setIndeterminate(true);
+			if (luceneSearcher == null) {
+				updater.setProgressInfo("Opening search index...");
+				luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
+			}
+			updater.setProgressInfo("Starting lucene query...");
+			long startTime = System.currentTimeMillis();
+			updater.setProgressInfo("Query complete in "
+					+ Long.toString(System.currentTimeMillis() - startTime)
+					+ " ms.");
+			Hits hits = luceneSearcher.search(q);
+			updater.setProgressInfo("Query complete in "
+					+ Long.toString(System.currentTimeMillis() - startTime)
+					+ " ms. Hits: " + hits.length());
 
-			ACE.threadPool.execute(new CheckAndProcessLuceneMatch(hitLatch,
-					updater, doc, score, matches, checkList, config, this));
-		}
-		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-			if (tracker.continueWork()) {
-				AceLog.getAppLog().info(
-						"Search time 1: " + timer.getElapsedTime());
-			} else {
-				AceLog.getAppLog().info(
-						"Search 1 Canceled. Elapsed time: "
-								+ timer.getElapsedTime());
+			CountDownLatch hitLatch = new CountDownLatch(hits.length());
+			updater.setHits(hits.length());
+			updater.setIndeterminate(false);
+
+			for (int i = 0; i < hits.length(); i++) {
+				Document doc = hits.doc(i);
+				float score = hits.score(i);
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
+				}
+
+				ACE.threadPool.execute(new CheckAndProcessLuceneMatch(hitLatch,
+						updater, doc, score, matches, checkList, config, this));
+			}
+			if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+				if (tracker.continueWork()) {
+					AceLog.getAppLog().info(
+							"Search time 1: " + timer.getElapsedTime());
+				} else {
+					AceLog.getAppLog().info(
+							"Search 1 Canceled. Elapsed time: "
+									+ timer.getElapsedTime());
+				}
 			}
 			timer.stop();
+			return hitLatch;
+		} catch (ParseException pe) {
+			AceLog.getAppLog().alertAndLogException(pe);
+			timer.stop();
+			updater.setProgressInfo("Query malformed: " + query);
+			updater.setIndeterminate(false);
+			updater.setHits(0);
+			return new CountDownLatch(0);
 		}
-		return hitLatch;
 	}
 
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
@@ -1664,12 +1727,13 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			try {
 				checkSemaphore.acquire();
 			} catch (InterruptedException e) {
-				AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+				AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
+						e);
 			}
 			if (tracker.continueWork()) {
 				I_DescriptionVersioned descV = descItr.next();
-				ACE.threadPool.execute(new CheckAndProcessRegexMatch(latch, checkSemaphore,
-						p, matches, descV, checkList, config));
+				ACE.threadPool.execute(new CheckAndProcessRegexMatch(latch,
+						checkSemaphore, p, matches, descV, checkList, config));
 			} else {
 				while (latch.getCount() > 0) {
 					latch.countDown();
@@ -1718,9 +1782,10 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				addIdsToIndex(doc, identifierDb.getId(descV.getDescId()));
 				addIdsToIndex(doc, identifierDb.getId(descV.getConceptId()));
 			} catch (ToIoException e) {
-				AceLog.getAppLog().severe("error indexing description: " + descV);
+				AceLog.getAppLog().severe(
+						"error indexing description: " + descV);
 				AceLog.getAppLog().alertAndLogException(e);
-				
+
 			}
 
 			String lastDesc = null;
@@ -1953,8 +2018,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				totalRels++;
 				I_RelVersioned vrel = relItr.next();
 				if (relsToIgnore.contains(vrel.getRelId()) == false) {
-					boolean addRetired = vrel.addRetiredRec(releases.getSetValues(),
-							retiredNid);
+					boolean addRetired = vrel.addRetiredRec(releases
+							.getSetValues(), retiredNid);
 					boolean removeRedundant = vrel.removeRedundantRecs();
 					if (addRetired && removeRedundant) {
 						changed = true;
@@ -1996,7 +2061,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(cb.getConceptId(), key);
 		try {
-			if (conDescRelDb.get(BdbEnv.transaction, key, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (conDescRelDb.get(BdbEnv.transaction, key, value,
+					LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(value.getData());
 				conDescRelBinding.populateBean(ti, cb);
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
