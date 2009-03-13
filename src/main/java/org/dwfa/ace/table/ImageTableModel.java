@@ -198,54 +198,56 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 	}
 
 	public class ReferencedConceptsSwingWorker extends
-			SwingWorker<Map<Integer, ConceptBean>> {
+			SwingWorker<Boolean> {
 		private boolean stopWork = false;
-
+		Map<Integer, ConceptBean> concepts;
 		@Override
-		protected Map<Integer, ConceptBean> construct() throws Exception {
+		protected Boolean construct() throws Exception {
 			getProgress().setActive(true);
-			Map<Integer, ConceptBean> concepts = new HashMap<Integer, ConceptBean>();
+			concepts = new HashMap<Integer, ConceptBean>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
                 fetchSet = new HashSet<Integer>(conceptsToFetch);
             }
             for (Integer id : fetchSet) {
  				if (stopWork) {
-					break;
+					return false;
 				}
 				ConceptBean b = ConceptBean.get(id);
 				b.getDescriptions();
 				concepts.put(id, b);
 
 			}
-			return concepts;
+			return true;
 		}
 
 		@Override
 		protected void finished() {
 			super.finished();
-			if (getProgress() != null) {
-				getProgress().getProgressBar().setIndeterminate(false);
-				if (conceptsToFetch.size() == 0) {
-					getProgress().getProgressBar().setValue(1);
-				} else {
-					getProgress().getProgressBar().setValue(conceptsToFetch.size());
-				}
-			}
-			if (stopWork) {
-				return;
-			}
 			try {
-				referencedConcepts = get();
+				if (get()) {
+					if (stopWork) {
+						return;
+					}
+					if (getProgress() != null) {
+						getProgress().getProgressBar().setIndeterminate(false);
+						if (conceptsToFetch.size() == 0) {
+							getProgress().getProgressBar().setValue(1);
+						} else {
+							getProgress().getProgressBar().setValue(conceptsToFetch.size());
+						}
+					}
+					referencedConcepts = concepts;
+					fireTableDataChanged();
+					if (getProgress() != null) {
+						getProgress().setProgressInfo("   " + getRowCount() + "   ");
+						getProgress().setActive(false);
+					}
+				}
 			} catch (InterruptedException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
-			}
-			fireTableDataChanged();
-			if (getProgress() != null) {
-				getProgress().setProgressInfo("   " + getRowCount() + "   ");
-				getProgress().setActive(false);
 			}
 
 		}
@@ -271,8 +273,6 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			if (refConWorker != null) {
 				refConWorker.stop();
 			}
-			conceptsToFetch.clear();
-			referencedConcepts.clear();
 			if (cb == null) {
 				return 0;
 			}
@@ -528,13 +528,15 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 			getProgress().getProgressBar().setIndeterminate(true);
 		}
 		tableConcept = null;
-		fireTableDataChanged();
 		if (tableChangeWorker != null) {
 			tableChangeWorker.stop();
 		}
+		conceptsToFetch.clear();
+		referencedConcepts.clear();
 		tableChangeWorker = new TableChangedSwingWorker((ConceptBean) evt
 				.getNewValue());
 		tableChangeWorker.start();
+		fireTableDataChanged();
 	}
 
 	public IMAGE_FIELD[] getColumnEnums() {

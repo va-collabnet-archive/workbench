@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
@@ -82,58 +83,60 @@ public class IdTableModel extends AbstractTableModel implements
 
 	private TableChangedSwingWorker tableChangeWorker;
 
-	private ReferencedConceptsSwingWorker refConWorker;
-
 	private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
 	private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 
 	public class ReferencedConceptsSwingWorker extends
-			SwingWorker<Map<Integer, ConceptBean>> {
+			SwingWorker<Boolean> {
 		private boolean stopWork = false;
-
+		
+		Map<Integer, ConceptBean> concepts;
+		
 		@Override
-		protected Map<Integer, ConceptBean> construct() throws Exception {
+		protected Boolean construct() throws Exception {
 			getProgress().setActive(true);
-			Map<Integer, ConceptBean> concepts = new HashMap<Integer, ConceptBean>();
+			concepts = new HashMap<Integer, ConceptBean>();
 			for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
 				if (stopWork) {
-					break;
+					return false;
 				}
 				ConceptBean b = ConceptBean.get(id);
 				b.getDescriptions();
 				concepts.put(id, b);
 
 			}
-			return concepts;
+			return true;
 		}
 
 		@Override
 		protected void finished() {
 			super.finished();
-			if (getProgress() != null) {
-				getProgress().getProgressBar().setIndeterminate(false);
-				if (conceptsToFetch.size() == 0) {
-					getProgress().getProgressBar().setValue(1);
-				} else {
-					getProgress().getProgressBar().setValue(
-							conceptsToFetch.size());
-				}
-			}
-			if (stopWork) {
-				return;
-			}
 			try {
-				referencedConcepts = get();
+				if (get()) {
+					if (stopWork) {
+						return;
+					}
+					if (getProgress() != null) {
+						getProgress().getProgressBar().setIndeterminate(false);
+						if (conceptsToFetch.size() == 0) {
+							getProgress().getProgressBar().setValue(1);
+						} else {
+							getProgress().getProgressBar().setValue(
+									conceptsToFetch.size());
+						}
+					}
+					referencedConcepts = concepts;
+					fireTableDataChanged();
+					if (getProgress() != null) {
+						getProgress().setProgressInfo("   " + getRowCount() + "   ");
+						getProgress().setActive(false);
+					}
+				}
 			} catch (InterruptedException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
-			}
-			fireTableDataChanged();
-			if (getProgress() != null) {
-				getProgress().setProgressInfo("   " + getRowCount() + "   ");
-				getProgress().setActive(false);
 			}
 
 		}
@@ -141,73 +144,82 @@ public class IdTableModel extends AbstractTableModel implements
 		public void stop() {
 			stopWork = true;
 		}
-
+		public String toString() {
+			return "ReferencedConceptsSwingWorker stopWork: " + stopWork + " concepts: " + concepts;
+		}
 	}
 
-	public class TableChangedSwingWorker extends SwingWorker<Object> {
+	public class TableChangedSwingWorker extends SwingWorker<Boolean> {
 		I_AmTermComponent tc;
 
-		private boolean stopWork = false;
+		private boolean workStopped = false;
 
+		ReferencedConceptsSwingWorker refConWorker;
+		
 		public TableChangedSwingWorker(I_AmTermComponent tc) {
 			super();
 			this.tc = tc;
 		}
 
 		@Override
-		protected Integer construct() throws Exception {
-			if (refConWorker != null) {
-				refConWorker.stop();
-			}
-			conceptsToFetch.clear();
-			referencedConcepts.clear();
+		protected Boolean construct() throws Exception {
 			if (tc == null) {
-				return 0;
+				return false;
 			}
 			int nid = getNidFromTermComponent(tc);
 			
 			I_IdVersioned id = LocalVersionedTerminology.get().getId(nid);
 			for (I_IdPart part : id.getVersions()) {
+				if (workStopped) {
+					return false;
+				}
 				conceptsToFetch.add(part.getIdStatus());
 				conceptsToFetch.add(part.getPathId());
 			}
 
+			if (workStopped) {
+				return false;
+			}
 			refConWorker = new ReferencedConceptsSwingWorker();
 			refConWorker.start();
-			return null;
+			return true;
 		}
 
 
 		@Override
 		protected void finished() {
 			super.finished();
-			if (getProgress() != null) {
-				getProgress().getProgressBar().setIndeterminate(false);
-				if (conceptsToFetch.size() == 0) {
-					getProgress().getProgressBar().setValue(1);
-					getProgress().getProgressBar().setMaximum(1);
-				} else {
-					getProgress().getProgressBar().setValue(1);
-					getProgress().getProgressBar().setMaximum(
-							conceptsToFetch.size());
-				}
-			}
-			if (stopWork) {
-				return;
-			}
 			try {
+				if (getProgress() != null) {
+					getProgress().getProgressBar().setIndeterminate(false);
+					if (conceptsToFetch.size() == 0) {
+						getProgress().getProgressBar().setValue(1);
+						getProgress().getProgressBar().setMaximum(1);
+					} else {
+						getProgress().getProgressBar().setValue(1);
+						getProgress().getProgressBar().setMaximum(
+								conceptsToFetch.size());
+					}
+				}
 				get();
+				fireTableDataChanged();
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
-			fireTableDataChanged();
-
 		}
 
 		public void stop() {
-			stopWork = true;
+			workStopped = true;
+			if (refConWorker != null) {
+				refConWorker.stop();
+			}
+		}
+		
+		public String toString() {
+			return "TableChangedSwingWorker: " + tc + " workStopped: " + workStopped + "\n" +
+			refConWorker;
 		}
 	}
 
@@ -281,19 +293,22 @@ public class IdTableModel extends AbstractTableModel implements
 
 	public void propertyChange(PropertyChangeEvent evt) {
 		allTuples = null;
+		if (tableChangeWorker != null) {
+			tableChangeWorker.stop();
+		}
+		conceptsToFetch.clear();
+		referencedConcepts.clear();
 		if (getProgress() != null) {
 			getProgress().setVisible(true);
 			getProgress().getProgressBar().setValue(0);
 			getProgress().getProgressBar().setIndeterminate(true);
 		}
-		fireTableDataChanged();
-		if (tableChangeWorker != null) {
-			tableChangeWorker.stop();
-		}
 		tableChangeWorker = new TableChangedSwingWorker((I_AmTermComponent) evt
 				.getNewValue());
 		tableChangeWorker.start();
+		fireTableDataChanged();
 	}
+
 	public String getColumnName(int col) {
 		return columns[col].getColumnName();
 	}
@@ -330,7 +345,7 @@ public class IdTableModel extends AbstractTableModel implements
 		return allTuples.size();
 	}
 	private String getPrefText(int id) throws IOException {
-		ConceptBean cb = getReferencedConcepts().get(id);
+		ConceptBean cb = referencedConcepts.get(id);
 		I_DescriptionTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
 		if (statusDesc != null) {
 			String text = statusDesc.getText();
@@ -354,7 +369,7 @@ public class IdTableModel extends AbstractTableModel implements
 				return new StringWithIdTuple(Integer.toString(idTuple
 						.getNativeId()), idTuple);
 			case STATUS:
-				if (getReferencedConcepts().containsKey(idTuple.getIdStatus())) {
+				if (referencedConcepts.containsKey(idTuple.getIdStatus())) {
 					return new StringWithIdTuple(getPrefText(idTuple.getIdStatus()), idTuple);
 				}
 				return new StringWithIdTuple(Integer.toString(idTuple
@@ -367,17 +382,10 @@ public class IdTableModel extends AbstractTableModel implements
 					return new StringWithIdTuple(ThinVersionHelper
 							.uncommittedHtml(), idTuple);
 				}
-				new ThinVersionHelper();
-				AceLog.getAppLog().info("ID tuple version: " + idTuple.getVersion());
-				AceLog.getAppLog().info("ID tuple time: " + ThinVersionHelper.convert(idTuple.getVersion()));
-				AceLog.getAppLog().info("ID tuple formatted: " + ThinVersionHelper.format(idTuple
-						.getVersion()));
-				
-				
 				return new StringWithIdTuple(ThinVersionHelper.format(idTuple
 						.getVersion()), idTuple);
 			case PATH:
-				if (getReferencedConcepts().containsKey(idTuple.getPathId())) {
+				if (referencedConcepts.containsKey(idTuple.getPathId())) {
 					return new StringWithIdTuple(getPrefText(idTuple.getPathId()), idTuple);
 				}
 				return new StringWithIdTuple(Integer.toString(idTuple
@@ -388,6 +396,7 @@ public class IdTableModel extends AbstractTableModel implements
 		}
 		return null;
 	}
+	
 	
 	public Class<?> getColumnClass(int c) {
 		switch (columns[c]) {
@@ -426,9 +435,7 @@ public class IdTableModel extends AbstractTableModel implements
 	public void setProgress(SmallProgressPanel progress) {
 		this.progress = progress;
 	}
-	public Map<Integer, ConceptBean> getReferencedConcepts() {
-		return referencedConcepts;
-	}
+
 	public class PopupListener extends MouseAdapter {
 		private class ChangeActionListener implements ActionListener {
 
@@ -467,7 +474,7 @@ public class IdTableModel extends AbstractTableModel implements
 						newPart.setIdStatus(AceConfig.getVodb()
 								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
 										.getUids()));
-						getReferencedConcepts().put(newPart.getIdStatus(), 
+						referencedConcepts.put(newPart.getIdStatus(), 
 								ConceptBean.get(newPart.getIdStatus()));
 						selectedObject.getTuple().getIdVersioned()
 								.getVersions().add(newPart);

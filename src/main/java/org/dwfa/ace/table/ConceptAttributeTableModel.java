@@ -85,56 +85,61 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 	Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
 
 	public class ReferencedConceptsSwingWorker extends
-			SwingWorker<Map<Integer, ConceptBean>> {
+			SwingWorker<Boolean> {
 		private boolean stopWork = false;
+		private HashMap<Integer, ConceptBean> concepts;
 
 		@Override
-		protected Map<Integer, ConceptBean> construct() throws Exception {
+		protected Boolean construct() throws Exception {
 			getProgress().setActive(true);
-			Map<Integer, ConceptBean> concepts = new HashMap<Integer, ConceptBean>();
+			concepts = new HashMap<Integer, ConceptBean>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
                 fetchSet = new HashSet<Integer>(conceptsToFetch);
             }
             for (Integer id : fetchSet) {
  				if (stopWork) {
-					break;
+					return false;
 				}
 				ConceptBean b = ConceptBean.get(id);
 				b.getDescriptions();
 				concepts.put(id, b);
 			}
-			return concepts;
+			if (stopWork) {
+				return false;
+			}
+			return true;
 		}
 
 		@Override
 		protected void finished() {
 			super.finished();
-			if (getProgress() != null) {
-				getProgress().getProgressBar().setIndeterminate(false);
-				if (conceptsToFetch.size() == 0) {
-					getProgress().getProgressBar().setValue(1);
-				} else {
-					getProgress().getProgressBar().setValue(
-							conceptsToFetch.size());
-				}
-			}
-			if (stopWork) {
-				return;
-			}
 			try {
-				referencedConcepts = get();
+				if (get()) {
+					if (stopWork) {
+						return;
+					}
+					if (getProgress() != null) {
+						getProgress().getProgressBar().setIndeterminate(false);
+						if (conceptsToFetch.size() == 0) {
+							getProgress().getProgressBar().setValue(1);
+						} else {
+							getProgress().getProgressBar().setValue(
+									conceptsToFetch.size());
+						}
+					}
+					referencedConcepts = concepts;
+					fireTableDataChanged();
+					if (getProgress() != null) {
+						getProgress().setProgressInfo("   " + getRowCount() + "   ");
+						getProgress().setActive(false);
+					}
+				}
 			} catch (InterruptedException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
-			fireTableDataChanged();
-			if (getProgress() != null) {
-				getProgress().setProgressInfo("   " + getRowCount() + "   ");
-				getProgress().setActive(false);
-			}
-
 		}
 
 		public void stop() {
@@ -143,7 +148,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 
 	}
 
-	public class TableChangedSwingWorker extends SwingWorker<Object> {
+	public class TableChangedSwingWorker extends SwingWorker<Boolean> {
 		I_GetConceptData cb;
 
 		private boolean stopWork = false;
@@ -154,53 +159,50 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 		}
 
 		@Override
-		protected Integer construct() throws Exception {
+		protected Boolean construct() throws Exception {
 			if (refConWorker != null) {
 				refConWorker.stop();
 			}
-			conceptsToFetch.clear();
-			referencedConcepts.clear();
 			if ((cb == null) || (cb.getConceptAttributes() == null)) {
-				return 0;
+				return true;
 			}
 			I_ConceptAttributeVersioned concept = cb.getConceptAttributes();
 			for (I_ConceptAttributePart conVersion : concept.getVersions()) {
 				conceptsToFetch.add(conVersion.getConceptStatus());
 				conceptsToFetch.add(conVersion.getPathId());
+				if (stopWork) {
+					return false;
+				}
 			}
 
 			refConWorker = new ReferencedConceptsSwingWorker();
 			refConWorker.start();
-			return null;
+			return true;
 		}
 
 		@Override
 		protected void finished() {
 			super.finished();
-			if (getProgress() != null) {
-				getProgress().getProgressBar().setIndeterminate(false);
-				if (conceptsToFetch.size() == 0) {
-					getProgress().getProgressBar().setValue(1);
-					getProgress().getProgressBar().setMaximum(1);
-				} else {
-					getProgress().getProgressBar().setValue(1);
-					getProgress().getProgressBar().setMaximum(
-							conceptsToFetch.size());
-				}
-			}
-			if (stopWork) {
-            fireTableDataChanged();
-				return;
-			}
 			try {
-				get();
+				if (get()) {
+					if (getProgress() != null) {
+						getProgress().getProgressBar().setIndeterminate(false);
+						if (conceptsToFetch.size() == 0) {
+							getProgress().getProgressBar().setValue(1);
+							getProgress().getProgressBar().setMaximum(1);
+						} else {
+							getProgress().getProgressBar().setValue(1);
+							getProgress().getProgressBar().setMaximum(
+									conceptsToFetch.size());
+						}
+					}
+					fireTableDataChanged();
+				}
 			} catch (InterruptedException e) {
 				;
 			} catch (ExecutionException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
-			fireTableDataChanged();
-
 		}
 
 		public void stop() {
@@ -470,13 +472,15 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			getProgress().getProgressBar().setValue(0);
 			getProgress().getProgressBar().setIndeterminate(true);
 		}
-		fireTableDataChanged();
 		if (tableChangeWorker != null) {
 			tableChangeWorker.stop();
 		}
+		conceptsToFetch.clear();
+		referencedConcepts.clear();
 		tableChangeWorker = new TableChangedSwingWorker((I_GetConceptData) evt
 				.getNewValue());
 		tableChangeWorker.start();
+		fireTableDataChanged();
 	}
 
 	public Map<Integer, ConceptBean> getReferencedConcepts() {

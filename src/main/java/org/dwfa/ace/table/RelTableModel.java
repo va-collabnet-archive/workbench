@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -68,14 +69,14 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	private SmallProgressPanel progress = new SmallProgressPanel();
 
 	public class ReferencedConceptsSwingWorker extends
-			SwingWorker<Map<Integer, ConceptBean>> {
+			SwingWorker<Boolean> {
 		private class ProgressUpdator implements I_UpdateProgress {
 			Timer updateTimer;
 
 			public ProgressUpdator() {
 				super();
 				getProgress().setActive(true);
-				updateTimer = new Timer(100, this);
+				updateTimer = new Timer(500, this);
 				updateTimer.start();
 				if (progress != null) {
 					progress.setActive(true);
@@ -111,7 +112,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		ProgressUpdator updator = new ProgressUpdator();
 
 		@Override
-		protected Map<Integer, ConceptBean> construct() throws Exception {
+		protected Boolean construct() throws Exception {
 			referencedConcepts = Collections
 					.synchronizedMap(new HashMap<Integer, ConceptBean>());
 			Set<Integer> fetchSet = null;
@@ -120,37 +121,38 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			}
 			for (Integer id : fetchSet) {
 				if (stopWork) {
-					break;
+					return false;
 				}
 				ConceptBean b = ConceptBean.get(id);
 				b.getDescriptions();
 				referencedConcepts.put(id, b);
 			}
-			return referencedConcepts;
+			return true;
 		}
 
 		@Override
 		protected void finished() {
 			super.finished();
-			if (progress != null) {
-				progress.getProgressBar().setIndeterminate(false);
-				if (conceptsToFetch.size() == 0) {
-					progress.getProgressBar().setValue(1);
-				} else {
-					progress.getProgressBar().setValue(conceptsToFetch.size());
-				}
-				progress.setEnabled(false);
-			}
 			try {
-				referencedConcepts = get();
+				if (get()) {
+					if (progress != null) {
+						progress.getProgressBar().setIndeterminate(false);
+						if (conceptsToFetch.size() == 0) {
+							progress.getProgressBar().setValue(1);
+						} else {
+							progress.getProgressBar().setValue(conceptsToFetch.size());
+						}
+						progress.setEnabled(false);
+					}
+					fireTableDataChanged();
+					updator.normalCompletionForUpdator();
+					stopWork = true;
+				}
 			} catch (InterruptedException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			} catch (ExecutionException ex) {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
-			fireTableDataChanged();
-			updator.normalCompletionForUpdator();
-			stopWork = true;
 		}
 
 		public void stop() {
@@ -162,7 +164,11 @@ public abstract class RelTableModel extends AbstractTableModel implements
 	public class TableChangedSwingWorker extends SwingWorker<Integer> {
 		I_GetConceptData cb;
 
-		private boolean stopWork = false;
+		private boolean workStopped = false;
+
+		public boolean isWorkStopped() {
+			return workStopped;
+		}
 
 		private ReferencedConceptsSwingWorker refConWorker;
 
@@ -176,15 +182,15 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			if (refConWorker != null) {
 				refConWorker.stop();
 			}
-			conceptsToFetch.clear();
-			referencedConcepts.clear();
 			if (cb == null) {
 				return 0;
 			}
+			allTuples = new ArrayList<I_RelTuple>();
 			List<I_RelTuple> rels = getRels(cb, host.getUsePrefs(),
-					getShowHistory());
+					getShowHistory(), this);
+			allTuples = new ArrayList<I_RelTuple>(rels);
 			for (I_RelTuple r : rels) {
-				if (stopWork) {
+				if (workStopped) {
 					return -1;
 				}
 				conceptsToFetch.add(r.getC1Id());
@@ -194,7 +200,6 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				conceptsToFetch.add(r.getRelTypeId());
 				conceptsToFetch.add(r.getStatusId());
 				conceptsToFetch.add(r.getPathId());
-
 			}
 
 			refConWorker = new ReferencedConceptsSwingWorker();
@@ -216,7 +221,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 							.setMaximum(conceptsToFetch.size());
 				}
 			}
-			if (stopWork) {
+			if (workStopped) {
 				fireTableDataChanged();
 				return;
 			}
@@ -233,7 +238,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		}
 
 		public void stop() {
-			stopWork = true;
+			workStopped = true;
 		}
 
 	}
@@ -303,17 +308,14 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		if (tableBean == null) {
 			return 0;
 		}
-		try {
-			allTuples = getRels(tableBean, host.getUsePrefs(), getShowHistory());
+		if (allTuples != null) {
 			return allTuples.size();
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return 0;
 	}
 
 	public abstract List<I_RelTuple> getRels(I_GetConceptData cb,
-			boolean usePrefs, boolean showHistory) throws IOException;
+			boolean usePrefs, boolean showHistory, TableChangedSwingWorker tableChangedSwingWorker) throws IOException;
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
@@ -586,6 +588,9 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 	public void propertyChange(PropertyChangeEvent evt) {
 		allTuples = null;
+		if (tableChangeWorker != null) {
+			tableChangeWorker.stop();
+		}
 		if (progress != null) {
 			progress.getProgressBar().setValue(0);
 			progress.getProgressBar().setIndeterminate(true);
@@ -593,18 +598,20 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			progress.setVisible(true);
 		}
 		tableBean = null;
-		fireTableDataChanged();
 
-		if (tableChangeWorker != null) {
-			tableChangeWorker.stop();
-		}
 		I_GetConceptData tableConcept = (I_GetConceptData) evt.getNewValue();
 		updateTable(tableConcept);
 	}
 
 	void updateTable(I_GetConceptData tableConcept) {
+		if (tableChangeWorker != null) {
+			tableChangeWorker.stop();
+		}
+		conceptsToFetch.clear();
+		referencedConcepts.clear();
 		tableChangeWorker = new TableChangedSwingWorker(tableConcept);
 		tableChangeWorker.start();
+		fireTableDataChanged();
 	}
 
 	public SmallProgressPanel getProgress() {

@@ -24,7 +24,7 @@ public class DestRelTableModel extends RelTableModel {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public List<I_RelTuple> getRels(I_GetConceptData cb, boolean usePrefs, boolean showHistory) throws IOException {
+	public List<I_RelTuple> getRels(I_GetConceptData cb, boolean usePrefs, boolean showHistory, TableChangedSwingWorker tableChangedSwingWorker) throws IOException {
 		List<I_RelTuple> selectedTuples = new ArrayList<I_RelTuple>();
 		I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
 		I_IntSet allowedTypes = null;
@@ -42,6 +42,9 @@ public class DestRelTableModel extends RelTableModel {
 			allowedStatus = null;
 		}
 		for (I_RelVersioned rel: cb.getDestRels()) {
+			if (tableChangedSwingWorker.isWorkStopped()) {
+				return selectedTuples;
+			}
 			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
 		}
 		
