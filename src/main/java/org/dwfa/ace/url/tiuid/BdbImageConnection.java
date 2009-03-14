@@ -29,7 +29,7 @@ public class BdbImageConnection extends URLConnection {
 	      String queryString = url.getQuery();
 	      if (queryString.contains("$")) {
 		    String[] parts = new String[2];
-		    parts[0] = queryString.substring(0, queryString.indexOf('$') - 1);
+		    parts[0] = queryString.substring(0, queryString.indexOf('$'));
 		    parts[1] = queryString.substring(queryString.indexOf('$') + 1);;
 	        String imageIdPart = parts[0];
 	        Collection<UUID> conceptIdCollection = new ArrayList<UUID>();
@@ -102,9 +102,9 @@ public class BdbImageConnection extends URLConnection {
 	        for (String id : ids) {
 	          idList.add(UUID.fromString(id));
 	        }
-	      } else {
+	      } 
+	    } else {
 	        idList.add(UUID.fromString(idString));
-	      }
 	    }
 	    return idList;
 	  }
