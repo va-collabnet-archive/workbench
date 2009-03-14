@@ -42,6 +42,7 @@ public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 	protected void readInput() {
 		config.setUsername(user.getText());
 		config.setPassword(pwd.getText());
+		config.setFrameName(user + " Editor Window");
 	}
 
 	@Override
