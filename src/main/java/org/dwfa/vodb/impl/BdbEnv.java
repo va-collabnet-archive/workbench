@@ -541,8 +541,8 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		identifierDb.writeId(id);
 	}
 
-	public int countDescriptions() throws DatabaseException, IOException {
-		return descBdb.countDescriptions();
+	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
+		return descBdb.countDescriptions(tracker);
 	}
 
 	public void createLuceneDescriptionIndex() throws IOException {

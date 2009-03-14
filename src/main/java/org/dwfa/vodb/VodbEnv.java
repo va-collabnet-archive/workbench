@@ -460,8 +460,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	}
 
 
-	public int countDescriptions() throws DatabaseException, IOException {
-		return bdbEnv.countDescriptions();
+	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
+		return bdbEnv.countDescriptions(tracker);
 	}
 
 	/**

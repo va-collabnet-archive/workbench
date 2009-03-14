@@ -349,7 +349,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 	 * 
 	 * @see org.dwfa.vodb.impl.I_StoreDescriptions#countDescriptions()
 	 */
-	public int countDescriptions() throws DatabaseException {
+	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException {
 		Stopwatch timer = null;
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			timer = new Stopwatch();
@@ -362,6 +362,9 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		foundData.setPartial(0, 0, true);
 		int count = 0;
 		while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (tracker.continueWork() == false) {
+				return Integer.MIN_VALUE;
+			}
 			count++;
 		}
 		descCursor.close();

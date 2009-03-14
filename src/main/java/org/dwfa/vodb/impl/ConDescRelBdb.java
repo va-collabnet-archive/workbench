@@ -1633,11 +1633,14 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 	private Integer descCount = null;
 
-	public int countDescriptions() throws DatabaseException, IOException {
+	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
 		if (descCount == null) {
 			int count = 0;
 			Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
 			while (descItr.hasNext()) {
+				if (tracker.continueWork() == false) {
+					return Integer.MIN_VALUE;
+				}
 				descItr.next();
 				count++;
 			}

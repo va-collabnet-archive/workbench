@@ -168,16 +168,24 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 				.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
 						new ThinDescVersionedComparator()));
 		descCount = Integer.MAX_VALUE;
-		I_UpdateProgress updater = new RegexProgressUpdator();
-		descCount = AceConfig.getVodb().countDescriptions();
-		AceLog.getAppLog().info("Desc count sa: " + descCount);
-		searchPanel.setProgressMaximum(descCount);
-		completeLatch = new CountDownLatch(descCount);
-		new MatchUpdator();
-		AceConfig.getVodb().searchRegex(this, null, regexMatches, completeLatch,
-				searchPanel.getExtraCriterion(), config);
+		descCount = AceConfig.getVodb().countDescriptions(this);
+		I_UpdateProgress updater;
+		if (descCount != Integer.MIN_VALUE) {
+			AceLog.getAppLog().info("Desc count sa: " + descCount);
+			searchPanel.setProgressMaximum(descCount);
+			completeLatch = new CountDownLatch(descCount);
+			new MatchUpdator();
+			updater = new RegexProgressUpdator();
+			AceConfig.getVodb().searchRegex(this, null, regexMatches, completeLatch,
+					searchPanel.getExtraCriterion(), config);
 
-		completeLatch.await();
+			completeLatch.await();
+		} else {
+			searchPanel.setProgressMaximum(0);
+			completeLatch = new CountDownLatch(0);
+			updater = new RegexProgressUpdator();
+			completeLatch.await();
+		}
 		return updater;
 	}
 

@@ -499,9 +499,14 @@ public class SearchPanel extends JPanel {
             ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config, 
             		searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
         } else if (searchPhraseField.getText().length() == 0) {
-            setShowProgress(true);
-            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
-            ACE.threadPool.execute(new SearchAllWorker(this, model, config));
+        	if (this.extraCriterion.size() > 0) {
+                setShowProgress(true);
+                model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+                ACE.threadPool.execute(new SearchAllWorker(this, model, config));
+        	} else {
+                JOptionPane.showMessageDialog(getRootPane(), "<html>Unindexed search (a search with an empty query string),<br>requires at least one advanced search criterion. ", 
+                		"Search Error", JOptionPane.ERROR_MESSAGE);
+        	}
         } else {
             JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 1 character: "
                     + searchPhraseField.getText(), "Search Error", JOptionPane.ERROR_MESSAGE);

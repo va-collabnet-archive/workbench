@@ -764,11 +764,14 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 				+ concId);
 	}
 
-	public int countDescriptions() throws DatabaseException, IOException {
+	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
 		int count = 0;
 		Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
 		while (descItr.hasNext()) {
 			descItr.next();
+			if (tracker.continueWork() == false) {
+				return Integer.MIN_VALUE;
+			}
 			count++;
 		}
 		return count;

@@ -259,7 +259,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 					new ThinDescVersionedComparator()));
 			updater = new RegexProgressUpdator();
 			descCount = Integer.MAX_VALUE;
-			descCount = AceConfig.getVodb().countDescriptions();
+			descCount = AceConfig.getVodb().countDescriptions(this);
 			AceLog.getAppLog().info("Desc count 3: " + descCount);
 			completeLatch = new CountDownLatch(descCount);
 			Pattern p = Pattern.compile(patternString);
