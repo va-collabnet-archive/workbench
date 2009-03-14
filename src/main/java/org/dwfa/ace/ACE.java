@@ -1659,10 +1659,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			NoSuchMethodException {
 		if (editMode) {
 			JMenuItem menuItem = null;
-			menuItem = new JMenuItem("Export Baseline Jar...");
-			menuItem.addActionListener(new WriteJar(aceConfig));
-			fileMenu.add(menuItem);
-			fileMenu.addSeparator();
+			/*
+			 * menuItem = new JMenuItem("Export Baseline Jar...");
+			 * menuItem.addActionListener(new WriteJar(aceConfig));
+			 * fileMenu.add(menuItem);
+			 * fileMenu.addSeparator();
+			 */
 			menuItem = new JMenuItem("Import Java Changeset...");
 			menuItem.addActionListener(new ImportJavaChangeset(config));
 			fileMenu.add(menuItem);
