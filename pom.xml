@@ -17,8 +17,8 @@
 	<description>ACE editor toolkit and version-oriented database
 	</description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/vodb/trunk/dev</developerConnection>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ide/top-level/trunk/dev</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ide/top-level/trunk/dev</developerConnection>
 		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
 	</scm>
 	<ciManagement>
@@ -49,22 +49,12 @@
 			<artifactId>lucene-core</artifactId>
 			<version>2.4.0</version>
 		</dependency>
-		<!--
-			<dependency> <groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-bdb-je</artifactId> <version>2.3.1</version>
-			</dependency>
-		-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!--
-			<dependency> <groupId>jung</groupId>
-			<artifactId>jung-samples</artifactId> <version>2.0a</version>
-			</dependency>
-		-->
 		<dependency>
 			<groupId>jung</groupId>
 			<artifactId>jung</artifactId>
