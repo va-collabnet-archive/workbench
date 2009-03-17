@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.dwfa</groupId>
 			<artifactId>ace-api</artifactId>
-			<version>1.31</version>
+			<version>1.32-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
