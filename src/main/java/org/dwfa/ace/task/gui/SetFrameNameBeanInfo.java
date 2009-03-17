@@ -5,7 +5,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.ace.task.address.AddElectronicAddress;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
@@ -22,7 +21,7 @@ public class SetFrameNameBeanInfo extends SimpleBeanInfo {
 	           profilePropName.setShortDescription("The property containing the profile to change.");
 
 	           PropertyDescriptor newFrameName =
-	                new PropertyDescriptor("newFrameName", AddElectronicAddress.class);
+	                new PropertyDescriptor("newFrameName", getBeanDescriptor().getBeanClass());
 	            newFrameName.setBound(true);
 	            newFrameName.setPropertyEditorClass(JTextFieldEditor.class);
 	            newFrameName.setDisplayName("<html><font color='green'>Name:");
