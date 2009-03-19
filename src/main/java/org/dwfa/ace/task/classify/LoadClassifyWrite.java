@@ -57,161 +57,203 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class LoadClassifyWrite extends AbstractTask {
 
-    final static Object LOCK = new Object();
-    
-    /**
+	final static Object LOCK = new Object();
+
+	/**
      * 
      */
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+	private static final int dataVersion = 1;
 
-    private static volatile int conceptCount = 0;
-    private static volatile int classifyConceptCount = 0;
-    private static volatile int relCount = 0;
-    private static volatile int relsOnPathCount = 0;
-    private static volatile int activeRelCount = 0;
-    private static volatile int statedRelCount = 0;
-    
-    private static int multipleRelEntriesForVersion = 0;
-    private static int multipleRelEntriesForVersion2 = 0;
-    private static int multipleAttrEntriesForVersion = 0;
+	private static volatile int conceptCount = 0;
+	private static volatile int classifyConceptCount = 0;
+	private static volatile int relCount = 0;
+	private static volatile int relsOnPathCount = 0;
+	private static volatile int activeRelCount = 0;
+	private static volatile int statedRelCount = 0;
 
-    private static int isaId = Integer.MIN_VALUE;
+	private static int multipleRelEntriesForVersion = 0;
+	private static int multipleRelEntriesForVersion2 = 0;
+	private static int multipleAttrEntriesForVersion = 0;
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-    }
+	private static int isaId = Integer.MIN_VALUE;
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        final int objDataVersion = in.readInt();
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
 
-        if (objDataVersion <= dataVersion) {
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		final int objDataVersion = in.readInt();
 
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
-    }
+		if (objDataVersion <= dataVersion) {
 
-    private static class MockSnorocketFactory implements I_SnorocketFactory {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
 
-        private int conceptCount = 0;
-        private int isACount = 0;
-        private int relationshipCount = 0;
+	private static class MockSnorocketFactory implements I_SnorocketFactory {
 
-        synchronized public void addConcept(int conceptId, boolean fullyDefined) {
-            conceptCount++;
-        }
+		private int conceptCount = 0;
+		private int isACount = 0;
+		private int relationshipCount = 0;
 
-        public void setIsa(int id) {
-            isACount++;
-        }
+		synchronized public void addConcept(int conceptId, boolean fullyDefined) {
+			conceptCount++;
+		}
 
-        synchronized public void addRelationship(int c1, int rel, int c2, int group) {
-            relationshipCount++;
-        }
+		public void setIsa(int id) {
+			isACount++;
+		}
 
-        public void classify() {
-            System.err.println("*** " + conceptCount + "\t" + relationshipCount);
-        }
+		synchronized public void addRelationship(int c1, int rel, int c2,
+				int group) {
+			relationshipCount++;
+		}
 
-        public void getResults(I_Callback callback) {
-        }
+		public void classify() {
+			System.err
+					.println("*** " + conceptCount + "\t" + relationshipCount);
+		}
 
-        public I_SnorocketFactory createExtension() {
-            // TODO Auto-generated method stub
-            return null;
-        }
+		public void getResults(I_Callback callback) {
+		}
 
-        public InputStream getStream() throws IOException {
-            // TODO Auto-generated method stub
-            return null;
-        }
+		public I_SnorocketFactory createExtension() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 
-    }
+		public InputStream getStream() throws IOException {
+			// TODO Auto-generated method stub
+			return null;
+		}
 
-    private class ProcessConcepts implements I_ProcessConcepts {
+	}
 
-        final private ClassifierUtil util;
+	private class ProcessConcepts implements I_ProcessConcepts {
 
-        public ProcessConcepts(I_Work worker, I_SnorocketFactory rocket) throws TerminologyException, IOException {
-            util = new ClassifierUtil(worker.getLogger(), rocket);
-        }
+		final private ClassifierUtil util;
 
-        public void processConcept(I_GetConceptData concept) throws Exception {
-            conceptCount++;
-            util.processConcept(concept, false);
-        }
+		public ProcessConcepts(I_Work worker, I_SnorocketFactory rocket)
+				throws TerminologyException, IOException {
+			util = new ClassifierUtil(worker.getLogger(), rocket);
+		}
 
-    }
+		public void processConcept(I_GetConceptData concept) throws Exception {
+			conceptCount++;
+			util.processConcept(concept, false);
+		}
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+	}
 
-        try {
-            worker.getLogger().info("LCW start evaluate()");
+	public static void logMemory(String tag, I_Work worker) {
+		boolean log_memory_p = true;
+		if (!log_memory_p)
+			return;
+		StackTraceElement[] st = Thread.currentThread().getStackTrace();
+		System.out.println(">>>" + "@" + st[3].getClassName() + "."
+				+ st[3].getMethodName() + ":" + st[3].getLineNumber() + ">>>"
+				+ tag);
+		Runtime rt = Runtime.getRuntime();
+		rt.gc();
+		System.out.println(">>>" + "Used memory @ " + tag + ": "
+				+ ((rt.totalMemory() - rt.freeMemory()) / (1024 * 1024)));
+	}
 
-            conceptCount = 0;
-            classifyConceptCount = 0;
-            relCount = 0;
-            relsOnPathCount = 0;
-            activeRelCount = 0;
-            statedRelCount = 0;
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+			throws TaskFailedException {
 
-            long startTime = System.currentTimeMillis();
+		try {
+			logMemory("LCW evaluate start", worker);
+			worker.getLogger().info("LCW start evaluate()");
 
-            final I_SnorocketFactory rocket =
-                (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
-//                new MockSnorocketFactory();
+			conceptCount = 0;
+			classifyConceptCount = 0;
+			relCount = 0;
+			relsOnPathCount = 0;
+			activeRelCount = 0;
+			statedRelCount = 0;
 
-            final I_TermFactory tf = LocalVersionedTerminology.get();
-            
-            if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
-                throw new TaskFailedException("Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet());
-            }
+			long startTime = System.currentTimeMillis();
 
-            isaId = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
-            rocket.setIsa(isaId);
+			I_SnorocketFactory rocket = (I_SnorocketFactory) process
+					.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
+			// new MockSnorocketFactory();
 
-            tf.iterateConcepts(new ProcessConcepts(worker, rocket));
+			final I_TermFactory tf = LocalVersionedTerminology.get();
 
-            worker.getLogger().info("LCW load time (ms): " + (System.currentTimeMillis() - startTime));
+			if (tf.getActiveAceFrameConfig().getEditingPathSet().size() != 1) {
+				throw new TaskFailedException(
+						"Profile must have only one edit path. Found: "
+								+ tf.getActiveAceFrameConfig()
+										.getEditingPathSet());
+			}
 
-            startTime = System.currentTimeMillis();
-            worker.getLogger().info("LCW executionService termination time (ms): " + (System.currentTimeMillis() - startTime));
-            worker.getLogger().info("Processed total concepts: " + conceptCount + " for classification: " + classifyConceptCount);
-            worker.getLogger().info(
-                    "Processed total rels: " + relCount + " rels on path: " + relsOnPathCount + " active: " + activeRelCount + " stated: "
-                            + statedRelCount);
-            worker.getLogger().info("Rels with multiple entries for version: " + multipleRelEntriesForVersion);
-            worker.getLogger().info("Rels with multiple entries for version2: " + multipleRelEntriesForVersion2);
-            worker.getLogger().info("Concepts with multiple entries for attribute: " + multipleAttrEntriesForVersion);
+			isaId = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
+			rocket.setIsa(isaId);
 
-            worker.getLogger().info("Starting classify. ");
+			tf.iterateConcepts(new ProcessConcepts(worker, rocket));
 
-            startTime = System.currentTimeMillis();
-            rocket.classify();
-            worker.getLogger().info("LCW classify time: " + (System.currentTimeMillis() - startTime));
+			worker.getLogger().info(
+					"LCW load time (ms): "
+							+ (System.currentTimeMillis() - startTime));
+			logMemory("LCW load", worker);
 
-            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
+			startTime = System.currentTimeMillis();
+			worker.getLogger().info(
+					"LCW executionService termination time (ms): "
+							+ (System.currentTimeMillis() - startTime));
+			worker.getLogger().info(
+					"Processed total concepts: " + conceptCount
+							+ " for classification: " + classifyConceptCount);
+			worker.getLogger().info(
+					"Processed total rels: " + relCount + " rels on path: "
+							+ relsOnPathCount + " active: " + activeRelCount
+							+ " stated: " + statedRelCount);
+			worker.getLogger().info(
+					"Rels with multiple entries for version: "
+							+ multipleRelEntriesForVersion);
+			worker.getLogger().info(
+					"Rels with multiple entries for version2: "
+							+ multipleRelEntriesForVersion2);
+			worker.getLogger().info(
+					"Concepts with multiple entries for attribute: "
+							+ multipleAttrEntriesForVersion);
 
-        } catch (Exception e) {
-            throw new TaskFailedException(e);
-        }
+			worker.getLogger().info("Starting classify. ");
+			logMemory("LCW pre classify", worker);
+			startTime = System.currentTimeMillis();
+			rocket.classify();
+			worker.getLogger().info(
+					"LCW classify time: "
+							+ (System.currentTimeMillis() - startTime));
+			logMemory("LCW post classify", worker);
 
-        return Condition.CONTINUE;
-    }
+			process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(),
+					rocket);
+			logMemory("LCW evaluate end", worker);
 
-    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1) throws TaskFailedException {
-        // nothing to do...
-    }
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		}
 
-    public Collection<Condition> getConditions() {
-        return CONTINUE_CONDITION;
-    }
+		return Condition.CONTINUE;
+	}
 
-    public int[] getDataContainerIds() {
-        return new int[] {};
-    }
+	public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
+			throws TaskFailedException {
+		// nothing to do...
+	}
+
+	public Collection<Condition> getConditions() {
+		return CONTINUE_CONDITION;
+	}
+
+	public int[] getDataContainerIds() {
+		return new int[] {};
+	}
 
 }

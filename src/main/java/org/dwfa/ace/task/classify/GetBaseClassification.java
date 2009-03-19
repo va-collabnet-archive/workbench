@@ -78,6 +78,7 @@ public class GetBaseClassification extends AbstractTask {
             throws TaskFailedException {
 
         try {
+        	LoadClassifyWrite.logMemory("GBC evaluate start", worker);
             final I_SnorocketFactory rocket = getRocket();
             
             if (null == rocket) {
@@ -86,6 +87,7 @@ public class GetBaseClassification extends AbstractTask {
             
             worker.getLogger().info("New Snorocket Classifier instance is " + rocket);
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
+            LoadClassifyWrite.logMemory("GBC evaluate end", worker);
         } catch (RuntimeException e) {
             throw new TaskFailedException(e);
         }
