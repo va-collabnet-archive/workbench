@@ -289,6 +289,10 @@ public class ExportIterator implements I_ProcessConcepts {
 					latestAttrib = attribTup;
 				}
 			}
+			
+			if (latestAttrib == null) {
+				return false;
+			}
 				
 			// ConceptId
 			createRecord(stringBuilder, concept.getUids().get(0));
@@ -335,12 +339,10 @@ public class ExportIterator implements I_ProcessConcepts {
 	}
 
 	private boolean validPosition(int pathId) {                        
-
         for (I_Position position : positions) {
             if (position.getPath().getConceptId() == pathId) {
                 return true;
             }
-
         }                               
         return false;
 	}

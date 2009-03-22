@@ -28,5 +28,8 @@ public class PositionDescriptor {
       int version = ThinVersionHelper.convert(timeString);
       return LocalVersionedTerminology.get().newPosition(pathForPosition, version);
    }
-
+   
+   public String toString() {
+	   return "Path: " + path + " position: " + timeString;
+   }
 }

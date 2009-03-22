@@ -31,9 +31,9 @@ public class ConceptDescriptor {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         List<UUID> uuidList = new LinkedList<UUID>();
         uuidList.add(UUID.fromString(uuid));
-
+        I_GetConceptData concept = null;
         try {
-            I_GetConceptData concept = termFactory.getConcept(uuidList);
+            concept = termFactory.getConcept(uuidList);
 
             // check that the description parameter corresponds to one of the
             // concept's descriptions
@@ -46,11 +46,14 @@ public class ConceptDescriptor {
                 }
             }
         } catch (Exception e) {
-            throw new Exception(e.getMessage() + " : " + description);
+            throw new Exception(e.getMessage() + " : " + description + " " + uuidList);
         }
-
+        if (concept != null) {
+            throw new Exception("Failed to find matching description: "
+                    + description + " " + uuidList + " in concept: " + concept);
+        }
         throw new Exception("Failed to find matching description: "
-                + description);
+                + description + " " + uuidList);
     }
 
     public String getDescription() {

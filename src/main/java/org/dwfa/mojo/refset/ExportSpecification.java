@@ -3,152 +3,174 @@ package org.dwfa.mojo.refset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 
 public class ExportSpecification {
 
-   private ConceptDescriptor root;
+	private ConceptDescriptor root;
 
-   private ConceptDescriptor[] relTypesForHierarchy;
+	private ConceptDescriptor[] relTypesForHierarchy;
 
-   private PositionDescriptor[] positionsForExport;
+	private PositionDescriptor[] positionsForExport;
 
-   private ConceptDescriptor[] statusValuesForExport;
+	private ConceptDescriptor[] statusValuesForExport;
 
-   private ExportSpecification[] exclusions;
+	private ExportSpecification[] exclusions;
 
-   private CheckSpec spec;
+	private CheckSpec spec;
 
-   private class CheckSpec {
-      private I_GetConceptData checkSpecRoot;
+	private class CheckSpec {
+		private I_GetConceptData checkSpecRoot;
 
-      private I_IntSet relTypeIntSet;
+		private I_IntSet relTypeIntSet;
 
-      private HashSet<I_Position> positions;
+		private HashSet<I_Position> positions;
 
-      private I_IntSet statusValues;
+		private I_IntSet statusValues;
 
-      private CheckSpec[] checkSpecExclusions;
+		private CheckSpec[] checkSpecExclusions;
 
-      public CheckSpec() throws Exception {
-         super();
-         this.checkSpecRoot = root.getVerifiedConcept();
-         I_TermFactory termFactory = LocalVersionedTerminology.get();
+		private ArrayList<I_GetConceptData> statusValueList;
 
-         if (positionsForExport != null && positionsForExport.length > 0) {
-            positions = new HashSet<I_Position>(positionsForExport.length);
-            for (PositionDescriptor pd : positionsForExport) {
-               positions.add(pd.getPosition());
-            }
-         }
+		private ArrayList<I_GetConceptData> relTypes;
 
-         List<I_GetConceptData> statusValueList = new ArrayList<I_GetConceptData>();
-         if (statusValuesForExport != null && statusValuesForExport.length > 0) {
-            statusValues = termFactory.newIntSet();
-            for (ConceptDescriptor status : statusValuesForExport) {
-               I_GetConceptData statusConcept = status.getVerifiedConcept();
-               statusValues.add(statusConcept.getConceptId());
-               statusValueList.add(statusConcept);
-            }
-         }
+		public CheckSpec() throws Exception {
+			super();
+			this.checkSpecRoot = root.getVerifiedConcept();
+			I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-         List<I_GetConceptData> relTypes = new ArrayList<I_GetConceptData>();
-         if (relTypesForHierarchy != null && relTypesForHierarchy.length > 0) {
-            relTypeIntSet = termFactory.newIntSet();
-            for (ConceptDescriptor relType : relTypesForHierarchy) {
-               I_GetConceptData relTypeConcept = relType.getVerifiedConcept();
-               relTypeIntSet.add(relTypeConcept.getConceptId());
-               relTypes.add(relTypeConcept);
-            }
-         }
+			if (positionsForExport != null && positionsForExport.length > 0) {
+				positions = new HashSet<I_Position>(positionsForExport.length);
+				for (PositionDescriptor pd : positionsForExport) {
+					positions.add(pd.getPosition());
+				}
+			}
 
-         if (exclusions != null && exclusions.length > 0) {
-            this.checkSpecExclusions = new CheckSpec[exclusions.length];
-            for (int i = 0; i < checkSpecExclusions.length; i++) {
-               checkSpecExclusions[i] = exclusions[i].getSpec();
-            }
-         }
-         System.out.println(" Created CheckSpec for positions: " + positions + " with status: " + statusValueList
-               + ", rel types:" + relTypes + ", root:" + checkSpecRoot);
-      }
+			statusValueList = new ArrayList<I_GetConceptData>();
+			if (statusValuesForExport != null
+					&& statusValuesForExport.length > 0) {
+				statusValues = termFactory.newIntSet();
+				for (ConceptDescriptor status : statusValuesForExport) {
+					I_GetConceptData statusConcept = status
+							.getVerifiedConcept();
+					statusValues.add(statusConcept.getConceptId());
+					statusValueList.add(statusConcept);
+				}
+			}
 
-      public boolean test(I_GetConceptData testConcept) throws IOException {
-         boolean allowed = false;
-         if (checkSpecRoot.equals(testConcept)) {
-            return true;
-         }
-         if (checkSpecRoot.isParentOf(testConcept, statusValues, relTypeIntSet, positions, false)
-               || root.equals(testConcept)) {
-            allowed = true;
-         }
-         if (allowed && checkSpecExclusions != null) {
-            for (CheckSpec excludeSpec: checkSpecExclusions) {
-               if (excludeSpec.test(testConcept)) {
-                  allowed = false;
-                  break;
-               }
-            }
-         }
-         return allowed;
-      }
-   }
+			relTypes = new ArrayList<I_GetConceptData>();
+			if (relTypesForHierarchy != null && relTypesForHierarchy.length > 0) {
+				relTypeIntSet = termFactory.newIntSet();
+				for (ConceptDescriptor relType : relTypesForHierarchy) {
+					I_GetConceptData relTypeConcept = relType
+							.getVerifiedConcept();
+					relTypeIntSet.add(relTypeConcept.getConceptId());
+					relTypes.add(relTypeConcept);
+				}
+			}
 
-   private CheckSpec getSpec() throws Exception {
-      if (spec == null) {
-         spec = new CheckSpec();
-      }
-      return spec;
-   }
+			if (exclusions != null && exclusions.length > 0) {
+				this.checkSpecExclusions = new CheckSpec[exclusions.length];
+				for (int i = 0; i < checkSpecExclusions.length; i++) {
+					checkSpecExclusions[i] = exclusions[i].getSpec();
+				}
+			}
+			if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+				AceLog.getAppLog().info(
+						" Created CheckSpec for positions: " + positions
+								+ " with status: " + statusValueList
+								+ ", rel types:" + relTypes + ", root:"
+								+ checkSpecRoot);
+			}
 
-   public boolean test(I_GetConceptData testConcept) throws Exception {
-      return getSpec().test(testConcept);
-   }
+		}
 
-   public ConceptDescriptor getRoot() {
-      return root;
-   }
+		public String toString() {
+			return "CheckSpec positions: " + positions + " with status: "
+					+ statusValueList + ", rel types:" + relTypes + ", root:"
+					+ checkSpecRoot;
+		}
 
-   public void setRoot(ConceptDescriptor root) {
-      this.root = root;
-   }
+		public boolean test(I_GetConceptData testConcept) throws IOException {
+			boolean allowed = false;
+			if (checkSpecRoot.equals(testConcept)) {
+				return true;
+			}
+			if (checkSpecRoot.isParentOf(testConcept, statusValues,
+					relTypeIntSet, positions, false)
+					|| root.equals(testConcept)) {
+				allowed = true;
+			}
+			if (allowed && checkSpecExclusions != null) {
+				for (CheckSpec excludeSpec : checkSpecExclusions) {
+					if (excludeSpec.test(testConcept)) {
+						allowed = false;
+						break;
+					}
+				}
+			}
+			return allowed;
+		}
+	}
 
-   public ConceptDescriptor[] getRelTypesForHierarchy() {
-      return relTypesForHierarchy;
-   }
+	private CheckSpec getSpec() throws Exception {
+		if (spec == null) {
+			spec = new CheckSpec();
+		}
+		return spec;
+	}
 
-   public void setRelTypesForHierarchy(ConceptDescriptor[] relTypesForHierarchy) {
-      this.relTypesForHierarchy = relTypesForHierarchy;
-   }
+	public boolean test(I_GetConceptData testConcept) throws Exception {
+		return getSpec().test(testConcept);
+	}
 
-   public ConceptDescriptor[] getStatusValuesForExport() {
-      return statusValuesForExport;
-   }
+	public ConceptDescriptor getRoot() {
+		return root;
+	}
 
-   public void setStatusValuesForExport(ConceptDescriptor[] statusValuesForExport) {
-      this.statusValuesForExport = statusValuesForExport;
-   }
+	public void setRoot(ConceptDescriptor root) {
+		this.root = root;
+	}
 
-   public PositionDescriptor[] getPositionsForExport() {
-      return positionsForExport;
-   }
+	public ConceptDescriptor[] getRelTypesForHierarchy() {
+		return relTypesForHierarchy;
+	}
 
-   public void setPositionsForExport(PositionDescriptor[] positionsForExport) {
-      this.positionsForExport = positionsForExport;
-   }
+	public void setRelTypesForHierarchy(ConceptDescriptor[] relTypesForHierarchy) {
+		this.relTypesForHierarchy = relTypesForHierarchy;
+	}
 
-   public ExportSpecification[] getExclusions() {
-      return exclusions;
-   }
+	public ConceptDescriptor[] getStatusValuesForExport() {
+		return statusValuesForExport;
+	}
 
-   public void setExclusions(ExportSpecification[] exclusions) {
-      this.exclusions = exclusions;
-   }
+	public void setStatusValuesForExport(
+			ConceptDescriptor[] statusValuesForExport) {
+		this.statusValuesForExport = statusValuesForExport;
+	}
+
+	public PositionDescriptor[] getPositionsForExport() {
+		return positionsForExport;
+	}
+
+	public void setPositionsForExport(PositionDescriptor[] positionsForExport) {
+		this.positionsForExport = positionsForExport;
+	}
+
+	public ExportSpecification[] getExclusions() {
+		return exclusions;
+	}
+
+	public void setExclusions(ExportSpecification[] exclusions) {
+		this.exclusions = exclusions;
+	}
 }
