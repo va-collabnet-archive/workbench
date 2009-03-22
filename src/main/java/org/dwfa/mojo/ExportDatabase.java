@@ -162,6 +162,9 @@ public class ExportDatabase extends AbstractMojo {
 					" processing concepts for positions: " + positions
 							+ " with status: " + statusValueList);
 
+			if (outputDirectory.endsWith("/") == false) {
+				outputDirectory = outputDirectory + "/";
+			}
 			File outputDirFile = new File(outputDirectory);
 			outputDirFile.mkdirs();
 			Writer errorWriter = new BufferedWriter(new FileWriter(
