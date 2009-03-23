@@ -99,7 +99,6 @@ import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
-import org.dwfa.ace.actions.WriteJar;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -703,6 +702,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				}
 				for (I_Transact to : testFailureSet) {
 					to.abort();
+					uncommitted.remove(to);
 				}
 			}
 

@@ -49,13 +49,19 @@ public class IntList implements ListDataListener, I_IntList {
 			out.writeInt(Integer.MIN_VALUE);
 			return;
 		}
-		out.writeInt(list.size());
+		
+		ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
 		for (int i : list.getListValues()) {
 			try {
-				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
+				outList.add(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
 				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 			}
+		}
+		
+		out.writeInt(outList.size());
+		for (List<UUID> i : outList) {
+			out.writeObject(i);
 		}
 	}
 
@@ -79,7 +85,13 @@ public class IntList implements ListDataListener, I_IntList {
 			try {
         		if (ignoreMappingErrors) {
             		try {
-            			list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+            			Object uuidObj  = in.readObject();
+            			if (List.class.isAssignableFrom(uuidObj.getClass())) {
+                			list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) uuidObj);
+            			} else {
+            				AceLog.getAppLog().alertAndLogException(new Exception("<html>Expecting List<UUID>. Found:<br>"
+            						+ uuidObj));
+            			}
 					} catch (NoMappingException e) {
                   AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
 						unmappedIds++;

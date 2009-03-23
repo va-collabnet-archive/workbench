@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -169,15 +170,22 @@ public class IntSet implements ListDataListener, I_IntSet {
 			out.writeInt(Integer.MIN_VALUE);
 			return;
 		}
-		out.writeInt(set.getSetValues().length);
-        for (int i: set.getSetValues()) {
-        	try {
-				out.writeObject(AceConfig.getVodb().nativeToUuid(i));
+		
+		ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
+		for (int i : set.getSetValues()) {
+			try {
+				outList.add(AceConfig.getVodb().nativeToUuid(i));
 			} catch (DatabaseException e) {
 				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
 			}
-        }
+		}
+		
+		out.writeInt(outList.size());
+		for (List<UUID> i : outList) {
+			out.writeObject(i);
+		}
 	}
+	
 	public static IntSet readIntSetIgnoreMapErrors(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		return readIntSet(in, true);
 	}
