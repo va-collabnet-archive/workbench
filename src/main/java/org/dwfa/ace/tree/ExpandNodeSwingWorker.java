@@ -237,6 +237,10 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	Boolean continueWork = true;
 
+	public Boolean getContinueWork() {
+		return continueWork;
+	}
+
 	boolean canceled = false;
 
 	int maxChildren = -1;
@@ -330,10 +334,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 					stopWorkAndRemove("worker finished");
 					expandIfInList();
 				}
+			} else {
+				stopWorkAndRemove("worker canceled");
 			}
 		} catch (InterruptedException ex) {
+			stopWorkAndRemove("worker interrupted");
 			AceLog.getAppLog().alertAndLogException(ex);
 		} catch (ExecutionException ex) {
+			stopWorkAndRemove("worker threw exception");
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
         long elapsedTime = System.currentTimeMillis() - expansionStart;
@@ -342,8 +350,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			logger.fine("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
 		} else if (logTimingInfo) {
             logger.info("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
-        }
-        
+        } 
 		tree.workerFinished(this);
 	}
 

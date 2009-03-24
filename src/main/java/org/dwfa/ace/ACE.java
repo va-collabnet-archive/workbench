@@ -2948,6 +2948,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 		});
 		JScrollPane treeView = new JScrollPane(tree);
+		tree.setScroller(treeView);
 		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
 			AceLog.getAppLog().info("Child expand: " + id);
 		}
@@ -3098,6 +3099,15 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
 			if ((worker != null) && (foundWorker == worker)) {
 				worker.stopWork(message);
+				expansionWorkers.remove(key);
+			}
+		}
+	}
+
+	public static void removeStaleExpansionWorker(TreeIdPath key) {
+		synchronized (expansionWorkers) {
+			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+			if (foundWorker.getContinueWork() == false) {
 				expansionWorkers.remove(key);
 			}
 		}

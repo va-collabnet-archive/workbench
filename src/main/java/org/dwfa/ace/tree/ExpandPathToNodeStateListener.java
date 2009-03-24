@@ -21,7 +21,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 	private ArrayList<I_GetConceptData> ancestors;
 	private TreePath lastPath;
 	private DefaultMutableTreeNode lastChildNode;
-	I_GetConceptData focus;
+	private I_GetConceptData focus;
 
 	
 	

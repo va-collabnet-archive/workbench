@@ -22,6 +22,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,11 +32,15 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -74,6 +79,15 @@ public class JTreeWithDragImage extends JTree {
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
+	}
+	
+	private class SelectionListener implements TreeSelectionListener {
+
+		public void valueChanged(TreeSelectionEvent e) {
+			nextToLastSelection = lastSelection;
+			lastSelection = e.getNewLeadSelectionPath();	
+		}
+		
 	}
 
 	private class DragGestureListenerWithImage implements DragGestureListener {
@@ -137,27 +151,35 @@ public class JTreeWithDragImage extends JTree {
 			return dragImage;
 		}
 	}
-	private class CommitListener implements PropertyChangeListener {
-
-		@SuppressWarnings("unchecked")
-		public void propertyChange(PropertyChangeEvent evt) {
-			DefaultTreeModel m = (DefaultTreeModel) JTreeWithDragImage.this.getModel();
-			DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
-			Enumeration<DefaultMutableTreeNode> childEnum = root.children();
-			while (childEnum.hasMoreElements()) {
-				m.nodeStructureChanged(childEnum.nextElement());
-			}
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine("Tree model changed");
-			}
-		}
-		
-	}
     private class RefreshListener implements PropertyChangeListener {
 
-        @SuppressWarnings("unchecked")
+        public RefreshListener() {
+			super();
+			lastPropagationId = Long.MIN_VALUE;
+		}
+
+		@SuppressWarnings("unchecked")
         public void propertyChange(PropertyChangeEvent evt) {
+        	if (lastPropagationId == evt.getPropagationId()) {
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                	AceLog.getAppLog().info("rf pc suppressed: " + evt.getPropertyName() + " " + evt.getPropagationId());
+                }
+        		return;
+        	}
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            	AceLog.getAppLog().info("rf pc: " + evt.getPropertyName() + " " + evt.getPropagationId() + 
+        			" (" + lastPropagationId + ") Thread: " + Thread.currentThread().getName() + 
+        			" tree hash: " + JTreeWithDragImage.this.hashCode());
+            }
+        	lastPropagationId = evt.getPropagationId();
+        	
+        	TreePath selection = lastSelection;
+        	if (selection == null) {
+        		selection = nextToLastSelection;
+        	}
+        	
             DefaultTreeModel m = (DefaultTreeModel) JTreeWithDragImage.this.getModel();
+            logSelectionPaths(selection, "Initial Selection Paths:");
             DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
             Enumeration<DefaultMutableTreeNode> childEnum = root.children();
             while (childEnum.hasMoreElements()) {
@@ -166,8 +188,29 @@ public class JTreeWithDragImage extends JTree {
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 AceLog.getAppLog().fine("Tree data changed");
             }
+            
+        	if (scroller != null) {
+            	int horizValue = scroller.getHorizontalScrollBar().getValue();
+            	int vertValue = scroller.getVerticalScrollBar().getValue();
+                Timer timer = new Timer(1000, new RestoreSelectionSwingWorker(JTreeWithDragImage.this,
+    					lastPropagationId, horizValue, vertValue,
+    					selection));
+                timer.setRepeats(false);
+                timer.start();
+				AceLog.getAppLog().info("Started timer for RestoreSelectionSwingWorker: " + lastPropagationId);
+        	}
+ 
         }
-        
+
+		private void logSelectionPaths(TreePath selectionPath, String prefix) {
+			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            	if (selectionPath != null) {
+                	AceLog.getAppLog().fine(prefix + " \n  " + Arrays.asList(selectionPath));
+            	} else {
+                	AceLog.getAppLog().fine(prefix + " \n  null");
+            	}
+            }
+		}       
     }
 
 	/**
@@ -178,6 +221,26 @@ public class JTreeWithDragImage extends JTree {
 	private I_ConfigAceFrame config;
 
 	private List<ChangeListener> workerFinishedListeners = new ArrayList<ChangeListener>();
+	
+	public Object lastPropagationId;
+	
+	public JScrollPane scroller;
+	
+	private TreePath lastSelection;
+	private TreePath nextToLastSelection;
+
+
+	public JScrollPane getScroller() {
+		return scroller;
+	}
+
+	public void setScroller(JScrollPane scroller) {
+		this.scroller = scroller;
+	}
+
+	public Object getLastPropagationId() {
+		return lastPropagationId;
+	}
 
 	public JTreeWithDragImage(I_ConfigAceFrame config) {
 		super();
@@ -208,11 +271,13 @@ public class JTreeWithDragImage extends JTree {
 		map.put("cut", new AceTransferAction("cut"));
 		map.put("copy", new AceTransferAction("copy"));
 		map.put("paste", new AceTransferAction("paste"));
-		config.addPropertyChangeListener("commit", new CommitListener());
-        config.addPropertyChangeListener("viewPositions", new CommitListener());
-        config.addPropertyChangeListener("sortTaxonomyUsingRefset", new CommitListener());
-		config.addPropertyChangeListener("showViewerImagesInTaxonomy", new RefreshListener());
-        config.addPropertyChangeListener("showRefsetInfoInTaxonomy", new RefreshListener());
+		RefreshListener rl = new RefreshListener();
+		config.addPropertyChangeListener("commit", rl);
+        config.addPropertyChangeListener("viewPositions", rl);
+        config.addPropertyChangeListener("sortTaxonomyUsingRefset", rl);
+		config.addPropertyChangeListener("showViewerImagesInTaxonomy", rl);
+        config.addPropertyChangeListener("showRefsetInfoInTaxonomy", rl);
+        addTreeSelectionListener(new SelectionListener());
 	}
 
 	public I_ConfigAceFrame getConfig() {
