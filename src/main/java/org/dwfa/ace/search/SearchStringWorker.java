@@ -68,6 +68,8 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			continueWork = false;
 			AceLog.getAppLog().info("Search canceled by user");
 			searchPanel.setProgressInfo("cancelled by user");
+			searchPanel.setProgressIndeterminate(false);
+			searchPanel.setProgressValue(0);
 			if (completeLatch != null) {
 				while (completeLatch.getCount() > 0) {
 					completeLatch.countDown();
@@ -119,8 +121,12 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		}
 
 		private void updateProgress() {
+			String max = "" + searchPanel.getProgressMaximum();
+			if (searchPanel.getProgressMaximum() == Integer.MAX_VALUE) {
+				max = "unknown";
+			}
 			searchPanel.setProgressInfo("   " +
-					regexMatches.size() + " out of " + searchPanel.getProgressMaximum()
+					regexMatches.size() + " out of " + max
 							+ " descriptions   ");
 		}
 
@@ -258,13 +264,24 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
 					new ThinDescVersionedComparator()));
 			updater = new RegexProgressUpdator();
-			descCount = Integer.MAX_VALUE;
-			descCount = AceConfig.getVodb().countDescriptions(this);
-			AceLog.getAppLog().info("Desc count 3: " + descCount);
-			completeLatch = new CountDownLatch(descCount);
-			Pattern p = Pattern.compile(patternString);
-			new MatchUpdator();
-			AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(), config);
+			try {
+				completeLatch = new CountDownLatch(0);
+				Pattern p = Pattern.compile(patternString);
+				descCount = Integer.MAX_VALUE;
+				descCount = AceConfig.getVodb().countDescriptions(this);
+				AceLog.getAppLog().info("Desc count 3: " + descCount);
+				if (descCount > 0) {
+					completeLatch = new CountDownLatch(descCount);
+					descCount = Integer.MAX_VALUE;
+				}
+				new MatchUpdator();
+				AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(), config);
+			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+				while (completeLatch.getCount() > 0) {
+					completeLatch.countDown();
+				}
+			}
 		}
         completeLatch.await();
         updater.actionPerformed(null);

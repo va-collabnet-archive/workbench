@@ -73,7 +73,7 @@ public class AceFrame extends ComponentFrame {
 
 	}
 
-	private static String pluginRoot = "plugins";
+	public static String pluginRoot = "plugins";
 
 	public static String getPluginRoot() {
 		return pluginRoot;

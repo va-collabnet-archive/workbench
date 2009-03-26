@@ -129,6 +129,7 @@ import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.list.TerminologyIntList;
 import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.list.TerminologyList;
@@ -1527,7 +1528,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			NoSuchMethodException {
 		addFileMenu(menuBar);
 		addEditMenu(menuBar, editMenu);
-		addProcessMenus(menuBar);
+		ProcessPopupUtil.addProcessMenus(menuBar, pluginRoot, menuWorker);
 
 		return menuBar;
 	}

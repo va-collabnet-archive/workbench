@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -149,59 +150,6 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 		}
 	}
 
-	private static class CheckAndProcessRegexMatch implements Runnable {
-		Pattern p;
-
-		Collection<I_DescriptionVersioned> matches;
-
-		I_DescriptionVersioned descV;
-
-		List<I_TestSearchResults> checkList;
-
-		I_ConfigAceFrame config;
-
-		public CheckAndProcessRegexMatch(Pattern p,
-				Collection<I_DescriptionVersioned> matches,
-				I_DescriptionVersioned descV,
-				List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
-			super();
-			this.p = p;
-			this.matches = matches;
-			this.descV = descV;
-			this.checkList = checkList;
-			this.config = config;
-		}
-
-		public void run() {
-			if ((p == null) || (descV.matches(p))) {
-				if (checkList == null || checkList.size() == 0) {
-					matches.add(descV);
-				} else {
-					try {
-						boolean failed = false;
-						for (I_TestSearchResults test : checkList) {
-							if (test.test(descV, config) == false) {
-								failed = true;
-								break;
-							}
-						}
-
-						if (failed == false) {
-							matches.add(descV);
-						}
-					} catch (TaskFailedException e) {
-						if (ACE.editMode) {
-							AceLog.getAppLog().alertAndLogException(e);
-						} else {
-							AceLog.getAppLog().log(Level.SEVERE,
-									e.getLocalizedMessage(), e);
-						}
-					}
-				}
-			}
-		}
-
-	}
 
 	public class ConDescBinding extends TupleBinding {
 
@@ -846,18 +794,29 @@ public class ConDescBdb implements I_StoreConceptAttributes,
 			timer.start();
 		}
 		Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
+		Semaphore checkSemaphore = new Semaphore(15);
 		while (descItr.hasNext()) {
+			try {
+				checkSemaphore.acquire();
+			} catch (InterruptedException e) {
+				AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
+						e);
+			}
 			if (tracker.continueWork()) {
 				I_DescriptionVersioned descV = descItr.next();
-				ACE.threadPool.execute(new CheckAndProcessRegexMatch(p,
-						matches, descV, checkList, config));
+				ACE.threadPool.execute(new CheckAndProcessRegexMatch(latch, checkSemaphore,
+						p, matches, descV, checkList, config));
 			} else {
 				while (latch.getCount() > 0) {
 					latch.countDown();
 				}
 				break;
 			}
-			latch.countDown();
+		}
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
 		}
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			if (tracker.continueWork()) {

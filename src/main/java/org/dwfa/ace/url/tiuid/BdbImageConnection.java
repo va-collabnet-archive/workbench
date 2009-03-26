@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.config.AceConfig;
@@ -50,9 +51,11 @@ public class BdbImageConnection extends URLConnection {
 	        			"\n imageIdCollection: " + imageIdCollection + 
 	        			"\n conceptIdCollection: " + conceptIdCollection);
 	        } else {
-	        	AceLog.getAppLog().warning("Found image for queryString:" + queryString + 
-	        			"\n imageIdCollection: " + imageIdCollection + 
-	        			"\n conceptIdCollection: " + conceptIdCollection);
+	        	if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+		        	AceLog.getAppLog().fine("Found image for queryString:" + queryString + 
+		        			"\n imageIdCollection: " + imageIdCollection + 
+		        			"\n conceptIdCollection: " + conceptIdCollection);
+	        	}
 	        }
 	      } else {
 	        if (queryString.startsWith("[")) {

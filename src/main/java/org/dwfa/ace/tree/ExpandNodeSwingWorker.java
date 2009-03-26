@@ -270,7 +270,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			}
 		});
 		upperProgressMessage = "Construct " + node + workerIdStr;
-		AceLog.getAppLog().info("Expanding node with view positions: " + this.config.getViewPositionSet());
+		AceLog.getAppLog().info("Expanding node: " + node);
 		I_GetConceptData cb = (I_GetConceptData) node.getUserObject();
 		I_IntSet allowedStatus = this.config.getAllowedStatus();
 		I_IntSet destRelTypes = this.config.getDestRelTypes();
@@ -379,8 +379,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 							.getUserObject();
 					if (parentBean != null) {
 						if (parentBean.getConceptId() == cb.getConceptId()) {
-							System.out
-									.println(" Auto expand stopped. Found cycle.");
+							AceLog.getAppLog().warning("###\n### Auto expand stopped. Found cycle.\n###");
 							return;
 						}
 					}

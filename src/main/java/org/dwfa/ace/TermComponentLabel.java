@@ -13,18 +13,22 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -67,6 +71,18 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		}
 	}
 
+	private class DeleteAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent e) {
+			setTermComponent(null);
+		}
+	}
+	
 	private class DragGestureListenerWithImage implements DragGestureListener {
 
 		DragSourceListener dsl;
@@ -132,6 +148,9 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
 		map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
 		map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
+		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),"deleteTask");
+		map.put("deleteTask", new DeleteAction());
 		setBorder(noFocusBorder);
 	}
 
