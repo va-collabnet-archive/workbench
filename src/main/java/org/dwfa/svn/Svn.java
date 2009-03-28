@@ -1,6 +1,7 @@
 package org.dwfa.svn;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.queue.ObjectServerCore;
+import org.dwfa.util.io.FileIO;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.DirEntry;
@@ -307,6 +309,70 @@ public class Svn implements I_HandleSubversion {
 		SvnLog.info("refreshed Object Servers");
 	}
 
+	public static void revert(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+		SvnLog.info("Starting revert");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+			int depth = Depth.unknown;
+			boolean onServer = false;
+			boolean getAll = false;
+			boolean noIgnore = false;
+			boolean ignoreExternals = false;
+			String[] changelists = null;
+			HandleStatus statusHandler = new HandleStatus();
+			Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth, onServer,
+					getAll, noIgnore, ignoreExternals, changelists,
+					statusHandler);
+			for (Status s : statusHandler.getStatusList()) {
+				if (s.isManaged() == true) {
+					if (s.getTextStatus() == StatusKind.missing) {
+						revert(s);
+					} else if (s.getTextStatus() == StatusKind.modified) {
+						revert(s);						
+					} else if (s.getTextStatus() == StatusKind.deleted) {
+						revert(s);						
+					} else if (s.getTextStatus() == StatusKind.conflicted) {
+						revert(s);						
+					} else if (s.getTextStatus() == StatusKind.merged) {
+						revert(s);						
+					} else if (s.getTextStatus() == StatusKind.unversioned) {
+						revert(s);						
+					} 
+				} else {
+					File fileToRevert = new File(s.getPath());
+					if (fileToRevert.isHidden() || fileToRevert.getName().startsWith(".")) {
+						// don't mess with the hidden files.
+					} else {
+						FileIO.recursiveDelete(fileToRevert);
+					}
+				}
+			}
+		} catch (ClientException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
+		} catch (IOException e) {
+			SvnLog.alertAndLog(e);
+			SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + 
+					"with exception: " + e.getLocalizedMessage());
+			throw new TaskFailedException(e);
+		}
+		SvnLog.info("finished revert");
+		ObjectServerCore.refreshServers();
+		SvnLog.info("refreshed Object Servers");
+	}
+
+	private static void revert(Status s) throws ClientException {
+		Svn.getSvnClient()
+				.revert(s.getPath(),
+						Depth.infinity,
+						null);
+		SvnLog.info("reverted: " + s.getPath());
+	}
+
+
 	public static void update(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		SvnLog.info("starting update");
@@ -505,6 +571,11 @@ public class Svn implements I_HandleSubversion {
 		purge(svd, authenticator, interactive);
 	}
 
+	public void svnRevert(SubversionData svd, PromptUserPassword3 authenticator,
+			boolean interactive) throws TaskFailedException {
+		revert(svd, authenticator, interactive);
+	}
+
 	public void svnStatus(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
 		status(svd, authenticator, interactive);
@@ -542,6 +613,10 @@ public class Svn implements I_HandleSubversion {
 
 	public void svnPurge(SubversionData svd) throws TaskFailedException {
 		svnPurge(svd, prompter, true);
+	}
+
+	public void svnRevert(SubversionData svd) throws TaskFailedException {
+		svnRevert(svd, prompter, true);
 	}
 
 	public void svnStatus(SubversionData svd) throws TaskFailedException {

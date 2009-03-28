@@ -35,6 +35,7 @@ import net.jini.core.lookup.ServiceItem;
 import net.jini.lookup.ServiceItemFilter;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
@@ -254,8 +255,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient I_GetConceptData lastViewed;
 
     private transient AceFrame aceFrame;
+    
+    private transient BundleType bundleType;
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(active);
         out.writeObject(frameName);
@@ -1748,7 +1752,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.setupSvn();
         Svn.update(svd, getAuthenticator(svd), true);
     }
-    
+ 
+    public void svnRevert(SubversionData svd) throws TaskFailedException {
+        aceFrame.setupSvn();
+        Svn.revert(svd, getAuthenticator(svd), true);
+    }
+    public void svnRevert(SubversionData svd,
+    		PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+        aceFrame.setupSvn();
+        Svn.revert(svd, authenticator, interactive);
+    }
+
 	public void svnUpdateDatabase(SubversionData svd,
 			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
@@ -2234,6 +2248,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	public void setHiddenTopToggles(Set<TopToggleTypes> hiddenTopToggles) {
 		this.hiddenTopToggles = hiddenTopToggles;
+	}
+
+    public BundleType getBundleType() {
+    	if (bundleType == null) {
+            File profileDirSvn = new File("profiles" + File.separator + ".svn");
+            File databaseSvn = new File(getDbConfig().getDbFolder(), ".svn");
+            if (profileDirSvn.exists() && databaseSvn.exists()) {
+            	bundleType = BundleType.DATABASE_UPDATE;
+            } else if (profileDirSvn.exists()) {
+            	bundleType = BundleType.CHANGE_SET_UPDATE;
+            } else {
+            	bundleType = BundleType.STAND_ALONE;
+            }
+    	}
+		return bundleType;
 	}
 
 }

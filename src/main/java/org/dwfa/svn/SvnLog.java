@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import org.dwfa.vodb.VodbEnv;
-import org.tigris.subversion.javahl.ClientException;
 
 public class SvnLog {
 
@@ -181,7 +180,7 @@ public class SvnLog {
 			logger.warning(arg0);
 		}
 
-		public static void alertAndLog(ClientException e) {
+		public static void alertAndLog(Exception e) {
 			if (VodbEnv.headless == false) {
 				JOptionPane.showMessageDialog(null,
 					    "<html>" + e.getMessage() + 

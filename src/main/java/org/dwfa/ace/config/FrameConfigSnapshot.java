@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
@@ -51,6 +52,20 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
+
+	public void svnRevert(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive)
+			throws TaskFailedException {
+		baseFrame.svnRevert(svd, authenticator, interactive);
+	}
+
+	public void svnRevert(SubversionData svd) throws TaskFailedException {
+		baseFrame.svnRevert(svd);
+	}
+
+	public BundleType getBundleType() {
+		return baseFrame.getBundleType();
+	}
 
 	public I_GetConceptData getContext() {
 		return baseFrame.getContext();
