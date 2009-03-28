@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_ConfigAceFrame.SPECIAL_SVN_ENTRIES;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -38,7 +40,24 @@ public class PurgeSvnEntry extends AbstractSvnEntryTask {
 
 
     protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey) throws TaskFailedException {
-        config.svnPurge(svd);
-    }
+		try {
+			SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(svnEntryKey);
+			switch (entry) {
+			case BERKELEY_DB:
+				// nothing to do
+				break;
+			case PROFILE_CSU:
+				// nothing to do
+				break;
+			case PROFILE_DBU:
+				// nothing to do
+
+			default:
+				throw new TaskFailedException("Don't know how to handle: " + entry);
+			}
+		} catch (IllegalArgumentException e) {
+            config.svnPurge(svd);			
+		}
+	}
 
 }

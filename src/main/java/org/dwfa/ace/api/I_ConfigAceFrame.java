@@ -24,6 +24,11 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
+	
+	public enum SPECIAL_SVN_ENTRIES { PROFILE_CSU(), 
+		PROFILE_DBU(),
+		BERKELEY_DB();
+	};
 
 	public boolean isActive();
 
@@ -363,5 +368,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     
     public void setContext(I_GetConceptData context);
     public I_GetConceptData getContext();
+    
+	public BundleType getBundleType();
+
 
 }

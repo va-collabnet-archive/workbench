@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_ConfigAceFrame.SPECIAL_SVN_ENTRIES;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -37,10 +39,49 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
 
 
     protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) throws TaskFailedException {
-       	if (taskKey.equalsIgnoreCase("database")) {
-            // don't commit database changes;
-    	} else {
-            config.svnCommit(svd);
-    	}
-    }
+		try {
+			SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(taskKey);
+			BundleType bundleType = config.getBundleType();
+			switch (entry) {
+			case BERKELEY_DB:
+				// Nothing to do...
+				
+				break;
+			case PROFILE_CSU:
+				switch (bundleType) {
+				case DATABASE_UPDATE:
+				case STAND_ALONE:
+					// nothing to do...
+					break;
+
+				case CHANGE_SET_UPDATE:
+					config.svnCommit(svd);
+					break;
+				default:
+					throw new TaskFailedException("Can't handle: " + bundleType);
+				}
+				
+				break;
+			case PROFILE_DBU:
+				switch (bundleType) {
+				case CHANGE_SET_UPDATE:
+				case STAND_ALONE:
+					// nothing to do...
+					break;
+
+				case DATABASE_UPDATE:
+					config.svnCommit(svd);
+					break;
+				default:
+					throw new TaskFailedException("Can't handle: " + bundleType);
+				}
+				break;
+
+			default:
+				throw new TaskFailedException("Don't know how to handle: " + entry);
+			}
+		} catch (IllegalArgumentException e) {
+            config.svnCommit(svd);			
+		}
+	}
 }

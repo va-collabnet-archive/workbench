@@ -32,18 +32,6 @@
       <artifactId>core</artifactId>
       <version>2.0.19</version>
     </dependency>
-    <!-- added by lawley to support drag-and-drop -->
-<!-- 
-    This creates a circular dependency, and we can't release 
-    while this dependency remains...
-
-    <dependency>
-      <groupId>org.dwfa</groupId>
-      <artifactId>vodb</artifactId>
-      <version>1.20</version>
-      <scope>compile</scope>
-    </dependency>
- -->
     <dependency>
       <groupId>net.jini</groupId>
       <artifactId>jsk-lib</artifactId>

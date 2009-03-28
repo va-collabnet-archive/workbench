@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_ConfigAceFrame.SPECIAL_SVN_ENTRIES;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -38,11 +40,27 @@ public class PurgeAllSvnEntries extends AbstractAllSvnEntriesTask {
 
 
     protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) throws TaskFailedException {
-       	if (taskKey.equalsIgnoreCase("database")) {
-            // don't purge database changes;
-    	} else {
-            config.svnPurge(svd);
-    	}
-    }
+		try {
+			SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(taskKey);
+			switch (entry) {
+			case BERKELEY_DB:
+				// nothing to do...
+				break;
+			case PROFILE_CSU:
+				// nothing to do
+				
+				break;
+			case PROFILE_DBU:
+				// nothing to do
+				
+				break;
+
+			default:
+				throw new TaskFailedException("Don't know how to handle: " + entry);
+			}
+		} catch (IllegalArgumentException e) {
+            config.svnPurge(svd);			
+		}
+	}
 
 }

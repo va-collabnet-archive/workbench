@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ImplementTermFactory;
@@ -62,11 +63,13 @@ public class SaveNewProfile extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            BundleType bundleType = currentProfile.getBundleType();
+            
             I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
             File creatorsProfileFile = currentDbProfile.getProfileFile();
-            String repositoryUrlStr = null;
+
             String workingCopyStr = FileIO.getNormalizedRelativePath(creatorsProfileFile);
-            SubversionData creatorSvd = new SubversionData(repositoryUrlStr, workingCopyStr);
+            SubversionData creatorSvd = new SubversionData(null, workingCopyStr);
             currentProfile.svnCompleteRepoInfo(creatorSvd);
             String sequenceToFind = "src/main/profiles/";
             int sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
@@ -94,56 +97,64 @@ public class SaveNewProfile extends AbstractTask {
             newDbProfile.setProfileFile(profileFile);
             newDbProfile.setUsername(profileToSave.getUsername());
             
-
-            File profileDirSvn = new File("profiles" + File.separator + ".svn");
-            
-            if (profileDirSvn.exists()) {
-                // Create a new svn profile for the profile directory
-                AddSubversionEntry addUserProfileTask = new AddSubversionEntry();
-                addUserProfileTask.setKeyName("profile");
-                addUserProfileTask.setProfilePropName(profilePropName);
-                addUserProfileTask.setPrompt("verify subversion settings for profile directory: ");
-                addUserProfileTask.setRepoUrl(profileDirRepoUrl);
-                addUserProfileTask.setWorkingCopy("profiles" + File.separator);
-                addUserProfileTask.evaluate(process, worker);           	
-            } else {
-                // Create a new svn profile for the user
-                AddSubversionEntry addUserProfileTask = new AddSubversionEntry();
-                addUserProfileTask.setKeyName("profile");
-                addUserProfileTask.setProfilePropName(profilePropName);
-                addUserProfileTask.setPrompt("verify subversion settings for user profile: ");
-                addUserProfileTask.setRepoUrl(userDirRepoUrl);
-                addUserProfileTask.setWorkingCopy(userDirStr);
-                addUserProfileTask.evaluate(process, worker);
-            }
-            
-            // Crate a new svn profile for the database if it has a .svn folder
-            File databaseSvn = new File(currentDbProfile.getDbFolder(), ".svn");
-            if (databaseSvn.exists()) {
-                SubversionData databaseSvd = new SubversionData(repositoryUrlStr, FileIO.getNormalizedRelativePath(currentDbProfile.getDbFolder()));
-                currentProfile.svnCompleteRepoInfo(databaseSvd);
-                AddSubversionEntry addDatabaseProfileTask = new AddSubversionEntry();
-                addDatabaseProfileTask.setKeyName("database");
-                addDatabaseProfileTask.setProfilePropName(profilePropName);
-                addDatabaseProfileTask.setPrompt("verify subversion settings for database: ");
-                addDatabaseProfileTask.setRepoUrl(databaseSvd.getRepositoryUrlStr());
-                addDatabaseProfileTask.setWorkingCopy(databaseSvd.getWorkingCopyStr());
-                addDatabaseProfileTask.evaluate(process, worker);
-            }
-            
-            // write to disk
+            // write new profile to disk
             FileOutputStream fos = new FileOutputStream(profileFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(newDbProfile);
-            oos.close();
-              
-            // import, delete, then checkout...
-            SubversionData userSvd = new SubversionData(userDirRepoUrl, userDirStr);
-            currentProfile.svnImport(userSvd);
-            //
-            FileIO.recursiveDelete(new File(userDirStr));
-            currentProfile.svnCheckout(userSvd);
+            oos.close();            
+            
+            // Create a new profile-csu subversion entry
+            AddSubversionEntry addUserCsuProfileTask = new AddSubversionEntry();
+            addUserCsuProfileTask.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
+            addUserCsuProfileTask.setProfilePropName(profilePropName);
+            addUserCsuProfileTask.setPrompt("verify subversion settings for profile directory: ");
+            addUserCsuProfileTask.setRepoUrl(profileDirRepoUrl);
+            addUserCsuProfileTask.setWorkingCopy("profiles" + File.separator);
+            addUserCsuProfileTask.evaluate(process, worker);           	
+  
+            // Create a new profile-dbu subversion entry
+            AddSubversionEntry addUserDbuProfileTask = new AddSubversionEntry();
+            addUserDbuProfileTask.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
+            addUserDbuProfileTask.setProfilePropName(profilePropName);
+            addUserDbuProfileTask.setPrompt("verify subversion settings for user profile: ");
+            addUserDbuProfileTask.setRepoUrl(userDirRepoUrl);
+            addUserDbuProfileTask.setWorkingCopy(userDirStr);
+            addUserDbuProfileTask.evaluate(process, worker);
+           
+            
+            // Create a new berkeley-db subversion entry
+            SubversionData databaseSvd = new SubversionData(null, FileIO.getNormalizedRelativePath(currentDbProfile.getDbFolder()));
+            currentProfile.svnCompleteRepoInfo(databaseSvd);
+            AddSubversionEntry addDatabaseProfileTask = new AddSubversionEntry();
+            addDatabaseProfileTask.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.BERKELEY_DB.toString());
+            addDatabaseProfileTask.setProfilePropName(profilePropName);
+            addDatabaseProfileTask.setPrompt("verify subversion settings for berkeley-db: ");
+            addDatabaseProfileTask.setRepoUrl(databaseSvd.getRepositoryUrlStr());
+            addDatabaseProfileTask.setWorkingCopy(databaseSvd.getWorkingCopyStr());
+            addDatabaseProfileTask.evaluate(process, worker);
+            
+            // Depending on bundle type, synchronize with subversion...
+            switch (bundleType) {
+			case CHANGE_SET_UPDATE:
+	            SubversionData profileCsu = currentProfile.getSubversionMap().get(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
+	            currentProfile.svnCommit(profileCsu);
+				break;
+			case DATABASE_UPDATE:
+	            SubversionData profileDbu = currentProfile.getSubversionMap().get(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
+	            currentProfile.svnImport(profileDbu);
+	            //
+	            FileIO.recursiveDelete(new File(userDirStr));
+	            currentProfile.svnCheckout(profileDbu);
+				
+				break;
+			case STAND_ALONE:
+				//No subversion synchronization for standalone bundle. 
+				break;
+
+			default:
+				throw new TaskFailedException("Don't know how to handle bundle type: " + bundleType);
+			}
             
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {

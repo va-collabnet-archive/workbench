@@ -13,6 +13,7 @@ public interface I_HandleSubversion {
     public void svnCommit(SubversionData svd) throws TaskFailedException;
     public void svnImport(SubversionData svd) throws TaskFailedException;
     public void svnPurge(SubversionData svd) throws TaskFailedException;
+    public void svnRevert(SubversionData svd) throws TaskFailedException;
     public void svnStatus(SubversionData svd) throws TaskFailedException;
     public void svnUpdate(SubversionData svd) throws TaskFailedException;
 	public void svnUpdateDatabase(SubversionData svd) throws TaskFailedException;
@@ -27,6 +28,7 @@ public interface I_HandleSubversion {
 	public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
 	public void svnImport(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
 	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
+	public void svnRevert(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
 	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
 	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
 	public void svnUpdateDatabase(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException;
