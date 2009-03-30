@@ -1,5 +1,7 @@
 package org.dwfa.ace.config;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -21,13 +23,17 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
@@ -45,11 +51,13 @@ import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.bpa.util.SelectObjectDialog;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPrompter;
+import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.VodbEnv;
 import org.tigris.subversion.javahl.ClientException;
@@ -98,6 +106,7 @@ public class AceRunner {
 	private static boolean firstStartup = true;
 
 	private File aceConfigFile;
+	private Properties aceProperties;
 
 	public AceRunner(String[] args, LifeCycle lc) {
 		try {
@@ -122,7 +131,7 @@ public class AceRunner {
 			setupIpChangeListener();
 			setBerkeleyDbAsTransactional();
 
-			File acePropertiesFile = new File("config","ace.properties");
+			File acePropertiesFile = new File("config", "ace.properties");
 			if (acePropertiesFile.exists() == false) {
 				try {
 					initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
@@ -131,9 +140,10 @@ public class AceRunner {
 					System.exit(0);
 				}
 			}
-			final Properties aceProperties = new Properties();
+			aceProperties = new Properties();
 			if (acePropertiesFile.exists()) {
-				aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+				aceProperties
+						.loadFromXML(new FileInputStream(acePropertiesFile));
 			}
 
 			aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
@@ -141,42 +151,15 @@ public class AceRunner {
 					"src/main/config/config.ace"));
 
 			if (aceConfigFile.exists()) {
-
+				
 				// Put up a dialog to select the configuration file...
-				SwingUtilities.invokeAndWait(new Runnable() {
-
-					public void run() {
-						File profileDir = new File("profiles" + File.separator
-								+ "users");
-						if (profileDir.exists() == false) {
-							profileDir = new File("profiles");
-							if (profileDir.exists() == false) {
-								profileDir.mkdirs();
-							}
-						}
-						File lastProfileDir = profileDir;
-						if (aceProperties.getProperty("last-profile-dir") != null) {
-							lastProfileDir = new File(aceProperties.getProperty("last-profile-dir"));
-						}
-						try {
-							aceConfigFile = FileDialogUtil.getExistingFile(
-									"Please select your user profile:",
-									new FilenameFilter() {
-										public boolean accept(File dir,
-												String name) {
-											return name.toLowerCase().endsWith(
-													".ace");
-										}
-									}, lastProfileDir);
-							aceProperties.setProperty("last-profile-dir", FileIO.getRelativePath(aceConfigFile));
-						} catch (TaskFailedException e) {
-							AceLog.getAppLog().alertAndLogException(e);
-							System.exit(0);
-						}
-					}
-
-				});
-
+				CountDownLatch latch = new CountDownLatch(1);
+				GetProfileWorker profiler = new GetProfileWorker(aceConfigFile, aceProperties, latch);
+				profiler.start();
+				latch.await();
+				
+				aceConfigFile = profiler.aceConfigFile;
+				
 				ObjectInputStream ois = new ObjectInputStream(
 						new BufferedInputStream(new FileInputStream(
 								aceConfigFile)));
@@ -191,7 +174,8 @@ public class AceRunner {
 				AceConfig.config.setProfileFile(aceConfigFile);
 				AceConfig.setupAceConfig(AceConfig.config, null, null, false);
 			}
-			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
+			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile),
+					null);
 			ACE.setAceConfig(AceConfig.config);
 			AceConfig.config.addChangeSetWriters();
 			int successCount = 0;
@@ -217,7 +201,7 @@ public class AceRunner {
 								login = false;
 								successCount++;
 								handleAdministrativeFrame(prompter, ace);
-								
+
 							} else {
 								login = false;
 								successCount++;
@@ -242,7 +226,7 @@ public class AceRunner {
 						"No successful logins...", JOptionPane.ERROR_MESSAGE);
 				System.exit(0);
 			}
-			
+
 			// Startup queues in profile sub-directories here...
 
 			File directory = AceConfig.config.getProfileFile().getParentFile();
@@ -252,21 +236,127 @@ public class AceRunner {
 					processFile(dir, lc);
 				}
 			}
-			
+
 			// Startup other queues here...
-           for (String queue: AceConfig.config.getQueues()) {
-        	   File queueFile = new File(queue);
-            	AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
-            	if (QueueServer.started(queueFile)) {
-                	AceLog.getAppLog().info("Queue already started: " + queueFile.toURI().toURL().toExternalForm());
-            	} else {
-                    new QueueServer(new String[] { queueFile.getCanonicalPath() }, lc);
-            	}
-            }			
+			for (String queue : AceConfig.config.getQueues()) {
+				File queueFile = new File(queue);
+				AceLog.getAppLog().info(
+						"Found queue: "
+								+ queueFile.toURI().toURL().toExternalForm());
+				if (QueueServer.started(queueFile)) {
+					AceLog.getAppLog().info(
+							"Queue already started: "
+									+ queueFile.toURI().toURL()
+											.toExternalForm());
+				} else {
+					new QueueServer(
+							new String[] { queueFile.getCanonicalPath() }, lc);
+				}
+			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			System.exit(0);
 		}
+	}
+
+	private static class GetProfileWorker extends SwingWorker<Boolean> {
+		StartupFrameListener fl = new StartupFrameListener();
+		JFrame parentFrame = new JFrame();
+		boolean newFrame = true;
+		private File aceConfigFile;
+		private Properties aceProperties;
+		private File lastProfileDir;
+		CountDownLatch latch;
+
+		public GetProfileWorker(File aceConfigFile, Properties aceProperties, CountDownLatch latch) {
+			super();
+			this.aceConfigFile = aceConfigFile;
+			this.aceProperties = aceProperties;
+			this.latch = latch;
+		}
+
+		@Override
+		protected Boolean construct() throws Exception {
+
+			File profileDir = new File("profiles" + File.separator + "users");
+			if (profileDir.exists() == false) {
+				profileDir = new File("profiles");
+				if (profileDir.exists() == false) {
+					profileDir.mkdirs();
+				}
+			}
+			lastProfileDir = profileDir;
+			if (aceProperties.getProperty("last-profile-dir") != null) {
+				lastProfileDir = new File(aceProperties
+						.getProperty("last-profile-dir"));
+			}
+			OpenFrames.addFrameListener(fl);
+			if (OpenFrames.getNumOfFrames() > 0) {
+				newFrame = false;
+				parentFrame = OpenFrames.getFrames().iterator().next();
+				AceLog.getAppLog().info("### Adding an existing frame");
+			} else {
+				SwingUtilities.invokeAndWait(new Runnable() {
+
+					public void run() {
+						parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
+						parentFrame.pack();
+						Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+						parentFrame.setLocation(d.width/2, d.height/2);
+						parentFrame.setVisible(true);
+						OpenFrames.addFrame(parentFrame);
+						AceLog.getAppLog().info("### Using a new frame");
+					}
+					
+				});
+			}
+			return true;
+		}
+
+		@Override
+		protected void finished() {
+			super.finished();
+			try {
+				aceConfigFile = FileDialogUtil.getExistingFile(
+						"Please select your user profile:",
+						new FilenameFilter() {
+							public boolean accept(File dir, String name) {
+								return name.toLowerCase().endsWith(".ace");
+							}
+						}, lastProfileDir, parentFrame);
+				aceProperties.setProperty("last-profile-dir", FileIO
+						.getRelativePath(aceConfigFile));
+				if (newFrame) {
+					OpenFrames.removeFrame(parentFrame);
+					parentFrame.setVisible(false);
+				}
+				latch.countDown();
+				OpenFrames.removeFrameListener(fl);
+			} catch (TaskFailedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+				System.exit(0);
+			}
+		}
+
+	}
+
+	private static class StartupFrameListener implements ListDataListener {
+
+		public void contentsChanged(ListDataEvent arg0) {
+			AceLog.getAppLog().info("Contents changed: " + arg0);
+
+		}
+
+		public void intervalAdded(ListDataEvent arg0) {
+			AceLog.getAppLog().info("intervalAdded: " + arg0);
+
+		}
+
+		public void intervalRemoved(ListDataEvent arg0) {
+			AceLog.getAppLog().info("intervalRemoved: " + arg0);
+
+		}
+
 	}
 
 	private void handleNormalFrame(final I_ConfigAceFrame ace) {
@@ -275,13 +365,11 @@ public class AceRunner {
 				try {
 					boolean startup = firstStartup;
 					firstStartup = false;
-					AceFrame af = new AceFrame(
-							AceRunner.args,
-							AceRunner.lc, ace, startup);
+					AceFrame af = new AceFrame(AceRunner.args, AceRunner.lc,
+							ace, startup);
 					af.setVisible(true);
 				} catch (Exception e) {
-					AceLog.getAppLog()
-							.alertAndLogException(e);
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
 
@@ -296,45 +384,38 @@ public class AceRunner {
 		prompter.setUsername(ace.getAdminUsername());
 		prompter.setPassword("");
 		while (tryAgain) {
-			prompter.prompt(
-							"Please authenticate as an administrative user:",
-							ace.getAdminUsername());
+			prompter.prompt("Please authenticate as an administrative user:",
+					ace.getAdminUsername());
 			if (ace.getAdminUsername().equals(prompter.getUsername())
 					&& ace.getAdminPassword().equals(prompter.getPassword())) {
-				SwingUtilities
-						.invokeLater(new Runnable() {
-							public void run() {
-								try {
-									boolean startup = firstStartup;
-									firstStartup = false;
-									String regularPluginRoot = AceFrame.getPluginRoot();
-									AceFrame.setPluginRoot(AceFrame.getAdminPluginRoot());
-									AceFrame newFrame = new AceFrame(
-											AceRunner.args,
-											AceRunner.lc,
-											ace,
-											startup);
-									AceFrame.setPluginRoot(regularPluginRoot);
-									ace.setSubversionToggleVisible(true);
-									newFrame.setTitle(newFrame.getTitle().replace(
-															"Editor",
-															"Administrator"));
-									newFrame.setVisible(true);
-								} catch (Exception e) {
-									AceLog.getAppLog().alertAndLogException(e);
-								}
-							}
-						});
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							boolean startup = firstStartup;
+							firstStartup = false;
+							String regularPluginRoot = AceFrame.getPluginRoot();
+							AceFrame.setPluginRoot(AceFrame
+									.getAdminPluginRoot());
+							AceFrame newFrame = new AceFrame(AceRunner.args,
+									AceRunner.lc, ace, startup);
+							AceFrame.setPluginRoot(regularPluginRoot);
+							ace.setSubversionToggleVisible(true);
+							newFrame.setTitle(newFrame.getTitle().replace(
+									"Editor", "Administrator"));
+							newFrame.setVisible(true);
+						} catch (Exception e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						}
+					}
+				});
 
 				tryAgain = false;
 				prompter.setPassword("");
 			} else {
-				int n = JOptionPane
-						.showConfirmDialog(
-								null,
-								"Would you like to try again?",
-								"Administrative authentication failed",
-								JOptionPane.YES_NO_OPTION);
+				int n = JOptionPane.showConfirmDialog(null,
+						"Would you like to try again?",
+						"Administrative authentication failed",
+						JOptionPane.YES_NO_OPTION);
 				if (n == JOptionPane.YES_OPTION) {
 					tryAgain = true;
 				} else {
@@ -346,17 +427,17 @@ public class AceRunner {
 		prompter.setPassword(password);
 	}
 
-	private void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile)
-			throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
+	private void initialSubversionOperationsAndChangeSetImport(
+			File acePropertiesFile) throws ConfigurationException,
+			FileNotFoundException, IOException, TaskFailedException,
+			ClientException {
 		Properties aceProperties = new Properties();
 		aceProperties.setProperty("initial-svn-checkout", "true");
-		
-		
+
 		String svnCheckoutProfileOnStart = (String) jiniConfig.getEntry(this
-				.getClass().getName(), "svnCheckoutProfileOnStart", String.class,
-				"");
-		
-		
+				.getClass().getName(), "svnCheckoutProfileOnStart",
+				String.class, "");
+
 		String[] svnCheckoutOnStart = (String[]) jiniConfig.getEntry(this
 				.getClass().getName(), "svnCheckoutOnStart", String[].class,
 				new String[] {});
@@ -366,7 +447,8 @@ public class AceRunner {
 		List<File> changeLocations = new ArrayList<File>();
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
-				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
+				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart
+						.length() > 0)) {
 			boolean connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
 					.showConfirmDialog(
 							null,
@@ -374,10 +456,12 @@ public class AceRunner {
 							"Confirm network operation",
 							JOptionPane.YES_NO_OPTION));
 			if (connectToSubversion) {
-				if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-					handleSvnProfileCheckout(changeLocations, svnCheckoutProfileOnStart, aceProperties);
+				if (svnCheckoutProfileOnStart != null
+						&& svnCheckoutProfileOnStart.length() > 0) {
+					handleSvnProfileCheckout(changeLocations,
+							svnCheckoutProfileOnStart, aceProperties);
 				}
-				
+
 				if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
 					for (String svnSpec : svnCheckoutOnStart) {
 						handleSvnCheckout(changeLocations, svnSpec);
@@ -393,27 +477,33 @@ public class AceRunner {
 				if (changeLocations.size() > 0) {
 					doStealthChangeSetImport(changeLocations);
 				}
-				aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
+				aceProperties.storeToXML(
+						new FileOutputStream(acePropertiesFile), null);
 			} else {
-				throw new TaskFailedException("User did not want to connect to Subversion.");
+				throw new TaskFailedException(
+						"User did not want to connect to Subversion.");
 			}
 		}
 	}
 
-	private void handleSvnProfileCheckout(List<File> changeLocations, String svnSpec, Properties aceProperties) throws ClientException, TaskFailedException {
+	private void handleSvnProfileCheckout(List<File> changeLocations,
+			String svnSpec, Properties aceProperties) throws ClientException,
+			TaskFailedException {
 		SubversionData svd = new SubversionData(svnSpec, null);
 		List<String> listing = Svn.list(svd);
 		Map<String, String> profileMap = new HashMap<String, String>();
-		for (String item: listing) {
+		for (String item : listing) {
 			if (item.endsWith(".ace")) {
-				profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
+				profileMap.put(item.substring(item.lastIndexOf("/") + 1)
+						.replace(".ace", ""), item);
 			}
 		}
-		SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
+		SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap
+				.keySet());
 		JFrame emptyFrame = new JFrame();
-		String selectedProfile = (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, 
-				"Select profile to checkout:",
-		          "Checkout profile:", sortedProfiles.toArray(), null, null);
+		String selectedProfile = (String) SelectObjectDialog.showDialog(
+				emptyFrame, emptyFrame, "Select profile to checkout:",
+				"Checkout profile:", sortedProfiles.toArray(), null, null);
 		String selectedPath = profileMap.get(selectedProfile);
 		if (selectedPath.startsWith("/")) {
 			selectedPath = selectedPath.substring(1);
@@ -422,27 +512,29 @@ public class AceRunner {
 		String[] specParts = svnSpec.split("/");
 		int matchStart = 0;
 		for (int i = 0; i < specParts.length; i++) {
-			if (specParts[i].equals(pathParts[i-matchStart])) {
-				
+			if (specParts[i].equals(pathParts[i - matchStart])) {
+
 			} else {
-				matchStart = i+1;
+				matchStart = i + 1;
 			}
 		}
 		List<String> specList = new ArrayList<String>();
 		for (int i = 0; i < matchStart; i++) {
 			specList.add(specParts[i]);
 		}
-		for (String pathPart: pathParts) {
+		for (String pathPart : pathParts) {
 			specList.add(pathPart);
 		}
 		StringBuffer checkoutBuffer = new StringBuffer();
-		for (int i = 0; i < specList.size() -1; i++) {
+		for (int i = 0; i < specList.size() - 1; i++) {
 			checkoutBuffer.append(specList.get(i));
 			checkoutBuffer.append("/");
 		}
 		String svnProfilePath = checkoutBuffer.toString();
-		SubversionData svnCheckoutData = new SubversionData(svnProfilePath, "profiles/" + selectedProfile);
-		aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
+		SubversionData svnCheckoutData = new SubversionData(svnProfilePath,
+				"profiles/" + selectedProfile);
+		aceProperties.setProperty("last-profile-dir", "profiles/"
+				+ selectedProfile);
 		String moduleName = svnCheckoutData.getRepositoryUrlStr();
 		String destPath = svnCheckoutData.getWorkingCopyStr();
 		Revision revision = Revision.HEAD;
@@ -451,12 +543,12 @@ public class AceRunner {
 		boolean ignoreExternals = false;
 		boolean allowUnverObstructions = false;
 		Svn.getSvnClient().checkout(moduleName, destPath, revision,
-				pegRevision, depth, ignoreExternals,
-				allowUnverObstructions);
+				pegRevision, depth, ignoreExternals, allowUnverObstructions);
 		changeLocations.add(new File(destPath));
 	}
-	
-	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException, ClientException {
+
+	private void handleSvnCheckout(List<File> changeLocations, String svnSpec)
+			throws TaskFailedException, ClientException {
 		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
 		String[] specParts = new String[] {
 				svnSpec.substring(0, svnSpec.lastIndexOf("|")),
@@ -472,21 +564,21 @@ public class AceRunner {
 							+ specParts[local]);
 		} else {
 
-				// do the checkout...
-				AceLog.getAppLog().info(
-						"svn checkout " + specParts[server] + " to: "
-								+ specParts[local]);
-				String moduleName = specParts[server];
-				String destPath = specParts[local];
-				Revision revision = Revision.HEAD;
-				Revision pegRevision = Revision.HEAD;
-				int depth = Depth.infinity;
-				boolean ignoreExternals = false;
-				boolean allowUnverObstructions = false;
-				Svn.getSvnClient().checkout(moduleName, destPath, revision,
-						pegRevision, depth, ignoreExternals,
-						allowUnverObstructions);
-				changeLocations.add(checkoutLocation);
+			// do the checkout...
+			AceLog.getAppLog().info(
+					"svn checkout " + specParts[server] + " to: "
+							+ specParts[local]);
+			String moduleName = specParts[server];
+			String destPath = specParts[local];
+			Revision revision = Revision.HEAD;
+			Revision pegRevision = Revision.HEAD;
+			int depth = Depth.infinity;
+			boolean ignoreExternals = false;
+			boolean allowUnverObstructions = false;
+			Svn.getSvnClient()
+					.checkout(moduleName, destPath, revision, pegRevision,
+							depth, ignoreExternals, allowUnverObstructions);
+			changeLocations.add(checkoutLocation);
 		}
 	}
 
@@ -533,10 +625,9 @@ public class AceRunner {
 			};
 
 			for (File checkoutLocation : changeLocations) {
-				jcsImporter
-						.importAllChangeSets(AceLog.getAppLog().getLogger(),
-								null, checkoutLocation.getAbsolutePath(),
-								false, ".jcs", "bootstrap.init");
+				jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(),
+						null, checkoutLocation.getAbsolutePath(), false,
+						".jcs", "bootstrap.init");
 			}
 
 			for (File checkoutLocation : changeLocations) {
@@ -554,7 +645,6 @@ public class AceRunner {
 		AceConfig.stealthVodb = null;
 		LocalVersionedTerminology.setStealthfactory(null);
 	}
-
 
 	private void setupLookAndFeel() throws ConfigurationException,
 			ClassNotFoundException, InstantiationException,
@@ -614,7 +704,8 @@ public class AceRunner {
 		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
 	}
 
-	private void setupDatabase(AceConfig aceConfig, File configFileFile) throws IOException {
+	private void setupDatabase(AceConfig aceConfig, File configFileFile)
+			throws IOException {
 		if (aceConfig.isDbCreated() == false) {
 			int n = JOptionPane
 					.showConfirmDialog(
@@ -631,10 +722,12 @@ public class AceRunner {
 				return;
 			}
 		}
-		
-		File jeUserPropertiesFile = new File(configFileFile.getParentFile(), "je.properties");
+
+		File jeUserPropertiesFile = new File(configFileFile.getParentFile(),
+				"je.properties");
 		if (jeUserPropertiesFile.exists()) {
-			File jeDbPropertiesFile = new File(aceConfig.getDbFolder(), "je.properties");
+			File jeDbPropertiesFile = new File(aceConfig.getDbFolder(),
+					"je.properties");
 			FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
 		}
 	}

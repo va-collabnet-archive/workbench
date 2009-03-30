@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -89,8 +87,6 @@ import javax.swing.tree.TreePath;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
-import net.jini.config.ConfigurationProvider;
-import net.jini.core.entry.Entry;
 import net.jini.lookup.ServiceItemFilter;
 
 import org.dwfa.ace.actions.Abort;
@@ -113,7 +109,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -135,6 +130,8 @@ import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.queue.AddQueueListener;
+import org.dwfa.ace.queue.NewQueueListener;
 import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
@@ -165,12 +162,9 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.jini.ElectronicAddress;
-import org.dwfa.queue.QueueServer;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -893,65 +887,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		}
 	}
 
-	public class AddQueueListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent evt) {
-
-			try {
-				FileDialog dialog = new FileDialog(new Frame(),
-						"Select a queue");
-				dialog.setDirectory(System.getProperty("user.dir"));
-				dialog.setFilenameFilter(new FilenameFilter() {
-					public boolean accept(File dir, String name) {
-						return name.endsWith("queue.config");
-					}
-				});
-				dialog.setVisible(true);
-				if (dialog.getFile() != null) {
-					File queueFile = new File(dialog.getDirectory(), dialog
-							.getFile());
-					String workingCopy = FileIO.getRelativePath(queueFile
-							.getParentFile().getAbsoluteFile());
-					SubversionData svd = new SubversionData(null, workingCopy);
-					aceFrameConfig.svnCompleteRepoInfo(svd);
-
-					aceFrameConfig.getDbConfig().getQueues().add(
-							FileIO.getRelativePath(queueFile));
-					Configuration queueConfig = ConfigurationProvider
-							.getInstance(new String[] { queueFile
-									.getAbsolutePath() });
-					Entry[] entries = (Entry[]) queueConfig.getEntry(
-							"org.dwfa.queue.QueueServer", "entries",
-							Entry[].class, new Entry[] {});
-					for (Entry entry : entries) {
-						if (ElectronicAddress.class.isAssignableFrom(entry
-								.getClass())) {
-							ElectronicAddress ea = (ElectronicAddress) entry;
-							aceFrameConfig.getQueueAddressesToShow().add(
-									ea.address);
-							aceFrameConfig.getSubversionMap().put(ea.address,
-									svd);
-							break;
-						}
-					}
-					if (QueueServer.started(queueFile)) {
-						AceLog.getAppLog().info(
-								"Queue already started: "
-										+ queueFile.toURI().toURL()
-												.toExternalForm());
-					} else {
-						new QueueServer(new String[] { queueFile
-								.getCanonicalPath() }, null);
-					}
-				}
-
-				queueViewer.refreshQueues();
-			} catch (Exception e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}
-	}
-
 	private class StatusChangeListener implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent evt) {
@@ -1232,7 +1167,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	protected JMenuItem addQueueMI, moveToDiskMI;
 
-	private QueueViewerPanel queueViewer;
+	QueueViewerPanel queueViewer;
 
 	private JLabel statusLabel = new JLabel();
 
@@ -1293,7 +1228,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public static Timer timer = new Timer();
 
-	private AceFrameConfig aceFrameConfig;
+	AceFrameConfig aceFrameConfig;
 
 	private JPanel treeProgress;
 
@@ -1971,8 +1906,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		listEditorTopPanel.add(new JLabel(" "), c); // filler
 		c.gridx++;
 		c.weightx = 0.0;
-		addActionButton(new AddQueueListener(), "/24x24/plain/inbox_add.png",
-				"Add new inbox to profile", listEditorTopPanel, c);
+		addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
+				"Create new inbox and add to profile", listEditorTopPanel, c);
+		addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png",
+				"Add existing inbox to profile", listEditorTopPanel, c);
 		addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
 				"Take Selected Processes and Save To Disk (no transaction)",
 				listEditorTopPanel, c);
@@ -3962,6 +3899,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public JTreeWithDragImage getTree() {
 		return tree;
+	}
+
+	public QueueViewerPanel getQueueViewer() {
+		return queueViewer;
 	}
 
 }

@@ -2,7 +2,6 @@ package org.dwfa.vodb.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -24,7 +23,6 @@ import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
-import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.bind.EntryBinding;

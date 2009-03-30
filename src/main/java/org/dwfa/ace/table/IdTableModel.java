@@ -18,7 +18,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;

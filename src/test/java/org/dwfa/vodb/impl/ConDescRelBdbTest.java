@@ -8,8 +8,6 @@ import java.util.zip.DataFormatException;
 import junit.framework.TestCase;
 
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.vodb.impl.ConDescRelBdb;
-import org.dwfa.vodb.impl.ConDescRelBdb.DescriptionCompressionMap;
 
 public class ConDescRelBdbTest extends TestCase {
 	
