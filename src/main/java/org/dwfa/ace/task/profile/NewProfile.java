@@ -84,11 +84,13 @@ public abstract class NewProfile extends AbstractTask {
 					.readProperty(adminPasswordPropName);
 			I_ConfigAceFrame newProfile = setupNewProfile(username, password,
 					adminUsername, adminPassword);
-			if (newProfile.getAddressesList().contains(username) == false) {
-				newProfile.getAddressesList().add(username);
-			}
-			if (username != null && newProfile.getQueueAddressesToShow().contains(username) == false) {
-				newProfile.getQueueAddressesToShow().add(username);
+			if (username != null) {
+				if (newProfile.getAddressesList().contains(username) == false) {
+					newProfile.getAddressesList().add(username);
+				}
+				if (username != null && newProfile.getQueueAddressesToShow().contains(username) == false) {
+					newProfile.getQueueAddressesToShow().add(username);
+				}
 			}
 			process.setProperty(profilePropName, newProfile);
 			return Condition.CONTINUE;

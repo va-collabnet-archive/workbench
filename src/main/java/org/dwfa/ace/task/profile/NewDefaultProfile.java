@@ -6,14 +6,16 @@ import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
+import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.NoMappingException;
@@ -56,8 +58,14 @@ public class NewDefaultProfile extends NewProfile {
 	public static I_ConfigAceFrame newProfile(String username, String password,
 			String adminUsername, String adminPassword)
 			throws TerminologyException, IOException {
-		I_TermFactory tf = LocalVersionedTerminology.get();
+		
+		
+		I_ImplementTermFactory tf = (I_ImplementTermFactory) LocalVersionedTerminology.get();
 		I_ConfigAceFrame activeConfig = tf.newAceFrameConfig();
+		
+		I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
+		activeConfig.setDbConfig(newDbProfile);
+		
 		
 		if (username == null || username.length() < 2) {
 			username = "username";

@@ -14,8 +14,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_ImplementTermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -66,6 +64,11 @@ public class SaveNewProfile extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
+			I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process
+					.readProperty(profilePropName);
+			
+			profileToSave.setFrameName(profileToSave.getUsername() + " editor");
+
 			I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 							.name());
@@ -73,16 +76,11 @@ public class SaveNewProfile extends AbstractTask {
 
 			I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
 			File creatorsProfileFile = currentDbProfile.getProfileFile();
+			I_ConfigAceDb newDbProfile = profileToSave.getDbConfig();
 
 			String workingCopyStr = FileIO
 					.getNormalizedRelativePath(creatorsProfileFile);
 
-			I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process
-					.readProperty(profilePropName);
-			I_ImplementTermFactory termFactory = (I_ImplementTermFactory) LocalVersionedTerminology
-					.get();
-			I_ConfigAceDb newDbProfile = termFactory.newAceDbConfig();
-			profileToSave.setDbConfig(newDbProfile);
 			String userDirStr = "profiles" + File.separator
 					+ profileToSave.getUsername();
 			File userDir = new File(userDirStr);
@@ -133,7 +131,8 @@ public class SaveNewProfile extends AbstractTask {
 
 				// Create a new berkeley-db subversion entry
 				SubversionData databaseSvd = new SubversionData(null, FileIO
-						.getNormalizedRelativePath(currentDbProfile.getDbFolder()));
+						.getNormalizedRelativePath(currentDbProfile
+								.getDbFolder()));
 
 				currentProfile.svnCompleteRepoInfo(databaseSvd);
 
@@ -144,12 +143,12 @@ public class SaveNewProfile extends AbstractTask {
 				addDatabaseProfileTask.setProfilePropName(profilePropName);
 				addDatabaseProfileTask
 						.setPrompt("verify subversion settings for berkeley-db: ");
-				addDatabaseProfileTask
-						.setRepoUrl(databaseSvd.getRepositoryUrlStr());
+				addDatabaseProfileTask.setRepoUrl(databaseSvd
+						.getRepositoryUrlStr());
 				addDatabaseProfileTask.setWorkingCopy(databaseSvd
 						.getWorkingCopyStr());
 				addDatabaseProfileTask.evaluate(process, worker);
-			
+
 			}
 
 			newDbProfile.getAceFrames().clear();
@@ -168,19 +167,22 @@ public class SaveNewProfile extends AbstractTask {
 			oos.writeObject(newDbProfile);
 			oos.close();
 
-
 			// Depending on bundle type, synchronize with subversion...
 			switch (bundleType) {
 			case CHANGE_SET_UPDATE:
 				SubversionData profileCsu = currentProfile
 						.getSubversionMap()
-						.get(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
+						.get(
+								I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU
+										.toString());
 				currentProfile.svnCommit(profileCsu);
 				break;
 			case DATABASE_UPDATE:
 				SubversionData profileDbu = currentProfile
 						.getSubversionMap()
-						.get(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
+						.get(
+								I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU
+										.toString());
 				currentProfile.svnImport(profileDbu);
 				//
 				FileIO.recursiveDelete(new File(userDirStr));
