@@ -2,8 +2,10 @@ package org.dwfa.ace;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,10 +23,14 @@ import org.dwfa.bpa.gui.ProcessBuilderPanel;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
+import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.queue.ObjectServerCore;
 
 public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleClickInTaskProcess {
 
+	
+	
 	public enum ContainerType { TOP_LEVEL, EMBEDDED_TASK };
 	/**
 	 * 
@@ -109,6 +115,7 @@ public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleCli
 				"/24x24/plain/inbox_into.png",
 				"save for queue",
 				listEditorTopPanel, c);
+		
 		}
 		if (type.equals(ContainerType.EMBEDDED_TASK)) {
 		addActionButton(processBuilderPanel.getWriteAttachmentActionListener(), 
@@ -134,16 +141,17 @@ public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleCli
 		return listEditorTopPanel;
 
 	}
-	private static void addActionButton(ActionListener actionListener, 
+	private static JButton addActionButton(ActionListener actionListener, 
 			String resource,
 			String tooltipText,
 			JPanel topPanel, GridBagConstraints c) {
-		JButton newProcess = new JButton(new ImageIcon(
+		JButton button = new JButton(new ImageIcon(
 				ACE.class.getResource(resource)));
-		newProcess.setToolTipText(tooltipText);
-		newProcess.addActionListener(actionListener);
-		topPanel.add(newProcess, c);
+		button.setToolTipText(tooltipText);
+		button.addActionListener(actionListener);
+		topPanel.add(button, c);
 		c.gridx++;
+		return button;
 	}
 	public void handle(I_EncodeBusinessProcess process, I_Work worker, I_EncodeBusinessProcess parent) {
 		try {

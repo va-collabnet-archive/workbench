@@ -8,6 +8,8 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
@@ -52,10 +54,25 @@ public class NewQueueListener implements ActionListener {
 
 				File queueDirectory = new File(dialog.getDirectory(), dialog
 						.getFile());
+				String username = ace.getAceFrameConfig().getUsername();
+				if (queueDirectory.getName().startsWith(username) == false) {
+					queueDirectory = new File(queueDirectory.getParent(), username + "." + dialog.getFile());
+				}
+				
 				queueDirectory.mkdirs();
 				File queueConfigTemplate = new File("config", "queue.config");
+				String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
+				
+				configTemplateString = configTemplateString.replaceFirst("username",
+						queueDirectory.getName());
+				configTemplateString = configTemplateString.replaceFirst("username", 
+						queueDirectory.getName());
+				
+				
 				File newQueueConfig = new File(queueDirectory, "queue.config");
-				FileIO.copyFile(queueConfigTemplate, newQueueConfig);
+				FileWriter fw = new FileWriter(newQueueConfig);
+				fw.write(configTemplateString);
+				fw.close();
 
 				this.ace.getAceFrameConfig().getDbConfig().getQueues().add(
 						FileIO.getRelativePath(newQueueConfig));

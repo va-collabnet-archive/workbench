@@ -52,11 +52,15 @@ public class AddQueueListener implements ActionListener {
 						.getFile());
 				String workingCopy = FileIO.getRelativePath(queueFile
 						.getParentFile().getAbsoluteFile());
-				SubversionData svd = new SubversionData(null, workingCopy);
-				this.ace.getAceFrameConfig().svnCompleteRepoInfo(svd);
+				
+				File queueSvnDir = new File(dialog.getDirectory(), ".svn");
+				
+				
+				
 
 				this.ace.getAceFrameConfig().getDbConfig().getQueues().add(
 						FileIO.getRelativePath(queueFile));
+				
 				Configuration queueConfig = ConfigurationProvider
 						.getInstance(new String[] { queueFile
 								.getAbsolutePath() });
@@ -69,8 +73,12 @@ public class AddQueueListener implements ActionListener {
 						ElectronicAddress ea = (ElectronicAddress) entry;
 						this.ace.getAceFrameConfig().getQueueAddressesToShow().add(
 								ea.address);
-						this.ace.getAceFrameConfig().getSubversionMap().put(ea.address,
-								svd);
+						if (queueSvnDir.exists()) {
+							SubversionData svd = new SubversionData(null, workingCopy);
+							this.ace.getAceFrameConfig().svnCompleteRepoInfo(svd);
+							this.ace.getAceFrameConfig().getSubversionMap().put(ea.address,
+									svd);
+						}
 						break;
 					}
 				}

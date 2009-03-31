@@ -5,7 +5,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeSupport;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -1774,9 +1776,31 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		Svn.updateDatabase(svd, getAuthenticator(svd), true);
 	}
 
-	public void svnCompleteRepoInfo(SubversionData svd) {
-        aceFrame.setupSvn();
-        Svn.completeRepoInfo(svd);
+	public void svnCompleteRepoInfo(SubversionData svd) throws TaskFailedException {
+		File svnDir = new File(svd.getWorkingCopyStr(), ".svn");
+		if (svnDir.exists()) {
+			File svnEntries = new File(svnDir, "entries");
+			try {
+				LineNumberReader lnr = new LineNumberReader(new java.io.FileReader(svnEntries));
+				@SuppressWarnings("unused")
+				String line1 = lnr.readLine();
+				@SuppressWarnings("unused")
+				String line2 = lnr.readLine();
+				@SuppressWarnings("unused")
+				String line3 = lnr.readLine();
+				@SuppressWarnings("unused")
+				String line4 = lnr.readLine();
+				String line5 = lnr.readLine();
+				AceLog.getAppLog().info("Found url " + line5 + " for working copy: " + svd.getWorkingCopyStr());
+				lnr.close();
+				svd.setRepositoryUrlStr(line5);
+				
+			} catch (FileNotFoundException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		}
 	}
 
 	public List<String> svnList(SubversionData svd) throws TaskFailedException {
