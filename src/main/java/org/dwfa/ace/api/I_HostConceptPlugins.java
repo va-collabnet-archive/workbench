@@ -7,7 +7,7 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
    public static final String USE_PREFS = "usePrefs";
 
    public enum VIEW_TYPE {
-      STATED, INFERRED
+      STATED, INFERRED 
    };
 
    public enum TOGGLES {
