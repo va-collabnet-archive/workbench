@@ -57,7 +57,6 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
         retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
         currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 		refsetHelper = new RefsetHelper(termFactory);
-        injectValidTypeIds();
 	}
 
     /**
@@ -66,6 +65,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	 */
 	public Iterator<I_ThinExtByRefVersioned> iterator() {
 		try {
+            injectValidTypeIds();
 			candidateWriter = new CandidateWriter(reportFile, termFactory);
             DuplicateFinder duplicateFinder = new DuplicateFinder(currentStatusId);
 
