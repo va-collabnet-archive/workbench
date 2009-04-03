@@ -1,8 +1,5 @@
 package org.dwfa.mojo.refset.scrub;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -10,6 +7,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * This implementation will take each candidate concept extensions and ensure that 
@@ -30,7 +30,7 @@ public class MemberSpecScrubber implements ConceptExtHandler {
 	private int retiredStatusId;
 	
 	public MemberSpecScrubber() throws Exception {
-		termFactory = LocalVersionedTerminology.get();
+		termFactory = LocalVersionedTerminology.get();        			
 		currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 		retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
 
