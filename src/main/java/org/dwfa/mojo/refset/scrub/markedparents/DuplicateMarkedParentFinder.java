@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Finds duplicate marked parents.
+ * Finds duplicate marked parents which should be "retired".
  */
 public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 
@@ -29,8 +29,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	public String reportFile;
 
 	/**
-	 * Specifies the valid extension concept values that are permitted. Extensions not of this type
-	 * will be returned by the {@link #iterator()}
+	 * Specifies the list of concepts that are processed.
 	 * @parameter
 	 */
 	public ConceptDescriptor[] validTypeConcepts;
@@ -60,14 +59,13 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	}
 
     /**
-	 * Find any concept extension that has a current version part which does NOT have an
-	 * valid concept value/type.
+	 * Finds members which are "marked parents" and which are current.
 	 */
 	public Iterator<I_ThinExtByRefVersioned> iterator() {
 		try {
             injectValidTypeIds();
 			candidateWriter = new CandidateWriter(reportFile, termFactory);
-            DuplicateFinder duplicateFinder = new DuplicateFinder(currentStatusId);
+            DuplicateMarkedParentMarker duplicateMarkedParentMarker = new DuplicateMarkedParentMarker(currentStatusId);
 
             for (Integer refsetId : refsetHelper.getSpecificationRefsets()) {
 				int memberRefsetId = refsetHelper.getMemberSetConcept(refsetId).getConceptId();
@@ -76,9 +74,9 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 				System.out.println("\nProcessing spec refset: " + memberRefsetName);
 
 				List<I_ThinExtByRefVersioned> refsetMembers = termFactory.getRefsetExtensionMembers(memberRefsetId);
-                processRefsetMembers(duplicateFinder, memberRefsetName, refsetMembers);
+                processRefsetMembers(duplicateMarkedParentMarker, memberRefsetName, refsetMembers);
             }
-            List<I_ThinExtByRefVersioned> results = new DuplicateMarkerParentSorter().sort(duplicateFinder.getDuplicates());
+            List<I_ThinExtByRefVersioned> results = new DuplicateMarketParentSifter().sift(duplicateMarkedParentMarker.getDuplicates());
             System.out.println("Found " + results.size() + " candidate extensions.");
 			return results.iterator();
 		} catch (Exception e) {
@@ -88,7 +86,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 		}
 	}
 
-    private void processRefsetMembers(final DuplicateFinder duplicateFinder, final String memberRefsetName,
+    private void processRefsetMembers(final DuplicateMarkedParentMarker duplicateMarkedParentMarker, final String memberRefsetName,
                                       final List<I_ThinExtByRefVersioned> refsetMembers) throws Exception {
 
         for (I_ThinExtByRefVersioned member : refsetMembers) {
@@ -97,7 +95,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
                 if (version instanceof I_ThinExtByRefPartConcept && isCurrentOrRetired(version)) {
                     int inclusionType = ((I_ThinExtByRefPartConcept) version).getConceptId();
                     if (isMarkedParent(inclusionType)) {
-                        duplicateFinder.put(member);
+                        duplicateMarkedParentMarker.put(member);
                         candidateWriter.logCandidate(memberRefsetName, member);
                     }
                 }
@@ -121,10 +119,11 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	}
 
     /**
-	 * Utilises the {@link org.dwfa.ace.refset.RefsetUtilities} class by injecting the db
+	 * Utilises the {@link RefsetUtilities} class by injecting the db
 	 */
 	private class RefsetHelper extends RefsetUtilities {
-		public RefsetHelper(I_TermFactory termFactory) {
+        
+		public RefsetHelper(final I_TermFactory termFactory) {
 			super.termFactory = termFactory;
 		}
 	}

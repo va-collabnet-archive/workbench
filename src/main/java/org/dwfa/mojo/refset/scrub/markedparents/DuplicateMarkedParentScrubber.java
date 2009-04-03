@@ -2,6 +2,7 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -9,15 +10,17 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
 import org.dwfa.mojo.refset.scrub.ConceptExtHandler;
 
-import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
- * This scrubber removes duplicate marked parents.
+ * This scrubber removes duplicate "marked parents" changing their status to "retired".
  */
 public class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
 	/**
-	 * Specifies the valid concept extension concept values (refset membership types)
+	 * This is not used. This has been introduced to get around a maven problem of not allowing implementations
+     * without parameters. Remove once this is sorted out.
 	 * @parameter
 	 */
 	protected ConceptDescriptor[] validTypeConcepts;
@@ -33,10 +36,9 @@ public class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
 	public void process(final ConceptExtFinder finder) {
 		try {
-			Iterator<I_ThinExtByRefVersioned> iterator = finder.iterator();
-			while  (iterator.hasNext()) {
-				processExtension(iterator.next());
-			}
+            for (Object aFinder : finder) {
+                processExtension((I_ThinExtByRefVersioned) aFinder);
+            }
 			termFactory.commit();
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to complete the scrub.", e);
@@ -44,9 +46,12 @@ public class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 	}
 
 	private void processExtension(final I_ThinExtByRefVersioned member) throws Exception {
-        //There should be one only version for each member.
-        //TODO: clean this up to handle a variable number of versions.
-        I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) member.getVersions().get(0).duplicatePart();
+        //sort by version, smallest to largest.
+        SortedSet<I_ThinExtByRefPart> sortedVersions =  new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
+        sortedVersions.addAll(member.getVersions());
+
+        //Get the latest version.
+        I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) sortedVersions.last().duplicatePart();
         newPart.setStatus(retiredStatusId);
         newPart.setVersion(Integer.MAX_VALUE);
         member.addVersion(newPart);
