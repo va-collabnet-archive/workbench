@@ -12,9 +12,9 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Finds duplicate marked parents which should be "retired".
@@ -44,7 +44,18 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	private List<Integer> validTypeIds;
 
     private int currentStatusId;
+
     private int retiredStatusId;
+
+    private DuplicateMarketParentSifter duplicateMarketParentSifter;
+
+    private List<ComponentRefsetKey> normalMemberList;
+
+    private int normalMemberId;
+
+    private static final String NORMAL_MEMBER_UUID = "cc624429-b17d-4ac5-a69e-0b32448aaf3c";
+
+    private static final String NORMAL_MEMBER_DESC = "normal member";
 
 
     public DuplicateMarkedParentFinder() throws Exception {
@@ -56,7 +67,11 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
         retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
         currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 		refsetHelper = new RefsetHelper(termFactory);
-	}
+
+        duplicateMarketParentSifter = new DuplicateMarketParentSifter();
+        normalMemberList = new ArrayList<ComponentRefsetKey>();
+        injectNormalMemberId(new ConceptDescriptor(NORMAL_MEMBER_UUID, NORMAL_MEMBER_DESC));
+    }
 
     /**
 	 * Finds members which are "marked parents" and which are current.
@@ -67,18 +82,12 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 			candidateWriter = new CandidateWriter(reportFile, termFactory);
             DuplicateMarkedParentMarker duplicateMarkedParentMarker = new DuplicateMarkedParentMarker(currentStatusId);
 
-            for (Integer refsetId : refsetHelper.getSpecificationRefsets()) {
-				int memberRefsetId = refsetHelper.getMemberSetConcept(refsetId).getConceptId();
-				I_GetConceptData memberSet = refsetHelper.getConcept(memberRefsetId);
-				String memberRefsetName = memberSet.getInitialText();
-				System.out.println("\nProcessing spec refset: " + memberRefsetName);
+            processRefsets(duplicateMarkedParentMarker);
+            List<ComponentRefsetMembers> markedParents = duplicateMarkedParentMarker.getDuplicates();
+            List<I_ThinExtByRefVersioned> siftedResults = duplicateMarketParentSifter.sift(normalMemberList, markedParents);
+            System.out.println("Found " + siftedResults.size() + " candidate extensions.");
 
-				List<I_ThinExtByRefVersioned> refsetMembers = termFactory.getRefsetExtensionMembers(memberRefsetId);
-                processRefsetMembers(duplicateMarkedParentMarker, memberRefsetName, refsetMembers);
-            }
-            List<I_ThinExtByRefVersioned> results = new DuplicateMarketParentSifter().sift(duplicateMarkedParentMarker.getDuplicates());
-            System.out.println("Found " + results.size() + " candidate extensions.");
-			return results.iterator();
+            return siftedResults.iterator();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -86,7 +95,23 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 		}
 	}
 
-    private void processRefsetMembers(final DuplicateMarkedParentMarker duplicateMarkedParentMarker, final String memberRefsetName,
+    private void injectNormalMemberId(final ConceptDescriptor conceptDescriptor) throws Exception {
+        normalMemberId = conceptDescriptor.getVerifiedConcept().getId().getNativeId();
+    }
+
+    private void processRefsets(final DuplicateMarkedParentMarker duplicateMarkedParentMarker) throws Exception {
+        for (Integer refsetId : refsetHelper.getSpecificationRefsets()) {
+            int memberRefsetId = refsetHelper.getMemberSetConcept(refsetId).getConceptId();
+            I_GetConceptData memberSet = refsetHelper.getConcept(memberRefsetId);
+            String memberRefsetName = memberSet.getInitialText();
+            System.out.println("\nProcessing spec refset: " + memberRefsetName);
+
+            List<I_ThinExtByRefVersioned> refsetMembers = termFactory.getRefsetExtensionMembers(memberRefsetId);
+            processMarkedParentsInRefsetMembers(duplicateMarkedParentMarker, memberRefsetName, refsetMembers);
+        }
+    }
+
+    private void processMarkedParentsInRefsetMembers(final DuplicateMarkedParentMarker duplicateMarkedParentMarker, final String memberRefsetName,
                                       final List<I_ThinExtByRefVersioned> refsetMembers) throws Exception {
 
         for (I_ThinExtByRefVersioned member : refsetMembers) {
@@ -96,8 +121,13 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
                     int inclusionType = ((I_ThinExtByRefPartConcept) version).getConceptId();
                     if (isMarkedParent(inclusionType)) {
                         duplicateMarkedParentMarker.put(member);
-                        candidateWriter.logCandidate(memberRefsetName, member);
                     }
+
+                    if (isNormalMember(inclusionType)) {
+                        normalMemberList.add(new ComponentRefsetKey(member));
+                    }
+
+                    candidateWriter.logCandidate(memberRefsetName, member);
                 }
             }
         }
@@ -117,6 +147,10 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
     private boolean isMarkedParent(final int inclusionType) throws Exception {
 		return validTypeIds.contains(Integer.valueOf(inclusionType));
 	}
+
+    private boolean isNormalMember(final int inclusionType) throws Exception {
+        return  normalMemberId == inclusionType;
+    }
 
     /**
 	 * Utilises the {@link RefsetUtilities} class by injecting the db
