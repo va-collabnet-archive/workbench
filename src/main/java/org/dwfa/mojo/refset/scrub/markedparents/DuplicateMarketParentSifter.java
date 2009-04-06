@@ -13,21 +13,22 @@ import java.util.List;
  */
 public final class DuplicateMarketParentSifter {
 
-    public List<I_ThinExtByRefVersioned> sift(final List<ComponentRefsetKey> normalMemberList,
-                                              final List<ComponentRefsetMembers> componentRefsetMembersList) {
-
+    public List<I_ThinExtByRefVersioned> sift(final MarkedParentProcessor markedParentProcessor) {
         List<I_ThinExtByRefVersioned> sortedMembersList = new ArrayList<I_ThinExtByRefVersioned>();
         SiftingStrategy duplicateMarkedParentStrategy = new DuplicateMarkedParentStrategy(sortedMembersList);
         SiftingStrategy normalMemberStrategy = new NormalMemberStrategy(sortedMembersList);
 
-        for (ComponentRefsetMembers componentRefsetMembers : componentRefsetMembersList) {
+        List<ComponentRefsetKey> normalMemberList = markedParentProcessor.getNormalMembers();
+        List<ComponentRefsetMembers> markedParentList = markedParentProcessor.getDuplicateMarkedParentMarker();
 
-            if (isNormalMember(normalMemberList, componentRefsetMembers)) {
-                normalMemberStrategy.sift(componentRefsetMembers);
+        for (ComponentRefsetMembers markedParentMember : markedParentList) {
+
+            if (isNormalMember(normalMemberList, markedParentMember)) {
+                normalMemberStrategy.sift(markedParentMember);
                 continue;
             }
             
-            duplicateMarkedParentStrategy.sift(componentRefsetMembers);
+            duplicateMarkedParentStrategy.sift(markedParentMember);
         }
 
         return sortedMembersList;
@@ -45,6 +46,9 @@ public final class DuplicateMarketParentSifter {
     }
 
 
+    /**
+     * Adds all "marked parent" to the <code>sortedMemberList</code>.
+     */
     private final class NormalMemberStrategy implements SiftingStrategy {
 
         private final List<I_ThinExtByRefVersioned> sortedMembersList;
@@ -53,11 +57,14 @@ public final class DuplicateMarketParentSifter {
             this.sortedMembersList = sortedMembersList;
         }
 
-        public void sift(final ComponentRefsetMembers componentRefsetMembers) {
-            sortedMembersList.addAll(componentRefsetMembers.getMembers());
+        public void sift(final ComponentRefsetMembers markedParentMember) {
+            sortedMembersList.addAll(markedParentMember.getMembers());
         }
     }
 
+    /**
+     * Adds all but one "marked parent" to the <code>sortedMemberList</code>.
+     */
     private final class DuplicateMarkedParentStrategy implements SiftingStrategy {
 
         private final List<I_ThinExtByRefVersioned> sortedMembersList;
@@ -66,8 +73,8 @@ public final class DuplicateMarketParentSifter {
             this.sortedMembersList = sortedMembersList;
         }
 
-        public void sift(final ComponentRefsetMembers componentRefsetMembers) {
-            List<I_ThinExtByRefVersioned> affectedMembers = componentRefsetMembers.getMembers();
+        public void sift(final ComponentRefsetMembers markedParentMember) {
+            List<I_ThinExtByRefVersioned> affectedMembers = markedParentMember.getMembers();
             for (int x = 0; x < affectedMembers.size() - 1; x++) {
                 sortedMembersList.add(affectedMembers.get(x));//add all but the last one
             }

@@ -2,6 +2,8 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.mojo.refset.scrub.util.TerminologyFactoryUtil;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +23,8 @@ public final class DuplicateMarkedParentMarker {
     private final Map<ComponentRefsetKey, ComponentRefsetMembers> memberMap;
     private final int currentStatusId;
 
-    public DuplicateMarkedParentMarker(final int currentStatusId) {
-        this.currentStatusId = currentStatusId;
+    public DuplicateMarkedParentMarker() throws Exception {
+        currentStatusId = new TerminologyFactoryUtil().getNativeConceptId(ArchitectonicAuxiliary.Concept.CURRENT);
         memberMap = new HashMap<ComponentRefsetKey, ComponentRefsetMembers>();
     }
 
