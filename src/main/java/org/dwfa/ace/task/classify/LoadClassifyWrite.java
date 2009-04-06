@@ -158,7 +158,8 @@ public class LoadClassifyWrite extends AbstractTask {
 				+ st[3].getMethodName() + ":" + st[3].getLineNumber() + ">>>"
 				+ tag);
 		Runtime rt = Runtime.getRuntime();
-		rt.gc();
+		// EKM - comment this in to meter memory
+		// rt.gc();
 		System.out.println(">>>" + "Used memory @ " + tag + ": "
 				+ ((rt.totalMemory() - rt.freeMemory()) / (1024 * 1024)));
 	}
@@ -226,6 +227,7 @@ public class LoadClassifyWrite extends AbstractTask {
 			worker.getLogger().info("Starting classify. ");
 			logMemory("LCW pre classify", worker);
 			startTime = System.currentTimeMillis();
+
 			rocket.classify();
 			worker.getLogger().info(
 					"LCW classify time: "
