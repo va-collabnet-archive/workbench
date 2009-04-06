@@ -6,9 +6,10 @@ import java.io.Serializable;
 
 public final class ComponentRefsetKey implements Serializable {
 
+    private static final long serialVersionUID = 3960306563510866348L;
+    
     private final Integer componentId;
     private final Integer refsetId;
-
 
     public ComponentRefsetKey(final I_ThinExtByRefVersioned member) {
         this.componentId = member.getComponentId();

@@ -32,8 +32,6 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	public ConceptDescriptor[] validTypeConcepts;
 
 
-	private I_TermFactory termFactory;
-
 	private RefsetHelper refsetHelper;
 
     private CandidateWriter candidateWriter;
@@ -44,8 +42,11 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 
     private MarkedParentProcessor markedParentProcessor;
 
+    private I_TermFactory termFactory;
+
     public DuplicateMarkedParentFinder() throws Exception {
-		refsetHelper = new RefsetHelper(new TerminologyFactoryUtil().getTermFactory());
+        termFactory = new TerminologyFactoryUtil().getTermFactory();
+        refsetHelper = new RefsetHelper(termFactory);
 
         duplicateMarketParentSifter = new DuplicateMarketParentSifter();
     }
@@ -56,8 +57,8 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 	public Iterator<I_ThinExtByRefVersioned> iterator() {
 		try {
             injectValidTypeIds();
-            markedParentProcessor = new MarkedParentProcessor(candidateWriter, validTypeIds);
             candidateWriter = new CandidateWriter(reportFile, termFactory);
+            markedParentProcessor = new MarkedParentProcessor(candidateWriter, validTypeIds);
 
             processRefsets();
             
@@ -89,7 +90,6 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
         }
     }
 
-//
     /**
 	 * Utilises the {@link RefsetUtilities} class by injecting the db
 	 */

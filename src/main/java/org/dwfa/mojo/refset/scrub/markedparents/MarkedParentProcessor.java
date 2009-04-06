@@ -26,7 +26,6 @@ public final class MarkedParentProcessor {
     private final int currentStatusId;
     private final int retiredStatusId;    
     private final int normalMemberId;
-    private boolean current;
 
     public MarkedParentProcessor(final CandidateWriter candidateWriter, final List<Integer> validTypeIds) throws Exception {
         this.candidateWriter = candidateWriter;
