@@ -51,17 +51,11 @@ public final class DuplicateMarkedParentMarker {
         List<ComponentRefsetMembers> duplicateList = new ArrayList<ComponentRefsetMembers>();
 
         for (ComponentRefsetMembers componentRefsetMembers : memberMap.values()) {
-            if (hasDuplicateMarkedParents(componentRefsetMembers)) {
-                removeRetiredMembers(componentRefsetMembers);
-                duplicateList.add(componentRefsetMembers);
-            }
+            removeRetiredMembers(componentRefsetMembers);
+            duplicateList.add(componentRefsetMembers);
         }
 
         return duplicateList;
-    }
-
-    private boolean hasDuplicateMarkedParents(final ComponentRefsetMembers componentRefsetMembers) {
-        return componentRefsetMembers.getMemberCount() > 1;
     }
 
     private void removeRetiredMembers(final ComponentRefsetMembers componentRefsetMembers) {
