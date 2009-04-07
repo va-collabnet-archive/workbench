@@ -24,7 +24,7 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
      * without parameters. Remove once this is sorted out.
 	 * @parameter
 	 */
-	public ConceptDescriptor[] validTypeConcepts;
+	private ConceptDescriptor[] validTypeConcepts;
 
 	private final I_TermFactory termFactory;
 

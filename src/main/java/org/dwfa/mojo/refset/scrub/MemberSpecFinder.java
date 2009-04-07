@@ -1,13 +1,5 @@
 package org.dwfa.mojo.refset.scrub;
 
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -17,6 +9,11 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Finds concept extensions that match a particular criteria.<br>
@@ -45,12 +42,12 @@ public class MemberSpecFinder implements ConceptExtFinder {
 	
 	protected RefsetHelper refsetHelper;
 	
-	protected PrintWriter reportWriter;
-	
 	private List<Integer> validTypeIds;
-	
-	
-	public MemberSpecFinder() throws Exception {
+
+    private CandidateWriter candidateWriter;
+
+
+    public MemberSpecFinder() throws Exception {
 		termFactory = LocalVersionedTerminology.get();
 		if (termFactory == null) { 
 			throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
@@ -65,8 +62,8 @@ public class MemberSpecFinder implements ConceptExtFinder {
 	 */
 	public Iterator<I_ThinExtByRefVersioned> iterator() {
 		try {
-			reportWriter = new PrintWriter(reportFile);
-			ArrayList<I_ThinExtByRefVersioned> candidates = new ArrayList<I_ThinExtByRefVersioned>(); 
+            candidateWriter = new CandidateWriter(reportFile,  termFactory);
+            ArrayList<I_ThinExtByRefVersioned> candidates = new ArrayList<I_ThinExtByRefVersioned>();
 			
 			for (Integer refsetId : refsetHelper.getSpecificationRefsets()) {
 				
@@ -87,7 +84,7 @@ public class MemberSpecFinder implements ConceptExtFinder {
 								int inclusionType = ((I_ThinExtByRefPartConcept)version).getConceptId();
 								if (!isValidType(inclusionType)) {
 									candidates.add(member);
-									logCandidate(memberRefsetName, member);
+									candidateWriter.logCandidate(memberRefsetName, member);
 									break;
 								}
 							}
@@ -101,41 +98,10 @@ public class MemberSpecFinder implements ConceptExtFinder {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			reportWriter.flush();
-			reportWriter.close();
+            candidateWriter.close();
 		}
 	}
-	
-	private void logCandidate(String refsetName, I_ThinExtByRefVersioned candidate) throws Exception {
-		String conceptDesc = termFactory.getConcept(candidate.getComponentId()).getInitialText();
-		
-		// First index the version parts so we can print back in chronological order
-		TreeMap<Long, PartDescription> partIndex = new TreeMap<Long, PartDescription>();  
-		for (I_ThinExtByRefPart part : candidate.getVersions()) {
-			if (part instanceof I_ThinExtByRefPartConcept) {
-				PartDescription partDesc = new PartDescription();
-				int inclusionType = ((I_ThinExtByRefPartConcept)part).getConceptId();	
-				partDesc.typeDesc = termFactory.getConcept(inclusionType).getInitialText();
-				partDesc.statusDesc = termFactory.getConcept(part.getStatus()).getInitialText();
-				partDesc.pathDesc = termFactory.getConcept(part.getPathId()).getInitialText();
-				Long version = termFactory.convertToThickVersion(part.getVersion());
-				partIndex.put(version, partDesc);
-			}
-		}
-		
-		System.out.println("\tFound candidate: " + conceptDesc);
-		SimpleDateFormat dateFmt = new SimpleDateFormat("d MMM yyyy HH:mm:ss z");
-		for (Long version : partIndex.keySet()) {
-			PartDescription partDesc = partIndex.get(version);			 
-			String dateStr = dateFmt.format(new Date(version));
-			System.out.println("\t\t" + partDesc.typeDesc + "," + partDesc.statusDesc + "," + 
-					partDesc.pathDesc + "," + dateStr);
-			reportWriter.println(refsetName + "\t" + conceptDesc + "\t" + partDesc.typeDesc + "\t" + 
-					partDesc.statusDesc + "\t" + partDesc.pathDesc + "\t" + dateStr);			
-		}
-		reportWriter.println();
-	}
-	
+
 	private boolean isValidType(int inclusionType) throws Exception {
 		if (validTypeIds == null) {
 			validTypeIds = new ArrayList<Integer>();

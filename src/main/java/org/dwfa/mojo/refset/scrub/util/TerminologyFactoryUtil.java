@@ -10,12 +10,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 public final class TerminologyFactoryUtil {
 
     public int getNativeConceptId(final ArchitectonicAuxiliary.Concept concept) throws Exception {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
-        if (termFactory == null) {
-            throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
-        }
-
-        return termFactory.uuidToNative(concept.getUids().iterator().next());
+        return getTermFactory().uuidToNative(concept.getUids().iterator().next());
     }
 
     public I_TermFactory getTermFactory() {
