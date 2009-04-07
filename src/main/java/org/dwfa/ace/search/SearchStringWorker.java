@@ -272,7 +272,6 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				AceLog.getAppLog().info("Desc count 3: " + descCount);
 				if (descCount > 0) {
 					completeLatch = new CountDownLatch(descCount);
-					descCount = Integer.MAX_VALUE;
 				}
 				new MatchUpdator();
 				AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(), config);

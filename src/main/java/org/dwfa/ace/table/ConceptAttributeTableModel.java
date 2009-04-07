@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -425,7 +426,6 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 		}
 	}
 
-	java.util.Timer timer = new java.util.Timer("updateDataAlertsTimer");
 	private class UpdateDataAlertsTimerTask extends TimerTask {
 		boolean active = true;
 		final int row;
@@ -461,7 +461,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			alertUpdater.setActive(false);
 		}
 		alertUpdater = new UpdateDataAlertsTimerTask(row);
-		timer.schedule(alertUpdater, 2000);
+		UpdateAlertsTimer.schedule(alertUpdater, 2000);
 		
 	}
 

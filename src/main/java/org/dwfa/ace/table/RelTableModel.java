@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -536,8 +537,6 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		}
 	}
 
-	java.util.Timer timer = new java.util.Timer("updateDataAlertsTimer");
-
 	private class UpdateDataAlertsTimerTask extends TimerTask {
 		boolean active = true;
 		final int row;
@@ -578,8 +577,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			alertUpdater.setActive(false);
 		}
 		alertUpdater = new UpdateDataAlertsTimerTask(row);
-		timer.schedule(alertUpdater, 2000);
-
+		UpdateAlertsTimer.schedule(alertUpdater, 2000);
 	}
 
 	public Class<?> getColumnClass(int c) {

@@ -58,6 +58,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
+import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
@@ -1702,8 +1703,6 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 		}
 	}
 
-	java.util.Timer timer = new java.util.Timer("updateDataAlertsTimer");
-
 	private class UpdateDataAlertsTimerTask extends TimerTask {
 		boolean active = true;
 		final int row;
@@ -1745,7 +1744,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 			alertUpdater.setActive(false);
 		}
 		alertUpdater = new UpdateDataAlertsTimerTask(row);
-		timer.schedule(alertUpdater, 2000);
+		UpdateAlertsTimer.schedule(alertUpdater, 2000);
 
 	}
 

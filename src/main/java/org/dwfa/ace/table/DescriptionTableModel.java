@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.EventObject;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 
@@ -26,6 +25,7 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -256,7 +256,6 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		}
 	}
 
-	Timer timer = new Timer("updateDataAlertsTimer");
 	private class UpdateDataAlertsTimerTask extends TimerTask {
 		boolean active = true;
 		final int row;
@@ -296,7 +295,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 			alertUpdater.setActive(false);
 		}
 		alertUpdater = new UpdateDataAlertsTimerTask(row);
-		timer.schedule(alertUpdater, 2000);
+		UpdateAlertsTimer.schedule(alertUpdater, 2000);
 		
 	}
 	public abstract Map<Integer, ConceptBean> getReferencedConcepts();
