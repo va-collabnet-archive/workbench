@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -227,9 +229,7 @@ public class QueueViewerPanel extends JPanel {
 
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							execute
-									.setText("<html><font color='#006400'>execute");
-							execute.setEnabled(true);
+							setupExecuteButton();
 							if (exceptionMessage.equals("")) {
 								statusMessage
 										.setText("<html><font color='blue'>Process complete");
@@ -282,8 +282,7 @@ public class QueueViewerPanel extends JPanel {
 
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			chooser
-					.setDialogTitle("Select directory to put selected processes");
+			chooser.setDialogTitle("Select directory to put selected processes");
 			int returnVal = chooser.showDialog(QueueViewerPanel.this
 					.getTopLevelAncestor(), "Select Directory");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -345,11 +344,8 @@ public class QueueViewerPanel extends JPanel {
 
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
-								execute
-										.setText("<html><font color='#006400'>execute");
-								execute.setEnabled(true);
-								statusMessage
-										.setText("<html><font color='blue'>Take complete");
+								setupExecuteButton();
+								statusMessage.setText("<html><font color='blue'>Take complete");
 								refresh.doClick();
 							}
 						});
@@ -438,31 +434,7 @@ public class QueueViewerPanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			RefreshObjectServers ros = new RefreshObjectServers();
 			ros.start();
-
-			/*
-			QueueAdaptor qAdaptor = null;
-			if (tableOfQueues.getSelectedRow() >= 0) {
-				qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(
-						tableOfQueues.getSelectedRow(), 0);
-			}
-
-			if (qAdaptor == null) { // nothing to do...
-				if (logger.isLoggable(Level.FINE)) {
-					logger.fine("Refresh, but qAdaptor is null");
-				}
-			} else {
-				try {
-					if (logger.isLoggable(Level.FINE)) {
-						logger.fine("Starting refresh for qAdaptor");
-					}
-					updateQueueModelAndDisplay(qAdaptor.queue);
-				} catch (Exception e1) {
-					logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
-				}
-			}
-			*/
 		}
-
 	}
 
 	private class ProcessSelectionActionListener implements
@@ -512,9 +484,7 @@ public class QueueViewerPanel extends JPanel {
 											processPanel));
 							queueContentsSplitPane
 									.setDividerLocation(dividerLoc);
-							execute
-									.setText("<html><font color='#006400'>execute");
-							execute.setEnabled(true);
+							setupExecuteButton();
 						} catch (NoMatchingEntryException ex) {
 							logger.info(" NoMatchingEntry: " + ex);
 							lsm.clearSelection();
@@ -527,6 +497,7 @@ public class QueueViewerPanel extends JPanel {
 									.setDividerLocation(dividerLoc);
 							execute.setText("execute");
 							execute.setEnabled(false);
+							process = null;
 						}
 					} else {
 						lsm.clearSelection();
@@ -537,6 +508,7 @@ public class QueueViewerPanel extends JPanel {
 						queueContentsSplitPane.setDividerLocation(dividerLoc);
 						execute.setText("execute");
 						execute.setEnabled(false);
+						process = null;
 					}
 				} catch (Exception ex) {
 					logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
@@ -589,6 +561,14 @@ public class QueueViewerPanel extends JPanel {
 		}
 
 	}
+	
+	private class ExecutionPropertyChangeListener implements PropertyChangeListener {
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			setupExecuteButton();
+		}
+		
+	}
 
 	JSplitPane splitPane = new JSplitPane();
 
@@ -621,6 +601,7 @@ public class QueueViewerPanel extends JPanel {
 		super(new GridBagLayout());
 		this.queuefilter = queuefilter;
 		this.worker = worker;
+		this.worker.addPropertyChangeListener("executing", new ExecutionPropertyChangeListener());
 		this.splitPane.setLeftComponent(createTableOfQueues());
 		this.splitPane.setRightComponent(this.queueContentsSplitPane);
 		this.splitPane.setDividerLocation(250);
@@ -655,6 +636,19 @@ public class QueueViewerPanel extends JPanel {
 				.addCommitListener(new CommitListener());
 
 	}
+	
+	private void setupExecuteButton() {
+		if (worker.isExecuting()) {
+			execute.setText("execute");
+			execute.setEnabled(false);
+		} else {
+			if (process != null) {
+				execute.setText("<html><font color='#006400'>execute");
+				execute.setEnabled(true);
+			}
+		}
+	}
+
 
 	/**
 	 * @param worker
@@ -898,6 +892,8 @@ public class QueueViewerPanel extends JPanel {
 							if (entryFound == false) {
 								tableOfQueueEntries.getSelectionModel()
 										.setSelectionInterval(0, 0);
+							} else {
+								execute.setEnabled(worker.isExecuting() == false);
 							}
 						} else {
 							tableOfQueueEntries.getSelectionModel()

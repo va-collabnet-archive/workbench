@@ -283,7 +283,7 @@ public abstract class Worker implements I_Work {
 	public synchronized Condition execute(I_EncodeBusinessProcess process)
 			throws TaskFailedException {
         stopExecutionFlagged = false;
-		executing = true;
+        setExecuting(true);
 		Condition condition;
 		try {
 			if (this.loginContext != null) {
@@ -297,16 +297,22 @@ public abstract class Worker implements I_Work {
 			} else {
 				condition = executeProcess(process);
 			}
-			executing = false;
+	        setExecuting(false);
 			return condition;
 		} catch (TaskFailedException ex) {
-			executing = false;
+	        setExecuting(false);
          this.setActiveTransaction(null);
          this.nextTransaction = null;
 			throw ex;
 		}
 	}
 
+	private void setExecuting(boolean executing) {
+		boolean oldState = this.executing;
+		this.executing = executing;
+		this.propChangeSupport.firePropertyChange("executing", oldState, this.executing);
+	}
+	
 	public boolean isExecuting() {
 		return executing;
 	}

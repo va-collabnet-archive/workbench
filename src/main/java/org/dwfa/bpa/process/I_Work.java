@@ -114,6 +114,7 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @return Text description of this worker.
      */
     public String getWorkerDesc();
+    
 
     /**
      * @param workspaceId
@@ -291,6 +292,7 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
     
     public Object getObjFromFilesystem(Frame parent, String title, String startDir, FilenameFilter fileFilter) throws IOException, ClassNotFoundException;
     public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj) throws IOException;
+    
     public boolean isExecuting();
     
     public void flagExecutionStop();
