@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Processes "marked parents" and "normal members" and separates them into disparate lists.
+ * Puts "marked parents" and "normal members" into logical structures that can be used later.
  */
 public final class MarkedParentProcessor {
 

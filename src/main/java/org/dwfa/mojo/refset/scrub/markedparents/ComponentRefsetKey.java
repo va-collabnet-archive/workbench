@@ -4,6 +4,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 
 import java.io.Serializable;
 
+/**
+ * Uniquely identifies a component in a specific reference set.
+ */
 public final class ComponentRefsetKey implements Serializable {
 
     private static final long serialVersionUID = 3960306563510866348L;
@@ -12,8 +15,8 @@ public final class ComponentRefsetKey implements Serializable {
     private final Integer refsetId;
 
     public ComponentRefsetKey(final I_ThinExtByRefVersioned member) {
-        this.componentId = member.getComponentId();
-        this.refsetId = member.getRefsetId();
+        componentId = member.getComponentId();
+        refsetId = member.getRefsetId();
     }
 
     public Integer getComponentId() {

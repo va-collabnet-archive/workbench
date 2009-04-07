@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * Sifts through the list of supplied "normal members" and "marked parents". Applies 1 of 2 strategies:
  *
- * 1. If the "marked parent" is a normal member then, return all "marked parents".
- * 2. If the "market parent" is not a normal member then return all but 1 "marked parent".
+ * 1. If the refset has "marked parents" and a normal member then, return all "marked parents".
+ * 2. If the refset has "market parents" but no normal members then return all but 1 "marked parent".
  */
 public final class DuplicateMarketParentSifter {
 

@@ -5,6 +5,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Captures information about a <code>ComponentRefsetKey</code>. Stores <code>I_ThinExtByRefVersioned</code> members
+ * for this component-refset combination. 
+ */
 public final class ComponentRefsetMembers {
 
     private final ComponentRefsetKey componentRefsetKey;

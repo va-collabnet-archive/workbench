@@ -16,18 +16,19 @@ import java.util.TreeSet;
 /**
  * This scrubber removes duplicate "marked parents" changing their status to "retired".
  */
-public class DuplicateMarkedParentScrubber implements ConceptExtHandler {
+public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
 	/**
-	 * This is not used. This has been introduced to get around a maven problem of not allowing implementations
+	 * TODO: REMOVE.
+     * This is not used. This has been introduced to get around a maven problem of not allowing implementations
      * without parameters. Remove once this is sorted out.
 	 * @parameter
 	 */
-	protected ConceptDescriptor[] validTypeConcepts;
+	public ConceptDescriptor[] validTypeConcepts;
 
-	protected I_TermFactory termFactory;
+	private final I_TermFactory termFactory;
 
-	private int retiredStatusId;
+	private final int retiredStatusId;
 
 	public DuplicateMarkedParentScrubber() throws Exception {
 		termFactory = LocalVersionedTerminology.get();
