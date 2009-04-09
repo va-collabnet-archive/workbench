@@ -923,4 +923,8 @@ public class QueueViewerPanel extends JPanel {
 		});
 	}
 
+	public JTable getTableOfQueues() {
+		return tableOfQueues;
+	}
+
 }
