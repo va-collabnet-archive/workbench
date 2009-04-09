@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -60,29 +62,45 @@ public class NewQueueListener implements ActionListener {
 					}
 					
 					queueDirectory.mkdirs();
-					String fileName = "queue.config";
-					if (queueType.equals("Aging")) {
-						fileName = "queueAging.config";
-					} else if (queueType.equals("Archival")) {
-						fileName = "queueArchival.config";
-					} else if (queueType.equals("Compute")) {
-						fileName = "queueCompute.config";
-					} else if (queueType.equals("Inbox")) {
-						fileName = "queueInbox.config";
-					} else if (queueType.equals("Launcher")) {
-						fileName = "queueLauncher.config";
-					} else if (queueType.equals("Outbox")) {
-						fileName = "queueOutbox.config";
+					
+					String nodeInboxAddress = queueDirectory.getName().toLowerCase().replace(' ', '.');
+					nodeInboxAddress = nodeInboxAddress.replace("....", ".");
+					nodeInboxAddress = nodeInboxAddress.replace("...", ".");
+					nodeInboxAddress = nodeInboxAddress.replace("..", ".");
+
+					
+					Map<String, String> substutionMap = new TreeMap<String, String>();
+					substutionMap.put("**queueName**", queueDirectory.getName());
+					substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory));
+					substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
+					
+					String fileName = "template.queue.config";
+					if (queueType.equals("aging")) {
+						fileName = "template.queueAging.config";
+					} else if (queueType.equals("archival")) {
+						fileName = "template.queueArchival.config";
+					} else if (queueType.equals("compute")) {
+						fileName = "template.queueCompute.config";
+					} else if (queueType.equals("inbox")) {
+						substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
+						substutionMap.put("**mailUsername**", "**mailUsername**");
+						fileName = "template.queueInbox.config";
+					} else if (queueType.equals("launcher")) {
+						fileName = "template.queueLauncher.config";
+					} else if (queueType.equals("outbox")) {
+						substutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
+						substutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
+						substutionMap.put("**mailHost**", "**mailHost**");
+						fileName = "template.queueOutbox.config";
 					} 
 					
 					File queueConfigTemplate = new File("config", fileName);
 					String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
 					
-					configTemplateString = configTemplateString.replaceFirst("username",
-							queueDirectory.getName());
-					configTemplateString = configTemplateString.replaceFirst("username", 
-							queueDirectory.getName());
-					
+					for (String key: substutionMap.keySet()) {
+						configTemplateString = configTemplateString.replace(key, substutionMap.get(key));
+					}
+										
 					
 					File newQueueConfig = new File(queueDirectory, "queue.config");
 					FileWriter fw = new FileWriter(newQueueConfig);
@@ -136,7 +154,7 @@ public class NewQueueListener implements ActionListener {
 	 */
 	public NewQueueListener(ACE ace) {
 		this.ace = ace;
-		String[] QueueTypes = new String[] {"Aging", "Archival", "Compute", "Inbox", "Launcher", "Outbox" };
+		String[] QueueTypes = new String[] {"aging", "archival", "compute", "inbox", "launcher", "outbox" };
 		
 		queueTypePopup = new JPopupMenu();
 		for (String type: QueueTypes) {

@@ -18,6 +18,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.IntrospectionException;
@@ -67,6 +68,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -664,7 +666,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			boolean testFailures = false;
 			Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
 			List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-			AceLog.getEditLog().info("Uncommitted count: " + uncommitted.size());
+			AceLog.getEditLog()
+					.info("Uncommitted count: " + uncommitted.size());
 			AceLog.getEditLog().finer("Uncommitted set: " + uncommitted);
 			for (I_Transact to : uncommitted) {
 				for (I_TestDataConstraints test : commitTests) {
@@ -1598,8 +1601,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			/*
 			 * menuItem = new JMenuItem("Export Baseline Jar...");
 			 * menuItem.addActionListener(new WriteJar(aceConfig));
-			 * fileMenu.add(menuItem);
-			 * fileMenu.addSeparator();
+			 * fileMenu.add(menuItem); fileMenu.addSeparator();
 			 */
 			menuItem = new JMenuItem("Import Java Changeset...");
 			menuItem.addActionListener(new ImportJavaChangeset(config));
@@ -1873,7 +1875,31 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	public JPanel makeQueueViewerPanel(Configuration config,
 			MasterWorker worker, ServiceItemFilter queueFilter)
 			throws Exception {
-		queueViewer = new QueueViewerPanel(config, worker, queueFilter);
+			queueViewer = new QueueViewerPanel(config, worker, queueFilter);
+			/* Code to add a popup menu to the queue list...
+			queueViewer.getTableOfQueues().addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				showPopup(e);
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				showPopup(e);
+			}
+
+			private void showPopup(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					JPopupMenu popupMenu = new JPopupMenu();
+					JMenuItem menuItem = new JMenuItem("Hide");
+				    //menuItem.addActionListener(new InsertRowsActionAdapter(this));
+				    popupMenu.add(menuItem);
+					JMenuItem showItem = new JMenuItem("Show");
+				    //showItem.addActionListener(new InsertRowsActionAdapter(this));
+				    popupMenu.add(showItem);
+				    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
+		*/
 		JPanel combinedPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -1906,10 +1932,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		listEditorTopPanel.add(new JLabel(" "), c); // filler
 		c.gridx++;
 		c.weightx = 0.0;
-		addActionButton(new NewQueueListener(this), "/24x24/plain/inbox_new.png",
+		addActionButton(new NewQueueListener(this),
+				"/24x24/plain/inbox_new.png",
 				"Create new inbox and add to profile", listEditorTopPanel, c);
-		addActionButton(new AddQueueListener(this), "/24x24/plain/inbox_add.png",
-				"Add existing inbox to profile", listEditorTopPanel, c);
+		addActionButton(new AddQueueListener(this),
+				"/24x24/plain/inbox_add.png", "Add existing inbox to profile",
+				listEditorTopPanel, c);
 		addActionButton(new MoveListener(), "/24x24/plain/outbox_out.png",
 				"Take Selected Processes and Save To Disk (no transaction)",
 				listEditorTopPanel, c);
