@@ -50,10 +50,10 @@ public class TestForIsa extends AbstractConceptTest {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            I_ConfigAceFrame activeProfile = termFactory
-                    .getActiveAceFrameConfig();
-            Set<I_Path> editingPaths = new HashSet<I_Path>(activeProfile
-                    .getEditingPathSet());
+            
+            I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
+            Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
+            
             I_GetConceptData is_a = null;
             I_GetConceptData is_a_rel_aux = null;
 
@@ -69,12 +69,17 @@ public class TestForIsa extends AbstractConceptTest {
                          .getUids());
             }
 
-            Set<I_Position> positions = new HashSet<I_Position>();
+            Set<I_Position> allPositions = new HashSet<I_Position>();
             for (I_Path path : editingPaths) {
-                positions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+            	allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+                for (I_Position position : path.getOrigins()) {
+                	addOriginPositions(termFactory, position, allPositions);
+                }
             }
+            
+            
             for (I_RelTuple rel : concept.getSourceRelTuples(activeProfile
-                    .getAllowedStatus(), null, positions, true)) {
+                    .getAllowedStatus(), null, allPositions, true)) {
                 if ((is_a != null && rel.getRelTypeId() == is_a.getConceptId())
                         || (is_a_rel_aux != null && rel.getRelTypeId() == is_a_rel_aux.getConceptId()))
                     return alertList;
@@ -88,4 +93,11 @@ public class TestForIsa extends AbstractConceptTest {
         }
     }
 
+    private void addOriginPositions(I_TermFactory termFactory, I_Position position, Set<I_Position> allPositions) {
+    	allPositions.add(position);
+    	for (I_Position originPosition : position.getPath().getOrigins()) {
+    		addOriginPositions(termFactory, originPosition, allPositions);
+    	}
+    }
+    
 }
