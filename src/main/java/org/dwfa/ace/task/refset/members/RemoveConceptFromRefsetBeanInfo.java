@@ -13,20 +13,27 @@ public class RemoveConceptFromRefsetBeanInfo extends SimpleBeanInfo {
 		try {
 			
 			PropertyDescriptor refsetConceptPropName = 
-				new PropertyDescriptor("refsetConceptPropName", RemoveConceptFromRefset.class);
+				new PropertyDescriptor("refsetConceptPropName", getBeanDescriptor().getBeanClass());
 			refsetConceptPropName.setBound(true);
 			refsetConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
 			refsetConceptPropName.setDisplayName("<html><font color='green'>Refset concept property:");
 			refsetConceptPropName.setShortDescription("The property containing the refset concept. ");
 
 			PropertyDescriptor memberConceptPropName = 
-				new PropertyDescriptor("memberConceptPropName", RemoveConceptFromRefset.class);
+				new PropertyDescriptor("memberConceptPropName", getBeanDescriptor().getBeanClass());
 			memberConceptPropName.setBound(true);
 			memberConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
 			memberConceptPropName.setDisplayName("<html><font color='green'>Member concept property:");
 			memberConceptPropName.setShortDescription("The property containing the target member concept. ");
+
+			PropertyDescriptor conceptExtValuePropName = 
+				new PropertyDescriptor("conceptExtValuePropName", getBeanDescriptor().getBeanClass());
+			conceptExtValuePropName.setBound(true);
+			conceptExtValuePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+			conceptExtValuePropName.setDisplayName("<html><font color='green'>Extension value concept property:");
+			conceptExtValuePropName.setShortDescription("The property containing the value for the new concept extension. ");
 			
-			PropertyDescriptor rv[] = { refsetConceptPropName, memberConceptPropName };
+			PropertyDescriptor rv[] = { refsetConceptPropName, memberConceptPropName, conceptExtValuePropName };
 			return rv;
 		} catch (IntrospectionException e) {
             throw new Error(e.toString());
