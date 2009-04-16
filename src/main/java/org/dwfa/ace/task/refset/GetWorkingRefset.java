@@ -26,7 +26,7 @@ public class GetWorkingRefset extends AbstractTask {
 
 	private static final int dataVersion = 1;
 	
-    private String componentPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String componentPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 
 
 	private void writeObject(ObjectOutputStream out) throws IOException {

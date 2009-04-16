@@ -34,7 +34,7 @@ public class SelectWorkingRefset extends AbstractTask {
 	private static final long serialVersionUID = -3119550198197703394L;
 	private static final int dataVersion = 1;
 	
-    private String componentPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String componentPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
