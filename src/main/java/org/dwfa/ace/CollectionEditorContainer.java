@@ -40,6 +40,7 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button32x32;
 import org.dwfa.gui.toggle.Toggle32x32;
@@ -213,7 +214,8 @@ public class CollectionEditorContainer extends JPanel {
 		c.gridx++;
 		c.weightx = 0.0;
 
-		File componentPluginDir = new File(ace.getPluginRoot() + File.separator + "list");
+		File componentPluginDir = new File(ace.getPluginRoot() + File.separator
+				+ "list");
 		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String fileName) {
 				return fileName.toLowerCase().endsWith(".bp");
@@ -230,31 +232,36 @@ public class CollectionEditorContainer extends JPanel {
 					FileInputStream fis = new FileInputStream(f);
 					BufferedInputStream bis = new BufferedInputStream(fis);
 					ObjectInputStream ois = new ObjectInputStream(bis);
-					BusinessProcess bp = (BusinessProcess) ois.readObject();
-					ois.close();
-					byte[] iconBytes = (byte[]) bp
-							.readAttachement("button_icon");
-					if (iconBytes != null) {
-						ImageIcon icon = new ImageIcon(iconBytes);
-						JButton pluginButton = new Button32x32(icon);
-						pluginButton.setToolTipText(bp.getSubject());
-						pluginButton.addActionListener(new PluginListener(f));
-						c.gridx++;
-						listEditorTopPanel.add(pluginButton, c);
-						AceLog.getAppLog().info(
-								"adding collection plugin: " + f.getName());
-					} else {
-						JButton pluginButton = new Button32x32(bp.getName());
-						pluginButton.setToolTipText(bp.getSubject());
-						pluginButton.addActionListener(new PluginListener(f));
-						c.gridx++;
-						listEditorTopPanel.add(pluginButton, c);
-						AceLog.getAppLog().info(
-								"adding collection plugin: " + f.getName());
+					try {
+						BusinessProcess bp = (BusinessProcess) ois.readObject();
+						byte[] iconBytes = (byte[]) bp
+								.readAttachement("button_icon");
+						if (iconBytes != null) {
+							ImageIcon icon = new ImageIcon(iconBytes);
+							JButton pluginButton = new Button32x32(icon);
+							pluginButton.setToolTipText(bp.getSubject());
+							pluginButton
+									.addActionListener(new PluginListener(f));
+							c.gridx++;
+							listEditorTopPanel.add(pluginButton, c);
+							AceLog.getAppLog().info(
+									"adding collection plugin: " + f.getName());
+						} else {
+							JButton pluginButton = new Button32x32(bp.getName());
+							pluginButton.setToolTipText(bp.getSubject());
+							pluginButton
+									.addActionListener(new PluginListener(f));
+							c.gridx++;
+							listEditorTopPanel.add(pluginButton, c);
+							AceLog.getAppLog().info(
+									"adding collection plugin: " + f.getName());
+						}
+					} catch (Exception ex) {
+						TaskFailedException ex2 = new TaskFailedException("Exception processing file: " + f, ex);
+						AceLog.getAppLog().alertAndLogException(ex2);
 					}
+					ois.close();
 				} catch (IOException ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				} catch (ClassNotFoundException ex) {
 					AceLog.getAppLog().alertAndLogException(ex);
 				}
 			}
