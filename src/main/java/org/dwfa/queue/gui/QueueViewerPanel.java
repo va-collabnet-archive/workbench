@@ -471,33 +471,35 @@ public class QueueViewerPanel extends JPanel {
 						tableOfQueueEntriesModel.updateQueueData();
 						I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel
 								.getRowMetaData(firstSelectedRow);
-						processEntryID = processMeta.getEntryID();
-						try {
-							process = tableOfQueueEntriesModel.getQueue().read(
-									processMeta.getEntryID(), null);
-							ProcessPanel processPanel = new ProcessPanel(
-									process, worker, null);
-							int dividerLoc = queueContentsSplitPane
-									.getDividerLocation();
-							queueContentsSplitPane
-									.setBottomComponent(new JScrollPane(
-											processPanel));
-							queueContentsSplitPane
-									.setDividerLocation(dividerLoc);
-							setupExecuteButton();
-						} catch (NoMatchingEntryException ex) {
-							logger.info(" NoMatchingEntry: " + ex);
-							lsm.clearSelection();
-							int dividerLoc = queueContentsSplitPane
-									.getDividerLocation();
-							queueContentsSplitPane
-									.setBottomComponent(new JLabel(
-											"No matching entry"));
-							queueContentsSplitPane
-									.setDividerLocation(dividerLoc);
-							execute.setText("execute");
-							execute.setEnabled(false);
-							process = null;
+						if (processMeta != null) {
+							processEntryID = processMeta.getEntryID();
+							try {
+								process = tableOfQueueEntriesModel.getQueue().read(
+										processMeta.getEntryID(), null);
+								ProcessPanel processPanel = new ProcessPanel(
+										process, worker, null);
+								int dividerLoc = queueContentsSplitPane
+										.getDividerLocation();
+								queueContentsSplitPane
+										.setBottomComponent(new JScrollPane(
+												processPanel));
+								queueContentsSplitPane
+										.setDividerLocation(dividerLoc);
+								setupExecuteButton();
+							} catch (NoMatchingEntryException ex) {
+								logger.info(" NoMatchingEntry: " + ex);
+								lsm.clearSelection();
+								int dividerLoc = queueContentsSplitPane
+										.getDividerLocation();
+								queueContentsSplitPane
+										.setBottomComponent(new JLabel(
+												"No matching entry"));
+								queueContentsSplitPane
+										.setDividerLocation(dividerLoc);
+								execute.setText("execute");
+								execute.setEnabled(false);
+								process = null;
+							}
 						}
 					} else {
 						lsm.clearSelection();

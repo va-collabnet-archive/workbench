@@ -174,7 +174,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
 
     private Comparator<T> nativeComparator;
     
-    private I_GetObjectInputStream oisGetter = new DefaultObjectInputStreamCreator(); 
+    private I_GetObjectInputStream oisGetter = new DefaultObjectInputStreamCreator();
+
+	private File logDir; 
 
     /**
      * @param files
@@ -193,6 +195,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     /**
      * @param files
      * @param i
+     * @throws IOException 
      */
     public File finishWrite(File file) {
         String currentName = file.getName();
@@ -201,6 +204,11 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                 getFileSuffix());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
+        try {
+			writeLogEntry(newFile);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
         return newFile;
     }
 
@@ -240,6 +248,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         this.directory = (File) this.config.getEntry(this.getClass().getName(),
                 "directory", File.class, new File(args[0]).getParentFile());
         this.directory.mkdirs();
+        this.logDir = new File(this.directory, ".llog");
+        this.logDir.mkdirs();
+
         this.nativeComparator = (Comparator<T>) this.config.getEntry(this
                 .getClass().getName(), "nativeComparator", Comparator.class);
         initFromDirectory();
@@ -373,7 +384,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         initEntryMetaInfo();
     }
 
-    void rollbackUncommittedChanges() {
+    void rollbackUncommittedChanges() throws IOException {
         File[] files = this.directory.listFiles(new FileFilter() {
 
             public boolean accept(File pathname) {
@@ -400,6 +411,17 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                 }
             }
         }
+        files = this.directory.listFiles(new FileFilter() {
+            public boolean accept(File pathname) {
+                return pathname.getName().endsWith(getFileSuffix());
+            }
+        });
+        if (files != null) {
+        	for (File f: files) {
+        		writeLogEntry(f);
+        	}
+        }
+
     }
 
     public Object read(EntryID entryID, Transaction t) throws IOException,
@@ -538,8 +560,18 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(object);
         oos.close();
+        writeLogEntry(objectFile);
         objectInfoSortedSet.add(getObjectDescription(object, entryID));
     }
+
+	private void writeLogEntry(File entryFile) throws IOException {
+		if (entryFile.exists()) {
+			File logEntry = new File(logDir, entryFile.getName());
+			if (logEntry.exists() == false) {
+				logEntry.createNewFile();
+			}
+		}
+	}
 
     /**
      * @see org.dwfa.bpa.process.I_QueueProcesses#writeThenTake(org.dwfa.bpa.process.I_EncodeBusinessProcess,
@@ -557,6 +589,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(object);
         oos.close();
+        writeLogEntry(processFile);
         T objectDesc = getObjectDescription(object, entryID);
         this.addWriteThenTakeToTransaction(objectDesc,
                 this.objectInfoSortedSet, processFile,
