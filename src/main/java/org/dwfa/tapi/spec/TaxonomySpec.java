@@ -9,8 +9,8 @@ import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * Class that allows a hierarchy to be specified or identified by secifying a root node and the relationship
- * type to children of the hierarcy. Implemented on top of the ConceptSpec class.
+ * Class that allows a hierarchy to be specified or identified by specifying a root node and the relationship
+ * type to children of the hierarchy. Implemented on top of the ConceptSpec class.
  *
  * @author Dion McMurtrie
  */
