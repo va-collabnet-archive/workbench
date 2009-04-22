@@ -95,7 +95,7 @@ public class BatchMonitor {
 			result.append(minutes).append(" minutes, ");
 		}
 		long seconds = ((durationMs % 3600000) % 60000) / 1000;
-		long millis = durationMs % 1000;
+		String millis = String.format("%03d", (durationMs % 1000));
 		result.append(seconds).append(".").append(millis).append(" seconds. ");
 		return result.toString();
 	}
