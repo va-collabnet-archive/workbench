@@ -66,6 +66,28 @@ public class MemberRefsetHelper {
 	}
 	
 	/**
+	 * Remove a collection of concepts from a refset.
+	 * 
+	 * @param refsetId The subject refset.
+	 * @param members The collection of concepts to be removed from the refset
+	 * @param valueId The value of the concept extension (membership type) to be removed from each concept.
+	 * @param batchDescription A textual description of the batch being processed. 
+	 *                         Used in the progress reports given during processing.
+	 */
+	public void removeAllFromRefset(int refsetId, Set<I_GetConceptData> members, int valueId, String batchDescription) 
+			throws Exception {
+		BatchMonitor batch = new BatchMonitor(batchDescription, members.size(), 100, 20000);			
+		batch.start();
+		
+		for (I_GetConceptData member : members) {
+			removeFromRefset(refsetId, member.getConceptId(), valueId);
+			batch.mark();
+		}
+		
+		batch.complete();		
+	}	
+	
+	/**
 	 * Add a concept to a refset
 	 * 
 	 * @param refsetId The subject refset
