@@ -6,18 +6,12 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -68,8 +62,6 @@ public class RemoveConceptFromRefset extends AbstractTask {
 			I_GetConceptData member = (I_GetConceptData) process.readProperty(memberConceptPropName);
 			I_GetConceptData value  = (I_GetConceptData) process.readProperty(conceptExtValuePropName);
 			
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
-			
 			if (refset == null) {
 				throw new TerminologyException("A working refset has not been selected.");
 			}
@@ -87,47 +79,10 @@ public class RemoveConceptFromRefset extends AbstractTask {
 					"' as a '" + value.getInitialText() + 
 					"' from refset '" + refset.getInitialText() + "'.");
 			
-			int currentStatusId = 
-				termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
-			
-			int retiredStatusId = 
-				termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
-			
-			// check subject is not already a member
-			for (I_ThinExtByRefVersioned extension : 
-					termFactory.getAllExtensionsForComponent(member.getConceptId())) {
-				
-				if (extension.getRefsetId() == refset.getConceptId()) {
-					
-					// get the latest version
-					I_ThinExtByRefPart latestPart = null;
-					for(I_ThinExtByRefPart part : extension.getVersions()) {
-						if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
-							latestPart = part;
-						}
-					}
-					
-					// confirm its the right extension value and its status is current
-					if (latestPart.getStatus() == currentStatusId) {
-						if (latestPart instanceof I_ThinExtByRefPartConcept) {
-							int partValue = ((I_ThinExtByRefPartConcept)latestPart).getConceptId();
-							if (partValue == value.getConceptId()) {
-								// found a member to retire
-								
-								I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicatePart();
-								clone.setStatus(retiredStatusId);
-								clone.setVersion(Integer.MAX_VALUE);
-								extension.addVersion(clone);
-								termFactory.addUncommitted(extension);
-								
-							}
-						}
-					}
-					
-				}
-			}
-			
-			termFactory.commit();
+			new MemberRefsetHelper()
+					.removeFromRefset(refset.getConceptId(), member.getConceptId(), value.getConceptId());
+	
+			// use commit in business process			
 			
 			return Condition.CONTINUE;
 			

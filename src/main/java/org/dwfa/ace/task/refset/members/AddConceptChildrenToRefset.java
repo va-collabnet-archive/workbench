@@ -4,10 +4,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -29,14 +36,22 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 
 	private static final int dataVersion = 1;
 	
-    private String refsetConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+	/** the refset we are adding to */
+    private String refsetConceptPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 
-    private String memberConceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
+    /** the concept to be added to the refset */
+    private String memberConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    
+    /** the value to be given to the new concept extension */
+    private String conceptExtValuePropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(); 
+    
+    protected I_TermFactory termFactory;
     
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
         out.writeObject(this.refsetConceptPropName);
         out.writeObject(this.memberConceptPropName);
+        out.writeObject(this.conceptExtValuePropName);
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -44,6 +59,7 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 		if (objDataVersion == dataVersion) {
 			this.refsetConceptPropName = (String) in.readObject();
 			this.memberConceptPropName = (String) in.readObject();
+			this.conceptExtValuePropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -57,7 +73,7 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 		try {
 			I_GetConceptData refset = (I_GetConceptData) process.readProperty(refsetConceptPropName);
 			I_GetConceptData member = (I_GetConceptData) process.readProperty(memberConceptPropName);
-			I_TermFactory tf = LocalVersionedTerminology.get();
+			I_GetConceptData value  = (I_GetConceptData) process.readProperty(conceptExtValuePropName);
 			
 			if (refset == null) {
 				throw new TerminologyException("A working refset has not been selected.");
@@ -67,11 +83,20 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 				throw new TerminologyException("No member concept selected.");				
 			}
 			
+			if (value == null) {
+				throw new TerminologyException("No concept extension value selected.");
+			}
+			
 			getLogger().info(
 					"Adding children of concept '" + member.getInitialText() + 
-					"' as member of refset '" + refset.getInitialText() + "'.");			
+					"' as member of refset '" + refset.getInitialText() +
+					"' with a value '" + value.getInitialText() + "'.");
 			
-			//TODO implementation
+			MemberRefsetHelper helper = new MemberRefsetHelper();			
+			Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
+			
+			helper.addAllToRefset(refset.getConceptId(), newMembers, value.getConceptId(), 
+					"Adding children of concept " + member.getInitialText());
 			
 			return Condition.CONTINUE;
 			
@@ -80,6 +105,9 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 		}
 	}
 
+	
+
+	
 	public int[] getDataContainerIds() {
 		return new int[] {};
 	}
@@ -87,6 +115,7 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 	public Collection<Condition> getConditions() {
 		return AbstractTask.CONTINUE_CONDITION;
 	}
+
 
 	public String getRefsetConceptPropName() {
 		return refsetConceptPropName;
@@ -102,6 +131,14 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 
 	public void setMemberConceptPropName(String memberConceptPropName) {
 		this.memberConceptPropName = memberConceptPropName;
+	}
+
+	public String getConceptExtValuePropName() {
+		return conceptExtValuePropName;
+	}
+
+	public void setConceptExtValuePropName(String conceptExtValuePropName) {
+		this.conceptExtValuePropName = conceptExtValuePropName;
 	}
 	
 	
