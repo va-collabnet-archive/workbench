@@ -27,6 +27,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.io.FileIO;
 
 public class CmrscsReader implements I_ReadChangeSet {
 
@@ -184,15 +185,13 @@ public class CmrscsReader implements I_ReadChangeSet {
 	private void lazyInit() throws FileNotFoundException, IOException,
 			ClassNotFoundException {
 		if (initialized == false) {
-			String lastImportSize = getVodb().getProperty(
-					changeSetFile.toURI().toURL().toExternalForm());
+			String lastImportSize = getVodb().getProperty(FileIO.getNormalizedRelativePath(changeSetFile));
 			if (lastImportSize != null) {
 				long lastSize = Long.parseLong(lastImportSize);
 				if (lastSize == changeSetFile.length()) {
 					AceLog.getAppLog().finer(
 							"Change set already fully read: "
-									+ changeSetFile.toURI().toURL()
-											.toExternalForm());
+									+ FileIO.getNormalizedRelativePath(changeSetFile));
 					// already imported, set to nothing to do...
 					nextCommit = Long.MAX_VALUE;
 					initialized = true;
