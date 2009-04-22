@@ -52,11 +52,13 @@ public class BatchMonitor {
 	 * Report updated statistics
 	 */
 	public void report() {
-		 long percentComplete = (eventCount * 100) / totalEvents;
-		 long timeToCompleteMs = (totalEvents - eventCount) * movingAverageMs;
-		 logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + 
-				 "). Average time per event: " + asTimeFormat(movingAverageMs) + 
-				 " Estimated time to complete: " + asTimeFormat(timeToCompleteMs));
+		if (totalEvents != 0) {
+			long percentComplete = (eventCount * 100) / totalEvents;
+			long timeToCompleteMs = (totalEvents - eventCount) * movingAverageMs;
+			logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + 
+					"). Average time per event: " + asTimeFormat(movingAverageMs) + 
+					" Estimated time to complete: " + asTimeFormat(timeToCompleteMs));
+		}
 	}
 	
 	/**
