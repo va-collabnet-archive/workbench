@@ -275,6 +275,7 @@ public interface I_TermFactory {
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted) throws IOException;
 
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
+    public I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId);
     
     public I_ThinExtByRefPartBoolean newBooleanExtensionPart();
     public I_ThinExtByRefPartConcept newConceptExtensionPart();

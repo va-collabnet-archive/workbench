@@ -135,7 +135,7 @@ public class MemberRefsetHelper {
 				termFactory.getPaths(), Integer.MAX_VALUE);
 
 		I_ThinExtByRefVersioned newExtension =
-			termFactory.newExtension(refsetId, memberId, newMemberId, conceptTypeId);
+			termFactory.newExtensionNoChecks(refsetId, memberId, newMemberId, conceptTypeId);
 
 		for (I_Path editPath : userEditPaths) {
 		
