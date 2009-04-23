@@ -1421,6 +1421,18 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return thinEbr;
 	}
 
+	public I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId) {
+		
+		ThinExtByRefVersioned thinEbr = 
+			new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
+		
+		ExtensionByReferenceBean ebrBean = 
+			ExtensionByReferenceBean.makeNew(memberId, thinEbr);
+		
+		ACE.addUncommittedNoChecks(ebrBean);
+		return thinEbr;
+	}
+	
 	public I_ThinExtByRefVersioned newExtensionBypassCommit(int refsetId,
 			int memberId, int componentId, int typeId) {
 		ThinExtByRefVersioned thinEbr = new ThinExtByRefVersioned(refsetId,
