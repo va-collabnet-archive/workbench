@@ -129,6 +129,11 @@ public interface I_TermFactory {
     public void addUncommitted(I_GetConceptData concept);
     
     public void addUncommitted(I_ThinExtByRefVersioned extension);
+
+    public void addUncommittedNoChecks(I_GetConceptData concept);
+    
+    public void addUncommittedNoChecks(I_ThinExtByRefVersioned extension);
+
     /**
      * 
      * @return An unmodifiable set of uncommitted items. 

@@ -150,7 +150,7 @@ public class MemberRefsetHelper {
 			newExtension.addVersion(conceptExtension);
 		}
 		
-		termFactory.addUncommitted(newExtension); 
+		termFactory.addUncommittedNoChecks(newExtension); 
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class MemberRefsetHelper {
 							clone.setStatus(retiredStatusId);
 							clone.setVersion(Integer.MAX_VALUE);
 							extension.addVersion(clone);
-							termFactory.addUncommitted(extension);
+							termFactory.addUncommittedNoChecks(extension);
 						}
 					}
 				}
