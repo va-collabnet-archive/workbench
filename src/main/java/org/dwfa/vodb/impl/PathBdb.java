@@ -61,7 +61,6 @@ public class PathBdb implements I_StoreInBdb, I_StorePaths {
 		intBinder.objectToEntry(p.getConceptId(), key);
 		pathBinder.objectToEntry(p, value);
 		pathDb.put(BdbEnv.transaction, key, value);
-		ACE.addUncommitted((I_Transact) p);
 	}
 
 	/* (non-Javadoc)
