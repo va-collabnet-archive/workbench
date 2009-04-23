@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarInputStream;
@@ -125,8 +124,6 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 						importChangeSet(csFile, riverConfig);
 						ACE.commit();
 					} catch (TaskFailedException ex) {
-						AceLog.getAppLog().alertAndLogException(ex);
-					} catch (IOException ex) {
 						AceLog.getAppLog().alertAndLogException(ex);
 					}
 				}

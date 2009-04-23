@@ -956,16 +956,38 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	}
 
 	public void addUncommitted(I_GetConceptData concept) {
-		AceLog.getEditLog().fine(
-				"Adding uncommitted " + concept + " from vodb: " + this);
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(
+					"Adding uncommitted " + concept + " from vodb: " + this);
+		}
 		ACE.addUncommitted((I_Transact) concept);
 	}
 
 	public void addUncommitted(I_ThinExtByRefVersioned extension) {
-		AceLog.getEditLog().fine(
-				"Adding uncommitted extension " + extension + " from vodb: "
-						+ this);
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(
+					"Adding uncommitted extension " + extension + " from vodb: "
+							+ this);
+		}
 		ACE.addUncommitted(ExtensionByReferenceBean.make(extension
+				.getMemberId(), extension));
+	}
+
+	public void addUncommittedNoChecks(I_GetConceptData concept) {
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(
+					"Adding uncommittedNoChecks " + concept + " from vodb: " + this);
+		}
+		ACE.addUncommittedNoChecks((I_Transact) concept);
+	}
+
+	public void addUncommittedNoChecks(I_ThinExtByRefVersioned extension) {
+		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+			AceLog.getEditLog().fine(
+					"Adding uncommittedNoChecks extension " + extension + " from vodb: "
+							+ this);
+		}
+		ACE.addUncommittedNoChecks(ExtensionByReferenceBean.make(extension
 				.getMemberId(), extension));
 	}
 
@@ -1714,5 +1736,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
   public I_HandleSubversion getSvnHandler() {
 	return new Svn();
   }
+
+
 
 }

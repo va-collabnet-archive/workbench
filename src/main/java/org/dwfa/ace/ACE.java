@@ -18,7 +18,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.IntrospectionException;
@@ -68,7 +67,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -485,8 +483,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		}
 	}
 
-	private static Set<I_Transact> uncommitted = Collections
-			.synchronizedSet(new HashSet<I_Transact>());
+	private static Set<I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
+	private static Set<I_Transact> uncommittedNoChecks = Collections.synchronizedSet(new HashSet<I_Transact>());
 
 	private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
 
@@ -514,7 +512,29 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
 
+	public static void addUncommittedNoChecks(I_Transact to) {
+		if (commitInProgress) {
+			try {
+				to.abort();
+				AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return;
+		}
+		uncommittedNoChecks.add(to);
+	}
+	
 	public static void addUncommitted(I_Transact to) {
+		if (commitInProgress) {
+			try {
+				to.abort();
+				AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return;
+		}
 		I_Transact extraToAdd = null;
 		ConceptBean uncommittedBean = null;
 		if (ExtensionByReferenceBean.class.isAssignableFrom(to.getClass())) {
@@ -656,162 +676,196 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	public static int commitSequence = 0;
+	private static boolean commitInProgress = false;
 
 	/*
 	 * 
 	 */
-	public static void commit() throws IOException {
+	public static void commit() {
+		if (commitInProgress) {
+			AceLog.getAppLog().alertAndLogException(new Exception("Commit is already in process."));
+			return;
+		}
 		commitSequence++;
-		synchronized (uncommitted) {
-			boolean testFailures = false;
-			Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
-			List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-			AceLog.getEditLog()
-					.info("Uncommitted count: " + uncommitted.size());
-			AceLog.getEditLog().finer("Uncommitted set: " + uncommitted);
-			for (I_Transact to : uncommitted) {
-				for (I_TestDataConstraints test : commitTests) {
-					try {
-						for (AlertToDataConstraintFailure failure : test.test(
-								to, true)) {
-							warningsAndErrors.add(failure);
-							if (failure.getAlertType() == ALERT_TYPE.ERROR) {
-								testFailureSet.add(to);
-								testFailures = true;
+		commitInProgress = true;
+		try {
+			synchronized (uncommitted) {
+			synchronized (uncommittedNoChecks) {
+				boolean testFailures = false;
+				Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
+				List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+				AceLog.getEditLog()
+						.info("Uncommitted count: " + uncommitted.size());
+				AceLog.getEditLog().finer("Uncommitted set: " + uncommitted);
+				for (I_Transact to : uncommitted) {
+					for (I_TestDataConstraints test : commitTests) {
+						try {
+							for (AlertToDataConstraintFailure failure : test.test(
+									to, true)) {
+								warningsAndErrors.add(failure);
+								if (failure.getAlertType() == ALERT_TYPE.ERROR) {
+									testFailureSet.add(to);
+									testFailures = true;
+								}
 							}
-						}
 
-					} catch (Exception e) {
-						AceLog.getEditLog().alertAndLogException(e);
-					}
-				}
-			}
-
-			if (testFailures) {
-				int n = JOptionPane
-						.showConfirmDialog(
-								null,
-								"Would you like to cancel the commit?\n"
-										+ "If you continue, components with test failures will be rolled back prior to commit.\n  ",
-								"Failures Detected", JOptionPane.YES_NO_OPTION,
-								JOptionPane.QUESTION_MESSAGE);
-				if (n == JOptionPane.YES_OPTION) {
-					return;
-				}
-				for (I_Transact to : testFailureSet) {
-					to.abort();
-					uncommitted.remove(to);
-				}
-			}
-
-			Date now = new Date();
-			Set<TimePathId> values = new HashSet<TimePathId>();
-			if (writeChangeSets) {
-				for (I_WriteChangeSet writer : csWriters) {
-					AceLog.getEditLog().info(
-							"Opening writer: " + writer.toString());
-					writer.open();
-				}
-			}
-			int version = ThinVersionHelper.convert(now.getTime());
-			AceLog.getEditLog().info(
-					"Starting commit: " + version + " (" + now.getTime() + ")");
-
-			UniversalIdList uncommittedIds = new UniversalIdList();
-
-			for (I_Transact cb : uncommitted) {
-				if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
-					I_GetConceptData igcd = (I_GetConceptData) cb;
-					for (int nid : igcd.getUncommittedIds().getSetValues()) {
-						I_IdVersioned idv = AceConfig.getVodb().getId(nid);
-						try {
-							uncommittedIds.getUncommittedIds().add(
-									idv.getUniversal());
-						} catch (TerminologyException e) {
-							throw new ToIoException(e);
-						}
-					}
-				} else if (ExtensionByReferenceBean.class.isAssignableFrom(cb
-						.getClass())) {
-					ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
-					if (ebrBean.isFirstCommit()) {
-						I_IdVersioned idv = AceConfig.getVodb().getId(
-								ebrBean.getMemberId());
-						try {
-							uncommittedIds.getUncommittedIds().add(
-									idv.getUniversal());
-						} catch (TerminologyException e) {
-							throw new ToIoException(e);
+						} catch (Exception e) {
+							AceLog.getEditLog().alertAndLogException(e);
 						}
 					}
 				}
-			}
-			if (writeChangeSets) {
-				if (uncommitted.size() > 0) {
+
+				if (testFailures) {
+					int n = JOptionPane
+							.showConfirmDialog(
+									null,
+									"Would you like to cancel the commit?\n"
+											+ "If you continue, components with test failures will be rolled back prior to commit.\n  ",
+									"Failures Detected", JOptionPane.YES_NO_OPTION,
+									JOptionPane.QUESTION_MESSAGE);
+					if (n == JOptionPane.YES_OPTION) {
+						return;
+					}
+					for (I_Transact to : testFailureSet) {
+						to.abort();
+						uncommitted.remove(to);
+					}
+				}
+
+				Date now = new Date();
+				Set<TimePathId> values = new HashSet<TimePathId>();
+				if (writeChangeSets) {
 					for (I_WriteChangeSet writer : csWriters) {
-						writer.writeChanges(uncommittedIds, ThinVersionHelper
-								.convert(version));
-					}
-					for (I_Transact cb : uncommitted) {
-						for (I_WriteChangeSet writer : csWriters) {
-							writer.writeChanges(cb, ThinVersionHelper
-									.convert(version));
-						}
+						AceLog.getEditLog().info(
+								"Opening writer: " + writer.toString());
+						writer.open();
 					}
 				}
-			}
+				int version = ThinVersionHelper.convert(now.getTime());
+				AceLog.getEditLog().info(
+						"Starting commit: " + version + " (" + now.getTime() + ")");
 
-			try {
-				if (VodbEnv.isTransactional()) {
-					AceConfig.getVodb().startTransaction();
-				}
+				UniversalIdList uncommittedIds = new UniversalIdList();
 
 				for (I_Transact cb : uncommitted) {
-					cb.commit(version, values);
+					processIdentifiers(uncommittedIds, cb);
 				}
-				AceConfig.getVodb().addPositions(values);
-				if (VodbEnv.isTransactional()) {
-					AceConfig.getVodb().commitTransaction();
+				for (I_Transact cb : uncommittedNoChecks) {
+					processIdentifiers(uncommittedIds, cb);
 				}
-				AceConfig.getVodb().sync();
-			} catch (DatabaseException e) {
-				if (VodbEnv.isTransactional()) {
-					AceConfig.getVodb().cancelTransaction();
-				}
-				throw new ToIoException(e);
-			}
-			if (writeChangeSets) {
-				for (I_WriteChangeSet writer : csWriters) {
-					AceLog.getEditLog().info(
-							"Committing writer: " + writer.toString());
-					writer.commit();
-				}
-			}
-			uncommitted.clear();
-			dataCheckMap.clear();
-			if (VodbEnv.headless == false) {
-				fireCommit();
-			}
-			AceLog.getEditLog().info(
-					"Finished commit: " + version + " (" + now.getTime() + ")");
-			if (aceConfig != null && VodbEnv.headless == false) {
-				for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-					if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
-						frameConfig.setCommitEnabled(true);
-						ACE aceInstance = ((AceFrameConfig) frameConfig)
-								.getAceFrame().getCdePanel();
-						aceInstance.getUncommittedListModel().clear();
+				if (writeChangeSets) {
+					if (uncommitted.size() > 0) {
+						for (I_WriteChangeSet writer : csWriters) {
+							writer.writeChanges(uncommittedIds, ThinVersionHelper
+									.convert(version));
+						}
+						for (I_Transact cb : uncommitted) {
+							for (I_WriteChangeSet writer : csWriters) {
+								writer.writeChanges(cb, ThinVersionHelper
+										.convert(version));
+							}
+						}
 					}
+				}
+
+				try {
+					if (VodbEnv.isTransactional()) {
+						AceConfig.getVodb().startTransaction();
+					}
+
+					for (I_Transact cb : uncommitted) {
+						cb.commit(version, values);
+					}
+					for (I_Transact cb : uncommittedNoChecks) {
+						cb.commit(version, values);
+					}
+					AceConfig.getVodb().addPositions(values);
+					if (VodbEnv.isTransactional()) {
+						AceConfig.getVodb().commitTransaction();
+					}
+					AceConfig.getVodb().sync();
+				} catch (DatabaseException e) {
+					if (VodbEnv.isTransactional()) {
+						AceConfig.getVodb().cancelTransaction();
+					}
+					throw new ToIoException(e);
+				}
+				if (writeChangeSets) {
+					for (I_WriteChangeSet writer : csWriters) {
+						AceLog.getEditLog().info(
+								"Committing writer: " + writer.toString());
+						writer.commit();
+					}
+				}
+				uncommitted.clear();
+				uncommittedNoChecks.clear();
+				dataCheckMap.clear();
+				if (VodbEnv.headless == false) {
+					fireCommit();
+				}
+				AceLog.getEditLog().info(
+						"Finished commit: " + version + " (" + now.getTime() + ")");
+				if (aceConfig != null && VodbEnv.headless == false) {
+					for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+						if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
+							frameConfig.setCommitEnabled(true);
+							ACE aceInstance = ((AceFrameConfig) frameConfig)
+									.getAceFrame().getCdePanel();
+							aceInstance.getUncommittedListModel().clear();
+						}
+					}
+				}
+			}
+			}
+			commitInProgress = false;
+		} catch (IOException e) {
+			commitInProgress = false;
+			e.printStackTrace();
+		}
+	}
+
+	private static void processIdentifiers(UniversalIdList uncommittedIds,
+			I_Transact cb) throws IOException, ToIoException {
+		if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
+			I_GetConceptData igcd = (I_GetConceptData) cb;
+			for (int nid : igcd.getUncommittedIds().getSetValues()) {
+				I_IdVersioned idv = AceConfig.getVodb().getId(nid);
+				try {
+					uncommittedIds.getUncommittedIds().add(
+							idv.getUniversal());
+				} catch (TerminologyException e) {
+					throw new ToIoException(e);
+				}
+			}
+		} else if (ExtensionByReferenceBean.class.isAssignableFrom(cb
+				.getClass())) {
+			ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
+			if (ebrBean.isFirstCommit()) {
+				I_IdVersioned idv = AceConfig.getVodb().getId(
+						ebrBean.getMemberId());
+				try {
+					uncommittedIds.getUncommittedIds().add(
+							idv.getUniversal());
+				} catch (TerminologyException e) {
+					throw new ToIoException(e);
 				}
 			}
 		}
 	}
 
 	public static void abort() throws IOException {
+		if (commitInProgress) {
+			AceLog.getAppLog().alertAndLogException(new Exception("Commit is already in process."));
+			return;
+		}
 		for (I_Transact cb : uncommitted) {
 			cb.abort();
 		}
 		uncommitted.clear();
+		for (I_Transact cb : uncommittedNoChecks) {
+			cb.abort();
+		}
+		uncommittedNoChecks.clear();
 		dataCheckMap.clear();
 		fireCommit();
 	}
