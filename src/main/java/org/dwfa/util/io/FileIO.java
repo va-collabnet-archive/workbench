@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,7 +25,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -530,5 +533,42 @@ public class FileIO {
 	public static String getNormalizedRelativePath(File f) {
 	  return getRelativePath(f).replace('\\', '/');
 	}
+
+    public static List<File> recursiveGetFiles(File rootFile, String prefix, String suffix, boolean excludeHidden) {
+    	List<File> fileList = new ArrayList<File>();
+    	recursiveGetFiles(rootFile, fileList, prefix, suffix, excludeHidden);
+    	return fileList;
+    }
+
+    private static void recursiveGetFiles(File rootFile, List<File> fileList, 
+    		final String prefix, final String suffix, final boolean excludeHidden) {
+        File[] children = rootFile.listFiles(new FileFilter() {
+
+            public boolean accept(File child) {
+            	if (excludeHidden) {
+                    if (child.isHidden() || child.getName().startsWith(".")) {
+                        return false;
+                    }
+            	}
+                if (child.isDirectory()) {
+                    return true;
+                }
+                if (prefix != null && prefix.length() > 1) {
+                    return child.getName().endsWith(suffix) && child.getName().startsWith(prefix);
+                } else {
+                    return child.getName().endsWith(suffix);
+                }
+           }
+        });
+        if (children != null) {
+            for (File child : children) {
+                if (child.isDirectory()) {
+                	recursiveGetFiles(child, fileList, prefix, suffix, excludeHidden);
+                } else {
+                    fileList.add(child);
+                }
+            }
+        }
+    }
 
 }
