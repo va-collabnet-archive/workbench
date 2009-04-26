@@ -10,11 +10,14 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -60,6 +63,7 @@ public class ProcessUserToCentralSyncPackage extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
+
 			// Get the file
 			SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -90,8 +94,13 @@ public class ProcessUserToCentralSyncPackage extends AbstractTask {
 			throw ex;
 		}
 		try {
+			if (LocalVersionedTerminology.get().getProperty(jarFile.getName()) != null) {
+				AceLog.getAppLog().alertAndLogException(new Exception(jarFile.getName() + 
+						" has already been processed on: " + LocalVersionedTerminology.get().getProperty(jarFile.getName())));
+				return Condition.CONTINUE;
+			}
+			
 			// Extract the contents
-
 			File destDir = new File("tmp", UUID.randomUUID().toString());
 			JarExtractor.execute(jarFile, destDir);
 			// Process Inboxes
@@ -248,12 +257,11 @@ public class ProcessUserToCentralSyncPackage extends AbstractTask {
 			
 			// Cleanup
 			FileIO.recursiveDelete(destDir);
-
+			LocalVersionedTerminology.get().setProperty(jarFile.getName(), new Date().toString());
 			
 		} catch (IOException e) {
 			throw new TaskFailedException(e);
-		}
-		
+		}		
 		return Condition.CONTINUE;
 	}
 

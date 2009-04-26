@@ -1,13 +1,18 @@
 package org.dwfa.ace.task.standalone.sync;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -20,10 +25,11 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes.Name;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
+import javax.swing.SwingUtilities;
+
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -37,17 +43,16 @@ import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarCreator;
 import org.dwfa.util.io.JarExtractor;
 
-/**
- * 
- * @author kec
- * 
- */
 @BeanList(specs = { @Spec(directory = "tasks/ide/ssync/", type = BeanType.TASK_BEAN) })
-public class UserToCentralSyncPkg extends AbstractTask {
+public class CentralToUserSyncPkg extends AbstractTask {
 
 	private static final long serialVersionUID = 1;
 
 	private static final int dataVersion = 1;
+
+	private transient TaskFailedException ex = null;
+
+	private transient File remoteProfile = null;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -66,18 +71,22 @@ public class UserToCentralSyncPkg extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-							.name());
+			//Select the remote profile
+			getRemoteDbProfile();
+
+			ObjectInputStream ois = new ObjectInputStream(
+					new BufferedInputStream(new FileInputStream(
+							remoteProfile)));
+			I_ConfigAceDb remoteDbConfig = (I_ConfigAceDb) ois.readObject();
+			
 			int sequence = 1;
 			String dir = "ssync";
-			String prefix = config.getUsername() + "-central-";
+			String prefix = "central-" + remoteDbConfig.getUsername() + "-";
 			String sequenceString = LocalVersionedTerminology.get().getProperty(prefix);
 			if (sequenceString != null) {
 				sequence = Integer.parseInt(sequenceString) + 1;
 			}
-			
-			String suffix = ".ucs";
+			String suffix = ".cus";
 			File jarFile = new File(dir, prefix + sequence + suffix);
 			Manifest manifest = new Manifest();
 			Attributes a = manifest.getMainAttributes();
@@ -94,7 +103,7 @@ public class UserToCentralSyncPkg extends AbstractTask {
 					output);
 
 			// Inbox and outbox
-			for (String queueFile : config.getDbConfig().getQueues()) {
+			for (String queueFile : remoteDbConfig.getQueues()) {
 				String queueConfigString = FileIO
 						.readerToString(new FileReader(queueFile));
 				if (queueConfigString.contains("getInboxQueueType")) {
@@ -106,7 +115,7 @@ public class UserToCentralSyncPkg extends AbstractTask {
 
 			// change sets
 			Properties csProperties = new Properties();
-			File csPropsFile = new File(config.getDbConfig().getProfileFile()
+			File csPropsFile = new File(remoteDbConfig.getProfileFile()
 					.getParentFile(), ".csp");
 			if (csPropsFile.exists()) {
 				InputStream fis = new FileInputStream(csPropsFile);
@@ -135,16 +144,43 @@ public class UserToCentralSyncPkg extends AbstractTask {
 			csProperties.storeToXML(fos, "");
 			fos.close();
 
-			JarCreator.addToZip("profiles/", config.getDbConfig().getProfileFile(), output, "");
-			JarCreator.addToZip("profiles/", csPropsFile, output, "");
+			JarCreator.addToZip("profiles/", remoteDbConfig.getProfileFile(), output, "");
+			JarCreator.addToZip("profiles/", new File(remoteDbConfig.getProfileFile().getParentFile(), ".csp"), output, "");
 
 			output.close();
 			LocalVersionedTerminology.get().setProperty(prefix, Integer.toString(sequence + 1));
+			
 			return Condition.CONTINUE;
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			throw new TaskFailedException(ex);
-		} catch (ClassNotFoundException ex) {
-			throw new TaskFailedException(ex);
+		} 
+	}
+
+	private void getRemoteDbProfile() throws Exception {
+		// Get the file
+		SwingUtilities.invokeAndWait(new Runnable() {
+
+
+			public void run() {
+				FileDialog dialog = new FileDialog(new Frame(),
+						"Select a profile to prepare sync pkg for:");
+				dialog.setDirectory(System.getProperty("user.dir"));
+				dialog.setFilenameFilter(new FilenameFilter() {
+					public boolean accept(File dir, String name) {
+						return name.endsWith(".ace");
+					}
+				});
+				dialog.setVisible(true);
+				if (dialog.getFile() == null) {
+					ex = new TaskFailedException("User canceled operation");
+				} else {
+					remoteProfile = new File(dialog.getDirectory(), dialog
+							.getFile());
+				}
+			}
+		});
+		if (ex != null) {
+			throw ex;
 		}
 	}
 
@@ -155,17 +191,17 @@ public class UserToCentralSyncPkg extends AbstractTask {
 		JarCreator.addToZip("changeSets/", csf, output, "");
 	}
 
-	private void putOutboxInJar(String queueFileStr, JarOutputStream output)
-			throws IOException {
-		AceLog.getAppLog().info("Processing outbox: " + queueFileStr);
-		File queueDir = new File(queueFileStr).getParentFile();
-		String prefix = "outboxes/";
-		JarCreator.recursiveAddToZip(output, queueDir, prefix);
-	}
-
 	private void putInboxInJar(String queueFileStr, JarOutputStream output)
 			throws IOException {
 		AceLog.getAppLog().info("Processing inbox: " + queueFileStr);
+		File queueDir = new File(queueFileStr).getParentFile();
+		String prefix = "inboxes/";
+		JarCreator.recursiveAddToZip(output, queueDir, prefix);
+	}
+
+	private void putOutboxInJar(String queueFileStr, JarOutputStream output)
+			throws IOException {
+		AceLog.getAppLog().info("Processing outbox: " + queueFileStr);
 		File queueDir = new File(queueFileStr).getParentFile();
 		File queueLlog = new File(queueDir, ".llog");
 		File[] logItems = queueLlog.listFiles(new FileFilter() {
@@ -174,17 +210,15 @@ public class UserToCentralSyncPkg extends AbstractTask {
 			}
 		});
 		if (logItems != null) {
-			String prefix = "inboxes/";
+			String prefix = "outboxes/";
 			for (File llogEntry : logItems) {
-				File queueFile = new File(queueDir, llogEntry.getName());
-				if (queueFile.exists() == false) {
-					File dlogEntry = new File(FileIO.getRelativePath(queueFile.getParentFile())
-							+ "/.dlog/" + queueFile.getName()); 
-					JarCreator.addToZip(prefix, dlogEntry, output, "");
-				}
+				File clogEntry = new File(FileIO.getRelativePath(queueDir)
+							+ "/.clog/" + llogEntry.getName()); 
+					JarCreator.addToZip(prefix, clogEntry, output, "");
 			}
 		}
 	}
+
 
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
