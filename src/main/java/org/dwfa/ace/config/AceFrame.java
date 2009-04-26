@@ -32,10 +32,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.svn.SvnPrompter;
 import org.dwfa.tapi.TerminologyException;
 
 import com.sun.jini.start.LifeCycle;

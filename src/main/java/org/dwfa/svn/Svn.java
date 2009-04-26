@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.queue.ObjectServerCore;
 import org.dwfa.util.io.FileIO;

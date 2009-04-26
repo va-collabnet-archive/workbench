@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.log.HtmlHandler;
 

@@ -9,7 +9,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.svn.SvnPrompter;
+import org.dwfa.ace.task.svn.SvnPrompter;
 
 public class ChangeFramePassword implements ActionListener {
 
