@@ -3,7 +3,6 @@ package org.dwfa.util.io;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
@@ -58,7 +57,7 @@ public class JarExtractor {
 		JarFile jf = new JarFile(source);
 		for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
 			JarEntry je = e.nextElement();
-			System.out.println("Jar entry: " + je.getName() + " compressed: "
+			System.out.println("Jar entry (a): " + je.getName() + " compressed: "
 					+ je.getCompressedSize() + " size: " + je.getSize()
 					+ " time: " + new Date(je.getTime()) + " comment: "
 					+ je.getComment());
@@ -69,14 +68,14 @@ public class JarExtractor {
 				f.mkdir();
 				continue;
 			}
-			java.io.InputStream is = jf.getInputStream(je); // get the input
-			// stream
+			// get the input stream
+			java.io.InputStream is = new BufferedInputStream(jf.getInputStream(je)); 
 			f.getParentFile().mkdirs();
 			java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
 			byte[] buffer = new byte[102400];
-			while (is.available() > 0) { // write contents of 'is' to
-				// 'fos'
-				int bytesRead = is.read(buffer);
+			int bytesRead;
+			while ((bytesRead = is.read(buffer, 0, 102400)) != -1) { 
+				// write contents of 'is' to 'fos'
 				fos.write(buffer, 0, bytesRead);
 			}
 			fos.close();
@@ -93,25 +92,23 @@ public class JarExtractor {
 		JarInputStream jis = new JarInputStream(bis);
 		JarEntry je = jis.getNextJarEntry();
 		while (je != null) {
-			System.out.println("Jar entry: " + je.getName() + " compressed: "
+			System.out.println("Jar entry (b): " + je.getName() + " compressed: "
 					+ je.getCompressedSize() + " size: " + je.getSize()
 					+ " time: " + new Date(je.getTime()) + " comment: "
 					+ je.getComment());
 			java.io.File f = new java.io.File(destDir + java.io.File.separator
 					+ je.getName());
 
-			if (je.isDirectory()) { // if its a directory, create it
+			if (je.isDirectory()) { // if it is a directory, create it
 				f.mkdir();
 			} else {
 				f.getParentFile().mkdirs();
 				java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-				byte[] buffer = new byte[10240];
-				long bytesToRead = je.getSize();
-				while (bytesToRead > 0) { // write contents of 'is' to
-					// 'fos'
-					int bytesRead = jis.read(buffer);
+				byte[] buffer = new byte[102400];
+				int bytesRead;
+				while ((bytesRead = jis.read(buffer, 0, 102400)) != -1) { 
+					// write contents of 'is' to 'fos'
 					fos.write(buffer, 0, bytesRead);
-					bytesToRead = bytesToRead - bytesRead;
 				}
 				fos.close();
 				f.setLastModified(je.getTime());
