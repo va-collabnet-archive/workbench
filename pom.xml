@@ -84,58 +84,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.dwfa</groupId>
-				<artifactId>dwfa-mojo</artifactId>
-				<executions>
-					<execution>
-						<id>export-beans</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>export-beans</goal>
-						</goals>
-						<configuration>
-
-							<targetSubDir>classes/org/dwfa/resources/core
-							</targetSubDir>
-							<specs>
-								<beanSpec>
-									<sourceName>java.lang.Integer</sourceName>
-									<dirName>beans</dirName>
-									<type>bean</type>
-									<constructArg>0</constructArg>
-									<beanName>Integer-0</beanName>
-								</beanSpec>
-								<beanSpec>
-									<sourceName>java.lang.Boolean</sourceName>
-									<dirName>beans</dirName>
-									<type>bean</type>
-									<constructArg>false</constructArg>
-									<beanName>Boolean-False</beanName>
-								</beanSpec>
-								<beanSpec>
-									<sourceName>java.lang.Boolean</sourceName>
-									<dirName>beans</dirName>
-									<type>bean</type>
-									<constructArg>true</constructArg>
-									<beanName>Boolean-True</beanName>
-								</beanSpec>
-								<beanSpec>
-									<sourceName>Break Password</sourceName>
-									<dirName>processes/grid</dirName>
-									<type>process</type>
-								</beanSpec>
-								<beanSpec>
-									<sourceName>Break Password</sourceName>
-									<dirName>queue/static/Launcher</dirName>
-									<type>process</type>
-									<format>queue</format>
-								</beanSpec>
-							</specs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.dwfa</groupId>
 				<artifactId>pbl-mojo</artifactId>
 				<version>1.1</version>
 				<configuration>
