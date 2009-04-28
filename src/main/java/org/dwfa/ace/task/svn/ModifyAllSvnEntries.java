@@ -24,7 +24,7 @@ public class ModifyAllSvnEntries extends AbstractAllSvnEntriesTask {
 	private static final int dataVersion = 1;
 	
 	private String repoUrl = 
-		"https://au-ct.au-ct.org/svn/au-ct/branches/test-1.0/au-ct-edit-bundle/src/main/profiles/users";
+		"https://csfe.aceworkspace.net/svn/repos/sct-au/branches/dev-1.0/au-ct-edit-bundle/src/main/profiles/users";
 	
 	@Override
 	protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) {
@@ -33,7 +33,8 @@ public class ModifyAllSvnEntries extends AbstractAllSvnEntriesTask {
 		logger.info("The existing repo url in the profile is " + existingRepoUrl);
 		logger.info("Setting repo url in the profile to " + getRepoUrl());
 		
-		svd.setRepositoryUrlStr(getRepoUrl());		
+		svd.setRepositoryUrlStr(getRepoUrl());	
+		svd.setPreferredReadRepository(getRepoUrl());
 	}
 
     private void writeObject(ObjectOutputStream out) throws IOException {
