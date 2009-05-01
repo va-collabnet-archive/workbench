@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.refset.members;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -32,15 +33,16 @@ public class MemberRefsetHelper {
 	protected int currentStatusId;
 	protected int retiredStatusId;
 	protected int conceptTypeId;
+	protected int unspecifiedUuid;
+	protected List<I_Path> allPaths;
 	
 	public MemberRefsetHelper() throws Exception {
 		termFactory = LocalVersionedTerminology.get();
-		currentStatusId = 
-			termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
-		retiredStatusId = 
-			termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
-		conceptTypeId = 
-			termFactory.uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next());
+		currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+		retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
+		unspecifiedUuid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid();
+		conceptTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
+		allPaths = termFactory.getPaths();
 	}
 	
 	/**
@@ -54,7 +56,7 @@ public class MemberRefsetHelper {
 	 */
 	public void addAllToRefset(int refsetId, Set<I_GetConceptData> newMembers, int valueId, String batchDescription) 
 			throws Exception {
-		BatchMonitor batch = new BatchMonitor(batchDescription, newMembers.size(), 100, 20000);			
+		BatchMonitor batch = new BatchMonitor(batchDescription, newMembers.size(), 15000);			
 		batch.start();
 		
 		for (I_GetConceptData member : newMembers) {
@@ -76,7 +78,7 @@ public class MemberRefsetHelper {
 	 */
 	public void removeAllFromRefset(int refsetId, Set<I_GetConceptData> members, int valueId, String batchDescription) 
 			throws Exception {
-		BatchMonitor batch = new BatchMonitor(batchDescription, members.size(), 100, 20000);			
+		BatchMonitor batch = new BatchMonitor(batchDescription, members.size(), 5000);			
 		batch.start();
 		
 		for (I_GetConceptData member : members) {
@@ -130,9 +132,8 @@ public class MemberRefsetHelper {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		Set<I_Path> userEditPaths = config.getEditingPathSet();
 		
-		int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-				ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-				termFactory.getPaths(), Integer.MAX_VALUE);
+		int memberId = termFactory.uuidToNativeWithGeneration( 
+				UUID.randomUUID(), unspecifiedUuid, allPaths, Integer.MAX_VALUE);
 
 		I_ThinExtByRefVersioned newExtension =
 			termFactory.newExtensionNoChecks(refsetId, memberId, newMemberId, conceptTypeId);
