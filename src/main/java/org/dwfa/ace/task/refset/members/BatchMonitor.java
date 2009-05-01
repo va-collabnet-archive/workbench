@@ -1,5 +1,7 @@
 package org.dwfa.ace.task.refset.members;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -10,12 +12,11 @@ public class BatchMonitor {
 
 	private String description = "Batch process";
 	private long startTime = 0;
-	private long lastMark = 0;
 	private long totalEvents = 0;	
-	private long avgSampleSize = 0;
-	private long movingAverageMs = 0;
 	private long reportCycleMs = 0;
 	private long eventCount = 0;
+	private long lastReportTime = 0;
+	private long lastReportEventCount = 0;
 	
 	private Logger logger = Logger.getLogger(BatchMonitor.class.getName());
 	
@@ -24,15 +25,13 @@ public class BatchMonitor {
 	/**
 	 * @param description A textual description of the batch
 	 * @param totalEvents The total number of expected events
-	 * @param avgSampleSize The sample size to use when calculating the simple moving average (for time between marks)
 	 * @param reportCycleMs The time between giving an updated report
 	 */
-	public BatchMonitor(String description, long totalEvents, long avgSampleSize, long reportCycleMs) {
+	public BatchMonitor(String description, long totalEvents, long reportCycleMs) {
 		if (description != null) {
 			this.description = description;
 		}
 		this.totalEvents = totalEvents;
-		this.avgSampleSize = avgSampleSize;
 		this.reportCycleMs = reportCycleMs;
 	}
 	
@@ -41,11 +40,6 @@ public class BatchMonitor {
 	 */
 	public void mark() {		
 		eventCount++;
-		long now = new Date().getTime();
-		if (lastMark != 0) {
-			calcMovingAverage(now - lastMark);
-		}
-		lastMark = now;
 	}
 	
 	/**
@@ -53,11 +47,21 @@ public class BatchMonitor {
 	 */
 	public void report() {
 		if (totalEvents != 0) {
+			
+			long eventsSinceLastReport = eventCount - lastReportEventCount;
+			long timeSinceLastReport = new Date().getTime() - lastReportTime;			
 			long percentComplete = (eventCount * 100) / totalEvents;
-			long timeToCompleteMs = (totalEvents - eventCount) * movingAverageMs;
-			logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + 
-					"). Average time per event: " + asTimeFormat(movingAverageMs) + 
-					" Estimated time to complete: " + asTimeFormat(timeToCompleteMs));
+			
+			double eventsPerMs = eventsSinceLastReport / (double)timeSinceLastReport;
+			long timeToCompleteMs = Math.round((totalEvents - eventCount) / eventsPerMs);
+			
+			logger.info(description + ": " + percentComplete + "% complete (" + 
+					eventCount + " of " + totalEvents + 
+					"). " + getEventRate(eventsPerMs) + 
+					". Estimated time to complete: " + asTimeFormat(timeToCompleteMs));
+
+			lastReportEventCount = eventCount;		
+			lastReportTime = new Date().getTime();
 		}
 	}
 	
@@ -66,6 +70,7 @@ public class BatchMonitor {
 	 */
 	public void start() {
 		startTime = new Date().getTime();
+		lastReportTime = startTime;
 		worker = new BatchReportingThread(this, reportCycleMs);
 		worker.start();
 	}
@@ -80,10 +85,13 @@ public class BatchMonitor {
 		logger.info("Batch completed: " + description + ". " + eventCount + " events taking " + asTimeFormat(duration));
 	}
 	
-	
-	private void calcMovingAverage(long nextValue) {
-		long sampleSize = (eventCount < avgSampleSize) ? eventCount : avgSampleSize;
-		movingAverageMs = ((movingAverageMs * (sampleSize - 1)) + nextValue) / sampleSize;
+	private String getEventRate(double eventsPerMs) {
+		DecimalFormat format = new DecimalFormat("0.00");
+		if (eventsPerMs < 0.001) {
+			return "Events per minute: " + format.format(eventsPerMs * 60000); 
+		} else {
+			return "Events per second: " + format.format(eventsPerMs * 1000);
+		}			
 	}
 	
 	private String asTimeFormat(long durationMs) {
