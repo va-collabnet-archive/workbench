@@ -52,7 +52,7 @@ public interface I_ManageStandardAppFunctions {
     public boolean quit();
     
     /**
-     * Called when the application recieves a 
+     * Called when the application receives a 
      * Reopen Application Event from the finder or
      * another application. 
      *
