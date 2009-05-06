@@ -41,17 +41,7 @@ public class TreeMouseListener implements MouseListener {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
 						.getLastPathComponent();
 				if (e.isPopupTrigger()) {
-					JPopupMenu popup;
-					try {
-						popup = makePopup(e);
-						popup.show(e.getComponent(), e.getX(), e.getY());
-					} catch (FileNotFoundException e1) {
-						AceLog.getAppLog().alertAndLogException(e1);
-					} catch (IOException e1) {
-						AceLog.getAppLog().alertAndLogException(e1);
-					} catch (ClassNotFoundException e1) {
-						AceLog.getAppLog().alertAndLogException(e1);
-					}
+					makeAndShowPopup(e);
 				} else {
 					I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree
 							.getCellRenderer();
@@ -81,6 +71,20 @@ public class TreeMouseListener implements MouseListener {
 					tree.setSelectionInterval(newRow, newRow);
 				}
 			}
+		}
+	}
+
+	private void makeAndShowPopup(MouseEvent e) {
+		JPopupMenu popup;
+		try {
+			popup = makePopup(e);
+			popup.show(e.getComponent(), e.getX(), e.getY());
+		} catch (FileNotFoundException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		} catch (IOException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		} catch (ClassNotFoundException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
 
@@ -164,7 +168,10 @@ public class TreeMouseListener implements MouseListener {
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+		if (e.isPopupTrigger()) {
+			makeAndShowPopup(e);
+		}
+		
 	}
 
 	public void mouseClicked(MouseEvent e) {
