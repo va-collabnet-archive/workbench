@@ -16,8 +16,7 @@ public class TestForFullySpecifiedNameBeanInfo extends
 	 */
 	public BeanDescriptor getBeanDescriptor() {
 		BeanDescriptor bd = new BeanDescriptor(TestForFullySpecifiedName.class);
-		bd
-				.setDisplayName("<html><font color='green'><center>Test For<br>Fully Specified Name");
+		bd.setDisplayName("<html><font color='green'><center>Test For<br>Fully Specified Name");
 		return bd;
 	}
 
