@@ -3,6 +3,7 @@ package org.dwfa.mojo;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -18,11 +19,16 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary.Concept;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * Generate ConceptSpec Java file from a given Refset
@@ -72,6 +78,9 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 
 	private List<I_GetConceptData> getListTrivial() throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		for (Concept c : Concept.values()) {
+			System.out.println(c.name());
+		}
 		return Arrays
 				.asList(
 						termFactory
@@ -107,14 +116,64 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 		return Arrays.asList(con);
 	}
 
-	public List<I_GetConceptData> getRefsetConcepts() throws Exception {
+	private I_GetConceptData getRefsetConcept() throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		List<I_GetConceptData> ret = new ArrayList<I_GetConceptData>();
 		I_GetConceptData con = termFactory.getConcept(Arrays.asList(UUID
 				.fromString(refSetUuid)));
+		if (con == null)
+			throw new Exception("No concept for " + refSetUuid);
 		if (!con.getInitialText().equals(refSetName))
 			throw new Exception("Name mismatch: " + con.getInitialText()
 					+ " <> " + refSetName);
+		return con;
+	}
+
+	private class RefsetBuilder extends RefsetUtilities {
+
+		public RefsetBuilder(I_TermFactory termFactory) {
+			this.termFactory = termFactory;
+			try {
+				// for (I_Path p :termFactory.getPaths()) {
+				// if (termFactory
+				// .getConcept(ArchitectonicAuxiliary.Concept.SNOMED_CORE
+				// .getUids()).getConceptId() == p.getConceptId()) {
+				// System.out.println("Path: " + p);
+				// this.pathConcept = p.
+				// }
+				this.pathConcept = termFactory
+						.getConcept(ArchitectonicAuxiliary.Concept.TEST
+								.getUids());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private void buildRefset() throws Exception {
+		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		I_GetConceptData refset = getRefsetConcept();
+		I_GetConceptData include_individual = termFactory
+				.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL
+						.getUids());
+		RefsetBuilder rb = new RefsetBuilder(termFactory);
+		for (Concept c : Concept.values()) {
+			System.out.println("Concept:" + c.name());
+			I_GetConceptData member = termFactory.getConcept(c.getUids());
+			System.out.println("Member: " + member.getUids().get(0));
+			System.out.println("Include: "
+					+ include_individual.getUids().get(0));
+			System.out.println("Refset: " + refset.getUids().get(0));
+			rb.addToMemberSet(member.getConceptId(), include_individual
+					.getConceptId(), refset.getConceptId());
+		}
+	}
+
+	public List<I_GetConceptData> getRefsetConcepts() throws Exception {
+		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		List<I_GetConceptData> ret = new ArrayList<I_GetConceptData>();
+		I_GetConceptData con = getRefsetConcept();
 		for (I_ThinExtByRefVersioned mem : termFactory
 				.getRefsetExtensionMembers(con.getConceptId())) {
 			I_GetConceptData mem_con = termFactory.getConcept(mem
@@ -140,6 +199,7 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
+			buildRefset();
 			String dir = outputDirectory + File.separator
 					+ packageName.replace(".", File.separator) + File.separator;
 			System.out.println("dir:" + dir);
