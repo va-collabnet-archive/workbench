@@ -1,6 +1,5 @@
 package org.dwfa.ace.task.refset;
 
-import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.util.LogMill;
@@ -26,7 +25,6 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     private static final int dataVersion        = 1;
 
     private String filePropertyName;
-    private I_ProcessExtByRef processExtByRef;
     private LogMill logMill;
 
     public WriteRefsetDescriptions() {
@@ -57,9 +55,10 @@ public final class WriteRefsetDescriptions extends AbstractTask {
             TaskLogger taskLogger = new TaskLogger(worker);
             logMill.logInfo(taskLogger, "Exporting reference sets as description files");
             String filePath = (String) process.readProperty(filePropertyName);
+            logMill.logInfo(taskLogger, "Export to path --> " + filePath);
 
-            processExtByRef = new WriteRefsetDescriptionsProcessExtByRef(taskLogger, filePath);
-            LocalVersionedTerminology.get().iterateExtByRefs(processExtByRef);
+            LocalVersionedTerminology.get().iterateExtByRefs(
+                    new WriteRefsetDescriptionsProcessExtByRef(taskLogger, filePath));
 
         } catch (Exception e) {
             throw new TaskFailedException("The task failed with a path of -> " + outputDirectoryPath, e);
