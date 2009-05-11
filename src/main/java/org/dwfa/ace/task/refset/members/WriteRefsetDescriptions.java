@@ -1,7 +1,8 @@
-package org.dwfa.ace.task.refset;
+package org.dwfa.ace.task.refset.members;
 
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.refset.TaskLogger;
 import org.dwfa.ace.task.util.LogMill;
 import org.dwfa.ace.task.util.SimpleLogMill;
 import org.dwfa.bpa.process.Condition;

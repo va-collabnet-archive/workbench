@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.refset;
+package org.dwfa.ace.task.refset.members;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionTuple;

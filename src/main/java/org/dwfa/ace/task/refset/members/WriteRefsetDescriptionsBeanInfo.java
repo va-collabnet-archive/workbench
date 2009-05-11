@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.refset;
+package org.dwfa.ace.task.refset.members;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
@@ -30,7 +30,7 @@ public final class WriteRefsetDescriptionsBeanInfo extends SimpleBeanInfo {
     @Override
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(WriteRefsetDescriptions.class);
-        bd.setDisplayName("<html><font color='green'><center>Export Refsets<br>to Disk<br>Specify File");
+        bd.setDisplayName("<html><font color='green'><center>Export Refsets<br>to Disk");
         return bd;
     }
 }
