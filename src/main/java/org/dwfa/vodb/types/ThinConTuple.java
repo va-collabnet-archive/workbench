@@ -131,4 +131,8 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
    public I_ConceptAttributePart getPart() {
       return part;
    }
+
+   public int getStatusId() {
+	   return getConceptStatus();
+   }
 }

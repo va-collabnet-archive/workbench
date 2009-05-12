@@ -156,5 +156,9 @@ public class ThinRelTuple implements I_RelTuple {
      buff.append(part.toString());
       return buff.toString();
    }
+   
+   public int getTypeId() {
+	return getRelTypeId();
+   }
 
 }

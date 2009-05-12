@@ -104,5 +104,8 @@ public class ThinIdTuple implements I_IdTuple {
    public I_IdPart getPart() {
       return part;
    }
+   public int getStatusId() {
+	return getIdStatus();
+   }
 
 }
