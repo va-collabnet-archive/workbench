@@ -3,10 +3,7 @@ package org.dwfa.ace.task.refset.members;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ProcessExtByRef;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -31,25 +28,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public final class WriteRefsetDescriptionsProcessExtByRef implements I_ProcessExtByRef {
+/**
+ * An exporter of reference sets that can be shared between tasks and mojos. Given a reference set extension as a
+ * <code>I_ThinExtByRefVersioned</code> exports it to a file with the reference set name.
+ * @{link #processExtensionByReference} should be called for each extension and @{link #clean} should be called
+ * after all extensions have been supplied to the @{link #processExtensionByReference} to release allocated resources.
+ */
+public final class WriteRefsetDescriptionsProcessExtByRef implements CleanableProcessExtByRef {
 
-    private static final Collection<UUID> CURRENT_STATUS_UUIDS = ArchitectonicAuxiliary.Concept.CURRENT.getUids();
-    private static final Collection<UUID> PREFERED_TERM_UUIDS = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids();
-    private static final Collection<UUID> FULLY_SPECIFIED_UUIDS = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids();
-
+    private static final Collection<UUID> CURRENT_STATUS_UUIDS =
+            ArchitectonicAuxiliary.Concept.CURRENT.getUids();
+    private static final Collection<UUID> PREFERED_TERM_UUIDS =
+            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids();
+    private static final Collection<UUID> FULLY_SPECIFIED_UUIDS =
+            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids();
+    private static final String CONCEPTS_WITH_NO_DESCS_KEY = "_CONCEPTS_WITH_NO_DESCS_KEY_";
+    private static final String CONCEPT_ID_HEADER = "Concept ID";
+    private static final String PREFERRED_TERM_HEADER = "PREFERRED_TERM";
+    
+    private final Logger logger;
+    private final File outputDirectory;
+    private final LogMill logMill;
     private final Map<String, Writer> fileMap;
     private final Map<String, Integer> progressMap;
-    private Writer noDescriptionWriter;
-    private final Logger logger;
-    private final String outputPath;
-    private LogMill logMill;
+    private final RefsetUtil refsetUtil;
+    private final String lineSeparator;
 
-    public WriteRefsetDescriptionsProcessExtByRef(final Logger logger, final String outputPath) {
+
+    public WriteRefsetDescriptionsProcessExtByRef(final Logger logger, final File outputDirectory) {
         this.logger = logger;
-        this.outputPath = outputPath;
+        this.outputDirectory = outputDirectory;
         fileMap = new HashMap<String, Writer>();
-        progressMap = new HashMap<String, Integer>();
+        progressMap = new HashMap<String, Integer>();        
         logMill = new SimpleLogMill();
+        refsetUtil = new RefsetUtilImpl();
+        lineSeparator = System.getProperty("line.separator");
     }
 
     public void processExtensionByReference(final I_ThinExtByRefVersioned refset) throws Exception {
@@ -57,12 +70,13 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements I_ProcessEx
         I_GetConceptData refsetConcept = termFactory.getConcept(refset.getRefsetId());
 
         if (refset.getTypeId() != RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid()) {
-            logMill.logInfo(logger, "Skipping non-concept type refset " + refsetConcept.getId().getUIDs().iterator().next());
+            logMill.logInfo(logger, "Skipping non-concept type refset " +
+                    refsetConcept.getId().getUIDs().iterator().next());
             return;
         }
 
 
-        I_ConceptAttributePart latestAttributePart = getLastestAttributePart(refsetConcept);
+        I_ConceptAttributePart latestAttributePart = refsetUtil.getLastestAttributePart(refsetConcept);
         if (latestAttributePart == null || latestAttributePart.getConceptStatus() !=
                 ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
             logMill.logInfo(logger, "Skipping non-current refset " + refsetConcept.getId().getUIDs().iterator().next());
@@ -72,39 +86,35 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements I_ProcessEx
         writeRefset(refset, termFactory);
     }
 
-    private void writeRefset(final I_ThinExtByRefVersioned refset, final I_TermFactory termFactory) throws Exception {
-        noDescriptionWriter = createFileForConceptsWithoutDescriptions(outputPath);
-        I_IntSet status = createIntSet(termFactory, CURRENT_STATUS_UUIDS);
-        I_IntSet fsn = createIntSet(termFactory, FULLY_SPECIFIED_UUIDS);
-        I_IntSet preferredTerm = createIntSet(termFactory, PREFERED_TERM_UUIDS);
+    /**
+     * Call this method to close all open files.
+     * @throws Exception If an exception occurs.
+     */
+    @Override
+    public void clean() throws Exception {
+        logMill.logInfo(logger, "closing files.");
+        closeFiles();
+    }    
 
-        I_DescriptionTuple refsetName = assertExactlyOne(
+    private void writeRefset(final I_ThinExtByRefVersioned refset, final I_TermFactory termFactory) throws Exception {
+        I_IntSet status = refsetUtil.createIntSet(termFactory, CURRENT_STATUS_UUIDS);
+        I_IntSet fsn = refsetUtil.createIntSet(termFactory, FULLY_SPECIFIED_UUIDS);
+        I_IntSet preferredTerm = refsetUtil.createIntSet(termFactory, PREFERED_TERM_UUIDS);
+
+        I_DescriptionTuple refsetName = refsetUtil.assertExactlyOne(
                 termFactory.getConcept((refset.getRefsetId())).getDescriptionTuples(status, fsn, null));
         logProgress(refsetName.getText());
 
-        Writer writer = getWriter(refsetName.getText());
-        I_ThinExtByRefPart part = getLatestVersionIfCurrent(refset, termFactory);
+        Writer writer = getWriter(refsetName.getText());        
 
         try {
+            I_ThinExtByRefPart part = getLatestVersionIfCurrent(refset, termFactory);
             if (part != null) {
                 writeRefset(refset, termFactory, status, preferredTerm, writer, part);
             }
         } catch (Exception e) {
             logMill.logWarn(logger, e.getMessage());
-        } finally {
-            closeFiles();
         }
-    }
-
-    private I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
-        List<I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
-        I_ConceptAttributePart latestAttributePart = null;
-        for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
-            if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
-                latestAttributePart = attributePart;
-            }
-        }
-        return latestAttributePart;
     }
 
     private void writeRefset(final I_ThinExtByRefVersioned refset, final I_TermFactory termFactory,
@@ -117,61 +127,23 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements I_ProcessEx
         List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(status, preferredTerm, null);
         if (descriptionTuples.size() == 0) {
             logMill.logWarn(logger, "Concept " + conceptUuids + " has no active preferred term");
+            Writer noDescriptionWriter = getWriterForConceptsWithoutDescriptions();
             noDescriptionWriter.append("Concept " + conceptUuids + " has no active preferred term");
-            noDescriptionWriter.append("\r\n");
+            noDescriptionWriter.append(lineSeparator);
         } else {
-            String conceptName;
-            int descriptionId;
-            I_DescriptionTuple descriptionTuple = descriptionTuples.iterator().next();
-            conceptName = descriptionTuple.getText();
-            descriptionId = descriptionTuple.getDescId();
             if (value.getConceptId() != ConceptConstants.PARENT_MARKER.localize().getNid()) {
-                writer.append(getSnomedId(descriptionId, termFactory));
+                I_DescriptionTuple descriptionTuple = descriptionTuples.iterator().next();
+                writer.append(lineSeparator);                
+                writer.append(refsetUtil.getSnomedId(concept.getConceptId(), termFactory));
                 writer.append("\t");
-                writer.append(getSnomedId(concept.getConceptId(), termFactory));
-                writer.append("\t");
-                writer.append(conceptName);
-                writer.append("\t");
-                writer.append(value.toString());
-                writer.append("\r\n");
+                writer.append(descriptionTuple.getText());
             }
         }
     }
 
-    private I_IntSet createIntSet(final I_TermFactory termFactory, final Collection<UUID> uuid) throws Exception {
-        I_IntSet status = termFactory.newIntSet();
-        status.add(termFactory.getConcept(uuid).getConceptId());
-        status.add(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(uuid));
-        return status;
-    }
-
-    private void closeFiles() throws IOException {
-        for (final Writer fileWriter : fileMap.values()) {
-            flushAndClose(fileWriter);
-        }
-
-        flushAndClose(noDescriptionWriter);
-    }
-
-    private void flushAndClose(final Writer fileWriter) throws IOException {
-        fileWriter.flush();
-        fileWriter.close();
-    }
-
-    public I_ThinExtByRefPart getLatestVersionIfCurrent(final I_ThinExtByRefVersioned ext, final I_TermFactory termFactory)
-            throws TerminologyException, IOException {
-        I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
-        for (final I_ThinExtByRefPart version : versions) {
-
-            if (latest == null) {
-                latest = version;
-            } else {
-                if (latest.getVersion()<version.getVersion()) {
-                    latest = version;
-                }
-            }
-        }
+    private I_ThinExtByRefPart getLatestVersionIfCurrent(final I_ThinExtByRefVersioned ext,
+        final I_TermFactory termFactory) throws TerminologyException, IOException {
+        I_ThinExtByRefPart latest = refsetUtil.getLatestVersionIfCurrent(ext, termFactory);
 
         if (latest != null && !(latest.getStatus() == termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId())) {
             latest = null;
@@ -180,50 +152,36 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements I_ProcessEx
         return latest;
     }
 
-    private String getSnomedId(final int nid, final I_TermFactory termFactory) throws IOException, TerminologyException {
+    private Writer getWriterForConceptsWithoutDescriptions() throws Exception {
+        return getWriter(CONCEPTS_WITH_NO_DESCS_KEY, "Concepts with no descriptions.txt", false);
+    }
 
-        if (nid == 0) {
-            return "no identifier";
-        }
+    private Writer getWriter(final String text) throws IOException {
+        return getWriter(text, text + ".refset.text", true);
+    }
 
-        I_IdVersioned idVersioned = termFactory.getId(nid);
-        for (final I_IdPart idPart : idVersioned.getVersions()) {
-            if (idPart.getSource() == termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) {
-                return idPart.getSourceId().toString();
+    private Writer getWriter(String key, String fileName, final boolean addHeader) throws IOException {
+        if (!fileMap.containsKey(key)) {
+            File outputFile = new File(outputDirectory, fileName);
+            if (outputFile.getParentFile().mkdirs()) {
+                logMill.logInfo(logger, "making directory - " + outputFile.getParentFile());
+            }
+
+            outputFile.createNewFile();
+            fileMap.put(key, new BufferedWriter(new FileWriter(outputFile)));
+
+            if (addHeader) {
+                addHeader(fileMap.get(key));
             }
         }
 
-        return "no SCTID found";
+        return fileMap.get(key);
     }
 
-    private Writer createFileForConceptsWithoutDescriptions(String outputDirectoryPath) throws Exception {
-        File outputDirectory = new File(outputDirectoryPath);
-        Writer noDescriptionWriter = new BufferedWriter(new FileWriter(new File(outputDirectory, "Concepts with no descriptions.txt")));
-
-        if (!outputDirectory.exists()) {
-            outputDirectory.mkdirs();
-        }
-
-        return  noDescriptionWriter;
-    }    
-
-    private Writer getWriter(final String text) throws IOException {
-        Writer writer = fileMap.get(text);
-        if (writer == null) {
-            File outputFile = new File(new File(outputPath), text + ".refset.text");
-            System.out.println("making directory - " + outputFile.getParentFile());
-            outputFile.getParentFile().mkdirs();
-            outputFile.createNewFile();
-            writer = new BufferedWriter(new FileWriter(outputFile));
-            fileMap.put(text, writer);
-        }
-        return writer;
-    }
-
-    private <T> T assertExactlyOne(
-            final Collection<T> collection) {
-        assert collection.size() == 1 : "Collection " + collection + " was expected to only have one element";
-        return collection.iterator().next();
+    private void addHeader(final Writer writer) throws IOException {
+        writer.append(CONCEPT_ID_HEADER);
+        writer.append("\t");
+        writer.append(PREFERRED_TERM_HEADER);
     }
 
     private void logProgress(final String refsetName) {
@@ -237,5 +195,16 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements I_ProcessEx
         if (progress % 1000 == 0) {
             logMill.logInfo(logger, "Exported " + progress + " of refset " + refsetName);
         }
+    }
+
+    private void closeFiles() throws IOException {
+        for (Writer fileWriter : fileMap.values()) {
+            flushAndClose(fileWriter);
+        }
+    }
+
+    private void flushAndClose(final Writer fileWriter) throws IOException {
+        fileWriter.flush();
+        fileWriter.close();
     }
 }

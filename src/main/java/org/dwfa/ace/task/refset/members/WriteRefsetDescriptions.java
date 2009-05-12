@@ -14,28 +14,29 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/refset", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public final class WriteRefsetDescriptions extends AbstractTask {
 
     private static final long serialVersionUID  = 1;
     private static final int dataVersion        = 1;
 
-    private String filePropertyName;
+    private String directoryKey;
     private LogMill logMill;
 
     public WriteRefsetDescriptions() {
-        filePropertyName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
+        directoryKey = ProcessAttachmentKeys.WORKING_DIR.getAttachmentKey();
         logMill = new SimpleLogMill();
     }
 
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeUTF(filePropertyName);
+        out.writeUTF(directoryKey);
         out.writeObject(logMill);
      }
 
@@ -43,7 +44,7 @@ public final class WriteRefsetDescriptions extends AbstractTask {
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-            filePropertyName = in.readUTF();
+            directoryKey = in.readUTF();
             logMill = (LogMill) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -51,18 +52,21 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-        String outputDirectoryPath = "unknown";
+        File selectedDirectory = null;
         try {
             TaskLogger taskLogger = new TaskLogger(worker);
             logMill.logInfo(taskLogger, "Exporting reference sets as description files");
-            String filePath = (String) process.readProperty(filePropertyName);
-            logMill.logInfo(taskLogger, "Export to path --> " + filePath);
+            logMill.logInfo(taskLogger, "reading directoryKey ->"  + directoryKey);
+            selectedDirectory = (File) process.readProperty(directoryKey);
+            logMill.logInfo(taskLogger, "Export to path --> " + selectedDirectory);
 
-            LocalVersionedTerminology.get().iterateExtByRefs(
-                    new WriteRefsetDescriptionsProcessExtByRef(taskLogger, filePath));
+            CleanableProcessExtByRef refsetDescriptionWriter = new WriteRefsetDescriptionsProcessExtByRef(taskLogger,
+                    selectedDirectory);
+            LocalVersionedTerminology.get().iterateExtByRefs(refsetDescriptionWriter);
+            refsetDescriptionWriter.clean();
 
         } catch (Exception e) {
-            throw new TaskFailedException("The task failed with a path of -> " + outputDirectoryPath, e);
+            throw new TaskFailedException("The task failed with a path of -> " + selectedDirectory, e);
         }
 
         return  Condition.CONTINUE;
@@ -79,5 +83,13 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     @Override
     public int[] getDataContainerIds() {
         return new int[] {  };
+    }
+
+    public String getDirectoryKey() {
+        return directoryKey;
+    }
+
+    public void setDirectoryKey(final String directoryKey) {
+        this.directoryKey = directoryKey;
     }
 }

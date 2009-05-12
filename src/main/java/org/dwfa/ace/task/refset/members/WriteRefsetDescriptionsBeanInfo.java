@@ -13,7 +13,7 @@ public final class WriteRefsetDescriptionsBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
               try {
                 PropertyDescriptor filePropName =
-                     new PropertyDescriptor("filePropertyName", WriteRefsetDescriptions.class);
+                     new PropertyDescriptor("directoryKey", WriteRefsetDescriptions.class);
                 filePropName.setBound(true);
                 filePropName.setDisplayName("<html><font color='green'>Output directory key:");
                 filePropName.setShortDescription("Output directory key");
