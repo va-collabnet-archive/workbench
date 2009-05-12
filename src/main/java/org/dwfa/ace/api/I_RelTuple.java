@@ -1,6 +1,6 @@
 package org.dwfa.ace.api;
 
-public interface I_RelTuple {
+public interface I_RelTuple extends I_AmTypedPart {
 
 	public abstract int getC1Id();
 
