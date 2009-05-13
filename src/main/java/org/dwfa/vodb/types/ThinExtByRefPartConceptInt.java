@@ -58,15 +58,15 @@ public class ThinExtByRefPartConceptInt extends ThinExtByRefPartConcept
 		universalPart.setConceptUid(tf.getUids(getConceptId()));
 		universalPart.setIntValue(getIntValue());
 		universalPart.setPathUid(tf.getUids(getPathId()));
-		universalPart.setStatusUid(tf.getUids(getStatus()));
+		universalPart.setStatusUid(tf.getUids(getStatusId()));
 		universalPart.setTime(ThinVersionHelper.convert(getVersion()));
 		return universalPart;
 	}
 
-	@Override
-	public I_ThinExtByRefPart duplicatePart() {
+	public I_ThinExtByRefPart duplicate() {
 		return new ThinExtByRefPartConceptInt(this);
 	}
+	
 	   public int compareTo(ThinExtByRefPart o) {
 	       if (ThinExtByRefPartConceptInt.class.isAssignableFrom(o.getClass())) {
 	           ThinExtByRefPartConceptInt otherPart = (ThinExtByRefPartConceptInt) o;

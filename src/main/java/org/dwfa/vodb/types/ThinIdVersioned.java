@@ -129,7 +129,7 @@ public class ThinIdVersioned implements I_IdVersioned {
 		UniversalAceIdentification universal = new UniversalAceIdentification(this.versions.size());
 		for (I_IdPart part: versions) {
 			UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
-			universalPart.setIdStatus(getUids(part.getIdStatus()));
+			universalPart.setIdStatus(getUids(part.getStatusId()));
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setSource(getUids(part.getSource()));
 			universalPart.setSourceId(part.getSourceId());

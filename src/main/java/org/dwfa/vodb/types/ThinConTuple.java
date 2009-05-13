@@ -31,10 +31,18 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     * 
     * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConceptStatus()
     */
+   @Deprecated
    public int getConceptStatus() {
       return part.getConceptStatus();
    }
 
+   /* (non-Javadoc)
+    * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
+    */
+   public void setStatusId(int statusId) {
+		part.setStatusId(statusId);
+	}
+   
    /*
     * (non-Javadoc)
     * 
@@ -77,7 +85,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#setStatusId(java.lang.Integer)
     */
    public void setStatusId(Integer statusId) {
-      part.setConceptStatus(statusId);
+      part.setStatusId(statusId);
 
    }
 
@@ -105,6 +113,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     * 
     * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#duplicatePart()
     */
+   @Deprecated
    public I_ConceptAttributePart duplicatePart() {
       return part.duplicate();
    }
@@ -135,4 +144,17 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
    public int getStatusId() {
 	   return getConceptStatus();
    }
+
+	public I_ConceptAttributePart duplicate() {
+		return part.duplicate();
+	}
+	
+	public void setPathId(int pathId) {
+		part.getPathId();
+	}
+	
+	public void setVersion(int version) {
+		part.setVersion(version);
+	}
+
 }

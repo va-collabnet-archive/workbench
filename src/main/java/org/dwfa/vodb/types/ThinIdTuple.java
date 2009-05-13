@@ -56,8 +56,9 @@ public class ThinIdTuple implements I_IdTuple {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdTuple#getIdStatus()
 	 */
+	@Deprecated
 	public int getIdStatus() {
-		return part.getIdStatus();
+		return part.getStatusId();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdTuple#getPathId()
@@ -92,6 +93,7 @@ public class ThinIdTuple implements I_IdTuple {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdTuple#duplicatePart()
 	 */
+	@Deprecated
 	public I_IdPart duplicatePart() {
 		ThinIdPart newPart = new ThinIdPart();
 		newPart.setPathId(getPathId());
@@ -107,5 +109,21 @@ public class ThinIdTuple implements I_IdTuple {
    public int getStatusId() {
 	return getIdStatus();
    }
+   
+	public I_IdPart duplicate() {
+		return duplicatePart();
+	}
+	
+	public void setPathId(int pathId) {
+		part.setPathId(pathId);
+	}
+	
+	public void setStatusId(int statusId) {
+		part.setStatusId(statusId);
+	}
+
+	public void setVersion(int version) {
+		part.setVersion(version);
+	}
 
 }

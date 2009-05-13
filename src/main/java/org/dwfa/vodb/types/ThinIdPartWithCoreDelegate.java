@@ -79,7 +79,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
 	 */
 	public boolean hasNewData(I_IdPart another) {
 		return ((this.getPathId() != another.getPathId()) ||
-				(this.getIdStatus() != another.getIdStatus()) ||
+				(this.getIdStatus() != another.getStatusId()) ||
 				(this.getSource() != another.getSource()) ||
 				sourceId.equals(another.getSourceId()) == false);
 	}
@@ -103,7 +103,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
 		I_IdPart another = (I_IdPart) obj;
 		return ((getPathId() == another.getPathId()) &&
 				(getVersion() == another.getVersion()) &&
-				(getIdStatus() == another.getIdStatus()) &&
+				(getIdStatus() == another.getStatusId()) &&
 				(getSource() == another.getSource()) &&
 				(sourceId.equals(another.getSourceId())));
 	}
@@ -113,6 +113,14 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
 	}
 	public I_IdPart duplicate() {
 		return new ThinIdPart(this);
+	}
+	
+	public int getStatusId() {
+		return getIdStatus();
+	}
+	
+	public void setStatusId(int statusId) {
+		setIdStatus(statusId);
 	}
 
 }

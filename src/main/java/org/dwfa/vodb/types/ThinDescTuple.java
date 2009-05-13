@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_MapNativeToNative;
 
 public class ThinDescTuple implements I_DescriptionTuple {
 	I_DescriptionVersioned fixedPart;
@@ -114,6 +115,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionTuple#duplicatePart()
 	 */
+	@Deprecated
 	public I_DescriptionPart duplicatePart() {
 		return part.duplicate();
 	}
@@ -140,4 +142,12 @@ public class ThinDescTuple implements I_DescriptionTuple {
    public I_DescriptionPart getPart() {
       return part;
    }
+   
+	public I_DescriptionPart duplicate() {
+		return duplicatePart();
+	}
+	
+	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+		// TODO 
+	}
 }

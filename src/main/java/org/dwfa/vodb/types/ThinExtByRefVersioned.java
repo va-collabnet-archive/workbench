@@ -261,7 +261,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 			VodbEnv vodb, I_ThinExtByRefPart thinPart)
 			throws TerminologyException, IOException {
 		thinPart.setPathId(vodb.uuidToNative(part.getPathUid()));
-		thinPart.setStatus(vodb.uuidToNative(part.getStatusUid()));
+		thinPart.setStatusId(vodb.uuidToNative(part.getStatusUid()));
 		thinPart.setVersion(ThinVersionHelper.convert(part.getTime()));
 	}
 

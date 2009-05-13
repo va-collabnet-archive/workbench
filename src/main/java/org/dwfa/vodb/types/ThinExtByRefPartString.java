@@ -35,16 +35,15 @@ public class ThinExtByRefPartString extends ThinExtByRefPart implements I_ThinEx
        UniversalAceExtByRefPartString stringPart = new UniversalAceExtByRefPartString();
        stringPart.setStringValue(stringValue);
        stringPart.setPathUid(tf.getUids(getPathId()));
-       stringPart.setStatusUid(tf.getUids(getStatus()));
+       stringPart.setStatusUid(tf.getUids(getStatusId()));
        stringPart.setTime(ThinVersionHelper.convert(getVersion()));
        return stringPart;
     }
 
-    /* (non-Javadoc)
-    * @see org.dwfa.vodb.types.I_ThinExtByRefPartString#duplicatePart()
+   /* (non-Javadoc)
+    * @see org.dwfa.ace.api.ebr.I_ThinExtByRefPart#duplicate()
     */
-   @Override
-    public ThinExtByRefPartString duplicatePart() {
+	public ThinExtByRefPartString duplicate() {
        return new ThinExtByRefPartString(this);
     }
 

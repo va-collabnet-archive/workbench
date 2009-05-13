@@ -76,17 +76,18 @@ public class ThinExtByRefPartLanguage extends ThinExtByRefPart implements I_Thin
       universalPart.setCorrectnessUids(tf.getUids(getCorrectnessId()));
       universalPart.setDegreeOfSynonymyUids(tf.getUids(getDegreeOfSynonymyId()));
       universalPart.setPathUid(tf.getUids(getPathId()));
-      universalPart.setStatusUid(tf.getUids(getStatus()));
+      universalPart.setStatusUid(tf.getUids(getStatusId()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
    }
+
    /* (non-Javadoc)
-    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#duplicatePart()
+    * @see org.dwfa.ace.api.ebr.I_ThinExtByRefPart#duplicate()
     */
-   @Override
-   public I_ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicate() {
       return new ThinExtByRefPartLanguage(this);
    }
+   
    public ThinExtByRefPartLanguage(ThinExtByRefPartLanguage another) {
       super(another);
       this.acceptabilityId = another.acceptabilityId;

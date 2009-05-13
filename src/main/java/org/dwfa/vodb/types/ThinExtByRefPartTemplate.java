@@ -46,8 +46,8 @@ public class ThinExtByRefPartTemplate extends ThinExtByRefPartTemplateForRel imp
         this.targetCodeId = another.targetCodeId;
     }
 
-    @Override
-    public I_ThinExtByRefPart duplicatePart() {
+
+	public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartTemplate(this);
     }
 
@@ -69,7 +69,7 @@ public class ThinExtByRefPartTemplate extends ThinExtByRefPartTemplateForRel imp
         universalPart.setAttributeDisplayStatusUid(tf.getUids(attributeDisplayStatusId));
         universalPart.setCharacteristicStatusUid(tf.getUids(characteristicStatusId));
         universalPart.setPathUid(tf.getUids(getPathId()));
-        universalPart.setStatusUid(tf.getUids(getStatus()));
+        universalPart.setStatusUid(tf.getUids(getStatusId()));
         universalPart.setTime(ThinVersionHelper.convert(getVersion()));
         return universalPart;
     }

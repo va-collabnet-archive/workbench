@@ -38,13 +38,15 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdPart#getIdStatus()
-	 */
+	 */	
+	@Deprecated
 	public int getIdStatus() {
 		return core.getIdStatus();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdPart#setIdStatus(int)
 	 */
+	@Deprecated
 	public void setIdStatus(int idStatus) {
 		throw new UnsupportedOperationException("Create a duplicate, then set values on the duplicate. ");
 	}
@@ -91,7 +93,7 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	 */
 	public boolean hasNewData(I_IdPart another) {
 		return ((this.getPathId() != another.getPathId()) ||
-				(this.getIdStatus() != another.getIdStatus()) ||
+				(this.getIdStatus() != another.getStatusId()) ||
 				(this.getSource() != another.getSource()) ||
 				getSourceId().equals(another.getSourceId()) == false);
 	}
@@ -115,7 +117,7 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 		I_IdPart another = (I_IdPart) obj;
 		return ((getPathId() == another.getPathId()) &&
 				(getVersion() == another.getVersion()) &&
-				(getIdStatus() == another.getIdStatus()) &&
+				(getIdStatus() == another.getStatusId()) &&
 				(getSource() == another.getSource()) &&
 				(getSourceId().equals(another.getSourceId())));
 	}
@@ -137,6 +139,14 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	}
 	public void setLsb(long lsb) {
 		this.lsb = lsb;
+	}
+	
+	public int getStatusId() {
+		return getIdStatus();
+	}
+	
+	public void setStatusId(int statusId) {
+		setIdStatus(statusId);
 	}
 
 }

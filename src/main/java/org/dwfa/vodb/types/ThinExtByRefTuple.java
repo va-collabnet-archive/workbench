@@ -26,8 +26,9 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getStatus()
     */
+   @Deprecated
    public int getStatus() {
-      return part.getStatus();
+      return part.getStatusId();
    }
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersion()
@@ -44,8 +45,9 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setStatus(int)
     */
+   @Deprecated
    public void setStatus(int idStatus) {
-      part.setStatus(idStatus);
+      part.setStatusId(idStatus);
    }
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setVersion(int)
@@ -107,9 +109,11 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
        return "ThinExtByRefVersioned refsetId: " + core.getRefsetId() + " memberId: " + core.getMemberId() + 
            " componentId: " + core.getComponentId() + " typeId: " + core.getTypeId() + " version: " + part;
    }
-   public I_ThinExtByRefPart duplicatePart() {
-      return part.duplicatePart();
+   
+   public I_ThinExtByRefPart duplicate() {
+      return part.duplicate();
    }
+   
    public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
       return part.getUniversalPart();
    }
@@ -117,8 +121,18 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    public int compareTo(I_ThinExtByRefPart o) {
      return part.compareTo(o);
    }
-public int getStatusId() {
-	return part.getStatusId();
-}
+   
+   public int getStatusId() {
+	   return part.getStatusId();
+   }
+   
+   public void setStatusId(int statusId) {
+	   part.setStatusId(statusId);
+   }
+   
+   @Deprecated
+   public I_ThinExtByRefPart duplicatePart() {
+	   return duplicate();
+   }
    
 }

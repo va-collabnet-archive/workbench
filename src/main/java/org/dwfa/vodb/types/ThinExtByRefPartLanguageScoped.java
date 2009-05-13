@@ -90,18 +90,18 @@ public class ThinExtByRefPartLanguageScoped extends ThinExtByRefPartLanguage imp
       universalPart.setTagUids(tf.getUids(getTagId()));
       universalPart.setPriority(getPriority());
       universalPart.setPathUid(tf.getUids(getPathId()));
-      universalPart.setStatusUid(tf.getUids(getStatus()));
+      universalPart.setStatusUid(tf.getUids(getStatusId()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
    }
 
    /* (non-Javadoc)
-    * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguageScoped#duplicatePart()
+    * @see org.dwfa.vodb.types.ThinExtByRefPartLanguage#duplicate()
     */
-   @Override
-   public I_ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicate() {
       return new ThinExtByRefPartLanguageScoped(this);
    }
+   
    public int compareTo(ThinExtByRefPart o) {
        if (ThinExtByRefPartLanguageScoped.class.isAssignableFrom(o.getClass())) {
            ThinExtByRefPartLanguageScoped otherPart = (ThinExtByRefPartLanguageScoped) o;

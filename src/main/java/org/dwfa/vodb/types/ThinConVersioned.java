@@ -193,7 +193,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 				getUids(conId), this.versionCount());
 		for (I_ConceptAttributePart part : versions) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
-			universalPart.setConceptStatus(getUids(part.getConceptStatus()));
+			universalPart.setConceptStatus(getUids(part.getStatusId()));
 			universalPart.setDefined(part.isDefined());
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));

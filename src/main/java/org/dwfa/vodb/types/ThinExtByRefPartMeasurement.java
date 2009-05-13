@@ -64,16 +64,15 @@ public class ThinExtByRefPartMeasurement extends ThinExtByRefPart implements I_T
       universalPart.setMeasurementValue(getMeasurementValue());
       universalPart.setUnitsOfMeasureUids(tf.getUids(getUnitsOfMeasureId()));
       universalPart.setPathUid(tf.getUids(getPathId()));
-      universalPart.setStatusUid(tf.getUids(getStatus()));
+      universalPart.setStatusUid(tf.getUids(getStatusId()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
    }
 
    /* (non-Javadoc)
-    * @see org.dwfa.vodb.types.I_ThinExtByRefPartMeasurement#duplicatePart()
+    * @see org.dwfa.ace.api.ebr.I_ThinExtByRefPart#duplicate()
     */
-   @Override
-   public I_ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicate() {
       return new ThinExtByRefPartMeasurement(this);
    }
 

@@ -134,8 +134,8 @@ public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements 
         this.characteristicStatusId = characteristicStatusId;
     }
 
-    @Override
-    public I_ThinExtByRefPart duplicatePart() {
+
+	public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartTemplateForRel(this);
     }
 
@@ -175,7 +175,7 @@ public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements 
         universalPart.setAttributeDisplayStatusUid(tf.getUids(attributeDisplayStatusId));
         universalPart.setCharacteristicStatusUid(tf.getUids(characteristicStatusId));
         universalPart.setPathUid(tf.getUids(getPathId()));
-        universalPart.setStatusUid(tf.getUids(getStatus()));
+        universalPart.setStatusUid(tf.getUids(getStatusId()));
         universalPart.setTime(ThinVersionHelper.convert(getVersion()));
         return universalPart;
     }

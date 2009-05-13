@@ -47,13 +47,12 @@ public class ThinExtByRefPartInteger extends ThinExtByRefPart implements I_ThinE
       UniversalAceExtByRefPartInteger universalPart = new UniversalAceExtByRefPartInteger();
       universalPart.setIntValue(value);
       universalPart.setPathUid(tf.getUids(getPathId()));
-      universalPart.setStatusUid(tf.getUids(getStatus()));
+      universalPart.setStatusUid(tf.getUids(getStatusId()));
       universalPart.setTime(ThinVersionHelper.convert(getVersion()));
       return universalPart;
    }
 
-   @Override
-   public I_ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicate() {
       return new ThinExtByRefPartInteger(this);
    }
 

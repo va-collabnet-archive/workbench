@@ -51,8 +51,9 @@ public class ThinExtByRefPartCrossmap extends ThinExtByRefPartCrossmapForRel imp
     public ThinExtByRefPartCrossmap() {
         super();
     }
-    @Override
-    public I_ThinExtByRefPart duplicatePart() {
+
+    
+	public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartCrossmap(this);
     }
 
@@ -67,7 +68,7 @@ public class ThinExtByRefPartCrossmap extends ThinExtByRefPartCrossmapForRel imp
         universalPart.setElementNo(elementNo);
         universalPart.setBlockNo(blockNo);
         universalPart.setPathUid(tf.getUids(getPathId()));
-        universalPart.setStatusUid(tf.getUids(getStatus()));
+        universalPart.setStatusUid(tf.getUids(getStatusId()));
         universalPart.setTime(ThinVersionHelper.convert(getVersion()));
         return universalPart;
     }

@@ -48,13 +48,12 @@ public class ThinExtByRefPartBoolean extends ThinExtByRefPart implements I_ThinE
       UniversalAceExtByRefPartBoolean booleanPart = new UniversalAceExtByRefPartBoolean();
       booleanPart.setBooleanValue(value);
       booleanPart.setPathUid(tf.getUids(getPathId()));
-      booleanPart.setStatusUid(tf.getUids(getStatus()));
+      booleanPart.setStatusUid(tf.getUids(getStatusId()));
       booleanPart.setTime(ThinVersionHelper.convert(getVersion()));
       return booleanPart;
    }
 
-   @Override
-   public I_ThinExtByRefPart duplicatePart() {
+   public I_ThinExtByRefPart duplicate() {
       return new ThinExtByRefPartBoolean(this);
    }
 

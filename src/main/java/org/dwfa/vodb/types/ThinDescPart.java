@@ -178,9 +178,6 @@ public class ThinDescPart implements I_DescriptionPart {
 		});
 	}
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_DescriptionPart#duplicate()
-	 */
 	public ThinDescPart duplicate() {
 		ThinDescPart newPart = new ThinDescPart();
 		newPart.pathId = pathId;
@@ -192,6 +189,5 @@ public class ThinDescPart implements I_DescriptionPart {
 		newPart.lang = lang;
 		return newPart;
 	}
-	
 	
 }

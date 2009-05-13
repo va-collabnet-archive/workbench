@@ -16,7 +16,7 @@ public class ThinIdPart implements I_IdPart {
 		super();
 		this.pathId = another.getPathId();
 		this.version = another.getVersion();
-		this.idStatus = another.getIdStatus();
+		this.idStatus = another.getStatusId();
 		this.source = another.getSource();
 		this.sourceId = another.getSourceId();
 	}
@@ -35,12 +35,14 @@ public class ThinIdPart implements I_IdPart {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdPart#getIdStatus()
 	 */
+	@Deprecated
 	public int getIdStatus() {
 		return idStatus;
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdPart#setIdStatus(int)
 	 */
+	@Deprecated
 	public void setIdStatus(int idStatus) {
 		this.idStatus = idStatus;
 	}
@@ -85,7 +87,7 @@ public class ThinIdPart implements I_IdPart {
 	 */
 	public boolean hasNewData(I_IdPart another) {
 		return ((this.pathId != another.getPathId()) ||
-				(this.idStatus != another.getIdStatus()) ||
+				(this.idStatus != another.getStatusId()) ||
 				(this.source != another.getSource()) ||
 				sourceId.equals(another.getSourceId()) == false);
 	}
@@ -109,7 +111,7 @@ public class ThinIdPart implements I_IdPart {
 		I_IdPart another = (I_IdPart) obj;
 		return ((pathId == another.getPathId()) &&
 				(version == another.getVersion()) &&
-				(idStatus == another.getIdStatus()) &&
+				(idStatus == another.getStatusId()) &&
 				(source == another.getSource()) &&
 				(sourceId.equals(another.getSourceId())));
 	}
@@ -119,6 +121,14 @@ public class ThinIdPart implements I_IdPart {
 	}
 	public I_IdPart duplicate() {
 		return new ThinIdPart(this);
+	}
+	
+	public int getStatusId() {
+		return idStatus;		
+	}
+	
+	public void setStatusId(int statusId) {
+		this.idStatus = statusId;
 	}
 
 }

@@ -12,21 +12,36 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
    private int version;
    private int status;
    
-   public int getStatusId() {
-	   return getStatus();
-   }
 /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getStatus()
     */
+   @Deprecated
    public int getStatus() {
       return status;
    }
+   
+   /* (non-Javadoc)
+    * @see org.dwfa.ace.api.I_AmPart#getStatusId()
+    */
+   public int getStatusId() {
+	   return getStatus();
+   }   
+   
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPart#setStatus(int)
     */
+   @Deprecated
    public void setStatus(int idStatus) {
       this.status = idStatus;
    }
+   
+   /* (non-Javadoc)
+    * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
+    */
+   public void setStatusId(int statusId) {	
+	   setStatus(statusId);
+   }
+   
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getPathId()
     */
@@ -68,11 +83,6 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
     * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getUniversalPart()
     */
    public abstract UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
-
-   /* (non-Javadoc)
-    * @see org.dwfa.vodb.types.I_ThinExtByRefPart#duplicatePart()
-    */
-   public abstract I_ThinExtByRefPart duplicatePart();
    
    public ThinExtByRefPart(ThinExtByRefPart another) {
       super();
@@ -87,4 +97,11 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
    public String toString() {
        return this.getClass().getSimpleName() + " pathId: " + pathId + " version: " + version + " status: " + status;
    }
+
+   @Deprecated
+   public I_ThinExtByRefPart duplicatePart() {
+	   return duplicate();
+   }
 }
+
+

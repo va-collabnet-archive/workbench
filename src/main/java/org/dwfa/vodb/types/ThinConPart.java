@@ -29,12 +29,14 @@ public class ThinConPart implements I_ConceptAttributePart {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#getConceptStatus()
 	 */
+	@Deprecated
 	public int getConceptStatus() {
 		return conceptStatus;
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#setConceptStatus(int)
 	 */
+	@Deprecated
 	public void setConceptStatus(int conceptStatus) {
 		this.conceptStatus = conceptStatus;
 	}
@@ -69,7 +71,7 @@ public class ThinConPart implements I_ConceptAttributePart {
 	public boolean hasNewData(I_ConceptAttributePart another) {
 		return ((this.defined != another.isDefined()) ||
 				(this.pathId != another.getPathId()) ||
-				(this.conceptStatus != another.getConceptStatus()));
+				(this.conceptStatus != another.getStatusId()));
 	}
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		pathId = jarToDbNativeMap.get(pathId);
@@ -105,7 +107,12 @@ public class ThinConPart implements I_ConceptAttributePart {
 		" pathId " + pathId + 
 		" version " + version + " (" + new Date(ThinVersionHelper.convert(version)) + ")";
 	}
+	
 	public int getStatusId() {
-		return conceptStatus;
+		return getConceptStatus();
+	}
+	
+	public void setStatusId(int statusId) {
+		setConceptStatus(statusId);
 	}
 }

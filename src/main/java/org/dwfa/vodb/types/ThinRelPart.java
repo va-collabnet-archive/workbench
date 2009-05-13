@@ -24,7 +24,7 @@ public class ThinRelPart implements I_RelPart {
 	public boolean hasNewData(I_RelPart another) {
 		return ((this.pathId != another.getPathId()) ||
 				(this.statusId != another.getStatusId()) ||
-				(this.relTypeId != another.getRelTypeId()) ||
+				(this.relTypeId != another.getTypeId()) ||
 				(this.characteristicId != another.getCharacteristicId()) ||
 				(this.refinabilityId != another.getRefinabilityId()) ||
 				(this.group != another.getGroup()));
@@ -81,12 +81,14 @@ public class ThinRelPart implements I_RelPart {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelPart#getRelTypeId()
 	 */
+	@Deprecated
 	public int getRelTypeId() {
 		return relTypeId;
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelPart#setRelTypeId(int)
 	 */
+	@Deprecated
 	public void setRelTypeId(int relTypeId) {
 		this.relTypeId = relTypeId;
 	}
@@ -151,7 +153,7 @@ public class ThinRelPart implements I_RelPart {
 	}
 	private static int[] getAsArray(I_RelPart part) {
 		return new int[] { part.getPathId(), part.getVersion(), part.getStatusId(),
-				part.getRelTypeId(), part.getCharacteristicId(), part.getRefinabilityId(), part.getGroup()};
+				part.getTypeId(), part.getCharacteristicId(), part.getRefinabilityId(), part.getGroup()};
 	}
 	
 	private int[] getAsArray() {
@@ -193,6 +195,9 @@ public class ThinRelPart implements I_RelPart {
 	public int getTypeId() {
 		return getRelTypeId();
 	}
-	
+
+	public void setTypeId(int type) {		
+		setRelTypeId(type);
+	}
 	
 }

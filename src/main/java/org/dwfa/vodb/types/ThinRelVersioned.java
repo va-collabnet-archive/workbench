@@ -120,7 +120,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 						.setCharacteristicId(lastRelVersion.getCharacteristicId());
 				retiredRel.setGroup(lastRelVersion.getGroup());
 				retiredRel.setRefinabilityId(lastRelVersion.getRefinabilityId());
-				retiredRel.setRelTypeId(lastRelVersion.getRelTypeId());
+				retiredRel.setTypeId(lastRelVersion.getTypeId());
 				versions.add(retiredRel);
 				return true;
 			} else {
@@ -333,7 +333,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 			universalPart.setCharacteristicId(getUids(part.getCharacteristicId()));
 			universalPart.setGroup(part.getGroup());
 			universalPart.setRefinabilityId(getUids(part.getRefinabilityId()));
-			universalPart.setRelTypeId(getUids(part.getRelTypeId()));
+			universalPart.setRelTypeId(getUids(part.getTypeId()));
 			universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
 			universal.addVersion(universalPart);
 		}

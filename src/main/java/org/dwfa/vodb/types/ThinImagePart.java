@@ -123,6 +123,7 @@ public class ThinImagePart implements I_ImagePart {
 		return HashFunction.hashCode(new int[] {pathId, statusId, textDescription.hashCode(),
 				typeId, version});
 	}
+	
 	public I_ImagePart duplicate() {
 		return new ThinImagePart(this);
 	}
