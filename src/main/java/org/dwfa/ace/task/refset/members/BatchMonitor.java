@@ -1,6 +1,5 @@
 package org.dwfa.ace.task.refset.members;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.logging.Logger;
