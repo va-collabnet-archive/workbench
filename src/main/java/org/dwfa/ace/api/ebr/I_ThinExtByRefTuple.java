@@ -4,17 +4,17 @@ import java.util.List;
 
 public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart {
 
-   public int getPathId();
-
+	/**
+	 * @deprecated Use {@link #getStatusId()}
+	 */
+   @Deprecated	
    public int getStatus();
 
-   public int getVersion();
-
-   public void setPathId(int pathId);
-
+   /**
+    * @deprecated Use {@link #setStatusId(int)}
+    */
+   @Deprecated
    public void setStatus(int idStatus);
-
-   public void setVersion(int version);
 
    public void addVersion(I_ThinExtByRefPart part);
 

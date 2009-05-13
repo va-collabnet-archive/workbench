@@ -1,13 +1,17 @@
 package org.dwfa.ace.api;
 
-public interface I_IdPart {
+public interface I_IdPart extends I_AmPart {
 
-	public int getPathId();
-
-	public void setPathId(int pathId);
-
+	/**
+	 * @deprecated Use {@link #getStatusId()}
+	 */
+	@Deprecated
 	public int getIdStatus();
 
+	/**
+	 * @deprecated Use {@link #setStatusId(int)}
+	 */
+	@Deprecated
 	public void setIdStatus(int idStatus);
 
 	public int getSource();
@@ -17,10 +21,6 @@ public interface I_IdPart {
 	public Object getSourceId();
 
 	public void setSourceId(Object sourceId);
-
-	public int getVersion();
-
-	public void setVersion(int version);
 
 	public boolean hasNewData(I_IdPart another);
 	

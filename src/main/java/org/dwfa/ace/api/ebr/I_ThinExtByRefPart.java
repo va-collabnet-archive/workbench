@@ -8,16 +8,26 @@ import org.dwfa.tapi.TerminologyException;
 
 public interface I_ThinExtByRefPart extends Comparable<I_ThinExtByRefPart>, I_AmPart {
 
-   public int getStatus();
+	/**
+	 * @deprecated Use {@link #getStatusId()}
+	 */
+	@Deprecated
+	public int getStatus();
 
-   public void setStatus(int idStatus);
+	/**
+	 * @deprecated Use {@link #setStatusId(int)}
+	 */
+	@Deprecated
+	public void setStatus(int idStatus);
 
-   public void setPathId(int pathId);
+	public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
 
-   public void setVersion(int version);
+	/**
+	 * @deprecated Use {@link #duplicate()}
+	 */
+	@Deprecated
+	public I_ThinExtByRefPart duplicatePart();
 
-   public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
-
-   public I_ThinExtByRefPart duplicatePart();
-
+	public I_ThinExtByRefPart duplicate();
+   
 }

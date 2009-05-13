@@ -8,20 +8,22 @@ public interface I_RelTuple extends I_AmTypedPart {
 
 	public abstract int getRelId();
 
-	public abstract int getPathId();
-
 	public abstract int getCharacteristicId();
 
 	public abstract int getGroup();
 
 	public abstract int getRefinabilityId();
 
+	/**
+	 * @deprecated Use {@link #getTypeId()}
+	 */
+	@Deprecated
 	public abstract int getRelTypeId();
 
-	public abstract int getStatusId();
-
-	public abstract int getVersion();
-
+	/**
+	 * @deprecated Use {@link #setTypeId(int)}
+	 */
+	@Deprecated
 	public abstract void setRelTypeId(Integer typeId);
 
 	public abstract void setStatusId(Integer statusId);
@@ -32,9 +34,15 @@ public interface I_RelTuple extends I_AmTypedPart {
 
 	public abstract void setGroup(Integer group);
 
-   public abstract I_RelPart duplicatePart();
+	/**
+	 * @deprecated Use {@link #duplicate()}
+	 */
+	@Deprecated
+	public abstract I_RelPart duplicatePart();
 
-   public abstract I_RelPart getPart();
+	public I_RelPart duplicate();
+	
+	public abstract I_RelPart getPart();
 
 	public abstract I_RelVersioned getRelVersioned();
 

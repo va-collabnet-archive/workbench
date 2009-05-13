@@ -6,15 +6,7 @@ public interface I_ImageTuple extends I_AmTypedPart {
 
 	public int getImageId();
 
-	public int getPathId();
-
-	public int getStatusId();
-
-	public int getVersion();
-
 	public String getTextDescription();
-
-	public int getTypeId();
 
 	public String getFormat();
 
@@ -22,8 +14,14 @@ public interface I_ImageTuple extends I_AmTypedPart {
 
 	public I_ImageVersioned getVersioned();
 
+	/**
+	 * @deprecated Use {@link #duplicate()}
+	 */
+	@Deprecated
 	public I_ImagePart duplicatePart();
 
+	public I_ImagePart duplicate();
+	
 	public I_ImagePart getPart();
 
 

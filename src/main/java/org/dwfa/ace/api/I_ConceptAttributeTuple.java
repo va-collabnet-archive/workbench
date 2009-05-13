@@ -7,22 +7,22 @@ public interface I_ConceptAttributeTuple extends I_AmPart {
 
 	public abstract int getConceptStatus();
 
-	public abstract int getPathId();
-
-	public abstract int getVersion();
-
 	public abstract boolean hasNewData(I_ConceptAttributePart another);
 
 	public abstract boolean isDefined();
-
-	public abstract void setStatusId(Integer statusId);
 
 	public abstract void setDefined(boolean defined);
 
 	public abstract I_ConceptAttributeVersioned getConVersioned();
 
-   public abstract I_ConceptAttributePart duplicatePart();
-
+	/**
+	 * @deprecated Use {@link #duplicate()}
+	 */
+	@Deprecated
+	public abstract I_ConceptAttributePart duplicatePart();
+	
+	public I_ConceptAttributePart duplicate();
+	
    public abstract I_ConceptAttributePart getPart();
 
 }

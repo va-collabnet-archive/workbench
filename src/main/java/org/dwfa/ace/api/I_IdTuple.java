@@ -19,20 +19,26 @@ public interface I_IdTuple extends I_AmPart {
 
 	public abstract void setNativeId(int nativeId);
 
+	/**
+	 * @deprecated Use {@link #getStatusId()}
+	 */
+	@Deprecated
 	public abstract int getIdStatus();
-
-	public abstract int getPathId();
 
 	public abstract int getSource();
 
 	public abstract Object getSourceId();
 
-	public abstract int getVersion();
-
 	public abstract I_IdVersioned getIdVersioned();
 
-   public abstract I_IdPart duplicatePart();
+	/**
+	 * @deprecated Use {@link #duplicate()}
+	 */
+	@Deprecated
+	public abstract I_IdPart duplicatePart();
 
+	public I_IdPart duplicate();
+	
    public abstract I_IdPart getPart();
 
 }
