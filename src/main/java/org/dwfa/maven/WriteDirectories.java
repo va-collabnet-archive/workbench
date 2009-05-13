@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -50,7 +52,22 @@ public class WriteDirectories extends AbstractMojo {
 	 */
 	private List<Dependency> dependencies;
 
-	/**
+    /**
+     * The dependency artifacts of this project, for resolving
+     *
+     * @pathOf(..)@ expressions. These are of type
+     *              org.apache.maven.artifact.Artifact, and are keyed by
+     *              groupId:artifactId, using
+     *              org.apache.maven.artifact.ArtifactUtils.versionlessKey(..)
+     *              for consistent formatting.
+     *
+     * @parameter expression="${project.artifacts}"
+     * @required
+     * @readonly
+     */
+    private Set<Artifact> artifacts;
+
+    /**
 	 * @parameter expression="${localRepository}"
 	 * @required
 	 */
@@ -85,20 +102,22 @@ public class WriteDirectories extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
-		for (Dependency d : dependencies) {
-			if (d.getScope().equals("runtime-directory")) {
+		
+		for (Artifact a: artifacts) {
+			if (a.getScope().equals("runtime-directory")) {
 				File rootDir = this.outputDirectory;
 				if (targetSubDir != null) {
 					rootDir = new File(rootDir, targetSubDir);
 				}
-				extractDependencyToDir(l, rootDir, d);
-			} else if (d.getScope().equals("resource-directory")) {
+				extractArtifactDependencyToDir(l, rootDir, a);
+				
+			} else if (a.getScope().equals("resource-directory")) {
 				File rootDir = new File(this.sourceDirectory.getParentFile(), "resources");
 				if (targetSubDir != null) {
 					rootDir = new File(rootDir, targetSubDir);
 				}
 				if (rootDir.exists() == false) {
-					extractDependencyToDir(l, rootDir, d);
+					extractArtifactDependencyToDir(l, rootDir, a);
 				} else {
 					l.info("resource directory already exists: " + rootDir.getAbsolutePath());
 				}
@@ -106,15 +125,12 @@ public class WriteDirectories extends AbstractMojo {
 		}
 	}
 
-	private void extractDependencyToDir(Log l, File rootDir, Dependency d)
-			throws MojoExecutionException {
-		l.info("Processing directory: " + d);
-
-		String dependencyPath = MojoUtil.dependencyToPath(localRepository
-				.getBasedir(), d);
+	private void extractArtifactDependencyToDir(Log l, File rootDir, Artifact a)
+		throws MojoExecutionException {
+		l.info("Processing dependency artifact: " + a);
+		l.info("   file: " + a.getFile());
 		try {
-
-			FileInputStream fis = new FileInputStream(dependencyPath);
+			FileInputStream fis = new FileInputStream(a.getFile());
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			JarInputStream jis = new JarInputStream(bis);
 			JarEntry je = jis.getNextJarEntry();
@@ -146,8 +162,8 @@ public class WriteDirectories extends AbstractMojo {
 			}
 			jis.close();
 		} catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage() + " path:"
-					+ dependencyPath, e);
+			throw new MojoExecutionException(e.getMessage() + " file:"
+					+ a.getFile(), e);
 		}
 	}
 }
