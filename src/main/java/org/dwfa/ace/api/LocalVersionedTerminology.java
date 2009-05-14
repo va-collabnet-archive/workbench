@@ -2,11 +2,15 @@ package org.dwfa.ace.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 
 public class LocalVersionedTerminology {
 	private static I_TermFactory factory;
+
+	private static I_IdVersioned authorityId;
 
 	private static I_TermFactory stealthfactory;
 
@@ -25,15 +29,37 @@ public class LocalVersionedTerminology {
 		} else {
 			if (LocalVersionedTerminology.factory == null
 					|| LocalVersionedTerminology.factory == factory) {
-				AceLog.getAppLog().info(
-						"Setting LocalVersionedTerminology to: " + factory);
-				LocalVersionedTerminology.factory = factory;
+				setFactory(factory);
 			} else {
-				throw new RuntimeException(
-						"LocalVersionedTerminology.factory is already set to: "
-								+ LocalVersionedTerminology.factory
-								+ " new factory: " + factory);
+				try {
+					if (authorityId.equals(factory.getAuthorityId())) {
+						setFactory(factory);
+					} else if (authorityId.equals(factory
+							.getPreviousAuthorityId())) {
+						setFactory(factory);
+					} else {
+						throw new RuntimeException(
+								"LocalVersionedTerminology.factory is already set to: "
+										+ LocalVersionedTerminology.factory
+										+ " new factory: " + factory);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 			}
+		}
+	}
+
+	private static void setFactory(I_TermFactory factory) {
+		AceLog.getAppLog().info(
+				"Setting LocalVersionedTerminology to: " + factory);
+		LocalVersionedTerminology.factory = factory;
+		try {
+			LocalVersionedTerminology.authorityId = factory.getAuthorityId();
+		} catch (TerminologyException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -51,7 +77,8 @@ public class LocalVersionedTerminology {
 	}
 
 	public static void open(Class<I_ImplementTermFactory> factoryClass,
-			Object envHome, boolean readOnly, Long cacheSize, DatabaseSetupConfig databaseSetupConfig)
+			Object envHome, boolean readOnly, Long cacheSize,
+			DatabaseSetupConfig databaseSetupConfig)
 			throws InstantiationException, IllegalAccessException, IOException {
 		if (stealthfactory != null && stealthfactory == factory) {
 			// stealth factory set
@@ -70,10 +97,6 @@ public class LocalVersionedTerminology {
 		if (stealthfactory != null && stealthfactory == factory) {
 			// stealth factory set
 		} else {
-			if (factory != null) {
-				throw new IOException("Factory is already open and set to: "
-						+ factory);
-			}
 			open((Class<I_ImplementTermFactory>) Class
 					.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly,
 					cacheSize);
@@ -82,15 +105,12 @@ public class LocalVersionedTerminology {
 
 	@SuppressWarnings("unchecked")
 	public static void createFactory(File envHome, boolean readOnly,
-			Long cacheSize, DatabaseSetupConfig dbSetupConfig) throws InstantiationException,
-			IllegalAccessException, ClassNotFoundException, IOException {
+			Long cacheSize, DatabaseSetupConfig dbSetupConfig)
+			throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, IOException {
 		if (stealthfactory != null && stealthfactory == factory) {
 			// stealth factory set
 		} else {
-			if (factory != null) {
-				throw new IOException("Factory is already open and set to: "
-						+ factory);
-			}
 			open((Class<I_ImplementTermFactory>) Class
 					.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly,
 					cacheSize, dbSetupConfig);

@@ -218,6 +218,8 @@ public interface I_TermFactory {
     public I_IdVersioned getId(int nid) throws TerminologyException, IOException;
     public I_IdVersioned getId(UUID uid) throws TerminologyException, IOException;
     public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException;
+    public I_IdVersioned getAuthorityId() throws TerminologyException, IOException;
+    public I_IdVersioned getPreviousAuthorityId() throws TerminologyException, IOException;
     
     /**
      * Delete any uncommitted changes. 
