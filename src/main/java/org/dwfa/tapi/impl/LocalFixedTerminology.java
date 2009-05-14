@@ -11,11 +11,6 @@ public class LocalFixedTerminology {
 	}
 	
 	public static void setStore(I_StoreLocalFixedTerminology store) {
-		if ((LocalFixedTerminology.store == null) || (LocalFixedTerminology.store == store)){
-			LocalFixedTerminology.store = store;
-		} else {
-			throw new RuntimeException("LocalFixedTerminology.store is already set to: " + LocalFixedTerminology.store + 
-					" new store is: " + store);
-		}
+		LocalFixedTerminology.store = store;
 	}
 }
