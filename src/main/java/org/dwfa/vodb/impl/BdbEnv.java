@@ -278,7 +278,12 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 
 	}
 
-	private void resetAuthorityId() throws DatabaseException {
+	private I_IdVersioned previousAuthorityId;
+	
+	private void resetAuthorityId() throws DatabaseException, IOException {
+		previousAuthorityId = getAuthorityId();
+		AceLog.getAppLog().info("Old authority id: " + previousAuthorityId.getTuples().iterator().next().getSourceId());
+		
 		PrimordialId primId = PrimordialId.AUTHORITY_ID;
 		I_IdVersioned thinId = new ThinIdVersioned(primId
 				.getNativeId(Integer.MIN_VALUE), 1);
@@ -292,8 +297,20 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		idPart.setSourceId(UUID.randomUUID());
 		idPart.setVersion(Integer.MIN_VALUE);
 		thinId.addVersion(idPart);
+		AceLog.getAppLog().info("New authority id: " + idPart.getSourceId());
 		writeId(thinId);
+		commitTransaction();
 	}
+
+	public I_IdVersioned getAuthorityId() throws IOException  {
+		return getId(PrimordialId.AUTHORITY_ID.getNativeId(Integer.MIN_VALUE));
+	}
+
+	public I_IdVersioned getPreviousAuthorityId() throws TerminologyException,
+			IOException {
+		return previousAuthorityId;
+	}
+
 
 	private DatabaseConfig makeConfig(boolean readOnly, boolean transactional) {
 		DatabaseConfig dbConfig = new DatabaseConfig();

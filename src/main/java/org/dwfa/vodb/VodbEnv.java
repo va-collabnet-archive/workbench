@@ -144,13 +144,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	private static boolean readOnly;
 
 	private File luceneDir;
+	
+	private boolean stealth = false;
 
 	public VodbEnv() {
-		LocalVersionedTerminology.set(this);
 	}
 
 	public VodbEnv(boolean stealth) {
-
+		this.stealth = stealth;
 	}
 
 	private static boolean transactional = false;
@@ -268,9 +269,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			}
 
 			VodbEnv.readOnly = readOnly;
-			if (this != LocalVersionedTerminology.getStealthfactory()) {
-				LocalFixedTerminology.setStore(new VodbFixedServer(this));
-			}
 			envHome.mkdirs();
 			luceneDir = new File(envHome, "lucene");
 
@@ -284,7 +282,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 							+ JEVersion.CURRENT_VERSION.getVersionString());
 			
 			bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
-			
+			if (this.stealth == false) {
+				LocalVersionedTerminology.set(this);
+				LocalFixedTerminology.setStore(new VodbFixedServer(this));				
+			}
 			activityFrame.setProgressInfoLower("complete");
 			activityFrame.complete();
 			long loadTime = System.currentTimeMillis() - startTime;
@@ -1536,6 +1537,16 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		return bdbEnv.getId(uid);
 	}
 
+	public I_IdVersioned getAuthorityId() throws TerminologyException, IOException {
+		return bdbEnv.getAuthorityId();
+	}
+
+	public I_IdVersioned getPreviousAuthorityId() throws TerminologyException,
+			IOException {
+		return bdbEnv.getPreviousAuthorityId();
+	}
+
+
 	public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
 		return bdbEnv.getIdNullOk(nativeId);
 	}
@@ -1748,7 +1759,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
   public I_HandleSubversion getSvnHandler() {
 	return new Svn();
   }
-
 
 
 }

@@ -103,9 +103,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public AceConfig() throws DatabaseException {
 		super();
-		if (LocalVersionedTerminology.get() == null) {
-			LocalVersionedTerminology.set(new VodbEnv());
-		}
 	}
 
 	public AceConfig(File dbFolder) throws DatabaseException {
@@ -157,10 +154,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 					in.readObject(); // was cacheSize
 				} 
 				try {
+					VodbEnv vodbEnv;
 					if (AceConfig.getVodb() == null) {
-						new VodbEnv();
+						vodbEnv = new VodbEnv();
+					} else {
+						vodbEnv = AceConfig.getVodb();
 					}
-					AceConfig.getVodb().setup(dbFolder, readOnly);
+					vodbEnv.setup(dbFolder, readOnly);
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				} catch (Exception e) {
@@ -199,172 +199,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		this.changeSupport = new PropertyChangeSupport(this);
 	}
 
-	public static void main(String[] args) throws SecurityException,
-			IOException {
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
-		AceLog.getEditLog().setLevel(Level.FINER);
-		HtmlHandler h = new HtmlHandler(null, "edits");
-		h.setLevel(Level.FINER);
-		AceLog.getEditLog().addHandler(h);
-		AceLog.getEditLog().info("Setting up for editing.");
-		try {
-			String fileStr;
-			if (args.length == 0) {
-				fileStr = "config.ace";
-			} else {
-				fileStr = args[0];
-				if (args.length > 1) {
-					dbFolderOverride = new File(args[1]);
-				}
-			}
-			if (dbFolderOverride != null) {
-				config = new AceConfig(dbFolderOverride);
-			} else {
-				config = new AceConfig();
-			}
-
-			if (config.isDbCreated() == false) {
-
-				AceLog.getAppLog().info("DB not created");
-				int n = JOptionPane
-						.showConfirmDialog(
-								new JFrame(),
-								"Would you like to extract the db from your maven repository?",
-								"DB does not exist", JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					extractMavenLib(config);
-				} else {
-					AceLog
-							.getAppLog()
-							.info(
-									"Exiting, user did not want to extract the DB from maven.");
-					return;
-				}
-			}
-			long defaultCacheSize = 600000000L;
-			File configFile = new File(fileStr);
-			if (configFile.exists() == false) {
-				setupAceConfig(config, configFile, defaultCacheSize, false);
-			} else {
-				FileInputStream fis = new FileInputStream(configFile);
-				ObjectInputStream ois = new ObjectInputStream(fis);
-				try {
-					config = (AceConfig) ois.readObject();
-				} catch (IOException e) {
-					if (e.getMessage().equalsIgnoreCase(authFailureMsg)) {
-						IOException ioe = e;
-						while (ioe != null) {
-							ioe = null;
-							ioe = loopOpenOrCreateConfig(defaultCacheSize, ioe);
-						}
-
-					} else {
-						throw e;
-					}
-				}
-			}
-			File logConfigFile = new File(configFile.getParent(),
-					config.loggerRiverConfigFile);
-			if (logConfigFile.exists() == false) {
-				URL logConfigUrl = AceConfig.class
-						.getResource("/org/dwfa/resources/core/config/logViewer.config");
-				AceLog.getAppLog().info(
-						"Config file does not exist... " + logConfigUrl);
-				InputStream is = logConfigUrl.openStream();
-				FileOutputStream fos = new FileOutputStream(logConfigFile);
-				FileIO.copyFile(is, fos, true);
-				is.close();
-			}
-			new LogViewerFrame(
-					new String[] { logConfigFile.getCanonicalPath() }, null);
-
-			File aceRiverConfigFile = new File(configFile.getParent(), config
-					.getAceRiverConfigFile());
-			if (aceRiverConfigFile.exists() == false) {
-				URL configUrl = AceConfig.class
-						.getResource("/org/dwfa/ace/config/ace.config");
-				AceLog.getAppLog().info(
-						"Config file does not exist... " + configUrl);
-				InputStream is = configUrl.openStream();
-				FileOutputStream fos = new FileOutputStream(aceRiverConfigFile);
-				FileIO.copyFile(is, fos, true);
-				is.close();
-			}
-
-			ACE.setAceConfig(config);
-			for (I_ConfigAceFrame ace : config.aceFrames) {
-				if (ace.isActive()) {
-					AceFrame af = new AceFrame(
-							new String[] { aceRiverConfigFile.getAbsolutePath() },
-							null, ace, false);
-					af.setVisible(true);
-				}
-			}
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-	}
-
-	private static IOException loopOpenOrCreateConfig(long defaultCacheSize,
-			IOException ioe) throws TaskFailedException,
-			ClassNotFoundException, DatabaseException, ParseException,
-			TerminologyException, IOException {
-		try {
-			// Custom button text
-			Object[] options = { "Select Config", "New Config", "Cancel" };
-			int n = JOptionPane.showOptionDialog(null,
-					"Would you like to select or "
-							+ "\ncreate a configuration file?",
-					"Authorization failure", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-			switch (n) {
-			case 0:
-				// for reading existing
-				File inFile = FileDialogUtil.getExistingFile(
-						"Select a configuration file", new FilenameFilter() {
-							public boolean accept(File dir, String name) {
-								return name.endsWith(".ace");
-							}
-						});
-				ObjectInputStream configStream = new ObjectInputStream(
-						new BufferedInputStream(new FileInputStream(inFile)));
-				config = (AceConfig) configStream.readObject();
-
-				break;
-			case 1:
-				// for creating new
-				File outFile = FileDialogUtil
-						.getNewFile("Save environment to config file...");
-				if (outFile.getName().endsWith(".ace") == false) {
-					outFile = new File(outFile.getParentFile(), outFile
-							.getName()
-							+ ".ace");
-				}
-				config = new AceConfig();
-				setupAceConfig(config, outFile, defaultCacheSize, false);
-				break;
-			case 2:
-			default:
-				System.out.println("System.exit from AceConfig ");
-				System.exit(0);
-
-			}
-		} catch (IOException innerIoe) {
-			if (innerIoe.getMessage().equalsIgnoreCase(authFailureMsg)) {
-				ioe = innerIoe;
-			} else {
-				throw innerIoe;
-			}
-		}
-		return ioe;
-	}
-
 	public static void setupAceConfig(AceConfig config, File configFile,
 			Long cacheSize, boolean includeSnomed) throws DatabaseException, ParseException,
 			TerminologyException, IOException, FileNotFoundException {
 		try {
-			AceConfig.getVodb().setup(config.dbFolder, config.readOnly, cacheSize);
+			VodbEnv vodbEnv = new VodbEnv();
+			vodbEnv.setup(config.dbFolder, config.readOnly, cacheSize);
+			LocalVersionedTerminology.set(vodbEnv);
 		} catch (Exception e) {
 			throw new ToIoException(e);
 		}

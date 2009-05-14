@@ -366,40 +366,46 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				memberId = id.getNativeId();
 			}
 
-			I_ThinExtByRefVersioned extension;
+			I_ThinExtByRefVersioned extension = null;
 			if (getVodb().hasExtension(memberId)) {
 				extension = getVodb().getExtension(memberId);
 			} else {
 				int refsetId = getVodb().getId(bean.getRefsetUid())
 						.getNativeId();
-				int componentId = getVodb().getId(bean.getComponentUid())
-						.getNativeId();
-				int typeId = getVodb().getId(bean.getTypeUid()).getNativeId();
-				int partCount = bean.getVersions().size();
-				extension = new ThinExtByRefVersioned(refsetId, memberId,
-						componentId, typeId, partCount);
-			}
-
-			boolean changed = false;
-			for (UniversalAceExtByRefPart part : bean.getVersions()) {
-				if (part.getTime() == Long.MAX_VALUE) {
-					ThinExtByRefPart newPart = ThinExtByRefVersioned
-							.makePart(part);
-					newPart.setVersion(ThinVersionHelper.convert(time));
-					if (extension.getVersions().contains(newPart)) {
-						changed = false;
-					} else {
-						changed = true;
-						extension.addVersion(newPart);
-						values.add(new TimePathId(newPart.getVersion(), newPart
-								.getPathId()));
-					}
+				I_IdVersioned componentUuid = getVodb().getId(bean.getComponentUid());
+				
+				if (componentUuid == null) {
+					AceLog.getAppLog().severe(" Error importing extension... Component with id does not exist: " + bean.getComponentUid());
+				} else {
+					int componentId = componentUuid.getNativeId();
+					int typeId = getVodb().getId(bean.getTypeUid()).getNativeId();
+					int partCount = bean.getVersions().size();
+					extension = new ThinExtByRefVersioned(refsetId, memberId,
+							componentId, typeId, partCount);
 				}
 			}
-			if (changed) {
-				getVodb().writeExt(extension);
-				AceLog.getEditLog().fine(
-						"Importing changed extension: \n" + extension);
+			if (extension != null) {
+				boolean changed = false;
+				for (UniversalAceExtByRefPart part : bean.getVersions()) {
+					if (part.getTime() == Long.MAX_VALUE) {
+						ThinExtByRefPart newPart = ThinExtByRefVersioned
+								.makePart(part);
+						newPart.setVersion(ThinVersionHelper.convert(time));
+						if (extension.getVersions().contains(newPart)) {
+							changed = false;
+						} else {
+							changed = true;
+							extension.addVersion(newPart);
+							values.add(new TimePathId(newPart.getVersion(), newPart
+									.getPathId()));
+						}
+					}
+				}
+				if (changed) {
+					getVodb().writeExt(extension);
+					AceLog.getEditLog().fine(
+							"Importing changed extension: \n" + extension);
+				}
 			}
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
