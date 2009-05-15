@@ -219,24 +219,29 @@ public class CriterionPanel extends JPanel {
     private void setupCriterionOptions() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         File searchPluginFolder = new File("search");
         criterionOptions = new ArrayList<I_TestSearchResults>();
-        for (File plugin : searchPluginFolder.listFiles(new FilenameFilter() {
+        File[] searchPlugins = searchPluginFolder.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(".task");
             }
-        })) {
-            try {
-                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(plugin)));
-                Object pluginObj = ois.readObject();
-                ois.close();
-                if (I_TestSearchResults.class.isAssignableFrom(pluginObj.getClass())) {
-                    criterionOptions.add((I_TestSearchResults) pluginObj);
-                }
-            } catch (IOException ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            } catch (ClassNotFoundException ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            }
-
+        });
+        if (searchPlugins != null) {
+	        for (File plugin : searchPlugins) {
+	            try {
+	                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(plugin)));
+	                Object pluginObj = ois.readObject();
+	                ois.close();
+	                if (I_TestSearchResults.class.isAssignableFrom(pluginObj.getClass())) {
+	                    criterionOptions.add((I_TestSearchResults) pluginObj);
+	                }
+	            } catch (IOException ex) {
+	                AceLog.getAppLog().alertAndLogException(ex);
+	            } catch (ClassNotFoundException ex) {
+	                AceLog.getAppLog().alertAndLogException(ex);
+	            }
+	        }
+        } else {
+        	AceLog.getAppLog().alertAndLogException(this, new Exception("No search plugins in folder: " 
+        			+ searchPluginFolder.getAbsolutePath()));
         }
         for (I_TestSearchResults bean : criterionOptions) {
             String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
