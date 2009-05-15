@@ -509,15 +509,21 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		this.ace.getAceFrameConfig().addPropertyChangeListener(this);
 		this.conceptTabs = conceptTabs;
 		GridBagConstraints c = new GridBagConstraints();
-
-		LinkListModel linkSpinnerModel = new LinkListModel(new ImageIcon[] {
-				UNLINKED_ICON, SEARCH_LINK_ICON, TREE_LINK_ICON,
-				DATA_CHECK_LINK_ICON }, link.ordinal());
-		if (enableListLink) {
-			linkSpinnerModel = new LinkListModel(new ImageIcon[] {
-					UNLINKED_ICON, SEARCH_LINK_ICON, TREE_LINK_ICON,
-					DATA_CHECK_LINK_ICON, LIST_LINK_ICON }, link.ordinal());
+		
+		List<ImageIcon> ImageIconList = new ArrayList<ImageIcon>();
+		ImageIconList.add(UNLINKED_ICON);
+		ImageIconList.add(SEARCH_LINK_ICON);
+		ImageIconList.add(TREE_LINK_ICON);
+		if (ACE.editMode) {
+			ImageIconList.add(DATA_CHECK_LINK_ICON);
 		}
+		if (enableListLink) {
+			ImageIconList.add(LIST_LINK_ICON);
+		}
+
+		LinkListModel linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), 
+				link.ordinal());
+
 		JSpinner linkSpinner = new JSpinner(linkSpinnerModel);
 		linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
 
