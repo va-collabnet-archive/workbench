@@ -257,59 +257,76 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		}
 
 		private void layoutAlerts() {
-			JPanel uncommittedListPanel = new JPanel(new GridBagLayout());
-			JScrollPane uncommittedComponentScroller = new JScrollPane(
-					uncommittedListPanel);
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			c.gridheight = 1;
-			c.gridwidth = 1;
-			c.anchor = GridBagConstraints.NORTHWEST;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.weightx = 1;
-			c.weighty = 0;
-
-			for (AlertToDataConstraintFailure alert : dataCheckListModel) {
-				setupAlert(alert);
-				uncommittedListPanel.add(alert.getRendererComponent(), c);
-				c.gridy++;
-			}
-
-			c.weighty = 1;
-			c.gridy++;
-			uncommittedListPanel.add(new JPanel(), c);
-
-			int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-			leftTabs.setComponentAt(dataCheckIndex,
-					uncommittedComponentScroller);
-			int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
-			if (dataCheckListModel.size() > 0) {
-				leftTabs.setSelectedIndex(dataCheckIndex);
-				if (dataCheckPanel == null) {
-					try {
-						dataCheckPanel = new ConceptPanel(ACE.this,
-								LINK_TYPE.DATA_CHECK_LINK, conceptTabs,
-								Integer.MAX_VALUE);
-						conceptPanels.add(dataCheckPanel);
-					} catch (DatabaseException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					} catch (IOException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					} catch (ClassNotFoundException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					}
+			if (editMode) {
+				if (dataCheckListPanel == null) {
+					getDataCheckListScroller();
 				}
-				conceptTabs.addTab("Checks",
-						ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
-						"Data Checks Linked");
+				for (Component component: dataCheckListPanel.getComponents()) {
+					dataCheckListPanel.remove(component);
+				}
+				
+				dataCheckListPanel.setLayout(new GridBagLayout());
+				
+				GridBagConstraints c = new GridBagConstraints();
+				c.gridx = 0;
+				c.gridy = 0;
+				c.gridheight = 1;
+				c.gridwidth = 1;
+				c.anchor = GridBagConstraints.NORTHWEST;
+				c.fill = GridBagConstraints.HORIZONTAL;
+				c.weightx = 1;
+				c.weighty = 0;
 
-			} else {
-				leftTabs.setSelectedIndex(taxonomyIndex);
-				if (dataCheckPanel != null) {
-					if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
-						conceptTabs.remove(dataCheckPanel);
-						dataCheckPanel.setTermComponent(null);
+				int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+				int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
+				if (dataCheckListModel.size() > 0) {
+
+					for (AlertToDataConstraintFailure alert : dataCheckListModel) {
+						setupAlert(alert);
+						dataCheckListPanel.add(alert.getRendererComponent(), c);
+						c.gridy++;
+					}
+
+					c.weighty = 1;
+					c.gridy++;
+					dataCheckListPanel.add(new JPanel(), c);
+					if (dataCheckIndex == -1) {
+						leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
+						dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+					}		
+					
+					leftTabs.setSelectedIndex(dataCheckIndex);
+					if (dataCheckPanel == null) {
+						try {
+							dataCheckPanel = new ConceptPanel(ACE.this,
+									LINK_TYPE.DATA_CHECK_LINK, conceptTabs,
+									Integer.MAX_VALUE);
+							conceptPanels.add(dataCheckPanel);
+						} catch (DatabaseException e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						} catch (IOException e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						} catch (ClassNotFoundException e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						}
+					}
+					conceptTabs.addTab("Checks",
+							ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
+							"Data Checks Linked");
+
+				} else {
+					leftTabs.setSelectedIndex(taxonomyIndex);
+					if (dataCheckIndex != -1) {
+						leftTabs.removeTabAt(dataCheckIndex);
+					}
+					if (dataCheckPanel != null) {
+						c.weighty = 1;
+						c.gridy++;
+						dataCheckListPanel.add(new JPanel(), c);
+						if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
+							conceptTabs.remove(dataCheckPanel);
+							dataCheckPanel.setTermComponent(null);
+						}
 					}
 				}
 			}
@@ -409,12 +426,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				}
 
 				public void mouseReleased(MouseEvent e) {
-					AceLog.getAppLog().info("Mouse released in alert...");
 					for (TermComponentDataCheckSelectionListener l : dataCheckListeners) {
 						l.setSelection(alert.getConceptWithAlert());
 					}
 				}
-
 			});
 
 			/*
@@ -624,6 +639,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
 			ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame()
 					.getCdePanel();
+			aceInstance.getDataCheckListScroller();
 			aceInstance.getUncommittedListModel().clear();
 
 			for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap
@@ -638,10 +654,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
 						break;
 					}
 				}
+				// show data checks tab...
 			} else {
 				for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
 					l.setSelection(null);
 				}
+				// hide data checks tab...
 			}
 		}
 	}
@@ -1358,6 +1376,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	private String pluginRoot;
+	private JScrollPane dataCheckListScroller;
+	private JPanel dataCheckListPanel;
 
 	public String getPluginRoot() {
 		return pluginRoot;
@@ -1753,9 +1773,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 		termTreeConceptSplit.setRightComponent(conceptTabs);
 		leftTabs.addTab(taxonomyTabLabel, termTree);
-		if (editMode) {
-			leftTabs.addTab(dataCheckTabLabel, getUncommittedList());
-		}
 
 		ConceptPanel c5panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
 				leftTabs, 3);
@@ -1796,13 +1813,15 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		return content;
 	}
 
-	private JComponent getUncommittedList() {
-		dataCheckListModel = new UncommittedListModel();
-		JPanel uncommittedListPanel = new JPanel(new GridBagLayout());
-		dataCheckListModel.addListDataListener(new ListenForDataChecks());
-		JScrollPane uncommittedComponentScroller = new JScrollPane(
-				uncommittedListPanel);
-		return uncommittedComponentScroller;
+	private JComponent getDataCheckListScroller() {
+		if (dataCheckListScroller == null) {
+			dataCheckListModel = new UncommittedListModel();
+			dataCheckListPanel = new JPanel(new GridBagLayout());
+			dataCheckListModel.addListDataListener(new ListenForDataChecks());
+			dataCheckListScroller = new JScrollPane(
+					dataCheckListPanel);
+		}
+		return dataCheckListScroller;
 	}
 
 	CollectionEditorContainer conceptListEditor;
