@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.task.cs.transform.ChangeSetTransformer;
+import org.dwfa.ace.task.cs.transform.ChangeSetXmlEncoder;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -27,7 +28,7 @@ public class ConvertChangeSet extends AbstractTask {
 
 	protected String filename = "";
 
-	protected String changeSetTransformer = "org.dwfa.ace.task.cs.ChangeSetXmlEncoder";
+	protected String changeSetTransformer = ChangeSetXmlEncoder.class.getName();
 
 	private static final long serialVersionUID = 1;
 

@@ -1,5 +1,16 @@
 package org.dwfa.ace.task.refset.members;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -16,17 +27,6 @@ import org.dwfa.ace.task.util.SimpleLogMill;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * An exporter of reference sets that can be shared between tasks and mojos. Given a reference set extension as a
@@ -90,7 +90,6 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements CleanablePr
      * Call this method to close all open files.
      * @throws Exception If an exception occurs.
      */
-    @Override
     public void clean() throws Exception {
         logMill.logInfo(logger, "closing files.");
         closeFiles();

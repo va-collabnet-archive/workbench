@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.task.cs.transform.ChangeSetTransformer;
+import org.dwfa.ace.task.cs.transform.ChangeSetXmlEncoder;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -40,7 +41,7 @@ public class ConvertAllChangeSets extends AbstractTask {
 
 	private Logger logger;
 
-	private String changeSetTransformer = "org.dwfa.ace.task.cs.ChangeSetXmlEncoder";
+	private String changeSetTransformer = ChangeSetXmlEncoder.class.getName();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
