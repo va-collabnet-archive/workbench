@@ -829,7 +829,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 							frameConfig.setCommitEnabled(true);
 							ACE aceInstance = ((AceFrameConfig) frameConfig)
 									.getAceFrame().getCdePanel();
-							aceInstance.getUncommittedListModel().clear();
+							UncommittedListModel uncommittedList = aceInstance.getUncommittedListModel();
+							if (uncommittedList != null) {
+								uncommittedList.clear();
+							}
 						}
 					}
 				}
