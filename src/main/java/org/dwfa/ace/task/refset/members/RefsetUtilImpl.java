@@ -6,9 +6,13 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.task.refset.members.export.StatusUUIDs;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 import java.io.IOException;
@@ -16,7 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public final class RefsetUtilImpl implements RefsetUtil {
+//TODO: Test this.
+public final class RefsetUtilImpl implements RefsetUtil, StatusUUIDs {
 
     public I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
         List<I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
@@ -36,7 +41,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
         return status;
     }
 
-    public I_ThinExtByRefPart getLatestVersionIfCurrent(final I_ThinExtByRefVersioned ext,
+    public I_ThinExtByRefPart getLatestVersion(final I_ThinExtByRefVersioned ext,
         final I_TermFactory termFactory) throws TerminologyException, IOException {
         I_ThinExtByRefPart latest = null;
         List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
@@ -49,6 +54,17 @@ public final class RefsetUtilImpl implements RefsetUtil {
                     latest = version;
                 }
             }
+        }
+
+        return latest;
+    }
+
+    public I_ThinExtByRefPart getLatestVersionIfCurrent(final I_ThinExtByRefVersioned ext,
+            final I_TermFactory termFactory) throws Exception {
+        I_ThinExtByRefPart latest = getLatestVersion(ext, termFactory);
+
+        if (latest != null && !(latest.getStatusId() == termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId())) {
+            latest = null;
         }
 
         return latest;
@@ -75,5 +91,50 @@ public final class RefsetUtilImpl implements RefsetUtil {
             final Collection<T> collection) {
         assert collection.size() == 1 : "Collection " + collection + " was expected to only have one element";
         return collection.iterator().next();
-    }    
+    }
+
+
+    public int getLocalizedParentMarkerNid() {
+        return ConceptConstants.PARENT_MARKER.localize().getNid();
+    }
+
+    public int getLocalizedConceptExtensionNid() throws Exception {
+        return RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
+    }
+
+    public int getLocalizedCurrentConceptNid() throws Exception {
+        return ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+    }
+
+    public List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept, final I_IntSet allowedStatuses,
+                                                         final I_IntSet allowedTypes) throws Exception {
+        return concept.getDescriptionTuples(allowedStatuses, allowedTypes, null);
+
+    }
+
+    public I_IntSet createCurrentStatus(final I_TermFactory termFactory) throws Exception {
+        return createIntSet(termFactory, CURRENT_STATUS_UUIDS);
+    }
+
+    public I_IntSet createFullySpecifiedName(final I_TermFactory termFactory) throws Exception {
+        return createIntSet(termFactory, FULLY_SPECIFIED_UUIDS);
+    }
+
+    public I_IntSet createPreferredTerm(final I_TermFactory termFactory) throws Exception {
+        return createIntSet(termFactory, PREFERED_TERM_UUIDS);
+    }
+
+    public List<I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
+                                                                          final int conceptId) throws Exception {
+        I_GetConceptData refsetConcept = termFactory.getConcept(conceptId);
+        return getDescriptionTuples(refsetConcept, createCurrentStatus(termFactory),
+                createFullySpecifiedName(termFactory));
+    }
+
+    public List<I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
+                                                                          final int conceptId) throws Exception {
+        I_GetConceptData refsetConcept = termFactory.getConcept(conceptId);
+        return getDescriptionTuples(refsetConcept, createPreferredTerm(termFactory),
+                createFullySpecifiedName(termFactory));
+    }
 }
