@@ -5,7 +5,6 @@ import org.dwfa.ace.task.util.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO: Test
 public final class ProgressLoggerImpl implements ProgressLogger {
 
     private final Map<String, Integer> progressMap;
@@ -16,15 +15,23 @@ public final class ProgressLoggerImpl implements ProgressLogger {
         progressMap = new HashMap<String, Integer>();
     }
 
+    //for testing.
+    ProgressLoggerImpl(final Logger logger, final Map<String, Integer> progressMap) {
+        this.logger = logger;
+        this.progressMap = progressMap;
+    }
+
     public void logProgress(final String refsetName) {
-        Integer progress = progressMap.get(refsetName);
-        if (progress == null) {
-            progress = 0;
+        if (!progressMap.containsKey(refsetName)) {
+            progressMap.put(refsetName, 0);
+        } else {
+            Integer prevProgress = progressMap.get(refsetName);
+            progressMap.put(refsetName, ++prevProgress);
         }
 
-        progressMap.put(refsetName, progress++);
+        Integer progress = progressMap.get(refsetName);
 
-        if (progress % 1000 == 0) {
+        if (progress !=0 && progress % 1000 == 0) {
             logger.logInfo("Exported " + progress + " of refset " + refsetName);
         }
     }
