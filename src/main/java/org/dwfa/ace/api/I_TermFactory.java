@@ -314,6 +314,9 @@ public interface I_TermFactory {
 	public void cancelTransaction() throws IOException;
 	public void commitTransaction() throws IOException;
 	
+	/**
+	 * @param displayInViewer If true, the activity will be lodged in the activity viewer window
+	 */
 	public I_ShowActivity newActivityPanel(boolean displayInViewer);	
 	
 	public I_HandleSubversion getSvnHandler();
