@@ -1723,7 +1723,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		bdbEnv.commitTransaction();
 	}
 
-	public I_ShowActivity newActivityPanel() {
+	public I_ShowActivity newActivityPanel(boolean displayInViewer) {
 		if (headless) {
 			return new UpperInfoOnlyConsoleMonitor();
 		} else {
@@ -1731,10 +1731,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			ap.setIndeterminate(true);
 			ap.setProgressInfoUpper("New activty");
 			ap.setProgressInfoLower("");
-			try {
-				ActivityViewer.addActivity(ap);
-			} catch (Exception e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
+			if (displayInViewer) {
+				try {
+					ActivityViewer.addActivity(ap);
+				} catch (Exception e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
 			}
 			return ap;
 		}
