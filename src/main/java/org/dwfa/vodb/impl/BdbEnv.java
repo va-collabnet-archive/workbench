@@ -281,14 +281,17 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 	private I_IdVersioned previousAuthorityId;
 	
 	private void resetAuthorityId() throws DatabaseException, IOException {
-		previousAuthorityId = getAuthorityId();
-		AceLog.getAppLog().info("Old authority id: " + previousAuthorityId.getTuples().iterator().next().getSourceId());
-		
+		try {
+			previousAuthorityId = getAuthorityId();
+			AceLog.getAppLog().info("Old authority id: " + previousAuthorityId.getTuples().iterator().next().getSourceId());
+		} catch (Exception e) {
+			AceLog.getAppLog().warning("Unable to get previous authority id.");
+		}
 		PrimordialId primId = PrimordialId.AUTHORITY_ID;
 		I_IdVersioned thinId = new ThinIdVersioned(primId
 				.getNativeId(Integer.MIN_VALUE), 1);
 		ThinIdPart idPart = new ThinIdPart();
-		idPart.setIdStatus(PrimordialId.CURRENT_ID
+		idPart.setStatusId(PrimordialId.CURRENT_ID
 				.getNativeId(Integer.MIN_VALUE));
 		idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID
 				.getNativeId(Integer.MIN_VALUE));
