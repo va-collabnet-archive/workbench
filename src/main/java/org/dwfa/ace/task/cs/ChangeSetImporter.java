@@ -39,7 +39,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     		String suffix, String prefix) throws TaskFailedException {
         try {
             I_TermFactory tf = LocalVersionedTerminology.get();
-            I_ShowActivity activity = tf.newActivityPanel();
+            I_ShowActivity activity = tf.newActivityPanel(true);
             activity.setProgressInfoUpper("Importing " + suffix + " change sets. ");
             activity.setIndeterminate(true);
             activity.addActionListener(this);

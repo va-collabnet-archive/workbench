@@ -1,8 +1,19 @@
 package org.dwfa.ace.task.refset.members;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.logging.Logger;
+
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 
 /**
  * Used to give statistical reporting (progress, time remaining, etc) during a batch processing operation.  
@@ -17,9 +28,13 @@ public class BatchMonitor {
 	private long lastReportTime = 0;
 	private long lastReportEventCount = 0;
 	
+	private boolean isCancelled = false;
+	
 	private Logger logger = Logger.getLogger(BatchMonitor.class.getName());
 	
-	BatchReportingThread worker;
+	private BatchReportingThread timer;
+	
+	private I_ShowActivity activity;
 	
 	/**
 	 * @param description A textual description of the batch
@@ -37,7 +52,8 @@ public class BatchMonitor {
 	/**
 	 * Mark an event
 	 */
-	public void mark() {		
+	public void mark() throws BatchCancelledException {
+		throwIfCancelled();
 		eventCount++;
 	}
 	
@@ -54,10 +70,12 @@ public class BatchMonitor {
 			double eventsPerMs = eventsSinceLastReport / (double)timeSinceLastReport;
 			long timeToCompleteMs = Math.round((totalEvents - eventCount) / eventsPerMs);
 			
-			logger.info(description + ": " + percentComplete + "% complete (" + 
-					eventCount + " of " + totalEvents + 
-					"). " + getEventRate(eventsPerMs) + 
-					". Estimated time to complete: " + asTimeFormat(timeToCompleteMs));
+			activity.setProgressInfoLower(percentComplete + "% completed (" + eventCount + " of " + totalEvents + "). " + 
+					asTimeFormat(timeToCompleteMs, false) + "remaining");
+			activity.setValue((int)eventCount);
+			
+			logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + "). " + 
+					getEventRate(eventsPerMs) + ". Estimated time to complete: " + asTimeFormat(timeToCompleteMs, true));
 
 			lastReportEventCount = eventCount;		
 			lastReportTime = new Date().getTime();
@@ -67,21 +85,51 @@ public class BatchMonitor {
 	/**
 	 * Start this monitor. Batch processing has commenced.
 	 */
-	public void start() {
+	public void start() throws Exception {
+		I_TermFactory termFactory = LocalVersionedTerminology.get();
+		activity = termFactory.newActivityPanel(false);
+		activity.setProgressInfoUpper(description);
+		activity.setProgressInfoLower("Commencing...");
+		activity.setMaximum((int)totalEvents);
+		activity.setValue(0);
+		activity.setIndeterminate(false);
+		
 		startTime = new Date().getTime();
 		lastReportTime = startTime;
-		worker = new BatchReportingThread(this, reportCycleMs);
-		worker.start();
+		timer = new BatchReportingThread(this, reportCycleMs, activity);
+		timer.start();
 	}
-	
+
 	/** 
 	 * Stop the monitor. Batch processing has completed.
 	 */
-	public void complete() {
-		worker.interrupt();		
+	public void complete() throws BatchCancelledException {
+		throwIfCancelled();
+		timer.interrupt();		
 		long duration = new Date().getTime() - startTime;
 		report();
-		logger.info("Batch completed: " + description + ". " + eventCount + " events taking " + asTimeFormat(duration));
+		String timeElapsed = asTimeFormat(duration, true);
+		activity.complete();
+		activity.setProgressInfoLower("Completed processing " + eventCount + " items in " + timeElapsed);		
+		logger.info("Batch completed: " + description + ". " + eventCount + " items processed in " + timeElapsed);
+		
+	}
+	
+	/**
+	 * Cancel the monitor. Batch has been aborted. 
+	 * Any further calls to {@link #mark()} or {@link #complete()} will raise a {@link BatchCancelledException} 
+	 */
+	public void cancel() {
+		isCancelled = true;
+		timer.interrupt();	
+		activity.complete();
+		activity.setProgressInfoLower("Cancelled by user");
+	}
+	
+	private void throwIfCancelled() throws BatchCancelledException {
+		if (isCancelled) {
+			throw new BatchCancelledException();
+		}
 	}
 	
 	private String getEventRate(double eventsPerMs) {
@@ -93,7 +141,7 @@ public class BatchMonitor {
 		}			
 	}
 	
-	private String asTimeFormat(long durationMs) {
+	private String asTimeFormat(long durationMs, boolean showMillis) {
 		StringBuffer result = new StringBuffer();
 		long hours = durationMs / 3600000;
 		if (hours != 0) {
@@ -104,8 +152,12 @@ public class BatchMonitor {
 			result.append(minutes).append(" minutes, ");
 		}
 		long seconds = ((durationMs % 3600000) % 60000) / 1000;
-		String millis = String.format("%03d", (durationMs % 1000));
-		result.append(seconds).append(".").append(millis).append(" seconds. ");
+		result.append(seconds);
+		if (showMillis) {
+			String millis = String.format("%03d", (durationMs % 1000));
+			result.append(".").append(millis);
+		}
+		result.append(" seconds ");
 		return result.toString();
 	}
 	
@@ -114,20 +166,66 @@ public class BatchMonitor {
 		private long reportCycle = 0;
 		
 		private BatchMonitor batch;
+		private MonitorDialog dialog;
+		private I_ShowActivity activity;		
 		
-		public BatchReportingThread(BatchMonitor batch, long reportCycleMs) {
+		public BatchReportingThread(BatchMonitor batch, long reportCycleMs, I_ShowActivity activity) {
 			this.batch = batch;
 			this.reportCycle = reportCycleMs;
+			this.activity = activity;
+			
+			this.activity.addActionListener(
+					new ActionListener(){
+						public void actionPerformed(ActionEvent e) {
+							cancel();
+						};	
+					}
+			);			
 		}
 		
 		@Override
 		public void run() {
 			try {
+				showDialog();
 				while (true) {
 					sleep(reportCycle);
-					batch.report();
+					batch.report();	
 				}
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			} finally {
+				dialog.dispose();
+			}
+		}
+		
+		private void showDialog() {
+			dialog = new MonitorDialog(activity);
+	        dialog.pack();
+	        dialog.setTitle("Operation in progress");
+	        dialog.setResizable(false);
+	        dialog.setModal(false);
+	        dialog.setAlwaysOnTop(true);
+
+	        Toolkit toolkit = Toolkit.getDefaultToolkit();
+	        Dimension screenSize = toolkit.getScreenSize();
+
+	        // centre on the screen
+	        int x = (screenSize.width - dialog.getWidth()) / 2;  
+	        int y = (screenSize.height - dialog.getHeight()) / 2;
+	        dialog.setLocation(x, y);
+	        
+	        // beef it up a little
+	        dialog.setSize((int)(1.25 * dialog.getWidth()), (int)(1.5 * dialog.getHeight()));
+	        
+	        dialog.setVisible(true);
+		}
+	}
+	
+	public class MonitorDialog extends JDialog {
+
+		private static final long serialVersionUID = 8408703041409497746L;
+
+		public MonitorDialog(I_ShowActivity activity) {
+			setContentPane((JPanel)activity);			
 		}
 		
 	}

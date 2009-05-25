@@ -56,15 +56,21 @@ public class MemberRefsetHelper {
 	 */
 	public void addAllToRefset(int refsetId, Set<I_GetConceptData> newMembers, int valueId, String batchDescription) 
 			throws Exception {
-		BatchMonitor batch = new BatchMonitor(batchDescription, newMembers.size(), 15000);			
+		
+		BatchMonitor batch = new BatchMonitor(batchDescription, newMembers.size(), 2000);			
 		batch.start();
 		
-		for (I_GetConceptData member : newMembers) {
-			addToRefset(refsetId, member.getConceptId(), valueId);
-			batch.mark();
+		try {
+			for (I_GetConceptData member : newMembers) {
+				addToRefset(refsetId, member.getConceptId(), valueId);
+				batch.mark();
+			}
+			batch.complete();
+			
+		} catch (BatchCancelledException ex) {
+			termFactory.cancel();
+			logger.info("Batch operation '" + batchDescription + "' cancelled by user.");
 		}
-		
-		batch.complete();		
 	}
 	
 	/**
@@ -78,15 +84,21 @@ public class MemberRefsetHelper {
 	 */
 	public void removeAllFromRefset(int refsetId, Set<I_GetConceptData> members, int valueId, String batchDescription) 
 			throws Exception {
-		BatchMonitor batch = new BatchMonitor(batchDescription, members.size(), 5000);			
+		
+		BatchMonitor batch = new BatchMonitor(batchDescription, members.size(), 1000);			
 		batch.start();
 		
-		for (I_GetConceptData member : members) {
-			removeFromRefset(refsetId, member.getConceptId(), valueId);
-			batch.mark();
+		try {
+			for (I_GetConceptData member : members) {
+				removeFromRefset(refsetId, member.getConceptId(), valueId);
+				batch.mark();
+			}
+			batch.complete();
+			
+		} catch (BatchCancelledException ex) {
+			termFactory.cancel();
+			logger.info("Batch operation '" + batchDescription + "' cancelled by user.");			
 		}
-		
-		batch.complete();		
 	}	
 	
 	/**
@@ -113,12 +125,12 @@ public class MemberRefsetHelper {
 				}
 				
 				// confirm its the right extension value and its status is current
-				if (latestPart.getStatus() == currentStatusId) {
+				if (latestPart.getStatusId() == currentStatusId) {
 					if (latestPart instanceof I_ThinExtByRefPartConcept) {
 						int partValue = ((I_ThinExtByRefPartConcept)latestPart).getConceptId();
 						if (partValue == valueId) {
 							// its already a member so skip
-							logger.info("Concept is already a member of the refset. Skipping.");
+							logger.fine("Concept is already a member of the refset. Skipping.");
 							return;
 						}
 					}
@@ -144,7 +156,7 @@ public class MemberRefsetHelper {
 				termFactory.newConceptExtensionPart();
 
 			conceptExtension.setPathId(editPath.getConceptId());
-			conceptExtension.setStatus(currentStatusId);
+			conceptExtension.setStatusId(currentStatusId);
 			conceptExtension.setVersion(Integer.MAX_VALUE);
 			conceptExtension.setConceptId(valueId);
 
@@ -178,14 +190,14 @@ public class MemberRefsetHelper {
 				}
 				
 				// confirm its the right extension value and its status is current
-				if (latestPart.getStatus() == currentStatusId) {
+				if (latestPart.getStatusId() == currentStatusId) {
 					if (latestPart instanceof I_ThinExtByRefPartConcept) {
 						int partValue = ((I_ThinExtByRefPartConcept)latestPart).getConceptId();
 						if (partValue == valueId) {
 							// found a member to retire
 							
-							I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicatePart();
-							clone.setStatus(retiredStatusId);
+							I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+							clone.setStatusId(retiredStatusId);
 							clone.setVersion(Integer.MAX_VALUE);
 							extension.addVersion(clone);
 							termFactory.addUncommittedNoChecks(extension);

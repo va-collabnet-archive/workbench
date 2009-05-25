@@ -314,7 +314,7 @@ public interface I_TermFactory {
 	public void cancelTransaction() throws IOException;
 	public void commitTransaction() throws IOException;
 	
-	public I_ShowActivity newActivityPanel();
+	public I_ShowActivity newActivityPanel(boolean displayInViewer);	
 	
 	public I_HandleSubversion getSvnHandler();
 	
