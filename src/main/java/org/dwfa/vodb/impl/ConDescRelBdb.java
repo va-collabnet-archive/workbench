@@ -908,6 +908,10 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 						int relId = ti.readInt();
 						int c2Id = ti.readInt();
 						int versionCount = ti.readShort();
+						if (versionCount < 0) {
+							throw new IOException("Negative rel version count: " + versionCount + 
+									" for concept: \n\n"+ conceptBean);
+						}
 						ThinRelVersioned relv = new ThinRelVersioned(relId,
 								conceptNid, c2Id, versionCount);
 						conceptBean.sourceRels.add(relv);
@@ -934,6 +938,10 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					for (int x = 0; x < descCount; x++) {
 						int descId = ti.readInt();
 						int versionCount = ti.readShort();
+						if (versionCount < 0) {
+							throw new IOException("Negative desc version count: " + versionCount + 
+									" for concept: \n\n"+ conceptBean);
+						}
 						ThinDescVersioned descV = new ThinDescVersioned(descId,
 								conceptNid, versionCount);
 						conceptBean.descriptions.add(descV);
@@ -983,12 +991,14 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 						for (I_RelVersioned rel : conceptBean.sourceRels) {
 							to.writeInt(rel.getRelId());
 							to.writeInt(rel.getC2Id());
+							if (rel.versionCount() >= Short.MAX_VALUE) {
+								AceLog.getAppLog().warning("Relationship has " + rel.versionCount() + 
+										" versions: \n\n" + conceptBean);
+							}
 							to.writeShort(rel.versionCount());
 							for (I_RelPart part : rel.getVersions()) {
 								try {
-									to
-											.writeShort(relPartBdb
-													.getRelPartId(part));
+									to.writeShort(relPartBdb.getRelPartId(part));
 								} catch (DatabaseException e) {
 									throw new RuntimeException(e);
 								}
@@ -998,8 +1008,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					if (conceptBean.getRelOrigins() == null) {
 						to.writeInt(0);
 					} else {
-						to
-								.writeInt(conceptBean.getRelOrigins()
+						to.writeInt(conceptBean.getRelOrigins()
 										.getSetValues().length);
 						for (int i : conceptBean.getRelOrigins().getSetValues()) {
 							to.writeInt(i);
@@ -1009,9 +1018,17 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 						to.writeShort(0);
 					} else {
 						int descSize = conceptBean.getDescriptions().size();
+						if (descSize >= Short.MAX_VALUE) {
+							AceLog.getAppLog().warning("Concept has " + descSize + 
+									" descriptions: \n\n" + conceptBean);
+						}
 						to.writeShort(descSize);
 						for (I_DescriptionVersioned desc : conceptBean.descriptions) {
 							to.writeInt(desc.getDescId());
+							if (desc.versionCount() >= Short.MAX_VALUE) {
+								AceLog.getAppLog().warning("Description has " + descSize + 
+										" versions: \n\n" + conceptBean);
+							}
 							to.writeShort(desc.versionCount());
 							for (I_DescriptionPart part : desc.getVersions()) {
 								try {
