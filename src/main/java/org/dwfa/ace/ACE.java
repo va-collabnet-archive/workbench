@@ -132,6 +132,7 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.queue.AddQueueListener;
 import org.dwfa.ace.queue.NewQueueListener;
+import org.dwfa.ace.refset.RefsetSpecPanel;
 import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetDefaultsConcept;
@@ -1381,6 +1382,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private String pluginRoot;
 	private JScrollPane dataCheckListScroller;
 	private JPanel dataCheckListPanel;
+	private RefsetSpecPanel refsetSpecPanel;
 
 	public String getPluginRoot() {
 		return pluginRoot;
@@ -1477,8 +1479,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	public void setup(I_ConfigAceFrame aceFrameConfig)
-			throws DatabaseException, IOException, ClassNotFoundException,
-			TerminologyException {
+			throws Exception {
 		menuWorker.writeAttachment(
 				WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
 		this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
@@ -1745,8 +1746,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		c.gridx++;
 	}
 
-	private JComponent getContentPanel() throws DatabaseException, IOException,
-			ClassNotFoundException, TerminologyException {
+	private JComponent getContentPanel() throws Exception {
 		termTree = getHierarchyPanel();
 		conceptPanels = new ArrayList<ConceptPanel>();
 		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs, 1);
@@ -1770,6 +1770,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		conceptTabs.addTab("List", new ImageIcon(ACE.class
 				.getResource("/16x16/plain/notebook.png")),
 				getConceptListEditor());
+
+		refsetSpecPanel = new RefsetSpecPanel(this);
+		conceptTabs.addTab("RefSet Spec", new ImageIcon(ACE.class
+				.getResource("/16x16/plain/paperclip.png")),
+				refsetSpecPanel);
 
 		conceptTabs.setMinimumSize(new Dimension(0, 0));
 		c2Panel.setMinimumSize(new Dimension(0, 0));
@@ -4007,6 +4012,14 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public QueueViewerPanel getQueueViewer() {
 		return queueViewer;
+	}
+
+	public I_GetConceptData getRefsetInSpecEditor() {
+		return refsetSpecPanel.getRefsetInSpecEditor();
+	}
+
+	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
+		return refsetSpecPanel.getSelectedRefsetClauseInSpecEditor();
 	}
 
 }

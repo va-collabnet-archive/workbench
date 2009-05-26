@@ -17,7 +17,11 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.I_MapIds;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptString;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptString;
 import org.dwfa.vodb.types.ThinExtByRefPartCrossmap;
 import org.dwfa.vodb.types.ThinExtByRefPartCrossmapForRel;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
@@ -46,6 +50,10 @@ public class ThinExtBinder extends TupleBinding {
     private static int TEMPLATE_ID = 10;
     private static int CROSS_MAP_FOR_REL_ID = 11;
     private static int CROSS_MAP_ID = 12;
+    private static int CONCEPT_CONCEPT_ID = 13;
+    private static int CONCEPT_CONCEPT_CONCEPT_ID = 14;
+    private static int CONCEPT_CONCEPT_STRING_ID = 15;
+    private static int CONCEPT_STRING_ID = 16;
 	
     public static enum EXT_TYPE {
         BOOLEAN(BOOLEAN_ID, "boolean"), CONCEPT(CONCEPT_ID, "concept"), CON_INT(CON_INT_ID, "con int"),
@@ -56,7 +64,10 @@ public class ThinExtBinder extends TupleBinding {
                 TEMPLATE(TEMPLATE_ID, "template"),
                 CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel"),
                 CROSS_MAP(CROSS_MAP_ID, "cross map"),
-                
+                CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept"),
+                CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept"),
+                CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string"),
+                CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string"),
                 ;
 
         private int enumId;
@@ -98,6 +109,14 @@ public class ThinExtBinder extends TupleBinding {
                 return CROSS_MAP_FOR_REL;
             case 12:
                 return CROSS_MAP;
+            case 13:
+                return CONCEPT_CONCEPT;
+            case 14:
+                return CONCEPT_CONCEPT_CONCEPT;
+            case 15:
+                return CONCEPT_CONCEPT_STRING;
+            case 16:
+                return CONCEPT_STRING;
 
             default:
                 throw new RuntimeException("Can't convert to EXT_TYPE: " + id);
@@ -140,7 +159,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartString part = new ThinExtByRefPartString();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setStringValue(ti.readString());
                 versioned.addVersion(part);
             }
@@ -150,7 +169,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartBoolean part = new ThinExtByRefPartBoolean();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setValue(ti.readBoolean());
                 versioned.addVersion(part);
             }
@@ -160,7 +179,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setConceptId(ti.readInt());
                 versioned.addVersion(part);
             }
@@ -170,7 +189,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartConceptInt part = new ThinExtByRefPartConceptInt();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setConceptId(ti.readInt());
                 part.setIntValue(ti.readInt());
                 versioned.addVersion(part);
@@ -181,7 +200,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartMeasurement part = new ThinExtByRefPartMeasurement();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setUnitsOfMeasureId(ti.readInt());
                 part.setMeasurementValue(ti.readDouble());
                 versioned.addVersion(part);
@@ -193,7 +212,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartInteger part = new ThinExtByRefPartInteger();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setValue(ti.readInt());
                 versioned.addVersion(part);
             }
@@ -203,7 +222,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartLanguage part = new ThinExtByRefPartLanguage();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setAcceptabilityId(ti.readInt());
                 part.setCorrectnessId(ti.readInt());
                 part.setDegreeOfSynonymyId(ti.readInt());
@@ -215,7 +234,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartLanguageScoped part = new ThinExtByRefPartLanguageScoped();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setAcceptabilityId(ti.readInt());
                 part.setCorrectnessId(ti.readInt());
                 part.setDegreeOfSynonymyId(ti.readInt());
@@ -230,7 +249,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartCrossmap part = new ThinExtByRefPartCrossmap();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setAdditionalCodeId(ti.readInt());
                 part.setBlockNo(ti.readInt());
                 part.setElementNo(ti.readInt());
@@ -245,7 +264,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartCrossmapForRel part = new ThinExtByRefPartCrossmapForRel();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setAdditionalCodeId(ti.readInt());
                 part.setBlockNo(ti.readInt());
                 part.setElementNo(ti.readInt());
@@ -258,7 +277,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartTemplate part = new ThinExtByRefPartTemplate();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setAttributeDisplayStatusId(ti.readInt());
                 part.setAttributeId(ti.readInt());
                 part.setBrowseAttributeOrder(ti.readInt());
@@ -277,7 +296,7 @@ public class ThinExtBinder extends TupleBinding {
                 ThinExtByRefPartTemplateForRel part = new ThinExtByRefPartTemplateForRel();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
-                part.setStatus(ti.readInt());
+                part.setStatusId(ti.readInt());
                 part.setAttributeDisplayStatusId(ti.readInt());
                 part.setBrowseAttributeOrder(ti.readInt());
                 part.setBrowseValueOrder(ti.readInt());
@@ -286,6 +305,53 @@ public class ThinExtBinder extends TupleBinding {
                 part.setNotesScreenOrder(ti.readInt());
                 part.setSemanticStatusId(ti.readInt());
                 part.setValueTypeId(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+        case CONCEPT_CONCEPT:
+            for (int x = 0; x < partCount; x++) {
+            	ThinExtByRefPartConceptConcept part = new ThinExtByRefPartConceptConcept();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatusId(ti.readInt());
+                part.setC1id(ti.readInt());
+                part.setC2id(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+
+        case CONCEPT_CONCEPT_CONCEPT:
+            for (int x = 0; x < partCount; x++) {
+            	ThinExtByRefPartConceptConceptConcept part = new ThinExtByRefPartConceptConceptConcept();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatusId(ti.readInt());
+                part.setC1id(ti.readInt());
+                part.setC2id(ti.readInt());
+                part.setC3id(ti.readInt());
+                versioned.addVersion(part);
+            }
+            break;
+        case CONCEPT_CONCEPT_STRING:
+            for (int x = 0; x < partCount; x++) {
+            	ThinExtByRefPartConceptConceptString part = new ThinExtByRefPartConceptConceptString();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatusId(ti.readInt());
+                part.setC1id(ti.readInt());
+                part.setC2id(ti.readInt());
+                part.setStr(ti.readString());
+                versioned.addVersion(part);
+            }
+            break;
+        case CONCEPT_STRING:
+            for (int x = 0; x < partCount; x++) {
+            	ThinExtByRefPartConceptString part = new ThinExtByRefPartConceptString();
+                part.setPathId(ti.readInt());
+                part.setVersion(ti.readInt());
+                part.setStatusId(ti.readInt());
+                part.setC1id(ti.readInt());
+                part.setStr(ti.readString());
                 versioned.addVersion(part);
             }
             break;
@@ -308,6 +374,10 @@ public class ThinExtBinder extends TupleBinding {
     private static Integer crossMapForRelNid;
     private static Integer templateNid;
     private static Integer templateForRelNid;
+    private static Integer conceptConceptNid;
+    private static Integer conceptConceptConceptNid;
+    private static Integer conceptConceptStringNid;
+    private static Integer conceptStringNid;
 
     public static int getExtensionTypeNid(EXT_TYPE type) {
         try {
@@ -372,6 +442,26 @@ public class ThinExtBinder extends TupleBinding {
                     templateForRelNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids());
                 }
                 return templateForRelNid;
+            case CONCEPT_CONCEPT:
+                if (conceptConceptNid == null) {
+                	conceptConceptNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids());
+                }
+                return conceptConceptNid;
+            case CONCEPT_CONCEPT_CONCEPT:
+                if (conceptConceptConceptNid == null) {
+                	conceptConceptConceptNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids());
+                }
+                return conceptConceptConceptNid;
+            case CONCEPT_CONCEPT_STRING:
+                if (conceptConceptStringNid == null) {
+                	conceptConceptStringNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids());
+                }
+                return conceptConceptStringNid;
+            case CONCEPT_STRING:
+                if (conceptStringNid == null) {
+                	conceptStringNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids());
+                }
+                return conceptStringNid;
             default:
                 throw new RuntimeException("Can't convert to type: " + type);
             }
@@ -443,6 +533,26 @@ public class ThinExtBinder extends TupleBinding {
                     templateForRelNid = map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids(), idPath, version);
                 }
                 return templateForRelNid;
+            case CONCEPT_CONCEPT:
+                if (conceptConceptNid == null) {
+                	conceptConceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
+                }
+                return conceptConceptNid;
+            case CONCEPT_CONCEPT_CONCEPT:
+                if (conceptConceptConceptNid == null) {
+                	conceptConceptConceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
+                }
+                return conceptConceptConceptNid;
+            case CONCEPT_CONCEPT_STRING:
+                if (conceptConceptStringNid == null) {
+                	conceptConceptStringNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
+                }
+                return conceptConceptStringNid;
+            case CONCEPT_STRING:
+                if (conceptStringNid == null) {
+                	conceptStringNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
+                }
+                return conceptStringNid;
             default:
                 throw new RuntimeException("Can't convert to type: " + type);
             }
@@ -472,7 +582,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartBoolean part : booleanParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeBoolean(part.getValue());
             }
             break;
@@ -481,7 +591,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartString part : stringParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeString(part.getStringValue());
             }
             break;
@@ -490,7 +600,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartConcept part : conceptParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getConceptId());
             }
             break;
@@ -499,7 +609,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartConceptInt part : conceptIntParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getConceptId());
                 to.writeInt(part.getIntValue());
             }
@@ -510,7 +620,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartMeasurement part : measurementParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getUnitsOfMeasureId());
                 to.writeDouble(part.getMeasurementValue());
             }
@@ -521,7 +631,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartInteger part : intParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getValue());
             }
             break;
@@ -530,7 +640,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartLanguage part : langParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getAcceptabilityId());
                 to.writeInt(part.getCorrectnessId());
                 to.writeInt(part.getDegreeOfSynonymyId());
@@ -542,7 +652,7 @@ public class ThinExtBinder extends TupleBinding {
             for (I_ThinExtByRefPartLanguageScoped part : scopedLangParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getAcceptabilityId());
                 to.writeInt(part.getCorrectnessId());
                 to.writeInt(part.getDegreeOfSynonymyId());
@@ -556,7 +666,7 @@ public class ThinExtBinder extends TupleBinding {
             for (ThinExtByRefPartCrossmap part: crossMapParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getAdditionalCodeId());
                 to.writeInt(part.getBlockNo());
                 to.writeInt(part.getElementNo());
@@ -572,7 +682,7 @@ public class ThinExtBinder extends TupleBinding {
             for (ThinExtByRefPartCrossmapForRel part: crossMapForRelParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getAdditionalCodeId());
                 to.writeInt(part.getBlockNo());
                 to.writeInt(part.getElementNo());
@@ -586,7 +696,7 @@ public class ThinExtBinder extends TupleBinding {
             for (ThinExtByRefPartTemplate part: templateParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getAttributeDisplayStatusId());
                 to.writeInt(part.getAttributeId());
                 to.writeInt(part.getBrowseAttributeOrder());
@@ -606,7 +716,7 @@ public class ThinExtBinder extends TupleBinding {
             for (ThinExtByRefPartTemplateForRel part: templateForRelParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
-                to.writeInt(part.getStatus());
+                to.writeInt(part.getStatusId());
                 to.writeInt(part.getAttributeDisplayStatusId());
                 to.writeInt(part.getBrowseAttributeOrder());
                 to.writeInt(part.getBrowseValueOrder());
@@ -618,6 +728,48 @@ public class ThinExtBinder extends TupleBinding {
                 versioned.addVersion(part);
             }
             break;
+            case CONCEPT_CONCEPT:
+                List<ThinExtByRefPartConceptConcept> ccParts = (List<ThinExtByRefPartConceptConcept>) versioned.getVersions();
+                for (ThinExtByRefPartConceptConcept part : ccParts) {
+                    to.writeInt(part.getPathId());
+                    to.writeInt(part.getVersion());
+                    to.writeInt(part.getStatusId());
+                    to.writeInt(part.getC1id());
+                    to.writeInt(part.getC2id());
+                }
+            	break;
+            case CONCEPT_CONCEPT_CONCEPT:
+                List<ThinExtByRefPartConceptConceptConcept> cccParts = (List<ThinExtByRefPartConceptConceptConcept>) versioned.getVersions();
+                for (ThinExtByRefPartConceptConceptConcept part : cccParts) {
+                    to.writeInt(part.getPathId());
+                    to.writeInt(part.getVersion());
+                    to.writeInt(part.getStatusId());
+                    to.writeInt(part.getC1id());
+                    to.writeInt(part.getC2id());
+                    to.writeInt(part.getC3id());
+                }
+            	break;
+            case CONCEPT_CONCEPT_STRING:
+                List<ThinExtByRefPartConceptConceptString> ccsParts = (List<ThinExtByRefPartConceptConceptString>) versioned.getVersions();
+                for (ThinExtByRefPartConceptConceptString part : ccsParts) {
+                    to.writeInt(part.getPathId());
+                    to.writeInt(part.getVersion());
+                    to.writeInt(part.getStatusId());
+                    to.writeInt(part.getC1id());
+                    to.writeInt(part.getC2id());
+                    to.writeString(part.getStr());
+                }
+            	break;
+            case CONCEPT_STRING:
+                List<ThinExtByRefPartConceptString> csParts = (List<ThinExtByRefPartConceptString>) versioned.getVersions();
+                for (ThinExtByRefPartConceptString part : csParts) {
+                    to.writeInt(part.getPathId());
+                    to.writeInt(part.getVersion());
+                    to.writeInt(part.getStatusId());
+                    to.writeInt(part.getC1id());
+                    to.writeString(part.getStr());
+                }
+            	break;
         default:
             throw new RuntimeException("Can't handle type: " + extType);
         }
@@ -650,6 +802,14 @@ public class ThinExtBinder extends TupleBinding {
                     return EXT_TYPE.TEMPLATE;
                 }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE_FOR_REL)) {
                     return EXT_TYPE.TEMPLATE_FOR_REL;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT)) {
+                    return EXT_TYPE.CONCEPT_CONCEPT;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT_CONCEPT)) {
+                    return EXT_TYPE.CONCEPT_CONCEPT_CONCEPT;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT_STRING)) {
+                    return EXT_TYPE.CONCEPT_CONCEPT_STRING;
+                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_STRING)) {
+                    return EXT_TYPE.CONCEPT_STRING;
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -680,6 +840,14 @@ public class ThinExtBinder extends TupleBinding {
                 return EXT_TYPE.CROSS_MAP;
             }else if (ThinExtByRefPartCrossmapForRel.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CROSS_MAP_FOR_REL;
+            }else if (ThinExtByRefPartConceptConcept.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CONCEPT_CONCEPT;
+            }else if (ThinExtByRefPartConceptConceptConcept.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CONCEPT_CONCEPT_CONCEPT;
+            }else if (ThinExtByRefPartConceptConceptString.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CONCEPT_CONCEPT_STRING;
+            }else if (ThinExtByRefPartConceptString.class.equals(firstPart.getClass())) {
+                return EXT_TYPE.CONCEPT_STRING;
             }
         }
         throw new UnsupportedOperationException("Can't convert to type: " + versioned);

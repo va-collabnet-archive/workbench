@@ -67,7 +67,11 @@ import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -116,7 +120,11 @@ import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptString;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptString;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguageScoped;
@@ -1760,6 +1768,22 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
   public I_HandleSubversion getSvnHandler() {
 	return new Svn();
+  }
+
+  public I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart() {
+	  return new ThinExtByRefPartConceptConceptConcept();
+  }
+
+  public I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart() {
+	  return new ThinExtByRefPartConceptConcept();
+  }
+
+  public I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart() {
+	  return new ThinExtByRefPartConceptConceptString();
+  }
+
+  public I_ThinExtByRefPartConceptString newConceptStringExtensionPart() {
+	  return new ThinExtByRefPartConceptString();
   }
 
 

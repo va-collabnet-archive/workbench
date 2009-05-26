@@ -59,7 +59,7 @@ public class RefsetUtil {
         }
     }
 
-    private static JPanel getExtensionPanel(EXT_TYPE extType, RefsetMemberTableModel refsetModel,
+    public static JPanel getExtensionPanel(EXT_TYPE extType, RefsetMemberTableModel refsetModel,
         I_HostConceptPlugins host, TOGGLES toggle) throws Exception {
         JPanel relPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

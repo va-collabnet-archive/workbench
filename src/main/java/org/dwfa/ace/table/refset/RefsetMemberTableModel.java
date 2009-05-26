@@ -48,6 +48,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartCrossmap;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -239,7 +240,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				throw new UnsupportedOperationException(
 						"Can't do concept combobox on " + field);
 			case STATUS:
-				return ConceptBean.get(swet.getTuple().getStatus());
+				return ConceptBean.get(swet.getTuple().getStatusId());
 			case VERSION:
 				throw new UnsupportedOperationException(
 						"Can't do concept combobox on " + field);
@@ -789,33 +790,33 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 						break;
 					}
 					if (ThinExtByRefPartBoolean.class.equals(part.getClass())) {
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartString.class.equals(part
 							.getClass())) {
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartConcept.class.equals(part
 							.getClass())) {
 						I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
 						conceptsToFetch.add(conceptPart.getConceptId());
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartConceptInt.class.equals(part
 							.getClass())) {
 						I_ThinExtByRefPartConceptInt conceptPart = (I_ThinExtByRefPartConceptInt) part;
 						conceptsToFetch.add(conceptPart.getConceptId());
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartMeasurement.class.equals(part
 							.getClass())) {
 						I_ThinExtByRefPartMeasurement conceptPart = (I_ThinExtByRefPartMeasurement) part;
 						conceptsToFetch.add(conceptPart.getUnitsOfMeasureId());
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartInteger.class.equals(part
 							.getClass())) {
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartLanguage.class.equals(part
 							.getClass())) {
@@ -824,7 +825,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 						conceptsToFetch.add(conceptPart.getCorrectnessId());
 						conceptsToFetch
 								.add(conceptPart.getDegreeOfSynonymyId());
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					} else if (ThinExtByRefPartLanguageScoped.class.equals(part
 							.getClass())) {
@@ -835,7 +836,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 						conceptsToFetch.add(conceptPart.getCorrectnessId());
 						conceptsToFetch
 								.add(conceptPart.getDegreeOfSynonymyId());
-						conceptsToFetch.add(part.getStatus());
+						conceptsToFetch.add(part.getStatusId());
 						conceptsToFetch.add(part.getPathId());
 					}
 					if (stopWork) {
@@ -1042,12 +1043,12 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 						.getComponentId()), tuple);
 
 			case STATUS:
-				if (referencedConcepts.containsKey(tuple.getStatus())) {
+				if (referencedConcepts.containsKey(tuple.getStatusId())) {
 					return new StringWithExtTuple(
-							getPrefText(tuple.getStatus()), tuple);
+							getPrefText(tuple.getStatusId()), tuple);
 				}
 				return new StringWithExtTuple(Integer.toString(tuple
-						.getStatus()), tuple);
+						.getStatusId()), tuple);
 			case VERSION:
 				if (tuple.getVersion() == Integer.MAX_VALUE) {
 					return new StringWithExtTuple(ThinVersionHelper
@@ -1175,7 +1176,17 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				return new StringWithExtTuple(Double
 						.toString(((I_ThinExtByRefPartMeasurement) tuple
 								.getPart()).getMeasurementValue()), tuple);
+			case MAP_REFINABILITY:
+				return new StringWithExtTuple(Double
+						.toString(((I_ThinExtByRefPartCrossmap) tuple
+								.getPart()).getRefineFlagId()), tuple);
+			case MAP_STATUS:
+				return new StringWithExtTuple(Double
+						.toString(((I_ThinExtByRefPartCrossmap) tuple
+								.getPart()).getMapStatusId()), tuple);
 			}
+			
+				
 			AceLog.getAppLog().alertAndLogException(
 					new Exception("Can't handle column type: "
 							+ columns[columnIndex]));
@@ -1279,7 +1290,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartBoolean booleanPart = new ThinExtByRefPartBoolean();
 					booleanPart.setPathId(editPath.getConceptId());
-					booleanPart.setStatus(refsetDefaults
+					booleanPart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					booleanPart.setValue(preferences.getBooleanPreferences()
 							.getDefaultForBooleanRefset());
@@ -1291,7 +1302,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartString stringPart = new ThinExtByRefPartString();
 					stringPart.setPathId(editPath.getConceptId());
-					stringPart.setStatus(refsetDefaults
+					stringPart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					stringPart
 							.setStringValue(preferences.getStringPreferences()
@@ -1304,7 +1315,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartConcept conceptPart = new ThinExtByRefPartConcept();
 					conceptPart.setPathId(editPath.getConceptId());
-					conceptPart.setStatus(refsetDefaults
+					conceptPart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					conceptPart.setConceptId(preferences
 							.getConceptPreferences()
@@ -1317,7 +1328,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartConceptInt conceptPart = new ThinExtByRefPartConceptInt();
 					conceptPart.setPathId(editPath.getConceptId());
-					conceptPart.setStatus(refsetDefaults
+					conceptPart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					conceptPart.setConceptId(preferences.getConIntPreferences()
 							.getDefaultForConceptRefset().getConceptId());
@@ -1331,7 +1342,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartInteger integerPart = new ThinExtByRefPartInteger();
 					integerPart.setPathId(editPath.getConceptId());
-					integerPart.setStatus(refsetDefaults
+					integerPart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					integerPart.setValue(preferences.getIntegerPreferences()
 							.getDefaultForIntegerRefset());
@@ -1343,7 +1354,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartMeasurement measurementPart = new ThinExtByRefPartMeasurement();
 					measurementPart.setPathId(editPath.getConceptId());
-					measurementPart.setStatus(refsetDefaults
+					measurementPart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					measurementPart.setUnitsOfMeasureId(preferences
 							.getMeasurementPreferences()
@@ -1360,7 +1371,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartLanguage laguagePart = new ThinExtByRefPartLanguage();
 					laguagePart.setPathId(editPath.getConceptId());
-					laguagePart.setStatus(refsetDefaults
+					laguagePart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					laguagePart.setAcceptabilityId(preferences
 							.getLanguagePreferences()
@@ -1382,7 +1393,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartLanguageScoped scopedLaguagePart = new ThinExtByRefPartLanguageScoped();
 					scopedLaguagePart.setPathId(editPath.getConceptId());
-					scopedLaguagePart.setStatus(refsetDefaults
+					scopedLaguagePart.setStatusId(refsetDefaults
 							.getDefaultStatusForRefset().getConceptId());
 					scopedLaguagePart.setAcceptabilityId(preferences
 							.getLanguageScopedPreferences()
@@ -1415,7 +1426,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartCrossmap part = new ThinExtByRefPartCrossmap();
 					part.setPathId(editPath.getConceptId());
-					part.setStatus(refsetDefaults.getDefaultStatusForRefset()
+					part.setStatusId(refsetDefaults.getDefaultStatusForRefset()
 							.getConceptId());
 					part.setVersion(Integer.MAX_VALUE);
 					part.setAdditionalCodeId(preferences
@@ -1444,7 +1455,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartCrossmapForRel part = new ThinExtByRefPartCrossmapForRel();
 					part.setPathId(editPath.getConceptId());
-					part.setStatus(refsetDefaults.getDefaultStatusForRefset()
+					part.setStatusId(refsetDefaults.getDefaultStatusForRefset()
 							.getConceptId());
 					part.setVersion(Integer.MAX_VALUE);
 					part.setAdditionalCodeId(preferences
@@ -1465,7 +1476,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartTemplate part = new ThinExtByRefPartTemplate();
 					part.setPathId(editPath.getConceptId());
-					part.setStatus(refsetDefaults.getDefaultStatusForRefset()
+					part.setStatusId(refsetDefaults.getDefaultStatusForRefset()
 							.getConceptId());
 					part.setVersion(Integer.MAX_VALUE);
 					part.setAttributeDisplayStatusId(preferences
@@ -1506,7 +1517,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				for (I_Path editPath : host.getConfig().getEditingPathSet()) {
 					ThinExtByRefPartTemplateForRel part = new ThinExtByRefPartTemplateForRel();
 					part.setPathId(editPath.getConceptId());
-					part.setStatus(refsetDefaults.getDefaultStatusForRefset()
+					part.setStatusId(refsetDefaults.getDefaultStatusForRefset()
 							.getConceptId());
 					part.setVersion(Integer.MAX_VALUE);
 					part.setAttributeDisplayStatusId(preferences
@@ -1590,8 +1601,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 				break;
 			case STATUS:
 				Integer statusId = (Integer) value;
-				if (statusId != extTuple.getStatus()) {
-					extTuple.setStatus(statusId);
+				if (statusId != extTuple.getStatusId()) {
+					extTuple.setStatusId(statusId);
 					referencedConcepts.put(statusId, ConceptBean.get(statusId));
 					changed = true;
 				}

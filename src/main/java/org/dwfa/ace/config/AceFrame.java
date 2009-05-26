@@ -29,7 +29,9 @@ import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.svn.SvnPrompter;

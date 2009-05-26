@@ -55,6 +55,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -2287,6 +2288,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
     	}
 		return bundleType;
+	}
+
+	public I_GetConceptData getRefsetInSpecEditor() {
+		return aceFrame.getCdePanel().getRefsetInSpecEditor();
+	}
+
+	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
+		return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
 	}
 
 }
