@@ -5,7 +5,7 @@ import org.apache.maven.plugin.logging.Log;
 import java.io.File;
 
 /**
- * Wraps <code>MojoUtil</code> so it can be mocked out.
+ * Wraps {@link org.dwfa.maven.MojoUtil} so it can be mocked out.
  */
 public interface MojoUtilWrapper {
 

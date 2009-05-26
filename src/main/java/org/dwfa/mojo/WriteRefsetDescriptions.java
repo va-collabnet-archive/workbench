@@ -13,7 +13,8 @@ import org.dwfa.ace.task.util.Logger;
 import java.io.File;
 
 /**
- *
+ * Mojo that exports all reference sets.
+ * 
  * @goal write-refset-descriptions
  *
  * @phase process-classes
@@ -23,7 +24,7 @@ import java.io.File;
 public class WriteRefsetDescriptions extends AbstractMojo {
 
 	/**
-	 * Location of the directory to output data files to.
+	 * Location of the directory to output data files to.  Refset files are exported to this directory.
 	 * 
 	 * @parameter expression="${project.build.directory}"
 	 * @required
@@ -45,18 +46,18 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 
     private final MojoUtilWrapper mojoUtilWrapper;
 
-
+    //default constructor for maven.
     public WriteRefsetDescriptions() {
-        //default constructor for maven.
         termFactory = LocalVersionedTerminology.get();
         mojoUtilWrapper = new MojoUtilWrapperImpl();
         cleanableProcessExtByRefBuilder = new WriteRefsetDescriptionsProcessExtByRefBuilder();
     }
 
     //for testing
-    WriteRefsetDescriptions(final File targetDirectory, final I_TermFactory termFactory,
-        final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder, final File outputDirectory,
+    WriteRefsetDescriptions(final File outputDirectory, final I_TermFactory termFactory,
+        final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder, final File targetDirectory,
         final MojoUtilWrapper mojoUtilWrapper) {
+        
         this.outputDirectory = outputDirectory;
         this.targetDirectory = targetDirectory;
         this.termFactory = termFactory;
@@ -67,7 +68,7 @@ public class WriteRefsetDescriptions extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
-			if (mojoUtilWrapper.alreadyRun(getLog(), targetDirectory.getAbsolutePath(), getClass(), outputDirectory)) {
+			if (mojoUtilWrapper.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), getClass(), targetDirectory)) {
 				return;
 			}
 
@@ -76,12 +77,14 @@ public class WriteRefsetDescriptions extends AbstractMojo {
             CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.
                                                                 withTermFactory(termFactory).
                                                                 withLogger(logger).
-                                                                withSelectedDir(targetDirectory).
+                                                                withSelectedDir(outputDirectory).
                                                                 build();
-
-            //test what happens when an exception occurs
-            termFactory.iterateExtByRefs(refsetDescriptionWriter);
-            refsetDescriptionWriter.clean();
+            try {
+                termFactory.iterateExtByRefs(refsetDescriptionWriter);
+            } finally {
+                //close any open files.
+                refsetDescriptionWriter.clean();
+            }
         } catch (Exception e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
