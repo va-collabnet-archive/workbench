@@ -386,6 +386,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			}
 			count1 = count1 + nAdd;
 			a1 = a2;
+			Arrays.sort(a1);
 
 		} // FOR (EACH FILE)
 
@@ -536,6 +537,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			}
 			count1 = count1 + nAdd;
 			a1 = a2;
+			Arrays.sort(a1);
 
 		} // FOR (EACH FILE)
 
@@ -684,6 +686,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			}
 			count1 = count1 + nAdd;
 			a1 = a2;
+			Arrays.sort(a1);
 
 		} // FOR (EACH FILE)
 
