@@ -9,7 +9,6 @@ import org.dwfa.ace.task.refset.members.CleanableProcessExtByRef;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRefBuilder;
 import org.dwfa.ace.task.refset.members.WriteRefsetDescriptionsProcessExtByRefBuilder;
 import org.dwfa.ace.task.util.Logger;
-import org.dwfa.maven.MojoUtil;
 
 import java.io.File;
 
@@ -44,26 +43,31 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 
     private final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder;
 
+    private final MojoUtilWrapper mojoUtilWrapper;
+
 
     public WriteRefsetDescriptions() {
         //default constructor for maven.
         termFactory = LocalVersionedTerminology.get();
+        mojoUtilWrapper = new MojoUtilWrapperImpl();
         cleanableProcessExtByRefBuilder = new WriteRefsetDescriptionsProcessExtByRefBuilder();
     }
 
-    //Used for testing.
-    WriteRefsetDescriptions(final File outputDirectory, final File targetDirectory, final I_TermFactory termFactory,
-                            final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder) {
+    //for testing
+    WriteRefsetDescriptions(final File targetDirectory, final I_TermFactory termFactory,
+        final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder, final File outputDirectory,
+        final MojoUtilWrapper mojoUtilWrapper) {
         this.outputDirectory = outputDirectory;
         this.targetDirectory = targetDirectory;
         this.termFactory = termFactory;
         this.cleanableProcessExtByRefBuilder = cleanableProcessExtByRefBuilder;
+        this.mojoUtilWrapper = mojoUtilWrapper;
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
-			if (MojoUtil.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), getClass(), targetDirectory)) {
+			if (mojoUtilWrapper.alreadyRun(getLog(), targetDirectory.getAbsolutePath(), getClass(), outputDirectory)) {
 				return;
 			}
 
