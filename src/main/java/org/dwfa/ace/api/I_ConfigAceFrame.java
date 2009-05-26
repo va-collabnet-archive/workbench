@@ -17,6 +17,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
@@ -370,6 +371,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getContext();
     
 	public BundleType getBundleType();
+	
+	public I_GetConceptData getRefsetInSpecEditor();
+	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor();
 
 
 }

@@ -16,7 +16,11 @@ import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -281,7 +285,11 @@ public interface I_TermFactory {
     
     public I_ThinExtByRefPartBoolean newBooleanExtensionPart();
     public I_ThinExtByRefPartConcept newConceptExtensionPart();
+    public I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart();
+    public I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart();
+    public I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart();
     public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart();
+    public I_ThinExtByRefPartConceptString newConceptStringExtensionPart();
     public I_ThinExtByRefPartInteger newIntegerExtensionPart();
     public I_ThinExtByRefPartLanguage newLanguageExtensionPart();
     public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
