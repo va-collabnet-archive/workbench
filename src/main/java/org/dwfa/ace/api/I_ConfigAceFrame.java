@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTree;
 
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -373,6 +374,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public BundleType getBundleType();
 	
 	public I_GetConceptData getRefsetInSpecEditor();
+	public JTree getTreeInSpecEditor();
 	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor();
 
 

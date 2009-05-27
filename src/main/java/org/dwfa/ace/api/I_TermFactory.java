@@ -265,8 +265,10 @@ public interface I_TermFactory {
      */
     public I_RelPart newRelPart();
     
+    // TODO We need a method call that will include the concept id...
     public I_GetExtensionData getExtensionWrapper(int memberId) throws IOException;
     
+    // TODO We need a method call that will include the concept id...
     public I_ThinExtByRefVersioned getExtension(int memberId) throws IOException;
 
     public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException;
@@ -276,10 +278,13 @@ public interface I_TermFactory {
      */
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
 
+    // TODO We need a method call that will include the concept id...
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
 
+    // TODO We need a method call that will include the concept id...
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted) throws IOException;
 
+    // TODO getAllExtensionsForConcept() -- return all extensions of the concept, or any desc, rel, or ext of this concept... 
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
     public I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId);
     

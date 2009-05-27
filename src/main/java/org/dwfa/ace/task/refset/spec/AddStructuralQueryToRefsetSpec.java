@@ -3,21 +3,21 @@ package org.dwfa.ace.task.refset.spec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Collection;
 
-import javax.swing.JOptionPane;
-
-import org.dwfa.bpa.process.Condition;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
-public class AddStructuralQueryToRefsetSpec extends AbstractTask {
+public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
 	/**
 	 * 
 	 */
@@ -39,23 +39,24 @@ public class AddStructuralQueryToRefsetSpec extends AbstractTask {
 		}
 	}
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
+	protected int getRefsetPartTypeId() throws IOException, TerminologyException {
+		int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
+				.localize().getNid();
+		return typeId;
 	}
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		JOptionPane.showMessageDialog(null, "Adding structural query");
-		return Condition.CONTINUE;
-	}
-
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
-
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
+	protected I_ThinExtByRefPart createAndPopulatePart(
+			I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame) throws IOException,
+			TerminologyException {
+		I_ThinExtByRefPartConceptConceptConcept specPart = tf.newConceptConceptConceptExtensionPart();
+		specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
+		specPart.setC2id(RefsetAuxiliary.Concept.CONCEPT_IS.localize().getNid());
+		specPart.setC3id(configFrame.getHierarchySelection().getConceptId());
+		specPart.setPathId(p.getConceptId());
+		specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+		specPart.setVersion(Integer.MAX_VALUE);
+		return specPart;
 	}
 
 }
+
