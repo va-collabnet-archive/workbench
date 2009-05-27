@@ -342,7 +342,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					// see ArchitectonicAuxiliary.getStatusFromId()
 					if (a1[r1].status != 1) { // if not RETIRED
 						a1[r1].status = 1; // set to RETIRED
-						bw.write(a2[r2].toStringAce(revDate, sctPath));
+						bw.write(a1[r1].toStringAce(revDate, sctPath));
 					}
 					r1++;
 					nDrop++;
@@ -492,7 +492,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					// see ArchitectonicAuxiliary.getStatusFromId()
 					if (a1[r1].status != 1) { // if not RETIRED
 						a1[r1].status = 1; // set to RETIRED
-						bw.write(a2[r2].toStringAce(revDate, sctPath));
+						bw.write(a1[r1].toStringAce(revDate, sctPath));
 					}
 					r1++;
 					nDrop++;
@@ -503,8 +503,7 @@ public class Sct2AceMojo extends AbstractMojo {
 
 			// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
 			if (r1 < count1) {
-				getLog().info(
-						"ERROR: MISSED DESCRIPTION RECORDS r1 < count1");
+				getLog().info("ERROR: MISSED DESCRIPTION RECORDS r1 < count1");
 			}
 
 			if (r2 < count2) {
@@ -542,7 +541,6 @@ public class Sct2AceMojo extends AbstractMojo {
 		} // FOR (EACH FILE)
 
 		bw.close(); // Need to be sure to the close file!
-
 	}
 
 	protected void processRelationshipsFiles(String bDir, String sctPath)
@@ -610,7 +608,6 @@ public class Sct2AceMojo extends AbstractMojo {
 			int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
 			a3 = new SCTRelationshipRecord[count2];
 			while ((r1 < count1) && (r2 < count2)) {
-
 				switch (compareRelationship(a1[r1], a2[r2])) {
 				case 1: // SAME, skip to next
 					r1++;
@@ -621,6 +618,7 @@ public class Sct2AceMojo extends AbstractMojo {
 				case 2: // MODIFIED
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
+					
 					// Update master via pointer assignment
 					a1[r1] = a2[r2];
 					r1++;
@@ -631,6 +629,7 @@ public class Sct2AceMojo extends AbstractMojo {
 				case 3: // ADDED
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
+
 					// hold pointer to append to master
 					a3[r3] = a2[r2];
 					r2++;
@@ -642,25 +641,26 @@ public class Sct2AceMojo extends AbstractMojo {
 					// see ArchitectonicAuxiliary.getStatusFromId()
 					if (a1[r1].status != 1) { // if not RETIRED
 						a1[r1].status = 1; // set to RETIRED
-						bw.write(a2[r2].toStringAce(revDate, sctPath));
+						bw.write(a1[r1].toStringAce(revDate, sctPath));
 					}
 					r1++;
 					nDrop++;
 					break;
 
-				}
+				} // SWITCH (COMPARE RELATIONSHIP)
 			} // WHILE (NOT END OF EITHER A1 OR A2)
 
 			// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
 			if (r1 < count1) {
-				getLog().info(
-						"ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
+				getLog().info("ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
 			}
 
 			if (r2 < count2) {
 				while (r2 < count2) { // ADD REMAINING INPUT
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
+
+					//
 					a3[r3] = a2[r2];
 					nAdd++;
 					r2++;
@@ -691,7 +691,6 @@ public class Sct2AceMojo extends AbstractMojo {
 		} // FOR (EACH FILE)
 
 		bw.close(); // Need to be sure to the close file!
-
 	}
 
 	private int compareConcept(SCTConceptRecord c1, SCTConceptRecord c2) {
