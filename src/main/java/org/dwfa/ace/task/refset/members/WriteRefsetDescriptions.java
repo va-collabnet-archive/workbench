@@ -29,13 +29,12 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     private static final int dataVersion        = 1;
 
     private String directoryKey;
-    private final I_TermFactory termFactory;
-    private final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder;
+    private transient I_TermFactory termFactory;
+    private transient CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder;
 
     public WriteRefsetDescriptions() {
         directoryKey = ProcessAttachmentKeys.WORKING_DIR.getAttachmentKey();
-        termFactory = LocalVersionedTerminology.get();
-        cleanableProcessExtByRefBuilder = new WriteRefsetDescriptionsProcessExtByRefBuilder();
+        setTransientProperties();
     }
 
     /**
@@ -57,6 +56,7 @@ public final class WriteRefsetDescriptions extends AbstractTask {
      * @param termFactory The <code>I_TermFactory</code> instance to use.
      * @param cleanableProcessExtByRefBuilder Builder used to create the <code>CleanableProcessExtByRef</code> instance.
      */
+    @ForTesting
     WriteRefsetDescriptions(final String directoryKey, final I_TermFactory termFactory,
                             final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder) {
         this.directoryKey = directoryKey;
@@ -73,7 +73,8 @@ public final class WriteRefsetDescriptions extends AbstractTask {
             ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-            directoryKey = in.readUTF();            
+            directoryKey = in.readUTF();
+            setTransientProperties();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -99,11 +100,11 @@ public final class WriteRefsetDescriptions extends AbstractTask {
                 //if any writing fails close the open connections.
                 refsetDescriptionWriter.clean();
             }
+
+            return  Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException("The task failed with a path of -> " + selectedDirectory, e);
         }
-
-        return  Condition.CONTINUE;
     }
 
     public void complete(final I_EncodeBusinessProcess i_encodeBusinessProcess, final I_Work i_work) {
@@ -125,5 +126,10 @@ public final class WriteRefsetDescriptions extends AbstractTask {
 
     public void setDirectoryKey(final String directoryKey) {
         this.directoryKey = directoryKey;
+    }
+
+    private void setTransientProperties() {
+        termFactory = LocalVersionedTerminology.get();
+        cleanableProcessExtByRefBuilder = new WriteRefsetDescriptionsProcessExtByRefBuilder();
     }
 }
