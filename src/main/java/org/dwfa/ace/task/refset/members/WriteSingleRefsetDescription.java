@@ -113,4 +113,24 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
             throw new IllegalStateException("Error when initializing transient variables.", e);
         }
     }
+
+    @ForJavaBeans
+    public String getSelectedRefsetKey() {
+        return selectedRefsetKey;
+    }
+
+    @ForJavaBeans
+    public String getDirectoryKey() {
+        return directoryKey;
+    }
+
+    @ForJavaBeans
+    public void setSelectedRefsetKey(final String selectedRefsetKey) {
+        this.selectedRefsetKey = selectedRefsetKey;
+    }
+
+    @ForJavaBeans
+    public void setDirectoryKey(final String directoryKey) {
+        this.directoryKey = directoryKey;
+    }
 }
