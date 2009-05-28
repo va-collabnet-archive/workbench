@@ -83,6 +83,19 @@ public final class WriteSingleRefsetDescriptionTest {
     }
 
     @Test
+    public void shouldReturnZeroContainerIds() {
+        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder =
+                mockControl.createMock(CleanableProcessExtByRefBuilder.class);
+        PropertyValidator mockPropertyValidator = mockControl.createMock(PropertyValidator.class);
+        mockControl.replay();
+
+        I_DefineTask task = new WriteSingleRefsetDescription(WORKING_REFSET_KEY,
+                mockCleanableProcessBuilder, DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
+        int[] containerIds = task.getDataContainerIds();
+        assertThat(containerIds.length, equalTo(0));
+    }
+
+    @Test
     public void shouldHaveTheCorrectBeanAnnotations() {
         BeanList beanListAnnotation = WriteSingleRefsetDescription.class.getAnnotation(BeanList.class);
         assertThat(beanListAnnotation, notNullValue());

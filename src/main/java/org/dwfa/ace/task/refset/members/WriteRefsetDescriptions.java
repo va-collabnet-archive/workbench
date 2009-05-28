@@ -120,10 +120,12 @@ public final class WriteRefsetDescriptions extends AbstractTask {
         return new int[] {  };
     }
 
+    @ForJavaBeans
     public String getDirectoryKey() {
         return directoryKey;
     }
 
+    @ForJavaBeans
     public void setDirectoryKey(final String directoryKey) {
         this.directoryKey = directoryKey;
     }

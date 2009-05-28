@@ -114,6 +114,11 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
         }
     }
 
+    @Override
+    public int[] getDataContainerIds() {
+        return new int[] {  };
+    }
+
     @ForJavaBeans
     public String getSelectedRefsetKey() {
         return selectedRefsetKey;

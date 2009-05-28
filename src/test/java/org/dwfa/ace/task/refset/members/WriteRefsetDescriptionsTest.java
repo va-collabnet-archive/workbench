@@ -11,12 +11,13 @@ import org.easymock.classextension.EasyMock;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -103,6 +104,23 @@ public final class WriteRefsetDescriptionsTest {
         }
 
         mockControl.verify();
+    }
+    
+    @Test
+    public void shouldReturnExpectedConditions() {
+        Collection<Condition> conditions = new WriteRefsetDescriptions(DIRECTORY_KEY, mockTermFactory,
+                mockBuilder).getConditions();
+
+        assertThat(conditions, notNullValue());
+        assertThat(conditions.size(), equalTo(1));
+        assertThat(conditions.iterator().next(), equalTo(Condition.CONTINUE));
+    }
+
+    public void shouldReturnZeroContainerIds() {
+        int[] containerIds = new WriteRefsetDescriptions(DIRECTORY_KEY, mockTermFactory,
+                mockBuilder).getDataContainerIds();
+
+        assertThat(containerIds.length, equalTo(0));
     }
 
     private void expectThatCleanableProcessisBuilt(final CleanableProcessExtByRef mockCleanableProcess,
