@@ -52,7 +52,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 
 		public String toString() {
-			return id + "," + status + "," + isprimitive + "\r\n";
+			return id + "\t" + status + "\t" + isprimitive + "\r\n";
 		}
 
 		public String toStringAce(String date, String path) throws IOException,
@@ -96,7 +96,9 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 
 		public String toString() {
-			return id + "," + status + "," + termText + "\r\n";
+			return id + "\t" + status + "\t" + conceptId + "\t" + termText
+					+ "\t" + capStatus + "\t" + descriptionType + "\t"
+					+ languageCode + "\r\n";
 		}
 
 		public String toStringAce(String date, String path) throws IOException,
@@ -129,6 +131,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		private int characteristic; // CHARACTERISTICTYPE
 		private int refinability; // REFINABILITY
 		private int group; // RELATIONSHIPGROUP
+		private boolean exceptionFlag; // to handle Concept ID change exception
 
 		public SCTRelationshipRecord(long relID, int st, long cOneID,
 				long relType, long cTwoID, int characterType, int r, int grp) {
@@ -140,6 +143,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			characteristic = characterType; // CHARACTERISTICTYPE
 			refinability = r; // REFINABILITY
 			group = grp; // RELATIONSHIPGROUP
+			exceptionFlag = false;
 		}
 
 		public int compareTo(Object obj) {
@@ -153,14 +157,20 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 
 		public String toString() {
-			return id + "," + conceptOneID + "," + relationshipType + ","
-					+ conceptTwoID + "\r\n";
+			return id + "\t" + status + "\t" + conceptOneID + "\t"
+					+ relationshipType + "\t" + conceptTwoID + "\r\n";
 		}
 
 		public String toStringAce(String date, String path) throws IOException,
 				TerminologyException {
 
-			UUID u = Type3UuidFactory.fromSNOMED(id);
+			UUID u;
+			if (exceptionFlag) {
+				// Use negative SNOMED ID for exceptions
+				 u = Type3UuidFactory.fromSNOMED(-id);
+			} else {
+				 u = Type3UuidFactory.fromSNOMED(id);
+			}
 
 			UUID cOne = Type3UuidFactory.fromSNOMED(conceptOneID);
 			UUID relType = Type3UuidFactory.fromSNOMED(relationshipType);
@@ -312,13 +322,13 @@ public class Sct2AceMojo extends AbstractMojo {
 			while ((r1 < count1) && (r2 < count2)) {
 
 				switch (compareConcept(a1[r1], a2[r2])) {
-				case 1: // SAME, skip to next
+				case 1: // SAME CONCEPT, skip to next
 					r1++;
 					r2++;
 					nSame++;
 					break;
 
-				case 2: // MODIFIED
+				case 2: // MODIFIED CONCEPT
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
 					// Update master via pointer assignment
@@ -328,7 +338,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					nMod++;
 					break;
 
-				case 3: // ADDED
+				case 3: // ADDED CONCEPT
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
 					// Hold pointer to append to master
@@ -338,7 +348,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					nAdd++;
 					break;
 
-				case 4: // DROPPED
+				case 4: // DROPPED CONCEPT
 					// see ArchitectonicAuxiliary.getStatusFromId()
 					if (a1[r1].status != 1) { // if not RETIRED
 						a1[r1].status = 1; // set to RETIRED
@@ -413,6 +423,13 @@ public class Sct2AceMojo extends AbstractMojo {
 			return;
 		}
 
+		// Setup exception report
+		String erFileName = bDir
+				+ "/classes/org/ihtsdo/sct/sct-arf/descriptions_report.txt";
+		BufferedWriter er;
+		er = new BufferedWriter(new FileWriter(erFileName));
+		getLog().info("exceptions report OUTPUT: " + erFileName);
+
 		// Setup output file
 		String outFileName = bDir
 				+ "/classes/org/ihtsdo/sct/sct-arf/descriptions.txt";
@@ -462,15 +479,33 @@ public class Sct2AceMojo extends AbstractMojo {
 			while ((r1 < count1) && (r2 < count2)) {
 
 				switch (compareDescription(a1[r1], a2[r2])) {
-				case 1: // SAME, skip to next
+				case 1: // SAME DESCRIPTION, skip to next
 					r1++;
 					r2++;
 					nSame++;
 					break;
 
-				case 2: // MODIFIED
+				case 2: // MODIFIED DESCRIPTION
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
+
+					// REPORT DESCRIPTION CHANGE EXCEPTION
+					if (a1[r1].conceptId != a2[r2].conceptId) {
+						er.write("** CONCEPTID CHANGE ** WAS/IS \r\n");
+						er.write("id\tstatus\t" + "conceptId\t" + "termText\t"
+								+ "capStatus\t" + "descriptionType\t"
+								+ "languageCode\r\n");
+						er.write(a1[r1].toString());
+						er.write(a2[r2].toString());
+						er.write("description uuid\t" + "status uuid\t"
+								+ "concept uuid\t" + "term\t"
+								+ "capitalization status\t"
+								+ "description type uuid\t" + "language code\t"
+								+ "effective date\tpath uuid\r\n");
+						er.write(a1[r1].toStringAce(revDate, sctPath));
+						er.write(a2[r2].toStringAce(revDate, sctPath));
+					}
+
 					// Update master via pointer assignment
 					a1[r1] = a2[r2];
 					r1++;
@@ -478,7 +513,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					nMod++;
 					break;
 
-				case 3: // ADDED
+				case 3: // ADDED DESCRIPTION
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
 					// Hold pointer to append to master
@@ -488,7 +523,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					nAdd++;
 					break;
 
-				case 4: // DROPPED
+				case 4: // DROPPED DESCRIPTION
 					// see ArchitectonicAuxiliary.getStatusFromId()
 					if (a1[r1].status != 1) { // if not RETIRED
 						a1[r1].status = 1; // set to RETIRED
@@ -541,6 +576,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		} // FOR (EACH FILE)
 
 		bw.close(); // Need to be sure to the close file!
+		er.close(); // Need to be sure to the close file!
 	}
 
 	protected void processRelationshipsFiles(String bDir, String sctPath)
@@ -562,6 +598,13 @@ public class Sct2AceMojo extends AbstractMojo {
 			getLog().info("FAILED: NO SUBDIRECTORIES " + snomedDirStr);
 			return;
 		}
+
+		// Setup exception report
+		String erFileName = bDir
+				+ "/classes/org/ihtsdo/sct/sct-arf/relationships_report.txt";
+		BufferedWriter er;
+		er = new BufferedWriter(new FileWriter(erFileName));
+		getLog().info("exceptions report OUTPUT: " + erFileName);
 
 		// Setup output file
 		String outFileName = bDir
@@ -609,16 +652,45 @@ public class Sct2AceMojo extends AbstractMojo {
 			a3 = new SCTRelationshipRecord[count2];
 			while ((r1 < count1) && (r2 < count2)) {
 				switch (compareRelationship(a1[r1], a2[r2])) {
-				case 1: // SAME, skip to next
+				case 1: // SAME RELATIONSHIP, skip to next
 					r1++;
 					r2++;
 					nSame++;
 					break;
 
-				case 2: // MODIFIED
+				case 2: // MODIFIED RELATIONSHIP
+
+					// REPORT & HANDLE CHANGE EXCEPTION
+					if ((a1[r1].conceptOneID != a2[r2].conceptOneID)
+							|| (a1[r1].conceptTwoID != a2[r2].conceptTwoID)) {
+						er.write("** CONCEPTID CHANGE ** WAS/IS \r\n");
+						er.write("id\t" + "status\t" + "conceptOneID\t"
+								+ "relationshipType\t" + "conceptTwoID\r\n");
+						er.write(a1[r1].toString());
+						er.write(a2[r2].toString());
+						er.write("relationship uuid\t" + "status uuid\t"
+								+ "source concept uuid\t"
+								+ "relationship type uuid\t"
+								+ "destination concept uuid\t"
+								+ "characteristic type uuid\t"
+								+ "refinability uuid\t"
+								+ "relationship group\t" + "effective date\t"
+								+ "path uuid" + "\r\n");
+						er.write(a1[r1].toStringAce(revDate, sctPath));
+						er.write(a2[r2].toStringAce(revDate, sctPath));
+
+						// RETIRE & WRITE MASTER RELATIONSHIP a1[r1]
+						a1[r1].status = 1; // set to RETIRED
+						bw.write(a1[r1].toStringAce(revDate, sctPath));
+
+						// SET EXCEPTIONFLAG for subsequence writes
+						// WILL WRITE INPUT RELATIONSHIP w/ NEGATIVE SNOMEDID
+						a2[r2].exceptionFlag = true;
+					}
+					
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
-					
+
 					// Update master via pointer assignment
 					a1[r1] = a2[r2];
 					r1++;
@@ -626,7 +698,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					nMod++;
 					break;
 
-				case 3: // ADDED
+				case 3: // ADDED RELATIONSHIP
 					// Write history
 					bw.write(a2[r2].toStringAce(revDate, sctPath));
 
@@ -637,7 +709,7 @@ public class Sct2AceMojo extends AbstractMojo {
 					nAdd++;
 					break;
 
-				case 4: // DROPPED
+				case 4: // DROPPED RELATIONSHIP
 					// see ArchitectonicAuxiliary.getStatusFromId()
 					if (a1[r1].status != 1) { // if not RETIRED
 						a1[r1].status = 1; // set to RETIRED
@@ -691,6 +763,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		} // FOR (EACH FILE)
 
 		bw.close(); // Need to be sure to the close file!
+		er.close(); // Need to be sure to the close file!
 	}
 
 	private int compareConcept(SCTConceptRecord c1, SCTConceptRecord c2) {
