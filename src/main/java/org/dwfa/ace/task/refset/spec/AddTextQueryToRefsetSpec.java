@@ -50,7 +50,7 @@ public class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
 			TerminologyException {
 		I_ThinExtByRefPartConceptConceptString specPart = tf.newConceptConceptStringExtensionPart();
 		specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
-		specPart.setC2id(RefsetAuxiliary.Concept.CONCEPT_IS.localize().getNid());
+		specPart.setC2id(RefsetAuxiliary.Concept.DESC_LUCENE_MATCH.localize().getNid());
 		specPart.setStr("+corneal +abrasion");
 		specPart.setPathId(p.getConceptId());
 		specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());

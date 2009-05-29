@@ -25,6 +25,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
@@ -61,7 +62,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 							.name());
 			if (configFrame.getEditingPathSet().size() == 0) {
-				String msg = "Unable to add AND. Editing path set is empty.";
+				String msg = "Unable to add spec. Editing path set is empty.";
 				JOptionPane.showMessageDialog(null, msg);
 				throw new TaskFailedException(msg);
 			}
@@ -75,29 +76,37 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 
 				TreePath selection = specTree.getSelectionPath();
 				
+				boolean canAdd = true;
 				if (selection != null) {
+					canAdd = false;
 					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) selection.getLastPathComponent();
 					I_ThinExtByRefVersioned selectedSpec = (I_ThinExtByRefVersioned) selectedNode.getUserObject();
 					componentId = selectedSpec.getMemberId();
+					if (selectedSpec.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+						canAdd = true;
+					}
 				}
 				
-				
-				I_TermFactory tf = LocalVersionedTerminology.get();
-				int typeId = getRefsetPartTypeId();
-				int memberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
-						ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
-						configFrame.getEditingPathSet(), Integer.MAX_VALUE);
+				if (canAdd) {
+					I_TermFactory tf = LocalVersionedTerminology.get();
+					int typeId = getRefsetPartTypeId();
+					int memberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
+							ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
+							configFrame.getEditingPathSet(), Integer.MAX_VALUE);
 
-				
-				I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
-				for (I_Path p: configFrame.getEditingPathSet()) {
-					I_ThinExtByRefPart specPart = createAndPopulatePart(
-							tf, p, configFrame);
-					ext.addVersion(specPart);
+					
+					I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
+					for (I_Path p: configFrame.getEditingPathSet()) {
+						I_ThinExtByRefPart specPart = createAndPopulatePart(
+								tf, p, configFrame);
+						ext.addVersion(specPart);
+					}
+					tf.addUncommitted(ext);
+				} else {
+					String msg = "Unable to add spec. Selected parent must be a branching spec.";
+					JOptionPane.showMessageDialog(null, msg);
+					throw new TaskFailedException(msg);
 				}
-				tf.addUncommitted(ext);
-				
-				
 			} else {
 				throw new TaskFailedException("Unable to complete operation. Refset is null.");
 			}
