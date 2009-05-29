@@ -1,7 +1,6 @@
 package org.dwfa.ace.task.refset.members;
 
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.TaskLogger;
 import org.dwfa.bpa.process.Condition;
@@ -28,9 +27,9 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     private static final long serialVersionUID  = 1;
     private static final int dataVersion        = 1;
 
-    private String directoryKey;
-    private transient I_TermFactory termFactory;
+    private transient LocalVersionedTerminologyWrapper terminologyWrapper;
     private transient CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder;
+    private String directoryKey;
 
     public WriteRefsetDescriptions() {
         directoryKey = ProcessAttachmentKeys.WORKING_DIR.getAttachmentKey();
@@ -53,14 +52,14 @@ public final class WriteRefsetDescriptions extends AbstractTask {
      * 3. We could legitimately use this constructor if we desired to.
      *
      * @param directoryKey The name of the key used to store the default directory.
-     * @param termFactory The <code>I_TermFactory</code> instance to use.
+     * @param terminologyWrapper The <code>I_TermFactory</code> wrapper to to use.
      * @param cleanableProcessExtByRefBuilder Builder used to create the <code>CleanableProcessExtByRef</code> instance.
      */
     @ForTesting
-    WriteRefsetDescriptions(final String directoryKey, final I_TermFactory termFactory,
+    WriteRefsetDescriptions(final String directoryKey, final LocalVersionedTerminologyWrapper terminologyWrapper,
                             final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder) {
         this.directoryKey = directoryKey;
-        this.termFactory = termFactory;
+        this.terminologyWrapper = terminologyWrapper;
         this.cleanableProcessExtByRefBuilder = cleanableProcessExtByRefBuilder;
     }
 
@@ -89,6 +88,7 @@ public final class WriteRefsetDescriptions extends AbstractTask {
             selectedDirectory = (File) process.readProperty(directoryKey);
             taskLogger.logInfo("Export to path --> " + selectedDirectory);
 
+            I_TermFactory termFactory = terminologyWrapper.get();
             CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.
                                                                 withTermFactory(termFactory).
                                                                 withLogger(taskLogger).
@@ -131,7 +131,7 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     }
 
     private void setTransientProperties() {
-        termFactory = LocalVersionedTerminology.get();
+        terminologyWrapper = new LocalVersionedTerminologyWrapperImpl();
         cleanableProcessExtByRefBuilder = new WriteRefsetDescriptionsProcessExtByRefBuilder();
     }
 }

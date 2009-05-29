@@ -77,12 +77,6 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
         mockControl.verify();
     }
 
-    private Object getFieldValue(final I_DefineTask task, final String fieldName) throws Exception {
-        Field field = WriteSingleRefsetDescription.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return field.get(task);
-    }
-
     @SuppressWarnings({"unchecked"})
     @Test
     public void shouldThrowAnExceptionIfTheObjectCantBeDeserialized() throws Exception {
@@ -103,7 +97,13 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
             mockControl.verify();
         }
     }
-    
+
+    private Object getFieldValue(final I_DefineTask task, final String fieldName) throws Exception {
+        Field field = WriteSingleRefsetDescription.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(task);
+    }
+
     private WriteSingleRefsetDescription createTask() {
         return new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder, DIRECTORY_KEY,
                 mockPropertyValidator, mockTerminologyWrapper);
