@@ -991,57 +991,29 @@ public class Sct2AceUKMojo extends AbstractMojo {
 
 		long start = System.currentTimeMillis();
 
-		BufferedReader r = new BufferedReader(new FileReader(fName));
-		StreamTokenizer st = new StreamTokenizer(r);
-		st.resetSyntax();
-		st.wordChars('\u001F', '\u00FF');
-		st.whitespaceChars('\t', '\t');
-		st.eolIsSignificant(true);
+		int CONCEPTID = 0;
+		int CONCEPTSTATUS = 1;
+		// int FULLYSPECIFIEDNAME = 2;
+		// int CTV3ID = 3;
+		// int SNOMEDID = 4;
+		int ISPRIMITIVE = 5;
+		
+		BufferedReader br = new BufferedReader(new FileReader(fName));
 		int concepts = 0;
-
-		skipLineOne(st);
-		int tokenType = st.nextToken();
-		while ((tokenType != StreamTokenizer.TT_EOF) && (concepts < count)) {
-			// CONCEPTID
-			long conceptKey = Long.parseLong(st.sval);
-			// CONCEPTSTATUS
-			tokenType = st.nextToken();
-			int conceptStatus = Integer.parseInt(st.sval);
-			// FULLYSPECIFIEDNAME: Ignore, already in the descriptions table
-			tokenType = st.nextToken();
-			// CTV3ID: Do nothing with the legacy CTV3ID
-			tokenType = st.nextToken();
-			// SNOMEDID: Do nothing with the legacy SNOMED id
-			tokenType = st.nextToken();
-			// ISPRIMITIVE
-			tokenType = st.nextToken();
-			int defChar = Integer.parseInt(st.sval);
+		
+		// Header row
+		br.readLine();
+		
+		while(br.ready()) {
+			String[] line = br.readLine().split("\t");
+			long conceptKey = Long.parseLong(line[CONCEPTID]);
+			int conceptStatus = Integer.parseInt(line[CONCEPTSTATUS]);
+			int isPrimitive = Integer.parseInt(line[ISPRIMITIVE]);
 			
-			// :DEBUG:!!!
-			// SNOMED_CORE WORKS FINE, HOWEVER, UK EXTENSIONS GET
-			// A NumberFormatException here.
-			
-//			// :DEBUG:!!! 
-//			int defChar = 0;
-//			try {
-//				defChar = Integer.parseInt(st.sval);
-//				
-//			} catch (Exception e) {
-//				getLog().info("CONCEPTS COUNT = " + concepts);
-//				// TODO: handle exception
-//			}
-
 			// Save to sortable array
 			a[concepts] = new SCTConceptRecord(conceptKey, conceptStatus,
-					defChar);
+					isPrimitive);
 			concepts++;
-
-			// CR
-			tokenType = st.nextToken();
-			// LF
-			tokenType = st.nextToken();
-			// Beginning of loop
-			tokenType = st.nextToken();
 		}
 
 		Arrays.sort(a);
