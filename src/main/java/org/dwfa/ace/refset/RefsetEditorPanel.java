@@ -20,6 +20,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +55,6 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -533,8 +533,9 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		c.fill = GridBagConstraints.HORIZONTAL;
 
 		JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		specTree = new JTree();
-		specTree.setCellRenderer(new RefsetSpecTreeCellRenderer());
+		specTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null)));
+		specTree.addMouseListener(new RefsetSpecTreeMouseListener(ace.getAceFrameConfig()));
+		specTree.setCellRenderer(new RefsetSpecTreeCellRenderer(ace.getAceFrameConfig()));
 		specTree.setRootVisible(false);
 		specTree.setShowsRootHandles(true);
 		
@@ -693,63 +694,63 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		updater.start();
 	}
 	
-	private class UpdateTreeSpec extends SwingWorker<DefaultTreeModel> {
+	private class UpdateTreeSpec extends SwingWorker<DefaultMutableTreeNode> {
 
 		@Override
-		protected DefaultTreeModel construct() throws Exception {
+		protected DefaultMutableTreeNode construct() throws Exception {
 			
-			I_TermFactory tf = LocalVersionedTerminology.get();
+			boolean newRefset = true;
+			
+			DefaultMutableTreeNode oldRoot = (DefaultMutableTreeNode) specTree.getModel().getRoot();
+			
 			
 			I_GetConceptData refsetConcept = (I_GetConceptData) label.getTermComponent();
 			DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetConcept);
-
+			
+			if (oldRoot.getUserObject() != null && refsetConcept != null) {
+				I_GetConceptData oldRefsetConcept = (I_GetConceptData) oldRoot.getUserObject();
+				newRefset = oldRefsetConcept.getConceptId() == refsetConcept.getConceptId();
+			}
+			
 			if (refsetConcept != null) {
-				List<I_ThinExtByRefVersioned> extensions = tf.getAllExtensionsForComponent(refsetConcept.getConceptId(), true);
-				for (I_ThinExtByRefVersioned ext: extensions) {
+				List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetConcept.getConceptId(), true);
+				HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+				HashSet<Integer> fetchedComponents = new HashSet<Integer>();
+				fetchedComponents.add(refsetConcept.getConceptId());
+				addExtensionsToMap(extensions, extensionMap, fetchedComponents);		
+				AceLog.getAppLog().info("Extension map: " + extensionMap);
+				for (DefaultMutableTreeNode extNode: extensionMap.values()) {
+					I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
 					if (ext.getComponentId() == refsetConcept.getConceptId()) {
-						root.add(new DefaultMutableTreeNode(ext));
+						root.add(extNode);
 					} else {
-						//TODO hook it up to one of the other components...
+						extensionMap.get(ext.getComponentId()).add(extNode);
 					}
 				}
-			} else {
-				makeDummyTree(root);
 			}
-
-			return new DefaultTreeModel(root);
+			return root;
 		}
 
-		private void makeDummyTree(DefaultMutableTreeNode root) {
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: At risk of choking"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: At risk for aspiration"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Eating faeces"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Habitual eating of own hair"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Eating own flesh"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Pica"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Under care of stoma nurse"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Urinary stoma bag adjusted"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Urinary stoma bag changed"));
-			root.add(new DefaultMutableTreeNode("CONCEPT-IS: Smearing faeces"));
-
-			DefaultMutableTreeNode node1 = new DefaultMutableTreeNode("AND");
-			root.add(node1);
-			DefaultMutableTreeNode node2 = new DefaultMutableTreeNode("IS-KIND-OF: Finding of Activity of Daily Living");
-			DefaultMutableTreeNode node3 = new DefaultMutableTreeNode("NOT CONCEPT-IS: Finding of activity of dailiy living");
-			DefaultMutableTreeNode node4 = new DefaultMutableTreeNode("NOT CONCEPT-IS: Basic activity of Daily Living");
-			DefaultMutableTreeNode node5 = new DefaultMutableTreeNode("NOT CONCEPT-IS: Dressing (ADL Finding)");
-			DefaultMutableTreeNode node6 = new DefaultMutableTreeNode("CONCEPT-STATUS-IS: Current");
-
-			node1.add(node2);
-			node1.add(node6);
-			node1.add(node3);
-			node1.add(node4);
-			node1.add(node5);
+		private void addExtensionsToMap(
+				List<I_ThinExtByRefVersioned> extensions,
+				HashMap<Integer, 
+				DefaultMutableTreeNode> extensionMap, 
+				HashSet<Integer> fetchedComponents) throws IOException {
+			for (I_ThinExtByRefVersioned ext: extensions) {
+				extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
+				if (fetchedComponents.contains(ext.getMemberId())== false) {
+					fetchedComponents.add(ext.getMemberId());
+					addExtensionsToMap(LocalVersionedTerminology.get().getAllExtensionsForComponent(ext.getMemberId(), true), 
+							extensionMap, fetchedComponents);		
+				}
+			}
 		}
 
 		@Override
 		protected void finished() {
 			try {
-				specTree.setModel(get());
+				DefaultTreeModel tm = (DefaultTreeModel) specTree.getModel();
+				tm.setRoot(get());
 			} catch (InterruptedException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (ExecutionException e) {
@@ -758,6 +759,10 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			super.finished();
 		}
 		
+	}
+
+	public JTree getTreeInSpecEditor() {
+		return specTree;
 	}
 
 }

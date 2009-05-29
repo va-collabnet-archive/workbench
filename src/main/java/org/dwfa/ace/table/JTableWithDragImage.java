@@ -296,7 +296,7 @@ public class JTableWithDragImage extends JTable {
         private Transferable transferableFromIWImgT(Object obj) throws DatabaseException {
             ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
             return new StringSelection("<img src='ace:" + AceConfig.getVodb().nativeToUuid(iwit.tuple.getImageId())
-                    + "'>");
+            		 + "$" + AceConfig.getVodb().nativeToUuid(iwit.tuple.getConceptId()) +  "'>");
         }
 
         private Transferable transferableFromSWImgT(Object obj, int column) throws DatabaseException {
@@ -305,14 +305,16 @@ public class JTableWithDragImage extends JTable {
             switch (field) {
             case IMAGE_ID:
                 return new StringSelection("<img src='ace:"
-                        + AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId()) + "'>");
+                        + AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId())  + "$" 
+                        + AceConfig.getVodb().nativeToUuid(swit.getTuple().getConceptId()) +  "'>");
             case CON_ID:
                 return new ConceptTransferable(ConceptBean.get(swit.getTuple().getConceptId()));
             case DESC:
                 return new StringSelection(swit.getTuple().getTextDescription());
             case IMAGE:
                 return new StringSelection("<img src='ace:"
-                        + AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId()) + "'>");
+                        + AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId())  + "$" 
+                        + AceConfig.getVodb().nativeToUuid(swit.getTuple().getConceptId()) +  "'>");
             case FORMAT:
                 return new StringSelection(swit.getTuple().getFormat());
             case STATUS:
@@ -324,7 +326,7 @@ public class JTableWithDragImage extends JTable {
             case PATH:
                 return new ConceptTransferable(ConceptBean.get(swit.getTuple().getPathId()));
             default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+                throw new UnsupportedOperationException("Can't handle field: " + field);
             }
         }
 

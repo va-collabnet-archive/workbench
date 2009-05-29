@@ -127,7 +127,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                   if (showViewerImagesInTaxonomy) {
                      for (I_ImageTuple imageTuple : cb.getImageTuples(aceConfig.getAllowedStatus(), viewerImageTypes,
                            aceConfig.getViewPositionSet())) {
-                        htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "' align=center>");
+                        htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()  + "$" + imageTuple.getConceptId() +  "' align=center>");
                      }
                   }
 
@@ -158,7 +158,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                        for (I_ImageTuple imageTuple : booleanImageBean.getImageTuples(aceConfig
                                              .getAllowedStatus(), viewerImageTypes, aceConfig.getViewPositionSet())) {
                                           htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()
-                                                + "' align=center>");
+                                        		  + "$" + imageTuple.getConceptId() + "' align=center>");
                                        }
                                     } catch (TerminologyException e) {
                                        AceLog.getAppLog().alertAndLogException(e);
@@ -173,7 +173,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                           .getConceptId());
                                     for (I_ImageTuple imageTuple : ebrCb.getImageTuples(aceConfig.getAllowedStatus(),
                                           viewerImageTypes, aceConfig.getViewPositionSet())) {
-                                       htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "' align=center>");
+                                       htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()  + "$" + imageTuple.getConceptId() +  "' align=center>");
                                     }
                                  }
                                  break;
@@ -210,8 +210,6 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                   StringBuffer buff = new StringBuffer();
                   if (htmlPrefixes.size() > 0 || htmlSuffixes.size() > 0) {
                      buff.append("<html>");
-                     // add extra images example
-                     // <img src='ace:1c4214ec-147a-11db-ac5d-0800200c9a66'>
                      for (String prefix : htmlPrefixes) {
                         buff.append(prefix);
                      }

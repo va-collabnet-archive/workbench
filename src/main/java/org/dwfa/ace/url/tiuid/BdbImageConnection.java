@@ -31,32 +31,57 @@ public class BdbImageConnection extends URLConnection {
 	      if (queryString.contains("$")) {
 		    String[] parts = new String[2];
 		    parts[0] = queryString.substring(0, queryString.indexOf('$'));
-		    parts[1] = queryString.substring(queryString.indexOf('$') + 1);;
-	        String imageIdPart = parts[0];
-	        Collection<UUID> conceptIdCollection = new ArrayList<UUID>();
-	        if (parts.length > 1) {
-		        String conceptIdPart = parts[1];
-		        conceptIdCollection = collectionFromString(conceptIdPart);
-	        } else {
-	        	AceLog.getAppLog().warning("Query string with $ only has one part: " + queryString);
-	        }
-	        Collection<UUID> imageIdCollection = collectionFromString(imageIdPart);
-	        //int conceptId = AceConfig.getVodb().getConceptNid(conceptIdCollection);
-	        //int imageId = AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection, conceptId);
-	        //image = AceConfig.getVodb().getImage(imageId, conceptId);
-	        image = AceConfig.getVodb().getImage(AceConfig.getVodb().uuidToNative(imageIdCollection));
-	        
-	        if (image == null) {
-	        	AceLog.getAppLog().warning("Image is null for queryString:" + queryString + 
-	        			"\n imageIdCollection: " + imageIdCollection + 
-	        			"\n conceptIdCollection: " + conceptIdCollection);
-	        } else {
-	        	if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-		        	AceLog.getAppLog().fine("Found image for queryString:" + queryString + 
+		    parts[1] = queryString.substring(queryString.indexOf('$') + 1);
+		    if (parts[0].length() >= 36) {
+		        String imageIdPart = parts[0];
+		        Collection<UUID> conceptIdCollection = new ArrayList<UUID>();
+		        if (parts.length > 1) {
+			        String conceptIdPart = parts[1];
+			        conceptIdCollection = collectionFromString(conceptIdPart);
+		        } else {
+		        	AceLog.getAppLog().warning("Query string with $ only has one part: " + queryString);
+		        }
+		        Collection<UUID> imageIdCollection = collectionFromString(imageIdPart);
+		        //int conceptId = AceConfig.getVodb().getConceptNid(conceptIdCollection);
+		        //int imageId = AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection, conceptId);
+		        //image = AceConfig.getVodb().getImage(imageId, conceptId);
+		        image = AceConfig.getVodb().getImage(AceConfig.getVodb().uuidToNative(imageIdCollection));
+		        if (image == null) {
+		        	AceLog.getAppLog().warning("Image is null for queryString:" + queryString + 
 		        			"\n imageIdCollection: " + imageIdCollection + 
 		        			"\n conceptIdCollection: " + conceptIdCollection);
-	        	}
-	        }
+		        } else {
+		        	if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+			        	AceLog.getAppLog().fine("Found image for queryString:" + queryString + 
+			        			"\n imageIdCollection: " + imageIdCollection + 
+			        			"\n conceptIdCollection: " + conceptIdCollection);
+		        	}
+		        }
+		    } else {
+		        String imageIdPart = parts[0];
+		        String conceptIdPart = null;
+		        if (parts.length > 1) {
+			        conceptIdPart = parts[1];
+		        } else {
+		        	AceLog.getAppLog().warning("Query string with $ only has one part: " + queryString);
+		        }
+		        //int conceptId = AceConfig.getVodb().getConceptNid(conceptIdCollection);
+		        //int imageId = AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection, conceptId);
+		        //image = AceConfig.getVodb().getImage(imageId, conceptId);
+		        image = AceConfig.getVodb().getImage(Integer.parseInt(imageIdPart));
+		        if (image == null) {
+		        	AceLog.getAppLog().warning("Image is null for queryString:" + queryString + 
+		        			"\n imageIdCollection: " + imageIdPart + 
+		        			"\n conceptIdCollection: " + conceptIdPart);
+		        } else {
+		        	if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+			        	AceLog.getAppLog().fine("Found image for queryString:" + queryString + 
+			        			"\n imageIdCollection: " + imageIdPart + 
+			        			"\n conceptIdCollection: " + conceptIdPart);
+		        	}
+		        }
+		    }
+	        
 	      } else {
 	        if (queryString.startsWith("[")) {
 	          queryString = queryString.substring(1, queryString.length() - 2);

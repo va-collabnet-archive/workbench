@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -2296,6 +2297,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
 		return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
+	}
+
+	public JTree getTreeInSpecEditor() {
+		return aceFrame.getCdePanel().getTreeInSpecEditor();
 	}
 
 }

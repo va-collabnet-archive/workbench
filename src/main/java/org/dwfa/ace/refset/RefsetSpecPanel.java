@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTree;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -26,7 +27,7 @@ public class RefsetSpecPanel extends JPanel {
 		add(split);
 		editor = new RefsetEditorPanel(ace);
 		split.setLeftComponent(editor);
-		viewer = new RefsetViewerPanel();
+		viewer = new RefsetViewerPanel(ace.getAceFrameConfig());
 		split.setRightComponent(viewer);
 		split.setDividerLocation(700);
 	}
@@ -37,5 +38,9 @@ public class RefsetSpecPanel extends JPanel {
 
 	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
 		return getSelectedRefsetClauseInSpecEditor();
+	}
+
+	public JTree getTreeInSpecEditor() {
+		return editor.getTreeInSpecEditor();
 	}
 }

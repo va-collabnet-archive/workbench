@@ -71,6 +71,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
@@ -4020,6 +4021,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
 		return refsetSpecPanel.getSelectedRefsetClauseInSpecEditor();
+	}
+
+	public JTree getTreeInSpecEditor() {
+		return refsetSpecPanel.getTreeInSpecEditor();
 	}
 
 }

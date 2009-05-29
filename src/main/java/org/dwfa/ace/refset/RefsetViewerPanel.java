@@ -5,6 +5,9 @@ import java.awt.GridLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 public class RefsetViewerPanel extends JPanel {
 
@@ -14,10 +17,10 @@ public class RefsetViewerPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public RefsetViewerPanel() {
+	public RefsetViewerPanel(I_ConfigAceFrame configAceFrame) {
 		super(new GridLayout(1,1));
 		viewerTree = new JTree();
-		viewerTree.setCellRenderer(new RefsetSpecTreeCellRenderer());
+		viewerTree.setCellRenderer(new DefaultTreeCellRenderer());
 		viewerTree.setRootVisible(false);
 		viewerTree.setShowsRootHandles(true);
 		add(new JScrollPane(viewerTree));

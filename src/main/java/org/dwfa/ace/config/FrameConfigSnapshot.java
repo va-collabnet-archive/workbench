@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTree;
 
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -53,6 +54,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
+
+	public JTree getTreeInSpecEditor() {
+		return baseFrame.getTreeInSpecEditor();
+	}
 
 	public I_GetConceptData getRefsetInSpecEditor() {
 		return baseFrame.getRefsetInSpecEditor();
