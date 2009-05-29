@@ -6,8 +6,12 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -50,6 +54,18 @@ public final class WriteRefsetDescriptionsWithFailuresTest {
     public void shouldExtendsAbstractTask() {
         assertTrue("WriteRefsetDescriptions should extend AbstractTask",
                 AbstractTask.class.isAssignableFrom(WriteRefsetDescriptions.class));
+    }
+
+    @Test
+    public void shouldHaveTheCorrectBeanAnnotations() {
+        BeanList beanListAnnotation = WriteRefsetDescriptions.class.getAnnotation(BeanList.class);
+        assertThat(beanListAnnotation, notNullValue());
+        Spec[] specs = beanListAnnotation.specs();
+
+        assertThat(specs.length, equalTo(1));
+        Spec spec = specs[0];
+        assertThat(spec.directory(), equalTo("tasks/ide/refset/membership"));
+        assertThat(spec.type(), equalTo(BeanType.TASK_BEAN));
     }
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
