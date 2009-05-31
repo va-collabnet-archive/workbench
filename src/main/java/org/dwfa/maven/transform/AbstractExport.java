@@ -88,7 +88,9 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 			if (statusTransform != null) {
                 try {
                 	if (statusTransform.getLastTransform().length() == 36) {
-                		activeUuidStrSet.contains(statusTransform.getLastTransform());
+                		if (activeUuidStrSet.contains(statusTransform.getLastTransform())) {
+        					writeRec();
+                		}
                 	} else if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
     					writeRec();
     				}
