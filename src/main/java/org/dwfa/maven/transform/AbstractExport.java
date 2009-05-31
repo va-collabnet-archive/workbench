@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.I_ReadAndTransform;
@@ -22,7 +23,8 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 	private I_ReadAndTransform statusTransform;
 	private String statusTransformName;
 	private Set<Integer> activeSet = new HashSet<Integer>();
-   private String fileName;
+	private Set<String> activeUuidStrSet = new HashSet<String>();
+    private String fileName;
 
 	/**
 	 * @parameter
@@ -85,7 +87,9 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 		} else {
 			if (statusTransform != null) {
                 try {
-    				if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
+                	if (statusTransform.getLastTransform().length() == 36) {
+                		activeUuidStrSet.contains(statusTransform.getLastTransform());
+                	} else if (activeSet.contains(Integer.parseInt(statusTransform.getLastTransform()))) {
     					writeRec();
     				}
                 } catch (NumberFormatException e) {
@@ -113,7 +117,19 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 			writeColumns(w);
 		}
 		if (exportOnlyActive) {
-
+			for (UUID uid: ArchitectonicAuxiliary.Concept.ACTIVE.getUids()) {
+				activeUuidStrSet.add(uid.toString());
+			}
+			for (UUID uid: ArchitectonicAuxiliary.Concept.CURRENT.getUids()) {
+				activeUuidStrSet.add(uid.toString());
+			}
+			for (UUID uid: ArchitectonicAuxiliary.Concept.LIMITED.getUids()) {
+				activeUuidStrSet.add(uid.toString());
+			}
+			for (UUID uid: ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()) {
+				activeUuidStrSet.add(uid.toString());
+			}
+			
 			activeSet.add(t.uuidToNid(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 			activeSet.add(t.uuidToNid(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 			activeSet.add(t.uuidToNid(ArchitectonicAuxiliary.Concept.LIMITED.getUids()));
@@ -121,8 +137,9 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 			System.out.println("ACTIVE: " + ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 			System.out.println("CURRENT: " + ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			System.out.println("LIMITED: " + ArchitectonicAuxiliary.Concept.LIMITED.getUids());
-			System.out.println("LIMITED: " + ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids());
-			System.out.println("export only active: " + activeSet);
+			System.out.println("PENDING_MOVE: " + ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids());
+			System.out.println("export only active nid set: " + activeSet);
+			System.out.println("export only active uuid set: " + activeUuidStrSet);
 		}
 	}
 	protected abstract void writeColumns(Writer w) throws IOException;
