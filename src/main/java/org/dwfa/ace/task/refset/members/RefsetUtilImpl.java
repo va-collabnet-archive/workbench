@@ -1,16 +1,16 @@
 package org.dwfa.ace.task.refset.members;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.task.refset.members.export.StatusUUIDs;
 import org.dwfa.ace.refset.ConceptConstants;
+import org.dwfa.ace.task.refset.members.export.StatusUUIDs;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -135,6 +135,6 @@ public final class RefsetUtilImpl implements RefsetUtil, StatusUUIDs {
                                                                           final int conceptId) throws Exception {
         I_GetConceptData refsetConcept = termFactory.getConcept(conceptId);
         return getDescriptionTuples(refsetConcept, createPreferredTerm(termFactory),
-                createFullySpecifiedName(termFactory));
+                createPreferredTerm(termFactory));
     }
 }

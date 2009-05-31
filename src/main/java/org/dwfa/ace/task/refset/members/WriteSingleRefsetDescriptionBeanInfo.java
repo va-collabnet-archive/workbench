@@ -35,7 +35,7 @@ public final class WriteSingleRefsetDescriptionBeanInfo extends SimpleBeanInfo {
     @Override
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(WriteSingleRefsetDescription.class);
-        bd.setDisplayName("<html><font color='green'><center>Export a single Refsets<br>to Disk");
+        bd.setDisplayName("<html><font color='green'><center>Export a single Refset<br>to Disk");
         return bd;
     }
 }

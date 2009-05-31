@@ -47,7 +47,7 @@ public final class WriteSingleRefsetDescriptionBeanInfoTest {
         BeanDescriptor beanDescriptor = new WriteSingleRefsetDescriptionBeanInfo().getBeanDescriptor();
         assertThat(beanDescriptor, notNullValue());
         assertThat(beanDescriptor.getDisplayName(),
-                equalTo("<html><font color='green'><center>Export a single Refsets<br>to Disk"));
+                equalTo("<html><font color='green'><center>Export a single Refset<br>to Disk"));
         assertThat(beanDescriptor.getBeanClass(), equalTo((Class) WriteSingleRefsetDescription.class));
     }
 }
