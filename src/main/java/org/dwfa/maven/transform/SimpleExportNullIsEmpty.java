@@ -21,6 +21,4 @@ public class SimpleExportNullIsEmpty extends SimpleExport {
       }
       w.append(WINDOWS_LINE_TERMINATOR);
    }
-
-
 }

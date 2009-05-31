@@ -89,11 +89,9 @@ public abstract class AbstractExport implements I_TransformAndWrite {
     					writeRec();
     				}
                 } catch (NumberFormatException e) {
-                    //System.out.println("Number format exception in "
-                    //        + "AbstractExport parsing: "
-                     //       + statusTransform.getLastTransform());
-                    // ??
-					writeRec();
+                    System.out.println("Number format exception in "
+                            + "AbstractExport parsing: "
+                           + statusTransform.getLastTransform());
 				}
 			}
 		}
@@ -123,13 +121,14 @@ public abstract class AbstractExport implements I_TransformAndWrite {
 			System.out.println("ACTIVE: " + ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 			System.out.println("CURRENT: " + ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			System.out.println("LIMITED: " + ArchitectonicAuxiliary.Concept.LIMITED.getUids());
+			System.out.println("LIMITED: " + ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids());
 			System.out.println("export only active: " + activeSet);
 		}
 	}
 	protected abstract void writeColumns(Writer w) throws IOException;
 
 	public final void addTransform(I_ReadAndTransform t) {
-		if (exportOnlyActive) {
+		if (exportOnlyActive && statusTransformName != null) {
 			if (statusTransformName.equals(t.getName())) {
 				statusTransform = t;
 			}
