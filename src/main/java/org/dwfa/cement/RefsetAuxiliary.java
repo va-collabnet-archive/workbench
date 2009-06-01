@@ -138,6 +138,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 						REFSET_AUXILIARY}),
 				REFSET_TYPE_REL(new String[] { "refset type rel", "refset type rel"}, REFSET_RELATIONSHIP),
 				REFSET_PURPOSE_REL(new String[] { "refest purpose rel", "refest purpose rel"}, REFSET_RELATIONSHIP),
+				SPECIFIES_REFSET(new String[] { "specifies refset", "specifies refset"}, REFSET_RELATIONSHIP),
 			REFSET_IDENTITY(new String[] { "refset identity", "refset"}, REFSET_AUXILIARY),
             
                 PATHOLOGY_INCLUSION_SPEC(new String[] { "pathology inclusion specification","pathology inclusion specification",
