@@ -24,6 +24,7 @@ public final class WriterFactoryImpl implements WriterFactory {
     private final Map<String, ExportWriter> fileMap;
     private final I_TermFactory termFactory;
     private final RefsetUtil refsetUtil;
+    private final String lineSepator;
 
 
     public WriterFactoryImpl(final File outputDirectory, final Logger logger, final I_TermFactory termFactory,
@@ -33,6 +34,7 @@ public final class WriterFactoryImpl implements WriterFactory {
         this.outputDirectory = validate(outputDirectory);
         this.logger = logger;
         fileMap = new HashMap<String, ExportWriter>();
+        lineSepator = System.getProperty("line.separator");
     }
 
     public DescriptionWriter createDescriptionFile(final String refsetName) throws Exception {
@@ -69,12 +71,12 @@ public final class WriterFactoryImpl implements WriterFactory {
     private DescriptionWriter createDescriptionExportWriter(final String fileName) throws IOException {
         File outputFile = prepareFile(fileName);
         return new DescriptionWriterImpl(new BufferedWriter(new FileWriter(outputFile)), termFactory, refsetUtil,
-                File.separator);
+                lineSepator);
     }
 
     private NoDescriptionWriter createNoDescriptionExportWriter(final String fileName) throws IOException {
         File outputFile = prepareFile(fileName);
-        return new NoDescriptionWriterImpl(new BufferedWriter(new FileWriter(outputFile)),  File.separator, logger);
+        return new NoDescriptionWriterImpl(new BufferedWriter(new FileWriter(outputFile)),  lineSepator, logger);
     }
 
     private File prepareFile(final String fileName) throws IOException {

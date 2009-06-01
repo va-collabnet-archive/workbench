@@ -134,7 +134,7 @@ public final class RefsetUtilImpl implements RefsetUtil, StatusUUIDs {
     public List<I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
                                                                           final int conceptId) throws Exception {
         I_GetConceptData refsetConcept = termFactory.getConcept(conceptId);
-        return getDescriptionTuples(refsetConcept, createPreferredTerm(termFactory),
+        return getDescriptionTuples(refsetConcept, createCurrentStatus(termFactory),
                 createPreferredTerm(termFactory));
     }
 }
