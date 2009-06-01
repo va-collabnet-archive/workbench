@@ -8,11 +8,16 @@ import java.io.IOException;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.vodb.bind.ThinExtBinder;
 
 public class RefsetSpecTreeMouseListener implements MouseListener {
 
@@ -32,23 +37,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 	public void mousePressed(MouseEvent e) {
 		if (e.isPopupTrigger()) {
 			makeAndShowPopup(e);
-		} 
-		/*
-		JTree tree = (JTree) e.getSource();
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-		int selRow = tree.getRowForLocation(e.getX(), e.getY());
-		// AceLog.getLog().info("Selected row: " + selRow);
-		TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-		if (selPath != null) {
-			if (selRow != -1) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
-						.getLastPathComponent();
-				if (e.isPopupTrigger()) {
-					makeAndShowPopup(e);
-				}
-			}
 		}
-		*/
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -64,27 +53,70 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 	}
 
 	private void makeAndShowPopup(MouseEvent e) {
-		JPopupMenu popup;
-		try {
-			popup = makePopup(e);
-			popup.show(e.getComponent(), e.getX(), e.getY());
-		} catch (FileNotFoundException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (ClassNotFoundException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
+		JPopupMenu popup = null;
+		if (e.isPopupTrigger()) {
+			try {
+				JTree tree = (JTree) e.getSource();
+				int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
+				int [] selectedRow = tree.getSelectionRows();
+				if (rowForLocation < 0 || selectedRow == null || selectedRow[0] != rowForLocation) {
+					tree.clearSelection();
+					popup = makePopup(e, new File(AceFrame.pluginRoot,
+							"refsetspec/spec-popup"));
+				} else {
+					TreePath selPath = tree.getPathForLocation(e.getX(), e
+							.getY());
+					if (selPath != null) {
+						if (rowForLocation != -1) {
+							DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
+									.getLastPathComponent();
+							I_ThinExtByRefVersioned specPart = (I_ThinExtByRefVersioned) node
+									.getUserObject();
+							switch (ThinExtBinder.getExtensionType(specPart)) {
+							case CONCEPT_CONCEPT:
+								popup = makePopup(e, new File(AceFrame.pluginRoot,
+								"refsetspec/branch-popup"));
+								break;
+								
+							case CONCEPT_CONCEPT_CONCEPT:
+								popup = makePopup(e, new File(AceFrame.pluginRoot,
+								"refsetspec/structural-query-popup"));
+								break;
+								
+							case CONCEPT_CONCEPT_STRING:
+								popup = makePopup(e, new File(AceFrame.pluginRoot,
+								"refsetspec/text-query-popup"));
+								break;
+							default:
+								popup = null;
+							}
+						}
+					} else {
+						popup = makePopup(e, new File(AceFrame.pluginRoot,
+								"refsetspec/spec-popup"));
+					}
+				}
+				if (popup != null) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
+				}
+			} catch (FileNotFoundException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			} catch (IOException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			} catch (ClassNotFoundException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
 		}
 	}
 
-	private JPopupMenu makePopup(MouseEvent e) throws FileNotFoundException, IOException, ClassNotFoundException {
-			JPopupMenu popup = new JPopupMenu();
-			JMenuItem noActionItem = new JMenuItem("");
-			popup.add(noActionItem);
-			ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"), 
-					this.aceConfig.getWorker());
-			return popup;
+	private JPopupMenu makePopup(MouseEvent e, File directory)
+			throws FileNotFoundException, IOException, ClassNotFoundException {
+		JPopupMenu popup = new JPopupMenu();
+		JMenuItem noActionItem = new JMenuItem("");
+		popup.add(noActionItem);
+		ProcessPopupUtil.addSubmenMenuItems(popup, directory, this.aceConfig
+				.getWorker());
+		return popup;
 	}
-
 
 }

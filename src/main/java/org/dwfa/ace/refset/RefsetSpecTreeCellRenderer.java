@@ -68,14 +68,17 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 				row, hasFocus);
 
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		if (I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject()
-				.getClass())) {
+		if (node.getUserObject() != null &&
+				I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass())) {
 			I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) node
 					.getUserObject();
 			List<I_ThinExtByRefTuple> tuples = ext.getTuples(configAceFrame
 					.getAllowedStatus(), configAceFrame.getViewPositionSet(),
 					true);
-			I_ThinExtByRefTuple firstTuple = tuples.get(0);
+			I_ThinExtByRefTuple firstTuple = null;
+			if (tuples != null) {
+				firstTuple = tuples.get(0);
+			}
 
 			boolean indent = false;
 			
@@ -137,14 +140,14 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 		addPrefixImage(htmlParts, ccsPart.getC1id());
 		htmlParts.add("&nbsp;&nbsp;");
 		addConceptDescription(htmlParts, ccsPart.getC2id(), "#483D8B");
-		htmlParts.add("<font color='#483D8B'>:&nbsp;&nbsp;</font>");
+		htmlParts.add("<font color='#483D8B'>:&nbsp;&nbsp;\"</font>");
 		String text = ccsPart.getStr();
 		if (text.toLowerCase().startsWith("<html>")) {
 			htmlParts.add(text.substring(5));
 		} else {
 			htmlParts.add(text);
 		}
-		htmlParts.add("&nbsp;&nbsp;");
+		htmlParts.add("<font color='#483D8B'>\"&nbsp;&nbsp;</font>");
 		setTextToHtml(htmlParts);
 	}
 
