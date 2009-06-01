@@ -1,5 +1,6 @@
 package org.dwfa.ace.task.refset.members;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.util.Logger;
@@ -28,6 +29,7 @@ public final class WriteSingleRefsetDescriptionTest {
 
     private static final String WORKING_REFSET_KEY  = "REFSET_KEY";
     private static final String DIRECTORY_KEY       = "DIR_KEY";
+    private static final int REFSET_CONCEPT_ID      = 1200;
 
     private IMocksControl mockControl;
     private LocalVersionedTerminologyWrapper mockTerminologyWrapper;
@@ -114,7 +116,7 @@ public final class WriteSingleRefsetDescriptionTest {
             throws Exception {
 
         File mockDirectoryFile = mockControl.createMock(File.class);
-        I_ThinExtByRefVersioned mockRefset = mockControl.createMock(I_ThinExtByRefVersioned.class);
+        I_GetConceptData mockRefset = mockControl.createMock(I_GetConceptData.class);
 
         EasyMock.expect(mockTerminologyWrapper.get()).andReturn(mockTermFactory);
         EasyMock.expect(mockBusinessProcess.readProperty(DIRECTORY_KEY)).andReturn(mockDirectoryFile);
@@ -129,8 +131,16 @@ public final class WriteSingleRefsetDescriptionTest {
         EasyMock.expect(mockCleanableProcessBuilder.withLogger(EasyMock.isA(Logger.class))).
                 andReturn(mockCleanableProcessBuilder);
         EasyMock.expect(mockCleanableProcessBuilder.build()).andReturn(mockCleanableProcess);
+        EasyMock.expect(mockRefset.getConceptId()).andReturn(REFSET_CONCEPT_ID);
 
-        mockCleanableProcess.processExtensionByReference(mockRefset);
+        I_ThinExtByRefVersioned mockExt1 = mockControl.createMock(I_ThinExtByRefVersioned.class);
+        I_ThinExtByRefVersioned mockExt2 = mockControl.createMock(I_ThinExtByRefVersioned.class);
+        EasyMock.expect(mockTermFactory.getRefsetExtensionMembers(REFSET_CONCEPT_ID)).
+                andReturn(Arrays.asList(mockExt1, mockExt2));
+
+        mockCleanableProcess.processExtensionByReference(mockExt1);
+        mockCleanableProcess.processExtensionByReference(mockExt2);
+        
         mockCleanableProcess.clean();
     }
 }

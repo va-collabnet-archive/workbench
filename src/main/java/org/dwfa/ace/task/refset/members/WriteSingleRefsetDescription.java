@@ -1,5 +1,7 @@
 package org.dwfa.ace.task.refset.members;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.TaskLogger;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Task that exports a single specified referenceset.
@@ -57,17 +60,21 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
         try {
             File outputDirecotry = (File) process.readProperty(directoryKey);
             propertyValidator.validate(outputDirecotry, "output directory");
-            I_ThinExtByRefVersioned refset = (I_ThinExtByRefVersioned) process.readProperty(selectedRefsetKey);
+            I_GetConceptData refset = (I_GetConceptData) process.readProperty(selectedRefsetKey);
             propertyValidator.validate(refset, "selected refset");
 
+            I_TermFactory termFactory = terminologyWrapper.get();
             CleanableProcessExtByRef processor = cleanableProcessBuilder.
-                                                    withTermFactory(terminologyWrapper.get()).
+                                                    withTermFactory(termFactory).
                                                     withLogger(new TaskLogger(worker)).
                                                     withSelectedDir(outputDirecotry).
                                                     build();
 
             try {
-                processor.processExtensionByReference(refset);
+                List<I_ThinExtByRefVersioned> extensions = termFactory.getRefsetExtensionMembers(refset.getConceptId());
+                for (I_ThinExtByRefVersioned extension : extensions) {
+                    processor.processExtensionByReference(extension);
+                }
             } finally {
                 processor.clean();
             }
