@@ -207,6 +207,9 @@ public class LogWithAlerts {
 	public void severe(String arg0) {
 		getLogger().severe(arg0);
 	}
+	public void severe(String arg0, Throwable t) {
+		getLogger().log(Level.SEVERE, arg0, t);
+	}
 
 	public void throwing(String arg0, String arg1, Throwable arg2) {
 		getLogger().throwing(arg0, arg1, arg2);
