@@ -43,6 +43,13 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 	private String refsetName;
 
 	/**
+	 * The Uuid of the RefSet.
+	 * 
+	 * @parameter
+	 */
+	private String refsetUuid;
+
+	/**
 	 * The Java package name.
 	 * 
 	 * @parameter
@@ -105,13 +112,18 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 
 	private I_GetConceptData getRefsetConcept() throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		Iterator<I_GetConceptData> cons = termFactory.getConceptIterator();
-		while (cons.hasNext()) {
-			I_GetConceptData c = cons.next();
-			if (c.getInitialText().equals(refsetName))
-				return c;
-		}
-		return null;
+		// Iterator<I_GetConceptData> cons = termFactory.getConceptIterator();
+		// while (cons.hasNext()) {
+		// I_GetConceptData c = cons.next();
+		// if (c.getInitialText().equals(refsetName))
+		// return c;
+		// }
+		// return null;
+		I_GetConceptData con = termFactory.getConcept(new UUID[] { UUID
+				.fromString(this.refsetUuid) });
+		if (!this.refsetName.equals(con.getInitialText()))
+			throw new Exception ("refsetName != name from refsetUuid");
+		return con;
 	}
 
 	public List<I_GetConceptData> getRefsetConcepts(I_GetConceptData con)

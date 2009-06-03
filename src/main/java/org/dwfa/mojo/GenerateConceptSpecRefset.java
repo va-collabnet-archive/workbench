@@ -14,7 +14,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary.Concept;
 
 /**
  * Generate a Refset for all concepts in the Concept enum
@@ -34,6 +33,13 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 	 */
 	private String refsetName;
 
+	/**
+	 * The Uuid of the RefSet.
+	 * 
+	 * @parameter
+	 */
+	private String refsetUuid;
+
 	protected I_GetConceptData createRefsetConcept() throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		I_GetConceptData fully_specified_description_type = termFactory
@@ -49,8 +55,10 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 		config.addEditingPath(path);
 		config.setDefaultStatus(termFactory
 				.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
-		I_GetConceptData newConcept = termFactory.newConcept(UUID.randomUUID(),
-				false, config);
+		// UUID uuid = UUID.randomUUID();
+		UUID uuid = UUID.fromString(this.refsetUuid);
+		I_GetConceptData newConcept = termFactory.newConcept(uuid, false,
+				config);
 		// Install the FSN
 		termFactory.newDescription(UUID.randomUUID(), newConcept, "en",
 				refsetName, fully_specified_description_type, config);
@@ -135,7 +143,18 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 		I_GetConceptData refset = createRefsetConcept();
 		getLog().info("Refset: " + refset.getInitialText());
 		getLog().info("Refset: " + refset.getUids().get(0));
-		for (Concept c : Concept.values()) {
+		for (ArchitectonicAuxiliary.Concept c : ArchitectonicAuxiliary.Concept
+				.values()) {
+			getLog().info("Processing concept:" + c.name());
+			try {
+				I_GetConceptData member = termFactory.getConcept(c.getUids());
+				addToRefset(termFactory, refset.getConceptId(), member
+						.getConceptId());
+			} catch (Exception ex) {
+				getLog().error("Skipping concept:" + c.name());
+			}
+		}
+		for (RefsetAuxiliary.Concept c : RefsetAuxiliary.Concept.values()) {
 			getLog().info("Processing concept:" + c.name());
 			try {
 				I_GetConceptData member = termFactory.getConcept(c.getUids());
