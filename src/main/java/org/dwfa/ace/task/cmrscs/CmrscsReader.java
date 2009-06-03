@@ -152,7 +152,7 @@ public class CmrscsReader implements I_ReadChangeSet {
 			AceLog.getEditLog().info("End of change set: " + changeSetFile);
 			nextCommit = Long.MAX_VALUE;
 			getVodb().setProperty(
-					changeSetFile.toURI().toURL().toExternalForm(),
+					FileIO.getNormalizedRelativePath(changeSetFile),
 					Long.toString(changeSetFile.length()));
 		} catch (TerminologyException e) {
 			IOException ioe = new IOException();
@@ -195,8 +195,17 @@ public class CmrscsReader implements I_ReadChangeSet {
 					// already imported, set to nothing to do...
 					nextCommit = Long.MAX_VALUE;
 					initialized = true;
+				} else {
+					AceLog.getAppLog().finer(
+							"Change set previously encountered, but different length. Old length was " + lastSize + " new length is " + changeSetFile.length() + ": "
+									+ FileIO.getNormalizedRelativePath(changeSetFile));
 				}
+			} else {
+				AceLog.getAppLog().finer(
+						"Change set never previously encountered: "
+								+ FileIO.getNormalizedRelativePath(changeSetFile));
 			}
+			
 			if (initialized == false) {
 				FileInputStream fis = new FileInputStream(changeSetFile);
 				BufferedInputStream bis = new BufferedInputStream(fis);
