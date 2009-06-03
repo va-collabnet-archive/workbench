@@ -450,7 +450,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 			IOException {
 		try {
 			return uuidToNative(uids);
-		} catch (TerminologyException e) {
+		} catch (NoMappingException e) {
 			// create a new one...
 			try {
 				I_IdVersioned newId = new ThinIdVersioned(
