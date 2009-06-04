@@ -448,9 +448,10 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 	public int uuidToNativeWithGeneration(Collection<UUID> uids, int source,
 			I_Path idPath, int version) throws TerminologyException,
 			IOException {
-		try {
-			return uuidToNative(uids);
-		} catch (NoMappingException e) {
+		
+		int rv =  uuidToNativeCore(uids);
+		
+		if(rv == 0) {
 			// create a new one...
 			try {
 				I_IdVersioned newId = new ThinIdVersioned(
@@ -472,6 +473,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 			} catch (DatabaseException ex) {
 				throw new ToIoException(ex);
 			}
+		} else {
+			return rv;
 		}
 	}
 
@@ -625,14 +628,24 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 	 * @see org.dwfa.vodb.I_StoreIdentifiers#uuidToNative(java.util.UUID)
 	 */
 	public int uuidToNative(UUID uid) throws TerminologyException, IOException {
-		Integer returnValue = uuidToNativeCore(uid);
-		if (returnValue != null) {
+		int returnValue = uuidToNativeCore(uid);
+		if (returnValue != 0) {
 			return returnValue;
 		}
 		throw new NoMappingException("No id for: " + uid);
 	}
 
-	private Integer uuidToNativeCore(UUID uid) throws ToIoException {
+	private int uuidToNativeCore(Collection<UUID> uuids) throws ToIoException {
+		for(UUID uuid : uuids) {
+			int returnValue = uuidToNativeCore(uuid);
+			if(returnValue != 0){
+				return returnValue;
+			}
+		}
+		return 0;
+	}
+	
+	private int uuidToNativeCore(UUID uid) throws ToIoException {
 		Integer nid = uuidNidMapCache.get(uid);
 		if (nid != null) {
 			return nid;
@@ -664,7 +677,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
-		return null;
+		return 0;
 	}
 
 	/*
@@ -675,8 +688,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 	public int uuidToNative(Collection<UUID> uids) throws TerminologyException,
 			IOException {
 		for (UUID uuid : uids) {
-			Integer returnValue = uuidToNativeCore(uuid);
-			if (returnValue != null) {
+			int returnValue = uuidToNativeCore(uuid);
+			if (returnValue != 0) {
 				return returnValue;
 			}
 		}
