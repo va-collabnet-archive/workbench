@@ -1,7 +1,13 @@
 package org.dwfa.maven.sct;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -11,6 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.dwfa.util.id.Type5UuidFactory;
 
 /**
  * Sct2AceMojo converts SNOMED text release files to ACE text import files.
@@ -21,6 +28,15 @@ import org.dwfa.util.id.Type3UuidFactory;
  * 
  */
 
+/*
+ * REQUIRMENTS:
+ * 
+ * 1. RELEASE DATE must be in either the SNOMED file name or parent folder name.
+ * The date must have the format of yyyy-MM-dd.
+ * 
+ * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE.
+ */
+
 public class Sct2AceMojo extends AbstractMojo {
 	/**
 	 * Location of the build directory.
@@ -28,9 +44,24 @@ public class Sct2AceMojo extends AbstractMojo {
 	 * @parameter expression="${project.build.directory}"
 	 * @required
 	 */
-	File buildDirectory;
+	private File buildDirectory;
 
-	class SCTConceptRecord implements Comparable<Object> {
+	/**
+	 * The greeting to display.
+	 * 
+	 * @parameter default-value=""
+	 */
+	private String targetSubDir;
+
+	/**
+	 * SCT Input Directories Array.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String[] sctInputDirArray;
+
+	private class SCTConceptRecord implements Comparable<Object> {
 		private long id; // CONCEPTID
 		private int status; // CONCEPTSTATUS
 		private int isprimitive; // ISPRIMITIVE
@@ -65,7 +96,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 	}
 
-	class SCTDescriptionRecord implements Comparable<Object> {
+	private class SCTDescriptionRecord implements Comparable<Object> {
 		private long id; // DESCRIPTIONID
 		private int status; // DESCRIPTIONSTATUS
 		private long conceptId; // CONCEPTID
@@ -122,7 +153,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 	}
 
-	class SCTRelationshipRecord implements Comparable<Object> {
+	private class SCTRelationshipRecord implements Comparable<Object> {
 		private long id; // RELATIONSHIPID
 		private int status; // status is computed for relationships
 		private long conceptOneID; // CONCEPTID1
@@ -167,9 +198,9 @@ public class Sct2AceMojo extends AbstractMojo {
 			UUID u;
 			if (exceptionFlag) {
 				// Use negative SNOMED ID for exceptions
-				 u = Type3UuidFactory.fromSNOMED(-id);
+				u = Type3UuidFactory.fromSNOMED(-id);
 			} else {
-				 u = Type3UuidFactory.fromSNOMED(id);
+				u = Type3UuidFactory.fromSNOMED(id);
 			}
 
 			UUID cOne = Type3UuidFactory.fromSNOMED(conceptOneID);
@@ -196,55 +227,286 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 	}
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		getLog().info("BEGIN execute()");
+	private class SCTFile {
+		File file;
+		String revDate;
+		String pathId;
+		int set;
 
-		// Setup build directory
+		public SCTFile(File f, String d, String pid, int s) {
+			file = f;
+			revDate = d;
+			pathId = pid;
+			set = s;
+		}
+
+		public String toString() {
+			return pathId + " :: " + revDate + " :: " + file.getPath();
+		}
+	}
+
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		// SHOW build directory from POM file
 		String buildDir = buildDirectory.getAbsolutePath();
-		getLog().info("Build Directory: " + buildDir);
+		getLog().info("POM Target Directory: " + buildDir);
+
+		// SHOW input sub directory from POM file
+		if (!targetSubDir.equals("")) {
+			targetSubDir = "/" + targetSubDir;
+			getLog().info("POM Input Sub Directory: " + targetSubDir);
+		}
+
+		// SHOW input directories from POM file
+		for (int i = 0; i < sctInputDirArray.length; i++) {
+			getLog().info(
+					"POM Input Directory (" + i + "): " + sctInputDirArray[i]);
+		}
 
 		try {
+			executeMojo(buildDir, targetSubDir, sctInputDirArray);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		getLog().info("POM PROCESSING COMPLETE ");
+	}
+
+	/*
+	 * 1. build directory buildDir
+	 */
+
+	void executeMojo(String wDir, String subDir, String[] inDirs)
+			throws Exception {
+		long start = System.currentTimeMillis();
+		getLog().info("*** SCT2ACE PROCESSING STARTED ***");
+
+		// Setup build directory
+		getLog().info("Build Directory: " + wDir);
+
+		// Setup status UUID String Array
+		setupStatusStrings();
+
+		// SETUP OUTPUT directory target/classes/ace
+		try {
 			// Create multiple directories
-			String sctArfOut = "/classes/org/ihtsdo/sct/sct-arf";
-			boolean success = (new File(buildDir + sctArfOut)).mkdirs();
+			String aceOutDir = "/classes/ace";
+			boolean success = (new File(wDir + aceOutDir)).mkdirs();
 			if (success) {
-				getLog().info("OUTPUT DIRECTORY: " + buildDir + sctArfOut);
+				getLog().info("OUTPUT DIRECTORY: " + wDir + aceOutDir);
 			}
 		} catch (Exception e) { // Catch exception if any
 			getLog().info("Error: could not create directories");
 		}
 
-		// Setup snomedPath UUID String
-		String snomedPathUUID = ArchitectonicAuxiliary.Concept.SNOMED_CORE
-				.getUids().iterator().next().toString();
+		// SETUP CONCEPTS INPUT SCTFile ArrayList
+		List<List<SCTFile>> listOfCDirs = new ArrayList<List<SCTFile>>(); // ***
+		for (int i = 0; i < inDirs.length; i++) {
+			ArrayList<SCTFile> listOfCFiles = new ArrayList<SCTFile>(); // ***
 
-		// Setup status UUID String Array
-		setupStatusStrings();
+			getLog().info("CONCEPTS (" + i + "): " + wDir + subDir + inDirs[i]);
 
-		// :TODO: tie in current directory via Maven Plug-in
-		// "target/generated-source/org/snomed/2003-01-31/"
-		// sct_concepts_20030131.txt
-		// sct_relationships_20030131.txt
-		// sct_descriptions_20030131.txt
+			// PARSE each sub-directory for "sct_descriptions*.txt" files
+			File f1 = new File(wDir + subDir + inDirs[i]);
+			ArrayList<File> fv = new ArrayList<File>();
+			listFilesRecursive(fv, f1, "sct_concepts");
 
-		try {
-			long start = System.currentTimeMillis();
-
-			processConceptsFiles(buildDir, snomedPathUUID);
-			processDescriptionsFiles(buildDir, snomedPathUUID);
-			processRelationshipsFiles(buildDir, snomedPathUUID);
-
-			getLog().info(
-					"CONVERSION TIME: "
-							+ ((System.currentTimeMillis() - start) / 1000)
-							+ " seconds");
-
-		} catch (Exception e1) {
-			e1.printStackTrace();
+			Iterator<File> it = fv.iterator();
+			while (it.hasNext()) {
+				File f2 = it.next();
+				// ADD SCTFile Entry
+				String tempRevDate = getFileRevDate(f2);
+				String tmpPathID = getFilePathID(f2, wDir, subDir);
+				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID, i);
+				listOfCFiles.add(tmpObj); // ***
+				getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+			}
+			listOfCDirs.add(listOfCFiles); // ***
 		}
 
-		getLog().info("PROCESSING COMPLETE ");
+		// SETUP DESCRIPTIONS INPUT SCTFile ArrayList
+		List<List<SCTFile>> listOfDDirs = new ArrayList<List<SCTFile>>(); // **
+		for (int i = 0; i < inDirs.length; i++) {
+			ArrayList<SCTFile> listOfDFiles = new ArrayList<SCTFile>(); // **
+			getLog().info(
+					"DESCRIPTIONS (" + i + "): " + wDir + subDir + inDirs[i]);
 
+			// PARSE each sub-directory for "sct_descriptions*.txt" files
+			File f1 = new File(wDir + subDir + inDirs[i]);
+			ArrayList<File> fv = new ArrayList<File>();
+			listFilesRecursive(fv, f1, "sct_descriptions");
+
+			Iterator<File> it = fv.iterator();
+			while (it.hasNext()) {
+				File f2 = it.next();
+				// ADD SCTFile Entry
+				String tempRevDate = getFileRevDate(f2);
+				String tmpPathID = getFilePathID(f2, wDir, subDir);
+				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID, i);
+				listOfDFiles.add(tmpObj); // **
+				getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+			}
+			listOfDDirs.add(listOfDFiles); // **
+		}
+
+		// SETUP RELATIONSHIPS INPUT SCTFile ArrayList
+		List<List<SCTFile>> listOfRDirs = new ArrayList<List<SCTFile>>(); // *
+		for (int i = 0; i < inDirs.length; i++) {
+			ArrayList<SCTFile> listOfRFiles = new ArrayList<SCTFile>(); // *
+			getLog().info(
+					"RELATIONSHIPS (" + i + "): " + wDir + subDir + inDirs[i]);
+
+			// PARSE each sub-directory for "sct_relationships*.txt" files
+			File f1 = new File(wDir + subDir + inDirs[i]);
+			ArrayList<File> fv = new ArrayList<File>();
+			listFilesRecursive(fv, f1, "sct_relationships");
+
+			Iterator<File> it = fv.iterator();
+			while (it.hasNext()) {
+				File f2 = it.next();
+				// ADD SCTFile Entry
+				String tempRevDate = getFileRevDate(f2);
+				String tmpPathID = getFilePathID(f2, wDir, subDir);
+				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID, i);
+				listOfRFiles.add(tmpObj); // *
+				getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+			}
+			listOfRDirs.add(listOfRFiles); // *
+		}
+
+		processConceptsFiles(wDir, listOfCDirs); // ***
+		processDescriptionsFiles(wDir, listOfDDirs); // **
+		processRelationshipsFiles(wDir, listOfRDirs); // *
+
+		getLog().info("*** SCT2ACE PROCESSING COMPLETED ***");
+		getLog().info(
+				"CONVERSION TIME: "
+						+ ((System.currentTimeMillis() - start) / 1000)
+						+ " seconds");
+	}
+
+	private String getFileRevDate(File f) {
+		int pos;
+		// Check file name for date yyyyMMdd
+		// EXAMPLE: ../net/nhs/uktc/ukde/sct_relationships_uk_drug_20090401.txt
+		pos = f.getName().length() - 12; // "yyyyMMdd.txt"
+		String s1 = f.getName().substring(pos, pos + 8);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		dateFormat.setLenient(false);
+		try {
+			dateFormat.parse(s1);
+		} catch (ParseException pe) {
+			s1 = null;
+		}
+
+		// Check path for date yyyy-MM-dd
+		// EXAMPLE: ../org/snomed/2003-01-31
+		pos = f.getParent().length() - 10; // "yyyy-MM-dd"
+		String s2 = f.getParent().substring(pos);
+		// normalize date format
+		s2 = s2.substring(0, 4) + s2.substring(5, 7) + s2.substring(8, 10);
+		try {
+			dateFormat.parse(s2);
+		} catch (ParseException pe) {
+			s2 = null;
+		}
+
+		// 
+		if ((s1 != null) && (s2 != null)) {
+			if (s1.equals(s2)) {
+				return s1 + " 00:00:00";
+			} else {
+				return null; // !!! throw exception here
+			}
+		} else if (s1 != null) {
+			return s1 + " 00:00:00";
+		} else if (s2 != null) {
+			return s2 + " 00:00:00";
+		} else {
+			return null;
+		}
+	}
+
+	private String getFilePathID(File f, String baseDir, String subDir) {
+		String puuid = null;
+		UUID u;
+
+		String s;
+		if (subDir.equals("")) {
+			// !!! @@@ :TODO: TEST NO SUBDIRECTORY CODE BRANCH
+			s = f.getParent().substring(baseDir.length() - 1);
+		} else {
+			s = f.getParent().substring(baseDir.length() + subDir.length());
+		}
+
+		// :NYI: (Maybe) Additional checks if last directory branch is a date
+		// @@@ (Maybe just use the directory branch for UUID)
+		if (s.substring(0, 11).equals("/org/snomed")) {
+			// SNOMED_CORE Path UUID
+			puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()
+					.iterator().next().toString();
+			getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
+		} else if (s.equals("/net/nhs/uktc/uke")) {
+			// "UK Extensions" Path UUID
+			try {
+				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+						"NHS UK Extension Path");
+				puuid = u.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			getLog().info("  PATH UUID (uke): " + s + " " + puuid);
+		} else if (s.equals("/net/nhs/uktc/ukde")) {
+			// "UK Drug Extensions" Path UUID
+			try {
+				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+						"NHS UK Drug Extension Path");
+				puuid = u.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			getLog().info("  PATH UUID (ukde): " + s + " " + puuid);
+
+		} else {
+			// OTHER PATH UUID: based on directory path
+			// !!! @@@ :TODO: TEST THIS CODE BRANCH
+			try {
+				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+						s);
+				puuid = u.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			getLog().info("  PATH UUID: " + s + " " + puuid);
+		}
+
+		return puuid;
+	}
+
+	/*
+	 * 1. build directory buildDir
+	 */
+
+	private static void listFilesRecursive(ArrayList<File> list, File root,
+			String prefix) {
+		if (root.isFile()) {
+			list.add(root);
+			return;
+		}
+		File[] files = root.listFiles();
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isFile() && files[i].getName().endsWith(".txt")
+					&& files[i].getName().startsWith(prefix)) {
+				list.add(files[i]);
+			}
+			if (files[i].isDirectory()) {
+				listFilesRecursive(list, files[i], prefix);
+			}
+		}
 	}
 
 	/*
@@ -255,512 +517,465 @@ public class Sct2AceMojo extends AbstractMojo {
 	 * 
 	 * IGNORE: FULLYSPECIFIEDNAME CTV3ID SNOMEDID
 	 */
-	protected void processConceptsFiles(String bDir, String sctPath)
+	protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv)
 			throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
-		String revDate;
+		String revDate, pathID;
 		SCTConceptRecord[] a1, a2, a3 = null;
 
 		getLog().info("START CONCEPTS PROCESSING...");
-		// Get base SNOMED directory
-		String snomedDirStr = bDir + "/generated-source/org/snomed";
-		getLog().info("SNOMED Directory: " + snomedDirStr);
 
-		// Get list of dated SNOMED sub directory names
-		File snomedDir = new File(snomedDirStr);
-		String[] children = snomedDir.list();
-		if (children == null) {
-			getLog().info("FAILED: NO SUBDIRECTORIES " + snomedDirStr);
-			return;
-		}
-
-		// Setup output file
-		String outFileName = bDir
-				+ "/classes/org/ihtsdo/sct/sct-arf/concepts.txt";
+		// SETUP CONCEPTS OUTPUT FILE
+		String outFileName = wDir + "/classes/ace/concepts.txt";
 		BufferedWriter bw;
-		getLog().info("sct-arf OUTPUT: " + outFileName);
+		getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
 		bw.write("concept uuid\tstatus uuid\tprimitive\t"
 				+ "effective date\tpath uuid" + "\r\n");
-		// Read in file1 as master file
-		revDate = cleanDate(children[0]) + " 00:00:00";
-		fName1 = buildFileName(snomedDirStr, children[0], "sct_concepts_");
-		File file1 = new File(fName1);
-		if (!file1.exists()) {
-			fName1 = buildFileName2(snomedDirStr, children[0], "sct_concepts");
-			getLog().info("ALT FILE NAME 1:  " + fName1);
-		}
 
-		count1 = countFileLines(fName1);
-		getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
-		a1 = new SCTConceptRecord[count1];
-		parseConcepts(fName1, a1, count1);
-		writeConcepts(bw, a1, count1, revDate, sctPath);
+		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator *
+		while (dit.hasNext()) {
+			List<SCTFile> fl = dit.next(); // File List *
+			Iterator<SCTFile> fit = fl.iterator(); // File Iterator *
 
-		for (int i = 1; i < children.length; i++) {
-			// Get filename of file or directory
-			revDate = cleanDate(children[i]) + " 00:00:00";
-			fName2 = buildFileName(snomedDirStr, children[i], "sct_concepts_");
-			File file2 = new File(fName2);
-			if (!file2.exists()) {
-				fName2 = buildFileName2(snomedDirStr, children[i],
-						"sct_concepts");
-				getLog().info("ALT FILE NAME 2:  " + fName2);
-			}
+			// READ file1 as MASTER FILE
+			SCTFile f1 = fit.next();
+			fName1 = f1.file.getPath();
+			revDate = f1.revDate;
+			pathID = f1.pathId;
 
-			count2 = countFileLines(fName2);
-			getLog().info("Counted: " + count2 + " records, " + fName2);
+			count1 = countFileLines(fName1);
+			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
+			a1 = new SCTConceptRecord[count1];
+			parseConcepts(fName1, a1, count1);
+			writeConcepts(bw, a1, count1, revDate, pathID);
 
-			// Parse in file2
-			a2 = new SCTConceptRecord[count2];
-			parseConcepts(fName2, a2, count2);
+			while (fit.hasNext()) {
+				// SETUP CURRENT CONCEPTS INPUT FILE
+				SCTFile f2 = fit.next();
+				fName2 = f2.file.getPath();
+				revDate = f2.revDate;
+				pathID = f2.pathId;
 
-			int r1 = 0, r2 = 0, r3 = 0; // reset record indices
-			int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
-			a3 = new SCTConceptRecord[count2]; // max3
-			while ((r1 < count1) && (r2 < count2)) {
+				count2 = countFileLines(fName2);
+				getLog().info("Counted: " + count2 + " records, " + fName2);
 
-				switch (compareConcept(a1[r1], a2[r2])) {
-				case 1: // SAME CONCEPT, skip to next
-					r1++;
-					r2++;
-					nSame++;
-					break;
+				// Parse in file2
+				a2 = new SCTConceptRecord[count2];
+				parseConcepts(fName2, a2, count2);
 
-				case 2: // MODIFIED CONCEPT
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-					// Update master via pointer assignment
-					a1[r1] = a2[r2];
-					r1++;
-					r2++;
-					nMod++;
-					break;
+				int r1 = 0, r2 = 0, r3 = 0; // reset record indices
+				int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
+				a3 = new SCTConceptRecord[count2]; // max3
+				while ((r1 < count1) && (r2 < count2)) {
 
-				case 3: // ADDED CONCEPT
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-					// Hold pointer to append to master
-					a3[r3] = a2[r2];
-					r2++;
-					r3++;
-					nAdd++;
-					break;
+					switch (compareConcept(a1[r1], a2[r2])) {
+					case 1: // SAME CONCEPT, skip to next
+						r1++;
+						r2++;
+						nSame++;
+						break;
 
-				case 4: // DROPPED CONCEPT
-					// see ArchitectonicAuxiliary.getStatusFromId()
-					if (a1[r1].status != 1) { // if not RETIRED
-						a1[r1].status = 1; // set to RETIRED
-						bw.write(a1[r1].toStringAce(revDate, sctPath));
+					case 2: // MODIFIED CONCEPT
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+						// Update master via pointer assignment
+						a1[r1] = a2[r2];
+						r1++;
+						r2++;
+						nMod++;
+						break;
+
+					case 3: // ADDED CONCEPT
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+						// Hold pointer to append to master
+						a3[r3] = a2[r2];
+						r2++;
+						r3++;
+						nAdd++;
+						break;
+
+					case 4: // DROPPED CONCEPT
+						// see ArchitectonicAuxiliary.getStatusFromId()
+						if (a1[r1].status != 1) { // if not RETIRED
+							a1[r1].status = 1; // set to RETIRED
+							bw.write(a1[r1].toStringAce(revDate, pathID));
+						}
+						r1++;
+						nDrop++;
+						break;
+
 					}
-					r1++;
-					nDrop++;
-					break;
+				} // WHILE (NOT END OF EITHER A1 OR A2)
 
+				// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
+				if (r1 < count1) {
+					getLog().info("ERROR: MISSED CONCEPT RECORDS r1 < count1");
 				}
-			} // WHILE (NOT END OF EITHER A1 OR A2)
 
-			// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
-			if (r1 < count1) {
-				getLog().info("ERROR: MISSED CONCEPT RECORDS r1 < count1");
-			}
+				if (r2 < count2) {
+					while (r2 < count2) { // ADD REMAINING INPUT
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+						// Add to append array
+						a3[r3] = a2[r2];
+						nAdd++;
+						r2++;
+						r3++;
+					}
+				}
 
-			if (r2 < count2) {
-				while (r2 < count2) { // ADD REMAINING INPUT
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-					// Add to append array
-					a3[r3] = a2[r2];
-					nAdd++;
+				// Check counter numbers to master and input file record counts
+				countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
+
+				// SETUP NEW MASTER ARRAY
+				a2 = new SCTConceptRecord[count1 + nAdd];
+				r2 = 0;
+				while (r2 < count1) {
+					a2[r2] = a1[r2];
+					r2++;
+				}
+				r3 = 0;
+				while (r3 < nAdd) {
+					a2[r2] = a3[r3];
 					r2++;
 					r3++;
 				}
-			}
+				count1 = count1 + nAdd;
+				a1 = a2;
+				Arrays.sort(a1);
 
-			// Check counter numbers to master and input file record counts
-			countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
-
-			// SETUP NEW MASTER ARRAY
-			a2 = new SCTConceptRecord[count1 + nAdd];
-			r2 = 0;
-			while (r2 < count1) {
-				a2[r2] = a1[r2];
-				r2++;
-			}
-			r3 = 0;
-			while (r3 < nAdd) {
-				a2[r2] = a3[r3];
-				r2++;
-				r3++;
-			}
-			count1 = count1 + nAdd;
-			a1 = a2;
-			Arrays.sort(a1);
-
-		} // FOR (EACH FILE)
+			} // WHILE (EACH CONCEPTS INPUT FILE)
+		} // WHILE (EACH CONCEPTS DIRECTORY) *
 
 		bw.close(); // Need to be sure to the close file!
 	}
 
-	protected void processDescriptionsFiles(String bDir, String sctPath)
-			throws Exception {
+	protected void processDescriptionsFiles(String wDir,
+			List<List<SCTFile>> sctv) throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
-		String revDate;
+		String revDate, pathID;
 		SCTDescriptionRecord[] a1, a2, a3 = null;
 
 		getLog().info("START DESCRIPTIONS PROCESSING...");
-		// Get base SNOMED directory
-		String snomedDirStr = bDir + "/generated-source/org/snomed";
-		getLog().info("SNOMED Directory: " + snomedDirStr);
-
-		// Get list of dated SNOMED sub directory names
-		File snomedDir = new File(snomedDirStr);
-		String[] children = snomedDir.list();
-		if (children == null) {
-			getLog().info("FAILED: NO SUBDIRECTORIES " + snomedDirStr);
-			return;
-		}
-
-		// Setup exception report
-		String erFileName = bDir
-				+ "/classes/org/ihtsdo/sct/sct-arf/descriptions_report.txt";
+		// SETUP DESCRIPTIONS EXCEPTION REPORT
+		String erFileName = wDir + "/classes/ace/descriptions_report.txt";
 		BufferedWriter er;
 		er = new BufferedWriter(new FileWriter(erFileName));
 		getLog().info("exceptions report OUTPUT: " + erFileName);
 
-		// Setup output file
-		String outFileName = bDir
-				+ "/classes/org/ihtsdo/sct/sct-arf/descriptions.txt";
+		// SETUP DESCRIPTIONS OUTPUT FILE
+		String outFileName = wDir + "/classes/ace/descriptions.txt";
 		BufferedWriter bw;
-		getLog().info("sct-arf OUTPUT: " + outFileName);
+		getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
 		bw.write("description uuid\tstatus uuid\t" + "concept uuid\t"
 				+ "term\t" + "capitalization status\t"
 				+ "description type uuid\t" + "language code\t"
 				+ "effective date\tpath uuid" + "\r\n");
-		// Read in file1 as master file
-		revDate = cleanDate(children[0]) + " 00:00:00";
-		fName1 = buildFileName(snomedDirStr, children[0], "sct_descriptions_");
-		File file1 = new File(fName1);
-		if (!file1.exists()) {
-			fName1 = buildFileName2(snomedDirStr, children[0],
-					"sct_descriptions");
-			getLog().info("ALT FILE NAME 1:  " + fName1);
-		}
-		count1 = countFileLines(fName1);
-		getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
-		a1 = new SCTDescriptionRecord[count1];
-		parseDescriptions(fName1, a1, count1);
-		writeDescriptions(bw, a1, count1, revDate, sctPath);
 
-		for (int i = 1; i < children.length; i++) {
-			// Get filename of file or directory
-			revDate = cleanDate(children[i]) + " 00:00:00";
-			fName2 = buildFileName(snomedDirStr, children[i],
-					"sct_descriptions_");
-			File file2 = new File(fName2);
-			if (!file2.exists()) {
-				fName2 = buildFileName2(snomedDirStr, children[i],
-						"sct_descriptions");
-				getLog().info("ALT FILE NAME 2:  " + fName2);
-			}
-			count2 = countFileLines(fName2);
-			getLog().info("Counted: " + count2 + " records, " + fName2);
+		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator **
+		while (dit.hasNext()) {
+			List<SCTFile> fl = dit.next(); // File List **
+			Iterator<SCTFile> fit = fl.iterator(); // File Iterator **
 
-			// Parse in file2
-			a2 = new SCTDescriptionRecord[count2];
-			parseDescriptions(fName2, a2, count2);
+			// READ file1 as MASTER FILE
+			SCTFile f1 = fit.next();
+			fName1 = f1.file.getPath();
+			revDate = f1.revDate;
+			pathID = f1.pathId;
 
-			int r1 = 0, r2 = 0, r3 = 0; // reset record indices
-			int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
-			a3 = new SCTDescriptionRecord[count2];
-			while ((r1 < count1) && (r2 < count2)) {
+			count1 = countFileLines(fName1);
+			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
+			a1 = new SCTDescriptionRecord[count1];
+			parseDescriptions(fName1, a1, count1);
+			writeDescriptions(bw, a1, count1, revDate, pathID);
 
-				switch (compareDescription(a1[r1], a2[r2])) {
-				case 1: // SAME DESCRIPTION, skip to next
-					r1++;
-					r2++;
-					nSame++;
-					break;
+			while (fit.hasNext()) {
+				// SETUP CURRENT CONCEPTS INPUT FILE
+				SCTFile f2 = fit.next();
+				fName2 = f2.file.getPath();
+				revDate = f2.revDate;
+				pathID = f2.pathId;
 
-				case 2: // MODIFIED DESCRIPTION
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
+				count2 = countFileLines(fName2);
+				getLog().info("Counted: " + count2 + " records, " + fName2);
 
-					// REPORT DESCRIPTION CHANGE EXCEPTION
-					if (a1[r1].conceptId != a2[r2].conceptId) {
-						er.write("** CONCEPTID CHANGE ** WAS/IS \r\n");
-						er.write("id\tstatus\t" + "conceptId\t" + "termText\t"
-								+ "capStatus\t" + "descriptionType\t"
-								+ "languageCode\r\n");
-						er.write(a1[r1].toString());
-						er.write(a2[r2].toString());
-						er.write("description uuid\t" + "status uuid\t"
-								+ "concept uuid\t" + "term\t"
-								+ "capitalization status\t"
-								+ "description type uuid\t" + "language code\t"
-								+ "effective date\tpath uuid\r\n");
-						er.write(a1[r1].toStringAce(revDate, sctPath));
-						er.write(a2[r2].toStringAce(revDate, sctPath));
+				// Parse in file2
+				a2 = new SCTDescriptionRecord[count2];
+				parseDescriptions(fName2, a2, count2);
+
+				int r1 = 0, r2 = 0, r3 = 0; // reset record indices
+				int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
+				a3 = new SCTDescriptionRecord[count2];
+				while ((r1 < count1) && (r2 < count2)) {
+
+					switch (compareDescription(a1[r1], a2[r2])) {
+					case 1: // SAME DESCRIPTION, skip to next
+						r1++;
+						r2++;
+						nSame++;
+						break;
+
+					case 2: // MODIFIED DESCRIPTION
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+
+						// REPORT DESCRIPTION CHANGE EXCEPTION
+						if (a1[r1].conceptId != a2[r2].conceptId) {
+							er.write("** CONCEPTID CHANGE ** WAS/IS \r\n");
+							er.write("id\tstatus\t" + "conceptId\t"
+									+ "termText\t" + "capStatus\t"
+									+ "descriptionType\t" + "languageCode\r\n");
+							er.write(a1[r1].toString());
+							er.write(a2[r2].toString());
+						}
+
+						// Update master via pointer assignment
+						a1[r1] = a2[r2];
+						r1++;
+						r2++;
+						nMod++;
+						break;
+
+					case 3: // ADDED DESCRIPTION
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+						// Hold pointer to append to master
+						a3[r3] = a2[r2];
+						r2++;
+						r3++;
+						nAdd++;
+						break;
+
+					case 4: // DROPPED DESCRIPTION
+						// see ArchitectonicAuxiliary.getStatusFromId()
+						if (a1[r1].status != 1) { // if not RETIRED
+							a1[r1].status = 1; // set to RETIRED
+							bw.write(a1[r1].toStringAce(revDate, pathID));
+						}
+						r1++;
+						nDrop++;
+						break;
+
 					}
+				} // WHILE (NOT END OF EITHER A1 OR A2)
 
-					// Update master via pointer assignment
-					a1[r1] = a2[r2];
-					r1++;
+				// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
+				if (r1 < count1) {
+					getLog().info(
+							"ERROR: MISSED DESCRIPTION RECORDS r1 < count1");
+				}
+
+				if (r2 < count2) {
+					while (r2 < count2) { // ADD REMAINING INPUT
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+						// Add to append array
+						a3[r3] = a2[r2];
+						nAdd++;
+						r2++;
+						r3++;
+					}
+				}
+
+				// Check counter numbers to master and input file record counts
+				countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
+
+				// SETUP NEW MASTER ARRAY
+				a2 = new SCTDescriptionRecord[count1 + nAdd];
+				r2 = 0;
+				while (r2 < count1) {
+					a2[r2] = a1[r2];
 					r2++;
-					nMod++;
-					break;
-
-				case 3: // ADDED DESCRIPTION
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-					// Hold pointer to append to master
-					a3[r3] = a2[r2];
+				}
+				r3 = 0;
+				while (r3 < nAdd) {
+					a2[r2] = a3[r3];
 					r2++;
 					r3++;
-					nAdd++;
-					break;
-
-				case 4: // DROPPED DESCRIPTION
-					// see ArchitectonicAuxiliary.getStatusFromId()
-					if (a1[r1].status != 1) { // if not RETIRED
-						a1[r1].status = 1; // set to RETIRED
-						bw.write(a1[r1].toStringAce(revDate, sctPath));
-					}
-					r1++;
-					nDrop++;
-					break;
-
 				}
-			} // WHILE (NOT END OF EITHER A1 OR A2)
+				count1 = count1 + nAdd;
+				a1 = a2;
+				Arrays.sort(a1);
 
-			// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
-			if (r1 < count1) {
-				getLog().info("ERROR: MISSED DESCRIPTION RECORDS r1 < count1");
-			}
-
-			if (r2 < count2) {
-				while (r2 < count2) { // ADD REMAINING INPUT
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-					// Add to append array
-					a3[r3] = a2[r2];
-					nAdd++;
-					r2++;
-					r3++;
-				}
-			}
-
-			// Check counter numbers to master and input file record counts
-			countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
-
-			// SETUP NEW MASTER ARRAY
-			a2 = new SCTDescriptionRecord[count1 + nAdd];
-			r2 = 0;
-			while (r2 < count1) {
-				a2[r2] = a1[r2];
-				r2++;
-			}
-			r3 = 0;
-			while (r3 < nAdd) {
-				a2[r2] = a3[r3];
-				r2++;
-				r3++;
-			}
-			count1 = count1 + nAdd;
-			a1 = a2;
-			Arrays.sort(a1);
-
-		} // FOR (EACH FILE)
+			} // WHILE (EACH DESCRIPTIONS INPUT FILE)
+		} // WHILE (EACH DESCRIPTIONS DIRECTORY) *
 
 		bw.close(); // Need to be sure to the close file!
 		er.close(); // Need to be sure to the close file!
 	}
 
-	protected void processRelationshipsFiles(String bDir, String sctPath)
-			throws Exception {
+	protected void processRelationshipsFiles(String wDir,
+			List<List<SCTFile>> sctv) throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
-		String revDate;
+		String revDate, pathID;
 		SCTRelationshipRecord[] a1, a2, a3 = null;
 
 		getLog().info("START RELATIONSHIPS PROCESSING...");
-		// Get base SNOMED directory
-		String snomedDirStr = bDir + "/generated-source/org/snomed";
-		getLog().info("SNOMED Directory: " + snomedDirStr);
-
-		// Get list of dated SNOMED sub directory names
-		File snomedDir = new File(snomedDirStr);
-		String[] children = snomedDir.list();
-		if (children == null) {
-			getLog().info("FAILED: NO SUBDIRECTORIES " + snomedDirStr);
-			return;
-		}
 
 		// Setup exception report
-		String erFileName = bDir
-				+ "/classes/org/ihtsdo/sct/sct-arf/relationships_report.txt";
+		String erFileName = wDir + "/classes/ace/relationships_report.txt";
 		BufferedWriter er;
 		er = new BufferedWriter(new FileWriter(erFileName));
 		getLog().info("exceptions report OUTPUT: " + erFileName);
 
-		// Setup output file
-		String outFileName = bDir
-				+ "/classes/org/ihtsdo/sct/sct-arf/relationships.txt";
+		// SETUP CONCEPTS OUTPUT FILE
+		String outFileName = wDir + "/classes/ace/relationships.txt";
 		BufferedWriter bw;
-		getLog().info("sct-arf OUTPUT: " + outFileName);
+		getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-		bw.write("concept uuid\tstatus uuid\tprimitive\t"
-				+ "effective date\tpath uuid" + "\r\n");
-		// Read in file1 as master file
-		revDate = cleanDate(children[0]) + " 00:00:00";
-		fName1 = buildFileName(snomedDirStr, children[0], "sct_relationships_");
-		File file1 = new File(fName1);
-		if (!file1.exists()) {
-			fName1 = buildFileName2(snomedDirStr, children[0],
-					"sct_relationships");
-			getLog().info("ALT FILE NAME 1:  " + fName1);
-		}
-		count1 = countFileLines(fName1);
-		getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
-		a1 = new SCTRelationshipRecord[count1];
-		parseRelationships(fName1, a1, count1);
-		writeRelationships(bw, a1, count1, revDate, sctPath);
+		bw.write("relationship uuid\t" + "status uuid\t"
+				+ "source concept uuid\t" + "relationship type uuid\t"
+				+ "destination concept uuid\t" + "characteristic type uuid\t"
+				+ "refinability uuid\t" + "relationship group\t"
+				+ "effective date\t" + "path uuid" + "\r\n");
 
-		for (int i = 1; i < children.length; i++) {
-			// Get filename of file or directory
-			revDate = cleanDate(children[i]) + " 00:00:00";
-			fName2 = buildFileName(snomedDirStr, children[i],
-					"sct_relationships_");
-			File file2 = new File(fName2);
-			if (!file2.exists()) {
-				fName2 = buildFileName2(snomedDirStr, children[i],
-						"sct_relationships");
-				getLog().info("ALT FILE NAME 2:  " + fName2);
-			}
-			count2 = countFileLines(fName2);
-			getLog().info("Counted: " + count2 + " records, " + fName2);
+		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator *
+		while (dit.hasNext()) {
+			List<SCTFile> fl = dit.next(); // File List *
+			Iterator<SCTFile> fit = fl.iterator(); // File Iterator *
 
-			// Parse in file2
-			a2 = new SCTRelationshipRecord[count2];
-			parseRelationships(fName2, a2, count2);
+			// READ file1 as MASTER FILE
+			SCTFile f1 = fit.next();
+			fName1 = f1.file.getPath();
+			revDate = f1.revDate;
+			pathID = f1.pathId;
 
-			int r1 = 0, r2 = 0, r3 = 0; // reset record indices
-			int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
-			a3 = new SCTRelationshipRecord[count2];
-			while ((r1 < count1) && (r2 < count2)) {
-				switch (compareRelationship(a1[r1], a2[r2])) {
-				case 1: // SAME RELATIONSHIP, skip to next
-					r1++;
-					r2++;
-					nSame++;
-					break;
+			count1 = countFileLines(fName1);
+			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
+			a1 = new SCTRelationshipRecord[count1];
+			parseRelationships(fName1, a1, count1);
+			writeRelationships(bw, a1, count1, revDate, pathID);
 
-				case 2: // MODIFIED RELATIONSHIP
+			while (fit.hasNext()) {
+				// SETUP CURRENT RELATIONSHIPS INPUT FILE
+				SCTFile f2 = fit.next();
+				fName2 = f2.file.getPath();
+				revDate = f2.revDate;
+				pathID = f2.pathId;
 
-					// REPORT & HANDLE CHANGE EXCEPTION
-					if ((a1[r1].conceptOneID != a2[r2].conceptOneID)
-							|| (a1[r1].conceptTwoID != a2[r2].conceptTwoID)) {
-						er.write("** CONCEPTID CHANGE ** WAS/IS \r\n");
-						er.write("id\t" + "status\t" + "conceptOneID\t"
-								+ "relationshipType\t" + "conceptTwoID\r\n");
-						er.write(a1[r1].toString());
-						er.write(a2[r2].toString());
-						er.write("relationship uuid\t" + "status uuid\t"
-								+ "source concept uuid\t"
-								+ "relationship type uuid\t"
-								+ "destination concept uuid\t"
-								+ "characteristic type uuid\t"
-								+ "refinability uuid\t"
-								+ "relationship group\t" + "effective date\t"
-								+ "path uuid" + "\r\n");
-						er.write(a1[r1].toStringAce(revDate, sctPath));
-						er.write(a2[r2].toStringAce(revDate, sctPath));
+				count2 = countFileLines(fName2);
+				getLog().info("Counted: " + count2 + " records, " + fName2);
 
-						// RETIRE & WRITE MASTER RELATIONSHIP a1[r1]
-						a1[r1].status = 1; // set to RETIRED
-						bw.write(a1[r1].toStringAce(revDate, sctPath));
+				// Parse in file2
+				a2 = new SCTRelationshipRecord[count2];
+				parseRelationships(fName2, a2, count2);
 
-						// SET EXCEPTIONFLAG for subsequence writes
-						// WILL WRITE INPUT RELATIONSHIP w/ NEGATIVE SNOMEDID
-						a2[r2].exceptionFlag = true;
+				int r1 = 0, r2 = 0, r3 = 0; // reset record indices
+				int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
+				a3 = new SCTRelationshipRecord[count2];
+				while ((r1 < count1) && (r2 < count2)) {
+					switch (compareRelationship(a1[r1], a2[r2])) {
+					case 1: // SAME RELATIONSHIP, skip to next
+						r1++;
+						r2++;
+						nSame++;
+						break;
+
+					case 2: // MODIFIED RELATIONSHIP
+
+						// REPORT & HANDLE CHANGE EXCEPTION
+						if ((a1[r1].conceptOneID != a2[r2].conceptOneID)
+								|| (a1[r1].conceptTwoID != a2[r2].conceptTwoID)) {
+							er.write("** CONCEPTID CHANGE ** WAS/IS \r\n");
+							er
+									.write("id\t" + "status\t"
+											+ "conceptOneID\t"
+											+ "relationshipType\t"
+											+ "conceptTwoID\r\n");
+							er.write(a1[r1].toString());
+							er.write(a2[r2].toString());
+
+							// RETIRE & WRITE MASTER RELATIONSHIP a1[r1]
+							a1[r1].status = 1; // set to RETIRED
+							bw.write(a1[r1].toStringAce(revDate, pathID));
+
+							// SET EXCEPTIONFLAG for subsequence writes
+							// WILL WRITE INPUT RELATIONSHIP w/ NEGATIVE
+							// SNOMEDID
+							a2[r2].exceptionFlag = true;
+						}
+
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+
+						// Update master via pointer assignment
+						a1[r1] = a2[r2];
+						r1++;
+						r2++;
+						nMod++;
+						break;
+
+					case 3: // ADDED RELATIONSHIP
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+
+						// hold pointer to append to master
+						a3[r3] = a2[r2];
+						r2++;
+						r3++;
+						nAdd++;
+						break;
+
+					case 4: // DROPPED RELATIONSHIP
+						// see ArchitectonicAuxiliary.getStatusFromId()
+						if (a1[r1].status != 1) { // if not RETIRED
+							a1[r1].status = 1; // set to RETIRED
+							bw.write(a1[r1].toStringAce(revDate, pathID));
+						}
+						r1++;
+						nDrop++;
+						break;
+
+					} // SWITCH (COMPARE RELATIONSHIP)
+				} // WHILE (NOT END OF EITHER A1 OR A2)
+
+				// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
+				if (r1 < count1) {
+					getLog().info(
+							"ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
+				}
+
+				if (r2 < count2) {
+					while (r2 < count2) { // ADD REMAINING INPUT
+						// Write history
+						bw.write(a2[r2].toStringAce(revDate, pathID));
+
+						//
+						a3[r3] = a2[r2];
+						nAdd++;
+						r2++;
+						r3++;
 					}
-					
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
+				}
 
-					// Update master via pointer assignment
-					a1[r1] = a2[r2];
-					r1++;
+				// Check counter numbers to master and input file record counts
+				countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
+
+				// SETUP NEW MASTER ARRAY
+				a2 = new SCTRelationshipRecord[count1 + nAdd];
+				r2 = 0;
+				while (r2 < count1) {
+					a2[r2] = a1[r2];
 					r2++;
-					nMod++;
-					break;
-
-				case 3: // ADDED RELATIONSHIP
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-
-					// hold pointer to append to master
-					a3[r3] = a2[r2];
-					r2++;
-					r3++;
-					nAdd++;
-					break;
-
-				case 4: // DROPPED RELATIONSHIP
-					// see ArchitectonicAuxiliary.getStatusFromId()
-					if (a1[r1].status != 1) { // if not RETIRED
-						a1[r1].status = 1; // set to RETIRED
-						bw.write(a1[r1].toStringAce(revDate, sctPath));
-					}
-					r1++;
-					nDrop++;
-					break;
-
-				} // SWITCH (COMPARE RELATIONSHIP)
-			} // WHILE (NOT END OF EITHER A1 OR A2)
-
-			// NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
-			if (r1 < count1) {
-				getLog().info("ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
-			}
-
-			if (r2 < count2) {
-				while (r2 < count2) { // ADD REMAINING INPUT
-					// Write history
-					bw.write(a2[r2].toStringAce(revDate, sctPath));
-
-					//
-					a3[r3] = a2[r2];
-					nAdd++;
+				}
+				r3 = 0;
+				while (r3 < nAdd) {
+					a2[r2] = a3[r3];
 					r2++;
 					r3++;
 				}
-			}
+				count1 = count1 + nAdd;
+				a1 = a2;
+				Arrays.sort(a1);
 
-			// Check counter numbers to master and input file record counts
-			countCheck(count1, count2, nSame, nMod, nAdd, nDrop);
-
-			// SETUP NEW MASTER ARRAY
-			a2 = new SCTRelationshipRecord[count1 + nAdd];
-			r2 = 0;
-			while (r2 < count1) {
-				a2[r2] = a1[r2];
-				r2++;
-			}
-			r3 = 0;
-			while (r3 < nAdd) {
-				a2[r2] = a3[r3];
-				r2++;
-				r3++;
-			}
-			count1 = count1 + nAdd;
-			a1 = a2;
-			Arrays.sort(a1);
-
-		} // FOR (EACH FILE)
+			} // WHILE (EACH INPUT RELATIONSHIPS FILE)
+		} // WHILE (EACH RELATIONSHIPS DIRECTORY) *
 
 		bw.close(); // Need to be sure to the close file!
 		er.close(); // Need to be sure to the close file!
@@ -828,43 +1043,29 @@ public class Sct2AceMojo extends AbstractMojo {
 
 		long start = System.currentTimeMillis();
 
-		BufferedReader r = new BufferedReader(new FileReader(fName));
-		StreamTokenizer st = new StreamTokenizer(r);
-		st.resetSyntax();
-		st.wordChars('\u001F', '\u00FF');
-		st.whitespaceChars('\t', '\t');
-		st.eolIsSignificant(true);
+		int CONCEPTID = 0;
+		int CONCEPTSTATUS = 1;
+		// int FULLYSPECIFIEDNAME = 2;
+		// int CTV3ID = 3;
+		// int SNOMEDID = 4;
+		int ISPRIMITIVE = 5;
+
+		BufferedReader br = new BufferedReader(new FileReader(fName));
 		int concepts = 0;
 
-		skipLineOne(st);
-		int tokenType = st.nextToken();
-		while ((tokenType != StreamTokenizer.TT_EOF) && (concepts < count)) {
-			// CONCEPTID
-			long conceptKey = Long.parseLong(st.sval);
-			// CONCEPTSTATUS
-			tokenType = st.nextToken();
-			int conceptStatus = Integer.parseInt(st.sval);
-			// FULLYSPECIFIEDNAME: Ignore, already in the descriptions table
-			tokenType = st.nextToken();
-			// CTV3ID: Do nothing with the legacy CTV3ID
-			tokenType = st.nextToken();
-			// SNOMEDID: Do nothing with the legacy SNOMED id
-			tokenType = st.nextToken();
-			// ISPRIMITIVE
-			tokenType = st.nextToken();
-			int defChar = Integer.parseInt(st.sval);
+		// Header row
+		br.readLine();
+
+		while (br.ready()) {
+			String[] line = br.readLine().split("\t");
+			long conceptKey = Long.parseLong(line[CONCEPTID]);
+			int conceptStatus = Integer.parseInt(line[CONCEPTSTATUS]);
+			int isPrimitive = Integer.parseInt(line[ISPRIMITIVE]);
 
 			// Save to sortable array
 			a[concepts] = new SCTConceptRecord(conceptKey, conceptStatus,
-					defChar);
+					isPrimitive);
 			concepts++;
-
-			// CR
-			tokenType = st.nextToken();
-			// LF
-			tokenType = st.nextToken();
-			// Beginning of loop
-			tokenType = st.nextToken();
 		}
 
 		Arrays.sort(a);
@@ -1038,22 +1239,6 @@ public class Sct2AceMojo extends AbstractMojo {
 				"Output time: " + count + " records, "
 						+ (System.currentTimeMillis() - start)
 						+ " milliseconds");
-	}
-
-	private static String buildFileName(String p, String d, String r) {
-		return p + "/" + d + "/" + r + d.substring(0, 4) + d.substring(5, 7)
-				+ d.substring(8, 10) + ".txt";
-
-	}
-
-	private static String buildFileName2(String p, String d, String r) {
-		return p + "/" + d + "/" + r + ".txt";
-
-	}
-
-	// Convert yyyy-MM-dd to yyyyMMdd
-	private static String cleanDate(String s) {
-		return s.substring(0, 4) + s.substring(5, 7) + s.substring(8, 10);
 	}
 
 	private void skipLineOne(StreamTokenizer st) throws IOException {
