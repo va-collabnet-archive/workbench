@@ -531,8 +531,8 @@ public class Sct2AceMojo extends AbstractMojo {
 		BufferedWriter bw;
 		getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-		bw.write("concept uuid\tstatus uuid\tprimitive\t"
-				+ "effective date\tpath uuid" + "\r\n");
+//		bw.write("concept uuid\tstatus uuid\tprimitive\t"
+//				+ "effective date\tpath uuid" + "\r\n");
 
 		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator *
 		while (dit.hasNext()) {
@@ -672,10 +672,10 @@ public class Sct2AceMojo extends AbstractMojo {
 		BufferedWriter bw;
 		getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-		bw.write("description uuid\tstatus uuid\t" + "concept uuid\t"
-				+ "term\t" + "capitalization status\t"
-				+ "description type uuid\t" + "language code\t"
-				+ "effective date\tpath uuid" + "\r\n");
+//		bw.write("description uuid\tstatus uuid\t" + "concept uuid\t"
+//				+ "term\t" + "capitalization status\t"
+//				+ "description type uuid\t" + "language code\t"
+//				+ "effective date\tpath uuid" + "\r\n");
 
 		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator **
 		while (dit.hasNext()) {
@@ -829,11 +829,11 @@ public class Sct2AceMojo extends AbstractMojo {
 		BufferedWriter bw;
 		getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-		bw.write("relationship uuid\t" + "status uuid\t"
-				+ "source concept uuid\t" + "relationship type uuid\t"
-				+ "destination concept uuid\t" + "characteristic type uuid\t"
-				+ "refinability uuid\t" + "relationship group\t"
-				+ "effective date\t" + "path uuid" + "\r\n");
+//		bw.write("relationship uuid\t" + "status uuid\t"
+//				+ "source concept uuid\t" + "relationship type uuid\t"
+//				+ "destination concept uuid\t" + "characteristic type uuid\t"
+//				+ "refinability uuid\t" + "relationship group\t"
+//				+ "effective date\t" + "path uuid" + "\r\n");
 
 		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator *
 		while (dit.hasNext()) {
