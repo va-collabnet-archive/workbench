@@ -198,7 +198,8 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 		File[] dataFiles = dataDir.listFiles(new FileFilter() {
 			public boolean accept(File f) {
 				return f.getName().endsWith(".txt")
-						&& (f.getName().equals("ids.txt") == false);
+						&& ((f.getName().equals("ids.txt") == false)
+						&& (f.getName().toLowerCase().contains("_report") == false));
 			}
 		});
 		
