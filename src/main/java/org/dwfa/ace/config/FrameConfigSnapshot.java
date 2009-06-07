@@ -55,6 +55,42 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+	public I_GetConceptData getClassificationRoot() {
+		return baseFrame.getClassificationRoot();
+	}
+
+	public I_GetConceptData getClassifierInputPath() {
+		return baseFrame.getClassifierInputPath();
+	}
+
+	public I_GetConceptData getClassifierIsaType() {
+		return baseFrame.getClassifierIsaType();
+	}
+
+	public I_GetConceptData getClassifierOutputPath() {
+		return baseFrame.getClassifierOutputPath();
+	}
+
+	public void setClassificationRoot(I_GetConceptData classificationRoot) {
+		baseFrame.setClassificationRoot(classificationRoot);
+	}
+
+	public void setClassifierInputPath(I_GetConceptData inputPath) {
+		baseFrame.setClassifierInputPath(inputPath);
+	}
+
+	public void setClassifierIsaType(I_GetConceptData classifierIsaType) {
+		baseFrame.setClassifierIsaType(classifierIsaType);
+	}
+
+	public void setClassifierOutputPath(I_GetConceptData outputPath) {
+		baseFrame.setClassifierOutputPath(outputPath);
+	}
+
+	public I_GetConceptData getRefsetSpecInSpecEditor() {
+		return baseFrame.getRefsetSpecInSpecEditor();
+	}
+
 	public JTree getTreeInSpecEditor() {
 		return baseFrame.getTreeInSpecEditor();
 	}

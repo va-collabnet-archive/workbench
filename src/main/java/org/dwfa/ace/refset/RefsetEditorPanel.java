@@ -1,5 +1,6 @@
 package org.dwfa.ace.refset;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -55,14 +56,13 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.table.refset.RefsetMemberTableModel;
-import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
@@ -70,9 +70,10 @@ import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntSet;
 
 public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		PropertyChangeListener, Scrollable {
@@ -235,6 +236,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 	private JButton componentHistoryButton;
 
 	private JTree specTree;
+
+	public I_GetConceptData refsetSpecConcept;
 
 	public RefsetEditorPanel(ACE ace) throws Exception {
 		super(new GridBagLayout());
@@ -530,7 +533,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1.0;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weighty = 1.0;
+		c.fill = GridBagConstraints.BOTH;
 
 		JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		specTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null)));
@@ -541,13 +545,17 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		
 		sp.setTopComponent(new JScrollPane(specTree));
 		
+		
+		sp.setBottomComponent(new JScrollPane(new JPanel()));
+		
+		/*
         RefsetMemberTableModel refsetModel = new RefsetMemberTableModel(this, 
         					RefsetMemberTableModel.getRefsetColumns(this, EXT_TYPE.LANGUAGE),
         					EXT_TYPE.LANGUAGE, TOGGLES.REFSETS);
 
 		sp.setBottomComponent(RefsetUtil.getExtensionPanel(EXT_TYPE.LANGUAGE, refsetModel,
                 this, TOGGLES.REFSETS));
-		
+		*/
 		content.add(sp, c);
 		
 		c.gridy++;
@@ -558,8 +566,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 				c.gridy++;
 			}
 		}
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		c.weightx = 0.0;
+		c.weighty = 0.0;
 		c.fill = GridBagConstraints.BOTH;
 		content.add(new JPanel(), c);
 		return content;
@@ -705,23 +713,33 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			
 			
 			I_GetConceptData refsetConcept = (I_GetConceptData) label.getTermComponent();
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetConcept);
+			IntSet relTypes = new IntSet();			
+			refsetSpecConcept = null;
+			if (refsetConcept != null) {
+				relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
+				List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), 
+						relTypes, ace.getAceFrameConfig().getViewPositionSet(), true);
+				if (refsetSpecTuples != null && refsetSpecTuples.size() >0) {
+					refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
+				}
+			}
+			DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpecConcept);
 			
-			if (oldRoot.getUserObject() != null && refsetConcept != null) {
+			if (oldRoot.getUserObject() != null && refsetSpecConcept != null) {
 				I_GetConceptData oldRefsetConcept = (I_GetConceptData) oldRoot.getUserObject();
-				newRefset = oldRefsetConcept.getConceptId() == refsetConcept.getConceptId();
+				newRefset = oldRefsetConcept.getConceptId() != refsetSpecConcept.getConceptId();
 			}
 			
-			if (refsetConcept != null) {
-				List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetConcept.getConceptId(), true);
+			if (refsetSpecConcept != null) {
+				List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpecConcept.getConceptId(), true);
 				HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
 				HashSet<Integer> fetchedComponents = new HashSet<Integer>();
-				fetchedComponents.add(refsetConcept.getConceptId());
+				fetchedComponents.add(refsetSpecConcept.getConceptId());
 				addExtensionsToMap(extensions, extensionMap, fetchedComponents);		
 				AceLog.getAppLog().info("Extension map: " + extensionMap);
 				for (DefaultMutableTreeNode extNode: extensionMap.values()) {
 					I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
-					if (ext.getComponentId() == refsetConcept.getConceptId()) {
+					if (ext.getComponentId() == refsetSpecConcept.getConceptId()) {
 						root.add(extNode);
 					} else {
 						extensionMap.get(ext.getComponentId()).add(extNode);
@@ -765,4 +783,11 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		return specTree;
 	}
 
+	public I_GetConceptData getRefsetSpecInSpecEditor() {
+		return refsetSpecConcept;
+	}
+
+	public Container getLabel() {
+		return label;
+	}
 }

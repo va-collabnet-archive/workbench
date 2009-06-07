@@ -27,7 +27,7 @@ public class RefsetSpecPanel extends JPanel {
 		add(split);
 		editor = new RefsetEditorPanel(ace);
 		split.setLeftComponent(editor);
-		viewer = new RefsetViewerPanel(ace.getAceFrameConfig());
+		viewer = new RefsetViewerPanel(ace.getAceFrameConfig(), editor);
 		split.setRightComponent(viewer);
 		split.setDividerLocation(700);
 	}
@@ -42,5 +42,9 @@ public class RefsetSpecPanel extends JPanel {
 
 	public JTree getTreeInSpecEditor() {
 		return editor.getTreeInSpecEditor();
+	}
+
+	public I_GetConceptData getRefsetSpecInSpecEditor() {
+		return editor.getRefsetSpecInSpecEditor();
 	}
 }

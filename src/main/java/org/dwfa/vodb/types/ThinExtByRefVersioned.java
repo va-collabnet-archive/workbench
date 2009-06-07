@@ -18,6 +18,10 @@ import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartBoolean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartConcept;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPartConceptConcept;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPartConceptConceptString;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPartConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartInteger;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartLanguage;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartMeasurement;
@@ -248,6 +252,48 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
 			UniversalAceExtByRefPartString stringPart = (UniversalAceExtByRefPartString) part;
 			thinPart.setStringValue(stringPart.getStringValue());
+			return thinPart;
+
+		} else if (UniversalAceExtByRefPartConceptString.class.isAssignableFrom(part
+				.getClass())) {
+			ThinExtByRefPartConceptString thinPart = new ThinExtByRefPartConceptString();
+			setStandardFields(part, vodb, thinPart);
+
+			UniversalAceExtByRefPartConceptString conceptStringPart = (UniversalAceExtByRefPartConceptString) part;
+			thinPart.setC1id(vodb.uuidToNative(conceptStringPart.getC1UuidCollection()));
+			thinPart.setStr(conceptStringPart.getStr());
+			return thinPart;
+
+		} else if (UniversalAceExtByRefPartConceptConcept.class.isAssignableFrom(part
+				.getClass())) {
+			ThinExtByRefPartConceptConcept thinPart = new ThinExtByRefPartConceptConcept();
+			setStandardFields(part, vodb, thinPart);
+
+			UniversalAceExtByRefPartConceptConcept ccPart = (UniversalAceExtByRefPartConceptConcept) part;
+			thinPart.setC1id(vodb.uuidToNative(ccPart.getC1UuidCollection()));
+			thinPart.setC2id(vodb.uuidToNative(ccPart.getC2UuidCollection()));
+			return thinPart;
+
+		} else if (UniversalAceExtByRefPartConceptConceptConcept.class.isAssignableFrom(part
+				.getClass())) {
+			ThinExtByRefPartConceptConceptConcept thinPart = new ThinExtByRefPartConceptConceptConcept();
+			setStandardFields(part, vodb, thinPart);
+
+			UniversalAceExtByRefPartConceptConceptConcept cccPart = (UniversalAceExtByRefPartConceptConceptConcept) part;
+			thinPart.setC1id(vodb.uuidToNative(cccPart.getC1UuidCollection()));
+			thinPart.setC2id(vodb.uuidToNative(cccPart.getC2UuidCollection()));
+			thinPart.setC3id(vodb.uuidToNative(cccPart.getC3UuidCollection()));
+			return thinPart;
+
+		} else if (UniversalAceExtByRefPartConceptConceptString.class.isAssignableFrom(part
+				.getClass())) {
+			ThinExtByRefPartConceptConceptString thinPart = new ThinExtByRefPartConceptConceptString();
+			setStandardFields(part, vodb, thinPart);
+
+			UniversalAceExtByRefPartConceptConceptString ccsPart = (UniversalAceExtByRefPartConceptConceptString) part;
+			thinPart.setC1id(vodb.uuidToNative(ccsPart.getC1UuidCollection()));
+			thinPart.setC2id(vodb.uuidToNative(ccsPart.getC2UuidCollection()));
+			thinPart.setStr(ccsPart.getStr());
 			return thinPart;
 
 		} else {

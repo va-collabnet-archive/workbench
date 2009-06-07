@@ -2102,6 +2102,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
 		tabs.addTab("Ref Set", makeRefsetConfig());
 		tabs.addTab("Component Panel", makeComponentConfig());
+		tabs.addTab("Classifier", makeClassifierConfig());
 
 		layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
 		preferencesPalette.add(tabs, BorderLayout.CENTER);
@@ -2399,6 +2400,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private JScrollPane makeComponentConfig() throws Exception {
 		return new JScrollPane(makeComponentToggleCheckboxPane());
+	}
+
+	private JScrollPane makeClassifierConfig() throws Exception {
+		return new JScrollPane(makeClassifierPrefPane());
 	}
 
 	private JPanel makeRefsetDefaultsPanel(TOGGLES toggle, EXT_TYPE type)
@@ -2704,9 +2709,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		editDefaultsTabs.addTab("defaults", refsetsDefault);
 
 		// add standard popups...
-		editDefaultsTabs.addTab("refset types", new JScrollPane(
+		editDefaultsTabs.addTab("refsets", new JScrollPane(
 				makePopupConfigPanel(defaults.getRefsetPopupIds(),
-						"Refset types for popup:")));
+						"Refsets for popup:")));
 
 		editDefaultsTabs.addTab("status types", new JScrollPane(
 				makePopupConfigPanel(defaults.getStatusPopupIds(),
@@ -2750,6 +2755,54 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		return checkBoxPane;
 	}
 
+	private JPanel makeClassifierPrefPane() {
+		JPanel classifierPrefPanel = new JPanel(new GridLayout(0, 1));
+
+		TermComponentLabel classifierRootLabel = new TermComponentLabel(
+				aceFrameConfig);
+		classifierRootLabel.setTermComponent(aceFrameConfig.getClassificationRoot());
+		aceFrameConfig.addPropertyChangeListener("classificationRoot",
+				new PropertyListenerGlue("setTermComponent",
+						I_AmTermComponent.class, classifierRootLabel));
+		classifierRootLabel.addTermChangeListener(new PropertyListenerGlue(
+				"setClassificationRoot", I_GetConceptData.class, aceFrameConfig));
+
+		wrapAndAdd(classifierPrefPanel, classifierRootLabel, "Classification root: ");
+
+		TermComponentLabel classificationIsaLabel = new TermComponentLabel(
+				aceFrameConfig);
+		classificationIsaLabel.setTermComponent(aceFrameConfig.getClassifierIsaType());
+		aceFrameConfig.addPropertyChangeListener("classifierIsaType",
+				new PropertyListenerGlue("setTermComponent",
+						I_AmTermComponent.class, classificationIsaLabel));
+		classificationIsaLabel.addTermChangeListener(new PropertyListenerGlue(
+				"setClassifierIsaType", I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(classifierPrefPanel, classificationIsaLabel, "Classification is-a: ");
+
+		TermComponentLabel classificationInputPathLabel = new TermComponentLabel(
+				aceFrameConfig);
+		classificationInputPathLabel.setTermComponent(aceFrameConfig.getClassifierInputPath());
+		aceFrameConfig.addPropertyChangeListener("classifierInputPath",
+				new PropertyListenerGlue("setTermComponent",
+						I_AmTermComponent.class, classificationInputPathLabel));
+		classificationInputPathLabel.addTermChangeListener(new PropertyListenerGlue(
+				"setClassifierInputPath", I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(classifierPrefPanel, classificationInputPathLabel, "Classification Input Path: ");
+
+		TermComponentLabel classificationOutputPathLabel = new TermComponentLabel(
+				aceFrameConfig);
+		classificationOutputPathLabel.setTermComponent(aceFrameConfig.getClassifierOutputPath());
+		aceFrameConfig.addPropertyChangeListener("classifierOutputPath",
+				new PropertyListenerGlue("setTermComponent",
+						I_AmTermComponent.class, classificationOutputPathLabel));
+		classificationOutputPathLabel.addTermChangeListener(new PropertyListenerGlue(
+				"setClassifierOutputPath", I_GetConceptData.class, aceFrameConfig));
+		wrapAndAdd(classifierPrefPanel, classificationOutputPathLabel, "Classification Output Path: ");
+
+		return classifierPrefPanel;
+		
+	}
+	
 	private JTabbedPane makeEditConfig() throws Exception {
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.addTab("defaults", new JScrollPane(madeDefaultsPanel()));
@@ -4025,6 +4078,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public JTree getTreeInSpecEditor() {
 		return refsetSpecPanel.getTreeInSpecEditor();
+	}
+
+	public I_GetConceptData getRefsetSpecInSpecEditor() {
+		return refsetSpecPanel.getRefsetSpecInSpecEditor();
 	}
 
 }

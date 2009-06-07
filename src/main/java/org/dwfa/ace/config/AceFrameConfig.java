@@ -92,7 +92,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 33;
+    private static final int dataVersion = 35;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -247,6 +247,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     //34
     private I_GetConceptData context;
+    
+    //35
+    
+    private I_GetConceptData classificationRoot;
+    private I_GetConceptData classifierInputPathConcept;
+    private I_GetConceptData classifierIsaType;
+    private I_GetConceptData classifierOutputPathConcept;
 
 
 	// transient
@@ -416,6 +423,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             contextIntList.add(context.getConceptId());
         }
         IntList.writeIntList(out, contextIntList);
+        
+        // 35
+        try {
+            out.writeObject(AceConfig.getVodb().nativeToUuid(classificationRoot.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(classifierIsaType.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(classifierInputPathConcept.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(classifierOutputPathConcept.getConceptId()));
+        } catch (DatabaseException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+        }
     }
 
     public I_GetConceptData getContext() {
@@ -740,8 +759,26 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	context = null;
             } 
         
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
+            
+            // 35
+            
+            if (objDataVersion >= 35) {
+            	try {
+            		classificationRoot = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
+            		classifierIsaType = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
+            		classifierInputPathConcept = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
+            		classifierOutputPathConcept = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
+            	} catch (TerminologyException e) {
+            		IOException newEx = new IOException();
+            		newEx.initCause(e);
+            		throw newEx;
+            	}
+            } else {
+            	classificationRoot = null;
+            	classifierIsaType = null;
+            	classifierInputPathConcept = null;
+            	classifierOutputPathConcept = null;
+            }
         }
         addListeners();
     }
@@ -2301,6 +2338,50 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	public JTree getTreeInSpecEditor() {
 		return aceFrame.getCdePanel().getTreeInSpecEditor();
+	}
+
+	public I_GetConceptData getRefsetSpecInSpecEditor() {
+		return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
+	}
+
+	public I_GetConceptData getClassificationRoot() {
+		return classificationRoot;
+	}
+
+	public I_GetConceptData getClassifierInputPath() {
+		return classifierInputPathConcept;
+	}
+
+	public I_GetConceptData getClassifierIsaType() {
+		return classifierIsaType;
+	}
+
+	public I_GetConceptData getClassifierOutputPath() {
+		return classifierOutputPathConcept;
+	}
+
+	public void setClassificationRoot(I_GetConceptData classificationRoot) {
+		Object old = this.classificationRoot;
+		this.classificationRoot = classificationRoot;
+		changeSupport.firePropertyChange("classificationRoot", old, classificationRoot);
+	}
+
+	public void setClassifierInputPath(I_GetConceptData inputPath) {
+		Object old = inputPath;
+		classifierInputPathConcept = inputPath;
+		changeSupport.firePropertyChange("classifierInputPath", old, inputPath);
+	}
+
+	public void setClassifierIsaType(I_GetConceptData classifierIsaType) {
+		Object old = classifierIsaType;
+		this.classifierIsaType = classifierIsaType;
+		changeSupport.firePropertyChange("classifierIsaType", old, classifierIsaType);
+	}
+
+	public void setClassifierOutputPath(I_GetConceptData outputPath) {
+		Object old = outputPath;
+		this.classifierOutputPathConcept = outputPath;
+		changeSupport.firePropertyChange("classifierOutputPath", old, outputPath);
 	}
 
 }
