@@ -34,17 +34,24 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
+	
+	private Boolean clauseIsTrue = true;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
+		out.writeBoolean(clauseIsTrue);
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			//
+		if (objDataVersion <= dataVersion) {
+			if (objDataVersion < 2) {
+				clauseIsTrue = true;
+			} else {
+				clauseIsTrue = in.readBoolean();
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -67,11 +74,11 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 				throw new TaskFailedException(msg);
 			}
 
-			I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
-			if (refset != null) {
+			I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
+			if (refsetSpec != null) {
 				JTree specTree = configFrame.getTreeInSpecEditor();
 				
-				int refsetId = refset.getConceptId();
+				int refsetId = refsetSpec.getConceptId();
 				int componentId = refsetId;
 
 				TreePath selection = specTree.getSelectionPath();
@@ -129,5 +136,17 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 	public Collection<Condition> getConditions() {
 		return AbstractTask.CONTINUE_CONDITION;
 	}
+
+	public Boolean getClauseIsTrue() {
+		if (clauseIsTrue == null) {
+			clauseIsTrue = true;
+		}
+		return clauseIsTrue;
+	}
+
+	public void setClauseIsTrue(Boolean clauseIsTrue) {
+		this.clauseIsTrue = clauseIsTrue;
+	}
+
 
 }

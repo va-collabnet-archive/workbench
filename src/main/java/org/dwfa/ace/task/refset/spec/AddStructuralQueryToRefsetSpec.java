@@ -49,14 +49,21 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
 			I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame) throws IOException,
 			TerminologyException {
 		I_ThinExtByRefPartConceptConceptConcept specPart = tf.newConceptConceptConceptExtensionPart();
-		specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
-		specPart.setC2id(RefsetAuxiliary.Concept.CONCEPT_IS.localize().getNid());
+		if (getClauseIsTrue()) {
+			specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
+		} else {
+			specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
+		}
+		specPart.setC2id(getStructuralQueryTokenId());
 		specPart.setC3id(configFrame.getHierarchySelection().getConceptId());
 		specPart.setPathId(p.getConceptId());
 		specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 		specPart.setVersion(Integer.MAX_VALUE);
 		return specPart;
 	}
-
+	
+	protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
+		return RefsetAuxiliary.Concept.CONCEPT_IS.localize().getNid();
+	}
 }
 

@@ -374,8 +374,22 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public BundleType getBundleType();
 	
 	public I_GetConceptData getRefsetInSpecEditor();
+	public I_GetConceptData getRefsetSpecInSpecEditor();
 	public JTree getTreeInSpecEditor();
 	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor();
+	
+	//Configuration items to support the classifier. 
+	public I_GetConceptData getClassificationRoot();
+	public void setClassificationRoot(I_GetConceptData classificationRoot);
+	
+	public I_GetConceptData getClassifierIsaType();
+	public void setClassifierIsaType(I_GetConceptData classifierIsaType);
+	
+	public I_GetConceptData getClassifierInputPath();
+	public void setClassifierInputPath(I_GetConceptData inputPath);
+
+	public I_GetConceptData getClassifierOutputPath();
+	public void setClassifierOutputPath(I_GetConceptData outputPath);
 
 
 }
