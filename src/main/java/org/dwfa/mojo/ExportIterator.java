@@ -1,16 +1,5 @@
 package org.dwfa.mojo;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -37,6 +26,17 @@ import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.refset.ExportSpecification;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class ExportIterator implements I_ProcessConcepts {
 
@@ -255,13 +255,11 @@ public class ExportIterator implements I_ProcessConcepts {
 	private boolean writeUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) 
 			throws Exception {
 
-		I_IntSet descStatus = termFactory.newIntSet();
-		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
-		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId());
-		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-		descStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId());
-		I_DescriptionTuple descForConceptFile = concept.getDescTuple(nameOrder, descStatus, positions);
-		if (descForConceptFile == null) {
+        I_IntList fsn = termFactory.newIntList();
+        fsn.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
+        I_DescriptionTuple descForConceptFile = concept.getDescTuple(fsn, null, positions);
+
+        if (descForConceptFile == null) {
 			errorWriter.append("\n\nnull desc for: " + concept.getUids() + " " + concept.getDescriptions());
 			return false;			
 		} else {
@@ -338,7 +336,7 @@ public class ExportIterator implements I_ProcessConcepts {
 		}// End method getUuidBasedConceptDetaiils
 	}
 
-	private boolean validPosition(int pathId) {                        
+	private boolean validPosition(int pathId) {
         for (I_Position position : positions) {
             if (position.getPath().getConceptId() == pathId) {
                 return true;
@@ -541,7 +539,7 @@ public class ExportIterator implements I_ProcessConcepts {
 				I_DescriptionTuple latestTuple = latestDesc.get(tuple.getDescId());
 				if (tuple.getVersion() >= latestTuple.getVersion()) {
 					latestDesc.put(tuple.getDescId(), tuple);
-				}
+				}                                                                       
 			}
 		}
 		
