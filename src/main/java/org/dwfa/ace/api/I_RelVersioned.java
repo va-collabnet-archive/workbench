@@ -14,6 +14,8 @@ public interface I_RelVersioned extends I_AmTermComponent {
 	public boolean addVersionNoRedundancyCheck(I_RelPart rel);
 
 	public List<I_RelPart> getVersions();
+	
+	public List<I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public int versionCount();
 
@@ -33,8 +35,10 @@ public interface I_RelVersioned extends I_AmTermComponent {
 	public int getC2Id();
 
 	public int getRelId();
-
+	
 	public List<I_RelTuple> getTuples();
+
+	public List<I_RelTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public I_RelTuple getFirstTuple();
 
@@ -43,6 +47,13 @@ public interface I_RelVersioned extends I_AmTermComponent {
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positions, List<I_RelTuple> returnRels,
 			boolean addUncommitted);
+			
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_RelTuple> returnRels,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+	
+	public void addTuples(I_IntSet allowedTypes, List<I_RelTuple> returnRels,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 

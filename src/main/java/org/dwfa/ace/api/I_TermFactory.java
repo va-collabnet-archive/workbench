@@ -73,6 +73,15 @@ public interface I_TermFactory {
             String text, I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
                 IOException;
 
+    /**
+     * Gets a description given a description native ID and a concept native ID
+     * 
+     * @param dnid description native ID
+     * @param cnid concept native ID
+     * @return description matching the description and concept IDs
+     * @throws TerminologyException if the description could not be found
+     * @throws IOException
+     */
     public I_DescriptionVersioned getDescription(int dnid, int cnid) throws TerminologyException, IOException;
 
     /**

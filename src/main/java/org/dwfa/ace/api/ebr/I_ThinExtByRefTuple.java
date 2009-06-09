@@ -2,7 +2,9 @@ package org.dwfa.ace.api.ebr;
 
 import java.util.List;
 
-public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart {
+import org.dwfa.ace.api.I_AmTuple;
+
+public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart, I_AmTuple {
 
 	/**
 	 * @deprecated Use {@link #getStatusId()}

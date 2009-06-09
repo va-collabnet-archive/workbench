@@ -1,7 +1,7 @@
 package org.dwfa.ace.api;
 
 
-public interface I_ConceptAttributeTuple extends I_AmPart {
+public interface I_ConceptAttributeTuple extends I_AmTuple {
 
 	public abstract int getConId();
 
@@ -23,6 +23,6 @@ public interface I_ConceptAttributeTuple extends I_AmPart {
 	
 	public I_ConceptAttributePart duplicate();
 	
-   public abstract I_ConceptAttributePart getPart();
+    public abstract I_ConceptAttributePart getPart();
 
 }

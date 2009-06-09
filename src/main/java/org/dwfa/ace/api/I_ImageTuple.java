@@ -1,6 +1,6 @@
 package org.dwfa.ace.api;
 
-public interface I_ImageTuple extends I_AmTypedPart {
+public interface I_ImageTuple extends I_AmTypedTuple {
 
 	public byte[] getImage();
 

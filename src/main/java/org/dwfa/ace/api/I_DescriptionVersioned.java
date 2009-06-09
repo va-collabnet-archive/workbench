@@ -14,6 +14,8 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 	public boolean addVersion(I_DescriptionPart newPart);
 
 	public List<I_DescriptionPart> getVersions();
+	
+	public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public int versionCount();
 
@@ -24,7 +26,9 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 	public int getDescId();
 
 	public List<I_DescriptionTuple> getTuples();
-
+	
+	public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+	
 	public I_DescriptionTuple getFirstTuple();
 
 	public I_DescriptionTuple getLastTuple();
@@ -32,6 +36,13 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
          boolean addUncommitted);
+         
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
+         boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+	
+	public void addTuples(I_IntSet allowedTypes, List<I_DescriptionTuple> matchingTuples,
+         boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 

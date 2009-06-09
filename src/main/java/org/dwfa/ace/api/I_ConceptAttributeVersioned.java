@@ -26,14 +26,22 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
 	public Set<TimePathId> getTimePathSet();
 
-   public void addTuples(I_IntSet allowedStatus,
+    public void addTuples(I_IntSet allowedStatus,
          Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples);
 
-   public void addTuples(I_IntSet allowedStatus,
+    public void addTuples(I_IntSet allowedStatus,
          Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted);
+   
+
+    public void addTuples(I_IntSet allowedStatus,
+         Set<I_Position> positionSet, List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted, 
+         boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public I_ConceptualizeLocally getLocalFixedConcept();
 	
 	public UniversalAceConceptAttributes getUniversal() throws IOException, TerminologyException;
+
+	public List<I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> viewPositionSet);
 
 }

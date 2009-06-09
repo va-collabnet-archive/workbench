@@ -1,6 +1,6 @@
 package org.dwfa.ace.api;
 
-public interface I_DescriptionTuple extends I_AmTypedPart {
+public interface I_DescriptionTuple extends I_AmTypedTuple {
 
 	public abstract boolean getInitialCaseSignificant();
 

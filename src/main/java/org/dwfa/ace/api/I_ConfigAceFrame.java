@@ -373,6 +373,37 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     
 	public BundleType getBundleType();
 	
+	/**
+	 * @return the conflict resolution strategy in use by the profile
+	 */
+	I_ManageConflict getConflictResolutionStrategy();
+
+	/**
+	 * Sets the conflict resolution strategy for this profile
+	 * 
+	 * @param conflictResolutionStrategy
+	 */
+	void setConflictResolutionStrategy(
+			I_ManageConflict conflictResolutionStrategy);
+
+	/**
+	 * Sets the conflict resolution strategy for this profile
+	 * 
+	 * @param conflictResolutionStrategy
+	 */
+	public <T extends I_ManageConflict> void setConflictResolutionStrategy(
+			Class<T> conflictResolutionStrategyClass);
+	
+	public Boolean getHighlightConflictsInTaxonomyView();
+	
+	public void setHighlightConflictsInTaxonomyView(
+			Boolean highlightConflictsInTaxonomyView);
+	
+	public Boolean getHighlightConflictsInComponentPanel();
+	
+	public void setHighlightConflictsInComponentPanel(
+			Boolean highlightConflictsInComponentPanel);
+	
 	public I_GetConceptData getRefsetInSpecEditor();
 	public I_GetConceptData getRefsetSpecInSpecEditor();
 	public JTree getTreeInSpecEditor();
@@ -391,5 +422,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public I_GetConceptData getClassifierOutputPath();
 	public void setClassifierOutputPath(I_GetConceptData outputPath);
 
+	public I_ManageConflict[] getAllConflictResolutionStrategies();
 
 }

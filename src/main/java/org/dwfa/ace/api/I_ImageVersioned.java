@@ -1,7 +1,6 @@
 package org.dwfa.ace.api;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +23,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
 	public I_ImageTuple getLastTuple();
 
-	public Collection<I_ImageTuple> getTuples();
+	public List<I_ImageTuple> getTuples();
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 

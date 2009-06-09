@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-public interface I_IdTuple extends I_AmPart {
+public interface I_IdTuple extends I_AmTuple {
 
 	public abstract int getNativeId();
 

@@ -1,40 +1,134 @@
 package org.dwfa.ace.api.ebr;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.tapi.TerminologyException;
 
-public interface I_ThinExtByRefVersioned {
+public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 
-   public int getMemberId();
+	/**
+	 * @return the membership identifier - this is the surrogate key for the
+	 *         I_ThinExtByRefVersioned object itself which represents a
+	 *         component's membership of a given reference set
+	 */
+	public int getMemberId();
 
-   public int getComponentId();
+	/**
+	 * @return the component that is "in the reference set" - really the
+	 *         component that this I_ThinExtByRefVersioned represents the
+	 *         membership of relative to a given reference set
+	 */
+	public int getComponentId();
 
-   public int getTypeId();
+	public int getTypeId();
 
-   public List<? extends I_ThinExtByRefPart> getVersions();
+	public List<? extends I_ThinExtByRefPart> getVersions();
 
-   public int getRefsetId();
+	/**
+	 * @return the id of the reference set which this I_ThinExtByRefVersioned
+	 *         represents a component's membership of
+	 */
+	public int getRefsetId();
 
-   public void addVersion(I_ThinExtByRefPart part);
+	public void addVersion(I_ThinExtByRefPart part);
 
-   public void setRefsetId(int refsetId);
+	public void setRefsetId(int refsetId);
 
-   public void setTypeId(int typeId);
+	public void setTypeId(int typeId);
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.dwfa.vodb.types.I_RelVersioned#addTuples(org.dwfa.ace.IntSet,
-    *      org.dwfa.ace.IntSet, java.util.Set, java.util.List, boolean)
-    */
    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
        List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted);
+
+	/**
+	 * Retrieves tuples matching the specified allowedStatuses and positions -
+	 * tuples are returned in the supplied returnTuples List parameter
+	 * 
+	 * @param allowedStatus
+	 *            statuses tuples must match to be returned
+	 * @param positions
+	 *            postions a tuple must be on to be returned
+	 * @param returnTuples
+	 *            List to be populated with the result of the search
+	 * @param addUncommitted
+	 *            if true matching items from the uncommitted list will be
+	 *            added, if false the uncommitted list is ignored
+	 * @param returnConflictResolvedLatestState
+	 *            indicates if all tuples or just the latest state using the
+	 *            current profile's conflict resolution strategy is required
+	 * @throws IOException 
+	 * @throws TerminologyException 
+	 */
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+			List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+
+	/**
+	 * Retrieves tuples matching the specified allowedStatuses and positions
+	 * configured in the current profile - tuples are returned in the supplied
+	 * returnTuples List parameter
+	 * 
+	 * @param returnTuples
+	 *            List to be populated with the result of the search
+	 * @param addUncommitted
+	 *            if true matching items from the uncommitted list will be
+	 *            added, if false the uncommitted list is ignored
+	 * @param returnConflictResolvedLatestState
+	 *            indicates if all tuples or just the latest state using the
+	 *            current profile's conflict resolution strategy is required
+	 * @throws IOException 
+	 * @throws TerminologyException 
+	 */
+	public void addTuples(List<I_ThinExtByRefTuple> returnTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
    public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus, 
                                               Set<I_Position> positions, 
                                               boolean addUncommitted);
+                                              
+	/**
+	 * Retrieves tuples matching the specified allowedStatuses and positions
+	 * 
+	 * @param allowedStatus
+	 *            statuses tuples must match to be returned
+	 * @param positions
+	 *            postions a tuple must be on to be returned
+	 * @param addUncommitted
+	 *            if true matching items from the uncommitted list will be
+	 *            added, if false the uncommitted list is ignored
+	 * @param returnConflictResolvedLatestState
+	 *            indicates if all tuples or just the latest state using the
+	 *            current profile's conflict resolution strategy is required
+	 * @return List of matching tuples
+	 * @throws IOException 
+	 * @throws TerminologyException 
+	 */
+	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> positions, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
+	/**
+	 * Retrieves tuples matching the specified allowedStatuses and positions
+	 * configured in the current profile
+	 * 
+	 * @param allowedStatus
+	 *            statuses tuples must match to be returned
+	 * @param positions
+	 *            postions a tuple must be on to be returned
+	 * @param addUncommitted
+	 *            if true matching items from the uncommitted list will be
+	 *            added, if false the uncommitted list is ignored
+	 * @param returnConflictResolvedLatestState
+	 *            indicates if all tuples or just the latest state using the
+	 *            current profile's conflict resolution strategy is required
+	 * @return List of matching tuples
+	 * @throws IOException 
+	 * @throws TerminologyException 
+	 */
+	public List<I_ThinExtByRefTuple> getTuples(boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 }
