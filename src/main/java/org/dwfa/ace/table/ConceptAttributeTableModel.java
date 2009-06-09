@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +19,6 @@ import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -32,6 +30,8 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -167,8 +167,8 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			if ((cb == null) || (cb.getConceptAttributes() == null)) {
 				return true;
 			}
-			I_ConceptAttributeVersioned concept = cb.getConceptAttributes();
-			for (I_ConceptAttributePart conVersion : concept.getVersions()) {
+			List<I_ConceptAttributeTuple> tuples = getConceptTuples(cb);
+			for (I_ConceptAttributeTuple conVersion : tuples) {
 				conceptsToFetch.add(conVersion.getConceptStatus());
 				conceptsToFetch.add(conVersion.getPathId());
 				if (stopWork) {
@@ -291,40 +291,44 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			if (conTuple == null) {
 				return null;
 			}
+			
+			I_ConfigAceFrame config = host.getConfig();
+			boolean inConflict = config .getHighlightConflictsInComponentPanel() 
+				&& config.getConflictResolutionStrategy().isInConflict((I_ConceptAttributeVersioned) conTuple.getFixedPart());
 
 			switch (columns[columnIndex]) {
 			case CON_ID:
 				return new StringWithConceptTuple(Integer.toString(conTuple
-						.getConId()), conTuple);
+						.getConId()), conTuple, inConflict);
 			case STATUS:
 				if (getReferencedConcepts().containsKey(conTuple.getConceptStatus())) {
-					return new StringWithConceptTuple(getPrefText(conTuple.getConceptStatus()), conTuple);
+					return new StringWithConceptTuple(getPrefText(conTuple.getConceptStatus()), conTuple, inConflict);
 				}
 				return new StringWithConceptTuple(Integer.toString(conTuple
-						.getConceptStatus()), conTuple);
+						.getConceptStatus()), conTuple, inConflict);
 			case DEFINED:
 				return new StringWithConceptTuple(Boolean.toString(conTuple
-						.isDefined()), conTuple);
+						.isDefined()), conTuple, inConflict);
 			case VERSION:
 				if (conTuple.getVersion() == Integer.MAX_VALUE) {
 					return new StringWithConceptTuple(ThinVersionHelper
-							.uncommittedHtml(), conTuple);
+							.uncommittedHtml(), conTuple, inConflict);
 				}
 				return new StringWithConceptTuple(ThinVersionHelper.format(conTuple
-						.getVersion()), conTuple);
+						.getVersion()), conTuple, inConflict);
 			case PATH:
 				if (getReferencedConcepts().containsKey(conTuple.getPathId())) {
 					try {
-						return new StringWithConceptTuple(getPrefText(conTuple.getPathId()), conTuple);
+						return new StringWithConceptTuple(getPrefText(conTuple.getPathId()), conTuple, inConflict);
 					} catch (Exception e) {
 						return new StringWithConceptTuple(Integer.toString(conTuple
-								.getPathId()), conTuple);
+								.getPathId()), conTuple, inConflict);
 					}
 				}
 				return new StringWithConceptTuple(Integer.toString(conTuple
-						.getPathId()), conTuple);
+						.getPathId()), conTuple, inConflict);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
@@ -347,20 +351,28 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			return null;
 		}
 		if (allTuples == null) {
-         allTuples = new ArrayList<I_ConceptAttributeTuple>();
-         Set<I_Position> positions = null;
-         if (host.getUsePrefs()) {
-            positions = host.getConfig().getViewPositionSet();
-         }
-         if (host.getShowHistory()) {
-            positions = null;
-          }
-			cb.getConceptAttributes().addTuples(null, positions, allTuples);
+         allTuples = getConceptTuples(cb);
 		}
       if (rowIndex < allTuples.size()) {
          return allTuples.get(rowIndex);
       }
 		return null;
+	}
+
+	private List<I_ConceptAttributeTuple> getConceptTuples(I_GetConceptData cb) throws IOException {
+		Set<I_Position> positions = null;
+		if (host.getUsePrefs()) {
+			positions = host.getConfig().getViewPositionSet();
+		}
+		if (host.getShowHistory()) {
+			positions = null;
+		}
+		try {
+			return cb.getConceptAttributeTuples(
+					host.getConfig().getAllowedStatus(), positions, true, !host.getShowHistory());
+		} catch (TerminologyException e) {
+			throw new ToIoException(e);
+		}
 	}
 
 	public String getColumnName(int col) {
@@ -511,22 +523,14 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 		this.progress = progress;
 	}
 
-	public static class StringWithConceptTuple implements Comparable<StringWithConceptTuple>, I_CellTextWithTuple {
+	public static class StringWithConceptTuple extends StringWithTuple implements Comparable<StringWithConceptTuple>, I_CellTextWithTuple {
 		String cellText;
 
 		I_ConceptAttributeTuple tuple;
 
-		public StringWithConceptTuple(String cellText, I_ConceptAttributeTuple tuple) {
-			super();
-			this.cellText = cellText;
+		public StringWithConceptTuple(String cellText, I_ConceptAttributeTuple tuple, boolean inConflict) {
+			super(cellText, inConflict);
 			this.tuple = tuple;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.dwfa.ace.table.I_CellTextWithTuple#getCellText()
-		 */
-		public String getCellText() {
-			return cellText;
 		}
 
 		/* (non-Javadoc)
@@ -536,12 +540,8 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 			return tuple;
 		}
 
-		public String toString() {
-			return cellText;
-		}
-
 		public int compareTo(StringWithConceptTuple another) {
-			return cellText.compareTo(another.cellText);
+			return super.compareTo(another);
 		}
 	}
 

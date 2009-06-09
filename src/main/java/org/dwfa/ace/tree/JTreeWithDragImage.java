@@ -276,6 +276,9 @@ public class JTreeWithDragImage extends JTree {
         config.addPropertyChangeListener("viewPositions", rl);
         config.addPropertyChangeListener("sortTaxonomyUsingRefset", rl);
 		config.addPropertyChangeListener("showViewerImagesInTaxonomy", rl);
+		config.addPropertyChangeListener("highlightConflictsInTaxonomyView", rl);
+		config.addPropertyChangeListener("highlightConflictsInComponentPanel", rl);
+		config.addPropertyChangeListener("conflictResolutionStrategy", rl);
         config.addPropertyChangeListener("showRefsetInfoInTaxonomy", rl);
         addTreeSelectionListener(new SelectionListener());
 	}

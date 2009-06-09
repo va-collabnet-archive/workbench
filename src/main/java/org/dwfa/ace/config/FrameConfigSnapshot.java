@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -679,6 +680,21 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		throw new UnsupportedOperationException();
 
 	}
+	
+	public <T extends I_ManageConflict> void setConflictResolutionStrategy(
+			Class<T> conflictResolutionStrategyClass) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setHighlightConflictsInComponentPanel(
+			Boolean highlightConflictsInComponentPanel) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setHighlightConflictsInTaxonomyView(
+			Boolean highlightConflictsInTaxonomyView) {
+		throw new UnsupportedOperationException();
+	}
 
 	public void showListView() {
 		throw new UnsupportedOperationException();
@@ -1009,4 +1025,24 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		return baseFrame.getTabHistoryMap();
 	}
 
+	public I_ManageConflict getConflictResolutionStrategy() {
+		return baseFrame.getConflictResolutionStrategy();
+	}
+
+	public void setConflictResolutionStrategy(
+			I_ManageConflict conflictResolutionStrategy) {
+		throw new UnsupportedOperationException();
+	}
+
+	public I_ManageConflict[] getAllConflictResolutionStrategies() {
+		return baseFrame.getAllConflictResolutionStrategies();
+	}
+
+	public Boolean getHighlightConflictsInComponentPanel() {
+		return baseFrame.getHighlightConflictsInComponentPanel();
+	}
+
+	public Boolean getHighlightConflictsInTaxonomyView() {
+		return baseFrame.getHighlightConflictsInTaxonomyView();
+	}
 }

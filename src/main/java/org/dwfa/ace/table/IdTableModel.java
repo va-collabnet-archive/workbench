@@ -51,31 +51,22 @@ public class IdTableModel extends AbstractTableModel implements
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static class StringWithIdTuple implements Comparable<StringWithIdTuple>, I_CellTextWithTuple {
+	public static class StringWithIdTuple extends StringWithTuple implements Comparable<StringWithIdTuple>, I_CellTextWithTuple {
 		String cellText;
 
 		I_IdTuple tuple;
 
-		public StringWithIdTuple(String cellText, I_IdTuple tuple) {
-			super();
-			this.cellText = cellText;
+		public StringWithIdTuple(String cellText, I_IdTuple tuple, boolean isInConflict) {
+			super(cellText, isInConflict);
 			this.tuple = tuple;
-		}
-
-		public String getCellText() {
-			return cellText;
 		}
 
 		public I_IdTuple getTuple() {
 			return tuple;
 		}
 
-		public String toString() {
-			return cellText;
-		}
-
 		public int compareTo(StringWithIdTuple another) {
-			return cellText.compareTo(another.cellText);
+			return super.compareTo(another);
 		}
 	}
 	private List<I_IdTuple> allTuples;
@@ -172,7 +163,7 @@ public class IdTableModel extends AbstractTableModel implements
 				if (workStopped) {
 					return false;
 				}
-				conceptsToFetch.add(part.getIdStatus());
+				conceptsToFetch.add(part.getStatusId());
 				conceptsToFetch.add(part.getPathId());
 			}
 
@@ -363,34 +354,38 @@ public class IdTableModel extends AbstractTableModel implements
 				return null;
 			}
 
+			I_ConfigAceFrame config = host.getConfig();
+			boolean inConflict = config .getHighlightConflictsInComponentPanel() 
+				&& config.getConflictResolutionStrategy().isInConflict((I_IdVersioned) idTuple.getFixedPart());
+			
 			switch (columns[columnIndex]) {
 			case LOCAL_ID:
 				return new StringWithIdTuple(Integer.toString(idTuple
-						.getNativeId()), idTuple);
+						.getNativeId()), idTuple, inConflict);
 			case STATUS:
-				if (referencedConcepts.containsKey(idTuple.getIdStatus())) {
-					return new StringWithIdTuple(getPrefText(idTuple.getIdStatus()), idTuple);
+				if (referencedConcepts.containsKey(idTuple.getStatusId())) {
+					return new StringWithIdTuple(getPrefText(idTuple.getStatusId()), idTuple, inConflict);
 				}
 				return new StringWithIdTuple(Integer.toString(idTuple
-						.getIdStatus()), idTuple);
+						.getStatusId()), idTuple, inConflict);
 			case EXT_ID:
 				return new StringWithIdTuple(idTuple
-						.getSourceId().toString(), idTuple);
+						.getSourceId().toString(), idTuple, inConflict);
 			case VERSION:
 				if (idTuple.getVersion() == Integer.MAX_VALUE) {
 					return new StringWithIdTuple(ThinVersionHelper
-							.uncommittedHtml(), idTuple);
+							.uncommittedHtml(), idTuple, inConflict);
 				}
 				return new StringWithIdTuple(ThinVersionHelper.format(idTuple
-						.getVersion()), idTuple);
+						.getVersion()), idTuple, inConflict);
 			case PATH:
 				if (referencedConcepts.containsKey(idTuple.getPathId())) {
-					return new StringWithIdTuple(getPrefText(idTuple.getPathId()), idTuple);
+					return new StringWithIdTuple(getPrefText(idTuple.getPathId()), idTuple, inConflict);
 				}
 				return new StringWithIdTuple(Integer.toString(idTuple
-						.getPathId()), idTuple);
+						.getPathId()), idTuple, inConflict);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
@@ -445,7 +440,7 @@ public class IdTableModel extends AbstractTableModel implements
 			public void actionPerformed(ActionEvent e) {
 				for (I_Path p : config.getEditingPathSet()) {
 					I_IdPart newPart = selectedObject.getTuple()
-							.duplicatePart();
+							.duplicate();
 					newPart.setPathId(p.getConceptId());
 					newPart.setVersion(Integer.MAX_VALUE);
 					selectedObject.getTuple().getIdVersioned().getVersions().add(
@@ -467,14 +462,14 @@ public class IdTableModel extends AbstractTableModel implements
 				try {
 					for (I_Path p : config.getEditingPathSet()) {
 						I_IdPart newPart = selectedObject.getTuple()
-								.duplicatePart();
+								.duplicate();
 						newPart.setPathId(p.getConceptId());
 						newPart.setVersion(Integer.MAX_VALUE);
-						newPart.setIdStatus(AceConfig.getVodb()
+						newPart.setStatusId(AceConfig.getVodb()
 								.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
 										.getUids()));
-						referencedConcepts.put(newPart.getIdStatus(), 
-								ConceptBean.get(newPart.getIdStatus()));
+						referencedConcepts.put(newPart.getStatusId(), 
+								ConceptBean.get(newPart.getStatusId()));
 						selectedObject.getTuple().getIdVersioned()
 								.getVersions().add(newPart);
 					}
@@ -561,7 +556,7 @@ public class IdTableModel extends AbstractTableModel implements
 		@Override
 		public ConceptBean getSelectedItem(Object value) {
 			StringWithIdTuple swdt = (StringWithIdTuple) value;
-			return ConceptBean.get(swdt.getTuple().getIdStatus());
+			return ConceptBean.get(swdt.getTuple().getStatusId());
 		}
 	}
 

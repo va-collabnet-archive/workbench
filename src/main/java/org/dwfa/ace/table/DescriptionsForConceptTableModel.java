@@ -24,6 +24,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionsForConceptTableModel extends DescriptionTableModel
@@ -214,11 +216,17 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel
 		if (cb == null) {
 			return selectedTuples;
 		}
-		for (I_DescriptionVersioned desc: cb.getDescriptions()) {
-			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
-		}
-		for (I_DescriptionVersioned desc: cb.getUncommittedDescriptions()) {
-			desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
+		try {
+			for (I_DescriptionVersioned desc : cb.getDescriptions()) {
+				desc.addTuples(allowedStatus, allowedTypes, positions,
+						selectedTuples, true, !host.getShowHistory());
+			}
+			for (I_DescriptionVersioned desc : cb.getUncommittedDescriptions()) {
+				desc.addTuples(allowedStatus, allowedTypes, positions,
+						selectedTuples, true, !host.getShowHistory());
+			}
+		} catch (TerminologyException e) {
+			throw new ToIoException(e);
 		}
 		return selectedTuples;
 	}

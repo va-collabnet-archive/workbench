@@ -47,6 +47,7 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -77,6 +78,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.dwfa.vodb.conflict.LastCommitWinsConflictResolutionStrategy;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
@@ -92,7 +95,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 35;
+    private static final int dataVersion = 36;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -249,11 +252,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_GetConceptData context;
     
     //35
-    
     private I_GetConceptData classificationRoot;
     private I_GetConceptData classifierInputPathConcept;
     private I_GetConceptData classifierIsaType;
     private I_GetConceptData classifierOutputPathConcept;
+
+    //36
+    private I_ManageConflict conflictResolutionStrategy;
+    private boolean highlightConflictsInTaxonomyView;
+    private boolean highlightConflictsInComponentPanel;
 
 
 	// transient
@@ -426,16 +433,29 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         // 35
         try {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(classificationRoot.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(classifierIsaType.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(classifierInputPathConcept.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(classifierOutputPathConcept.getConceptId()));
+        	writeConceptAsId(classificationRoot, out);
+        	writeConceptAsId(classifierIsaType, out);
+        	writeConceptAsId(classifierInputPathConcept, out);
+        	writeConceptAsId(classifierOutputPathConcept, out);
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
             throw newEx;
         }
+        
+        // 36
+        out.writeObject(conflictResolutionStrategy);
+        out.writeBoolean(highlightConflictsInComponentPanel);
+        out.writeBoolean(highlightConflictsInTaxonomyView);
     }
+
+	private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException, IOException {
+    	if (concept == null) {
+    		out.writeObject(null);
+    	} else {
+    		out.writeObject(AceConfig.getVodb().nativeToUuid(concept.getConceptId()));
+    	}
+	}
 
     public I_GetConceptData getContext() {
 		return context;
@@ -749,25 +769,24 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	IntList contextIntList = IntList.readIntListIgnoreMapErrors(in);
             	if (contextIntList.size() != 1) {
                    	context = null;
+            	} else {
+	            	try {
+						context = LocalVersionedTerminology.get().getConcept(contextIntList.getListArray()[0]);
+					} catch (TerminologyException e) {
+						throw new ToIoException(e);
+					}
             	}
-            	try {
-					context = LocalVersionedTerminology.get().getConcept(contextIntList.getListArray()[0]);
-				} catch (TerminologyException e) {
-					throw new ToIoException(e);
-				}
             } else {
             	context = null;
             } 
-        
             
             // 35
-            
             if (objDataVersion >= 35) {
             	try {
-            		classificationRoot = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
-            		classifierIsaType = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
-            		classifierInputPathConcept = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
-            		classifierOutputPathConcept = LocalVersionedTerminology.get().getConcept((List<UUID>)in.readObject());
+            		classificationRoot = readConceptFromSerializedUuids(in);
+            		classifierIsaType = readConceptFromSerializedUuids(in);
+            		classifierInputPathConcept = readConceptFromSerializedUuids(in);
+            		classifierOutputPathConcept = readConceptFromSerializedUuids(in);
             	} catch (TerminologyException e) {
             		IOException newEx = new IOException();
             		newEx.initCause(e);
@@ -779,9 +798,34 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	classifierInputPathConcept = null;
             	classifierOutputPathConcept = null;
             }
+            
+            if (objDataVersion >= 36) {
+            	conflictResolutionStrategy = (I_ManageConflict) in.readObject();
+            	highlightConflictsInComponentPanel = in.readBoolean();
+            	highlightConflictsInTaxonomyView = in.readBoolean();
+            } else {
+            	conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+            	highlightConflictsInComponentPanel = false;
+            	highlightConflictsInTaxonomyView = false;
+            }
+        
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
         addListeners();
     }
+
+	@SuppressWarnings("unchecked")
+	private I_GetConceptData readConceptFromSerializedUuids(
+			java.io.ObjectInputStream in) throws TerminologyException,
+			IOException, ClassNotFoundException {
+		Object obj = in.readObject();
+		if (obj == null) {
+			return null;
+		} else {
+			return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+		}
+	}
 
     private static HashMap<TOGGLES, I_HoldRefsetPreferences> setupRefsetPreferences() throws IOException {
         HashMap<TOGGLES, I_HoldRefsetPreferences> map = new HashMap<TOGGLES, I_HoldRefsetPreferences>();
@@ -1489,7 +1533,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 				try {
 					new ExpandPathToNodeStateListener(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this, 
 							getHierarchySelection());
-				} catch (IOException e) {
+				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}});
@@ -2328,6 +2372,97 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		return bundleType;
 	}
 
+	/**
+	 * @return the conflict resolution strategy in use by the profile
+	 */
+	public I_ManageConflict getConflictResolutionStrategy() {
+		if (conflictResolutionStrategy == null) {
+			conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+		}
+		return conflictResolutionStrategy;
+	}
+
+	/**
+	 * Sets the conflict resolution strategy for this profile
+	 * 
+	 * @param conflictResolutionStrategy
+	 */
+	public void setConflictResolutionStrategy(
+			I_ManageConflict conflictResolutionStrategy) {
+		
+		I_ManageConflict old = this.conflictResolutionStrategy;
+		
+		this.conflictResolutionStrategy = conflictResolutionStrategy;
+
+        changeSupport.firePropertyChange("conflictResolutionStrategy", old, conflictResolutionStrategy);
+	}
+
+	/**
+	 * Sets the conflict resolution strategy for this profile
+	 * 
+	 * @param conflictResolutionStrategy
+	 */
+	public <T extends I_ManageConflict> void setConflictResolutionStrategy(
+			Class<T> conflictResolutionStrategyClass) {
+
+		try {
+			setConflictResolutionStrategy(conflictResolutionStrategyClass.newInstance());
+		} catch (InstantiationException e) {
+			alertAndLog("Cannot instanciate conflict resolution strategy of type '"
+									+ conflictResolutionStrategyClass
+									+ "', will continue with existing value '"
+									+ getConflictResolutionStrategy().getClass() + "'", e);
+		} catch (IllegalAccessException e) {
+			alertAndLog("Cannot instanciate conflict resolution strategy of type '"
+					+ conflictResolutionStrategyClass
+					+ "' due to permissions, will continue with existing value '"
+					+ getConflictResolutionStrategy().getClass() + "'", e);
+		}
+	}
+
+	private void alertAndLog(String message, Exception e) {
+		LocalVersionedTerminology.get().getEditLog().alertAndLog(
+				Level.WARNING,
+				message,
+				e);
+	}
+		
+	public Boolean getHighlightConflictsInTaxonomyView() {
+		return highlightConflictsInTaxonomyView;
+	}
+
+	public void setHighlightConflictsInTaxonomyView(
+			Boolean highlightConflictsInTaxonomyView) {
+		
+		Boolean old = this.highlightConflictsInTaxonomyView;
+		
+		this.highlightConflictsInTaxonomyView = highlightConflictsInTaxonomyView;
+
+        changeSupport.firePropertyChange("highlightConflictsInTaxonomyView", old, highlightConflictsInTaxonomyView);
+	}
+	
+	public Boolean getHighlightConflictsInComponentPanel() {
+		return highlightConflictsInComponentPanel;
+	}
+
+	public void setHighlightConflictsInComponentPanel(
+			Boolean highlightConflictsInComponentPanel) {
+		
+		Boolean old = this.highlightConflictsInComponentPanel;
+		
+		this.highlightConflictsInComponentPanel = highlightConflictsInComponentPanel;
+
+        changeSupport.firePropertyChange("highlightConflictsInComponentPanel", old, highlightConflictsInComponentPanel);
+	}
+
+	@SuppressWarnings("unchecked")
+	public I_ManageConflict[] getAllConflictResolutionStrategies() {
+		I_ManageConflict[] strategies = new I_ManageConflict[2];
+		strategies[0] = new IdentifyAllConflictStrategy();
+		strategies[1] = new LastCommitWinsConflictResolutionStrategy();
+		return strategies;
+	}
+
 	public I_GetConceptData getRefsetInSpecEditor() {
 		return aceFrame.getCdePanel().getRefsetInSpecEditor();
 	}
@@ -2339,7 +2474,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public JTree getTreeInSpecEditor() {
 		return aceFrame.getCdePanel().getTreeInSpecEditor();
 	}
-
+	
 	public I_GetConceptData getRefsetSpecInSpecEditor() {
 		return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
 	}

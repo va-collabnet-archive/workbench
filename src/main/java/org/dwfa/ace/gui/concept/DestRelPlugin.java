@@ -46,7 +46,7 @@ public class DestRelPlugin extends RelPlugin {
 			AceLog.getAppLog().fine("creating dest rel plugin component...");
 		}
 		destRelTableModel = new DestRelTableModel(host, getDestRelColumns(host
-				.getShowHistory()));
+				.getShowHistory()), host.getConfig());
 		pluginPanel = getRelPanel(host, destRelTableModel,
 				"Destination relationships:", false, toggleType);
 		host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);

@@ -346,28 +346,22 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 		}
 		
 	}
-	public static class StringWithImageTuple implements Comparable<StringWithImageTuple>, I_CellTextWithTuple {
-		String cellText;
+	public static class StringWithImageTuple extends StringWithTuple implements Comparable<StringWithImageTuple>, I_CellTextWithTuple {
+
 		I_ImageTuple tuple;
-		public StringWithImageTuple(String cellText, I_ImageTuple tuple) {
-			super();
-			this.cellText = cellText;
+		public StringWithImageTuple(String cellText, I_ImageTuple tuple, boolean isInConflict) {
+			super(cellText, isInConflict);
 			this.tuple = tuple;
-		}
-		public String getCellText() {
-			return cellText;
 		}
 		public I_ImageTuple getTuple() {
 			return tuple;
 		}
 		
-		public String toString() {
-			return cellText;
-		}
 		public int compareTo(StringWithImageTuple another) {
-			return cellText.compareTo(another.cellText);
+			return super.compareTo(another);
 		}
 	}
+	
 	private IMAGE_FIELD[] columns;
 	private SmallProgressPanel progress = new SmallProgressPanel();
 	I_HostConceptPlugins host;
@@ -461,43 +455,47 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 				return null;
 			}
 
+			I_ConfigAceFrame config = host.getConfig();
+			boolean inConflict = config.getHighlightConflictsInComponentPanel() 
+				&& config.getConflictResolutionStrategy().isInConflict((I_ImageVersioned) image.getFixedPart());
+			
 			switch (columns[columnIndex]) {
 			case IMAGE_ID:
-				return new StringWithImageTuple(Integer.toString(image.getImageId()), image);
+				return new StringWithImageTuple(Integer.toString(image.getImageId()), image, inConflict);
 			case CON_ID:
-				return new StringWithImageTuple(Integer.toString(image.getConceptId()), image);
+				return new StringWithImageTuple(Integer.toString(image.getConceptId()), image, inConflict);
 			case DESC:
 				if (BasicHTML.isHTMLString(image.getTextDescription())) {
-					return new StringWithImageTuple(image.getTextDescription(), image);
+					return new StringWithImageTuple(image.getTextDescription(), image, inConflict);
 				} else {
-					return new StringWithImageTuple("<html>" + image.getTextDescription(), image);
+					return new StringWithImageTuple("<html>" + image.getTextDescription(), image, inConflict);
 				}
 			case IMAGE:
 				return new ImageWithImageTuple(new ImageIcon(image.getImage()), image);
 			case FORMAT:
-				return new StringWithImageTuple(image.getFormat(), image);
+				return new StringWithImageTuple(image.getFormat(), image, inConflict);
 			case STATUS:
 				if (getReferencedConcepts().containsKey(image.getStatusId())) {
-					return new StringWithImageTuple(getPrefText(image.getStatusId()), image);
+					return new StringWithImageTuple(getPrefText(image.getStatusId()), image, inConflict);
 				}
-				return new StringWithImageTuple(Integer.toString(image.getStatusId()), image);
+				return new StringWithImageTuple(Integer.toString(image.getStatusId()), image, inConflict);
 			case TYPE:
 				if (getReferencedConcepts().containsKey(image.getTypeId())) {
-					return new StringWithImageTuple(getPrefText(image.getTypeId()), image);
+					return new StringWithImageTuple(getPrefText(image.getTypeId()), image, inConflict);
 				}
-				return new StringWithImageTuple(Integer.toString(image.getTypeId()), image);
+				return new StringWithImageTuple(Integer.toString(image.getTypeId()), image, inConflict);
 			case VERSION:
 				if (image.getVersion() == Integer.MAX_VALUE) {
-					return new StringWithImageTuple(ThinVersionHelper.uncommittedHtml(), image);
+					return new StringWithImageTuple(ThinVersionHelper.uncommittedHtml(), image, inConflict);
 				}
-				return new StringWithImageTuple(ThinVersionHelper.format(image.getVersion()), image);
+				return new StringWithImageTuple(ThinVersionHelper.format(image.getVersion()), image, inConflict);
 			case PATH:
 				if (getReferencedConcepts().containsKey(image.getPathId())) {
-					return new StringWithImageTuple(getPrefText(image.getPathId()), image);
+					return new StringWithImageTuple(getPrefText(image.getPathId()), image, inConflict);
 				}
-				return new StringWithImageTuple(Integer.toString(image.getPathId()), image);
+				return new StringWithImageTuple(Integer.toString(image.getPathId()), image, inConflict);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;

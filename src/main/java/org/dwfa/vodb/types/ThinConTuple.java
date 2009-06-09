@@ -1,5 +1,6 @@
 package org.dwfa.vodb.types;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -42,7 +43,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
    public void setStatusId(int statusId) {
 		part.setStatusId(statusId);
 	}
-   
+
    /*
     * (non-Javadoc)
     * 
@@ -85,7 +86,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#setStatusId(java.lang.Integer)
     */
    public void setStatusId(Integer statusId) {
-      part.setStatusId(statusId);
+       part.setStatusId(statusId);
 
    }
 
@@ -141,20 +142,27 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
       return part;
    }
 
-   public int getStatusId() {
-	   return getConceptStatus();
-   }
+	public int getStatusId() {
+		return getConceptStatus();
+	}
 
+	public void setPathId(int pathId) {
+		part.setPathId(pathId);
+	}
+		
+	public void setVersion(int version) {
+		part.setVersion(version);	
+	}
+
+	public I_AmTermComponent getFixedPart() {
+		return core;
+	}
+	
 	public I_ConceptAttributePart duplicate() {
 		return part.duplicate();
 	}
-	
-	public void setPathId(int pathId) {
-		part.getPathId();
-	}
-	
-	public void setVersion(int version) {
-		part.setVersion(version);
-	}
 
+	public int getFixedPartId() {
+		return core.getTermComponentId();
+	}
 }

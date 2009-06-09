@@ -11,13 +11,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
@@ -26,6 +29,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 
 public class ThinDescVersioned implements I_DescriptionVersioned {
    private int descId;
@@ -66,6 +70,19 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
     */
    public List<I_DescriptionPart> getVersions() {
       return versions;
+   }
+   
+   public List<I_DescriptionPart> getVersions(
+   		boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+	  
+	  List<I_DescriptionPart> returnList = new ArrayList<I_DescriptionPart>(versions); 
+	  
+	  if (returnConflictResolvedLatestState) {
+		 I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+		 returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
+	  }
+	   
+   	  return returnList;
    }
 
    /*
@@ -129,6 +146,10 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
    public int getDescId() {
       return descId;
    }
+   
+	public int getTermComponentId() {
+		return descId;
+	}
 
    /*
     * (non-Javadoc)
@@ -140,6 +161,16 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
       for (I_DescriptionPart p : getVersions()) {
          tuples.add(new ThinDescTuple(this, p));
       }
+	      
+      return tuples;
+   }
+   
+   public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+      List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+      for (I_DescriptionPart p : getVersions(returnConflictResolvedLatestState)) {
+         tuples.add(new ThinDescTuple(this, p));
+      }
+      
       return tuples;
    }
 
@@ -177,6 +208,40 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 	   adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, addUncommitted, versions, this);
    }
 
+   public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		
+	    List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+	   
+	    addTuples(allowedStatus, allowedTypes, positionSet, tuples, addUncommitted);
+		
+		if (returnConflictResolvedLatestState) {
+		    I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+			I_ManageConflict conflictResolutionStrategy;
+			if (config == null) {
+				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+			} else {
+				conflictResolutionStrategy = config.getConflictResolutionStrategy();
+			}
+			
+			tuples = conflictResolutionStrategy.resolveTuples(tuples);
+		}
+		
+		matchingTuples.addAll(tuples);
+	}
+
+	public void addTuples(I_IntSet allowedTypes,
+			List<I_DescriptionTuple> matchingTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		
+		I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+		
+	    addTuples(config.getAllowedStatus(), allowedTypes, config
+				.getViewPositionSet(), matchingTuples, addUncommitted,
+				returnConflictResolvedLatestState);
+	}
+   
    /*
     * (non-Javadoc)
     * 

@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 
 public class SrcRelTableModel extends RelTableModel {
 
-	public SrcRelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns) {
-		super(host, columns);
+	public SrcRelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns, I_ConfigAceFrame config) {
+		super(host, columns, config);
 	}
 
 	/**
@@ -41,17 +44,23 @@ public class SrcRelTableModel extends RelTableModel {
 			positions = null;
 			allowedStatus = null;
 		}
-		for (I_RelVersioned rel: cb.getSourceRels()) {
-			if (tableChangedSwingWorker.isWorkStopped()) {
-				return selectedTuples;
+		try {
+			for (I_RelVersioned rel : cb.getSourceRels()) {
+				if (tableChangedSwingWorker.isWorkStopped()) {
+					return selectedTuples;
+				}
+				rel.addTuples(allowedStatus, allowedTypes, positions,
+						selectedTuples, true, !showHistory);
 			}
-			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
-		}
-		for (I_RelVersioned rel: cb.getUncommittedSourceRels()) {
-			if (tableChangedSwingWorker.isWorkStopped()) {
-				return selectedTuples;
+			for (I_RelVersioned rel : cb.getUncommittedSourceRels()) {
+				if (tableChangedSwingWorker.isWorkStopped()) {
+					return selectedTuples;
+				}
+				rel.addTuples(allowedStatus, allowedTypes, positions,
+						selectedTuples, true, !showHistory);
 			}
-			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
+		} catch (TerminologyException e) {
+			throw new ToIoException(e);
 		}
 		
 		return selectedTuples;

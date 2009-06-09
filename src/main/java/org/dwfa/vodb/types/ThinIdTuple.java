@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
@@ -106,24 +107,31 @@ public class ThinIdTuple implements I_IdTuple {
    public I_IdPart getPart() {
       return part;
    }
-   public int getStatusId() {
-	return getIdStatus();
-   }
    
-	public I_IdPart duplicate() {
-		return duplicatePart();
+
+	public int getStatusId() {
+		return part.getStatusId();
 	}
-	
+
 	public void setPathId(int pathId) {
 		part.setPathId(pathId);
 	}
-	
-	public void setStatusId(int statusId) {
-		part.setStatusId(statusId);
+
+	public void setStatusId(int idStatus) {
+		part.setStatusId(idStatus);
 	}
 
 	public void setVersion(int version) {
 		part.setVersion(version);
 	}
-
+	public I_AmTermComponent getFixedPart() {
+		return core;
+	}
+	public I_IdPart duplicate() {
+		return duplicatePart();
+	}
+	
+	public int getFixedPartId() {
+		return core.getTermComponentId();
+	}
 }

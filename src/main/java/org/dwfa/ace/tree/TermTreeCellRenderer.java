@@ -85,6 +85,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
    private I_IntList refsetsToShow;
 
+private Boolean highlightConflictsInTaxonomyView;
+
    /**
     * 
     */
@@ -96,6 +98,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
       showViewerImagesInTaxonomy = this.aceConfig.getShowViewerImagesInTaxonomy();
       variableHeightTaxonomyView = this.aceConfig.getVariableHeightTaxonomyView();
       showRefsetInfoInTaxonomy = this.aceConfig.getShowRefsetInfoInTaxonomy();
+      highlightConflictsInTaxonomyView = this.aceConfig.getHighlightConflictsInTaxonomyView();
       this.aceConfig.addPropertyChangeListener(this);
       refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
       setLeafIcon(null);
@@ -124,6 +127,14 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                if (tdt != null) {
                   List<String> htmlPrefixes = new ArrayList<String>();
                   List<String> htmlSuffixes = new ArrayList<String>();
+                  
+                  if (highlightConflictsInTaxonomyView) {
+                	  if (aceConfig.getConflictResolutionStrategy().isInConflict(cb, true)) {
+                		  htmlPrefixes.add("<strong><em style=\"color:red\">");
+                		  htmlSuffixes.add("</em></strong>");
+                	  }
+                  }
+                  
                   if (showViewerImagesInTaxonomy) {
                      for (I_ImageTuple imageTuple : cb.getImageTuples(aceConfig.getAllowedStatus(), viewerImageTypes,
                            aceConfig.getViewPositionSet())) {
@@ -392,12 +403,17 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
    public void propertyChange(PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
-         showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
-      } else if (evt.getPropertyName().equals("variableHeightTaxonomyView")) {
-         variableHeightTaxonomyView = aceConfig.getVariableHeightTaxonomyView();
-      } else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
-         showViewerImagesInTaxonomy = aceConfig.getShowViewerImagesInTaxonomy();
-      }
+			showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
+		} else if (evt.getPropertyName().equals("variableHeightTaxonomyView")) {
+			variableHeightTaxonomyView = aceConfig
+					.getVariableHeightTaxonomyView();
+		} else if (evt.getPropertyName().equals("highlightConflictsInTaxonomyView")) {
+			highlightConflictsInTaxonomyView = aceConfig
+					.getHighlightConflictsInTaxonomyView();
+		} else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
+			showViewerImagesInTaxonomy = aceConfig
+					.getShowViewerImagesInTaxonomy();
+		}
    }
 
 }

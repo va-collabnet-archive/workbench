@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
@@ -59,6 +60,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getConceptId();
 	}
 
+	public int getTermComponentId() {
+		return bean.getTermComponentId();
+	}
+	
 	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions) throws IOException {
 		return bean.getConceptAttributeTuples(allowedStatus, positions);
 	}
@@ -210,22 +215,137 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
        return relId;
    }
 
-public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-    Set<I_Position> positions, boolean addUncommitted) throws IOException {
-    return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, addUncommitted);
-}
+   public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+	   Set<I_Position> positions, boolean addUncommitted) throws IOException {
+	   return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, addUncommitted);
+   }
+
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
+			I_IntSet allowedStatus, Set<I_Position> positions,
+			boolean returnConflictResolvedLatestState) throws IOException {
+		
+		return bean.getConceptAttributeTuples(allowedStatus, positions,
+				returnConflictResolvedLatestState);
+	}
+
+	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
+			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getConceptAttributeTuples(returnConflictResolvedLatestState);
+	}
+
+	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
+			I_IntSet allowedStatus, Set<I_Position> positionSet,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getConceptAttributeTuples(allowedStatus, positionSet,
+				addUncommitted, returnConflictResolvedLatestState);
+	}
+
+	public List<I_DescriptionTuple> getDescriptionTuples(
+			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getDescriptionTuples(returnConflictResolvedLatestState);
+	}
+
+	public List<I_DescriptionTuple> getDescriptionTuples(
+			I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positionSet, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getDescriptionTuples(allowedStatus, allowedTypes,
+				positionSet, addUncommitted, returnConflictResolvedLatestState);
+	}
+
+	public List<I_DescriptionTuple> getDescriptionTuples(
+			I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, boolean returnConflictResolvedLatestState)
+			throws IOException {
+		return getDescriptionTuples(allowedStatus, allowedTypes, positions,
+				returnConflictResolvedLatestState);
+	}
+
+	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getDestRelOrigins(allowedTypes, addUncommitted,
+				returnConflictResolvedLatestState);
+	}
+
+	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions,
+				addUncommitted, returnConflictResolvedLatestState);
+	}
+
+	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedTypes,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getDestRelTuples(allowedTypes, addUncommitted,
+				returnConflictResolvedLatestState);
+	}
+
+	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions,
+				addUncommitted, returnConflictResolvedLatestState);
+	}
+
+	public List<I_ImageTuple> getImageTuples(
+			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getImageTuples(returnConflictResolvedLatestState);
+	}
+
+	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getImageTuples(allowedStatus, allowedTypes, positions,
+				returnConflictResolvedLatestState);
+	}
+
+	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getSourceRelTargets(allowedTypes, addUncommitted,
+				returnConflictResolvedLatestState);
+	}
+
+	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions,
+				addUncommitted, returnConflictResolvedLatestState);
+	}
+
+	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getSourceRelTuples(allowedTypes, addUncommitted,
+				returnConflictResolvedLatestState);
+	}
+
+	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, Set<I_Position> positions,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions,
+				addUncommitted, returnConflictResolvedLatestState);
+	}
+
+	public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException {
+		return bean.isParentOf(child, addUncommitted);
+	}
+
+	public boolean isParentOfOrEqualTo(I_GetConceptData child,
+			boolean addUncommitted) throws IOException, TerminologyException {
+		return bean.isParentOfOrEqualTo(child, addUncommitted);
+	}
+
+	public List<I_ThinExtByRefVersioned> getExtensions() throws IOException,
+			TerminologyException {
+		return bean.getExtensions();
+	}
+
 	
 	/*
-
-	@Override
-	public boolean equals(Object another) {
-		return bean.equals(another);
-	}
-
-	@Override
-	public int hashCode() {
-		return bean.hashCode();
-	}
-	*/
+	 * 
+	 * @Override public boolean equals(Object another) { return
+	 * bean.equals(another); }
+	 * 
+	 * @Override public int hashCode() { return bean.hashCode(); }
+	 */
 	
 }

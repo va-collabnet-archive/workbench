@@ -155,7 +155,7 @@ public class JTableWithDragImage extends JTable {
             case COMPONENT_ID:
                 throw new UnsupportedOperationException();
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getStatus()));
+                return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getStatusId()));
             case VERSION:
                 return new StringSelection(swextt.getCellText());
             case PATH:
@@ -206,7 +206,7 @@ public class JTableWithDragImage extends JTable {
             case EXT_ID:
                 return new StringSelection(seidt.getTuple().getSourceId().toString());
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(seidt.getTuple().getIdStatus()));
+                return new ConceptTransferable(ConceptBean.get(seidt.getTuple().getStatusId()));
             case VERSION:
                 return new StringSelection(ThinVersionHelper.format(seidt.getTuple().getVersion()));
             case PATH:
@@ -226,7 +226,7 @@ public class JTableWithDragImage extends JTable {
             case SOURCE_ID:
                 return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getC1Id()));
             case REL_TYPE:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getRelTypeId()));
+                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getTypeId()));
             case DEST_ID:
                 return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getC2Id()));
             case GROUP:
@@ -260,7 +260,7 @@ public class JTableWithDragImage extends JTable {
             case LANG:
                 return new StringSelection(swdt.tuple.getLang());
             case CASE_FIXED:
-                return new StringSelection(swdt.cellText);
+                return new StringSelection(swdt.getCellText());
             case STATUS:
                 return new ConceptTransferable(ConceptBean.get(swdt.getTuple().getStatusId()));
             case TYPE:

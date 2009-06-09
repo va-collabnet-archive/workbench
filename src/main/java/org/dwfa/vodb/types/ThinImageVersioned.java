@@ -66,6 +66,10 @@ public class ThinImageVersioned implements I_ImageVersioned {
 		return imageId;
 	}
 
+	public int getTermComponentId() {
+		return imageId;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -129,7 +133,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
 	 */
-	public Collection<I_ImageTuple> getTuples() {
+	public List<I_ImageTuple> getTuples() {
 		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
 		for (I_ImagePart p : getVersions()) {
 			tuples.add(new ThinImageTuple(this, p));

@@ -40,6 +40,11 @@ public class ThinIdVersioned implements I_IdVersioned {
 	public void setNativeId(int nativeId) {
 		this.nativeId = nativeId;
 	}
+	
+	public int getTermComponentId() {
+		return nativeId;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdVersioned#getVersions()
 	 */

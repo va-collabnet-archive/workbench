@@ -7,8 +7,10 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -30,6 +32,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPartString;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 
 /**
  * @todo add version to vodb -> added as getProperty...
@@ -79,6 +82,10 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 		return memberId;
 	}
 
+	public int getTermComponentId() {
+		return memberId;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -329,11 +336,57 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 		adder.addTuples(allowedStatus, null, positions, matchingTuples,
 				addUncommitted, versions, this);
 	}
+	
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+			List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		
+	    List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
+		
+	    addTuples(allowedStatus, positions, returnTuples, addUncommitted);
+		
+		if (returnConflictResolvedLatestState) {
+		    I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+			I_ManageConflict conflictResolutionStrategy;
+			if (config == null) {
+				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+			} else {
+				conflictResolutionStrategy = config.getConflictResolutionStrategy();
+			}
+			
+			tuples = conflictResolutionStrategy.resolveTuples(tuples);
+		}
+
+		returnTuples.addAll(tuples);
+	}
+
+	public void addTuples(List<I_ThinExtByRefTuple> returnTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		
+		I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+		addTuples(config.getAllowedStatus(), config.getViewPositionSet(), returnTuples, 
+				addUncommitted, returnConflictResolvedLatestState);
+	}
 
 	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
 			Set<I_Position> positions, boolean addUncommitted) {
 		List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
 		addTuples(allowedStatus, positions, returnTuples, addUncommitted);
+		return returnTuples;
+	}
+
+	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> positions, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
+		addTuples(allowedStatus, positions, returnTuples, addUncommitted, returnConflictResolvedLatestState);
+		return returnTuples;
+	}
+
+	public List<I_ThinExtByRefTuple> getTuples(boolean addUncommitted,
+			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
+		addTuples(returnTuples, addUncommitted, returnConflictResolvedLatestState);
 		return returnTuples;
 	}
 }

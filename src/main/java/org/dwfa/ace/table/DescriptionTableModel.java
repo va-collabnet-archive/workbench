@@ -24,6 +24,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -119,6 +120,10 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				return null;
 			}
 			I_DescriptionTuple desc = getDescription(rowIndex);
+						
+			boolean inConflict = config.getHighlightConflictsInComponentPanel() 
+				&& config.getConflictResolutionStrategy().isInConflict((I_DescriptionVersioned) desc.getFixedPart());
+			
 			if (desc == null) {
 				return null;
 			}
@@ -128,53 +133,53 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 				return getScore(rowIndex);
 			case DESC_ID:
 				return new StringWithDescTuple(Integer.toString(desc
-						.getDescId()), desc, false);
+						.getDescId()), desc, false, inConflict);
 			case CON_ID:
 				return new StringWithDescTuple(Integer.toString(desc
-						.getConceptId()), desc, false);
+						.getConceptId()), desc, false, inConflict);
 			case TEXT:
 				if (BasicHTML.isHTMLString(desc.getText())) {
-					return new StringWithDescTuple(desc.getText(), desc, true);
+					return new StringWithDescTuple(desc.getText(), desc, true, inConflict);
 				} else {
 					return new StringWithDescTuple(desc.getText(),
-							desc, true);
+							desc, true, inConflict);
 				}
 			case LANG:
-				return new StringWithDescTuple(desc.getLang(), desc, false);
+				return new StringWithDescTuple(desc.getLang(), desc, false, inConflict);
 			case CASE_FIXED:
 				return new StringWithDescTuple(Boolean.toString(desc
-						.getInitialCaseSignificant()), desc, false);
+						.getInitialCaseSignificant()), desc, false, inConflict);
 			case STATUS:
 				if (getReferencedConcepts().containsKey(desc.getStatusId())) {
-					return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc, false);
+					return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc, false, inConflict);
 				}
 				return new StringWithDescTuple(Integer.toString(desc
-						.getStatusId()), desc, false);
+						.getStatusId()), desc, false, inConflict);
 			case TYPE:
 				if (getReferencedConcepts().containsKey(desc.getTypeId())) {
-					return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc, false);
+					return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc, false, inConflict);
 				}
 				return new StringWithDescTuple(Integer.toString(desc
-						.getTypeId()), desc, false);
+						.getTypeId()), desc, false, inConflict);
 			case VERSION:
 				if (desc.getVersion() == Integer.MAX_VALUE) {
-					return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false);
+					return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false, inConflict);
 				}
 				return new StringWithDescTuple(ThinVersionHelper.format(desc
-						.getVersion()), desc, false);
+						.getVersion()), desc, false, inConflict);
 			case PATH:
 				if (getReferencedConcepts().containsKey(desc.getPathId())) {
 					try {
-						return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false);
+						return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false, inConflict);
 					} catch (Exception e) {
 						return new StringWithDescTuple(Integer.toString(desc
-								.getPathId()) + " no pref desc...", desc, false);
+								.getPathId()) + " no pref desc...", desc, false, inConflict);
 					}
 				}
 				return new StringWithDescTuple(Integer.toString(desc
-						.getPathId()), desc, false);
+						.getPathId()), desc, false, inConflict);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
@@ -332,33 +337,23 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 		this.progress = progress;
 	}
 
-	public static class StringWithDescTuple implements Comparable<StringWithDescTuple>, I_CellTextWithTuple {
-		String cellText;
-
+	public static class StringWithDescTuple extends StringWithTuple implements Comparable<StringWithDescTuple>, I_CellTextWithTuple {
 		I_DescriptionTuple tuple;
 
       boolean wrapLines;
-		public StringWithDescTuple(String cellText, I_DescriptionTuple tuple, boolean wrapLines) {
-			super();
-			this.cellText = cellText;
+      
+		public StringWithDescTuple(String cellText, I_DescriptionTuple tuple, boolean wrapLines, boolean inConflict) {
+			super(cellText, inConflict);
 			this.tuple = tuple;
-         this.wrapLines = wrapLines;
-		}
-
-		public String getCellText() {
-			return cellText;
+			this.wrapLines = wrapLines;
 		}
 
 		public I_DescriptionTuple getTuple() {
 			return tuple;
 		}
 
-		public String toString() {
-			return cellText;
-		}
-
 		public int compareTo(StringWithDescTuple another) {
-			return cellText.compareTo(another.cellText);
+			return super.compareTo(another);
 		}
 
       public boolean getWrapLines() {

@@ -161,10 +161,19 @@ public class ThinRelTuple implements I_RelTuple {
      buff.append(part.toString());
       return buff.toString();
    }
-   
-   public int getTypeId() {
-	return part.getTypeId();
-   }
+	public void setPathId(int pathId) {
+		part.setPathId(pathId);
+	}
+	public void setStatusId(int idStatus) {
+		part.setStatusId(idStatus);
+	}
+	public void setVersion(int version) {
+		part.setVersion(version);
+	}
+	
+	public int getTypeId() {
+		return part.getTypeId();
+   	}
 
 	public void setTypeId(int type) {
 		part.setTypeId(type);
@@ -177,17 +186,8 @@ public class ThinRelTuple implements I_RelTuple {
 	public I_RelPart duplicate() {
 		return duplicatePart();
 	}
-	
-	public void setPathId(int pathId) {
-		part.setPathId(pathId);
-	}
-	
-	public void setStatusId(int statusId) {
-		part.setStatusId(statusId);
-	}
-	
-	public void setVersion(int version) {
-		part.setVersion(version);
-	}
    
+	public int getFixedPartId() {
+		return fixedPart.getTermComponentId();
+	}
 }

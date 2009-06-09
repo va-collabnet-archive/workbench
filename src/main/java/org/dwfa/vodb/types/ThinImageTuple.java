@@ -1,5 +1,6 @@
 package org.dwfa.vodb.types;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -79,29 +80,31 @@ public class ThinImageTuple implements I_ImageTuple {
 	public I_ImagePart getPart() {
 		return part;
 	}
-	
-	public I_ImagePart duplicate() {
-		return duplicatePart();
-	}
-	
 	public void setPathId(int pathId) {
-		part.setPathId(pathId);		
+		part.setPathId(pathId);
 	}
-	
-	public void setStatusId(int statusId) {
-		part.setStatusId(statusId);
+	public void setStatusId(int idStatus) {
+		part.setStatusId(idStatus);
 	}
-	
 	public void setVersion(int version) {
 		part.setVersion(version);
+	}
+	public I_AmTermComponent getFixedPart() {
+		return core;
+	}
+
+	public I_ImagePart duplicate() {
+		return duplicatePart();
 	}
 	
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		// TODO 
 	}
-	
 	public void setTypeId(int type) {
 		part.setTypeId(type);
 	}
-
+	
+	public int getFixedPartId() {
+		return core.getTermComponentId();
+	}
 }

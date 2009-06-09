@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.List;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -121,6 +122,10 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    public int compareTo(I_ThinExtByRefPart o) {
      return part.compareTo(o);
    }
+
+	public I_AmTermComponent getFixedPart() {
+		return core;
+	}
    
    public int getStatusId() {
 	   return part.getStatusId();
@@ -135,4 +140,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 	   return duplicate();
    }
    
+	public int getFixedPartId() {
+		return core.getTermComponentId();
+	}
 }

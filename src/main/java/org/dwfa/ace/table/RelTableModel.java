@@ -41,6 +41,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
@@ -198,7 +199,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				conceptsToFetch.add(r.getC2Id());
 				conceptsToFetch.add(r.getCharacteristicId());
 				conceptsToFetch.add(r.getRefinabilityId());
-				conceptsToFetch.add(r.getRelTypeId());
+				conceptsToFetch.add(r.getTypeId());
 				conceptsToFetch.add(r.getStatusId());
 				conceptsToFetch.add(r.getPathId());
 			}
@@ -293,10 +294,13 @@ public abstract class RelTableModel extends AbstractTableModel implements
 
 	protected I_HostConceptPlugins host;
 
-	public RelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns) {
+	private I_ConfigAceFrame config;
+
+	public RelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns, I_ConfigAceFrame config) {
 		super();
 		this.columns = columns;
 		this.host = host;
+		this.config = config;
 		this.host.addPropertyChangeListener(
 				I_ContainTermComponent.TERM_COMPONENT, this);
 	}
@@ -331,78 +335,81 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			}
 			rel = allTuples.get(rowIndex);
 
+			boolean inConflict = config.getHighlightConflictsInComponentPanel() 
+				&& config.getConflictResolutionStrategy().isInConflict((I_RelVersioned) rel.getFixedPart());
+			
 			switch (field) {
 			case REL_ID:
 				return new StringWithRelTuple(Integer.toString(rel.getRelId()),
-						rel);
+						rel, inConflict);
 			case SOURCE_ID:
 				if (referencedConcepts.containsKey(rel.getC1Id())) {
 					return new StringWithRelTuple(getPrefText(rel.getC1Id()),
-							rel);
+							rel, inConflict);
 				}
 				return new StringWithRelTuple(Integer.toString(rel.getC1Id()),
-						rel);
+						rel, inConflict);
 			case REL_TYPE:
-				if (referencedConcepts.containsKey(rel.getRelTypeId())) {
+				if (referencedConcepts.containsKey(rel.getTypeId())) {
 					return new StringWithRelTuple(getPrefText(rel
-							.getRelTypeId()), rel);
+							.getTypeId()), rel, inConflict);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
-						.getRelTypeId()), rel);
+						.getTypeId()), rel, inConflict);
 			case DEST_ID:
 				if (referencedConcepts.containsKey(rel.getC2Id())) {
 					return new StringWithRelTuple(getPrefText(rel.getC2Id()),
-							rel);
+							rel, inConflict);
 				}
 				return new StringWithRelTuple(Integer.toString(rel.getC2Id()),
-						rel);
+						rel, inConflict);
 			case GROUP:
 				return new StringWithRelTuple(Integer.toString(rel.getGroup()),
-						rel);
+						rel, inConflict);
 			case REFINABILITY:
 				if (referencedConcepts.containsKey(rel.getRefinabilityId())) {
 					return new StringWithRelTuple(getPrefText(rel
-							.getRefinabilityId()), rel);
+							.getRefinabilityId()), rel, inConflict);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
-						.getRefinabilityId()), rel);
+						.getRefinabilityId()), rel, inConflict);
 			case CHARACTERISTIC:
 				if (referencedConcepts.containsKey(rel.getCharacteristicId())) {
 					return new StringWithRelTuple(getPrefText(rel
-							.getCharacteristicId()), rel);
+							.getCharacteristicId()), rel, inConflict);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
-						.getCharacteristicId()), rel);
+						.getCharacteristicId()), rel, inConflict);
 			case STATUS:
 				if (referencedConcepts.containsKey(rel.getStatusId())) {
 					return new StringWithRelTuple(
-							getPrefText(rel.getStatusId()), rel);
+							getPrefText(rel.getStatusId()), rel, inConflict);
 				}
 				return new StringWithRelTuple(Integer.toString(rel
-						.getStatusId()), rel);
+						.getStatusId()), rel, inConflict);
 			case VERSION:
 				if (rel.getVersion() == Integer.MAX_VALUE) {
 					return new StringWithRelTuple(ThinVersionHelper
-							.uncommittedHtml(), rel);
+							.uncommittedHtml(), rel, inConflict);
 				}
 				return new StringWithRelTuple(ThinVersionHelper.format(rel
-						.getVersion()), rel);
+						.getVersion()), rel, inConflict);
 			case PATH:
 				if (referencedConcepts.containsKey(rel.getPathId())) {
 					try {
 						return new StringWithRelTuple(getPrefText(rel
-								.getPathId()), rel);
+								.getPathId()), rel, inConflict);
 					} catch (Exception e) {
 						new StringWithRelTuple(Integer
 								.toString(rel.getPathId())
-								+ " no pref text...", rel);
+								+ " no pref text...", rel, inConflict);
 						;
 					}
 				}
 				return new StringWithRelTuple(
-						Integer.toString(rel.getPathId()), rel);
+						Integer.toString(rel.getPathId()), rel, inConflict);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return "No case found for: " + field;
@@ -486,7 +493,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 			break;
 		case REL_TYPE:
 			Integer typeId = (Integer) value;
-			rel.setRelTypeId(typeId);
+			rel.setTypeId(typeId);
 			referencedConcepts.put(typeId, ConceptBean.get(typeId));
 			changed = true;
 			break;
@@ -620,33 +627,24 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		this.progress = progress;
 	}
 
-	public static class StringWithRelTuple implements
+	public static class StringWithRelTuple extends StringWithTuple implements
 			Comparable<StringWithRelTuple>, I_CellTextWithTuple {
-		String cellText;
 
 		I_RelTuple tuple;
 
-		public StringWithRelTuple(String cellText, I_RelTuple tuple) {
-			super();
-			this.cellText = cellText;
+		public StringWithRelTuple(String cellText, I_RelTuple tuple, boolean isInConflict) {
+			super(cellText, isInConflict);
 			this.tuple = tuple;
-		}
-
-		public String getCellText() {
-			return cellText;
 		}
 
 		public I_RelTuple getTuple() {
 			return tuple;
 		}
 
-		public String toString() {
-			return cellText;
+		public int compareTo(StringWithRelTuple o) {
+			return super.compareTo(o);
 		}
 
-		public int compareTo(StringWithRelTuple another) {
-			return cellText.compareTo(another.cellText);
-		}
 	}
 
 	public REL_FIELD[] getColumnEnums() {
@@ -749,7 +747,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 					if (StringWithRelTuple.class.isAssignableFrom(value
 							.getClass())) {
 						StringWithRelTuple swrt = (StringWithRelTuple) value;
-						textField.setText((value != null) ? swrt.cellText : "");
+						textField.setText((value != null) ? swrt.getCellText() : "");
 					} else {
 						textField.setText((value != null) ? value.toString()
 								: "");
@@ -833,7 +831,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		@Override
 		public ConceptBean getSelectedItem(Object value) {
 			StringWithRelTuple swdt = (StringWithRelTuple) value;
-			return ConceptBean.get(swdt.getTuple().getRelTypeId());
+			return ConceptBean.get(swdt.getTuple().getTypeId());
 		}
 
 		@Override

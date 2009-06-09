@@ -480,7 +480,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		this.ace.getAceFrameConfig().addPropertyChangeListener(
 				"visibleComponentToggles", updateListener);
 
-		
+		addPropertyChangeListener("conflictResolutionStrategy", this);
+		addPropertyChangeListener("highlightConflictsInComponentPanel", this);
 		
 		
 		if (ACE.editMode) {
@@ -991,9 +992,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("viewPositions")) {
+		String propertyName = evt.getPropertyName();
+		if (propertyName.equals("viewPositions") 
+				|| propertyName.equals("conflictResolutionStrategy") 
+				|| propertyName.equals("highlightConflictsInComponentPanel")) {
 			fixedToggleChangeActionListener.actionPerformed(null);
-		} else if (evt.getPropertyName().equals("commit")) {
+		} else if (propertyName.equals("commit")) {
 			if (label.getTermComponent() != null) {
 				ConceptBean cb = (ConceptBean) label.getTermComponent();
 				try {

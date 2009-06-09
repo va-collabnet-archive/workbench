@@ -42,7 +42,7 @@ public class SrcRelPlugin extends RelPlugin {
          AceLog.getAppLog().fine("creating src rel plugin component...");
       }
       srcRelTableModel = new SrcRelTableModel(host,
-      		getSrcRelColumns(host.getShowHistory()));
+      		getSrcRelColumns(host.getShowHistory()), host.getConfig());
       pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true, toggleType);
       host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
       host.addPropertyChangeListener("commit", this);

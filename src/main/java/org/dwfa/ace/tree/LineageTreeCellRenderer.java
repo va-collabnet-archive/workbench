@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -85,6 +84,12 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
 						.getUserObject().getClass())) {
                I_GetConceptData cb = (I_GetConceptData) node
 							.getUserObject();
+               if (aceConfig.getHighlightConflictsInComponentPanel() 
+            		   && aceConfig.getConflictResolutionStrategy().isInConflict(cb, true)) {
+            	   this.setForeground(Color.red);
+               } else {
+            	   this.setForeground(Color.black);
+               }
 					I_DescriptionTuple tdt = cb.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
 					if (tdt != null) {
 						setText(tdt.getText());
@@ -108,7 +113,8 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
 			} else {
 				this.setText("ROOT? (User object is null)");
 			}
-		} catch (IOException e) {
+			
+		} catch (Exception e) {
 			this.setText(e.toString());
 			AceLog.getAppLog().alertAndLogException(e);
 		}

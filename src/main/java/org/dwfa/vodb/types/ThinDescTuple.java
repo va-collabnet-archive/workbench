@@ -143,11 +143,18 @@ public class ThinDescTuple implements I_DescriptionTuple {
       return part;
    }
    
+	public I_DescriptionVersioned getFixedPart() {
+		return fixedPart;
+	}
+	   
 	public I_DescriptionPart duplicate() {
 		return duplicatePart();
 	}
 	
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		// TODO 
+	}
+	public int getFixedPartId() {
+		return fixedPart.getTermComponentId();
 	}
 }

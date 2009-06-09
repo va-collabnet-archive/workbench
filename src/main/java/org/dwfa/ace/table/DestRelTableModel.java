@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 
 public class DestRelTableModel extends RelTableModel {
 
-	public DestRelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns) {
-		super(host, columns);
+	public DestRelTableModel(I_HostConceptPlugins host, REL_FIELD[] columns, I_ConfigAceFrame config) {
+		super(host, columns, config);
 	}
 
 	/**
@@ -45,7 +48,11 @@ public class DestRelTableModel extends RelTableModel {
 			if (tableChangedSwingWorker.isWorkStopped()) {
 				return selectedTuples;
 			}
-			rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true);
+			try {
+				rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !showHistory);
+			} catch (TerminologyException e) {
+				throw new ToIoException(e);
+			}
 		}
 		
 		return selectedTuples;

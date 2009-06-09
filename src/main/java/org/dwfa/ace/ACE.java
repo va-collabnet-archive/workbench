@@ -70,6 +70,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -108,6 +109,7 @@ import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -1780,6 +1782,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		conceptTabs.setMinimumSize(new Dimension(0, 0));
 		c2Panel.setMinimumSize(new Dimension(0, 0));
 
+
 		termTreeConceptSplit.setRightComponent(conceptTabs);
 		leftTabs.addTab(taxonomyTabLabel, termTree);
 
@@ -2164,6 +2167,44 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 		return new JScrollPane(refsetViewPrefPanel);
 	}
+	
+	private Component makeConflictViewPanel() {
+		JPanel conflictConfigPanel = new JPanel(new BorderLayout());
+		
+		JPanel controlPanel = new JPanel(new GridLayout(3, 1));
+		controlPanel.add(getCheckboxEditor("show conflicts in taxonomy view",
+				"highlightConflictsInTaxonomyView", aceFrameConfig
+						.getHighlightConflictsInTaxonomyView(), true));
+		controlPanel.add(getCheckboxEditor("show conflicts in component panel",
+				"highlightConflictsInComponentPanel", aceFrameConfig
+						.getHighlightConflictsInComponentPanel(), true));
+		
+		final JTextPane descriptionPanel = new JTextPane();
+		descriptionPanel.setEditable(false);
+		descriptionPanel.setContentType("text/html");
+		JScrollPane descriptionScroll = new JScrollPane(descriptionPanel, 
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		JComboBox conflictComboBox = new JComboBox(aceFrameConfig.getAllConflictResolutionStrategies());
+		conflictComboBox.setSelectedItem(aceFrameConfig.getConflictResolutionStrategy());
+		descriptionPanel.setText(aceFrameConfig.getConflictResolutionStrategy().getDescription());
+		conflictComboBox.addActionListener(new ActionListener() {
+			@SuppressWarnings("unchecked")
+			public void actionPerformed(ActionEvent actionevent) {
+		        JComboBox cb = (JComboBox) actionevent.getSource();
+		        I_ManageConflict conflictResolutionStrategy = (I_ManageConflict) cb.getSelectedItem();
+		        aceFrameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
+				descriptionPanel.setText(aceFrameConfig.getConflictResolutionStrategy().getDescription());
+			}
+		});
+		
+		controlPanel.add(conflictComboBox);
+
+		conflictConfigPanel.add(controlPanel, BorderLayout.PAGE_START);
+		conflictConfigPanel.add(descriptionScroll, BorderLayout.CENTER);
+		
+		return conflictConfigPanel;
+	}
 
 	private JComponent makeRefsetTaxonomySortPanel() {
 
@@ -2368,6 +2409,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		tabs.addTab("taxonomy sort", makeRefsetTaxonomySortPanel());
 		tabs.addTab("status", makeStatusPrefPanel());
 		tabs.addTab("refset", makeRefsetViewPanel());
+		tabs.addTab("conflict", makeConflictViewPanel());
 		return tabs;
 	}
 

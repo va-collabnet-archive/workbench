@@ -11,13 +11,16 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
@@ -25,6 +28,7 @@ import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 
 public class ThinRelVersioned implements I_RelVersioned {
 	private int relId;
@@ -80,6 +84,17 @@ public class ThinRelVersioned implements I_RelVersioned {
 	 */
 	public List<I_RelPart> getVersions() {
 		return versions;
+	}
+	
+	public List<I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		List<I_RelPart> returnList = versions; 
+		  
+		if (returnConflictResolvedLatestState) {
+			I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+			returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
+		}
+   
+		return returnList;
 	}
 
 	/*
@@ -211,6 +226,10 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return relId;
 	}
 
+	public int getTermComponentId() {
+		return relId;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -218,12 +237,20 @@ public class ThinRelVersioned implements I_RelVersioned {
 	 */
 	public List<I_RelTuple> getTuples() {
 		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-		for (I_RelPart p : versions) {
+		for (I_RelPart p : getVersions()) {
 			tuples.add(new ThinRelTuple(this, p));
 		}
 		return tuples;
 	}
 
+	public List<I_RelTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
+		for (I_RelPart p : getVersions(returnConflictResolvedLatestState)) {
+			tuples.add(new ThinRelTuple(this, p));
+		}
+		return tuples;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -260,7 +287,37 @@ public class ThinRelVersioned implements I_RelVersioned {
 		adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples,
 				addUncommitted, versions, this);
 	}
-
+	
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_RelTuple> returnRels,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		
+	    List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
+	    
+	    addTuples(allowedStatus, allowedTypes, positions, tuples, addUncommitted);
+		
+		if (returnConflictResolvedLatestState) {
+		    I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+			I_ManageConflict conflictResolutionStrategy;
+			if (config == null) {
+				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+			} else {
+				conflictResolutionStrategy = config.getConflictResolutionStrategy();
+			}
+			
+			tuples = conflictResolutionStrategy.resolveTuples(tuples);
+		}
+		
+		returnRels.addAll(tuples);
+	}
+	
+	public void addTuples(I_IntSet allowedTypes, List<I_RelTuple> returnRels,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+		
+		addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), 
+				returnRels, addUncommitted, returnConflictResolvedLatestState);
+	}
 
 	/*
 	 * (non-Javadoc)
