@@ -20,7 +20,28 @@ import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * Sct2AceMojo converts SNOMED text release files to ACE text import files.
+ * Sct2AceMojo is a maven mojo which converts SNOMED release files to IHTSDO
+ * (ACE) Workbench import files in historical sequence.
+ * 
+ * The POM needs to specify mutual exclusive extensions in separate directories
+ * in the array 'sctInputDirArray' parameter. Each directory entry will be
+ * parsed to locate SNOMED formated text files in any sub-directories.
+ * 
+ * Each SNOMED file should contain a version date in the file name
+ * "sct_*yyyyMMdd.txt". If a valid date is not found in the file name then the
+ * parent directory name will be checked for a date in the format 'yyyy-MM-dd'.
+ * 
+ * Versioning is performed for the files under the SAME 'sctInputDirArray[a]'
+ * directory. Records of the same primary ids are compared in historical
+ * sequence to other records of the same primary ids for all applicable files
+ * under directory 'sctInputDirArray[a]'.
+ * 
+ * NOTE: Records are NOT VERSIONED between files under DIFFERENT
+ * 'sctInputDirArray' directories. The versioned output from
+ * 'sctInputDirArray[a+1]' is appended to the versioned output from
+ * 'sctInputDirArray[a]'.
+ * 
+ * @author Marc Campbell
  * 
  * @goal sct2ace
  * @requiresDependencyResolution compile
@@ -72,6 +93,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			isprimitive = p;
 		}
 
+		// method required for object to be sortable (comparable) in arrays
 		public int compareTo(Object obj) {
 			SCTConceptRecord tmp = (SCTConceptRecord) obj;
 			if (this.id < tmp.id) {
@@ -82,10 +104,12 @@ public class Sct2AceMojo extends AbstractMojo {
 			return 0; // instance == received
 		}
 
+		// Create string to show some input fields for exception reporting
 		public String toString() {
 			return id + "\t" + status + "\t" + isprimitive + "\r\n";
 		}
 
+		// Create string for concepts.txt file
 		public String toStringAce(String date, String path) throws IOException,
 				TerminologyException {
 
@@ -93,6 +117,20 @@ public class Sct2AceMojo extends AbstractMojo {
 
 			return u + "\t" + getStatusString(status) + "\t" + isprimitive
 					+ "\t" + date + "\t" + path + "\r\n";
+		}
+
+		// Create string for ids.txt file
+		public String toIdsTxt(String source, String date, String path)
+				throws IOException, TerminologyException {
+
+			UUID u = Type3UuidFactory.fromSNOMED(id);
+
+			return u // (canonical) primary uuid
+					+ "\t" + source // (canonical UUID) source system uuid
+					+ "\t" + id // (original primary) source id
+					+ "\t" + getStatusString(status) // (canonical) status uuid
+					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
+					+ "\t" + path + "\r\n"; // (canonical) path uuid
 		}
 	}
 
@@ -116,6 +154,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			languageCode = new String(lang);
 		}
 
+		// method required for object to be sortable (comparable) in arrays
 		public int compareTo(Object obj) {
 			SCTDescriptionRecord tmp = (SCTDescriptionRecord) obj;
 			if (this.id < tmp.id) {
@@ -126,12 +165,14 @@ public class Sct2AceMojo extends AbstractMojo {
 			return 0; // instance == received
 		}
 
+		// Create string to show some input fields for exception reporting
 		public String toString() {
 			return id + "\t" + status + "\t" + conceptId + "\t" + termText
 					+ "\t" + capStatus + "\t" + descriptionType + "\t"
 					+ languageCode + "\r\n";
 		}
 
+		// Create string for descriptions.txt file
 		public String toStringAce(String date, String path) throws IOException,
 				TerminologyException {
 
@@ -150,6 +191,20 @@ public class Sct2AceMojo extends AbstractMojo {
 					+ languageCode + "\t" // language code
 					+ date + "\t" // effective date
 					+ path + "\r\n"; // path uuid
+		}
+
+		// Create string for ids.txt file
+		public String toIdsTxt(String source, String date, String path)
+				throws IOException, TerminologyException {
+
+			UUID u = Type3UuidFactory.fromSNOMED(id);
+
+			return u // (canonical) primary uuid
+					+ "\t" + source // (canonical UUID) source system uuid
+					+ "\t" + id // (original primary) source id
+					+ "\t" + getStatusString(status) // (canonical) status uuid
+					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
+					+ "\t" + path + "\r\n"; // (canonical) path uuid
 		}
 	}
 
@@ -177,6 +232,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			exceptionFlag = false;
 		}
 
+		// method required for object to be sortable (comparable) in arrays
 		public int compareTo(Object obj) {
 			SCTRelationshipRecord tmp = (SCTRelationshipRecord) obj;
 			if (this.id < tmp.id) {
@@ -187,11 +243,13 @@ public class Sct2AceMojo extends AbstractMojo {
 			return 0; // instance == received
 		}
 
+		// Create string to show some input fields for exception reporting
 		public String toString() {
 			return id + "\t" + status + "\t" + conceptOneID + "\t"
 					+ relationshipType + "\t" + conceptTwoID + "\r\n";
 		}
 
+		// Create string for relationships.txt file
 		public String toStringAce(String date, String path) throws IOException,
 				TerminologyException {
 
@@ -225,19 +283,34 @@ public class Sct2AceMojo extends AbstractMojo {
 					+ group + "\t" // relationship group -- integer
 					+ date + "\t" + path + "\r\n";
 		}
+
+		// Create string for ids.txt file
+		public String toIdsTxt(String source, String date, String path)
+				throws IOException, TerminologyException {
+
+			UUID u = Type3UuidFactory.fromSNOMED(id);
+
+			return u // (canonical) primary uuid
+					+ "\t" + source // (canonical UUID) source system uuid
+					+ "\t" + id // (original primary) source id
+					+ "\t" + getStatusString(status) // (canonical) status uuid
+					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
+					+ "\t" + path + "\r\n"; // (canonical) path uuid
+		}
 	}
 
 	private class SCTFile {
 		File file;
 		String revDate;
 		String pathId;
-		int set;
+		String sourceUuid;
 
-		public SCTFile(File f, String d, String pid, int s) {
+		public SCTFile(File f, String d, String pid) {
 			file = f;
 			revDate = d;
 			pathId = pid;
-			set = s;
+			sourceUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
+					.iterator().next().toString(); // @@@ Confirm source uuid
 		}
 
 		public String toString() {
@@ -270,10 +343,6 @@ public class Sct2AceMojo extends AbstractMojo {
 		getLog().info("POM PROCESSING COMPLETE ");
 	}
 
-	/*
-	 * 1. build directory buildDir
-	 */
-
 	void executeMojo(String wDir, String subDir, String[] inDirs)
 			throws Exception {
 		long start = System.currentTimeMillis();
@@ -298,9 +367,9 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 
 		// SETUP CONCEPTS INPUT SCTFile ArrayList
-		List<List<SCTFile>> listOfCDirs = new ArrayList<List<SCTFile>>(); // ***
+		List<List<SCTFile>> listOfCDirs = new ArrayList<List<SCTFile>>();
 		for (int i = 0; i < inDirs.length; i++) {
-			ArrayList<SCTFile> listOfCFiles = new ArrayList<SCTFile>(); // ***
+			ArrayList<SCTFile> listOfCFiles = new ArrayList<SCTFile>();
 
 			getLog().info("CONCEPTS (" + i + "): " + wDir + subDir + inDirs[i]);
 
@@ -315,17 +384,17 @@ public class Sct2AceMojo extends AbstractMojo {
 				// ADD SCTFile Entry
 				String tempRevDate = getFileRevDate(f2);
 				String tmpPathID = getFilePathID(f2, wDir, subDir);
-				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID, i);
-				listOfCFiles.add(tmpObj); // ***
+				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
+				listOfCFiles.add(tmpObj);
 				getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
 			}
-			listOfCDirs.add(listOfCFiles); // ***
+			listOfCDirs.add(listOfCFiles);
 		}
 
 		// SETUP DESCRIPTIONS INPUT SCTFile ArrayList
-		List<List<SCTFile>> listOfDDirs = new ArrayList<List<SCTFile>>(); // **
+		List<List<SCTFile>> listOfDDirs = new ArrayList<List<SCTFile>>();
 		for (int i = 0; i < inDirs.length; i++) {
-			ArrayList<SCTFile> listOfDFiles = new ArrayList<SCTFile>(); // **
+			ArrayList<SCTFile> listOfDFiles = new ArrayList<SCTFile>();
 			getLog().info(
 					"DESCRIPTIONS (" + i + "): " + wDir + subDir + inDirs[i]);
 
@@ -340,17 +409,17 @@ public class Sct2AceMojo extends AbstractMojo {
 				// ADD SCTFile Entry
 				String tempRevDate = getFileRevDate(f2);
 				String tmpPathID = getFilePathID(f2, wDir, subDir);
-				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID, i);
-				listOfDFiles.add(tmpObj); // **
+				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
+				listOfDFiles.add(tmpObj);
 				getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
 			}
-			listOfDDirs.add(listOfDFiles); // **
+			listOfDDirs.add(listOfDFiles);
 		}
 
 		// SETUP RELATIONSHIPS INPUT SCTFile ArrayList
-		List<List<SCTFile>> listOfRDirs = new ArrayList<List<SCTFile>>(); // *
+		List<List<SCTFile>> listOfRDirs = new ArrayList<List<SCTFile>>();
 		for (int i = 0; i < inDirs.length; i++) {
-			ArrayList<SCTFile> listOfRFiles = new ArrayList<SCTFile>(); // *
+			ArrayList<SCTFile> listOfRFiles = new ArrayList<SCTFile>();
 			getLog().info(
 					"RELATIONSHIPS (" + i + "): " + wDir + subDir + inDirs[i]);
 
@@ -365,148 +434,34 @@ public class Sct2AceMojo extends AbstractMojo {
 				// ADD SCTFile Entry
 				String tempRevDate = getFileRevDate(f2);
 				String tmpPathID = getFilePathID(f2, wDir, subDir);
-				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID, i);
-				listOfRFiles.add(tmpObj); // *
+				SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
+				listOfRFiles.add(tmpObj);
 				getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
 			}
-			listOfRDirs.add(listOfRFiles); // *
+			listOfRDirs.add(listOfRFiles);
 		}
 
-		processConceptsFiles(wDir, listOfCDirs); // ***
-		processDescriptionsFiles(wDir, listOfDDirs); // **
-		processRelationshipsFiles(wDir, listOfRDirs); // *
+		// SETUP "ids.txt" OUTPUT FILE
+		String idsFileName = wDir + "/classes/ace/ids.txt";
+		BufferedWriter idstxtWriter;
+		idstxtWriter = new BufferedWriter(new FileWriter(idsFileName));
+		getLog().info("ids.txt OUTPUT: " + idsFileName);
+		// if (writeHeader) {
+		// idstxtWriter.write("primary uuid\tsource\tsource id\tstatus uuid\t"
+		// + "effective date\tpath uuid" + "\r\n");
+		// }
 
+		// PROCESS SNOMED FILES
+		processConceptsFiles(wDir, listOfCDirs, idstxtWriter);
+		processDescriptionsFiles(wDir, listOfDDirs, idstxtWriter);
+		processRelationshipsFiles(wDir, listOfRDirs, idstxtWriter);
+
+		idstxtWriter.close();
 		getLog().info("*** SCT2ACE PROCESSING COMPLETED ***");
 		getLog().info(
 				"CONVERSION TIME: "
 						+ ((System.currentTimeMillis() - start) / 1000)
 						+ " seconds");
-	}
-
-	private String getFileRevDate(File f) {
-		int pos;
-		// Check file name for date yyyyMMdd
-		// EXAMPLE: ../net/nhs/uktc/ukde/sct_relationships_uk_drug_20090401.txt
-		pos = f.getName().length() - 12; // "yyyyMMdd.txt"
-		String s1 = f.getName().substring(pos, pos + 8);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		dateFormat.setLenient(false);
-		try {
-			dateFormat.parse(s1);
-		} catch (ParseException pe) {
-			s1 = null;
-		}
-
-		// Check path for date yyyy-MM-dd
-		// EXAMPLE: ../org/snomed/2003-01-31
-		pos = f.getParent().length() - 10; // "yyyy-MM-dd"
-		String s2 = f.getParent().substring(pos);
-		// normalize date format
-		s2 = s2.substring(0, 4) + s2.substring(5, 7) + s2.substring(8, 10);
-		try {
-			dateFormat.parse(s2);
-		} catch (ParseException pe) {
-			s2 = null;
-		}
-
-		// 
-		if ((s1 != null) && (s2 != null)) {
-			if (s1.equals(s2)) {
-				return s1 + " 00:00:00";
-			} else {
-				return null; // !!! throw exception here
-			}
-		} else if (s1 != null) {
-			return s1 + " 00:00:00";
-		} else if (s2 != null) {
-			return s2 + " 00:00:00";
-		} else {
-			return null;
-		}
-	}
-
-	private String getFilePathID(File f, String baseDir, String subDir) {
-		String puuid = null;
-		UUID u;
-
-		String s;
-		if (subDir.equals("")) {
-			// !!! @@@ :TODO: TEST NO SUBDIRECTORY CODE BRANCH
-			s = f.getParent().substring(baseDir.length() - 1);
-		} else {
-			s = f.getParent().substring(baseDir.length() + subDir.length());
-		}
-
-		// :NYI: (Maybe) Additional checks if last directory branch is a date
-		// @@@ (Maybe just use the directory branch for UUID)
-		if (s.substring(0, 11).equals("/org/snomed")) {
-			// SNOMED_CORE Path UUID
-			puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()
-					.iterator().next().toString();
-			getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
-		} else if (s.equals("/net/nhs/uktc/uke")) {
-			// "UK Extensions" Path UUID
-			try {
-				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-						"NHS UK Extension Path");
-				puuid = u.toString();
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			getLog().info("  PATH UUID (uke): " + s + " " + puuid);
-		} else if (s.equals("/net/nhs/uktc/ukde")) {
-			// "UK Drug Extensions" Path UUID
-			try {
-				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-						"NHS UK Drug Extension Path");
-				puuid = u.toString();
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			getLog().info("  PATH UUID (ukde): " + s + " " + puuid);
-
-		} else {
-			// OTHER PATH UUID: based on directory path
-			// !!! @@@ :TODO: TEST THIS CODE BRANCH
-			try {
-				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-						s);
-				puuid = u.toString();
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			getLog().info("  PATH UUID: " + s + " " + puuid);
-		}
-
-		return puuid;
-	}
-
-	/*
-	 * 1. build directory buildDir
-	 */
-
-	private static void listFilesRecursive(ArrayList<File> list, File root,
-			String prefix) {
-		if (root.isFile()) {
-			list.add(root);
-			return;
-		}
-		File[] files = root.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isFile() && files[i].getName().endsWith(".txt")
-					&& files[i].getName().startsWith(prefix)) {
-				list.add(files[i]);
-			}
-			if (files[i].isDirectory()) {
-				listFilesRecursive(list, files[i], prefix);
-			}
-		}
 	}
 
 	/*
@@ -517,11 +472,11 @@ public class Sct2AceMojo extends AbstractMojo {
 	 * 
 	 * IGNORE: FULLYSPECIFIEDNAME CTV3ID SNOMEDID
 	 */
-	protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv)
-			throws Exception {
+	protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv,
+			Writer idstxt) throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
-		String revDate, pathID;
+		String sourceUUID, revDate, pathID;
 		SCTConceptRecord[] a1, a2, a3 = null;
 
 		getLog().info("START CONCEPTS PROCESSING...");
@@ -529,27 +484,31 @@ public class Sct2AceMojo extends AbstractMojo {
 		// SETUP CONCEPTS OUTPUT FILE
 		String outFileName = wDir + "/classes/ace/concepts.txt";
 		BufferedWriter bw;
-		getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-//		bw.write("concept uuid\tstatus uuid\tprimitive\t"
-//				+ "effective date\tpath uuid" + "\r\n");
+		getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
+		// if (writeHeader) {
+		// bw.write("concept uuid\tstatus uuid\tprimitive\t"
+		// + "effective date\tpath uuid" + "\r\n");
+		// }
 
-		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator *
+		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
 		while (dit.hasNext()) {
-			List<SCTFile> fl = dit.next(); // File List *
-			Iterator<SCTFile> fit = fl.iterator(); // File Iterator *
+			List<SCTFile> fl = dit.next(); // File List
+			Iterator<SCTFile> fit = fl.iterator(); // File Iterator
 
 			// READ file1 as MASTER FILE
 			SCTFile f1 = fit.next();
 			fName1 = f1.file.getPath();
 			revDate = f1.revDate;
 			pathID = f1.pathId;
+			sourceUUID = f1.sourceUuid;
 
 			count1 = countFileLines(fName1);
 			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
 			a1 = new SCTConceptRecord[count1];
 			parseConcepts(fName1, a1, count1);
 			writeConcepts(bw, a1, count1, revDate, pathID);
+			writeConceptIds(idstxt, a1, count1, sourceUUID, revDate, pathID);
 
 			while (fit.hasNext()) {
 				// SETUP CURRENT CONCEPTS INPUT FILE
@@ -557,6 +516,7 @@ public class Sct2AceMojo extends AbstractMojo {
 				fName2 = f2.file.getPath();
 				revDate = f2.revDate;
 				pathID = f2.pathId;
+				sourceUUID = f2.sourceUuid;
 
 				count2 = countFileLines(fName2);
 				getLog().info("Counted: " + count2 + " records, " + fName2);
@@ -590,6 +550,8 @@ public class Sct2AceMojo extends AbstractMojo {
 					case 3: // ADDED CONCEPT
 						// Write history
 						bw.write(a2[r2].toStringAce(revDate, pathID));
+						idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+								pathID));
 						// Hold pointer to append to master
 						a3[r3] = a2[r2];
 						r2++;
@@ -616,9 +578,11 @@ public class Sct2AceMojo extends AbstractMojo {
 				}
 
 				if (r2 < count2) {
-					while (r2 < count2) { // ADD REMAINING INPUT
+					while (r2 < count2) { // ADD CONCEPT REMAINING INPUT
 						// Write history
 						bw.write(a2[r2].toStringAce(revDate, pathID));
+						idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+								pathID));
 						// Add to append array
 						a3[r3] = a2[r2];
 						nAdd++;
@@ -654,10 +618,10 @@ public class Sct2AceMojo extends AbstractMojo {
 	}
 
 	protected void processDescriptionsFiles(String wDir,
-			List<List<SCTFile>> sctv) throws Exception {
+			List<List<SCTFile>> sctv, Writer idstxt) throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
-		String revDate, pathID;
+		String sourceUUID, revDate, pathID;
 		SCTDescriptionRecord[] a1, a2, a3 = null;
 
 		getLog().info("START DESCRIPTIONS PROCESSING...");
@@ -670,29 +634,33 @@ public class Sct2AceMojo extends AbstractMojo {
 		// SETUP DESCRIPTIONS OUTPUT FILE
 		String outFileName = wDir + "/classes/ace/descriptions.txt";
 		BufferedWriter bw;
-		getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-//		bw.write("description uuid\tstatus uuid\t" + "concept uuid\t"
-//				+ "term\t" + "capitalization status\t"
-//				+ "description type uuid\t" + "language code\t"
-//				+ "effective date\tpath uuid" + "\r\n");
+		getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
+		// if (writeHeader) {
+		// bw.write("description uuid\tstatus uuid\t" + "concept uuid\t"
+		// + "term\t" + "capitalization status\t"
+		// + "description type uuid\t" + "language code\t"
+		// + "effective date\tpath uuid" + "\r\n");
+		// }
 
-		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator **
+		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
 		while (dit.hasNext()) {
-			List<SCTFile> fl = dit.next(); // File List **
-			Iterator<SCTFile> fit = fl.iterator(); // File Iterator **
+			List<SCTFile> fl = dit.next(); // File List
+			Iterator<SCTFile> fit = fl.iterator(); // File Iterator
 
 			// READ file1 as MASTER FILE
 			SCTFile f1 = fit.next();
 			fName1 = f1.file.getPath();
 			revDate = f1.revDate;
 			pathID = f1.pathId;
+			sourceUUID = f1.sourceUuid;
 
 			count1 = countFileLines(fName1);
 			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
 			a1 = new SCTDescriptionRecord[count1];
 			parseDescriptions(fName1, a1, count1);
 			writeDescriptions(bw, a1, count1, revDate, pathID);
+			writeDescriptionIds(idstxt, a1, count1, sourceUUID, revDate, pathID);
 
 			while (fit.hasNext()) {
 				// SETUP CURRENT CONCEPTS INPUT FILE
@@ -700,6 +668,7 @@ public class Sct2AceMojo extends AbstractMojo {
 				fName2 = f2.file.getPath();
 				revDate = f2.revDate;
 				pathID = f2.pathId;
+				sourceUUID = f2.sourceUuid;
 
 				count2 = countFileLines(fName2);
 				getLog().info("Counted: " + count2 + " records, " + fName2);
@@ -744,6 +713,8 @@ public class Sct2AceMojo extends AbstractMojo {
 					case 3: // ADDED DESCRIPTION
 						// Write history
 						bw.write(a2[r2].toStringAce(revDate, pathID));
+						idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+								pathID));
 						// Hold pointer to append to master
 						a3[r3] = a2[r2];
 						r2++;
@@ -771,9 +742,11 @@ public class Sct2AceMojo extends AbstractMojo {
 				}
 
 				if (r2 < count2) {
-					while (r2 < count2) { // ADD REMAINING INPUT
+					while (r2 < count2) { // ADD REMAINING DESCRIPTION INPUT
 						// Write history
 						bw.write(a2[r2].toStringAce(revDate, pathID));
+						idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+								pathID));
 						// Add to append array
 						a3[r3] = a2[r2];
 						nAdd++;
@@ -810,10 +783,10 @@ public class Sct2AceMojo extends AbstractMojo {
 	}
 
 	protected void processRelationshipsFiles(String wDir,
-			List<List<SCTFile>> sctv) throws Exception {
+			List<List<SCTFile>> sctv, Writer idstxt) throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
-		String revDate, pathID;
+		String sourceUUID, revDate, pathID;
 		SCTRelationshipRecord[] a1, a2, a3 = null;
 
 		getLog().info("START RELATIONSHIPS PROCESSING...");
@@ -827,30 +800,35 @@ public class Sct2AceMojo extends AbstractMojo {
 		// SETUP CONCEPTS OUTPUT FILE
 		String outFileName = wDir + "/classes/ace/relationships.txt";
 		BufferedWriter bw;
-		getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
 		bw = new BufferedWriter(new FileWriter(outFileName));
-//		bw.write("relationship uuid\t" + "status uuid\t"
-//				+ "source concept uuid\t" + "relationship type uuid\t"
-//				+ "destination concept uuid\t" + "characteristic type uuid\t"
-//				+ "refinability uuid\t" + "relationship group\t"
-//				+ "effective date\t" + "path uuid" + "\r\n");
+		getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
+		// if (writeHeader) {
+		// bw.write("relationship uuid\t" + "status uuid\t"
+		// + "source concept uuid\t" + "relationship type uuid\t"
+		// + "destination concept uuid\t" + "characteristic type uuid\t"
+		// + "refinability uuid\t" + "relationship group\t"
+		// + "effective date\t" + "path uuid" + "\r\n");
+		// }
 
-		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator *
+		Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
 		while (dit.hasNext()) {
-			List<SCTFile> fl = dit.next(); // File List *
-			Iterator<SCTFile> fit = fl.iterator(); // File Iterator *
+			List<SCTFile> fl = dit.next(); // File List
+			Iterator<SCTFile> fit = fl.iterator(); // File Iterator
 
 			// READ file1 as MASTER FILE
 			SCTFile f1 = fit.next();
 			fName1 = f1.file.getPath();
 			revDate = f1.revDate;
 			pathID = f1.pathId;
+			sourceUUID = f1.sourceUuid;
 
 			count1 = countFileLines(fName1);
 			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
 			a1 = new SCTRelationshipRecord[count1];
 			parseRelationships(fName1, a1, count1);
 			writeRelationships(bw, a1, count1, revDate, pathID);
+			writeRelationshipIds(idstxt, a1, count1, sourceUUID, revDate,
+					pathID);
 
 			while (fit.hasNext()) {
 				// SETUP CURRENT RELATIONSHIPS INPUT FILE
@@ -858,6 +836,7 @@ public class Sct2AceMojo extends AbstractMojo {
 				fName2 = f2.file.getPath();
 				revDate = f2.revDate;
 				pathID = f2.pathId;
+				sourceUUID = f2.sourceUuid;
 
 				count2 = countFileLines(fName2);
 				getLog().info("Counted: " + count2 + " records, " + fName2);
@@ -914,7 +893,8 @@ public class Sct2AceMojo extends AbstractMojo {
 					case 3: // ADDED RELATIONSHIP
 						// Write history
 						bw.write(a2[r2].toStringAce(revDate, pathID));
-
+						idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+								pathID));
 						// hold pointer to append to master
 						a3[r3] = a2[r2];
 						r2++;
@@ -942,11 +922,12 @@ public class Sct2AceMojo extends AbstractMojo {
 				}
 
 				if (r2 < count2) {
-					while (r2 < count2) { // ADD REMAINING INPUT
+					while (r2 < count2) { // ADD REMAINING RELATIONSHIP INPUT
 						// Write history
 						bw.write(a2[r2].toStringAce(revDate, pathID));
-
-						//
+						idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+								pathID));
+						// Add to append array
 						a3[r3] = a2[r2];
 						nAdd++;
 						r2++;
@@ -1211,6 +1192,21 @@ public class Sct2AceMojo extends AbstractMojo {
 						+ " milliseconds");
 	}
 
+	protected void writeConceptIds(Writer w, SCTConceptRecord[] a, int count,
+			String source, String releaseDate, String path) throws Exception {
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < count; i++) {
+			w.write(a[i].toIdsTxt(source, releaseDate, path));
+		}
+
+		getLog().info(
+				"Output time: " + count + " records, "
+						+ (System.currentTimeMillis() - start)
+						+ " milliseconds");
+	}
+
 	protected void writeDescriptions(Writer w, SCTDescriptionRecord[] a,
 			int count, String releaseDate, String path) throws Exception {
 
@@ -1226,6 +1222,22 @@ public class Sct2AceMojo extends AbstractMojo {
 						+ " milliseconds");
 	}
 
+	protected void writeDescriptionIds(Writer w, SCTDescriptionRecord[] a,
+			int count, String source, String releaseDate, String path)
+			throws Exception {
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < count; i++) {
+			w.write(a[i].toIdsTxt(source, releaseDate, path));
+		}
+
+		getLog().info(
+				"Output time: " + count + " records, "
+						+ (System.currentTimeMillis() - start)
+						+ " milliseconds");
+	}
+
 	protected void writeRelationships(Writer w, SCTRelationshipRecord[] a,
 			int count, String releaseDate, String path) throws Exception {
 
@@ -1233,6 +1245,22 @@ public class Sct2AceMojo extends AbstractMojo {
 
 		for (int i = 0; i < count; i++) {
 			w.write(a[i].toStringAce(releaseDate, path));
+		}
+
+		getLog().info(
+				"Output time: " + count + " records, "
+						+ (System.currentTimeMillis() - start)
+						+ " milliseconds");
+	}
+
+	protected void writeRelationshipIds(Writer w, SCTRelationshipRecord[] a,
+			int count, String source, String releaseDate, String path)
+			throws Exception {
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < count; i++) {
+			w.write(a[i].toIdsTxt(source, releaseDate, path));
 		}
 
 		getLog().info(
@@ -1299,6 +1327,132 @@ public class Sct2AceMojo extends AbstractMojo {
 		// lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
 		// lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
 		return lineCount - 1;
+	}
+
+	private String getFileRevDate(File f) {
+		int pos;
+		// Check file name for date yyyyMMdd
+		// EXAMPLE: ../net/nhs/uktc/ukde/sct_relationships_uk_drug_20090401.txt
+		pos = f.getName().length() - 12; // "yyyyMMdd.txt"
+		String s1 = f.getName().substring(pos, pos + 8);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		dateFormat.setLenient(false);
+		try {
+			dateFormat.parse(s1);
+		} catch (ParseException pe) {
+			s1 = null;
+		}
+
+		// Check path for date yyyy-MM-dd
+		// EXAMPLE: ../org/snomed/2003-01-31
+		pos = f.getParent().length() - 10; // "yyyy-MM-dd"
+		String s2 = f.getParent().substring(pos);
+		// normalize date format
+		s2 = s2.substring(0, 4) + s2.substring(5, 7) + s2.substring(8, 10);
+		try {
+			dateFormat.parse(s2);
+		} catch (ParseException pe) {
+			s2 = null;
+		}
+
+		// 
+		if ((s1 != null) && (s2 != null)) {
+			if (s1.equals(s2)) {
+				return s1 + " 00:00:00";
+			} else {
+				return null; // :NYI: throw exception here
+			}
+		} else if (s1 != null) {
+			return s1 + " 00:00:00";
+		} else if (s2 != null) {
+			return s2 + " 00:00:00";
+		} else {
+			return null;
+		}
+	}
+
+	private String getFilePathID(File f, String baseDir, String subDir) {
+		String puuid = null;
+		UUID u;
+
+		String s;
+		if (subDir.equals("")) {
+			// :NYI: TEST NO SUBDIRECTORY CODE BRANCH
+			s = f.getParent().substring(baseDir.length() - 1);
+		} else {
+			s = f.getParent().substring(baseDir.length() + subDir.length());
+		}
+
+		// :NYI: (Maybe) Additional checks if last directory branch is a date
+		// @@@ (Maybe just use the directory branch for UUID)
+		if (s.substring(0, 11).equals("/org/snomed")) {
+			// SNOMED_CORE Path UUID
+			puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()
+					.iterator().next().toString();
+			getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
+		} else if (s.equals("/net/nhs/uktc/uke")) {
+			// "UK Extensions" Path UUID
+			try {
+				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+						"NHS UK Extension Path");
+				puuid = u.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			getLog().info("  PATH UUID (uke): " + s + " " + puuid);
+		} else if (s.equals("/net/nhs/uktc/ukde")) {
+			// "UK Drug Extensions" Path UUID
+			try {
+				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+						"NHS UK Drug Extension Path");
+				puuid = u.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			getLog().info("  PATH UUID (ukde): " + s + " " + puuid);
+
+		} else {
+			// OTHER PATH UUID: based on directory path
+			// :NYI: TEST THIS CODE BRANCH
+			try {
+				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+						s);
+				puuid = u.toString();
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			getLog().info("  PATH UUID: " + s + " " + puuid);
+		}
+
+		return puuid;
+	}
+
+	/*
+	 * 1. build directory buildDir
+	 */
+
+	private static void listFilesRecursive(ArrayList<File> list, File root,
+			String prefix) {
+		if (root.isFile()) {
+			list.add(root);
+			return;
+		}
+		File[] files = root.listFiles();
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isFile() && files[i].getName().endsWith(".txt")
+					&& files[i].getName().startsWith(prefix)) {
+				list.add(files[i]);
+			}
+			if (files[i].isDirectory()) {
+				listFilesRecursive(list, files[i], prefix);
+			}
+		}
 	}
 
 	// :TODO: refine exception policy try vs. throw
