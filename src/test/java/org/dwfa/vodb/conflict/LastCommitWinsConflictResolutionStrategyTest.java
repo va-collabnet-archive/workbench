@@ -2,6 +2,7 @@ package org.dwfa.vodb.conflict;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -77,36 +78,36 @@ public class LastCommitWinsConflictResolutionStrategyTest {
 		List<MockTuple> tuples = new ArrayList<MockTuple>();
 
 		tuples.add(new MockTuple(1, 0, 1, "value 1"));
-		Assert.assertEquals(tuples, conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(tuples, conflictResolutionStrategy.resolveTuples(tuples)));
 
 		tuples.add(new MockTuple(1, 0, 2, "value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 0, 2, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 0, 2, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 
 		tuples.add(new MockTuple(1, 0, 3, "value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 0, 3, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 0, 3, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 
 		//now add a new version on a different path with a different value
 		tuples.add(new MockTuple(1, 1, 5, "new value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 5, "new value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 5, "new value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 		
 		//now change the value back so the latest state on each path is the same
 		tuples.add(new MockTuple(1, 1, 6, "value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 		
 		//now try with 2 entities, no conflict for either
 		tuples.add(new MockTuple(2, 0, 1, "value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(2, 0, 1, "value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(2, 0, 1, "value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 		
 		tuples.add(new MockTuple(2, 0, 2, "value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(2, 0, 2, "value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(2, 0, 2, "value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 		
 		//add conflict for second entity
 		tuples.add(new MockTuple(2, 1, 3, "new value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(2, 1, 3, "new value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(2, 1, 3, "new value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 		
 		//add conflict for second entity - same version different data
 		tuples.add(new MockTuple(2, 0, 3, "even newer value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(2, 1, 3, "new value 2"),  new MockTuple(2, 0, 3, "even newer value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(2, 1, 3, "new value 2"),  new MockTuple(2, 0, 3, "even newer value 2"), new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveTuples(tuples)));
 	}
 	
 	@Test
@@ -121,33 +122,33 @@ public class LastCommitWinsConflictResolutionStrategyTest {
 		List<MockTuple> tuples = new ArrayList<MockTuple>();
 
 		tuples.add(new MockTuple(1, 0, 1, "value 1"));
-		Assert.assertEquals(tuples, conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(tuples, conflictResolutionStrategy.resolveParts(tuples)));
 
 		tuples.add(new MockTuple(1, 0, 2, "value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 0, 2, "value 1")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 0, 2, "value 1")), conflictResolutionStrategy.resolveParts(tuples)));
 
 		tuples.add(new MockTuple(1, 0, 3, "value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 0, 3, "value 1")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 0, 3, "value 1")), conflictResolutionStrategy.resolveParts(tuples)));
 
 		//now add a new version on a different path with a different value
 		tuples.add(new MockTuple(1, 1, 5, "new value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 5, "new value 1")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 5, "new value 1")), conflictResolutionStrategy.resolveParts(tuples)));
 		
 		//now change the value back so the latest state on each path is the same
 		tuples.add(new MockTuple(1, 1, 6, "value 1"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveParts(tuples)));
 		
 		//now try with 2 entities - this is outside the bounds for this method as it only takes parts from one entity
 		tuples.add(new MockTuple(2, 0, 1, "value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 6, "value 1")), conflictResolutionStrategy.resolveParts(tuples)));
 		
 		//add conflict for second entity
 		tuples.add(new MockTuple(1, 1, 7, "new value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 7, "new value 2")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 7, "new value 2")), conflictResolutionStrategy.resolveParts(tuples)));
 		
 		//add conflict for second entity - same version different data
 		tuples.add(new MockTuple(1, 1, 7, "even newer value 2"));
-		Assert.assertEquals(Arrays.asList(new MockTuple(1, 1, 7, "new value 2"),  new MockTuple(1, 1, 7, "even newer value 2")), conflictResolutionStrategy.resolveParts(tuples));
+		Assert.assertTrue(compareSame(Arrays.asList(new MockTuple(1, 1, 7, "new value 2"),  new MockTuple(1, 1, 7, "even newer value 2")), conflictResolutionStrategy.resolveParts(tuples)));
 
 	}
 	
@@ -156,5 +157,20 @@ public class LastCommitWinsConflictResolutionStrategyTest {
 		List<MockTuple> tuples = new ArrayList<MockTuple>();
 		Assert.assertEquals(null, conflictResolutionStrategy.resolveParts(null));
 		Assert.assertEquals(tuples, conflictResolutionStrategy.resolveParts(tuples));
+	}
+	
+	/**
+	 * @return True if lists have the same contents (order not important)
+	 */
+	private <T> boolean compareSame(List<T> a, List<T> b) {
+		if (a.size() != b.size()) {
+			return false;
+		}
+		for (T t:a) {
+			if (!b.contains(t)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
