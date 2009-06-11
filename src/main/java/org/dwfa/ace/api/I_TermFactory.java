@@ -27,6 +27,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -63,6 +64,12 @@ public interface I_TermFactory {
 
     public I_GetConceptData getConcept(int nid) throws TerminologyException, IOException;
 
+    /**
+     * @param conceptId Any textual id, for instance a SNOMED CT id 
+     * @param sourceId The native id of the source concept, eg {@link ArchitectonicAuxiliary.SNOMED_INT_ID#localize()}
+     */
+    public I_GetConceptData getConcept(String conceptId, int sourceId) throws TerminologyException, ParseException, IOException;
+    
     public Collection<UUID> getUids(int nid) throws TerminologyException, IOException;
 
     public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang,
