@@ -7,6 +7,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRef;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRefBuilder;
+import org.dwfa.ace.task.refset.members.ForTesting;
 import org.dwfa.ace.task.refset.members.WriteRefsetDescriptionsProcessExtByRefBuilder;
 import org.dwfa.ace.task.util.Logger;
 
@@ -53,7 +54,7 @@ public class WriteRefsetDescriptions extends AbstractMojo {
         cleanableProcessExtByRefBuilder = new WriteRefsetDescriptionsProcessExtByRefBuilder();
     }
 
-    //for testing
+    @ForTesting
     WriteRefsetDescriptions(final File outputDirectory, final I_TermFactory termFactory,
         final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder, final File targetDirectory,
         final MojoUtilWrapper mojoUtilWrapper) {
