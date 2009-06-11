@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.ACE;
@@ -1786,5 +1787,32 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	  return new ThinExtByRefPartConceptString();
   }
 
+ 
+	@SuppressWarnings("deprecation")
+	public I_GetConceptData getConcept(String conceptId, int sourceId)
+			throws TerminologyException, ParseException, IOException {
+		
+		Hits hits = doLuceneSearch(conceptId);
+	
+		if (hits == null || hits.length() == 0) {
+			throw new TerminologyException("Search produced no results");
+		}
+		
+		// Find the hit that actually has our concept id in it
+		
+		for (int i = 0; i < hits.length(); i++) {
+			Document doc = hits.doc(i);
+			int cnid = Integer.parseInt(doc.get("cnid"));
+			I_GetConceptData concept = getConcept(cnid);
+			for (I_IdPart version : concept.getId().getVersions()) {
+				if (conceptId.equals(version.getSourceId().toString())
+						&& (sourceId == version.getSource())) {
+					return concept;
+				}
+			}
+		}
+		
+		throw new TerminologyException("Unable to locate a matching concept");
+	}
 
 }
