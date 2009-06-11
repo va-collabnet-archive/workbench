@@ -79,7 +79,15 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 											AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
 											"<html>Unedited semantic tag",
 											concept));
-							return alertList;
+							// return alertList;
+						}
+						if (part.getText().length() > 255) {
+							alertList
+									.add(new AlertToDataConstraintFailure(
+											AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+											"<html>FSN exceeds 255 characters",
+											concept));
+							// return alertList;
 						}
 					}
 				}
