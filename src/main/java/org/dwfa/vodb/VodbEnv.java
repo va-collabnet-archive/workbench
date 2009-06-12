@@ -1787,7 +1787,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	  return new ThinExtByRefPartConceptString();
   }
 
- 
+  	/**
+  	 * @see org.dwfa.ace.api.I_TermFactory#getConcept(java.lang.String, int)
+  	 */
 	@SuppressWarnings("deprecation")
 	public I_GetConceptData getConcept(String conceptId, int sourceId)
 			throws TerminologyException, ParseException, IOException {
@@ -1799,6 +1801,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		}
 		
 		// Find the hit that actually has our concept id in it
+		// and has a matching source (the identifier scheme)
 		
 		for (int i = 0; i < hits.length(); i++) {
 			Document doc = hits.doc(i);
@@ -1814,5 +1817,39 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		
 		throw new TerminologyException("Unable to locate a matching concept");
 	}
+	
+	/**
+	 * @see org.dwfa.ace.api.I_TermFactory#getConcept(java.lang.String)
+	 */
+	@SuppressWarnings("deprecation")
+	public Set<I_GetConceptData> getConcept(String conceptId)
+			throws TerminologyException, ParseException, IOException {
 
+		Set<I_GetConceptData> results = new HashSet<I_GetConceptData>();
+		
+		Hits hits = doLuceneSearch(conceptId);
+		
+		if (hits == null || hits.length() == 0) {
+			throw new TerminologyException("Search produced no results");
+		}
+		
+		// Find the hit that actually has our concept id in it
+		
+		for (int i = 0; i < hits.length(); i++) {
+			Document doc = hits.doc(i);
+			int cnid = Integer.parseInt(doc.get("cnid"));
+			I_GetConceptData concept = getConcept(cnid);
+			for (I_IdPart version : concept.getId().getVersions()) {
+				if (conceptId.equals(version.getSourceId().toString())) {
+					results.add(concept);
+				}
+			}
+		}
+		
+		if (results.size() == 0) {
+			throw new TerminologyException("Unable to locate a matching concept");
+		} else {
+			return results;
+		}
+	}	
 }
