@@ -24,7 +24,7 @@ import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.ace.api.ConceptDescriptor;
 
 /**
  * 
@@ -37,7 +37,8 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 	
 	public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
 	
-	public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME = "includes marked parents";
+	public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME = 
+			ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
 	
 	/**
 	 * @parameter
