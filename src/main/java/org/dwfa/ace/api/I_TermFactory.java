@@ -65,10 +65,23 @@ public interface I_TermFactory {
     public I_GetConceptData getConcept(int nid) throws TerminologyException, IOException;
 
     /**
-     * @param conceptId Any textual id, for instance a SNOMED CT id 
-     * @param sourceId The native id of the source concept, eg {@link ArchitectonicAuxiliary.SNOMED_INT_ID#localize()}
+     * Find a concept using a textual identifier from a known identifier scheme
+     * (it is known to be a UUID or an SCTID, etc)
+     * 
+     * @param conceptId Any textual id, for instance a SNOMED CT ID or a UUID  
+     * @param sourceId The native id of the source scheme concept, eg {@link ArchitectonicAuxiliary.Concept.SNOMED_INT_ID}
+     * @throws TerminologyException if a suitable concept is not located
      */
     public I_GetConceptData getConcept(String conceptId, int sourceId) throws TerminologyException, ParseException, IOException;
+    
+    /**
+     * Find concepts with a matching textual identifier where the identifier scheme/type is unknown.
+     * This may result in multiple matches.
+     * 
+     * @param conceptId Any textual id, for instance a SNOMED CT id 
+     * @throws TerminologyException if no suitable concepts are located
+     */
+    public Set<I_GetConceptData> getConcept(String conceptId) throws TerminologyException, ParseException, IOException;
     
     public Collection<UUID> getUids(int nid) throws TerminologyException, IOException;
 
