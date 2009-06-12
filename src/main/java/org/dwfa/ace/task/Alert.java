@@ -20,24 +20,29 @@ public class Alert extends AbstractTask {
 
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 
 	private String alertText = "<html>Alert text";
+	private String alertTextProperty = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(alertText);
+		out.writeObject(alertTextProperty);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
+		if (objDataVersion >= 1) {
 			alertText = (String) in.readObject();
+		} 
+		
+		if (objDataVersion >= 2) {
+			alertTextProperty = (String) in.readObject();
 		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
+			alertTextProperty = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
 		}
-
 	}
 
 	/**
@@ -46,8 +51,15 @@ public class Alert extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
-        
-		JOptionPane.showMessageDialog(null, alertText, "", JOptionPane.WARNING_MESSAGE);
+		String readProperty;
+		
+        try {
+			readProperty = (String) process.readProperty(alertTextProperty);
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		}
+		
+		JOptionPane.showMessageDialog(null, alertText + readProperty, "", JOptionPane.WARNING_MESSAGE);
 		
 		return Condition.CONTINUE;
 	}
@@ -82,5 +94,13 @@ public class Alert extends AbstractTask {
 
 	public void setAlertText(String alertText) {
 		this.alertText = alertText;
+	}
+
+	public String getAlertTextProperty() {
+		return alertTextProperty;
+	}
+
+	public void setAlertTextProperty(String alertTextProperty) {
+		this.alertTextProperty = alertTextProperty;
 	}
 }

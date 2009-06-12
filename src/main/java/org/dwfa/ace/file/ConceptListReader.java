@@ -1,10 +1,9 @@
-package org.dwfa.ace.refset;
+package org.dwfa.ace.file;
 
 import org.dwfa.ace.api.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
 

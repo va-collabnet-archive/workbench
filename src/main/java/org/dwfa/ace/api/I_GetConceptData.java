@@ -381,4 +381,6 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	
 	public boolean isParentOfOrEqualTo(I_GetConceptData child, boolean addUncommitted)
 			throws IOException, TerminologyException;
+
+	public Object getId(int identifierScheme) throws IOException, TerminologyException;
 }
