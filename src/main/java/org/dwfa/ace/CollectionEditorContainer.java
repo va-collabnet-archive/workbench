@@ -1,7 +1,10 @@
 package org.dwfa.ace;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -18,6 +21,7 @@ import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -25,12 +29,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
+import org.dwfa.ace.file.ConceptListReader;
+import org.dwfa.ace.file.ConceptListWriter;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
@@ -48,6 +55,74 @@ import org.dwfa.gui.toggle.Toggle32x32;
 import com.sleepycat.je.DatabaseException;
 
 public class CollectionEditorContainer extends JPanel {
+
+	public class ImportListButtonListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent arg0) {
+			FileDialog dialog = new FileDialog(new Frame(),
+					"Select file to import: ");
+			dialog.setMode(FileDialog.LOAD);
+			dialog.setDirectory(System.getProperty("user.dir"));
+			dialog.setVisible(true);
+			if (dialog.getFile() != null) {
+				ConceptListReader reader = new ConceptListReader();
+				reader.setSourceFile(new File(dialog.getFile()));
+				
+				I_ModelTerminologyList model = (I_ModelTerminologyList) list.getModel();
+				
+				for (I_GetConceptData concept : reader) {
+					model.addElement(concept);
+				}
+			}
+		}
+
+	}
+
+	public class ExportListButtonListener implements ActionListener {
+
+		private static final String EXTENSION = ".txt";
+
+		public void actionPerformed(ActionEvent arg0) {
+			FileDialog dialog = new FileDialog(new Frame(),
+					"Select export file: ");
+			dialog.setMode(FileDialog.SAVE);
+			dialog.setDirectory(System.getProperty("user.dir"));
+			dialog.setVisible(true);
+			if (dialog.getFile() != null) {
+				if (dialog.getFile().toLowerCase().endsWith(EXTENSION) == false) {
+					dialog.setFile(dialog.getFile() + EXTENSION);
+				}
+				
+				ConceptListWriter writer = new ConceptListWriter();
+				try {
+					writer.open(new File(dialog.getFile()), false);
+					
+					ListModel model = list.getModel();
+	
+					for (int i = 0; i < model.getSize(); i++) {
+						writer.write((I_GetConceptData) model.getElementAt(i));
+					}
+					
+					writer.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					
+					final JDialog alert = new JDialog();
+					JPanel panel = new JPanel(new GridLayout(2,1));
+					panel.add(new JLabel("Failed to write to file " + dialog.getFile() + " due to " + e.getLocalizedMessage()));
+					JButton button = new JButton("OK");
+					button.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							alert.dispose();
+						}
+					});
+					
+					panel.add(button);
+					alert.add(panel);
+				}
+			}
+		}
+	}
 
 	public class EraseListActionListener implements ActionListener {
 
@@ -206,6 +281,24 @@ public class CollectionEditorContainer extends JPanel {
 		eraseListButton.addActionListener(new EraseListActionListener());
 		eraseListButton.setToolTipText("clear the list");
 		listEditorTopPanel.add(eraseListButton, c);
+		
+		c.gridx++;
+
+		JButton exportListButton = new JButton(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/funnel_up.png")));
+		exportListButton.setVisible(ACE.editMode);
+		exportListButton.addActionListener(new ExportListButtonListener());
+		exportListButton.setToolTipText("export the list to a file");
+		listEditorTopPanel.add(exportListButton, c);
+
+		c.gridx++;
+
+		JButton importListButton = new JButton(new ImageIcon(ACE.class
+				.getResource("/32x32/plain/funnel_down.png")));
+		importListButton.setVisible(ACE.editMode);
+		importListButton.addActionListener(new ImportListButtonListener());
+		importListButton.setToolTipText("import the list to a file");
+		listEditorTopPanel.add(importListButton, c);
 
 		c.gridx++;
 

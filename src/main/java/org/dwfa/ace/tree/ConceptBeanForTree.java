@@ -339,6 +339,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getExtensions();
 	}
 
+	public Object getId(int identifierScheme) throws IOException,
+			TerminologyException {
+		return bean.getId(identifierScheme);
+	}
+
 	
 	/*
 	 * 

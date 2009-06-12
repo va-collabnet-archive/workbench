@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
@@ -1362,6 +1363,17 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 	public List<I_ThinExtByRefVersioned> getExtensions() throws IOException,
 			TerminologyException {
 		return LocalVersionedTerminology.get().getAllExtensionsForComponent(getConceptId());
+	}
+
+	public Object getId(int identifierScheme) throws IOException, TerminologyException {
+		I_IntSet allowedStatus = LocalVersionedTerminology.get().getActiveAceFrameConfig().getAllowedStatus();
+		for (I_IdTuple idTuple : getId().getTuples()) {
+			if (allowedStatus.contains(idTuple.getStatusId()) 
+					&& idTuple.getSource() == identifierScheme) {
+				return idTuple.getSourceId();
+			}
+		}
+		return null;
 	}
 
 }
