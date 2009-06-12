@@ -17,14 +17,14 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.maven.transform.UuidSnomedMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
-import org.dwfa.mojo.file.FileHandler;
 import org.dwfa.tapi.TerminologyException;
 
-public abstract class MemberRefsetHandler extends FileHandler<I_ThinExtByRefPart> {
+public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtByRefPart> {
 
 	protected static final String COMPONENT_ID = "COMPONENT_ID";
 	protected static final String STATUS_ID = "STATUS_ID";

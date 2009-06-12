@@ -13,17 +13,17 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
+import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
-import org.dwfa.mojo.file.FileHandler;
 import org.dwfa.mojo.refset.writers.BooleanRefsetHandler;
+import org.dwfa.mojo.refset.writers.ConceptDoubleRefsetHandler;
 import org.dwfa.mojo.refset.writers.ConceptIntegerRefsetHandler;
 import org.dwfa.mojo.refset.writers.ConceptRefsetHandler;
 import org.dwfa.mojo.refset.writers.IntegerRefsetHandler;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.mojo.refset.writers.StringRefsetHandler;
-import org.dwfa.mojo.refset.writers.ConceptDoubleRefsetHandler;
 
 enum RefsetType {
 
@@ -151,7 +151,7 @@ enum RefsetType {
         };
     }
 
-    public static FileHandler<I_ThinExtByRefPart> getHandlerForFile(File file) throws InstantiationException, IllegalAccessException {
+    public static IterableFileReader<I_ThinExtByRefPart> getHandlerForFile(File file) throws InstantiationException, IllegalAccessException {
         return findByFilename(file.getName()).getRefsetHandler();
     }
 }

@@ -13,8 +13,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.mojo.file.FileHandler;
 
 /**
  * Processes a tab delimited file containing refset specification extensions in the export format.
@@ -32,7 +32,7 @@ import org.dwfa.mojo.file.FileHandler;
  *
  * @see org.dwfa.mojo.refset.ExportRefSet
  */
-public class ExportedRefsetHandler extends FileHandler<I_ThinExtByRefVersioned> {
+public class ExportedRefsetHandler extends IterableFileReader<I_ThinExtByRefVersioned> {
 
     private final SimpleDateFormat EXPORTED_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
