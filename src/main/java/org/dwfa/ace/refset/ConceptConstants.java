@@ -35,4 +35,7 @@ public class ConceptConstants {
 	public static final ConceptSpec PATH_VERSION_REFSET = new ConceptSpec("Path version reference set", "999d61ec-ba1e-48eb-b759-62ffeefbf4b1");
 
 	public static final ConceptSpec EXCLUDE_MEMBERS_REL_TYPE = new ConceptSpec("exclude members", "4fdc7569-ff5a-49ec-bcfb-cc41308abcc0");
+	
+	public static final ConceptSpec INCLUDES_MARKED_PARENTS_REL_TYPE = new ConceptSpec("includes marked parents", "6266b677-5a77-43ca-8479-0127c5751cf6");
+	
 }
