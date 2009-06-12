@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.refset.members;
+package org.dwfa.ace.batch;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -57,6 +57,21 @@ public class BatchMonitor {
 		eventCount++;
 	}
 	
+	public void setText(String text) {
+		if (activity != null) {
+			activity.setProgressInfoLower(text);
+		}
+	}
+	
+	public void setIndeterminate(boolean indeterminate) {
+		if (activity != null) {
+			activity.setIndeterminate(indeterminate);			
+		}
+		if (indeterminate) {
+			totalEvents = 0;
+		}
+	}
+	
 	/**
 	 * Report updated statistics
 	 */
@@ -67,16 +82,22 @@ public class BatchMonitor {
 			long timeSinceLastReport = new Date().getTime() - lastReportTime;			
 			long percentComplete = (eventCount * 100) / totalEvents;
 			
-			double eventsPerMs = eventsSinceLastReport / (double)timeSinceLastReport;
-			long timeToCompleteMs = Math.round((totalEvents - eventCount) / eventsPerMs);
+			if (eventsSinceLastReport > 0) {
+				
+				double eventsPerMs = eventsSinceLastReport / (double)timeSinceLastReport;
+				long timeToCompleteMs = Math.round((totalEvents - eventCount) / eventsPerMs);
+				
+				activity.setProgressInfoLower(percentComplete + "% completed (" + eventCount + " of " + totalEvents + "). " + 
+						asTimeFormat(timeToCompleteMs, false) + "remaining");
+				activity.setValue((int)eventCount);
+				
+				logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + "). " + 
+						getEventRate(eventsPerMs) + ". Estimated time to complete: " + asTimeFormat(timeToCompleteMs, true));
+			} else {
+				logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + "). " +
+						"No activity since last report!");
+			}
 			
-			activity.setProgressInfoLower(percentComplete + "% completed (" + eventCount + " of " + totalEvents + "). " + 
-					asTimeFormat(timeToCompleteMs, false) + "remaining");
-			activity.setValue((int)eventCount);
-			
-			logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + "). " + 
-					getEventRate(eventsPerMs) + ". Estimated time to complete: " + asTimeFormat(timeToCompleteMs, true));
-
 			lastReportEventCount = eventCount;		
 			lastReportTime = new Date().getTime();
 		}

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -84,11 +85,10 @@ public class RemoveConceptChildrenFromRefset extends AbstractTask {
 					"' members from refset '" + refset.getInitialText() + "'.");
 			
 			
-			MemberRefsetHelper helper = new MemberRefsetHelper();			
+			MemberRefsetHelper helper = new MemberRefsetHelper(refset.getConceptId(), value.getConceptId());			
 			Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
 			
-			helper.removeAllFromRefset(refset.getConceptId(), newMembers, value.getConceptId(), 
-					"Removing children of concept " + member.getInitialText());
+			helper.removeAllFromRefset(newMembers, "Removing children of concept " + member.getInitialText());
 			
 			return Condition.CONTINUE;
 			

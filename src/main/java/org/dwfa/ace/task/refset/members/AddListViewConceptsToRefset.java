@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -86,8 +87,8 @@ public class AddListViewConceptsToRefset extends AbstractTask {
 				newMembers.add(model.getElementAt(i));
 			}
 			
-			new MemberRefsetHelper().addAllToRefset(refset.getConceptId(), newMembers, value.getConceptId(), 
-							"Adding concepts from list view to refset");
+			new MemberRefsetHelper(refset.getConceptId(), value.getConceptId())
+					.addAllToRefset(newMembers, "Adding concepts from list view to refset");
 			
 			// use commit in business process
 			

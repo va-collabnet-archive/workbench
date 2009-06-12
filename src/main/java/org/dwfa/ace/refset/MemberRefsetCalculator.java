@@ -27,6 +27,7 @@ import static org.dwfa.ace.refset.ConflictReportWriter.RESOLUTION;
 /**
  * Generates the corresponding member refsets for the specification refsets. 
  */
+@Deprecated
 public class MemberRefsetCalculator extends RefsetUtilities {
 
 	private int commitSize = 1000;

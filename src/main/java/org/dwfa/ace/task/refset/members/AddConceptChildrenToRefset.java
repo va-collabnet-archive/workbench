@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -85,11 +86,10 @@ public class AddConceptChildrenToRefset extends AbstractTask {
 					"' as member of refset '" + refset.getInitialText() +
 					"' with a value '" + value.getInitialText() + "'.");
 			
-			MemberRefsetHelper helper = new MemberRefsetHelper();			
+			MemberRefsetHelper helper = new MemberRefsetHelper(refset.getConceptId(), value.getConceptId());			
 			Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
 			
-			helper.addAllToRefset(refset.getConceptId(), newMembers, value.getConceptId(), 
-					"Adding children of concept " + member.getInitialText());
+			helper.addAllToRefset(newMembers, "Adding children of concept " + member.getInitialText());
 			
 			return Condition.CONTINUE;
 			

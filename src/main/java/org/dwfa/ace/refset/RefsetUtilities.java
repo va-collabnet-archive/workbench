@@ -26,6 +26,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.UnknownComponentException;
 import org.dwfa.tapi.spec.ConceptSpec;
 
+@Deprecated
 public abstract class RefsetUtilities {
 
 	public final int ID_NOT_FOUND = 0;    
@@ -201,7 +202,7 @@ public abstract class RefsetUtilities {
 		}
 		return allowedRefsets;
 	}
-	protected I_IntSet getIntSet(ArchitectonicAuxiliary.Concept... concepts) throws Exception {
+	public I_IntSet getIntSet(ArchitectonicAuxiliary.Concept... concepts) throws Exception {
 		I_IntSet status = termFactory.newIntSet();
 
 		for (ArchitectonicAuxiliary.Concept concept : concepts) {
@@ -211,7 +212,7 @@ public abstract class RefsetUtilities {
 		return status;
 	}
 
-	protected I_IntSet getIntSet(ConceptSpec... concepts) throws Exception {
+	public I_IntSet getIntSet(ConceptSpec... concepts) throws Exception {
 		I_IntSet status = termFactory.newIntSet();
 
 		for (ConceptSpec concept : concepts) {
@@ -221,7 +222,7 @@ public abstract class RefsetUtilities {
 		return status;
 	}
 
-    protected I_IntSet getIntSet(I_GetConceptData... concepts) throws Exception {
+    public I_IntSet getIntSet(I_GetConceptData... concepts) throws Exception {
 		I_IntSet status = termFactory.newIntSet();
 
 		for (I_GetConceptData concept : concepts) {

@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.refset.members;
+package org.dwfa.ace.batch;
 
 public class BatchCancelledException extends Exception {
 

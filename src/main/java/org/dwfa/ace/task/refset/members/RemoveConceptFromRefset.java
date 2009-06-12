@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -79,8 +80,8 @@ public class RemoveConceptFromRefset extends AbstractTask {
 					"' as a '" + value.getInitialText() + 
 					"' from refset '" + refset.getInitialText() + "'.");
 			
-			new MemberRefsetHelper()
-					.removeFromRefset(refset.getConceptId(), member.getConceptId(), value.getConceptId());
+			new MemberRefsetHelper(refset.getConceptId(), value.getConceptId())
+					.removeFromRefset(member.getConceptId());
 	
 			// use commit in business process			
 			

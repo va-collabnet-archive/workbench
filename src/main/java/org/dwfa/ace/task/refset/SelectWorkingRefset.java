@@ -10,6 +10,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.MarkedParentRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -75,6 +76,10 @@ public class SelectWorkingRefset extends AbstractTask {
 			I_IntList refsetsToShow = config.getRefsetsToShowInTaxonomy();
 			refsetsToShow.clear();
 			refsetsToShow.add(refset.getConceptId());
+			
+			//view ancillary refsets
+			int parentRefsetId = new MarkedParentRefsetHelper(refset.getConceptId(), 0).getParentRefset();
+			refsetsToShow.add(parentRefsetId);
 			
 			//TODO: enable concept refsets
 			
