@@ -6,19 +6,16 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
+import org.dwfa.ace.api.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
-
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-
-
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 /**

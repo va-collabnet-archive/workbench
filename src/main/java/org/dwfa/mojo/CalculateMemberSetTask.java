@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.dwfa.ace.api.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.Condition;

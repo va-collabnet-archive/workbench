@@ -9,7 +9,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.mojo.file.FileHandler;
+import org.dwfa.ace.file.IterableFileReader;
 
 
 /**
@@ -65,7 +65,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 			
 			for (File file : files) {
 				if (notExcluded(file.getName())) {
-					FileHandler<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
+					IterableFileReader<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
 					handler.setTransactional(transactional);
 					handler.setSourceFile(file);
 					handler.setHasHeader(hasHeader);

@@ -4,7 +4,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.RefsetUtilities;
-import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.ace.api.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
 import org.dwfa.mojo.refset.scrub.util.TerminologyFactoryUtil;

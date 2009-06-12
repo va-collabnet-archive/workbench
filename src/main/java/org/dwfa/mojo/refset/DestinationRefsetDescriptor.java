@@ -1,6 +1,6 @@
 package org.dwfa.mojo.refset;
 
-import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.ace.api.ConceptDescriptor;
 
 /**
  * Describes a destination refset to be modified, including the path 

@@ -12,7 +12,7 @@ import org.dwfa.ace.refset.MemberRefsetCalculator;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.ace.api.ConceptDescriptor;
 
 /**
  *
@@ -23,6 +23,7 @@ import org.dwfa.mojo.ConceptDescriptor;
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
+@Deprecated
 public class CreateMemberRefset extends AbstractMojo {
 
 	/**

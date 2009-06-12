@@ -28,7 +28,7 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private String changeSetFileName = "maven." + UUID.randomUUID().toString()
+	String changeSetFileName = "maven." + UUID.randomUUID().toString()
 			+ ".jcs";
 
 	/**
@@ -36,14 +36,14 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private boolean addTimestampToFileName = false;
+	boolean addTimestampToFileName = false;
 
 	/**
 	 * Name for the temporary binary change set.
 	 * 
 	 * @parameter
 	 */
-	private String changeSetTempFileName = changeSetFileName + ".temp";
+	String changeSetTempFileName = changeSetFileName + ".temp";
 
 	/**
 	 * Set to true if you want to split the changeset files into multiple
@@ -51,7 +51,7 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private boolean splitFiles = false;
+	boolean splitFiles = false;
 	
     /**
      * Location of the build directory.
@@ -59,7 +59,7 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
      * @parameter expression="${project.build.directory}"
      * @required
      */
-    private File targetDirectory;
+    File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 		if (addTimestampToFileName) {

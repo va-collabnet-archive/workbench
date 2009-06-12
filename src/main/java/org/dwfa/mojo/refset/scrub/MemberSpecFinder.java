@@ -8,7 +8,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.ace.api.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
 
 import java.util.ArrayList;
