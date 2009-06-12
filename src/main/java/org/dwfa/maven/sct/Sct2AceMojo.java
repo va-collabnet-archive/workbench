@@ -20,42 +20,61 @@ import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * Sct2AceMojo is a maven mojo which converts SNOMED release files to IHTSDO
- * (ACE) Workbench import files in historical sequence.
+ * <b>DESCRIPTION: </b><br>
  * 
- * The POM needs to specify mutual exclusive extensions in separate directories
- * in the array 'sctInputDirArray' parameter. Each directory entry will be
- * parsed to locate SNOMED formated text files in any sub-directories.
+ * Sct2AceMojo is a maven mojo which converts SNOMED release files to IHTSDO
+ * (ACE) Workbench versioned import files in historical sequence.
+ * <p>
+ * 
+ * <b>INPUTS:</b><br>
+ * 
+ * The POM needs to specify mutually exclusive extensions in separate
+ * directories in the array <code>sctInputDirArray</code> parameter. Each
+ * directory entry will be parsed to locate SNOMED formated text files in any
+ * sub-directories. <br>
+ * <br>
  * 
  * Each SNOMED file should contain a version date in the file name
- * "sct_*yyyyMMdd.txt". If a valid date is not found in the file name then the
- * parent directory name will be checked for a date in the format 'yyyy-MM-dd'.
+ * <code>"sct_*yyyyMMdd.txt"</code>. If a valid date is not found in the file
+ * name then the parent directory name will be checked for a date in the format
+ * <code>"yyyy-MM-dd"</code>.
  * 
- * Versioning is performed for the files under the SAME 'sctInputDirArray[a]'
- * directory. Records of the same primary ids are compared in historical
- * sequence to other records of the same primary ids for all applicable files
- * under directory 'sctInputDirArray[a]'.
+ * Versioning is performed for the files under the SAME
+ * <code>sctInputDirArray[a]</code> directory. Records of the same primary ids
+ * are compared in historical sequence to other records of the same primary ids
+ * for all applicable files under directory <code>sctInputDirArray[a]</code>.
+ * <p>
  * 
- * NOTE: Records are NOT VERSIONED between files under DIFFERENT
- * 'sctInputDirArray' directories. The versioned output from
- * 'sctInputDirArray[a+1]' is appended to the versioned output from
- * 'sctInputDirArray[a]'.
+ * <b>OUTPUTS:</b><br>
+ * The following files are generated in {project.build.directory}/classes/ace:
+ * <p>
+ * <code>
+ * &#160;&#160;&#160;&#160;concepts.txt, descriptions.txt, descriptions_report.txt<br>  
+ * &#160;&#160;&#160;&#160;ids.txt, relationships.txt, relationships_report.txt</code>
+ * <p>
  * 
- * @author Marc Campbell
+ * <b>REQUIRMENTS:</b><br>
+ * 
+ * 1. RELEASE DATE must be in either the SNOMED file name or the parent folder
+ * name. The date must have the format of <code>yyyy-MM-dd</code> or
+ * <code>yyyyMMdd</code>. <br>
+ * 
+ * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE and each
+ * other; and, placed under separate <code>sctInputDirArray</code> directories.
+ * <p>
+ * 
+ * <b>NOTES:</b><br>
+ * Records are NOT VERSIONED between files under DIFFERENT
+ * <code>sctInputDirArray</code> directories. The versioned output from
+ * <code>sctInputDirArray[a+1]</code> is appended to the versioned output from
+ * <code>sctInputDirArray[a]</code>. <br>
+ * 
+ * @author Marc E. Campbell
  * 
  * @goal sct2ace
  * @requiresDependencyResolution compile
  * @requiresProject false
  * 
- */
-
-/*
- * REQUIRMENTS:
- * 
- * 1. RELEASE DATE must be in either the SNOMED file name or parent folder name.
- * The date must have the format of yyyy-MM-dd.
- * 
- * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE.
  */
 
 public class Sct2AceMojo extends AbstractMojo {
@@ -68,14 +87,19 @@ public class Sct2AceMojo extends AbstractMojo {
 	private File buildDirectory;
 
 	/**
-	 * The greeting to display.
+	 * Applicable input sub directory under the build directory.
 	 * 
 	 * @parameter default-value=""
 	 */
 	private String targetSubDir;
 
 	/**
-	 * SCT Input Directories Array.
+	 * SCT Input Directories Array. The directory array parameter supported
+	 * extensions via separate directories in the array.
+	 * 
+	 * Files under the SAME directory entry in the array will be versioned
+	 * relative each other. Each input directory in the array is treated as
+	 * mutually exclusive to others directories in the array.
 	 * 
 	 * @parameter
 	 * @required
