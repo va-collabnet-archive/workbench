@@ -47,8 +47,11 @@ import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
@@ -63,6 +66,10 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
+import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
+import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
@@ -72,11 +79,103 @@ import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.bind.ThinExtBinder;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
 public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		PropertyChangeListener, Scrollable {
+
+	public class RefsetSpecSelectionListener implements TreeSelectionListener {
+
+		public void valueChanged(TreeSelectionEvent tse) {
+			if (tse.getPath() != null) {
+				TreePath selectionPath = tse.getPath();
+				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+				I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) selectedNode.getUserObject();
+				
+		        try {
+		        		
+					EXT_TYPE extType = ThinExtBinder.getExtensionType(ext);
+					
+		        	List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+		        			        	
+		        	ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
+		        	column1.setColumnName("Truth");
+		        	column1.setCreationEditable(true);
+		        	column1.setUpdateEditable(false);
+		        	column1.setFieldClass(Number.class);
+		        	column1.setMin(5);
+		        	column1.setPref(75);
+		        	column1.setMax(1000);
+		        	column1.setInvokedOnPart(true);
+		        	column1.setReadMethod(extType.getPartClass().getMethod("getC1id"));
+		        	column1.setWriteMethod(extType.getPartClass().getMethod("setC1id", int.class));
+		        	column1.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+		        	columns.add(column1);
+		        	
+		        	ReflexiveRefsetFieldData column2 = new ReflexiveRefsetFieldData();
+		        	column2.setColumnName("Clause");
+		        	column2.setCreationEditable(true);
+		        	column2.setUpdateEditable(false);
+		        	column2.setFieldClass(Number.class);
+		        	column2.setMin(5);
+		        	column2.setPref(75);
+		        	column2.setMax(1000);
+		        	column2.setInvokedOnPart(true);
+		        	column2.setReadMethod(extType.getPartClass().getMethod("getC2id"));
+		        	column2.setWriteMethod(extType.getPartClass().getMethod("setC2id", int.class));
+		        	column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+		        	columns.add(column2);
+		        	
+		        	if (extType == EXT_TYPE.CONCEPT_CONCEPT_CONCEPT) {
+			        	ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
+			        	column3.setColumnName("Constraint");
+			        	column3.setCreationEditable(true);
+			        	column3.setUpdateEditable(false);
+			        	column3.setFieldClass(Number.class);
+			        	column3.setMin(5);
+			        	column3.setPref(75);
+			        	column3.setMax(1000);
+			        	column3.setInvokedOnPart(true);
+			        	column3.setReadMethod(extType.getPartClass().getMethod("getC3id"));
+			        	column3.setWriteMethod(extType.getPartClass().getMethod("setC3id", int.class));
+			        	column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+			        	columns.add(column3);
+		        		
+		        	} else if (extType == EXT_TYPE.CONCEPT_CONCEPT_STRING) {
+			        	ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
+			        	column3.setColumnName("Query String");
+			        	column3.setCreationEditable(true);
+			        	column3.setUpdateEditable(false);
+			        	column3.setFieldClass(String.class);
+			        	column3.setMin(5);
+			        	column3.setPref(75);
+			        	column3.setMax(1000);
+			        	column3.setInvokedOnPart(true);
+			        	column3.setReadMethod(extType.getPartClass().getMethod("getStr"));
+			        	column3.setWriteMethod(extType.getPartClass().getMethod("setStr", String.class));
+			        	column3.setType(REFSET_FIELD_TYPE.STRING);
+			        	columns.add(column3);
+		        	}
+		        	
+		        	
+		        	ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(RefsetEditorPanel.this,
+		        			columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+		        	
+		        	reflexiveModel.setComponentId(ext.getMemberId());
+		        	reflexiveModel.getRowCount();
+		        	
+					sp.setBottomComponent(ReflexiveRefsetUtil.getExtensionPanel("Refset Specification Clause", reflexiveModel,
+							RefsetEditorPanel.this, false));
+				} catch (Exception e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			}
+		}
+
+	}
 
 	/**
 	 * 
@@ -238,6 +337,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 	private JTree specTree;
 
 	public I_GetConceptData refsetSpecConcept;
+
+	private JSplitPane sp;
 
 	public RefsetEditorPanel(ACE ace) throws Exception {
 		super(new GridBagLayout());
@@ -536,7 +637,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 
-		JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		specTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null)));
 		specTree.addMouseListener(new RefsetSpecTreeMouseListener(ace.getAceFrameConfig()));
 		specTree.setCellRenderer(new RefsetSpecTreeCellRenderer(ace.getAceFrameConfig()));
@@ -545,17 +646,9 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		
 		sp.setTopComponent(new JScrollPane(specTree));
 		
+		specTree.addTreeSelectionListener(new RefsetSpecSelectionListener());
 		
-		sp.setBottomComponent(new JScrollPane(new JPanel()));
 		
-		/*
-        RefsetMemberTableModel refsetModel = new RefsetMemberTableModel(this, 
-        					RefsetMemberTableModel.getRefsetColumns(this, EXT_TYPE.LANGUAGE),
-        					EXT_TYPE.LANGUAGE, TOGGLES.REFSETS);
-
-		sp.setBottomComponent(RefsetUtil.getExtensionPanel(EXT_TYPE.LANGUAGE, refsetModel,
-                this, TOGGLES.REFSETS));
-		*/
 		content.add(sp, c);
 		
 		c.gridy++;
@@ -704,6 +797,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 	
 	private class UpdateTreeSpec extends SwingWorker<DefaultMutableTreeNode> {
 
+		private DefaultMutableTreeNode root;
+
 		@Override
 		protected DefaultMutableTreeNode construct() throws Exception {
 			
@@ -723,7 +818,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 					refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
 				}
 			}
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpecConcept);
+			root = new DefaultMutableTreeNode(refsetSpecConcept);
 			
 			if (oldRoot.getUserObject() != null && refsetSpecConcept != null) {
 				I_GetConceptData oldRefsetConcept = (I_GetConceptData) oldRoot.getUserObject();
@@ -767,8 +862,10 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		@Override
 		protected void finished() {
 			try {
+				get();
 				DefaultTreeModel tm = (DefaultTreeModel) specTree.getModel();
-				tm.setRoot(get());
+				tm.setRoot(root);
+				
 			} catch (InterruptedException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (ExecutionException e) {

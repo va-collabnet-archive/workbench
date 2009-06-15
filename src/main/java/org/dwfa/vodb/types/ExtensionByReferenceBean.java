@@ -153,6 +153,16 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 		return returnValues;
 	}
 
+	public static I_ThinExtByRefVersioned getNewExtensionMember(
+			int memberId) throws IOException {
+		for (I_GetExtensionData newEbr : newExtensions) {
+			if (newEbr.getExtension().getMemberId() == memberId) {
+				return newEbr.getExtension();
+			}
+		}
+		return null;
+	}
+
 	public static Collection<I_ThinExtByRefVersioned> getNewThinExtensionsForRefset(
 			int refsetId) throws IOException {
 		List<I_ThinExtByRefVersioned> returnValues = new ArrayList<I_ThinExtByRefVersioned>();
