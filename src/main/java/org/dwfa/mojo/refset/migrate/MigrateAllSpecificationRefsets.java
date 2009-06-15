@@ -24,7 +24,7 @@ import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.ace.api.ConceptDescriptor;
+import org.dwfa.mojo.ConceptDescriptor;
 
 /**
  * 
