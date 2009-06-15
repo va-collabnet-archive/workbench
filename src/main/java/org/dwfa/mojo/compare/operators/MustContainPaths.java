@@ -3,7 +3,7 @@ package org.dwfa.mojo.compare.operators;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.ConceptDescriptor;
+import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.compare.CompareOperator;
 import org.dwfa.mojo.compare.Match;
 

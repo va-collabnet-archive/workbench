@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.maven.plugin.logging.Log;
-import org.dwfa.ace.api.ConceptDescriptor;
+import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
