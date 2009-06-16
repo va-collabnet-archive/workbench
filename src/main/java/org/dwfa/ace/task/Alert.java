@@ -59,6 +59,10 @@ public class Alert extends AbstractTask {
 			throw new TaskFailedException(e);
 		}
 		
+		if (readProperty == null) {
+			readProperty = "";
+		}
+		
 		JOptionPane.showMessageDialog(null, alertText + readProperty, "", JOptionPane.WARNING_MESSAGE);
 		
 		return Condition.CONTINUE;
