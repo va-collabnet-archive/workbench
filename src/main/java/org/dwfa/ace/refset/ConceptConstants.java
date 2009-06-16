@@ -36,6 +36,6 @@ public class ConceptConstants {
 
 	public static final ConceptSpec EXCLUDE_MEMBERS_REL_TYPE = new ConceptSpec("exclude members", "4fdc7569-ff5a-49ec-bcfb-cc41308abcc0");
 	
-	public static final ConceptSpec INCLUDES_MARKED_PARENTS_REL_TYPE = new ConceptSpec("includes marked parents", "6266b677-5a77-43ca-8479-0127c5751cf6");
+	public static final ConceptSpec INCLUDES_MARKED_PARENTS_REL_TYPE = new ConceptSpec("includes marked parents", "6e2518c8-13f0-4766-896f-83fc95d4cd0e");
 	
 }
