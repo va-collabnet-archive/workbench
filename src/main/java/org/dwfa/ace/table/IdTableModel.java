@@ -87,7 +87,11 @@ public class IdTableModel extends AbstractTableModel implements
 		protected Boolean construct() throws Exception {
 			getProgress().setActive(true);
 			concepts = new HashMap<Integer, ConceptBean>();
-			for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
+			HashSet<Integer> idSetToFetch = null;
+			synchronized (conceptsToFetch) {
+				idSetToFetch = new HashSet<Integer>(conceptsToFetch);
+			}
+			for (Integer id : idSetToFetch) {
 				if (stopWork) {
 					return false;
 				}
