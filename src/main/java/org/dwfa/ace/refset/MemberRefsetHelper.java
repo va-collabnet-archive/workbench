@@ -1,11 +1,24 @@
 package org.dwfa.ace.refset;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.batch.Batch;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 
 /**
  * Utility class providing refset membership operations. 
@@ -30,7 +43,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 	 * @param batchDescription A textual description of the batch being processed. 
 	 *                         Used in the progress reports given during processing.
 	 */
-	public void addAllToRefset(Set<I_GetConceptData> members, String batchDescription) 
+	public void addAllToRefset(Collection<I_GetConceptData> members, String batchDescription) 
 			throws Exception {
 		
 		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members, batchDescription) {
@@ -45,7 +58,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 			}
 	
 			@Override
-			public void onComplete() throws Exception {
+			public void onComplete() throws Exception {				
 				monitor.setText("Adding marked parent members...");
 				monitor.setIndeterminate(true);
 				addMarkedParents(newMembers.toArray(new Integer[]{}));
@@ -77,7 +90,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 	 * @param batchDescription A textual description of the batch being processed. 
 	 *                         Used in the progress reports given during processing.
 	 */
-	public void removeAllFromRefset(Set<I_GetConceptData> members, String batchDescription) 
+	public void removeAllFromRefset(Collection<I_GetConceptData> members, String batchDescription) 
 			throws Exception {
 		
 		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members, batchDescription) {
@@ -151,4 +164,73 @@ public class MemberRefsetHelper extends RefsetHelper {
 		this.memberRefsetId = memberRefsetId;
 	}
 
+	public Set<Integer> getExistingMembers() throws Exception {		
+		
+		HashSet<Integer> results = new HashSet<Integer>();
+		
+		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+		
+		List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(memberRefsetId);
+		
+		for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
+			
+			List<I_ThinExtByRefTuple> extensions = 
+				thinExtByRefVersioned.getTuples(config.getAllowedStatus(), config.getViewPositionSet(), true, false);
+			
+			for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
+				if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
+					
+					I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
+					if (part.getConceptId() == memberTypeId) {
+						results.add(thinExtByRefTuple.getComponentId());
+					}
+				}
+			}
+		}		
+		
+		return results;
+	}
+
+    public static Set<Integer> getMemberRefsets() throws Exception {
+
+    	HashSet<Integer> memberRefsets = new HashSet<Integer>();
+    	I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+    	int currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+    	int refsetPurposeRelId = RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.localize().getNid();
+    	int memberRefsetPurposeId = ConceptConstants.REFSET_MEMBER_PURPOSE.localize().getNid();
+    	
+		I_IntSet statuses = termFactory.newIntSet();
+		statuses.add(currentStatusId);
+
+		I_IntSet relTypes = termFactory.newIntSet();
+	    relTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+	    relTypes.add(termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getUids()).getConceptId());
+
+		I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+
+		Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(statuses, relTypes, null, false);
+		for (I_GetConceptData refsetConcept : refsetChildren) {
+			Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
+
+			List<I_RelVersioned> rels = refsetConcept.getSourceRels();
+			for (I_RelVersioned rel: rels) {
+				List<I_RelTuple> tuples = rel.getTuples();
+				for (I_RelTuple tuple : tuples) {
+					if (tuple.getStatusId() == currentStatusId && tuple.getTypeId() == refsetPurposeRelId) {
+						purposeConcepts.add(termFactory.getConcept(tuple.getC2Id()));
+					}
+				}
+			}
+
+			if (purposeConcepts.size() == 1) {
+				if (purposeConcepts.iterator().next().getConceptId() == memberRefsetPurposeId) {
+					memberRefsets.add(refsetConcept.getConceptId());
+				} 
+			} 
+		}
+		
+		return memberRefsets;
+	}
+	
 }
