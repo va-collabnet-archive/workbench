@@ -30,14 +30,17 @@ import org.dwfa.mojo.ConceptDescriptor;
  *
  * @goal migrate-all-spec-refsets
  */
+@SuppressWarnings("deprecation")
 public class MigrateAllSpecificationRefsets extends AbstractMojo {
 
 
     public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
 
-    public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
+    public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = 
+    		ConceptConstants.REFSET_PARENT_MEMBER_PURPOSE.getDescription();
 
-	public final String MEMBER_REFSET_PURPOSE_NAME = "refset membership";
+	public final String MEMBER_REFSET_PURPOSE_NAME = 
+			ConceptConstants.REFSET_MEMBER_PURPOSE.getDescription();
 	
     public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME =
             ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
@@ -91,7 +94,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
         config.getEditingPathSet().add(pathForEditing);
     }
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
+	public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             init();
 
@@ -151,7 +154,8 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
      */
     private I_GetConceptData createRefsetRel() throws Exception {
 
-        I_GetConceptData newRefsetRel = termFactory.newConcept(UUID.randomUUID(), false, config);
+        I_GetConceptData newRefsetRel = 
+        	termFactory.newConcept(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids()[0], false, config);
 
         termFactory.newDescription(
                 UUID.randomUUID(), newRefsetRel, "en", PARENT_MEMBER_REFSET_RELATIONSHIP_NAME,
@@ -173,7 +177,8 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
      */
 	private I_GetConceptData createParentRefsetPurpose() throws Exception {
 
-        I_GetConceptData newRefsetPurpose = termFactory.newConcept(UUID.randomUUID(), false, config);
+        I_GetConceptData newRefsetPurpose = 
+        	termFactory.newConcept(ConceptConstants.REFSET_PARENT_MEMBER_PURPOSE.getUuids()[0], false, config);
 
         termFactory.newDescription(
                 UUID.randomUUID(), newRefsetPurpose, "en", PARENT_MEMBER_REFSET_PURPOSE_NAME,
@@ -195,7 +200,8 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 	 */
 	private I_GetConceptData createMemberRefsetPurpose() throws Exception {
 		
-		I_GetConceptData newRefsetPurpose = termFactory.newConcept(UUID.randomUUID(), false, config);
+		I_GetConceptData newRefsetPurpose = 
+			termFactory.newConcept(ConceptConstants.REFSET_MEMBER_PURPOSE.getUuids()[0], false, config);
 		
 		termFactory.newDescription(
 				UUID.randomUUID(), newRefsetPurpose, "en", MEMBER_REFSET_PURPOSE_NAME,
@@ -356,8 +362,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 
         return newHierarchyConcept;
     }
-
-
+    
     /**
      * Utilises the {@link RefsetUtilities} class by injecting the db
      */
