@@ -2,15 +2,12 @@ package org.dwfa.mojo.refset.migrate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -23,15 +20,11 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.refset.MarkedParentRefsetHelper;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.mojo.ConceptDescriptor;
 
 /**
  *
@@ -44,6 +37,8 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 
     public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
 
+	public final String MEMBER_REFSET_PURPOSE_NAME = "refset membership";
+	
     public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME =
             ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
 
@@ -101,7 +96,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
             init();
 
             I_GetConceptData parentRefsetHierarchy = createParentMemberHierarchy();
-            I_GetConceptData parentRefsetPurpose = createRefsetPurpose();
+			I_GetConceptData parentRefsetPurpose = createParentRefsetPurpose();
             I_GetConceptData parentRefsetRel = createRefsetRel();
             List<Integer> specificationRefsets = refsetHelper.getSpecificationRefsets();
 
@@ -109,6 +104,8 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
                 I_GetConceptData specRefsetConcept = termFactory.getConcept(specRefsetId);
                 I_GetConceptData memberRefsetConcept = refsetHelper.getMemberSetConcept(specRefsetId);
 
+				addMemberRefsetPurpose(memberRefsetConcept, createMemberRefsetPurpose());
+				
                 I_GetConceptData parentMemberRefset = createParentMemberRefset(parentRefsetHierarchy, memberRefsetConcept, parentRefsetPurpose);
 
                 linkMemberRefsetToParentRefset(memberRefsetConcept, parentMemberRefset, parentRefsetRel);
@@ -121,62 +118,6 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 
     }
 
-    private void regenerateMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
-
-        int refsetId = memberRefsetConcept.getConceptId();
-
-        Set<Integer> normalMemberIds = new HashSet<Integer>();
-        List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
-
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
-
-            List<I_ThinExtByRefTuple> extensions =
-                thinExtByRefVersioned.getTuples(null, null, true, false);
-
-            for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
-                if (thinExtByRefTuple.getRefsetId() == refsetId) {
-
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
-                    if (part.getConceptId() == concepts.get("NORMAL_MEMBER").getConceptId()) {
-                        normalMemberIds.add(thinExtByRefTuple.getComponentId());
-                    }
-                }
-            }
-        }
-
-        new MarkedParentRefsetHelper(refsetId, concepts.get("NORMAL_MEMBER").getConceptId())
-                .addParentMembers(normalMemberIds.toArray(new Integer[]{}));
-    }
-
-    private void retireExistingMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
-
-        int refsetId = memberRefsetConcept.getConceptId();
-
-        List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
-
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
-
-            List<I_ThinExtByRefTuple> extensions =
-                thinExtByRefVersioned.getTuples(null, null, true, false);
-
-            for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
-                if (thinExtByRefTuple.getRefsetId() == refsetId) {
-
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
-                    if (part.getConceptId() == concepts.get("PARENT_MARKER").getConceptId()
-                            && part.getStatusId() == concepts.get("CURRENT").getConceptId() ) {
-
-                        I_ThinExtByRefPart clone = part.duplicate();
-                        clone.setStatusId(concepts.get("RETIRED").getConceptId());
-                        clone.setVersion(Integer.MAX_VALUE);
-                        thinExtByRefVersioned.addVersion(clone);
-
-                        termFactory.addUncommitted(thinExtByRefVersioned);
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * Transfer refset extension relationships from the specification refset (now redundant) to the member refset concept
@@ -229,7 +170,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
     /**
      * Creates the new purpose which can be given the marked parent member refset concepts
      */
-    private I_GetConceptData createRefsetPurpose() throws Exception {
+	private I_GetConceptData createParentRefsetPurpose() throws Exception {
 
         I_GetConceptData newRefsetPurpose = termFactory.newConcept(UUID.randomUUID(), false, config);
 
@@ -248,33 +189,55 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
         return newRefsetPurpose;
     }
 
-    /**
-     * Retire the existing specification refset
-     */
-    private void retireSpecificationRefset(I_GetConceptData specRefsetConcept) throws Exception {
+	/**
+	 * Creates the new purpose which can be given the marked parent member refset concepts
+	 */
+	private I_GetConceptData createMemberRefsetPurpose() throws Exception {
+		
+		I_GetConceptData newRefsetPurpose = termFactory.newConcept(UUID.randomUUID(), false, config);
+		
+		termFactory.newDescription(
+				UUID.randomUUID(), newRefsetPurpose, "en", MEMBER_REFSET_PURPOSE_NAME,
+				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), config);
+		
+		termFactory.newDescription(
+				UUID.randomUUID(), newRefsetPurpose, "en", MEMBER_REFSET_PURPOSE_NAME,
+				ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), config);
 
-        // Attribute
-        I_ConceptAttributeVersioned attribute = specRefsetConcept.getConceptAttributes();
-        for (I_ConceptAttributePart attribPart : retireParts(attribute.getVersions())) {
-            attribute.addVersion(attribPart);
-        }
-
-        // Descriptions
-        for (I_DescriptionVersioned description : specRefsetConcept.getDescriptions()) {
-            for (I_DescriptionPart retiredDesc : retireParts(description.getVersions())) {
-                description.addVersion(retiredDesc);
-            }
-        }
-
-        // Source Relationships
-        for (I_RelVersioned relationship : specRefsetConcept.getSourceRels()) {
-            for (I_RelPart retiredRel : retireParts(relationship.getVersions())) {
-                relationship.addVersion(retiredRel);
-            }
-        }
-
-        termFactory.addUncommitted(specRefsetConcept);
-    }
+		termFactory.newRelationship(
+				UUID.randomUUID(), newRefsetPurpose, concepts.get("SNOMED_IS_A"), concepts.get("REFSET_PURPOSE"), 
+				concepts.get("DEFINING_CHARACTERISTIC"), concepts.get("OPTIONAL_REFINABILITY"), concepts.get("CURRENT"), 0, config);
+		
+		return newRefsetPurpose;
+	}	
+	
+	/**
+	 * Retire the existing specification refset 
+	 */
+	private void retireSpecificationRefset(I_GetConceptData specRefsetConcept) throws Exception {
+		
+		// Attribute
+		I_ConceptAttributeVersioned attribute = specRefsetConcept.getConceptAttributes();		
+		for (I_ConceptAttributePart attribPart : retireParts(attribute.getVersions())) {
+			attribute.addVersion(attribPart);			
+		}
+		 
+		// Descriptions
+		for (I_DescriptionVersioned description : specRefsetConcept.getDescriptions()) {			
+			for (I_DescriptionPart retiredDesc : retireParts(description.getVersions())) {				
+				description.addVersion(retiredDesc);				
+			}
+		}
+		
+		// Source Relationships
+		for (I_RelVersioned relationship : specRefsetConcept.getSourceRels()) {
+			for (I_RelPart retiredRel : retireParts(relationship.getVersions())) {
+				relationship.addVersion(retiredRel);
+			}
+		}
+				
+		termFactory.addUncommitted(specRefsetConcept);
+	}
 
     @SuppressWarnings("unchecked")
     private <T extends I_AmPart> List<T> retireParts(List<T> parts) {
@@ -321,6 +284,14 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
         return newRetirees;
     }
 
+	private void addMemberRefsetPurpose(I_GetConceptData memberRefsetConcept, I_GetConceptData refsetPurpose) 
+			throws Exception {
+		
+		termFactory.newRelationship(
+				UUID.randomUUID(), memberRefsetConcept, concepts.get("REFSET_PURPOSE"), refsetPurpose, 
+				concepts.get("DEFINING_CHARACTERISTIC"), concepts.get("OPTIONAL_REFINABILITY"), concepts.get("CURRENT"), 0, config);			
+	}
+	
     /**
      * Create a new refset to hold marked parent members
      */
