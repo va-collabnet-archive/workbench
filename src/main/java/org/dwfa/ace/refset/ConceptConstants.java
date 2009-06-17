@@ -18,7 +18,8 @@ public class ConceptConstants {
 	public static final ConceptSpec REFSET_PURPOSE_REL = new ConceptSpec("refest purpose rel","f60922c9-cb3d-3099-8960-1097d2c5afdc");
 	public static final ConceptSpec INCLUSION_TYPE = new ConceptSpec("inclusion specification type", "566c380d-a9ac-318e-9e96-9df2fd405a53");
 	public static final ConceptSpec REFSET = new ConceptSpec("refset identity", "3e0cd740-2cc6-3d68-ace7-bad2eb2621da");
-	public static final ConceptSpec REFSET_MEMBER_PURPOSE = new ConceptSpec("refset membership", "a4f5319e-7127-48a7-8b87-075c758f7abd");
+	public static final ConceptSpec REFSET_MEMBER_PURPOSE = new ConceptSpec("refset membership", "090a41ac-3299-54b4-a287-4f279b85d059");
+	public static final ConceptSpec REFSET_PARENT_MEMBER_PURPOSE = new ConceptSpec("marked parent membership", "7dd8fa86-7a20-56ab-8606-f82d28f6fd67");
 	
 	public static final ConceptSpec BOOLEAN_EXT = new ConceptSpec("boolean extension by reference", "893b86c9-1f2d-395c-a184-f10358c37856");
 	public static final ConceptSpec CONCEPT_EXT = new ConceptSpec("concept extension by reference", "d815700e-dd66-3f91-8f05-99c60b995eb4");
@@ -37,6 +38,6 @@ public class ConceptConstants {
 
 	public static final ConceptSpec EXCLUDE_MEMBERS_REL_TYPE = new ConceptSpec("exclude members", "4fdc7569-ff5a-49ec-bcfb-cc41308abcc0");
 	
-	public static final ConceptSpec INCLUDES_MARKED_PARENTS_REL_TYPE = new ConceptSpec("includes marked parents", "6e2518c8-13f0-4766-896f-83fc95d4cd0e");
+	public static final ConceptSpec INCLUDES_MARKED_PARENTS_REL_TYPE = new ConceptSpec("includes marked parents", "8d0bcde8-6610-5573-86bd-8ab050dfc6a3");
 	
 }
