@@ -35,9 +35,9 @@ import org.dwfa.cement.RefsetAuxiliary;
 
 /**
  *
- * @goal migrate-all-spec-refsets
+ * @goal regenerate-marked-parents
  */
-public class MigrateAllSpecificationRefsets extends AbstractMojo {
+public class RegenerateMarkedParents extends AbstractMojo {
 
 
     public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
@@ -62,7 +62,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
     protected HashMap<String, I_GetConceptData> concepts = new HashMap<String, I_GetConceptData>();
 
 
-    public MigrateAllSpecificationRefsets() throws Exception {
+    public RegenerateMarkedParents() throws Exception {
         termFactory = LocalVersionedTerminology.get();
         if (termFactory == null) {
             throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
@@ -99,21 +99,13 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             init();
-
-            I_GetConceptData parentRefsetHierarchy = createParentMemberHierarchy();
-            I_GetConceptData parentRefsetPurpose = createRefsetPurpose();
-            I_GetConceptData parentRefsetRel = createRefsetRel();
             List<Integer> specificationRefsets = refsetHelper.getSpecificationRefsets();
 
             for (Integer specRefsetId : specificationRefsets) {
-                I_GetConceptData specRefsetConcept = termFactory.getConcept(specRefsetId);
                 I_GetConceptData memberRefsetConcept = refsetHelper.getMemberSetConcept(specRefsetId);
 
-                I_GetConceptData parentMemberRefset = createParentMemberRefset(parentRefsetHierarchy, memberRefsetConcept, parentRefsetPurpose);
-
-                linkMemberRefsetToParentRefset(memberRefsetConcept, parentMemberRefset, parentRefsetRel);
-                copySpecRefsetExtensions(specRefsetConcept, memberRefsetConcept);
-                retireSpecificationRefset(specRefsetConcept);
+                retireExistingMarkedParentMembers(memberRefsetConcept);
+                regenerateMarkedParentMembers(memberRefsetConcept);
             }
         } catch (Exception ex) {
             throw new MojoExecutionException("Unable to migrate specification refsets", ex);
