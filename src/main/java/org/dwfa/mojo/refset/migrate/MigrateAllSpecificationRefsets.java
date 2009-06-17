@@ -97,6 +97,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 
             I_GetConceptData parentRefsetHierarchy = createParentMemberHierarchy();
 			I_GetConceptData parentRefsetPurpose = createParentRefsetPurpose();
+			I_GetConceptData refsetPurpose = createMemberRefsetPurpose();
             I_GetConceptData parentRefsetRel = createRefsetRel();
             List<Integer> specificationRefsets = refsetHelper.getSpecificationRefsets();
 
@@ -104,7 +105,7 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
                 I_GetConceptData specRefsetConcept = termFactory.getConcept(specRefsetId);
                 I_GetConceptData memberRefsetConcept = refsetHelper.getMemberSetConcept(specRefsetId);
 
-				addMemberRefsetPurpose(memberRefsetConcept, createMemberRefsetPurpose());
+				addMemberRefsetPurpose(memberRefsetConcept, refsetPurpose);
 				
                 I_GetConceptData parentMemberRefset = createParentMemberRefset(parentRefsetHierarchy, memberRefsetConcept, parentRefsetPurpose);
 

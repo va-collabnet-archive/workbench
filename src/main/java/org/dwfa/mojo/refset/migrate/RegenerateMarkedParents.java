@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -29,9 +28,11 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.MarkedParentRefsetHelper;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.mojo.ConceptDescriptor;
 
 /**
  *
@@ -99,11 +100,10 @@ public class RegenerateMarkedParents extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             init();
-            List<Integer> specificationRefsets = refsetHelper.getSpecificationRefsets();
+            Set<Integer> memberRefsets = MemberRefsetHelper.getMemberRefsets();
 
-            for (Integer specRefsetId : specificationRefsets) {
-                I_GetConceptData memberRefsetConcept = refsetHelper.getMemberSetConcept(specRefsetId);
-
+            for (Integer memberRefsetId : memberRefsets) {      
+            	I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
                 retireExistingMarkedParentMembers(memberRefsetConcept);
                 regenerateMarkedParentMembers(memberRefsetConcept);
             }
