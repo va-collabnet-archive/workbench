@@ -1,13 +1,21 @@
 package org.dwfa.ace.task.refset.members;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
 
+import javax.swing.JOptionPane;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.file.ConceptListReader;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -22,8 +30,8 @@ import org.dwfa.util.bean.Spec;
 /**
  * Adds a single concept as a member of the working refset 
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
-public class UpdateParentMembers extends AbstractTask {
+@BeanList(specs = { @Spec(directory = "tasks/ide/refset", type = BeanType.TASK_BEAN) })
+public class ImportRefsetFromFile extends AbstractTask {
 
 	private static final long serialVersionUID = -2883696709930614625L;
 
@@ -32,18 +40,16 @@ public class UpdateParentMembers extends AbstractTask {
 	/** the refset we are adding to */
     private String refsetConceptPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 
-    /** the concept to be added to the refset */
-    private String memberConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    /** the name of the file to be imported */
+    private String importFileName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
     
     /** the value to be given to the new concept extension */
     private String conceptExtValuePropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(); 
     
-    protected I_TermFactory termFactory;
-    
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
         out.writeObject(this.refsetConceptPropName);
-        out.writeObject(this.memberConceptPropName);
+        out.writeObject(this.importFileName);
         out.writeObject(this.conceptExtValuePropName);
 	}
 
@@ -51,7 +57,7 @@ public class UpdateParentMembers extends AbstractTask {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == dataVersion) {
 			this.refsetConceptPropName = (String) in.readObject();
-			this.memberConceptPropName = (String) in.readObject();
+			this.importFileName = (String) in.readObject();
 			this.conceptExtValuePropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -65,36 +71,57 @@ public class UpdateParentMembers extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		try {
 			I_GetConceptData refset = (I_GetConceptData) process.readProperty(refsetConceptPropName);
-			I_GetConceptData member = (I_GetConceptData) process.readProperty(memberConceptPropName);
+			String filename = (String) process.readProperty(importFileName);
 			I_GetConceptData value  = (I_GetConceptData) process.readProperty(conceptExtValuePropName);
 			
 			if (refset == null) {
 				throw new TerminologyException("A working refset has not been selected.");
 			}
 			
-			if (member == null) {
-				throw new TerminologyException("No member concept selected.");				
+			if (filename == null) {
+				throw new TerminologyException("No file selected.");				
 			}
 			
 			if (value == null) {
 				throw new TerminologyException("No concept extension value selected.");
 			}
 			
-//			getLogger().info(
-//					"Adding children of concept '" + member.getInitialText() + 
-//					"' as member of refset '" + refset.getInitialText() +
-//					"' with a value '" + value.getInitialText() + "'.");
-//			
-//			MemberRefsetHelper helper = new MemberRefsetHelper();			
-//			Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
-//			
-//			helper.addAllToRefset(refset.getConceptId(), newMembers, value.getConceptId(), 
-//					"Adding children of concept " + member.getInitialText());
+			if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(null,
+							"The existing refset will be replaced by the contents of the file. Do you wish to continue?",
+							"Confirmation",
+							JOptionPane.YES_NO_OPTION)) {
+				return Condition.PROCESS_COMPLETE;
+			}
+			
+			I_TermFactory termFactory = LocalVersionedTerminology.get();
+			
+			ConceptListReader reader = new ConceptListReader();
+			reader.setSourceFile(new File(filename));
+			reader.setHasHeader(true);
+			
+			// Load in all concepts from the import file
+			HashMap<Integer, I_GetConceptData> importConcepts = new HashMap<Integer, I_GetConceptData>();
+			for (I_GetConceptData concept : reader) {
+				importConcepts.put(concept.getConceptId(), concept);
+			}
+			
+			MemberRefsetHelper refsetHelper = new MemberRefsetHelper(refset.getConceptId(), value.getConceptId());
+			
+			// Find existing members of the refset that are not in the import set. These need to be retired.
+			HashSet<I_GetConceptData> membersToRemove = new HashSet<I_GetConceptData>();
+			for (Integer existingMemberId : refsetHelper.getExistingMembers()) {
+				if (!importConcepts.containsKey(existingMemberId)) {
+					membersToRemove.add(termFactory.getConcept(existingMemberId));
+				}
+			}			
+			
+			refsetHelper.addAllToRefset(importConcepts.values(), "Importing new refset members from file");
+			refsetHelper.removeAllFromRefset(membersToRemove, "Removing existing members absent from file");
 			
 			return Condition.CONTINUE;
 			
 		} catch (Exception e) {
-			throw new TaskFailedException("Unable to add children of concept to refset. " + e.getMessage(), e);
+			throw new TaskFailedException("Unable to import refset from file. " + e.getMessage(), e);
 		}
 	}
 
@@ -118,20 +145,20 @@ public class UpdateParentMembers extends AbstractTask {
 		this.refsetConceptPropName = refsetConceptPropName;
 	}
 
-	public String getMemberConceptPropName() {
-		return memberConceptPropName;
-	}
-
-	public void setMemberConceptPropName(String memberConceptPropName) {
-		this.memberConceptPropName = memberConceptPropName;
-	}
-
 	public String getConceptExtValuePropName() {
 		return conceptExtValuePropName;
 	}
 
 	public void setConceptExtValuePropName(String conceptExtValuePropName) {
 		this.conceptExtValuePropName = conceptExtValuePropName;
+	}
+
+	public String getImportFileName() {
+		return importFileName;
+	}
+
+	public void setImportFileName(String importFileName) {
+		this.importFileName = importFileName;
 	}
 	
 	
