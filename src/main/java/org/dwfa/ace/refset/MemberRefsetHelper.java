@@ -189,6 +189,14 @@ public class MemberRefsetHelper extends RefsetHelper {
 		return results;
 	}
 
+	/**
+	 * Find all the current member refset concepts.
+	 * <p>
+	 * Member refsets must have the following properties:
+	 * <ul>
+	 * <li>Is a <i>refset identity</i>
+	 * <li>A <i>refset purpose</i> of <i>refset membership</i>
+	 */
     public static Set<Integer> getMemberRefsets() throws Exception {
 
     	HashSet<Integer> memberRefsets = new HashSet<Integer>();
