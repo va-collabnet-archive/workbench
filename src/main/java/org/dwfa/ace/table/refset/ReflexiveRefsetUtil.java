@@ -23,10 +23,13 @@ public class ReflexiveRefsetUtil {
 
 
     public static JPanel getExtensionPanel(String labelTxt, ReflexiveRefsetMemberTableModel refsetModel,
-        I_HostConceptPlugins host, boolean showRowAdd) throws Exception {
+        I_HostConceptPlugins host, boolean showRowAdd, boolean spaceForAdd) throws Exception {
         JPanel relPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         JLabel srcRelLabel = new JLabel("     " + labelTxt);
+        if (spaceForAdd == false) {
+        	srcRelLabel = new JLabel(labelTxt);
+        }
         srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = 2;
@@ -59,13 +62,18 @@ public class ReflexiveRefsetUtil {
             relPanel.add(rowAddAfter, c);
             rowAddAfter.setEnabled(false);
             //refsetModel.setAddButton(rowAddAfter);
-        } else {
+        } else if (spaceForAdd) {
             JPanel filler = new JPanel();
             filler.setMaximumSize(new Dimension(40, 32));
             filler.setMinimumSize(new Dimension(40, 32));
             filler.setPreferredSize(new Dimension(40, 32));
             relPanel.add(filler, c);
-
+        } else {
+            JPanel filler = new JPanel();
+            filler.setMaximumSize(new Dimension(0,0));
+            filler.setMinimumSize(new Dimension(0,0));
+            filler.setPreferredSize(new Dimension(0,0));
+            relPanel.add(filler, c);
         }
         c.gridheight = 1;
         c.gridx++;

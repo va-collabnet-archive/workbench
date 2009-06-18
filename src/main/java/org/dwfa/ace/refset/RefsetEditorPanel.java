@@ -108,7 +108,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		        	column1.setFieldClass(Number.class);
 		        	column1.setMin(5);
 		        	column1.setPref(75);
-		        	column1.setMax(1000);
+		        	column1.setMax(150);
 		        	column1.setInvokedOnPart(true);
 		        	column1.setReadMethod(extType.getPartClass().getMethod("getC1id"));
 		        	column1.setWriteMethod(extType.getPartClass().getMethod("setC1id", int.class));
@@ -136,8 +136,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			        	column3.setUpdateEditable(false);
 			        	column3.setFieldClass(Number.class);
 			        	column3.setMin(5);
-			        	column3.setPref(75);
-			        	column3.setMax(1000);
+			        	column3.setPref(175);
+			        	column3.setMax(2000);
 			        	column3.setInvokedOnPart(true);
 			        	column3.setReadMethod(extType.getPartClass().getMethod("getC3id"));
 			        	column3.setWriteMethod(extType.getPartClass().getMethod("setC3id", int.class));
@@ -151,8 +151,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			        	column3.setUpdateEditable(false);
 			        	column3.setFieldClass(String.class);
 			        	column3.setMin(5);
-			        	column3.setPref(75);
-			        	column3.setMax(1000);
+			        	column3.setPref(175);
+			        	column3.setMax(2000);
 			        	column3.setInvokedOnPart(true);
 			        	column3.setReadMethod(extType.getPartClass().getMethod("getStr"));
 			        	column3.setWriteMethod(extType.getPartClass().getMethod("setStr", String.class));
@@ -167,8 +167,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		        	reflexiveModel.setComponentId(ext.getMemberId());
 		        	reflexiveModel.getRowCount();
 		        	
-					sp.setBottomComponent(ReflexiveRefsetUtil.getExtensionPanel("Refset Specification Clause", reflexiveModel,
-							RefsetEditorPanel.this, false));
+					sp.setBottomComponent(ReflexiveRefsetUtil.getExtensionPanel("Refset Specification Clause:", reflexiveModel,
+							RefsetEditorPanel.this, false, false));
 				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}

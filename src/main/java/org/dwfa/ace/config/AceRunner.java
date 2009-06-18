@@ -444,11 +444,16 @@ public class AceRunner {
 		String[] svnUpdateOnStart = (String[]) jiniConfig.getEntry(this
 				.getClass().getName(), "svnUpdateOnStart", String[].class,
 				new String[] {});
+		String[] csImportOnStart = (String[]) jiniConfig.getEntry(this
+				.getClass().getName(), "csImportOnStart", String[].class,
+				new String[] {});
 		List<File> changeLocations = new ArrayList<File>();
+		for (String importLoc: csImportOnStart) {
+			changeLocations.add(new File(importLoc));
+		}
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
-				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart
-						.length() > 0)) {
+				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
 			boolean connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
 					.showConfirmDialog(
 							null,
@@ -483,6 +488,8 @@ public class AceRunner {
 				throw new TaskFailedException(
 						"User did not want to connect to Subversion.");
 			}
+		} else if (changeLocations.size() > 0) {
+			doStealthChangeSetImport(changeLocations);			
 		}
 	}
 
