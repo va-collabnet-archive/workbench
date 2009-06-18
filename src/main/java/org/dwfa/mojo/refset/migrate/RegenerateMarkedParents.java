@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -18,6 +19,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.MarkedParentRefsetHelper;
 import org.dwfa.ace.refset.MemberRefsetHelper;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 
@@ -28,6 +30,12 @@ import org.dwfa.mojo.ConceptDescriptor;
 public class RegenerateMarkedParents extends AbstractMojo {
 
 
+    /**
+     * @parameter
+     * @required
+     */
+    public ConceptDescriptor editPath;
+	
     public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
 
     public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
@@ -52,6 +60,16 @@ public class RegenerateMarkedParents extends AbstractMojo {
         concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
         concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
         concepts.put("NORMAL_MEMBER", new ConceptDescriptor("cc624429-b17d-4ac5-a69e-0b32448aaf3c", "normal member").getVerifiedConcept());
+        
+		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+		if (config == null) {
+			config = NewDefaultProfile.newProfile(null, null, null, null);
+			termFactory.setActiveAceFrameConfig(config);
+		}
+		config.getEditingPathSet().clear();
+		config.addEditingPath(termFactory.getPath(editPath.getVerifiedConcept().getUids()));
+		
+		config.setViewPositions(null);
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
