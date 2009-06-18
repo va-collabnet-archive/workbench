@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -197,39 +195,30 @@ public class MemberRefsetHelper extends RefsetHelper {
     	I_TermFactory termFactory = LocalVersionedTerminology.get();
 
     	int currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-    	int refsetPurposeRelId = RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.localize().getNid();
     	int memberRefsetPurposeId = ConceptConstants.REFSET_MEMBER_PURPOSE.localize().getNid();
+    	int refsetIdenityId = RefsetAuxiliary.Concept.REFSET_IDENTITY.localize().getNid();
     	
 		I_IntSet statuses = termFactory.newIntSet();
 		statuses.add(currentStatusId);
 
-		I_IntSet relTypes = termFactory.newIntSet();
-	    relTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
-	    relTypes.add(termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getUids()).getConceptId());
+		I_IntSet purposeTypes = termFactory.newIntSet();	
+		purposeTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());
+		
+		I_IntSet isATypes = termFactory.newIntSet();
+		isATypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+		isATypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
 
-		I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-
-		Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(statuses, relTypes, null, false);
-		for (I_GetConceptData refsetConcept : refsetChildren) {
-			Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
-
-			List<I_RelVersioned> rels = refsetConcept.getSourceRels();
-			for (I_RelVersioned rel: rels) {
-				List<I_RelTuple> tuples = rel.getTuples();
-				for (I_RelTuple tuple : tuples) {
-					if (tuple.getStatusId() == currentStatusId && tuple.getTypeId() == refsetPurposeRelId) {
-						purposeConcepts.add(termFactory.getConcept(tuple.getC2Id()));
-					}
+		I_GetConceptData memberPurpose = termFactory.getConcept(memberRefsetPurposeId);
+		
+		for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, false, true)) {
+			// Check origin is a refset (ie. has not been retired as a refset)
+			for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, false, true)) {
+				if (target.getConceptId() == refsetIdenityId) {
+					memberRefsets.add(origin.getConceptId());
 				}
 			}
-
-			if (purposeConcepts.size() == 1) {
-				if (purposeConcepts.iterator().next().getConceptId() == memberRefsetPurposeId) {
-					memberRefsets.add(refsetConcept.getConceptId());
-				} 
-			} 
 		}
-		
+
 		return memberRefsets;
 	}
 	
