@@ -1,7 +1,6 @@
 package org.dwfa.mojo.refset.migrate;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,18 +16,15 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.refset.MarkedParentRefsetHelper;
 import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 
 /**
- *
- * @goal regenerate-marked-parents
+ * @goal retire-all-marked-parents
  */
-public class RegenerateMarkedParents extends AbstractMojo {
-
+public class RetireAllMarkedParents extends AbstractMojo {
 
     /**
      * @parameter
@@ -36,19 +32,12 @@ public class RegenerateMarkedParents extends AbstractMojo {
      */
     public ConceptDescriptor editPath;
 	
-    public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
-
-    public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
-
-    public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME =
-            ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
-
     protected I_TermFactory termFactory;
 
     protected HashMap<String, I_GetConceptData> concepts = new HashMap<String, I_GetConceptData>();
 
 
-    public RegenerateMarkedParents() throws Exception {
+    public RetireAllMarkedParents() throws Exception {
         termFactory = LocalVersionedTerminology.get();
         if (termFactory == null) {
             throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
@@ -79,7 +68,7 @@ public class RegenerateMarkedParents extends AbstractMojo {
 
             for (Integer memberRefsetId : memberRefsets) {      
             	I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
-                regenerateMarkedParentMembers(memberRefsetConcept);
+                retireExistingMarkedParentMembers(memberRefsetConcept);
             }
         } catch (Exception ex) {
             throw new MojoExecutionException("Unable to migrate specification refsets", ex);
@@ -87,11 +76,10 @@ public class RegenerateMarkedParents extends AbstractMojo {
 
     }
 
-    private void regenerateMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
+    private void retireExistingMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
 
         int refsetId = memberRefsetConcept.getConceptId();
 
-        Set<Integer> normalMemberIds = new HashSet<Integer>();
         List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
@@ -103,16 +91,19 @@ public class RegenerateMarkedParents extends AbstractMojo {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
                     I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
-                    if (part.getConceptId() == concepts.get("NORMAL_MEMBER").getConceptId()) {
-                        normalMemberIds.add(thinExtByRefTuple.getComponentId());
+                    if (part.getConceptId() == concepts.get("PARENT_MARKER").getConceptId()
+                            && part.getStatusId() == concepts.get("CURRENT").getConceptId() ) {
+
+                        I_ThinExtByRefPart clone = part.duplicate();
+                        clone.setStatusId(concepts.get("RETIRED").getConceptId());
+                        clone.setVersion(Integer.MAX_VALUE);
+                        thinExtByRefVersioned.addVersion(clone);
+
+                        termFactory.addUncommitted(thinExtByRefVersioned);
                     }
                 }
             }
         }
-
-        new MarkedParentRefsetHelper(refsetId, concepts.get("NORMAL_MEMBER").getConceptId())
-                .addParentMembers(normalMemberIds.toArray(new Integer[]{}));
     }
-
 
 }
