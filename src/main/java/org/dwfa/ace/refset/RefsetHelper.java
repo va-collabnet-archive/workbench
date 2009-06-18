@@ -77,6 +77,8 @@ public class RefsetHelper {
 	 */
 	protected boolean newRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
 		
+		Set<I_Path> userEditPaths = null;
+		
 		// check subject is not already a member
 		if (hasCurrentRefsetExtension(refsetId, conceptId, memberTypeId)) {
 			if (logger.isLoggable(Level.FINE)) {
@@ -89,7 +91,9 @@ public class RefsetHelper {
 		// create a new extension (with a part for each path the user is editing)
 		
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-		Set<I_Path> userEditPaths = config.getEditingPathSet();
+		if (config != null) {
+			userEditPaths = config.getEditingPathSet();
+		}
 		
 		int newMemberId = termFactory.uuidToNativeWithGeneration( 
 				UUID.randomUUID(), unspecifiedUuid, userEditPaths, Integer.MAX_VALUE);
@@ -166,10 +170,18 @@ public class RefsetHelper {
 	 */
 	public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept, Condition ... conditions) throws Exception {
 		
+		Set<I_Position> userViewPositions = null;
+		I_IntSet userViewStatuses;
+		
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
-		Set<I_Position> userViewPositions = config.getViewPositionSet();
-		I_IntSet userViewStatuses = config.getAllowedStatus();
+		if (config != null) {
+			userViewPositions = config.getViewPositionSet();
+			userViewStatuses = config.getAllowedStatus();
+		} else {
+			userViewStatuses = termFactory.newIntSet();
+			userViewStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+		}
 		
         I_IntSet isARel = termFactory.newIntSet();
         isARel.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
@@ -211,11 +223,19 @@ public class RefsetHelper {
 	 * Get all the ancestors (parents, parents of parents, etc) of a particular concept.
 	 */
 	public Set<I_GetConceptData> getAllAncestors(I_GetConceptData concept, Condition ... conditions) throws Exception {
+
+		Set<I_Position> userViewPositions = null;
+		I_IntSet userViewStatuses;
 		
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
-		Set<I_Position> userViewPositions = config.getViewPositionSet();
-		I_IntSet userViewStatuses = config.getAllowedStatus();
+		if (config != null) {
+			userViewPositions = config.getViewPositionSet();
+			userViewStatuses = config.getAllowedStatus();
+		} else {
+			userViewStatuses = termFactory.newIntSet();
+			userViewStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+		}
 		
         I_IntSet isARel = termFactory.newIntSet();
         isARel.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
