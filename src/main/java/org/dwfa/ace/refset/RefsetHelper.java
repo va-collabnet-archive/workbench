@@ -40,7 +40,7 @@ public class RefsetHelper {
 	}
 	
 	
-	protected boolean hasCurrentRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
+	public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
 		for (I_ThinExtByRefVersioned extension : 
 			termFactory.getAllExtensionsForComponent(conceptId)) {
 		
@@ -178,7 +178,7 @@ public class RefsetHelper {
 		Set<I_GetConceptData> descendants = 
 			getAllDescendants(new HashSet<I_GetConceptData>(), concept, userViewStatuses, isARel, userViewPositions, conditions);
 	
-		logger.info("Found " + descendants.size() + " descendants of concept '" + concept.getInitialText() + "'.");
+		logger.fine("Found " + descendants.size() + " descendants of concept '" + concept.getInitialText() + "'.");
 	
 		return descendants;
 	}
@@ -224,7 +224,7 @@ public class RefsetHelper {
 		Set<I_GetConceptData> parentConcepts = 
 			getAllAncestors(new HashSet<I_GetConceptData>(), concept, userViewStatuses, isARel, userViewPositions, conditions);
 	
-		logger.info("Found " + parentConcepts.size() + " ancestors of concept '" + concept.getInitialText() + "'.");
+		logger.fine("Found " + parentConcepts.size() + " ancestors of concept '" + concept.getInitialText() + "'.");
 	
 		return parentConcepts;
 	}
