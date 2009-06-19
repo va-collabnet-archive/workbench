@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
@@ -46,14 +47,16 @@ public class CommitLog implements I_WriteChangeSet {
 	          tempOut.flush();
 	          tempOut.close();
 	          tempOut = null;
+		       String canonicalFileString = tempFile.getCanonicalPath();
+		       if (tempFile.exists()) {
+			       if (tempFile.renameTo(changeSetFile) == false) {
+				          AceLog.getAppLog().alertAndLogException(new Exception("tempFile.renameTo failed. Attempting FileIO.copyFile..."));
+				          FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
+				   }
+			       tempFile = new File(canonicalFileString);
+			       tempFile.delete();
+		       }
 	       }
-	       String canonicalFileString = tempFile.getCanonicalPath();
-	       if (tempFile.renameTo(changeSetFile) == false) {
-	          System.out.println("tempFile.renameTo failed. Attempting FileIO.copyFile...");
-	          FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
-	       }
-	       tempFile = new File(canonicalFileString);
-	       tempFile.delete();
 	   }
 
 	public void open() throws IOException {

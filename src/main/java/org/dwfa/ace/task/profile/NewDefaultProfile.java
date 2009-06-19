@@ -64,6 +64,7 @@ public class NewDefaultProfile extends NewProfile {
 		I_ConfigAceFrame activeConfig = tf.newAceFrameConfig();
 		
 		I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
+		newDbProfile.setUsername(username);
 		activeConfig.setDbConfig(newDbProfile);
 		
 		
