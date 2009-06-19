@@ -1,9 +1,11 @@
 package org.dwfa.ace.refset;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -56,10 +58,13 @@ public class MemberRefsetHelper extends RefsetHelper {
 			}
 	
 			@Override
-			public void onComplete() throws Exception {				
-				monitor.setText("Adding marked parent members...");
-				monitor.setIndeterminate(true);
-				addMarkedParents(newMembers.toArray(new Integer[]{}));
+			public void onComplete() throws Exception {	
+				List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+				if (termFactory.hasId(markedParentsUuid)) { 
+					monitor.setText("Adding marked parent members...");
+					monitor.setIndeterminate(true);
+						addMarkedParents(newMembers.toArray(new Integer[]{}));
+				}
 			}			
 			
 			@Override
@@ -104,9 +109,12 @@ public class MemberRefsetHelper extends RefsetHelper {
 
 			@Override
 			public void onComplete() throws Exception {
-				monitor.setText("Removing marked parent members...");
-				monitor.setIndeterminate(true);
-				removeMarkedParents(removedMembers.toArray(new Integer[]{}));
+				List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+				if (termFactory.hasId(markedParentsUuid)) { 
+					monitor.setText("Removing marked parent members...");
+					monitor.setIndeterminate(true);
+					removeMarkedParents(removedMembers.toArray(new Integer[]{}));
+				}
 			}
 			
 			@Override
