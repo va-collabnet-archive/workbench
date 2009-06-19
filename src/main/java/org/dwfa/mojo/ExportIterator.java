@@ -24,19 +24,13 @@ import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.refset.ExportSpecification;
+import org.dwfa.mojo.comparator.TupleComparator;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class ExportIterator implements I_ProcessConcepts {
 
@@ -255,9 +249,35 @@ public class ExportIterator implements I_ProcessConcepts {
 	private boolean writeUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) 
 			throws Exception {
 
-        I_IntList fsn = termFactory.newIntList();
+        I_IntSet fsn = termFactory.newIntSet();
         fsn.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
-        I_DescriptionTuple descForConceptFile = concept.getDescTuple(fsn, null, positions);
+        List<I_DescriptionTuple> descTuples = concept.getDescriptionTuples(null, fsn, positions);
+        List<I_DescriptionTuple> latestDescTuples = getLatestTuples(descTuples);
+
+        I_DescriptionTuple descForConceptFile = null;
+
+        if (latestDescTuples != null) {
+
+            // Get the latest, 'current', FSN
+            for (I_DescriptionTuple descTuple : latestDescTuples) {
+                if (isDescriptionStatusCurrent(descTuple.getStatusId())) {
+                    if (descForConceptFile == null ||
+                            descForConceptFile.getVersion() < descTuple.getVersion()) {
+                        descForConceptFile = descTuple;
+                    }
+                }
+            }
+
+            // If no 'current' FSN is available, get the latest FSN (regardless of status)
+            if (descForConceptFile == null) {
+                for (I_DescriptionTuple descTuple : latestDescTuples) {
+                    if (descForConceptFile == null ||
+                            descForConceptFile.getVersion() < descTuple.getVersion()) {
+                        descForConceptFile = descTuple;
+                    }
+                }
+            }
+        }
 
         if (descForConceptFile == null) {
 			errorWriter.append("\n\nnull desc for: " + concept.getUids() + " " + concept.getDescriptions());
@@ -336,7 +356,41 @@ public class ExportIterator implements I_ProcessConcepts {
 		}// End method getUuidBasedConceptDetaiils
 	}
 
-	private boolean validPosition(int pathId) {
+    private List<I_DescriptionTuple> getLatestTuples(List<I_DescriptionTuple> descTuples) {
+
+        // Sort and reverse the tuples so that the list is ordered by the latest description and then the latest version
+        Collections.sort(descTuples, new TupleComparator());
+        Collections.reverse(descTuples);
+
+        List<I_DescriptionTuple> latestTuples = new ArrayList<I_DescriptionTuple>();
+        I_DescriptionTuple previousTuple = null;
+
+        for (I_DescriptionTuple tuple : descTuples) {
+
+            // If this is the first loop, or this is a new description version
+            if (previousTuple == null ||
+                    previousTuple.getDescId() != tuple.getDescId()) {
+
+                latestTuples.add(tuple);
+                previousTuple = tuple;
+            }
+        }
+        return latestTuples;
+    }
+
+    private boolean isDescriptionStatusCurrent(int statusId) throws IOException, TerminologyException {
+
+        // If statusId matches a 'current'/'active' description status
+        if (statusId == termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId() ||
+            statusId == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId() ||
+            statusId == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId() ||
+            statusId == termFactory.getConcept(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId()) {
+            return Boolean.TRUE;
+        }
+        return false;
+    }
+
+    private boolean validPosition(int pathId) {
         for (I_Position position : positions) {
             if (position.getPath().getConceptId() == pathId) {
                 return true;
