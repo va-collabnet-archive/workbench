@@ -41,8 +41,30 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 
 	public void setTypeId(int typeId);
 
-   public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
-       List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted);
+   /**
+	 * Retrieves tuples matching the specified allowedStatuses and positions -
+	 * tuples are returned in the supplied returnTuples List parameter -
+	 * <strong>NOTE: this does not use the conflict management strategy</strong>.
+	 * It is strongly recommended that you use a method that does use a conflict
+	 * management strategy.
+	 * 
+	 * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
+	 * 
+	 * @param allowedStatus
+	 *            statuses tuples must match to be returned
+	 * @param positions
+	 *            postions a tuple must be on to be returned
+	 * @param returnTuples
+	 *            List to be populated with the result of the search
+	 * @param addUncommitted
+	 *            if true matching items from the uncommitted list will be
+	 *            added, if false the uncommitted list is ignored
+	 * @throws IOException
+	 * @throws TerminologyException
+	 */
+	@Deprecated
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+			List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted);
 
 	/**
 	 * Retrieves tuples matching the specified allowedStatuses and positions -
@@ -60,8 +82,8 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 	 * @param returnConflictResolvedLatestState
 	 *            indicates if all tuples or just the latest state using the
 	 *            current profile's conflict resolution strategy is required
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @throws IOException
+	 * @throws TerminologyException
 	 */
 	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
 			List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
@@ -86,10 +108,27 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 	public void addTuples(List<I_ThinExtByRefTuple> returnTuples,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
-   public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus, 
-                                              Set<I_Position> positions, 
-                                              boolean addUncommitted);
-                                              
+   /**
+	 * Retrieves tuples matching the specified allowedStatuses and positions
+	 * configured in the current profile - <strong>NOTE: this does not use the
+	 * conflict management strategy</strong>. It is strongly recommended that
+	 * you use a method that does use a conflict management strategy.
+	 * 
+	 * @see #getTuples(I_IntSet, Set, boolean, boolean)
+	 * 
+	 * @param allowedStatus
+	 *            statuses tuples must match to be returned
+	 * @param positions
+	 *            positions a tuple must be on to be returned
+	 * @param addUncommitted
+	 *            if true matching items from the uncommitted list will be
+	 *            added, if false the uncommitted list is ignored
+	 * @return matching tuples
+	 */
+	@Deprecated
+	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> positions, boolean addUncommitted);
+
 	/**
 	 * Retrieves tuples matching the specified allowedStatuses and positions
 	 * 
@@ -104,8 +143,8 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 	 *            indicates if all tuples or just the latest state using the
 	 *            current profile's conflict resolution strategy is required
 	 * @return List of matching tuples
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @throws IOException
+	 * @throws TerminologyException
 	 */
 	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
 			Set<I_Position> positions, boolean addUncommitted,
