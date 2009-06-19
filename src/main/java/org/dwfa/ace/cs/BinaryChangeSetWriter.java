@@ -5,10 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalIdList;
@@ -39,7 +41,6 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
       protected void writeStreamHeader() throws IOException {
          reset();
       }
-
    }
 
    private File changeSetFile;
@@ -60,14 +61,16 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
          tempOut.flush();
          tempOut.close();
          tempOut = null;
+         String canonicalFileString = tempFile.getCanonicalPath();
+         if (tempFile.exists()) {
+             if (tempFile.renameTo(changeSetFile) == false) {
+            	 AceLog.getAppLog().warning("tempFile.renameTo failed. Attempting FileIO.copyFile...");
+                 FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
+              }
+              tempFile = new File(canonicalFileString);
+              tempFile.delete();
+         }
       }
-      String canonicalFileString = tempFile.getCanonicalPath();
-      if (tempFile.renameTo(changeSetFile) == false) {
-         System.out.println("tempFile.renameTo failed. Attempting FileIO.copyFile...");
-         FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
-      }
-      tempFile = new File(canonicalFileString);
-      tempFile.delete();
    }
 
    public void open() throws IOException {
@@ -80,6 +83,8 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
          oos.close();
       }
       FileIO.copyFile(changeSetFile.getCanonicalPath(), tempFile.getCanonicalPath());
+      AceLog.getAppLog().info("Copying from: " + changeSetFile.getCanonicalPath() + 
+    		                "\n        to: " + tempFile.getCanonicalPath());
       tempOut = new NoHeaderObjectOutputStream(new FileOutputStream(tempFile, true));
    }
 
@@ -114,6 +119,9 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
       try {
          UniversalAceBean bean = cb.getUniversalAceBean();
          tempOut.writeObject(bean);
+	   	  if (AceLog.getEditLog().isLoggable(Level.FINER)) {
+			  AceLog.getEditLog().finer("writeChanges time: " + time + " concept: " + bean);
+		  }
       } catch (TerminologyException e) {
          IOException ioe = new IOException(e.getLocalizedMessage());
          ioe.initCause(e);
@@ -125,6 +133,9 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
       try {
          UniversalAceExtByRefBean bean = ebrBean.getUniversalAceBean();
          tempOut.writeObject(bean);
+	   	  if (AceLog.getEditLog().isLoggable(Level.FINER)) {
+			  AceLog.getEditLog().finer("writeChanges time: " + time + " extension: " + bean);
+		  }
       } catch (TerminologyException e) {
          IOException ioe = new IOException(e.getLocalizedMessage());
          ioe.initCause(e);
@@ -134,11 +145,17 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 
    private void writeIds(UniversalIdList idList, long time) throws IOException {
       tempOut.writeObject(idList);
+   	  if (AceLog.getEditLog().isLoggable(Level.FINER)) {
+		  AceLog.getEditLog().finer("writeChanges time: " + time + " idList: " + idList);
+	  }
    }
 
    private void writeChanges(I_Path path, long time) throws IOException {
       try {
          tempOut.writeObject(path.getUniversal());
+      	  if (AceLog.getEditLog().isLoggable(Level.FINER)) {
+    		  AceLog.getEditLog().finer("writeChanges time: " + time + " path: " + path);
+    	  }
       } catch (TerminologyException e) {
          IOException ioe = new IOException(e.getLocalizedMessage());
          ioe.initCause(e);

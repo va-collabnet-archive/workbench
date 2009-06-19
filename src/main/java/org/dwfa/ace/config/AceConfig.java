@@ -4,17 +4,12 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
@@ -24,10 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -38,13 +29,7 @@ import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.svn.SvnPrompter;
-import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
-import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.fd.FileDialogUtil;
-import org.dwfa.log.HtmlHandler;
-import org.dwfa.log.LogViewerFrame;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
@@ -77,7 +62,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public List<I_ConfigAceFrame> aceFrames = new ArrayList<I_ConfigAceFrame>();
 
-	private File dbFolder = new File("../test/berkeley-db");
+	private File dbFolder = new File("berkeley-db");
 
 	private String loggerRiverConfigFile = DEFAULT_LOGGER_CONFIG_FILE;
 
@@ -184,7 +169,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                    changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
                 }
             } else {
-                changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + username);
+                changeSetRoot = new File("profiles" + File.separator + username);
                 changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
             }
             if (objDataVersion >= 6) {
@@ -214,6 +199,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 		I_ConfigAceFrame profile = NewDefaultProfile.newProfile(prompter.getUsername(), prompter.getPassword(), 
 				"admin", "visit.bend");
+		config.setUsername(profile.getUsername());
 		config.aceFrames.add(profile);
 
 		if (config.getUsername() == null) {
@@ -223,8 +209,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			config.setChangeSetWriterFileName(config.getUsername() + "."
 					+ UUID.randomUUID().toString() + ".jcs");
 		}
-        config.changeSetRoot = new File("profiles" + File.separator + "users" + File.separator + config.getUsername());
-        config.addChangeSetWriters();
+        config.changeSetRoot = new File("profiles" + File.separator + config.getUsername());
 
         if (configFile == null) {
         	File profileDir = new File("profiles");
@@ -349,6 +334,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	public void setUsername(String username) {
 		Object old = this.username;
 		this.username = username;
+		if (this.username == null) {
+			config.setChangeSetWriterFileName("nullUser."
+					+ UUID.randomUUID().toString() + ".jcs");
+		} else {
+			config.setChangeSetWriterFileName(this.username + "."
+					+ UUID.randomUUID().toString() + ".jcs");
+		}
+        config.changeSetRoot = new File("profiles" + File.separator + config.getUsername());
 		this.changeSupport.firePropertyChange("username", old, username);
 	}
 

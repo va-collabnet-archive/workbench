@@ -122,9 +122,10 @@ public class AceRunner {
 							+ this.getClass().getSimpleName()
 							+ "\n with config file: " + getArgString(args)
 							+ "\n\n******************\n");
-
-			jiniConfig = ConfigurationProvider.getInstance(args, getClass()
-					.getClassLoader());
+			if (new File(args[0]).exists()) {
+				jiniConfig = ConfigurationProvider.getInstance(args, getClass()
+						.getClassLoader());
+			}
 
 			setupLookAndFeel();
 			setupSwingExpansionTimerLogging();
@@ -132,7 +133,15 @@ public class AceRunner {
 			setBerkeleyDbAsTransactional();
 
 			File acePropertiesFile = new File("config", "ace.properties");
-			if (acePropertiesFile.exists() == false) {
+			boolean acePropertiesFileExists = acePropertiesFile.exists();
+			aceProperties = new Properties();
+			boolean initialized = false;
+			if (acePropertiesFileExists) {
+				aceProperties
+						.loadFromXML(new FileInputStream(acePropertiesFile));
+				initialized = Boolean.parseBoolean((String) aceProperties.get("initialized"));
+			}
+			if (acePropertiesFileExists == false || initialized == false) {
 				try {
 					initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
 				} catch (Exception ex) {
@@ -140,17 +149,16 @@ public class AceRunner {
 					System.exit(0);
 				}
 			}
-			aceProperties = new Properties();
-			if (acePropertiesFile.exists()) {
-				aceProperties
-						.loadFromXML(new FileInputStream(acePropertiesFile));
+			aceProperties.put("initialized", "true");
+			if (jiniConfig != null) {
+				aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
+						.getName(), "aceConfigFile", File.class, new File(
+						"config/config.ace"));
+			} else {
+				aceConfigFile = new File("config/config.ace");
 			}
 
-			aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
-					.getName(), "aceConfigFile", File.class, new File(
-					"src/main/config/config.ace"));
-
-			if (aceConfigFile.exists()) {
+			if (aceConfigFile != null && aceConfigFile.exists() && acePropertiesFile.exists()) {
 				
 				// Put up a dialog to select the configuration file...
 				CountDownLatch latch = new CountDownLatch(1);
@@ -167,9 +175,12 @@ public class AceRunner {
 				AceConfig.config.setProfileFile(aceConfigFile);
 				setupDatabase(AceConfig.config, aceConfigFile);
 			} else {
-				File dbFolder = (File) jiniConfig.getEntry(this.getClass()
-						.getName(), "dbFolder", File.class, new File(
-						"target/berkeley-db"));
+				File dbFolder = new File("berkeley-db");
+				if (jiniConfig != null) {
+					dbFolder = (File) jiniConfig.getEntry(this.getClass()
+							.getName(), "dbFolder", File.class, new File(
+							"target/berkeley-db"));
+				}
 				AceConfig.config = new AceConfig(dbFolder);
 				AceConfig.config.setProfileFile(aceConfigFile);
 				AceConfig.setupAceConfig(AceConfig.config, null, null, false);
@@ -434,22 +445,31 @@ public class AceRunner {
 		Properties aceProperties = new Properties();
 		aceProperties.setProperty("initial-svn-checkout", "true");
 
-		String svnCheckoutProfileOnStart = (String) jiniConfig.getEntry(this
-				.getClass().getName(), "svnCheckoutProfileOnStart",
-				String.class, "");
-
-		String[] svnCheckoutOnStart = (String[]) jiniConfig.getEntry(this
-				.getClass().getName(), "svnCheckoutOnStart", String[].class,
-				new String[] {});
-		String[] svnUpdateOnStart = (String[]) jiniConfig.getEntry(this
-				.getClass().getName(), "svnUpdateOnStart", String[].class,
-				new String[] {});
-		String[] csImportOnStart = (String[]) jiniConfig.getEntry(this
-				.getClass().getName(), "csImportOnStart", String[].class,
-				new String[] {});
+		String svnCheckoutProfileOnStart = null;
+		String[] svnCheckoutOnStart = null;
+		String[] svnUpdateOnStart = null;
+		String[] csImportOnStart = null;
 		List<File> changeLocations = new ArrayList<File>();
-		for (String importLoc: csImportOnStart) {
-			changeLocations.add(new File(importLoc));
+		
+		if (jiniConfig != null) {
+			svnCheckoutProfileOnStart = (String) jiniConfig.getEntry(this
+					.getClass().getName(), "svnCheckoutProfileOnStart",
+					String.class, "");
+
+			svnCheckoutOnStart = (String[]) jiniConfig.getEntry(this
+					.getClass().getName(), "svnCheckoutOnStart", String[].class,
+					new String[] {});
+			svnUpdateOnStart = (String[]) jiniConfig.getEntry(this
+					.getClass().getName(), "svnUpdateOnStart", String[].class,
+					new String[] {});
+			csImportOnStart = (String[]) jiniConfig.getEntry(this
+					.getClass().getName(), "csImportOnStart", String[].class,
+					new String[] {});
+			if (csImportOnStart != null) {
+				for (String importLoc: csImportOnStart) {
+					changeLocations.add(new File(importLoc));
+				}
+			}
 		}
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
@@ -656,11 +676,15 @@ public class AceRunner {
 	private void setupLookAndFeel() throws ConfigurationException,
 			ClassNotFoundException, InstantiationException,
 			IllegalAccessException, UnsupportedLookAndFeelException {
-		String lookAndFeelClassName = (String) jiniConfig.getEntry(this
-				.getClass().getName(), "lookAndFeelClassName", String.class,
-				UIManager.getSystemLookAndFeelClassName());
+		if (jiniConfig != null) {
+			String lookAndFeelClassName = (String) jiniConfig.getEntry(this
+					.getClass().getName(), "lookAndFeelClassName", String.class,
+					UIManager.getSystemLookAndFeelClassName());
 
-		UIManager.setLookAndFeel(lookAndFeelClassName);
+			UIManager.setLookAndFeel(lookAndFeelClassName);
+		} else {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
 	}
 
 	private void setBerkeleyDbAsTransactional() {
@@ -671,27 +695,31 @@ public class AceRunner {
 
 	private void setupIpChangeListener() throws ConfigurationException,
 			UnknownHostException {
-		Boolean listenForIpChanges = (Boolean) jiniConfig.getEntry(this
-				.getClass().getName(), "listenForIpChanges", Boolean.class,
-				null);
-		if (listenForIpChanges != null) {
-			if (listenForIpChanges) {
-				Timer ipChangeTimer = new Timer(2 * 60 * 1000,
-						new CheckIpAddressForChanges());
-				ipChangeTimer.start();
+		if (jiniConfig != null) {
+			Boolean listenForIpChanges = (Boolean) jiniConfig.getEntry(this
+					.getClass().getName(), "listenForIpChanges", Boolean.class,
+					null);
+			if (listenForIpChanges != null) {
+				if (listenForIpChanges) {
+					Timer ipChangeTimer = new Timer(2 * 60 * 1000,
+							new CheckIpAddressForChanges());
+					ipChangeTimer.start();
+				}
 			}
 		}
 	}
 
 	private void setupSwingExpansionTimerLogging()
 			throws ConfigurationException {
-		Boolean logTimingInfo = (Boolean) jiniConfig.getEntry(this.getClass()
-				.getName(), "logTimingInfo", Boolean.class, null);
-		if (logTimingInfo != null) {
-			ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
+		if (jiniConfig != null) {
+			Boolean logTimingInfo = (Boolean) jiniConfig.getEntry(this.getClass()
+					.getName(), "logTimingInfo", Boolean.class, null);
+			if (logTimingInfo != null) {
+				ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
+			}
+			AceLog.getAppLog().info(
+					"Swing expansion logTimingInfo " + logTimingInfo);
 		}
-		AceLog.getAppLog().info(
-				"Swing expansion logTimingInfo " + logTimingInfo);
 	}
 
 	private String getArgString(final String[] args) {
