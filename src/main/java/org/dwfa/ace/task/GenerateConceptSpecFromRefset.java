@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.binding.java.GenerateClassFromRefset;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -95,18 +96,21 @@ public class GenerateConceptSpecFromRefset extends AbstractTask {
 					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 							.name());
 			I_GetConceptData con = config.getHierarchySelection();
-			if (con != null)
-				System.out.println(con.getInitialText());
-			System.out.println(packageName + "." + className + ">>"
-					+ outputDirectory);
-			GenerateClassFromRefset gcfr = new GenerateClassFromRefset();
-			gcfr.setPackageName(packageName);
-			gcfr.setClassName(className);
-			gcfr.setOutputDirectory(outputDirectory);
-			gcfr.setRefsetName(con.getInitialText());
-			gcfr.setRefsetUuid(con.getUids().get(0).toString());
-			gcfr.run();
-			return Condition.ITEM_COMPLETE;
+			if (con != null) {
+				AceLog.getAppLog().info(con.getInitialText());
+				AceLog.getAppLog().info(packageName + "." + className + ">>"
+						+ outputDirectory);
+				GenerateClassFromRefset gcfr = new GenerateClassFromRefset();
+				gcfr.setPackageName(packageName);
+				gcfr.setClassName(className);
+				gcfr.setOutputDirectory(outputDirectory);
+				gcfr.setRefsetName(con.getInitialText());
+				gcfr.setRefsetUuid(con.getUids().get(0).toString());
+				gcfr.run();
+			} else {
+				throw new TaskFailedException("Refset selected in hierarchy cannot be null...");
+			}
+			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
@@ -119,6 +123,6 @@ public class GenerateConceptSpecFromRefset extends AbstractTask {
 	}
 
 	public Collection<Condition> getConditions() {
-		return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
+		return AbstractTask.CONTINUE_CONDITION;
 	}
 }
