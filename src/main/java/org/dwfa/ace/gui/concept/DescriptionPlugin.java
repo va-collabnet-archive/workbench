@@ -209,6 +209,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 			descPanel.add(rowAddAfter, c);
 			rowAddAfter.addActionListener(new AddDescription(host, host
 					.getConfig()));
+			rowAddAfter.setToolTipText("add new description");
 		} else {
 			JPanel filler = new JPanel();
 			filler.setMaximumSize(new Dimension(40, 32));

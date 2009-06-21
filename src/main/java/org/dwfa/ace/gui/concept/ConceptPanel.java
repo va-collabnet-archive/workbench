@@ -638,7 +638,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		refsetToggleButton.setSelected(false);
 		refsetToggleButton.setVisible(ACE.editMode);
 		refsetToggleButton
-				.setToolTipText("show hide refset entries of types selected in the preferences");
+				.setToolTipText("show/hide refset entries of types selected in the preferences");
 		refsetToggleButton.addActionListener(fixedToggleChangeActionListener);
 		leftTogglePane.add(refsetToggleButton);
 

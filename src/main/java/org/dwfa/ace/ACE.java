@@ -108,8 +108,8 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -3523,12 +3523,14 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				.getResource("/32x32/plain/find.png")));
 		showSearchToggle.addActionListener(bottomPanelActionListener);
 		bottomPanel.add(showSearchToggle, c);
+		showSearchToggle.setToolTipText("show/hide search panel");
 		c.gridx++;
 		showSignpostPanelToggle = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/signpost.png")));
 		showSignpostPanelToggle.addActionListener(bottomPanelActionListener);
 		showSignpostPanelToggle.setVisible(true);
 		bottomPanel.add(showSignpostPanelToggle, c);
+		showSignpostPanelToggle.setToolTipText("show/hide signpost panel");
 		c.gridx++;
 
 		TransporterLabel flashButton = new TransporterLabel(new ImageIcon(

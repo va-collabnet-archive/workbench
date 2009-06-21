@@ -94,6 +94,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 			rowAddAfter.setEnabled(enableEdit);
 			rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
 			rowAddAfter.setTransferHandler(new TerminologyTransferHandler(rowAddAfter));
+			rowAddAfter.setToolTipText("add a new relationship (the concept selected in the taxonomy view will be the default destination)");
 		} else {
 			JPanel filler = new JPanel();
 			filler.setMaximumSize(new Dimension(40, 32));

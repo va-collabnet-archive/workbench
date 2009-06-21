@@ -270,6 +270,7 @@ public class SearchPanel extends JPanel {
         addButton.setIconTextGap(0);
         addButton.addActionListener(new AddCriterion(this));
         add(addButton, gbc);
+        addButton.setToolTipText("add a new AND search clause to end of query");
         gbc.gridx++;
         removeButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
         removeButton.setIconTextGap(0);
