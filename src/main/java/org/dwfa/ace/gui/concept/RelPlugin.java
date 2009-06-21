@@ -282,7 +282,10 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 		}
 		StringWithRelTuple swrt = (StringWithRelTuple) relTable.getValueAt(
 				relTable.getSelectedRow(), 0);
-		return swrt.getTuple().getRelVersioned();
+		if (swrt != null && swrt.getTuple() != null) {
+			return swrt.getTuple().getRelVersioned();
+		}
+		return null;
 	}
 
 	
