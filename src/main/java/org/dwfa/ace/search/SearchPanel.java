@@ -51,9 +51,11 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
+import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
@@ -398,12 +400,19 @@ public class SearchPanel extends JPanel {
         gbc.gridy++;
         gbc.gridheight = 1;
 
-        model = new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.TEXT,
+        model = new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, 
+        		DESC_FIELD.STATUS, DESC_FIELD.TEXT,
                 DESC_FIELD.TYPE }, config);
         sortingTable = new TableSorter(model);
         descTable = new JTableWithDragImage(sortingTable);
         descTable.setDragEnabled(true);
         descTable.setTransferHandler(new TerminologyTransferHandler(this));
+		DescriptionTableRenderer renderer = new DescriptionTableRenderer(config, true);
+		descTable.setDefaultRenderer(Number.class, renderer);
+		descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
+		descTable.setDefaultRenderer(String.class, renderer);
+		descTable.setDefaultRenderer(Boolean.class, renderer);
+
         sortingTable.setTableHeader(descTable.getTableHeader());
 
         DESC_FIELD[] columnEnums = model.getColumnEnums();

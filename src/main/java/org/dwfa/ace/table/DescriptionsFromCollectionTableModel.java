@@ -79,6 +79,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
         for (I_DescriptionVersioned desc: descriptionListCopy) {
             for (I_DescriptionPart part: desc.getVersions()) {
                 referencedConcept.put(part.getTypeId(), ConceptBean.get(part.getTypeId()));
+                referencedConcept.put(part.getStatusId(), ConceptBean.get(part.getStatusId()));
             }
             
         }

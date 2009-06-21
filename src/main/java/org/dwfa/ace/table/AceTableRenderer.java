@@ -16,9 +16,11 @@ public abstract class AceTableRenderer extends DefaultTableCellRenderer {
 	public static Color KAHAKI = new Color(0xF0E68C);
 	public static Color LEMON_CHIFFON = new Color(0xFFFACD);
 	
+	public static Color INACTIVE = Color.LIGHT_GRAY; 
 	public static Color STRIPE = LEMON_CHIFFON; 
 	public static Color UNCOMMITTED_COLOR = new Color(128,224,72);
-	protected void setBorder(int column, JLabel renderComponent, boolean same, boolean uncommitted) {
+	protected void setBorder(int column, JLabel renderComponent, 
+			boolean same, boolean uncommitted) {
 		if (!same) {
 			if (uncommitted && column == 0) {
 				renderComponent.setBorder(BorderFactory.createCompoundBorder(

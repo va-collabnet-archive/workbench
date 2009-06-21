@@ -114,7 +114,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 	}
 
 	private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
-		DescriptionTableRenderer renderer = new DescriptionTableRenderer();
+		DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
 		languageRefsetTable.setDefaultRenderer(Boolean.class, renderer);
 		JComboBox comboBox = new JComboBox() {
 			/**

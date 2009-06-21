@@ -287,7 +287,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	}
 
 	private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
-		DescriptionTableRenderer renderer = new DescriptionTableRenderer();
+		DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
 		descTable.setDefaultRenderer(Boolean.class, renderer);
 		JComboBox comboBox = new JComboBox() {
 			/**
