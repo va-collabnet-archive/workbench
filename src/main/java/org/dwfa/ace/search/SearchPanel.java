@@ -504,10 +504,12 @@ public class SearchPanel extends JPanel {
         updateExtraCriterion();
 
         if (searchPhraseField.getText().length() > 1) {
-            setShowProgress(true);
-            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
-            ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config, 
-            		searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
+        	if (checkLuceneQuery(searchPhraseField.getText())) {
+                setShowProgress(true);
+                model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+                ACE.threadPool.execute(new SearchStringWorker(this, model, searchPhraseField.getText(), config, 
+                		searchTypeCombo.getSelectedItem().equals(LUCENE_QUERY)));
+        	}
         } else if (searchPhraseField.getText().length() == 0) {
         	if (this.extraCriterion.size() > 0) {
                 setShowProgress(true);
@@ -573,13 +575,33 @@ public class SearchPanel extends JPanel {
     }
 
     public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
-    	searchTypeCombo.setSelectedItem(LUCENE_QUERY);
-        searchPhraseField.setText(query);
-        this.extraCriterion = extraCriterion;
-        startSearch();
+    	if (checkLuceneQuery(query)) {
+        	searchTypeCombo.setSelectedItem(LUCENE_QUERY);
+            searchPhraseField.setText(query);
+            this.extraCriterion = extraCriterion;
+            startSearch();    		
+    	}
     }
 
-    public List<I_TestSearchResults> getExtraCriterion() {
+    private boolean checkLuceneQuery(String query) {
+		if (query != null && query.length() > 0) {
+			// check for short wildcard
+			if (query.contains("*")) {
+				String[] queryParts = query.split(" ");
+				for (int i = 0; i < queryParts.length; i++) {
+					if (queryParts[i].contains("*")) {
+						if (queryParts[i].length() < 4) {
+							JOptionPane.showMessageDialog(this, "The wildcard clause '" + queryParts[i] + "' must start with at least 3 characters before the *.");
+							return false;
+						} 
+					}
+				}
+			}
+		} 
+		return true;
+	}
+
+	public List<I_TestSearchResults> getExtraCriterion() {
         return extraCriterion;
     }
 }
