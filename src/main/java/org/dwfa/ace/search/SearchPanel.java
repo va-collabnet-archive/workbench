@@ -438,6 +438,7 @@ public class SearchPanel extends JPanel {
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
         JToggleButton maximizeTable = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/fit_to_size.png")));
+        maximizeTable.setToolTipText("show/hide search criterion");
         maximizeTable.setSelected(false);
         maximizeTable.addActionListener(new MaximizeSearchListener());
         
