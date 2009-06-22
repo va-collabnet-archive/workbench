@@ -383,8 +383,18 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         OID("OID", null,
               new I_ConceptualizeUniversally[] { ID_SOURCE }),
         UNSPECIFIED_STRING("unspecified string", null,
-              new I_ConceptualizeUniversally[] { ID_SOURCE });
-        ;
+              new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        ICD_9("ICD-9 ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        ICD_10("ICD-10 ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        LOINC("LOINC ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        RX_NORM("RX Norm ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        CPT("CPT ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE });
+       ;
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
