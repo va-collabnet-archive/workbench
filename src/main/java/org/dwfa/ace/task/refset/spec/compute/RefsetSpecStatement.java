@@ -66,14 +66,14 @@ public class RefsetSpecStatement {
 		boolean statementResult = getStatementResult(concept);
 		
 		if (useNotQualifier) { // if the statement has a negation associated with it then we need to negate the results
-			System.out.println(concept.getInitialText() + " " + queryType.getInitialText() + " " 
+			/* System.out.println(concept.getInitialText() + " NOT " + queryType.getInitialText() + " " 
 					+ queryDestination.getInitialText() 
-					+ " result: " + !statementResult);
+					+ " result: " + !statementResult); */
 			return !statementResult;
 		} else {
-			System.out.println(concept.getInitialText() + " " + queryType.getInitialText() + " " 
+			/* System.out.println(concept.getInitialText() + " " + queryType.getInitialText() + " " 
 					+ queryDestination.getInitialText() 
-					+ " result: " + statementResult);
+					+ " result: " + statementResult); */
 			return statementResult;
 		}
 	}
