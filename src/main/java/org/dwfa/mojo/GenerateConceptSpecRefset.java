@@ -40,6 +40,9 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 	 */
 	private String refsetUuid;
 
+	/*
+	 * Creates the refset concept
+	 */
 	protected I_GetConceptData createRefsetConcept() throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		I_GetConceptData fully_specified_description_type = termFactory
@@ -107,6 +110,9 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 		return newConcept;
 	}
 
+	/*
+	 * Adds a concept to a refset
+	 */
 	private void addToRefset(I_TermFactory termFactory, int refsetId,
 			int conceptId) throws Exception {
 		I_GetConceptData include_individual = termFactory
@@ -138,6 +144,10 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 		termFactory.addUncommitted(newExtension);
 	}
 
+	/*
+	 * Primary method to build the refset <br> Create the refset concept <br>
+	 * Iterate over the enums and add them to the refset
+	 */
 	private void buildRefset() throws Exception {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		I_GetConceptData refset = createRefsetConcept();
@@ -167,17 +177,30 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
 		termFactory.commit();
 	}
 
-	// <execution>
-	// <id>generate-concept-spec-refset</id>
-	// <phase>generate-sources</phase>
-	// <goals>
-	// <goal>generate-concept-spec-refset</goal>
-	// </goals>
-	// <configuration>
-	// <refsetName>IHTSDO Concept Spec Refset</refsetName>
-	// </configuration>
-	// </execution>
-
+	/*
+	 * 
+	 * Example use:
+	 * 
+	 * <br>&lt;execution&gt;
+	 * 
+	 * <br>&lt;id&gt;generate-concept-spec-refset&lt;/id&gt;
+	 * 
+	 * <br>&lt;phase&gt;generate-sources&lt;/phase&gt;
+	 * 
+	 * <br>&lt;goals&gt;
+	 * 
+	 * <br>&lt;goal&gt;generate-concept-spec-refset&lt;/goal&gt;
+	 * 
+	 * <br>&lt;/goals&gt;
+	 * 
+	 * <br>&lt;configuration&gt;
+	 * 
+	 * <br>&lt;refsetName&gt;IHTSDO Concept Spec Refset&lt;/refsetName&gt;
+	 * 
+	 * <br>&lt;/configuration&gt;
+	 * 
+	 * <br>&lt;/execution&gt;
+	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			buildRefset();

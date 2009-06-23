@@ -53,19 +53,33 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 	 */
 	private File outputDirectory;
 
-	// <execution>
-	// <id>generate-concept-spec</id>
-	// <phase>generate-sources</phase>
-	// <goals>
-	// <goal>generate-concept-spec</goal>
-	// </goals>
-	// <configuration>
-	// <packageName>org.ihtsdo</packageName>
-	// <className>IhtsdoConceptSpec</className>
-	// <refsetName>spec</refsetName>
-	// </configuration>
-	// </execution>
-
+	/*
+	 * Example use:
+	 * 
+	 * <br>&lt;execution&gt;
+	 * 
+	 * <br>&lt;id&gt;generate-concept-spec&lt;/id&gt;
+	 * 
+	 * <br>&lt;phase&gt;generate-sources&lt;/phase&gt;
+	 * 
+	 * <br>&lt;goals&gt;
+	 * 
+	 * <br>&lt;goal&gt;generate-concept-spec&lt;/goal&gt;
+	 * 
+	 * <br>&lt;/goals&gt;
+	 * 
+	 * <br>&lt;configuration&gt;
+	 * 
+	 * <br>&lt;packageName&gt;org.ihtsdo&lt;/packageName&gt;
+	 * 
+	 * <br>&lt;className&gt;IhtsdoConceptSpec&lt;/className&gt;
+	 * 
+	 * <br>&lt;refsetName&gt;spec&lt;/refsetName&gt;
+	 * 
+	 * <br>&lt;/configuration&gt;
+	 * 
+	 * <br>&lt;/execution&gt;
+	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			GenerateClassFromRefset gcfr = new GenerateClassFromRefset();
