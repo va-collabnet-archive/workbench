@@ -139,6 +139,9 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 				REFSET_TYPE_REL(new String[] { "refset type rel", "refset type rel"}, REFSET_RELATIONSHIP),
 				REFSET_PURPOSE_REL(new String[] { "refest purpose rel", "refest purpose rel"}, REFSET_RELATIONSHIP),
 				SPECIFIES_REFSET(new String[] { "specifies refset", "specifies refset"}, REFSET_RELATIONSHIP),
+				MARKED_PARENT_IS_A_TYPE(new String[] { "specifies refset", "specifies refset"}, 
+						 new I_ConceptualizeUniversally[] { REFSET_RELATIONSHIP },
+						UUID.fromString("8d0bcde8-6610-5573-86bd-8ab050dfc6a3")),
 			REFSET_IDENTITY(new String[] { "refset identity", "refset"}, REFSET_AUXILIARY),
             
                 PATHOLOGY_INCLUSION_SPEC(new String[] { "pathology inclusion specification","pathology inclusion specification",
@@ -318,6 +321,19 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
       }
 		private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
 			this.conceptUids.add(Type3UuidFactory.fromEnum(this)); 
+			try {
+				this.rels = DocumentAuxiliary.makeRels(this, parents);
+				this.descriptions = DocumentAuxiliary.makeDescriptions(this, descriptionStrings, descTypeOrder);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents, UUID primaryUuid) {
+			if (primaryUuid != null) {
+				this.conceptUids.add(primaryUuid); 
+			} else {
+				this.conceptUids.add(Type3UuidFactory.fromEnum(this)); 
+			}
 			try {
 				this.rels = DocumentAuxiliary.makeRels(this, parents);
 				this.descriptions = DocumentAuxiliary.makeDescriptions(this, descriptionStrings, descTypeOrder);
