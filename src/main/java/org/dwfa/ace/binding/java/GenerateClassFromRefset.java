@@ -24,6 +24,12 @@ import org.dwfa.cement.RefsetAuxiliary.Concept;
  * 
  * Generate ConceptSpec Java file from a given Refset
  * 
+ * Call the constructor
+ * 
+ * Set the parameters
+ * 
+ * Call run
+ * 
  */
 public class GenerateClassFromRefset {
 
@@ -174,6 +180,9 @@ public class GenerateClassFromRefset {
 	// </configuration>
 	// </execution>
 
+	/*
+	 * Writes the Java file
+	 */
 	public void run() throws Exception {
 		I_GetConceptData refset_con = getRefsetConcept();
 		// buildRefset();
@@ -197,11 +206,13 @@ public class GenerateClassFromRefset {
 		Set<String> var_names = new HashSet<String>();
 		for (I_GetConceptData con : getRefsetConcepts(refset_con)) {
 			String con_name = con.getInitialText();
+			// Need to create a vlid Java identifier
 			String var_name = con_name.replaceAll("\\W", "_");
 			var_name = var_name.toUpperCase();
 			if (var_name.matches("^\\d.*"))
 				var_name = "$" + var_name;
 			{
+				// There might be dups, just keep tacking on til we get a unique one
 				int i = 0;
 				String orig_var_name = var_name;
 				while (var_names.contains(var_name)) {
