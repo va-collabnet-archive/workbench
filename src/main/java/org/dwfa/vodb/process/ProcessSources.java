@@ -151,7 +151,19 @@ public abstract class ProcessSources {
                     sourceId = getId(st);
                 }
                 tokenType = st.nextToken();
-                UUID statusUuid = (UUID) getId(st);
+                Object statusIdObject = getId(st);
+                UUID statusUuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+                if (UUID.class.isAssignableFrom(statusIdObject.getClass()) == false) {
+                	AceLog.getAppLog().severe("Status id is not a UUID." +
+                			"\n    primaryUuid: " + primaryUuid +
+                			"\n    sourceSystemUuid: " + sourceSystemUuid +
+                			"\n    sourceId: " + sourceId +
+                			"\n    statusIdObject: " + statusIdObject
+                			);
+                    tokenType = st.nextToken();
+                } else {
+                	statusUuid = (UUID) statusIdObject;
+                }
                 tokenType = st.nextToken();
                 Date statusDate = new Date();
                 if (st.sval.equals("null") == false) {
