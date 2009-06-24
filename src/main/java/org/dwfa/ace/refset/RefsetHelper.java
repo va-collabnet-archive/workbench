@@ -184,7 +184,9 @@ public class RefsetHelper {
 		}
 		
         I_IntSet isARel = termFactory.newIntSet();
-        isARel.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+        
+        // get the appropriate is-a type (SNOMED or architectonic), based on "marked parent is-a type" rel
+        isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(termFactory, concept));   
 		
 		// find all the children
 		Set<I_GetConceptData> descendants = 
@@ -194,7 +196,6 @@ public class RefsetHelper {
 	
 		return descendants;
 	}
-	
 	
 	protected Set<I_GetConceptData> getAllDescendants(Set<I_GetConceptData> resultSet, I_GetConceptData parent, 
 			I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition ... conditions) throws Exception {
@@ -238,7 +239,9 @@ public class RefsetHelper {
 		}
 		
         I_IntSet isARel = termFactory.newIntSet();
-        isARel.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+        
+        // get the appropriate is-a type (SNOMED or architectonic), based on "marked parent is-a type" rel
+        isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(termFactory, concept));  
 		
 		// find all the parents
 		Set<I_GetConceptData> parentConcepts = 

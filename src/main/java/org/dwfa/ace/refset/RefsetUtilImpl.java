@@ -1,5 +1,12 @@
 package org.dwfa.ace.refset;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
@@ -9,12 +16,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 public final class RefsetUtilImpl implements RefsetUtil {
 
@@ -76,4 +79,31 @@ public final class RefsetUtilImpl implements RefsetUtil {
         assert collection.size() == 1 : "Collection " + collection + " was expected to only have one element";
         return collection.iterator().next();
     }    
+    
+	public int getMarkedParentIsARelationshipTarget(final I_TermFactory termFactory, 
+			I_GetConceptData memberRefset) throws Exception {
+
+		I_IntSet allowedStatus = termFactory.newIntSet();
+		allowedStatus.add(termFactory.getConcept(
+				ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
+		
+		I_IntSet allowedType = termFactory.newIntSet();
+		allowedType.add(termFactory.getConcept(
+				RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids()).getConceptId());
+		
+		Set<I_GetConceptData> requiredIsAType = memberRefset.getSourceRelTargets(
+						allowedStatus, allowedType, null, false);
+		
+        if (requiredIsAType == null || requiredIsAType.size() == 0) {
+        	// no specified marked-parent-is-a relationship defined, so first default to using snomed is-a
+        	List<UUID> snomedIsA = Arrays.asList(ConceptConstants.SNOMED_IS_A.getUuids());
+			if (termFactory.hasId(snomedIsA)) { 
+        		return termFactory.getConcept(snomedIsA).getConceptId();
+        	} else { // second default if snomed is-a doesn't exist
+        		return termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId();
+        	}
+        } else { // relationship exists so use the is-a specified by the marked-parent-is-a relationship
+        	return requiredIsAType.iterator().next().getConceptId();
+        }
+	}
 }

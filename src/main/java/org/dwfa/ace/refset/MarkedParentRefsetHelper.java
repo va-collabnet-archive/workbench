@@ -5,8 +5,10 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class MarkedParentRefsetHelper extends RefsetHelper {
@@ -25,7 +27,9 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 		this.refsetId = refsetId;
 		this.memberTypeId = memberTypeId;
 		this.refsetHelper = new RefsetHelper(termFactory);
-		this.parentMemberTypeId = ConceptConstants.PARENT_MARKER.localize().getNid();
+		//this.parentMemberTypeId = ConceptConstants.PARENT_MARKER.localize().getNid();
+		this.parentMemberTypeId = termFactory.getConcept(
+				RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptId();
 		this.parentRefsetId = getParentRefset();
 	}
 
@@ -109,9 +113,18 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 	public int getParentRefset() throws Exception {
 
 		I_GetConceptData memberRefset = termFactory.getConcept(refsetId);
+		
+		I_IntSet allowedStatus = termFactory.newIntSet();
+		allowedStatus.add(termFactory.getConcept(
+				ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
+		
+		I_IntSet allowedType = termFactory.newIntSet();
+		allowedType.add(termFactory.getConcept(
+				RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
+		
 		Set<I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(
-						refsetHelper.getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), 
-						refsetHelper.getIntSet(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE), null, false);
+						allowedStatus, allowedType, null, false);
+		
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
         	throw new TerminologyException(
         			"Unable to locate parent member refset for '" + memberRefset.getInitialText() + "'");
@@ -123,9 +136,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 		I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
 		return parentRefset.getConceptId();
 	}	
-	
 
-	
 	
 	/**
 	 * Utilises the {@link RefsetUtilities} class by injecting the db
