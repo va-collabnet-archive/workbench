@@ -138,7 +138,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         private void addUuidPart(UUID uuid, I_IdVersioned idv)
                 throws TerminologyException, IOException {
             ThinIdPart idPart = new ThinIdPart();
-            idPart.setIdStatus(currentStatusId);
+            idPart.setStatusId(currentStatusId);
             idPart.setPathId(encodingPathId);
             idPart.setSource(encodingSource);
             idPart.setSourceId(uuid);
@@ -213,7 +213,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         private void addUuidPart(I_Path idPath, int version, UUID firstId, I_IdVersioned idv)
                 throws TerminologyException, IOException {
             ThinIdPart idPart = new ThinIdPart();
-            idPart.setIdStatus(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
+            idPart.setStatusId(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
                                                                encodingSource, idPath, version));
             idPart.setPathId(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
                     .getUids(), encodingSource, idPath, version));
@@ -245,7 +245,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                 for (UUID uid : primId.getUids()) {
                     I_IdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
                     ThinIdPart idPart = new ThinIdPart();
-                    idPart.setIdStatus(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
+                    idPart.setStatusId(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setSourceId(uid);
@@ -278,7 +278,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         ThinConPart con = new ThinConPart();
         con.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
         con.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
-        con.setConceptStatus(map.getIntId((UUID) conceptStatus, aceAuxPath, version));
+        con.setStatusId(map.getIntId((UUID) conceptStatus, aceAuxPath, version));
         con.setDefined(defChar);        
         int conceptId = map.getIntId((UUID) conceptKey, aceAuxPath, version);
         I_ConceptAttributeVersioned vcon = null;
@@ -347,7 +347,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         part.setCharacteristicId(map.getIntId((UUID) characteristic, aceAuxPath, version));
         part.setGroup(group);
         part.setRefinabilityId(map.getIntId((UUID) refinability, aceAuxPath, version));
-        part.setRelTypeId(map.getIntId((UUID) relationshipTypeConceptID, aceAuxPath, version));
+        part.setTypeId(map.getIntId((UUID) relationshipTypeConceptID, aceAuxPath, version));
 
         int relId = map.getIntId((UUID) relID, aceAuxPath, version);
         I_RelVersioned vrel;
@@ -377,7 +377,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
         ThinIdVersioned idv = ((VodbEnv) LocalVersionedTerminology.get()).getId(primaryUuid);
         ThinIdPart idPart = new ThinIdPart();
-        idPart.setIdStatus(vodb.uuidToNative(statusUuid));
+        idPart.setStatusId(vodb.uuidToNative(statusUuid));
         idPart.setPathId(vodb.uuidToNative(pathUuid));
         idPart.setSource(vodb.uuidToNative(sourceSystemUuid));
         idPart.setSourceId(sourceId);
