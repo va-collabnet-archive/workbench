@@ -45,6 +45,11 @@ import org.dwfa.util.id.Type5UuidFactory;
  * for all applicable files under directory <code>sctInputDirArray[a]</code>.
  * <p>
  * 
+ * Set <code>includeCTV3ID</code> and/or <code>includeSNOMEDRTID</code> to true
+ * to have the corresponding CTV3 IDs and SNOMED RT IDs to be included in
+ * <code>ids.txt</code> output file. The default value is false to not include
+ * the CTV3 IDs and SNOMED RT IDs.
+ * 
  * <b>OUTPUTS:</b><br>
  * The following files are generated in {project.build.directory}/classes/ace:
  * <p>
@@ -106,14 +111,37 @@ public class Sct2AceMojo extends AbstractMojo {
 	 */
 	private String[] sctInputDirArray;
 
+	/**
+	 * 
+	 * @parameter default-value="false"
+	 * 
+	 */
+	private boolean includeCTV3ID;
+
+	/**
+	 * 
+	 * @parameter default-value="false"
+	 * 
+	 */
+	private boolean includeSNOMEDRTID;
+
+	private static String sourceCtv3Uuid = ArchitectonicAuxiliary.Concept.CTV3_ID
+			.getUids().iterator().next().toString();
+	private static String sourceSnomedRtUuid = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID
+			.getUids().iterator().next().toString();
+
 	private class SCTConceptRecord implements Comparable<Object> {
 		private long id; // CONCEPTID
 		private int status; // CONCEPTSTATUS
+		private String ctv3id; // CTV3ID
+		private String snomedrtid; // SNOMEDID (SNOMED RT ID)
 		private int isprimitive; // ISPRIMITIVE
 
-		public SCTConceptRecord(long i, int s, int p) {
+		public SCTConceptRecord(long i, int s, String ctv, String rt, int p) {
 			id = i;
 			status = s;
+			ctv3id = ctv;
+			snomedrtid = rt;
 			isprimitive = p;
 		}
 
@@ -147,14 +175,37 @@ public class Sct2AceMojo extends AbstractMojo {
 		public String toIdsTxt(String source, String date, String path)
 				throws IOException, TerminologyException {
 
+			String outputStr;
 			UUID u = Type3UuidFactory.fromSNOMED(id);
 
-			return u // (canonical) primary uuid
+			outputStr = u // (canonical) primary uuid
 					+ "\t" + source // (canonical UUID) source system uuid
 					+ "\t" + id // (original primary) source id
 					+ "\t" + getStatusString(status) // (canonical) status uuid
 					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
 					+ "\t" + path + "\r\n"; // (canonical) path uuid
+
+			if (ctv3id != null) {
+				outputStr = outputStr + u // (canonical) primary uuid
+						+ "\t" + sourceCtv3Uuid // (canonical UUID) source
+						// system uuid
+						+ "\t" + ctv3id // (original primary) source id
+						+ "\t" + getStatusString(status) // (canonical) status
+						// uuid
+						+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
+						+ "\t" + path + "\r\n"; // (canonical) path uuid
+			}
+			if (snomedrtid != null) {
+				outputStr = outputStr + u // (canonical) primary uuid
+						+ "\t" + sourceSnomedRtUuid // (canonical UUID) source
+						// system uuid
+						+ "\t" + snomedrtid // (original primary) source id
+						+ "\t" + getStatusString(status) // (canonical) status
+						// uuid
+						+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
+						+ "\t" + path + "\r\n"; // (canonical) path uuid
+			}
+			return outputStr;
 		}
 	}
 
@@ -360,15 +411,16 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 
 		try {
-			executeMojo(buildDir, targetSubDir, sctInputDirArray);
+			executeMojo(buildDir, targetSubDir, sctInputDirArray,
+					includeCTV3ID, includeSNOMEDRTID);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		getLog().info("POM PROCESSING COMPLETE ");
 	}
 
-	void executeMojo(String wDir, String subDir, String[] inDirs)
-			throws Exception {
+	void executeMojo(String wDir, String subDir, String[] inDirs,
+			boolean ctv3idTF, boolean snomedrtTF) throws Exception {
 		long start = System.currentTimeMillis();
 		getLog().info("*** SCT2ACE PROCESSING STARTED ***");
 
@@ -476,7 +528,8 @@ public class Sct2AceMojo extends AbstractMojo {
 		// }
 
 		// PROCESS SNOMED FILES
-		processConceptsFiles(wDir, listOfCDirs, idstxtWriter);
+		processConceptsFiles(wDir, listOfCDirs, idstxtWriter, ctv3idTF,
+				snomedrtTF);
 		processDescriptionsFiles(wDir, listOfDDirs, idstxtWriter);
 		processRelationshipsFiles(wDir, listOfRDirs, idstxtWriter);
 
@@ -497,7 +550,8 @@ public class Sct2AceMojo extends AbstractMojo {
 	 * IGNORE: FULLYSPECIFIEDNAME CTV3ID SNOMEDID
 	 */
 	protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv,
-			Writer idstxt) throws Exception {
+			Writer idstxt, boolean ctv3idTF, boolean snomedrtTF)
+			throws Exception {
 		int count1, count2; // records in arrays 1 & 2
 		String fName1, fName2; // file path name
 		String sourceUUID, revDate, pathID;
@@ -530,7 +584,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			count1 = countFileLines(fName1);
 			getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
 			a1 = new SCTConceptRecord[count1];
-			parseConcepts(fName1, a1, count1);
+			parseConcepts(fName1, a1, count1, ctv3idTF, snomedrtTF);
 			writeConcepts(bw, a1, count1, revDate, pathID);
 			writeConceptIds(idstxt, a1, count1, sourceUUID, revDate, pathID);
 
@@ -547,7 +601,7 @@ public class Sct2AceMojo extends AbstractMojo {
 
 				// Parse in file2
 				a2 = new SCTConceptRecord[count2];
-				parseConcepts(fName2, a2, count2);
+				parseConcepts(fName2, a2, count2, ctv3idTF, snomedrtTF);
 
 				int r1 = 0, r2 = 0, r3 = 0; // reset record indices
 				int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
@@ -1043,16 +1097,18 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 	}
 
-	protected void parseConcepts(String fName, SCTConceptRecord[] a, int count)
-			throws Exception {
+	protected void parseConcepts(String fName, SCTConceptRecord[] a, int count,
+			boolean ctv3idTF, boolean snomedrtTF) throws Exception {
 
+		String ctv3Str;
+		String snomedrtStr;
 		long start = System.currentTimeMillis();
 
 		int CONCEPTID = 0;
 		int CONCEPTSTATUS = 1;
 		// int FULLYSPECIFIEDNAME = 2;
-		// int CTV3ID = 3;
-		// int SNOMEDID = 4;
+		int CTV3ID = 3;
+		int SNOMEDID = 4; // SNOMED RT ID (Read Code)
 		int ISPRIMITIVE = 5;
 
 		BufferedReader br = new BufferedReader(new FileReader(fName));
@@ -1065,11 +1121,22 @@ public class Sct2AceMojo extends AbstractMojo {
 			String[] line = br.readLine().split("\t");
 			long conceptKey = Long.parseLong(line[CONCEPTID]);
 			int conceptStatus = Integer.parseInt(line[CONCEPTSTATUS]);
+			if (ctv3idTF) {
+				ctv3Str = new String(line[CTV3ID]);
+			} else {
+				ctv3Str = null;
+			}
+			if (snomedrtTF) {
+				snomedrtStr = new String(line[SNOMEDID]);
+			} else {
+				snomedrtStr = null;
+			}
+
 			int isPrimitive = Integer.parseInt(line[ISPRIMITIVE]);
 
 			// Save to sortable array
 			a[concepts] = new SCTConceptRecord(conceptKey, conceptStatus,
-					isPrimitive);
+					ctv3Str, snomedrtStr, isPrimitive);
 			concepts++;
 		}
 
