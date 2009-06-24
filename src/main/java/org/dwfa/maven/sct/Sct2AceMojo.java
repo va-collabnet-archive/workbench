@@ -1121,12 +1121,12 @@ public class Sct2AceMojo extends AbstractMojo {
 			String[] line = br.readLine().split("\t");
 			long conceptKey = Long.parseLong(line[CONCEPTID]);
 			int conceptStatus = Integer.parseInt(line[CONCEPTSTATUS]);
-			if (ctv3idTF) {
+			if (ctv3idTF && (line[CTV3ID].length() > 2)) {
 				ctv3Str = new String(line[CTV3ID]);
 			} else {
 				ctv3Str = null;
 			}
-			if (snomedrtTF) {
+			if (snomedrtTF && (line[SNOMEDID].length() > 2)) {
 				snomedrtStr = new String(line[SNOMEDID]);
 			} else {
 				snomedrtStr = null;
