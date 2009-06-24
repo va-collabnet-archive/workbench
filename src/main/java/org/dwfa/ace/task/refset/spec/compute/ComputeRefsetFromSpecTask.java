@@ -89,6 +89,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			if (refsetSpec == null) {
 				throw new TaskFailedException("Refset spec is null.");
 			}
+			
+			I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
+			if (refset == null) {
+				throw new TaskFailedException("Refset is null.");
+			}
 
 			termFactory = LocalVersionedTerminology.get();
 			JList conceptList = configFrame.getBatchConceptList();
@@ -143,10 +148,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			
 			// set properties for use later in BP
 			// the refset we are adding to
-	        process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refsetSpec);
+	        process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refset);
 
 		    // the value to be given to the new concept extension 
-	        process.setProperty(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(), refsetSpec); 
+	        process.setProperty(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(), refset); 
 		    
 
 			return Condition.CONTINUE;
