@@ -130,16 +130,22 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
 			// 1. iterate over each concept and run query against it (this will also execute any sub-queries)
 			// 2. any concepts that meet the query criteria are added to results list
+			getLogger().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 			while (conceptIterator.hasNext()) {
 				I_GetConceptData currentConcept = conceptIterator.next();
 				if (query.execute(currentConcept)) {
 					results.add(currentConcept);
 				}
 				conceptCount++;
+				if (conceptCount % 10000 == 0) {
+					getLogger().info("Processed " + conceptCount + " concepts for " + refsetSpec.getInitialText());
+					getLogger().info(results.size() + " matching concepts found so far.");
+				}
 			}
 
 			getLogger().info("Number of member refset members: " + results.size());
 			getLogger().info("Total number of concepts processed: " + conceptCount);
+			getLogger().info("End execution of refset spec : " + refsetSpec.getInitialText());
 			
 			// add results to batch list for review 
 			for (I_GetConceptData result : results) {
