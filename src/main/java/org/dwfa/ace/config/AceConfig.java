@@ -334,16 +334,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	public void setUsername(String username) {
 		Object old = this.username;
 		this.username = username;
-		if (config != null) {
-			if (this.username == null) {
-				config.setChangeSetWriterFileName("nullUser."
-						+ UUID.randomUUID().toString() + ".jcs");
-			} else {
-				config.setChangeSetWriterFileName(this.username + "."
-						+ UUID.randomUUID().toString() + ".jcs");
-			}
-	        config.changeSetRoot = new File("profiles" + File.separator + config.getUsername());
+		if (this.username == null) {
+			this.setChangeSetWriterFileName("nullUser."
+					+ UUID.randomUUID().toString() + ".jcs");
+		} else {
+			this.setChangeSetWriterFileName(this.username + "."
+					+ UUID.randomUUID().toString() + ".jcs");
 		}
+        this.changeSetRoot = new File("profiles" + File.separator + config.getUsername());
 		this.changeSupport.firePropertyChange("username", old, username);
 	}
 
