@@ -15,7 +15,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
-import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.NoMappingException;
