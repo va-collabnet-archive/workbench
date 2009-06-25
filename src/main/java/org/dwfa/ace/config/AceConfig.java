@@ -341,7 +341,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			this.setChangeSetWriterFileName(this.username + "."
 					+ UUID.randomUUID().toString() + ".jcs");
 		}
-        this.changeSetRoot = new File("profiles" + File.separator + config.getUsername());
+		
+        this.changeSetRoot = new File("profiles" + File.separator + username);
 		this.changeSupport.firePropertyChange("username", old, username);
 	}
 
