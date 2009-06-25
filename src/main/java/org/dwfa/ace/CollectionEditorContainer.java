@@ -66,7 +66,7 @@ public class CollectionEditorContainer extends JPanel {
 			dialog.setVisible(true);
 			if (dialog.getFile() != null) {
 				ConceptListReader reader = new ConceptListReader();
-				reader.setSourceFile(new File(dialog.getFile()));
+				reader.setSourceFile(new File(dialog.getDirectory(), dialog.getFile()));
 				
 				I_ModelTerminologyList model = (I_ModelTerminologyList) list.getModel();
 				
@@ -95,7 +95,7 @@ public class CollectionEditorContainer extends JPanel {
 				
 				ConceptListWriter writer = new ConceptListWriter();
 				try {
-					writer.open(new File(dialog.getFile()), false);
+					writer.open(new File(dialog.getDirectory(), dialog.getFile()), false);
 					
 					ListModel model = list.getModel();
 	
