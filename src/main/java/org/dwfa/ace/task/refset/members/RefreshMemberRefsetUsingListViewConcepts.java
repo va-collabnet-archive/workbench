@@ -100,20 +100,34 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 			int conceptCount = 0;
 			Set<I_GetConceptData> oldMembers = new HashSet<I_GetConceptData>();
 			I_GetConceptData currentConcept = null;
+			int cleanupCount = 0;
 
 			while (conceptIterator.hasNext()) {
-				currentConcept = conceptIterator.next();
-				if (!newMembers.contains(currentConcept)) {
-					oldMembers.add(currentConcept);
+				
+				
+				while (conceptIterator.hasNext()) {
+					currentConcept = conceptIterator.next();
+					if (!newMembers.contains(currentConcept)) {
+						oldMembers.add(currentConcept);
+					}
+					
+					conceptCount++;
+					if (conceptCount % 10000 == 0) {
+						getLogger().info("Scanned " + conceptCount + " concepts for member refset cleanup.");
+					}
+					
+					if (oldMembers.size() > 100000) {
+						break;
+					}
 				}
 				
-				conceptCount++;
-				if (conceptCount % 10000 == 0) {
-					getLogger().info("Scanned " + conceptCount + " concepts for member refset cleanup.");
-				}
+				helper.removeAllFromRefset(oldMembers, "Cleaning up old members from member refset");
+				oldMembers = new HashSet<I_GetConceptData>();
+				cleanupCount++;
 			}
 			
-			helper.removeAllFromRefset(oldMembers, "Cleaning up old members from member refset");
+			getLogger().info("Number of cleanup executions=" + cleanupCount);
+			
 			
 			return Condition.CONTINUE;
 			
