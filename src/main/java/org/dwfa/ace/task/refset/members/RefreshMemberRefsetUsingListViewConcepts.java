@@ -91,20 +91,29 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 			}
 			
 			MemberRefsetHelper helper = new MemberRefsetHelper(refset.getConceptId(), value.getConceptId());
-			helper.addAllToRefset(newMembers, "Adding concepts from list view to refset");
+			helper.addAllToRefset(newMembers, "Adding new members to member refset");
+			
+			getLogger().info("Calculating which concepts need to be removed from member refset.");
 			
 			// remove any concepts from member refset who are no longer in the list
 			Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
+			int conceptCount = 0;
 			Set<I_GetConceptData> oldMembers = new HashSet<I_GetConceptData>();
+			I_GetConceptData currentConcept = null;
 
 			while (conceptIterator.hasNext()) {
-				I_GetConceptData currentConcept = conceptIterator.next();
+				currentConcept = conceptIterator.next();
 				if (!newMembers.contains(currentConcept)) {
 					oldMembers.add(currentConcept);
 				}
+				
+				conceptCount++;
+				if (conceptCount % 10000 == 0) {
+					getLogger().info("Scanned " + conceptCount + " concepts for member refset cleanup.");
+				}
 			}
 			
-			helper.removeAllFromRefset(oldMembers, "Removing old members, not in list view, from refset");
+			helper.removeAllFromRefset(oldMembers, "Cleaning up old members from member refset");
 			
 			return Condition.CONTINUE;
 			
