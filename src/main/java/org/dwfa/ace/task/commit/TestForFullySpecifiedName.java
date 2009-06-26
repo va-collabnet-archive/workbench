@@ -3,13 +3,19 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -45,9 +51,24 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 	public List<AlertToDataConstraintFailure> test(I_GetConceptData concept,
 			boolean forCommit) throws TaskFailedException {
 		try {
+			I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+			I_ConfigAceFrame activeProfile = termFactory
+					.getActiveAceFrameConfig();
+			Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
+
+			Set<I_Position> allPositions = new HashSet<I_Position>();
+			for (I_Path path : editingPaths) {
+				allPositions.add(termFactory.newPosition(path,
+						Integer.MAX_VALUE));
+				for (I_Position position : path.getOrigins()) {
+					addOriginPositions(termFactory, position, allPositions);
+				}
+			}
 			ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-			for (I_DescriptionVersioned desc : concept.getDescriptions()) {
-				descriptions.add(desc);
+			for (I_DescriptionTuple desc : concept.getDescriptionTuples(
+					activeProfile.getAllowedStatus(), null, allPositions, true)) {
+				descriptions.add(desc.getDescVersioned());
 			}
 			for (I_DescriptionVersioned desc : concept
 					.getUncommittedDescriptions()) {
@@ -56,6 +77,14 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 			return testDescriptions(concept, descriptions, forCommit);
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
+		}
+	}
+
+	private void addOriginPositions(I_TermFactory termFactory,
+			I_Position position, Set<I_Position> allPositions) {
+		allPositions.add(position);
+		for (I_Position originPosition : position.getPath().getOrigins()) {
+			addOriginPositions(termFactory, originPosition, allPositions);
 		}
 	}
 
@@ -116,11 +145,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 							langs.add(lang);
 						}
 						// ///////////
-//						System.out.println("Searching...");
+						// System.out.println("Searching...");
 						Hits hits = termFactory.doLuceneSearch("\""
 								+ part.getText().replace("(", "\\(").replace(
 										")", "\\)") + "\"");
-//						System.out.println("Found " + hits.length());
+						// System.out.println("Found " + hits.length());
 						for (int i = 0; i < hits.length(); i++) {
 							// if (i == 10000)
 							// break;
