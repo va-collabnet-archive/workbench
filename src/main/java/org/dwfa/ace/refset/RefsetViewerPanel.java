@@ -46,11 +46,11 @@ public class RefsetViewerPanel extends JPanel {
 	}
 
 	private JTree viewerTree;
-	private RefsetEditorPanel editor;
+	private RefsetSpecEditor editor;
 	private DefaultTreeModel viewerTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode(null));
 	
 
-	public RefsetViewerPanel(I_ConfigAceFrame configAceFrame, RefsetEditorPanel editor) throws TerminologyException, IOException {
+	public RefsetViewerPanel(I_ConfigAceFrame configAceFrame, RefsetSpecEditor editor) throws TerminologyException, IOException {
 		super(new GridLayout(1,1));
 		this.editor = editor;
 		editor.getLabel().addPropertyChangeListener("termComponent", new LabelListener());

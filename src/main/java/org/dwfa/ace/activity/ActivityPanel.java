@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -23,6 +24,15 @@ import org.dwfa.swing.SwingTask;
 
 public class ActivityPanel extends JPanel implements I_ShowActivity {
 	
+	private long startTime = System.currentTimeMillis();
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
 	char[] spinners = new char[] {'|', '\\', '-', '/'};
 	int spinnerIndex = 0;
 	public char nextSpinner() {
@@ -103,7 +113,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 	JLabel progressInfoLower = new JLabel();
 	private boolean showDelete;
 
-	public ActivityPanel(boolean showBorder, boolean showDelete) {
+	public ActivityPanel(boolean showBorder, boolean showDelete, JPanel secondaryPanel) {
 		super(new GridBagLayout());
 		this.showDelete = showDelete;
 		progressInfoUpper.setFont(new Font("Dialog", java.awt.Font.BOLD, 10));
@@ -146,6 +156,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
 	public void setProgressInfoUpper(String text) {
 		progressInfoUpper.setText(text);
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.setProgressInfoUpper(text);
+		}		
 	}
 
 	public void setProgressInfoLower(String text) {
@@ -154,10 +167,16 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 		} else {
 			progressInfoLower.setText("   " + text);
 		}
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.setProgressInfoLower(text);
+		}		
 	}
 
 	public void setIndeterminate(boolean newValue) {
 		progressBar.setIndeterminate(newValue);
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.setIndeterminate(newValue);
+		}		
 	}
 
 	public void setMaximum(final int n) {
@@ -166,6 +185,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 				progressBar.setMaximum(n);
 			}
 		});
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.setMaximum(n);
+		}		
 	}
 
 	public void setValue(final int n) {
@@ -174,6 +196,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 				progressBar.setValue(n);
 			}
 		});
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.setValue(n);
+		}		
 	}
 
 	public void complete() {
@@ -186,6 +211,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 				}
 			}
 		});
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.complete();
+		}
 	}
 
 	public void addActionListener(final ActionListener l) {
@@ -194,6 +222,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 				stopButton.addActionListener(l);
 			}
 		});
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.addActionListener(l);
+		}
 	}
 
 	public void removeActionListener(final ActionListener l) {
@@ -202,6 +233,43 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 				stopButton.removeActionListener(l);
 			}
 		});
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.removeActionListener(l);
+		}
+	}
+
+	private HashSet<I_ShowActivity> showActivityListeners = new HashSet<I_ShowActivity>();
+	public void addShowActivityListener(I_ShowActivity listener) {
+		showActivityListeners.add(listener);
+	}
+
+	public void removeShowActivityListener(I_ShowActivity listener) {
+		showActivityListeners.remove(listener);
+	}
+
+	public int getMaximum() {
+		return progressBar.getMaximum();
+	}
+
+	public int getValue() {
+		return progressBar.getValue();
+	}
+
+	public boolean isComplete() {
+		return stopButton.isVisible() == false;
+	}
+
+	public boolean isIndeterminate() {
+		return progressBar.isIndeterminate();
+	}
+
+	JPanel secondaryPanel;
+	public JPanel getSecondaryPanel() {
+		return secondaryPanel;
+	}
+
+	public void setSecondaryPanel(JPanel panel) {
+		this.secondaryPanel = panel;
 	}
 
 }

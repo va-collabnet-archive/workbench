@@ -70,10 +70,10 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 
 		}
 
-		JTextField textField;
-		int row;
-		int column;
-		ReflexiveRefsetFieldData field;
+		private JTextField textField;
+		private int row;
+		private int column;
+		private ReflexiveRefsetFieldData field;
 
 		public StringExtFieldEditor(ReflexiveRefsetFieldData field) {
 			super(new JTextField());
@@ -436,7 +436,7 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 
 	public int getRowCount() {
 		if (tableComponentId == Integer.MIN_VALUE) {
-			return 0;
+			return 1;
 		}
 		if (allTuples == null) {
 			allTuples = new ArrayList<ThinExtByRefTuple>();
@@ -459,7 +459,7 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		if (allTuples == null) {
+		if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
 			return null;
 		}
 		try {
@@ -526,7 +526,7 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		if (ACE.editMode == false) {
+		if (ACE.editMode == false || allTuples == null) {
 			return false;
 		}
 		if (columns[col].isCreationEditable() == false) {

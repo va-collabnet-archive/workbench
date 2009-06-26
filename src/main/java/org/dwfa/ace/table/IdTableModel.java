@@ -169,6 +169,7 @@ public class IdTableModel extends AbstractTableModel implements
 				}
 				conceptsToFetch.add(part.getStatusId());
 				conceptsToFetch.add(part.getPathId());
+				conceptsToFetch.add(part.getSource());
 			}
 
 			if (workStopped) {
@@ -223,8 +224,8 @@ public class IdTableModel extends AbstractTableModel implements
 
 	public enum ID_FIELD {
 		LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 250), EXT_ID(
-				"external id", 5, 85, 1550), VERSION("version", 5, 140, 140), PATH(
-				"path", 5, 90, 150);
+				"id", 5, 85, 1550), VERSION("version", 5, 140, 140), PATH(
+				"path", 5, 90, 150), SOURCE("id source", 5, 50, 250);
 
 		private String columnName;
 
@@ -388,6 +389,11 @@ public class IdTableModel extends AbstractTableModel implements
 				}
 				return new StringWithIdTuple(Integer.toString(idTuple
 						.getPathId()), idTuple, inConflict);
+			case SOURCE:
+				if (referencedConcepts.containsKey(idTuple.getSource())) {
+					return new StringWithIdTuple(getPrefText(idTuple.getSource()), idTuple, inConflict);
+				}
+				return new StringWithIdTuple(Integer.toString(idTuple.getSource()), idTuple, inConflict);
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);

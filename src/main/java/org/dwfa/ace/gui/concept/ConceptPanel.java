@@ -954,7 +954,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 
 	public void changeLinkListener(LINK_TYPE type) {
 		if (treeListener != null) {
-			ace.removeTreeSelectionListener(treeListener);
+			ace.removeTaxonomySelectionListener(treeListener);
 			treeListener = null;
 		}
 		if (listListener != null) {
@@ -969,7 +969,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		switch (type) {
 		case TREE_LINK:
 			treeListener = new TermComponentTreeSelectionListener(this);
-			ace.addTreeSelectionListener(treeListener);
+			ace.addTaxonomySelectionListener(treeListener);
 			break;
 		case SEARCH_LINK:
 			ace.addSearchLinkedComponent(this);

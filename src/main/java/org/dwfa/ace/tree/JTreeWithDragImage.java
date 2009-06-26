@@ -194,7 +194,7 @@ public class JTreeWithDragImage extends JTree {
             	int vertValue = scroller.getVerticalScrollBar().getValue();
                 Timer timer = new Timer(1000, new RestoreSelectionSwingWorker(JTreeWithDragImage.this,
     					lastPropagationId, horizValue, vertValue,
-    					selection));
+    					selection, helper));
                 timer.setRepeats(false);
                 timer.start();
 				AceLog.getAppLog().info("Started timer for RestoreSelectionSwingWorker: " + lastPropagationId);
@@ -229,6 +229,8 @@ public class JTreeWithDragImage extends JTree {
 	private TreePath lastSelection;
 	private TreePath nextToLastSelection;
 
+	private TermTreeHelper helper;
+
 
 	public JScrollPane getScroller() {
 		return scroller;
@@ -243,8 +245,12 @@ public class JTreeWithDragImage extends JTree {
 	}
 
 	public JTreeWithDragImage(I_ConfigAceFrame config) {
+		this(config, null);
+	}
+	protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
 		super();
 		this.config = config;
+		this.helper = helper;
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(
 				this,
 				DnDConstants.ACTION_COPY,

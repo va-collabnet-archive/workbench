@@ -8,7 +8,6 @@ import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
@@ -20,12 +19,14 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 	private int horizValue;
 	private int vertValue;
 	private TreePath selelectionPath;
+	private TermTreeHelper helper;
 	
 	public RestoreSelectionSwingWorker(JTreeWithDragImage tree,
 			Object lastPropagationId, int horizValue, int vertValue,
-			TreePath selelectionPath) {
+			TreePath selelectionPath, TermTreeHelper helper) {
 		super();
 		this.tree = tree;
+		this.helper = helper;
 		this.lastPropagationId = lastPropagationId;
 		this.horizValue = horizValue;
 		this.vertValue = vertValue;
@@ -39,6 +40,7 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 		this.horizValue = other.horizValue;
 		this.vertValue = other.vertValue;
 		this.selelectionPath = other.selelectionPath;
+		this.helper = other.helper;
 	}
 
 	@Override
@@ -51,7 +53,7 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 		try {
 			get();
 			if (lastPropagationId.equals(tree.getLastPropagationId())) {
-				if (ACE.expansionWorkers.size() == 0) {
+				if (helper.getExpansionWorkers().size() == 0) {
 					AceLog.getAppLog().info("RestoreSelectionSwingWorker resetting selection: " + lastPropagationId);
 					if (selelectionPath != null && selelectionPath.getPathCount() > 0) {
 						Object[] nodesToMatch = selelectionPath.getPath();
@@ -74,10 +76,10 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 		        	scroller.getHorizontalScrollBar().setValue(horizValue);
 		        	scroller.getVerticalScrollBar().setValue(vertValue);
 				} else {
-					ACE.treeExpandThread.execute(new RestoreSelectionSwingWorker(this));
-					AceLog.getAppLog().info("Expansion workers: " + ACE.expansionWorkers.entrySet());
+					helper.getTreeExpandThread().execute(new RestoreSelectionSwingWorker(this));
+					AceLog.getAppLog().info("Expansion workers: " + helper.getExpansionWorkers().entrySet());
 					AceLog.getAppLog().info("Adding back RestoreSelectionSwingWorker: " + lastPropagationId);
-					ACE.removeStaleExpansionWorker(ACE.expansionWorkers.keySet().iterator().next());
+					helper.removeStaleExpansionWorker(helper.getExpansionWorkers().keySet().iterator().next());
 				}
 			} else {
 				AceLog.getAppLog().info("RestoreSelectionSwingWorker ending secondary to inequal propigationId: " + lastPropagationId
@@ -92,6 +94,6 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 
 	public void actionPerformed(ActionEvent e) {
 		AceLog.getAppLog().info("RestoreSelectionSwingWorker timer thread finished: " + lastPropagationId);
-		ACE.treeExpandThread.execute(this);
+		helper.getTreeExpandThread().execute(this);
 	}
 }

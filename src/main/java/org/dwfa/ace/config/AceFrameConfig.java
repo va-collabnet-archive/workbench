@@ -51,6 +51,7 @@ import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -2517,6 +2518,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		Object old = outputPath;
 		this.classifierOutputPathConcept = outputPath;
 		changeSupport.firePropertyChange("classifierOutputPath", old, outputPath);
+	}
+
+	public JPanel getTopActivityPanel() {
+		return aceFrame.getCdePanel().getTopActivityPanel();
+	}
+
+	public void setTopActivityPanel(I_ShowActivity ap) {
+		aceFrame.getCdePanel().setTopActivityPanel(ap);
 	}
 
 }

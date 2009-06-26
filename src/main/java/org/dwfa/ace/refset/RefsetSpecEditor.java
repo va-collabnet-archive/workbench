@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,10 +44,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
-import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -66,12 +66,14 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -84,8 +86,103 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
-public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
-		PropertyChangeListener, Scrollable {
+public class RefsetSpecEditor implements I_HostConceptPlugins,
+		PropertyChangeListener {
+	
+	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+
+
+	public void addPropertyChangeListener(String propertyName,
+			PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(propertyName, listener);
+	}
+
+
+	public boolean equals(Object obj) {
+		return pcs.equals(obj);
+	}
+
+
+	public void fireIndexedPropertyChange(String propertyName, int index,
+			boolean oldValue, boolean newValue) {
+		pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+	}
+
+
+	public void fireIndexedPropertyChange(String propertyName, int index,
+			int oldValue, int newValue) {
+		pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+	}
+
+
+	public void fireIndexedPropertyChange(String propertyName, int index,
+			Object oldValue, Object newValue) {
+		pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+	}
+
+
+	public void firePropertyChange(PropertyChangeEvent evt) {
+		pcs.firePropertyChange(evt);
+	}
+
+
+	public void firePropertyChange(String propertyName, boolean oldValue,
+			boolean newValue) {
+		pcs.firePropertyChange(propertyName, oldValue, newValue);
+	}
+
+
+	public void firePropertyChange(String propertyName, int oldValue,
+			int newValue) {
+		pcs.firePropertyChange(propertyName, oldValue, newValue);
+	}
+
+
+	public void firePropertyChange(String propertyName, Object oldValue,
+			Object newValue) {
+		pcs.firePropertyChange(propertyName, oldValue, newValue);
+	}
+
+
+	public PropertyChangeListener[] getPropertyChangeListeners() {
+		return pcs.getPropertyChangeListeners();
+	}
+
+
+	public PropertyChangeListener[] getPropertyChangeListeners(
+			String propertyName) {
+		return pcs.getPropertyChangeListeners(propertyName);
+	}
+
+
+	public int hashCode() {
+		return pcs.hashCode();
+	}
+
+
+	public boolean hasListeners(String propertyName) {
+		return pcs.hasListeners(propertyName);
+	}
+
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(listener);
+	}
+
+
+	public void removePropertyChangeListener(String propertyName,
+			PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(propertyName, listener);
+	}
+
+
+	public String toString() {
+		return pcs.toString();
+	}
 
 	public class RefsetSpecSelectionListener implements TreeSelectionListener {
 
@@ -99,39 +196,22 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		        		
 					EXT_TYPE extType = ThinExtBinder.getExtensionType(ext);
 					
+					EnumSet<EXT_TYPE> allowedTypes = EnumSet.of(EXT_TYPE.CONCEPT_CONCEPT, 
+							EXT_TYPE.CONCEPT_CONCEPT_CONCEPT, EXT_TYPE.CONCEPT_CONCEPT_STRING);
+					
+					if (allowedTypes.contains(extType) == false) {
+						throw new Exception("Can't handle " + extType);
+					}
+					
+					
+					
 		        	List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
 		        			        	
-		        	ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
-		        	column1.setColumnName("Truth");
-		        	column1.setCreationEditable(true);
-		        	column1.setUpdateEditable(false);
-		        	column1.setFieldClass(Number.class);
-		        	column1.setMin(5);
-		        	column1.setPref(75);
-		        	column1.setMax(150);
-		        	column1.setInvokedOnPart(true);
-		        	column1.setReadMethod(extType.getPartClass().getMethod("getC1id"));
-		        	column1.setWriteMethod(extType.getPartClass().getMethod("setC1id", int.class));
-		        	column1.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
-		        	columns.add(column1);
-		        	
-		        	ReflexiveRefsetFieldData column2 = new ReflexiveRefsetFieldData();
-		        	column2.setColumnName("Clause");
-		        	column2.setCreationEditable(true);
-		        	column2.setUpdateEditable(false);
-		        	column2.setFieldClass(Number.class);
-		        	column2.setMin(5);
-		        	column2.setPref(75);
-		        	column2.setMax(1000);
-		        	column2.setInvokedOnPart(true);
-		        	column2.setReadMethod(extType.getPartClass().getMethod("getC2id"));
-		        	column2.setWriteMethod(extType.getPartClass().getMethod("setC2id", int.class));
-		        	column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
-		        	columns.add(column2);
+		        	getDefaultSpecColumns(extType, columns);
 		        	
 		        	if (extType == EXT_TYPE.CONCEPT_CONCEPT_CONCEPT) {
 			        	ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
-			        	column3.setColumnName("Constraint");
+			        	column3.setColumnName("constraint");
 			        	column3.setCreationEditable(true);
 			        	column3.setUpdateEditable(false);
 			        	column3.setFieldClass(Number.class);
@@ -146,7 +226,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		        		
 		        	} else if (extType == EXT_TYPE.CONCEPT_CONCEPT_STRING) {
 			        	ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
-			        	column3.setColumnName("Query String");
+			        	column3.setColumnName("query string");
 			        	column3.setCreationEditable(true);
 			        	column3.setUpdateEditable(false);
 			        	column3.setFieldClass(String.class);
@@ -160,15 +240,55 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			        	columns.add(column3);
 		        	}
 		        	
+		        	if (historyButton.isSelected()) {
+			        	ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
+			        	column4.setColumnName("version");
+			        	column4.setCreationEditable(false);
+			        	column4.setUpdateEditable(false);
+			        	column4.setFieldClass(Number.class);
+			        	column4.setMin(5);
+			        	column4.setPref(150);
+			        	column4.setMax(150);
+			        	column4.setInvokedOnPart(true);
+			        	column4.setReadMethod(extType.getPartClass().getMethod("getVersion"));
+			        	column4.setWriteMethod(extType.getPartClass().getMethod("setVersion", int.class));
+			        	column4.setType(REFSET_FIELD_TYPE.VERSION);
+			        	columns.add(column4);
+
+			        	ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
+			        	column5.setColumnName("path");
+			        	column5.setCreationEditable(false);
+			        	column5.setUpdateEditable(false);
+			        	column5.setFieldClass(String.class);
+			        	column5.setMin(5);
+			        	column5.setPref(150);
+			        	column5.setMax(150);
+			        	column5.setInvokedOnPart(true);
+			        	column5.setReadMethod(extType.getPartClass().getMethod("getPathId"));
+			        	column5.setWriteMethod(extType.getPartClass().getMethod("setPathId", int.class));
+			        	column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+			        	columns.add(column5);
+		        	}
 		        	
-		        	ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(RefsetEditorPanel.this,
+		        	
+		        	ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this,
 		        			columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
 		        	
 		        	reflexiveModel.setComponentId(ext.getMemberId());
 		        	reflexiveModel.getRowCount();
-		        	
-					sp.setBottomComponent(ReflexiveRefsetUtil.getExtensionPanel("Refset Specification Clause:", reflexiveModel,
-							RefsetEditorPanel.this, false, false));
+		        	clauseTable.setModel(reflexiveModel);
+				} catch (Exception e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			} else {
+		    	try {
+			    	List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+					getDefaultSpecColumns(EXT_TYPE.CONCEPT_CONCEPT, columns);
+			    	ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this,
+			    			columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+		        	reflexiveModel.setComponentId(Integer.MIN_VALUE);
+			       	reflexiveModel.getRowCount();
+		        	clauseTable.setModel(reflexiveModel);
 				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
@@ -201,9 +321,9 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY,
 					!historyButton.isSelected(), historyButton.isSelected());
 			try {
-				contentScroller.setViewportView(getContentPane());
+				updateSpecTree();
 			} catch (Exception e1) {
-				AceLog.getAppLog().alertAndLog(RefsetEditorPanel.this,
+				AceLog.getAppLog().alertAndLog(contentPanel,
 						Level.SEVERE,
 						"Database Exception: " + e1.getLocalizedMessage(), e1);
 			}
@@ -212,26 +332,6 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		public void propertyChange(PropertyChangeEvent arg0) {
 			perform();
 		}
-	}
-
-	private class ShowPluginComponentActionListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					try {
-						contentScroller.setViewportView(getContentPane());
-					} catch (Exception e) {
-						AceLog.getAppLog().alertAndLog(
-								RefsetEditorPanel.this,
-								Level.SEVERE,
-								"Database Exception: "
-										+ e.getLocalizedMessage(), e);
-					}
-				}
-			});
-		}
-
 	}
 
 	private class LabelListener implements PropertyChangeListener {
@@ -277,7 +377,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				RefsetEditorPanel.this.setTermComponent(concept);
+				RefsetSpecEditor.this.setTermComponent(concept);
 			}
 
 		}
@@ -305,8 +405,8 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 				tabHistoryList.removeAll(historyToRemove);
 				Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(mouseLocation,
-						RefsetEditorPanel.this);
-				popup.show(RefsetEditorPanel.this, mouseLocation.x,
+						contentPanel);
+				popup.show(contentPanel, mouseLocation.x,
 						mouseLocation.y);
 			}
 		}
@@ -326,8 +426,6 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 
 	private JToggleButton historyButton;
 
-	private JScrollPane contentScroller;
-
 	private static final String TAB_HISTORY_KEY = "refset 0";
 
 	private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, I_PluginToConceptPanel>();
@@ -338,11 +436,19 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 
 	public I_GetConceptData refsetSpecConcept;
 
-	private JSplitPane sp;
+	private JTableWithDragImage clauseTable;
+	
+	private JPanel topPanel;
 
-	public RefsetEditorPanel(ACE ace) throws Exception {
-		super(new GridBagLayout());
+
+	private JComponent contentPanel;
+
+	private TermTreeHelper treeHelper;
+
+	public RefsetSpecEditor(ACE ace) throws Exception {
+		super();
 		this.ace = ace;
+		topPanel = new JPanel(new GridBagLayout());
 
 		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace
 				.getAceFrameConfig().getTabHistoryMap().get(TAB_HISTORY_KEY);
@@ -372,32 +478,30 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.BOTH;
-		add(linkSpinner, c);
+		topPanel.add(linkSpinner, c);
 		c.gridx++;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
-		add(label, c);
+		topPanel.add(label, c);
 		c.weightx = 0.0;
 		c.gridx++;
 		componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
 		componentHistoryButton.addActionListener(new ShowHistoryListener());
 		componentHistoryButton
 				.setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
-		add(componentHistoryButton, c);
+		topPanel.add(componentHistoryButton, c);
 
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		add(getToggleBar(), c);
+		topPanel.add(getToggleBar(), c);
 		c.fill = GridBagConstraints.BOTH;
 		c.weighty = 1.0;
 		c.gridy++;
+		topPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 
-		contentScroller = new JScrollPane(getContentPane());
-		contentScroller.getVerticalScrollBar().setUnitIncrement(20);
-		add(contentScroller, c);
-		setBorder(BorderFactory.createRaisedBevelBorder());
+		this.contentPanel = getContentPane();
 		label.addPropertyChangeListener("termComponent", labelListener);
 		if (this.tabHistoryList.size() > 0
 				&& this.tabHistoryList.getFirst() != null) {
@@ -405,6 +509,10 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		}
 	}
 
+	public JComponent getRefsetTreeViewer() throws TerminologyException, IOException {
+		treeHelper = new TermTreeHelper(ace.getAceFrameConfig());
+		return treeHelper.getHierarchyPanel();
+	}
 
 	public JComponent getToggleBar() throws IOException, ClassNotFoundException {
 		JPanel toggleBar = new JPanel(new GridBagLayout());
@@ -421,21 +529,6 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 
 		JPanel rightTogglePane = new JPanel(new FlowLayout());
 
-		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
-		for (I_PluginToConceptPanel plugin : plugins) {
-			if (plugin != null) {
-				if (plugin.getToggleBarComponents() != null) {
-					for (JComponent component : plugin.getToggleBarComponents()) {
-						leftTogglePane.add(component);
-					}
-					plugin.addShowComponentListener(l);
-				} else {
-					AceLog.getAppLog().warning(plugin + " has null components");
-				}
-			} else {
-				AceLog.getAppLog().warning(plugin + " is null: " + plugins);
-			}
-		}
 		fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
 
 		historyButton = new JToggleButton(new ImageIcon(ACE.class
@@ -509,7 +602,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 				exceptionMessage
 						.append("<p>Please see the log file for more details.");
 				JOptionPane
-						.showMessageDialog(this, exceptionMessage.toString());
+						.showMessageDialog(this.contentPanel, exceptionMessage.toString());
 			}
 		}
 
@@ -569,7 +662,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 						.name(), label.getTermComponent());
 				worker.writeAttachment(
 						WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
-						RefsetEditorPanel.this);
+						RefsetSpecEditor.this);
 				Runnable r = new Runnable() {
 					private String exceptionMessage;
 
@@ -627,29 +720,40 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 
 	}
 
-	public JComponent getContentPane() throws Exception {
+	private JComponent getContentPane() throws Exception {
 		JPanel content = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
+		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1.0;
-		c.weighty = 1.0;
+		c.weighty = 0.0;
 		c.fill = GridBagConstraints.BOTH;
 
-		sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    	List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+    	getDefaultSpecColumns(EXT_TYPE.CONCEPT_CONCEPT, columns);
+    	ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this,
+    			columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+    	reflexiveModel.setComponentId(Integer.MIN_VALUE);
+       	reflexiveModel.getRowCount();
+    	
+		JPanel clauseTablePanel = ReflexiveRefsetUtil.getExtensionPanel("Refset Specification:", reflexiveModel,
+				RefsetSpecEditor.this, false, false);
+		clauseTable = (JTableWithDragImage) clauseTablePanel.getClientProperty("extTable");
+		content.add(clauseTablePanel, c);
+		c.gridy++;
+		c.weighty = 1.0;
+
+
 		specTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null)));
 		specTree.addMouseListener(new RefsetSpecTreeMouseListener(ace.getAceFrameConfig()));
 		specTree.setCellRenderer(new RefsetSpecTreeCellRenderer(ace.getAceFrameConfig()));
 		specTree.setRootVisible(false);
 		specTree.setShowsRootHandles(true);
 		
-		sp.setTopComponent(new JScrollPane(specTree));
+		content.add(new JScrollPane(specTree), c);
 		
 		specTree.addTreeSelectionListener(new RefsetSpecSelectionListener());
-		
-		
-		content.add(sp, c);
 		
 		c.gridy++;
 		
@@ -674,7 +778,6 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				label.setTermComponent(termComponent);
-				contentScroller.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
 			}
 		});
 	}
@@ -798,11 +901,13 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 	private class UpdateTreeSpec extends SwingWorker<DefaultMutableTreeNode> {
 
 		private DefaultMutableTreeNode root;
+		private TreePath selectionPath;
 
 		@Override
 		protected DefaultMutableTreeNode construct() throws Exception {
 			
 			boolean newRefset = true;
+			selectionPath = specTree.getSelectionPath();
 			
 			DefaultMutableTreeNode oldRoot = (DefaultMutableTreeNode) specTree.getModel().getRoot();
 			
@@ -865,6 +970,7 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 				get();
 				DefaultTreeModel tm = (DefaultTreeModel) specTree.getModel();
 				tm.setRoot(root);
+				specTree.setSelectionPath(selectionPath);
 				
 			} catch (InterruptedException e) {
 				AceLog.getAppLog().alertAndLogException(e);
@@ -887,4 +993,46 @@ public class RefsetEditorPanel extends JPanel implements I_HostConceptPlugins,
 	public Container getLabel() {
 		return label;
 	}
+
+
+	private void getDefaultSpecColumns(EXT_TYPE extType,
+			List<ReflexiveRefsetFieldData> columns)
+			throws NoSuchMethodException {
+		ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
+		column1.setColumnName("truth");
+		column1.setCreationEditable(true);
+		column1.setUpdateEditable(false);
+		column1.setFieldClass(Number.class);
+		column1.setMin(5);
+		column1.setPref(50);
+		column1.setMax(50);
+		column1.setInvokedOnPart(true);
+		column1.setReadMethod(extType.getPartClass().getMethod("getC1id"));
+		column1.setWriteMethod(extType.getPartClass().getMethod("setC1id", int.class));
+		column1.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+		columns.add(column1);
+		
+		ReflexiveRefsetFieldData column2 = new ReflexiveRefsetFieldData();
+		column2.setColumnName("clause");
+		column2.setCreationEditable(true);
+		column2.setUpdateEditable(false);
+		column2.setFieldClass(Number.class);
+		column2.setMin(5);
+		column2.setPref(75);
+		column2.setMax(1000);
+		column2.setInvokedOnPart(true);
+		column2.setReadMethod(extType.getPartClass().getMethod("getC2id"));
+		column2.setWriteMethod(extType.getPartClass().getMethod("setC2id", int.class));
+		column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+		columns.add(column2);
+	}
+	
+	public JPanel getTopPanel() {
+		return topPanel;
+	}
+
+	public JComponent getContentPanel() {
+		return contentPanel;
+	}
+
 }

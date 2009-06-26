@@ -78,14 +78,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
@@ -97,12 +89,10 @@ import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
-import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdVersioned;
@@ -110,6 +100,7 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -123,9 +114,7 @@ import org.dwfa.ace.checks.UncommittedListModel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
-import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
-import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.list.TerminologyIntList;
@@ -148,14 +137,8 @@ import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.tree.CompareConceptBeansForTree;
-import org.dwfa.ace.tree.ConceptBeanForTree;
-import org.dwfa.ace.tree.ExpandNodeSwingWorker;
-import org.dwfa.ace.tree.I_GetConceptDataForTree;
 import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.ace.tree.TermTreeCellRenderer;
-import org.dwfa.ace.tree.TreeIdPath;
-import org.dwfa.ace.tree.TreeMouseListener;
+import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.ace.utypes.UniversalIdList;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
@@ -1253,8 +1236,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	private JLabel statusLabel = new JLabel();
 
-	private JTreeWithDragImage tree;
-
 	private JTabbedPane leftTabs = new JTabbedPane();
 
 	private JPanel topPanel;
@@ -1305,14 +1286,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public static ExecutorService threadPool = Executors.newFixedThreadPool(9);
 
-	public static ExecutorService treeExpandThread = Executors
-			.newFixedThreadPool(1);
-
 	public static Timer timer = new Timer();
 
 	AceFrameConfig aceFrameConfig;
 
-	private JPanel treeProgress;
+	private JPanel topActivityPanel;
 
 	private static AceConfig aceConfig;
 
@@ -1386,6 +1364,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	private JScrollPane dataCheckListScroller;
 	private JPanel dataCheckListPanel;
 	private RefsetSpecPanel refsetSpecPanel;
+	private TermTreeHelper treeHelper;
 
 	public String getPluginRoot() {
 		return pluginRoot;
@@ -1750,7 +1729,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	private JComponent getContentPanel() throws Exception {
-		termTree = getHierarchyPanel();
+		treeHelper = new TermTreeHelper(aceFrameConfig);
+		termTree = treeHelper.getHierarchyPanel();
 		conceptPanels = new ArrayList<ConceptPanel>();
 		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs, 1);
 		conceptPanels.add(c1Panel);
@@ -3034,254 +3014,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		addressPalette.setVisible(true);
 	}
 
-	JComponent getHierarchyPanel() throws TerminologyException, IOException {
-		if (tree != null) {
-			for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
-				tree.removeTreeExpansionListener(tel);
-			}
-			for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
-				tree.removeTreeSelectionListener(tsl);
-			}
-			for (TreeWillExpandListener twel : tree
-					.getTreeWillExpandListeners()) {
-				tree.removeTreeWillExpandListener(twel);
-			}
-		}
-		tree = new JTreeWithDragImage(aceFrameConfig);
-		tree.putClientProperty("JTree.lineStyle", "None");
-		tree.addMouseListener(new TreeMouseListener(aceFrameConfig));
-		tree.setLargeModel(true);
-		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		tree.setTransferHandler(new TerminologyTransferHandler(tree));
-		tree.setDragEnabled(true);
 
-		tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));
-		tree.setRootVisible(false);
-		tree.setShowsRootHandles(true);
-		DefaultTreeModel model = setRoots();
-		/*
-		 * Since nodes are added dynamically in this application, the only true
-		 * leaf nodes are nodes that don't allow children to be added. (By
-		 * default, askAllowsChildren is false and all nodes without children
-		 * are considered to be leaves.)
-		 * 
-		 * But there's a complication: when the tree structure changes, JTree
-		 * pre-expands the root node unless it's a leaf. To avoid having the
-		 * root pre-expanded, we set askAllowsChildrenafter assigning the new
-		 * root.
-		 */
-
-		model.setAsksAllowsChildren(true);
-
-		tree.addTreeExpansionListener(new TreeExpansionListener() {
-			public void treeExpanded(TreeExpansionEvent evt) {
-				treeTreeExpanded(evt);
-			}
-
-			public void treeCollapsed(TreeExpansionEvent evt) {
-				treeTreeCollapsed(evt);
-			}
-		});
-
-		tree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			public void valueChanged(TreeSelectionEvent evt) {
-				treeValueChanged(evt);
-			}
-
-		});
-		JScrollPane treeView = new JScrollPane(tree);
-		tree.setScroller(treeView);
-		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
-			AceLog.getAppLog().info("Child expand: " + id);
-		}
-		for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
-			AceLog.getAppLog().info("Parent expand: " + id);
-		}
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			TreePath path = tree.getPathForRow(i);
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path
-					.getLastPathComponent();
-			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-					.getUserObject();
-			if (aceFrameConfig.getChildrenExpandedNodes().contains(
-					treeBean.getConceptId())) {
-				tree.expandPath(new TreePath(node.getPath()));
-			}
-		}
-		return treeView;
-	}
-
-	private DefaultTreeModel setRoots() {
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
-
-		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
-			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
-					Integer.MIN_VALUE, 0, false, aceFrameConfig), true));
-		}
-		model.setRoot(root);
-		return model;
-	}
-
-	protected void treeValueChanged(TreeSelectionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String nodeStr = getNodeString(node);
-		String s = evt.isAddedPath() ? "Selected " + nodeStr : "";
-		aceFrameConfig.setStatusMessage(s);
-		if (node != null) {
-			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-					.getUserObject();
-			aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
-		} else {
-			aceFrameConfig.setHierarchySelection(null);
-		}
-	}
-
-	private String getNodeString(DefaultMutableTreeNode node) {
-		String nodeStr = node.toString();
-		if ((node.getUserObject() != null)
-				&& (I_GetConceptData.class.isAssignableFrom(node
-						.getUserObject().getClass()))) {
-			I_GetConceptData concept = (I_GetConceptData) node.getUserObject();
-			try {
-				I_DescriptionTuple desc = concept.getDescTuple(aceFrameConfig
-						.getShortLabelDescPreferenceList(), aceFrameConfig);
-				if (desc != null) {
-					nodeStr = desc.getText();
-				} else {
-					AceLog.getAppLog().info(
-							" descTuple is null: " + concept.toString());
-					nodeStr = concept.getInitialText();
-				}
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-
-		}
-		return nodeStr;
-	}
-
-	protected void treeTreeCollapsed(TreeExpansionEvent evt) {
-		I_GetConceptDataForTree userObject = handleCollapse(evt);
-		aceFrameConfig.getChildrenExpandedNodes().remove(
-				userObject.getConceptId());
-
-	}
-
-	private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt) {
-		System.out
-				.println("Collapsing " + evt.getPath().getLastPathComponent());
-		TreeIdPath idPath = new TreeIdPath(evt.getPath());
-		stopWorkersOnPath(idPath, "stopping for collapse");
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String nodeStr = getNodeString(node);
-		node.removeAllChildren();
-		I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
-				.getUserObject();
-
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-
-		/*
-		 * To avoid having JTree re-expand the root node, we disable
-		 * ask-allows-children when we notify JTree about the new node
-		 * structure.
-		 */
-
-		model.setAsksAllowsChildren(false);
-		model.nodeStructureChanged(node);
-		model.setAsksAllowsChildren(true);
-
-		aceFrameConfig.setStatusMessage("Collapsed " + nodeStr);
-		return userObject;
-	}
-
-	private void stopWorkersOnPath(TreeIdPath idPath, String message) {
-		synchronized (expansionWorkers) {
-			if (idPath == null) {
-				List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(
-						expansionWorkers.keySet());
-				for (TreeIdPath key : allKeys) {
-					AceLog.getAppLog().info("  Stopping all: " + key);
-					removeAnyMatchingExpansionWorker(key, message);
-				}
-			} else {
-				if (expansionWorkers.containsKey(idPath)) {
-					AceLog.getAppLog().info("  Stopping: " + idPath);
-					removeAnyMatchingExpansionWorker(idPath, message);
-				}
-
-				List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(
-						expansionWorkers.keySet());
-				for (TreeIdPath key : otherKeys) {
-					if (key.initiallyEqual(idPath)) {
-						AceLog.getAppLog().info("  Stopping child: " + key);
-						removeAnyMatchingExpansionWorker(key, message);
-					}
-				}
-			}
-		}
-	}
-
-	private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if (foundWorker != null) {
-				foundWorker.stopWork(message);
-				expansionWorkers.remove(key);
-			}
-		}
-	}
-
-	public void removeExpansionWorker(TreeIdPath key,
-			ExpandNodeSwingWorker worker, String message) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if ((worker != null) && (foundWorker == worker)) {
-				worker.stopWork(message);
-				expansionWorkers.remove(key);
-			}
-		}
-	}
-
-	public static void removeStaleExpansionWorker(TreeIdPath key) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if (foundWorker.getContinueWork() == false) {
-				expansionWorkers.remove(key);
-			}
-		}
-	}
-
-	public static Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
-
-	protected void treeTreeExpanded(TreeExpansionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String nodeStr = getNodeString(node);
-		TreeIdPath idPath = new TreeIdPath(evt.getPath());
-		synchronized (expansionWorkers) {
-			stopWorkersOnPath(idPath, "stopping before expansion");
-			I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
-					.getUserObject();
-			if (userObject != null) {
-				aceFrameConfig.getChildrenExpandedNodes().add(
-						userObject.getConceptId());
-				aceFrameConfig.setStatusMessage("Expanding " + nodeStr + "...");
-				FrameConfigSnapshot configSnap = new FrameConfigSnapshot(
-						aceFrameConfig);
-				ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker(
-						(DefaultTreeModel) tree.getModel(), tree, node,
-						new CompareConceptBeansForTree(configSnap), this,
-						configSnap);
-				treeExpandThread.execute(worker);
-				expansionWorkers.put(idPath, worker);
-			}
-		}
-	}
 
 	private JPanel getTopPanel() throws IOException, ClassNotFoundException {
 		JPanel topPanel = new JPanel(new GridBagLayout());
@@ -3332,8 +3065,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		showComponentButton.addActionListener(resizeListener);
 		topPanel.add(showComponentButton, c);
 		c.gridx++;
-		treeProgress = new JPanel(new GridLayout(1, 1));
-		topPanel.add((JPanel) treeProgress, c);
+		topActivityPanel = new JPanel(new GridLayout(1, 1));
+		topPanel.add((JPanel) topActivityPanel, c);
 		c.gridx++;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
@@ -3586,14 +3319,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		}
 	}
 
-	public void addTreeSelectionListener(TreeSelectionListener tsl) {
-		tree.addTreeSelectionListener(tsl);
-	}
-
-	public void removeTreeSelectionListener(TreeSelectionListener tsl) {
-		tree.removeTreeSelectionListener(tsl);
-	}
-
 	public I_ConfigAceFrame getAceFrameConfig() {
 		return aceFrameConfig;
 	}
@@ -3606,17 +3331,22 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		searchPanel.removeLinkedComponent(component);
 	}
 
-	public void setTreeActivityPanel(ActivityPanel ap) {
-		treeProgress.removeAll();
-		treeProgress.add(ap);
+	public void setTopActivityPanel(I_ShowActivity ap) {
+		for (Component c: topActivityPanel.getComponents()) {
+			topActivityPanel.remove(c);
+		}
+		topActivityPanel.add(ap.getViewPanel());
+	}
 
+	public JPanel getTopActivityPanel() {
+		return topActivityPanel;
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("viewPositions")) {
-			updateHierarchyView(evt.getPropertyName());
+			treeHelper.updateHierarchyView(evt.getPropertyName());
 		} else if (evt.getPropertyName().equals("commit")) {
-			updateHierarchyView(evt.getPropertyName());
+			treeHelper.updateHierarchyView(evt.getPropertyName());
 			for (int i = 0; i < uncommittedTableModel.getSize(); i++) {
 				commitHistoryTableModel.addElement(uncommittedTableModel
 						.getElementAt(i));
@@ -3659,27 +3389,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			}
 		} else if (evt.getPropertyName().equals("roots")) {
 			try {
-				setRoots();
+				treeHelper.setRoots();
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}
-	}
-
-	private void updateHierarchyView(String propChangeName) {
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		stopWorkersOnPath(null, "stopping for change in " + propChangeName);
-		for (int i = 0; i < root.getChildCount(); i++) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root
-					.getChildAt(i);
-			I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
-			if (aceFrameConfig.getChildrenExpandedNodes().contains(
-					cb.getConceptId())) {
-				TreePath tp = new TreePath(childNode);
-				TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
-				handleCollapse(treeEvent);
-				treeTreeExpanded(treeEvent);
 			}
 		}
 	}
@@ -4008,7 +3720,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	public boolean isProgressToggleVisible() {
-		return treeProgress.isVisible();
+		return topActivityPanel.isVisible();
 	}
 
 	public boolean isSubversionToggleVisible() {
@@ -4074,7 +3786,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	public void setProgressToggleVisible(final boolean visible) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				treeProgress.setVisible(visible);
+				topActivityPanel.setVisible(visible);
 			}
 		});
 	}
@@ -4105,7 +3817,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	public JTreeWithDragImage getTree() {
-		return tree;
+		return treeHelper.getTree();
 	}
 
 	public QueueViewerPanel getQueueViewer() {
@@ -4126,6 +3838,16 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public I_GetConceptData getRefsetSpecInSpecEditor() {
 		return refsetSpecPanel.getRefsetSpecInSpecEditor();
+	}
+
+	public void removeTaxonomySelectionListener(
+			TermComponentTreeSelectionListener treeListener) {
+		treeHelper.removeTreeSelectionListener(treeListener);
+	}
+
+	public void addTaxonomySelectionListener(
+			TermComponentTreeSelectionListener treeListener) {
+		treeHelper.addTreeSelectionListener(treeListener);
 	}
 
 }

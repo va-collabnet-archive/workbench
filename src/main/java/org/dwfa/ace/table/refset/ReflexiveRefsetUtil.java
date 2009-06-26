@@ -97,6 +97,7 @@ public class ReflexiveRefsetUtil {
         extTable.setDragEnabled(true);
         extTable.setTransferHandler(new TerminologyTransferHandler(extTable));
         extTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        relPanel.putClientProperty("extTable", extTable);
         if (ACE.editMode) {
             //extTable.addMouseListener(refsetModel.makePopupListener(extTable, host.getConfig()));
         }

@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -55,6 +56,14 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
+
+	public JPanel getTopActivityPanel() {
+		return baseFrame.getTopActivityPanel();
+	}
+
+	public void setTopActivityPanel(I_ShowActivity ap) {
+		baseFrame.setTopActivityPanel(ap);
+	}
 
 	public I_GetConceptData getClassificationRoot() {
 		return baseFrame.getClassificationRoot();

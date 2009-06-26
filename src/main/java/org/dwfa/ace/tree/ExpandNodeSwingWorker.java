@@ -72,7 +72,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		public ProgressUpdator(boolean addToViewer) {
 			super();
 			this.addToViewer = addToViewer;
-			activity = new ActivityPanel(addToViewer, addToViewer);
+			activity = new ActivityPanel(addToViewer, addToViewer, config.getTopActivityPanel());
 			updateTimer = new Timer(300, this);
 			updateTimer.start();
 		}
@@ -255,7 +255,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 
 	StopActionListener stopListener = new StopActionListener();
 
-	private ACE acePanel;
+	private TermTreeHelper treeHelper;
 
 	private JTreeWithDragImage tree;
 
@@ -264,7 +264,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				ProgressUpdator progressUpdator = new ProgressUpdator(false);
-				acePanel.setTreeActivityPanel(progressUpdator.activity);
+				treeHelper.setTreeActivityPanel(progressUpdator.activity);
 				progressUpdator.activity
 						.addActionListener(ExpandNodeSwingWorker.this);
 			}
@@ -284,7 +284,6 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 			sourceRelTypes = null;
 			positions = null;
 		}
-		// allowedStatus = null;
 
 		lowerProgressMessage = "getting destination rels ";
 		destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions,
@@ -418,7 +417,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
     
 	public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree,
 			DefaultMutableTreeNode node,
-			Comparator<I_GetConceptDataForTree> conceptBeanComparator, ACE acePanel, I_ConfigAceFrame config) {
+			Comparator<I_GetConceptDataForTree> conceptBeanComparator, TermTreeHelper acePanel, I_ConfigAceFrame config) {
 		super();
         expansionStart = System.currentTimeMillis();
 		if (logger.isLoggable(Level.FINE)) {
@@ -429,16 +428,16 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		if (hideWorkerId) {
 			workerIdStr = "";
 		}
-		ProgressUpdator progressUpdator = new ProgressUpdator(true);
-		progressUpdator.activity.addActionListener(this);
 		this.node = node;
-		this.acePanel = acePanel;
+		this.treeHelper = acePanel;
 		this.config = config;
 		this.conceptBeanComparator = conceptBeanComparator;
 		sortedNodes = Collections
 				.synchronizedSortedSet(new TreeSet<DefaultMutableTreeNode>(
 						new NodeComparator(conceptBeanComparator)));
 		upperProgressMessage = "Expanding " + node + workerIdStr;
+		ProgressUpdator progressUpdator = new ProgressUpdator(true);
+		progressUpdator.activity.addActionListener(this);
 	}
 
 	public void stopWork(String message) {
@@ -458,7 +457,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 	private void stopWorkAndRemove(String message) {
 		continueWork = false;
 		TreeIdPath idPath = new TreeIdPath(node.getPath());
-		acePanel.removeExpansionWorker(idPath, this, message);
+		treeHelper.removeExpansionWorker(idPath, this, message);
 		if (completeLatch != null) {
 			while (completeLatch.getCount() > 0) {
 				completeLatch.countDown();

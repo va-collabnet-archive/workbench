@@ -9,6 +9,16 @@ import org.dwfa.ace.log.AceLog;
 
 public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 
+	long startTime;
+	
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
 	public void addActionListener(ActionListener l) {
 		// TODO Auto-generated method stub
 
@@ -52,6 +62,40 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 	public void setValue(int n) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void addShowActivityListener(I_ShowActivity listener) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void removeShowActivityListener(I_ShowActivity listener) {
+		throw new UnsupportedOperationException();
+	}
+
+	public int getMaximum() {
+		throw new UnsupportedOperationException();
+	}
+
+	public int getValue() {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean isComplete() {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean isIndeterminate() {
+		throw new UnsupportedOperationException();
+	}
+
+	public JPanel getSecondaryPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setSecondaryPanel(JPanel panel) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -134,7 +134,7 @@ public class ImportUpdateJarReader implements ActionListener {
 
 		boolean firstUpdate = true;
 
-		ActivityPanel activity = new ActivityPanel(true, true);
+		ActivityPanel activity = new ActivityPanel(true, true, null);
 
 		public ProgressUpdator() {
 			super();

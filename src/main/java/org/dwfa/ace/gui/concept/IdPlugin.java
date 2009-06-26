@@ -84,6 +84,7 @@ public class IdPlugin extends AbstractPlugin {
 	private ID_FIELD[] getIdColumns(I_HostConceptPlugins host) {
 		List<ID_FIELD> fields = new ArrayList<ID_FIELD>();
 		//fields.add(ID_FIELD.LOCAL_ID);
+		fields.add(ID_FIELD.SOURCE);
 		fields.add(ID_FIELD.EXT_ID);
 		fields.add(ID_FIELD.STATUS);
 		if (host.getShowHistory()) {

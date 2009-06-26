@@ -11,6 +11,7 @@ import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -63,16 +64,18 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
 	private AceConfig config;
 
+	private JPanel secondaryProgressPanel;
+
 	private class ProgressUpdator implements I_UpdateProgress {
 		Timer updateTimer;
 
 		boolean firstUpdate = true;
 
-		ActivityPanel activity = new ActivityPanel(true, true);
+		ActivityPanel activity = new ActivityPanel(true, true, secondaryProgressPanel);
 
 		public ProgressUpdator() {
 			super();
-			updateTimer = new Timer(300, this);
+			updateTimer = new Timer(1000, this);
 			updateTimer.start();
 		}
 
@@ -106,6 +109,11 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 			updateTimer.stop();
 		}
 
+	}
+
+	public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel) {
+		this(riverConfig);
+		this.secondaryProgressPanel = secondaryProgressPanel;
 	}
 
 	public ImportChangeSetReader(final Configuration riverConfig) {
