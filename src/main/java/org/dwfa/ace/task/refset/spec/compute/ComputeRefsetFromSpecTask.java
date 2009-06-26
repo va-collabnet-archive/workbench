@@ -157,8 +157,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 	        process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refset);
 
 		    // the value to be given to the new concept extension 
-	        process.setProperty(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(), refset); 
-		    
+	        process.setProperty(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(), 
+	        		termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()));
 
 			return Condition.CONTINUE;
 		} catch (Exception ex) {
