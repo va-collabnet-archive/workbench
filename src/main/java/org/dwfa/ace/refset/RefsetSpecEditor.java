@@ -1,6 +1,5 @@
 package org.dwfa.ace.refset;
 
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -354,6 +353,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 				}
 			}
 			updateSpecTree();
+			if (treeHelper.getRenderer() != null) {
+				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy", null, null));
+				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "variableHeightTaxonomyView", null, null));
+				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "highlightConflictsInTaxonomyView", null, null));
+				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showViewerImagesInTaxonomy", null, null));
+				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null, null));
+			} else {
+				AceLog.getAppLog().info("treeHelper.getRenderer() == null");
+			}
 			firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt
 					.getNewValue());
 		}
@@ -445,9 +453,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private TermTreeHelper treeHelper;
 
-	public RefsetSpecEditor(ACE ace) throws Exception {
+	public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper) throws Exception {
 		super();
 		this.ace = ace;
+		this.treeHelper = treeHelper;
 		topPanel = new JPanel(new GridBagLayout());
 
 		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace
@@ -507,11 +516,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 				&& this.tabHistoryList.getFirst() != null) {
 			this.setTermComponent(this.tabHistoryList.getFirst());
 		}
-	}
-
-	public JComponent getRefsetTreeViewer() throws TerminologyException, IOException {
-		treeHelper = new TermTreeHelper(ace.getAceFrameConfig());
-		return treeHelper.getHierarchyPanel();
 	}
 
 	public JComponent getToggleBar() throws IOException, ClassNotFoundException {
@@ -916,7 +920,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			IntSet relTypes = new IntSet();			
 			refsetSpecConcept = null;
 			if (refsetConcept != null) {
-				relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
+				relTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
 				List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), 
 						relTypes, ace.getAceFrameConfig().getViewPositionSet(), true);
 				if (refsetSpecTuples != null && refsetSpecTuples.size() >0) {
@@ -990,7 +994,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		return refsetSpecConcept;
 	}
 
-	public Container getLabel() {
+	public TermComponentLabel getLabel() {
 		return label;
 	}
 

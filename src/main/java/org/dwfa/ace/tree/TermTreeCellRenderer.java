@@ -33,7 +33,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -54,7 +53,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
    private static ImageIcon multiParentRoot = new ImageIcon(ACE.class.getResource("/16x16/plain/pin_green.png"));
 
-   private AceFrameConfig aceConfig;
+   private I_ConfigAceFrame aceConfig;
 
    private boolean drawsFocusBorderAroundIcon = false;
 
@@ -94,7 +93,7 @@ private Boolean highlightConflictsInTaxonomyView;
 
    public TermTreeCellRenderer(I_ConfigAceFrame aceConfig) throws TerminologyException, IOException {
       super();
-      this.aceConfig = (AceFrameConfig) aceConfig;
+      this.aceConfig = aceConfig;
       showViewerImagesInTaxonomy = this.aceConfig.getShowViewerImagesInTaxonomy();
       variableHeightTaxonomyView = this.aceConfig.getVariableHeightTaxonomyView();
       showRefsetInfoInTaxonomy = this.aceConfig.getShowRefsetInfoInTaxonomy();
@@ -413,6 +412,8 @@ private Boolean highlightConflictsInTaxonomyView;
 		} else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
 			showViewerImagesInTaxonomy = aceConfig
 					.getShowViewerImagesInTaxonomy();
+		} else if (evt.getPropertyName().equals("refsetsToShow")) {
+		      refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
 		}
    }
 

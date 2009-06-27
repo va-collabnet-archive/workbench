@@ -42,6 +42,9 @@ public class IdPlugin extends AbstractPlugin {
 	private I_HostConceptPlugins host;
 	private JTableWithDragImage idTable;
 	private boolean showBorder = true;
+	
+	//@TODO find a way to handle this field dynamically, like pressing the shift key...
+	private boolean showNids = false;
 
 	@Override
 	protected ImageIcon getImageIcon() {
@@ -53,8 +56,8 @@ public class IdPlugin extends AbstractPlugin {
 		if (host != null) {
 			PropertyChangeEvent evt = new PropertyChangeEvent(host,
 					"termComponent", null, host.getTermComponent());
-			ID_FIELD[] columnEnums = getIdColumns(host);
-			idTableModel.setColumns(getIdColumns(host));
+			ID_FIELD[] columnEnums = getIdColumns(host, showNids);
+			idTableModel.setColumns(getIdColumns(host, showNids));
 			for (int i = 0; i < idTableModel.getColumnCount(); i++) {
 				TableColumn column = idTable.getColumnModel().getColumn(i);
 				ID_FIELD columnDesc = columnEnums[i];
@@ -70,7 +73,7 @@ public class IdPlugin extends AbstractPlugin {
 	public JComponent getComponent(I_HostConceptPlugins host) {
 		if (idPanel == null) {
 			this.host = host;
-			idPanel = getIdPanel(host);
+			idPanel = getIdPanel(host, showNids);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY,
 					this);
 			host.addPropertyChangeListener("commit", this);
@@ -81,9 +84,11 @@ public class IdPlugin extends AbstractPlugin {
 		return idPanel;
 	}
 
-	private ID_FIELD[] getIdColumns(I_HostConceptPlugins host) {
+	private ID_FIELD[] getIdColumns(I_HostConceptPlugins host, boolean showNatives) {
 		List<ID_FIELD> fields = new ArrayList<ID_FIELD>();
-		//fields.add(ID_FIELD.LOCAL_ID);
+		if (showNatives) {
+			fields.add(ID_FIELD.LOCAL_ID);
+		}
 		fields.add(ID_FIELD.SOURCE);
 		fields.add(ID_FIELD.EXT_ID);
 		fields.add(ID_FIELD.STATUS);
@@ -94,8 +99,8 @@ public class IdPlugin extends AbstractPlugin {
 		return fields.toArray(new ID_FIELD[fields.size()]);
 	}
 
-	private JPanel getIdPanel(I_HostConceptPlugins host) {
-		idTableModel = new IdTableModel(getIdColumns(host), host);
+	private JPanel getIdPanel(I_HostConceptPlugins host, boolean showNatives) {
+		idTableModel = new IdTableModel(getIdColumns(host, showNatives), host);
 		JPanel idPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;

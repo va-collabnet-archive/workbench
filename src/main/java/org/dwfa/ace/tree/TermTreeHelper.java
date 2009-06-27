@@ -1,5 +1,7 @@
 package org.dwfa.ace.tree;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-public class TermTreeHelper {
+public class TermTreeHelper implements PropertyChangeListener {
 	private Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
 	private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1);
 
@@ -36,6 +38,7 @@ public class TermTreeHelper {
 	private I_ConfigAceFrame aceFrameConfig;
 	private JTreeWithDragImage tree;
 	private ActivityPanel activity;
+	private TermTreeCellRenderer renderer;
 
 	
 	public ActivityPanel getTreeActivityPanel() {
@@ -75,8 +78,8 @@ public class TermTreeHelper {
 		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		tree.setTransferHandler(new TerminologyTransferHandler(tree));
 		tree.setDragEnabled(true);
-
-		tree.setCellRenderer(new TermTreeCellRenderer(aceFrameConfig));
+		renderer = new TermTreeCellRenderer(aceFrameConfig);
+		tree.setCellRenderer(renderer);
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		DefaultTreeModel model = setRoots();
@@ -131,6 +134,10 @@ public class TermTreeHelper {
 			}
 		}
 		return treeView;
+	}
+
+	public TermTreeCellRenderer getRenderer() {
+		return renderer;
 	}
 
 	public void updateHierarchyView(String propChangeName) {
@@ -340,6 +347,10 @@ public class TermTreeHelper {
 
 	public ExecutorService getTreeExpandThread() {
 		return treeExpandThread;
+	}
+
+	public void propertyChange(PropertyChangeEvent evt) {
+		setRoots();
 	}
 
 

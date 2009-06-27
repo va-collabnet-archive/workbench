@@ -27,12 +27,17 @@ public class RefsetSpecPanel extends JPanel {
 		super(new GridBagLayout());
 		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		split.setOneTouchExpandable(true);
-		editor = new RefsetSpecEditor(ace);
+		TermTreeHelper treeHelper = new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig()));
+		editor = new RefsetSpecEditor(ace, treeHelper);
 		split.setTopComponent(editor.getContentPanel());
-		TermTreeHelper treeHelper = new TermTreeHelper(ace.getAceFrameConfig());
+		
+		ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", treeHelper);
+		ace.getAceFrameConfig().addPropertyChangeListener("commit", treeHelper);
+		editor.getLabel().addTermChangeListener(treeHelper);
+		
 		JTabbedPane bottomTabs = new JTabbedPane();
-		bottomTabs.addTab("table view", new JLabel("insert table here"));
 		bottomTabs.addTab("hierarchical view", treeHelper.getHierarchyPanel());
+		bottomTabs.addTab("table view", new JLabel("insert table here"));
 		split.setBottomComponent(bottomTabs);
 		split.setDividerLocation(200);
 		
