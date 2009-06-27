@@ -3,6 +3,7 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 		I_GetConceptData limited_status_con = termFactory
 				.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.LIMITED
 						.getUids());
-		ArrayList<String> langs = new ArrayList<String>();
+		HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
 		for (I_DescriptionVersioned desc : descriptions) {
 			for (I_DescriptionPart part : desc.getVersions()) {
 				// if (part.getVersion() == Integer.MAX_VALUE) {
@@ -135,14 +136,21 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 							|| part.getStatusId() == limited_status_con
 									.getConceptId()) {
 						String lang = part.getLang();
-						if (langs.contains(lang)) {
-							alertList
-									.add(new AlertToDataConstraintFailure(
-											AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-											"<html>More than one FSN for "
-													+ lang, concept));
+						if (langs.get(lang) != null) {
+							for (I_DescriptionVersioned d : langs.get(lang)) {
+								if (d.getDescId() != desc.getDescId()) {
+									alertList
+											.add(new AlertToDataConstraintFailure(
+													AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+													"<html>More than one FSN for "
+															+ lang, concept));
+								}
+							}
+							langs.get(lang).add(desc);
 						} else {
-							langs.add(lang);
+							ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
+							dl.add(desc);
+							langs.put(lang, dl);
 						}
 						// ///////////
 						// System.out.println("Searching...");
