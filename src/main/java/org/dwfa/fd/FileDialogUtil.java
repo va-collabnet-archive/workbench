@@ -56,9 +56,6 @@ public class FileDialogUtil {
 
 	public static File getExistingFile(String frameTitle, FilenameFilter filter, File defaultDirectory, Frame parentFrame) throws TaskFailedException {
 		// Create a file dialog box to prompt for a new file to display
-		if (parentFrame == null) {
-			parentFrame = new JFrame();
-		}
 		FileDialog f = new FileDialog(parentFrame, frameTitle,
 				FileDialog.LOAD);
 		if (defaultDirectory != null) {

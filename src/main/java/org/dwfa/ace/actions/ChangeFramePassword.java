@@ -26,26 +26,29 @@ public class ChangeFramePassword implements ActionListener {
 		try {
 			I_ConfigAceFrame frameConfig = acePanel.getAceFrameConfig();
 			SvnPrompter prompter = new SvnPrompter();
-			prompter.prompt("Current username/password", 
-					frameConfig.getUsername());
-			if (prompter.getUsername() != null) {
-				if (prompter.getUsername().equals(
-						frameConfig.getUsername()) == false) {
-					throw new AuthenticationFailedException(
-							"username does not match");
+			prompter.setParentContainer(acePanel);
+			if (prompter.prompt("Current username/password", 
+					frameConfig.getUsername())) {
+				if (prompter.getUsername() != null) {
+					if (prompter.getUsername().equals(
+							frameConfig.getUsername()) == false) {
+						throw new AuthenticationFailedException(
+								"username does not match");
+					}
+				}
+				if (prompter.getPassword() != null) {
+					if (prompter.getPassword().equals(
+							frameConfig.getPassword()) == false) {
+						throw new AuthenticationFailedException(
+								"password does not match");
+					}
+				}
+				if (prompter.prompt("New username/password", AceConfig.config
+						.getUsername())) {
+					frameConfig.setUsername(prompter.getUsername());
+					frameConfig.setPassword(prompter.getPassword());
 				}
 			}
-			if (prompter.getPassword() != null) {
-				if (prompter.getPassword().equals(
-						frameConfig.getPassword()) == false) {
-					throw new AuthenticationFailedException(
-							"password does not match");
-				}
-			}
-			prompter.prompt("New username/password", AceConfig.config
-					.getUsername());
-			frameConfig.setUsername(prompter.getUsername());
-			frameConfig.setPassword(prompter.getPassword());
 
 		} catch (Exception e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
