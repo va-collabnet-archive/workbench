@@ -920,7 +920,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			IntSet relTypes = new IntSet();			
 			refsetSpecConcept = null;
 			if (refsetConcept != null) {
-				relTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
+				relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 				List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), 
 						relTypes, ace.getAceFrameConfig().getViewPositionSet(), true);
 				if (refsetSpecTuples != null && refsetSpecTuples.size() >0) {
