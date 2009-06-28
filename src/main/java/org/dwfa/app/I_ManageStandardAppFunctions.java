@@ -3,7 +3,7 @@ package org.dwfa.app;
 /**
  * This interface facilitates integration with native
  * platform conventions such as menu items for
- * preferences, about boxes, and quitting the applicaiton.
+ * preferences, about boxes, and quitting the application.
  * <p>
  * Platform-specific events are routed to a platform-specific 
  * class that implements this interface. Platform-specific classes

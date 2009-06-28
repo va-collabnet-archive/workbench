@@ -1,6 +1,8 @@
 package org.dwfa.util;
 
 import java.awt.Component;
+import java.awt.Frame;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ResourceBundle;
 import java.util.logging.Filter;
 import java.util.logging.Handler;
@@ -9,6 +11,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class LogWithAlerts {
 	Logger logger;
@@ -31,7 +34,30 @@ public class LogWithAlerts {
 	public void alertAndLog(Level level, String message, Throwable ex) {
 		alertAndLog(null, level, message, ex);
 	}
-	public void alertAndLog(Component parent, Level level, String message, Throwable ex) {
+	public void alertAndLog(final Component parent, 
+			final Level level, final String message, 
+			final Throwable ex) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			alertAndLogPrivate(parent, level, message, ex); 
+		} else {
+	        try {
+	            SwingUtilities.invokeAndWait(new Runnable() {
+	              public void run() {
+	        		alertAndLogPrivate(parent, level, message, ex); 
+	              }
+	              
+	            });
+	          } catch (InterruptedException e) {
+	      		getLogger().log(Level.SEVERE, message, e);
+	          } catch (InvocationTargetException e) {
+		      	getLogger().log(Level.SEVERE, message, e);
+	          }
+		}
+	}
+
+	private void alertAndLogPrivate(Component parent, Level level,
+			String message, Throwable ex) {
+		parent = getActiveFrame(parent);
 		getLogger().log(level, message, ex);
 		message = "<html>" + message;
 		if (level.intValue() <= Level.INFO.intValue()) {
@@ -49,7 +75,42 @@ public class LogWithAlerts {
 					message,
 				    "An error has been logged",
 				    JOptionPane.ERROR_MESSAGE);
-		} 
+		}
+		if (parent != null) {
+			SwingUtilities.invokeLater(new FocusParentLater(parent));
+		} else {
+	      	getLogger().log(Level.SEVERE, "No parent for alert");
+		}
+	}
+	
+	private static class FocusParentLater implements Runnable {
+		Component parent;
+
+		private FocusParentLater(Component parent) {
+			super();
+			this.parent = parent;
+		}
+
+		public void run() {
+			parent.requestFocus();
+		}
+		
+		
+	}
+
+	public static Component getActiveFrame(Component parent) {
+		if (parent == null) {
+			for (Frame f: Frame.getFrames()) {
+				if (f.isActive()) {
+					parent = f;
+					break;
+				}
+			}
+			if (parent == null) {
+				Logger.global.log(Level.WARNING, "cannot find active parent frame");
+			}
+		}
+		return parent;
 	}
 	public void addHandler(Handler arg0) throws SecurityException {
 		getLogger().addHandler(arg0);
