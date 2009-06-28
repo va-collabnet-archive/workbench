@@ -132,8 +132,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		return frameConfig.getChangeSetWriters();
 	}
 
+	private IntSet childrenExpandedNodes = new IntSet();
 	public I_IntSet getChildrenExpandedNodes() {
-		return frameConfig.getChildrenExpandedNodes();
+		
+		return childrenExpandedNodes;
 	}
 
 	public I_GetConceptData getClassificationRoot() {
