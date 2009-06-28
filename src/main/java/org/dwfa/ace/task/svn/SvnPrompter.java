@@ -13,6 +13,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import org.dwfa.bpa.gui.SpringUtilities;
+import org.dwfa.util.LogWithAlerts;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class SvnPrompter implements PromptUserPassword3 {
@@ -62,8 +63,9 @@ public class SvnPrompter implements PromptUserPassword3 {
             public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-		int action = JOptionPane.showOptionDialog(parentContainer, promptPane, realm,
+		int action = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+		LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
 		if (action == JOptionPane.CANCEL_OPTION) {
 			userAllowedSave = false;
 			return null;
@@ -105,8 +107,9 @@ public class SvnPrompter implements PromptUserPassword3 {
             public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-		int action = JOptionPane.showOptionDialog(parentContainer, promptPane, realm, 
+		int action = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm, 
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+		LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
 		if (action == JOptionPane.CANCEL_OPTION) {
 			userAllowedSave = false;
 			return false;
@@ -130,9 +133,11 @@ public class SvnPrompter implements PromptUserPassword3 {
 					"Accept Permanently" };
 			optionType = JOptionPane.YES_NO_CANCEL_OPTION;
 		}
-		return JOptionPane.showOptionDialog(parentContainer, info, "Trust SSL Server",
+		int returnValue = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), info, "Trust SSL Server",
 				optionType, JOptionPane.QUESTION_MESSAGE, null, options,
 				options[0]);
+		LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
+		return returnValue;
 	}
 
 	public String askQuestion(String realm, String question, boolean showAnswer) {
@@ -142,7 +147,7 @@ public class SvnPrompter implements PromptUserPassword3 {
         if (showAnswer == false) {
             return askQuestion(realm, question, showAnswer, false);
         }
-        return (String) JOptionPane.showInputDialog(parentContainer, question, realm,
+        return (String) JOptionPane.showInputDialog(LogWithAlerts.getActiveFrame(parentContainer), question, realm,
                 JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
     }
 
@@ -151,9 +156,10 @@ public class SvnPrompter implements PromptUserPassword3 {
 		if (yesIsDefault) {
 			initialValue = JOptionPane.YES_OPTION;
 		}
-		int n = JOptionPane.showOptionDialog(parentContainer, question, realm,
+		int n = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), question, realm,
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 				null, initialValue);
+		LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
 		return n == JOptionPane.YES_OPTION;
 	}
 
