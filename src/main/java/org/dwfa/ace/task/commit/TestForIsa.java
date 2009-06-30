@@ -56,6 +56,9 @@ public class TestForIsa extends AbstractConceptTest {
 					.getActiveAceFrameConfig();
 			Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
 
+			if (activeProfile.getRoots().contains(concept.getConceptId()))
+				return alertList;
+
 			I_GetConceptData is_a = null;
 			I_GetConceptData is_a_rel_aux = null;
 
@@ -101,12 +104,11 @@ public class TestForIsa extends AbstractConceptTest {
 								.getConceptId()))
 					found = true;
 			}
-			alertList
-					.add(new AlertToDataConstraintFailure(
-							AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-							"<html>No IS_A relationship"
-									+ (found ? " - check editing path settings" : ""),
-							concept));
+			alertList.add(new AlertToDataConstraintFailure(
+					AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+					"<html>No IS_A relationship"
+							+ (found ? " - check editing path settings" : ""),
+					concept));
 			return alertList;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
