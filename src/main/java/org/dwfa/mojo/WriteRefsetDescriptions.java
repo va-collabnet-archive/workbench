@@ -1,17 +1,19 @@
 package org.dwfa.mojo;
 
+import java.io.File;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.select.DescriptionSelector;
+import org.dwfa.ace.select.DescriptionSelector.LanguagePreference;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRef;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRefBuilder;
 import org.dwfa.ace.task.refset.members.ForTesting;
 import org.dwfa.ace.task.refset.members.WriteRefsetDescriptionsProcessExtByRefBuilder;
 import org.dwfa.ace.task.util.Logger;
-
-import java.io.File;
 
 /**
  * Mojo that exports all reference sets.
@@ -40,6 +42,11 @@ public class WriteRefsetDescriptions extends AbstractMojo {
      */
     private File targetDirectory;
 
+    /**
+     * A comma separated list of languages used to selected the most preferred description for each concept written.
+     * @parameter 
+     */
+    private String language;
 
     private final I_TermFactory termFactory;
 
@@ -75,6 +82,10 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 
             Logger logger = new MojoLogger(getLog());
 
+            if (language != null) {
+            	cleanableProcessExtByRefBuilder.withLanguagePreference(new DescriptionSelector(new LanguagePreference(language)));
+            }
+            
             CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.
                                                                 withTermFactory(termFactory).
                                                                 withLogger(logger).
