@@ -1,5 +1,14 @@
 package org.dwfa.ace.task.refset.members;
 
+import static org.dwfa.ace.task.refset.members.export.StatusUUIDs.CURRENT_STATUS_UUIDS;
+import static org.dwfa.ace.task.refset.members.export.StatusUUIDs.FULLY_SPECIFIED_UUIDS;
+import static org.dwfa.ace.task.refset.members.export.StatusUUIDs.PREFERED_TERM_UUIDS;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -10,18 +19,12 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.task.refset.members.export.StatusUUIDs;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
 //TODO: Test this.
-public final class RefsetUtilImpl implements RefsetUtil, StatusUUIDs {
+public final class RefsetUtilImpl implements RefsetUtil {
 
     public I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
         List<I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
@@ -87,8 +90,7 @@ public final class RefsetUtilImpl implements RefsetUtil, StatusUUIDs {
         return "no SCTID found";
     }
 
-    public <T> T assertExactlyOne(
-            final Collection<T> collection) {
+    public <T> T assertExactlyOne(final Collection<T> collection) {
         assert collection.size() == 1 : "Collection " + collection + " was expected to only have one element";
         return collection.iterator().next();
     }

@@ -5,6 +5,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.select.DescriptionSelector;
 import org.dwfa.ace.task.refset.members.RefsetUtil;
 import org.dwfa.ace.task.util.Logger;
 import org.easymock.IMocksControl;
@@ -69,7 +70,7 @@ public final class RefsetWriterImplTest {
         mockRefsetTextWriter.writeRefset(mockConcept, conceptDescriptionList, mockWriter, mockVersion, mockNoDecWriter);
         mockControl.replay();
 
-        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj);
+        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj, null);
         writer.write(mockRefset);
 
         mockControl.verify();
@@ -80,7 +81,7 @@ public final class RefsetWriterImplTest {
         I_ThinExtByRefVersioned mockRefset = expectRefset(null);
         mockControl.replay();
 
-        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj);
+        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj, null);
         writer.write(mockRefset);
 
         mockControl.verify();
@@ -94,7 +95,7 @@ public final class RefsetWriterImplTest {
         mockLogger.logWarn(ERROR_MESSAGE);
         mockControl.replay();
 
-        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj);
+        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj, null);
         writer.write(mockRefset);
 
         mockControl.verify();
@@ -105,7 +106,7 @@ public final class RefsetWriterImplTest {
         mockWriterFactory.closeFiles();
         mockControl.replay();
 
-        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj);
+        RefsetWriter writer = new RefsetWriterImpl(mockRefsetParamObj, mockCommonAPIParamObj, null);
         writer.closeFiles();
 
         mockControl.verify();

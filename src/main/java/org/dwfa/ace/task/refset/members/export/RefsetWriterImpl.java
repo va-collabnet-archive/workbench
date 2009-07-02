@@ -5,6 +5,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.select.DescriptionSelector;
 import org.dwfa.ace.task.refset.members.RefsetUtil;
 import org.dwfa.ace.task.util.Logger;
 
@@ -20,14 +21,15 @@ public final class RefsetWriterImpl implements RefsetWriter {
     private final Logger logger;
     private final RefsetTextWriter refsetTextWriter;
     private final WriterFactory writerFactory;
-
+    private DescriptionSelector descSelector;
 
     public RefsetWriterImpl(final RefsetWriterParameterObject refsetWriterParameterObject,
-                            final CommonAPIParameterObject commonAPIParameterObject) {
-        refsetUtil = commonAPIParameterObject.getRefsetUtil();
+                            final CommonAPIParameterObject commonAPIParameterObject, DescriptionSelector descSelector) {
+		refsetUtil = commonAPIParameterObject.getRefsetUtil();
         termFactory = commonAPIParameterObject.getTermFactory();
         logger = commonAPIParameterObject.getLogger();
-
+        this.descSelector = descSelector;
+        
         progressLogger = refsetWriterParameterObject.getProgressLogger();
         refsetTextWriter = refsetWriterParameterObject.getRefsetTextWriter();
         writerFactory = refsetWriterParameterObject.getWriterFactory();
@@ -44,6 +46,12 @@ public final class RefsetWriterImpl implements RefsetWriter {
             List<I_DescriptionTuple> descriptionTuples =
                     refsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(termFactory, componentId);
 
+            if (descSelector != null) {
+            	I_DescriptionTuple preferredDesc = descSelector.getPreferred(descriptionTuples);
+            	descriptionTuples.clear();
+            	descriptionTuples.add(preferredDesc);
+            }
+            
             String refsetName = refsetNameDescription.getText();
             progressLogger.logProgress(refsetName);
 

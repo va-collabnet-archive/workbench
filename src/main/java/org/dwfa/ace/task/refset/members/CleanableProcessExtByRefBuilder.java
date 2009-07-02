@@ -1,9 +1,10 @@
 package org.dwfa.ace.task.refset.members;
 
-import org.dwfa.ace.task.util.Logger;
-import org.dwfa.ace.api.I_TermFactory;
-
 import java.io.File;
+
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.select.DescriptionSelector;
+import org.dwfa.ace.task.util.Logger;
 
 public interface CleanableProcessExtByRefBuilder {
 
@@ -14,4 +15,7 @@ public interface CleanableProcessExtByRefBuilder {
     CleanableProcessExtByRef build();
 
     CleanableProcessExtByRefBuilder withTermFactory(I_TermFactory termFactory);
+
+    CleanableProcessExtByRefBuilder withLanguagePreference(DescriptionSelector descriptionSelector);
+    
 }
