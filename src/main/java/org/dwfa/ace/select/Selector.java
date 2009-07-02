@@ -8,11 +8,11 @@ import java.util.List;
  * A generic class for selecting the preferred element from a collection. 
  * 
  * The implementing class will define both:<ul>
- * <li> 1. The type of object that it can handle
- * <li> 2. Preferences class (which implement {@link SelectionStrategy}) that influence its behaviour 
+ * <li> 1. The type of object (the collection type) that it is made to process
+ * <li> 2. Preferences classes (which implement {@link SelectionStrategy}) that influence it's behaviour 
  * <br>
- * @param <E> The type of the objects handled by an implementation
- * @see DescriptionSelector 
+ * @see org.dwfa.ace.select.DescriptionSelector
+ * @param <E> The type of the objects to be selected from
  */
 public class Selector<E> {
 
@@ -42,9 +42,11 @@ public class Selector<E> {
 	
 	
 	/**
+	 * A template for strategies that may be provided to a {@link Selector} as an ordering/ranking preference. 
 	 * 
-	 * @param <T> The type of configuration parameters that may be passed to the implementing class
-	 * @param <O> The type of the objects to be compared
+	 * @param <T> The type of configuration parameters that may be passed to the implementing class. 
+	 *            This is the type of the comparable attribute from the object(s) being compared. 
+	 * @param <O> The type of the objects to be compared. Should matched generic type E from top-level {@link Selector} class.
 	 */
 	protected static abstract class SelectionStrategy<T, O> implements Comparator<O> {
 		
