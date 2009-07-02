@@ -50,7 +50,12 @@ public class CommitLog implements I_WriteChangeSet {
 		       String canonicalFileString = tempFile.getCanonicalPath();
 		       if (tempFile.exists()) {
 			       try {
-			    	   FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
+			    	   if (changeSetFile.exists()) {
+			    		   changeSetFile.delete();
+			    	   }
+			    	   if (tempFile.renameTo(changeSetFile) == false) {
+				    	 FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
+			    	   }
 			       } catch (Exception e) {
 			    	   AceLog.getAppLog().alertAndLogException(new Exception("FileIO.copyFile failed in CommitLog."));
 			       }
