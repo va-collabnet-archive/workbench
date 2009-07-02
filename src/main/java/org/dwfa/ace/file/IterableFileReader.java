@@ -7,130 +7,163 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Provides a mechanism to iteratively progress through a file line by line whereby various 
+ * Provides a mechanism to iteratively progress through a file line by line whereby various
  * implementing subclasses will produce a strongly typed output from each line.
  * <p>
  * Effectively each line of the source file will be converted to an object of type T
  * and the objects will be streamed from the file as this instance is iterated.
  * <p>
- * <b>NOTE</b> 
+ * <b>NOTE</b>
  * If a line of the file cannot be processed a RuntimeException may be raised by the implementation
  * as {@link Iterator#next()} defines no checked exceptions.
  *
- * @param <T> The defined type output to be produced by a concrete implementation 
+ * @param <T> The defined type output to be produced by a concrete implementation
  */
 public abstract class IterableFileReader<T> implements Iterable<T> {
 
-	protected File sourceFile;	
+    protected File sourceFile;
 
-	protected boolean hasHeader;
-	
-	protected String headerLine;
-	
-	/**
-	 * Indicates if transactions should be used in the import
-	 */
-	protected boolean transactional;
-	
-	public File getSourceFile() {
-		return sourceFile;
-	}
+    protected boolean hasHeader;
 
-	public void setSourceFile(File sourceFile) {
-		this.sourceFile = sourceFile;
-	} 
+    protected String headerLine;
 
-	public boolean getHasHeader() {
-		return hasHeader;
-	}
+    private FileReaderIterator<T> fileReaderIterator;
 
-	/**
-	 * @param hasHeader If true the first line of the file will not be iterated.
-	 * @see #getHeader()
-	 */
-	public void setHasHeader(boolean hasHeader) {
-		this.hasHeader = hasHeader;
-	}
+    /**
+     * Indicates if transactions should be used in the import
+     */
+    protected boolean transactional;
 
-	/**
-	 * If it exists, the header line will be available after iteration commences.
-	 * @return The header line (if available) otherwise null.
-	 */
-	public String getHeader() {
-		return this.headerLine;
-	}
-	
-	public Iterator<T> iterator() {
-		try {
-			return new FileReaderIterator<T>(sourceFile);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+    public File getSourceFile() {
+        return sourceFile;
+    }
 
-	/**
-	 * To be implemented by subclass.
-	 * 
-	 * @param line The next line in the file.
-	 * @return A actual object. Must never return null. 
-	 *         If the line cannot be processed a runtime exception should be raised.
-	 * @throws RuntimeException if processing fails
-	 */
-	protected abstract T processLine(String line);
-	
-	
-	
-	/**
-	 *	The iterator instance for the reader 
-	 */
-	public class FileReaderIterator<E> implements Iterator<T> {
-		
-		protected String currentLine;
-		
-		protected BufferedReader reader;
+    public void setSourceFile(File sourceFile) {
+        this.sourceFile = sourceFile;
+    }
 
-		protected FileReaderIterator(File sourceFile) throws IOException {
-			reader = new BufferedReader( new FileReader( sourceFile ) );
-			if (hasHeader) {
-				headerLine = reader.readLine();
-			}
+    public boolean getHasHeader() {
+        return hasHeader;
+    }
 
-			currentLine = getNextLine();			
-		}
-		
-		protected String getNextLine() {
-			try {
-				String nextLine = reader.readLine();		
-				if (nextLine == null) {
-					reader.close();
-				}		
-				return nextLine;
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-		}
-		
-		public boolean hasNext() {
-			return (currentLine != null);
-		}
+    /**
+     * @param hasHeader If true the first line of the file will not be iterated.
+     * @see #getHeader()
+     */
+    public void setHasHeader(boolean hasHeader) {
+        this.hasHeader = hasHeader;
+    }
 
-		public T next() {
-			String result = currentLine;
-			currentLine = getNextLine();
-			return processLine(result);
-		}
+    /**
+     * If it exists, the header line will be available after iteration commences.
+     * @return The header line (if available) otherwise null.
+     */
+    public String getHeader() {
+        return this.headerLine;
+    }
 
-		public void remove() {
-		}		
-	}
+    public long getSize() throws IOException {
+        return getFileReaderIterator().getSize();
+    }
+
+    public Iterator<T> iterator() {
+        try {
+            return getFileReaderIterator();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private FileReaderIterator<T> getFileReaderIterator() throws IOException {
+        if(fileReaderIterator == null){
+            fileReaderIterator = new FileReaderIterator<T>(sourceFile);
+        }
+
+        return fileReaderIterator;
+    }
+
+    /**
+     * To be implemented by subclass.
+     *
+     * @param line The next line in the file.
+     * @return A actual object. Must never return null.
+     *         If the line cannot be processed a runtime exception should be raised.
+     * @throws RuntimeException if processing fails
+     */
+    protected abstract T processLine(String line);
 
 
 
-	public boolean isTransactional() {
-		return transactional;
-	}
+    /**
+     *	The iterator instance for the reader
+     */
+    public class FileReaderIterator<E> implements Iterator<T> {
 
-	public void setTransactional(boolean transactional) {
-		this.transactional = transactional;
-	}
+        protected String currentLine;
+
+        private long size;
+
+        protected BufferedReader reader;
+
+        protected FileReaderIterator(File sourceFile) throws IOException {
+            setSize(sourceFile);
+            reader = new BufferedReader( new FileReader( sourceFile ) );
+
+            if (hasHeader) {
+                headerLine = reader.readLine();
+            }
+
+            currentLine = getNextLine();
+        }
+
+        protected String getNextLine() {
+            try {
+                String nextLine = reader.readLine();
+                if (nextLine == null) {
+                    reader.close();
+                }
+                return nextLine;
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+
+        public boolean hasNext() {
+            return (currentLine != null);
+        }
+
+        public T next() {
+            String result = currentLine;
+            currentLine = getNextLine();
+            return processLine(result);
+        }
+
+        public void remove() {
+        }
+
+        private void setSize(File sourceFile) throws IOException {
+            try {
+                size = 0;
+                reader = new BufferedReader( new FileReader( sourceFile ) );
+
+                for(;reader.readLine() != null; size++){}
+            } finally {
+                reader.close();
+            }
+        }
+
+        public long getSize() {
+            return size;
+        }
+    }
+
+
+
+    public boolean isTransactional() {
+        return transactional;
+    }
+
+    public void setTransactional(boolean transactional) {
+        this.transactional = transactional;
+    }
 }
