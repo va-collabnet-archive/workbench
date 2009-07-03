@@ -147,13 +147,13 @@ public class BatchMonitor {
         activity.setValue(0);
         activity.setIndeterminate(false);
 
+        timer = new BatchReportingThread(this, reportCycleMs, activity);
         if (showMessagePanel) {
             addMessagePanel();
         }
-
         addFinishedButton();
-
         timer.activity.getViewPanel().validate();
+
         timer.start();
     }
 
@@ -183,7 +183,6 @@ public class BatchMonitor {
 
         startTime = new Date().getTime();
         lastReportTime = startTime;
-        timer = new BatchReportingThread(this, reportCycleMs, activity);
         timer.activity.getViewPanel().add(htmlPanel, c);
     }
 
