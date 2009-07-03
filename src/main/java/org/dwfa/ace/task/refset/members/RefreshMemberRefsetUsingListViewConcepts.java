@@ -13,6 +13,7 @@ import javax.swing.JList;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.MemberRefsetHelper;
@@ -52,7 +53,7 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 		if (objDataVersion == 1) {
 			this.refsetConceptPropName = (String) in.readObject();
 			this.conceptExtValuePropName = (String) in.readObject();
-		} else { 
+		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
 	}
@@ -83,6 +84,25 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();			
 			
+			I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(
+					true);
+			computeRefsetActivityPanel.setProgressInfoUpper("Computing refset " 
+					+ ": " + refset.getInitialText());
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "3) Adding new members to member refset.   "
+					+ "<font color='green'>Executing.<br><font color='black'>"
+					
+					+ "4) Calculating concepts for parent refset removal.   "
+					+ "<font color='green'> <br><font color='black'>");
+			
+			
 			// add concepts from list view to the refset
 			// this will skip any that already exist as current members of the refset
 			Set<I_GetConceptData> newMembers = new HashSet<I_GetConceptData>();
@@ -92,6 +112,21 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 			
 			MemberRefsetHelper helper = new MemberRefsetHelper(refset.getConceptId(), value.getConceptId());
 			helper.addAllToRefset(newMembers, "Adding new members to member refset");
+			
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "3) Adding new members to member refset.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "4) Calculating concepts for parent refset removal.   "
+					+ "<font color='green'>Executing.<br><font color='black'>");
+					
 			
 			getLogger().info("Calculating which concepts need to be removed from member refset.");
 			
@@ -114,6 +149,20 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 					conceptCount++;
 					if (conceptCount % 10000 == 0) {
 						getLogger().info("Scanned " + conceptCount + " concepts for member refset cleanup.");
+						computeRefsetActivityPanel.setProgressInfoLower(
+								"<html>" 
+								+ "1) Creating refset spec query.   " 
+								+ "<font color='red'>COMPLETE.<br><font color='black'>"
+								
+								+ "2) Executing refset spec query over database.   "
+								+ "<font color='red'>COMPLETE.<br><font color='black'>"
+								
+								+ "3) Adding new members to member refset.   "
+								+ "<font color='red'>COMPLETE.<br><font color='black'>"
+								
+								+ "4) Calculating concepts for parent refset removal.   "
+								+ "<font color='green'>Executing.<br><font color='black'>"
+								+ "   Scanned " + conceptCount + " concepts for member refset cleanup.");
 					}
 					
 					if (oldMembers.size() > 100000) {
@@ -125,7 +174,21 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 				oldMembers = new HashSet<I_GetConceptData>();
 				cleanupCount++;
 			}
-			
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "3) Adding new members to member refset.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "4) Calculating concepts for parent refset removal.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					+ "   Final number of scanned concepts for member refset cleanup: " + conceptCount);
+			computeRefsetActivityPanel.complete();
 			getLogger().info("Number of cleanup executions=" + cleanupCount);
 			
 			

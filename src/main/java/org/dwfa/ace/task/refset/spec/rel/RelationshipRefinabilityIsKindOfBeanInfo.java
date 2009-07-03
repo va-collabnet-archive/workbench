@@ -10,7 +10,7 @@ public class RelationshipRefinabilityIsKindOfBeanInfo extends
 	@Override
 	public BeanDescriptor getBeanDescriptor()  {
         BeanDescriptor bd = new BeanDescriptor(RelationshipRefinabilityIsKindOf.class);
-        bd.setDisplayName("<html><font color='green'><center>Add<br>Description Refinability<br>Is Kind Of<br>Clause to RefSet Spec");
+        bd.setDisplayName("<html><font color='green'><center>Add<br>Relationship Refinability<br>Is Kind Of<br>Clause to RefSet Spec");
         return bd;
     }
 }

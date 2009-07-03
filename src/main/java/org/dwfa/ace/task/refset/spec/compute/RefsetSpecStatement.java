@@ -1,16 +1,19 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -19,118 +22,122 @@ import org.dwfa.tapi.TerminologyException;
  * @author Chrissy Hill
  *
  */
-public class RefsetSpecStatement {
+public abstract class RefsetSpecStatement {
 
 	/**
 	 * Whether to use the NOT qualifier.
 	 */
-	private boolean useNotQualifier;
+	protected boolean useNotQualifier;
 	
 	/**
 	 * The type of query - e.g. "Concept is", "Concept is member of" etc.
 	 */
-	private I_GetConceptData queryType;
+	protected I_GetConceptData queryToken;
 	
 	/**
 	 * The concept to which the query type is applied.
 	 * e.g. if query type is "concept is" and query destination is "paracetamol",
 	 * then the statement would be "concept is":"paracetamol".
 	 */
-	private I_GetConceptData queryDestination;
+	protected I_GetConceptData queryConstraint;
 	
-	private I_TermFactory termFactory;
+	protected I_TermFactory termFactory;
 	
 	/**
 	 * Constructor for refset spec statement.
 	 * @param useNotQualifier Whether to use the NOT qualifier.
-	 * @param queryType The query type to use (e.g. "concept is")
-	 * @param queryDestination The destination concept (e.g. "paracetamol")
+	 * @param queryToken The query type to use (e.g. "concept is")
+	 * @param queryConstraint The destination concept (e.g. "paracetamol")
 	 */
-	public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData queryType, 
-			I_GetConceptData queryDestination) {
-		
+	public RefsetSpecStatement(boolean useNotQualifier, 
+			I_GetConceptData groupingToken, 
+			I_GetConceptData constraint) {
 		this.useNotQualifier = useNotQualifier;
-		this.queryType = queryType;
-		this.queryDestination = queryDestination;
+		this.queryToken = groupingToken;
+		this.queryConstraint = constraint;
 		termFactory = LocalVersionedTerminology.get();
 	}
-	
-	/**
-	 * Executes the specified statement.
-	 * @return boolean based on the result of the statement execution.
-	 * @throws TerminologyException 
-	 * @throws IOException 
-	 */
-	public boolean execute(I_GetConceptData concept) throws IOException, TerminologyException {
 
-		boolean statementResult = getStatementResult(concept);
+
+	public boolean execute(I_AmTermComponent component)
+		throws IOException, TerminologyException {
+	
+		boolean statementResult = getStatementResult(component);
 		
-		if (useNotQualifier) { // if the statement has a negation associated with it then we need to negate the results
-			/* System.out.println(concept.getInitialText() + " NOT " + queryType.getInitialText() + " " 
-					+ queryDestination.getInitialText() 
-					+ " result: " + !statementResult); */
+		if (useNotQualifier) { 
+			// if the statement has a negation associated with it then we need to negate the results
 			return !statementResult;
 		} else {
-			/* System.out.println(concept.getInitialText() + " " + queryType.getInitialText() + " " 
-					+ queryDestination.getInitialText() 
-					+ " result: " + statementResult); */
 			return statementResult;
 		}
 	}
 	
-	/**
-	 * Negates the statement by inverting the current associated negation.
-	 */
-	public void negateStatement() {
-		useNotQualifier = !useNotQualifier;
-	}
-	
-	/**
-	 * Calculates the results of the statement.
-	 * @param concept The concept whose truth is being tested. e.g. 
-	 * test if "Panadeine" passes the test of "Concept is: paracetamol".
-	 * @return A boolean representing the success of the statement execution.
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	private boolean getStatementResult(I_GetConceptData concept) throws IOException, TerminologyException {
+	public abstract boolean getStatementResult(I_AmTermComponent component) 
+		throws IOException, TerminologyException;
+
+
+	protected boolean isComponentStatus(I_GetConceptData requiredStatus, 
+			List<I_AmTuple> tuples) {
 		
-		if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS.getUids()))) {
-			return conceptIs(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids()))) {
-			return conceptIsMemberOf(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF.getUids()))) { 
-			return conceptIsKindOf(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS.getUids()))) {
-			return conceptStatusIs(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF.getUids()))) {
-			return conceptStatusIsKindOf(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF.getUids()))) {
-			return conceptIsChildOf(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.getUids()))) {
-			return conceptContainsRelGrouping(concept);
-		} else if (queryType.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.getUids()))) {
-			return conceptContainsDescGrouping(concept);
-		} else {
-			throw new TerminologyException("Unknown query type : " + queryType.getInitialText());
+		// get latest tuple
+		I_AmTuple latestTuple = null;
+		int latestTupleVersion = Integer.MIN_VALUE;
+		for (I_AmTuple tuple : tuples) {
+			if (tuple.getVersion() > latestTupleVersion) {
+				latestTupleVersion = tuple.getVersion();
+				latestTuple = tuple;
+			}
 		}
+		
+		if (latestTuple != null && latestTuple.getStatusId() == 
+							requiredStatus.getConceptId()) {
+			return true; 
+		}
+		
+		return false;
 	}
 	
-	/**
-	 * Tests of the current concept is a member of the specified refset.
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException 
-	 */
-	private boolean conceptIsMemberOf(I_GetConceptData concept) throws IOException, TerminologyException {
+	protected boolean componentStatusIs(I_AmTuple tuple) {
+		List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
+		tuples.add(tuple);
 		
+		return isComponentStatus(queryConstraint, tuples);
+	}
+	
+	protected boolean componentStatusIsKindOf(I_AmTuple tuple) throws IOException, TerminologyException {
+		
+		List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
+		tuples.add(tuple);
+		
+		if (isComponentStatus(queryConstraint, tuples)) {
+			return true;
+		}
+		
+		I_IntSet allowedTypes = termFactory.newIntSet();
+		allowedTypes.add(termFactory.getConcept(
+				ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+		
+		// get list of all children of input concept
+		Set<I_GetConceptData> childStatuses = queryConstraint.getDestRelOrigins(
+				termFactory.getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, null, true, true);
+		
+		// call conceptStatusIs on each
+		for (I_GetConceptData childStatus : childStatuses) {
+			if (isComponentStatus(childStatus, tuples)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	protected boolean componentIsMemberOf(int componentId) throws IOException, TerminologyException {
 		// get all extensions for this concept
 		List<I_ThinExtByRefVersioned> extensions = 
-			termFactory.getAllExtensionsForComponent(concept.getConceptId());
+			termFactory.getAllExtensionsForComponent(componentId);
 		
 		for (I_ThinExtByRefVersioned ext : extensions) {
-			if (ext.getRefsetId() == queryDestination.getConceptId()) { // check they are of the specified refset
+			if (ext.getRefsetId() == queryConstraint.getConceptId()) { // check they are of the specified refset
 				
 				List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
 				
@@ -154,90 +161,12 @@ public class RefsetSpecStatement {
 
 		return false; 
 	}
-	
-	private boolean conceptContainsRelGrouping(I_GetConceptData concept) throws TerminologyException {
-		throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
-	}
-	
-	private boolean conceptContainsDescGrouping(I_GetConceptData concept) throws TerminologyException {
-		throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
-	}
-	
+
+
 	/**
-	 * Tests of the current concept is the same as the destination concept.
-	 * @param concept
-	 * @return
+	 * Negates the statement by inverting the current associated negation.
 	 */
-	private boolean conceptIs(I_GetConceptData concept) {
-		return concept.equals(queryDestination);
-	}
-	
-	/**
-	 * Tests if the current concept is a child of the destination concept. This does not 
-	 * return true if they are the same concept.
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	private boolean conceptIsChildOf(I_GetConceptData concept) throws IOException, TerminologyException {
-		return queryDestination.isParentOf(concept, true); 
-	}
-	
-	/**
-	 * Tests if the current concept is a child of or the same as the destination concept.
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	private boolean conceptIsKindOf(I_GetConceptData concept) throws IOException, TerminologyException {
-		return queryDestination.isParentOfOrEqualTo(concept, true); 
-	}
-	
-	/**
-	 * Tests if the current concept has a status of the status represented by the destination concept.
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	private boolean conceptStatusIs(I_GetConceptData concept) throws IOException, TerminologyException {
-		List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, null); 
-		
-		// get latest tuple
-		I_ConceptAttributeTuple latestTuple = null;
-		int latestTupleVersion = Integer.MIN_VALUE;
-		for (I_ConceptAttributeTuple tuple : tuples) {
-			if (tuple.getVersion() > latestTupleVersion) {
-				latestTupleVersion = tuple.getVersion();
-				latestTuple = tuple;
-			}
-		}
-		
-		if (latestTuple != null && latestTuple.getConceptStatus() == 
-				queryDestination.getConceptId()) {
-				return true; 
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Tests if the current concept has a status of the status represented by the destination concept,
-	 * or any of its children.
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	private boolean conceptStatusIsKindOf(I_GetConceptData concept) throws IOException, TerminologyException {
-	
-		// get list of all children of input concept
-		
-		// call conceptStatusIs on each
-		
-		// return true if any of the calls return true
-		throw new TerminologyException("Unimplemented query : concept status is kind of"); // unimplemented
+	public void negateStatement() {
+		useNotQualifier = !useNotQualifier;
 	}
 }

@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JList;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -23,7 +23,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -54,7 +54,13 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 	private static final int dataVersion = 1;
 
 	private I_ConfigAceFrame configFrame;
-	I_TermFactory termFactory;
+	private I_TermFactory termFactory;
+	
+	private final int REL = 1;
+	private final int DESC = 2;
+	private final int CONCEPT = 3;
+	
+	private boolean useMonitor = false;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -80,7 +86,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 		throws TaskFailedException {
 
 		try {
-
+			long startTime = new Date().getTime();
+			
 			configFrame = (I_ConfigAceFrame) worker
 				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
 					.name());
@@ -96,9 +103,25 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			}
 
 			termFactory = LocalVersionedTerminology.get();
-			JList conceptList = configFrame.getBatchConceptList();
-			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-			
+			I_GetConceptData normalMemberConcept = termFactory.getConcept(
+					RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
+			int numberOfNHSConcepts = 620384; // TODO
+			I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(
+					true);
+			computeRefsetActivityPanel.setMaximum(numberOfNHSConcepts);
+			computeRefsetActivityPanel.setStringPainted(true);
+			computeRefsetActivityPanel.setValue(0);
+			computeRefsetActivityPanel.setIndeterminate(false);
+			computeRefsetActivityPanel.setProgressInfoUpper("Computing refset " 
+					+ ": " + refset.getInitialText());
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='green'>Executing.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='green'> <br><font color='black'>");
+				
 			// create tree object that corresponds to the database's refset spec
 			List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
 					refsetSpec.getConceptId(), true);
@@ -120,46 +143,119 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			}
 
 			// create refset spec query
-			boolean useAndQualifier = false;
-			RefsetSpecQuery query = new RefsetSpecQuery(useAndQualifier);
-			query = processNode(root, query);
+			I_GetConceptData orConcept = termFactory.getConcept(
+					RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
+			RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
+			query = processNode(root, query, CONCEPT);
+			
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='green'>Executing.<br><font color='black'>"
+					+ "     New members added : 0 <br>"
+					+ "     Non-members cleaned : 0");
 
 			Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
 			int conceptCount = 0;
-			HashSet<I_GetConceptData> results = new HashSet<I_GetConceptData>();
+			HashSet<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
+			HashSet<I_GetConceptData> nonRefsetMembers = new HashSet<I_GetConceptData>();
+			int refsetMembersCount = 0;
+			int nonRefsetMembersCount = 0;
+ 
+			MemberRefsetHelper memberRefsetHelper = new MemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
 			// 1. iterate over each concept and run query against it (this will also execute any sub-queries)
 			// 2. any concepts that meet the query criteria are added to results list
 			getLogger().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 			while (conceptIterator.hasNext()) {
+				
 				I_GetConceptData currentConcept = conceptIterator.next();
-				if (query.execute(currentConcept)) {
-					results.add(currentConcept);
-				}
 				conceptCount++;
-				if (conceptCount % 10000 == 0) {
-					getLogger().info("Processed " + conceptCount + " concepts for " + refsetSpec.getInitialText());
-					getLogger().info(results.size() + " matching concepts found so far.");
+				
+				if (query.execute(currentConcept)) {
+					refsetMembers.add(currentConcept);
+				} else {
+					nonRefsetMembers.add(currentConcept);
+				}
+				
+				if (refsetMembers.size() > 50000) {
+					// add them now
+					memberRefsetHelper.addAllToRefset(refsetMembers, 
+							"Adding new members to member refset", useMonitor);
+					
+					refsetMembersCount = refsetMembersCount 
+							+ refsetMembers.size();
+					refsetMembers = new HashSet<I_GetConceptData>();
+				}	
+				
+				if (nonRefsetMembers.size() > 50000) {
+					memberRefsetHelper.removeAllFromRefset(nonRefsetMembers, 
+							"Cleaning up old members from member refset",
+							useMonitor);
+					nonRefsetMembersCount = nonRefsetMembersCount + nonRefsetMembers.size();
+					nonRefsetMembers = new HashSet<I_GetConceptData>();
+				}
+				
+				if (conceptCount % 500 == 0) {
+					computeRefsetActivityPanel.setProgressInfoLower(
+									"<html>" 
+									+ "1) Creating refset spec query.   " 
+									+ "<font color='red'>COMPLETE.<br><font color='black'>"
+									
+									+ "2) Executing refset spec query over database.   "
+									+ "<font color='green'>Executing.<br><font color='black'>"
+									+ "     New members added : " + (refsetMembersCount + refsetMembers.size()) + "<br>"
+									+ "     Non-members cleaned : " + (nonRefsetMembersCount + nonRefsetMembers.size()));
+					computeRefsetActivityPanel.setValue(refsetMembersCount + nonRefsetMembersCount);
 				}
 			}
-
-			getLogger().info("Number of member refset members: " + results.size());
+			
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					+ "     New members added : " + (refsetMembersCount + refsetMembers.size()) + "<br>"
+					+ "     Non-members cleaned : " + (nonRefsetMembersCount + nonRefsetMembers.size()) + "<br>"
+					+ "     Finalising refset, please wait..."); 
+			
+			// add any remaining members
+			// add concepts from list view to the refset
+			// this will skip any that already exist as current members of the refset
+			memberRefsetHelper.addAllToRefset(refsetMembers, 
+					"Adding new members to member refset",
+					useMonitor);
+			
+			// remaining parent refsets
+			memberRefsetHelper.removeAllFromRefset(nonRefsetMembers, 
+					"Cleaning up old members from member refset", 
+					useMonitor);
+			
+			getLogger().info("Number of member refset members: " + refsetMembersCount);
 			getLogger().info("Total number of concepts processed: " + conceptCount);
 			getLogger().info("End execution of refset spec : " + refsetSpec.getInitialText());
-			
-			// add results to batch list for review 
-			for (I_GetConceptData result : results) {
-				model.addElement(result);
-			}
-			
-			// set properties for use later in BP
-			// the refset we are adding to
-	        process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refset);
 
-		    // the value to be given to the new concept extension 
-	        process.setProperty(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(), 
-	        		termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()));
-
+			long endTime = new Date().getTime();
+			long minutes = (endTime - startTime) / 60000;
+			long seconds = ((endTime - startTime) % 60000)/1000;
+			computeRefsetActivityPanel.setProgressInfoLower(
+					"<html>" 
+					+ "1) Creating refset spec query.   " 
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					
+					+ "2) Executing refset spec query over database.   "
+					+ "<font color='red'>COMPLETE.<br><font color='black'>"
+					+ "     New members added : " + (refsetMembersCount + refsetMembers.size()) + "<br>"
+					+ "     Non-members cleaned : " + (nonRefsetMembersCount + nonRefsetMembers.size()) + "<br>"
+					+ "     Total execution time: " + minutes + " minutes, " + seconds + " seconds.");
+		//	computeRefsetActivityPanel.setValue(numberOfNHSConcepts);
+			computeRefsetActivityPanel.complete();
+			
 			return Condition.CONTINUE;
 		} catch (Exception ex) {
 			throw new TaskFailedException(ex);
@@ -177,7 +273,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 	 * @throws TerminologyException
 	 * @throws ParseException
 	 */
-	private RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query) 
+	private RefsetSpecQuery processNode(DefaultMutableTreeNode node, 
+			RefsetSpecQuery query, int type) 
 		throws IOException, TerminologyException, ParseException {
 		
 		if (query == null) {
@@ -193,8 +290,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			// determine type of current child
 			I_ThinExtByRefVersioned currExt = (I_ThinExtByRefVersioned) childNode.getUserObject();
 
-			List<I_ThinExtByRefTuple> extensions = 
-				currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSet(), true);
+			boolean addUncommitted = true;
+			boolean returnConflictResolvedLatestState = true;
+			List<I_ThinExtByRefTuple> extensions = currExt.getTuples(
+						configFrame.getAllowedStatus(), 
+						configFrame.getViewPositionSet(), addUncommitted, 
+						returnConflictResolvedLatestState);
 			I_ThinExtByRefPart thinPart = extensions.get(0).getPart();	
 			
 			if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
@@ -208,17 +309,30 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 				getLogger().info(termFactory.getConcept(part.getC2id()).getInitialText());
 				getLogger().info(termFactory.getConcept(part.getC3id()).getInitialText());
 
-				I_GetConceptData c1 = termFactory.getConcept(part.getC1id());
-				I_GetConceptData c2 = termFactory.getConcept(part.getC2id());
-				I_GetConceptData c3 = termFactory.getConcept(part.getC3id());
+				I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
+				I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
+				I_GetConceptData constraint = termFactory.getConcept(part.getC3id());
 
-				boolean negate = getNegation(c1);
-
-				query.addStatement(negate, c2, c3); 
-
+				switch (type) {
+					case (CONCEPT) :
+						query.addConceptStatement(getNegation(truthToken), groupingToken, 
+								constraint);
+						break;
+					case (DESC) :
+						query.addDescStatement(getNegation(truthToken), groupingToken, 
+								constraint);
+						break;
+					case (REL) :
+						query.addRelStatement(getNegation(truthToken), groupingToken, 
+								constraint);
+						break;
+					default:
+						throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
+				}
 			} else if (thinPart instanceof I_ThinExtByRefPartConceptConcept) {
 				
-				// logical OR or AND e.g. true : and
+				// logical OR, AND, CONCEPT-CONTAINS-REL, or 
+				// CONCEPT-CONTAINS-DESC.
 				I_ThinExtByRefPartConceptConcept part = 
 					(I_ThinExtByRefPartConceptConcept) thinPart;
 
@@ -226,17 +340,24 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 				getLogger().info(termFactory.getConcept(part.getC1id()).getInitialText());
 				getLogger().info(termFactory.getConcept(part.getC2id()).getInitialText());
 
-				I_GetConceptData c1 = termFactory.getConcept(part.getC1id());
-				I_GetConceptData c2 = termFactory.getConcept(part.getC2id());
-
-				boolean negate = getNegation(c1);
+				I_GetConceptData truthToken = termFactory.getConcept(
+						part.getC1id());
+				I_GetConceptData groupingToken = termFactory.getConcept(
+						part.getC2id());
+				
+				boolean negate = getNegation(truthToken);
 				
 				// add subquery
-				RefsetSpecQuery subquery = query.addSubquery(useAndQualifier(c2));
+				RefsetSpecQuery subquery = query.addSubquery(groupingToken);
+				
+				int subtype = getType(groupingToken);
+				if (subtype == -1) {
+					subtype = type;
+				}
 				
 				// process each grandchild
 				if (!childNode.isLeaf()) {
-					processNode(childNode, subquery);
+					processNode(childNode, subquery, subtype);
 				}
 				if (negate) {
 					subquery.negateQuery();
@@ -247,6 +368,19 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 		}
 		return query;
 	} 
+
+	
+	private int getType(I_GetConceptData groupingToken) throws TerminologyException, IOException {
+		if (termFactory.getConcept(
+				RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.getUids()).equals(groupingToken)) {
+			return REL;
+		} else if (termFactory.getConcept(
+				RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.getUids()).equals(groupingToken)) {
+			return DESC;
+		} else {
+			return -1;
+		}
+	}
 
 
 	/**
@@ -265,25 +399,6 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 		} else {
 			throw new TerminologyException ("Unable to recognise truth type: " 
 					+ c1.getInitialText());
-		}
-	}
-
-	/**
-	 * Calculates if the "AND" qualifier is to be used. In This case, the concept passed in 
-	 * will be "refset AND grouping". Otherwise, if "refset OR grouping" is passed in, 
-	 * the calling statement will use "OR". Other inputs are invalid.
-	 * @param c2
-	 * @return
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-	private boolean useAndQualifier(I_GetConceptData c2) throws TerminologyException, IOException {
-		if (c2.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_AND_GROUPING.getUids()))) {
-			return true;
-		} else if (c2.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids()))) {
-			return false;
-		}  else {
-			throw new TerminologyException("Neither AND or OR grouping specifieid.");
 		}
 	}
 
