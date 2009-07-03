@@ -26,5 +26,5 @@ public interface I_ShowActivity {
 	
 	public void addShowActivityListener(I_ShowActivity listener);
 	public void removeShowActivityListener(I_ShowActivity listener);
-
+	public void setStringPainted(boolean stringPainted); // displays a string on the progress bar
 }
