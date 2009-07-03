@@ -75,7 +75,7 @@ public class RefsetHelper {
 
     public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
         for (I_ThinExtByRefVersioned extension :
-            termFactory.getAllExtensionsForComponent(conceptId)) {
+            termFactory.getAllExtensionsForComponent(conceptId, true)) {
 
             if (extension.getRefsetId() == refsetId) {
 

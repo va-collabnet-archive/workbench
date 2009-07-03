@@ -9,20 +9,33 @@ public class Batch<T> implements Runnable {
 	protected String description;
 	
 	protected BatchMonitor monitor;
+	protected boolean useMonitor = true;
 	
 	public Batch(Collection<T> items, String description) {
 		this.items = items;
 		this.description = description;
 	}
 	
+	public Batch(Collection<T> items, String description, 
+			boolean useMonitor) {
+		this(items, description);
+		this.useMonitor = useMonitor;
+	}
+	
 	public void run() {
 		try {
 			try {
-				monitor = new BatchMonitor(description, items.size(), reportIterval);
-				monitor.start();
+				if (useMonitor) {
+					monitor = new BatchMonitor(description, items.size(), reportIterval);
+					monitor.start();
+				}
+				
 				process();
 				onComplete();
-				monitor.complete();
+				
+				if (useMonitor) { 
+					monitor.complete();
+				}
 			} catch (BatchCancelledException ex) {
 				onCancel();
 			} catch (Exception ex) {
@@ -37,7 +50,9 @@ public class Batch<T> implements Runnable {
 	protected void process() throws Exception {
 		for (T item : items) {
 			processItem(item);
-			monitor.mark();
+			if (useMonitor) {
+				monitor.mark();
+			}
 		}
 	}
 	

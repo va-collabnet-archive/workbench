@@ -43,10 +43,12 @@ public class MemberRefsetHelper extends RefsetHelper {
 	 * @param batchDescription A textual description of the batch being processed. 
 	 *                         Used in the progress reports given during processing.
 	 */
-	public void addAllToRefset(Collection<I_GetConceptData> members, String batchDescription) 
+	public void addAllToRefset(Collection<I_GetConceptData> members, 
+			String batchDescription, boolean useMonitor) 
 			throws Exception {
 		
-		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members, batchDescription) {
+		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(
+				members, batchDescription, useMonitor) {
 
 			Set<Integer> newMembers = new HashSet<Integer>();
 			
@@ -61,9 +63,11 @@ public class MemberRefsetHelper extends RefsetHelper {
 			public void onComplete() throws Exception {	
 				List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 				if (termFactory.hasId(markedParentsUuid)) { 
-					monitor.setText("Adding marked parent members...");
-					monitor.setIndeterminate(true);
-						addMarkedParents(newMembers.toArray(new Integer[]{}));
+					if (useMonitor) {
+						monitor.setText("Adding marked parent members...");
+						monitor.setIndeterminate(true);
+					}
+					addMarkedParents(newMembers.toArray(new Integer[]{}));
 				}
 			}			
 			
@@ -76,6 +80,19 @@ public class MemberRefsetHelper extends RefsetHelper {
 		};
 		
 		batch.run();
+	}
+	
+	/**
+	 * Add a collection of concepts to a refset.
+	 * 
+	 * @param members The collection of concepts to be added to the refset
+	 * @param batchDescription A textual description of the batch being processed. 
+	 *                         Used in the progress reports given during processing.
+	 */
+	public void addAllToRefset(Collection<I_GetConceptData> members, String batchDescription) 
+			throws Exception {
+		boolean useMonitor = true;
+		addAllToRefset(members, batchDescription, useMonitor);
 	}
 	
 	protected void addMarkedParents(Integer ... conceptIds) throws Exception {
@@ -93,10 +110,12 @@ public class MemberRefsetHelper extends RefsetHelper {
 	 * @param batchDescription A textual description of the batch being processed. 
 	 *                         Used in the progress reports given during processing.
 	 */
-	public void removeAllFromRefset(Collection<I_GetConceptData> members, String batchDescription) 
+	public void removeAllFromRefset(Collection<I_GetConceptData> members, String batchDescription,
+			boolean useMonitor) 
 			throws Exception {
-		
-		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members, batchDescription) {
+
+		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members, batchDescription,
+				useMonitor) {
 
 			Set<Integer> removedMembers = new HashSet<Integer>();
 			
@@ -111,8 +130,10 @@ public class MemberRefsetHelper extends RefsetHelper {
 			public void onComplete() throws Exception {
 				List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 				if (termFactory.hasId(markedParentsUuid)) { 
-					monitor.setText("Removing marked parent members...");
-					monitor.setIndeterminate(true);
+					if (useMonitor) {
+						monitor.setText("Removing marked parent members...");
+						monitor.setIndeterminate(true);
+					}
 					removeMarkedParents(removedMembers.toArray(new Integer[]{}));
 				}
 			}
@@ -126,6 +147,20 @@ public class MemberRefsetHelper extends RefsetHelper {
 		};
 		
 		batch.run();
+	}
+	
+	/**
+	 * Remove a collection of concepts from a refset.
+	 * 
+	 * @param members The collection of concepts to be removed from the refset
+	 * @param batchDescription A textual description of the batch being processed. 
+	 *                         Used in the progress reports given during processing.
+	 */
+	public void removeAllFromRefset(Collection<I_GetConceptData> members, String batchDescription) 
+			throws Exception {
+		boolean useMonitor = true;
+		removeAllFromRefset(members, batchDescription, useMonitor);
+		
 	}	
 	
 	/**
