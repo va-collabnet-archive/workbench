@@ -1,5 +1,6 @@
 package org.dwfa.ace.api;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -137,12 +138,28 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
 	public void setEditStatusTypePopup(I_IntList editStatusTypePopup);
 
+    /**
+     * 
+     * @deprecated view on the classifier path instead...
+     */
 	public I_IntSet getInferredViewTypes();
 
+    /**
+     * 
+     * @deprecated view on the classifier path instead...
+     */
 	public void setInferredViewTypes(I_IntSet inferredViewTypes);
 
+    /**
+     * 
+     * @deprecated view on the classifier path instead...
+     */
 	public I_IntSet getStatedViewTypes();
 
+    /**
+     * 
+     * @deprecated view on the classifier path instead...
+     */
 	public void setStatedViewTypes(I_IntSet statedViewTypes);
 
 	public I_GetConceptData getDefaultImageType();
@@ -330,8 +347,17 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setVariableHeightTaxonomyView(Boolean variableHeightTaxonomyView);
 
+    /**
+     * 
+     * @return
+     * @deprecated view on the classifier path instead...
+     */
     public Boolean getShowInferredInTaxonomy();
 
+    /**
+     * 
+     * @deprecated view on the classifier path instead...
+     */
     public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy);
 
     public Boolean getShowRefsetInfoInTaxonomy();
@@ -426,5 +452,13 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	
 	public void setTopActivityPanel(I_ShowActivity ap);
 	public JPanel getTopActivityPanel();
+	
+	public Color getColorForPath(int pathNid);
+	public void setColorForPath(int pathNid, Color pathColor);
+	
+	public I_IntList getLanguagePreferenceList();
 
+	public void invalidate();
+	public void validate();
+	public void repaint();
 }
