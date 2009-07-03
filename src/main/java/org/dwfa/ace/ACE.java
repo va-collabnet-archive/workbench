@@ -2186,25 +2186,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		return conflictConfigPanel;
 	}
 
-	private JComponent makeRefsetTaxonomySortPanel() {
-
-		TerminologyListModel refsetTaxonomySortTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getRefsetsToSortTaxonomy().getListValues()) {
-			refsetTaxonomySortTableModel.addElement(ConceptBean.get(id));
-		}
-		refsetTaxonomySortTableModel.addListDataListener(aceFrameConfig
-				.getRefsetsToSortTaxonomy());
-		TerminologyList refsetTaxonomySortList = new TerminologyList(
-				refsetTaxonomySortTableModel, aceFrameConfig);
-
-		refsetTaxonomySortList.setBorder(BorderFactory
-				.createTitledBorder("Refsets to sort taxonomy view: "));
-		JPanel refsetTaxonomySortPrefPanel = new JPanel(new GridLayout(0, 1));
-		refsetTaxonomySortPrefPanel
-				.add(new JScrollPane(refsetTaxonomySortList));
-
-		return new JScrollPane(refsetTaxonomySortPrefPanel);
-	}
 
 	private JComponent makeDescPrefPanel() {
 
@@ -2280,14 +2261,23 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		return descPrefPanel;
 	}
 
+	private JComponent makeLanguagePanel() {
+		JPanel langPrefPanel = new JPanel(new GridLayout(0, 1));
+		langPrefPanel.add(new JScrollPane(makeTermList("Langauge/Dialect preference order:",
+				aceFrameConfig.getLanguagePreferenceList())));
+		return langPrefPanel;
+		
+	}
 	private JComponent makeTaxonomyPrefPanel() {
 		JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
 
 		JPanel checkPanel = new JPanel(new GridLayout(0, 1));
 
-		checkPanel.add(getCheckboxEditor("use inferred rels in taxonomy view",
-				"showInferredInTaxonomy", aceFrameConfig
-						.getShowInferredInTaxonomy(), false));
+		relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:",
+				aceFrameConfig.getDestRelTypes())));
+		relPrefPanel.add(new JScrollPane(makeTermList("child relationships:",
+				aceFrameConfig.getSourceRelTypes())));
+
 		checkPanel.add(getCheckboxEditor("allow variable height taxonomy view",
 				"variableHeightTaxonomyView", aceFrameConfig
 						.getVariableHeightTaxonomyView(), false));
@@ -2300,20 +2290,13 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		checkPanel.add(getCheckboxEditor("sort taxonomy using refset",
 				"sortTaxonomyUsingRefset", aceFrameConfig
 						.getSortTaxonomyUsingRefset(), true));
-
 		relPrefPanel.add(checkPanel);
-		relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:",
-				aceFrameConfig.getDestRelTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList("child relationships:",
-				aceFrameConfig.getSourceRelTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList(
-				"stated view characteristic types:", aceFrameConfig
-						.getStatedViewTypes())));
-		relPrefPanel.add(new JScrollPane(makeTermList(
-				"inferred view characteristic types:", aceFrameConfig
-						.getInferredViewTypes())));
+
+		relPrefPanel.add(new JScrollPane(makeTermList("Refsets to sort taxonomy view: ",
+				aceFrameConfig.getRefsetsToSortTaxonomy())));
 		return relPrefPanel;
 	}
+	
 
 	private Component getCheckboxEditor(String label, String propertyName,
 			boolean initialValue, boolean enabled) {
@@ -2386,7 +2369,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		tabs.addTab("descriptions", makeDescPrefPanel());
 		tabs.addTab("roots", makeRootPrefPanel());
 		tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
-		tabs.addTab("taxonomy sort", makeRefsetTaxonomySortPanel());
+		tabs.addTab("language", makeLanguagePanel());
 		tabs.addTab("status", makeStatusPrefPanel());
 		tabs.addTab("refset", makeRefsetViewPanel());
 		tabs.addTab("conflict", makeConflictViewPanel());

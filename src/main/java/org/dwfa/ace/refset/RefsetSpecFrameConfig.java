@@ -1,5 +1,6 @@
 package org.dwfa.ace.refset;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -53,6 +54,26 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	
 	I_ConfigAceFrame frameConfig;
+
+	public void invalidate() {
+		frameConfig.invalidate();
+	}
+
+	public void repaint() {
+		frameConfig.repaint();
+	}
+
+	public void validate() {
+		frameConfig.validate();
+	}
+
+	public Color getColorForPath(int pathNid) {
+		return frameConfig.getColorForPath(pathNid);
+	}
+
+	public void setColorForPath(int pathNid, Color pathColor) {
+		frameConfig.setColorForPath(pathNid, pathColor);
+	}
 
 	RefsetSpecFrameConfig(I_ConfigAceFrame frameConfig) {
 		super();
@@ -1003,6 +1024,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	public void svnUpdateDatabase(SubversionData svd)
 			throws TaskFailedException {
 		frameConfig.svnUpdateDatabase(svd);
+	}
+
+	public I_IntList getLanguagePreferenceList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

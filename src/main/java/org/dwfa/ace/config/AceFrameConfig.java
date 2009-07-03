@@ -1,5 +1,6 @@
 package org.dwfa.ace.config;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -96,7 +97,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 36;
+    private static final int dataVersion = 37;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -262,6 +263,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_ManageConflict conflictResolutionStrategy;
     private boolean highlightConflictsInTaxonomyView;
     private boolean highlightConflictsInComponentPanel;
+    
+    //37
+    private Map<Integer, Color> pathColorMap = new HashMap<Integer, Color>();
+    private I_IntList languagePreferenceList = new IntList();
 
 
 	// transient
@@ -448,6 +453,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         out.writeObject(conflictResolutionStrategy);
         out.writeBoolean(highlightConflictsInComponentPanel);
         out.writeBoolean(highlightConflictsInTaxonomyView);
+        
+        // 37
+        IntList pathColorMapKeyIntList = new IntList();
+        for (Integer key: pathColorMap.keySet()) {
+        	pathColorMapKeyIntList.add(key);
+        }
+        IntList.writeIntList(out, pathColorMapKeyIntList);
+        for (Integer key: pathColorMapKeyIntList.getListValues()) {
+        	Color pathColor = pathColorMap.get(key);
+        	out.writeObject(pathColor);
+        }
+        IntList.writeIntList(out, languagePreferenceList);
     }
 
 	private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException, IOException {
@@ -809,6 +826,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	highlightConflictsInComponentPanel = false;
             	highlightConflictsInTaxonomyView = false;
             }
+            
+        	pathColorMap = new HashMap<Integer, Color>();
+        	languagePreferenceList = new IntList();
+            if (objDataVersion >= 37) {
+                // 37
+                IntList pathColorMapKeyIntList = IntList.readIntListStrict(in);
+                for (Integer key: pathColorMapKeyIntList.getListValues()) {
+                	Color pathColor = (Color) in.readObject();
+                	pathColorMap.put(key, pathColor);
+                }
+                languagePreferenceList = IntList.readIntListStrict(in);
+            } 
         
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -2528,4 +2557,27 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		aceFrame.getCdePanel().setTopActivityPanel(ap);
 	}
 
+	public Color getColorForPath(int pathNid) {
+		return pathColorMap.get(pathNid);
+	}
+
+	public void setColorForPath(int pathNid, Color pathColor) {
+		pathColorMap.put(pathNid, pathColor);
+	}
+
+	public I_IntList getLanguagePreferenceList() {
+		return languagePreferenceList;
+	}
+
+	public void invalidate() {
+		aceFrame.getCdePanel().invalidate();
+	}
+
+	public void repaint() {
+		aceFrame.getCdePanel().repaint();
+	}
+
+	public void validate() {
+		aceFrame.getCdePanel().validate();
+	}
 }

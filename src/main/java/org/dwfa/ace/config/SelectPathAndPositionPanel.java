@@ -19,7 +19,8 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SelectPathAndPositionPanel(boolean selectPositionOnly, String purpose, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws Exception {
+	public SelectPathAndPositionPanel(boolean selectPositionOnly, String purpose, 
+			I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws Exception {
 		super();
 		List<TimePathId> timePathEntries = AceConfig.getVodb().getTimePathList();
 		for (I_Path p: AceConfig.getVodb().getPaths()) {

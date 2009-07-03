@@ -1,5 +1,6 @@
 package org.dwfa.ace.config;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -56,6 +57,38 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
+
+	public void invalidate() {
+		baseFrame.invalidate();
+	}
+
+	public void repaint() {
+		baseFrame.repaint();
+	}
+
+	public void validate() {
+		baseFrame.validate();
+	}
+
+	public I_IntList getLanguagePreferenceList() {
+		return baseFrame.getLanguagePreferenceList();
+	}
+
+	public Color getColorForPath(int pathNid) {
+		return baseFrame.getColorForPath(pathNid);
+	}
+
+	public void setColorForPath(int pathNid, Color pathColor) {
+		baseFrame.setColorForPath(pathNid, pathColor);
+	}
+
+	public I_ConfigAceFrame getBaseFrame() {
+		return baseFrame;
+	}
+
+	public void setBaseFrame(I_ConfigAceFrame baseFrame) {
+		this.baseFrame = baseFrame;
+	}
 
 	public JPanel getTopActivityPanel() {
 		return baseFrame.getTopActivityPanel();

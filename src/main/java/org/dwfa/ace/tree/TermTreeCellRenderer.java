@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_ImageTuple;
@@ -115,12 +116,30 @@ private Boolean highlightConflictsInTaxonomyView;
       super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-      this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+      this.setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 
       try {
          if (node.getUserObject() != null) {
             if (I_GetConceptDataForTree.class.isAssignableFrom(node.getUserObject().getClass())) {
                I_GetConceptDataForTree cb = (I_GetConceptDataForTree) node.getUserObject();
+               List<Color> pathColors = new ArrayList<Color>();
+               List<I_ConceptAttributeTuple> attributes = cb.getConceptAttributeTuples(aceConfig.getAllowedStatus(), 
+            		   aceConfig.getViewPositionSet(), true);
+               for (I_ConceptAttributeTuple t: attributes) {
+            	   Color pathColor = aceConfig.getColorForPath(t.getPathId());
+            	   if (pathColor != null) {
+            		   pathColors.add(pathColor);
+            	   }
+               }
+               for (Color pathColor: pathColors) {
+            	      this.setBorder(BorderFactory.createCompoundBorder(
+            	    		  this.getBorder(),
+            	    		  BorderFactory.createMatteBorder(0, 2, 0, 0, pathColor)
+            	    		  ));
+            	      this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(), 
+            	    		  BorderFactory.createEmptyBorder(0, 2, 0, 0)));
+               }
+               
                Rectangle iconRect = getIconRect(cb.getParentDepth());
                I_DescriptionTuple tdt = cb.getDescTuple(aceConfig);
                if (tdt != null) {
@@ -254,16 +273,21 @@ private Boolean highlightConflictsInTaxonomyView;
                   } else {
                      this.setIcon(multiParentClosed);
                   }
-                  this
-                        .setBorder(BorderFactory.createMatteBorder(0, iconRect.x, 0, 0,
-                              getBackgroundNonSelectionColor()));
-                  // this.setBorder(BorderFactory.createMatteBorder(0,
-                  // indent, 0, 0, multiParentClosed));
+        	      this.setBorder(BorderFactory.createCompoundBorder(
+        	    		  this.getBorder(),
+        	    		  BorderFactory.createMatteBorder(
+        	    				  0, iconRect.x, 0, 0,
+                                  getBackgroundNonSelectionColor()) 
+        	    		  ));
 
                } else {
                   if (cb.isSecondaryParentNode()) {
-                     this.setBorder(BorderFactory.createMatteBorder(0, iconRect.x, 0, 0,
-                           getBackgroundNonSelectionColor()));
+            	      this.setBorder(BorderFactory.createCompoundBorder(
+            	    		  this.getBorder(),
+            	    		  BorderFactory.createMatteBorder(
+            	    				  0, iconRect.x, 0, 0,
+                                      getBackgroundNonSelectionColor()) 
+            	    		  ));
                      if (sourceRelTupleSize == 0) {
                         this.setIcon(multiParentRoot);
                      } else {

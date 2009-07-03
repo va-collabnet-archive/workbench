@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -87,6 +88,8 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 	private PropertySetListenerGlue selectGlue;
 
 	private I_ConfigAceFrame aceConfig;
+
+	private JCheckBox colorPath;
 
     private class Setup implements Runnable {
         public void run() {
@@ -201,6 +204,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         this.editGlue = new PropertySetListenerGlue("removeEditingPath",
         	    "addEditingPath", "replaceEditingPath", "getEditingPathSet",
                 I_Path.class, aceConfig);
+        colorPath = new JCheckBox("color path");
+        if (aceConfig.getColorForPath(path.getConceptId()) != null) {
+        	colorPath.setSelected(true);
+        	colorPath.setBackground(aceConfig.getColorForPath(path.getConceptId()));
+        	colorPath.setOpaque(true);
+        }
+
         new Thread(new Setup(), "PositionPanel Setup").start();
         Dimension size = new Dimension(330, 310);
         setSize(size);
@@ -258,6 +268,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             c.gridy++;
             sliderPanel.add(this.selectPositionCheckBox, c);
         }
+        c.gridy++;
+        colorPath.addItemListener(this);
+        sliderPanel.add(this.colorPath, c);
         c.gridy++;
         JPanel fill = new JPanel();
         fill.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 1));
@@ -531,6 +544,28 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                         this.selectGlue.addObj(position);
                     }
                 }
+            } else if (e.getSource() == colorPath) {
+            	if (e.getStateChange() == ItemEvent.SELECTED) {
+                	Color selectedColor = JColorChooser.showDialog(this, 
+                			"Select color to identify components on path", 
+                			colorPath.getBackground());
+                	if (selectedColor == null) {
+                		colorPath.setSelected(false);
+                	} else {
+                		colorPath.setOpaque(true);
+                		colorPath.setBackground(selectedColor);
+                	}
+            		aceConfig.setColorForPath(path.getConceptId(), selectedColor);
+            		aceConfig.invalidate();
+            		aceConfig.validate();
+            		aceConfig.repaint();
+            	} else {
+            		colorPath.setOpaque(false);
+            		aceConfig.setColorForPath(path.getConceptId(), null);
+            		aceConfig.invalidate();
+            		aceConfig.validate();
+            		aceConfig.repaint();
+            	}
             }
         } catch (Exception ex) {
 			AceLog.getAppLog().alertAndLogException(ex);

@@ -777,7 +777,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
         ACE.removeUncommitted((I_Transact) concept);
     }
-
     public void forget(I_DescriptionVersioned desc) {
         throw new UnsupportedOperationException();
 

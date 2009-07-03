@@ -46,23 +46,13 @@ public class LoadBdb {
         }
         AceLog.getAppLog().info("Finished loading " + dataDir + ". Elapsed time: " + timer.getElapsedTime());
         printElapsedTime();
-        AceLog.getAppLog().info("Creating concept->desc map.");
-        // Update the history records for the relationships...
-        printElapsedTime();
-
-        printElapsedTime();
-        printElapsedTime();
-        // monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
+         // Update the history records for the relationships...
+        AceLog.getAppLog().info("Starting populateTimeBranchDb()");
         ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
         printElapsedTime();
-        // AceConfig.monitor.setProgressInfoUpper("Starting
-        // makeLuceneIndex().");
+        AceLog.getAppLog().info("Starting createLuceneDescriptionIndex()");
         ((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
-        // AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
         printElapsedTime();
-        // ((VodbEnv) LocalVersionedTerminology.get()).close();
-        // printElapsedTime();
-
     }
 
     public static void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
