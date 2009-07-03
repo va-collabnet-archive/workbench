@@ -97,5 +97,8 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	public void setStringPainted(boolean stringPainted) {
+		// TODO Auto-generated method stub
+	}
 }

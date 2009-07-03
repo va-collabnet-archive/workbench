@@ -137,8 +137,8 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 		c.weightx = 0.0;
 		c.gridx++;
 		c.anchor = GridBagConstraints.EAST;
-		add(progressBar, c);
 		c.fill = GridBagConstraints.HORIZONTAL;
+		add(progressBar, c);
 		c.gridx++;
 		add(stopButton, c);
 		stopButton.addActionListener(new StopActionListener());
@@ -270,6 +270,17 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
 	public void setSecondaryPanel(JPanel panel) {
 		this.secondaryPanel = panel;
+	}
+	
+	public void setStringPainted(final boolean stringPainted) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressBar.setStringPainted(stringPainted);
+			}
+		});
+		for (I_ShowActivity shower: showActivityListeners) {
+			shower.setStringPainted(stringPainted);
+		}	
 	}
 
 }

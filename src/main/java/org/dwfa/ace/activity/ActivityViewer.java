@@ -94,6 +94,9 @@ public class ActivityViewer {
 		public void setSecondaryPanel(JPanel panel) {
 		}
 		
+		public void setStringPainted(boolean stringPainted) {
+		}
+		
 	}
 
 	private class ActivityViewerFrame extends ComponentFrame {
@@ -346,5 +349,4 @@ public class ActivityViewer {
 	public static void setHeadless(boolean headless) {
 		ActivityViewer.headless = headless;
 	}
-
 }
