@@ -3,7 +3,7 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -11,15 +11,13 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -57,59 +55,47 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 
 			I_ConfigAceFrame activeProfile = termFactory
 					.getActiveAceFrameConfig();
-			Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
 
-			Set<I_Position> allPositions = new HashSet<I_Position>();
-			for (I_Path path : editingPaths) {
-				allPositions.add(termFactory.newPosition(path,
-						Integer.MAX_VALUE));
-				for (I_Position position : path.getOrigins()) {
-					addOriginPositions(termFactory, position, allPositions);
-				}
+			Set<I_Position> allPositions = getPositions(termFactory);
+
+			ArrayList<Integer> actives = new ArrayList<Integer>();
+
+			for (ArchitectonicAuxiliary.Concept con : Arrays.asList(
+					ArchitectonicAuxiliary.Concept.ACTIVE,
+					ArchitectonicAuxiliary.Concept.CURRENT,
+					ArchitectonicAuxiliary.Concept.LIMITED)) {
+				I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
+				if (c != null)
+					actives.add(c.getConceptId());
 			}
-
-			I_GetConceptData active_status_con = termFactory
-					.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE
-							.getUids());
-			I_GetConceptData current_status_con = termFactory
-					.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT
-							.getUids());
-			I_GetConceptData limited_status_con = termFactory
-					.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.LIMITED
-							.getUids());
 
 			for (I_ConceptAttributeTuple rel : concept
 					.getConceptAttributeTuples(
 							activeProfile.getAllowedStatus(), allPositions,
 							true, true)) {
-				if (rel.getConceptStatus() == active_status_con.getConceptId()
-						|| rel.getConceptStatus() == current_status_con
-								.getConceptId()
-						|| rel.getConceptStatus() == limited_status_con
-								.getConceptId())
+				if (actives.contains(rel.getConceptStatus()))
 					return alertList;
 			}
 
-			I_GetConceptData refset_con = termFactory
-					.getConcept(org.dwfa.cement.RefsetAuxiliary.Concept.REFSET_IDENTITY
-							.getUids());
+			I_GetConceptData refset_con = getConceptSafe(termFactory,
+					RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+			if (refset_con == null)
+				return alertList;
 
-			I_GetConceptData isa_con = termFactory
-					.getConcept(SNOMED.Concept.IS_A.getUids());
 			I_IntSet types = termFactory.newIntSet();
-			types.add(isa_con.getConceptId());
-
-			System.out.println(isa_con.getInitialText());
-
-			isa_con = termFactory
-					.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.IS_A_REL
-							.getUids());
-			types.add(isa_con.getConceptId());
+			I_GetConceptData isa_con;
+			isa_con = getConceptSafe(termFactory, SNOMED.Concept.IS_A.getUids());
+			if (isa_con != null)
+				types.add(isa_con.getConceptId());
+			isa_con = getConceptSafe(termFactory,
+					ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+			if (isa_con != null)
+				types.add(isa_con.getConceptId());
 
 			for (I_GetConceptData refset : refset_con.getDestRelOrigins(
 					activeProfile.getAllowedStatus(), types, allPositions,
 					true, true)) {
-				System.out.println(refset.getInitialText());
+				// System.out.println(refset.getInitialText());
 				for (I_ThinExtByRefVersioned mem : termFactory
 						.getRefsetExtensionMembers(refset.getConceptId())) {
 					// List<I_ThinExtByRefVersioned> extensions = termFactory
@@ -130,14 +116,6 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 			return alertList;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
-		}
-	}
-
-	private void addOriginPositions(I_TermFactory termFactory,
-			I_Position position, Set<I_Position> allPositions) {
-		allPositions.add(position);
-		for (I_Position originPosition : position.getPath().getOrigins()) {
-			addOriginPositions(termFactory, originPosition, allPositions);
 		}
 	}
 
