@@ -28,4 +28,6 @@ public interface I_StoreConceptAttributes extends I_StoreInBdb {
 
 	public I_ConceptAttributeVersioned conAttrEntryToObject(DatabaseEntry key, DatabaseEntry value);
 
+	public int getConceptCount() throws DatabaseException;
+
 }

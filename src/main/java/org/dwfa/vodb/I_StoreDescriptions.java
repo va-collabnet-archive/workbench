@@ -39,8 +39,6 @@ public interface I_StoreDescriptions extends I_StoreInBdb {
 	public List<I_DescriptionVersioned> getDescriptions(int conceptId)
 			throws DatabaseException, IOException;
 
-	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException;
-
 	/**
 	 * This method is multithreaded hot.
 	 * 

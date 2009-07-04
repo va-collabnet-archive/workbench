@@ -225,15 +225,6 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		
 		
 		switch (dbSetupConfig.getCoreDbType()) {
-		case CON_DESC:
-			ConDescBdb conDescBdb = new ConDescBdb(env, makeConfig(readOnly,
-					VodbEnv .isTransactional()), luceneDir, identifierDb);
-			 conAttBdb = conDescBdb;
-			 descBdb = conDescBdb;
-			 relBdb = new RelWithPartCoreBdb(env, makeConfig(readOnly, VodbEnv.isTransactional()));
-			databases.add(conDescBdb);
-			databases.add(relBdb);
-			break;
 		case CON_DESC_REL:
 		case CON_DESCMAP_REL:
 		case CON_COMPDESC_REL:
@@ -243,14 +234,6 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 			relBdb = conDescRelBdb;
 			descBdb = conDescRelBdb;
 			databases.add(conDescRelBdb);
-			break;
-		case LAZY:
-			conAttBdb = new ConWithPartCoreBdb(env, makeConfig(readOnly, VodbEnv.isTransactional()));
-			relBdb = new RelWithPartCoreBdb(env, makeConfig(readOnly, VodbEnv.isTransactional()));
-			descBdb = new DescriptionBdb(env, makeConfig(readOnly, VodbEnv.isTransactional()), luceneDir, identifierDb);
-			databases.add(conAttBdb);
-			databases.add(relBdb);
-			databases.add(descBdb);
 			break;
 		}
 
@@ -559,10 +542,6 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 
 	public void writeId(I_IdVersioned id) throws DatabaseException {
 		identifierDb.writeId(id);
-	}
-
-	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
-		return descBdb.countDescriptions(tracker);
 	}
 
 	public void createLuceneDescriptionIndex() throws IOException {
@@ -964,5 +943,9 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
+	}
+
+	public int getConceptCount() throws DatabaseException {
+		return conAttBdb.getConceptCount();
 	}
 }

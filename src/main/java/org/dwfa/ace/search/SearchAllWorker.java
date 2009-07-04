@@ -32,7 +32,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 
 	CountDownLatch completeLatch;
 
-	private int descCount;
+	private int conceptCount;
 
 	private Collection<I_DescriptionVersioned> regexMatches;
 	private Collection<LuceneMatch> luceneMatches;
@@ -93,11 +93,11 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 		public void actionPerformed(ActionEvent e) {
 			if (continueWork) {
 				if (firstUpdate) {
-					if (descCount == Integer.MAX_VALUE) {
+					if (conceptCount == Integer.MAX_VALUE) {
 						searchPanel.setProgressIndeterminate(true);
 					} else {
 						searchPanel.setProgressIndeterminate(false);
-						searchPanel.setProgressMaximum(descCount);
+						searchPanel.setProgressMaximum(conceptCount);
 						firstUpdate = false;
 					}
 				}
@@ -125,17 +125,17 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 			updateTimer.stop();
 			if (firstUpdate) {
 				searchPanel.setProgressIndeterminate(false);
-				searchPanel.setProgressMaximum(descCount);
+				searchPanel.setProgressMaximum(conceptCount);
 				firstUpdate = false;
 			}
-			searchPanel.setProgressValue(descCount);
+			searchPanel.setProgressValue(conceptCount);
 			updateProgress();
 		}
 
 		private void updateProgress() {
 			searchPanel.setProgressInfo("   " +
-					regexMatches.size() + " out of " + (searchPanel.getProgressMaximum() - completeLatch.getCount())
-							+ " descriptions   ");
+					regexMatches.size() + " descriptions out of " + (searchPanel.getProgressMaximum() - completeLatch.getCount())
+							+ " concepts   ");
 		}
 	}
 
@@ -167,13 +167,13 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 		regexMatches = Collections
 				.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
 						new ThinDescVersionedComparator()));
-		descCount = Integer.MAX_VALUE;
-		descCount = AceConfig.getVodb().countDescriptions(this);
+		conceptCount = Integer.MAX_VALUE;
+		conceptCount = AceConfig.getVodb().getConceptCount();
 		I_UpdateProgress updater;
-		if (descCount != Integer.MIN_VALUE) {
-			AceLog.getAppLog().info("Desc count sa: " + descCount);
-			searchPanel.setProgressMaximum(descCount);
-			completeLatch = new CountDownLatch(descCount);
+		if (conceptCount != Integer.MIN_VALUE) {
+			AceLog.getAppLog().info("Concept count sa: " + conceptCount);
+			searchPanel.setProgressMaximum(conceptCount);
+			completeLatch = new CountDownLatch(conceptCount);
 			new MatchUpdator();
 			updater = new RegexProgressUpdator();
 			AceConfig.getVodb().searchRegex(this, null, regexMatches, completeLatch,

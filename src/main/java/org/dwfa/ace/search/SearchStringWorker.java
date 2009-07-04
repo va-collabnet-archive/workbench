@@ -34,7 +34,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
 	private String patternString;
 
-	private int descCount;
+	private int conceptCount;
 
 	private Collection<I_DescriptionVersioned> regexMatches;
 	private Collection<LuceneMatch> luceneMatches;
@@ -97,9 +97,9 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			if (continueWork) {
 				if (firstUpdate) {
 					searchPanel.setProgressInfo("   Starting regex search   ");
-					if (descCount != Integer.MAX_VALUE) {
+					if (conceptCount != Integer.MAX_VALUE) {
 						searchPanel.setProgressIndeterminate(false);
-						searchPanel.setProgressMaximum(descCount);
+						searchPanel.setProgressMaximum(conceptCount);
 						firstUpdate = false;
 					} 
 				}
@@ -126,15 +126,15 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				max = "unknown";
 			}
 			searchPanel.setProgressInfo("   " +
-					regexMatches.size() + " out of " + max
-							+ " descriptions   ");
+					regexMatches.size() + " descriptions out of " + max
+							+ " concepts   ");
 		}
 
 		public void normalCompletion() {
 			updateTimer.stop();
 			if (firstUpdate) {
 				searchPanel.setProgressIndeterminate(false);
-				searchPanel.setProgressMaximum(descCount);
+				searchPanel.setProgressMaximum(conceptCount);
 				firstUpdate = false;
 			}
 			searchPanel.setProgressValue(0);
@@ -163,14 +163,14 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 				    if (hits == null) {
 	                    searchPanel.setProgressIndeterminate(true);
 				    }
-					searchPanel.setProgressMaximum(descCount);
+					searchPanel.setProgressMaximum(conceptCount);
 					firstUpdate = false;
 				}
 				if (completeLatch != null) {
 				    if (hits != null) {
 				        searchPanel.setProgressIndeterminate(false);
 				    }
-				    searchPanel.setProgressMaximum(descCount);
+				    searchPanel.setProgressMaximum(conceptCount);
 					searchPanel
 					.setProgressValue((int) (searchPanel.getProgressMaximum() - completeLatch
 							.getCount()));
@@ -194,7 +194,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			updateTimer.stop();
 			if (firstUpdate) {
 				searchPanel.setProgressIndeterminate(false);
-				searchPanel.setProgressMaximum(descCount);
+				searchPanel.setProgressMaximum(conceptCount);
 				firstUpdate = false;
 			}
 			searchPanel.setProgressValue(0);
@@ -207,7 +207,7 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 
         public void setHits(int hits) {
             this.hits = hits;
-            descCount = hits;
+            conceptCount = hits;
             searchPanel.setProgressMaximum(hits);
         }
         
@@ -252,8 +252,8 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 		if (lucene) {
 			luceneMatches = Collections
 			.synchronizedCollection(new TreeSet<LuceneMatch>());
-			descCount = Integer.MAX_VALUE;
-			AceLog.getAppLog().info("Desc count 2: " + descCount);
+			conceptCount = Integer.MAX_VALUE;
+			AceLog.getAppLog().info("Desc count 2: " + conceptCount);
 			updater = new LuceneProgressUpdator();
 			completeLatch = new CountDownLatch(1);
 			new MatchUpdator();
@@ -267,11 +267,11 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
 			try {
 				completeLatch = new CountDownLatch(0);
 				Pattern p = Pattern.compile(patternString);
-				descCount = Integer.MAX_VALUE;
-				descCount = AceConfig.getVodb().countDescriptions(this);
-				AceLog.getAppLog().info("Desc count 3: " + descCount);
-				if (descCount > 0) {
-					completeLatch = new CountDownLatch(descCount);
+				conceptCount = Integer.MAX_VALUE;
+				conceptCount = AceConfig.getVodb().getConceptCount();
+				AceLog.getAppLog().info("Desc count 3: " + conceptCount);
+				if (conceptCount > 0) {
+					completeLatch = new CountDownLatch(conceptCount);
 				}
 				new MatchUpdator();
 				AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(), config);

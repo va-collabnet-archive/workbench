@@ -216,7 +216,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		descBinding.objectToEntry(desc, value);
 		descDb.put(BdbEnv.transaction, key, value);
 	}
-
+	
 	private void writeToLucene(I_DescriptionVersioned desc)
 			throws DatabaseException {
 		try {
@@ -345,38 +345,6 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		return matches;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.impl.I_StoreDescriptions#countDescriptions()
-	 */
-	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException {
-		Stopwatch timer = null;
-		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-			timer = new Stopwatch();
-			timer.start();
-		}
-		Cursor descCursor = descDb.openCursor(null, null);
-		DatabaseEntry foundKey = new DatabaseEntry();
-		foundKey.setPartial(0, 0, true);
-		DatabaseEntry foundData = new DatabaseEntry();
-		foundData.setPartial(0, 0, true);
-		int count = 0;
-		while (descCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			if (tracker.continueWork() == false) {
-				return Integer.MIN_VALUE;
-			}
-			count++;
-		}
-		descCursor.close();
-		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-			AceLog.getAppLog().info(
-					"Desc count dbdb: " + count + " count time: "
-							+ timer.getElapsedTime());
-			timer.stop();
-		}
-		return count;
-	}
 
 	/*
 	 * (non-Javadoc)

@@ -498,10 +498,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
 
-    public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
-        return bdbEnv.countDescriptions(tracker);
-    }
-
     /**
      * This method is multithreaded hot.
      *
@@ -1879,4 +1875,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             return results;
         }
     }
+
+	public int getConceptCount() throws IOException {
+		try {
+			return bdbEnv.getConceptCount();
+		} catch (DatabaseException e) {
+			throw new ToIoException(e);
+		}
+	}
 }

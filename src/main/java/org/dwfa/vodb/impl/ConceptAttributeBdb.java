@@ -287,4 +287,8 @@ public class ConceptAttributeBdb implements I_StoreConceptAttributes {
 		// nothing to do
 	}
 
+	public int getConceptCount() throws DatabaseException {
+		return (int) conceptDb.count();
+	}
+
 }

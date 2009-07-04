@@ -1585,23 +1585,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				+ concId);
 	}
 
-	private Integer descCount = null;
-
-	public int countDescriptions(I_TrackContinuation tracker) throws DatabaseException, IOException {
-		if (descCount == null) {
-			int count = 0;
-			Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
-			while (descItr.hasNext()) {
-				if (tracker.continueWork() == false) {
-					return Integer.MIN_VALUE;
-				}
-				descItr.next();
-				count++;
-			}
-			descCount = count;
-		}
-		return descCount;
-	}
 
 	public CountDownLatch searchLucene(I_TrackContinuation tracker,
 			String query, Collection<LuceneMatch> matches,
@@ -1670,7 +1653,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
-			Collection<I_DescriptionVersioned> matches, CountDownLatch latch,
+			Collection<I_DescriptionVersioned> matches, CountDownLatch conceptLatch,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
 			throws DatabaseException, IOException {
 		Stopwatch timer = null;
@@ -1678,28 +1661,38 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			timer = new Stopwatch();
 			timer.start();
 		}
-		Iterator<I_DescriptionVersioned> descItr = getDescriptionIterator();
+		Iterator<I_GetConceptData> conItr = getConceptIterator();
 		Semaphore checkSemaphore = new Semaphore(15);
-		while (descItr.hasNext()) {
-			try {
-				checkSemaphore.acquire();
-			} catch (InterruptedException e) {
-				AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
-						e);
-			}
+		while (conItr.hasNext()) {
+			I_GetConceptData concept = conItr.next();
 			if (tracker.continueWork()) {
-				I_DescriptionVersioned descV = descItr.next();
-				ACE.threadPool.execute(new CheckAndProcessRegexMatch(latch,
-						checkSemaphore, p, matches, descV, checkList, config));
+				List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
+				CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
+				for (I_DescriptionVersioned descV: descriptions) {
+					try {
+						checkSemaphore.acquire();
+					} catch (InterruptedException e) {
+						AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
+								e);
+					}
+					ACE.threadPool.execute(new CheckAndProcessRegexMatch(descriptionLatch,
+							checkSemaphore, p, matches, descV, checkList, config));
+				}
+				try {
+					descriptionLatch.await();
+				} catch (InterruptedException e) {
+					AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+				}
+				conceptLatch.countDown();
 			} else {
-				while (latch.getCount() > 0) {
-					latch.countDown();
+				while (conceptLatch.getCount() > 0) {
+					conceptLatch.countDown();
 				}
 				break;
 			}
 		}
 		try {
-			latch.await();
+			conceptLatch.await();
 		} catch (InterruptedException e) {
 			AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
 		}
@@ -1792,7 +1785,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			bean.getDescriptions().add(newDesc);
 		}
 		writeConceptToBdb(bean);
-		descCount = null;
 	}
 
 	public I_RelVersioned getRel(int relId, int conceptId)
@@ -2036,4 +2028,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 	}
 
+	public int getConceptCount() throws DatabaseException {
+		return (int) conDescRelDb.count();
+	}
+
+	
 }
