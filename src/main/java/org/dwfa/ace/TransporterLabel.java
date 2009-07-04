@@ -184,7 +184,7 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 	    menuItem.addActionListener(this);
 	    popup.add(menuItem);
 	    
-	    this.setToolTipText("drag and drop--or click then paste--concepts onto this well to transport the concept to the selected location");
+	    this.setToolTipText("drag and drop--or click then paste--concepts transport to the selected location");
 	    
 	}
 

@@ -285,19 +285,19 @@ public class CollectionEditorContainer extends JPanel {
 		c.gridx++;
 
 		JButton exportListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/funnel_up.png")));
+				.getResource("/32x32/plain/notebook_read.png")));
 		exportListButton.setVisible(ACE.editMode);
 		exportListButton.addActionListener(new ExportListButtonListener());
-		exportListButton.setToolTipText("export the list to a file");
+		exportListButton.setToolTipText("read a list");
 		listEditorTopPanel.add(exportListButton, c);
 
 		c.gridx++;
 
 		JButton importListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/funnel_down.png")));
+				.getResource("/32x32/plain/notebook_save.png")));
 		importListButton.setVisible(ACE.editMode);
 		importListButton.addActionListener(new ImportListButtonListener());
-		importListButton.setToolTipText("import the list to a file");
+		importListButton.setToolTipText("save the list");
 		listEditorTopPanel.add(importListButton, c);
 
 		c.gridx++;

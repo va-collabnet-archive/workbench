@@ -95,6 +95,7 @@ public class RefsetUtil {
             JButton rowAddAfter = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_add.png")));
             relPanel.add(rowAddAfter, c);
             rowAddAfter.setEnabled(false);
+            rowAddAfter.setToolTipText("add new refset member");
             refsetModel.setAddButton(rowAddAfter);
         } else {
             JPanel filler = new JPanel();
