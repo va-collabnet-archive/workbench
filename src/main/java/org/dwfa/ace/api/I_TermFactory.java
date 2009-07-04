@@ -229,24 +229,48 @@ public interface I_TermFactory {
     public int uuidToNativeWithGeneration(UUID uid, int source, I_Path idPath, int version)
             throws TerminologyException, IOException;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iterateDescriptions(I_ProcessDescriptions processor) throws Exception;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public Iterator<I_DescriptionVersioned> getDescriptionIterator() throws IOException;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iterateRelationships(I_ProcessRelationships processor) throws Exception;
 
     public void iterateConcepts(I_ProcessConcepts procesor) throws Exception;
 
     public Iterator<I_GetConceptData> getConceptIterator() throws IOException;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iterateConceptAttributes(I_ProcessConceptAttributes processor) throws Exception;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iterateExtByRefs(I_ProcessExtByRef processor) throws Exception;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iterateIds(I_ProcessIds processor) throws Exception;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iterateImages(I_ProcessImages processor) throws Exception;
 
+    /**
+     * @deprecated iterateConcepts instead
+     */
     public void iteratePaths(I_ProcessPaths processor) throws Exception;
 
     public Hits doLuceneSearch(String query) throws IOException, ParseException;
@@ -373,5 +397,14 @@ public interface I_TermFactory {
     public I_ShowActivity newActivityPanel(boolean displayInViewer);
 
     public I_HandleSubversion getSvnHandler();
+    
+    /**
+     * Count of the number of concepts in the database. 
+     * The count may not be accurate in the face of concurrent update operations in the database
+     * @return
+     * @throws IOException
+     */
+    public int getConceptCount() throws IOException;
+
 
 }
