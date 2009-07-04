@@ -105,10 +105,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			termFactory = LocalVersionedTerminology.get();
 			I_GetConceptData normalMemberConcept = termFactory.getConcept(
 					RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
-			int numberOfNHSConcepts = 620384; // TODO
+			int conceptsToProcess = termFactory.getConceptCount();
 			I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(
 					true);
-			computeRefsetActivityPanel.setMaximum(numberOfNHSConcepts);
+			computeRefsetActivityPanel.setMaximum(conceptsToProcess);
 			computeRefsetActivityPanel.setStringPainted(true);
 			computeRefsetActivityPanel.setValue(0);
 			computeRefsetActivityPanel.setIndeterminate(false);
@@ -159,7 +159,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 					+ "     Non-members cleaned : 0");
 
 			Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
-			int conceptCount = 0;
+			int conceptsProcessed = 0;
 			HashSet<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
 			HashSet<I_GetConceptData> nonRefsetMembers = new HashSet<I_GetConceptData>();
 			int refsetMembersCount = 0;
@@ -173,7 +173,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			while (conceptIterator.hasNext()) {
 				
 				I_GetConceptData currentConcept = conceptIterator.next();
-				conceptCount++;
+				conceptsProcessed++;
 				
 				if (query.execute(currentConcept)) {
 					refsetMembers.add(currentConcept);
@@ -199,7 +199,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 					nonRefsetMembers = new HashSet<I_GetConceptData>();
 				}
 				
-				if (conceptCount % 500 == 0) {
+				if (conceptsProcessed % 500 == 0) {
 					computeRefsetActivityPanel.setProgressInfoLower(
 									"<html>" 
 									+ "1) Creating refset spec query.   " 
@@ -237,7 +237,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 					useMonitor);
 			
 			getLogger().info("Number of member refset members: " + refsetMembersCount);
-			getLogger().info("Total number of concepts processed: " + conceptCount);
+			getLogger().info("Total number of concepts processed: " + conceptsProcessed);
 			getLogger().info("End execution of refset spec : " + refsetSpec.getInitialText());
 
 			long endTime = new Date().getTime();
