@@ -320,7 +320,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		IntList refsetsToShow = new IntList();
 		if (getRefsetInSpecEditor() != null) {
 			I_GetConceptData refset = getRefsetInSpecEditor();
-			refsetsToShow.add(refset.getConceptId());
 			IntSet allowedTypes = new IntSet();
 			try {
 			allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
@@ -336,12 +335,13 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 			} catch (TerminologyException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
+			refsetsToShow.add(refset.getConceptId());
 		}
 		return refsetsToShow;
 	}
 
 	public I_IntList getRefsetsToSortTaxonomy() {
-		return frameConfig.getRefsetsToSortTaxonomy();
+		return this.getRefsetsToShowInTaxonomy();
 	}
 
 	public I_IntSet getRoots() {
@@ -397,7 +397,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	}
 
 	public Boolean getSortTaxonomyUsingRefset() {
-		return frameConfig.getSortTaxonomyUsingRefset();
+		return true;
 	}
 
 	public I_IntSet getSourceRelTypes() {
