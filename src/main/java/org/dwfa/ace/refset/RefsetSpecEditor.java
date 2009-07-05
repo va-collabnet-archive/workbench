@@ -69,6 +69,7 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -217,7 +218,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			        	column3.setMin(5);
 			        	column3.setPref(175);
 			        	column3.setMax(2000);
-			        	column3.setInvokedOnPart(true);
+			        	column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
 			        	column3.setReadMethod(extType.getPartClass().getMethod("getC3id"));
 			        	column3.setWriteMethod(extType.getPartClass().getMethod("setC3id", int.class));
 			        	column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
@@ -232,7 +233,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			        	column3.setMin(5);
 			        	column3.setPref(175);
 			        	column3.setMax(2000);
-			        	column3.setInvokedOnPart(true);
+			        	column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
 			        	column3.setReadMethod(extType.getPartClass().getMethod("getStr"));
 			        	column3.setWriteMethod(extType.getPartClass().getMethod("setStr", String.class));
 			        	column3.setType(REFSET_FIELD_TYPE.STRING);
@@ -248,7 +249,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			        	column4.setMin(5);
 			        	column4.setPref(150);
 			        	column4.setMax(150);
-			        	column4.setInvokedOnPart(true);
+			        	column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
 			        	column4.setReadMethod(extType.getPartClass().getMethod("getVersion"));
 			        	column4.setWriteMethod(extType.getPartClass().getMethod("setVersion", int.class));
 			        	column4.setType(REFSET_FIELD_TYPE.VERSION);
@@ -262,7 +263,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			        	column5.setMin(5);
 			        	column5.setPref(150);
 			        	column5.setMax(150);
-			        	column5.setInvokedOnPart(true);
+			        	column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
 			        	column5.setReadMethod(extType.getPartClass().getMethod("getPathId"));
 			        	column5.setWriteMethod(extType.getPartClass().getMethod("setPathId", int.class));
 			        	column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
@@ -1010,7 +1011,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		column1.setMin(5);
 		column1.setPref(50);
 		column1.setMax(50);
-		column1.setInvokedOnPart(true);
+    	column1.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
 		column1.setReadMethod(extType.getPartClass().getMethod("getC1id"));
 		column1.setWriteMethod(extType.getPartClass().getMethod("setC1id", int.class));
 		column1.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
@@ -1024,7 +1025,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		column2.setMin(5);
 		column2.setPref(75);
 		column2.setMax(1000);
-		column2.setInvokedOnPart(true);
+    	column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
 		column2.setReadMethod(extType.getPartClass().getMethod("getC2id"));
 		column2.setWriteMethod(extType.getPartClass().getMethod("setC2id", int.class));
 		column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);

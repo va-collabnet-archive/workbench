@@ -328,10 +328,20 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 				ThinExtByRefTuple ebrTuple = new ThinExtByRefTuple(extension, part);
 				for (ReflexiveRefsetFieldData col: columns) {
 					if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
-						if (col.invokedOnPart) {
-							conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
-						} else {
-							conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
+						switch (col.invokeOnObjectType) {
+						case CONCEPT_COMPONENT:
+							conceptsToFetch.add((Integer) col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()), col.readParamaters));
+							break;
+						case COMPONENT:
+							throw new UnsupportedOperationException();
+						case CONCEPT:
+							throw new UnsupportedOperationException();
+						case IMMUTABLE:
+							conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
+							break;
+						case PART:
+							conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart(), col.readParamaters));
+							break;
 						}
 					}
 
@@ -465,10 +475,20 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 		try {
 			I_ThinExtByRefTuple tuple = allTuples.get(rowIndex);
 			Object value = null;
-			if (columns[columnIndex].invokedOnPart) {
-				value = columns[columnIndex].getReadMethod().invoke(tuple.getPart());
-			} else {
-				value = columns[columnIndex].getReadMethod().invoke(tuple);
+			switch (columns[columnIndex].invokeOnObjectType) {
+			case CONCEPT_COMPONENT:
+				value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()), columns[columnIndex].readParamaters);
+				break;
+			case COMPONENT:
+				throw new UnsupportedOperationException();
+			case CONCEPT:
+				throw new UnsupportedOperationException();
+			case IMMUTABLE:
+				value = columns[columnIndex].getReadMethod().invoke(tuple, columns[columnIndex].readParamaters);
+				break;
+			case PART:
+				value = columns[columnIndex].getReadMethod().invoke(tuple.getPart(), columns[columnIndex].readParamaters);
+				break;
 			}
 			switch (columns[columnIndex].getType()) {
 			case CONCEPT_IDENTIFIER:
@@ -558,12 +578,24 @@ public class ReflexiveRefsetMemberTableModel extends AbstractTableModel implemen
 					referencedConcepts.put(identifier, ConceptBean.get(identifier));
 				default:
 					try {
-						if (columns[col].invokedOnPart) {
-							columns[col].getWriteMethod().invoke(extTuple.getPart(), value);
-						} else {
+						switch (columns[col].invokeOnObjectType) {
+						case COMPONENT:
+						case CONCEPT:
+						case CONCEPT_COMPONENT:
+							break;
+						case IMMUTABLE:
 							columns[col].getWriteMethod().invoke(extTuple, value);
+							changed = true;
+							break;
+						case PART:
+							columns[col].getWriteMethod().invoke(extTuple.getPart(), value);
+							changed = true;
+							break;
+							default:
+								throw new UnsupportedOperationException("Can't handle type: " + 
+										columns[col].invokeOnObjectType);
+							
 						}
-						changed = true;
 					} catch (Exception e) {
 						AceLog.getAppLog().alertAndLogException(e);
 					} 

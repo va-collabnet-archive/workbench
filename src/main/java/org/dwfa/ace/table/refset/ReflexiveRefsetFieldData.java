@@ -1,6 +1,7 @@
 package org.dwfa.ace.table.refset;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class ReflexiveRefsetFieldData {
 	
@@ -9,6 +10,10 @@ public class ReflexiveRefsetFieldData {
 		COMPONENT_IDENTIFIER,
 		STRING,
 		VERSION
+	}
+	
+	public enum INVOKE_ON_OBJECT_TYPE {
+		IMMUTABLE, PART, COMPONENT, CONCEPT, CONCEPT_COMPONENT;
 	}
 
 	protected REFSET_FIELD_TYPE type;
@@ -19,11 +24,20 @@ public class ReflexiveRefsetFieldData {
 	protected boolean creationEditable;
 	protected boolean updateEditable;
 	protected Class<?> fieldClass;
-	protected boolean invokedOnPart;
+	protected INVOKE_ON_OBJECT_TYPE invokeOnObjectType;
 	protected Method readMethod;
 	protected Method writeMethod;
+	protected List<Object> readParamaters;
 
 	public ReflexiveRefsetFieldData() {
+	}
+
+	public INVOKE_ON_OBJECT_TYPE getInvokeOnObjectType() {
+		return invokeOnObjectType;
+	}
+
+	public void setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE invokeOnObjectType) {
+		this.invokeOnObjectType = invokeOnObjectType;
 	}
 
 	public REFSET_FIELD_TYPE getType() {
@@ -105,13 +119,12 @@ public class ReflexiveRefsetFieldData {
 	public void setWriteMethod(Method writeMethod) {
 		this.writeMethod = writeMethod;
 	}
-	
-	public boolean isInvokedOnPart() {
-		return invokedOnPart;
+
+	public List<Object> getReadParamaters() {
+		return readParamaters;
 	}
 
-	public void setInvokedOnPart(boolean invokedOnPart) {
-		this.invokedOnPart = invokedOnPart;
+	public void setReadParamaters(List<Object> paramaters) {
+		this.readParamaters = paramaters;
 	}
-
 }

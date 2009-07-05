@@ -2126,28 +2126,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 			}
 		}
 
-	}
-
-	private JComponent makeRefsetViewPanel() {
-
-		TerminologyListModel refsetViewTableModel = new TerminologyListModel();
-		for (int id : aceFrameConfig.getRefsetsToShowInTaxonomy()
-				.getListValues()) {
-			refsetViewTableModel.addElement(ConceptBean.get(id));
-		}
-		refsetViewTableModel.addListDataListener(aceFrameConfig
-				.getRefsetsToShowInTaxonomy());
-		TerminologyList refsetViewList = new TerminologyList(
-				refsetViewTableModel, aceFrameConfig);
-
-		refsetViewList.setBorder(BorderFactory
-				.createTitledBorder("Refsets to show in taxonomy view: "));
-		JPanel refsetViewPrefPanel = new JPanel(new GridLayout(0, 1));
-		refsetViewPrefPanel.add(new JScrollPane(refsetViewList));
-
-		return new JScrollPane(refsetViewPrefPanel);
-	}
-	
+	}	
 	private Component makeConflictViewPanel() {
 		JPanel conflictConfigPanel = new JPanel(new BorderLayout());
 		
@@ -2272,32 +2251,38 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
 
 		JPanel checkPanel = new JPanel(new GridLayout(0, 1));
+		JPanel checkPanel2 = new JPanel(new GridLayout(0, 1));
 
 		relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:",
 				aceFrameConfig.getDestRelTypes())));
 		relPrefPanel.add(new JScrollPane(makeTermList("child relationships:",
 				aceFrameConfig.getSourceRelTypes())));
 
+		/*
 		checkPanel.add(getCheckboxEditor("allow variable height taxonomy view",
 				"variableHeightTaxonomyView", aceFrameConfig
 						.getVariableHeightTaxonomyView(), false));
+		*/
 		checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view",
 				"showViewerImagesInTaxonomy", aceFrameConfig
 						.getShowViewerImagesInTaxonomy(), true));
 		checkPanel.add(getCheckboxEditor("show refset info in taxonomy view",
 				"showRefsetInfoInTaxonomy", aceFrameConfig
 						.getShowRefsetInfoInTaxonomy(), true));
-		checkPanel.add(getCheckboxEditor("sort taxonomy using refset",
+		relPrefPanel.add(checkPanel);
+		relPrefPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ",
+				aceFrameConfig.getRefsetsToShowInTaxonomy())));
+		
+		checkPanel2.add(getCheckboxEditor("sort taxonomy using refset",
 				"sortTaxonomyUsingRefset", aceFrameConfig
 						.getSortTaxonomyUsingRefset(), true));
-		relPrefPanel.add(checkPanel);
+		relPrefPanel.add(checkPanel2);
 
 		relPrefPanel.add(new JScrollPane(makeTermList("Refsets to sort taxonomy view: ",
 				aceFrameConfig.getRefsetsToSortTaxonomy())));
 		return relPrefPanel;
 	}
-	
-
+		
 	private Component getCheckboxEditor(String label, String propertyName,
 			boolean initialValue, boolean enabled) {
 		CheckboxEditor checkBoxEditor = new CheckboxEditor();
@@ -2371,7 +2356,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
 		tabs.addTab("language", makeLanguagePanel());
 		tabs.addTab("status", makeStatusPrefPanel());
-		tabs.addTab("refset", makeRefsetViewPanel());
 		tabs.addTab("conflict", makeConflictViewPanel());
 		return tabs;
 	}
