@@ -1,6 +1,8 @@
 package org.dwfa.mojo;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -82,8 +84,9 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 
             Logger logger = new MojoLogger(getLog());
 
-            if (language != null) {
-            	cleanableProcessExtByRefBuilder.withLanguagePreference(new DescriptionSelector(new LanguagePreference(language)));
+            if (language != null) {           	
+            	cleanableProcessExtByRefBuilder.withLanguagePreference(
+            			new DescriptionSelector(new LanguagePreference(csvToArray(language))));
             }
             
             CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.
@@ -101,4 +104,16 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
 		}
 	}
+    
+    /**
+     * Convert a comma separated list of values into an array of values. 
+     */
+    private String[] csvToArray(String csv) {
+    	ArrayList<String> values = new ArrayList<String>();
+    	StringTokenizer tokens = new StringTokenizer(csv, ",");
+    	while (tokens.hasMoreTokens()) {
+    		values.add(tokens.nextToken());
+    	}
+    	return values.toArray(new String[]{});
+    }
 }
