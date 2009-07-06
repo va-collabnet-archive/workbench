@@ -275,6 +275,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		        			columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
 		        	
 		        	reflexiveModel.setComponentId(ext.getMemberId());
+		        	
 		        	reflexiveModel.getRowCount();
 		        	clauseTable.setModel(reflexiveModel);
 		        	
@@ -350,6 +351,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	private class LabelListener implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent evt) {
+			refsetSpecConcept = null;
 			if (label.getTermComponent() != null) {
 				ace.getAceFrameConfig().setLastViewed(
 						(I_GetConceptData) label.getTermComponent());
@@ -917,6 +919,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	}
 	
 	private void updateSpecTree() {
+		refsetSpecConcept = null;
 		UpdateTreeSpec updater = new UpdateTreeSpec();
 		updater.start();
 	}
@@ -1056,6 +1059,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	public JComponent getContentPanel() {
 		return contentPanel;
+	}
+	
+	public void addHistoryActionListener(ActionListener al) {
+		this.historyButton.addActionListener(al);
+	}
+	public void removeHistoryActionListener(ActionListener al) {
+		this.historyButton.removeActionListener(al);
 	}
 
 }

@@ -125,7 +125,6 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 				AceLog.getAppLog().alertAndLogException(ex);
 			}
 			fireTableDataChanged();
-
 		}
 
 		public void stop() {
@@ -159,7 +158,21 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 			getProgress().getProgressBar().setValue(0);
 			getProgress().getProgressBar().setIndeterminate(true);
 		}
+		if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
+			this.tableComponentId = Integer.MIN_VALUE;
+		}
 		fireTableDataChanged();
 	}
 
+	public int getRowCount() {
+		if (tableComponentId == Integer.MIN_VALUE) {
+			return 1;
+		}
+		int count = super.getRowCount();
+		if (count == 0) {
+			return 1;
+		}
+		return count;
+
+	}
 }

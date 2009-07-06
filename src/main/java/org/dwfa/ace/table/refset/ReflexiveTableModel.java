@@ -326,6 +326,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 
 	public void setComponentId(int componentId) throws Exception {
 		this.tableComponentId = componentId;
+		this.allTuples = null;
+		this.allExtensions = null;
 		if (ACE.editMode) {
 			this.addButton
 					.setEnabled(this.tableComponentId != Integer.MIN_VALUE);
@@ -334,9 +336,6 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 	}
 
 	public int getRowCount() {
-		if (tableComponentId == Integer.MIN_VALUE) {
-			return 1;
-		}
 		if (allTuples == null) {
 			allTuples = new ArrayList<ThinExtByRefTuple>();
 			if (tableChangeWorker != null) {
@@ -345,13 +344,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 			conceptsToFetch.clear();
 			referencedConcepts.clear();
 			tableChangeWorker = getTableChangedSwingWorker(tableComponentId);
-			SwingUtilities.invokeLater(new Runnable() {
-
-				public void run() {
-					tableChangeWorker.start();
-				}
-
-			});
+			tableChangeWorker.start();
 			return 0;
 		}
 		return allTuples.size();
@@ -359,7 +352,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
-			return null;
+			return " ";
+		}
+		if (allTuples.size() == 0 && rowIndex == 0) {
+			return " ";
 		}
 		try {
 			I_ThinExtByRefTuple tuple = allTuples.get(rowIndex);
@@ -472,6 +468,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 			return false;
 		}
 		if (columns[col].isCreationEditable() == false) {
+			return false;
+		}
+		if (allTuples.size() == 0) {
 			return false;
 		}
 		if (allTuples.get(row).getVersion() == Integer.MAX_VALUE) {

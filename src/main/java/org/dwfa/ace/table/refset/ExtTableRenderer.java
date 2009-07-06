@@ -20,21 +20,26 @@ public class ExtTableRenderer extends AceTableRenderer {
                 row, column);
         boolean same = false;
         if (value != null) {
-            StringWithExtTuple swt = (StringWithExtTuple) value;
-            
-            boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
+            if (StringWithExtTuple.class.isAssignableFrom(value.getClass())) {
+                StringWithExtTuple swt = (StringWithExtTuple) value;
+                
+                boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
 
-            if (row > 0) {
-                StringWithExtTuple prevSwt = (StringWithExtTuple) table.getValueAt(row - 1, column);
-                same = swt.getTuple().getMemberId() == prevSwt.getTuple().getMemberId();
-                setBorder(column, this, same, uncommitted);
-                if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
-                    renderComponent.setText("");
+                if (row > 0) {
+                    StringWithExtTuple prevSwt = (StringWithExtTuple) table.getValueAt(row - 1, column);
+                    same = swt.getTuple().getMemberId() == prevSwt.getTuple().getMemberId();
+                    setBorder(column, this, same, uncommitted);
+                    if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
+                        renderComponent.setText("");
+                    }
+                } else {
+                    setBorder(column, this, false, uncommitted);
                 }
             } else {
-                setBorder(column, this, false, uncommitted);
+                renderComponent.setText(value.toString());
+                setBorder(column, this, false, false);
             }
-        }
+        } 
         
         if (isSelected == false) {
             renderComponent.setBackground(colorForRow(row));

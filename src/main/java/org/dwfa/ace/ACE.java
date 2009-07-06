@@ -3807,6 +3807,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	}
 
 	public I_GetConceptData getRefsetSpecInSpecEditor() {
+		if (refsetSpecPanel == null) {
+			return null;
+		}
 		return refsetSpecPanel.getRefsetSpecInSpecEditor();
 	}
 

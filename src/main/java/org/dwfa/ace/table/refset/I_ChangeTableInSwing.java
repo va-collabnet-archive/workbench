@@ -7,5 +7,5 @@ public interface I_ChangeTableInSwing {
 	void stop();
 
 	void start();
-
+	
 }
