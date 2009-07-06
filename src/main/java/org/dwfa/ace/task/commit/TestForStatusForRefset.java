@@ -58,16 +58,7 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 
 			Set<I_Position> allPositions = getPositions(termFactory);
 
-			ArrayList<Integer> actives = new ArrayList<Integer>();
-
-			for (ArchitectonicAuxiliary.Concept con : Arrays.asList(
-					ArchitectonicAuxiliary.Concept.ACTIVE,
-					ArchitectonicAuxiliary.Concept.CURRENT,
-					ArchitectonicAuxiliary.Concept.LIMITED)) {
-				I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
-				if (c != null)
-					actives.add(c.getConceptId());
-			}
+			ArrayList<Integer> actives = getActiveStatus(termFactory);
 
 			for (I_ConceptAttributeTuple rel : concept
 					.getConceptAttributeTuples(

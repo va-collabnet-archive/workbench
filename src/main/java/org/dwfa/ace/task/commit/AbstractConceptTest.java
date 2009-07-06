@@ -3,6 +3,7 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 
@@ -79,6 +81,21 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
 		for (I_Position originPosition : position.getPath().getOrigins()) {
 			addOriginPositions(termFactory, originPosition, allPositions);
 		}
+	}
+
+	public ArrayList<Integer> getActiveStatus(I_TermFactory termFactory)
+			throws Exception {
+		ArrayList<Integer> actives = new ArrayList<Integer>();
+		for (ArchitectonicAuxiliary.Concept con : Arrays.asList(
+				ArchitectonicAuxiliary.Concept.ACTIVE,
+				ArchitectonicAuxiliary.Concept.CURRENT,
+				ArchitectonicAuxiliary.Concept.LIMITED,
+				ArchitectonicAuxiliary.Concept.PENDING_MOVE)) {
+			I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
+			if (c != null)
+				actives.add(c.getConceptId());
+		}
+		return actives;
 	}
 
 }

@@ -2,9 +2,10 @@ package org.dwfa.ace.task.commit;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +16,6 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -56,16 +56,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 
 			I_ConfigAceFrame activeProfile = termFactory
 					.getActiveAceFrameConfig();
-			Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
 
-			Set<I_Position> allPositions = new HashSet<I_Position>();
-			for (I_Path path : editingPaths) {
-				allPositions.add(termFactory.newPosition(path,
-						Integer.MAX_VALUE));
-				for (I_Position position : path.getOrigins()) {
-					addOriginPositions(termFactory, position, allPositions);
-				}
-			}
+			Set<I_Position> allPositions = getPositions(termFactory);
+
 			ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
 			for (I_DescriptionTuple desc : concept.getDescriptionTuples(
 					activeProfile.getAllowedStatus(), null, allPositions, true)) {
@@ -75,17 +68,10 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 					.getUncommittedDescriptions()) {
 				descriptions.add(desc);
 			}
+
 			return testDescriptions(concept, descriptions, forCommit);
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
-		}
-	}
-
-	private void addOriginPositions(I_TermFactory termFactory,
-			I_Position position, Set<I_Position> allPositions) {
-		allPositions.add(position);
-		for (I_Position originPosition : position.getPath().getOrigins()) {
-			addOriginPositions(termFactory, originPosition, allPositions);
 		}
 	}
 
@@ -94,107 +80,90 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 			ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit)
 			throws Exception {
 		ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-		boolean found = false;
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		I_GetConceptData fully_specified_description_type_aux = termFactory
-				.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+		I_GetConceptData fsn_type = getConceptSafe(termFactory,
+				ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 						.getUids());
-		I_GetConceptData active_status_con = termFactory
-				.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE
-						.getUids());
-		I_GetConceptData current_status_con = termFactory
-				.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT
-						.getUids());
-		I_GetConceptData limited_status_con = termFactory
-				.getConcept(org.dwfa.cement.ArchitectonicAuxiliary.Concept.LIMITED
-						.getUids());
+		if (fsn_type == null)
+			return alertList;
+		ArrayList<Integer> actives = getActiveStatus(termFactory);
 		HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
 		for (I_DescriptionVersioned desc : descriptions) {
 			for (I_DescriptionPart part : desc.getVersions()) {
-				// if (part.getVersion() == Integer.MAX_VALUE) {
-				if (part.getTypeId() == fully_specified_description_type_aux
-						.getConceptId()) {
-					found = true;
+				if (!actives.contains(part.getStatusId()))
+					continue;
+				if (part.getTypeId() == fsn_type.getConceptId()) {
 					if (part.getText().matches(".*\\(\\?+\\).*")) {
 						alertList
 								.add(new AlertToDataConstraintFailure(
 										AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
 										"<html>Unedited semantic tag", concept));
-						// return alertList;
 					}
-					if (part.getText().length() > 255) {
+					Charset utf8 = Charset.forName("UTF-8");
+					ByteBuffer bytes = utf8.encode(part.getText());
+					if (bytes.limit() > 255) {
 						alertList
 								.add(new AlertToDataConstraintFailure(
 										(forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
 												: AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
 										"<html>FSN exceeds 255 characters",
 										concept));
-						// return alertList;
 					}
-					if (part.getStatusId() == active_status_con.getConceptId()
-							|| part.getStatusId() == current_status_con
-									.getConceptId()
-							|| part.getStatusId() == limited_status_con
-									.getConceptId()) {
-						String lang = part.getLang();
-						if (langs.get(lang) != null) {
-							for (I_DescriptionVersioned d : langs.get(lang)) {
-								if (d.getDescId() != desc.getDescId()) {
-									alertList
-											.add(new AlertToDataConstraintFailure(
-													AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-													"<html>More than one FSN for "
-															+ lang, concept));
-								}
-							}
-							langs.get(lang).add(desc);
-						} else {
-							ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
-							dl.add(desc);
-							langs.put(lang, dl);
-						}
-						// ///////////
-						// System.out.println("Searching...");
-						Hits hits = termFactory.doLuceneSearch("\""
-								+ part.getText().replace("(", "\\(").replace(
-										")", "\\)") + "\"");
-						// System.out.println("Found " + hits.length());
-						for (int i = 0; i < hits.length(); i++) {
-							// if (i == 10000)
-							// break;
-							Document doc = hits.doc(i);
-							int cnid = Integer.parseInt(doc.get("cnid"));
-							int dnid = Integer.parseInt(doc.get("dnid"));
-							if (cnid == concept.getConceptId())
-								continue;
-							I_DescriptionVersioned potential_fsn = termFactory
-									.getDescription(dnid, cnid);
-							for (I_DescriptionPart part_search : potential_fsn
-									.getVersions()) {
-								// System.out.println("Hit: "
-								// + part_search.getVersion() + "\t"
-								// + part_search.getText());
-								// if (part_search.getVersion() ==
-								// Integer.MAX_VALUE) {
-								if (part_search.getTypeId() == fully_specified_description_type_aux
-										.getConceptId()
-										&& part_search.getText().equals(
-												part.getText())
-										&& part_search.getLang().equals(
-												part.getLang())) {
-									alertList
-											.add(new AlertToDataConstraintFailure(
-													AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-													"<html>FSN already used",
-													concept));
-									// }
-								}
+					String lang = part.getLang();
+					if (langs.get(lang) != null) {
+						for (I_DescriptionVersioned d : langs.get(lang)) {
+							if (d.getDescId() != desc.getDescId()) {
+								alertList
+										.add(new AlertToDataConstraintFailure(
+												AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+												"<html>More than one FSN for "
+														+ lang, concept));
 							}
 						}
-						// ///////////
+						langs.get(lang).add(desc);
+					} else {
+						ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
+						dl.add(desc);
+						langs.put(lang, dl);
+					}
+					// ///////////
+					// System.out.println("Searching...");
+					Hits hits = termFactory.doLuceneSearch("\""
+							+ part.getText().replace("(", "\\(").replace(")",
+									"\\)") + "\"");
+					// System.out.println("Found " + hits.length());
+					search: for (int i = 0; i < hits.length(); i++) {
+						// if (i == 10000)
+						// break;
+						Document doc = hits.doc(i);
+						int cnid = Integer.parseInt(doc.get("cnid"));
+						int dnid = Integer.parseInt(doc.get("dnid"));
+						if (cnid == concept.getConceptId())
+							continue;
+						I_DescriptionVersioned potential_fsn = termFactory
+								.getDescription(dnid, cnid);
+						for (I_DescriptionPart part_search : potential_fsn
+								.getVersions()) {
+							// System.out.println("Hit: "
+							// + part_search.getVersion() + "\t"
+							// + part_search.getText());
+							if (actives.contains(part_search.getStatusId())
+									&& part_search.getTypeId() == fsn_type
+											.getConceptId()
+									&& part_search.getText().equals(
+											part.getText())
+									&& part_search.getLang().equals(
+											part.getLang())) {
+								alertList
+										.add(new AlertToDataConstraintFailure(
+												AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+												"<html>FSN already used",
+												concept));
+								break search;
+							}
+						}
 					}
 				}
-				// }
 			}
 		}
 		// This might work once we get the SNOMED version of FSN down
