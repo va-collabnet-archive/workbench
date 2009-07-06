@@ -27,7 +27,7 @@ public class ReflexiveRefsetFieldData {
 	protected INVOKE_ON_OBJECT_TYPE invokeOnObjectType;
 	protected Method readMethod;
 	protected Method writeMethod;
-	protected List<Object> readParamaters;
+	protected Object[] readParamaters;
 
 	public ReflexiveRefsetFieldData() {
 	}
@@ -120,11 +120,14 @@ public class ReflexiveRefsetFieldData {
 		this.writeMethod = writeMethod;
 	}
 
-	public List<Object> getReadParamaters() {
+	public Object[] getReadParamaters() {
 		return readParamaters;
 	}
 
 	public void setReadParamaters(List<Object> paramaters) {
+		this.readParamaters = paramaters.toArray();
+	}
+	public void setReadParamaters(Object[] paramaters) {
 		this.readParamaters = paramaters;
 	}
 }

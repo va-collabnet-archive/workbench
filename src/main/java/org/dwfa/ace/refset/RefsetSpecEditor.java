@@ -277,6 +277,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		        	reflexiveModel.setComponentId(ext.getMemberId());
 		        	reflexiveModel.getRowCount();
 		        	clauseTable.setModel(reflexiveModel);
+		        	
+		    		int columnIndex = 0;
+		    		for (ReflexiveRefsetFieldData columnId: reflexiveModel.getColumns()) {
+		    			clauseTable.getColumnModel().getColumn(columnIndex).setIdentifier(columnId);
+		    			columnIndex++;
+		    		}
+
 				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
@@ -289,7 +296,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		        	reflexiveModel.setComponentId(Integer.MIN_VALUE);
 			       	reflexiveModel.getRowCount();
 		        	clauseTable.setModel(reflexiveModel);
-				} catch (Exception e) {
+
+		    		int columnIndex = 0;
+		    		for (ReflexiveRefsetFieldData columnId: reflexiveModel.getColumns()) {
+		    			clauseTable.getColumnModel().getColumn(columnIndex).setIdentifier(columnId);
+		    			columnIndex++;
+		    		}
+		    	} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
@@ -745,6 +758,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		JPanel clauseTablePanel = ReflexiveRefsetUtil.getExtensionPanel("Refset Specification:", reflexiveModel,
 				RefsetSpecEditor.this, false, false);
 		clauseTable = (JTableWithDragImage) clauseTablePanel.getClientProperty("extTable");
+		int columnIndex = 0;
+		for (ReflexiveRefsetFieldData columnId: reflexiveModel.getColumns()) {
+			clauseTable.getColumnModel().getColumn(columnIndex).setIdentifier(columnId);
+			columnIndex++;
+		}
 		content.add(clauseTablePanel, c);
 		c.gridy++;
 		c.weighty = 1.0;
@@ -1000,7 +1018,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	}
 
 
-	private void getDefaultSpecColumns(EXT_TYPE extType,
+	public static void getDefaultSpecColumns(EXT_TYPE extType,
 			List<ReflexiveRefsetFieldData> columns)
 			throws NoSuchMethodException {
 		ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();

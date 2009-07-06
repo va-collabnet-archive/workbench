@@ -52,6 +52,7 @@ import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
 import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -144,56 +145,75 @@ public class JTableWithDragImage extends JTable {
 
         private Transferable transferableFromSWExtT(Object obj, int column) {
             StringWithExtTuple swextt = (StringWithExtTuple) obj;
-
-            REFSET_FIELDS field = (REFSET_FIELDS) getColumnModel().getColumn(column).getIdentifier();
-            switch (field) {
-            // All extensions
-            case REFSET_ID:
-                return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getRefsetId()));
-            case MEMBER_ID:
-                throw new UnsupportedOperationException();
-            case COMPONENT_ID:
-                throw new UnsupportedOperationException();
-            case STATUS:
-                return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getStatusId()));
-            case VERSION:
-                return new StringSelection(swextt.getCellText());
-            case PATH:
-                return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getPathId()));
-            case BOOLEAN_VALUE:
-                return new StringSelection(swextt.getCellText());
-            case CONCEPT_ID:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConcept) swextt.getTuple().getPart())
-                        .getConceptId()));
-            case INTEGER_VALUE:
-                return new StringSelection(swextt.getCellText());
-            case ACCEPTABILITY:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
-                        .getAcceptabilityId()));
-            case CORRECTNESS:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
-                        .getCorrectnessId()));
-            case DEGREE_OF_SYNONYMY:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
-                        .getDegreeOfSynonymyId()));
-            case TAG:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple()
-                        .getPart()).getTagId()));
-            case SCOPE:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple()
-                        .getPart()).getScopeId()));
-            case PRIORITY:
-                return new StringSelection(swextt.getCellText());
-            case MEASUREMENT_VALUE:
-                return new StringSelection(swextt.getCellText());
-            case MEASUREMENT_UNITS_ID:
-                return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartMeasurement) swextt.getTuple()
-                        .getPart()).getUnitsOfMeasureId()));
-            case STRING_VALUE:
-                return new StringSelection(swextt.getCellText()); 
-            default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+            Object columnIdentifier = getColumnModel().getColumn(column).getIdentifier();
+            if (ReflexiveRefsetFieldData.class.isAssignableFrom(columnIdentifier.getClass())) {
+            	ReflexiveRefsetFieldData fieldData = (ReflexiveRefsetFieldData) columnIdentifier;
+            	switch (fieldData.getType()) {
+            	case COMPONENT_IDENTIFIER:
+            		throw new UnsupportedOperationException();
+            	case CONCEPT_IDENTIFIER:
+                    return new ConceptTransferable(ConceptBean.get(swextt.getId()));
+            	case STRING:
+                    return new StringSelection(swextt.getCellText());
+            	case VERSION:
+                    return new StringSelection(swextt.getCellText());
+                    default: 
+                		throw new UnsupportedOperationException("Can't handle fieldDataType: " + fieldData.getType());	
+            	}
+            	
+            } else if (REFSET_FIELDS.class.isAssignableFrom(columnIdentifier.getClass())) {
+                REFSET_FIELDS field = (REFSET_FIELDS) columnIdentifier;
+                switch (field) {
+                // All extensions
+                case REFSET_ID:
+                    return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getRefsetId()));
+                case MEMBER_ID:
+                    throw new UnsupportedOperationException();
+                case COMPONENT_ID:
+                    throw new UnsupportedOperationException();
+                case STATUS:
+                    return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getStatusId()));
+                case VERSION:
+                    return new StringSelection(swextt.getCellText());
+                case PATH:
+                    return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getPathId()));
+                case BOOLEAN_VALUE:
+                    return new StringSelection(swextt.getCellText());
+                case CONCEPT_ID:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConcept) swextt.getTuple().getPart())
+                            .getConceptId()));
+                case INTEGER_VALUE:
+                    return new StringSelection(swextt.getCellText());
+                case ACCEPTABILITY:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
+                            .getAcceptabilityId()));
+                case CORRECTNESS:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
+                            .getCorrectnessId()));
+                case DEGREE_OF_SYNONYMY:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple().getPart())
+                            .getDegreeOfSynonymyId()));
+                case TAG:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple()
+                            .getPart()).getTagId()));
+                case SCOPE:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple()
+                            .getPart()).getScopeId()));
+                case PRIORITY:
+                    return new StringSelection(swextt.getCellText());
+                case MEASUREMENT_VALUE:
+                    return new StringSelection(swextt.getCellText());
+                case MEASUREMENT_UNITS_ID:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartMeasurement) swextt.getTuple()
+                            .getPart()).getUnitsOfMeasureId()));
+                case STRING_VALUE:
+                    return new StringSelection(swextt.getCellText()); 
+                default:
+                    throw new UnsupportedOperationException("Can't handle field: " + field);
+                }
             }
+            throw new UnsupportedOperationException("Can't handle columnIdentifier: " + columnIdentifier);
+
         }
 
         private Transferable TransferableFromSWIdT(Object obj, int column) {
