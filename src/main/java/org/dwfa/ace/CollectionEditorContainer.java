@@ -60,7 +60,7 @@ public class CollectionEditorContainer extends JPanel {
 
 		public void actionPerformed(ActionEvent arg0) {
 			FileDialog dialog = new FileDialog(new Frame(),
-					"Select file to import: ");
+					"Open file: ");
 			dialog.setMode(FileDialog.LOAD);
 			dialog.setDirectory(System.getProperty("user.dir"));
 			dialog.setVisible(true);
@@ -84,7 +84,7 @@ public class CollectionEditorContainer extends JPanel {
 
 		public void actionPerformed(ActionEvent arg0) {
 			FileDialog dialog = new FileDialog(new Frame(),
-					"Select export file: ");
+					"Enter file name: ");
 			dialog.setMode(FileDialog.SAVE);
 			dialog.setDirectory(System.getProperty("user.dir"));
 			dialog.setVisible(true);
@@ -285,19 +285,19 @@ public class CollectionEditorContainer extends JPanel {
 		c.gridx++;
 
 		JButton exportListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/notebook_read.png")));
+				.getResource("/32x32/plain/notebook_save.png")));
 		exportListButton.setVisible(ACE.editMode);
 		exportListButton.addActionListener(new ExportListButtonListener());
-		exportListButton.setToolTipText("read a list");
+		exportListButton.setToolTipText("save the list to a file");
 		listEditorTopPanel.add(exportListButton, c);
 
 		c.gridx++;
 
 		JButton importListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/notebook_save.png")));
+				.getResource("/32x32/plain/notebook_read.png")));
 		importListButton.setVisible(ACE.editMode);
 		importListButton.addActionListener(new ImportListButtonListener());
-		importListButton.setToolTipText("save the list");
+		importListButton.setToolTipText("read a list from a file");
 		listEditorTopPanel.add(importListButton, c);
 
 		c.gridx++;
