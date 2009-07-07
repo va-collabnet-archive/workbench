@@ -1535,6 +1535,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			return;
 		}
 		File[] files = root.listFiles();
+		Arrays.sort(files);
 		for (int i = 0; i < files.length; i++) {
 			if (files[i].isFile() && files[i].getName().endsWith(".txt")
 					&& files[i].getName().startsWith(prefix)) {
