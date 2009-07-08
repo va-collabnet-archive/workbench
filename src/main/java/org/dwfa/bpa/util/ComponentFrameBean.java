@@ -209,7 +209,7 @@ public class ComponentFrameBean implements ActionListener,
    * 
    */
   private void setupAbout() {
-    aboutBox = AboutBox.getAboutBox();
+    aboutBox = AboutBox.getAboutBox(this.frame);
     setupPrefs();
   }
 
@@ -376,12 +376,18 @@ public class ComponentFrameBean implements ActionListener,
   // OSXAdapter"
   // is selected from the application menu.
   public final void about() {
-    aboutBox.pack();
-    aboutBox.setLocation((int) this.frame.getLocation().getX() + 22,
-        (int) this.frame.getLocation().getY() + 22);
-    aboutBox.setResizable(false);
-    aboutBox.setVisible(true);
-    aboutBox.toFront();
+	for (JFrame frame: OpenFrames.getFrames()) {
+		if (frame.isActive()) {
+		  	aboutBox = AboutBox.getAboutBox(frame);
+		    aboutBox.pack();
+		    aboutBox.setLocation((int) frame.getLocation().getX() + 22,
+		        (int) frame.getLocation().getY() + 22);
+		    aboutBox.setResizable(false);
+		    aboutBox.setVisible(true);
+		    aboutBox.toFront();
+		    break;
+		}
+	}
   }
 
   // General preferences dialog. The OSXAdapter calls this method when

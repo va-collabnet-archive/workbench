@@ -136,7 +136,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
      *  
      */
     private void setupAbout() {
-        aboutBox = AboutBox.getAboutBox();
+        aboutBox = AboutBox.getAboutBox(this);
         setupPrefs();
     }
     
@@ -239,6 +239,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     // OSXAdapter"
     // is selected from the application menu.
     public void about() {
+    	aboutBox = AboutBox.getAboutBox(this);
         aboutBox.pack();
         aboutBox.setLocation((int) this.getLocation().getX() + 22, (int) this
                 .getLocation().getY() + 22);

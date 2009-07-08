@@ -20,15 +20,14 @@ import javax.swing.JLabel;
  *
  */
 public class AboutBox  {
-    private static JDialog aboutBox;
-    private static void setupAbout() {
+    private static JDialog setupAbout(JFrame parent) {
        
         String title = "About the Workflow Bundle";
         
         if (System.getProperty("org.dwfa.AboutBoxTitle") != null && System.getProperty("org.dwfa.AboutBoxTitle").length() > 3) {
            title = removeQuotes(System.getProperty("org.dwfa.AboutBoxTitle"));
         }
-        aboutBox = new JDialog(new JFrame(), title);
+        JDialog aboutBox = new JDialog(parent, title);
         
         String graphic = "/about-box.gif";
         if (System.getProperty("org.dwfa.AboutBoxGraphic") != null && System.getProperty("org.dwfa.AboutBoxGraphic").length() > 3) {
@@ -46,6 +45,8 @@ public class AboutBox  {
         aboutBox.getContentPane().setLayout(new GridLayout(1, 1));
         aboutBox.getContentPane().add(aboutLabel);
         aboutBox.pack();
+        aboutBox.setModal(true);
+        return aboutBox;
     }
 
    public static String removeQuotes(String str) {
@@ -58,10 +59,7 @@ public class AboutBox  {
       return str;
    }
     
-    public static JDialog getAboutBox() {
-        if (aboutBox == null) {
-            setupAbout();
-        }
-        return aboutBox;
+    public static JDialog getAboutBox(JFrame parent) {
+         return setupAbout(parent);
     }
 }

@@ -35,7 +35,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
     this.setVisible(true);
     OpenFrames.addFrameListener(this);
     getQuitList().clear();
-    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
   }
 
   public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
@@ -63,7 +63,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
   }
 
   public void intervalRemoved(ListDataEvent e) {
-    if (e.getIndex1() == 0) {
+	if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
       this.setVisible(true);
       this.getQuitList().clear();
       this.getQuitList().add(new ComponentFrameBean.StandardQuitter(this));
@@ -79,7 +79,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
    * @param object
    */
   public void intervalAdded(ListDataEvent e) {
-    if (e.getIndex1() == 0) {
+	if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
       this.setVisible(true);
       this.getQuitList().clear();
       this.getQuitList().add(new ComponentFrameBean.StandardQuitter(this));
@@ -92,7 +92,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
   }
 
   public void contentsChanged(ListDataEvent e) {
-    if (e.getIndex1() == 0) {
+    if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
       this.setVisible(true);
       this.getQuitList().clear();
       this.getQuitList().add(new ComponentFrameBean.StandardQuitter(this));
@@ -103,4 +103,5 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
       }
     }
   }
+
 }
