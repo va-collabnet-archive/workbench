@@ -50,6 +50,9 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
 			for (I_ThinExtByRefPart part : extension.getVersions()) {
 				testPart(part, activeProfile, alerts, forCommit);
 			}
+			checkForInactive(activeProfile, alerts, extension.getComponentId());
+			checkForInactive(activeProfile, alerts, extension.getRefsetId());
+			checkForInactive(activeProfile, alerts, extension.getTypeId());
 		} catch (IOException e) {
 			throw new TaskFailedException(e);
 		} catch (TerminologyException e) {
@@ -65,24 +68,35 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
 		if (part.getVersion() == Integer.MAX_VALUE) {
 			for (int nid : part.getPartComponentNids().toArray()) {
 				if (LocalVersionedTerminology.get().hasConcept(nid)) {
-					I_GetConceptData concept = LocalVersionedTerminology.get()
-							.getConcept(nid);
-					List<I_ConceptAttributeTuple> attributes = concept
-							.getConceptAttributeTuples(activeProfile
-									.getAllowedStatus(), activeProfile
-									.getViewPositionSet());
-					if (attributes == null || attributes.size() == 0) {
-						String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
-								+ concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile)
-								+ "</font><br>If appropriate, please change prior to commit...";
-						AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
-						AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(
-								alertType, alertString, concept);
-						alerts2.add(alert);
-						
-					}
+					checkForInactive(activeProfile, alerts2, nid);
 				}
 			}
+		}
+	}
+
+	private void checkForInactive(I_ConfigAceFrame activeProfile,
+			List<AlertToDataConstraintFailure> alerts2, int nid)
+			throws TerminologyException, IOException {
+		I_GetConceptData concept = LocalVersionedTerminology.get()
+				.getConcept(nid);
+		List<I_ConceptAttributeTuple> attributes = concept
+				.getConceptAttributeTuples(activeProfile
+						.getAllowedStatus(), activeProfile
+						.getViewPositionSet());
+		if (attributes == null || attributes.size() == 0) {
+			String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
+				+ concept.toString()
+				+ "</font><br>If appropriate, please change prior to commit...";
+			if (concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile) != null) {
+				alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
+					+ concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile).getText()
+					+ "</font><br>If appropriate, please change prior to commit...";
+			}
+			AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
+			AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(
+					alertType, alertString, concept);
+			alerts2.add(alert);
+			
 		}
 	}
 
