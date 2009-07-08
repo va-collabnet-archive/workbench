@@ -86,11 +86,11 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
 		if (attributes == null || attributes.size() == 0) {
 			String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
 				+ concept.toString()
-				+ "</font><br>If appropriate, please change prior to commit...";
+				+ "</font><br>If appropriate,<br>please change prior to commit...";
 			if (concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile) != null) {
 				alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
 					+ concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile).getText()
-					+ "</font><br>If appropriate, please change prior to commit...";
+					+ "</font><br>If appropriate,<br>please change prior to commit...";
 			}
 			AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 			AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(
