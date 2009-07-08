@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -14,6 +15,12 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 public class ThinExtByRefPartString extends ThinExtByRefPart implements I_ThinExtByRefPartString {
     private String stringValue;
 
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(2);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		return partComponentNids;
+	}
     
     @Override
     public boolean equals(Object obj) {

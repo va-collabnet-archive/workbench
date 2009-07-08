@@ -1,5 +1,6 @@
 package org.dwfa.vodb.types;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 
@@ -10,6 +11,14 @@ public class ThinImagePart implements I_ImagePart {
 	private String textDescription;
 	private int typeId;
 	
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(3);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(typeId);
+		return partComponentNids;
+	}
+
 	public ThinImagePart() {
 		super();
 	}

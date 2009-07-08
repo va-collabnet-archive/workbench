@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -17,7 +18,18 @@ public class ThinRelPart implements I_RelPart {
 	private int characteristicId;
 	private int refinabilityId;
 	private int group;
-	
+
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(5);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(relTypeId);
+		partComponentNids.add(characteristicId);
+		partComponentNids.add(refinabilityId);
+		return partComponentNids;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_RelPart#hasNewData(org.dwfa.vodb.types.ThinRelPart)
 	 */

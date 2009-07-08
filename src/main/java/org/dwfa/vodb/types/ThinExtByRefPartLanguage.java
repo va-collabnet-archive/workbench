@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -16,7 +17,17 @@ public class ThinExtByRefPartLanguage extends ThinExtByRefPart implements I_Thin
    private int correctnessId;
    private int degreeOfSynonymyId;
    
-   /* (non-Javadoc)
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(5);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(acceptabilityId);
+		partComponentNids.add(correctnessId);
+		partComponentNids.add(degreeOfSynonymyId);
+		return partComponentNids;
+	}
+
+	/* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPartLanguage#getAcceptabilityId()
     */
    public int getAcceptabilityId() {

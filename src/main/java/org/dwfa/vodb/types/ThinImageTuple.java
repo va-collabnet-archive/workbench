@@ -1,5 +1,6 @@
 package org.dwfa.vodb.types;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
@@ -10,6 +11,9 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 public class ThinImageTuple implements I_ImageTuple {
 	private I_ImageVersioned core ;
 	private I_ImagePart part;
+	public ArrayIntList getPartComponentNids() {
+		return part.getPartComponentNids();
+	}
 	public ThinImageTuple(I_ImageVersioned core, I_ImagePart part) {
 		super();
 		this.core = core;

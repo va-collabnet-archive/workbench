@@ -1,5 +1,6 @@
 package org.dwfa.vodb.types;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -8,6 +9,9 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 public class ThinDescTuple implements I_DescriptionTuple {
 	I_DescriptionVersioned fixedPart;
 	I_DescriptionPart part;
+	public ArrayIntList getPartComponentNids() {
+		return part.getPartComponentNids();
+	}
 	transient Integer hash;
 	
 	

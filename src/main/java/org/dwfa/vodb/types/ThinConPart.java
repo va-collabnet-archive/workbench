@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.util.Date;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -13,7 +14,14 @@ public class ThinConPart implements I_ConceptAttributePart {
 	private int version;
 	private int conceptStatus;
 	private boolean defined;
-	
+
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(2);
+		partComponentNids.add(pathId);
+		partComponentNids.add(conceptStatus);
+		return partComponentNids;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#getPathId()
 	 */

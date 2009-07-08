@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -14,6 +15,13 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 public class ThinExtByRefPartConcept extends ThinExtByRefPart implements I_ThinExtByRefPartConcept {
    private int conceptId;
 
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(3);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(conceptId);
+		return partComponentNids;
+	}
    public ThinExtByRefPartConcept(ThinExtByRefPartConcept another) {
       super(another);
       this.conceptId = another.conceptId;

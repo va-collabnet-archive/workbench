@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -15,6 +16,13 @@ public class ThinExtByRefPartMeasurement extends ThinExtByRefPart implements I_T
    private int unitsOfMeasureId;
    private double measurementValue;
 
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(3);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(unitsOfMeasureId);
+		return partComponentNids;
+	}
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPartMeasurement#getUnitsOfMeasureId()
     */

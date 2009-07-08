@@ -5,6 +5,7 @@ package org.dwfa.vodb.conflict;
 
 import junit.framework.Assert;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,10 @@ public class PartDateOrderSortComparatorTest {
 		public void setVersion(int version) {
 			this.version = version;
 
+		}
+
+		public ArrayIntList getPartComponentNids() {
+			throw new UnsupportedOperationException();
 		}
 
 	}

@@ -1,11 +1,18 @@
 package org.dwfa.vodb.types;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
 
 public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 	private ThinIdPartCore core;
 	private int sourceId;
 	
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(3);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		return partComponentNids;
+	}
 	public ThinIdIntegerPartWithCoreDelegate() {
 		super();
 	}

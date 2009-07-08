@@ -1,5 +1,6 @@
 package org.dwfa.vodb.types;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -9,6 +10,10 @@ public class ThinRelTuple implements I_RelTuple {
 
 	I_RelVersioned fixedPart;
 	I_RelPart part;
+	public ArrayIntList getPartComponentNids() {
+		return part.getPartComponentNids();
+	}
+
 	transient Integer hash;
 	public ThinRelTuple(I_RelVersioned fixedPart, I_RelPart variablePart) {
 		super();

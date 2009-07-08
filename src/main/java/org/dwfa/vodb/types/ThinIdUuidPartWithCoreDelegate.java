@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.util.UUID;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
 
 public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
@@ -9,6 +10,14 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	private long msb;
 	private long lsb;
 	
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(3);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(getSource());
+		return partComponentNids;
+	}
+
 	public ThinIdUuidPartWithCoreDelegate() {
 		super();
 	}

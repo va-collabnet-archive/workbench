@@ -3,11 +3,13 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class ThinDescPartCore {
+public class ThinDescPartCore implements I_AmPart {
 	
 	private int pathId;
 	private int version;
@@ -16,6 +18,14 @@ public class ThinDescPartCore {
 	private int typeId; 
 	private String lang;
 	
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(3);
+		partComponentNids.add(pathId);
+		partComponentNids.add(statusId);
+		partComponentNids.add(typeId);
+		return partComponentNids;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_DescriptionPart#hasNewData(org.dwfa.vodb.types.ThinDescPart)
 	 */

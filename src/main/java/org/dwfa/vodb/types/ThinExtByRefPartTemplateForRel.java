@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -22,7 +23,18 @@ public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements 
     int attributeDisplayStatusId;
     int characteristicStatusId;
 
-    /* (non-Javadoc)
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(6);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(valueTypeId);
+		partComponentNids.add(semanticStatusId);
+		partComponentNids.add(attributeDisplayStatusId);
+		partComponentNids.add(characteristicStatusId);
+		return partComponentNids;
+	}
+
+	/* (non-Javadoc)
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getValueTypeId()
      */
     public int getValueTypeId() {

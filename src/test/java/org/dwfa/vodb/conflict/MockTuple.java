@@ -1,5 +1,6 @@
 package org.dwfa.vodb.conflict;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
@@ -29,6 +30,10 @@ public class MockTuple implements I_AmTuple {
 	}
 
 	public I_AmPart getPart() {
+		throw new UnsupportedOperationException();
+	}
+	
+	public ArrayIntList getPartComponentNids() {
 		throw new UnsupportedOperationException();
 	}
 

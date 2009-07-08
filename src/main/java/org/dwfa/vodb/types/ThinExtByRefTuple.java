@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
@@ -12,7 +13,11 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
    I_ThinExtByRefPart part;
-   I_ThinExtByRefVersioned core;
+   public ArrayIntList getPartComponentNids() {
+	return part.getPartComponentNids();
+}
+
+I_ThinExtByRefVersioned core;
    public ThinExtByRefTuple(I_ThinExtByRefVersioned core, I_ThinExtByRefPart part) {
       super();
       this.part = part;

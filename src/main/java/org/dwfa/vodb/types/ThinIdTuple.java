@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
@@ -13,6 +14,9 @@ import org.dwfa.ace.api.TimePathId;
 public class ThinIdTuple implements I_IdTuple {
 	I_IdVersioned core;
 	I_IdPart part;
+	public ArrayIntList getPartComponentNids() {
+		return part.getPartComponentNids();
+	}
 	public ThinIdTuple(I_IdVersioned core, I_IdPart part) {
 		super();
 		this.core = core;

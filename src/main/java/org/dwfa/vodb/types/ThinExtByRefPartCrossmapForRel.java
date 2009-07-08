@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -19,7 +20,16 @@ public class ThinExtByRefPartCrossmapForRel extends ThinExtByRefPart implements 
     int blockNo;
 
 
-    public ThinExtByRefPartCrossmapForRel(ThinExtByRefPartCrossmapForRel another) {
+	public ArrayIntList getPartComponentNids() {
+		ArrayIntList partComponentNids = new ArrayIntList(4);
+		partComponentNids.add(getPathId());
+		partComponentNids.add(getStatusId());
+		partComponentNids.add(refineFlagId);
+		partComponentNids.add(additionalCodeId);
+		return partComponentNids;
+	}
+
+	public ThinExtByRefPartCrossmapForRel(ThinExtByRefPartCrossmapForRel another) {
         super(another);
         this.refineFlagId = another.refineFlagId;
         this.additionalCodeId = another.additionalCodeId;

@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -12,6 +13,10 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
 	private String text;
 	private ThinDescPartCore core;
 	
+	public ArrayIntList getPartComponentNids() {
+		return core.getPartComponentNids();
+	}
+
 	public ThinDescPartWithCoreDelegate(String text, ThinDescPartCore core) {
 		super();
 		this.text = text;
