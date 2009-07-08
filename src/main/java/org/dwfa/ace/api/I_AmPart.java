@@ -1,5 +1,7 @@
 package org.dwfa.ace.api;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
+
 public interface I_AmPart {
 	
 	public int getPathId();
@@ -11,5 +13,7 @@ public interface I_AmPart {
 	public void setStatusId(int statusId);
 	
 	public I_AmPart duplicate();
+	
+	public ArrayIntList getPartComponentNids();
 	
 }

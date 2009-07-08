@@ -44,6 +44,11 @@
       <version>2.0.20-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>commons-primitives</groupId>
+      <artifactId>commons-primitives</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>net.jini</groupId>
       <artifactId>jsk-lib</artifactId>
       <version>2.1</version>
