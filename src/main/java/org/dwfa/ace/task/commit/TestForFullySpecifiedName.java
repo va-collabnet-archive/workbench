@@ -115,7 +115,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 							if (d.getDescId() != desc.getDescId()) {
 								alertList
 										.add(new AlertToDataConstraintFailure(
-												AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+												(forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+														: AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
 												"<html>More than one FSN for "
 														+ lang, concept));
 							}
@@ -126,8 +127,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 						dl.add(desc);
 						langs.put(lang, dl);
 					}
-					// ///////////
-					// System.out.println("Searching...");
+
 					Hits hits = termFactory.doLuceneSearch("\""
 							+ part.getText().replace("(", "\\(").replace(")",
 									"\\)") + "\"");
@@ -166,12 +166,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 				}
 			}
 		}
-		// This might work once we get the SNOMED version of FSN down
-		// if (!found) {
-		// alertList.add(new AlertToDataConstraintFailure(
-		// AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-		// "<html>No fully Specified name", concept));
-		// }
+		if (langs.get("en") == null)
+			alertList.add(new AlertToDataConstraintFailure(
+					(forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+							: AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+					"<html>No FSN for en", concept));
 		return alertList;
 	}
+
 }
