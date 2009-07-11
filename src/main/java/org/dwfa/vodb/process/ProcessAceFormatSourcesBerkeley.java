@@ -385,6 +385,18 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         if (idv.getVersions().contains(idPart) == false) {
             idv.addVersion(idPart);
             vodb.writeId(idv);
+        } else {
+        	AceLog.getAppLog().info("ID already present: \n" + idv 
+        			+ "\n\n new part: " + idPart
+        			+ "\n primaryUuid: " + primaryUuid
+        			+ "\n sourceSystemUuid: " + sourceSystemUuid
+        			+ "\n sourceId: " + sourceId
+        			+ "\n statusUuid: " + statusUuid
+        			+ "\n statusDate: " + statusDate
+        			+ "\n pathUuid: " + pathUuid
+        			);
+        		
+        
         }
 
     }
