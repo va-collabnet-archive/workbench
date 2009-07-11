@@ -290,6 +290,16 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         }
         if (vcon.addVersion(con)) {
             vodb.writeConceptAttributes(vcon);
+        } else {
+        	AceLog.getAppLog().info("Concept attributes not added: \n" 
+        			+ vcon.getVersions().size() + " " + vcon 
+        			+ "\n\n new part: " + con
+        			+ "\n concept id: " + conceptKey
+        			+ "\n defChar: " + defChar
+        			+ "\n statusUuid: " + conceptStatus
+        			+ "\n statusDate: " + releaseDate
+        			+ "\n pathUuid: " + pathId
+        			);
         }
     }
 
