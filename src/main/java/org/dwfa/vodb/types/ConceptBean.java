@@ -226,7 +226,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		if (getConceptAttributes() != null) {
 			getConceptAttributes().addTuples(allowedStatus, positionSet,
 					returnTuples, addUncommitted);
-		} else if (addUncommitted && getUncommittedConceptAttributes() != null) {
+		} 
+		if (addUncommitted && getUncommittedConceptAttributes() != null) {
 			getUncommittedConceptAttributes().addTuples(allowedStatus, positionSet,
 					returnTuples, addUncommitted);
 		}
