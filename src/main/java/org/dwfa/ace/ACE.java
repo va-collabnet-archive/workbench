@@ -729,6 +729,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 									"Failures Detected", JOptionPane.YES_NO_OPTION,
 									JOptionPane.QUESTION_MESSAGE);
 					if (n == JOptionPane.YES_OPTION) {
+						commitInProgress = false;
 						return;
 					}
 					for (I_Transact to : testFailureSet) {
