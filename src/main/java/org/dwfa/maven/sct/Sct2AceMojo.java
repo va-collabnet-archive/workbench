@@ -178,10 +178,13 @@ public class Sct2AceMojo extends AbstractMojo {
 			String outputStr;
 			UUID u = Type3UuidFactory.fromSNOMED(id);
 
+			// STATUS FOR IDs IS SET TO CURRENT '0'
 			outputStr = u // (canonical) primary uuid
 					+ "\t" + source // (canonical UUID) source system uuid
 					+ "\t" + id // (original primary) source id
-					+ "\t" + getStatusString(status) // (canonical) status uuid
+					// + "\t" + getStatusString(status) -- PARSED STATUS
+					// STATUS IS SET TO CURRENT '0' FOR ALL CASES
+					+ "\t" + getStatusString(0) // (canonical) status uuid
 					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
 					+ "\t" + path + "\r\n"; // (canonical) path uuid
 
@@ -190,8 +193,9 @@ public class Sct2AceMojo extends AbstractMojo {
 						+ "\t" + sourceCtv3Uuid // (canonical UUID) source
 						// system uuid
 						+ "\t" + ctv3id // (original primary) source id
-						+ "\t" + getStatusString(status) // (canonical) status
-						// uuid
+						// + "\t" + getStatusString(status) -- PARSED STATUS
+						// STATUS IS SET TO CURRENT '0' FOR ALL CASES
+						+ "\t" + getStatusString(0) // (canonical) status uuid
 						+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
 						+ "\t" + path + "\r\n"; // (canonical) path uuid
 			}
@@ -200,8 +204,9 @@ public class Sct2AceMojo extends AbstractMojo {
 						+ "\t" + sourceSnomedRtUuid // (canonical UUID) source
 						// system uuid
 						+ "\t" + snomedrtid // (original primary) source id
-						+ "\t" + getStatusString(status) // (canonical) status
-						// uuid
+						// + "\t" + getStatusString(status) -- PARSED STATUS
+						// STATUS IS SET TO CURRENT '0' FOR ALL CASES
+						+ "\t" + getStatusString(0) // (canonical) status uuid
 						+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
 						+ "\t" + path + "\r\n"; // (canonical) path uuid
 			}
@@ -274,10 +279,13 @@ public class Sct2AceMojo extends AbstractMojo {
 
 			UUID u = Type3UuidFactory.fromSNOMED(id);
 
+			// STATUS IS SET TO
 			return u // (canonical) primary uuid
 					+ "\t" + source // (canonical UUID) source system uuid
 					+ "\t" + id // (original primary) source id
-					+ "\t" + getStatusString(status) // (canonical) status uuid
+					// + "\t" + getStatusString(status) -- PARSED STATUS
+					// STATUS IS SET TO CURRENT '0' FOR ALL CASES
+					+ "\t" + getStatusString(0) // (canonical) status uuid
 					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
 					+ "\t" + path + "\r\n"; // (canonical) path uuid
 		}
@@ -368,7 +376,9 @@ public class Sct2AceMojo extends AbstractMojo {
 			return u // (canonical) primary uuid
 					+ "\t" + source // (canonical UUID) source system uuid
 					+ "\t" + id // (original primary) source id
-					+ "\t" + getStatusString(status) // (canonical) status uuid
+					// + "\t" + getStatusString(status) -- PARSED STATUS
+					// STATUS IS SET TO CURRENT '0' FOR ALL CASES
+					+ "\t" + getStatusString(0) // (canonical) status uuid
 					+ "\t" + date // (yyyyMMdd HH:mm:ss) effective date
 					+ "\t" + path + "\r\n"; // (canonical) path uuid
 		}
@@ -410,17 +420,13 @@ public class Sct2AceMojo extends AbstractMojo {
 					"POM Input Directory (" + i + "): " + sctInputDirArray[i]);
 		}
 
-		try {
-			executeMojo(buildDir, targetSubDir, sctInputDirArray,
-					includeCTV3ID, includeSNOMEDRTID);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+		executeMojo(buildDir, targetSubDir, sctInputDirArray, includeCTV3ID,
+				includeSNOMEDRTID);
 		getLog().info("POM PROCESSING COMPLETE ");
 	}
 
 	void executeMojo(String wDir, String subDir, String[] inDirs,
-			boolean ctv3idTF, boolean snomedrtTF) throws Exception {
+			boolean ctv3idTF, boolean snomedrtTF) throws MojoFailureException {
 		long start = System.currentTimeMillis();
 		getLog().info("*** SCT2ACE PROCESSING STARTED ***");
 
@@ -439,7 +445,9 @@ public class Sct2AceMojo extends AbstractMojo {
 				getLog().info("OUTPUT DIRECTORY: " + wDir + aceOutDir);
 			}
 		} catch (Exception e) { // Catch exception if any
-			getLog().info("Error: could not create directories");
+			getLog().info("Error: could not create output directories");
+			throw new MojoFailureException(
+					"Error: could not create output directories", e);
 		}
 
 		// SETUP CONCEPTS INPUT SCTFile ArrayList
@@ -520,7 +528,14 @@ public class Sct2AceMojo extends AbstractMojo {
 		// SETUP "ids.txt" OUTPUT FILE
 		String idsFileName = wDir + "/classes/ace/ids.txt";
 		BufferedWriter idstxtWriter;
-		idstxtWriter = new BufferedWriter(new FileWriter(idsFileName));
+		try {
+			idstxtWriter = new BufferedWriter(new FileWriter(idsFileName));
+		} catch (IOException e) {
+			getLog().info("FAILED: could not create /classes/ace/ids.txt");
+			e.printStackTrace();
+			throw new MojoFailureException(
+					"FAILED: could not create /classes/ace/ids.txt", e);
+		}
 		getLog().info("ids.txt OUTPUT: " + idsFileName);
 		// if (writeHeader) {
 		// idstxtWriter.write("primary uuid\tsource\tsource id\tstatus uuid\t"
@@ -528,12 +543,38 @@ public class Sct2AceMojo extends AbstractMojo {
 		// }
 
 		// PROCESS SNOMED FILES
-		processConceptsFiles(wDir, listOfCDirs, idstxtWriter, ctv3idTF,
-				snomedrtTF);
-		processDescriptionsFiles(wDir, listOfDDirs, idstxtWriter);
-		processRelationshipsFiles(wDir, listOfRDirs, idstxtWriter);
+		try {
+			processConceptsFiles(wDir, listOfCDirs, idstxtWriter, ctv3idTF,
+					snomedrtTF);
+		} catch (Exception e1) {
+			getLog().info("FAILED: processConceptsFiles()");
+			e1.printStackTrace();
+			throw new MojoFailureException("FAILED: processConceptsFiles()", e1);
+		}
+		try {
+			processDescriptionsFiles(wDir, listOfDDirs, idstxtWriter);
+		} catch (Exception e1) {
+			getLog().info("FAILED: processDescriptionsFiles()");
+			e1.printStackTrace();
+			throw new MojoFailureException(
+					"FAILED: processDescriptionsFiles()", e1);
+		}
+		try {
+			processRelationshipsFiles(wDir, listOfRDirs, idstxtWriter);
+		} catch (Exception e1) {
+			getLog().info("FAILED: processRelationshipsFiles()");
+			e1.printStackTrace();
+			throw new MojoFailureException(
+					"FAILED: processRelationshipsFiles()", e1);
+		}
 
-		idstxtWriter.close();
+		try {
+			idstxtWriter.close();
+		} catch (IOException e) {
+			getLog().info("FAILED: error closing ids.txt");
+			e.printStackTrace();
+			throw new MojoFailureException("FAILED: error closing ids.txt", e);
+		}
 		getLog().info("*** SCT2ACE PROCESSING COMPLETED ***");
 		getLog().info(
 				"CONVERSION TIME: "
@@ -1225,6 +1266,7 @@ public class Sct2AceMojo extends AbstractMojo {
 			// RELATIONSHIPID
 			long relID = Long.parseLong(st.sval);
 			// ADD STATUS VALUE: see ArchitectonicAuxiliary.getStatusFromId()
+			// STATUS VALUE MUST BE ADDED BECAUSE NOT PRESENT IN SNOMED INPUT
 			int status = 0; // status added as CURRENT '0' for parsed record
 			// CONCEPTID1
 			tokenType = st.nextToken();
@@ -1398,7 +1440,8 @@ public class Sct2AceMojo extends AbstractMojo {
 
 	}
 
-	private static int countFileLines(String fileName) {
+	private static int countFileLines(String fileName)
+			throws MojoFailureException {
 		int lineCount = 0;
 		BufferedReader br = null;
 
@@ -1408,11 +1451,17 @@ public class Sct2AceMojo extends AbstractMojo {
 				while (br.readLine() != null) {
 					lineCount++;
 				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				throw new MojoFailureException(
+						"FAILED: error counting lines in " + fileName, ex);
 			} finally {
 				br.close();
 			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
+			throw new MojoFailureException(
+					"FAILED: error open BufferedReader for " + fileName, ex);
 		}
 
 		// lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
@@ -1420,7 +1469,7 @@ public class Sct2AceMojo extends AbstractMojo {
 		return lineCount - 1;
 	}
 
-	private String getFileRevDate(File f) {
+	private String getFileRevDate(File f) throws MojoFailureException {
 		int pos;
 		// Check file name for date yyyyMMdd
 		// EXAMPLE: ../net/nhs/uktc/ukde/sct_relationships_uk_drug_20090401.txt
@@ -1451,18 +1500,21 @@ public class Sct2AceMojo extends AbstractMojo {
 			if (s1.equals(s2)) {
 				return s1 + " 00:00:00";
 			} else {
-				return null; // :NYI: throw exception here
+				throw new MojoFailureException("FAILED: file name date "
+						+ "and directory name date do not agree. ");
 			}
 		} else if (s1 != null) {
 			return s1 + " 00:00:00";
 		} else if (s2 != null) {
 			return s2 + " 00:00:00";
 		} else {
-			return null;
+			throw new MojoFailureException("FAILED: date can not be determined"
+					+ " from either file name date or directory name date.");
 		}
 	}
 
-	private String getFilePathID(File f, String baseDir, String subDir) {
+	private String getFilePathID(File f, String baseDir, String subDir)
+			throws MojoFailureException {
 		String puuid = null;
 		UUID u;
 
@@ -1489,8 +1541,15 @@ public class Sct2AceMojo extends AbstractMojo {
 				puuid = u.toString();
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
+				throw new MojoFailureException(
+						"FAILED: NHS UK Extension Path.."
+								+ "getFilePathID() NoSuchAlgorithmException", e);
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
+				throw new MojoFailureException(
+						"FAILED: NHS UK Extension Path.."
+								+ "getFilePathID() UnsupportedEncodingException",
+						e);
 			}
 			getLog().info("  PATH UUID (uke): " + s + " " + puuid);
 		} else if (s.equals("/net/nhs/uktc/ukde")) {
@@ -1501,22 +1560,31 @@ public class Sct2AceMojo extends AbstractMojo {
 				puuid = u.toString();
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
+				throw new MojoFailureException(
+						"FAILED: NHS UK Drug Extension Path.. getFilePathID()"
+								+ " NoSuchAlgorithmException", e);
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
+				throw new MojoFailureException(
+						"FAILED: NHS UK Drug Extension Path.. getFilePathID()"
+								+ " UnsupportedEncodingException", e);
 			}
 			getLog().info("  PATH UUID (ukde): " + s + " " + puuid);
 
 		} else {
 			// OTHER PATH UUID: based on directory path
-			// :NYI: TEST THIS CODE BRANCH
 			try {
 				u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
 						s);
 				puuid = u.toString();
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
+				throw new MojoFailureException(
+						"FAILED: getFilePathID() NoSuchAlgorithmException", e);
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
+				throw new MojoFailureException("FAILED: getFilePathID() "
+						+ "UnsupportedEncodingException", e);
 			}
 			getLog().info("  PATH UUID: " + s + " " + puuid);
 		}
@@ -1547,7 +1615,6 @@ public class Sct2AceMojo extends AbstractMojo {
 		}
 	}
 
-	// :TODO: refine exception policy try vs. throw
 	private String[] statusStr;
 
 	private String getStatusString(int j) {
