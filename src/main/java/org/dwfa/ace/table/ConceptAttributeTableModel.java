@@ -361,9 +361,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 
 	private List<I_ConceptAttributeTuple> getConceptTuples(I_GetConceptData cb) throws IOException {
 		Set<I_Position> positions = null;
-		if (host.getUsePrefs()) {
-			positions = host.getConfig().getViewPositionSet();
-		}
+		positions = host.getConfig().getViewPositionSet();
 		if (host.getShowHistory()) {
 			positions = null;
 		}
@@ -372,7 +370,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements
 		} catch (TerminologyException e) {
 			throw new ToIoException(e);
 		}
-	}
+	} 
 
 	public String getColumnName(int col) {
 		return columns[col].getColumnName();
