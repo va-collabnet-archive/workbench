@@ -288,7 +288,23 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         if (vcon == null) {
             vcon = new ThinConVersioned(map.getIntId((UUID) conceptKey, aceAuxPath, version), 1);
         }
+        boolean found = false;
+        if (conceptKey.toString().equals("af46800c-c545-387f-a5c3-4e53bb4575ae")) {
+        	AceLog.getAppLog().info("Found Concept attributes for: af46800c-c545-387f-a5c3-4e53bb4575ae\n" 
+        			+ vcon.getVersions().size() + " " + vcon 
+        			+ "\n\n new part: " + con
+        			+ "\n concept id: " + conceptKey
+        			+ "\n defChar: " + defChar
+        			+ "\n statusUuid: " + conceptStatus
+        			+ "\n statusDate: " + releaseDate
+        			+ "\n pathUuid: " + pathId
+        			);
+        	found = true;
+        }
         if (vcon.addVersion(con)) {
+        	if (found) {
+        		AceLog.getAppLog().info("adding: " + vcon);
+        	}
             vodb.writeConceptAttributes(vcon);
         } else {
         	AceLog.getAppLog().info("Concept attributes not added: \n" 
