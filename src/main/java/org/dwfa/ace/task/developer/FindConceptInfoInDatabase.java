@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -51,13 +53,16 @@ public class FindConceptInfoInDatabase extends AbstractTask {
 		I_TermFactory termFactory = LocalVersionedTerminology.get();
 		
 		try{
-				UUID uuid = UUID.fromString("af46800c-c545-387f-a5c3-4e53bb4575ae");
+				UUID uuid = UUID.fromString("e9adad8e-99c6-3b5d-b3e8-0925e5ab54da");
 
 				int nid = termFactory.uuidToNative(uuid);
 				
 				I_GetConceptData concept = termFactory.getConcept(nid);
 				worker.getLogger().info("Found concept: " + concept);
 				worker.getLogger().info("Concept attributes: " + concept.getConceptAttributes());
+				
+				List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
+				worker.getLogger().info("Concept attribute tuples: " + tuples);
 					
 		}
 		catch(Exception e){throw new TaskFailedException(e);}	
