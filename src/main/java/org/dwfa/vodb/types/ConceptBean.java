@@ -223,8 +223,13 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			boolean addUncommitted) throws IOException {
 
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-		getConceptAttributes().addTuples(allowedStatus, positionSet,
-				returnTuples, addUncommitted);
+		if (getConceptAttributes() != null) {
+			getConceptAttributes().addTuples(allowedStatus, positionSet,
+					returnTuples, addUncommitted);
+		} else if (addUncommitted && getUncommittedConceptAttributes() != null) {
+			getUncommittedConceptAttributes().addTuples(allowedStatus, positionSet,
+					returnTuples, addUncommitted);
+		}
 		return returnTuples;
 	}
 	
