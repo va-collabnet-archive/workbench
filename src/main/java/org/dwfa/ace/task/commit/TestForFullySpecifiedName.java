@@ -106,7 +106,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 								.add(new AlertToDataConstraintFailure(
 										(forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
 												: AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-										"<html>FSN exceeds 255 characters",
+										"<html>FSN exceeds 255 bytes",
 										concept));
 					}
 					String lang = part.getLang();
