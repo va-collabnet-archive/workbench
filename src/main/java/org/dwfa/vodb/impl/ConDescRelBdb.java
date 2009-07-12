@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -1518,9 +1519,20 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	private void addIdsToIndex(Document doc, I_IdVersioned did) {
+		boolean foundSctRoot = false;
+		if (did.getUIDs().contains(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"))) {
+			AceLog.getAppLog().info("Found SCT Root id: " + did);
+			foundSctRoot = true;
+		}
 		for (I_IdPart p : did.getVersions()) {
 			doc.add(new Field("desc", p.getSourceId().toString(),
 					Field.Store.NO, Field.Index.UN_TOKENIZED));
+			if (foundSctRoot) {
+				AceLog.getAppLog().info(" writing: " + p.getSourceId() + 
+						"\n field: " + new Field("desc", p.getSourceId().toString(),
+								Field.Store.NO, Field.Index.UN_TOKENIZED) + 
+								"\n doc: " + doc);
+			}
 		}
 	}
 
