@@ -269,8 +269,10 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             sliderPanel.add(this.selectPositionCheckBox, c);
         }
         c.gridy++;
-        colorPath.addItemListener(this);
-        sliderPanel.add(this.colorPath, c);
+        if (selectPositionOnly == false) {
+            colorPath.addItemListener(this);
+            sliderPanel.add(this.colorPath, c);
+        }
         c.gridy++;
         JPanel fill = new JPanel();
         fill.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 1));
