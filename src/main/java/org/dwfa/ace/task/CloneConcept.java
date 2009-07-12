@@ -77,6 +77,9 @@ public class CloneConcept extends AbstractTask {
 					.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 			
 			I_GetConceptData conceptToClone = (I_GetConceptData) host.getTermComponent();
+			if (conceptToClone == null) {
+				throw new TaskFailedException("There is no concept in the component view to clone...");
+			}
 			
 			newConcept = LocalVersionedTerminology.get().newConcept(UUID.randomUUID(), false, config);
 			
