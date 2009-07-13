@@ -58,7 +58,9 @@ public class TermComponentTreeSelectionListener implements TreeSelectionListener
 
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj;
 		cb = (I_GetConceptDataForTree) node.getUserObject();
-		linkedComponent.setTermComponent(cb.getCoreBean());
+		if (cb != null) {
+			linkedComponent.setTermComponent(cb.getCoreBean());
+		}
 	}
 
 }

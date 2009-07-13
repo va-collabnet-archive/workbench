@@ -26,6 +26,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -1519,20 +1520,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	private void addIdsToIndex(Document doc, I_IdVersioned did) {
-		boolean foundSctRoot = false;
-		if (did.getUIDs().contains(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"))) {
-			AceLog.getAppLog().info("Found SCT Root id: " + did);
-			foundSctRoot = true;
-		}
 		for (I_IdPart p : did.getVersions()) {
 			doc.add(new Field("desc", p.getSourceId().toString(),
 					Field.Store.NO, Field.Index.UN_TOKENIZED));
-			if (foundSctRoot) {
-				AceLog.getAppLog().info(" writing: " + p.getSourceId() + 
-						"\n field: " + new Field("desc", p.getSourceId().toString(),
-								Field.Store.NO, Field.Index.UN_TOKENIZED) + 
-								"\n doc: " + doc);
-			}
 		}
 	}
 
@@ -1545,6 +1535,13 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			AceLog.getAppLog().info("Creating lucene searcher");
 		}
 		Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
+		Hits saHits = luceneSearcher.search(q);
+		if (saHits.length() > 0) {
+			AceLog.getAppLog().info("StandardAnalyzer query returned " + saHits.length() + " hits");
+			return saHits;
+		}
+		AceLog.getAppLog().info("StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
+		q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);
 		return luceneSearcher.search(q);
 	}
 
@@ -1618,12 +1615,23 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				updater.setProgressInfo("Opening search index...");
 				luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
 			}
-			updater.setProgressInfo("Starting lucene query...");
+			updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
 			long startTime = System.currentTimeMillis();
 			updater.setProgressInfo("Query complete in "
 					+ Long.toString(System.currentTimeMillis() - startTime)
 					+ " ms.");
 			Hits hits = luceneSearcher.search(q);
+			
+			if (hits.length() > 0) {
+				AceLog.getAppLog().info("StandardAnalyzer query returned " + hits.length() + " hits");
+			} else {
+				updater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
+				AceLog.getAppLog().info("StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
+				q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);
+				hits = luceneSearcher.search(q);
+			}
+
+			
 			updater.setProgressInfo("Query complete in "
 					+ Long.toString(System.currentTimeMillis() - startTime)
 					+ " ms. Hits: " + hits.length());
