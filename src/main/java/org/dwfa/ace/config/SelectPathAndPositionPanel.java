@@ -36,6 +36,7 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
 		            cb.getInitialText(), aceConfig, selectGlue) ;
 			addTab(cb.getInitialText(), pp);
 		}
+		setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
 
 	public List<I_Position> getSelectedPositions() {
