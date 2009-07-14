@@ -94,7 +94,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 					if (part.getText().matches(".*\\(\\?+\\).*")) {
 						alertList
 								.add(new AlertToDataConstraintFailure(
-										AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+										(forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+												: AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
 										"<html>Unedited semantic tag", concept));
 					}
 					String lang = part.getLang();
@@ -144,7 +145,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 											part.getLang())) {
 								alertList
 										.add(new AlertToDataConstraintFailure(
-												AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+												(forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+														: AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
 												"<html>FSN already used",
 												concept));
 								break search;
