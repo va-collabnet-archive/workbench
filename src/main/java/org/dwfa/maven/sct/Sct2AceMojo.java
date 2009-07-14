@@ -753,7 +753,9 @@ public class Sct2AceMojo extends AbstractMojo {
 		// SETUP DESCRIPTIONS OUTPUT FILE
 		String outFileName = wDir + "/classes/ace/descriptions.txt";
 		BufferedWriter bw;
-		bw = new BufferedWriter(new FileWriter(outFileName));
+		bw = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(outFileName), "UTF-8")
+				);
 		getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
 		// if (writeHeader) {
 		// bw.write("description uuid\tstatus uuid\t" + "concept uuid\t"
