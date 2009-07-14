@@ -6,10 +6,6 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
 
    public static final String USE_PREFS = "usePrefs";
 
-   public enum VIEW_TYPE {
-      STATED, INFERRED 
-   };
-
    public enum TOGGLES {
       ID, ATTRIBUTES, AU_DIALECT, UK_DIALECT, USA_DIALECT, NZ_DIALECT, CA_DIALECT, DESCRIPTIONS, SOURCE_RELS, 
       DEST_RELS, LINEAGE, LINEAGE_GRAPH, IMAGE, CONFLICT, STATED_INFERRED, PREFERENCES, HISTORY, REFSETS
@@ -30,8 +26,6 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
    public boolean getShowRefsets();
 
    public boolean getUsePrefs();
-
-   public VIEW_TYPE getViewType();
 
    public I_GetConceptData getHierarchySelection();
 
