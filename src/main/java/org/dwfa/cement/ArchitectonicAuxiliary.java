@@ -58,6 +58,30 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
         ARCHITECTONIC_ROOT_CONCEPT("Terminology Auxiliary concept", getArchitectonicText(),
             new I_ConceptualizeUniversally[] { }),
+        TUPLE_TYPE("tuple type",
+                    new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+                    CON_TUPLE(new String[] {"concept tuple", "concept tuple"}, null,
+                                  new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    DESC_TUPLE(new String[] {"description tuple", "description tuple"}, null,
+                                  new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    REL_TUPLE(new String[] {"relationship tuple", "relationship tuple"}, null,
+                                  new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_CONCEPT_CONCEPT_TUPLE(new String[] {"concept concept ext tuple", "concept concept ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE(new String[] {"concept concept concept ext tuple", "concept concept concept ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_CONCEPT_CONCEPT_STRING_TUPLE(new String[] {"concept concept string ext tuple", "concept concept string ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_CONCEPT_STRING_TUPLE(new String[] {"concept string ext tuple", "concept string ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_CONCEPT_TUPLE(new String[] {"concept ext tuple", "concept ext tuple"}, null,
+                                     new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_INT_TUPLE(new String[] {"int ext tuple", "int ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_BOOLEAN_TUPLE(new String[] {"boolean ext tuple", "boolean ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
+                    EXT_STRING_TUPLE(new String[] {"string ext tuple", "string ext tuple"}, null,
+                             new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
         DEFINITION_TYPE("definition type",
                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                PRIMITIVE_DEFINITION(new String[] {"necessary but not sufficient", "primitive"}, null,
@@ -142,28 +166,28 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                       new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                        
+
                   READ_198_DESC(new String[] {"read 198 desc (description type)", "read 198 desc"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                                
+
                   READ_60_DESC(new String[] {"read 60 desc (description type)", "read 60 desc"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                        
+
                   READ_30_DESC(new String[] {"read 30 desc (description type)", "read 30 desc"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                        
+
                   READ_SYN_198_DESC(new String[] {"synonym read 198 description (description type)", "synonym read 198 description"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                                        
+
                   READ_SYN_60_DESC(new String[] {"synonym read 60 description (description type)", "synonym read 60 description"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                                
+
                   READ_SYN_30_DESC(new String[] {"synonym read 30 description (description type)", "synonym read 30 description"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                        
+
                   READ_KEY_DESC(new String[] {"read key (description type)", "read key"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                        
+
                   FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
                           new String[] {"fully specified name (description type)", "fully specified name"}, null,
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
@@ -275,11 +299,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                             new I_ConceptualizeUniversally[] { ACTIVE }),
                     PROMOTED("promoted (active status type)",
                             new I_ConceptualizeUniversally[] { ACTIVE }),
-                            
+
                     OPTIONAL("optional (active status type)",
                              new I_ConceptualizeUniversally[] { ACTIVE }),
-               
-                                    
+
+
                             REASSIGNED("reassigned (active status type)",
                      new I_ConceptualizeUniversally[] { ACTIVE }),
                      DUAL_REVIEWED_AND_REASSIGNED("dual reviewed and reassigned (active status type)",
@@ -427,10 +451,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             			String[] newDescriptionStrings = new String[2];
                 		newDescriptionStrings[0] = descriptionStrings[0].trim();
                 		newDescriptionStrings[1] = descriptionStrings[0].substring(0,descriptionStrings[0].indexOf("(")).trim();
-            			descriptionStrings = newDescriptionStrings;            			
+            			descriptionStrings = newDescriptionStrings;
             		}
             	}
-            	
+
                 this.rels = makeRels(this, parents);
                 this.descriptions = makeDescriptions(this, descriptionStrings, defString);
             } catch (Exception e) {
@@ -670,7 +694,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
             return 0;
         else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()))
-            return 0; 
+            return 0;
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
             return 1;
         else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
@@ -1097,5 +1121,5 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
       throw new NoSuchElementException("UNK: " + uuids);
   }
 
-   
+
 }
