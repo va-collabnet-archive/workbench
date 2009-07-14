@@ -1196,7 +1196,11 @@ public class Sct2AceMojo extends AbstractMojo {
 
 		long start = System.currentTimeMillis();
 
-		BufferedReader r = new BufferedReader(new FileReader(fName));
+		BufferedReader r = new BufferedReader(
+				new InputStreamReader(
+						 new FileInputStream(fName)
+						,"UTF-8")
+				);
 		StreamTokenizer st = new StreamTokenizer(r);
 		st.resetSyntax();
 		st.wordChars('\u001F', '\u00FF');
