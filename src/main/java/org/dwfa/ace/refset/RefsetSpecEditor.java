@@ -848,11 +848,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	}
 
 
-	public VIEW_TYPE getViewType() {
-		throw new UnsupportedOperationException();
-	}
-
-
 	public void setAllTogglesToState(boolean state) {
 		throw new UnsupportedOperationException();
 	}

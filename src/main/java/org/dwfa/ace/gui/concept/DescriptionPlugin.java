@@ -387,10 +387,6 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		return host.getUsePrefs();
 	}
 
-	public VIEW_TYPE getViewType() {
-		return host.getViewType();
-	}
-
 	public void setAllTogglesToState(boolean state) {
 		host.setAllTogglesToState(state);
 	}

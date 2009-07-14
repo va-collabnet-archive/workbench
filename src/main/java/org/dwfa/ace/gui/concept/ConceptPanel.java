@@ -274,6 +274,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	private IdPlugin idPlugin = new IdPlugin();
 
 	private ImagePlugin imagePlugin = new ImagePlugin();
+	
+	private StatedAndNormalFormsPlugin statedAndNormalFormsPlugin = new StatedAndNormalFormsPlugin();
 
 	private DescriptionPlugin descPlugin = new DescriptionPlugin();
 
@@ -300,8 +302,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public ImageIcon tabIcon;
 
 	private JTabbedPane conceptTabs;
-
-	private JToggleButton inferredButton;
 
 	private FixedToggleChangeActionListener fixedToggleChangeActionListener;
 
@@ -492,14 +492,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 							nzDialectPlugin, caDialectPlugin,
 							descPlugin, srcRelPlugin,
 							destRelPlugin, lineagePlugin, lineageGraphPlugin, imagePlugin,
-							conflictPlugin }));
+							statedAndNormalFormsPlugin, conflictPlugin }));
 		} else {
 			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
 					.asList(new I_PluginToConceptPanel[] { idPlugin,
 							conceptAttributePlugin, auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
 							nzDialectPlugin, caDialectPlugin,
 							descPlugin, srcRelPlugin,
-							destRelPlugin, lineagePlugin, lineageGraphPlugin}));
+							destRelPlugin, lineagePlugin, 
+							lineageGraphPlugin, statedAndNormalFormsPlugin}));
 		}
 		ace.getAceFrameConfig().addPropertyChangeListener("uncommitted",
 				new UncommittedChangeListener());
@@ -620,19 +621,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 		fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
 
-		inferredButton = new JToggleButton(new ImageIcon(ACE.class
-				.getResource("/24x24/plain/yinyang.png")));
-		inferredButton.setSelected(false);
-		inferredButton.setVisible(false);
-		inferredButton
-				.setToolTipText("<html>Yin and yang can also be seen as a process of <br>"
-						+ "transformation which describes the changes between<br>"
-						+ " the phases of a cycle. For example, cold water (yin) <br>"
-						+ "can be boiled and eventually turn into steam (yang).<p> <p>"
-						+ "Stated forms (yin) can be classified and turned into<br>"
-						+ "inferred forms (yang).");
-		leftTogglePane.add(inferredButton);
-
 		refsetToggleButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/24x24/plain/paperclip.png")));
 		refsetToggleButton.setSelected(false);
@@ -739,6 +727,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
 		pluginMap.put(TOGGLES.LINEAGE_GRAPH, lineageGraphPlugin);
 		pluginMap.put(TOGGLES.IMAGE, imagePlugin);
+		pluginMap.put(TOGGLES.STATED_INFERRED, statedAndNormalFormsPlugin);
 		pluginMap.put(TOGGLES.CONFLICT, conflictPlugin);
 
 		updateToggles();
@@ -773,13 +762,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					refsetToggleButton.setVisible(visible);
 					refsetToggleButton.setEnabled(visible);
 					break;
-				case STATED_INFERRED:
-					if (ACE.editMode) {
-						inferredButton.setVisible(visible);
-						inferredButton.setEnabled(visible);
-					}
-					break;
-
 				default:
 					break;
 				}
@@ -1017,13 +999,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		return historyButton.isSelected();
 	}
 
-	public VIEW_TYPE getViewType() {
-		if (inferredButton.isSelected()) {
-			return VIEW_TYPE.INFERRED;
-		}
-		return VIEW_TYPE.STATED;
-	}
-
 	public I_GetConceptData getHierarchySelection() {
 		return ace.getAceFrameConfig().getHierarchySelection();
 	}
@@ -1131,14 +1106,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 							refsetToggleButton.doClick();
 						}
 						break;
-					case STATED_INFERRED:
-						if (inferredButton.isSelected() == state) {
-							// nothing to do...
-						} else {
-							inferredButton.doClick();
-						}
-						break;
-
 					default:
 						throw new UnsupportedOperationException(
 								" Can't handle toggle: " + toggle);
@@ -1191,8 +1158,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 				return usePrefButton.isSelected();
 			case REFSETS:
 				return refsetToggleButton.isSelected();
-			case STATED_INFERRED:
-				return inferredButton.isSelected();
 			}
 		}
 		throw new UnsupportedOperationException(" Can't handle toggle: "

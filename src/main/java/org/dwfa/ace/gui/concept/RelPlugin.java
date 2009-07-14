@@ -227,10 +227,6 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 		return getHost().getUsePrefs();
 	}
 
-	public VIEW_TYPE getViewType() {
-		return getHost().getViewType();
-	}
-
 	public void setAllTogglesToState(boolean state) {
 		getHost().setAllTogglesToState(state);
 	}
