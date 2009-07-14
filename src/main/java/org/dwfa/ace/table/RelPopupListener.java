@@ -126,7 +126,7 @@ public class RelPopupListener extends MouseAdapter {
               newPart.setStatusId(config.getDefaultStatus().getConceptId());
               break;
             case TYPE:
-              newPart.setRelTypeId((AceConfig.getVodb().uuidToNative(ids)));
+              newPart.setTypeId((AceConfig.getVodb().uuidToNative(ids)));
               newPart.setStatusId(config.getDefaultStatus().getConceptId());
               break;
 
@@ -139,23 +139,15 @@ public class RelPopupListener extends MouseAdapter {
               ConceptBean.get(newPart.getCharacteristicId()));
           model.referencedConcepts.put(newPart.getRefinabilityId(),
               ConceptBean.get(newPart.getRefinabilityId()));
-          model.referencedConcepts.put(newPart.getRelTypeId(),
-              ConceptBean.get(newPart.getRelTypeId()));
+          model.referencedConcepts.put(newPart.getTypeId(),
+              ConceptBean.get(newPart.getTypeId()));
 
           I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
 
+          selectedObject.getTuple().getRelVersioned().getVersions().add(
+                  newPart);
           if (destRel != null && srcRel != destRel) {
             destRel.addVersion(newPart);
-          } else {
-            AceLog.getEditLog().info(
-                "Suppressed duplicate addition of new rel part");
-          }
-          if (srcRel != selectedObject.getTuple().getRelVersioned()) {
-            selectedObject.getTuple().getRelVersioned().getVersions().add(
-                newPart);
-          } else {
-            AceLog.getEditLog().info(
-                "Suppressed duplicate addition of new rel part 2");
           }
         }
         ACE.addUncommitted(sourceBean);
