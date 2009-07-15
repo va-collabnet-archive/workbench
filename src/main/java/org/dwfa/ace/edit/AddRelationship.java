@@ -8,6 +8,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinRelPart;
@@ -34,23 +35,27 @@ public class AddRelationship extends AddComponent {
 		} else {
 			parentId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid();
 		}
-		ThinRelVersioned rel = new ThinRelVersioned(relId, cb.getConceptId(), parentId, 1);
-		ThinRelPart relPart = new ThinRelPart();
-		rel.addVersion(relPart);
-		int status = config.getDefaultStatus().getConceptId();
-		for (I_Path p: termContainer.getConfig().getEditingPathSet()) {
-			relPart.setVersion(Integer.MAX_VALUE);
-			relPart.setPathId(p.getConceptId());
-			relPart.setStatusId(status);
-			relPart.setRelTypeId(config.getDefaultRelationshipType().getConceptId());
-			relPart.setCharacteristicId(config.getDefaultRelationshipCharacteristic().getConceptId());
-			relPart.setRefinabilityId(config.getDefaultRelationshipRefinability().getConceptId());
-			relPart.setGroup(0);
+		if (cb != null) {
+			ThinRelVersioned rel = new ThinRelVersioned(relId, cb.getConceptId(), parentId, 1);
+			ThinRelPart relPart = new ThinRelPart();
+			rel.addVersion(relPart);
+			int status = config.getDefaultStatus().getConceptId();
+			for (I_Path p: termContainer.getConfig().getEditingPathSet()) {
+				relPart.setVersion(Integer.MAX_VALUE);
+				relPart.setPathId(p.getConceptId());
+				relPart.setStatusId(status);
+				relPart.setTypeId(config.getDefaultRelationshipType().getConceptId());
+				relPart.setCharacteristicId(config.getDefaultRelationshipCharacteristic().getConceptId());
+				relPart.setRefinabilityId(config.getDefaultRelationshipRefinability().getConceptId());
+				relPart.setGroup(0);
+			}
+			cb.getUncommittedSourceRels().add(rel);
+			cb.getUncommittedIds().add(relId);
+			ACE.addUncommitted(cb);
+			termContainer.setTermComponent(cb);
+		} else {
+			AceLog.getAppLog().alertAndLogException(new Exception("Cannot add a relationship while the component viewer is empty..."));
 		}
-		cb.getUncommittedSourceRels().add(rel);
-		cb.getUncommittedIds().add(relId);
-		ACE.addUncommitted(cb);
-		termContainer.setTermComponent(cb);
 	}
 
 }
