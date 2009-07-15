@@ -461,4 +461,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public void invalidate();
 	public void validate();
 	public void repaint();
+	
+    public Object getProperty(String key) throws IOException;
+    public void setProperty(String key, Object value) throws IOException;
+    public Map<String, Object> getProperties() throws IOException;
+
 }

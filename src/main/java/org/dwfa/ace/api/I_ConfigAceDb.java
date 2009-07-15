@@ -1,8 +1,10 @@
 package org.dwfa.ace.api;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface I_ConfigAceDb {
 	
@@ -42,6 +44,11 @@ public interface I_ConfigAceDb {
     
 	public String getUsername();
 	public void setUsername(String username);
+	
+    public Object getProperty(String key) throws IOException;
+    public void setProperty(String key, Object value) throws IOException;
+    public Map<String, Object> getProperties() throws IOException;
+
 	
 
 }
