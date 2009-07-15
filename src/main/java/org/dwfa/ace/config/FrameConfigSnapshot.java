@@ -58,6 +58,18 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+	public Map<String, Object> getProperties() throws IOException {
+		return baseFrame.getProperties();
+	}
+
+	public Object getProperty(String key) throws IOException {
+		return baseFrame.getProperty(key);
+	}
+
+	public void setProperty(String key, Object value) throws IOException {
+		baseFrame.setProperty(key, value);
+	}
+
 	public void invalidate() {
 		baseFrame.invalidate();
 	}

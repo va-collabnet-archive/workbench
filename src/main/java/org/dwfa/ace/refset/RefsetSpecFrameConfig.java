@@ -55,6 +55,18 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	
 	I_ConfigAceFrame frameConfig;
 
+	public Map<String, Object> getProperties() throws IOException {
+		return frameConfig.getProperties();
+	}
+
+	public Object getProperty(String key) throws IOException {
+		return frameConfig.getProperty(key);
+	}
+
+	public void setProperty(String key, Object value) throws IOException {
+		frameConfig.setProperty(key, value);
+	}
+
 	public void invalidate() {
 		frameConfig.invalidate();
 	}

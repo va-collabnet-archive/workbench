@@ -16,8 +16,10 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.dwfa.ace.ACE;
@@ -47,7 +49,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 6;
+	private static final int dataVersion = 7;
 
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
@@ -83,6 +85,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     // 6
     private Collection<String> queueFolders = new HashSet<String>();
     
+    // 7
+    private Map<String, Object> properties = new HashMap<String, Object>();
+    
     // transient
     private transient File profileFile;
 
@@ -114,6 +119,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         out.writeObject(changeSetRoot);
         out.writeObject(changeSetWriterFileName);
         out.writeObject(queueFolders);
+        out.writeObject(properties);
 	}
 
 	private static final String authFailureMsg = "Username and password do not match.";
@@ -176,6 +182,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             	queueFolders = (Collection<String>) in.readObject();
             } else {
             	queueFolders = new HashSet<String>();
+            }
+            if (objDataVersion >= 7) {
+            	properties = (Map<String, Object>) in.readObject();
+            } else {
+            	properties = new HashMap<String, Object>();
             }
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -430,5 +441,17 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 * @deprecated
 	 */
 	public void setCacheSize(Long cacheSize) {
+	}
+
+	public Map<String, Object> getProperties() throws IOException {
+		return properties;
+	}
+
+	public Object getProperty(String key) throws IOException {
+		return properties.get(key);
+	}
+
+	public void setProperty(String key, Object value) throws IOException {
+		properties.put(key, value);
 	}
 }

@@ -97,7 +97,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 37;
+    private static final int dataVersion = 38;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -267,6 +267,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     //37
     private Map<Integer, Color> pathColorMap = new HashMap<Integer, Color>();
     private I_IntList languagePreferenceList = new IntList();
+    
+    //38
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
 
 	// transient
@@ -465,6 +468,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         	out.writeObject(pathColor);
         }
         IntList.writeIntList(out, languagePreferenceList);
+        
+        // 38
+        out.writeObject(properties);
     }
 
 	private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException, IOException {
@@ -838,6 +844,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 }
                 languagePreferenceList = IntList.readIntListStrict(in);
             } 
+            if (objDataVersion >= 38) {
+                // 38
+                properties = (Map<String, Object>) in.readObject();
+            } else {
+            	properties = new HashMap<String, Object>();
+            }
         
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -2580,4 +2592,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void validate() {
 		aceFrame.getCdePanel().validate();
 	}
+	
+	public Map<String, Object> getProperties() throws IOException {
+		return properties;
+	}
+
+	public Object getProperty(String key) throws IOException {
+		return properties.get(key);
+	}
+
+	public void setProperty(String key, Object value) throws IOException {
+		properties.put(key, value);
+	}
+
 }
