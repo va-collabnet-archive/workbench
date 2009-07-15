@@ -60,6 +60,9 @@ public class PutConceptWithAllowedStatusInListView extends AbstractTask {
    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
        try {
           I_ConfigAceFrame profileForProcessing = (I_ConfigAceFrame) process.readProperty(profilePropName);
+          if (profileForProcessing == null) {
+        	  profileForProcessing = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+          }
           SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                I_ConfigAceFrame activeProfile = (I_ConfigAceFrame) worker

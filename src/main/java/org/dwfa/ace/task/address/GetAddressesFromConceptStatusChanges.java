@@ -82,6 +82,9 @@ public class GetAddressesFromConceptStatusChanges extends AbstractTask {
             .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
          
          I_ConfigAceFrame workingProfile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+         if (workingProfile == null) {
+        	 workingProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+         }
          
          Object conceptObj = process.readProperty(activeConceptPropName);
          I_GetConceptData concept = AceTaskUtil.getConceptFromObject(conceptObj);

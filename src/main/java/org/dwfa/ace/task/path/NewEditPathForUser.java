@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -92,6 +93,9 @@ public class NewEditPathForUser extends AbstractTask {
 
             I_Path editPath = tf.newPath(origins, newPathConcept);
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+	          if (profile == null) {
+	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	          }
             profile.getEditingPathSet().clear();
             profile.addEditingPath(editPath);
             profile.getViewPositionSet().clear();

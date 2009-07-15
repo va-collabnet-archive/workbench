@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -68,8 +69,11 @@ public class ShowQueueViewerForProfile extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            config.setShowQueueViewer(show);
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+	          if (profile == null) {
+	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	          }
+	          profile.setShowQueueViewer(show);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);

@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -61,6 +62,9 @@ public class EditPopupClear extends AbstractTask {
 		try {
 			I_ConfigAceFrame profile = (I_ConfigAceFrame) process
 					.readProperty(profilePropName);
+	          if (profile == null) {
+	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	          }
 			switch (type) {
 			case REL_CHARACTERISTIC:
 				profile.getEditRelCharacteristicPopup().clear();

@@ -17,6 +17,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -69,6 +70,9 @@ public class SaveProfile extends AbstractTask {
             I_ConfigAceDb aceConfig = termFactory.newAceDbConfig();
             String username = (String) process.readProperty(usernamePropName);
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+	          if (profile == null) {
+	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	          }
             aceConfig.getAceFrames().add(profile);
             File userDir = new File("profiles" + File.separator + "users" + File.separator + username);
             File changeSetRoot = new File(userDir, "changesets");

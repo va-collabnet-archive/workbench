@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -64,8 +65,11 @@ public abstract class AbstractSearchTest extends AbstractTask implements I_TestS
         
         try {
             I_AmTermComponent component = (I_AmTermComponent) process.readProperty(componentPropName);
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            if (test(component, config)) {
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+	          if (profile == null) {
+	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	          }
+            if (test(component, profile)) {
                 return Condition.TRUE;
             }
             return Condition.FALSE;

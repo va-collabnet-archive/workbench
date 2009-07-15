@@ -17,6 +17,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -61,6 +62,9 @@ public class AddNoInitialOsFilter extends AbstractTask {
         try {
             
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            if (profile == null) {
+            	profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            }
             profile.getTaxonomyRelFilterList().add(new NoInitialOsFilter());
             return Condition.CONTINUE;
             

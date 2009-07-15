@@ -13,6 +13,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -65,6 +66,9 @@ public class SetEditPathFromProperty extends AbstractTask {
             throws TaskFailedException {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+	          if (profile == null) {
+	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	          }
             I_GetConceptData editPathConcept = AceTaskUtil.getConceptFromProperty(process, editPathConceptPropName);
             I_Path editPath = LocalVersionedTerminology.get().getPath(editPathConcept.getUids());
 
