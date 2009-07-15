@@ -136,6 +136,7 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
+import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.TermTreeHelper;
@@ -3000,6 +3001,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		}
 		hpal = new HistoryPaletteActionListener();
 		showHistoryButton.addActionListener(hpal);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.HISTORY)) {
+			showHistoryButton.setVisible(false);
+		}
 		topPanel.add(showHistoryButton, c);
 		c.gridx++;
 		showAddressesButton = new JToggleButton(new ImageIcon(ACE.class
@@ -3009,6 +3013,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		apal = new AddressPaletteActionListener();
 		showAddressesButton.addActionListener(apal);
 		showAddressesButton.setVisible(editMode);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.ADDRESS)) {
+			showAddressesButton.setVisible(false);
+		}
 		topPanel.add(showAddressesButton, c);
 		c.gridx++;
 
@@ -3023,6 +3030,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				.setToolTipText("Show the hierarchy view of the terminology content.");
 		showTreeButton.setSelected(true);
 		showTreeButton.addActionListener(resizeListener);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.TAXONOMY)) {
+			showTreeButton.setVisible(false);
+		}
 		topPanel.add(showTreeButton, c);
 		c.gridx++;
 		showComponentButton = new JToggleButton(new ImageIcon(ACE.class
@@ -3031,6 +3041,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 				.setToolTipText("Show the component view of the terminology content.");
 		showComponentButton.setSelected(true);
 		showComponentButton.addActionListener(resizeListener);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.COMPONENT)) {
+			showComponentButton.setVisible(false);
+		}
 		topPanel.add(showComponentButton, c);
 		c.gridx++;
 		topActivityPanel = new JPanel(new GridLayout(1, 1));
@@ -3103,6 +3116,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		showQueuesButton.addActionListener(showQueuesActionListener);
 		showQueuesButton.setToolTipText("Show the queue viewer...");
 		showQueuesButton.setVisible(editMode);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.INBOX)) {
+			showQueuesButton.setVisible(false);
+		}
 		c.gridx++;
 
 		showProcessBuilder = new JToggleButton(new ImageIcon(ACE.class
@@ -3112,6 +3128,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		showProcessBuilder.addActionListener(showProcessBuilderActionListener);
 		showProcessBuilder.setToolTipText("Show the process builder...");
 		showProcessBuilder.setVisible(editMode);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.BUILDER)) {
+			showProcessBuilder.setVisible(false);
+		}
 		c.gridx++;
 
 		showSubversionButton = new JToggleButton(new ImageIcon(ACE.class
@@ -3120,7 +3139,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		showSubversionButton
 				.addActionListener(new SubversionPaletteActionListener());
 		showSubversionButton.setToolTipText("Show Subversion panel...");
-		showSubversionButton.setVisible(false);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.SUBVERSION)) {
+			showSubversionButton.setVisible(false);
+		}
 		c.gridx++;
 		showPreferencesButton = new JToggleButton(new ImageIcon(ACE.class
 				.getResource("/32x32/plain/preferences.png")));
@@ -3129,6 +3150,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		topPanel.add(showPreferencesButton, c);
 		showPreferencesButton.setToolTipText("Show preferences panel...");
 		showPreferencesButton.setVisible(editMode);
+		if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.PREFERENCES)) {
+			showPreferencesButton.setVisible(false);
+		}
 		c.gridx++;
 
 		return topPanel;
