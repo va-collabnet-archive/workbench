@@ -291,8 +291,8 @@ public class IdTableModel extends AbstractTableModel implements
 		if (tableChangeWorker != null) {
 			tableChangeWorker.stop();
 		}
-		conceptsToFetch.clear();
-		referencedConcepts.clear();
+		conceptsToFetch = new HashSet<Integer>();
+		referencedConcepts = new HashMap<Integer, ConceptBean>();
 		if (getProgress() != null) {
 			getProgress().setVisible(true);
 			getProgress().getProgressBar().setValue(0);
