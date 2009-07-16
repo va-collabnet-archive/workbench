@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -73,6 +74,8 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
             tupleImporter.importFile(new File(fileName));
+
+            LocalVersionedTerminology.get().commit();
 
             return Condition.CONTINUE;
         } catch (Exception ex) {

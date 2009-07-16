@@ -1,15 +1,18 @@
 package org.dwfa.ace.file;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -20,33 +23,36 @@ public class RelTupleFileUtil {
     public static String exportTuple(I_RelTuple relTuple)
             throws TerminologyException, IOException {
 
-        String result = "";
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        try {
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-        UUID tupleUuid = ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids()
-                .iterator().next();
-        UUID relUuid = termFactory.getUids(relTuple.getRelId()).iterator()
-                .next();
-        UUID c1Uuid = termFactory.getUids(relTuple.getC1Id()).iterator().next();
-        UUID c2Uuid = termFactory.getUids(relTuple.getC2Id()).iterator().next();
-        UUID charUuid = termFactory.getUids(relTuple.getCharacteristicId())
-                .iterator().next();
-        UUID groupUuid = termFactory.getUids(relTuple.getGroup()).iterator()
-                .next();
-        UUID refUuid = termFactory.getUids(relTuple.getRefinabilityId())
-                .iterator().next();
-        UUID relType = termFactory.getUids(relTuple.getTypeId()).iterator()
-                .next();
-        UUID pathUuid = termFactory.getUids(relTuple.getPathId()).iterator()
-                .next();
-        UUID statusUuid = termFactory.getUids(relTuple.getStatusId())
-                .iterator().next();
+            UUID tupleUuid = ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids()
+                    .iterator().next();
+            UUID relUuid = termFactory.getUids(relTuple.getRelId()).iterator()
+                    .next();
+            UUID c1Uuid = termFactory.getUids(relTuple.getC1Id()).iterator()
+                    .next();
+            UUID c2Uuid = termFactory.getUids(relTuple.getC2Id()).iterator()
+                    .next();
+            UUID charUuid = termFactory.getUids(relTuple.getCharacteristicId())
+                    .iterator().next();
+            int group = relTuple.getGroup();
+            UUID refUuid = termFactory.getUids(relTuple.getRefinabilityId())
+                    .iterator().next();
+            UUID relType = termFactory.getUids(relTuple.getTypeId()).iterator()
+                    .next();
+            UUID pathUuid = termFactory.getUids(relTuple.getPathId())
+                    .iterator().next();
+            UUID statusUuid = termFactory.getUids(relTuple.getStatusId())
+                    .iterator().next();
 
-        result = tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t" + c2Uuid
-                + "\t" + charUuid + "\t" + groupUuid + "\t" + refUuid + "\t"
-                + relType + "\t" + pathUuid + "\t" + statusUuid + "\n";
-
-        return result;
+            return tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t" + c2Uuid
+                    + "\t" + charUuid + "\t" + group + "\t" + refUuid + "\t"
+                    + relType + "\t" + pathUuid + "\t" + statusUuid + "\n";
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 
     public static void importTuple(String inputLine)
@@ -59,7 +65,7 @@ public class RelTupleFileUtil {
             UUID c1Uuid = UUID.fromString(lineParts[2]);
             UUID c2Uuid = UUID.fromString(lineParts[3]);
             UUID charUuid = UUID.fromString(lineParts[4]);
-            UUID groupUuid = UUID.fromString(lineParts[5]);
+            int group = Integer.parseInt(lineParts[5]);
             UUID refUuid = UUID.fromString(lineParts[6]);
             UUID relTypeUuid = UUID.fromString(lineParts[7]);
             UUID pathUuid = UUID.fromString(lineParts[8]);
@@ -70,7 +76,7 @@ public class RelTupleFileUtil {
 
             newPart.setCharacteristicId(termFactory.getId(charUuid)
                     .getNativeId());
-            newPart.setGroup(termFactory.getId(groupUuid).getNativeId());
+            newPart.setGroup(group);
             newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
             newPart.setRefinabilityId(termFactory.getId(refUuid).getNativeId());
             newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
@@ -81,7 +87,7 @@ public class RelTupleFileUtil {
                 I_IntSet allowedStatus = termFactory.newIntSet();
                 allowedStatus.add(newPart.getStatusId());
                 I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedStatus.add(newPart.getTypeId());
+                allowedTypes.add(newPart.getTypeId());
 
                 I_GetConceptData concept = termFactory
                         .getConcept(new UUID[] { c1Uuid });
@@ -94,16 +100,35 @@ public class RelTupleFileUtil {
                 List<I_RelTuple> parts = concept.getSourceRelTuples(
                         allowedStatus, allowedTypes, positions, addUncommitted,
                         returnConflictResolvedLatestState);
-                I_RelTuple latestPart = null;
+                I_RelTuple latestTuple = null;
                 for (I_RelTuple part : parts) {
-                    if (latestPart == null
-                            || part.getVersion() >= latestPart.getVersion()) {
-                        latestPart = part;
+                    if (latestTuple == null
+                            || part.getVersion() >= latestTuple.getVersion()) {
+                        latestTuple = part;
                     }
                 }
 
-                if (!latestPart.equals(newPart)) {
-                    latestPart.getPart().hasNewData(newPart);
+                if (latestTuple == null) {
+                    Collection<I_Path> paths = termFactory.getPaths();
+                    paths.clear();
+                    paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+                    termFactory.uuidToNativeWithGeneration(relUuid,
+                            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+                                    .localize().getNid(), paths,
+                            Integer.MAX_VALUE);
+
+                    I_RelVersioned v = termFactory.newRelationship(relUuid,
+                            concept, termFactory
+                                    .getConcept(new UUID[] { relTypeUuid }),
+                            termFactory.getConcept(new UUID[] { c2Uuid }),
+                            termFactory.getConcept(new UUID[] { charUuid }),
+                            termFactory.getConcept(new UUID[] { refUuid }),
+                            termFactory.getConcept(new UUID[] { statusUuid }),
+                            group, termFactory.getActiveAceFrameConfig());
+                    v.addVersion(newPart);
+                    termFactory.addUncommitted(concept);
+                } else if (!latestTuple.getPart().equals(newPart)) {
+                    latestTuple.getPart().hasNewData(newPart);
                     termFactory.addUncommitted(concept);
                 }
             } else {
@@ -115,6 +140,7 @@ public class RelTupleFileUtil {
                                 + inputLine);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new TerminologyException(
                     "Exception thrown while importing line: " + inputLine);
         }

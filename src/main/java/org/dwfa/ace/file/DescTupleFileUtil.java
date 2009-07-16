@@ -1,14 +1,17 @@
 package org.dwfa.ace.file;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -20,7 +23,6 @@ public class DescTupleFileUtil {
     public static String exportTuple(I_DescriptionTuple descTuple)
             throws TerminologyException, IOException {
 
-        String result = "";
         I_TermFactory termFactory = LocalVersionedTerminology.get();
 
         UUID tupleUuid = ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids()
@@ -39,11 +41,9 @@ public class DescTupleFileUtil {
                 .iterator().next();
         boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
 
-        result = tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text
+        return tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text
                 + "\t" + lang + "\t" + initialCapSignificant + "\t" + typeUuid
                 + "\t" + pathUuid + "\t" + statusUuid + "\n";
-
-        return result;
     }
 
     public static void importTuple(String inputLine)
@@ -77,7 +77,7 @@ public class DescTupleFileUtil {
                 I_IntSet allowedStatus = termFactory.newIntSet();
                 allowedStatus.add(newPart.getStatusId());
                 I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedStatus.add(newPart.getTypeId());
+                allowedTypes.add(newPart.getTypeId());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 Set<I_Position> positions = termFactory
                         .getActiveAceFrameConfig().getViewPositionSet();
@@ -87,16 +87,31 @@ public class DescTupleFileUtil {
                 List<I_DescriptionTuple> parts = concept.getDescriptionTuples(
                         allowedStatus, allowedTypes, positions,
                         returnConflictResolvedLatestState);
-                I_DescriptionTuple latestPart = null;
+                I_DescriptionTuple latestTuple = null;
                 for (I_DescriptionTuple part : parts) {
-                    if (latestPart == null
-                            || part.getVersion() >= latestPart.getVersion()) {
-                        latestPart = part;
+                    if (latestTuple == null
+                            || part.getVersion() >= latestTuple.getVersion()) {
+                        latestTuple = part;
                     }
                 }
 
-                if (!latestPart.equals(newPart)) {
-                    latestPart.getPart().hasNewData(newPart);
+                if (latestTuple == null) {
+                    Collection<I_Path> paths = termFactory.getPaths();
+                    paths.clear();
+                    paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+                    termFactory.uuidToNativeWithGeneration(descUuid,
+                            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+                                    .localize().getNid(), paths,
+                            Integer.MAX_VALUE);
+
+                    I_DescriptionVersioned v = termFactory.newDescription(
+                            descUuid, concept, lang, text, termFactory
+                                    .getConcept(new UUID[] { typeUuid }),
+                            termFactory.getActiveAceFrameConfig());
+                    v.addVersion(newPart);
+                    termFactory.addUncommitted(concept);
+                } else if (!latestTuple.getPart().equals(newPart)) {
+                    latestTuple.getPart().hasNewData(newPart);
                     termFactory.addUncommitted(concept);
                 }
             } else {
@@ -108,6 +123,7 @@ public class DescTupleFileUtil {
                                 + inputLine);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new TerminologyException(
                     "Exception thrown while importing line: " + inputLine);
         }

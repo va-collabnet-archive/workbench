@@ -23,8 +23,9 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Opens a file dialog so that user can choose a file location.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
 public class ChooseFile extends AbstractTask {
@@ -34,7 +35,7 @@ public class ChooseFile extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     /**
      * The input file path.
@@ -44,8 +45,19 @@ public class ChooseFile extends AbstractTask {
     /**
      * The key used by file attachment.
      */
-    private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
-    
+    private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE
+            .getAttachmentKey();
+
+    private String message = "Please select a file";
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     private int mode = FileDialog.LOAD;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -53,40 +65,44 @@ public class ChooseFile extends AbstractTask {
         out.writeObject(fileName);
         out.writeObject(fileKey);
         out.writeInt(mode);
+        out.writeObject(message);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion >= dataVersion) {
+        if (objDataVersion >= 1) {
             fileName = (String) in.readObject();
             fileKey = (String) in.readObject();
-            if (objDataVersion >= 2) {
-               mode = in.readInt();
+            if (objDataVersion == 2) {
+                mode = in.readInt();
+                message = "Please select a file";
+            } else if (objDataVersion >= 3) {
+                mode = in.readInt();
+                message = (String) in.readObject();
             } else {
-               mode = FileDialog.LOAD;
+                mode = FileDialog.LOAD;
+                message = "Please select a file";
             }
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+            throws TaskFailedException {
         // Nothing to do
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+            throws TaskFailedException {
         try {
             // prompt for location of file
-            FileDialog dialog = new FileDialog(new Frame(),
-                "Please select a file", mode);
+            FileDialog dialog = new FileDialog(new Frame(), message, mode);
             dialog.setVisible(true);
             fileName = dialog.getDirectory() + dialog.getFile();
             if (mode == FileDialog.LOAD) {
-               fileName = new File(fileName).toURI().toURL().toExternalForm();
+                fileName = new File(fileName).toURI().toURL().toExternalForm();
             }
 
             if (fileName == null) {
@@ -109,8 +125,8 @@ public class ChooseFile extends AbstractTask {
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
         } catch (MalformedURLException e) {
-           throw new TaskFailedException(e);
-      }
+            throw new TaskFailedException(e);
+        }
     }
 
     public int[] getDataContainerIds() {
@@ -136,16 +152,16 @@ public class ChooseFile extends AbstractTask {
     public void setFileKey(String fileKey) {
         this.fileKey = fileKey;
     }
-    
+
     public Boolean isLoadMode() {
-       return mode == FileDialog.LOAD;
+        return mode == FileDialog.LOAD;
     }
-    
+
     public void setLoadMode(Boolean load) {
-       if (load) {
-          mode = FileDialog.LOAD;
-       } else {
-          mode = FileDialog.SAVE;
-       }
+        if (load) {
+            mode = FileDialog.LOAD;
+        } else {
+            mode = FileDialog.SAVE;
+        }
     }
 }

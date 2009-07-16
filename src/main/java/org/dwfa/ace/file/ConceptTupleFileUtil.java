@@ -25,7 +25,6 @@ public class ConceptTupleFileUtil {
         RefsetUtilImpl refsetUtil = new RefsetUtilImpl();
         I_ConceptAttributePart part = refsetUtil
                 .getLastestAttributePart(concept);
-        String result = "";
         I_TermFactory termFactory = LocalVersionedTerminology.get();
 
         UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE
@@ -37,10 +36,8 @@ public class ConceptTupleFileUtil {
         boolean isDefined = part.isDefined();
         UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
 
-        result = conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined
-                + "\t" + pathUuid + "\t" + statusUuid + "\n";
-
-        return result;
+        return conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined + "\t"
+                + pathUuid + "\t" + statusUuid + "\n";
     }
 
     public static void importTuple(String inputLine)
@@ -77,16 +74,16 @@ public class ConceptTupleFileUtil {
                         .getConceptAttributeTuples(allowedStatus, positions,
                                 addUncommitted,
                                 returnConflictResolvedLatestState);
-                I_ConceptAttributeTuple latestPart = null;
+                I_ConceptAttributeTuple latestTuple = null;
                 for (I_ConceptAttributeTuple part : parts) {
-                    if (latestPart == null
-                            || part.getVersion() >= latestPart.getVersion()) {
-                        latestPart = part;
+                    if (latestTuple == null
+                            || part.getVersion() >= latestTuple.getVersion()) {
+                        latestTuple = part;
                     }
                 }
 
-                if (!latestPart.equals(newPart)) {
-                    latestPart.hasNewData(newPart);
+                if (!latestTuple.getPart().equals(newPart)) {
+                    latestTuple.hasNewData(newPart);
                     termFactory.addUncommitted(concept);
                 }
             } else {
@@ -100,6 +97,7 @@ public class ConceptTupleFileUtil {
                 termFactory.addUncommitted(newConcept);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new TerminologyException(
                     "Exception thrown while importing line: " + inputLine);
         }

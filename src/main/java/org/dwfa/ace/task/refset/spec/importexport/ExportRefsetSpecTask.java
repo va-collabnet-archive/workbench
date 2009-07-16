@@ -15,6 +15,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -76,6 +77,19 @@ public class ExportRefsetSpecTask extends AbstractTask {
                             .name());
             String fileName = (String) process.readProperty(outputFilePropName);
             TupleFileUtil tupleExporter = new TupleFileUtil();
+
+            if (configFrame.getRefsetSpecInSpecEditor() == null) {
+                throw new TerminologyException(
+                        "No refset spec found - the refset spec should have \n"
+                                + "a src relationship of type 'specifies refset' to the \n "
+                                + "member refset. Make sure the refset to be exported \n "
+                                + "is in the refset spec panel.");
+            }
+            if (configFrame.getRefsetInSpecEditor() == null) {
+                throw new TerminologyException(
+                        "No member spec found. Please put the refset to \n "
+                                + "be exported in the refset spec panel.");
+            }
             tupleExporter.exportRefsetSpecToFile(new File(fileName),
                     configFrame.getRefsetSpecInSpecEditor());
 
