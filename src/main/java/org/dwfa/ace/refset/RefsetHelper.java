@@ -122,7 +122,7 @@ public class RefsetHelper {
     }
 
     public boolean hasCurrentConceptConceptRefsetExtension(int refsetId,
-            int conceptId, int c1Id, int c2Id) throws Exception {
+            int conceptId, int c1Id, int c2Id, int statusId) throws Exception {
         for (I_ThinExtByRefVersioned extension : termFactory
                 .getAllExtensionsForComponent(conceptId, true)) {
 
@@ -139,7 +139,7 @@ public class RefsetHelper {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == currentStatusId) {
+                if (latestPart.getStatusId() == statusId) {
                     if (latestPart instanceof I_ThinExtByRefPartConceptConcept) {
                         int c1Value = ((I_ThinExtByRefPartConceptConcept) latestPart)
                                 .getC1id();
@@ -156,12 +156,12 @@ public class RefsetHelper {
     }
 
     public boolean hasCurrentConceptConceptConceptRefsetExtension(int refsetId,
-            int conceptId, int c1Id, int c2Id, int c3Id) throws Exception {
+            int conceptId, int c1Id, int c2Id, int c3Id, int statusId)
+            throws Exception {
+
         for (I_ThinExtByRefVersioned extension : termFactory
                 .getAllExtensionsForComponent(conceptId, true)) {
-
             if (extension.getRefsetId() == refsetId) {
-
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
                 for (I_ThinExtByRefPart part : extension.getVersions()) {
@@ -173,7 +173,7 @@ public class RefsetHelper {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == currentStatusId) {
+                if (latestPart.getStatusId() == statusId) {
                     if (latestPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
                         int c1Value = ((I_ThinExtByRefPartConceptConceptConcept) latestPart)
                                 .getC1id();
@@ -193,7 +193,7 @@ public class RefsetHelper {
     }
 
     public boolean hasCurrentConceptConceptStringRefsetExtension(int refsetId,
-            int conceptId, int c1Id, int c2Id, String stringInput)
+            int conceptId, int c1Id, int c2Id, String stringInput, int statusId)
             throws Exception {
         for (I_ThinExtByRefVersioned extension : termFactory
                 .getAllExtensionsForComponent(conceptId, true)) {
@@ -211,7 +211,7 @@ public class RefsetHelper {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == currentStatusId) {
+                if (latestPart.getStatusId() == statusId) {
                     if (latestPart instanceof I_ThinExtByRefPartConceptConceptString) {
                         int c1Value = ((I_ThinExtByRefPartConceptConceptString) latestPart)
                                 .getC1id();
@@ -290,22 +290,6 @@ public class RefsetHelper {
         return true;
     }
 
-    /*
-     * public boolean newConceptConceptRefsetExtension(int refsetId, int
-     * componentId, int c1Id, int c2Id) throws Exception {
-     * 
-     * Set<I_Path> userEditPaths = null; I_ConfigAceFrame config =
-     * termFactory.getActiveAceFrameConfig(); if (config != null) {
-     * userEditPaths = config.getEditingPathSet(); }
-     * 
-     * UUID memberUuid = UUID.randomUUID(); UUID statusUuid =
-     * termFactory.getConcept(currentStatusId).getUids() .iterator().next(); int
-     * effectiveTime = Integer.MAX_VALUE;
-     * 
-     * return newConceptConceptRefsetExtension(refsetId, componentId, c1Id,
-     * c2Id, memberUuid, statusUuid, userEditPaths, effectiveTime); }
-     */
-
     public boolean newConceptConceptRefsetExtension(int refsetId,
             int componentId, int c1Id, int c2Id, UUID memberUuid,
             UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
@@ -327,7 +311,8 @@ public class RefsetHelper {
 
         // check subject is not already a member
         if (hasCurrentConceptConceptRefsetExtension(refsetId, componentId,
-                c1Id, c2Id)) {
+                c1Id, c2Id, termFactory.getConcept(new UUID[] { statusUuid })
+                        .getConceptId())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger
                         .fine("Component is already a member of the refset. Skipping.");
@@ -385,7 +370,8 @@ public class RefsetHelper {
 
         // check subject is not already a member
         if (hasCurrentConceptConceptConceptRefsetExtension(refsetId,
-                componentId, c1Id, c2Id, c3Id)) {
+                componentId, c1Id, c2Id, c3Id, termFactory.getConcept(
+                        new UUID[] { statusUuid }).getConceptId())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger
                         .fine("Component is already a member of the refset. Skipping.");
@@ -408,7 +394,8 @@ public class RefsetHelper {
                     .newConceptConceptConceptExtensionPart();
 
             extension.setPathId(editPath.getConceptId());
-            extension.setStatusId(currentStatusId);
+            extension.setStatusId(termFactory.getConcept(
+                    new UUID[] { statusUuid }).getConceptId());
             extension.setVersion(Integer.MAX_VALUE);
             extension.setC1id(c1Id);
             extension.setC2id(c2Id);
@@ -435,7 +422,8 @@ public class RefsetHelper {
 
         // check subject is not already a member
         if (hasCurrentConceptConceptStringRefsetExtension(refsetId,
-                componentId, c1Id, c2Id, stringValue)) {
+                componentId, c1Id, c2Id, stringValue, termFactory.getConcept(
+                        new UUID[] { statusUuid }).getConceptId())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger
                         .fine("Component is already a member of the refset. Skipping.");
@@ -467,7 +455,8 @@ public class RefsetHelper {
                     .newConceptConceptStringExtensionPart();
 
             extension.setPathId(editPath.getConceptId());
-            extension.setStatusId(currentStatusId);
+            extension.setStatusId(termFactory.getConcept(
+                    new UUID[] { statusUuid }).getConceptId());
             extension.setVersion(Integer.MAX_VALUE);
             extension.setC1id(c1Id);
             extension.setC2id(c2Id);

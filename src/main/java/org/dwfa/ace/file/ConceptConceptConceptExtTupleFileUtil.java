@@ -30,7 +30,7 @@ public class ConceptConceptConceptExtTupleFileUtil {
             UUID componentUuid = termFactory.getUids(tuple.getComponentId())
                     .iterator().next();
             UUID typeUuid = termFactory.getUids(tuple.getTypeId()).iterator()
-                    .next(); // this should be concept concept
+                    .next(); // this should be concept concept concept
             if (!typeUuid
                     .equals(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
                             .getUids().iterator().next())) {
@@ -83,7 +83,6 @@ public class ConceptConceptConceptExtTupleFileUtil {
 
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-
             refsetHelper.newConceptConceptConceptRefsetExtension(termFactory
                     .getId(refsetUuid).getNativeId(), termFactory.getId(
                     componentUuid).getNativeId(), termFactory.getId(c1Uuid)
