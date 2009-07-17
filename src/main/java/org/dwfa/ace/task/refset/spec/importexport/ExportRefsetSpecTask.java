@@ -90,8 +90,10 @@ public class ExportRefsetSpecTask extends AbstractTask {
                         "No member spec found. Please put the refset to \n "
                                 + "be exported in the refset spec panel.");
             }
-            tupleExporter.exportRefsetSpecToFile(new File(fileName),
-                    configFrame.getRefsetSpecInSpecEditor());
+            File file = new File(fileName);
+
+            tupleExporter.exportRefsetSpecToFile(file, configFrame
+                    .getRefsetSpecInSpecEditor());
 
             return Condition.CONTINUE;
         } catch (Exception ex) {

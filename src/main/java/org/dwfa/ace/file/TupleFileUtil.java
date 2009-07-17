@@ -107,7 +107,7 @@ public class TupleFileUtil {
                                 .getUids()));
 
         BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(
-                file, true));
+                file, false));
 
         if (refsetSpec == null) {
             throw new TerminologyException(
