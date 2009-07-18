@@ -124,7 +124,8 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 			List<PropertyDescriptor> propertyDescriptorList = new ArrayList<PropertyDescriptor>();
 			for (PropertyDescriptor d : super.getPropertyDescriptors()) {
 				PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
-				if (PropertyNameLabelEditor.class.isAssignableFrom(d.getPropertyEditorClass())) {
+				if (d != null && d.getPropertyEditorClass() != null &&
+						PropertyNameLabelEditor.class.isAssignableFrom(d.getPropertyEditorClass())) {
 					if (AttachmentGlue.class.isAssignableFrom(dwt.getTarget().getClass())) {
 						d.setPropertyEditorClass(AttachmentNameReadOnlyEditor.class);
 						AttachmentGlue ag = (AttachmentGlue) dwt.getTarget();
