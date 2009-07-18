@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -54,6 +55,22 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	
 	I_ConfigAceFrame frameConfig;
+
+	public I_PluginToConceptPanel getConceptPanelPlugin(String key) {
+		return frameConfig.getConceptPanelPlugin(key);
+	}
+
+	public Set<String> getConceptPanelPluginKeys() {
+		return frameConfig.getConceptPanelPluginKeys();
+	}
+
+	public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin) {
+		frameConfig.addConceptPanelPlugins(key, plugin);
+	}
+
+	public I_PluginToConceptPanel removeConceptPanelPlugin(String key) {
+		return frameConfig.removeConceptPanelPlugin(key);
+	}
 
 	public Map<String, Object> getProperties() throws IOException {
 		return frameConfig.getProperties();

@@ -32,6 +32,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -295,6 +296,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 						} catch (IOException e) {
 							AceLog.getAppLog().alertAndLogException(e);
 						} catch (ClassNotFoundException e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						} catch (NoSuchAlgorithmException e) {
 							AceLog.getAppLog().alertAndLogException(e);
 						}
 					}
@@ -1821,7 +1824,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	CollectionEditorContainer conceptListEditor;
 
 	private Component getConceptListEditor() throws DatabaseException,
-			IOException, ClassNotFoundException {
+			IOException, ClassNotFoundException, NoSuchAlgorithmException {
 		if (conceptListEditor == null) {
 			if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {
 				aceFrameConfig.getTabHistoryMap().put("batchList",

@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -42,8 +43,8 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 
-	public RelPlugin(boolean selectedByDefault) {
-		super(selectedByDefault);
+	public RelPlugin(boolean selectedByDefault, int sequence, UUID id) {
+        super(selectedByDefault, sequence, id);
 	}
    
    protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
@@ -150,7 +151,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
       c.gridwidth = 2;
 
 		if (host.getToggleState(TOGGLES.ID) == true) {
-			idPlugin = new IdPlugin();
+			idPlugin = new IdPlugin(true, 1, UUID.randomUUID());
 			idPlugin.setShowBorder(false);
 			relPanel.add(idPlugin.getComponent(this), c);
 			c.gridy++;

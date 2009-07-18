@@ -440,7 +440,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private LinkedList<I_GetConceptData> tabHistoryList;
 
-	private ArrayList<I_PluginToConceptPanel> plugins;
+	private ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
 
 	private TermComponentLabel label;
 
@@ -452,7 +452,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private static final String TAB_HISTORY_KEY = "refset 0";
 
-	private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, I_PluginToConceptPanel>();
+	private Map<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel>();
 
 	private JButton componentHistoryButton;
 
@@ -484,8 +484,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					this.tabHistoryList);
 		}
 
-		plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
-					.asList(new I_PluginToConceptPanel[] {}));
+		plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(Arrays
+					.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] {}));
 		ace.getAceFrameConfig().addPropertyChangeListener("uncommitted",
 				new UncommittedChangeListener());
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
@@ -636,7 +636,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			boolean visible = ((AceFrameConfig) ace.getAceFrameConfig())
 					.isToggleVisible(t);
 			if (pluginMap.get(t) != null) {
-				I_PluginToConceptPanel plugin = pluginMap.get(t);
+				org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(t);
 				for (JComponent toggleComponent : plugin
 						.getToggleBarComponents()) {
 					toggleComponent.setVisible(visible);
@@ -782,7 +782,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		
 		c.gridy++;
 		
-		for (I_PluginToConceptPanel plugin : plugins) {
+		for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
 			if (plugin.showComponent()) {
 				content.add(plugin.getComponent(this), c);
 				c.gridy++;
@@ -824,7 +824,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 
 	public boolean getToggleState(TOGGLES toggle) {
-		I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+		org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(toggle);
 		if (plugin != null) {
 			for (JComponent component : plugin.getToggleBarComponents()) {
 				if (JToggleButton.class.isAssignableFrom(component.getClass())) {

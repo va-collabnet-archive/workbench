@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -33,8 +34,8 @@ import org.dwfa.bpa.util.TableSorter;
 
 public class IdPlugin extends AbstractPlugin {
 
-	public IdPlugin() {
-		super(false);
+	public IdPlugin(boolean shownByDefault, int sequence, UUID id) {
+        super(shownByDefault, sequence, id);
 	}
 
 	private IdTableModel idTableModel;

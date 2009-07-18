@@ -51,6 +51,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -97,7 +98,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 38;
+    private static final int dataVersion = 39;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -270,6 +271,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     //38
     private Map<String, Object> properties = new HashMap<String, Object>();
+    
+    // 39
+    private Map<String, I_PluginToConceptPanel> conceptPanelPlugins = new HashMap<String, I_PluginToConceptPanel>();
 
 
 	// transient
@@ -471,6 +475,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         // 38
         out.writeObject(properties);
+        
+        // 39
+        out.writeObject(conceptPanelPlugins);
     }
 
 	private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException, IOException {
@@ -850,7 +857,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
             	properties = new HashMap<String, Object>();
             }
+            if (objDataVersion >= 39) {
+                // 39
+            	conceptPanelPlugins = (Map<String, I_PluginToConceptPanel>) in.readObject();
+            } else {
+            	conceptPanelPlugins = new HashMap<String, I_PluginToConceptPanel>();
+            }
         
+            
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -2604,5 +2618,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	public void setProperty(String key, Object value) throws IOException {
 		properties.put(key, value);
 	}
+	
+    public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin) {
+    	conceptPanelPlugins.put(key, plugin);
+    }
+    public I_PluginToConceptPanel removeConceptPanelPlugin(String key) {
+    	return conceptPanelPlugins.remove(key);
+    }
+    
+    public Set<String> getConceptPanelPluginKeys() {
+    	return conceptPanelPlugins.keySet();
+    }
+
+    public I_PluginToConceptPanel getConceptPanelPlugin(String key) {
+    	return conceptPanelPlugins.get(key);
+    }
+
 
 }

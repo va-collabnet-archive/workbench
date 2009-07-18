@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.DefaultListSelectionModel;
@@ -19,9 +20,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.dwfa.ace.api.I_HoldRefsetData;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 
-public abstract class AbstractPlugin implements I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
+public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
    private int lastSelectedIndex = -1;
    private int pluginId = pluginSequence++;
    private static int pluginSequence = 0;
@@ -75,10 +77,14 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 
 	private JToggleButton toggleButton;
 	private Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
+	private int sequence;
+	private UUID id;
 
-	public AbstractPlugin(boolean selectedByDefault) {
+	public AbstractPlugin(boolean selectedByDefault, int sequence, UUID id) {
 		super();
 		this.selectedByDefault = selectedByDefault;
+		this.sequence = sequence;
+		this.id = id;
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -118,7 +124,33 @@ public abstract class AbstractPlugin implements I_PluginToConceptPanel, Property
 	}
 	
 	protected abstract ImageIcon getImageIcon();
-   protected abstract String getToolTipText();
+    protected abstract String getToolTipText();
+    
 	boolean selectedByDefault;
+	
+	public int getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(int sequence) {
+		this.sequence = sequence;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
+
+	public int compareTo(I_PluginToConceptPanel another) {
+		if (this.sequence == another.getSequence()) {
+			return this.id.compareTo(another.getId());
+		}
+		return this.sequence - another.getSequence();
+	}
+
+
 	
 }

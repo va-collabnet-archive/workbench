@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +81,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
@@ -265,25 +267,25 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public static ImageIcon SMALL_ALERT_LINK_ICON = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/warning.png"));
 
-	private ConflictPlugin conflictPlugin = new ConflictPlugin();
+	private ConflictPlugin conflictPlugin;
 
-	private AbstractPlugin srcRelPlugin = new SrcRelPlugin();
+	private AbstractPlugin srcRelPlugin;
 
-	private RelPlugin destRelPlugin = new DestRelPlugin();
+	private RelPlugin destRelPlugin;
 
-	private IdPlugin idPlugin = new IdPlugin();
+	private IdPlugin idPlugin;
 
-	private ImagePlugin imagePlugin = new ImagePlugin();
+	private ImagePlugin imagePlugin;
 	
-	private StatedAndNormalFormsPlugin statedAndNormalFormsPlugin = new StatedAndNormalFormsPlugin();
+	private StatedAndNormalFormsPlugin statedAndNormalFormsPlugin;
 
-	private DescriptionPlugin descPlugin = new DescriptionPlugin();
+	private DescriptionPlugin descPlugin;
 
-	private LineagePlugin lineagePlugin = new LineagePlugin();
+	private LineagePlugin lineagePlugin;
 	
-	private GraphPlugin lineageGraphPlugin = new GraphPlugin();
+	private GraphPlugin lineageGraphPlugin;
 
-	private ConceptAttributePlugin conceptAttributePlugin = new ConceptAttributePlugin();
+	private ConceptAttributePlugin conceptAttributePlugin;
 	
 	private LanguageRefsetDisplayPlugin auDialectPlugin;
 
@@ -295,9 +297,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	
 	private LanguageRefsetDisplayPlugin caDialectPlugin;
 
-	private List<I_PluginToConceptPanel> plugins;
+	private List<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
 
-	private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, I_PluginToConceptPanel>();
+	private Map<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel>();
 
 	public ImageIcon tabIcon;
 
@@ -431,17 +433,17 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public ConceptPanel(ACE ace, LINK_TYPE link, Integer panelId) throws DatabaseException,
-			IOException, ClassNotFoundException {
+			IOException, ClassNotFoundException, NoSuchAlgorithmException {
 		this(ace, link, null, panelId);
 	}
 
 	public ConceptPanel(ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
-			throws DatabaseException, IOException, ClassNotFoundException {
+			throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
 		this(ace, link, null, enableListLink, panelId);
 	}
 
 	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
-			throws DatabaseException, IOException, ClassNotFoundException {
+			throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
 		this(ace, link, conceptTabs, false, panelId);
 	}
 
@@ -449,21 +451,47 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	
 	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs,
 			boolean enableListLink, Integer panelId) throws DatabaseException, IOException,
-			ClassNotFoundException {
+			ClassNotFoundException, NoSuchAlgorithmException {
 		super(new GridBagLayout());
 		this.ace = ace;
 		this.panelId = panelId;
 		try {
-			auDialectPlugin = new LanguageRefsetDisplayPlugin(
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids()), false);
-			ukDialectPlugin = new LanguageRefsetDisplayPlugin(
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids()), false);
-			usaDialectPlugin = new LanguageRefsetDisplayPlugin(
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids()), false);
-			nzDialectPlugin = new LanguageRefsetDisplayPlugin(
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids()), false);
-			caDialectPlugin = new LanguageRefsetDisplayPlugin(
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids()), false);
+			int order = 0;
+			idPlugin = new IdPlugin(false, order++, Type5UuidFactory.get(IdPlugin.class.getName()));
+
+			descPlugin = new DescriptionPlugin(true, order++, Type5UuidFactory.get(DescriptionPlugin.class.getName()));
+
+			conceptAttributePlugin = new ConceptAttributePlugin(true, order++, Type5UuidFactory.get(ConceptAttributePlugin.class.getName()));
+
+			srcRelPlugin = new SrcRelPlugin(true, order++, Type5UuidFactory.get(SrcRelPlugin.class.getName()));
+
+			destRelPlugin = new DestRelPlugin(false, order++, Type5UuidFactory.get(DestRelPlugin.class.getName()));
+
+			lineagePlugin = new LineagePlugin(true, order++, Type5UuidFactory.get(LineagePlugin.class.getName()));
+			
+			lineageGraphPlugin = new GraphPlugin(false, order++, Type5UuidFactory.get(GraphPlugin.class.getName()));
+
+			imagePlugin = new ImagePlugin(false, order++, Type5UuidFactory.get(ImagePlugin.class.getName()));
+			
+			conflictPlugin = new ConflictPlugin(false, order++, Type5UuidFactory.get(ConflictPlugin.class.getName()));
+
+			statedAndNormalFormsPlugin = new StatedAndNormalFormsPlugin(false, order++, Type5UuidFactory.get(StatedAndNormalFormsPlugin.class.getName()));
+
+			auDialectPlugin = new LanguageRefsetDisplayPlugin(false, order++,
+					Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_AU"),
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids()));
+			ukDialectPlugin = new LanguageRefsetDisplayPlugin(false,
+					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_GB"),
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids()));
+			usaDialectPlugin = new LanguageRefsetDisplayPlugin(false,
+					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_US"),
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids()));
+			nzDialectPlugin = new LanguageRefsetDisplayPlugin(false,
+					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_NZ"),
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids()));
+			caDialectPlugin = new LanguageRefsetDisplayPlugin(false,
+					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_CA"),
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids()));
 		} catch (TerminologyException e) {
 			throw new ToIoException(e);
 		}
@@ -485,8 +513,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		
 		
 		if (ACE.editMode) {
-			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
-					.asList(new I_PluginToConceptPanel[] { idPlugin,
+			plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(Arrays
+					.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] { idPlugin,
 							conceptAttributePlugin, 
 							auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
 							nzDialectPlugin, caDialectPlugin,
@@ -494,8 +522,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 							destRelPlugin, lineagePlugin, lineageGraphPlugin, imagePlugin,
 							statedAndNormalFormsPlugin, conflictPlugin }));
 		} else {
-			plugins = new ArrayList<I_PluginToConceptPanel>(Arrays
-					.asList(new I_PluginToConceptPanel[] { idPlugin,
+			plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(Arrays
+					.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] { idPlugin,
 							conceptAttributePlugin, auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
 							nzDialectPlugin, caDialectPlugin,
 							descPlugin, srcRelPlugin,
@@ -576,7 +604,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 
-		for (I_PluginToConceptPanel plugin : plugins) {
+		for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
 			if (plugin.showComponent()) {
 				content.add(plugin.getComponent(this), c);
 				c.gridy++;
@@ -605,7 +633,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		JPanel rightTogglePane = new JPanel(new FlowLayout());
 
 		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
-		for (I_PluginToConceptPanel plugin : plugins) {
+		for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
 			if (plugin != null) {
 				if (plugin.getToggleBarComponents() != null) {
 					for (JComponent component : plugin.getToggleBarComponents()) {
@@ -740,7 +768,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			boolean visible = ((AceFrameConfig) ace.getAceFrameConfig())
 					.isToggleVisible(t);
 			if (pluginMap.get(t) != null) {
-				I_PluginToConceptPanel plugin = pluginMap.get(t);
+				org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(t);
 				for (JComponent toggleComponent : plugin
 						.getToggleBarComponents()) {
 					toggleComponent.setVisible(visible);
@@ -1045,7 +1073,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				for (I_PluginToConceptPanel plugin : plugins) {
+				for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
 					for (JComponent component : plugin.getToggleBarComponents()) {
 						if (JToggleButton.class.isAssignableFrom(component
 								.getClass())) {
@@ -1070,7 +1098,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+				org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(toggle);
 				if (plugin != null) {
 					for (JComponent component : plugin.getToggleBarComponents()) {
 						if (JToggleButton.class.isAssignableFrom(component
@@ -1142,7 +1170,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public boolean getToggleState(TOGGLES toggle) {
-		I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+		org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(toggle);
 		if (plugin != null) {
 			for (JComponent component : plugin.getToggleBarComponents()) {
 				if (JToggleButton.class.isAssignableFrom(component.getClass())) {

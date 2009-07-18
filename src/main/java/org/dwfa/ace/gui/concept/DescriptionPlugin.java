@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -61,8 +62,8 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	private IdPlugin idPlugin;
 	private I_GetConceptData lastSelectedConcept;
 
-	public DescriptionPlugin() {
-		super(true);
+	public DescriptionPlugin(boolean shownByDefault, int sequence, UUID id) {
+        super(shownByDefault, sequence, id);
 	}
 
 	@Override
@@ -270,7 +271,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		c.gridwidth = 2;
 
 		if (host.getToggleState(TOGGLES.ID) == true) {
-			idPlugin = new IdPlugin();
+			idPlugin = new IdPlugin(true, 1, UUID.randomUUID());
 			idPlugin.setShowBorder(false);
 			descPanel.add(idPlugin.getComponent(this), c);
 			c.gridy++;

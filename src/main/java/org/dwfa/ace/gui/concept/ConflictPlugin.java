@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 
@@ -11,8 +12,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ConflictPlugin extends AbstractPlugin {
-	public ConflictPlugin() {
-		super(false);
+	public ConflictPlugin(boolean shownByDefault, int sequence, UUID id) {
+        super(shownByDefault, sequence, id);
 	}
 
 	private ConflictPanel conflictPanel;
@@ -44,7 +45,6 @@ public class ConflictPlugin extends AbstractPlugin {
 		if (showComponent() && conflictPanel != null) {
 			conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
 		}
-		
 	}
    @Override
    protected String getToolTipText() {

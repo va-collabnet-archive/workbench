@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -210,7 +211,7 @@ public class CollectionEditorContainer extends JPanel {
 
 	public CollectionEditorContainer(TerminologyList list, ACE ace,
 			JPanel descListProcessBuilderPanel) throws DatabaseException,
-			IOException, ClassNotFoundException {
+			IOException, ClassNotFoundException, NoSuchAlgorithmException {
 		super(new GridBagLayout());
 		this.ace = ace;
 		this.list = list;

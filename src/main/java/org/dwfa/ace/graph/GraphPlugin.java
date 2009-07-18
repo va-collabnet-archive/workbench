@@ -3,6 +3,7 @@ package org.dwfa.ace.graph;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -23,7 +24,6 @@ public class GraphPlugin extends AbstractPlugin {
 		DAGLayout, FRLayout, ISOMLayout, KKLayout, SpringLayout, AceGraphLayout
 	};
 
-	private static boolean SHOWN_BY_DEFAULT = false;
 	private I_HostConceptPlugins host;
 
 	private JPanel graphWrapperPanel = new JPanel(new GridBagLayout());
@@ -32,10 +32,9 @@ public class GraphPlugin extends AbstractPlugin {
 	private GridBagConstraints gbc = new GridBagConstraints();
 	private boolean initialize = true;
 	private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.KKLayout;
-	private boolean lastShown = SHOWN_BY_DEFAULT;
 
-	public GraphPlugin() {
-		super(SHOWN_BY_DEFAULT);
+	public GraphPlugin(boolean shownByDefault, int sequence, UUID id) {
+        super(shownByDefault, sequence, id); 
 	}
 
 	@Override

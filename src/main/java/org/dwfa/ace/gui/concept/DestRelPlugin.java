@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
@@ -19,8 +20,8 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 
 public class DestRelPlugin extends RelPlugin {
 
-	public DestRelPlugin() {
-		super(false);
+	public DestRelPlugin(boolean shownByDefault, int sequence, UUID id) {
+        super(shownByDefault, sequence, id);
 	}
 
 	private JPanel pluginPanel;

@@ -1,6 +1,7 @@
 package org.dwfa.ace.gui.concept;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 
@@ -11,8 +12,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class StatedAndNormalFormsPlugin extends AbstractPlugin {
-	public StatedAndNormalFormsPlugin() {
-		super(false);
+	public StatedAndNormalFormsPlugin(boolean selectedByDefault, int sequence, UUID id) {
+        super(selectedByDefault, sequence, id);
 	}
 
 	private LogicalFormsPanel formsPanel;

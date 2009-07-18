@@ -26,10 +26,11 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -57,6 +58,22 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
+
+	public I_PluginToConceptPanel getConceptPanelPlugin(String key) {
+		return baseFrame.getConceptPanelPlugin(key);
+	}
+
+	public Set<String> getConceptPanelPluginKeys() {
+		return baseFrame.getConceptPanelPluginKeys();
+	}
+
+	public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin) {
+		baseFrame.addConceptPanelPlugins(key, plugin);
+	}
+
+	public I_PluginToConceptPanel removeConceptPanelPlugin(String key) {
+		return baseFrame.removeConceptPanelPlugin(key);
+	}
 
 	public Map<String, Object> getProperties() throws IOException {
 		return baseFrame.getProperties();

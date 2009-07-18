@@ -34,7 +34,7 @@ import org.dwfa.vodb.types.IntList;
 
 public class RefsetUtil {
 
-    public static void addRefsetTables(I_HostConceptPlugins host, I_PluginToConceptPanel plugin, TOGGLES toggle,
+    public static void addRefsetTables(I_HostConceptPlugins host, org.dwfa.ace.api.I_PluginToConceptPanel plugin, TOGGLES toggle,
         GridBagConstraints c, Set<EXT_TYPE> visibleExtensions, JPanel panel) {
         plugin.clearRefsetListeners();
         if (host.getShowRefsets()) {
@@ -296,9 +296,9 @@ public class RefsetUtil {
         extTable.getColumn(comboField).setCellEditor(conceptCombo);
     }
 
-    static HashSet<I_PluginToConceptPanel> historyState = new HashSet<I_PluginToConceptPanel>();
+    static HashSet<org.dwfa.ace.api.I_PluginToConceptPanel> historyState = new HashSet<org.dwfa.ace.api.I_PluginToConceptPanel>();
 
-    public static boolean refSetsChanged(I_HostConceptPlugins host, TOGGLES toggle, I_PluginToConceptPanel plugin,
+    public static boolean refSetsChanged(I_HostConceptPlugins host, TOGGLES toggle, org.dwfa.ace.api.I_PluginToConceptPanel plugin,
         Set<EXT_TYPE> visibleExtensions) {
         if (host.getShowRefsets()) {
             if (historyState.contains(plugin) == host.getShowHistory()) {

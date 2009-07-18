@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -43,8 +44,8 @@ public class ImagePlugin extends AbstractPlugin {
    protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
 
 
-	public ImagePlugin() {
-		super(false);
+	public ImagePlugin(boolean shownByDefault, int sequence, UUID id) {
+        super(shownByDefault, sequence, id);
 	}
 
 	@Override

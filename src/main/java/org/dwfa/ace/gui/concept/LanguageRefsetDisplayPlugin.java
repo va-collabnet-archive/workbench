@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -54,8 +55,8 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 
 	private JTableWithDragImage languageRefsetTable;
 
-    public LanguageRefsetDisplayPlugin(I_GetConceptData languageConcept, boolean selectedByDefault) {
-        super(selectedByDefault);
+    public LanguageRefsetDisplayPlugin(boolean selectedByDefault, int sequence, UUID id, I_GetConceptData languageConcept) {
+        super(selectedByDefault, sequence, id);
         this.languageConcept = languageConcept;
     }
 

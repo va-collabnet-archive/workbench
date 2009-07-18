@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
@@ -19,8 +20,8 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 
 public class SrcRelPlugin extends RelPlugin {
 
-	public SrcRelPlugin() {
-		super(true);
+	public SrcRelPlugin(boolean selectedByDefault, int sequence, UUID id) {
+        super(selectedByDefault, sequence, id);
 	}
 	private JPanel pluginPanel;
 	private SrcRelTableModel srcRelTableModel;
