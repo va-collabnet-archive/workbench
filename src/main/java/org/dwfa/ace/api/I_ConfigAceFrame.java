@@ -465,5 +465,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public Object getProperty(String key) throws IOException;
     public void setProperty(String key, Object value) throws IOException;
     public Map<String, Object> getProperties() throws IOException;
+    
+    public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin);
+    public I_PluginToConceptPanel removeConceptPanelPlugin(String key);
+    public Set<String> getConceptPanelPluginKeys();
+    public I_PluginToConceptPanel getConceptPanelPlugin(String key);
 
 }
