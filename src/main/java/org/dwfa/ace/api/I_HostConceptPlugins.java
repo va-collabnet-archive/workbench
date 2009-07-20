@@ -1,14 +1,67 @@
 package org.dwfa.ace.api;
 
+import java.util.UUID;
+
 public interface I_HostConceptPlugins extends I_ContainTermComponent {
 
    public static final String SHOW_HISTORY = "showHistory";
 
    public static final String USE_PREFS = "usePrefs";
+   
+   public enum HOST_ENUM {
+	   CONCEPT_PANEL_L1, CONCEPT_PANEL_R1, 
+	   CONCEPT_PANEL_R2, CONCEPT_PANEL_R3,
+	   CONCEPT_PANEL_R4, CONCEPT_PANEL_LIST_VIEW,
+	   CONCPET_PANEL_DATA_CHECK,
+	   REFSET_SPEC;
+   }
 
+   
    public enum TOGGLES {
-      ID, ATTRIBUTES, AU_DIALECT, UK_DIALECT, USA_DIALECT, NZ_DIALECT, CA_DIALECT, DESCRIPTIONS, SOURCE_RELS, 
-      DEST_RELS, LINEAGE, LINEAGE_GRAPH, IMAGE, CONFLICT, STATED_INFERRED, PREFERENCES, HISTORY, REFSETS
+      ID(UUID.fromString("f0e28620-7495-11de-8a39-0800200c9a66"), 1), 
+      ATTRIBUTES(UUID.fromString("f0e28621-7495-11de-8a39-0800200c9a66"), 1), 
+      AU_DIALECT(UUID.fromString("f0e28622-7495-11de-8a39-0800200c9a66"), 1), 
+      UK_DIALECT(UUID.fromString("f0e28623-7495-11de-8a39-0800200c9a66"), 1), 
+      USA_DIALECT(UUID.fromString("f0e28624-7495-11de-8a39-0800200c9a66"), 1), 
+      NZ_DIALECT(UUID.fromString("f0e28625-7495-11de-8a39-0800200c9a66"), 1), 
+      CA_DIALECT(UUID.fromString("f0e28626-7495-11de-8a39-0800200c9a66"), 1), 
+      DESCRIPTIONS(UUID.fromString("f0e28627-7495-11de-8a39-0800200c9a66"), 1), 
+      SOURCE_RELS(UUID.fromString("f0e28628-7495-11de-8a39-0800200c9a66"), 1), 
+      DEST_RELS(UUID.fromString("f0e28629-7495-11de-8a39-0800200c9a66"), 1), 
+      LINEAGE(UUID.fromString("f0e2862a-7495-11de-8a39-0800200c9a66"), 1), 
+      LINEAGE_GRAPH(UUID.fromString("f0e2862b-7495-11de-8a39-0800200c9a66"), 1), 
+      IMAGE(UUID.fromString("f0e2862c-7495-11de-8a39-0800200c9a66"), 1), 
+      CONFLICT(UUID.fromString("f0e2862d-7495-11de-8a39-0800200c9a66"), 1), 
+      STATED_INFERRED(UUID.fromString("f0e2862e-7495-11de-8a39-0800200c9a66"), 1), 
+      PREFERENCES(UUID.fromString("f0e28631-7495-11de-8a39-0800200c9a66"), 1), 
+      HISTORY(UUID.fromString("f0e28632-7495-11de-8a39-0800200c9a66"), 1), 
+      REFSETS(UUID.fromString("f0e28633-7495-11de-8a39-0800200c9a66"), 1);
+      
+      UUID pluginId;
+      private int controlId;
+
+
+      public UUID getPluginId() {
+    	  return pluginId;
+      }
+
+      public int getControlId() {
+    	  return controlId;
+      }
+
+      private TOGGLES(UUID pluginId, int controlId) {
+    	  this.pluginId = pluginId;
+    	  this.controlId = controlId;
+      }
+
+      public static TOGGLES fromId(UUID id) {
+    	  for (TOGGLES t: values()) {
+    		  if (t.pluginId == id) {
+    			  return t;
+    		  }
+    	  }
+    	  return null;
+      }
    };
    
    public enum REFSET_TYPES {
@@ -38,5 +91,5 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
    public void setAllTogglesToState(boolean state);
 
    public void setLinkType(LINK_TYPE link);
-   
+      
 }

@@ -12,8 +12,10 @@ import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
@@ -61,6 +63,12 @@ public class NewDefaultProfile extends NewProfile {
 		
 		I_ImplementTermFactory tf = (I_ImplementTermFactory) LocalVersionedTerminology.get();
 		I_ConfigAceFrame activeConfig = tf.newAceFrameConfig();
+		
+		for (HOST_ENUM h: HOST_ENUM.values()) {
+			for (I_PluginToConceptPanel plugin: activeConfig.getDefaultConceptPanelPluginsForEditor()) {
+				activeConfig.addConceptPanelPlugins(h, plugin.getId(), plugin);
+			}
+		}
 		
 		I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
 		newDbProfile.setUsername(username);

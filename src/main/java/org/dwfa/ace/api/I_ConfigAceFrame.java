@@ -9,12 +9,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -466,9 +468,27 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setProperty(String key, Object value) throws IOException;
     public Map<String, Object> getProperties() throws IOException;
     
-    public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin);
-    public I_PluginToConceptPanel removeConceptPanelPlugin(String key);
-    public Set<String> getConceptPanelPluginKeys();
-    public I_PluginToConceptPanel getConceptPanelPlugin(String key);
+    public void addConceptPanelPlugins(HOST_ENUM host, UUID id, I_PluginToConceptPanel plugin);
+    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID id);
+    public Set<UUID> getConceptPanelPluginKeys(HOST_ENUM host);
+    public I_PluginToConceptPanel getConceptPanelPlugin(HOST_ENUM host, UUID id);
+    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host);
+    
+    /**
+     * 
+     * @return A list of the default concept panel plugins for editing, that may be used to "reset the frame to defaults", 
+     * or initialize a frame configuration. This list is static, and has no relationship to the current set of 
+     * plugins for this frame. 
+     */
+    public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor();
+
+    /**
+     * 
+     * @return A list of the default concept panel plugins for a viewer, that may be used to "reset the frame to defaults", 
+     * or initialize a frame configuration. This list is static, and has no relationship to the current set of 
+     * plugins for this frame. 
+     */
+    public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer();
+
 
 }
