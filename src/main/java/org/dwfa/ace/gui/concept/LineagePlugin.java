@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
@@ -34,16 +37,30 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class LineagePlugin extends AbstractPlugin {
 
-	private JTreeWithDragImage lineageTree;
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
 
-	private JComponent lineagePanel;
+	private transient JTreeWithDragImage lineageTree;
+	private transient JComponent lineagePanel;
+	private transient I_HostConceptPlugins host;
+	private transient LineageTreeCellRenderer lineageRenderer;
 
-	private I_HostConceptPlugins host;
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
 
-	private LineageTreeCellRenderer lineageRenderer;
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
 
-	public LineagePlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
+	public LineagePlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
 	}
 
 	@Override
@@ -231,6 +248,10 @@ public class LineagePlugin extends AbstractPlugin {
    @Override
    protected int getComponentId() {
       return Integer.MIN_VALUE;
+   }
+
+   public UUID getId() {
+	   return TOGGLES.LINEAGE.getPluginId();
    }
 
 }

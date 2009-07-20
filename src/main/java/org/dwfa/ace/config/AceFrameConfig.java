@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,11 +57,23 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.graph.GraphPlugin;
+import org.dwfa.ace.gui.concept.ConceptAttributePlugin;
+import org.dwfa.ace.gui.concept.ConflictPlugin;
+import org.dwfa.ace.gui.concept.DescriptionPlugin;
+import org.dwfa.ace.gui.concept.DestRelPlugin;
+import org.dwfa.ace.gui.concept.IdPlugin;
+import org.dwfa.ace.gui.concept.ImagePlugin;
+import org.dwfa.ace.gui.concept.LanguageRefsetDisplayPlugin;
+import org.dwfa.ace.gui.concept.LineagePlugin;
+import org.dwfa.ace.gui.concept.SrcRelPlugin;
+import org.dwfa.ace.gui.concept.StatedAndNormalFormsPlugin;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -273,7 +286,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private Map<String, Object> properties = new HashMap<String, Object>();
     
     // 39
-    private Map<String, I_PluginToConceptPanel> conceptPanelPlugins = new HashMap<String, I_PluginToConceptPanel>();
+    private Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>> conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
 
 
 	// transient
@@ -859,9 +872,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 39) {
                 // 39
-            	conceptPanelPlugins = (Map<String, I_PluginToConceptPanel>) in.readObject();
+            	conceptPanelPlugins = (Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>) in.readObject();
+            	if (conceptPanelPlugins == null || conceptPanelPlugins.size() == 0) {
+            		for (HOST_ENUM h: HOST_ENUM.values()) {
+                		for (I_PluginToConceptPanel plugin: getDefaultConceptPanelPluginsForEditor()) {
+                			addConceptPanelPlugins(h, plugin.getId(), plugin);
+                		}
+            		}
+            	}
             } else {
-            	conceptPanelPlugins = new HashMap<String, I_PluginToConceptPanel>();
+        		for (HOST_ENUM h: HOST_ENUM.values()) {
+            		for (I_PluginToConceptPanel plugin: getDefaultConceptPanelPluginsForEditor()) {
+            			addConceptPanelPlugins(h, plugin.getId(), plugin);
+            		}
+        		}
             }
         
             
@@ -2511,7 +2535,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("highlightConflictsInComponentPanel", old, highlightConflictsInComponentPanel);
 	}
 
-	@SuppressWarnings("unchecked")
 	public I_ManageConflict[] getAllConflictResolutionStrategies() {
 		I_ManageConflict[] strategies = new I_ManageConflict[2];
 		strategies[0] = new IdentifyAllConflictStrategy();
@@ -2619,20 +2642,116 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		properties.put(key, value);
 	}
 	
-    public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin) {
-    	conceptPanelPlugins.put(key, plugin);
+    public void addConceptPanelPlugins(HOST_ENUM host, UUID key, I_PluginToConceptPanel plugin) {
+    	checkConceptPanelPlugins();
+    	conceptPanelPlugins.get(host).put(key, plugin);
     }
-    public I_PluginToConceptPanel removeConceptPanelPlugin(String key) {
-    	return conceptPanelPlugins.remove(key);
+
+	private void checkConceptPanelPlugins() {
+		if (conceptPanelPlugins == null) {
+    		conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
+    	}
+    	if (conceptPanelPlugins.size() < HOST_ENUM.values().length) {
+        	for (HOST_ENUM h: HOST_ENUM.values()) {
+            	if (conceptPanelPlugins.get(h) == null) {
+            		conceptPanelPlugins.put(h, new HashMap<UUID, I_PluginToConceptPanel>());
+            	}
+        	}
+    	}
+	}
+    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID key) {
+    	checkConceptPanelPlugins();
+    	return conceptPanelPlugins.get(host).remove(key);
     }
     
-    public Set<String> getConceptPanelPluginKeys() {
-    	return conceptPanelPlugins.keySet();
+    public Set<UUID> getConceptPanelPluginKeys(HOST_ENUM host) {
+    	checkConceptPanelPlugins();
+    	return conceptPanelPlugins.get(host).keySet();
     }
 
-    public I_PluginToConceptPanel getConceptPanelPlugin(String key) {
-    	return conceptPanelPlugins.get(key);
+    public I_PluginToConceptPanel getConceptPanelPlugin(HOST_ENUM host, UUID key) {
+    	checkConceptPanelPlugins();
+    	return conceptPanelPlugins.get(host).get(key);
     }
 
+   public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host) {
+    	return conceptPanelPlugins.get(host).values();
+	}
+
+	public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor() {
+    	return staticGetDefaultConceptPanelPlugins();
+    }
+    
+    public static List<I_PluginToConceptPanel> staticGetDefaultConceptPanelPlugins() {
+    	List<I_PluginToConceptPanel> list = new ArrayList<I_PluginToConceptPanel>();
+    	int order = 0;
+    	try {
+			list.add(new IdPlugin(false, order++));
+			list.add(new DescriptionPlugin(true, order++));
+			list.add(new ConceptAttributePlugin(true, order++));
+			list.add(new SrcRelPlugin(true, order++));
+			list.add(new DestRelPlugin(false, order++));
+			list.add(new LineagePlugin(true, order++));
+			list.add(new GraphPlugin(false, order++));
+			list.add(new ImagePlugin(false, order++));
+			list.add(new ConflictPlugin(false, order++));
+			list.add(new StatedAndNormalFormsPlugin(false, order++));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+    	} catch (TerminologyException e) {
+    		AceLog.getAppLog().alertAndLogException(e);
+		} catch (UnsupportedEncodingException e) {
+    		AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+    		AceLog.getAppLog().alertAndLogException(e);
+		}
+    	return list;
+    }
+
+    public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer() {
+    	return staticGetDefaultConceptPanelPluginsForViewer();
+    }
+    
+    public static List<I_PluginToConceptPanel> staticGetDefaultConceptPanelPluginsForViewer() {
+    	List<I_PluginToConceptPanel> list = new ArrayList<I_PluginToConceptPanel>();
+    	int order = 0;
+    	try {
+			list.add(new IdPlugin(false, order++));
+			list.add(new DescriptionPlugin(true, order++));
+			list.add(new ConceptAttributePlugin(true, order++));
+			list.add(new SrcRelPlugin(true, order++));
+			list.add(new DestRelPlugin(false, order++));
+			list.add(new LineagePlugin(true, order++));
+			list.add(new GraphPlugin(false, order++));
+			list.add(new ImagePlugin(false, order++));
+			list.add(new ConflictPlugin(false, order++));
+			list.add(new StatedAndNormalFormsPlugin(false, order++));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
+					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+    	} catch (TerminologyException e) {
+    		AceLog.getAppLog().alertAndLogException(e);
+		} catch (UnsupportedEncodingException e) {
+    		AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+    		AceLog.getAppLog().alertAndLogException(e);
+		}
+    	return list;
+    }
 
 }

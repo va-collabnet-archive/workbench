@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,15 +39,37 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ImagePlugin extends AbstractPlugin {
 
-	private JPanel imagePanel;
-	private I_HostConceptPlugins host;
-	private ImageTableModel imageTableModel;
-	private JTableWithDragImage imageTable;
-   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
+
+	private transient JPanel imagePanel;
+	private transient I_HostConceptPlugins host;
+	private transient ImageTableModel imageTableModel;
+	private transient JTableWithDragImage imageTable;
+    protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			visibleExtensions = new HashSet<EXT_TYPE>();
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
 
 
-	public ImagePlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
+
+	public ImagePlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
+	}
+
+	public UUID getId() {
+		return I_HostConceptPlugins.TOGGLES.IMAGE.getPluginId();
 	}
 
 	@Override

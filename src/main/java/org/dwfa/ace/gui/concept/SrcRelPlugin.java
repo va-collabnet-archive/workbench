@@ -2,6 +2,8 @@ package org.dwfa.ace.gui.concept;
 
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,14 +22,35 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 
 public class SrcRelPlugin extends RelPlugin {
 
-	public SrcRelPlugin(boolean selectedByDefault, int sequence, UUID id) {
-        super(selectedByDefault, sequence, id);
-	}
-	private JPanel pluginPanel;
-	private SrcRelTableModel srcRelTableModel;
-	I_HostConceptPlugins host;
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
 
-   TOGGLES toggleType = TOGGLES.SOURCE_RELS;
+	private transient JPanel pluginPanel;
+	private transient SrcRelTableModel srcRelTableModel;
+	private transient I_HostConceptPlugins host;
+    private static TOGGLES toggleType = TOGGLES.SOURCE_RELS;
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+	public SrcRelPlugin(boolean selectedByDefault, int sequence) {
+        super(selectedByDefault, sequence);
+	}
+	
+	   public UUID getId() {
+		   return TOGGLES.SOURCE_RELS.getPluginId();
+	   }
+
 
 	public JPanel getComponent(I_HostConceptPlugins host) {
 	  this.host = host;

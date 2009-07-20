@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,18 +42,32 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ConceptAttributePlugin extends AbstractPlugin implements TableModelListener {
 
-    private I_HostConceptPlugins host;
 
-    private JPanel conceptAttributes;
+   private static final long serialVersionUID = 1L;
+   private static final int dataVersion = 1;
 
-    private ConceptAttributeTableModel conceptTableModel;
+   private transient I_HostConceptPlugins host;
+   private transient JPanel conceptAttributes;
+   private transient ConceptAttributeTableModel conceptTableModel;
+   private transient JTableWithDragImage conceptTable;
+   protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
 
-    private JTableWithDragImage conceptTable;
+   private void writeObject(ObjectOutputStream out) throws IOException {
+       out.writeInt(dataVersion);
+   }
 
-    protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+       int objDataVersion = in.readInt();
+       if (objDataVersion == dataVersion) {
+    	   visibleExtensions = new HashSet<EXT_TYPE>();
+       } else {
+           throw new IOException("Can't handle dataversion: " + objDataVersion);
+       }
+   }
 
-    public ConceptAttributePlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
+
+    public ConceptAttributePlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
     }
 
     @Override
@@ -257,5 +273,9 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         }
         
     }
+
+	public UUID getId() {
+		return I_HostConceptPlugins.TOGGLES.ATTRIBUTES.getPluginId();
+	}
 
 }

@@ -6,6 +6,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -43,14 +46,34 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 
-	public RelPlugin(boolean selectedByDefault, int sequence, UUID id) {
-        super(selectedByDefault, sequence, id);
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
+
+	protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+	private transient JTableWithDragImage relTable;
+	protected transient boolean idToggleState = false;
+	protected transient IdPlugin idPlugin;
+	private transient PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			visibleExtensions = new HashSet<EXT_TYPE>();
+			pcs = new PropertyChangeSupport(this);
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+	public RelPlugin(boolean selectedByDefault, int sequence) {
+        super(selectedByDefault, sequence);
 	}
    
-   protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
-	private JTableWithDragImage relTable;
-	protected boolean idToggleState = false;
-	protected IdPlugin idPlugin;
 
 	protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText,
 			boolean enableEdit, TOGGLES toggle) {
@@ -151,7 +174,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
       c.gridwidth = 2;
 
 		if (host.getToggleState(TOGGLES.ID) == true) {
-			idPlugin = new IdPlugin(true, 1, UUID.randomUUID());
+			idPlugin = new IdPlugin(true, 1);
 			idPlugin.setShowBorder(false);
 			relPanel.add(idPlugin.getComponent(this), c);
 			c.gridy++;
@@ -253,7 +276,6 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 		return getSelectedPluginComponent();
 	}
 
-	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 	public void removePropertyChangeListener(String propertyName,
 			PropertyChangeListener listener) {
 		pcs.removePropertyChangeListener(propertyName, listener);

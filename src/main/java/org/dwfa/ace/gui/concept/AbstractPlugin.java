@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +26,44 @@ import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 
 public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
+
+   private static final long serialVersionUID = 1L;
+   private static final int dataVersion = 1;
+
+   private String name;
    private int lastSelectedIndex = -1;
-   private int pluginId = pluginSequence++;
-   private static int pluginSequence = 0;
+   private int sequence;
+   private boolean selectedByDefault;
+   
+   private transient JToggleButton toggleButton;
+   private transient Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
+   private transient Set<I_HoldRefsetData> refSetListeners = new HashSet<I_HoldRefsetData>();
+
+
+
+   private void writeObject(ObjectOutputStream out) throws IOException {
+       out.writeInt(dataVersion);
+       out.writeObject(name);
+       out.writeInt(lastSelectedIndex);
+       out.writeInt(sequence);
+       out.writeBoolean(selectedByDefault);
+   }
+
+   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+       int objDataVersion = in.readInt();
+       if (objDataVersion == dataVersion) {
+    	   name = (String) in.readObject();
+    	   lastSelectedIndex = in.readInt();
+    	   sequence = in.readInt();
+    	   selectedByDefault = in.readBoolean();
+    	   showComponentListeners = new HashSet<ActionListener>();
+    	   refSetListeners = new HashSet<I_HoldRefsetData>();
+    	   toggleButton = null;
+       } else {
+           throw new IOException("Can't handle dataversion: " + objDataVersion);
+       }
+   }
+
 	
    public int getLastSelectedIndex() {
 		return lastSelectedIndex;
@@ -40,7 +77,7 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
        DefaultListSelectionModel lsm = (DefaultListSelectionModel) evt.getSource();
 	  lastSelectedIndex = lsm.getMinSelectionIndex();
 	  if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-		   AceLog.getAppLog().fine("New selection ("+ pluginId + "): " + lastSelectedIndex);
+		   AceLog.getAppLog().fine("New selection ("+ getId() + "): " + lastSelectedIndex);
 	  }
       for (I_HoldRefsetData l: refSetListeners) {
          try {
@@ -53,7 +90,6 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
    }
    protected abstract int getComponentId();
    
-   Set<I_HoldRefsetData> refSetListeners = new HashSet<I_HoldRefsetData>();
 	public void addRefsetListener(I_HoldRefsetData listener) {
       refSetListeners.add(listener);
    }
@@ -75,16 +111,10 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
 		}
 	}
 
-	private JToggleButton toggleButton;
-	private Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
-	private int sequence;
-	private UUID id;
-
-	public AbstractPlugin(boolean selectedByDefault, int sequence, UUID id) {
+	public AbstractPlugin(boolean selectedByDefault, int sequence) {
 		super();
 		this.selectedByDefault = selectedByDefault;
 		this.sequence = sequence;
-		this.id = id;
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -126,7 +156,6 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
 	protected abstract ImageIcon getImageIcon();
     protected abstract String getToolTipText();
     
-	boolean selectedByDefault;
 	
 	public int getSequence() {
 		return sequence;
@@ -136,21 +165,22 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
 		this.sequence = sequence;
 	}
 
-	public UUID getId() {
-		return id;
-	}
-
 	public void setId(UUID id) {
-		this.id = id;
+		throw new UnsupportedOperationException();
 	}
 
 	public int compareTo(I_PluginToConceptPanel another) {
 		if (this.sequence == another.getSequence()) {
-			return this.id.compareTo(another.getId());
+			return this.getId().compareTo(another.getId());
 		}
 		return this.sequence - another.getSequence();
 	}
 
+	public String getName() {
+		return name;
+	}
 
-	
+	public void setName(String name) {
+		this.name = name;
+	}	
 }

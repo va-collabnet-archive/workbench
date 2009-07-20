@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
@@ -33,6 +34,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -56,20 +58,34 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	
 	I_ConfigAceFrame frameConfig;
 
-	public I_PluginToConceptPanel getConceptPanelPlugin(String key) {
-		return frameConfig.getConceptPanelPlugin(key);
+
+	public void addConceptPanelPlugins(HOST_ENUM host, UUID id,
+			I_PluginToConceptPanel plugin) {
+		frameConfig.addConceptPanelPlugins(host, id, plugin);
 	}
 
-	public Set<String> getConceptPanelPluginKeys() {
-		return frameConfig.getConceptPanelPluginKeys();
+	public I_PluginToConceptPanel getConceptPanelPlugin(HOST_ENUM host, UUID id) {
+		return frameConfig.getConceptPanelPlugin(host, id);
 	}
 
-	public void addConceptPanelPlugins(String key, I_PluginToConceptPanel plugin) {
-		frameConfig.addConceptPanelPlugins(key, plugin);
+	public Set<UUID> getConceptPanelPluginKeys(HOST_ENUM host) {
+		return frameConfig.getConceptPanelPluginKeys(host);
 	}
 
-	public I_PluginToConceptPanel removeConceptPanelPlugin(String key) {
-		return frameConfig.removeConceptPanelPlugin(key);
+	public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host) {
+		return frameConfig.getConceptPanelPlugins(host);
+	}
+
+	public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor() {
+		return frameConfig.getDefaultConceptPanelPluginsForEditor();
+	}
+
+	public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer() {
+		return frameConfig.getDefaultConceptPanelPluginsForViewer();
+	}
+
+	public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID id) {
+		return frameConfig.removeConceptPanelPlugin(host, id);
 	}
 
 	public Map<String, Object> getProperties() throws IOException {

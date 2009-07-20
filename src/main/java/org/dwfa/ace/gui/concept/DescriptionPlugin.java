@@ -8,6 +8,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,17 +55,40 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 public class DescriptionPlugin extends AbstractPlugin implements
 		TableModelListener, I_HostConceptPlugins {
 
-	private JPanel descPanel;
-	private I_HostConceptPlugins host;
-	private DescriptionsForConceptTableModel descTableModel;
-	private JTableWithDragImage descTable;
-	private boolean idToggleState = false;
-	protected Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
-	private IdPlugin idPlugin;
-	private I_GetConceptData lastSelectedConcept;
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
 
-	public DescriptionPlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
+	private transient JPanel descPanel;
+	private transient I_HostConceptPlugins host;
+	private transient DescriptionsForConceptTableModel descTableModel;
+	private transient JTableWithDragImage descTable;
+	private transient boolean idToggleState = false;
+	protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+	private transient IdPlugin idPlugin;
+	private transient I_GetConceptData lastSelectedConcept;
+	private transient PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			visibleExtensions = new HashSet<EXT_TYPE>();
+			pcs = new PropertyChangeSupport(this);
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+	public DescriptionPlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
+	}
+
+	public UUID getId() {
+		return I_HostConceptPlugins.TOGGLES.DESCRIPTIONS.getPluginId();
 	}
 
 	@Override
@@ -271,7 +296,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		c.gridwidth = 2;
 
 		if (host.getToggleState(TOGGLES.ID) == true) {
-			idPlugin = new IdPlugin(true, 1, UUID.randomUUID());
+			idPlugin = new IdPlugin(true, 1);
 			idPlugin.setShowBorder(false);
 			descPanel.add(idPlugin.getComponent(this), c);
 			c.gridy++;
@@ -413,7 +438,6 @@ public class DescriptionPlugin extends AbstractPlugin implements
 		return getSelectedPluginComponent();
 	}
 
-	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 	public void removePropertyChangeListener(String propertyName,
 			PropertyChangeListener listener) {
 		pcs.removePropertyChangeListener(propertyName, listener);

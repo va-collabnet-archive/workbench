@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +31,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
@@ -38,40 +42,69 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.ToIoException;
 
 public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements TableModelListener {
 
-    private I_HostConceptPlugins host;
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
 
-    private JComponent pluginComponent;
-    
-    private I_GetConceptData languageConcept;
+	private TOGGLES toggle;
 
-	private I_ImageVersioned pluginImage;
+	private transient I_HostConceptPlugins host;
+    private transient JComponent pluginComponent;
+    private transient I_GetConceptData languageConcept;
+	private transient I_ImageVersioned pluginImage;
+	private transient ImageIcon pluginIcon;
+	private transient DescriptionsForConceptTableModel descTableModel;
+	private transient JTableWithDragImage languageRefsetTable;
+
 	
-	private ImageIcon pluginIcon;
-	
-	private DescriptionsForConceptTableModel descTableModel;
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(toggle);
+		out.writeObject(languageConcept.getUids());
+	}
 
-	private JTableWithDragImage languageRefsetTable;
+	@SuppressWarnings("unchecked")
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			toggle = (TOGGLES) in.readObject();
+			List<UUID> uuids = (List<UUID>) in.readObject();
+			try {
+				languageConcept = LocalVersionedTerminology.get().getConcept(uuids);
+			} catch (TerminologyException e) {
+				throw new ToIoException(e);
+			}
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
 
-    public LanguageRefsetDisplayPlugin(boolean selectedByDefault, int sequence, UUID id, I_GetConceptData languageConcept) {
-        super(selectedByDefault, sequence, id);
+
+    public LanguageRefsetDisplayPlugin(boolean selectedByDefault, int sequence, TOGGLES toggle, I_GetConceptData languageConcept) {
+        super(selectedByDefault, sequence);
         this.languageConcept = languageConcept;
+        this.toggle = toggle;
     }
 
     @Override
     protected ImageIcon getImageIcon() {
     	if (this.pluginImage == null) {
         	try {
-    			for (I_ImageVersioned image: this.languageConcept.getImages()) {
-    				for (I_ImageTuple imageTuple: image.getTuples()) {
-    					if (imageTuple.getTextDescription().toLowerCase().contains("24x24")) {
-    						pluginIcon = new ImageIcon(imageTuple.getImage());
-    						return pluginIcon;
-    					}
-    				}
-    			}
+        		if (this.languageConcept.getImages() != null) {
+        			for (I_ImageVersioned image: this.languageConcept.getImages()) {
+        				for (I_ImageTuple imageTuple: image.getTuples()) {
+        					if (imageTuple.getTextDescription().toLowerCase().contains("24x24")) {
+        						pluginIcon = new ImageIcon(imageTuple.getImage());
+        						return pluginIcon;
+        					}
+        				}
+        			}
+        		}
     		} catch (IOException e) {
     			AceLog.getAppLog().alertAndLogException(e);
     		}
@@ -289,5 +322,9 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 				languageRefsetTable.setRowSelectionInterval(rowToSelect, rowToSelect);
 			}
 		}
+	}
+
+	public UUID getId() {
+		return toggle.getPluginId();
 	}
 }

@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,18 +36,41 @@ import org.dwfa.bpa.util.TableSorter;
 
 public class IdPlugin extends AbstractPlugin {
 
-	public IdPlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
-	}
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
 
-	private IdTableModel idTableModel;
-	private JPanel idPanel;
-	private I_HostConceptPlugins host;
-	private JTableWithDragImage idTable;
-	private boolean showBorder = true;
+	private transient IdTableModel idTableModel;
+	private transient JPanel idPanel;
+	private transient I_HostConceptPlugins host;
+	private transient JTableWithDragImage idTable;
+	private transient boolean showBorder = true;
 	
 	//@TODO find a way to handle this field dynamically, like pressing the shift key...
-	private boolean showNids = false;
+	private static boolean showNids = false;
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeBoolean(showBorder);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			showBorder = in.readBoolean();
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+	
+	public IdPlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
+	}
+
+	public UUID getId() {
+		return I_HostConceptPlugins.TOGGLES.ID.getPluginId();
+	}
+
 
 	@Override
 	protected ImageIcon getImageIcon() {

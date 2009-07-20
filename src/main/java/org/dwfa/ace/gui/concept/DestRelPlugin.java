@@ -2,6 +2,8 @@ package org.dwfa.ace.gui.concept;
 
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,17 +22,34 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 
 public class DestRelPlugin extends RelPlugin {
 
-	public DestRelPlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
+
+	private transient JPanel pluginPanel;
+	private transient DestRelTableModel destRelTableModel;
+	private transient I_HostConceptPlugins host;
+	private static TOGGLES toggleType = TOGGLES.DEST_RELS;
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
 	}
 
-	private JPanel pluginPanel;
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+	
+	public DestRelPlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
+	}
 
-	private DestRelTableModel destRelTableModel;
-
-	I_HostConceptPlugins host;
-
-	TOGGLES toggleType = TOGGLES.DEST_RELS;
+	public UUID getId() {
+		return I_HostConceptPlugins.TOGGLES.DEST_RELS.getPluginId();
+	}
 
 	public JPanel getComponent(I_HostConceptPlugins host) {
 		if (pluginPanel == null

@@ -1,6 +1,8 @@
 package org.dwfa.ace.gui.concept;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -12,21 +14,43 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ConflictPlugin extends AbstractPlugin {
-	public ConflictPlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id);
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
+
+	private transient ConflictPanel conflictPanel;
+	private transient I_HostConceptPlugins host;
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
 	}
 
-	private ConflictPanel conflictPanel;
-	private I_HostConceptPlugins host;
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+	public ConflictPlugin(boolean shownByDefault, int sequence) {
+		super(shownByDefault, sequence);
+	}
+
+	public UUID getId() {
+		return I_HostConceptPlugins.TOGGLES.CONFLICT.getPluginId();
+	}
 
 	public ConflictPanel getComponent(I_HostConceptPlugins host) {
 		if (conflictPanel == null) {
 			this.host = host;
 			conflictPanel = new ConflictPanel();
-			host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
+			host.addPropertyChangeListener(
+					I_ContainTermComponent.TERM_COMPONENT, this);
 			host.addPropertyChangeListener("commit", this);
 			try {
-				conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
+				conflictPanel.setConcept((ConceptBean) host.getTermComponent(),
+						host.getConfig());
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
@@ -43,16 +67,19 @@ public class ConflictPlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		if (showComponent() && conflictPanel != null) {
-			conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
+			conflictPanel.setConcept((ConceptBean) host.getTermComponent(),
+					host.getConfig());
 		}
 	}
-   @Override
-   protected String getToolTipText() {
-      return "show/hide the conflict view for this concept";
-   }
-   @Override
-   protected int getComponentId() {
-      return Integer.MIN_VALUE;
-   }
+
+	@Override
+	protected String getToolTipText() {
+		return "show/hide the conflict view for this concept";
+	}
+
+	@Override
+	protected int getComponentId() {
+		return Integer.MIN_VALUE;
+	}
 
 }

@@ -1,6 +1,8 @@
 package org.dwfa.ace.gui.concept;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -8,16 +10,38 @@ import javax.swing.ImageIcon;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class StatedAndNormalFormsPlugin extends AbstractPlugin {
-	public StatedAndNormalFormsPlugin(boolean selectedByDefault, int sequence, UUID id) {
-        super(selectedByDefault, sequence, id);
+	
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
+
+	private transient LogicalFormsPanel formsPanel;
+	private transient I_HostConceptPlugins host;
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
 	}
 
-	private LogicalFormsPanel formsPanel;
-	private I_HostConceptPlugins host;
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+	
+	public StatedAndNormalFormsPlugin(boolean selectedByDefault, int sequence) {
+        super(selectedByDefault, sequence);
+	}
+
+	public UUID getId() {
+		return TOGGLES.STATED_INFERRED.getPluginId();
+	}
 
 	public LogicalFormsPanel getComponent(I_HostConceptPlugins host) {
 		if (formsPanel == null) {

@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.gui.concept.AbstractPlugin;
 
 public class GraphPlugin extends AbstractPlugin {
@@ -33,9 +34,13 @@ public class GraphPlugin extends AbstractPlugin {
 	private boolean initialize = true;
 	private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.KKLayout;
 
-	public GraphPlugin(boolean shownByDefault, int sequence, UUID id) {
-        super(shownByDefault, sequence, id); 
+	public GraphPlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence); 
 	}
+
+	   public UUID getId() {
+		   return TOGGLES.LINEAGE_GRAPH.getPluginId();
+	   }
 
 	@Override
 	protected ImageIcon getImageIcon() {

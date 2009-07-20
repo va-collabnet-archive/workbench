@@ -59,7 +59,7 @@ import org.dwfa.vodb.types.Position;
 
 public class ConflictPanel extends JPanel implements ActionListener {
 
-   public static class ConflictColors {
+	  public static class ConflictColors {
       private List<Color> conflictColors = new ArrayList<Color>();
 
       int currentColor = 0;

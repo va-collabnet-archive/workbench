@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.ConceptListWriter;
@@ -216,7 +217,7 @@ public class CollectionEditorContainer extends JPanel {
 		this.ace = ace;
 		this.list = list;
 		this.processBuilder = descListProcessBuilderPanel;
-		conceptPanel = new ConceptPanel(ace, LINK_TYPE.LIST_LINK, true,
+		conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace, LINK_TYPE.LIST_LINK, true,
 				Integer.MIN_VALUE);
 		conceptPanel.setLinkedList(list);
 		conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);

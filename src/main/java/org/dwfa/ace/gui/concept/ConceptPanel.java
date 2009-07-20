@@ -21,11 +21,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -66,11 +64,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.graph.GraphPlugin;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -78,11 +76,8 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
-import org.dwfa.util.id.Type5UuidFactory;
-import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
@@ -267,40 +262,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	public static ImageIcon SMALL_ALERT_LINK_ICON = new ImageIcon(ACE.class
 			.getResource("/16x16/plain/warning.png"));
 
-	private ConflictPlugin conflictPlugin;
-
-	private AbstractPlugin srcRelPlugin;
-
-	private RelPlugin destRelPlugin;
-
-	private IdPlugin idPlugin;
-
-	private ImagePlugin imagePlugin;
-	
-	private StatedAndNormalFormsPlugin statedAndNormalFormsPlugin;
-
-	private DescriptionPlugin descPlugin;
-
-	private LineagePlugin lineagePlugin;
-	
-	private GraphPlugin lineageGraphPlugin;
-
-	private ConceptAttributePlugin conceptAttributePlugin;
-	
-	private LanguageRefsetDisplayPlugin auDialectPlugin;
-
-	private LanguageRefsetDisplayPlugin ukDialectPlugin;
-
-	private LanguageRefsetDisplayPlugin usaDialectPlugin;
-
-	private LanguageRefsetDisplayPlugin nzDialectPlugin;
-	
-	private LanguageRefsetDisplayPlugin caDialectPlugin;
-
-	private List<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
-
-	private Map<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel>();
-
 	public ImageIcon tabIcon;
 
 	private JTabbedPane conceptTabs;
@@ -432,72 +393,32 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		}
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link, Integer panelId) throws DatabaseException,
+	public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, Integer panelId) throws DatabaseException,
 			IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		this(ace, link, null, panelId);
+		this(host_enum, ace, link, null, panelId);
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
+	public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
 			throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		this(ace, link, null, enableListLink, panelId);
+		this(host_enum, ace, link, null, enableListLink, panelId);
 	}
 
-	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
+	public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
 			throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		this(ace, link, conceptTabs, false, panelId);
+		this(host_enum, ace, link, conceptTabs, false, panelId);
 	}
 
 	LinkedList<I_GetConceptData> tabHistoryList;
+
+	private HOST_ENUM host_enum;
 	
-	public ConceptPanel(ACE ace, LINK_TYPE link, JTabbedPane conceptTabs,
+	public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs,
 			boolean enableListLink, Integer panelId) throws DatabaseException, IOException,
 			ClassNotFoundException, NoSuchAlgorithmException {
 		super(new GridBagLayout());
 		this.ace = ace;
 		this.panelId = panelId;
-		try {
-			int order = 0;
-			idPlugin = new IdPlugin(false, order++, Type5UuidFactory.get(IdPlugin.class.getName()));
-
-			descPlugin = new DescriptionPlugin(true, order++, Type5UuidFactory.get(DescriptionPlugin.class.getName()));
-
-			conceptAttributePlugin = new ConceptAttributePlugin(true, order++, Type5UuidFactory.get(ConceptAttributePlugin.class.getName()));
-
-			srcRelPlugin = new SrcRelPlugin(true, order++, Type5UuidFactory.get(SrcRelPlugin.class.getName()));
-
-			destRelPlugin = new DestRelPlugin(false, order++, Type5UuidFactory.get(DestRelPlugin.class.getName()));
-
-			lineagePlugin = new LineagePlugin(true, order++, Type5UuidFactory.get(LineagePlugin.class.getName()));
-			
-			lineageGraphPlugin = new GraphPlugin(false, order++, Type5UuidFactory.get(GraphPlugin.class.getName()));
-
-			imagePlugin = new ImagePlugin(false, order++, Type5UuidFactory.get(ImagePlugin.class.getName()));
-			
-			conflictPlugin = new ConflictPlugin(false, order++, Type5UuidFactory.get(ConflictPlugin.class.getName()));
-
-			statedAndNormalFormsPlugin = new StatedAndNormalFormsPlugin(false, order++, Type5UuidFactory.get(StatedAndNormalFormsPlugin.class.getName()));
-
-			auDialectPlugin = new LanguageRefsetDisplayPlugin(false, order++,
-					Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_AU"),
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids()));
-			ukDialectPlugin = new LanguageRefsetDisplayPlugin(false,
-					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_GB"),
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids()));
-			usaDialectPlugin = new LanguageRefsetDisplayPlugin(false,
-					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_US"),
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids()));
-			nzDialectPlugin = new LanguageRefsetDisplayPlugin(false,
-					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_NZ"),
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids()));
-			caDialectPlugin = new LanguageRefsetDisplayPlugin(false,
-					order++,Type5UuidFactory.get(LanguageRefsetDisplayPlugin.class.getName() + "EN_CA"),
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids()));
-		} catch (TerminologyException e) {
-			throw new ToIoException(e);
-		}
-
-
-
+		this.host_enum = host_enum;
 
 		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get("tab " + panelId);
 		if (this.tabHistoryList == null) {
@@ -511,25 +432,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		addPropertyChangeListener("conflictResolutionStrategy", this);
 		addPropertyChangeListener("highlightConflictsInComponentPanel", this);
 		
-		
-		if (ACE.editMode) {
-			plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(Arrays
-					.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] { idPlugin,
-							conceptAttributePlugin, 
-							auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
-							nzDialectPlugin, caDialectPlugin,
-							descPlugin, srcRelPlugin,
-							destRelPlugin, lineagePlugin, lineageGraphPlugin, imagePlugin,
-							statedAndNormalFormsPlugin, conflictPlugin }));
-		} else {
-			plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(Arrays
-					.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] { idPlugin,
-							conceptAttributePlugin, auDialectPlugin, ukDialectPlugin, usaDialectPlugin, 
-							nzDialectPlugin, caDialectPlugin,
-							descPlugin, srcRelPlugin,
-							destRelPlugin, lineagePlugin, 
-							lineageGraphPlugin, statedAndNormalFormsPlugin}));
-		}
 		ace.getAceFrameConfig().addPropertyChangeListener("uncommitted",
 				new UncommittedChangeListener());
 		label = new TermComponentLabel(this.ace.getAceFrameConfig());
@@ -604,7 +506,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 
-		for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
+		for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig().getConceptPanelPlugins(host_enum))) {
 			if (plugin.showComponent()) {
 				content.add(plugin.getComponent(this), c);
 				c.gridy++;
@@ -633,18 +535,25 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		JPanel rightTogglePane = new JPanel(new FlowLayout());
 
 		ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
-		for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
+		for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig().getConceptPanelPlugins(host_enum))) {
 			if (plugin != null) {
 				if (plugin.getToggleBarComponents() != null) {
 					for (JComponent component : plugin.getToggleBarComponents()) {
 						leftTogglePane.add(component);
+						if (ace.getAceFrameConfig().isToggleVisible(TOGGLES.fromId(plugin.getId()))) {
+							component.setVisible(true);
+							component.setEnabled(true);
+						} else {
+							component.setVisible(false);
+							component.setEnabled(false);
+						}
 					}
 					plugin.addShowComponentListener(l);
 				} else {
 					AceLog.getAppLog().warning(plugin + " has null components");
 				}
 			} else {
-				AceLog.getAppLog().warning(plugin + " is null: " + plugins);
+				AceLog.getAppLog().warning(plugin + " is null: " + new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig().getConceptPanelPlugins(host_enum)));
 			}
 		}
 		fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
@@ -673,6 +582,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		historyButton.setToolTipText("show/hide the history records");
 		leftTogglePane.add(historyButton);
 		
+		IdPlugin idPlugin = (IdPlugin) ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, TOGGLES.ID.getPluginId());
 		idPlugin.getToggleButton().addActionListener(fixedToggleChangeActionListener);
 
 		c.gridx++;
@@ -742,22 +652,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 			}
 		}
 
-		pluginMap.put(TOGGLES.ID, idPlugin);
-		pluginMap.put(TOGGLES.ATTRIBUTES, conceptAttributePlugin);
-		pluginMap.put(TOGGLES.AU_DIALECT, auDialectPlugin);
-		pluginMap.put(TOGGLES.UK_DIALECT, ukDialectPlugin);
-		pluginMap.put(TOGGLES.USA_DIALECT, usaDialectPlugin);
-		pluginMap.put(TOGGLES.NZ_DIALECT, nzDialectPlugin);
-		pluginMap.put(TOGGLES.CA_DIALECT, caDialectPlugin);
-		pluginMap.put(TOGGLES.DESCRIPTIONS, descPlugin);
-		pluginMap.put(TOGGLES.SOURCE_RELS, srcRelPlugin);
-		pluginMap.put(TOGGLES.DEST_RELS, destRelPlugin);
-		pluginMap.put(TOGGLES.LINEAGE, lineagePlugin);
-		pluginMap.put(TOGGLES.LINEAGE_GRAPH, lineageGraphPlugin);
-		pluginMap.put(TOGGLES.IMAGE, imagePlugin);
-		pluginMap.put(TOGGLES.STATED_INFERRED, statedAndNormalFormsPlugin);
-		pluginMap.put(TOGGLES.CONFLICT, conflictPlugin);
-
 		updateToggles();
 
 		return toggleBar;
@@ -767,8 +661,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		for (TOGGLES t : TOGGLES.values()) {
 			boolean visible = ((AceFrameConfig) ace.getAceFrameConfig())
 					.isToggleVisible(t);
-			if (pluginMap.get(t) != null) {
-				org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(t);
+			if (ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, t.getPluginId()) != null) {
+				I_PluginToConceptPanel plugin = ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, t.getPluginId());
 				for (JComponent toggleComponent : plugin
 						.getToggleBarComponents()) {
 					toggleComponent.setVisible(visible);
@@ -1073,7 +967,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
+				for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig().getConceptPanelPlugins(host_enum))) {
 					for (JComponent component : plugin.getToggleBarComponents()) {
 						if (JToggleButton.class.isAssignableFrom(component
 								.getClass())) {
@@ -1098,7 +992,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+				I_PluginToConceptPanel plugin = ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, toggle.getPluginId());
 				if (plugin != null) {
 					for (JComponent component : plugin.getToggleBarComponents()) {
 						if (JToggleButton.class.isAssignableFrom(component
@@ -1170,7 +1064,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 	}
 
 	public boolean getToggleState(TOGGLES toggle) {
-		org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(toggle);
+		I_PluginToConceptPanel plugin = ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, toggle.getPluginId());
 		if (plugin != null) {
 			for (JComponent component : plugin.getToggleBarComponents()) {
 				if (JToggleButton.class.isAssignableFrom(component.getClass())) {

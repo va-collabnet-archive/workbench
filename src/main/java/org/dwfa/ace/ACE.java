@@ -105,6 +105,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -287,7 +288,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					leftTabs.setSelectedIndex(dataCheckIndex);
 					if (dataCheckPanel == null) {
 						try {
-							dataCheckPanel = new ConceptPanel(ACE.this,
+							dataCheckPanel = new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK,
+									ACE.this,
 									LINK_TYPE.DATA_CHECK_LINK, conceptTabs,
 									Integer.MAX_VALUE);
 							conceptPanels.add(dataCheckPanel);
@@ -1737,9 +1739,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		treeHelper = new TermTreeHelper(aceFrameConfig);
 		termTree = treeHelper.getHierarchyPanel();
 		conceptPanels = new ArrayList<ConceptPanel>();
-		c1Panel = new ConceptPanel(this, LINK_TYPE.TREE_LINK, conceptTabs, 1);
+		c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, this, LINK_TYPE.TREE_LINK, conceptTabs, 1);
 		conceptPanels.add(c1Panel);
-		c2Panel = new ConceptPanel(this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
+		c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
 		conceptPanels.add(c2Panel);
 		conceptTabs.addComponentListener(new ResizePalettesListener());
 		conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel,
@@ -1747,11 +1749,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON,
 				c2Panel, "Search Linked");
 
-		ConceptPanel c3panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
+		ConceptPanel c3panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, this, LINK_TYPE.UNLINKED,
 				conceptTabs, 3);
 		conceptPanels.add(c3panel);
 		conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
-		ConceptPanel c4panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
+		ConceptPanel c4panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, this, LINK_TYPE.UNLINKED,
 				conceptTabs, 4);
 		conceptPanels.add(c4panel);
 		conceptTabs.addTab("Empty", null, c4panel, "Unlinked");
@@ -1771,7 +1773,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 		termTreeConceptSplit.setRightComponent(conceptTabs);
 		leftTabs.addTab(taxonomyTabLabel, termTree);
 
-		ConceptPanel c5panel = new ConceptPanel(this, LINK_TYPE.UNLINKED,
+		ConceptPanel c5panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_L1, this, LINK_TYPE.UNLINKED,
 				leftTabs, 3);
 		conceptPanels.add(c5panel);
 		leftTabs.addTab("Empty", null, c5panel, "Unlinked");
