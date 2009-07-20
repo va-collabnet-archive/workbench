@@ -109,6 +109,11 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 
     private int conceptCount;
 
+    private boolean duplicateVersionDescriptions = Boolean.FALSE;
+    private boolean duplicateVersionRelationships = Boolean.FALSE;
+
+    List<I_DescriptionTuple> duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
+    List<I_RelTuple> duplicateRelTuples = new ArrayList<I_RelTuple>();
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         tf = LocalVersionedTerminology.get();
@@ -138,6 +143,17 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("Starting to iterate concept attributes to copy from " + fromPaths + " to " + toPath);
             tf.iterateConcepts(this);
 
+            String duplicateVersionError = "";
+            if (duplicateVersionDescriptions) {
+                duplicateVersionError += "One or more descriptions were found with multiple versions on the same path and with the same timestamp. ";
+            }
+            if (duplicateVersionRelationships) {
+                duplicateVersionError += "One or more relationships were found with multiple versions on the same path and with the same timestamp. ";
+            }
+            if (duplicateVersionDescriptions ||
+                    duplicateVersionRelationships) {
+                throw new MojoExecutionException(duplicateVersionError);
+            }
         } catch (Exception e) {
             throw new MojoExecutionException("failed copying from paths "
                     + fromPaths + " to path " + toPath, e);
@@ -161,6 +177,9 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed concept " + conceptCount);
         }
 
+        duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
+        duplicateRelTuples = new ArrayList<I_RelTuple>();
+
         if (validate ||
                 (arg0.getConceptAttributes() != null &&
                 arg0.getConceptAttributes().versionCount() > 0)) {
@@ -173,6 +192,22 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         processId(arg0.getId());
         processImages(arg0.getImages());
         processRelationship(arg0.getSourceRels());
+
+        // Log all Duplicate-versioned descriptions and relationships on the same path and timestamp here
+        if (!duplicateDescTuples.isEmpty()) {
+            duplicateVersionDescriptions = Boolean.TRUE;
+            getLog().error("***** Duplicate-versioned description tuple(s) in concept: " + arg0.getUids().get(0));
+            for (I_DescriptionTuple tuple : duplicateDescTuples) {
+                getLog().error("Desc id: " + tuple.getDescId() + ", Path id: " + tuple.getPathId() + ", Version: " + tuple.getVersion() + "\n\t(" + tuple.getText() + ")");
+            }
+        }
+        if (!duplicateRelTuples.isEmpty()) {
+            duplicateVersionRelationships = Boolean.TRUE;
+            getLog().error("***** Duplicate-versioned relationship tuple(s) in concept: " + arg0.getUids().get(0));
+            for (I_RelTuple tuple : duplicateRelTuples) {
+                getLog().error("Rel id: " + tuple.getRelId() + ", Path id: " + tuple.getPathId() + ", Version: " + tuple.getVersion() + "\n\t(" + tuple.getTypeId() + ")");
+            }
+        }
     }
 
     private void getFromPathIds(Collection<I_GetConceptData> pathDescriptors) throws Exception {
@@ -266,11 +301,42 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed description " + descriptionCount);
         }
 
+        Collection<I_DescriptionTuple> allTuples = descriptionVersioned.getTuples();
+        Map<TupleKey, List<I_AmTypedTuple>> versionsMap =
+                new HashMap<TupleKey, List<I_AmTypedTuple>>();
+
+        // Check for multi-versioned descriptions, with the same path and timestamp
+        for (I_DescriptionTuple tuple : allTuples) {
+            
+            /**
+             * add each tuple to a hashmap with a composite key of <tupletype>id, pathid & timestamp.
+             * If the current tuple exists in the map with these ids and time then we have a
+             * multi-versioned commit (bad). Store a copy of each of these so they can be logged,
+             * after iterating each version of this description/relationship, and then fail the build once all
+             * description/relationship have been copied (so we get to log all bad data)
+             */
+
+            TupleKey key = new TupleKey(tuple.getDescId(), tuple.getPathId(), tuple.getVersion());
+            List<I_AmTypedTuple> versions = new ArrayList<I_AmTypedTuple>();
+
+            if (versionsMap.containsKey(key)) {
+
+                versions = versionsMap.get(key);                
+
+                if (!duplicateDescTuples.contains(tuple)) {
+                    duplicateDescTuples.add(tuple);
+                }
+            }
+            versions.add(tuple);
+            versionsMap.put(key, versions);
+        }
+
         Collection<I_DescriptionTuple> descriptions;
+
         if (readLatestPartOnly) {
-            descriptions = getLatestDescriptions(descriptionVersioned.getTuples());
+            descriptions = getLatestDescriptions((List<I_DescriptionTuple>) allTuples);
         } else {
-            descriptions = descriptionVersioned.getTuples();
+            descriptions = allTuples;
         }
 
         boolean datachanged = false;
@@ -530,11 +596,41 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed relationship " + relCount);
         }
 
+        Collection<I_RelTuple> allTuples = relVersioned.getTuples();
+        Map<TupleKey, List<I_AmTypedTuple>> versionsMap =
+                new HashMap<TupleKey, List<I_AmTypedTuple>>();
+
+        // Check for multi-versioned relationships, with the same path and timestamp
+        for (I_RelTuple tuple : allTuples) {
+
+            /**
+             * add each tuple to a hashmap with a composite key of <tupletype>id, pathid & timestamp.
+             * If the current tuple exists in the map with these ids and time then we have a
+             * multi-versioned commit (bad). Store a copy of each of these so they can be logged,
+             * after iterating each version of this description/relationship, and then fail the build once all
+             * description/relationship have been copied (so we get to log all bad data)
+             */
+
+            TupleKey key = new TupleKey(tuple.getRelId(), tuple.getPathId(), tuple.getVersion());
+            List<I_AmTypedTuple> versions = new ArrayList<I_AmTypedTuple>();
+
+            if (versionsMap.containsKey(key)) {
+
+                versions = versionsMap.get(key);
+
+                if (!duplicateRelTuples.contains(tuple)) {
+                    duplicateRelTuples.add(tuple);
+                }
+            }
+            versions.add(tuple);
+            versionsMap.put(key, versions);
+        }
+
         Collection<I_RelTuple> rels;
         if (readLatestPartOnly) {
-            rels = getLatestRelationships(relVersioned.getTuples());
+            rels = getLatestRelationships((List<I_RelTuple>) allTuples);
         } else {
-            rels = relVersioned.getTuples();
+            rels = allTuples;
         }
 
         boolean datachanged = false;
