@@ -50,7 +50,9 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
 			for (I_ThinExtByRefPart part : extension.getVersions()) {
 				testPart(part, activeProfile, alerts, forCommit);
 			}
-			checkForInactive(activeProfile, alerts, extension.getComponentId());
+			if (LocalVersionedTerminology.get().hasConcept(extension.getComponentId())) {
+				checkForInactive(activeProfile, alerts, extension.getComponentId());
+			}
 			checkForInactive(activeProfile, alerts, extension.getRefsetId());
 			checkForInactive(activeProfile, alerts, extension.getTypeId());
 		} catch (IOException e) {
@@ -86,11 +88,11 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
 		if (attributes == null || attributes.size() == 0) {
 			String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
 				+ concept.toString()
-				+ "</font><br>If appropriate,<br>please change prior to commit...";
+				+ "</font><br>If appropriate, please change prior to commit...";
 			if (concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile) != null) {
 				alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
 					+ concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile).getText()
-					+ "</font><br>If appropriate,<br>please change prior to commit...";
+					+ "</font><br>If appropriate, please<br>change prior to commit...";
 			}
 			AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 			AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(
