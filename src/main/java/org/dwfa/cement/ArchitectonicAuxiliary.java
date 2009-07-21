@@ -60,6 +60,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             new I_ConceptualizeUniversally[] { }),
         TUPLE_TYPE("tuple type",
                     new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+                    ID_TUPLE(new String[] {"id tuple", "id tuple"}, null,
+                            new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
                     CON_TUPLE(new String[] {"concept tuple", "concept tuple"}, null,
                                   new I_ConceptualizeUniversally[] { TUPLE_TYPE }),
                     DESC_TUPLE(new String[] {"description tuple", "description tuple"}, null,
