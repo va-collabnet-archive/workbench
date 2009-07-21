@@ -575,8 +575,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 					}
 					return;
 				} else {
-					extraToAdd = ConceptBean.get(eb.getExtension()
-							.getComponentId());
+					if (LocalVersionedTerminology.get().hasConcept(eb.getExtension()
+								.getComponentId())) {
+						extraToAdd = ConceptBean.get(eb.getExtension()
+								.getComponentId());
+					}
 				}
 			} catch (IOException e) {
 				AceLog.getEditLog().alertAndLogException(e);
