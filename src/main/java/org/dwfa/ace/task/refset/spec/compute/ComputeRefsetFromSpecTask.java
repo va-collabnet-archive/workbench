@@ -113,6 +113,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             // the refset spec editor
             RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame,
                     termFactory, refsetSpec, refset);
+            if (query.getTotalStatementCount() == 0) {
+                throw new TaskFailedException(
+                        "Refset spec is empty - skipping execution.");
+            }
 
             progressReport.setStep1Complete(true);
             computeRefsetActivityPanel.setProgressInfoLower(progressReport
@@ -147,7 +151,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     nonRefsetMembers.add(currentConcept);
                 }
 
-                if (refsetMembers.size() > 0) {
+                if (refsetMembers.size() > 250) {
                     // add them now
                     memberRefsetHelper.addAllToRefset(refsetMembers,
                             "Adding new members to member refset", useMonitor);
@@ -157,7 +161,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     refsetMembers = new HashSet<I_GetConceptData>();
                 }
 
-                if (nonRefsetMembers.size() > 0) {
+                if (nonRefsetMembers.size() > 250) {
                     memberRefsetHelper.removeAllFromRefset(nonRefsetMembers,
                             "Cleaning up old members from member refset",
                             useMonitor);
