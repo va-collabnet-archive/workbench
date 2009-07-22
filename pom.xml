@@ -135,7 +135,7 @@
       <plugin>
         <groupId>org.dwfa</groupId>
         <artifactId>pbl-mojo</artifactId>
-        <version>1.1</version>
+        <version>1.5-SNAPSHOT</version>
         <configuration>
           <cubitProject>cubitci</cubitProject>
           <siteRoot>dwfa-mojo</siteRoot>

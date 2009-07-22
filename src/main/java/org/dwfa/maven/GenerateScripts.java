@@ -5,7 +5,9 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -115,11 +117,9 @@ public class GenerateScripts extends AbstractMojo {
                         }
                     });
         }
-		/*
-		 * if (jars != null) { for (File f: Arrays.asList(jars)) {
-		 * System.out.println("lib: " + f); } }
-		 */
+		
 		if (scriptNames == null) {
+			
 	        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle", true, false, false, false);
 	        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false, false, false);
 	        startAllScript(jars, "startJehriAuthoring", "start-jehri-authoring.config", "500m", "500m", "Jehri Authoring Bundle", true, false, false, false);
@@ -161,169 +161,300 @@ public class GenerateScripts extends AbstractMojo {
 	 * @throws MojoExecutionException
 	 */
 	private void startAllScript(File[] jars, String scriptName, String startFileName,
-			String startHeap, String maxHeap, String xdocName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
+			String startHeap, String maxHeap, String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
+		
 		File windowScript = new File(outputDirectory + fileSep
 				+ scriptOutputDir + fileSep + scriptName + ".bat");
-
-		try {
-            windowScript.getParentFile().mkdirs();
-			FileWriter fw = new FileWriter(windowScript);
-			// fw.write("export
-			// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
-         if (bundledJre) {
-            fw.write("jre\\bin\\java ");
-         } else {
-            fw.write("java ");
-         }
-         if (debug) {
-			fw.write("-Xdebug ");
-			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
-         }
-         if (profile) {
-  			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/ ");
-  			fw.write("-Xint ");
-  			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml ");
-			fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar ");
-			fw.write("-Xdebug ");
-			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
-       	 
-         }
-		fw.write("-Xms" + startHeap + " ");
-		fw.write("-Xmx" + maxHeap + " ");
-        if (jiniSecurity) {
-            fw.write("-Djava.security.manager=  ");
-            fw.write("-Djava.util.logging.config.file=config\\logging.properties ");
-            fw.write("-Djava.security.policy=config\\dwa.policy ");
-            fw.write("-Djava.security.properties=config\\dynamic-policy.security-properties ");
-            fw.write("-Djava.security.auth.login.config=config\\dwa.login ");
-            fw.write("-Djavax.net.ssl.trustStore=prebuiltkeys\\truststore ");
-            fw.write("-Djava.protocol.handler.pkgs=net.jini.url  ");
-            fw.write("-Dorg.dwfa.jiniport=8080 ");
-         }
-		fw.write("-cp ");
-		for (File f : Arrays.asList(jars)) {
-			fw.write(libDir + "\\" + f.getName() + ";");
-		}
-		fw.write(" ");
-		fw.write("     com.sun.jini.start.ServiceStarter config\\" + startFileName + " ");
-		fw.close();
-		} catch (IOException e) {
-			throw new MojoExecutionException("Error creating script file.", e);
-		}
-
+		File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir
+				+ fileSep + scriptName + "Linux.sh");
 		File unixScript = new File(outputDirectory + fileSep + scriptOutputDir
 				+ fileSep + scriptName + "OsX.sh");
 
-		try {
-            unixScript.getParentFile().mkdirs();
-			FileWriter fw = new FileWriter(unixScript);
-			// fw.write("export
-			// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
-			fw.write("java \\\n");
-	        if (debug) {
-				fw.write("-Xdebug ");
-				fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
-	         }
-	         if (profile) {
-	  			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/ ");
-	  			fw.write("-Xint ");
-	  			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml ");
-				fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar");
-				fw.write("-Xdebug ");
-				fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
-	       	 
-	         }
-			fw.write("     -Xms" + startHeap + "  \\\n");
-			fw.write("     -Xmx" + maxHeap + " \\\n");
-			fw.write("     -Xdock:name=\"" + xdocName + "\"  \\\n");
-             fw.write("     -Xdock:icon=config/icon/bundle.gif  \\\n");
-			fw.write("     -Dapple.laf.useScreenMenuBar=true \\\n");
-         if (jiniSecurity) {
-            fw.write("     -Djava.security.manager=  \\\n");
-            fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
-            fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
-            fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
-            fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
-            fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
-            fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
-            fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
-         }
-			fw.write("     -cp ");
-			for (File f : Arrays.asList(jars)) {
-				fw.write(libDir + "/" + f.getName() + ":");
+		List<Scripter> scripters = new ArrayList<Scripter>();
+		
+		scripters.add(new WindowsScripter(windowScript, libDir));
+		scripters.add(new PosixScripter(linuxScript, libDir));
+		scripters.add(new OSXScripter(unixScript, libDir));
+		
+		for(Scripter scripter : scripters) {
+			try {
+				scripter.writeStartupScript(
+						jars, startFileName, startHeap, maxHeap,
+						xdockName, jiniSecurity, bundledJre,
+						debug, profile);
+			} catch (IOException e) {
+				throw new MojoExecutionException("Error creating script file.", e);
 			}
-			fw.write(" \\\n");
-			fw
-					.write("     com.sun.jini.start.ServiceStarter config/" + startFileName + " \n");
+		}
+
+	}
+
+	/**
+	 * Abstract class that writes startup scripts for the workbench
+	 * 
+	 * @author adrian
+	 *
+	 */
+	private static abstract class Scripter {
+		
+		File scriptFile;
+		String libDir;
+		
+		protected int indent = 0;
+		
+		/**
+		 * Create a Scripter
+		 * @param scriptFile The file to write
+		 * @param libDir	 The library directory
+		 */
+		public Scripter(File scriptFile, String libDir) {
+			this.scriptFile = scriptFile;
+			this.libDir = libDir;
+		}
+		
+		/**
+		 * Write a startup script for the workbench
+		 * @param jars			A list of JAR files to put on the classpath
+		 * @param startFileName The start file parameter to pass
+		 * @param startHeap		Starting heap size (as per java property value)
+		 * @param maxHeap		Maximum heap size (as per java property value)
+		 * @param xdockName		Apple Dock name
+		 * @param jiniSecurity	Use JINI security?
+		 * @param bundledJre	Have we bundled a JRE?
+		 * @param debug			Do we want to attach a debugger?
+		 * @param profile		Do we want a profiler?
+		 * @throws IOException	Thrown when there is trouble writing to the file
+		 */
+		public void writeStartupScript(File[] jars, String startFileName, String startHeap, String maxHeap, String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws IOException {
+			// make parent directories
+			scriptFile.getParentFile().mkdirs();
+			// create file writer
+			FileWriter fw = new FileWriter(scriptFile);
+			
+			// write java path
+			indent += 4;
+			if(bundledJre) {
+				fw.write("jre.bin.java".replace('.', fileSeparator()));
+			} else {
+				fw.write("java");
+			}
+			fw.write(lineContinuance());
+			
+			// write debug options
+			if(debug) {
+				writeLine(fw, "-Xdebug");
+				writeLine(fw, "-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+			}
+			
+			// write profiling options
+			if(profile) {
+				writeFileLine(fw, "-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/");
+	  			writeFileLine(fw, "-Xint");
+	  			writeFileLine(fw, "-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml");
+				writeFileLine(fw, "-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar");
+				writeFileLine(fw, "-Xdebug");
+				writeFileLine(fw, "-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+			}
+			
+			// write heap size
+			writeLine(fw, String.format("-Xms%1$s", startHeap));
+			writeLine(fw, String.format("-Xmx%1$s", maxHeap));
+			
+			// write OS X specific options
+			if(isOSX()){
+				writeLine(fw, String.format("-Xdock:name=\"%1$s\"", xdockName));
+	            writeFileLine(fw, "-Xdock:icon=config/icon/bundle.gif");
+				writeLine(fw, "-Dapple.laf.useScreenMenuBar=true");
+			}
+			
+			// write JINI security options
+			writeFileLine(fw, "-Djava.ext.dirs=lib-ext");
+			writeFileLine(fw, "-Djava.util.logging.config.file=config/logging.properties");
+			writeFileLine(fw, "-Djava.security.policy=config/dwa.policy");
+			writeFileLine(fw, "-Djava.security.properties=config/dynamic-policy.security-properties");
+			writeFileLine(fw, "-Djava.security.auth.login.config=config/dwa.login");
+			writeFileLine(fw, "-Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore");
+			writeLine(fw, "-Djava.protocol.handler.pkgs=net.jini.url");
+			writeLine(fw, "-Dorg.dwfa.jiniport=8080");
+			
+			// write classpath
+			indent += 4;
+			writeLine(fw, "-cp");
+			for(File jar : Arrays.asList(jars)) {
+				fw.write(libDir);
+				fw.write(fileSeparator());
+				fw.write(jar.getName());
+				fw.write(pathSeparator());
+			}
+			writeLine(fw, "");
+			
+			// write start class
+			indent += 4;
+			writeLine(fw, "com.sun.jini.start.ServiceStarter");
+			fw.write("config");
+			fw.write(fileSeparator());
+			fw.write(startFileName);
+			
 			fw.close();
+			
+			// change file permissions
+			setFilePermissions(scriptFile);
+			
+		}
+		
+		/**
+		 * Try to set the executable bit
+		 * @param scriptFile	The file to set
+		 * @throws IOException
+		 */
+		private void setFilePermissions(File scriptFile) throws IOException {
 			if (System.getProperty("os.name").startsWith("Windows") == false) {
 				try {
 					Runtime.getRuntime().exec(
-							"chmod a+x " + unixScript.getPath());
+							"chmod a+x " + scriptFile.getPath());
 				} catch (RuntimeException e) {
 					// Ignore, may be running on windows, and the permissions
 					// don't matter there...;
 				}
 			}
-			File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir
-					+ fileSep + scriptName + "Linux.sh");
-            linuxScript.getParentFile().mkdirs();
+		}
+		
+		/**
+		 * Write a line to the file, followed by a line continuation
+		 * @param fw			A FileWriter
+		 * @param line			The line to write
+		 * @throws IOException
+		 */
+		private void writeLine(FileWriter fw, String line) throws IOException {
+			fw.write(line);
+			fw.write(lineContinuance());
+		}
+		
+		/**
+		 * Write a line to the file, replacing file separators for the target
+		 * environment
+		 * @param fw			A FileWriter
+		 * @param line			The line to write
+		 * @throws IOException
+		 */
+		private void writeFileLine(FileWriter fw, String line) throws IOException {
+			line = line.replace('/', fileSeparator());
+			writeLine(fw, line);
+		}
+		
+		/**
+		 * Return a string repeated a number of times
+		 * @param base	The string to repeat
+		 * @param count The number of times to repeat it
+		 * @return		The repeated string
+		 */
+		protected static String repeat(String base, int count) {
+			String rv = "";
+			for(int ii = 0 ; ii < count; ii++) {
+				rv += base;
+			}
+			return rv;
+		}
+		
+		/**
+		 * Is the target OSX?
+		 * @return true if the target is OSX
+		 */
+		protected boolean isOSX() {
+			return false;
+		}
+		
+		/**
+		 * Return the correct file separator for the target environment
+		 * @return
+		 */
+		protected abstract char fileSeparator();
+		/**
+		 * Return the correct PATH separator for the target environment 
+		 * @return
+		 */
+		protected abstract String pathSeparator();
+		/**
+		 * Return a line continuance, for those shells that support it
+		 * or a space for those that don't
+		 * @return
+		 */
+		protected abstract String lineContinuance();
+		
+	}
+	
+	/**
+	 * Class that writes a startup script for cmd.exe
+	 * @author adrian
+	 *
+	 */
+	private static class WindowsScripter extends Scripter {
+	
+		public WindowsScripter(File scriptFile, String libDir) {
+			super(scriptFile, libDir);
+		}
 
-				fw = new FileWriter(linuxScript);
-				// fw.write("export
-				// DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
-            if (bundledJre) {
-               fw.write("jre/bin/java \\\n");
-            } else {
-               fw.write("java \\\n");
-            }
-            if (debug) {
-    			fw.write("-Xdebug ");
-    			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
-             }
-             if (profile) {
-      			fw.write("-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/ ");
-      			fw.write("-Xint ");
-      			fw.write("-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml ");
-    			fw.write("-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar ");
-    			fw.write("-Xdebug ");
-    			fw.write("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n ");
-           	 
-             }
-				fw.write("     -Xms" + startHeap + "  \\\n");
-				fw.write("     -Xmx" + maxHeap + " \\\n");
-            if (jiniSecurity) {
-               fw.write("     -Djava.security.manager=  \\\n");
-               fw.write("     -Djava.util.logging.config.file=config/logging.properties \\\n");
-               fw.write("     -Djava.security.policy=config/dwa.policy \\\n");
-               fw.write("     -Djava.security.properties=config/dynamic-policy.security-properties \\\n");
-               fw.write("     -Djava.security.auth.login.config=config/dwa.login \\\n");
-               fw.write("     -Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore \\\n");
-               fw.write("     -Djava.protocol.handler.pkgs=net.jini.url  \\\n");
-               fw.write("     -Dorg.dwfa.jiniport=8080  \\\n");
-            }
-				fw.write("     -cp ");
-				for (File f : Arrays.asList(jars)) {
-					fw.write(libDir + "/" + f.getName() + ":");
-				}
-				fw.write(" \\\n");
-				fw
-						.write("     com.sun.jini.start.ServiceStarter config/" + startFileName + " \n");
-				fw.close();
-				if (System.getProperty("os.name").startsWith("Windows") == false) {
-					try {
-						Runtime.getRuntime().exec(
-								"chmod a+x " + linuxScript.getPath());
-					} catch (RuntimeException e) {
-						// Ignore, may be running on windows, and the permissions
-						// don't matter there...;
-					}
-				}
-		} catch (IOException e) {
-			throw new MojoExecutionException("Error creating script file.", e);
+		@Override
+		protected char fileSeparator() {
+			return '\\';
+		}
+		
+		@Override
+		protected String pathSeparator() {
+			return ";";
+		}
+		
+		@Override
+		protected String lineContinuance() {
+			return " ";
+		}
+		
+	}
+	
+	/**
+	 * Class that writes a startup script for POSIX shells
+	 * @author adrian
+	 *
+	 */
+	private static class PosixScripter extends Scripter {
+		
+		public PosixScripter(File scriptFile, String libDir) {
+			super(scriptFile, libDir);
+		}
+
+		@Override
+		protected char fileSeparator() {
+			return '/';
+		}
+		
+		@Override
+		protected String pathSeparator() {
+			return ":";
+		}
+		
+		@Override
+		protected String lineContinuance() {
+			return " \\\n" + repeat(" ", indent);
 		}
 	}
+	
+	/**
+	 * Class that writes a startup script for POSIX shells
+	 * and also does Mac-y stuff
+	 * @author adrian
+	 *
+	 */
+	private static class OSXScripter extends PosixScripter {
+		public OSXScripter(File scriptFile, String libDir) {
+			super(scriptFile, libDir);
+		}
 
+		@Override
+		protected boolean isOSX() {
+			return true;
+		}
+	}
+	
 	/**
 	 * @param jars
 	 * @throws MojoExecutionException
