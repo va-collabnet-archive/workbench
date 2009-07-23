@@ -61,7 +61,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 	@Override
 	protected ImageIcon getImageIcon() {
 		return new ImageIcon(ACE.class
-				.getResource("/24x24/plain/yinyang.png"));
+				.getResource("/24x24/plain/chrystal_ball.png"));
 	}
 
 	@Override
@@ -73,12 +73,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 	}
    @Override
    protected String getToolTipText() {
-      return "<html>Yin and yang can also be seen as a process of <br>"
-		+ "transformation which describes the changes between<br>"
-		+ " the phases of a cycle. For example, cold water (yin) <br>"
-		+ "can be boiled and eventually turn into steam (yang).<p> <p>"
-		+ "Stated forms (yin) can be classified and turned into<br>"
-		+ "inferred forms (yang).";
+      return "<html>The crystal ball is used to invoke the classifier.";
    }
    @Override
    protected int getComponentId() {
