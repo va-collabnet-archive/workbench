@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -72,13 +73,31 @@ public class ImportRefsetSpecTask extends AbstractTask {
         try {
             String fileName = (String) process.readProperty(inputFilePropName);
 
+            // initialise the progress panel
+            I_ShowActivity activityPanel = LocalVersionedTerminology.get()
+                    .newActivityPanel(true);
+            activityPanel.setIndeterminate(true);
+            activityPanel
+                    .setProgressInfoUpper("Importing refset spec from file : "
+                            + fileName);
+
             TupleFileUtil tupleImporter = new TupleFileUtil();
             tupleImporter.importFile(new File(fileName));
 
             LocalVersionedTerminology.get().commit();
 
+            activityPanel.setProgressInfoUpper("Importing refset spec : "
+                    + fileName
+                    + "<font color='red'> COMPLETE. <br><font color='black'>)");
+            activityPanel.complete();
+
             return Condition.CONTINUE;
         } catch (Exception ex) {
+            try {
+                LocalVersionedTerminology.get().cancel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             throw new TaskFailedException(ex);
         }
     }

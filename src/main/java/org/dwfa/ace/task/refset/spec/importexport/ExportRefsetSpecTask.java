@@ -7,6 +7,8 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -75,6 +77,7 @@ public class ExportRefsetSpecTask extends AbstractTask {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                     .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
                             .name());
+
             String fileName = (String) process.readProperty(outputFilePropName);
             TupleFileUtil tupleExporter = new TupleFileUtil();
 
@@ -92,8 +95,24 @@ public class ExportRefsetSpecTask extends AbstractTask {
             }
             File file = new File(fileName);
 
+            // initialise the progress panel
+            I_ShowActivity activityPanel = LocalVersionedTerminology
+                    .get().newActivityPanel(true);
+            activityPanel.setIndeterminate(true);
+            activityPanel
+                    .setProgressInfoUpper("Exporting refset spec : "
+                            + configFrame.getRefsetSpecInSpecEditor()
+                                    .getInitialText());
+
             tupleExporter.exportRefsetSpecToFile(file, configFrame
                     .getRefsetSpecInSpecEditor());
+
+            activityPanel
+                    .setProgressInfoUpper("Exporting refset spec : "
+                            + configFrame.getRefsetSpecInSpecEditor()
+                                    .getInitialText()
+                            + "<font color='red'> COMPLETE. <br><font color='black'>)");
+            activityPanel.complete();
 
             return Condition.CONTINUE;
         } catch (Exception ex) {
