@@ -75,6 +75,14 @@ public class TupleFileUtil {
                                 .getUids().iterator().next())) {
                     ConceptConceptStringExtTupleFileUtil
                             .importTuple(currentLine);
+                } else if (tupleUuid
+                        .equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_TUPLE
+                                .getUids().iterator().next())) {
+                    ConceptExtTupleFileUtil.importTuple(currentLine);
+                } else if (tupleUuid
+                        .equals(ArchitectonicAuxiliary.Concept.EXT_INT_TUPLE
+                                .getUids().iterator().next())) {
+                    IntExtTupleFileUtil.importTuple(currentLine);
                 } else {
                     throw new TerminologyException(
                             "Unimplemented tuple UUID : " + tupleUuid);
@@ -128,19 +136,10 @@ public class TupleFileUtil {
         Set<I_Position> positions = termFactory.getActiveAceFrameConfig()
                 .getViewPositionSet();
 
-        // member refset
-        outputFileWriter.append(ConceptTupleFileUtil.exportTuple(memberRefset));
-        List<I_DescriptionTuple> descTuples = memberRefset
-                .getDescriptionTuples(allowedStatus, allowedTypes, positions,
-                        true);
-        for (I_DescriptionTuple tuple : descTuples) {
-            outputFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
-        }
-
         // refset spec
         outputFileWriter.append(ConceptTupleFileUtil.exportTuple(refsetSpec));
-        descTuples = refsetSpec.getDescriptionTuples(allowedStatus,
-                allowedTypes, positions, true);
+        List<I_DescriptionTuple> descTuples = refsetSpec.getDescriptionTuples(
+                allowedStatus, allowedTypes, positions, true);
         for (I_DescriptionTuple tuple : descTuples) {
             outputFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
         }
@@ -149,6 +148,14 @@ public class TupleFileUtil {
         outputFileWriter.append(ConceptTupleFileUtil
                 .exportTuple(markedParentRefset));
         descTuples = markedParentRefset.getDescriptionTuples(allowedStatus,
+                allowedTypes, positions, true);
+        for (I_DescriptionTuple tuple : descTuples) {
+            outputFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
+        }
+
+        // member refset
+        outputFileWriter.append(ConceptTupleFileUtil.exportTuple(memberRefset));
+        descTuples = memberRefset.getDescriptionTuples(allowedStatus,
                 allowedTypes, positions, true);
         for (I_DescriptionTuple tuple : descTuples) {
             outputFileWriter.append(DescTupleFileUtil.exportTuple(tuple));

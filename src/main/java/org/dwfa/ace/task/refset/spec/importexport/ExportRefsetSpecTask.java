@@ -96,22 +96,22 @@ public class ExportRefsetSpecTask extends AbstractTask {
             File file = new File(fileName);
 
             // initialise the progress panel
-            I_ShowActivity activityPanel = LocalVersionedTerminology
-                    .get().newActivityPanel(true);
+            I_ShowActivity activityPanel = LocalVersionedTerminology.get()
+                    .newActivityPanel(true);
             activityPanel.setIndeterminate(true);
+            activityPanel.setProgressInfoUpper("Exporting refset spec : "
+                    + configFrame.getRefsetSpecInSpecEditor().getInitialText());
             activityPanel
-                    .setProgressInfoUpper("Exporting refset spec : "
-                            + configFrame.getRefsetSpecInSpecEditor()
-                                    .getInitialText());
+                    .setProgressInfoLower("<html><font color='black'> In progress.");
 
             tupleExporter.exportRefsetSpecToFile(file, configFrame
                     .getRefsetSpecInSpecEditor());
 
+            activityPanel.setProgressInfoUpper("Exporting refset spec : "
+                    + configFrame.getRefsetSpecInSpecEditor().getInitialText());
             activityPanel
-                    .setProgressInfoUpper("Exporting refset spec : "
-                            + configFrame.getRefsetSpecInSpecEditor()
-                                    .getInitialText()
-                            + "<font color='red'> COMPLETE. <br><font color='black'>)");
+                    .setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
+
             activityPanel.complete();
 
             return Condition.CONTINUE;

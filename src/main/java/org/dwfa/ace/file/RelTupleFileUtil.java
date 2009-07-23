@@ -39,16 +39,18 @@ public class RelTupleFileUtil {
             int group = relTuple.getGroup();
             UUID refUuid = termFactory.getUids(relTuple.getRefinabilityId())
                     .iterator().next();
-            UUID relType = termFactory.getUids(relTuple.getTypeId()).iterator()
-                    .next();
+            UUID relTypeUuid = termFactory.getUids(relTuple.getTypeId())
+                    .iterator().next();
             UUID pathUuid = termFactory.getUids(relTuple.getPathId())
                     .iterator().next();
             UUID statusUuid = termFactory.getUids(relTuple.getStatusId())
                     .iterator().next();
+            int effectiveDate = relTuple.getVersion();
 
             return tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t" + c2Uuid
                     + "\t" + charUuid + "\t" + group + "\t" + refUuid + "\t"
-                    + relType + "\t" + pathUuid + "\t" + statusUuid + "\n";
+                    + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
+                    + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
@@ -70,24 +72,28 @@ public class RelTupleFileUtil {
             UUID relTypeUuid = UUID.fromString(lineParts[7]);
             UUID pathUuid = UUID.fromString(lineParts[8]);
             UUID statusUuid = UUID.fromString(lineParts[9]);
+            int effectiveDate = Integer.parseInt(lineParts[10]);
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            I_RelPart newPart = termFactory.newRelPart();
 
-            newPart.setCharacteristicId(termFactory.getId(charUuid)
-                    .getNativeId());
-            newPart.setGroup(group);
-            newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-            newPart.setRefinabilityId(termFactory.getId(refUuid).getNativeId());
-            newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
-            newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
+            /*
+             * I_RelPart newPart = termFactory.newRelPart();
+             * newPart.setCharacteristicId(termFactory.getId(charUuid)
+             * .getNativeId()); newPart.setGroup(group);
+             * newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+             * newPart
+             * .setRefinabilityId(termFactory.getId(refUuid).getNativeId());
+             * newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
+             * newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
+             * newPart.setVersion(effectiveDate);
+             */
 
             if (termFactory.hasId(c1Uuid)) {
 
                 I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(newPart.getStatusId());
+                allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
                 I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedTypes.add(newPart.getTypeId());
+                allowedTypes.add(termFactory.getId(relTypeUuid).getNativeId());
 
                 I_GetConceptData concept = termFactory
                         .getConcept(new UUID[] { c1Uuid });
@@ -114,8 +120,7 @@ public class RelTupleFileUtil {
                     paths.add(termFactory.getPath(new UUID[] { pathUuid }));
                     termFactory.uuidToNativeWithGeneration(relUuid,
                             ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                                    .localize().getNid(), paths,
-                            Integer.MAX_VALUE);
+                                    .localize().getNid(), paths, effectiveDate);
 
                     I_RelVersioned v = termFactory.newRelationship(relUuid,
                             concept, termFactory
@@ -125,10 +130,42 @@ public class RelTupleFileUtil {
                             termFactory.getConcept(new UUID[] { refUuid }),
                             termFactory.getConcept(new UUID[] { statusUuid }),
                             group, termFactory.getActiveAceFrameConfig());
+
+                    I_RelPart newPart = v.getLastTuple().getPart();
+                    newPart.setCharacteristicId(termFactory.getId(charUuid)
+                            .getNativeId());
+                    newPart.setGroup(group);
+                    newPart
+                            .setPathId(termFactory.getId(pathUuid)
+                                    .getNativeId());
+                    newPart.setRefinabilityId(termFactory.getId(refUuid)
+                            .getNativeId());
+                    newPart.setTypeId(termFactory.getId(relTypeUuid)
+                            .getNativeId());
+                    newPart.setStatusId(termFactory.getId(statusUuid)
+                            .getNativeId());
+                    newPart.setVersion(effectiveDate);
+
                     v.addVersion(newPart);
                     termFactory.addUncommitted(concept);
-                } else if (!latestTuple.getPart().equals(newPart)) {
-                    latestTuple.getPart().hasNewData(newPart);
+                } else {
+
+                    I_RelPart newPart = latestTuple.getPart().duplicate();
+                    newPart.setCharacteristicId(termFactory.getId(charUuid)
+                            .getNativeId());
+                    newPart.setGroup(group);
+                    newPart
+                            .setPathId(termFactory.getId(pathUuid)
+                                    .getNativeId());
+                    newPart.setRefinabilityId(termFactory.getId(refUuid)
+                            .getNativeId());
+                    newPart.setTypeId(termFactory.getId(relTypeUuid)
+                            .getNativeId());
+                    newPart.setStatusId(termFactory.getId(statusUuid)
+                            .getNativeId());
+                    newPart.setVersion(effectiveDate);
+
+                    latestTuple.getRelVersioned().addVersion(newPart);
                     termFactory.addUncommitted(concept);
                 }
             } else {

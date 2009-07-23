@@ -35,9 +35,10 @@ public class ConceptTupleFileUtil {
                 .next();
         boolean isDefined = part.isDefined();
         UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
+        int effectiveDate = part.getVersion();
 
         return conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined + "\t"
-                + pathUuid + "\t" + statusUuid + "\n";
+                + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";
     }
 
     public static void importTuple(String inputLine)
@@ -50,19 +51,15 @@ public class ConceptTupleFileUtil {
             boolean isDefined = Boolean.parseBoolean(lineParts[2]);
             UUID pathUuid = UUID.fromString(lineParts[3]);
             UUID statusUuid = UUID.fromString(lineParts[4]);
+            int effectiveDate = Integer.parseInt(lineParts[5]);
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            I_ConceptAttributePart newPart = termFactory
-                    .newConceptAttributePart();
-            newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
-            newPart.setDefined(isDefined);
-            newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
 
             if (termFactory.hasId(conceptUuid)) {
 
                 int conceptId = termFactory.getId(conceptUuid).getNativeId();
                 I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(newPart.getStatusId());
+                allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 Set<I_Position> positions = termFactory
                         .getActiveAceFrameConfig().getViewPositionSet();
@@ -82,17 +79,44 @@ public class ConceptTupleFileUtil {
                     }
                 }
 
-                if (!latestTuple.getPart().equals(newPart)) {
-                    latestTuple.hasNewData(newPart);
+                if (latestTuple == null) {
+                    throw new Exception(
+                            "Concept UUID exists but has no tuples.");
+                } else {
+                    System.out.println("******** 1");
+                    I_ConceptAttributePart newPart = latestTuple.getPart()
+                            .duplicate();
+                    newPart.setStatusId(termFactory.getId(statusUuid)
+                            .getNativeId());
+                    newPart.setDefined(isDefined);
+                    newPart
+                            .setPathId(termFactory.getId(pathUuid)
+                                    .getNativeId());
+                    newPart.setVersion(effectiveDate);
+
+                    latestTuple.getConVersioned().addVersion(newPart);
                     termFactory.addUncommitted(concept);
                 }
+
             } else {
+                System.out.println("******** 2");
                 // need to create concept + part
                 I_GetConceptData newConcept = termFactory.newConcept(
                         conceptUuid, isDefined, termFactory
                                 .getActiveAceFrameConfig());
                 I_ConceptAttributeVersioned v = newConcept
                         .getConceptAttributes();
+
+                I_ConceptAttributePart newPart = v.getVersions().get(0);
+                // I_ConceptAttributePart newPart = termFactory
+                // .newConceptAttributePart();
+                newPart
+                        .setStatusId(termFactory.getId(statusUuid)
+                                .getNativeId());
+                newPart.setDefined(isDefined);
+                newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+                newPart.setVersion(effectiveDate);
+
                 v.addVersion(newPart);
                 termFactory.addUncommitted(newConcept);
             }

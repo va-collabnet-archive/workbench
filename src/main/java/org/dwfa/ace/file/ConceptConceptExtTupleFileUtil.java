@@ -47,10 +47,12 @@ public class ConceptConceptExtTupleFileUtil {
                     .next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId())
                     .iterator().next();
+            int version = tuple.getVersion();
 
             return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t"
                     + componentUuid + "\t" + typeUuid + "\t" + c1Uuid + "\t"
-                    + c2Uuid + "\t" + pathUuid + "\t" + statusUuid + "\n";
+                    + c2Uuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
+                    + version + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
@@ -77,6 +79,7 @@ public class ConceptConceptExtTupleFileUtil {
             UUID c2Uuid = UUID.fromString(lineParts[6]);//
             UUID pathUuid = UUID.fromString(lineParts[7]);
             UUID statusUuid = UUID.fromString(lineParts[8]);
+            int effectiveDate = Integer.parseInt(lineParts[9]);
 
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
@@ -85,7 +88,7 @@ public class ConceptConceptExtTupleFileUtil {
                     refsetUuid).getNativeId(), termFactory.getId(componentUuid)
                     .getNativeId(), termFactory.getId(c1Uuid).getNativeId(),
                     termFactory.getId(c2Uuid).getNativeId(), memberUuid,
-                    pathUuid, statusUuid, Integer.MAX_VALUE);
+                    pathUuid, statusUuid, effectiveDate);
 
         } catch (Exception e) {
             e.printStackTrace();

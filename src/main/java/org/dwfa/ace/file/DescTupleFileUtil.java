@@ -1,7 +1,9 @@
 package org.dwfa.ace.file;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -40,10 +42,43 @@ public class DescTupleFileUtil {
         UUID statusUuid = termFactory.getUids(descTuple.getStatusId())
                 .iterator().next();
         boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
+        int effectiveDate = descTuple.getVersion();
+        System.out.println("DESC TUPLE VERSION: " + effectiveDate);
+        System.out.println(format(effectiveDate));
+        System.out.println("DESC PART VERSION: "
+                + descTuple.getPart().getVersion());
 
         return tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text
                 + "\t" + lang + "\t" + initialCapSignificant + "\t" + typeUuid
-                + "\t" + pathUuid + "\t" + statusUuid + "\n";
+                + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate
+                + "\n";
+    }
+
+    public static String format(int version) {
+        if (version == Integer.MAX_VALUE) {
+            return "uncommitted";
+        }
+        if (version == Integer.MIN_VALUE) {
+            return "beginning of time";
+        }
+        long time = convert(version);
+        SimpleDateFormat formatter = new SimpleDateFormat();
+        if (formatter == null) {
+            formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+
+        }
+        return formatter.format(new Date(time));
+    }
+
+    public static long convert(int version) {
+        if (version == Integer.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        if (version == Integer.MIN_VALUE) {
+            return Long.MIN_VALUE;
+        }
+        long added = 1830407753 + version;
+        return added * 1000;
     }
 
     public static void importTuple(String inputLine)
@@ -60,24 +95,17 @@ public class DescTupleFileUtil {
             UUID typeUuid = UUID.fromString(lineParts[6]);
             UUID pathUuid = UUID.fromString(lineParts[7]);
             UUID statusUuid = UUID.fromString(lineParts[8]);
+            int effectiveDate = Integer.parseInt(lineParts[9]);
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            I_DescriptionPart newPart = termFactory.newDescriptionPart();
-
-            newPart.setLang(lang);
-            newPart.setText(text);
-            newPart.setInitialCaseSignificant(initialCapSignificant);
-            newPart.setTypeId(termFactory.getId(typeUuid).getNativeId());
-            newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
-            newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
 
             if (termFactory.hasId(conceptUuid)) {
 
                 int conceptId = termFactory.getId(conceptUuid).getNativeId();
                 I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(newPart.getStatusId());
+                allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
                 I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedTypes.add(newPart.getTypeId());
+                allowedTypes.add(termFactory.getId(typeUuid).getNativeId());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 Set<I_Position> positions = termFactory
                         .getActiveAceFrameConfig().getViewPositionSet();
@@ -101,17 +129,45 @@ public class DescTupleFileUtil {
                     paths.add(termFactory.getPath(new UUID[] { pathUuid }));
                     termFactory.uuidToNativeWithGeneration(descUuid,
                             ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                                    .localize().getNid(), paths,
-                            Integer.MAX_VALUE);
+                                    .localize().getNid(), paths, effectiveDate);
 
                     I_DescriptionVersioned v = termFactory.newDescription(
                             descUuid, concept, lang, text, termFactory
                                     .getConcept(new UUID[] { typeUuid }),
                             termFactory.getActiveAceFrameConfig());
-                    v.addVersion(newPart);
+
+                    I_DescriptionPart newLastPart = v.getLastTuple().getPart();
+                    newLastPart.setLang(lang);
+                    newLastPart.setText(text);
+                    newLastPart
+                            .setInitialCaseSignificant(initialCapSignificant);
+                    newLastPart.setTypeId(termFactory.getId(typeUuid)
+                            .getNativeId());
+                    newLastPart.setStatusId(termFactory.getId(statusUuid)
+                            .getNativeId());
+                    newLastPart.setPathId(termFactory.getId(pathUuid)
+                            .getNativeId());
+                    newLastPart.setVersion(effectiveDate);
+
+                    v.addVersion(newLastPart);
                     termFactory.addUncommitted(concept);
-                } else if (!latestTuple.getPart().equals(newPart)) {
-                    latestTuple.getPart().hasNewData(newPart);
+                } else {
+                    I_DescriptionPart newLastPart = latestTuple
+                            .getDescVersioned().getLastTuple().getPart()
+                            .duplicate();
+                    newLastPart.setLang(lang);
+                    newLastPart.setText(text);
+                    newLastPart
+                            .setInitialCaseSignificant(initialCapSignificant);
+                    newLastPart.setTypeId(termFactory.getId(typeUuid)
+                            .getNativeId());
+                    newLastPart.setStatusId(termFactory.getId(statusUuid)
+                            .getNativeId());
+                    newLastPart.setPathId(termFactory.getId(pathUuid)
+                            .getNativeId());
+                    newLastPart.setVersion(effectiveDate);
+
+                    latestTuple.getDescVersioned().addVersion(newLastPart);
                     termFactory.addUncommitted(concept);
                 }
             } else {

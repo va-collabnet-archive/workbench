@@ -80,15 +80,20 @@ public class ImportRefsetSpecTask extends AbstractTask {
             activityPanel
                     .setProgressInfoUpper("Importing refset spec from file : "
                             + fileName);
+            activityPanel
+                    .setProgressInfoLower("<html><font color='black'> In progress.");
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
             tupleImporter.importFile(new File(fileName));
 
             LocalVersionedTerminology.get().commit();
 
-            activityPanel.setProgressInfoUpper("Importing refset spec : "
-                    + fileName
-                    + "<font color='red'> COMPLETE. <br><font color='black'>)");
+            activityPanel
+                    .setProgressInfoUpper("Importing refset spec from file : "
+                            + fileName);
+            activityPanel
+                    .setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
+
             activityPanel.complete();
 
             return Condition.CONTINUE;

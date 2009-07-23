@@ -5,14 +5,14 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConceptConceptConceptExtTupleFileUtil {
+public class ConceptExtTupleFileUtil {
 
     public static String exportTuple(I_ThinExtByRefTuple tuple)
             throws TerminologyException, IOException {
@@ -20,7 +20,7 @@ public class ConceptConceptConceptExtTupleFileUtil {
         try {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            UUID tupleUuid = ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE
+            UUID tupleUuid = ArchitectonicAuxiliary.Concept.EXT_CONCEPT_TUPLE
                     .getUids().iterator().next();
 
             UUID memberUuid = termFactory.getUids(tuple.getMemberId())
@@ -30,20 +30,17 @@ public class ConceptConceptConceptExtTupleFileUtil {
             UUID componentUuid = termFactory.getUids(tuple.getComponentId())
                     .iterator().next();
             UUID typeUuid = termFactory.getUids(tuple.getTypeId()).iterator()
-                    .next(); // this should be concept concept concept
-            if (!typeUuid
-                    .equals(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
-                            .getUids().iterator().next())) {
+                    .next();
+            if (!typeUuid.equals(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
+                    .getUids().iterator().next())) {
                 throw new TerminologyException(
-                        "Non concept-concept-concept ext tuple passed to concept-concept-concept file util.");
+                        "Non concept ext tuple passed to concept file util.");
             }
 
-            I_ThinExtByRefPartConceptConceptConcept part = (I_ThinExtByRefPartConceptConceptConcept) tuple
+            I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple
                     .getPart();
-            UUID c1Uuid = termFactory.getUids(part.getC1id()).iterator().next();
-            UUID c2Uuid = termFactory.getUids(part.getC2id()).iterator().next();
-            UUID c3Uuid = termFactory.getUids(part.getC3id()).iterator().next();
-
+            UUID conceptUuid = termFactory.getUids(part.getConceptId())
+                    .iterator().next();
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator()
                     .next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId())
@@ -51,9 +48,9 @@ public class ConceptConceptConceptExtTupleFileUtil {
             int effectiveDate = tuple.getVersion();
 
             return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t"
-                    + componentUuid + "\t" + typeUuid + "\t" + c1Uuid + "\t"
-                    + c2Uuid + "\t" + c3Uuid + "\t" + pathUuid + "\t"
-                    + statusUuid + "\t" + effectiveDate + "\n";
+                    + componentUuid + "\t" + typeUuid + "\t" + conceptUuid
+                    + "\t" + pathUuid + "\t" + statusUuid + "\t"
+                    + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
@@ -70,27 +67,24 @@ public class ConceptConceptConceptExtTupleFileUtil {
             UUID refsetUuid = UUID.fromString(lineParts[2]);
             UUID componentUuid = UUID.fromString(lineParts[3]);
             UUID typeUuid = UUID.fromString(lineParts[4]);
-            if (!typeUuid
-                    .equals(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
-                            .getUids().iterator().next())) {
+            if (!typeUuid.equals(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
+                    .getUids().iterator().next())) {
                 throw new TerminologyException(
-                        "Non concept-concept-concept ext string passed to concept-concept-concept file util.");
+                        "Non concept ext string passed to concept file util.");
             }
-            UUID c1Uuid = UUID.fromString(lineParts[5]);
-            UUID c2Uuid = UUID.fromString(lineParts[6]);
-            UUID c3Uuid = UUID.fromString(lineParts[7]);
-            UUID pathUuid = UUID.fromString(lineParts[8]);
-            UUID statusUuid = UUID.fromString(lineParts[9]);
-            int effectiveDate = Integer.parseInt(lineParts[10]);
+            UUID conceptUuid = UUID.fromString(lineParts[5]);
+            UUID pathUuid = UUID.fromString(lineParts[6]);
+            UUID statusUuid = UUID.fromString(lineParts[7]);
+            int effectiveDate = Integer.parseInt(lineParts[8]);
 
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            refsetHelper.newConceptConceptConceptRefsetExtension(termFactory
+
+            refsetHelper.newConceptRefsetExtension(termFactory
                     .getId(refsetUuid).getNativeId(), termFactory.getId(
-                    componentUuid).getNativeId(), termFactory.getId(c1Uuid)
-                    .getNativeId(), termFactory.getId(c2Uuid).getNativeId(),
-                    termFactory.getId(c3Uuid).getNativeId(), memberUuid,
-                    pathUuid, statusUuid, effectiveDate);
+                    componentUuid).getNativeId(), termFactory
+                    .getId(conceptUuid).getNativeId(), memberUuid, pathUuid,
+                    statusUuid, effectiveDate);
 
         } catch (Exception e) {
             e.printStackTrace();
