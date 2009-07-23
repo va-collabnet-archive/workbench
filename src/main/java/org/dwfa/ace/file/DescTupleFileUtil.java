@@ -1,9 +1,7 @@
 package org.dwfa.ace.file;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -43,42 +41,11 @@ public class DescTupleFileUtil {
                 .iterator().next();
         boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
         int effectiveDate = descTuple.getVersion();
-        System.out.println("DESC TUPLE VERSION: " + effectiveDate);
-        System.out.println(format(effectiveDate));
-        System.out.println("DESC PART VERSION: "
-                + descTuple.getPart().getVersion());
 
         return tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text
                 + "\t" + lang + "\t" + initialCapSignificant + "\t" + typeUuid
                 + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate
                 + "\n";
-    }
-
-    public static String format(int version) {
-        if (version == Integer.MAX_VALUE) {
-            return "uncommitted";
-        }
-        if (version == Integer.MIN_VALUE) {
-            return "beginning of time";
-        }
-        long time = convert(version);
-        SimpleDateFormat formatter = new SimpleDateFormat();
-        if (formatter == null) {
-            formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-
-        }
-        return formatter.format(new Date(time));
-    }
-
-    public static long convert(int version) {
-        if (version == Integer.MAX_VALUE) {
-            return Long.MAX_VALUE;
-        }
-        if (version == Integer.MIN_VALUE) {
-            return Long.MIN_VALUE;
-        }
-        long added = 1830407753 + version;
-        return added * 1000;
     }
 
     public static void importTuple(String inputLine)

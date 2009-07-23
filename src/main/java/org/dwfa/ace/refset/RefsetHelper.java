@@ -411,6 +411,19 @@ public class RefsetHelper {
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
+
+        // edit the existing part's effectiveDate/version - this needs to occur
+        // after the part has been committed, or else the effectiveDate is set
+        // to the time at commit
+        int index = newExtension.getVersions().size() - 1;
+        I_ThinExtByRefPartConceptConcept extension = (I_ThinExtByRefPartConceptConcept) newExtension
+                .getVersions().get(index);
+        extension.setVersion(effectiveTime);
+        newExtension.addVersion(extension);
+
+        termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
         return true;
     }
 
@@ -468,6 +481,19 @@ public class RefsetHelper {
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
+
+        // edit the existing part's effectiveDate/version - this needs to occur
+        // after the part has been committed, or else the effectiveDate is set
+        // to the time at commit
+        int index = newExtension.getVersions().size() - 1;
+        I_ThinExtByRefPartInteger extension = (I_ThinExtByRefPartInteger) newExtension
+                .getVersions().get(index);
+        extension.setVersion(effectiveTime);
+        newExtension.addVersion(extension);
+
+        termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
         return true;
     }
 
@@ -525,6 +551,19 @@ public class RefsetHelper {
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
+
+        // edit the existing part's effectiveDate/version - this needs to occur
+        // after the part has been committed, or else the effectiveDate is set
+        // to the time at commit
+        int index = newExtension.getVersions().size() - 1;
+        I_ThinExtByRefPartConcept extension = (I_ThinExtByRefPartConcept) newExtension
+                .getVersions().get(index);
+        extension.setVersion(effectiveTime);
+        newExtension.addVersion(extension);
+
+        termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
         return true;
     }
 
@@ -560,18 +599,22 @@ public class RefsetHelper {
 
         // create a new extension (with a part for each path the user is
         // editing)
-        int newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid,
-                unspecifiedUuid, paths, effectiveTime);
+        int newMemberId = Integer.MAX_VALUE;
+        if (!termFactory.hasId(memberUuid)) {
+            newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid,
+                    unspecifiedUuid, paths, effectiveTime);
+        } else {
+            newMemberId = termFactory.getId(memberUuid).getNativeId();
+        }
 
         I_ThinExtByRefVersioned newExtension = termFactory
                 .newExtensionNoChecks(refsetId, newMemberId, componentId,
                         extTypeId);
 
+        // create a new part
         for (I_Path editPath : paths) {
-
             I_ThinExtByRefPartConceptConceptConcept extension = termFactory
                     .newConceptConceptConceptExtensionPart();
-
             extension.setPathId(editPath.getConceptId());
             extension.setStatusId(termFactory.getConcept(
                     new UUID[] { statusUuid }).getConceptId());
@@ -584,6 +627,19 @@ public class RefsetHelper {
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
+
+        // edit the existing part's effectiveDate/version - this needs to occur
+        // after the part has been committed, or else the effectiveDate is set
+        // to the time at commit
+        int index = newExtension.getVersions().size() - 1;
+        I_ThinExtByRefPartConceptConceptConcept extension = (I_ThinExtByRefPartConceptConceptConcept) newExtension
+                .getVersions().get(index);
+        extension.setVersion(effectiveTime);
+        newExtension.addVersion(extension);
+
+        termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
         return true;
     }
 
@@ -636,7 +692,7 @@ public class RefsetHelper {
             extension.setPathId(editPath.getConceptId());
             extension.setStatusId(termFactory.getConcept(
                     new UUID[] { statusUuid }).getConceptId());
-            extension.setVersion(Integer.MAX_VALUE);
+            extension.setVersion(effectiveTime);
             extension.setC1id(c1Id);
             extension.setC2id(c2Id);
             extension.setStr(stringValue);
@@ -645,6 +701,19 @@ public class RefsetHelper {
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
+
+        // edit the existing part's effectiveDate/version - this needs to occur
+        // after the part has been committed, or else the effectiveDate is set
+        // to the time at commit
+        int index = newExtension.getVersions().size() - 1;
+        I_ThinExtByRefPartConceptConceptString extension = (I_ThinExtByRefPartConceptConceptString) newExtension
+                .getVersions().get(index);
+        extension.setVersion(effectiveTime);
+        newExtension.addVersion(extension);
+
+        termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.commit();
         return true;
     }
 

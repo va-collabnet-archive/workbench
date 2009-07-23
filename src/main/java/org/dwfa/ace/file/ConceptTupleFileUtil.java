@@ -83,7 +83,6 @@ public class ConceptTupleFileUtil {
                     throw new Exception(
                             "Concept UUID exists but has no tuples.");
                 } else {
-                    System.out.println("******** 1");
                     I_ConceptAttributePart newPart = latestTuple.getPart()
                             .duplicate();
                     newPart.setStatusId(termFactory.getId(statusUuid)
@@ -99,7 +98,6 @@ public class ConceptTupleFileUtil {
                 }
 
             } else {
-                System.out.println("******** 2");
                 // need to create concept + part
                 I_GetConceptData newConcept = termFactory.newConcept(
                         conceptUuid, isDefined, termFactory
@@ -108,8 +106,6 @@ public class ConceptTupleFileUtil {
                         .getConceptAttributes();
 
                 I_ConceptAttributePart newPart = v.getVersions().get(0);
-                // I_ConceptAttributePart newPart = termFactory
-                // .newConceptAttributePart();
                 newPart
                         .setStatusId(termFactory.getId(statusUuid)
                                 .getNativeId());
