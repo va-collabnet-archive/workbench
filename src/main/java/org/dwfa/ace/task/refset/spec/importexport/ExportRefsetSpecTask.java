@@ -72,7 +72,8 @@ public class ExportRefsetSpecTask extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-
+        I_ShowActivity activityPanel = LocalVersionedTerminology.get()
+                .newActivityPanel(true);
         try {
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
                     .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
@@ -96,8 +97,7 @@ public class ExportRefsetSpecTask extends AbstractTask {
             File file = new File(fileName);
 
             // initialise the progress panel
-            I_ShowActivity activityPanel = LocalVersionedTerminology.get()
-                    .newActivityPanel(true);
+
             activityPanel.setIndeterminate(true);
             activityPanel.setProgressInfoUpper("Exporting refset spec : "
                     + configFrame.getRefsetSpecInSpecEditor().getInitialText());
@@ -116,6 +116,7 @@ public class ExportRefsetSpecTask extends AbstractTask {
 
             return Condition.CONTINUE;
         } catch (Exception ex) {
+            activityPanel.complete();
             throw new TaskFailedException(ex);
         }
     }

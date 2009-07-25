@@ -22,10 +22,14 @@ public class ConceptTupleFileUtil {
     public static String exportTuple(I_GetConceptData concept)
             throws TerminologyException, IOException {
 
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+        String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(concept
+                .getUids().iterator().next()));
+
         RefsetUtilImpl refsetUtil = new RefsetUtilImpl();
         I_ConceptAttributePart part = refsetUtil
                 .getLastestAttributePart(concept);
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
 
         UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE
                 .getUids().iterator().next();
@@ -37,8 +41,9 @@ public class ConceptTupleFileUtil {
         UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
         int effectiveDate = part.getVersion();
 
-        return conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined + "\t"
-                + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";
+        return idTuple + conceptTupleUuid + "\t" + conceptUuid + "\t"
+                + isDefined + "\t" + pathUuid + "\t" + statusUuid + "\t"
+                + effectiveDate + "\n";
     }
 
     public static void importTuple(String inputLine)
@@ -55,7 +60,12 @@ public class ConceptTupleFileUtil {
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            if (termFactory.hasId(conceptUuid)) {
+            if (!termFactory.hasId(conceptUuid)) {
+                throw new Exception(
+                        "Relevant Concept UUID tuple must occur before reference to a UUID."
+                                + conceptUuid);
+            } else if (termFactory.hasConcept(termFactory.getId(conceptUuid)
+                    .getNativeId())) {
 
                 int conceptId = termFactory.getId(conceptUuid).getNativeId();
                 I_IntSet allowedStatus = termFactory.newIntSet();
@@ -95,8 +105,8 @@ public class ConceptTupleFileUtil {
 
                     latestTuple.getConVersioned().addVersion(newPart);
                     termFactory.addUncommitted(concept);
+                    // termFactory.commit();
                 }
-
             } else {
                 // need to create concept + part
                 I_GetConceptData newConcept = termFactory.newConcept(
@@ -105,21 +115,22 @@ public class ConceptTupleFileUtil {
                 I_ConceptAttributeVersioned v = newConcept
                         .getConceptAttributes();
 
-                I_ConceptAttributePart newPart = v.getVersions().get(0);
+                I_ConceptAttributePart newPart = v.getVersions().get(0)
+                        .duplicate();
                 newPart
                         .setStatusId(termFactory.getId(statusUuid)
                                 .getNativeId());
                 newPart.setDefined(isDefined);
                 newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
                 newPart.setVersion(effectiveDate);
-
                 v.addVersion(newPart);
                 termFactory.addUncommitted(newConcept);
+                // termFactory.commit();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(
-                    "Exception thrown while importing line: " + inputLine);
+            throw new TerminologyException(e.getLocalizedMessage()
+                    + " Exception thrown while importing line: " + inputLine);
         }
     }
 }

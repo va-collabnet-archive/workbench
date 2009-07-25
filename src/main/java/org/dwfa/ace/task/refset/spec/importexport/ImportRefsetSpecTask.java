@@ -70,12 +70,12 @@ public class ImportRefsetSpecTask extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
 
+        // initialise the progress panel
+        I_ShowActivity activityPanel = LocalVersionedTerminology.get()
+                .newActivityPanel(true);
         try {
             String fileName = (String) process.readProperty(inputFilePropName);
 
-            // initialise the progress panel
-            I_ShowActivity activityPanel = LocalVersionedTerminology.get()
-                    .newActivityPanel(true);
             activityPanel.setIndeterminate(true);
             activityPanel
                     .setProgressInfoUpper("Importing refset spec from file : "
@@ -99,6 +99,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
             return Condition.CONTINUE;
         } catch (Exception ex) {
             try {
+                activityPanel.complete();
                 LocalVersionedTerminology.get().cancel();
             } catch (IOException e) {
                 e.printStackTrace();

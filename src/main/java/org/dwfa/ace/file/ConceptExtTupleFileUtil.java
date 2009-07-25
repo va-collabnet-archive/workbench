@@ -47,7 +47,11 @@ public class ConceptExtTupleFileUtil {
                     .iterator().next();
             int effectiveDate = tuple.getVersion();
 
-            return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t"
+            // String idTuple = IDTupleFileUtil.exportTuple(termFactory
+            // .getId(memberUuid));
+
+            return // idTuple + "\n" +
+            tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t"
                     + componentUuid + "\t" + typeUuid + "\t" + conceptUuid
                     + "\t" + pathUuid + "\t" + statusUuid + "\t"
                     + effectiveDate + "\n";
@@ -79,6 +83,11 @@ public class ConceptExtTupleFileUtil {
 
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+            /*
+             * if (!termFactory.hasId(memberUuid)) { throw new Exception(
+             * "Relevant ID tuple must occur before reference to a UUID."); }
+             */
 
             refsetHelper.newConceptRefsetExtension(termFactory
                     .getId(refsetUuid).getNativeId(), termFactory.getId(

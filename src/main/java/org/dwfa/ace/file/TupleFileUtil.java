@@ -83,6 +83,10 @@ public class TupleFileUtil {
                         .equals(ArchitectonicAuxiliary.Concept.EXT_INT_TUPLE
                                 .getUids().iterator().next())) {
                     IntExtTupleFileUtil.importTuple(currentLine);
+                } else if (tupleUuid
+                        .equals(ArchitectonicAuxiliary.Concept.ID_TUPLE
+                                .getUids().iterator().next())) {
+                    IDTupleFileUtil.importTuple(currentLine);
                 } else {
                     throw new TerminologyException(
                             "Unimplemented tuple UUID : " + tupleUuid);

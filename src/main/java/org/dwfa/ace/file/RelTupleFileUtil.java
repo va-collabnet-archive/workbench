@@ -47,10 +47,13 @@ public class RelTupleFileUtil {
                     .iterator().next();
             int effectiveDate = relTuple.getVersion();
 
-            return tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t" + c2Uuid
-                    + "\t" + charUuid + "\t" + group + "\t" + refUuid + "\t"
-                    + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
-                    + effectiveDate + "\n";
+            String idTuple = IDTupleFileUtil.exportTuple(termFactory
+                    .getId(relUuid));
+
+            return idTuple + tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t"
+                    + c2Uuid + "\t" + charUuid + "\t" + group + "\t" + refUuid
+                    + "\t" + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid
+                    + "\t" + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
@@ -76,110 +79,99 @@ public class RelTupleFileUtil {
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            /*
-             * I_RelPart newPart = termFactory.newRelPart();
-             * newPart.setCharacteristicId(termFactory.getId(charUuid)
-             * .getNativeId()); newPart.setGroup(group);
-             * newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-             * newPart
-             * .setRefinabilityId(termFactory.getId(refUuid).getNativeId());
-             * newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
-             * newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
-             * newPart.setVersion(effectiveDate);
-             */
+            if (!termFactory.hasId(c1Uuid)) {
+                throw new Exception(
+                        "Relevant c1 UUID tuple must occur before reference to a UUID.");
+            }
+            if (!termFactory.hasId(relUuid)) {
+                throw new Exception(
+                        "Relevant REL UUID tuple must occur before reference to a UUID.");
+            }
+            if (!termFactory.hasId(c2Uuid)) {
+                throw new Exception(
+                        "Relevant c2 UUID tuple must occur before reference to a UUID.");
+            }
 
-            if (termFactory.hasId(c1Uuid)) {
+            I_IntSet allowedStatus = termFactory.newIntSet();
+            allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
+            I_IntSet allowedTypes = termFactory.newIntSet();
+            allowedTypes.add(termFactory.getId(relTypeUuid).getNativeId());
 
-                I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
-                I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedTypes.add(termFactory.getId(relTypeUuid).getNativeId());
+            I_GetConceptData concept = termFactory
+                    .getConcept(new UUID[] { c1Uuid });
+            Set<I_Position> positions = termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSet();
+            boolean returnConflictResolvedLatestState = true;
+            boolean addUncommitted = true;
 
-                I_GetConceptData concept = termFactory
-                        .getConcept(new UUID[] { c1Uuid });
-                Set<I_Position> positions = termFactory
-                        .getActiveAceFrameConfig().getViewPositionSet();
-                boolean returnConflictResolvedLatestState = true;
-                boolean addUncommitted = true;
-
-                // check if the part exists
-                List<I_RelTuple> parts = concept.getSourceRelTuples(
-                        allowedStatus, allowedTypes, positions, addUncommitted,
-                        returnConflictResolvedLatestState);
-                I_RelTuple latestTuple = null;
-                for (I_RelTuple part : parts) {
-                    if (latestTuple == null
-                            || part.getVersion() >= latestTuple.getVersion()) {
-                        latestTuple = part;
-                    }
+            // check if the part exists
+            List<I_RelTuple> parts = concept.getSourceRelTuples(allowedStatus,
+                    allowedTypes, positions, addUncommitted,
+                    returnConflictResolvedLatestState);
+            I_RelTuple latestTuple = null;
+            for (I_RelTuple part : parts) {
+                if (latestTuple == null
+                        || part.getVersion() >= latestTuple.getVersion()) {
+                    latestTuple = part;
                 }
+            }
 
-                if (latestTuple == null) {
-                    Collection<I_Path> paths = termFactory.getPaths();
-                    paths.clear();
-                    paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-                    termFactory.uuidToNativeWithGeneration(relUuid,
-                            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                                    .localize().getNid(), paths, effectiveDate);
+            if (latestTuple == null) {
+                Collection<I_Path> paths = termFactory.getPaths();
+                paths.clear();
+                paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+                termFactory.uuidToNativeWithGeneration(relUuid,
+                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+                                .localize().getNid(), paths, effectiveDate);
 
-                    I_RelVersioned v = termFactory.newRelationship(relUuid,
-                            concept, termFactory
-                                    .getConcept(new UUID[] { relTypeUuid }),
-                            termFactory.getConcept(new UUID[] { c2Uuid }),
-                            termFactory.getConcept(new UUID[] { charUuid }),
-                            termFactory.getConcept(new UUID[] { refUuid }),
-                            termFactory.getConcept(new UUID[] { statusUuid }),
-                            group, termFactory.getActiveAceFrameConfig());
+                I_RelVersioned v = termFactory.newRelationship(relUuid,
+                        concept, termFactory
+                                .getConcept(new UUID[] { relTypeUuid }),
+                        termFactory.getConcept(new UUID[] { c2Uuid }),
+                        termFactory.getConcept(new UUID[] { charUuid }),
+                        termFactory.getConcept(new UUID[] { refUuid }),
+                        termFactory.getConcept(new UUID[] { statusUuid }),
+                        group, termFactory.getActiveAceFrameConfig());
 
-                    I_RelPart newPart = v.getLastTuple().getPart();
-                    newPart.setCharacteristicId(termFactory.getId(charUuid)
-                            .getNativeId());
-                    newPart.setGroup(group);
-                    newPart
-                            .setPathId(termFactory.getId(pathUuid)
-                                    .getNativeId());
-                    newPart.setRefinabilityId(termFactory.getId(refUuid)
-                            .getNativeId());
-                    newPart.setTypeId(termFactory.getId(relTypeUuid)
-                            .getNativeId());
-                    newPart.setStatusId(termFactory.getId(statusUuid)
-                            .getNativeId());
-                    newPart.setVersion(effectiveDate);
+                I_RelPart newPart = v.getLastTuple().getPart();
+                newPart.setCharacteristicId(termFactory.getId(charUuid)
+                        .getNativeId());
+                newPart.setGroup(group);
+                newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+                newPart.setRefinabilityId(termFactory.getId(refUuid)
+                        .getNativeId());
+                newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
+                newPart
+                        .setStatusId(termFactory.getId(statusUuid)
+                                .getNativeId());
+                newPart.setVersion(effectiveDate);
 
-                    v.addVersion(newPart);
-                    termFactory.addUncommitted(concept);
-                } else {
-
-                    I_RelPart newPart = latestTuple.getPart().duplicate();
-                    newPart.setCharacteristicId(termFactory.getId(charUuid)
-                            .getNativeId());
-                    newPart.setGroup(group);
-                    newPart
-                            .setPathId(termFactory.getId(pathUuid)
-                                    .getNativeId());
-                    newPart.setRefinabilityId(termFactory.getId(refUuid)
-                            .getNativeId());
-                    newPart.setTypeId(termFactory.getId(relTypeUuid)
-                            .getNativeId());
-                    newPart.setStatusId(termFactory.getId(statusUuid)
-                            .getNativeId());
-                    newPart.setVersion(effectiveDate);
-
-                    latestTuple.getRelVersioned().addVersion(newPart);
-                    termFactory.addUncommitted(concept);
-                }
+                v.addVersion(newPart);
+                termFactory.addUncommitted(concept);
+                // termFactory.commit();
             } else {
-                // concept doesn't exist
-                throw new TerminologyException(
-                        "Concept with ID : "
-                                + c1Uuid
-                                + " does not exist in database. Cannot complete import of "
-                                + inputLine);
+
+                I_RelPart newPart = latestTuple.getPart().duplicate();
+                newPart.setCharacteristicId(termFactory.getId(charUuid)
+                        .getNativeId());
+                newPart.setGroup(group);
+                newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+                newPart.setRefinabilityId(termFactory.getId(refUuid)
+                        .getNativeId());
+                newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
+                newPart
+                        .setStatusId(termFactory.getId(statusUuid)
+                                .getNativeId());
+                newPart.setVersion(effectiveDate);
+
+                latestTuple.getRelVersioned().addVersion(newPart);
+                termFactory.addUncommitted(concept);
+                // termFactory.commit();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(
-                    "Exception thrown while importing line: " + inputLine);
+            throw new TerminologyException(e.getLocalizedMessage()
+                    + "Exception thrown while importing line: " + inputLine);
         }
     }
 }

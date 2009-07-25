@@ -42,10 +42,13 @@ public class DescTupleFileUtil {
         boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
         int effectiveDate = descTuple.getVersion();
 
-        return tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text
-                + "\t" + lang + "\t" + initialCapSignificant + "\t" + typeUuid
-                + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate
-                + "\n";
+        String idTuple = IDTupleFileUtil.exportTuple(termFactory
+                .getId(descUuid));
+
+        return idTuple + tupleUuid + "\t" + conceptUuid + "\t" + descUuid
+                + "\t" + text + "\t" + lang + "\t" + initialCapSignificant
+                + "\t" + typeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
+                + effectiveDate + "\n";
     }
 
     public static void importTuple(String inputLine)
@@ -66,7 +69,14 @@ public class DescTupleFileUtil {
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            if (termFactory.hasId(conceptUuid)) {
+            if (!termFactory.hasId(descUuid)) {
+                throw new Exception(
+                        "Relevant DESC UUID tuple must occur before reference to a UUID.");
+            }
+            if (!termFactory.hasId(conceptUuid)) {
+                throw new Exception(
+                        "Relevant CONCEPT UUID tuple must occur before reference to a UUID.");
+            } else {
 
                 int conceptId = termFactory.getId(conceptUuid).getNativeId();
                 I_IntSet allowedStatus = termFactory.newIntSet();
@@ -118,6 +128,7 @@ public class DescTupleFileUtil {
 
                     v.addVersion(newLastPart);
                     termFactory.addUncommitted(concept);
+                    // termFactory.commit();
                 } else {
                     I_DescriptionPart newLastPart = latestTuple
                             .getDescVersioned().getLastTuple().getPart()
@@ -136,19 +147,13 @@ public class DescTupleFileUtil {
 
                     latestTuple.getDescVersioned().addVersion(newLastPart);
                     termFactory.addUncommitted(concept);
+                    // termFactory.commit();
                 }
-            } else {
-                // concept doesn't exist
-                throw new TerminologyException(
-                        "Concept with ID : "
-                                + conceptUuid
-                                + " does not exist in database. Cannot complete import of "
-                                + inputLine);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(
-                    "Exception thrown while importing line: " + inputLine);
+            throw new TerminologyException(e.getLocalizedMessage()
+                    + "Exception thrown while importing line: " + inputLine);
         }
     }
 }
