@@ -48,7 +48,6 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -63,7 +62,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
-import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
@@ -189,7 +187,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		public void valueChanged(TreeSelectionEvent tse) {
 			if (tse.getPath() != null) {
 				TreePath selectionPath = tse.getPath();
-				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+				RefsetSpecTreeNode selectedNode = (RefsetSpecTreeNode) selectionPath.getLastPathComponent();
 				I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) selectedNode.getUserObject();
 				
 		        try {
@@ -770,7 +768,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		c.weighty = 1.0;
 
 
-		specTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null)));
+		specTree = new JTree(new DefaultTreeModel(new RefsetSpecTreeNode(null)));
 		specTree.addMouseListener(new RefsetSpecTreeMouseListener(ace.getAceFrameConfig()));
 		specTree.setCellRenderer(new RefsetSpecTreeCellRenderer(ace.getAceFrameConfig()));
 		specTree.setRootVisible(false);
@@ -919,18 +917,18 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		updater.start();
 	}
 	
-	private class UpdateTreeSpec extends SwingWorker<DefaultMutableTreeNode> {
+	private class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode> {
 
-		private DefaultMutableTreeNode root;
+		private RefsetSpecTreeNode root;
 		private TreePath selectionPath;
 
 		@Override
-		protected DefaultMutableTreeNode construct() throws Exception {
+		protected RefsetSpecTreeNode construct() throws Exception {
 			
 			boolean newRefset = true;
 			selectionPath = specTree.getSelectionPath();
 			
-			DefaultMutableTreeNode oldRoot = (DefaultMutableTreeNode) specTree.getModel().getRoot();
+			RefsetSpecTreeNode oldRoot = (RefsetSpecTreeNode) specTree.getModel().getRoot();
 			
 			
 			I_GetConceptData refsetConcept = (I_GetConceptData) label.getTermComponent();
@@ -944,7 +942,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
 				}
 			}
-			root = new DefaultMutableTreeNode(refsetSpecConcept);
+			root = new RefsetSpecTreeNode(refsetSpecConcept, ace.getAceFrameConfig());
 			
 			if (oldRoot.getUserObject() != null && refsetSpecConcept != null) {
 				I_GetConceptData oldRefsetConcept = (I_GetConceptData) oldRoot.getUserObject();
@@ -953,12 +951,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			
 			if (refsetSpecConcept != null) {
 				List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpecConcept.getConceptId(), true);
-				HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+				HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
 				HashSet<Integer> fetchedComponents = new HashSet<Integer>();
 				fetchedComponents.add(refsetSpecConcept.getConceptId());
 				addExtensionsToMap(extensions, extensionMap, fetchedComponents);		
-				AceLog.getAppLog().info("Extension map: " + extensionMap);
-				for (DefaultMutableTreeNode extNode: extensionMap.values()) {
+				for (RefsetSpecTreeNode extNode: extensionMap.values()) {
 					I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
 					if (ext.getComponentId() == refsetSpecConcept.getConceptId()) {
 						root.add(extNode);
@@ -973,10 +970,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		private void addExtensionsToMap(
 				List<I_ThinExtByRefVersioned> extensions,
 				HashMap<Integer, 
-				DefaultMutableTreeNode> extensionMap, 
+				RefsetSpecTreeNode> extensionMap, 
 				HashSet<Integer> fetchedComponents) throws IOException {
 			for (I_ThinExtByRefVersioned ext: extensions) {
-				extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
+				extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
 				if (fetchedComponents.contains(ext.getMemberId())== false) {
 					fetchedComponents.add(ext.getMemberId());
 					addExtensionsToMap(LocalVersionedTerminology.get().getAllExtensionsForComponent(ext.getMemberId(), true), 

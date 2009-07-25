@@ -3,6 +3,8 @@ package org.dwfa.ace.graph;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
@@ -20,19 +22,46 @@ import org.dwfa.ace.gui.concept.AbstractPlugin;
 
 public class GraphPlugin extends AbstractPlugin {
 
-
 	public enum GRAPH_LAYOUTS {
 		DAGLayout, FRLayout, ISOMLayout, KKLayout, SpringLayout, AceGraphLayout
 	};
 
-	private I_HostConceptPlugins host;
+	private static final long serialVersionUID = 1L;
+	private static final int dataVersion = 1;
 
-	private JPanel graphWrapperPanel = new JPanel(new GridBagLayout());
-	private JPanel graphPanel;
-	private JPanel fillerPanel;
-	private GridBagConstraints gbc = new GridBagConstraints();
-	private boolean initialize = true;
 	private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.KKLayout;
+
+	private transient I_HostConceptPlugins host;
+	private transient JPanel graphWrapperPanel = new JPanel(new GridBagLayout());
+	private transient JPanel graphPanel;
+	private transient JPanel fillerPanel;
+	private transient GridBagConstraints gbc = new GridBagConstraints();
+	private transient boolean initialize = true;
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(graphLayout);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			graphLayout = (GRAPH_LAYOUTS) in.readObject();
+			
+			//transient
+			graphWrapperPanel = new JPanel(new GridBagLayout());
+			graphPanel = null;
+			fillerPanel = null;
+			gbc = new GridBagConstraints();
+			initialize = true;
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+
+
 
 	public GraphPlugin(boolean shownByDefault, int sequence) {
         super(shownByDefault, sequence); 

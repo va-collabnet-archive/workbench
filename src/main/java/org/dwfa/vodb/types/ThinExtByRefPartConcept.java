@@ -37,16 +37,25 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart implements I_ThinE
     * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#getConceptId()
     */
    public int getConceptId() {
-      return conceptId;
+      return getC1id();
    }
 
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#setConceptId(int)
     */
    public void setConceptId(int conceptId) {
-      this.conceptId = conceptId;
+	   setC1id(conceptId);
    }
-   @Override
+   
+   
+   
+   public int getC1id() {
+	return conceptId;
+   }
+   public void setC1id(int c1id) {
+	  this.conceptId = c1id;
+   }
+@Override
    public boolean equals(Object obj) {
       if (super.equals(obj)) {
          if (ThinExtByRefPartConcept.class.isAssignableFrom(obj.getClass())) {

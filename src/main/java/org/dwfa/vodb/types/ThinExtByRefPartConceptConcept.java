@@ -95,5 +95,11 @@ public class ThinExtByRefPartConceptConcept extends ThinExtByRefPart implements
 	public void setC2id(int c2id) {
 		this.c2id = c2id;
 	}
+	public int getConceptId() {
+		return getC1id();
+	}
+	public void setConceptId(int conceptId) {
+		setC1id(conceptId);
+	}
 
 }

@@ -73,7 +73,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 	}
    @Override
    protected String getToolTipText() {
-      return "<html>The crystal ball is used to invoke the classifier.";
+      return "<html>show/hide the stated and normal forms panel...";
    }
    @Override
    protected int getComponentId() {
