@@ -1,5 +1,8 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
+import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,6 +10,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+
+import javax.swing.JButton;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -48,6 +53,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     private I_TermFactory termFactory;
 
     private boolean useMonitor = false;
+    private boolean cancelComputation = false;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -72,6 +78,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             throws TaskFailedException {
 
         try {
+
             long startTime = new Date().getTime();
 
             configFrame = (I_ConfigAceFrame) worker
@@ -104,6 +111,24 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             computeRefsetActivityPanel.setIndeterminate(false);
             computeRefsetActivityPanel.setProgressInfoUpper("Computing refset "
                     + ": " + refset.getInitialText());
+
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 2;
+            c.gridy = 0;
+            c.gridheight = 1;
+            c.weightx = 0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.EAST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+
+            JButton cancelButton = computeRefsetActivityPanel.getStopButton();
+            if (cancelButton == null) {
+                cancelButton = new JButton("Cancel");
+                computeRefsetActivityPanel.getViewPanel().add(cancelButton, c);
+            }
+
+            cancelButton.addActionListener(new ButtonListener(this));
+
             ProgressReport progressReport = new ProgressReport();
             progressReport.setStartTime(startTime);
             computeRefsetActivityPanel.setProgressInfoLower(progressReport
@@ -140,7 +165,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             getLogger().info(
                     "Start execution of refset spec : "
                             + refsetSpec.getInitialText());
-            while (conceptIterator.hasNext()) {
+            while (!cancelComputation && conceptIterator.hasNext()) {
 
                 I_GetConceptData currentConcept = conceptIterator.next();
                 conceptsProcessed++;
@@ -151,6 +176,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     nonRefsetMembers.add(currentConcept);
                 }
 
+                if (cancelComputation) {
+                    break;
+                }
                 if (refsetMembers.size() > 250) {
                     // add them now
                     memberRefsetHelper.addAllToRefset(refsetMembers,
@@ -161,6 +189,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     refsetMembers = new HashSet<I_GetConceptData>();
                 }
 
+                if (cancelComputation) {
+                    break;
+                }
                 if (nonRefsetMembers.size() > 250) {
                     memberRefsetHelper.removeAllFromRefset(nonRefsetMembers,
                             "Cleaning up old members from member refset",
@@ -170,6 +201,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     nonRefsetMembers = new HashSet<I_GetConceptData>();
                 }
 
+                if (cancelComputation) {
+                    break;
+                }
                 if (conceptsProcessed % 500 == 0) {
                     progressReport.setMembersCount(refsetMembersCount
                             + refsetMembers.size());
@@ -182,6 +216,17 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     computeRefsetActivityPanel.setValue(refsetMembersCount
                             + nonRefsetMembersCount);
                 }
+            }
+
+            if (cancelComputation) {
+                termFactory.cancel();
+                cancelButton.setEnabled(false);
+                cancelButton.setVisible(false);
+                progressReport.setComplete(true);
+                computeRefsetActivityPanel
+                        .setProgressInfoLower("User cancelled.");
+                throw new TaskFailedException(
+                        "User cancelled refset computation.");
             }
 
             progressReport.setStep2Complete(true);
@@ -218,7 +263,17 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             computeRefsetActivityPanel.setProgressInfoLower(progressReport
                     .toString());
             computeRefsetActivityPanel.complete();
+            cancelButton.setEnabled(false);
+            cancelButton.setVisible(false);
 
+            if (cancelComputation) {
+                termFactory.cancel();
+                progressReport.setComplete(true);
+                computeRefsetActivityPanel
+                        .setProgressInfoLower("User cancelled.");
+                throw new TaskFailedException(
+                        "User cancelled refset computation.");
+            }
             return Condition.CONTINUE;
         } catch (Exception ex) {
             throw new TaskFailedException(ex);
@@ -231,5 +286,25 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    public boolean isCancelComputation() {
+        return cancelComputation;
+    }
+
+    public void setCancelComputation(boolean cancelComputation) {
+        this.cancelComputation = cancelComputation;
+    }
+
+    private class ButtonListener implements ActionListener {
+        ComputeRefsetFromSpecTask task;
+
+        public ButtonListener(ComputeRefsetFromSpecTask task) {
+            this.task = task;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            task.setCancelComputation(true);
+        }
     }
 }
