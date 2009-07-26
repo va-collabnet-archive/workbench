@@ -50,7 +50,7 @@ public class WriteConceptListFileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(WriteConceptListFile.class);
-        bd.setDisplayName("<html><font color='green'><center>Write conept list file");
+        bd.setDisplayName("<html><font color='green'><center>Write concept list file");
         return bd;
     }
 

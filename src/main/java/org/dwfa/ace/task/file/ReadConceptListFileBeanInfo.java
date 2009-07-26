@@ -43,7 +43,7 @@ public class ReadConceptListFileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ReadConceptListFile.class);
-        bd.setDisplayName("<html><font color='green'><center>Read conept list file");
+        bd.setDisplayName("<html><font color='green'><center>Read concept list file");
         return bd;
     }
 
