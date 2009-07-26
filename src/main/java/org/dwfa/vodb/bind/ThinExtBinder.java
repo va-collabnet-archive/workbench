@@ -3,9 +3,14 @@ package org.dwfa.vodb.bind;
 import java.util.List;
 
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
@@ -15,7 +20,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.I_MapIds;
-import org.dwfa.vodb.types.ThinExtByRefPart;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptConcept;
@@ -57,32 +61,32 @@ public class ThinExtBinder extends TupleBinding {
     private static int CONCEPT_STRING_ID = 16;
 	
     public static enum EXT_TYPE {
-        BOOLEAN(BOOLEAN_ID, "boolean", ThinExtByRefPartBoolean.class), 
-        CONCEPT(CONCEPT_ID, "concept", ThinExtByRefPartConcept.class), 
-        CON_INT(CON_INT_ID, "con int", ThinExtByRefPartConceptInt.class),
-        STRING(STRING_ID, "string", ThinExtByRefPartString.class), 
-        INTEGER(INTEGER_ID, "integer", ThinExtByRefPartInteger.class), 
-        MEASUREMENT(MEASUREMENT_ID, "measurement", ThinExtByRefPartMeasurement.class), 
-        LANGUAGE(LANGUAGE_ID,"language", ThinExtByRefPartLanguage.class), 
-        SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language", ThinExtByRefPartLanguageScoped.class), 
+        BOOLEAN(BOOLEAN_ID, "boolean", I_ThinExtByRefPartBoolean.class), 
+        CONCEPT(CONCEPT_ID, "concept", I_ThinExtByRefPartConcept.class), 
+        CON_INT(CON_INT_ID, "con int", I_ThinExtByRefPartConceptInt.class),
+        STRING(STRING_ID, "string", I_ThinExtByRefPartString.class), 
+        INTEGER(INTEGER_ID, "integer", I_ThinExtByRefPartInteger.class), 
+        MEASUREMENT(MEASUREMENT_ID, "measurement", I_ThinExtByRefPartMeasurement.class), 
+        LANGUAGE(LANGUAGE_ID,"language", I_ThinExtByRefPartLanguage.class), 
+        SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language", I_ThinExtByRefPartLanguageScoped.class), 
         TEMPLATE_FOR_REL(TEMPLATE_FOR_REL_ID, "template for rel", ThinExtByRefPartTemplateForRel.class),
         TEMPLATE(TEMPLATE_ID, "template", ThinExtByRefPartTemplate.class),
         CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel", ThinExtByRefPartCrossmapForRel.class),
         CROSS_MAP(CROSS_MAP_ID, "cross map", ThinExtByRefPartCrossmap.class),
-        CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", ThinExtByRefPartConceptConcept.class),
-        CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", ThinExtByRefPartConceptConceptConcept.class),
-        CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", ThinExtByRefPartConceptConceptString.class),
-        CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", ThinExtByRefPartConceptString.class),
+        CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", I_ThinExtByRefPartConceptConcept.class),
+        CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", I_ThinExtByRefPartConceptConceptConcept.class),
+        CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", I_ThinExtByRefPartConceptConceptString.class),
+        CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", I_ThinExtByRefPartConceptString.class),
                 ;
 
         private int enumId;
 
         private String interfaceName;
 
-        private Class<? extends ThinExtByRefPart> partClass;
+        private Class<? extends I_ThinExtByRefPart> partClass;
 
         private EXT_TYPE(int id, String interfaceName, 
-        		Class<? extends ThinExtByRefPart> partClass) {
+        		Class<? extends I_ThinExtByRefPart> partClass) {
             this.enumId = id;
             this.interfaceName = interfaceName;
             this.partClass = partClass;
@@ -136,7 +140,7 @@ public class ThinExtBinder extends TupleBinding {
             return interfaceName;
         }
 
-		public Class<? extends ThinExtByRefPart> getPartClass() {
+		public Class<? extends I_ThinExtByRefPart> getPartClass() {
 			return partClass;
 		}
     }

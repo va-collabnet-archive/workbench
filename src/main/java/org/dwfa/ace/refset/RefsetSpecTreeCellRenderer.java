@@ -1,11 +1,13 @@
 package org.dwfa.ace.refset;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -67,21 +69,29 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
 				row, hasFocus);
 
+		this.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 		if (node.getUserObject() != null &&
 				I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass())) {
 			I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) node
-					.getUserObject();
+			.getUserObject();
 			List<I_ThinExtByRefTuple> tuples = ext.getTuples(configAceFrame
 					.getAllowedStatus(), configAceFrame.getViewPositionSet(),
 					true);
 			I_ThinExtByRefTuple firstTuple = null;
-			if (tuples != null) {
+			I_ThinExtByRefTuple lastTuple = null;
+			if (tuples != null && tuples.size() > 0) {
 				firstTuple = tuples.get(0);
+			}
+			if (tuples != null && tuples.size() > 0) {
+				lastTuple = tuples.get(tuples.size() -1);
+				if (lastTuple.getVersion() == Integer.MAX_VALUE) {
+					this.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, Color.GREEN));					
+				}
 			}
 
 			boolean indent = false;
-			
+
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
 			if (parent != null && parent.getUserObject() != null) {
 				if (I_GetConceptData.class.isAssignableFrom(parent.getUserObject().getClass())) {
@@ -91,6 +101,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 				}
 			}
 			if (firstTuple != null) {
+				setOpaque(false);
 				try {
 					switch (ThinExtBinder.getExtensionType(ext)) {
 					case CONCEPT_CONCEPT:
@@ -108,19 +119,46 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 					AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
 				}
 			} else {
-				switch (ThinExtBinder.getExtensionType(ext)) {
-				case CONCEPT_CONCEPT:
-					this.setText("Branching clause is Primoridal or Extinct");
-					break;
-				case CONCEPT_CONCEPT_CONCEPT:
-					this.setText("Structural clause is Primoridal or Extinct");
-					break;
-				case CONCEPT_CONCEPT_STRING:
-					this.setText("Text clause is Primoridal or Extinct");
-					break;
-				default:
-					this.setText("Can't handle extinct type: "
-							+ ThinExtBinder.getExtensionType(ext));
+				setBackground(Color.LIGHT_GRAY);
+				setOpaque(true);
+				tuples = ext.getTuples(null, configAceFrame.getViewPositionSet(),
+						true);
+				firstTuple = null;
+				if (tuples != null && tuples.size() > 0) {
+					firstTuple = tuples.get(0);
+				}
+				if (firstTuple != null) {
+					try {
+						switch (ThinExtBinder.getExtensionType(ext)) {
+						case CONCEPT_CONCEPT:
+							renderBranchingClause(firstTuple);
+							break;
+						case CONCEPT_CONCEPT_CONCEPT:
+							renderStructuralQueryClause(firstTuple, indent);
+							break;
+						case CONCEPT_CONCEPT_STRING:
+							renderTextQueryClause(firstTuple, indent);
+							break;
+						}
+					} catch (Exception ex) {
+						setText(ex.getLocalizedMessage());
+						AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
+					}
+				} else {
+					switch (ThinExtBinder.getExtensionType(ext)) {
+					case CONCEPT_CONCEPT:
+						this.setText("Branching clause is Primoridal or Extinct");
+						break;
+					case CONCEPT_CONCEPT_CONCEPT:
+						this.setText("Structural clause is Primoridal or Extinct");
+						break;
+					case CONCEPT_CONCEPT_STRING:
+						this.setText("Text clause is Primoridal or Extinct");
+						break;
+					default:
+						this.setText("Can't handle extinct type: "
+								+ ThinExtBinder.getExtensionType(ext));
+					}
 
 				}
 			}

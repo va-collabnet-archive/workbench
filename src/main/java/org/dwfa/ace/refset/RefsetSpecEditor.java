@@ -237,35 +237,50 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			        	column3.setType(REFSET_FIELD_TYPE.STRING);
 			        	columns.add(column3);
 		        	}
-		        	
+
+		        	ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
+		        	column4.setColumnName("status");
+		        	column4.setCreationEditable(true);
+		        	column4.setUpdateEditable(true);
+		        	column4.setFieldClass(Number.class);
+		        	column4.setMin(5);
+		        	column4.setPref(150);
+		        	column4.setMax(150);
+		        	column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+		        	column4.setReadMethod(extType.getPartClass().getMethod("getStatusId"));
+		        	column4.setWriteMethod(extType.getPartClass().getMethod("setStatusId", int.class));
+		        	column4.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+		        	columns.add(column4);
+
 		        	if (historyButton.isSelected()) {
-			        	ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
-			        	column4.setColumnName("version");
-			        	column4.setCreationEditable(false);
-			        	column4.setUpdateEditable(false);
-			        	column4.setFieldClass(Number.class);
-			        	column4.setMin(5);
-			        	column4.setPref(150);
-			        	column4.setMax(150);
-			        	column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-			        	column4.setReadMethod(extType.getPartClass().getMethod("getVersion"));
-			        	column4.setWriteMethod(extType.getPartClass().getMethod("setVersion", int.class));
-			        	column4.setType(REFSET_FIELD_TYPE.VERSION);
-			        	columns.add(column4);
 
 			        	ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
-			        	column5.setColumnName("path");
+			        	column5.setColumnName("version");
 			        	column5.setCreationEditable(false);
 			        	column5.setUpdateEditable(false);
-			        	column5.setFieldClass(String.class);
+			        	column5.setFieldClass(Number.class);
 			        	column5.setMin(5);
 			        	column5.setPref(150);
 			        	column5.setMax(150);
 			        	column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-			        	column5.setReadMethod(extType.getPartClass().getMethod("getPathId"));
-			        	column5.setWriteMethod(extType.getPartClass().getMethod("setPathId", int.class));
-			        	column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+			        	column5.setReadMethod(extType.getPartClass().getMethod("getVersion"));
+			        	column5.setWriteMethod(extType.getPartClass().getMethod("setVersion", int.class));
+			        	column5.setType(REFSET_FIELD_TYPE.VERSION);
 			        	columns.add(column5);
+
+			        	ReflexiveRefsetFieldData column6 = new ReflexiveRefsetFieldData();
+			        	column6.setColumnName("path");
+			        	column6.setCreationEditable(false);
+			        	column6.setUpdateEditable(false);
+			        	column6.setFieldClass(String.class);
+			        	column6.setMin(5);
+			        	column6.setPref(150);
+			        	column6.setMax(150);
+			        	column6.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+			        	column6.setReadMethod(extType.getPartClass().getMethod("getPathId"));
+			        	column6.setWriteMethod(extType.getPartClass().getMethod("setPathId", int.class));
+			        	column6.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+			        	columns.add(column6);
 		        	}
 		        	
 		        	
@@ -957,14 +972,28 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 				addExtensionsToMap(extensions, extensionMap, fetchedComponents);		
 				for (RefsetSpecTreeNode extNode: extensionMap.values()) {
 					I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
-					if (ext.getComponentId() == refsetSpecConcept.getConceptId()) {
-						root.add(extNode);
+					if (refsetSpecConcept != null &&  ext != null) {
+						if (ext.getComponentId() == refsetSpecConcept.getConceptId()) {
+							root.add(extNode);
+						} else {
+							extensionMap.get(ext.getComponentId()).add(extNode);
+						}
 					} else {
-						extensionMap.get(ext.getComponentId()).add(extNode);
+						break;
 					}
 				}
 			}
+			sortTree(root);
 			return root;
+		}
+
+		private void sortTree(RefsetSpecTreeNode node) {
+			
+			if (node.sortChildren()) {
+				for (RefsetSpecTreeNode child: node.getChildren()) {
+					sortTree(child);
+				}
+			}
 		}
 
 		private void addExtensionsToMap(
@@ -973,11 +1002,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 				RefsetSpecTreeNode> extensionMap, 
 				HashSet<Integer> fetchedComponents) throws IOException {
 			for (I_ThinExtByRefVersioned ext: extensions) {
-				extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
-				if (fetchedComponents.contains(ext.getMemberId())== false) {
-					fetchedComponents.add(ext.getMemberId());
-					addExtensionsToMap(LocalVersionedTerminology.get().getAllExtensionsForComponent(ext.getMemberId(), true), 
-							extensionMap, fetchedComponents);		
+				int currentTupleCount = ext.getTuples(ace.getAceFrameConfig().getAllowedStatus(), ace.getAceFrameConfig().getViewPositionSet(), true).size();
+				if (currentTupleCount > 0 || historyButton.isSelected()) {
+					extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
+					if (fetchedComponents.contains(ext.getMemberId())== false) {
+						fetchedComponents.add(ext.getMemberId());
+						addExtensionsToMap(LocalVersionedTerminology.get().getAllExtensionsForComponent(ext.getMemberId(), true), 
+								extensionMap, fetchedComponents);		
+					}
 				}
 			}
 		}
