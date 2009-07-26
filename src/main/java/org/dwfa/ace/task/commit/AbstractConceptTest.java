@@ -12,14 +12,14 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMED;
-import org.dwfa.tapi.TerminologyException;
 
 public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
 
@@ -83,19 +83,22 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
 		}
 	}
 
-	public ArrayList<Integer> getActiveStatus(I_TermFactory termFactory)
+	public I_IntSet getActiveStatus(I_TermFactory termFactory)
 			throws Exception {
-		ArrayList<Integer> actives = new ArrayList<Integer>();
+		I_IntSet activeSet = LocalVersionedTerminology.get().newIntSet();
+		activeSet.addAll(getFrameConfig().getAllowedStatus().getSetValues());
 		for (ArchitectonicAuxiliary.Concept con : Arrays.asList(
 				ArchitectonicAuxiliary.Concept.ACTIVE,
 				ArchitectonicAuxiliary.Concept.CURRENT,
+				ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED,
 				ArchitectonicAuxiliary.Concept.LIMITED,
 				ArchitectonicAuxiliary.Concept.PENDING_MOVE)) {
 			I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
-			if (c != null)
-				actives.add(c.getConceptId());
+			if (c != null) {
+				activeSet.add(c.getConceptId());
+			}
 		}
-		return actives;
+		return activeSet;
 	}
 
 }

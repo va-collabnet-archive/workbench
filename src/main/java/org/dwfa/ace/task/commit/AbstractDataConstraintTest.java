@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -41,9 +42,15 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
      * If true, the task does the data constraint test with the forCommit paramater set to true. 
      */
     private Boolean forCommit = true;
+    
+    private transient I_ConfigAceFrame frameConfig;
 
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    public I_ConfigAceFrame getFrameConfig() {
+		return frameConfig;
+	}
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.componentPropName);
         out.writeObject(this.profilePropName);
@@ -70,6 +77,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         try {
             I_Transact component = (I_Transact) process.readProperty(componentPropName);
             List<AlertToDataConstraintFailure> alerts = test(component, forCommit);
+    		frameConfig = (I_ConfigAceFrame) process.readProperty(profilePropName);
  
             boolean noFailures = true;
             for (AlertToDataConstraintFailure failure: alerts) {

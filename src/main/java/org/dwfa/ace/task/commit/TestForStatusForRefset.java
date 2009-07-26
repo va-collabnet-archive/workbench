@@ -58,7 +58,7 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 
 			Set<I_Position> allPositions = getPositions(termFactory);
 
-			ArrayList<Integer> actives = getActiveStatus(termFactory);
+			I_IntSet actives = getActiveStatus(termFactory);
 
 			for (I_ConceptAttributeTuple rel : concept
 					.getConceptAttributeTuples(

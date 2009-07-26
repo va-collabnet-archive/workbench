@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -84,7 +85,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 						.getUids());
 		if (fsn_type == null)
 			return alertList;
-		ArrayList<Integer> actives = getActiveStatus(termFactory);
+		I_IntSet actives = getActiveStatus(termFactory);
 		HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
 		for (I_DescriptionVersioned desc : descriptions) {
 			for (I_DescriptionPart part : desc.getVersions()) {
