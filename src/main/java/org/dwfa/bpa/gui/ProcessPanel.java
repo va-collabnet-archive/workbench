@@ -44,6 +44,7 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -263,22 +264,26 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 			}
 			String command = e.getActionCommand().toLowerCase();
 			if (command.equals("open...")) {
-				String key = (String) attachmentTableModel.getValueAt(
-						attachmentSortingTable.modelIndex(attachmentTable
-								.getSelectedRow()),
-						ProcessAttachmentTableModel.NAME);
-				
-				Object object = process.readAttachement(key);
-				if (logger.isLoggable(Level.INFO)) {
-					if (object != null) {
-						logger.info("Opening attachment: " + key + " value: "
-								+ object.toString());
-					} else {
-						logger.info("Opening attachment: " + key + " value: "
-								+ null);
+				if (attachmentTable.getSelectedRow() >= 0) {
+					String key = (String) attachmentTableModel.getValueAt(
+							attachmentSortingTable.modelIndex(attachmentTable
+									.getSelectedRow()),
+							ProcessAttachmentTableModel.NAME);
+					
+					Object object = process.readAttachement(key);
+					if (logger.isLoggable(Level.INFO)) {
+						if (object != null) {
+							logger.info("Opening attachment: " + key + " value: "
+									+ object.toString());
+						} else {
+							logger.info("Opening attachment: " + key + " value: "
+									+ null);
+						}
 					}
+					open(object);
+				} else {
+					JOptionPane.showMessageDialog(attachmentTable, "No row is selected...");
 				}
-				open(object);
 				
 			} else if (command.equals("save as...")) {
 				saveAs();
