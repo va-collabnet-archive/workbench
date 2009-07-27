@@ -42,7 +42,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 			}
 			I_ThinExtByRefVersioned extension = null;
 			if (AceConfig.getVodb().hasExtension(memberId)) {
-				extension = AceConfig.getVodb().getExtension(memberId);
+				extension = ExtensionByReferenceBean.get(memberId).getExtension();
 			} else {
 				extension = ExtensionByReferenceBean.getNewExtensionMember(memberId);
 			}

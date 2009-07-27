@@ -22,6 +22,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.AceTableRenderer;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
@@ -69,7 +70,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
 				row, hasFocus);
 
-		this.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+		this.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 0));
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 		if (node.getUserObject() != null &&
 				I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass())) {
@@ -86,7 +87,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 			if (tuples != null && tuples.size() > 0) {
 				lastTuple = tuples.get(tuples.size() -1);
 				if (lastTuple.getVersion() == Integer.MAX_VALUE) {
-					this.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, Color.GREEN));					
+					this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));					
 				}
 			}
 
