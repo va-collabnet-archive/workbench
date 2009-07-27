@@ -1131,27 +1131,25 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		// change the external property information
 
 		PropertySpec specToChange = propertySpecs.remove("A: " + oldKey);
-		if (specToChange == null) {
-			throw new PropertyVetoException("The oldKey does not exist: "
-					+ oldKey, null); 
-		}
 		boolean isExternal = externalProperties.remove(specToChange);
 		
-		specToChange.setPropertyName(newKey);
-		PropertySpec changedSpec = specToChange;
-		if (isExternal) {
-			externalProperties.add(changedSpec);
+		if (specToChange != null) {
+			specToChange.setPropertyName(newKey);
+			PropertySpec changedSpec = specToChange;
+			if (isExternal) {
+				externalProperties.add(changedSpec);
+			}
+			if (changedSpec.getShortDescription() != null) {
+				changedSpec.setShortDescription(changedSpec.getShortDescription().replace(oldKey, newKey));
+			}
+			if (changedSpec.getExternalName() != null) {
+				changedSpec.setExternalName(changedSpec.getExternalName().replace(oldKey, newKey));
+			}
+			if (changedSpec.getExternalToolTip() != null) {
+				changedSpec.setExternalToolTip(changedSpec.getExternalToolTip().replace(oldKey, newKey));
+			}
+			propertySpecs.put(changedSpec.getKey(), changedSpec);
 		}
-		if (changedSpec.getShortDescription() != null) {
-			changedSpec.setShortDescription(changedSpec.getShortDescription().replace(oldKey, newKey));
-		}
-		if (changedSpec.getExternalName() != null) {
-			changedSpec.setExternalName(changedSpec.getExternalName().replace(oldKey, newKey));
-		}
-		if (changedSpec.getExternalToolTip() != null) {
-			changedSpec.setExternalToolTip(changedSpec.getExternalToolTip().replace(oldKey, newKey));
-		}
-		propertySpecs.put(changedSpec.getKey(), changedSpec);
 		Object attachment = takeAttachment(oldKey);
 		writeAttachment(newKey, attachment);
 		this.changeSupport.firePropertyChange(oldKey, attachment, null);
