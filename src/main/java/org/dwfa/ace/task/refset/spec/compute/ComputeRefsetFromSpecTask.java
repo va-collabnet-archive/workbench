@@ -246,7 +246,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     "Cleaning up old members from member refset", useMonitor);
 
             getLogger().info(
-                    "Number of member refset members: " + refsetMembersCount);
+                    "Number of member refset members: " + refsetMembersCount
+                            + refsetMembers.size());
             getLogger().info(
                     "Total number of concepts processed: " + conceptsProcessed);
             getLogger().info(

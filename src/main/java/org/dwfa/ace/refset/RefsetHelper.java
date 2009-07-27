@@ -844,7 +844,8 @@ public class RefsetHelper {
      * concept.
      */
     public Set<I_GetConceptData> getAllAncestors(I_GetConceptData concept,
-            Condition... conditions) throws Exception {
+            I_GetConceptData memberRefset, Condition... conditions)
+            throws Exception {
 
         Set<I_Position> userViewPositions = null;
         I_IntSet userViewStatuses;
@@ -865,7 +866,7 @@ public class RefsetHelper {
         // get the appropriate is-a type (SNOMED or architectonic), based on
         // "marked parent is-a type" rel
         isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(
-                termFactory, concept));
+                termFactory, memberRefset));
 
         // find all the parents
         Set<I_GetConceptData> parentConcepts = getAllAncestors(

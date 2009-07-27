@@ -21,256 +21,291 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 /**
- * Utility class providing refset membership operations. 
+ * Utility class providing refset membership operations.
  */
 public class MemberRefsetHelper extends RefsetHelper {
 
-	private Logger logger = Logger.getLogger(MemberRefsetHelper.class.getName());
-	
-	private int memberTypeId;
-	private int memberRefsetId;
-	
-	public MemberRefsetHelper(int memberRefsetId, int memberTypeId) throws Exception {
-		super();
-		setMemberRefsetId(memberRefsetId);
-		setMemberTypeId(memberTypeId);
-	}
-	
-	/**
-	 * Add a collection of concepts to a refset.
-	 * 
-	 * @param members The collection of concepts to be added to the refset
-	 * @param batchDescription A textual description of the batch being processed. 
-	 *                         Used in the progress reports given during processing.
-	 */
-	public void addAllToRefset(Collection<I_GetConceptData> members, 
-			String batchDescription, boolean useMonitor) 
-			throws Exception {
-		
-		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(
-				members, batchDescription, useMonitor) {
+    private Logger logger = Logger
+            .getLogger(MemberRefsetHelper.class.getName());
 
-			Set<Integer> newMembers = new HashSet<Integer>();
-			
-			@Override
-			public void processItem(I_GetConceptData item) throws Exception {
-				if (newRefsetExtension(getMemberRefsetId(), item.getConceptId(), getMemberTypeId())) {
-					newMembers.add(item.getConceptId());
-				}
-			}
-	
-			@Override
-			public void onComplete() throws Exception {	
-				List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
-				if (termFactory.hasId(markedParentsUuid)) { 
-					if (useMonitor) {
-						monitor.setText("Adding marked parent members...");
-						monitor.setIndeterminate(true);
-					}
-					addMarkedParents(newMembers.toArray(new Integer[]{}));
-				}
-			}			
-			
-			@Override
-			public void onCancel() throws Exception {
-				logger.info("Batch operation '" + description + "' cancelled by user.");
-				termFactory.cancel();
-			}
+    private int memberTypeId;
+    private int memberRefsetId;
 
-		};
-		
-		batch.run();
-	}
-	
-	/**
-	 * Add a collection of concepts to a refset.
-	 * 
-	 * @param members The collection of concepts to be added to the refset
-	 * @param batchDescription A textual description of the batch being processed. 
-	 *                         Used in the progress reports given during processing.
-	 */
-	public void addAllToRefset(Collection<I_GetConceptData> members, String batchDescription) 
-			throws Exception {
-		boolean useMonitor = true;
-		addAllToRefset(members, batchDescription, useMonitor);
-	}
-	
-	protected void addMarkedParents(Integer ... conceptIds) throws Exception {
-		new MarkedParentRefsetHelper(memberRefsetId, memberTypeId).addParentMembers(conceptIds);
-	}
+    public MemberRefsetHelper(int memberRefsetId, int memberTypeId)
+            throws Exception {
+        super();
+        setMemberRefsetId(memberRefsetId);
+        setMemberTypeId(memberTypeId);
+    }
 
-	protected void removeMarkedParents(Integer ... conceptIds) throws Exception {
-		new MarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeParentMembers(conceptIds);
-	}
-	
-	/**
-	 * Remove a collection of concepts from a refset.
-	 * 
-	 * @param members The collection of concepts to be removed from the refset
-	 * @param batchDescription A textual description of the batch being processed. 
-	 *                         Used in the progress reports given during processing.
-	 */
-	public void removeAllFromRefset(Collection<I_GetConceptData> members, String batchDescription,
-			boolean useMonitor) 
-			throws Exception {
+    /**
+     * Add a collection of concepts to a refset.
+     * 
+     * @param members
+     *            The collection of concepts to be added to the refset
+     * @param batchDescription
+     *            A textual description of the batch being processed. Used in
+     *            the progress reports given during processing.
+     */
+    public void addAllToRefset(Collection<I_GetConceptData> members,
+            String batchDescription, boolean useMonitor) throws Exception {
 
-		Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members, batchDescription,
-				useMonitor) {
+        Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members,
+                batchDescription, useMonitor) {
 
-			Set<Integer> removedMembers = new HashSet<Integer>();
-			
-			@Override
-			public void processItem(I_GetConceptData item) throws Exception {
-				 if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), getMemberTypeId())) {
-					 removedMembers.add(item.getConceptId());
-				 }
-			}
+            Set<Integer> newMembers = new HashSet<Integer>();
 
-			@Override
-			public void onComplete() throws Exception {
-				List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
-				if (termFactory.hasId(markedParentsUuid)) { 
-					if (useMonitor) {
-						monitor.setText("Removing marked parent members...");
-						monitor.setIndeterminate(true);
-					}
-					removeMarkedParents(removedMembers.toArray(new Integer[]{}));
-				}
-			}
-			
-			@Override
-			public void onCancel() throws Exception {
-				logger.info("Batch operation '" + description + "' cancelled by user.");
-				termFactory.cancel();
-			}
+            @Override
+            public void processItem(I_GetConceptData item) throws Exception {
+                if (newRefsetExtension(getMemberRefsetId(),
+                        item.getConceptId(), getMemberTypeId())) {
+                    newMembers.add(item.getConceptId());
+                }
+            }
 
-		};
-		
-		batch.run();
-	}
-	
-	/**
-	 * Remove a collection of concepts from a refset.
-	 * 
-	 * @param members The collection of concepts to be removed from the refset
-	 * @param batchDescription A textual description of the batch being processed. 
-	 *                         Used in the progress reports given during processing.
-	 */
-	public void removeAllFromRefset(Collection<I_GetConceptData> members, String batchDescription) 
-			throws Exception {
-		boolean useMonitor = true;
-		removeAllFromRefset(members, batchDescription, useMonitor);
-		
-	}	
-	
-	/**
-	 * Add a concept to a refset
-	 * 
-	 * @param newMemberId The concept to be added
-	 */
-	public boolean addToRefset(int conceptId) throws Exception {
-		if (newRefsetExtension(getMemberRefsetId(), conceptId, getMemberTypeId())) {
-			addMarkedParents(conceptId);
-			return true;
-		} else return false;
-	}
+            @Override
+            public void onComplete() throws Exception {
+                List<UUID> markedParentsUuid = Arrays
+                        .asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE
+                                .getUuids());
+                if (termFactory.hasId(markedParentsUuid)) {
+                    if (useMonitor) {
+                        monitor.setText("Adding marked parent members...");
+                        monitor.setIndeterminate(true);
+                    }
+                    logger.info("Adding marked parents.");
+                    addMarkedParents(newMembers.toArray(new Integer[] {}));
+                }
+            }
 
-	/**
-	 * Remove a concept from a refset
-	 * 
-	 * @param newMemberId The concept to be removed
-	 */
-	public boolean removeFromRefset(int conceptId) throws Exception {
-		 if (retireRefsetExtension(getMemberRefsetId(), conceptId, getMemberTypeId())) {
-			 removeMarkedParents(conceptId);
-			 return true;
-		 } else return false;
-	}
+            @Override
+            public void onCancel() throws Exception {
+                logger.info("Batch operation '" + description
+                        + "' cancelled by user.");
+                termFactory.cancel();
+            }
 
+        };
 
-	public int getMemberTypeId() {
-		return memberTypeId;
-	}
+        batch.run();
+    }
 
+    /**
+     * Add a collection of concepts to a refset.
+     * 
+     * @param members
+     *            The collection of concepts to be added to the refset
+     * @param batchDescription
+     *            A textual description of the batch being processed. Used in
+     *            the progress reports given during processing.
+     */
+    public void addAllToRefset(Collection<I_GetConceptData> members,
+            String batchDescription) throws Exception {
+        boolean useMonitor = true;
+        addAllToRefset(members, batchDescription, useMonitor);
+    }
 
-	public void setMemberTypeId(int memberTypeId) {
-		this.memberTypeId = memberTypeId;
-	}
+    protected void addMarkedParents(Integer... conceptIds) throws Exception {
+        new MarkedParentRefsetHelper(memberRefsetId, memberTypeId)
+                .addParentMembers(conceptIds);
+    }
 
-	public int getMemberRefsetId() {
-		return memberRefsetId;
-	}
+    protected void removeMarkedParents(Integer... conceptIds) throws Exception {
+        new MarkedParentRefsetHelper(memberRefsetId, memberTypeId)
+                .removeParentMembers(conceptIds);
+    }
 
-	public void setMemberRefsetId(int memberRefsetId) {
-		this.memberRefsetId = memberRefsetId;
-	}
+    /**
+     * Remove a collection of concepts from a refset.
+     * 
+     * @param members
+     *            The collection of concepts to be removed from the refset
+     * @param batchDescription
+     *            A textual description of the batch being processed. Used in
+     *            the progress reports given during processing.
+     */
+    public void removeAllFromRefset(Collection<I_GetConceptData> members,
+            String batchDescription, boolean useMonitor) throws Exception {
 
-	public Set<Integer> getExistingMembers() throws Exception {		
-		
-		HashSet<Integer> results = new HashSet<Integer>();
-		
-		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-		
-		List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(memberRefsetId);
-		
-		for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
-			
-			List<I_ThinExtByRefTuple> extensions = 
-				thinExtByRefVersioned.getTuples(config.getAllowedStatus(), config.getViewPositionSet(), true, false);
-			
-			for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
-				if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
-					
-					I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
-					if (part.getConceptId() == memberTypeId) {
-						results.add(thinExtByRefTuple.getComponentId());
-					}
-				}
-			}
-		}		
-		
-		return results;
-	}
+        Batch<I_GetConceptData> batch = new Batch<I_GetConceptData>(members,
+                batchDescription, useMonitor) {
 
-	/**
-	 * Find all the current member refset concepts.
-	 * <p>
-	 * Member refsets must have the following properties:
-	 * <ul>
-	 * <li>Is a <i>refset identity</i>
-	 * <li>A <i>refset purpose</i> of <i>refset membership</i>
-	 */
+            Set<Integer> removedMembers = new HashSet<Integer>();
+
+            @Override
+            public void processItem(I_GetConceptData item) throws Exception {
+                if (retireRefsetExtension(getMemberRefsetId(), item
+                        .getConceptId(), getMemberTypeId())) {
+                    removedMembers.add(item.getConceptId());
+                }
+            }
+
+            @Override
+            public void onComplete() throws Exception {
+                List<UUID> markedParentsUuid = Arrays
+                        .asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE
+                                .getUuids());
+                if (termFactory.hasId(markedParentsUuid)) {
+                    if (useMonitor) {
+                        monitor.setText("Removing marked parent members...");
+                        monitor.setIndeterminate(true);
+                    }
+                    removeMarkedParents(removedMembers
+                            .toArray(new Integer[] {}));
+                }
+            }
+
+            @Override
+            public void onCancel() throws Exception {
+                logger.info("Batch operation '" + description
+                        + "' cancelled by user.");
+                termFactory.cancel();
+            }
+
+        };
+
+        batch.run();
+    }
+
+    /**
+     * Remove a collection of concepts from a refset.
+     * 
+     * @param members
+     *            The collection of concepts to be removed from the refset
+     * @param batchDescription
+     *            A textual description of the batch being processed. Used in
+     *            the progress reports given during processing.
+     */
+    public void removeAllFromRefset(Collection<I_GetConceptData> members,
+            String batchDescription) throws Exception {
+        boolean useMonitor = true;
+        removeAllFromRefset(members, batchDescription, useMonitor);
+
+    }
+
+    /**
+     * Add a concept to a refset
+     * 
+     * @param newMemberId
+     *            The concept to be added
+     */
+    public boolean addToRefset(int conceptId) throws Exception {
+        if (newRefsetExtension(getMemberRefsetId(), conceptId,
+                getMemberTypeId())) {
+            addMarkedParents(conceptId);
+            return true;
+        } else
+            return false;
+    }
+
+    /**
+     * Remove a concept from a refset
+     * 
+     * @param newMemberId
+     *            The concept to be removed
+     */
+    public boolean removeFromRefset(int conceptId) throws Exception {
+        if (retireRefsetExtension(getMemberRefsetId(), conceptId,
+                getMemberTypeId())) {
+            removeMarkedParents(conceptId);
+            return true;
+        } else
+            return false;
+    }
+
+    public int getMemberTypeId() {
+        return memberTypeId;
+    }
+
+    public void setMemberTypeId(int memberTypeId) {
+        this.memberTypeId = memberTypeId;
+    }
+
+    public int getMemberRefsetId() {
+        return memberRefsetId;
+    }
+
+    public void setMemberRefsetId(int memberRefsetId) {
+        this.memberRefsetId = memberRefsetId;
+    }
+
+    public Set<Integer> getExistingMembers() throws Exception {
+
+        HashSet<Integer> results = new HashSet<Integer>();
+
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+
+        List<I_ThinExtByRefVersioned> extVersions = termFactory
+                .getRefsetExtensionMembers(memberRefsetId);
+
+        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
+
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned
+                    .getTuples(config.getAllowedStatus(), config
+                            .getViewPositionSet(), true, false);
+
+            for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
+                if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
+
+                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple
+                            .getPart();
+                    if (part.getConceptId() == memberTypeId) {
+                        results.add(thinExtByRefTuple.getComponentId());
+                    }
+                }
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Find all the current member refset concepts.
+     * <p>
+     * Member refsets must have the following properties:
+     * <ul>
+     * <li>Is a <i>refset identity</i>
+     * <li>A <i>refset purpose</i> of <i>refset membership</i>
+     */
     public static Set<Integer> getMemberRefsets() throws Exception {
 
-    	HashSet<Integer> memberRefsets = new HashSet<Integer>();
-    	I_TermFactory termFactory = LocalVersionedTerminology.get();
+        HashSet<Integer> memberRefsets = new HashSet<Integer>();
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-    	int currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-    	int memberRefsetPurposeId = ConceptConstants.REFSET_MEMBER_PURPOSE.localize().getNid();
-    	int refsetIdenityId = RefsetAuxiliary.Concept.REFSET_IDENTITY.localize().getNid();
-    	
-		I_IntSet statuses = termFactory.newIntSet();
-		statuses.add(currentStatusId);
+        int currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize()
+                .getNid();
+        int memberRefsetPurposeId = ConceptConstants.REFSET_MEMBER_PURPOSE
+                .localize().getNid();
+        int refsetIdenityId = RefsetAuxiliary.Concept.REFSET_IDENTITY
+                .localize().getNid();
 
-		I_IntSet purposeTypes = termFactory.newIntSet();	
-		purposeTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());
-		
-		I_IntSet isATypes = termFactory.newIntSet();
-		isATypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-		isATypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+        I_IntSet statuses = termFactory.newIntSet();
+        statuses.add(currentStatusId);
 
-		I_GetConceptData memberPurpose = termFactory.getConcept(memberRefsetPurposeId);
-		
-		for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, false, true)) {
-			// Check origin is a refset (ie. has not been retired as a refset)
-			for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, false, true)) {
-				if (target.getConceptId() == refsetIdenityId) {
-					memberRefsets.add(origin.getConceptId());
-				}
-			}
-		}
+        I_IntSet purposeTypes = termFactory.newIntSet();
+        purposeTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize()
+                .getNid());
 
-		return memberRefsets;
-	}
-	
+        I_IntSet isATypes = termFactory.newIntSet();
+        isATypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize()
+                .getNid());
+        isATypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+
+        I_GetConceptData memberPurpose = termFactory
+                .getConcept(memberRefsetPurposeId);
+
+        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(
+                statuses, purposeTypes, null, false, true)) {
+            // Check origin is a refset (ie. has not been retired as a refset)
+            for (I_GetConceptData target : origin.getSourceRelTargets(statuses,
+                    isATypes, null, false, true)) {
+                if (target.getConceptId() == refsetIdenityId) {
+                    memberRefsets.add(origin.getConceptId());
+                }
+            }
+        }
+
+        return memberRefsets;
+    }
+
 }
