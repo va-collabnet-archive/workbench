@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
@@ -25,6 +26,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -162,9 +164,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			} else if (this.c1Id < tmp.c1Id) {
 				return thisLess;
 			} else {
-				if (this.c2Id > tmp.c2Id) {
+				if (this.group > tmp.group) {
 					return thisMore;
-				} else if (this.c2Id < tmp.c2Id) {
+				} else if (this.group < tmp.group) {
 					return thisLess;
 				} else {
 					if (this.typeId > tmp.typeId) {
@@ -172,9 +174,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 					} else if (this.typeId < tmp.typeId) {
 						return thisLess;
 					} else {
-						if (this.group > tmp.group) {
+						if (this.c2Id > tmp.c2Id) {
 							return thisMore;
-						} else if (this.group < tmp.group) {
+						} else if (this.c2Id < tmp.c2Id) {
 							return thisLess;
 						} else {
 							return 0; // this == received
@@ -529,14 +531,22 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			// GET INPUT & OUTPUT PATHS FROM CLASSIFIER PREFERRENCES
 			// :TODO: change to classifier path setting
 			if (config.getEditingPathSet().size() != 1) {
-				throw new TaskFailedException(
-						"Profile must have only one edit path. Found: "
-								+ tf.getActiveAceFrameConfig()
-										.getEditingPathSet());
+				String errStr = "Profile must have only one edit path. Found: "
+						+ tf.getActiveAceFrameConfig().getEditingPathSet();
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new TaskFailedException(errStr));
+				return Condition.STOP;
 			}
 
 			// GET ALL EDIT_PATH ORIGINS
 			I_GetConceptData cEditPathObj = config.getClassifierInputPath();
+			if (cEditPathObj == null) {
+				String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new Exception(errStr));
+				return Condition.STOP;
+			}
+
 			cEditPathNid = cEditPathObj.getConceptId();
 			cEditIPath = tf.getPath(cEditPathObj.getUids());
 			cEditPathPos = new ArrayList<I_Position>();
@@ -545,6 +555,12 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 			// GET ALL CLASSIFER_PATH ORIGINS
 			I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
+			if (cClassPathObj == null) {
+				String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new Exception(errStr));
+				return Condition.STOP;
+			}
 			cClassPathNid = cClassPathObj.getConceptId();
 			cClassIPath = tf.getPath(cClassPathObj.getUids());
 			cClassPathPos = new ArrayList<I_Position>();
