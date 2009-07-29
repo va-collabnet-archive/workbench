@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -23,22 +24,28 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -49,7 +56,9 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -57,6 +66,8 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
+import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
 import org.dwfa.vodb.types.ConceptBean;
@@ -185,11 +196,121 @@ public class SearchPanel extends JPanel {
                 for (I_ContainTermComponent l : linkedComponents) {
                     l.setTermComponent(cb);
                 }
-
+                if (linkType == LINK_TYPE.TREE_LINK) {
+        			try {
+        				new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config, cb);
+        				config.setHierarchySelection(cb);
+        			} catch (IOException e1) {
+        				AceLog.getAppLog().alertAndLogException(e1);
+        			}
+                }
             }
         }
 
     }
+
+	private class LinkListModel extends AbstractSpinnerModel {
+		ImageIcon[] items;
+
+		int currentSelection = 0;
+
+		public LinkListModel(ImageIcon[] items) {
+			this(items, 0);
+		}
+
+		public LinkListModel(ImageIcon[] items, int currentSelection) {
+			super();
+			this.items = items;
+			this.currentSelection = currentSelection;
+		}
+
+		public Object getNextValue() {
+			currentSelection++;
+			if (currentSelection >= items.length) {
+				currentSelection = 0;
+			}
+			return getValue();
+		}
+
+		public Object getPreviousValue() {
+			currentSelection--;
+			if (currentSelection < 0) {
+				currentSelection = items.length - 1;
+			}
+			return getValue();
+		}
+
+		public Object getValue() {
+			return items[currentSelection];
+		}
+
+		public void setValue(Object value) {
+			for (int i = 0; i < items.length; i++) {
+				if (items[i] == value) {
+					currentSelection = i;
+					changeLinkListener(LINK_TYPE.values()[i]);
+					break;
+				}
+			}
+			fireStateChanged();
+		}
+
+	}
+
+	
+	private class LinkEditor extends JLabel implements ChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public LinkEditor(JSpinner spinner) {
+			setOpaque(true);
+
+			// Get info from the model.
+			LinkListModel myModel = (LinkListModel) (spinner.getModel());
+			Icon value = (Icon) myModel.getValue();
+			setIcon(value);
+			spinner.addChangeListener(this);
+
+			// Set tool tip text.
+			updateToolTipText(spinner);
+
+			// Set size info.
+			Dimension size = new Dimension(value.getIconWidth() + 4, value
+					.getIconHeight() + 4);
+			setMinimumSize(size);
+			setPreferredSize(size);
+		}
+
+		protected void updateToolTipText(JSpinner spinner) {
+			String toolTipText = spinner.getToolTipText();
+			if (toolTipText != null) {
+				// JSpinner has tool tip text. Use it.
+				if (!toolTipText.equals(getToolTipText())) {
+					setToolTipText(toolTipText);
+				}
+			} else {
+				// Define our own tool tip text.
+				LinkListModel myModel = (LinkListModel) (spinner.getModel());
+				Icon value = (Icon) myModel.getValue();
+				if (value == ConceptPanel.TREE_LINK_ICON) {
+					setToolTipText("The search selection is linked to the hierarchy view...");
+					linkType = LINK_TYPE.TREE_LINK;
+				} else if (value == ConceptPanel.UNLINKED_ICON) {
+					setToolTipText("This search selection is not linked to the hierarchy view...");
+					linkType = LINK_TYPE.UNLINKED;
+				}
+			}
+		}
+
+		public void stateChanged(ChangeEvent e) {
+			JSpinner mySpinner = (JSpinner) (e.getSource());
+			LinkListModel myModel = (LinkListModel) (mySpinner.getModel());
+			setIcon((Icon) myModel.getValue());
+			updateToolTipText(mySpinner);
+		}
+	}
 
     /**
      * 
@@ -237,6 +358,8 @@ public class SearchPanel extends JPanel {
 	private JButton addButton;
 
 	private JButton removeButton;
+
+	private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
 
     public SearchPanel(I_ConfigAceFrame config) {
         super(new GridBagLayout());
@@ -366,6 +489,21 @@ public class SearchPanel extends JPanel {
         gbc.gridwidth = 1;
         
         gbc.fill = GridBagConstraints.BOTH;
+        
+		List<ImageIcon> ImageIconList = new ArrayList<ImageIcon>();
+		ImageIconList.add(ConceptPanel.UNLINKED_ICON);
+		ImageIconList.add(ConceptPanel.TREE_LINK_ICON);
+
+		LinkListModel linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), 
+				LINK_TYPE.UNLINKED.ordinal());
+
+		JSpinner linkSpinner = new JSpinner(linkSpinnerModel);
+		linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
+
+		linkSpinner.setEditor(new LinkEditor(linkSpinner));
+
+		add(linkSpinner, gbc);
+        gbc.gridx++;
 
         loadButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
         loadButton.setToolTipText("read search specification from disk");
@@ -605,4 +743,9 @@ public class SearchPanel extends JPanel {
 	public List<I_TestSearchResults> getExtraCriterion() {
         return extraCriterion;
     }
+	
+	public void changeLinkListener(LINK_TYPE type) {
+		this.linkType = type;
+	}
+
 }

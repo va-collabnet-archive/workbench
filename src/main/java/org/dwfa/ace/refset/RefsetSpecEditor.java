@@ -185,8 +185,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	public class RefsetSpecSelectionListener implements TreeSelectionListener {
 
 		public void valueChanged(TreeSelectionEvent tse) {
-			if (tse.getPath() != null) {
-				TreePath selectionPath = tse.getPath();
+			if (tse.getNewLeadSelectionPath() != null) {
+				TreePath selectionPath = tse.getNewLeadSelectionPath();
 				RefsetSpecTreeNode selectedNode = (RefsetSpecTreeNode) selectionPath.getLastPathComponent();
 				I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) selectedNode.getUserObject();
 				
@@ -348,7 +348,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY,
 					!historyButton.isSelected(), historyButton.isSelected());
 			try {
-				updateSpecTree();
+				updateSpecTree(false);
 			} catch (Exception e1) {
 				AceLog.getAppLog().alertAndLog(contentPanel,
 						Level.SEVERE,
@@ -381,7 +381,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					tabHistoryList.removeLast();
 				}
 			}
-			updateSpecTree();
+			updateSpecTree(false);
 			if (treeHelper.getRenderer() != null) {
 				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy", null, null));
 				treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "variableHeightTaxonomyView", null, null));
@@ -901,7 +901,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
+			this.updateSpecTree(true);
 			this.firePropertyChange("commit", null, null);
+		} else if (evt.getPropertyName().equals("uncommitted")) {
+			this.updateSpecTree(false);
+		} else if (evt.getPropertyName().equals("refsetSpecChanged")) {
+			this.updateSpecTree(false);
 		}
 	}
 
@@ -926,22 +931,30 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		return 10;
 	}
 	
-	private void updateSpecTree() {
+	UpdateTreeSpec updater;
+	private void updateSpecTree(boolean clearSelection) {
 		refsetSpecConcept = null;
-		UpdateTreeSpec updater = new UpdateTreeSpec();
+		if (clearSelection) {
+			specTree.clearSelection();
+		}
+		if (updater != null) {
+			updater.cancel = true;
+		}
+		updater = new UpdateTreeSpec();
 		updater.start();
 	}
 	
 	private class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode> {
 
+		public boolean cancel = false;
 		private RefsetSpecTreeNode root;
 		private TreePath selectionPath;
+		private boolean newRefset = true;
 
 		@Override
 		protected RefsetSpecTreeNode construct() throws Exception {
-			
-			boolean newRefset = true;
-			selectionPath = specTree.getSelectionPath();
+			if (cancel) {return null;};
+			selectionPath = specTree.getLeadSelectionPath();
 			
 			RefsetSpecTreeNode oldRoot = (RefsetSpecTreeNode) specTree.getModel().getRoot();
 			
@@ -949,6 +962,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			I_GetConceptData refsetConcept = (I_GetConceptData) label.getTermComponent();
 			IntSet relTypes = new IntSet();			
 			refsetSpecConcept = null;
+			if (cancel) {return null;};
 			if (refsetConcept != null) {
 				relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 				List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), 
@@ -957,6 +971,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
 				}
 			}
+			if (cancel) {return null;};
 			root = new RefsetSpecTreeNode(refsetSpecConcept, ace.getAceFrameConfig());
 			
 			if (oldRoot.getUserObject() != null && refsetSpecConcept != null) {
@@ -965,12 +980,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			}
 			
 			if (refsetSpecConcept != null) {
+				if (cancel) {return null;};
 				List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpecConcept.getConceptId(), true);
 				HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
 				HashSet<Integer> fetchedComponents = new HashSet<Integer>();
 				fetchedComponents.add(refsetSpecConcept.getConceptId());
+				if (cancel) {return null;};
 				addExtensionsToMap(extensions, extensionMap, fetchedComponents);		
 				for (RefsetSpecTreeNode extNode: extensionMap.values()) {
+					if (cancel) {return null;};
 					I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
 					if (refsetSpecConcept != null &&  ext != null) {
 						if (ext.getComponentId() == refsetSpecConcept.getConceptId()) {
@@ -983,6 +1001,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					}
 				}
 			}
+			if (cancel) {return null;};
 			sortTree(root);
 			return root;
 		}
@@ -1018,9 +1037,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		protected void finished() {
 			try {
 				get();
+				if (cancel) {return;};
 				DefaultTreeModel tm = (DefaultTreeModel) specTree.getModel();
 				tm.setRoot(root);
-				specTree.setSelectionPath(selectionPath);
+				if (cancel) {return;};
+				if (newRefset == false) {
+					specTree.setSelectionPath(selectionPath);
+					specTree.setLeadSelectionPath(selectionPath);
+				}
 				
 			} catch (InterruptedException e) {
 				AceLog.getAppLog().alertAndLogException(e);

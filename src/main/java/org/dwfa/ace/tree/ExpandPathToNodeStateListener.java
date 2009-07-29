@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -22,8 +23,6 @@ public class ExpandPathToNodeStateListener implements ChangeListener{
 	private TreePath lastPath;
 	private DefaultMutableTreeNode lastChildNode;
 	private I_GetConceptData focus;
-
-	
 	
 	public ExpandPathToNodeStateListener(JTreeWithDragImage tree, I_ConfigAceFrame config, I_GetConceptData focus) throws IOException {
 		super();

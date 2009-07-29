@@ -2754,4 +2754,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     	return list;
     }
 
+	public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext) {
+		changeSupport.firePropertyChange("refsetSpecChanged", null, ext);
+	}
+
+	public JTree getTreeInTaxonomyPanel() {
+		return aceFrame.getCdePanel().getTree();
+	}
+
 }

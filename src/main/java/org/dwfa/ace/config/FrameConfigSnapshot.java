@@ -61,6 +61,14 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	I_ConfigAceFrame baseFrame;
 
+	public JTree getTreeInTaxonomyPanel() {
+		return baseFrame.getTreeInTaxonomyPanel();
+	}
+
+	public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext) {
+		baseFrame.fireRefsetSpecChanged(ext);
+	}
+
 	public void addConceptPanelPlugins(HOST_ENUM host, UUID id,
 			I_PluginToConceptPanel plugin) {
 		baseFrame.addConceptPanelPlugins(host, id, plugin);

@@ -133,34 +133,48 @@ public class RefsetSpecPanel extends JPanel {
 		column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
 		columns.add(column2);
 		
-		if (editor.getShowHistory()) {
-        	ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
-        	column3.setColumnName("version");
-        	column3.setCreationEditable(false);
-        	column3.setUpdateEditable(false);
-        	column3.setFieldClass(Number.class);
-        	column3.setMin(5);
-        	column3.setPref(150);
-        	column3.setMax(150);
-        	column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-        	column3.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getVersion"));
-        	column3.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setVersion", int.class));
-        	column3.setType(REFSET_FIELD_TYPE.VERSION);
-        	columns.add(column3);
+    	ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
+    	column3.setColumnName("status");
+    	column3.setCreationEditable(false);
+    	column3.setUpdateEditable(false);
+    	column3.setFieldClass(String.class);
+    	column3.setMin(5);
+    	column3.setPref(150);
+    	column3.setMax(150);
+    	column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+    	column3.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getStatusId"));
+    	column3.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setStatusId", int.class));
+    	column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+    	columns.add(column3);			
 
+    	if (editor.getShowHistory()) {
         	ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
-        	column4.setColumnName("path");
+        	column4.setColumnName("version");
         	column4.setCreationEditable(false);
         	column4.setUpdateEditable(false);
-        	column4.setFieldClass(String.class);
+        	column4.setFieldClass(Number.class);
         	column4.setMin(5);
         	column4.setPref(150);
         	column4.setMax(150);
         	column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-        	column4.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getPathId"));
-        	column4.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setPathId", int.class));
-        	column4.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
-        	columns.add(column4);			
+        	column4.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getVersion"));
+        	column4.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setVersion", int.class));
+        	column4.setType(REFSET_FIELD_TYPE.VERSION);
+        	columns.add(column4);
+
+        	ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
+        	column5.setColumnName("path");
+        	column5.setCreationEditable(false);
+        	column5.setUpdateEditable(false);
+        	column5.setFieldClass(String.class);
+        	column5.setMin(5);
+        	column5.setPref(150);
+        	column5.setMax(150);
+        	column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+        	column5.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getPathId"));
+        	column5.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setPathId", int.class));
+        	column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+        	columns.add(column5);			
 		}
 
 		ReflexiveRefsetTableModel refsetTableModel = new ReflexiveRefsetTableModel(editor,

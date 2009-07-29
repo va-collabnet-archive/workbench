@@ -59,6 +59,14 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	I_ConfigAceFrame frameConfig;
 
 
+	public JTree getTreeInTaxonomyPanel() {
+		return frameConfig.getTreeInTaxonomyPanel();
+	}
+
+	public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext) {
+		frameConfig.fireRefsetSpecChanged(ext);
+	}
+
 	public void addConceptPanelPlugins(HOST_ENUM host, UUID id,
 			I_PluginToConceptPanel plugin) {
 		frameConfig.addConceptPanelPlugins(host, id, plugin);
