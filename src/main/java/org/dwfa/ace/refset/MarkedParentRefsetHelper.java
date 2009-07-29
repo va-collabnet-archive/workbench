@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
@@ -75,7 +76,22 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         // lineage that should not be modified.
         Set<Integer> lineageToExclude = new HashSet<Integer>();
         for (Integer parentId : toBeRetired) {
-            for (Integer childId : refsetHelper.getChildrenOfConcept(parentId)) {
+
+            I_GetConceptData parent = termFactory.getConcept(parentId);
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+            I_IntSet isARel = termFactory.newIntSet();
+            // get the appropriate is-a type (SNOMED or architectonic), based on
+            // "marked parent is-a type" rel
+            isARel.add(new RefsetUtilImpl()
+                    .getMarkedParentIsARelationshipTarget(termFactory,
+                            termFactory.getConcept(refsetId)));
+
+            Set<I_GetConceptData> children = parent.getDestRelOrigins(config
+                    .getAllowedStatus(), isARel, config.getViewPositionSet(),
+                    true, true);
+
+            for (I_GetConceptData child : children) {
+                Integer childId = child.getConceptId();
                 if (!toBeRetired.contains(childId)
                         && (isMarkedParent(childId) || isMember(childId))) {
                     lineageToExclude.add(childId);
@@ -103,6 +119,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 
         // Retire the rest
         for (Integer markedParentId : toBeRetired) {
+
             retireRefsetExtension(parentRefsetId, markedParentId,
                     parentMemberTypeId);
         }

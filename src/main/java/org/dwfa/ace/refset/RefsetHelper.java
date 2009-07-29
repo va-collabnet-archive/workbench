@@ -778,6 +778,16 @@ public class RefsetHelper {
      */
     public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept,
             Condition... conditions) throws Exception {
+        return getAllDescendants(concept, concept, conditions);
+    }
+
+    /**
+     * Get all the descendants (children, children of children, etc) of a
+     * particular concept.
+     */
+    public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept,
+            I_GetConceptData memberRefset, Condition... conditions)
+            throws Exception {
 
         Set<I_Position> userViewPositions = null;
         I_IntSet userViewStatuses;
@@ -794,11 +804,10 @@ public class RefsetHelper {
         }
 
         I_IntSet isARel = termFactory.newIntSet();
-
         // get the appropriate is-a type (SNOMED or architectonic), based on
         // "marked parent is-a type" rel
         isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(
-                termFactory, concept));
+                termFactory, memberRefset));
 
         // find all the children
         Set<I_GetConceptData> descendants = getAllDescendants(

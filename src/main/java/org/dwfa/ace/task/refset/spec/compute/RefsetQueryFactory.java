@@ -106,83 +106,71 @@ public class RefsetQueryFactory {
                     configFrame.getAllowedStatus(), configFrame
                             .getViewPositionSet(), addUncommitted,
                     returnConflictResolvedLatestState);
-            I_ThinExtByRefPart thinPart = extensions.get(0).getPart();
+            if (extensions.size() > 0) {
+                I_ThinExtByRefPart thinPart = extensions.get(0).getPart();
 
-            if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
+                if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
 
-                // structural query e.g. true : is-concept : height
-                I_ThinExtByRefPartConceptConceptConcept part = (I_ThinExtByRefPartConceptConceptConcept) thinPart;
+                    // structural query e.g. true : is-concept : height
+                    I_ThinExtByRefPartConceptConceptConcept part = (I_ThinExtByRefPartConceptConceptConcept) thinPart;
 
-                /*
-                 * getLogger().info(">>>>>>>>>>>>>>>"); getLogger() .info(
-                 * termFactory.getConcept(part.getC1id()) .getInitialText());
-                 * getLogger() .info( termFactory.getConcept(part.getC2id())
-                 * .getInitialText()); getLogger() .info(
-                 * termFactory.getConcept(part.getC3id()) .getInitialText());
-                 */
+                    I_GetConceptData truthToken = termFactory.getConcept(part
+                            .getC1id());
+                    I_GetConceptData groupingToken = termFactory
+                            .getConcept(part.getC2id());
+                    I_GetConceptData constraint = termFactory.getConcept(part
+                            .getC3id());
 
-                I_GetConceptData truthToken = termFactory.getConcept(part
-                        .getC1id());
-                I_GetConceptData groupingToken = termFactory.getConcept(part
-                        .getC2id());
-                I_GetConceptData constraint = termFactory.getConcept(part
-                        .getC3id());
+                    switch (type) {
+                        case (CONCEPT):
+                            query.addConceptStatement(getNegation(truthToken,
+                                    termFactory), groupingToken, constraint);
+                            break;
+                        case (DESC):
+                            query.addDescStatement(getNegation(truthToken,
+                                    termFactory), groupingToken, constraint);
+                            break;
+                        case (REL):
+                            query.addRelStatement(getNegation(truthToken,
+                                    termFactory), groupingToken, constraint);
+                            break;
+                        default:
+                            throw new TerminologyException("Unknown type: "
+                                    + groupingToken.getInitialText());
+                    }
+                } else if (thinPart instanceof I_ThinExtByRefPartConceptConcept) {
 
-                switch (type) {
-                    case (CONCEPT):
-                        query.addConceptStatement(getNegation(truthToken,
-                                termFactory), groupingToken, constraint);
-                        break;
-                    case (DESC):
-                        query.addDescStatement(getNegation(truthToken,
-                                termFactory), groupingToken, constraint);
-                        break;
-                    case (REL):
-                        query.addRelStatement(getNegation(truthToken,
-                                termFactory), groupingToken, constraint);
-                        break;
-                    default:
-                        throw new TerminologyException("Unknown type: "
-                                + groupingToken.getInitialText());
+                    // logical OR, AND, CONCEPT-CONTAINS-REL, or
+                    // CONCEPT-CONTAINS-DESC.
+                    I_ThinExtByRefPartConceptConcept part = (I_ThinExtByRefPartConceptConcept) thinPart;
+
+                    I_GetConceptData truthToken = termFactory.getConcept(part
+                            .getC1id());
+                    I_GetConceptData groupingToken = termFactory
+                            .getConcept(part.getC2id());
+
+                    boolean negate = getNegation(truthToken, termFactory);
+
+                    // add subquery
+                    RefsetSpecQuery subquery = query.addSubquery(groupingToken);
+
+                    int subtype = getType(groupingToken, termFactory);
+                    if (subtype == -1) {
+                        subtype = type;
+                    }
+
+                    // process each grandchild
+                    if (!childNode.isLeaf()) {
+                        processNode(childNode, subquery, subtype, configFrame,
+                                termFactory);
+                    }
+                    if (negate) {
+                        subquery.negateQuery();
+                    }
+
+                } else {
+                    throw new TerminologyException("Unknown extension type");
                 }
-            } else if (thinPart instanceof I_ThinExtByRefPartConceptConcept) {
-
-                // logical OR, AND, CONCEPT-CONTAINS-REL, or
-                // CONCEPT-CONTAINS-DESC.
-                I_ThinExtByRefPartConceptConcept part = (I_ThinExtByRefPartConceptConcept) thinPart;
-
-                /*
-                 * getLogger().info(">>>>>>>>>>>>>>>"); getLogger() .info(
-                 * termFactory.getConcept(part.getC1id()) .getInitialText());
-                 * getLogger() .info( termFactory.getConcept(part.getC2id())
-                 * .getInitialText());
-                 */
-
-                I_GetConceptData truthToken = termFactory.getConcept(part
-                        .getC1id());
-                I_GetConceptData groupingToken = termFactory.getConcept(part
-                        .getC2id());
-
-                boolean negate = getNegation(truthToken, termFactory);
-
-                // add subquery
-                RefsetSpecQuery subquery = query.addSubquery(groupingToken);
-
-                int subtype = getType(groupingToken, termFactory);
-                if (subtype == -1) {
-                    subtype = type;
-                }
-
-                // process each grandchild
-                if (!childNode.isLeaf()) {
-                    processNode(childNode, subquery, subtype, configFrame,
-                            termFactory);
-                }
-                if (negate) {
-                    subquery.negateQuery();
-                }
-            } else {
-                throw new TerminologyException("Unknown extension type");
             }
         }
         return query;

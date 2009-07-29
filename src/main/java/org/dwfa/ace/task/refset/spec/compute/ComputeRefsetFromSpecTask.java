@@ -277,6 +277,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
             return Condition.CONTINUE;
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new TaskFailedException(ex);
         }
     }

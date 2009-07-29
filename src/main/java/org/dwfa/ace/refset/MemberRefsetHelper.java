@@ -73,7 +73,7 @@ public class MemberRefsetHelper extends RefsetHelper {
                         monitor.setText("Adding marked parent members...");
                         monitor.setIndeterminate(true);
                     }
-                    logger.info("Adding marked parents.");
+                    logger.fine("Adding marked parents.");
                     addMarkedParents(newMembers.toArray(new Integer[] {}));
                 }
             }
