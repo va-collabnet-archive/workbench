@@ -82,11 +82,11 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 				int componentId = refsetId;
 
 				TreePath selection = specTree.getSelectionPath();
-				
+				DefaultMutableTreeNode selectedNode = null;
 				boolean canAdd = true;
 				if (selection != null) {
 					canAdd = false;
-					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) selection.getLastPathComponent();
+					selectedNode = (DefaultMutableTreeNode) selection.getLastPathComponent();
 					I_ThinExtByRefVersioned selectedSpec = (I_ThinExtByRefVersioned) selectedNode.getUserObject();
 					componentId = selectedSpec.getMemberId();
 					if (selectedSpec.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
@@ -109,6 +109,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 						ext.addVersion(specPart);
 					}
 					tf.addUncommitted(ext);
+					configFrame.fireRefsetSpecChanged(ext);
 				} else {
 					String msg = "Unable to add spec. Selected parent must be a branching spec.";
 					JOptionPane.showMessageDialog(null, msg);

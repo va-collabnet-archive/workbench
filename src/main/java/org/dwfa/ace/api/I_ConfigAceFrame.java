@@ -437,6 +437,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public JTree getTreeInSpecEditor();
 	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor();
 	
+	public JTree getTreeInTaxonomyPanel();
+	
 	//Configuration items to support the classifier. 
 	public I_GetConceptData getClassificationRoot();
 	public void setClassificationRoot(I_GetConceptData classificationRoot);
@@ -489,6 +491,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
      * plugins for this frame. 
      */
     public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer();
+
+	public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext);
 
 
 }
