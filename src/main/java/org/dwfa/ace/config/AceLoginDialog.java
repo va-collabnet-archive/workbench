@@ -136,6 +136,8 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
         gbc.gridx++;
+        content.add(svnConnectCheckBox, gbc);
+        gbc.gridx++;
         content.add(cancelButton, gbc);
         gbc.gridx++;
         content.add(loginButton, gbc);
