@@ -107,7 +107,7 @@ import com.sleepycat.je.DatabaseException;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -115,9 +115,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
-    private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
+    private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(
+            this);
 
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(this);
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(
+            this);
 
     private boolean active = true;
 
@@ -131,7 +133,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private I_IntSet descTypes = new IntSet();
 
-    private Set<I_Position> viewPositions = Collections.synchronizedSet(new HashSet<I_Position>());
+    private Set<I_Position> viewPositions = Collections
+            .synchronizedSet(new HashSet<I_Position>());
 
     private Rectangle bounds = new Rectangle(0, 0, 1400, 1028);
 
@@ -249,47 +252,46 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 29
     private boolean sortTaxonomyUsingRefset = false;
-    
+
     // 30
-    
+
     private List<I_OverrideTaxonomyRenderer> taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
     private List<I_FilterTaxonomyRels> taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
-    
+
     // 31
     private Map<String, List<I_GetConceptData>> tabHistoryMap = new TreeMap<String, List<I_GetConceptData>>();
-    
+
     // 32
     private boolean isAdministrative = false;
-    
+
     // 33
     private Set<TopToggleTypes> hiddenTopToggles = new HashSet<TopToggleTypes>();
-    
-    //34
+
+    // 34
     private I_GetConceptData context;
-    
-    //35
+
+    // 35
     private I_GetConceptData classificationRoot;
     private I_GetConceptData classifierInputPathConcept;
     private I_GetConceptData classifierIsaType;
     private I_GetConceptData classifierOutputPathConcept;
 
-    //36
+    // 36
     private I_ManageConflict conflictResolutionStrategy;
     private boolean highlightConflictsInTaxonomyView;
     private boolean highlightConflictsInComponentPanel;
-    
-    //37
+
+    // 37
     private Map<Integer, Color> pathColorMap = new HashMap<Integer, Color>();
     private I_IntList languagePreferenceList = new IntList();
-    
-    //38
+
+    // 38
     private Map<String, Object> properties = new HashMap<String, Object>();
-    
+
     // 39
     private Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>> conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
 
-
-	// transient
+    // transient
     private transient MasterWorker worker;
 
     private transient String statusMessage;
@@ -299,11 +301,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient I_GetConceptData lastViewed;
 
     private transient AceFrame aceFrame;
-    
+
     private transient BundleType bundleType;
 
-
-	private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(active);
         out.writeObject(frameName);
@@ -328,11 +329,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntSet.writeIntSet(out, inferredViewTypes);
 
         try {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultStatus.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultDescriptionType.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipType.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipCharacteristic.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipRefinability.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    defaultStatus.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    defaultDescriptionType.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    defaultRelationshipType.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    defaultRelationshipCharacteristic.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    defaultRelationshipRefinability.getConceptId()));
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
@@ -346,7 +352,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         out.writeInt(termTreeDividerLoc);
         try {
             if (hierarchySelection != null) {
-                out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));
+                out.writeObject(AceConfig.getVodb().nativeToUuid(
+                        hierarchySelection.getConceptId()));
             } else {
                 out.writeObject(null);
             }
@@ -385,10 +392,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         try {
             if (defaultImageType == null) {
                 defaultImageType = AceConfig.getVodb().getConcept(
-                                                                  ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
-                                                                          .getUids());
+                        ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
+                                .getUids());
             }
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    defaultImageType.getConceptId()));
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
@@ -428,94 +436,98 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 29
         out.writeBoolean(sortTaxonomyUsingRefset);
-        
+
         // 30
         out.writeObject(taxonomyRendererOverrideList);
         out.writeObject(taxonomyRelFilterList);
 
         // 31
         out.writeInt(tabHistoryMap.size());
-        for (String keyStr: tabHistoryMap.keySet()) {
+        for (String keyStr : tabHistoryMap.keySet()) {
             out.writeObject(keyStr);
             IntList il = new IntList();
-            for (I_GetConceptData concept: tabHistoryMap.get(keyStr)) {
-            	il.add(concept.getConceptId());
+            for (I_GetConceptData concept : tabHistoryMap.get(keyStr)) {
+                il.add(concept.getConceptId());
             }
             IntList.writeIntList(out, il);
-         }
-        
+        }
+
         // 32
         out.writeBoolean(isAdministrative);
-        
+
         // 33
         out.writeObject(hiddenTopToggles);
-        
+
         // 34
         IntList contextIntList = new IntList();
         if (context != null) {
             contextIntList.add(context.getConceptId());
         }
         IntList.writeIntList(out, contextIntList);
-        
+
         // 35
         try {
-        	writeConceptAsId(classificationRoot, out);
-        	writeConceptAsId(classifierIsaType, out);
-        	writeConceptAsId(classifierInputPathConcept, out);
-        	writeConceptAsId(classifierOutputPathConcept, out);
+            writeConceptAsId(classificationRoot, out);
+            writeConceptAsId(classifierIsaType, out);
+            writeConceptAsId(classifierInputPathConcept, out);
+            writeConceptAsId(classifierOutputPathConcept, out);
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
             throw newEx;
         }
-        
+
         // 36
         out.writeObject(conflictResolutionStrategy);
         out.writeBoolean(highlightConflictsInComponentPanel);
         out.writeBoolean(highlightConflictsInTaxonomyView);
-        
+
         // 37
         IntList pathColorMapKeyIntList = new IntList();
-        for (Integer key: pathColorMap.keySet()) {
-        	pathColorMapKeyIntList.add(key);
+        for (Integer key : pathColorMap.keySet()) {
+            pathColorMapKeyIntList.add(key);
         }
         IntList.writeIntList(out, pathColorMapKeyIntList);
-        for (Integer key: pathColorMapKeyIntList.getListValues()) {
-        	Color pathColor = pathColorMap.get(key);
-        	out.writeObject(pathColor);
+        for (Integer key : pathColorMapKeyIntList.getListValues()) {
+            Color pathColor = pathColorMap.get(key);
+            out.writeObject(pathColor);
         }
         IntList.writeIntList(out, languagePreferenceList);
-        
+
         // 38
         out.writeObject(properties);
-        
+
         // 39
         out.writeObject(conceptPanelPlugins);
     }
 
-	private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException, IOException {
-    	if (concept == null) {
-    		out.writeObject(null);
-    	} else {
-    		out.writeObject(AceConfig.getVodb().nativeToUuid(concept.getConceptId()));
-    	}
-	}
+    private void writeConceptAsId(I_GetConceptData concept,
+            ObjectOutputStream out) throws DatabaseException, IOException {
+        if (concept == null) {
+            out.writeObject(null);
+        } else {
+            out.writeObject(AceConfig.getVodb().nativeToUuid(
+                    concept.getConceptId()));
+        }
+    }
 
     public I_GetConceptData getContext() {
-		return context;
-	}
+        return context;
+    }
 
-	public void setContext(I_GetConceptData context) {
-		this.context = context;
-	}
+    public void setContext(I_GetConceptData context) {
+        this.context = context;
+    }
 
-	@SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
         commitEnabled = false;
         int objDataVersion = in.readInt();
         if (objDataVersion >= 1) {
             this.vetoSupport = new VetoableChangeSupport(this);
-            this.changeSupport = new PropertyChangeSupportWithPropagationId(this);
+            this.changeSupport = new PropertyChangeSupportWithPropagationId(
+                    this);
             active = in.readBoolean();
             frameName = (String) in.readObject();
             sourceRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
@@ -543,8 +555,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 6) {
                 editRelTypePopup = IntList.readIntListIgnoreMapErrors(in);
-                editRelRefinabiltyPopup = IntList.readIntListIgnoreMapErrors(in);
-                editRelCharacteristicPopup = IntList.readIntListIgnoreMapErrors(in);
+                editRelRefinabiltyPopup = IntList
+                        .readIntListIgnoreMapErrors(in);
+                editRelCharacteristicPopup = IntList
+                        .readIntListIgnoreMapErrors(in);
                 editDescTypePopup = IntList.readIntListIgnoreMapErrors(in);
                 editStatusTypePopup = IntList.readIntListIgnoreMapErrors(in);
             } else {
@@ -563,17 +577,20 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 8) {
                 try {
-                    defaultStatus = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
-                    defaultDescriptionType = ConceptBean.get(AceConfig.getVodb().uuidToNative(
-                                                                                              (List<UUID>) in
-                                                                                                      .readObject()));
-                    defaultRelationshipType = ConceptBean.get(AceConfig.getVodb().uuidToNative(
-                                                                                               (List<UUID>) in
-                                                                                                       .readObject()));
-                    defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb()
+                    defaultStatus = ConceptBean.get(AceConfig.getVodb()
                             .uuidToNative((List<UUID>) in.readObject()));
-                    defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb()
-                            .uuidToNative((List<UUID>) in.readObject()));
+                    defaultDescriptionType = ConceptBean.get(AceConfig
+                            .getVodb().uuidToNative(
+                                    (List<UUID>) in.readObject()));
+                    defaultRelationshipType = ConceptBean.get(AceConfig
+                            .getVodb().uuidToNative(
+                                    (List<UUID>) in.readObject()));
+                    defaultRelationshipCharacteristic = ConceptBean
+                            .get(AceConfig.getVodb().uuidToNative(
+                                    (List<UUID>) in.readObject()));
+                    defaultRelationshipRefinability = ConceptBean.get(AceConfig
+                            .getVodb().uuidToNative(
+                                    (List<UUID>) in.readObject()));
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -582,16 +599,30 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 try {
                     defaultStatus = ConceptBean.get(AceConfig.getVodb().getId(
-                                                                              ArchitectonicAuxiliary.Concept.ACTIVE
-                                                                                      .getUids()).getNativeId());
-                    defaultDescriptionType = ConceptBean.get(AceConfig.getVodb()
-                            .getId(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNativeId());
-                    defaultRelationshipType = ConceptBean.get(AceConfig.getVodb()
-                            .getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNativeId());
-                    defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb()
-                            .getId(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNativeId());
-                    defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb()
-                            .getId(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNativeId());
+                            ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
+                            .getNativeId());
+                    defaultDescriptionType = ConceptBean
+                            .get(AceConfig
+                                    .getVodb()
+                                    .getId(
+                                            ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
+                                                    .getUids()).getNativeId());
+                    defaultRelationshipType = ConceptBean.get(AceConfig
+                            .getVodb().getId(
+                                    ArchitectonicAuxiliary.Concept.IS_A_REL
+                                            .getUids()).getNativeId());
+                    defaultRelationshipCharacteristic = ConceptBean
+                            .get(AceConfig
+                                    .getVodb()
+                                    .getId(
+                                            ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
+                                                    .getUids()).getNativeId());
+                    defaultRelationshipRefinability = ConceptBean
+                            .get(AceConfig
+                                    .getVodb()
+                                    .getId(
+                                            ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
+                                                    .getUids()).getNativeId());
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -604,9 +635,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 treeDescPreferenceList = new IntList();
             }
             if (objDataVersion >= 10) {
-                tableDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
-                shortLabelDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
-                longLabelDescPreferenceList = IntList.readIntListIgnoreMapErrors(in);
+                tableDescPreferenceList = IntList
+                        .readIntListIgnoreMapErrors(in);
+                shortLabelDescPreferenceList = IntList
+                        .readIntListIgnoreMapErrors(in);
+                longLabelDescPreferenceList = IntList
+                        .readIntListIgnoreMapErrors(in);
             } else {
                 tableDescPreferenceList = new IntList();
                 shortLabelDescPreferenceList = new IntList();
@@ -622,9 +656,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     List<UUID> uuidList = (List<UUID>) in.readObject();
                     if (uuidList != null) {
                         try {
-                            hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
+                            hierarchySelection = ConceptBean.get(AceConfig
+                                    .getVodb().uuidToNative(uuidList));
                         } catch (NoMappingException e) {
-                            AceLog.getAppLog().info("No mapping for hierarchySelection: " + uuidList);
+                            AceLog.getAppLog().info(
+                                    "No mapping for hierarchySelection: "
+                                            + uuidList);
                         }
                     }
                 } catch (Exception e) {
@@ -637,9 +674,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 // Do nothing here, the change set readers and writers are now
                 // managed differently, and should be null...
                 @SuppressWarnings("unused")
-                Collection<I_ReadChangeSet> readers = (Collection<I_ReadChangeSet>) in.readObject();
+                Collection<I_ReadChangeSet> readers = (Collection<I_ReadChangeSet>) in
+                        .readObject();
                 @SuppressWarnings("unused")
-                Collection<I_WriteChangeSet> writers = (Collection<I_WriteChangeSet>) in.readObject();
+                Collection<I_WriteChangeSet> writers = (Collection<I_WriteChangeSet>) in
+                        .readObject();
             }
             if (objDataVersion >= 14) {
                 in.readObject(); // repositoryUrlStr deprecated
@@ -655,7 +694,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
 
             if (objDataVersion >= 17) {
-                addressesList = new SortedSetModel<String>((Collection<String>) in.readObject());
+                addressesList = new SortedSetModel<String>(
+                        (Collection<String>) in.readObject());
             } else {
                 addressesList = new SortedSetModel<String>();
             }
@@ -673,12 +713,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 20) {
                 showAllQueues = in.readBoolean();
-                queueAddressesToShow = new SortedSetModel<String>((Collection<String>) in.readObject());
-                for (String s: queueAddressesToShow) {
-                	if (s == null) {
-                		queueAddressesToShow.clear();
-                		break;
-                	}
+                queueAddressesToShow = new SortedSetModel<String>(
+                        (Collection<String>) in.readObject());
+                for (String s : queueAddressesToShow) {
+                    if (s == null) {
+                        queueAddressesToShow.clear();
+                        break;
+                    }
                 }
             } else {
                 showAllQueues = false;
@@ -689,7 +730,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 21) {
                 try {
-                    defaultImageType = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultImageType = ConceptBean.get(AceConfig.getVodb()
+                            .uuidToNative((List<UUID>) in.readObject()));
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -697,8 +739,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 try {
                     defaultImageType = AceConfig.getVodb().getConcept(
-                                                                      ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
-                                                                              .getUids());
+                            ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE
+                                    .getUids());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -729,7 +771,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 setTogglesInComponentPanelVisible(TOGGLES.LINEAGE_GRAPH, false);
                 setTogglesInComponentPanelVisible(TOGGLES.IMAGE, true);
                 setTogglesInComponentPanelVisible(TOGGLES.CONFLICT, true);
-                setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED, false);
+                setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED,
+                        false);
                 setTogglesInComponentPanelVisible(TOGGLES.PREFERENCES, true);
                 setTogglesInComponentPanelVisible(TOGGLES.HISTORY, true);
                 setTogglesInComponentPanelVisible(TOGGLES.REFSETS, false);
@@ -740,7 +783,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 visibleRefsets = new HashSet<String>();
             }
             if (objDataVersion >= 25) {
-                refsetPreferencesMap = (Map<TOGGLES, I_HoldRefsetPreferences>) in.readObject();
+                refsetPreferencesMap = (Map<TOGGLES, I_HoldRefsetPreferences>) in
+                        .readObject();
                 if (refsetPreferencesMap == null) {
                     refsetPreferencesMap = setupRefsetPreferences();
                 }
@@ -749,7 +793,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
 
             if (objDataVersion >= 26) {
-                refsetsToShowInTaxonomy = IntList.readIntListIgnoreMapErrors(in);
+                refsetsToShowInTaxonomy = IntList
+                        .readIntListIgnoreMapErrors(in);
             } else {
                 refsetsToShowInTaxonomy = new IntList();
             }
@@ -776,147 +821,154 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 sortTaxonomyUsingRefset = false;
             }
-            
+
             if (objDataVersion >= 30) {
-                taxonomyRendererOverrideList = (ArrayList<I_OverrideTaxonomyRenderer>) in.readObject();
-                taxonomyRelFilterList = (ArrayList<I_FilterTaxonomyRels>) in.readObject();
+                taxonomyRendererOverrideList = (ArrayList<I_OverrideTaxonomyRenderer>) in
+                        .readObject();
+                taxonomyRelFilterList = (ArrayList<I_FilterTaxonomyRels>) in
+                        .readObject();
             } else {
                 taxonomyRendererOverrideList = new ArrayList<I_OverrideTaxonomyRenderer>();
                 taxonomyRelFilterList = new ArrayList<I_FilterTaxonomyRels>();
             }
             tabHistoryMap = new TreeMap<String, List<I_GetConceptData>>();
             if (objDataVersion >= 31) {
-            	int mapSize = in.readInt();
-            	for (int i = 0; i < mapSize; i++) {
-            		String mapId = (String) in.readObject();
-            		IntList il = IntList.readIntListIgnoreMapErrors(in);
-            		List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
-            		for (int nid: il.getListArray()) {
-            			tabHistoryList.add(ConceptBean.get(nid));
-            		}
-            		tabHistoryMap.put(mapId, tabHistoryList);
-            	}
-            } 
-            if (objDataVersion >= 32) {
-            	isAdministrative = in.readBoolean();
-            } else {
-            	isAdministrative = false;
+                int mapSize = in.readInt();
+                for (int i = 0; i < mapSize; i++) {
+                    String mapId = (String) in.readObject();
+                    IntList il = IntList.readIntListIgnoreMapErrors(in);
+                    List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
+                    for (int nid : il.getListArray()) {
+                        tabHistoryList.add(ConceptBean.get(nid));
+                    }
+                    tabHistoryMap.put(mapId, tabHistoryList);
+                }
             }
-            
-            if (objDataVersion >= 33) {
-            	hiddenTopToggles = (Set<TopToggleTypes>) in.readObject();
+            if (objDataVersion >= 32) {
+                isAdministrative = in.readBoolean();
             } else {
-            	hiddenTopToggles = new HashSet<TopToggleTypes>();
+                isAdministrative = false;
+            }
+
+            if (objDataVersion >= 33) {
+                hiddenTopToggles = (Set<TopToggleTypes>) in.readObject();
+            } else {
+                hiddenTopToggles = new HashSet<TopToggleTypes>();
             }
 
             if (objDataVersion >= 34) {
-            	IntList contextIntList = IntList.readIntListIgnoreMapErrors(in);
-            	if (contextIntList.size() != 1) {
-                   	context = null;
-            	} else {
-	            	try {
-						context = LocalVersionedTerminology.get().getConcept(contextIntList.getListArray()[0]);
-					} catch (TerminologyException e) {
-						throw new ToIoException(e);
-					}
-            	}
+                IntList contextIntList = IntList.readIntListIgnoreMapErrors(in);
+                if (contextIntList.size() != 1) {
+                    context = null;
+                } else {
+                    try {
+                        context = LocalVersionedTerminology.get().getConcept(
+                                contextIntList.getListArray()[0]);
+                    } catch (TerminologyException e) {
+                        throw new ToIoException(e);
+                    }
+                }
             } else {
-            	context = null;
-            } 
-            
+                context = null;
+            }
+
             // 35
             if (objDataVersion >= 35) {
-            	try {
-            		classificationRoot = readConceptFromSerializedUuids(in);
-            		classifierIsaType = readConceptFromSerializedUuids(in);
-            		classifierInputPathConcept = readConceptFromSerializedUuids(in);
-            		classifierOutputPathConcept = readConceptFromSerializedUuids(in);
-            	} catch (TerminologyException e) {
-            		IOException newEx = new IOException();
-            		newEx.initCause(e);
-            		throw newEx;
-            	}
+                try {
+                    classificationRoot = readConceptFromSerializedUuids(in);
+                    classifierIsaType = readConceptFromSerializedUuids(in);
+                    classifierInputPathConcept = readConceptFromSerializedUuids(in);
+                    classifierOutputPathConcept = readConceptFromSerializedUuids(in);
+                } catch (TerminologyException e) {
+                    IOException newEx = new IOException();
+                    newEx.initCause(e);
+                    throw newEx;
+                }
             } else {
-            	classificationRoot = null;
-            	classifierIsaType = null;
-            	classifierInputPathConcept = null;
-            	classifierOutputPathConcept = null;
+                classificationRoot = null;
+                classifierIsaType = null;
+                classifierInputPathConcept = null;
+                classifierOutputPathConcept = null;
             }
-            
+
             if (objDataVersion >= 36) {
-            	conflictResolutionStrategy = (I_ManageConflict) in.readObject();
-            	highlightConflictsInComponentPanel = in.readBoolean();
-            	highlightConflictsInTaxonomyView = in.readBoolean();
+                conflictResolutionStrategy = (I_ManageConflict) in.readObject();
+                highlightConflictsInComponentPanel = in.readBoolean();
+                highlightConflictsInTaxonomyView = in.readBoolean();
             } else {
-            	conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-            	highlightConflictsInComponentPanel = false;
-            	highlightConflictsInTaxonomyView = false;
+                conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+                highlightConflictsInComponentPanel = false;
+                highlightConflictsInTaxonomyView = false;
             }
-            
-        	pathColorMap = new HashMap<Integer, Color>();
-        	languagePreferenceList = new IntList();
+
+            pathColorMap = new HashMap<Integer, Color>();
+            languagePreferenceList = new IntList();
             if (objDataVersion >= 37) {
                 // 37
                 IntList pathColorMapKeyIntList = IntList.readIntListStrict(in);
-                for (Integer key: pathColorMapKeyIntList.getListValues()) {
-                	Color pathColor = (Color) in.readObject();
-                	pathColorMap.put(key, pathColor);
+                for (Integer key : pathColorMapKeyIntList.getListValues()) {
+                    Color pathColor = (Color) in.readObject();
+                    pathColorMap.put(key, pathColor);
                 }
                 languagePreferenceList = IntList.readIntListStrict(in);
-            } 
+            }
             if (objDataVersion >= 38) {
                 // 38
                 properties = (Map<String, Object>) in.readObject();
             } else {
-            	properties = new HashMap<String, Object>();
+                properties = new HashMap<String, Object>();
             }
             if (objDataVersion >= 39) {
                 // 39
-            	conceptPanelPlugins = (Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>) in.readObject();
-            	if (conceptPanelPlugins == null || conceptPanelPlugins.size() == 0) {
-            		for (HOST_ENUM h: HOST_ENUM.values()) {
-                		for (I_PluginToConceptPanel plugin: getDefaultConceptPanelPluginsForEditor()) {
-                			addConceptPanelPlugins(h, plugin.getId(), plugin);
-                		}
-            		}
-            	}
+                conceptPanelPlugins = (Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>) in
+                        .readObject();
+                if (conceptPanelPlugins == null
+                        || conceptPanelPlugins.size() == 0) {
+                    for (HOST_ENUM h : HOST_ENUM.values()) {
+                        for (I_PluginToConceptPanel plugin : getDefaultConceptPanelPluginsForEditor()) {
+                            addConceptPanelPlugins(h, plugin.getId(), plugin);
+                        }
+                    }
+                }
             } else {
-        		for (HOST_ENUM h: HOST_ENUM.values()) {
-            		for (I_PluginToConceptPanel plugin: getDefaultConceptPanelPluginsForEditor()) {
-            			addConceptPanelPlugins(h, plugin.getId(), plugin);
-            		}
-        		}
+                for (HOST_ENUM h : HOST_ENUM.values()) {
+                    for (I_PluginToConceptPanel plugin : getDefaultConceptPanelPluginsForEditor()) {
+                        addConceptPanelPlugins(h, plugin.getId(), plugin);
+                    }
+                }
             }
-        
-            
+
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
         addListeners();
     }
 
-	@SuppressWarnings("unchecked")
-	private I_GetConceptData readConceptFromSerializedUuids(
-			java.io.ObjectInputStream in) throws TerminologyException,
-			IOException, ClassNotFoundException {
-		Object obj = in.readObject();
-		if (obj == null) {
-			return null;
-		} else {
-			return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    private I_GetConceptData readConceptFromSerializedUuids(
+            java.io.ObjectInputStream in) throws TerminologyException,
+            IOException, ClassNotFoundException {
+        Object obj = in.readObject();
+        if (obj == null) {
+            return null;
+        } else {
+            return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+        }
+    }
 
-    private static HashMap<TOGGLES, I_HoldRefsetPreferences> setupRefsetPreferences() throws IOException {
+    private static HashMap<TOGGLES, I_HoldRefsetPreferences> setupRefsetPreferences()
+            throws IOException {
         HashMap<TOGGLES, I_HoldRefsetPreferences> map = new HashMap<TOGGLES, I_HoldRefsetPreferences>();
         for (TOGGLES toggle : TOGGLES.values()) {
             try {
                 map.put(toggle, new RefsetPreferences());
             } catch (TerminologyException e) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+                    AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(),
+                            e);
                 } else {
-                    AceLog.getAppLog().info("Missing terms to initialize refests: " + 26);
+                    AceLog.getAppLog().info(
+                            "Missing terms to initialize refests: " + 26);
                 }
             }
         }
@@ -933,15 +985,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         super();
         addListeners();
     }
-    
+
     public boolean isAdministrative() {
-		return isAdministrative;
-	}
+        return isAdministrative;
+    }
 
-	public void setAdministrative(boolean isAdministrative) {
-		this.isAdministrative = isAdministrative;
-	}
-
+    public void setAdministrative(boolean isAdministrative) {
+        this.isAdministrative = isAdministrative;
+    }
 
     private void addListeners() {
         addRootListener();
@@ -996,7 +1047,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setAllowedStatus(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setAllowedStatus(org.dwfa.ace.api
+     * .IntSet)
      */
     public void setAllowedStatus(I_IntSet allowedStatus) {
         this.allowedStatus = allowedStatus;
@@ -1014,7 +1067,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDescTypes(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDescTypes(org.dwfa.ace.api.IntSet
+     * )
      */
     public void setDescTypes(I_IntSet allowedTypes) {
         this.descTypes = allowedTypes;
@@ -1044,16 +1099,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setViewPositions(java.util.Set)
      */
     public void setViewPositions(Set<I_Position> positions) {
-    	if (positions == this.viewPositions) {
-    		return;
-    	}
-    	if (positions != null) {
-    		if (this.viewPositions != null) {
-    			if (positions.equals(this.viewPositions)) {
-    				return;
-    			}
-    		}
-    	}
+        if (positions == this.viewPositions) {
+            return;
+        }
+        if (positions != null) {
+            if (this.viewPositions != null) {
+                if (positions.equals(this.viewPositions)) {
+                    return;
+                }
+            }
+        }
         this.viewPositions = positions;
         this.changeSupport.firePropertyChange("viewPositions", null, positions);
     }
@@ -1070,7 +1125,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setVetoSupport(java.beans.VetoableChangeSupport)
+     * @seeorg.dwfa.ace.config.I_ConfigAceFrame#setVetoSupport(java.beans.
+     * VetoableChangeSupport)
      */
     public void setVetoSupport(VetoableChangeSupport vetoSupport) {
         this.vetoSupport = vetoSupport;
@@ -1106,7 +1162,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setSourceRelTypes(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setSourceRelTypes(org.dwfa.ace.api
+     * .IntSet)
      */
     public void setSourceRelTypes(I_IntSet browseDownRels) {
         this.sourceRelTypes = browseDownRels;
@@ -1124,7 +1182,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDestRelTypes(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDestRelTypes(org.dwfa.ace.api
+     * .IntSet)
      */
     public void setDestRelTypes(I_IntSet browseUpRels) {
         this.destRelTypes = browseUpRels;
@@ -1133,7 +1193,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types.Path)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
+     * .Path)
      */
     public void addEditingPath(I_Path p) {
         editingPathSet.add(p);
@@ -1142,7 +1204,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.types.Path)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
+     * types.Path)
      */
     public void removeEditingPath(I_Path p) {
         editingPathSet.remove(p);
@@ -1151,8 +1215,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb.types.Path,
-     *      org.dwfa.vodb.types.Path)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
+     * .types.Path, org.dwfa.vodb.types.Path)
      */
     public void replaceEditingPath(I_Path oldPath, I_Path newPath) {
         this.editingPathSet.remove(oldPath);
@@ -1171,12 +1236,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#addViewPosition(org.dwfa.ace.api.I_Position)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#addViewPosition(org.dwfa.ace.api
+     * .I_Position)
      */
     public void addViewPosition(I_Position p) {
-    	if (viewPositions.contains(p)) {
-    		return;
-    	}
+        if (viewPositions.contains(p)) {
+            return;
+        }
         viewPositions.add(p);
         this.changeSupport.firePropertyChange("viewPositions", null, p);
     }
@@ -1184,12 +1251,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#removeViewPosition(org.dwfa.ace.api.I_Position)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#removeViewPosition(org.dwfa.ace.
+     * api.I_Position)
      */
     public void removeViewPosition(I_Position p) {
-    	if (viewPositions.contains(p) == false) {
-    		return;
-    	}
+        if (viewPositions.contains(p) == false) {
+            return;
+        }
         viewPositions.remove(p);
         this.changeSupport.firePropertyChange("viewPositions", p, null);
     }
@@ -1197,16 +1266,19 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#replaceViewPosition(org.dwfa.ace.api.I_Position,
-     *      org.dwfa.ace.api.I_Position)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#replaceViewPosition(org.dwfa.ace
+     * .api.I_Position, org.dwfa.ace.api.I_Position)
      */
-    public void replaceViewPosition(I_Position oldPosition, I_Position newPosition) {
-    	if (oldPosition.equals(newPosition)) {
-    		return;
-    	}
+    public void replaceViewPosition(I_Position oldPosition,
+            I_Position newPosition) {
+        if (oldPosition.equals(newPosition)) {
+            return;
+        }
         this.viewPositions.remove(oldPosition);
         this.viewPositions.add(newPosition);
-        this.changeSupport.firePropertyChange("viewPositions", oldPosition, newPosition);
+        this.changeSupport.firePropertyChange("viewPositions", oldPosition,
+                newPosition);
     }
 
     /*
@@ -1239,7 +1311,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.beans.PropertyChangeListener)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.beans
+     * .PropertyChangeListener)
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
@@ -1257,17 +1331,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.lang.String,
-     *      java.beans.PropertyChangeListener)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#addPropertyChangeListener(java.lang
+     * .String, java.beans.PropertyChangeListener)
      */
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String propertyName,
+            PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java.beans.PropertyChangeListener)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java
+     * .beans.PropertyChangeListener)
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
@@ -1276,10 +1354,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java.lang.String,
-     *      java.beans.PropertyChangeListener)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#removePropertyChangeListener(java
+     * .lang.String, java.beans.PropertyChangeListener)
      */
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String propertyName,
+            PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
@@ -1295,7 +1375,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setRoots(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setRoots(org.dwfa.ace.api.IntSet)
      */
     public void setRoots(I_IntSet roots) {
         this.roots = roots;
@@ -1351,7 +1432,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditDescTypePopup(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setEditDescTypePopup(org.dwfa.ace
+     * .api.IntSet)
      */
     public void setEditDescTypePopup(I_IntList editDescTypePopup) {
         this.editDescTypePopup = editDescTypePopup;
@@ -1360,16 +1443,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelCharacteristicPopup(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setEditRelCharacteristicPopup(org
+     * .dwfa.ace.api.IntSet)
      */
-    public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup) {
+    public void setEditRelCharacteristicPopup(
+            I_IntList editRelCharacteristicPopup) {
         this.editRelCharacteristicPopup = editRelCharacteristicPopup;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelRefinabiltyPopup(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setEditRelRefinabiltyPopup(org.dwfa
+     * .ace.api.IntSet)
      */
     public void setEditRelRefinabiltyPopup(I_IntList editRelRefinabiltyPopup) {
         this.editRelRefinabiltyPopup = editRelRefinabiltyPopup;
@@ -1378,7 +1466,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditRelTypePopup(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setEditRelTypePopup(org.dwfa.ace
+     * .api.IntSet)
      */
     public void setEditRelTypePopup(I_IntList editRelTypePopup) {
         this.editRelTypePopup = editRelTypePopup;
@@ -1387,7 +1477,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setEditStatusTypePopup(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setEditStatusTypePopup(org.dwfa.
+     * ace.api.IntSet)
      */
     public void setEditStatusTypePopup(I_IntList editStatusTypePopup) {
         this.editStatusTypePopup = editStatusTypePopup;
@@ -1405,7 +1497,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setInferredViewTypes(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setInferredViewTypes(org.dwfa.ace
+     * .api.IntSet)
      */
     public void setInferredViewTypes(I_IntSet inferredViewTypes) {
         this.inferredViewTypes = inferredViewTypes;
@@ -1423,7 +1517,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setStatedViewTypes(org.dwfa.ace.api.IntSet)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setStatedViewTypes(org.dwfa.ace.
+     * api.IntSet)
      */
     public void setStatedViewTypes(I_IntSet statedViewTypes) {
         this.statedViewTypes = statedViewTypes;
@@ -1441,19 +1537,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultDescriptionType(org.dwfa.vodb.types.ConceptBean)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultDescriptionType(org.dwfa
+     * .vodb.types.ConceptBean)
      */
-    public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType) {
+    public void setDefaultDescriptionType(
+            I_GetConceptData defaultDescriptionType) {
         Object old = this.defaultDescriptionType;
         this.defaultDescriptionType = defaultDescriptionType;
-        changeSupport.firePropertyChange("defaultDescriptionType", old, defaultDescriptionType);
+        changeSupport.firePropertyChange("defaultDescriptionType", old,
+                defaultDescriptionType);
 
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipCharacteristic()
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipCharacteristic
+     * ()
      */
     public I_GetConceptData getDefaultRelationshipCharacteristic() {
         return defaultRelationshipCharacteristic;
@@ -1462,18 +1564,23 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipCharacteristic(org.dwfa.vodb.types.ConceptBean)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipCharacteristic
+     * (org.dwfa.vodb.types.ConceptBean)
      */
-    public void setDefaultRelationshipCharacteristic(I_GetConceptData defaultRelationshipCharacteristic) {
+    public void setDefaultRelationshipCharacteristic(
+            I_GetConceptData defaultRelationshipCharacteristic) {
         Object old = this.defaultRelationshipCharacteristic;
         this.defaultRelationshipCharacteristic = defaultRelationshipCharacteristic;
-        changeSupport.firePropertyChange("defaultRelationshipCharacteristic", old, defaultRelationshipCharacteristic);
+        changeSupport.firePropertyChange("defaultRelationshipCharacteristic",
+                old, defaultRelationshipCharacteristic);
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipRefinability()
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipRefinability()
      */
     public I_GetConceptData getDefaultRelationshipRefinability() {
         return defaultRelationshipRefinability;
@@ -1482,12 +1589,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipRefinability(org.dwfa.vodb.types.ConceptBean)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipRefinability
+     * (org.dwfa.vodb.types.ConceptBean)
      */
-    public void setDefaultRelationshipRefinability(I_GetConceptData defaultRelationshipRefinability) {
+    public void setDefaultRelationshipRefinability(
+            I_GetConceptData defaultRelationshipRefinability) {
         Object old = this.defaultRelationshipRefinability;
         this.defaultRelationshipRefinability = defaultRelationshipRefinability;
-        changeSupport.firePropertyChange("defaultRelationshipRefinability", old, defaultRelationshipRefinability);
+        changeSupport.firePropertyChange("defaultRelationshipRefinability",
+                old, defaultRelationshipRefinability);
     }
 
     /*
@@ -1502,12 +1613,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipType(org.dwfa.vodb.types.ConceptBean)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipType(org.dwfa
+     * .vodb.types.ConceptBean)
      */
-    public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
+    public void setDefaultRelationshipType(
+            I_GetConceptData defaultRelationshipType) {
         Object old = this.defaultRelationshipType;
         this.defaultRelationshipType = defaultRelationshipType;
-        changeSupport.firePropertyChange("defaultRelationshipType", old, defaultRelationshipType);
+        changeSupport.firePropertyChange("defaultRelationshipType", old,
+                defaultRelationshipType);
     }
 
     /*
@@ -1522,7 +1637,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setDefaultStatus(org.dwfa.vodb.types.ConceptBean)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultStatus(org.dwfa.vodb.types
+     * .ConceptBean)
      */
     public void setDefaultStatus(I_GetConceptData defaultStatus) {
         Object old = this.defaultStatus;
@@ -1551,7 +1668,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#getLongLabelDescPreferenceList()
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#getLongLabelDescPreferenceList()
      */
     public I_IntList getLongLabelDescPreferenceList() {
         return longLabelDescPreferenceList;
@@ -1560,7 +1678,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#getShortLabelDescPreferenceList()
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#getShortLabelDescPreferenceList()
      */
     public I_IntList getShortLabelDescPreferenceList() {
         return shortLabelDescPreferenceList;
@@ -1596,28 +1715,33 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setHierarchySelection(org.dwfa.vodb.types.ConceptBean)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setHierarchySelection(org.dwfa.vodb
+     * .types.ConceptBean)
      */
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
         Object old = this.hierarchySelection;
         this.hierarchySelection = hierarchySelection;
-        this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
+        this.changeSupport.firePropertyChange("hierarchySelection", old,
+                hierarchySelection);
     }
 
-	public void setHierarchySelectionAndExpand(
-			I_GetConceptData hierarchySelection) throws IOException {
-		setHierarchySelection(hierarchySelection);
-		SwingUtilities.invokeLater(new Runnable() {
+    public void setHierarchySelectionAndExpand(
+            I_GetConceptData hierarchySelection) throws IOException {
+        setHierarchySelection(hierarchySelection);
+        SwingUtilities.invokeLater(new Runnable() {
 
-			public void run() {
-				try {
-					new ExpandPathToNodeStateListener(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this, 
-							getHierarchySelection());
-				} catch (Exception e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}});
-	}
+            public void run() {
+                try {
+                    new ExpandPathToNodeStateListener(getAceFrame()
+                            .getCdePanel().getTree(), AceFrameConfig.this,
+                            getHierarchySelection());
+                } catch (Exception e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
+            }
+        });
+    }
 
     /*
      * (non-Javadoc)
@@ -1631,12 +1755,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setWorker(org.dwfa.bpa.worker.MasterWorker)
+     * @seeorg.dwfa.ace.config.I_ConfigAceFrame#setWorker(org.dwfa.bpa.worker.
+     * MasterWorker)
      */
     public void setWorker(MasterWorker worker) {
         Object old = this.worker;
         this.worker = worker;
-        this.worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), this);
+        this.worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG
+                .name(), this);
         this.changeSupport.firePropertyChange("worker", old, worker);
     }
 
@@ -1652,12 +1778,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.ace.config.I_ConfigAceFrame#setStatusMessage(java.lang.String)
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#setStatusMessage(java.lang.String)
      */
     public void setStatusMessage(String statusMessage) {
         Object old = this.statusMessage;
         this.statusMessage = statusMessage;
-        this.changeSupport.firePropertyChange("statusMessage", old, statusMessage);
+        this.changeSupport.firePropertyChange("statusMessage", old,
+                statusMessage);
     }
 
     public Collection<I_ReadChangeSet> getChangeSetReaders() {
@@ -1683,7 +1811,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setSvnRepository(String repositoryUrlStr) {
         Object old = getChangeSetSubversionData().getRepositoryUrlStr();
         getChangeSetSubversionData().setRepositoryUrlStr(repositoryUrlStr);
-        this.changeSupport.firePropertyChange("repositoryUrlStr", old, repositoryUrlStr);
+        this.changeSupport.firePropertyChange("repositoryUrlStr", old,
+                repositoryUrlStr);
     }
 
     public String getSvnWorkingCopy() {
@@ -1693,7 +1822,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setSvnWorkingCopy(String svnWorkingCopy) {
         Object old = getChangeSetSubversionData().getWorkingCopyStr();
         getChangeSetSubversionData().setWorkingCopyStr(svnWorkingCopy);
-        this.changeSupport.firePropertyChange("svnWorkingCopy", old, svnWorkingCopy);
+        this.changeSupport.firePropertyChange("svnWorkingCopy", old,
+                svnWorkingCopy);
     }
 
     public String getPassword() {
@@ -1729,7 +1859,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setCommitEnabled(boolean commitEnabled) {
         boolean old = this.commitEnabled;
         this.commitEnabled = commitEnabled;
-        this.changeSupport.firePropertyChange("commitEnabled", old, commitEnabled);
+        this.changeSupport.firePropertyChange("commitEnabled", old,
+                commitEnabled);
     }
 
     public I_GetConceptData getLastViewed() {
@@ -1740,13 +1871,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (lastViewed != null) {
             Object old = this.lastViewed;
             this.lastViewed = lastViewed;
-            this.changeSupport.firePropertyChange("lastViewed", old, lastViewed);
+            this.changeSupport
+                    .firePropertyChange("lastViewed", old, lastViewed);
         }
     }
 
     public void addUncommitted(I_GetConceptData uncommitted) {
         this.changeSupport.firePropertyChange("uncommitted", null, uncommitted);
     }
+
     public void removeUncommitted(I_GetConceptData uncommitted) {
         this.changeSupport.firePropertyChange("uncommitted", uncommitted, null);
     }
@@ -1776,18 +1909,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_HostConceptPlugins getConceptViewer(int index) {
-    	if (index == 0) {
+        if (index == 0) {
             return aceFrame.getCdePanel().getConceptPanels().get(index);
-    	}
+        }
         return aceFrame.getCdePanel().getConceptPanels().get(index - 1);
     }
 
     public void selectConceptViewer(int index) {
-    	if (index == 0) {
+        if (index == 0) {
             aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index);
-    	} else {
+        } else {
             aceFrame.getCdePanel().getConceptTabs().setSelectedIndex(index - 1);
-    	}
+        }
     }
 
     public JPanel getWorkflowPanel() {
@@ -1800,7 +1933,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public List<String> getSelectedAddresses() {
         List<String> addresses = new ArrayList<String>();
-        for (Object address : aceFrame.getCdePanel().getAddressList().getSelectedValues()) {
+        for (Object address : aceFrame.getCdePanel().getAddressList()
+                .getSelectedValues()) {
             addresses.add((String) address);
         }
         return addresses;
@@ -1839,7 +1973,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
     }
 
-    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
+    public void performLuceneSearch(String query,
+            List<I_TestSearchResults> extraCriterion) {
         aceFrame.performLuceneSearch(query, extraCriterion);
     }
 
@@ -1897,12 +2032,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.setupSvn();
         Svn.doImport(svd, getAuthenticator(svd), true);
     }
-    
+
     public void svnImport(SubversionData svd,
-    		PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.doImport(svd, authenticator, interactive);
     }
+
     public void svnPurge(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.purge(svd, getAuthenticator(svd), true);
@@ -1917,90 +2054,102 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.setupSvn();
         Svn.update(svd, getAuthenticator(svd), true);
     }
- 
+
     public void svnRevert(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.revert(svd, getAuthenticator(svd), true);
     }
+
     public void svnRevert(SubversionData svd,
-    		PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.revert(svd, authenticator, interactive);
     }
 
-	public void svnUpdateDatabase(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnUpdateDatabase(SubversionData svd,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
-		Svn.updateDatabase(svd, authenticator, interactive);
-	}
+        Svn.updateDatabase(svd, authenticator, interactive);
+    }
 
-	public void svnUpdateDatabase(SubversionData svd) throws TaskFailedException {
+    public void svnUpdateDatabase(SubversionData svd)
+            throws TaskFailedException {
         aceFrame.setupSvn();
-		Svn.updateDatabase(svd, getAuthenticator(svd), true);
-	}
+        Svn.updateDatabase(svd, getAuthenticator(svd), true);
+    }
 
-	public void svnCompleteRepoInfo(SubversionData svd) throws TaskFailedException {
-		File svnDir = new File(svd.getWorkingCopyStr(), ".svn");
-		if (svnDir.exists()) {
-			File svnEntries = new File(svnDir, "entries");
-			try {
-				LineNumberReader lnr = new LineNumberReader(new java.io.FileReader(svnEntries));
-				@SuppressWarnings("unused")
-				String line1 = lnr.readLine();
-				@SuppressWarnings("unused")
-				String line2 = lnr.readLine();
-				@SuppressWarnings("unused")
-				String line3 = lnr.readLine();
-				@SuppressWarnings("unused")
-				String line4 = lnr.readLine();
-				String line5 = lnr.readLine();
-				AceLog.getAppLog().info("Found url " + line5 + " for working copy: " + svd.getWorkingCopyStr());
-				lnr.close();
-				svd.setRepositoryUrlStr(line5);
-				
-			} catch (FileNotFoundException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}
-	}
+    public void svnCompleteRepoInfo(SubversionData svd)
+            throws TaskFailedException {
+        File svnDir = new File(svd.getWorkingCopyStr(), ".svn");
+        if (svnDir.exists()) {
+            File svnEntries = new File(svnDir, "entries");
+            try {
+                LineNumberReader lnr = new LineNumberReader(
+                        new java.io.FileReader(svnEntries));
+                @SuppressWarnings("unused")
+                String line1 = lnr.readLine();
+                @SuppressWarnings("unused")
+                String line2 = lnr.readLine();
+                @SuppressWarnings("unused")
+                String line3 = lnr.readLine();
+                @SuppressWarnings("unused")
+                String line4 = lnr.readLine();
+                String line5 = lnr.readLine();
+                AceLog.getAppLog().info(
+                        "Found url " + line5 + " for working copy: "
+                                + svd.getWorkingCopyStr());
+                lnr.close();
+                svd.setRepositoryUrlStr(line5);
 
-	public List<String> svnList(SubversionData svd) throws TaskFailedException {
+            } catch (FileNotFoundException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+    }
+
+    public List<String> svnList(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
         return Svn.list(svd);
-	}
+    }
 
     public void svnLock(SubversionData svd, File toLock,
-			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.lock(svd, toLock, authenticator, interactive);
-	}
+    }
 
-	public void svnLock(SubversionData svd, File toLock) throws TaskFailedException {
-	       aceFrame.setupSvn();
-	        Svn.lock(svd, toLock, getAuthenticator(svd), true);
-	}
+    public void svnLock(SubversionData svd, File toLock)
+            throws TaskFailedException {
+        aceFrame.setupSvn();
+        Svn.lock(svd, toLock, getAuthenticator(svd), true);
+    }
 
-	public void svnUnlock(SubversionData svd, File toUnlock,
-			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
-	       aceFrame.setupSvn();
-	       Svn.unlock(svd, toUnlock, authenticator, interactive);
-	}
+    public void svnUnlock(SubversionData svd, File toUnlock,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
+        aceFrame.setupSvn();
+        Svn.unlock(svd, toUnlock, authenticator, interactive);
+    }
 
-	public void svnUnlock(SubversionData svd, File toUnlock) throws TaskFailedException {
-	       aceFrame.setupSvn();
-	       Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
-	}
+    public void svnUnlock(SubversionData svd, File toUnlock)
+            throws TaskFailedException {
+        aceFrame.setupSvn();
+        Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
+    }
 
-
-	public class QueueFilter implements ServiceItemFilter {
+    public class QueueFilter implements ServiceItemFilter {
 
         public boolean check(ServiceItem item) {
             if (showAllQueues) {
                 return true;
             }
-            HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays.asList(item.attributeSets));
+            HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays
+                    .asList(item.attributeSets));
             for (String address : queueAddressesToShow) {
                 if (itemAttributes.contains(new ElectronicAddress(address))) {
                     AceLog.getAppLog().info(" true");
@@ -2023,14 +2172,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setShowAllQueues(boolean showAllQueues) {
         boolean old = this.showAllQueues;
         this.showAllQueues = showAllQueues;
-        this.changeSupport.firePropertyChange("showAllQueues", old, showAllQueues);
+        this.changeSupport.firePropertyChange("showAllQueues", old,
+                showAllQueues);
     }
 
     public SortedSetModel<String> getQueueAddressesToShow() {
         return queueAddressesToShow;
     }
 
-    public void setQueueAddressesToShow(SortedSetModel<String> queueAddressesToShow) {
+    public void setQueueAddressesToShow(
+            SortedSetModel<String> queueAddressesToShow) {
         this.queueAddressesToShow = queueAddressesToShow;
     }
 
@@ -2071,9 +2222,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return getMasterConfig();
     }
 
-	public void setDbConfig(I_ConfigAceDb dbConfig) {
-		setMasterConfig((AceConfig) dbConfig);
-	}
+    public void setDbConfig(I_ConfigAceDb dbConfig) {
+        setMasterConfig((AceConfig) dbConfig);
+    }
 
     public I_GetConceptData getDefaultImageType() {
         return defaultImageType;
@@ -2086,7 +2237,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setDefaultImageType(I_GetConceptData defaultImageType) {
         Object old = this.defaultImageType;
         this.defaultImageType = defaultImageType;
-        changeSupport.firePropertyChange("defaultImageType", old, defaultImageType);
+        changeSupport.firePropertyChange("defaultImageType", old,
+                defaultImageType);
     }
 
     public void setEditImageTypePopup(I_IntList editImageTypePopup) {
@@ -2136,81 +2288,81 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setAddressToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setAddressToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
+            hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.ADDRESS);
+            hiddenTopToggles.add(TopToggleTypes.ADDRESS);
         }
     }
 
     public void setBuilderToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setBuilderToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.BUILDER);
+            hiddenTopToggles.remove(TopToggleTypes.BUILDER);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.BUILDER);
+            hiddenTopToggles.add(TopToggleTypes.BUILDER);
         }
     }
 
     public void setComponentToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setComponentToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
+            hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.COMPONENT);
+            hiddenTopToggles.add(TopToggleTypes.COMPONENT);
         }
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
+            hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
+            hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
         }
     }
 
     public void setHistoryToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setHistoryToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.HISTORY);
+            hiddenTopToggles.remove(TopToggleTypes.HISTORY);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.HISTORY);
+            hiddenTopToggles.add(TopToggleTypes.HISTORY);
         }
     }
 
     public void setInboxToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setInboxToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.INBOX);
+            hiddenTopToggles.remove(TopToggleTypes.INBOX);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.INBOX);
+            hiddenTopToggles.add(TopToggleTypes.INBOX);
         }
     }
 
     public void setPreferencesToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
+            hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
+            hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
         }
     }
 
     public void setProgressToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setProgressToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.TREE_PROGRESS);
+            hiddenTopToggles.remove(TopToggleTypes.TREE_PROGRESS);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.TREE_PROGRESS);
+            hiddenTopToggles.add(TopToggleTypes.TREE_PROGRESS);
         }
     }
 
     public void setSubversionToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setSubversionToggleVisible(visible);
         if (visible) {
-        	hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
+            hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
         } else {
-        	hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
+            hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
         }
     }
 
@@ -2230,33 +2382,40 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return enabledRelExtTypes;
     }
 
-    public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible) {
+    public void setTogglesInComponentPanelVisible(TOGGLES toggle,
+            boolean visible) {
         if (visible) {
             visibleComponentToggles.add(toggle);
         } else {
             visibleComponentToggles.remove(toggle);
         }
-        changeSupport.firePropertyChange("visibleComponentToggles", null, visibleComponentToggles);
+        changeSupport.firePropertyChange("visibleComponentToggles", null,
+                visibleComponentToggles);
     }
 
     public boolean isToggleVisible(TOGGLES toggle) {
         return visibleComponentToggles.contains(toggle);
     }
 
-    public void setRefsetInToggleVisible(EXT_TYPE refsetType, TOGGLES toggle, boolean visible) {
+    public void setRefsetInToggleVisible(EXT_TYPE refsetType, TOGGLES toggle,
+            boolean visible) {
         if (visible) {
             visibleRefsets.add(refsetType.name() + toggle.toString());
         } else {
             visibleRefsets.remove(refsetType.name() + toggle.toString());
         }
-        changeSupport.firePropertyChange("visibleRefsets", null, visibleRefsets);
-    }
-    
-    public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible) {
-        setRefsetInToggleVisible(EXT_TYPE.valueOf(refsetType.name()), toggle, visible);        
+        changeSupport
+                .firePropertyChange("visibleRefsets", null, visibleRefsets);
     }
 
-    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
+    public void setRefsetInToggleVisible(REFSET_TYPES refsetType,
+            TOGGLES toggle, boolean visible) {
+        setRefsetInToggleVisible(EXT_TYPE.valueOf(refsetType.name()), toggle,
+                visible);
+    }
+
+    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType,
+            TOGGLES toggle) {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }
 
@@ -2264,8 +2423,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle)
+            throws TerminologyException, IOException {
         if (refsetPreferencesMap == null) {
             try {
                 refsetPreferencesMap = setupRefsetPreferences();
@@ -2301,7 +2460,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         Boolean old = this.showViewerImagesInTaxonomy;
         this.showViewerImagesInTaxonomy = showViewerImagesInTaxonomy;
-        changeSupport.firePropertyChange("showViewerImagesInTaxonomy", old, showViewerImagesInTaxonomy);
+        changeSupport.firePropertyChange("showViewerImagesInTaxonomy", old,
+                showViewerImagesInTaxonomy);
     }
 
     public Boolean getVariableHeightTaxonomyView() {
@@ -2311,7 +2471,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setVariableHeightTaxonomyView(Boolean variableHeightTaxonomyView) {
         Boolean old = this.variableHeightTaxonomyView;
         this.variableHeightTaxonomyView = variableHeightTaxonomyView;
-        changeSupport.firePropertyChange("variableHeightTaxonomyView", old, variableHeightTaxonomyView);
+        changeSupport.firePropertyChange("variableHeightTaxonomyView", old,
+                variableHeightTaxonomyView);
     }
 
     public Boolean getShowInferredInTaxonomy() {
@@ -2321,7 +2482,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy) {
         Boolean old = this.showInferredInTaxonomy;
         this.showInferredInTaxonomy = showInferredInTaxonomy;
-        changeSupport.firePropertyChange("showInferredInTaxonomy", old, showInferredInTaxonomy);
+        changeSupport.firePropertyChange("showInferredInTaxonomy", old,
+                showInferredInTaxonomy);
     }
 
     public Boolean getShowRefsetInfoInTaxonomy() {
@@ -2331,7 +2493,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setShowRefsetInfoInTaxonomy(Boolean showRefsetInfoInTaxonomy) {
         Boolean old = this.showRefsetInfoInTaxonomy;
         this.showRefsetInfoInTaxonomy = showRefsetInfoInTaxonomy;
-        changeSupport.firePropertyChange("showRefsetInfoInTaxonomy", old, showRefsetInfoInTaxonomy);
+        changeSupport.firePropertyChange("showRefsetInfoInTaxonomy", old,
+                showRefsetInfoInTaxonomy);
     }
 
     public I_IntList getRefsetsToSortTaxonomy() {
@@ -2350,416 +2513,477 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.sortTaxonomyUsingRefset = sortTaxonomyUsingRefset;
     }
 
-	public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList() {
-		return taxonomyRendererOverrideList;
-	}
+    public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList() {
+        return taxonomyRendererOverrideList;
+    }
 
-	public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList() {
-		return taxonomyRelFilterList;
-	}
+    public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList() {
+        return taxonomyRelFilterList;
+    }
 
-	public Map<String, List<I_GetConceptData>> getTabHistoryMap() {
-		return tabHistoryMap;
-	}
+    public Map<String, List<I_GetConceptData>> getTabHistoryMap() {
+        return tabHistoryMap;
+    }
 
-	public void svnCheckout(SubversionData svd,
-			PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnCheckout(SubversionData svd,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.checkout(svd, authenticator, interactive);
-	}
+    }
 
-	public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnCleanup(SubversionData svd,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.cleanup(svd, authenticator, interactive);
-	}
+    }
 
-	public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnCommit(SubversionData svd,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.commit(svd, authenticator, interactive);
-	}
+    }
 
-	public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator,
+            boolean interactive) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.purge(svd, authenticator, interactive);
-	}
+    }
 
-	public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnStatus(SubversionData svd,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.status(svd, authenticator, interactive);
-	}
+    }
 
-	public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) throws TaskFailedException {
+    public void svnUpdate(SubversionData svd,
+            PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.update(svd, authenticator, interactive);
-	}
+    }
 
-	public void closeFrame() {
-		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
+    public void closeFrame() {
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-				public void run() {
-					if (aceFrame != null) {
-						aceFrame.setVisible(false);
-						aceFrame.dispose();
-						aceFrame = null;
-					}
-				}});
-		} catch (InterruptedException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (InvocationTargetException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-	}
+                public void run() {
+                    if (aceFrame != null) {
+                        aceFrame.setVisible(false);
+                        aceFrame.dispose();
+                        aceFrame = null;
+                    }
+                }
+            });
+        } catch (InterruptedException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (InvocationTargetException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
 
-	public void setFrameVisible(final boolean visible) throws Exception {
-		SwingUtilities.invokeAndWait(new Runnable() {
+    public void setFrameVisible(final boolean visible) throws Exception {
+        SwingUtilities.invokeAndWait(new Runnable() {
 
-			public void run() {
-				if (aceFrame != null) {
-					aceFrame.setVisible(visible);
-				} else if (visible == true) {
-					try {
-						aceFrame = new AceFrame(new String[] { masterConfig.getAceRiverConfigFile() }, null,
-								AceFrameConfig.this, false);
-					} catch (Exception e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					}
-				}
-			}});
+            public void run() {
+                if (aceFrame != null) {
+                    aceFrame.setVisible(visible);
+                } else if (visible == true) {
+                    try {
+                        aceFrame = new AceFrame(new String[] { masterConfig
+                                .getAceRiverConfigFile() }, null,
+                                AceFrameConfig.this, false);
+                    } catch (Exception e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
+                }
+            }
+        });
 
-	}
+    }
 
-	public Set<TopToggleTypes> getHiddenTopToggles() {
-		return hiddenTopToggles;
-	}
+    public Set<TopToggleTypes> getHiddenTopToggles() {
+        return hiddenTopToggles;
+    }
 
-	public void setHiddenTopToggles(Set<TopToggleTypes> hiddenTopToggles) {
-		this.hiddenTopToggles = hiddenTopToggles;
-	}
+    public void setHiddenTopToggles(Set<TopToggleTypes> hiddenTopToggles) {
+        this.hiddenTopToggles = hiddenTopToggles;
+    }
 
     public BundleType getBundleType() {
-    	if (bundleType == null) {
+        if (bundleType == null) {
             File profileDirSvn = new File("profiles" + File.separator + ".svn");
             File databaseSvn = new File(getDbConfig().getDbFolder(), ".svn");
             if (profileDirSvn.exists() && databaseSvn.exists()) {
-            	bundleType = BundleType.DATABASE_UPDATE;
+                bundleType = BundleType.DATABASE_UPDATE;
             } else if (profileDirSvn.exists()) {
-            	bundleType = BundleType.CHANGE_SET_UPDATE;
+                bundleType = BundleType.CHANGE_SET_UPDATE;
             } else {
-            	bundleType = BundleType.STAND_ALONE;
+                bundleType = BundleType.STAND_ALONE;
             }
-    	}
-		return bundleType;
-	}
-
-	/**
-	 * @return the conflict resolution strategy in use by the profile
-	 */
-	public I_ManageConflict getConflictResolutionStrategy() {
-		if (conflictResolutionStrategy == null) {
-			conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-		}
-		return conflictResolutionStrategy;
-	}
-
-	/**
-	 * Sets the conflict resolution strategy for this profile
-	 * 
-	 * @param conflictResolutionStrategy
-	 */
-	public void setConflictResolutionStrategy(
-			I_ManageConflict conflictResolutionStrategy) {
-		
-		I_ManageConflict old = this.conflictResolutionStrategy;
-		
-		this.conflictResolutionStrategy = conflictResolutionStrategy;
-
-        changeSupport.firePropertyChange("conflictResolutionStrategy", old, conflictResolutionStrategy);
-	}
-
-	/**
-	 * Sets the conflict resolution strategy for this profile
-	 * 
-	 * @param conflictResolutionStrategy
-	 */
-	public <T extends I_ManageConflict> void setConflictResolutionStrategy(
-			Class<T> conflictResolutionStrategyClass) {
-
-		try {
-			setConflictResolutionStrategy(conflictResolutionStrategyClass.newInstance());
-		} catch (InstantiationException e) {
-			alertAndLog("Cannot instanciate conflict resolution strategy of type '"
-									+ conflictResolutionStrategyClass
-									+ "', will continue with existing value '"
-									+ getConflictResolutionStrategy().getClass() + "'", e);
-		} catch (IllegalAccessException e) {
-			alertAndLog("Cannot instanciate conflict resolution strategy of type '"
-					+ conflictResolutionStrategyClass
-					+ "' due to permissions, will continue with existing value '"
-					+ getConflictResolutionStrategy().getClass() + "'", e);
-		}
-	}
-
-	private void alertAndLog(String message, Exception e) {
-		LocalVersionedTerminology.get().getEditLog().alertAndLog(
-				Level.WARNING,
-				message,
-				e);
-	}
-		
-	public Boolean getHighlightConflictsInTaxonomyView() {
-		return highlightConflictsInTaxonomyView;
-	}
-
-	public void setHighlightConflictsInTaxonomyView(
-			Boolean highlightConflictsInTaxonomyView) {
-		
-		Boolean old = this.highlightConflictsInTaxonomyView;
-		
-		this.highlightConflictsInTaxonomyView = highlightConflictsInTaxonomyView;
-
-        changeSupport.firePropertyChange("highlightConflictsInTaxonomyView", old, highlightConflictsInTaxonomyView);
-	}
-	
-	public Boolean getHighlightConflictsInComponentPanel() {
-		return highlightConflictsInComponentPanel;
-	}
-
-	public void setHighlightConflictsInComponentPanel(
-			Boolean highlightConflictsInComponentPanel) {
-		
-		Boolean old = this.highlightConflictsInComponentPanel;
-		
-		this.highlightConflictsInComponentPanel = highlightConflictsInComponentPanel;
-
-        changeSupport.firePropertyChange("highlightConflictsInComponentPanel", old, highlightConflictsInComponentPanel);
-	}
-
-	public I_ManageConflict[] getAllConflictResolutionStrategies() {
-		I_ManageConflict[] strategies = new I_ManageConflict[2];
-		strategies[0] = new IdentifyAllConflictStrategy();
-		strategies[1] = new LastCommitWinsConflictResolutionStrategy();
-		return strategies;
-	}
-
-	public I_GetConceptData getRefsetInSpecEditor() {
-		return aceFrame.getCdePanel().getRefsetInSpecEditor();
-	}
-
-	public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
-		return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
-	}
-
-	public JTree getTreeInSpecEditor() {
-		return aceFrame.getCdePanel().getTreeInSpecEditor();
-	}
-	
-	public I_GetConceptData getRefsetSpecInSpecEditor() {
-		return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
-	}
-
-	public I_GetConceptData getClassificationRoot() {
-		return classificationRoot;
-	}
-
-	public I_GetConceptData getClassifierInputPath() {
-		return classifierInputPathConcept;
-	}
-
-	public I_GetConceptData getClassifierIsaType() {
-		return classifierIsaType;
-	}
-
-	public I_GetConceptData getClassifierOutputPath() {
-		return classifierOutputPathConcept;
-	}
-
-	public void setClassificationRoot(I_GetConceptData classificationRoot) {
-		Object old = this.classificationRoot;
-		this.classificationRoot = classificationRoot;
-		changeSupport.firePropertyChange("classificationRoot", old, classificationRoot);
-	}
-
-	public void setClassifierInputPath(I_GetConceptData inputPath) {
-		Object old = inputPath;
-		classifierInputPathConcept = inputPath;
-		changeSupport.firePropertyChange("classifierInputPath", old, inputPath);
-	}
-
-	public void setClassifierIsaType(I_GetConceptData classifierIsaType) {
-		Object old = classifierIsaType;
-		this.classifierIsaType = classifierIsaType;
-		changeSupport.firePropertyChange("classifierIsaType", old, classifierIsaType);
-	}
-
-	public void setClassifierOutputPath(I_GetConceptData outputPath) {
-		Object old = outputPath;
-		this.classifierOutputPathConcept = outputPath;
-		changeSupport.firePropertyChange("classifierOutputPath", old, outputPath);
-	}
-
-	public JPanel getTopActivityPanel() {
-		return aceFrame.getCdePanel().getTopActivityPanel();
-	}
-
-	public void setTopActivityPanel(I_ShowActivity ap) {
-		aceFrame.getCdePanel().setTopActivityPanel(ap);
-	}
-
-	public Color getColorForPath(int pathNid) {
-		return pathColorMap.get(pathNid);
-	}
-
-	public void setColorForPath(int pathNid, Color pathColor) {
-		pathColorMap.put(pathNid, pathColor);
-	}
-
-	public I_IntList getLanguagePreferenceList() {
-		return languagePreferenceList;
-	}
-
-	public void invalidate() {
-		aceFrame.getCdePanel().invalidate();
-	}
-
-	public void repaint() {
-		aceFrame.getCdePanel().repaint();
-	}
-
-	public void validate() {
-		aceFrame.getCdePanel().validate();
-	}
-	
-	public Map<String, Object> getProperties() throws IOException {
-		return properties;
-	}
-
-	public Object getProperty(String key) throws IOException {
-		return properties.get(key);
-	}
-
-	public void setProperty(String key, Object value) throws IOException {
-		properties.put(key, value);
-	}
-	
-    public void addConceptPanelPlugins(HOST_ENUM host, UUID key, I_PluginToConceptPanel plugin) {
-    	checkConceptPanelPlugins();
-    	conceptPanelPlugins.get(host).put(key, plugin);
+        }
+        return bundleType;
     }
 
-	private void checkConceptPanelPlugins() {
-		if (conceptPanelPlugins == null) {
-    		conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
-    	}
-    	if (conceptPanelPlugins.size() < HOST_ENUM.values().length) {
-        	for (HOST_ENUM h: HOST_ENUM.values()) {
-            	if (conceptPanelPlugins.get(h) == null) {
-            		conceptPanelPlugins.put(h, new HashMap<UUID, I_PluginToConceptPanel>());
-            	}
-        	}
-    	}
-	}
-    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID key) {
-    	checkConceptPanelPlugins();
-    	return conceptPanelPlugins.get(host).remove(key);
+    /**
+     * @return the conflict resolution strategy in use by the profile
+     */
+    public I_ManageConflict getConflictResolutionStrategy() {
+        if (conflictResolutionStrategy == null) {
+            conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+        }
+        return conflictResolutionStrategy;
     }
-    
+
+    /**
+     * Sets the conflict resolution strategy for this profile
+     * 
+     * @param conflictResolutionStrategy
+     */
+    public void setConflictResolutionStrategy(
+            I_ManageConflict conflictResolutionStrategy) {
+
+        I_ManageConflict old = this.conflictResolutionStrategy;
+
+        this.conflictResolutionStrategy = conflictResolutionStrategy;
+
+        changeSupport.firePropertyChange("conflictResolutionStrategy", old,
+                conflictResolutionStrategy);
+    }
+
+    /**
+     * Sets the conflict resolution strategy for this profile
+     * 
+     * @param conflictResolutionStrategy
+     */
+    public <T extends I_ManageConflict> void setConflictResolutionStrategy(
+            Class<T> conflictResolutionStrategyClass) {
+
+        try {
+            setConflictResolutionStrategy(conflictResolutionStrategyClass
+                    .newInstance());
+        } catch (InstantiationException e) {
+            alertAndLog(
+                    "Cannot instanciate conflict resolution strategy of type '"
+                            + conflictResolutionStrategyClass
+                            + "', will continue with existing value '"
+                            + getConflictResolutionStrategy().getClass() + "'",
+                    e);
+        } catch (IllegalAccessException e) {
+            alertAndLog(
+                    "Cannot instanciate conflict resolution strategy of type '"
+                            + conflictResolutionStrategyClass
+                            + "' due to permissions, will continue with existing value '"
+                            + getConflictResolutionStrategy().getClass() + "'",
+                    e);
+        }
+    }
+
+    private void alertAndLog(String message, Exception e) {
+        LocalVersionedTerminology.get().getEditLog().alertAndLog(Level.WARNING,
+                message, e);
+    }
+
+    public Boolean getHighlightConflictsInTaxonomyView() {
+        return highlightConflictsInTaxonomyView;
+    }
+
+    public void setHighlightConflictsInTaxonomyView(
+            Boolean highlightConflictsInTaxonomyView) {
+
+        Boolean old = this.highlightConflictsInTaxonomyView;
+
+        this.highlightConflictsInTaxonomyView = highlightConflictsInTaxonomyView;
+
+        changeSupport.firePropertyChange("highlightConflictsInTaxonomyView",
+                old, highlightConflictsInTaxonomyView);
+    }
+
+    public Boolean getHighlightConflictsInComponentPanel() {
+        return highlightConflictsInComponentPanel;
+    }
+
+    public void setHighlightConflictsInComponentPanel(
+            Boolean highlightConflictsInComponentPanel) {
+
+        Boolean old = this.highlightConflictsInComponentPanel;
+
+        this.highlightConflictsInComponentPanel = highlightConflictsInComponentPanel;
+
+        changeSupport.firePropertyChange("highlightConflictsInComponentPanel",
+                old, highlightConflictsInComponentPanel);
+    }
+
+    public I_ManageConflict[] getAllConflictResolutionStrategies() {
+        I_ManageConflict[] strategies = new I_ManageConflict[2];
+        strategies[0] = new IdentifyAllConflictStrategy();
+        strategies[1] = new LastCommitWinsConflictResolutionStrategy();
+        return strategies;
+    }
+
+    public I_GetConceptData getRefsetInSpecEditor() {
+        return aceFrame.getCdePanel().getRefsetInSpecEditor();
+    }
+
+    public I_ThinExtByRefVersioned getSelectedRefsetClauseInSpecEditor() {
+        return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
+    }
+
+    public JTree getTreeInSpecEditor() {
+        return aceFrame.getCdePanel().getTreeInSpecEditor();
+    }
+
+    public I_GetConceptData getRefsetSpecInSpecEditor() {
+        return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
+    }
+
+    public I_GetConceptData getClassificationRoot() {
+        return classificationRoot;
+    }
+
+    public I_GetConceptData getClassifierInputPath() {
+        return classifierInputPathConcept;
+    }
+
+    public I_GetConceptData getClassifierIsaType() {
+        return classifierIsaType;
+    }
+
+    public I_GetConceptData getClassifierOutputPath() {
+        return classifierOutputPathConcept;
+    }
+
+    public void setClassificationRoot(I_GetConceptData classificationRoot) {
+        Object old = this.classificationRoot;
+        this.classificationRoot = classificationRoot;
+        changeSupport.firePropertyChange("classificationRoot", old,
+                classificationRoot);
+    }
+
+    public void setClassifierInputPath(I_GetConceptData inputPath) {
+        Object old = inputPath;
+        classifierInputPathConcept = inputPath;
+        changeSupport.firePropertyChange("classifierInputPath", old, inputPath);
+    }
+
+    public void setClassifierIsaType(I_GetConceptData classifierIsaType) {
+        Object old = classifierIsaType;
+        this.classifierIsaType = classifierIsaType;
+        changeSupport.firePropertyChange("classifierIsaType", old,
+                classifierIsaType);
+    }
+
+    public void setClassifierOutputPath(I_GetConceptData outputPath) {
+        Object old = outputPath;
+        this.classifierOutputPathConcept = outputPath;
+        changeSupport.firePropertyChange("classifierOutputPath", old,
+                outputPath);
+    }
+
+    public JPanel getTopActivityPanel() {
+        return aceFrame.getCdePanel().getTopActivityPanel();
+    }
+
+    public void setTopActivityPanel(I_ShowActivity ap) {
+        aceFrame.getCdePanel().setTopActivityPanel(ap);
+    }
+
+    public Color getColorForPath(int pathNid) {
+        return pathColorMap.get(pathNid);
+    }
+
+    public void setColorForPath(int pathNid, Color pathColor) {
+        pathColorMap.put(pathNid, pathColor);
+    }
+
+    public I_IntList getLanguagePreferenceList() {
+        return languagePreferenceList;
+    }
+
+    public void invalidate() {
+        aceFrame.getCdePanel().invalidate();
+    }
+
+    public void repaint() {
+        aceFrame.getCdePanel().repaint();
+    }
+
+    public void validate() {
+        aceFrame.getCdePanel().validate();
+    }
+
+    public Map<String, Object> getProperties() throws IOException {
+        return properties;
+    }
+
+    public Object getProperty(String key) throws IOException {
+        return properties.get(key);
+    }
+
+    public void setProperty(String key, Object value) throws IOException {
+        properties.put(key, value);
+    }
+
+    public void addConceptPanelPlugins(HOST_ENUM host, UUID key,
+            I_PluginToConceptPanel plugin) {
+        checkConceptPanelPlugins();
+        conceptPanelPlugins.get(host).put(key, plugin);
+    }
+
+    private void checkConceptPanelPlugins() {
+        if (conceptPanelPlugins == null) {
+            conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
+        }
+        if (conceptPanelPlugins.size() < HOST_ENUM.values().length) {
+            for (HOST_ENUM h : HOST_ENUM.values()) {
+                if (conceptPanelPlugins.get(h) == null) {
+                    conceptPanelPlugins.put(h,
+                            new HashMap<UUID, I_PluginToConceptPanel>());
+                }
+            }
+        }
+    }
+
+    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host,
+            UUID key) {
+        checkConceptPanelPlugins();
+        return conceptPanelPlugins.get(host).remove(key);
+    }
+
     public Set<UUID> getConceptPanelPluginKeys(HOST_ENUM host) {
-    	checkConceptPanelPlugins();
-    	return conceptPanelPlugins.get(host).keySet();
+        checkConceptPanelPlugins();
+        return conceptPanelPlugins.get(host).keySet();
     }
 
     public I_PluginToConceptPanel getConceptPanelPlugin(HOST_ENUM host, UUID key) {
-    	checkConceptPanelPlugins();
-    	return conceptPanelPlugins.get(host).get(key);
+        checkConceptPanelPlugins();
+        return conceptPanelPlugins.get(host).get(key);
     }
 
-   public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host) {
-    	return conceptPanelPlugins.get(host).values();
-	}
-
-	public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor() {
-    	return staticGetDefaultConceptPanelPlugins();
+    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(
+            HOST_ENUM host) {
+        return conceptPanelPlugins.get(host).values();
     }
-    
+
+    public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor() {
+        return staticGetDefaultConceptPanelPlugins();
+    }
+
     public static List<I_PluginToConceptPanel> staticGetDefaultConceptPanelPlugins() {
-    	List<I_PluginToConceptPanel> list = new ArrayList<I_PluginToConceptPanel>();
-    	int order = 0;
-    	try {
-			list.add(new IdPlugin(false, order++));
-			list.add(new ConceptAttributePlugin(true, order++));
-			list.add(new DescriptionPlugin(true, order++));
-			list.add(new SrcRelPlugin(true, order++));
-			list.add(new DestRelPlugin(false, order++));
-			list.add(new LineagePlugin(true, order++));
-			list.add(new GraphPlugin(false, order++));
-			list.add(new ImagePlugin(false, order++));
-			list.add(new ConflictPlugin(false, order++));
-			list.add(new StatedAndNormalFormsPlugin(false, order++));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
-    	} catch (TerminologyException e) {
-    		AceLog.getAppLog().alertAndLogException(e);
-		} catch (UnsupportedEncodingException e) {
-    		AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-    		AceLog.getAppLog().alertAndLogException(e);
-		}
-    	return list;
+        List<I_PluginToConceptPanel> list = new ArrayList<I_PluginToConceptPanel>();
+        int order = 0;
+        try {
+            list.add(new IdPlugin(false, order++));
+            list.add(new ConceptAttributePlugin(true, order++));
+            list.add(new DescriptionPlugin(true, order++));
+            list.add(new SrcRelPlugin(true, order++));
+            list.add(new DestRelPlugin(false, order++));
+            list.add(new LineagePlugin(true, order++));
+            list.add(new GraphPlugin(false, order++));
+            list.add(new ImagePlugin(false, order++));
+            list.add(new ConflictPlugin(false, order++));
+            list.add(new StatedAndNormalFormsPlugin(false, order++));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.AU_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_AU
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.UK_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_GB
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.USA_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_US
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.NZ_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_NZ
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.CA_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_CA
+                                            .getUids())));
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (UnsupportedEncodingException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return list;
     }
 
     public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer() {
-    	return staticGetDefaultConceptPanelPluginsForViewer();
+        return staticGetDefaultConceptPanelPluginsForViewer();
     }
-    
+
     public static List<I_PluginToConceptPanel> staticGetDefaultConceptPanelPluginsForViewer() {
-    	List<I_PluginToConceptPanel> list = new ArrayList<I_PluginToConceptPanel>();
-    	int order = 0;
-    	try {
-			list.add(new IdPlugin(false, order++));
-			list.add(new ConceptAttributePlugin(true, order++));
-			list.add(new DescriptionPlugin(true, order++));
-			list.add(new SrcRelPlugin(true, order++));
-			list.add(new DestRelPlugin(false, order++));
-			list.add(new LineagePlugin(true, order++));
-			list.add(new GraphPlugin(false, order++));
-			list.add(new ImagePlugin(false, order++));
-			list.add(new ConflictPlugin(false, order++));
-			list.add(new StatedAndNormalFormsPlugin(false, order++));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-			list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
-					LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
-    	} catch (TerminologyException e) {
-    		AceLog.getAppLog().alertAndLogException(e);
-		} catch (UnsupportedEncodingException e) {
-    		AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-    		AceLog.getAppLog().alertAndLogException(e);
-		}
-    	return list;
+        List<I_PluginToConceptPanel> list = new ArrayList<I_PluginToConceptPanel>();
+        int order = 0;
+        try {
+            list.add(new IdPlugin(false, order++));
+            list.add(new ConceptAttributePlugin(true, order++));
+            list.add(new DescriptionPlugin(true, order++));
+            list.add(new SrcRelPlugin(true, order++));
+            list.add(new DestRelPlugin(false, order++));
+            list.add(new LineagePlugin(true, order++));
+            list.add(new GraphPlugin(false, order++));
+            list.add(new ImagePlugin(false, order++));
+            list.add(new ConflictPlugin(false, order++));
+            list.add(new StatedAndNormalFormsPlugin(false, order++));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.AU_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_AU
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.UK_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_GB
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.USA_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_US
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.NZ_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_NZ
+                                            .getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++,
+                    TOGGLES.CA_DIALECT, LocalVersionedTerminology.get()
+                            .getConcept(
+                                    ArchitectonicAuxiliary.Concept.EN_CA
+                                            .getUids())));
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (UnsupportedEncodingException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return list;
     }
 
-	public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext) {
-		changeSupport.firePropertyChange("refsetSpecChanged", null, ext);
-	}
+    public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext) {
+        changeSupport.firePropertyChange("refsetSpecChanged", null, ext);
+    }
 
-	public JTree getTreeInTaxonomyPanel() {
-		return aceFrame.getCdePanel().getTree();
-	}
+    public JTree getTreeInTaxonomyPanel() {
+        return aceFrame.getCdePanel().getTree();
+    }
+
+    public void setRefsetInSpecEditor(I_GetConceptData refset) {
+        aceFrame.getCdePanel().setRefsetInSpecEditor(refset);
+    }
 
 }
