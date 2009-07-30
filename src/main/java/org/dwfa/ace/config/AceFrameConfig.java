@@ -2687,8 +2687,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     	int order = 0;
     	try {
 			list.add(new IdPlugin(false, order++));
-			list.add(new DescriptionPlugin(true, order++));
 			list.add(new ConceptAttributePlugin(true, order++));
+			list.add(new DescriptionPlugin(true, order++));
 			list.add(new SrcRelPlugin(true, order++));
 			list.add(new DestRelPlugin(false, order++));
 			list.add(new LineagePlugin(true, order++));
@@ -2725,8 +2725,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     	int order = 0;
     	try {
 			list.add(new IdPlugin(false, order++));
-			list.add(new DescriptionPlugin(true, order++));
 			list.add(new ConceptAttributePlugin(true, order++));
+			list.add(new DescriptionPlugin(true, order++));
 			list.add(new SrcRelPlugin(true, order++));
 			list.add(new DestRelPlugin(false, order++));
 			list.add(new LineagePlugin(true, order++));

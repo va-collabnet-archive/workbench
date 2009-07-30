@@ -31,7 +31,6 @@ public class GraphPlugin extends AbstractPlugin {
 
 	private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.KKLayout;
 
-	private transient I_HostConceptPlugins host;
 	private transient JPanel graphWrapperPanel = new JPanel(new GridBagLayout());
 	private transient JPanel graphPanel;
 	private transient JPanel fillerPanel;
@@ -79,7 +78,7 @@ public class GraphPlugin extends AbstractPlugin {
 
 	@Override
 	public void update() throws IOException {
-		if (host != null) {
+		if (getHost() != null) {
 			if (fillerPanel != null) {
 				graphWrapperPanel.remove(fillerPanel);
 			}
@@ -134,11 +133,11 @@ public class GraphPlugin extends AbstractPlugin {
 			graphWrapperPanel.add(fillerPanel, gbc);
 			initialize = false;
 		}
-		if (host != this.host) {
+		if (host != getHost()) {
 			host.addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT,
 					this);
 			host.addPropertyChangeListener("commit", this);
-			this.host = host;
+			setHost(host);
 		}
 		return graphWrapperPanel;
 	}
@@ -160,10 +159,4 @@ public class GraphPlugin extends AbstractPlugin {
 	public void setGraphLayout(GRAPH_LAYOUTS graphLayout) {
 		this.graphLayout = graphLayout;
 	}
-
-	public I_HostConceptPlugins getHost() {
-		return host;
-	}
-
-
 }

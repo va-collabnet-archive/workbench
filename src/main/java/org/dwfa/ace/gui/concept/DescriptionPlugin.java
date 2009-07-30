@@ -59,7 +59,6 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	private static final int dataVersion = 1;
 
 	private transient JPanel descPanel;
-	private transient I_HostConceptPlugins host;
 	private transient DescriptionsForConceptTableModel descTableModel;
 	private transient JTableWithDragImage descTable;
 	private transient boolean idToggleState = false;
@@ -99,7 +98,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 
 	@Override
 	public void update() throws IOException {
-		if (host != null) {
+		if (getHost() != null) {
 			int lastSelectedRowCount = descTable.getRowCount();
 			int lastSelectedRow = descTable.getSelectedRow();
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -109,15 +108,15 @@ public class DescriptionPlugin extends AbstractPlugin implements
 				idPlugin.update();
 			}
 
-			if (RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this,
-					visibleExtensions) || host.getToggleState(TOGGLES.ID) != idToggleState) {
-				idToggleState = host.getToggleState(TOGGLES.ID);
-				createPluginComponent(host);
+			if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.DESCRIPTIONS, this,
+					visibleExtensions) || getHost().getToggleState(TOGGLES.ID) != idToggleState) {
+				idToggleState = getHost().getToggleState(TOGGLES.ID);
+				createPluginComponent(getHost());
 			}
 
-			PropertyChangeEvent evt = new PropertyChangeEvent(host,
-					"termComponent", null, host.getTermComponent());
-			DESC_FIELD[] columnEnums = getDescColumns(host);
+			PropertyChangeEvent evt = new PropertyChangeEvent(getHost(),
+					"termComponent", null, getHost().getTermComponent());
+			DESC_FIELD[] columnEnums = getDescColumns(getHost());
 			descTableModel.setColumns(columnEnums);
 			for (int i = 0; i < descTableModel.getColumnCount(); i++) {
 				TableColumn column = descTable.getColumnModel().getColumn(i);
@@ -127,13 +126,13 @@ public class DescriptionPlugin extends AbstractPlugin implements
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
-			setupEditorsAndRenderers(host);
+			setupEditorsAndRenderers(getHost());
 			descTableModel.propertyChange(evt);
 			
-			if (lastSelectedConcept == host.getTermComponent()) {
+			if (lastSelectedConcept == getHost().getTermComponent()) {
 				SwingUtilities.invokeLater(new ReselectRow(lastSelectedRowCount, lastSelectedRow));
 			}
-			lastSelectedConcept = (I_GetConceptData) host.getTermComponent();
+			lastSelectedConcept = (I_GetConceptData) getHost().getTermComponent();
 		}
 	}
 	
@@ -166,6 +165,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
+		setHost(host);
 		if (descPanel == null
 				|| RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this,
 						visibleExtensions)) {
@@ -175,7 +175,7 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	}
 
 	private void createPluginComponent(I_HostConceptPlugins host) {
-		this.host = host;
+		setHost(host);
 		descPanel = getDescPanel(host);
 		host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
 		host.addPropertyChangeListener("commit", this);
@@ -394,44 +394,44 @@ public class DescriptionPlugin extends AbstractPlugin implements
 	}
 
 	public I_GetConceptData getHierarchySelection() {
-		return host.getHierarchySelection();
+		return getHost().getHierarchySelection();
 	}
 
 	public boolean getShowHistory() {
-		return host.getShowHistory();
+		return getHost().getShowHistory();
 	}
 
 	public boolean getShowRefsets() {
-		return host.getShowRefsets();
+		return getHost().getShowRefsets();
 	}
 
 	public boolean getToggleState(TOGGLES toggle) {
-		return host.getToggleState(toggle);
+		return getHost().getToggleState(toggle);
 	}
 
 	public boolean getUsePrefs() {
-		return host.getUsePrefs();
+		return getHost().getUsePrefs();
 	}
 
 	public void setAllTogglesToState(boolean state) {
-		host.setAllTogglesToState(state);
+		getHost().setAllTogglesToState(state);
 	}
 
 	public void setLinkType(LINK_TYPE link) {
-		host.setLinkType(link);
+		getHost().setLinkType(link);
 	}
 
 	public void setToggleState(TOGGLES toggle, boolean state) {
-		host.setToggleState(toggle, state);
+		getHost().setToggleState(toggle, state);
 	}
 
 	public void unlink() {
-		host.unlink();
+		getHost().unlink();
 	}
 
 
 	public I_ConfigAceFrame getConfig() {
-		return host.getConfig();
+		return getHost().getConfig();
 	}
 
 	public I_AmTermComponent getTermComponent() {

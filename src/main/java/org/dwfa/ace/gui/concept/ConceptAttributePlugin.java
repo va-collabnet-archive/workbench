@@ -46,7 +46,6 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
    private static final long serialVersionUID = 1L;
    private static final int dataVersion = 1;
 
-   private transient I_HostConceptPlugins host;
    private transient JPanel conceptAttributes;
    private transient ConceptAttributeTableModel conceptTableModel;
    private transient JTableWithDragImage conceptTable;
@@ -77,15 +76,15 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
 
     @Override
     public void update() throws IOException {
-        if (host != null) {
+        if (getHost() != null) {
 
-            if (RefsetUtil.refSetsChanged(host, TOGGLES.ATTRIBUTES, this, visibleExtensions)) {
-                createPluginComponent(host);
+            if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.ATTRIBUTES, this, visibleExtensions)) {
+                createPluginComponent(getHost());
             }
 
-            PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-            CONCEPT_FIELD[] columnEnums = getConceptColumns(host);
-            conceptTableModel.setColumns(getConceptColumns(host));
+            PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null, getHost().getTermComponent());
+            CONCEPT_FIELD[] columnEnums = getConceptColumns(getHost());
+            conceptTableModel.setColumns(getConceptColumns(getHost()));
             for (int i = 0; i < conceptTableModel.getColumnCount(); i++) {
                 TableColumn column = conceptTable.getColumnModel().getColumn(i);
                 CONCEPT_FIELD columnDesc = columnEnums[i];
@@ -106,10 +105,10 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
     }
 
     private void createPluginComponent(I_HostConceptPlugins host) {
+    	setHost(host);
         conceptAttributes = getConceptAttributesPanel(host);
         host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
         host.addPropertyChangeListener("commit", this);
-        this.host = host;
         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
         conceptTableModel.propertyChange(evt);
     }

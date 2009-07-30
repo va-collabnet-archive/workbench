@@ -18,7 +18,6 @@ public class ConflictPlugin extends AbstractPlugin {
 	private static final int dataVersion = 1;
 
 	private transient ConflictPanel conflictPanel;
-	private transient I_HostConceptPlugins host;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -43,7 +42,7 @@ public class ConflictPlugin extends AbstractPlugin {
 
 	public ConflictPanel getComponent(I_HostConceptPlugins host) {
 		if (conflictPanel == null) {
-			this.host = host;
+			setHost(host);
 			conflictPanel = new ConflictPanel();
 			host.addPropertyChangeListener(
 					I_ContainTermComponent.TERM_COMPONENT, this);
@@ -67,8 +66,8 @@ public class ConflictPlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		if (showComponent() && conflictPanel != null) {
-			conflictPanel.setConcept((ConceptBean) host.getTermComponent(),
-					host.getConfig());
+			conflictPanel.setConcept((ConceptBean) getHost().getTermComponent(),
+					getHost().getConfig());
 		}
 	}
 

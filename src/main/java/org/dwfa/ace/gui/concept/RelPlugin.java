@@ -308,6 +308,4 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
 		return null;
 	}
 
-	
-	protected abstract I_HostConceptPlugins getHost();
 }

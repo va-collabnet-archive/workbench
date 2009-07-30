@@ -27,7 +27,6 @@ public class SrcRelPlugin extends RelPlugin {
 
 	private transient JPanel pluginPanel;
 	private transient SrcRelTableModel srcRelTableModel;
-	private transient I_HostConceptPlugins host;
     private static TOGGLES toggleType = TOGGLES.SOURCE_RELS;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
@@ -53,7 +52,7 @@ public class SrcRelPlugin extends RelPlugin {
 
 
 	public JPanel getComponent(I_HostConceptPlugins host) {
-	  this.host = host;
+	  setHost(host);
       if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
          createPluginComponent(host);
       }
@@ -61,7 +60,7 @@ public class SrcRelPlugin extends RelPlugin {
 	}
 
    private void createPluginComponent(I_HostConceptPlugins host) {
-	  this.host = host;
+		  setHost(host);
       if (AceLog.getAppLog().isLoggable(Level.FINE)) {
          AceLog.getAppLog().fine("creating src rel plugin component...");
       }
@@ -95,20 +94,20 @@ public class SrcRelPlugin extends RelPlugin {
 	}
 	@Override
 	public void update() throws IOException {
-		if (host != null) {
+		if (getHost() != null) {
 			
 		if (idPlugin != null) {
 			idPlugin.update();
 		}
 
-         if (RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)|| host.getToggleState(TOGGLES.ID) != idToggleState) {
-				idToggleState = host.getToggleState(TOGGLES.ID);
-				createPluginComponent(host);
+         if (RefsetUtil.refSetsChanged(getHost(), toggleType, this, visibleExtensions)|| getHost().getToggleState(TOGGLES.ID) != idToggleState) {
+				idToggleState = getHost().getToggleState(TOGGLES.ID);
+				createPluginComponent(getHost());
          }
 
-         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-			REL_FIELD[] columnEnums = getSrcRelColumns(host.getShowHistory());
-			srcRelTableModel.setColumns(getSrcRelColumns(host.getShowHistory()));
+         PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null, getHost().getTermComponent());
+			REL_FIELD[] columnEnums = getSrcRelColumns(getHost().getShowHistory());
+			srcRelTableModel.setColumns(getSrcRelColumns(getHost().getShowHistory()));
 			for (int i = 0; i < srcRelTableModel.getColumnCount(); i++) {
 				TableColumn column = getRelTable().getColumnModel().getColumn(i);
 				REL_FIELD columnDesc = columnEnums[i];
@@ -117,7 +116,7 @@ public class SrcRelPlugin extends RelPlugin {
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
-			setupEditors(host);
+			setupEditors(getHost());
 			srcRelTableModel.propertyChange(evt);			
 		}
 	}
@@ -125,10 +124,4 @@ public class SrcRelPlugin extends RelPlugin {
    protected String getToolTipText() {
       return "show/hide source relationships for this concept";
    }
-
-	@Override
-	protected I_HostConceptPlugins getHost() {
-		return host;
-	}
-
 }

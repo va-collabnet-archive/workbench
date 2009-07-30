@@ -42,7 +42,6 @@ public class LineagePlugin extends AbstractPlugin {
 
 	private transient JTreeWithDragImage lineageTree;
 	private transient JComponent lineagePanel;
-	private transient I_HostConceptPlugins host;
 	private transient LineageTreeCellRenderer lineageRenderer;
 
 	
@@ -71,14 +70,14 @@ public class LineagePlugin extends AbstractPlugin {
 
 	@Override
 	public void update() throws IOException {
-		if (host != null) {
+		if (getHost() != null) {
 			updateLineageModel();
 		}
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
 		if (lineagePanel == null) {
-			this.host = host;
+			setHost(host);
 			try {
 				lineagePanel = getLineagePanel(host);
 				host.addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, this);
@@ -93,6 +92,7 @@ public class LineagePlugin extends AbstractPlugin {
 
 	private JComponent getLineagePanel(I_HostConceptPlugins host)
 			throws IOException {
+		setHost(host);
 		JPanel lineagePanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
@@ -166,7 +166,7 @@ public class LineagePlugin extends AbstractPlugin {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
 		model.setRoot(root);
 
-		ConceptBean bean = (ConceptBean) host.getTermComponent();
+		ConceptBean bean = (ConceptBean) getHost().getTermComponent();
 		if (bean != null) {
 			lineageRenderer.setFocusBean(bean);
 			List<List<ConceptBean>> lineage = getLineage(bean, 0);
@@ -221,9 +221,9 @@ public class LineagePlugin extends AbstractPlugin {
 			throws IOException {
 		List<List<ConceptBean>> lineage = new ArrayList<List<ConceptBean>>();
 
-		List<I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(host.getConfig().getAllowedStatus(), 
-				host.getConfig().getDestRelTypes(), 
-				host.getConfig().getViewPositionSet(), false);
+		List<I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(), 
+				getHost().getConfig().getDestRelTypes(), 
+				getHost().getConfig().getViewPositionSet(), false);
 		if ((sourceRelTuples.size() > 0) && (depth < 40)) {
 			for (I_RelTuple rel : sourceRelTuples) {
 				ConceptBean parent = ConceptBean.get(rel.getC2Id());

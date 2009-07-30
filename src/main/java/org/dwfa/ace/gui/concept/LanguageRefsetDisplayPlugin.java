@@ -52,7 +52,6 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 
 	private TOGGLES toggle;
 
-	private transient I_HostConceptPlugins host;
     private transient JComponent pluginComponent;
     private transient I_GetConceptData languageConcept;
 	private transient I_ImageVersioned pluginImage;
@@ -116,10 +115,10 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 
     @Override
     public void update() throws IOException {
-        if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host,
-					"termComponent", null, host.getTermComponent());
-			DESC_FIELD[] columnEnums = getDescColumns(host);
+        if (getHost() != null) {
+			PropertyChangeEvent evt = new PropertyChangeEvent(getHost(),
+					"termComponent", null, getHost().getTermComponent());
+			DESC_FIELD[] columnEnums = getDescColumns(getHost());
 			descTableModel.setColumns(columnEnums);
 			for (int i = 0; i < descTableModel.getColumnCount(); i++) {
 				TableColumn column = languageRefsetTable.getColumnModel().getColumn(i);
@@ -129,12 +128,13 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
-			setupEditorsAndRenderers(host);
+			setupEditorsAndRenderers(getHost());
 			descTableModel.propertyChange(evt);
         }
     }
 
 	private DESC_FIELD[] getDescColumns(I_HostConceptPlugins host) {
+		setHost(host);
 		List<DESC_FIELD> fields = new ArrayList<DESC_FIELD>();
 		fields.add(DESC_FIELD.TEXT);
 		fields.add(DESC_FIELD.TYPE);
@@ -148,6 +148,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 	}
 
 	private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
+		setHost(host);
 		DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
 		languageRefsetTable.setDefaultRenderer(Boolean.class, renderer);
 		JComboBox comboBox = new JComboBox() {
@@ -204,10 +205,10 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
     private void createPluginComponent(I_HostConceptPlugins host) throws IOException {
     	I_DescriptionTuple descTuple = languageConcept.getDescTuple(host.getConfig().getTableDescPreferenceList(), 
     			host.getConfig());
+    	setHost(host);
         pluginComponent = getDescPanel(host, descTuple.getText());
         host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
         host.addPropertyChangeListener("commit", this);
-        this.host = host;
     }
 
 	private JPanel getDescPanel(I_HostConceptPlugins host, String DialectName) {
@@ -312,7 +313,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 
 	@Override
 	protected int getComponentId() {
-		return ((I_GetConceptData) host.getTermComponent()).getConceptId();
+		return ((I_GetConceptData) getHost().getTermComponent()).getConceptId();
 	}
 
 	public void tableChanged(TableModelEvent tme) {

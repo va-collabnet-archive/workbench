@@ -41,7 +41,6 @@ public class IdPlugin extends AbstractPlugin {
 
 	private transient IdTableModel idTableModel;
 	private transient JPanel idPanel;
-	private transient I_HostConceptPlugins host;
 	private transient JTableWithDragImage idTable;
 	private transient boolean showBorder = true;
 	
@@ -79,11 +78,11 @@ public class IdPlugin extends AbstractPlugin {
 
 	@Override
 	public void update() throws IOException {
-		if (host != null) {
-			PropertyChangeEvent evt = new PropertyChangeEvent(host,
-					"termComponent", null, host.getTermComponent());
-			ID_FIELD[] columnEnums = getIdColumns(host, showNids);
-			idTableModel.setColumns(getIdColumns(host, showNids));
+		if (getHost() != null) {
+			PropertyChangeEvent evt = new PropertyChangeEvent(getHost(),
+					"termComponent", null, getHost().getTermComponent());
+			ID_FIELD[] columnEnums = getIdColumns(getHost(), showNids);
+			idTableModel.setColumns(getIdColumns(getHost(), showNids));
 			for (int i = 0; i < idTableModel.getColumnCount(); i++) {
 				TableColumn column = idTable.getColumnModel().getColumn(i);
 				ID_FIELD columnDesc = columnEnums[i];
@@ -98,7 +97,7 @@ public class IdPlugin extends AbstractPlugin {
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
 		if (idPanel == null) {
-			this.host = host;
+			setHost(host);
 			idPanel = getIdPanel(host, showNids);
 			host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY,
 					this);
@@ -111,6 +110,7 @@ public class IdPlugin extends AbstractPlugin {
 	}
 
 	private ID_FIELD[] getIdColumns(I_HostConceptPlugins host, boolean showNatives) {
+		setHost(host);
 		List<ID_FIELD> fields = new ArrayList<ID_FIELD>();
 		if (showNatives) {
 			fields.add(ID_FIELD.LOCAL_ID);
@@ -126,6 +126,7 @@ public class IdPlugin extends AbstractPlugin {
 	}
 
 	private JPanel getIdPanel(I_HostConceptPlugins host, boolean showNatives) {
+		setHost(host);
 		idTableModel = new IdTableModel(getIdColumns(host, showNatives), host);
 		JPanel idPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();

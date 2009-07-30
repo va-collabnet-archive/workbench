@@ -43,7 +43,6 @@ public class ImagePlugin extends AbstractPlugin {
 	private static final int dataVersion = 1;
 
 	private transient JPanel imagePanel;
-	private transient I_HostConceptPlugins host;
 	private transient ImageTableModel imageTableModel;
 	private transient JTableWithDragImage imageTable;
     protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
@@ -79,15 +78,15 @@ public class ImagePlugin extends AbstractPlugin {
 
 	@Override
 	public void update() throws IOException {
-		if (host != null) {
+		if (getHost() != null) {
 
-         if (RefsetUtil.refSetsChanged(host, TOGGLES.IMAGE, this, visibleExtensions)) {
-            createPluginComponent(host);
+         if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.IMAGE, this, visibleExtensions)) {
+            createPluginComponent(getHost());
          }
 
-         PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-			IMAGE_FIELD[] columnEnums = getImageColumns(host);
-			imageTableModel.setColumns(getImageColumns(host));
+         PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null, getHost().getTermComponent());
+			IMAGE_FIELD[] columnEnums = getImageColumns(getHost());
+			imageTableModel.setColumns(getImageColumns(getHost()));
 			for (int i = 0; i < imageTableModel.getColumnCount(); i++) {
 				TableColumn column = imageTable.getColumnModel().getColumn(i);
 				IMAGE_FIELD columnDesc = columnEnums[i];
@@ -96,12 +95,13 @@ public class ImagePlugin extends AbstractPlugin {
 				column.setMaxWidth(columnDesc.getMax());
 				column.setMinWidth(columnDesc.getMin());
 			}
-			setupEditorsAndRenderers(host);
+			setupEditorsAndRenderers(getHost());
 			imageTableModel.propertyChange(evt);
 		}
 	}
 
 	public JComponent getComponent(I_HostConceptPlugins host) {
+		setHost(host);
 		if (imagePanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.IMAGE, this, visibleExtensions)) {
 			createPluginComponent(host);
 		}
@@ -109,7 +109,7 @@ public class ImagePlugin extends AbstractPlugin {
 	}
 
    private void createPluginComponent(I_HostConceptPlugins host) {
-      this.host = host;
+      setHost(host);
       imageTableModel = new ImageTableModel(host,
       		getImageColumns(host), host.getShowHistory());
       imagePanel = getImagePanel(host);
@@ -120,6 +120,7 @@ public class ImagePlugin extends AbstractPlugin {
    }
 
 	private IMAGE_FIELD[] getImageColumns(I_HostConceptPlugins host) {
+		setHost(host);
 		List<IMAGE_FIELD> fields = new ArrayList<IMAGE_FIELD>();
 		fields.add(IMAGE_FIELD.IMAGE);
 		fields.add(IMAGE_FIELD.TYPE);
@@ -133,6 +134,7 @@ public class ImagePlugin extends AbstractPlugin {
 	}
 
 	private JPanel getImagePanel(I_HostConceptPlugins host) {
+		setHost(host);
 		JPanel imagePanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;

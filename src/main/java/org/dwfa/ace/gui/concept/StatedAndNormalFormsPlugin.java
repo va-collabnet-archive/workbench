@@ -20,7 +20,6 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 	private static final int dataVersion = 1;
 
 	private transient LogicalFormsPanel formsPanel;
-	private transient I_HostConceptPlugins host;
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -45,7 +44,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 
 	public LogicalFormsPanel getComponent(I_HostConceptPlugins host) {
 		if (formsPanel == null) {
-			this.host = host;
+			setHost(host);
 			formsPanel = new LogicalFormsPanel();
 			host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
 			host.addPropertyChangeListener("commit", this);
@@ -67,7 +66,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		if (showComponent() && formsPanel != null) {
-			formsPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
+			formsPanel.setConcept((ConceptBean) getHost().getTermComponent(), getHost().getConfig());
 		}
 		
 	}

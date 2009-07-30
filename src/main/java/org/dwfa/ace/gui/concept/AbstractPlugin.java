@@ -1,7 +1,9 @@
 package org.dwfa.ace.gui.concept;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -14,14 +16,19 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.dwfa.ace.api.I_HoldRefsetData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 
@@ -38,6 +45,7 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
    private transient JToggleButton toggleButton;
    private transient Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
    private transient Set<I_HoldRefsetData> refSetListeners = new HashSet<I_HoldRefsetData>();
+   private transient I_HostConceptPlugins host;
 
 
 
@@ -115,6 +123,7 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
 		super();
 		this.selectedByDefault = selectedByDefault;
 		this.sequence = sequence;
+		
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -143,12 +152,67 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
 		return getToggleButton().isSelected();
 	}
 
+	private class MoveLeft extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		
+		private MoveLeft() {
+			super("left");
+		}
+
+
+		public void actionPerformed(ActionEvent arg0) {
+			sequence--;
+			AceLog.getAppLog().info("Sequence: "+ sequence);
+			try {
+				update();
+			} catch (IOException e1) {
+				AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
+			}
+		}
+		
+	}
+	private class MoveRight extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		private MoveRight() {
+			super("right");
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			sequence++;
+			AceLog.getAppLog().info("Sequence: "+ sequence);
+			try {
+				update();
+			} catch (IOException e1) {
+				AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
+			}
+			JOptionPane.showMessageDialog(getToggleButton(), "Move Right");
+		}
+		
+	}
 	public final JToggleButton getToggleButton() {
 		if (toggleButton == null) {
 			toggleButton = new JToggleButton(getImageIcon());
 			toggleButton.setSelected(selectedByDefault);
 			toggleButton.addActionListener(new ToggleActionListener());
-         toggleButton.setToolTipText(getToolTipText());
+			toggleButton.setToolTipText(getToolTipText());
+	        InputMap imap = toggleButton.getInputMap();
+	        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+	        		 "left");
+	        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+	        		"right");
+			
+			getToggleButton().getActionMap().put("left", new MoveLeft());
+			getToggleButton().getActionMap().put("right", new MoveRight());
 		}
 		return toggleButton;
 	}
@@ -183,4 +247,13 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
 	public void setName(String name) {
 		this.name = name;
 	}	
+	
+	public final I_HostConceptPlugins getHost() {
+		return host;
+	}
+
+	public final void setHost(I_HostConceptPlugins host) {
+		this.host = host;
+	}
+
 }
