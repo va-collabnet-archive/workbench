@@ -32,239 +32,250 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
-public class PromptUserForInput extends AbstractTask{
-	private static final long serialVersionUID = 1;
+public class PromptUserForInput extends AbstractTask {
+    private static final long serialVersionUID = 1;
 
-	   private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	   private String instruction = "<html>Instruction";
-	   private String newRefsetPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
-	   private String refsetName = "";
-	   private transient Condition returnCondition;
+    private String instruction = "<html>Instruction";
+    private String newRefsetPropName = ProcessAttachmentKeys.MESSAGE
+            .getAttachmentKey();
+    private String refsetName = "";
+    private transient Condition returnCondition;
 
-	   private transient boolean done;
+    private transient boolean done;
 
-	   private void writeObject(ObjectOutputStream out) throws IOException {
-	      out.writeInt(dataVersion);
-	      out.writeObject(instruction);
-	      out.writeObject(newRefsetPropName);
-	   }//End method writeObject
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(instruction);
+        out.writeObject(newRefsetPropName);
+    }// End method writeObject
 
-	   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-	      int objDataVersion = in.readInt();
-	      if (objDataVersion == 1) {
-	         // nothing to read...
-	         instruction = (String) in.readObject();
-	         newRefsetPropName = (String) in.readObject();
-	      } else {
-	         throw new IOException("Can't handle dataversion: " + objDataVersion);
-	      }
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            // nothing to read...
+            instruction = (String) in.readObject();
+            newRefsetPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	   }//End method readObject
+    }// End method readObject
 
-	   private class StepActionListener implements ActionListener {
+    private class StepActionListener implements ActionListener {
 
-	      /**
-	       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	       */
-	      public void actionPerformed(ActionEvent e) {
-	    	 
-	    	 JButton stepButton = (JButton) e.getSource();
-		     JPanel workflowPanel = (JPanel)stepButton.getParent(); 
-	    	 
-		     Component[] components = workflowPanel.getComponents();
-             for (int i = 0; i < components.length; i++) {
+        /**
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        public void actionPerformed(ActionEvent e) {
+
+            JButton stepButton = (JButton) e.getSource();
+            JPanel workflowPanel = (JPanel) stepButton.getParent();
+
+            Component[] components = workflowPanel.getComponents();
+            for (int i = 0; i < components.length; i++) {
                 if (components[i] instanceof JTextField) {
-                	refsetName = ((JTextField)components[i]).getText();
-				} 
-             }
-		     
-		     
-	         returnCondition = Condition.ITEM_COMPLETE;
-	         done = true;
-	         synchronized (PromptUserForInput.this) {
-	        	 PromptUserForInput.this.notifyAll();
-	         }
+                    refsetName = ((JTextField) components[i]).getText();
+                }
+            }
 
-	      }//End method actionPerformed
+            returnCondition = Condition.ITEM_COMPLETE;
+            done = true;
+            synchronized (PromptUserForInput.this) {
+                PromptUserForInput.this.notifyAll();
+            }
 
-	   }//End nested class StepActionListener
+        }// End method actionPerformed
 
-	   private class StopActionListener implements ActionListener {
+    }// End nested class StepActionListener
 
-	      /**
-	       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	       */
-	      public void actionPerformed(ActionEvent e) {
-	         returnCondition = Condition.ITEM_CANCELED;
-	         done = true;
-	         synchronized (PromptUserForInput.this) {
-	        	 PromptUserForInput.this.notifyAll();
-	         }
+    private class StopActionListener implements ActionListener {
 
-	      }//End method actionPerformed
+        /**
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        public void actionPerformed(ActionEvent e) {
+            returnCondition = Condition.ITEM_CANCELED;
+            done = true;
+            synchronized (PromptUserForInput.this) {
+                PromptUserForInput.this.notifyAll();
+            }
 
-	   }//End nested class StopActionListener
+        }// End method actionPerformed
 
-	   private void waitTillDone(Logger l) {
-	      while (!this.isDone()) {
-	         try {
-	            wait();
-	         } catch (InterruptedException e) {
-	            l.log(Level.SEVERE, e.getMessage(), e);
-	         }
-	      }
+    }// End nested class StopActionListener
 
-	   }//End method waitTilDone
+    private void waitTillDone(Logger l) {
+        while (!this.isDone()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                l.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
 
-	   public boolean isDone() {
-	      return this.done;
-	   }//End method isDone
+    }// End method waitTilDone
 
-	   /**
-	    * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	    *      org.dwfa.bpa.process.I_Work)
-	    */
-	   public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-	      this.done = false;
-	      I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	      boolean builderVisible = config.isBuilderToggleVisible();
-	      config.setBuilderToggleVisible(false);
-	      boolean progressPanelVisible = config.isProgressToggleVisible();
-	      config.setProgressToggleVisible(false);
-	      boolean subversionButtonVisible = config.isBuilderToggleVisible();
-	      config.setSubversionToggleVisible(false);
-	      boolean inboxButtonVisible = config.isInboxToggleVisible();
-	      config.setInboxToggleVisible(false);
-	      try {
-	         final JPanel workflowPanel = config.getWorkflowPanel();
-	         SwingUtilities.invokeAndWait(new Runnable() {
+    public boolean isDone() {
+        return this.done;
+    }// End method isDone
 
-	            public void run() {
-	               Component[] components = workflowPanel.getComponents();
-	               for (int i = 0; i < components.length; i++) {
-	                  workflowPanel.remove(components[i]);
-	               }
-	               workflowPanel.setLayout(new GridBagLayout());
-	               GridBagConstraints c = new GridBagConstraints();
-	               c.fill = GridBagConstraints.BOTH;
-	               c.gridx = 0;
-	               c.gridy = 0;
-	               c.weightx = 1.0;
-	               c.weighty = 0;
-	               c.anchor = GridBagConstraints.WEST;
-	               workflowPanel.add(new JPanel(), c); // Filler
-	               c.gridx++;
-	               c.weightx = 0.0;
-	               workflowPanel.add(new JLabel(instruction), c);
-	               c.gridx++;
-	               workflowPanel.add(new JLabel("  "), c);
-	               c.gridx++;
-	               JTextField nameField = new JTextField(30);
-	               workflowPanel.add(nameField, c);
-	               c.gridx++;
-	               c.anchor = GridBagConstraints.SOUTHWEST;
-	               JButton stepButton = new JButton(new ImageIcon(InstructAndWait.class
-	                     .getResource("/16x16/plain/media_step_forward.png")));
-	               workflowPanel.add(stepButton, c);
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process,
+            final I_Work worker) throws TaskFailedException {
+        this.done = false;
+        I_ConfigAceFrame config = (I_ConfigAceFrame) worker
+                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        boolean builderVisible = config.isBuilderToggleVisible();
+        config.setBuilderToggleVisible(false);
+        boolean progressPanelVisible = config.isProgressToggleVisible();
+        config.setProgressToggleVisible(false);
+        boolean subversionButtonVisible = config.isBuilderToggleVisible();
+        config.setSubversionToggleVisible(false);
+        boolean inboxButtonVisible = config.isInboxToggleVisible();
+        config.setInboxToggleVisible(false);
+        try {
+            final JPanel workflowPanel = config.getWorkflowPanel();
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-	               c.gridx++;
-	               stepButton.addActionListener(new StepActionListener());
-	               JButton stopButton = new JButton(new ImageIcon(InstructAndWait.class
-	                     .getResource("/16x16/plain/media_stop_red.png")));
-	               workflowPanel.add(stopButton, c);
-	               stopButton.addActionListener(new StopActionListener());
-	               c.gridx++;
-	               workflowPanel.add(new JLabel("     "), c);
-	               workflowPanel.validate();
-	               Container cont = workflowPanel;
-	               while (cont != null) {
-	                  cont.validate();
-	                  cont = cont.getParent();
-	               }
-	               stepButton.requestFocusInWindow();
-	            }
-	         });
-	         synchronized (this) {
-	            this.waitTillDone(worker.getLogger());
-	         }
-	         SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    Component[] components = workflowPanel.getComponents();
+                    for (int i = 0; i < components.length; i++) {
+                        workflowPanel.remove(components[i]);
+                    }
+                    workflowPanel.setLayout(new GridBagLayout());
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.fill = GridBagConstraints.BOTH;
+                    c.gridx = 0;
+                    c.gridy = 0;
+                    c.weightx = 1.0;
+                    c.weighty = 0;
+                    c.anchor = GridBagConstraints.WEST;
+                    workflowPanel.add(new JPanel(), c); // Filler
+                    c.gridx++;
+                    c.weightx = 0.0;
+                    workflowPanel.add(new JLabel(instruction), c);
+                    c.fill = GridBagConstraints.HORIZONTAL;
+                    c.gridx++;
+                    workflowPanel.add(new JLabel("  "), c);
+                    c.gridx++;
+                    JTextField nameField = new JTextField(30);
+                    workflowPanel.add(nameField, c);
+                    c.gridx++;
+                    c.anchor = GridBagConstraints.EAST;
+                    JButton stepButton = new JButton(
+                            new ImageIcon(
+                                    InstructAndWait.class
+                                            .getResource("/16x16/plain/media_step_forward.png")));
+                    stepButton.setToolTipText("Next step");
+                    workflowPanel.add(stepButton, c);
 
-	            public void run() {
-	               Component[] components = workflowPanel.getComponents();
-	               for (int i = 0; i < components.length; i++) {
-	                  workflowPanel.remove(components[i]);
-	               }
-	               workflowPanel.validate();
-	               Container cont = workflowPanel;
-	               while (cont != null) {
-	                  cont.validate();
-	                  cont = cont.getParent();
-	               }
-	            }
+                    c.gridx++;
+                    stepButton.addActionListener(new StepActionListener());
+                    JButton stopButton = new JButton(
+                            new ImageIcon(
+                                    InstructAndWait.class
+                                            .getResource("/16x16/plain/media_stop_red.png")));
+                    stopButton.setToolTipText("Cancel");
+                    workflowPanel.add(stopButton, c);
+                    stopButton.addActionListener(new StopActionListener());
+                    c.gridx++;
+                    workflowPanel.add(new JLabel("     "), c);
+                    workflowPanel.validate();
+                    Container cont = workflowPanel;
+                    while (cont != null) {
+                        cont.validate();
+                        cont = cont.getParent();
+                    }
+                    stepButton.requestFocusInWindow();
+                }
+            });
+            synchronized (this) {
+                this.waitTillDone(worker.getLogger());
+            }
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-	         });
-	      
-	         /*
-	    	  * Set process property value
-	    	  */ 
-	      
-	    	  process.setProperty(newRefsetPropName, refsetName);
-	      
-	      } catch (InterruptedException e) {
-	         throw new TaskFailedException(e);
-	      } catch (InvocationTargetException e) {
-	         throw new TaskFailedException(e);
-	      }catch(IntrospectionException e) {
-	    	  throw new TaskFailedException(e);
-	      }catch(IllegalAccessException e){
-	    	  throw new TaskFailedException(e);
-	      }
-	      
-	      config.setBuilderToggleVisible(builderVisible);
-	      config.setProgressToggleVisible(progressPanelVisible);
-	      config.setSubversionToggleVisible(subversionButtonVisible);
-	      config.setInboxToggleVisible(inboxButtonVisible);
-	      return returnCondition;
-	   }//End method evaluate
+                public void run() {
+                    Component[] components = workflowPanel.getComponents();
+                    for (int i = 0; i < components.length; i++) {
+                        workflowPanel.remove(components[i]);
+                    }
+                    workflowPanel.validate();
+                    Container cont = workflowPanel;
+                    while (cont != null) {
+                        cont.validate();
+                        cont = cont.getParent();
+                    }
+                }
 
-	   /**
-	    * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	    *      org.dwfa.bpa.process.I_Work)
-	    */
-	   public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-	      // Nothing to do
+            });
 
-	   }//End method complete
+            /*
+             * Set process property value
+             */
 
-	   /**
-	    * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-	    */
-	   public Collection<Condition> getConditions() {
-	      return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
-	   }//End method getConditions
+            process.setProperty(newRefsetPropName, refsetName);
 
-	   /**
-	    * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-	    */
-	   public int[] getDataContainerIds() {
-	      return new int[] {};
-	   }//End method getDataContainerIds
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        }
 
-	   public String getInstruction() {
-	      return instruction;
-	   }//End method getInstruction
+        config.setBuilderToggleVisible(builderVisible);
+        config.setProgressToggleVisible(progressPanelVisible);
+        config.setSubversionToggleVisible(subversionButtonVisible);
+        config.setInboxToggleVisible(inboxButtonVisible);
+        return returnCondition;
+    }// End method evaluate
 
-	   public void setInstruction(String instruction) {
-	      this.instruction = instruction;
-	   }//End method setInstruction
-	   
-	   public String getNewRefsetPropName() {
-		      return newRefsetPropName;
-		   }//End method getInstruction
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
+        // Nothing to do
 
-		   public void setNewRefsetPropName(String newRefsetPropName) {
-		      this.newRefsetPropName = newRefsetPropName;
-		   }//End method setInstruction
-	   
-}//End class PromptUserForInput
+    }// End method complete
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
+    }// End method getConditions
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }// End method getDataContainerIds
+
+    public String getInstruction() {
+        return instruction;
+    }// End method getInstruction
+
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }// End method setInstruction
+
+    public String getNewRefsetPropName() {
+        return newRefsetPropName;
+    }// End method getInstruction
+
+    public void setNewRefsetPropName(String newRefsetPropName) {
+        this.newRefsetPropName = newRefsetPropName;
+    }// End method setInstruction
+
+}// End class PromptUserForInput
