@@ -1,22 +1,35 @@
 package org.dwfa.ace.config;
 
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.fd.FileDialogUtil;
 import org.tigris.subversion.javahl.ClientException;
 
 /**
  * Login Dialog for ace.
  * 
- * Capturesuse subversion flag, profile and users password.
+ * Captures use subversion flag, profile and users password.
  *  
  * @author steve crow, ean dungey
  */
@@ -27,8 +40,11 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 	private FilenameFilter profileFileFilter;
 	private Configuration jiniConfig;
 	private Properties aceProperties;
+	private transient JFrame parentFrame;
 	
-    public AceLoginDialog(Properties acePropertiesToSet, Configuration jiniConfigToSet) {
+    public AceLoginDialog(Properties acePropertiesToSet, Configuration jiniConfigToSet, JFrame topFrame) {
+    	
+    	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
         
         aceProperties = acePropertiesToSet;
@@ -48,15 +64,18 @@ public class AceLoginDialog extends javax.swing.JDialog  {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        Container content = getContentPane();
+        content.setLayout(new GridBagLayout());
+
+        userLabel = new javax.swing.JLabel("User:", SwingConstants.RIGHT);
+        passwordLabel = new javax.swing.JLabel("Password:", SwingConstants.RIGHT);
         passwordField = new javax.swing.JPasswordField();
+        passwordField.setText("");
+        passwordField.setColumns(20);
         profileSelectionBox = new javax.swing.JComboBox();
         selectProfileButton = new javax.swing.JButton();
         svnConnectCheckBox = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
-        jSeparator1 = new javax.swing.JSeparator();
+        
         cancelButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
 
@@ -65,11 +84,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         setResizable(false);
         setModal(true);
 
-        jLabel1.setText("User");
-
-        jLabel2.setText("Password");
-
-        passwordField.setText("");
 
         profileSelectionBox.setBorder(null);
         
@@ -83,42 +97,28 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         svnConnectCheckBox.setSelected(true);
         svnConnectCheckBox.setText("Connect to subversion");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(svnConnectCheckBox)
-                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(profileSelectionBox, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(selectProfileButton, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(profileSelectionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(selectProfileButton))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(svnConnectCheckBox)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        
+        content.add(userLabel, gbc);
+        gbc.gridx++;
+        content.add(profileSelectionBox, gbc);
+        gbc.gridx++;
+        content.add(selectProfileButton, gbc);
 
+        gbc.gridy++;
+        gbc.gridx = 0;
+        content.add(passwordLabel, gbc);
+        gbc.gridx++;
+        content.add(passwordField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -133,46 +133,13 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 			}
 		});
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cancelButton)
-                    .addComponent(loginButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridy++;
+        gbc.gridx++;
+        content.add(cancelButton, gbc);
+        gbc.gridx++;
+        content.add(loginButton, gbc);
+        
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -188,9 +155,43 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 				new AceSvn(AceRunner.class, jiniConfig).handleSvnProfileCheckout(aceProperties);
 			}
 
+			parentFrame = new JFrame();
+			boolean newFrame = true;
+			if (OpenFrames.getNumOfFrames() > 0) {
+				newFrame = false;
+				parentFrame = OpenFrames.getFrames().iterator().next();
+				AceLog.getAppLog().info("### Adding an existing frame");
+			} else {
+				try {
+					SwingUtilities.invokeAndWait(new Runnable() {
+
+						public void run() {
+							parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
+							parentFrame.pack();
+							Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+							parentFrame.setLocation(d.width/2, d.height/2);
+							parentFrame.setVisible(true);
+							OpenFrames.addFrame(parentFrame);
+							AceLog.getAppLog().info("### Using a new frame");
+						}
+						
+					});
+				} catch (InterruptedException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				} catch (InvocationTargetException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			}
+			
+			
 			setProfile(FileDialogUtil.getExistingFile(
 					"Please select your user profile:", profileFileFilter,
-					profileDir, null));
+					profileDir, parentFrame));
+
+			if (newFrame) {
+				OpenFrames.removeFrame(parentFrame);
+				parentFrame.setVisible(false);
+			}
 
 			profileSelectionBox.setModel(new javax.swing.DefaultComboBoxModel(
 					profileDir.list(profileFileFilter)));
@@ -212,6 +213,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
      */
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.dispose();
+        System.exit(0);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
@@ -288,34 +290,10 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 		this.profile = profileToSet;
 	}
 
-	/**
-	 * Test main method.
-	 * 
-	 * @param args the command line arguments
-	 */
-    public static void main(String args[]) {
-        AceLoginDialog aceLoginDialog;
-
-        try {
-        	aceLoginDialog = new AceLoginDialog(null, null);
-			File userProfile = aceLoginDialog.getUserProfile(new File("/mnt/raid0/development/sct-au/branches/dev-1.0/au-ct-edit-bundle/target/au-ct-edit-bundle.dir/profiles/"));
-			
-			System.out.println(userProfile.toString());
-			System.out.println(aceLoginDialog.getPassword());
-
-		} catch (TaskFailedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel userLabel;
+    private javax.swing.JLabel passwordLabel;
     private javax.swing.JButton loginButton;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JComboBox profileSelectionBox;

@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -264,7 +265,34 @@ public class AceRunner {
 
 		public GetProfileWorker(File aceConfigFile, Properties aceProperties, Configuration jiniConfig, CountDownLatch latch) {
 			super();
-			aceLoginDialog = new AceLoginDialog(aceProperties, jiniConfig);
+			parentFrame = new JFrame();
+			boolean newFrame = true;
+			if (OpenFrames.getNumOfFrames() > 0) {
+				newFrame = false;
+				parentFrame = OpenFrames.getFrames().iterator().next();
+				AceLog.getAppLog().info("### Adding an existing frame");
+			} else {
+				try {
+					SwingUtilities.invokeAndWait(new Runnable() {
+
+						public void run() {
+							parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
+							parentFrame.pack();
+							Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+							parentFrame.setLocation(d.width/2, d.height/2);
+							parentFrame.setVisible(true);
+							OpenFrames.addFrame(parentFrame);
+							AceLog.getAppLog().info("### Using a new frame");
+						}
+						
+					});
+				} catch (InterruptedException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				} catch (InvocationTargetException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			}
+			aceLoginDialog = new AceLoginDialog(aceProperties, jiniConfig, parentFrame);
 
 			this.aceConfigFile = aceConfigFile;
 			this.jiniConfig = jiniConfig;
