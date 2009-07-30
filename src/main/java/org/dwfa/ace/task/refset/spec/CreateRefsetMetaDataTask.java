@@ -135,9 +135,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             // commit
             termFactory.commit();
 
-            // open refset spec panel TODO
-
-            // set new spec as focus TODO
+            // set new spec as focus
+            termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(refset);
 
             return Condition.CONTINUE;
         } catch (Exception ex) {

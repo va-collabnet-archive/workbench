@@ -164,7 +164,7 @@ public class PromptUserForInput extends AbstractTask {
                     c.gridx++;
                     workflowPanel.add(new JLabel("  "), c);
                     c.gridx++;
-                    JTextField nameField = new JTextField(30);
+                    JTextField nameField = new JTextField(15);
                     workflowPanel.add(nameField, c);
                     c.gridx++;
                     c.anchor = GridBagConstraints.EAST;
