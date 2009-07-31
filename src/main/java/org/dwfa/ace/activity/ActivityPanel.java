@@ -164,19 +164,27 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         return this;
     }
 
-    public void setProgressInfoUpper(String text) {
-        progressInfoUpper.setText(text);
+    public void setProgressInfoUpper(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressInfoUpper.setText(text);
+            }
+        });
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setProgressInfoUpper(text);
         }
     }
 
-    public void setProgressInfoLower(String text) {
-        if (text.startsWith("<html>")) {
-            progressInfoLower.setText("<html>   " + text.substring(6));
-        } else {
-            progressInfoLower.setText("   " + text);
-        }
+    public void setProgressInfoLower(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (text.startsWith("<html>")) {
+                    progressInfoLower.setText("<html>   " + text.substring(6));
+                } else {
+                    progressInfoLower.setText("   " + text);
+                }
+            }
+        });
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setProgressInfoLower(text);
         }

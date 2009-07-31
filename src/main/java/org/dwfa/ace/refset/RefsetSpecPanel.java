@@ -65,7 +65,7 @@ public class RefsetSpecPanel extends JPanel {
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
         TermTreeHelper treeHelper = new TermTreeHelper(
-                new RefsetSpecFrameConfig(ace.getAceFrameConfig()));
+                new RefsetSpecFrameConfig(ace.getAceFrameConfig()), ace);
         editor = new RefsetSpecEditor(ace, treeHelper);
         split.setTopComponent(editor.getContentPanel());
 

@@ -1750,7 +1750,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
     }
 
     private JComponent getContentPanel() throws Exception {
-        treeHelper = new TermTreeHelper(aceFrameConfig);
+        treeHelper = new TermTreeHelper(this.aceFrameConfig, this);
         termTree = treeHelper.getHierarchyPanel();
         conceptPanels = new ArrayList<ConceptPanel>();
         c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, this,
@@ -3900,4 +3900,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
     public void setRefsetInSpecEditor(I_GetConceptData refset) {
         refsetSpecPanel.setRefsetInSpecEditor(refset);
     }
+
+	public SearchPanel getSearchPanel() {
+		return searchPanel;
+	}
 }

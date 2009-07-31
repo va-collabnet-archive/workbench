@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -35,10 +36,11 @@ public class TermTreeHelper implements PropertyChangeListener {
 	private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1);
 
 
-	private I_ConfigAceFrame aceFrameConfig;
+	private ACE ace;
 	private JTreeWithDragImage tree;
 	private ActivityPanel activity;
 	private TermTreeCellRenderer renderer;
+	private I_ConfigAceFrame aceFrameConfig;
 
 	
 	public ActivityPanel getTreeActivityPanel() {
@@ -53,8 +55,9 @@ public class TermTreeHelper implements PropertyChangeListener {
 		return tree;
 	}
 
-	public TermTreeHelper(I_ConfigAceFrame aceFrameConfig) {
+	public TermTreeHelper(I_ConfigAceFrame aceFrameConfig, ACE ace) {
 		super();
+		this.ace = ace;
 		this.aceFrameConfig = aceFrameConfig;
 	}
 
@@ -73,7 +76,7 @@ public class TermTreeHelper implements PropertyChangeListener {
 		}
 		tree = new JTreeWithDragImage(aceFrameConfig, this);
 		tree.putClientProperty("JTree.lineStyle", "None");
-		tree.addMouseListener(new TreeMouseListener(aceFrameConfig));
+		tree.addMouseListener(new TreeMouseListener(ace));
 		tree.setLargeModel(true);
 		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		tree.setTransferHandler(new TerminologyTransferHandler(tree));

@@ -1,6 +1,8 @@
 package org.dwfa.ace.tree;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -15,19 +17,42 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.QueryBean;
+import org.dwfa.ace.search.SimilarConceptQuery;
 
 public class TreeMouseListener implements MouseListener {
 
-	private I_ConfigAceFrame aceConfig;
+	public class SetSearchToSimilar implements ActionListener {
 
-	public TreeMouseListener(I_ConfigAceFrame aceConfig) {
+		public void actionPerformed(ActionEvent arg0) {
+			I_GetConceptData selectedConcept = ace.getAceFrameConfig().getHierarchySelection();
+			try {
+				QueryBean qb = SimilarConceptQuery.make(selectedConcept, ace.getAceFrameConfig());
+				ace.getSearchPanel().setQuery(qb);
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (ClassNotFoundException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (InstantiationException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IllegalAccessException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		}
+	}
+
+	private ACE ace;
+
+	public TreeMouseListener(ACE ace) {
 		super();
-		this.aceConfig = aceConfig;
+		this.ace = ace;
 	}
 
 	public void mousePressed(MouseEvent e) {
@@ -92,8 +117,12 @@ public class TreeMouseListener implements MouseListener {
 			JPopupMenu popup = new JPopupMenu();
 			JMenuItem noActionItem = new JMenuItem("");
 			popup.add(noActionItem);
+			JMenuItem searchForSimilarConcepts = new JMenuItem("Search for similar concepts...");
+			popup.add(searchForSimilarConcepts);
+			searchForSimilarConcepts.addActionListener(new SetSearchToSimilar());
+			popup.addSeparator();
 			ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"), 
-					this.aceConfig.getWorker());
+					ace.getAceFrameConfig().getWorker());
 			return popup;
 	}
 
@@ -112,12 +141,12 @@ public class TreeMouseListener implements MouseListener {
 			return;
 		}
 		if (addNodes) {
-			aceConfig.getParentExpandedNodes().add(treeBean.getConceptId());
+			ace.getAceFrameConfig().getParentExpandedNodes().add(treeBean.getConceptId());
 			List<I_RelTuple> tuples;
 			try {
-				tuples = treeBean.getSourceRelTuples(aceConfig
-						.getAllowedStatus(), aceConfig.getDestRelTypes(),
-						aceConfig.getViewPositionSet(), false);
+				tuples = treeBean.getSourceRelTuples(ace.getAceFrameConfig()
+						.getAllowedStatus(), ace.getAceFrameConfig().getDestRelTypes(),
+						ace.getAceFrameConfig().getViewPositionSet(), false);
 				int[] newNodeIndices = new int[tuples.size()];
 				int index = 0;
 				int insertIndex = parentNode.getIndex(node);
@@ -133,7 +162,7 @@ public class TreeMouseListener implements MouseListener {
 
 					ConceptBeanForTree extraParentBean = ConceptBeanForTree
 							.get(t.getC2Id(), t.getRelId(), treeBean
-									.getParentDepth() + 1, true, this.aceConfig);
+									.getParentDepth() + 1, true, ace.getAceFrameConfig());
 					DefaultMutableTreeNode extraParentNode = new DefaultMutableTreeNode(
 							extraParentBean);
 					extraParentNode.setAllowsChildren(false);
@@ -147,7 +176,7 @@ public class TreeMouseListener implements MouseListener {
 			}
 		} else { // remove nodes
 			removeAllExtraParents(model, treeBean, parentNode);
-			aceConfig.getParentExpandedNodes().remove(treeBean.getConceptId());
+			ace.getAceFrameConfig().getParentExpandedNodes().remove(treeBean.getConceptId());
 		}
 		model.nodeStructureChanged(parentNode);
 	}
