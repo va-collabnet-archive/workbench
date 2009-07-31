@@ -571,7 +571,7 @@ public class SearchPanel extends JPanel {
         sortingTable.setSortingStatus(0, SortOrder.DESCENDING);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 10;
+        gbc.gridwidth = 11;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
