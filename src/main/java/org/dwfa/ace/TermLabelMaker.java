@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.plaf.basic.BasicHTML;
@@ -350,6 +351,77 @@ public class TermLabelMaker {
 		String toolTipHtml = toolTipBuff.toString();
 		LabelForRelationshipTuple lrt = new LabelForRelationshipTuple(rel,
 				showLongForm, showStatus);
+		return makeLabel(lrt, labelHtml, toolTipHtml);
+	}
+
+	// RELATIONSIP LABEL FOR NORMALIZED FORMS
+	public static I_ImplementActiveLabel newLabel(List<I_RelTuple> relList,
+			boolean showLongForm, boolean showStatus) throws IOException {
+
+		StringBuffer labelBuff = new StringBuffer();
+		StringBuffer toolTipBuff = new StringBuffer();
+		labelBuff.append("<html>");
+		toolTipBuff.append("<html>");
+
+		boolean addBreak = false;
+		for (I_RelTuple rel : relList) {
+			ConceptBean typeBean = ConceptBean.get(rel.getTypeId());
+			ConceptBean destBean = ConceptBean.get(rel.getC2Id());
+			ConceptBean refinabilityBean = ConceptBean.get(rel
+					.getRefinabilityId());
+			ConceptBean characteristicBean = ConceptBean.get(rel
+					.getCharacteristicId());
+			ConceptBean statusBean = ConceptBean.get(rel.getStatusId());
+
+			if (addBreak)
+				labelBuff.append("<br>");
+			else
+				addBreak = true;
+
+			labelBuff.append("<font face='Dialog' size='3' color='blue'>");
+			labelBuff.append(typeBean.getInitialText());
+			labelBuff
+					.append(" &nbsp;</font><br><font face='Dialog' size='3' color='green'>");
+			labelBuff.append(destBean.getInitialText());
+			labelBuff.append(" &nbsp;</font>");
+			StringBuffer writeBuff = labelBuff;
+			if (showLongForm) {
+				writeBuff = labelBuff;
+				writeBuff.append("<br>");
+			} else {
+				writeBuff = toolTipBuff;
+			}
+			writeBuff
+					.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
+			writeBuff.append(characteristicBean.getInitialText());
+			writeBuff
+					.append("</font> &#151 <font face='Dialog' size='2' color='#00008B'>");
+			writeBuff.append(refinabilityBean.getInitialText());
+			writeBuff.append("</font>");
+			writeBuff
+					.append("</font> &#151 <font face='Dialog' size='2' color='#00008B'>");
+			writeBuff.append(rel.getGroup());
+			writeBuff.append("&nbsp;</font>");
+			if (showStatus) {
+				writeBuff = labelBuff;
+				writeBuff.append("<br>");
+			} else {
+				writeBuff = toolTipBuff;
+				if (showLongForm == false) {
+					writeBuff.append("<br>");
+				}
+			}
+			writeBuff
+					.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
+			writeBuff.append(statusBean.getInitialText());
+			writeBuff.append("&nbsp;</font>");
+		}
+
+		String labelHtml = labelBuff.toString();
+		String toolTipHtml = toolTipBuff.toString();
+
+		LabelForGroupTuple lrt = new LabelForGroupTuple(relList, showLongForm,
+				showStatus);
 		return makeLabel(lrt, labelHtml, toolTipHtml);
 	}
 
