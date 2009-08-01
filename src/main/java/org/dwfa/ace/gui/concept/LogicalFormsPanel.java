@@ -10,9 +10,9 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +37,7 @@ import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
@@ -46,8 +46,13 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.ace.task.classify.SnoAB;
+import org.dwfa.ace.task.classify.SnoGrp;
+import org.dwfa.ace.task.classify.SnoGrpList;
+import org.dwfa.ace.task.classify.SnoRel;
+import org.dwfa.ace.utypes.UniversalAceBean;
+import org.dwfa.ace.utypes.UniversalAceIdentification;
+import org.dwfa.bpa.process.Condition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
@@ -70,7 +75,6 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 	 * Uses <code>AWT Color</code> object which use some of the following <a
 	 * href=http://www.w3schools.com/html/html_colornames.asp>color names &
 	 * values</a>. These colors are used to highlight differences.
-	 * 
 	 */
 	public static class DeltaColors {
 
@@ -118,7 +122,9 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 	private JPanel deltaJPanel;
 	private JPanel deltaPartJPanel;
 	private JPanel formsJPanel; // sub panels added using tmpJPanel
-	//private JPanel statsJPanel; // for additional useful information
+
+	boolean statsJPanelFlag = false;
+	private JPanel statsJPanel; // for additional useful information
 
 	private JCheckBox showStatusCB = new JCheckBox("show status");
 	private JCheckBox showDetailCB = new JCheckBox("show detail");
@@ -142,6 +148,8 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 	private I_TermFactory tf;
 	private I_ConfigAceFrame config;
 	private ConceptBean theCBean;
+	SnoAB util = null;
+	boolean showGroupLabels = true; // toggles grouped vs. single label display
 
 	// ** CORE CONSTANTS **
 	private static int isaNid;
@@ -172,6 +180,9 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 	private int countFindRoleProxDuplPartGE2 = 0;
 	private int countFindSelfDuplPartGE2 = 0;
 	private int countIsCDefinedDuplPartGE2 = 0;
+
+	// ** :DEBUG: **
+	private boolean debug = false;
 
 	// private int countIsCDefinedDuplPart = 0;
 
@@ -262,14 +273,14 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		add(formJScrollPane, c);
 
 		// STATS PANEL ROW
-		if (false) {
-			// c.gridy++;// next row
-			// c.gridx = 0; // reset at west side of row
-			// c.gridwidth = 1;
-			//statsJPanel = new JPanel(new GridBagLayout());
-			//statsJPanel.setName("Stats Panel");
-			//statsJPanel.setBorder(BorderFactory.createTitledBorder("Stats: "));
-			//add(statsJPanel, c);
+		if (statsJPanelFlag) {
+			c.gridy++;// next row
+			c.gridx = 0; // reset at west side of row
+			c.gridwidth = 1;
+			statsJPanel = new JPanel(new GridBagLayout());
+			statsJPanel.setName("Stats Panel");
+			statsJPanel.setBorder(BorderFactory.createTitledBorder("Stats: "));
+			add(statsJPanel, c);
 		}
 
 		// COMPONENT BORDER
@@ -281,6 +292,12 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		// SETUP CLASSIFIER PREFERENCE FIELDS
 		try {
 			config = tf.getActiveAceFrameConfig();
+			if (config.getClassifierIsaType() == null) {
+				String errStr = "Classifier Is-a -- not set in Classifier preferences tab!";
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new Exception(errStr));
+				return;
+			}
 			isaNid = config.getClassifierIsaType().getConceptId();
 			// :TODO: review as acceptable status set @@@
 			isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
@@ -297,6 +314,12 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 
 			// GET ALL EDIT_PATH ORIGINS
 			I_GetConceptData cEditPathObj = config.getClassifierInputPath();
+			if (cEditPathObj == null) {
+				String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new Exception(errStr));
+				return;
+			}
 			cEditIPath = tf.getPath(cEditPathObj.getUids());
 			cEditPathPos = new ArrayList<I_Position>();
 			cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
@@ -304,10 +327,21 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 
 			// GET ALL CLASSIFER_PATH ORIGINS
 			I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
+			if (cClassPathObj == null) {
+				String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new Exception(errStr));
+				return;
+			}
 			cClassIPath = tf.getPath(cClassPathObj.getUids());
 			cClassPathPos = new ArrayList<I_Position>();
 			cClassPathPos.add(new Position(Integer.MAX_VALUE, cClassIPath));
 			addPathOrigins(cClassPathPos, cClassIPath);
+
+			util = new SnoAB();
+			SnoAB.isCURRENT = isCURRENT;
+			SnoAB.isaNid = isaNid;
+			SnoAB.posList = cClassPathPos;
 
 		} catch (TerminologyException e) {
 			// TODO Auto-generated catch block
@@ -366,7 +400,8 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		commonJPanel.removeAll();
 		deltaJPanel.removeAll();
 		formsJPanel.removeAll(); // FORMS HAS TWO SUBPANELS: STATED & COMPUTED
-		// statsJPanel.removeAll();
+		if (statsJPanelFlag)
+			statsJPanel.removeAll();
 
 		if (conceptIn != null) {
 			// COMMON PANEL
@@ -422,6 +457,13 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 			c.gridy = 0;
 
 			I_Path path;
+			if (config.getClassifierInputPath() == null) {
+				String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
+				AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+						new Exception(errStr));
+				return;
+			}
+
 			try {
 				path = ((VodbEnv) LocalVersionedTerminology.get())
 						.getPath(config.getClassifierInputPath().getConceptId());
@@ -493,7 +535,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 			}
 
 			// STATISTICS PANEL
-			if (false) {
+			if (statsJPanelFlag) {
 				c = new GridBagConstraints();
 				c.fill = GridBagConstraints.BOTH;
 				c.anchor = GridBagConstraints.NORTHWEST;
@@ -506,7 +548,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 				JEditorPane ep2 = new JEditorPane("text/html", markup);
 				JScrollPane statsJScroll = new JScrollPane(ep2);
 				statsJScroll.setBorder(new TitledBorder("Statistics"));
-				// statsJPanel.add(statsJScroll);
+				statsJPanel.add(statsJScroll);
 
 				AceLog.getAppLog().log(Level.INFO, statsToString());
 				statsReset();
@@ -770,39 +812,51 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		return isaRTFinal;
 	}
 
-	private List<I_RelTuple> findRoleDiffFromRoot(ConceptBean cBean,
+	private SnoGrpList findRoleDiffFromRoot(ConceptBean cBean,
 			List<I_Position> posList) {
+		SnoGrpList rgl_A;
+		SnoGrpList rgl_B;
+		SnoGrp rv_A;
+		SnoGrp rv_B;
 
-		List<I_RelTuple> roleRTFinal = new ArrayList<I_RelTuple>();
+		// :DEBUG:
+		Set<Integer> debugRoleSet = new HashSet<Integer>();
+		Set<Integer> debugValueSet = new HashSet<Integer>();
 
-		// GET IMMEDIATE PROXIMAL ROLES
+		// GET IMMEDIATE PROXIMAL ROLES & SEPARATE GROUPS
 		List<I_RelTuple> roleRTProx = findRoleProximal(cBean, posList);
-		roleRTFinal.addAll(roleRTProx);
+		if (debug)
+			debugUpdateSets(roleRTProx, debugRoleSet, debugValueSet);
+		rgl_A = splitGrouped(roleRTProx);
+		rv_A = splitNonGrouped(roleRTProx);
 
 		// GET PROXIMAL ISAs, one next level up at a time
 		List<I_RelTuple> isaRTNext = findIsaProximal(cBean, posList);
 		List<I_RelTuple> isaRTNextB = new ArrayList<I_RelTuple>();
 		while (isaRTNext.size() > 0) {
 
-			// FOR EACH PROXIMAL CONCEPT...
+			// FOR EACH CURRENT PROXIMAL CONCEPT...
 			for (I_RelTuple isaRT : isaRTNext) {
 				ConceptBean isaCB = ConceptBean.get(isaRT.getC2Id());
 
-				// ... EVALUATE PROXIMAL ROLES
+				// ... EVALUATE PROXIMAL ROLES & SEPARATE GROUP
 				roleRTProx = findRoleProximal(isaCB, posList);
-				for (I_RelTuple roleRT : roleRTProx) {
-					// CHECK FOR REDUNDANT TYPE ID
-					int z = 0;
-					while ((z < roleRTFinal.size())
-							&& roleRTFinal.get(z).getTypeId() != roleRT
-									.getTypeId()) {
-						z++;
-					}
-					if (z == roleRTFinal.size()) {
-						// THEN ADD PROXIMAL ROLE TO FINALROLES
-						roleRTFinal.add(roleRT);
-					}
-				}
+				if (debug)
+					debugUpdateSets(roleRTProx, debugRoleSet, debugValueSet);
+				rgl_B = splitGrouped(roleRTProx);
+				rv_B = splitNonGrouped(roleRTProx);
+
+				// KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
+				rv_A = rv_A.whichRoleValDifferFrom(rv_B);
+				// setup rv_A for the next iteration
+				// add anything new which also differentiates
+				rv_A.addAllWithSort(rv_B.whichRoleValDifferFrom(rv_A));
+
+				// KEEP DIFFERENTIATED GROUPS
+				// keep what continues to differentiate
+				rgl_A = rgl_A.whichDifferentiateFrom(rgl_B);
+				// add anything new which also differentiates
+				rgl_A.addAll(rgl_B.whichDifferentiateFrom(rgl_A));
 
 				// ... GET PROXIMAL ISAs
 				isaRTNextB.addAll(findIsaProximal(isaCB, posList));
@@ -813,91 +867,189 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 			isaRTNextB = new ArrayList<I_RelTuple>();
 		}
 
-		return roleRTFinal;
+		// last check for redundant -- check may not be needed
+		rv_A = rv_A.whichRoleValAreNonRedundant();
+		rgl_A = rgl_A.whichNonRedundant();
+
+		if (debug)
+			debugToStringNidSet(debugRoleSet, debugValueSet);
+
+		// Remove any un-grouped which do not differentiate from other groups
+		SnoGrpList grpList0 = new SnoGrpList();
+		for (SnoRel a : rv_A)
+			grpList0.add(new SnoGrp(a));
+		grpList0 = grpList0.whichDifferentiateFrom(rgl_A);
+
+		// Repackage the un-grouped for passing to the GUI label presentation.
+		SnoGrp keepGrp0 = new SnoGrp();
+		for (SnoGrp g : grpList0)
+			keepGrp0.add(g.get(0));
+		// All un-grouped must in position 0 of the returned group list
+		rgl_A.add(0, keepGrp0.sortByType());
+
+		return rgl_A;
 	}
 
-	private List<I_RelTuple> findRoleDiffFromProx(ConceptBean cBean,
+	private SnoGrp splitNonGrouped(List<I_RelTuple> relsIn) {
+		List<SnoRel> relsOut = new ArrayList<SnoRel>();
+		for (I_RelTuple r : relsIn)
+			if (r.getGroup() == 0)
+				relsOut.add(new SnoRel(r.getFixedPart(), r.getPart(), -1));
+		SnoGrp sgOut = new SnoGrp(relsOut, true);
+		sgOut = sgOut.whichRoleValAreNonRedundant();
+		return sgOut; // returns as sorted.
+	}
+
+	private SnoGrpList splitGrouped(List<I_RelTuple> relsIn) {
+		SnoGrpList sg = new SnoGrpList();
+
+		// Step 1: Segment
+		// :TODO: flag rel-groups with only one member.
+		List<SnoRel> srl = new ArrayList<SnoRel>();
+		for (I_RelTuple r : relsIn)
+			if (r.getGroup() != 0)
+				srl.add(new SnoRel(r.getRelVersioned(), r.getPart(), -1));
+
+		if (srl.size() == 0)
+			return sg; // this is an empty set.
+
+		Collections.sort(srl);
+
+		// :TODO: since sorted, array may be partitioned a bit more efficiently
+		int i = 0;
+		int max = srl.size();
+		int lastGroupId = srl.get(0).group;
+		SnoGrp groupList = new SnoGrp();
+		while (i < max) {
+			SnoRel thisSnoRel = srl.get(i++);
+			if (thisSnoRel.group != lastGroupId) {
+				sg.add(groupList); // has been pre-sorted
+				groupList = new SnoGrp();
+			}
+			groupList.add(thisSnoRel);
+			lastGroupId = thisSnoRel.group;
+		}
+		if (groupList.size() > 0)
+			sg.add(groupList);
+
+		// Step 2: Get non-Redundant set
+		sg = sg.whichNonRedundant();
+
+		return sg;
+	}
+
+	private SnoGrpList findRoleDiffFromProx(ConceptBean cBean,
 			List<I_RelTuple> isaList, List<I_Position> posList) {
 
 		// FIND IMMEDIATE ROLES OF *THIS*CONCEPT*
 		List<I_RelTuple> roleRTSetA = findRoleProximal(cBean, posList);
+		SnoGrpList grpListA = splitGrouped(roleRTSetA);
+		SnoGrp unGrpA = splitNonGrouped(roleRTSetA);
 
 		// FIND NON-REDUNDANT ROLE SET OF PROXIMATE ISA
-		List<I_RelTuple> roleRTSetB = new ArrayList<I_RelTuple>();
+		SnoGrpList grpListB = new SnoGrpList();
+		SnoGrp unGrpB = new SnoGrp();
 		for (I_RelTuple isaRT : isaList) {
 			ConceptBean isaCB = ConceptBean.get(isaRT.getC2Id());
-			List<I_RelTuple> tmpRoleRT = findRoleDiffFromRoot(isaCB, posList);
+			SnoGrpList tmpGrpList = findRoleDiffFromRoot(isaCB, posList);
 
-			// check if already in set b
-			for (I_RelTuple roleRT : tmpRoleRT) {
-				int z = 0;
-				while ((z < roleRTSetB.size())
-						&& roleRTSetB.get(z).getTypeId() != roleRT.getTypeId()) {
-					z++;
-				}
-				if (z == roleRTSetB.size()) {
-					roleRTSetB.add(roleRT);
-				}
-			}
+			// separate un-grouped
+			SnoGrp tmpUnGrp;
+			if (tmpGrpList.size() > 0)
+				tmpUnGrp = tmpGrpList.remove(0);
+			else
+				break;
+
+			// KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
+			unGrpB = unGrpB.whichRoleValDifferFrom(tmpUnGrp);
+			// setup rv_A for the next iteration
+			// add anything new which also differentiates
+			unGrpB.addAllWithSort(tmpUnGrp.whichRoleValDifferFrom(unGrpB));
+
+			// keep role-groups which continue to differentiate
+			grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
+			// add anything new which also differentiates
+			grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
 		}
 
 		// KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE
-		List<I_RelTuple> roleRTFinal = new ArrayList<I_RelTuple>();
-		// ... i.e. keep the roles in A which are NOT present in B
-		for (I_RelTuple roleA : roleRTSetA) {
-			int z = 0;
-			while ((z < roleRTSetB.size())
-					&& roleRTSetB.get(z).getTypeId() != roleA.getTypeId()) {
-				z++;
-			}
-			if (z == roleRTSetB.size()) { // A not found in B
-				roleRTFinal.add(roleA); // therefore keep
-			}
-		}
+		unGrpA = unGrpA.whichRoleValDifferFrom(unGrpB);
+		grpListA.whichDifferentiateFrom(grpListB);
 
-		return roleRTFinal;
+		// Remove any un-grouped which do not differentiate from other groups
+		SnoGrpList grpList0 = new SnoGrpList();
+		for (SnoRel a : unGrpA)
+			grpList0.add(new SnoGrp(a));
+		grpList0 = grpList0.whichDifferentiateFrom(grpListA);
+
+		// Repackage the un-grouped for passing to the GUI label presentation.
+		SnoGrp keepGrp0 = new SnoGrp();
+		for (SnoGrp g : grpList0)
+			keepGrp0.add(g.get(0));
+		// All un-grouped must in position 0 of the returned group list
+		grpListA.add(0, keepGrp0.sortByType());
+
+		return grpListA;
 	}
 
-	private List<I_RelTuple> findRoleDiffFromProxPrim(ConceptBean cBean,
+	private SnoGrpList findRoleDiffFromProxPrim(ConceptBean cBean,
 			List<I_RelTuple> isaList, List<I_Position> posList) {
 
 		// FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
-		List<I_RelTuple> roleRTSetA = findRoleDiffFromRoot(cBean, posList);
+		SnoGrpList grpListA = findRoleDiffFromRoot(cBean, posList);
+		// separate un-grouped
+		SnoGrp unGrpA;
+		if (grpListA.size() > 0)
+			unGrpA = grpListA.remove(0);
+		else {
+			return grpListA;
+		}
 
 		// FIND ROLE SET OF MOST PROXIMATE PRIMITIVE
-		List<I_RelTuple> roleRTSetB = new ArrayList<I_RelTuple>();
+		// List<I_RelTuple> roleRTSetB = new ArrayList<I_RelTuple>();
+		SnoGrpList grpListB = new SnoGrpList();
+		SnoGrp unGrpB = new SnoGrp();
 		for (I_RelTuple isaRT : isaList) {
 			ConceptBean isaCB = ConceptBean.get(isaRT.getC2Id());
-			List<I_RelTuple> tmpRoleRT = findRoleDiffFromRoot(isaCB, posList);
+			SnoGrpList tmpGrpList = findRoleDiffFromRoot(isaCB, posList);
 
-			// check if already in set b
-			for (I_RelTuple roleRT : tmpRoleRT) {
-				int z = 0;
-				while ((z < roleRTSetB.size())
-						&& roleRTSetB.get(z).getTypeId() != roleRT.getTypeId()) {
-					z++;
-				}
-				if (z == roleRTSetB.size()) {
-					roleRTSetB.add(roleRT);
-				}
-			}
+			// separate un-grouped
+			SnoGrp tmpUnGrp;
+			if (tmpGrpList.size() > 0)
+				tmpUnGrp = tmpGrpList.remove(0);
+			else
+				break;
+
+			// KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
+			unGrpB = unGrpB.whichRoleValDifferFrom(tmpUnGrp);
+			// setup rv_A for the next iteration
+			// add anything new which also differentiates
+			unGrpB.addAllWithSort(tmpUnGrp.whichRoleValDifferFrom(unGrpB));
+
+			// keep role-groups which continue to differentiate
+			grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
+			// add anything new which also differentiates
+			grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
 		}
 
 		// KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE PRIMITIVE
-		List<I_RelTuple> roleRTFinal = new ArrayList<I_RelTuple>();
-		// ... i.e. keep the roles in A which are NOT present in B
-		for (I_RelTuple roleA : roleRTSetA) {
-			int z = 0;
-			while ((z < roleRTSetB.size())
-					&& roleRTSetB.get(z).getTypeId() != roleA.getTypeId()) {
-				z++;
-			}
-			if (z == roleRTSetB.size()) { // A not found in B
-				roleRTFinal.add(roleA); // therefore keep
-			}
-		}
+		unGrpA = unGrpA.whichRoleValDifferFrom(unGrpB);
+		grpListA.whichDifferentiateFrom(grpListB);
 
-		return roleRTFinal;
+		// Remove any un-grouped which do not differentiate from other groups
+		SnoGrpList grpList0 = new SnoGrpList();
+		for (SnoRel a : unGrpA)
+			grpList0.add(new SnoGrp(a));
+		grpList0 = grpList0.whichDifferentiateFrom(grpListA);
+
+		// Repackage the un-grouped for passing to the GUI label presentation.
+		SnoGrp keepGrp0 = new SnoGrp();
+		for (SnoGrp g : grpList0)
+			keepGrp0.add(g.get(0));
+		// All un-grouped must in position 0 of the returned group list
+		grpListA.add(0, keepGrp0.sortByType());
+
+		return grpListA;
 	}
 
 	private I_ConceptAttributeTuple findSelf(ConceptBean cBean,
@@ -1030,17 +1182,60 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		}
 
 		// FIND NON-REDUNDANT ROLES, DIFFERENTIATED FROM PROXIMATE ISA
-		List<I_RelTuple> roleList = findRoleDiffFromProx(theCBean, isaList,
-				cClassPathPos);
+		SnoGrpList sgl = findRoleDiffFromProx(theCBean, isaList, cClassPathPos);
 		// SHOW ROLE SET
-		for (I_RelTuple t : roleList) {
-			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t,
-					showDetailCB.isSelected(), showStatusCB.isSelected());
-			tLabelList.add((LabelForTuple) tLabel);
-			Color deltaColor = relColorMap.get(t);
-			setBorder(tLabel.getLabel(), deltaColor);
-			formJPanel.add(tLabel.getLabel(), c);
-			c.gridy++;
+		if (sgl.size() > 0) {
+			int i = 0;
+			SnoGrp sg = sgl.get(0);
+			// show each of the non-Rels
+			if (sg.size() > 0 && sg.get(0).group == 0) {
+				for (SnoRel sr : sg) {
+					I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+					tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+							showDetailCB.isSelected(), showStatusCB
+									.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(rTuple);
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				}
+				i++; // skip past 0 index of the "un-grouped"
+			}
+
+			// show each of the groups
+			for (; i < sgl.size(); i++) {
+				sg = sgl.get(i);
+				if (sg.size() == 0)
+					continue; // :TODO: investigate why empty sets exist
+				if (showGroupLabels) { // true shows one label per group
+					List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+					for (SnoRel sr : sg) {
+						grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
+					}
+					tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
+							.isSelected(), showStatusCB.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(grpTuple.get(0));
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				} else { // if false, show 1 rel per label
+					for (SnoRel sr : sg) {
+						I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
+								sr.relPart);
+						tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+								showDetailCB.isSelected(), showStatusCB
+										.isSelected());
+						tLabelList.add((LabelForTuple) tmpTLabel);
+						tmpDeltaColor = relColorMap.get(rTuple);
+						setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+						formJPanel.add(tmpTLabel.getLabel(), c);
+						c.gridy++;
+					}
+					c.gridy++;
+				}
+			}
 		}
 
 		c.weightx = 1.0;
@@ -1100,17 +1295,60 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		}
 
 		// SHOW ROLES, NON-REDUNDANT, DIFFERENTIATED FROM ROOT
-		relList = findRoleDiffFromRoot(theCBean, cClassPathPos);
-		for (I_RelTuple rTuple : relList) {
-			tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB
-					.isSelected(), showStatusCB.isSelected());
-			tLabelList.add((LabelForTuple) tmpTLabel);
-			tmpDeltaColor = relColorMap.get(rTuple);
-			setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
-			formJPanel.add(tmpTLabel.getLabel(), c);
-			c.gridy++;
-		}
+		SnoGrpList sgl = findRoleDiffFromRoot(theCBean, cClassPathPos);
+		if (sgl.size() > 0) {
+			int i = 0;
+			SnoGrp sg = sgl.get(0);
+			// show each of the non-Rels
+			if (sg.size() > 0 && sg.get(0).group == 0) {
+				for (SnoRel sr : sg) {
+					I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+					tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+							showDetailCB.isSelected(), showStatusCB
+									.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(rTuple);
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				}
+				i++; // skip past 0 index of the "un-grouped"
+			}
 
+			// show each of the groups
+			for (; i < sgl.size(); i++) {
+				sg = sgl.get(i);
+				if (sg.size() == 0)
+					continue;
+				if (showGroupLabels) { // true shows one label per group
+					List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+					for (SnoRel sr : sg) {
+						grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
+					}
+					tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
+							.isSelected(), showStatusCB.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(grpTuple.get(0));
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				} else { // if false, show 1 rel per label
+					for (SnoRel sr : sg) {
+						I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
+								sr.relPart);
+						tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+								showDetailCB.isSelected(), showStatusCB
+										.isSelected());
+						tLabelList.add((LabelForTuple) tmpTLabel);
+						tmpDeltaColor = relColorMap.get(rTuple);
+						setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+						formJPanel.add(tmpTLabel.getLabel(), c);
+						c.gridy++;
+					}
+					c.gridy++;
+				}
+			}
+		}
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		c.gridwidth = 2;
@@ -1169,15 +1407,60 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		}
 
 		// SHOW ROLES, NON-REDUNDANT, DIFFERENTIATED FROM ROOT
-		relList = findRoleDiffFromRoot(theCBean, cClassPathPos);
-		for (I_RelTuple rTuple : relList) {
-			tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB
-					.isSelected(), showStatusCB.isSelected());
-			tLabelList.add((LabelForTuple) tmpTLabel);
-			tmpDeltaColor = relColorMap.get(rTuple);
-			setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
-			formJPanel.add(tmpTLabel.getLabel(), c);
-			c.gridy++;
+		SnoGrpList sgl = findRoleDiffFromRoot(theCBean, cClassPathPos);
+		if (sgl.size() > 0) {
+			int i = 0;
+			SnoGrp sg = sgl.get(0);
+			// show each of the non-Rels
+			if (sg.size() > 0 && sg.get(0).group == 0) {
+				for (SnoRel sr : sg) {
+					I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+					tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+							showDetailCB.isSelected(), showStatusCB
+									.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(rTuple);
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				}
+				i++; // skip past 0 index of the "un-grouped"
+			}
+
+			// show each of the groups
+			for (; i < sgl.size(); i++) {
+				sg = sgl.get(i);
+				if (sg.size() == 0)
+					continue;
+				if (showGroupLabels) { // set to true to show one label per
+					// group
+					List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+					for (SnoRel sr : sg) {
+						grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
+					}
+					tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
+							.isSelected(), showStatusCB.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(grpTuple.get(0));
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				} else { // if false, show 1 rel per label
+					for (SnoRel sr : sg) {
+						I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
+								sr.relPart);
+						tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+								showDetailCB.isSelected(), showStatusCB
+										.isSelected());
+						tLabelList.add((LabelForTuple) tmpTLabel);
+						tmpDeltaColor = relColorMap.get(rTuple);
+						setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+						formJPanel.add(tmpTLabel.getLabel(), c);
+						c.gridy++;
+					}
+					c.gridy++;
+				}
+			}
 		}
 
 		c.weightx = 1.0;
@@ -1238,16 +1521,60 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		}
 
 		// SHOW ROLES
-		List<I_RelTuple> roleList = findRoleDiffFromProxPrim(theCBean, isaList,
+		SnoGrpList sgl = findRoleDiffFromProxPrim(theCBean, isaList,
 				cClassPathPos);
-		for (I_RelTuple t : roleList) {
-			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t,
-					showDetailCB.isSelected(), showStatusCB.isSelected());
-			tLabelList.add((LabelForTuple) tLabel);
-			Color deltaColor = relColorMap.get(t);
-			setBorder(tLabel.getLabel(), deltaColor);
-			formJPanel.add(tLabel.getLabel(), c);
-			c.gridy++;
+		if (sgl.size() > 0) {
+			int i = 0;
+			SnoGrp sg = sgl.get(0);
+			// show each of the non-Rels
+			if (sg.size() > 0 && sg.get(0).group == 0) {
+				for (SnoRel sr : sg) {
+					I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+					tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+							showDetailCB.isSelected(), showStatusCB
+									.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(rTuple);
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				}
+				i++; // skip past 0 index of the "un-grouped"
+			}
+
+			// show each of the groups
+			for (; i < sgl.size(); i++) {
+				sg = sgl.get(i);
+				if (sg.size() == 0)
+					continue;
+				if (showGroupLabels) { // true shows one label per group
+					List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+					for (SnoRel sr : sg) {
+						grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
+					}
+					tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
+							.isSelected(), showStatusCB.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(grpTuple.get(0));
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				} else { // if false, show 1 rel per label
+					for (SnoRel sr : sg) {
+						I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
+								sr.relPart);
+						tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+								showDetailCB.isSelected(), showStatusCB
+										.isSelected());
+						tLabelList.add((LabelForTuple) tmpTLabel);
+						tmpDeltaColor = relColorMap.get(rTuple);
+						setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+						formJPanel.add(tmpTLabel.getLabel(), c);
+						c.gridy++;
+					}
+					c.gridy++;
+				}
+			}
 		}
 
 		c.weightx = 1.0;
@@ -1281,31 +1608,86 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		c.gridwidth = 2;
 		c.anchor = GridBagConstraints.NORTHWEST;
 
-		// concept attributes
-		List<I_ConceptAttributeTuple> conTuples = this.theCBean
-				.getConceptAttributeTuples(config.getAllowedStatus(), posSet);
-		for (I_ConceptAttributeTuple t : conTuples) {
-			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t,
-					showDetailCB.isSelected(), showStatusCB.isSelected());
-			tLabelList.add((LabelForTuple) tLabel);
-			Color deltaColor = conAttrColorMap.get(t);
-			setBorder(tLabel.getLabel(), deltaColor);
-			formJPanel.add(tLabel.getLabel(), c);
+		// SHOW SELF CONCEPT
+		I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
+		I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple,
+				showDetailCB.isSelected(), showStatusCB.isSelected());
+		tLabelList.add((LabelForTuple) tmpTLabel);
+		Color tmpDeltaColor = conAttrColorMap.get(cTuple);
+		setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+		formJPanel.add(tmpTLabel.getLabel(), c);
+		c.gridy++;
+
+		// SHOW PROXIMAL ISAs -- as relationships
+		List<I_RelTuple> relList = findIsaProximal(theCBean, cEditPathPos);
+		for (I_RelTuple rTuple : relList) {
+			tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB
+					.isSelected(), showStatusCB.isSelected());
+			tLabelList.add((LabelForTuple) tmpTLabel);
+			tmpDeltaColor = relColorMap.get(rTuple);
+			setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+			formJPanel.add(tmpTLabel.getLabel(), c);
 			c.gridy++;
 		}
 
-		// rels
-		List<I_RelTuple> relList = this.theCBean.getSourceRelTuples(config
-				.getAllowedStatus(), null, posSet, false);
-		for (I_RelTuple t : relList) {
-			I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t,
-					showDetailCB.isSelected(), showStatusCB.isSelected());
-			tLabelList.add((LabelForTuple) tLabel);
-			Color deltaColor = relColorMap.get(t);
-			setBorder(tLabel.getLabel(), deltaColor);
-			formJPanel.add(tLabel.getLabel(), c);
-			c.gridy++;
+		// GET IMMEDIATE PROXIMAL ROLES & SEPARATE INTO GROUPS
+		List<I_RelTuple> roleRTProx = findRoleProximal(theCBean, cEditPathPos);
+		SnoGrpList sgl = splitGrouped(roleRTProx);
+		sgl.add(0, splitNonGrouped(roleRTProx)); // un-group to first position
+		if (sgl.size() > 0) {
+			int i = 0;
+			SnoGrp sg = sgl.get(0);
+			// show each of the non-Rels
+			if (sg.size() > 0 && sg.get(0).group == 0) {
+				for (SnoRel sr : sg) {
+					I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+					tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+							showDetailCB.isSelected(), showStatusCB
+									.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(rTuple);
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				}
+				i++; // skip past 0 index of the "un-grouped"
+			}
+
+			// show each of the groups
+			for (; i < sgl.size(); i++) {
+				sg = sgl.get(i);
+				if (sg.size() == 0)
+					continue;
+				if (showGroupLabels) { // true shows one label per group
+					List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+					for (SnoRel sr : sg) {
+						grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
+					}
+					tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
+							.isSelected(), showStatusCB.isSelected());
+					tLabelList.add((LabelForTuple) tmpTLabel);
+					tmpDeltaColor = relColorMap.get(grpTuple.get(0));
+					setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+					formJPanel.add(tmpTLabel.getLabel(), c);
+					c.gridy++;
+				} else { // if false, show 1 rel per label
+					for (SnoRel sr : sg) {
+						I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
+								sr.relPart);
+						tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
+								showDetailCB.isSelected(), showStatusCB
+										.isSelected());
+						tLabelList.add((LabelForTuple) tmpTLabel);
+						tmpDeltaColor = relColorMap.get(rTuple);
+						setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
+						formJPanel.add(tmpTLabel.getLabel(), c);
+						c.gridy++;
+					}
+					c.gridy++;
+				}
+			}
 		}
+
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		c.gridwidth = 2;
@@ -1315,51 +1697,91 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 	}
 
 	public String statsToHtml() {
-		StringBuilder markup = new StringBuilder(256);
+		StringBuilder html = new StringBuilder(256);
 
-		markup.append("<font face=\"monospace\">");
-		markup.append("<br>");
-		markup.append("<br>countFindIsaProxDuplPart=\t"
+		html.append("<font face=\"monospace\">");
+		html.append("<br>");
+		html.append("<br>countFindIsaProxDuplPart=\t"
 				+ countFindIsaProxDuplPart);
-		markup.append("<br>countFindRoleProxDuplPart=\t"
+		html.append("<br>countFindRoleProxDuplPart=\t"
 				+ countFindRoleProxDuplPart);
-		markup.append("<br>countFindSelfDuplPart=\t" + countFindSelfDuplPart);
-		markup.append("<br>countIsCDefinedDuplPart=\t"
-				+ countIsCDefinedDuplPart);
-		markup.append("<br>countFindIsaProxDuplPartGE2=\t"
+		html.append("<br>countFindSelfDuplPart=\t" + countFindSelfDuplPart);
+		html.append("<br>countIsCDefinedDuplPart=\t" + countIsCDefinedDuplPart);
+		html.append("<br>countFindIsaProxDuplPartGE2=\t"
 				+ countFindIsaProxDuplPartGE2);
-		markup.append("<br>countFindRoleProxDuplPartGE2=\t"
+		html.append("<br>countFindRoleProxDuplPartGE2=\t"
 				+ countFindRoleProxDuplPartGE2);
-		markup.append("<br>countFindSelfDuplPartGE2=\t"
+		html.append("<br>countFindSelfDuplPartGE2=\t"
 				+ countFindSelfDuplPartGE2);
-		markup.append("<br>countIsCDefinedDuplPartGE2=\t"
+		html.append("<br>countIsCDefinedDuplPartGE2=\t"
 				+ countIsCDefinedDuplPartGE2);
-		return markup.toString();
+		return html.toString();
 	}
 
 	public String statsToString() {
-		StringBuilder markup = new StringBuilder(256);
+		StringBuilder s = new StringBuilder(256);
 
-		markup.append("\r\n::: [LogicalFormsPanel]");
-		markup.append("\r\n:::");
-		markup.append("\r\n:::countFindIsaProxDuplPart=\t"
+		s.append("\r\n::: [LogicalFormsPanel]");
+		s.append("\r\n:::");
+		s.append("\r\n:::countFindIsaProxDuplPart=\t"
 				+ countFindIsaProxDuplPart);
-		markup.append("\r\n:::countFindRoleProxDuplPart=\t"
+		s.append("\r\n:::countFindRoleProxDuplPart=\t"
 				+ countFindRoleProxDuplPart);
-		markup
-				.append("\r\n:::countFindSelfDuplPart=\t"
-						+ countFindSelfDuplPart);
-		markup.append("\r\n:::countIsCDefinedDuplPart=\t"
-				+ countIsCDefinedDuplPart);
-		markup.append("\r\n:::countFindIsaProxDuplPartGE2=\t"
+		s.append("\r\n:::countFindSelfDuplPart=\t" + countFindSelfDuplPart);
+		s.append("\r\n:::countIsCDefinedDuplPart=\t" + countIsCDefinedDuplPart);
+		s.append("\r\n:::countFindIsaProxDuplPartGE2=\t"
 				+ countFindIsaProxDuplPartGE2);
-		markup.append("\r\n:::countFindRoleProxDuplPartGE2=\t"
+		s.append("\r\n:::countFindRoleProxDuplPartGE2=\t"
 				+ countFindRoleProxDuplPartGE2);
-		markup.append("\r\n:::countFindSelfDuplPartGE2=\t"
+		s.append("\r\n:::countFindSelfDuplPartGE2=\t"
 				+ countFindSelfDuplPartGE2);
-		markup.append("\r\n:::countIsCDefinedDuplPartGE2=\t"
+		s.append("\r\n:::countIsCDefinedDuplPartGE2=\t"
 				+ countIsCDefinedDuplPartGE2);
-		return markup.toString();
+		return s.toString();
+	}
+
+	private String toStringNid(int nid) {
+		try {
+			I_GetConceptData a = tf.getConcept(nid);
+			a.getUids().iterator().next().toString();
+			String s = nid + "\t" + a.getUids().iterator().next().toString()
+					+ "\t" + a.getInitialText();
+			return s;
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	// Most verbose. Includes "everything" (except the nid native id!)
+	// Everything: UUIDs, attrib., descr., source rels, images[], uncommitted[]
+	private String toStringNidUAB(int nid) {
+		try {
+			I_GetConceptData a = tf.getConcept(nid);
+			UniversalAceBean au = a.getUniversalAceBean();
+			return au.toString();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	// Several UUIDs related to the immediate concept.
+	private String toStringNidUAI(int nid) {
+		try {
+			I_IdVersioned idv = tf.getId(nid);
+			UniversalAceIdentification uai = idv.getUniversal();
+			return uai.toString();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 	public void statsReset() {
@@ -1371,6 +1793,59 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 		countFindRoleProxDuplPartGE2 = 0;
 		countFindSelfDuplPartGE2 = 0;
 		countIsCDefinedDuplPartGE2 = 0;
+	}
+
+	private void debugToStringNidSet(Set<Integer> roleSet, Set<Integer> valueSet) {
+		// Initial Text
+		StringBuilder s = new StringBuilder();
+		s.append("\r\n::: DEBUG ROLE_TYPE NIDS");
+		for (Integer i : roleSet)
+			s.append("\r\n::: \t" + toStringNid(i.intValue()));
+		AceLog.getAppLog().log(Level.INFO, s.toString());
+
+		s = new StringBuilder();
+		s.append("\r\n::: DEBUG ROLE_VALUE NIDS");
+		for (Integer i : valueSet)
+			s.append("\r\n::: \t" + toStringNid(i.intValue()));
+		AceLog.getAppLog().log(Level.INFO, s.toString());
+
+		if (false) {
+			// Universal Bean
+			s = new StringBuilder();
+			s.append("\r\n::: DEBUG ROLE_TYPE UBEAN");
+			for (Integer i : roleSet)
+				s.append("\r\n::: \r\n" + toStringNidUAB(i.intValue()));
+			AceLog.getAppLog().log(Level.INFO, s.toString());
+
+			s = new StringBuilder();
+			s.append("\r\n::: DEBUG ROLE_VALUE UBEAN");
+			for (Integer i : valueSet)
+				s.append("\r\n::: \r\n" + toStringNidUAB(i.intValue()));
+			AceLog.getAppLog().log(Level.INFO, s.toString());
+		}
+
+		if (false) {
+			// Universal ID
+			s = new StringBuilder();
+			s.append("\r\n::: DEBUG ROLE_TYPE UID");
+			for (Integer i : roleSet)
+				s.append("\r\n::: \r\n" + toStringNidUAI(i.intValue()));
+			AceLog.getAppLog().log(Level.INFO, s.toString());
+
+			s = new StringBuilder();
+			s.append("\r\n::: DEBUG ROLE_VALUE UID");
+			for (Integer i : valueSet)
+				s.append("\r\n::: \r\n" + toStringNidUAI(i.intValue()));
+			AceLog.getAppLog().log(Level.INFO, s.toString());
+		}
+	}
+
+	private void debugUpdateSets(List<I_RelTuple> rtlist, Set<Integer> typeSet,
+			Set<Integer> cid2Set) {
+		for (I_RelTuple rt : rtlist) {
+			typeSet.add(new Integer(rt.getTypeId()));
+			cid2Set.add(new Integer(rt.getC2Id()));
+		}
 	}
 
 }
