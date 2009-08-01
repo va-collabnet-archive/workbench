@@ -78,37 +78,46 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             throws TaskFailedException {
 
         try {
-
-            long startTime = new Date().getTime();
-
             configFrame = (I_ConfigAceFrame) worker
                     .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
                             .name());
 
+            long startTime = new Date().getTime();
+            termFactory = LocalVersionedTerminology.get();
+
+            // initialise the progress panel
+            I_ShowActivity computeRefsetActivityPanel = termFactory
+                    .newActivityPanel(true);
+
+            I_GetConceptData normalMemberConcept = termFactory
+                    .getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
+            int conceptsToProcess = termFactory.getConceptCount();
+            computeRefsetActivityPanel.setMaximum(conceptsToProcess);
+            computeRefsetActivityPanel.setStringPainted(true);
+            computeRefsetActivityPanel.setValue(0);
+            computeRefsetActivityPanel.setIndeterminate(false);
+            ProgressReport progressReport = new ProgressReport();
+            progressReport.setStartTime(startTime);
+
             I_GetConceptData refsetSpec = configFrame
                     .getRefsetSpecInSpecEditor();
             if (refsetSpec == null) {
+                progressReport.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel
+                        .setProgressInfoLower("Refset spec is null.");
                 throw new TaskFailedException("Refset spec is null.");
             }
 
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             if (refset == null) {
+                progressReport.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel
+                        .setProgressInfoLower("Refset is null.");
                 throw new TaskFailedException("Refset is null.");
             }
 
-            termFactory = LocalVersionedTerminology.get();
-
-            I_GetConceptData normalMemberConcept = termFactory
-                    .getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
-            int conceptsToProcess = termFactory.getConceptCount();
-
-            // initialise the progress panel
-            I_ShowActivity computeRefsetActivityPanel = termFactory
-                    .newActivityPanel(true);
-            computeRefsetActivityPanel.setMaximum(conceptsToProcess);
-            computeRefsetActivityPanel.setStringPainted(true);
-            computeRefsetActivityPanel.setValue(0);
-            computeRefsetActivityPanel.setIndeterminate(false);
             computeRefsetActivityPanel.setProgressInfoUpper("Computing refset "
                     + ": " + refset.getInitialText());
 
@@ -129,16 +138,18 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             cancelButton.addActionListener(new ButtonListener(this));
 
-            ProgressReport progressReport = new ProgressReport();
-            progressReport.setStartTime(startTime);
             computeRefsetActivityPanel.setProgressInfoLower(progressReport
                     .toString());
 
-            // create the query object, based on the refset spec currently in
-            // the refset spec editor
+            // create the query object, based on the refset spec
+            // currently in the refset spec editor
             RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame,
                     termFactory, refsetSpec, refset);
             if (query.getTotalStatementCount() == 0) {
+                progressReport.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel
+                        .setProgressInfoLower("Refset spec is empty - skipping execution.");
                 throw new TaskFailedException(
                         "Refset spec is empty - skipping execution.");
             }
@@ -160,8 +171,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // 1. iterate over each concept and run query against it
             // (this will also execute any sub-queries)
-            // 2. any concepts that meet the query criteria are added
-            // to results list
+            // 2. any concepts that meet the query criteria are
+            // added to results list
             getLogger().info(
                     "Start execution of refset spec : "
                             + refsetSpec.getInitialText());
@@ -223,10 +234,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 cancelButton.setEnabled(false);
                 cancelButton.setVisible(false);
                 progressReport.setComplete(true);
+                computeRefsetActivityPanel.complete();
                 computeRefsetActivityPanel
                         .setProgressInfoLower("User cancelled.");
                 throw new TaskFailedException(
                         "User cancelled refset computation.");
+                // return;
             }
 
             progressReport.setStep2Complete(true);
@@ -236,8 +249,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // add any remaining members
             // add concepts from list view to the refset
-            // this will skip any that already exist as current members of the
-            // refset
+            // this will skip any that already exist as current
+            // members of the refset
             memberRefsetHelper.addAllToRefset(refsetMembers,
                     "Adding new members to member refset", useMonitor);
 
@@ -275,6 +288,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 throw new TaskFailedException(
                         "User cancelled refset computation.");
             }
+
             return Condition.CONTINUE;
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -61,12 +61,14 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(final I_EncodeBusinessProcess process,
+            I_Work worker) throws TaskFailedException {
 
         try {
-            String name = (String) process.readProperty(newRefsetPropName);
             termFactory = LocalVersionedTerminology.get();
+
+            String name = (String) process.readProperty(newRefsetPropName);
+
             I_GetConceptData fsnConcept = termFactory
                     .getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
                             .getUids());
