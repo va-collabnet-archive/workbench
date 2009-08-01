@@ -53,7 +53,7 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion <= dataVersion) {
             uuidPropName = (String) in.readObject();
             conceptPropName = (String) in.readObject();
             if (objDataVersion < 2) {
@@ -129,6 +129,14 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
 
 	public void setUuidPropName(String uuidPropName) {
 		this.uuidPropName = uuidPropName;
+	}
+
+	public String getProfilePropName() {
+		return profilePropName;
+	}
+
+	public void setProfilePropName(String profilePropName) {
+		this.profilePropName = profilePropName;
 	}
 
 

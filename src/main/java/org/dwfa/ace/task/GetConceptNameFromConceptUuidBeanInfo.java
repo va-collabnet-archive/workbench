@@ -30,6 +30,14 @@ public class GetConceptNameFromConceptUuidBeanInfo extends SimpleBeanInfo {
             uuidPropName.setDisplayName("<html><font color='green'>Concept Uuid:");
             uuidPropName.setShortDescription("Uuuid list.");
 
+            PropertyDescriptor profilePropName =
+                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+            profilePropName.setBound(true);
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile");
+            
+            
             PropertyDescriptor conceptPropName =
                 new PropertyDescriptor("conceptPropName", getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
@@ -37,7 +45,7 @@ public class GetConceptNameFromConceptUuidBeanInfo extends SimpleBeanInfo {
             conceptPropName.setDisplayName("<html><font color='green'>Concept Name:");
             conceptPropName.setShortDescription("Concept");
 
-            PropertyDescriptor rv[] = { uuidPropName, conceptPropName };
+            PropertyDescriptor rv[] = { uuidPropName, conceptPropName, profilePropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
