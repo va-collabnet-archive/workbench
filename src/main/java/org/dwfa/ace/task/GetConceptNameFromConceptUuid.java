@@ -8,6 +8,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -33,16 +35,19 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     
     private String uuidPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
     
     private String conceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidPropName);
         out.writeObject(conceptPropName);
+        out.writeObject(profilePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -51,6 +56,11 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
         if (objDataVersion == dataVersion) {
             uuidPropName = (String) in.readObject();
             conceptPropName = (String) in.readObject();
+            if (objDataVersion < 2) {
+            	profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+            } else {
+            	profilePropName = (String) in.readObject();
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -69,18 +79,17 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
         try {
             
         	I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, uuidPropName);
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process
+            	.readProperty(profilePropName);
             
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
         
-          //  worker.getLogger().info("uuidListPropName: " + uuidListPropName);
-          // worker.getLogger().info("temporaryListUuid: " + temporaryListUuid);
-                        
+            I_DescriptionTuple desc = concept.getDescTuple(config.getLongLabelDescPreferenceList(), 
+            		config.getAllowedStatus(), config.getViewPositionSet());
 
-			//worker.getLogger().info("concept" + concept);
-
-            process.setProperty(this.conceptPropName, concept);
+            process.setProperty(this.conceptPropName, desc.getText());
             
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
