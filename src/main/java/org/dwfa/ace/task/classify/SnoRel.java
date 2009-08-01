@@ -90,10 +90,18 @@ public class SnoRel implements Comparable<Object> {
 
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append(relVers.getRelId() + "\t" + c1Id + "\t" + c2Id + "\t" + typeId
-				+ "\t" + group + "\t" + relPart.getPathId() + "\t"
-				+ relPart.getVersion() + "\t" + relPart.getRefinabilityId()
-				+ "\t" + relPart.getCharacteristicId() + "\t" + cid);
+		if (relVers != null && relPart != null) {
+			s.append(relVers.getRelId() + "\t" + c1Id + "\t" + c2Id + "\t"
+					+ typeId + "\t" + group + "\t" + relPart.getPathId() + "\t"
+					+ relPart.getVersion() + "\t" + relPart.getRefinabilityId()
+					+ "\t" + relPart.getCharacteristicId() + "\t" + cid);
+		} else {
+			s.append("___________" + "\t" + c1Id + "\t" + c2Id + "\t" + typeId
+					+ "\t" + group + "\t" + "___________" + "\t"
+					+ "___________" + "\t" + "___________" + "\t"
+					+ "___________" + "\t" + cid);
+		}
+
 		return s.toString();
 	}
 
