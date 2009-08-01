@@ -122,27 +122,29 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                                                         new I_ConceptualizeUniversally[] { CASE_SENSITIVITY }) ,
                LANGUAGE_SPECIFICATION(new String[] {"language specification (language concept)","language"}, null,
                        new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }) ,
+                       LIT(new String[] {"Language-independent token (language concept)","Language-independent token"}, null,
+  	                          new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
                        EN(new String[] {"English (language concept)","English"}, null,
  	                          new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
-	                       EN_BZ(new String[] {"Belize English (language concept)","BZ English"}, null,
+	                       EN_BZ(new String[] {"Belize English (language concept)","English-Belize"}, null,
 	                          new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_TT(new String[] {"Trinidad English (language concept)","TT English"}, null,
+	                       EN_TT(new String[] {"Trinidad English (language concept)","English-Trinidad"}, null,
 	                          new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_AU(new String[] {"Australian English (language concept)","AU English"}, null,
+	                       EN_AU(new String[] {"Australian English (language concept)","English-Australian"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_CA(new String[] {"Canadian English (language concept)","CA English"}, null,
+	                       EN_CA(new String[] {"Canadian English (language concept)","English-Canadian"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_US(new String[] {"United States English (language concept)","US English"}, null,
+	                       EN_US(new String[] {"United States English (language concept)","English-United States"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_GB(new String[] {"United Kingdom English (language concept)","UK English"}, null,
+	                       EN_GB(new String[] {"United Kingdom English (language concept)","English-United Kingdom"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_NZ(new String[] {"New Zealand English (language concept)","NZ English"}, null,
+	                       EN_NZ(new String[] {"New Zealand English (language concept)","English-New Zealand"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_IE(new String[] {"Ireland English (language concept)","IE English"}, null,
+	                       EN_IE(new String[] {"Ireland English (language concept)","English-Ireland"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_ZA(new String[] {"South Africa English (language concept)","ZA English"}, null,
+	                       EN_ZA(new String[] {"South Africa English (language concept)","English-South Africa"}, null,
 	                             new I_ConceptualizeUniversally[] { EN }) ,
-	                       EN_JM(new String[] {"Jamica English (language concept)","JM English"}, null,
+	                       EN_JM(new String[] {"Jamica English (language concept)","English-Jamica"}, null,
 	                                       new I_ConceptualizeUniversally[] { EN }) ,
                        ES(new String[] {"Spanish (language concept)","Spanish"}, null,
                     	 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
@@ -199,10 +201,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	                	 		FR_MC(new String[] {"French-Principality of Monaco (language concept)","French-Principality of Monaco"}, null,
 	                	 		 	    new I_ConceptualizeUniversally[] { FR }) ,
 
-                	 		DQ(new String[] {"Danish (language concept)","Danish"}, null,
+                	 		DA(new String[] {"Danish (language concept)","Danish"}, null,
                 	 		 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
                     	 		DA_DK(new String[] {"Danish-Denmark (language concept)","Danish-Denmark"}, null,
-                    	 		 	    new I_ConceptualizeUniversally[] { DQ }) ,
+                    	 		 	    new I_ConceptualizeUniversally[] { DA }) ,
 
                 	 		SV(new String[] {"Swedish (language concept)","Swedish"}, null,
                 	 		 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
@@ -273,7 +275,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                      NOT_ACCEPTABLE("not acceptable",
                            new I_ConceptualizeUniversally[] { ACCEPTABILITY }),
               DESCRIPTION_TYPE("description type",
-                      new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
+                      new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
@@ -326,6 +328,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is a (relationship type)"}, null,
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_SAME_AS_REL("is same as (relationship type)",
+                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_ALIAS_OF("is alias of (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             DUP_REL_TYPE("dup rel type (terminology constant)",
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
@@ -476,10 +480,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { STATUS }),
         USER_INFO("user info",
             new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-            USER_NAME("user name",
-                    new I_ConceptualizeUniversally[] { USER_INFO }),
+            USER_NAME("username",
+                    new I_ConceptualizeUniversally[] { USER_INFO, DESCRIPTION_TYPE }),
             USER_INBOX("user inbox",
-                    new I_ConceptualizeUniversally[] { USER_INFO }),
+                    new I_ConceptualizeUniversally[] { USER_INFO, DESCRIPTION_TYPE }),
         PATH("path",
                 new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
             RELEASE("release",
@@ -1227,9 +1231,93 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_US.getUids()))
         return "en-US";
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_ZA.getUids()))
-        return "en-ZA";
+          return "en-ZA";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LIT.getUids()))
+          return "LIT";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES.getUids()))
+          return "es";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_AR.getUids()))
+          return "es-AR";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_BO.getUids()))
+          return "es-BO";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_CL.getUids()))
+          return "es-CL";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_CO.getUids()))
+          return "es-CO";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_CR.getUids()))
+          return "es-CR";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_DO.getUids()))
+          return "es-DO";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_EC.getUids()))
+          return "es-EC";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_ES.getUids()))
+          return "es-ES";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_GT.getUids()))
+          return "es-GT";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_HN.getUids()))
+          return "es-HN";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_MX.getUids()))
+          return "es-MX";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_NI.getUids()))
+          return "es-NI";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PA.getUids()))
+          return "es-PA";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PE.getUids()))
+          return "es-PE";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PR.getUids()))
+          return "es-PR";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PY.getUids()))
+          return "es-PY";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_SV.getUids()))
+          return "es-SV";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_UY.getUids()))
+          return "es-UY";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_VE.getUids()))
+          return "es-VE";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR.getUids()))
+          return "fr";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_BE.getUids()))
+          return "fr-BE";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_CA.getUids()))
+          return "fr-CA";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_FR.getUids()))
+          return "fr-FR";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_CH.getUids()))
+          return "fr-CH";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_LU.getUids()))
+          return "fr-LU";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_MC.getUids()))
+          return "fr-MC";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DA.getUids()))
+          return "da";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DA_DK.getUids()))
+          return "da-DK";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SV.getUids()))
+          return "sv";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SV_FI.getUids()))
+          return "sv-FI";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SV_SE.getUids()))
+          return "sv-SE";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LT.getUids()))
+          return "lt";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LT_LT.getUids()))
+          return "lt-LT";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH.getUids()))
+          return "zh";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_CN.getUids()))
+          return "zh-CN";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_HK.getUids()))
+          return "zh-HK";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_CHS.getUids()))
+          return "zh-CHS";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_CHT.getUids()))
+          return "zh-CHT";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_MO.getUids()))
+          return "zh-MO";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_SG.getUids()))
+          return "zh-SG";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_TW.getUids()))
+          return "zh-TW";
       throw new NoSuchElementException("UNK: " + uuids);
   }
-
-
 }
