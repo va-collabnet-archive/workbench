@@ -88,8 +88,11 @@ public class PlatformWebBrowser {
 		public boolean openURL(URL url) {
 
 			try {
+				String externalForm = url.toExternalForm();
+				externalForm = externalForm.replace(" ", "%20");
+				URL urlForUri = new URL(externalForm);
 				browseMethod.invoke(
-						desktopObject, new Object[] { url.toURI() });
+						desktopObject, new Object[] { urlForUri.toURI() });
 				return true;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

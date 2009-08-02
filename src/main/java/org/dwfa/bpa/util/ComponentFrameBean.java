@@ -319,8 +319,20 @@ public class ComponentFrameBean implements ActionListener,
       bundleMenu.add(aboutMI = new JMenuItem("About..."));
       aboutMI.addActionListener(this);
     }
-
-    mainMenuBar.add(windowMenu = new JMenu("Window"));
+    int helpIndex = -1;
+    for (int i = 0; i < mainMenuBar.getMenuCount(); i++) {
+    	JMenu menu = mainMenuBar.getMenu(i);
+    	if (menu.getText().toLowerCase().equals("help")) {
+    		helpIndex = i;
+    		break;
+    	}
+    }
+    windowMenu = new JMenu("Window");
+    if (helpIndex == -1) {
+        mainMenuBar.add(windowMenu);
+    } else {
+        mainMenuBar.add(windowMenu, helpIndex);    	
+    }
     addFramesToWindowMenu();
 
     this.frame.setJMenuBar(mainMenuBar);
