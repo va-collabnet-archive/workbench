@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -17,10 +16,10 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import net.jini.config.Configuration;
-
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 
 /**
@@ -33,18 +32,11 @@ import org.dwfa.bpa.process.TaskFailedException;
 public class AceLoginDialog extends javax.swing.JDialog  {
 	private static final long serialVersionUID = -4458854470566944865L;
 	private File profile;
-	private File profileDir;
-	private Configuration jiniConfig;
-	private Properties aceProperties;
-	private transient JFrame parentFrame;
 	
-    public AceLoginDialog(Properties acePropertiesToSet, Configuration jiniConfigToSet, JFrame topFrame) {
+    public AceLoginDialog(JFrame topFrame) {
     	
     	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
-        
-        aceProperties = acePropertiesToSet;
-        jiniConfig = jiniConfigToSet;
     }
 
     private void initComponents() {
@@ -64,7 +56,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         loginButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("ACE User Login");
+        setTitle("User Login");
         setResizable(false);
         setModal(true);
 
@@ -117,17 +109,27 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         content.add(svnConnectCheckBox, gbc);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridy++;
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        content.add(new JPanel(), gbc);
+        gbc.gridx++;
+        content.add(new JPanel(), gbc);
+        gbc.gridx++;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         content.add(cancelButton, gbc);
         gbc.gridx++;
         content.add(loginButton, gbc);
-        if (content.getClass().isAssignableFrom(JComponent.class)) {
+        if (JComponent.class.isAssignableFrom(content.getClass())) {
         	JComponent jc = (JComponent) content;
         	jc.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        } else {
+        	AceLog.getAppLog().info("Container class is: " + content.getClass());
         }
         
         getRootPane().setDefaultButton(loginButton);
+        profileSelectionBox.requestFocusInWindow();
         pack();
     }
 
@@ -172,7 +174,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
                     isSelected,
                     cellHasFocus);
 			 if (value == null) {
-				 setText("----------");
+				 setText("");
 			 } else if (File.class.isAssignableFrom(value.getClass())) {
 				 File f = (File) value;
 				 setText(f.getName());
@@ -191,11 +193,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
      */
     public File getUserProfile(File profileDirToSet) throws TaskFailedException {
 		if (profileDirToSet != null) {
-			if (profileDirToSet.isFile()) {
-				this.profileDir = profileDirToSet.getParentFile();
-			} else {
-				this.profileDir = profileDirToSet;
-			}
 			List<File> profiles = new ArrayList<File>();
 			profiles.add(null);
 			getProfiles(profiles, new File("profiles"));
@@ -254,7 +251,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 	}
 
 	private void setProfile(File profileToSet) {
-		profileDir = profileToSet.getParentFile();
 		this.profile = profileToSet;
 	}
 

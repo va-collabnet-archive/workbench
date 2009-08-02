@@ -293,7 +293,7 @@ public class AceRunner {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
-			aceLoginDialog = new AceLoginDialog(aceProperties, jiniConfig, parentFrame);
+			aceLoginDialog = new AceLoginDialog(parentFrame);
 			aceLoginDialog.setLocation((d.width/2) - (aceLoginDialog.getWidth()/2), 
 					(d.height/2) - (aceLoginDialog.getHeight()/2));
 			this.aceConfigFile = aceConfigFile;
