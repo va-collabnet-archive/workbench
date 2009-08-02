@@ -304,21 +304,6 @@ public class ComponentFrameBean implements ActionListener,
       }
     }
 
-    // About menu item is provided on Mac OS X.. only make it on other
-    // platforms.
-    // Options/Prefs menu item is provided on Mac OS X.. only make it on
-    // other platforms.
-    if (!MAC_OS_X) {
-      String menuName = "Bundle";
-      if (System.getProperty("org.dwfa.AppMenuName") != null
-          && System.getProperty("org.dwfa.AppMenuName").length() > 3) {
-        menuName = AboutBox.removeQuotes(System.getProperty("org.dwfa.AppMenuName"));
-      }
-      mainMenuBar.add(bundleMenu = new JMenu(menuName));
-      bundleMenu.addSeparator();
-      bundleMenu.add(aboutMI = new JMenuItem("About..."));
-      aboutMI.addActionListener(this);
-    }
     int helpIndex = -1;
     for (int i = 0; i < mainMenuBar.getMenuCount(); i++) {
     	JMenu menu = mainMenuBar.getMenu(i);
@@ -326,6 +311,25 @@ public class ComponentFrameBean implements ActionListener,
     		helpIndex = i;
     		break;
     	}
+    }
+    // About menu item is provided on Mac OS X.. only make it on other
+    // platforms.
+    // Options/Prefs menu item is provided on Mac OS X.. only make it on
+    // other platforms.
+    if (!MAC_OS_X) {
+    	if (helpIndex == -1) {
+    	      String menuName = "Bundle";
+    	      if (System.getProperty("org.dwfa.AppMenuName") != null
+    	          && System.getProperty("org.dwfa.AppMenuName").length() > 3) {
+    	        menuName = AboutBox.removeQuotes(System.getProperty("org.dwfa.AppMenuName"));
+    	      }
+    	      mainMenuBar.add(bundleMenu = new JMenu(menuName));
+    	} else {
+    		bundleMenu = mainMenuBar.getMenu(helpIndex);
+    	}
+      bundleMenu.addSeparator();
+      bundleMenu.add(aboutMI = new JMenuItem("About..."));
+      aboutMI.addActionListener(this);
     }
     windowMenu = new JMenu("Window");
     if (helpIndex == -1) {
