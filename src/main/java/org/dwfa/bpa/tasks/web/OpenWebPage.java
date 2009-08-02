@@ -1,5 +1,6 @@
 package org.dwfa.bpa.tasks.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
@@ -21,21 +22,26 @@ import org.dwfa.util.bean.Spec;
 
 public class OpenWebPage extends AbstractTask {
 
-    private URL webURL = new URL("http://www.aceworkspace.net");
+    private String webURLStr = "http://www.aceworkspace.net";
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(webURL);
+        out.writeObject(webURLStr);
      }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-        	webURL = (URL) in.readObject();
+        if (objDataVersion <= dataVersion) {
+        	if (objDataVersion < 2) {
+        		URL webURL = (URL) in.readObject();
+        		webURLStr = webURL.toExternalForm();
+        	} else {
+        		webURLStr = (String) in.readObject();
+        	}
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);   
         }
@@ -48,7 +54,15 @@ public class OpenWebPage extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-        	PlatformWebBrowser.openURL(webURL);
+        	URL url = new URL(webURLStr);
+        	if (url.getProtocol().toLowerCase().equals("file")) {
+        		File f = new File(url.getFile());
+        		if (f.exists() == false) {
+        			f = new File(System.getProperty("user.dir"), url.getFile());
+        			url = f.toURL();
+        		}
+        	}
+        	PlatformWebBrowser.openURL(url);
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -72,7 +86,7 @@ public class OpenWebPage extends AbstractTask {
      * @return Returns the webURL.
      */
     public String getWebURLString() {
-        return webURL.toString();
+        return webURLStr;
     }
 
     /**
@@ -80,7 +94,7 @@ public class OpenWebPage extends AbstractTask {
      * @throws MalformedURLException 
      */
     public void setWebURLString(String webURLString) throws MalformedURLException {
-        this.webURL = new URL(webURLString);
+        this.webURLStr = webURLString;
     }
 
 }

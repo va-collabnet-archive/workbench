@@ -818,7 +818,6 @@ public class TaskPanel extends JPanel implements I_DoDragAndDrop,
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, ex.getMessage(), ex);
 		}
-
 	}
 
 	/**
