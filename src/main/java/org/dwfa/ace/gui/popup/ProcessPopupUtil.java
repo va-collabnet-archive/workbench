@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collection;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 import javax.swing.JComponent;
@@ -83,9 +85,17 @@ public class ProcessPopupUtil {
 		}
 	}
 
-	private static void addProcessMenuItems(JMenuBar menuBar, File menuDir, MasterWorker menuWorker)
+	private static Collection<File> getSortedFiles(File f) {
+		TreeSet<File> sortedFiles = new TreeSet<File>();
+		for (File child: f.listFiles()) {
+			sortedFiles.add(child);
+		}
+		return sortedFiles;
+	}
+	
+	public static void addProcessMenuItems(JMenuBar menuBar, File menuDir, MasterWorker menuWorker)
 			throws IOException, FileNotFoundException, ClassNotFoundException {
-		for (File f : menuDir.listFiles()) {
+		for (File f : getSortedFiles(menuDir)) {
 			JMenu newMenu = null;
 			if (f.isDirectory()) {
 				if (f.getName().equals("File")) {
@@ -100,11 +110,17 @@ public class ProcessPopupUtil {
 					}
 					newMenu.addSeparator();
 				} else {
-					newMenu = new JMenu(f.getName());
+					String menuName = f.getName();
+					String regex = "_";
+					if (menuName.contains(regex)) {
+						String[] parts = menuName.split(regex, 2);
+						menuName = parts[1];
+					}	
+					newMenu = new JMenu(menuName);
 					menuBar.add(newMenu);
 				}
 				if (f.listFiles() != null) {
-					for (File processFile : f.listFiles()) {
+					for (File processFile : getSortedFiles(f)) {
 						if (processFile.isDirectory()) {
 							JMenu submenu = new JMenu(processFile.getName());
 							newMenu.add(submenu);
@@ -134,6 +150,9 @@ public class ProcessPopupUtil {
 										Level.SEVERE,
 										"processing: " + processFile, e);
 							}
+						} else if (processFile.getName().toLowerCase()
+								.endsWith("separator")) {
+							newMenu.addSeparator();
 						}
 					}
 				}
@@ -145,7 +164,7 @@ public class ProcessPopupUtil {
 			MasterWorker menuWorker) throws IOException, FileNotFoundException,
 			ClassNotFoundException {
 		if ((menuDir != null) && menuDir.exists() && (menuDir.listFiles() != null)) {
-			for (File f : menuDir.listFiles()) {
+			for (File f : getSortedFiles(menuDir)) {
 				if (f.isDirectory()) {
 					JMenu newSubMenu = new JMenu(f.getName());
 					subMenu.add(newSubMenu);

@@ -32,8 +32,7 @@
 			<name>Informatics, Inc. End User License Agreement</name>
 		</license>
 	</licenses>
-
-	<dependencies>
+ 	<dependencies>
 		<dependency>
 			<groupId>com.sleepycat</groupId>
 			<artifactId>je</artifactId>
@@ -55,11 +54,11 @@
             		<version>4.5</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>jung</groupId>
-			<artifactId>jung</artifactId>
-			<version>1.7.6</version>
-		</dependency>
+    <dependency>
+      <groupId>jung</groupId>
+      <artifactId>jung</artifactId>
+      <version>1.7.6</version>
+    </dependency>
 		<dependency>
 			<groupId>org.dwfa</groupId>
 			<artifactId>icons</artifactId>
@@ -246,7 +245,17 @@
 	</build>
 
 	<repositories>
-		<repository>
+    <repository>
+      <id>mirrors.ibiblio.org</id>
+      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+ 		<repository>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>

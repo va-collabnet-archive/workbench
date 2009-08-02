@@ -1563,78 +1563,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
     private void addProcessMenuItems(JMenuBar menuBar, File menuDir)
             throws IOException, FileNotFoundException, ClassNotFoundException {
-        for (File f : menuDir.listFiles()) {
-            JMenu newMenu;
-            if (f.isDirectory()) {
-                if (f.getName().equals("File")) {
-                    newMenu = this.fileMenu;
-                    fileMenu.addSeparator();
-                    if (menuBar.getComponentIndex(fileMenu) == -1) {
-                        menuBar.add(fileMenu);
-                    }
-
-                } else {
-                    newMenu = new JMenu(f.getName());
-                    menuBar.add(newMenu);
-                }
-                if (f.listFiles() != null) {
-                    for (File processFile : f.listFiles()) {
-                        if (processFile.isDirectory()) {
-                            JMenu submenu = new JMenu(processFile.getName());
-                            newMenu.add(submenu);
-                            addSubmenMenuItems(submenu, processFile);
-                        } else if (processFile.getName().toLowerCase()
-                                .endsWith(".bp")) {
-                            try {
-                                ActionListener processMenuListener = new ProcessMenuActionListener(
-                                        processFile, menuWorker);
-                                ObjectInputStream ois = new ObjectInputStream(
-                                        new BufferedInputStream(
-                                                new FileInputStream(processFile)));
-                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-                                        .readObject();
-                                ois.close();
-                                JMenuItem processMenuItem = new JMenuItem(
-                                        process.getName());
-                                processMenuItem
-                                        .addActionListener(processMenuListener);
-                                newMenu.add(processMenuItem);
-                            } catch (IOException e) {
-                                AceLog.getAppLog().alertAndLog(null,
-                                        Level.SEVERE,
-                                        "processing: " + processFile, e);
-                            } catch (ClassNotFoundException e) {
-                                AceLog.getAppLog().alertAndLog(null,
-                                        Level.SEVERE,
-                                        "processing: " + processFile, e);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void addSubmenMenuItems(JMenu subMenu, File menuDir)
-            throws IOException, FileNotFoundException, ClassNotFoundException {
-        for (File f : menuDir.listFiles()) {
-            if (f.isDirectory()) {
-                JMenu newSubMenu = new JMenu(f.getName());
-                subMenu.add(newSubMenu);
-                addSubmenMenuItems(newSubMenu, f);
-            } else {
-                ActionListener processMenuListener = new ProcessMenuActionListener(
-                        f, menuWorker);
-                ObjectInputStream ois = new ObjectInputStream(
-                        new BufferedInputStream(new FileInputStream(f)));
-                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-                        .readObject();
-                ois.close();
-                JMenuItem processMenuItem = new JMenuItem(process.getName());
-                processMenuItem.addActionListener(processMenuListener);
-                subMenu.add(processMenuItem);
-            }
-        }
+    	ProcessPopupUtil.addProcessMenuItems(menuBar, menuDir, menuWorker);
     }
 
     private void addEditMenu(JMenuBar menuBar, JMenu editMenu) {
