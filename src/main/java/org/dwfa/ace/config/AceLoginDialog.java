@@ -1,30 +1,27 @@
 package org.dwfa.ace.config;
 
+import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FilenameFilter;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
 
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.bpa.util.OpenFrames;
-import org.dwfa.fd.FileDialogUtil;
-import org.tigris.subversion.javahl.ClientException;
 
 /**
  * Login Dialog for ace.
@@ -37,7 +34,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 	private static final long serialVersionUID = -4458854470566944865L;
 	private File profile;
 	private File profileDir;
-	private FilenameFilter profileFileFilter;
 	private Configuration jiniConfig;
 	private Properties aceProperties;
 	private transient JFrame parentFrame;
@@ -49,11 +45,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         
         aceProperties = acePropertiesToSet;
         jiniConfig = jiniConfigToSet;
-        profileFileFilter = new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.toLowerCase().endsWith(".ace");
-			}
-		};
     }
 
     private void initComponents() {
@@ -67,7 +58,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         passwordField.setText("");
         passwordField.setColumns(20);
         profileSelectionBox = new javax.swing.JComboBox();
-        selectProfileButton = new javax.swing.JButton();
         svnConnectCheckBox = new javax.swing.JCheckBox();
         
         cancelButton = new javax.swing.JButton();
@@ -81,12 +71,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 
         profileSelectionBox.setBorder(null);
         
-        selectProfileButton.setText("Other...");
-        selectProfileButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectProfileButtonActionPerformed(evt);
-            }
-        });
 
         svnConnectCheckBox.setSelected(true);
         svnConnectCheckBox.setText("Connect to subversion");
@@ -101,13 +85,13 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         
         content.add(userLabel, gbc);
         gbc.gridx++;
+        gbc.gridwidth = 3;
         content.add(profileSelectionBox, gbc);
-        gbc.gridx++;
-        content.add(selectProfileButton, gbc);
-
         gbc.gridy++;
+        gbc.gridwidth = 1;
         gbc.gridx = 0;
         content.add(passwordLabel, gbc);
+        gbc.gridwidth = 3;
         gbc.gridx++;
         content.add(passwordField, gbc);
         gbc.gridx = 0;
@@ -123,83 +107,28 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         loginButton.setText("Login");
         loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				loginButtonActionPerformed((String) profileSelectionBox.getSelectedItem());
+				loginButtonActionPerformed((File) profileSelectionBox.getSelectedItem());
 			}
 		});
 
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
-        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
         content.add(svnConnectCheckBox, gbc);
-        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridy++;
+        gbc.gridx = 2;
+        gbc.gridwidth = 1;
         content.add(cancelButton, gbc);
         gbc.gridx++;
         content.add(loginButton, gbc);
+        if (content.getClass().isAssignableFrom(JComponent.class)) {
+        	JComponent jc = (JComponent) content;
+        	jc.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        }
         
+        getRootPane().setDefaultButton(loginButton);
         pack();
-    }
-
-    /**
-     * Pops a FileDialogUtil dialog allowing the user to navigate to a profile file.
-     * 
-     * @param evt ActionEvent
-     */
-    private void selectProfileButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		try {
-
-			if (!Boolean.parseBoolean((String) aceProperties.get("initialized"))) {
-				new AceSvn(AceRunner.class, jiniConfig).handleSvnProfileCheckout(aceProperties);
-			}
-
-			parentFrame = new JFrame();
-			boolean newFrame = true;
-			if (OpenFrames.getNumOfFrames() > 0) {
-				newFrame = false;
-				parentFrame = OpenFrames.getFrames().iterator().next();
-				AceLog.getAppLog().info("### Using an existing frame LD");
-			} else {
-				try {
-					SwingUtilities.invokeAndWait(new Runnable() {
-
-						public void run() {
-							parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
-							parentFrame.pack();
-							Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-							parentFrame.setLocation(d.width/2, d.height/2);
-							parentFrame.setVisible(true);
-							OpenFrames.addFrame(parentFrame);
-							AceLog.getAppLog().info("### Adding a new frame LD");
-						}
-						
-					});
-				} catch (InterruptedException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} catch (InvocationTargetException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}
-			
-			
-			setProfile(FileDialogUtil.getExistingFile(
-					"Please select your user profile:", profileFileFilter,
-					profileDir, parentFrame));
-
-			if (newFrame) {
-				OpenFrames.removeFrame(parentFrame);
-				parentFrame.setVisible(false);
-			}
-
-			profileSelectionBox.setModel(new javax.swing.DefaultComboBoxModel(
-					profileDir.list(profileFileFilter)));
-			profileSelectionBox.validate();
-
-		} catch (TaskFailedException e) {
-			throw new RuntimeException(e);
-		} catch (ClientException e) {
-			throw new RuntimeException(e);
-		} catch (ConfigurationException e) {
-			throw new RuntimeException(e);
-		}
     }
 
     /**
@@ -217,13 +146,42 @@ public class AceLoginDialog extends javax.swing.JDialog  {
      * 
      * @param profile
      */
-    private void loginButtonActionPerformed(String profile) {
+    private void loginButtonActionPerformed(File profile) {
 		if (profile != null) {
-    		setProfile(new File(profileDir.getPath() + File.separatorChar + profile));
+    		setProfile(profile);
     	}
         dispose();
     }
 
+    private static class ProfileRenderer extends DefaultListCellRenderer {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getListCellRendererComponent(JList list,
+                Object value,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
+			 super.getListCellRendererComponent(list,
+                    value,
+                    index,
+                    isSelected,
+                    cellHasFocus);
+			 if (value == null) {
+				 setText("----------");
+			 } else if (File.class.isAssignableFrom(value.getClass())) {
+				 File f = (File) value;
+				 setText(f.getName());
+			 }
+			 
+			 return this;
+		}
+    	
+    }
     /**
      * Sets the profile dir and returns the 
      * 
@@ -231,17 +189,20 @@ public class AceLoginDialog extends javax.swing.JDialog  {
      * @return File
      * @throws TaskFailedException if there is no profile set. NB profileDirToSet can be null.
      */
-    public File getUserProfile(final File profileDirToSet) throws TaskFailedException {
+    public File getUserProfile(File profileDirToSet) throws TaskFailedException {
 		if (profileDirToSet != null) {
 			if (profileDirToSet.isFile()) {
 				this.profileDir = profileDirToSet.getParentFile();
 			} else {
 				this.profileDir = profileDirToSet;
 			}
-
-			profileSelectionBox.setModel(new javax.swing.DefaultComboBoxModel(
-					profileDir.list(profileFileFilter)));
+			List<File> profiles = new ArrayList<File>();
+			profiles.add(null);
+			getProfiles(profiles, new File("profiles"));
+			profileSelectionBox.setModel(new DefaultComboBoxModel(profiles.toArray()));
 			profileSelectionBox.validate();
+			profileSelectionBox.setSelectedItem(profileDirToSet);
+			profileSelectionBox.setRenderer(new ProfileRenderer());
 		}
 
     	setVisible(true);
@@ -249,7 +210,19 @@ public class AceLoginDialog extends javax.swing.JDialog  {
     	return getProfile();
     }
     
-    /**
+    private void getProfiles(List<File> profiles, File dir) {
+    	if (dir.listFiles() != null) {
+    		for (File f: dir.listFiles()) {
+    			if (f.isDirectory()) {
+    				getProfiles(profiles, f);
+    			} else if (f.getName().toLowerCase().endsWith(".ace")) {
+    				profiles.add(f);
+    			}
+    		}
+    	}
+    }
+    
+	/**
      * Entered password.
      * 
      * @return String
@@ -292,6 +265,5 @@ public class AceLoginDialog extends javax.swing.JDialog  {
     private javax.swing.JButton loginButton;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JComboBox profileSelectionBox;
-    private javax.swing.JButton selectProfileButton;
     private javax.swing.JCheckBox svnConnectCheckBox;
 }
