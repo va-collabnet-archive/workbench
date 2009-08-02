@@ -254,7 +254,7 @@ public class AceRunner {
 	private static class GetProfileWorker extends SwingWorker<Boolean> {
 		StartupFrameListener fl = new StartupFrameListener();
 		JFrame parentFrame = new JFrame();
-		boolean newFrame = true;
+		boolean newFrame = false;
 		private File aceConfigFile;
 		private Properties aceProperties;
 		private Configuration jiniConfig;
@@ -262,13 +262,12 @@ public class AceRunner {
 		private String password;
 		private AceLoginDialog aceLoginDialog;
 		CountDownLatch latch;
-
+		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+		
 		public GetProfileWorker(File aceConfigFile, Properties aceProperties, Configuration jiniConfig, CountDownLatch latch) {
 			super();
 			parentFrame = new JFrame();
-			boolean newFrame = true;
 			if (OpenFrames.getNumOfFrames() > 0) {
-				newFrame = false;
 				parentFrame = OpenFrames.getFrames().iterator().next();
 				AceLog.getAppLog().info("### Adding an existing frame");
 			} else {
@@ -278,11 +277,13 @@ public class AceRunner {
 						public void run() {
 							parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
 							parentFrame.pack();
-							Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-							parentFrame.setLocation(d.width/2, d.height/2);
+							
 							parentFrame.setVisible(true);
+							parentFrame.setLocation((d.width/2) - (parentFrame.getWidth()/2), 
+									(d.height/2) - (parentFrame.getHeight()/2));
 							OpenFrames.addFrame(parentFrame);
 							AceLog.getAppLog().info("### Using a new frame");
+							newFrame = true;
 						}
 						
 					});
@@ -293,7 +294,8 @@ public class AceRunner {
 				}
 			}
 			aceLoginDialog = new AceLoginDialog(aceProperties, jiniConfig, parentFrame);
-
+			aceLoginDialog.setLocation((d.width/2) - (aceLoginDialog.getWidth()/2), 
+					(d.height/2) - (aceLoginDialog.getHeight()/2));
 			this.aceConfigFile = aceConfigFile;
 			this.jiniConfig = jiniConfig;
 			this.aceProperties = aceProperties;
@@ -317,9 +319,8 @@ public class AceRunner {
 			}
 			OpenFrames.addFrameListener(fl);
 			if (OpenFrames.getNumOfFrames() > 0) {
-				newFrame = false;
 				parentFrame = OpenFrames.getFrames().iterator().next();
-				AceLog.getAppLog().info("### Adding an existing frame");
+				AceLog.getAppLog().info("### Using an existing frame 1");
 			} else {
 				SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -330,7 +331,8 @@ public class AceRunner {
 						parentFrame.setLocation(d.width/2, d.height/2);
 						parentFrame.setVisible(true);
 						OpenFrames.addFrame(parentFrame);
-						AceLog.getAppLog().info("### Using a new frame");
+						AceLog.getAppLog().info("### Adding a new frame 1");
+						newFrame = true;
 					}
 					
 				});
