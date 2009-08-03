@@ -5,6 +5,7 @@
  */
 package org.dwfa.bpa.util;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -68,6 +69,8 @@ public class PlatformWebBrowser {
 		Object desktopObject;
 
 		Method browseMethod;
+		
+		Method openMethod;
 
 		public DesktopOpener() throws ClassNotFoundException, SecurityException,
 				NoSuchMethodException, IllegalArgumentException,
@@ -83,16 +86,23 @@ public class PlatformWebBrowser {
 			browseMethod = desktopObject.getClass().getMethod("browse",
                     new Class[] { Class.forName("java.net.URI") });
 
+			openMethod = desktopObject.getClass().getMethod("open",
+                    new Class[] { Class.forName("java.io.File") });
 		}
 
 		public boolean openURL(URL url) {
 
 			try {
 				String externalForm = url.toExternalForm();
-				externalForm = externalForm.replace(" ", "%20");
-				URL urlForUri = new URL(externalForm);
-				browseMethod.invoke(
-						desktopObject, new Object[] { urlForUri.toURI() });
+				if (url.getProtocol().toLowerCase().equals("file") && 
+						url.getFile().toLowerCase().endsWith(".pdf")) {
+					openMethod.invoke(desktopObject, new Object[] { new File(url.getFile()) });
+				} else {
+					externalForm = externalForm.replace(" ", "%20");
+					URL urlForUri = new URL(externalForm);
+					browseMethod.invoke(
+							desktopObject, new Object[] { urlForUri.toURI() });
+				}
 				return true;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
