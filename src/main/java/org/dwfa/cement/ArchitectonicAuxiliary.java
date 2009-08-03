@@ -339,7 +339,12 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
             IS_A_DUP_REL("is-a dup rel (terminology constant)",
                     new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
-
+            GRANT_RELATIONSHIP("Grant relationship (user relationships)",
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+                    GRANTED_ROLE("Granted role",
+                          new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP }),
+                    GRANTED_PERMISSION("Granted permission",
+                          new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP }),
             ALLOWED_QUALIFIER_REL("allowed qualifier",
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             MAPPING_REL("mapping relationship",
