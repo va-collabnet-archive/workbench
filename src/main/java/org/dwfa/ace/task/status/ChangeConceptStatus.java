@@ -18,6 +18,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -74,8 +75,7 @@ public class ChangeConceptStatus extends AbstractTask {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			
-			I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
+        	I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, activeConceptPropName);
 			if (config.getEditingPathSet().size() == 0) {
 				throw new TaskFailedException("You must select at least one editing path. ");
 			}
