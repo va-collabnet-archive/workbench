@@ -948,6 +948,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
             if (a != null) {
                 a.actionPerformed(new ActionEvent(focusOwner,
                         ActionEvent.ACTION_PERFORMED, null));
+            } else {
+            	AceLog.getAppLog().info("No action: " + action +
+            			" for: " + focusOwner);
             }
         }
     }
@@ -1595,6 +1598,21 @@ public class ACE extends JPanel implements PropertyChangeListener,
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setMnemonic(KeyEvent.VK_P);
+        editMenu.add(menuItem);
+        
+        editMenu.addSeparator();
+        menuItem = new JMenuItem("Copy XML");
+        menuItem.setActionCommand("Copy XML");
+        menuItem.addActionListener(actionListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask() + java.awt.event.InputEvent.SHIFT_MASK));
+        editMenu.add(menuItem);
+        
+        menuItem = new JMenuItem("Copy Tab Delimited Text");
+        menuItem.setActionCommand("Copy TDT");
+        menuItem.addActionListener(actionListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask() + java.awt.event.InputEvent.ALT_MASK));
         editMenu.add(menuItem);
 
         menuBar.add(editMenu);

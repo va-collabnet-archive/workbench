@@ -5,6 +5,10 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -37,12 +41,16 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdTuple;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class TermComponentLabel extends JLabel implements FocusListener, I_ContainTermComponent {
+public class TermComponentLabel extends JLabel implements FocusListener, I_ContainTermComponent, ClipboardOwner {
 
 	private I_AmTermComponent termComponent;
 
@@ -82,7 +90,114 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 			setTermComponent(null);
 		}
 	}
-	
+
+	private class CopyXML extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			StringBuffer buff = new StringBuffer();
+			buff.append("<concept>\n");
+			if (getTermComponent() == null) {
+				
+			} else {
+				I_TermFactory tf = LocalVersionedTerminology.get();
+				I_GetConceptData concept = (I_GetConceptData) getTermComponent();
+				buff.append("  <concept-ids>\n");
+				for (I_IdTuple idt: concept.getId().getTuples()) {
+					writeIdentifiersToBuff("    ", buff, idt);
+				}
+				buff.append("  </concept-ids>\n");
+				buff.append("  <descriptions>\n");
+				for (I_DescriptionTuple dt: concept.getDescriptionTuples(config.getAllowedStatus(), 
+						null, config.getViewPositionSet())) {
+					buff.append("    <description type='"); 
+					ConceptBean type = ConceptBean.get(dt.getTypeId());
+					I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(), 
+							config.getAllowedStatus(), config.getViewPositionSet());
+					buff.append(typeDesc.getText()); 
+					buff.append("'\n                 text='"); 
+					buff.append(dt.getText());
+					buff.append("'>\n");
+					for (I_IdTuple idt: tf.getId(dt.getDescId()).getTuples()) {
+						writeIdentifiersToBuff("      ", buff, idt);
+					}
+					buff.append("    </description>\n");
+				}
+				buff.append("  </descriptions>\n");
+			}
+			buff.append("</concept>\n");
+			StringSelection transferable = new StringSelection(buff.toString());
+			
+			clipboard.setContents(transferable, TermComponentLabel.this);
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
+
+		private void writeIdentifiersToBuff(String indent, StringBuffer buff, I_IdTuple idt)
+				throws IOException {
+			buff.append(indent);
+			buff.append("<id source='");
+			ConceptBean source = ConceptBean.get(idt.getSource());
+			I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(), 
+					config.getAllowedStatus(), config.getViewPositionSet());
+			buff.append(sourceDesc.getText());
+			buff.append("' value='");
+			buff.append(idt.getSourceId().toString());
+			buff.append("'/>\n");
+		}
+	}
+
+	private class CopyTDT extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			StringBuffer buff = new StringBuffer();
+			if (getTermComponent() == null) {
+				
+			} else {
+				I_TermFactory tf = LocalVersionedTerminology.get();
+				I_GetConceptData concept = (I_GetConceptData) getTermComponent();
+				buff.append("cid source\tcid\tdesc\n");
+				I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
+				for (I_IdTuple idt: concept.getId().getTuples()) {
+					writeIdentifiersToBuff(buff, idt, dt.getText());
+				}
+			}
+			StringSelection transferable = new StringSelection(buff.toString());
+			
+			clipboard.setContents(transferable, TermComponentLabel.this);
+			} catch (Exception ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+			}
+		}
+		private void writeIdentifiersToBuff(StringBuffer buff, I_IdTuple idt, String text)
+		throws IOException {
+			ConceptBean source = ConceptBean.get(idt.getSource());
+			I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(), 
+					config.getAllowedStatus(), config.getViewPositionSet());
+			buff.append(sourceDesc.getText());
+			buff.append("\t");
+			buff.append(idt.getSourceId().toString());
+			buff.append("\t");
+			buff.append(text);
+			buff.append("\n");
+		}
+	}
+
+
 	private class DragGestureListenerWithImage implements DragGestureListener {
 
 		DragSourceListener dsl;
@@ -151,6 +266,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
 		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),"deleteTask");
 		map.put("deleteTask", new DeleteAction());
+		map.put("Copy TDT", new CopyTDT());
+		map.put("Copy XML", new CopyXML());
 		setBorder(noFocusBorder);
 	}
 
@@ -234,6 +351,10 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(), TermLabelMaker.getTransparentFilter());
 		dragImage = Toolkit.getDefaultToolkit().createImage(fis);
 		return dragImage;
+	}
+
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		// Nothing to do...
 	}
 
 }
