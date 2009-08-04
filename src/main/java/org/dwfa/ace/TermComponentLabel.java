@@ -168,7 +168,6 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 			if (getTermComponent() == null) {
 				
 			} else {
-				I_TermFactory tf = LocalVersionedTerminology.get();
 				I_GetConceptData concept = (I_GetConceptData) getTermComponent();
 				buff.append("cid source\tcid\tdesc\n");
 				I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
