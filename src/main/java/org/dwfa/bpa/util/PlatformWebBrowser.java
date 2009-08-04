@@ -96,7 +96,8 @@ public class PlatformWebBrowser {
 				String externalForm = url.toExternalForm();
 				if (url.getProtocol().toLowerCase().equals("file") && 
 						url.getFile().toLowerCase().endsWith(".pdf")) {
-					openMethod.invoke(desktopObject, new Object[] { new File(url.getFile()) });
+					openMethod.invoke(desktopObject, 
+							new Object[] { new File(url.getFile().replace("%20", " ")) });
 				} else {
 					externalForm = externalForm.replace(" ", "%20");
 					URL urlForUri = new URL(externalForm);
