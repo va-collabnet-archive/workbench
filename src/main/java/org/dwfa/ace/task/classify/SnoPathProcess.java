@@ -82,7 +82,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
 		if (concept.getConceptId() == rootNid) {
 			if (rocket != null)
 				rocket.addConcept(concept.getConceptId(), false); // @@@
-			
+
 			countConAdded++;
 			countConRoot++;
 			return;
@@ -109,8 +109,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
 			}
 		} // for PATHS_IN_PRIORITY_ORDER
 
-		if (cPart1.getStatusId() != isCURRENT) // @@@ "active" scope
-			return; // IF (NOT_CURRENT) RETURN;
+		if (cPart1 == null || cPart1.getStatusId() != isCURRENT)
+			return; // IF (NOT_CURRENT) RETURN;  @@@ "active" scope
 
 		if (snocons != null) {
 			snocons.add(new SnoCon(concept.getConceptId(), cPart1.isDefined()));
