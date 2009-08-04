@@ -1,6 +1,8 @@
 package org.dwfa.ace.task.classify;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class SnoGrpList extends ArrayList<SnoGrp> {
 	private static final long serialVersionUID = 1L;
@@ -9,6 +11,45 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
 		super();
 	}
 	
+	/**
+	 * Construct a ROLE_GROUP_LIST from <code>List&lt;SnoRel&gt;</code><br>
+	 * <br>
+	 * <font color=#990099> IMPLEMENTATION NOTE: roleGroups MUST be pre-sorted
+	 * in C1-Group-Type-C2 order for this routine. Pre-sorting is used to
+	 * provide overall computational efficiency.</font>
+	 * 
+	 */
+	public SnoGrpList(List<SnoRel> rels){
+		super();
+		// First Group
+		SnoGrp group = new SnoGrp();
+		this.add(group);
+
+		// First SnoRel in First Group
+		Iterator<SnoRel> it = rels.iterator();
+		SnoRel snoRelA = it.next();
+		group.add(snoRelA);
+
+		while (it.hasNext()) {
+			SnoRel snoRelB = it.next();
+			if (snoRelB.group == snoRelA.group) {
+				group.add(snoRelB); // ADD TO SAME GROUP
+			} else {
+				group = new SnoGrp(); // CREATE NEW GROUP
+				this.add(group); // ADD GROUP TO GROUP LIST
+				group.add(snoRelB);
+			}
+			snoRelA = snoRelB;
+		}
+	}
+
+	public int countRels() {
+		int returnCount = 0;
+		for (SnoGrp sg :  this)
+			returnCount += sg.size();
+		return returnCount;
+	}
+
 	/**
 	 * Which group(s) in THIS ROLE_GROUP_LIST are NON-REDUNTANT?<br>
 	 * <br>
@@ -99,8 +140,8 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
 	 * in C1-Group-Type-C2 order for this routine. Pre-sorting is used to
 	 * provide overall computational efficiency.</font>
 	 * 
-	 * @param groupListB
-	 * @return
+	 * @param <code>SnoGrpList groupListB</code>
+	 * @return <code>SnoGrpList</code>
 	 */
 	public SnoGrpList whichNotEqual(SnoGrpList groupListB) {
 		SnoGrpList sg = new SnoGrpList();
