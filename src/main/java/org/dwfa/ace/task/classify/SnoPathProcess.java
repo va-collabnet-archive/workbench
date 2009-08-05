@@ -109,8 +109,11 @@ public class SnoPathProcess implements I_ProcessConcepts {
 			}
 		} // for PATHS_IN_PRIORITY_ORDER
 
-		if (cPart1 == null || cPart1.getStatusId() != isCURRENT)
-			return; // IF (NOT_CURRENT) RETURN;  @@@ "active" scope
+		if (cPart1 == null)
+			return; // not relevant to the "visible path"
+
+		if (cPart1.getStatusId() != isCURRENT)
+			return; // IF (NOT_CURRENT) RETURN; "active" in "visible path"
 
 		if (snocons != null) {
 			snocons.add(new SnoCon(concept.getConceptId(), cPart1.isDefined()));
