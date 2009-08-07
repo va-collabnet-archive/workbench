@@ -92,28 +92,28 @@ public abstract class MemberRefsetHandler extends
             IOException {
 
         try {
-            I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
-            if (part instanceof I_ThinExtByRefPartConcept) {
 
+            if (part instanceof I_ThinExtByRefPartConcept) {
+                I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
+                Collection<UUID> statusUuids = tf.getUids(conceptPart
+                        .getStatusId());
+
+                String id = toId(tf, memberId, sctId);
+                String effectiveDate = getDate(tf, conceptPart.getVersion());
+                boolean active = isActiveStatus(statusUuids);
+                String moduleId = toId(tf, getModule().getConceptId(), sctId);
+                String refsetId = toId(tf, refsetNid, sctId);
+                String referencedComponentId = toId(tf, componentId, sctId);
+                String conceptId = toId(tf, conceptPart.getC1id(), sctId);
+
+                return id + FILE_DELIMITER + effectiveDate + FILE_DELIMITER
+                        + active + FILE_DELIMITER + moduleId + FILE_DELIMITER
+                        + refsetId + FILE_DELIMITER + referencedComponentId
+                        + FILE_DELIMITER + conceptId;
             } else {
                 throw new Exception("Part is not of type concept ext " + part);
             }
 
-            Collection<UUID> statusUuids = tf
-                    .getUids(conceptPart.getStatusId());
-
-            String id = toId(tf, memberId, sctId);
-            String effectiveDate = getDate(tf, conceptPart.getVersion());
-            boolean active = isActiveStatus(statusUuids);
-            String moduleId = toId(tf, getModule().getConceptId(), sctId);
-            String refsetId = toId(tf, refsetNid, sctId);
-            String referencedComponentId = toId(tf, componentId, sctId);
-            String conceptId = toId(tf, conceptPart.getC1id(), sctId);
-
-            return id + FILE_DELIMITER + effectiveDate + FILE_DELIMITER
-                    + active + FILE_DELIMITER + moduleId + FILE_DELIMITER
-                    + refsetId + FILE_DELIMITER + referencedComponentId
-                    + FILE_DELIMITER + conceptId;
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
