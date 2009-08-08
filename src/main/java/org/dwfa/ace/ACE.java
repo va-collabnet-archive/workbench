@@ -780,12 +780,18 @@ public class ACE extends JPanel implements PropertyChangeListener,
                         processIdentifiers(uncommittedIds, cb);
                     }
                     if (writeChangeSets) {
-                        if (uncommitted.size() > 0) {
+                        if (uncommitted.size() > 0 || uncommittedNoChecks.size() > 0) {
                             for (I_WriteChangeSet writer : csWriters) {
                                 writer.writeChanges(uncommittedIds,
                                         ThinVersionHelper.convert(version));
                             }
                             for (I_Transact cb : uncommitted) {
+                                for (I_WriteChangeSet writer : csWriters) {
+                                    writer.writeChanges(cb, ThinVersionHelper
+                                            .convert(version));
+                                }
+                            }
+                            for (I_Transact cb : uncommittedNoChecks) {
                                 for (I_WriteChangeSet writer : csWriters) {
                                     writer.writeChanges(cb, ThinVersionHelper
                                             .convert(version));
