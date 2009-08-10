@@ -246,13 +246,17 @@ public class CriterionPanel extends JPanel {
         			+ searchPluginFolder.getAbsolutePath()));
         }
         for (I_TestSearchResults bean : criterionOptions) {
-            String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
-            Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader()
-                    .loadClass(searchInfoClassName);
-            BeanInfo searchInfo = searchInfoClass.newInstance();
-            comboItems.add(searchInfo.getBeanDescriptor().getDisplayName());
-            menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
-            menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
+        	try {
+	            String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
+	            Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader()
+	                    .loadClass(searchInfoClassName);
+	            BeanInfo searchInfo = searchInfoClass.newInstance();
+	            comboItems.add(searchInfo.getBeanDescriptor().getDisplayName());
+	            menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
+	            menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
+        	} catch (Exception ex) {
+        		AceLog.getAppLog().alertAndLogException(ex);
+        	}
         }
     }
 

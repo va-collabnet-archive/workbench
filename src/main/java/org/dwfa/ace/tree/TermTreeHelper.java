@@ -354,6 +354,7 @@ public class TermTreeHelper implements PropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent evt) {
 		setRoots();
+		updateHierarchyView(evt.getPropertyName());
 	}
 
 

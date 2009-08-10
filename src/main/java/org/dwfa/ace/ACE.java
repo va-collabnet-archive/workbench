@@ -90,6 +90,7 @@ import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -2017,6 +2018,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
     }
 
     boolean svnPositionSet = false;
+	private JButton showProgressButton;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -3045,6 +3047,18 @@ public class ACE extends JPanel implements PropertyChangeListener,
         }
         topPanel.add(showComponentButton, c);
         c.gridx++;
+        topPanel.add(new JPanel(), c);
+        c.gridx++;
+        showProgressButton = new JButton(new ImageIcon(ACE.class
+                .getResource("/32x32/plain/gears_view.png")));
+        showProgressButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ActivityViewer.toFront();
+			}
+         });
+        topPanel.add(showProgressButton, c);
+        c.gridx++;
+        
         topActivityPanel = new JPanel(new GridLayout(1, 1));
         topPanel.add((JPanel) topActivityPanel, c);
         c.gridx++;

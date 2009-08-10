@@ -30,10 +30,12 @@ import org.dwfa.vodb.bind.ThinExtBinder;
 public class RefsetSpecTreeMouseListener implements MouseListener {
 
 	private I_ConfigAceFrame aceConfig;
+	private RefsetSpecEditor specEditor;
 
-	public RefsetSpecTreeMouseListener(I_ConfigAceFrame aceConfig) {
+	public RefsetSpecTreeMouseListener(I_ConfigAceFrame aceConfig, RefsetSpecEditor specEditor) {
 		super();
 		this.aceConfig = aceConfig;
+		this.specEditor = specEditor;
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -147,7 +149,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 		return popup;
 	}
 	
-	private static class RetireSpecAction implements ActionListener {
+	private class RetireSpecAction implements ActionListener {
 		private I_ThinExtByRefTuple thinExtByRefTuple;
 		
 		private RetireSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
@@ -167,9 +169,10 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 			}
 			thinExtByRefTuple.getCore().addVersion(newPart);
 			LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
+			specEditor.updateSpecTree(false);
 		}		
 	}
-	private static class ChangeSpecAction implements ActionListener {
+	private class ChangeSpecAction implements ActionListener {
 		private I_ThinExtByRefTuple thinExtByRefTuple;
 		
 		private ChangeSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
@@ -182,6 +185,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 			newPart.setVersion(Integer.MAX_VALUE);
 			thinExtByRefTuple.getCore().addVersion(newPart);
 			LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
+			specEditor.updateSpecTree(false);
 		}		
 	}
 

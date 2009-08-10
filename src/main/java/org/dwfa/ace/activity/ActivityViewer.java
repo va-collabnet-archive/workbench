@@ -375,4 +375,8 @@ public class ActivityViewer {
     public static void setHeadless(boolean headless) {
         ActivityViewer.headless = headless;
     }
+    
+    public static void toFront() {
+    	viewer.viewerFrame.toFront();
+    }
 }

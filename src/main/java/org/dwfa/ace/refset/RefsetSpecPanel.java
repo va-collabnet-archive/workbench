@@ -29,6 +29,7 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
+import org.dwfa.vodb.types.IntSet;
 
 public class RefsetSpecPanel extends JPanel {
     private class HistoryActionListener implements ActionListener {
@@ -56,6 +57,8 @@ public class RefsetSpecPanel extends JPanel {
 
     private I_ConfigAceFrame aceFrameConfig;
 
+	private ReflexiveRefsetTableModel refsetTableModel;
+
     private static final String HIERARCHICAL_VIEW = "hierarchical view";
     private static final String TABLE_VIEW = "table view";
 
@@ -65,7 +68,8 @@ public class RefsetSpecPanel extends JPanel {
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
         TermTreeHelper treeHelper = new TermTreeHelper(
-                new RefsetSpecFrameConfig(ace.getAceFrameConfig()), ace);
+                new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet()), ace);
+        
         editor = new RefsetSpecEditor(ace, treeHelper);
         split.setTopComponent(editor.getContentPanel());
 
@@ -79,6 +83,7 @@ public class RefsetSpecPanel extends JPanel {
 
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
         setupRefsetTable();
+        editor.getLabel().setTermComponent(editor.getTermComponent());
         editor.addHistoryActionListener(new HistoryActionListener());
 
         split.setBottomComponent(bottomTabs);
@@ -97,7 +102,7 @@ public class RefsetSpecPanel extends JPanel {
         c.weightx = 1.0;
         c.weighty = 1.0;
         add(split, c);
-
+        refsetTableModel.propertyChange(null);
     }
 
     public void setupRefsetTable() throws NoSuchMethodException, Exception {
@@ -186,13 +191,14 @@ public class RefsetSpecPanel extends JPanel {
             columns.add(column5);
         }
 
-        ReflexiveRefsetTableModel refsetTableModel = new ReflexiveRefsetTableModel(
+        refsetTableModel = new ReflexiveRefsetTableModel(
                 editor, columns.toArray(new ReflexiveRefsetFieldData[columns
                         .size()]));
         aceFrameConfig.addPropertyChangeListener("viewPositions",
                 refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
         editor.getLabel().addTermChangeListener(refsetTableModel);
+        
 
         refsetTableModel.setComponentId(Integer.MIN_VALUE);
         refsetTableModel.getRowCount();

@@ -129,9 +129,12 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setColorForPath(pathNid, pathColor);
     }
 
-    RefsetSpecFrameConfig(I_ConfigAceFrame frameConfig) {
+    private I_IntSet childrenExpandedNodes;
+
+    RefsetSpecFrameConfig(I_ConfigAceFrame frameConfig, I_IntSet childrenExpandedNodes) {
         super();
         this.frameConfig = frameConfig;
+        this.childrenExpandedNodes = childrenExpandedNodes;
     }
 
     public void addEditingPath(I_Path p) {
@@ -207,10 +210,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getChangeSetWriters();
     }
 
-    private IntSet childrenExpandedNodes = new IntSet();
-
-    public I_IntSet getChildrenExpandedNodes() {
-
+     public I_IntSet getChildrenExpandedNodes() {
         return childrenExpandedNodes;
     }
 

@@ -341,9 +341,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
     private class UncommittedChangeListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent arg0) {
-            setTermComponent(getTermComponent());
+        	UpdateTreeSpec specUpdater = new UpdateTreeSpec();
+        	specUpdater.start();
         }
-
     }
 
     private class FixedToggleChangeActionListener implements ActionListener,
@@ -499,6 +499,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
     private TermTreeHelper treeHelper;
 
+	private JScrollPane specTreeScroller;
+
     public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper)
             throws Exception {
         super();
@@ -561,6 +563,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
         label.addPropertyChangeListener("termComponent", labelListener);
         if (this.tabHistoryList.size() > 0
                 && this.tabHistoryList.getFirst() != null) {
+        	this.label.setTermComponent(this.tabHistoryList.getFirst());
             this.setTermComponent(this.tabHistoryList.getFirst());
         }
     }
@@ -822,15 +825,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
         specTree = new JTree(new DefaultTreeModel(new RefsetSpecTreeNode(null)));
         specTree.addMouseListener(new RefsetSpecTreeMouseListener(ace
-                .getAceFrameConfig()));
+                .getAceFrameConfig(), this));
         specTree.setCellRenderer(new RefsetSpecTreeCellRenderer(ace
                 .getAceFrameConfig()));
         specTree.setRootVisible(false);
         specTree.setShowsRootHandles(true);
-
-        content.add(new JScrollPane(specTree), c);
+        specTreeScroller = new JScrollPane(specTree);
+        content.add(specTreeScroller, c);
 
         specTree.addTreeSelectionListener(new RefsetSpecSelectionListener());
+        
 
         c.gridy++;
 
@@ -929,7 +933,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                     AceLog.getAppLog().alertAndLogException(e);
                 }
             }
-            this.updateSpecTree(true);
+            this.updateSpecTree(false);
             this.firePropertyChange("commit", null, null);
         } else if (evt.getPropertyName().equals("uncommitted")) {
             this.updateSpecTree(false);
@@ -960,7 +964,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
     UpdateTreeSpec updater;
 
-    private synchronized void updateSpecTree(boolean clearSelection) {
+    public synchronized void updateSpecTree(boolean clearSelection) {
         refsetSpecConcept = null;
         if (clearSelection) {
             specTree.clearSelection();
@@ -978,14 +982,47 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
         private RefsetSpecTreeNode root;
         private TreePath selectionPath;
         private boolean newRefset = true;
+		private int scrollHorizValue;
+		private int scrollVertValue;
+		private IntSet childrenExpandedNodes = new IntSet();
+		private int selectedNodeId = Integer.MAX_VALUE;
+        private RefsetSpecTreeNode newSelectedNode;
+		private ConceptBean localRefsetSpecConcept;
+		
+		private void addChildrenExpandedNodes(RefsetSpecTreeNode node) {
+			if (specTree.hasBeenExpanded(new TreePath(node.getPath()))) {
+				childrenExpandedNodes.add(getId(node));
+				for (RefsetSpecTreeNode childNode: node.getChildren()) {
+					addChildrenExpandedNodes(childNode);
+				}
+			}
+			
+		}
 
+		private int getId(RefsetSpecTreeNode node) {
+			if (I_GetConceptData.class.isAssignableFrom(node.getUserObject().getClass())) {
+				I_GetConceptData refsetConcept = (I_GetConceptData) node.getUserObject();
+				return refsetConcept.getConceptId();
+			} else if (I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass())) {
+				I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) node.getUserObject();
+				return ext.getMemberId();
+			}
+			return Integer.MAX_VALUE;
+		}
         @Override
         protected RefsetSpecTreeNode construct() throws Exception {
             if (cancel) {
                 return null;
             }
-            ;
+            scrollHorizValue = specTreeScroller.getHorizontalScrollBar().getValue();
+            scrollVertValue = specTreeScroller.getVerticalScrollBar().getValue();
             selectionPath = specTree.getLeadSelectionPath();
+            if (selectionPath != null) {
+            	RefsetSpecTreeNode selectedNode = (RefsetSpecTreeNode) selectionPath.getLastPathComponent();
+            	if (selectedNode != null) {
+            		selectedNodeId = getId(selectedNode);
+            	}
+            }
 
             RefsetSpecTreeNode oldRoot = (RefsetSpecTreeNode) specTree
                     .getModel().getRoot();
@@ -1008,33 +1045,37 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                     refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0)
                             .getC1Id());
+                    localRefsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0)
+                            .getC1Id());
                 }
             }
             if (cancel) {
                 return null;
             }
             ;
-            root = new RefsetSpecTreeNode(refsetSpecConcept, ace
+            root = new RefsetSpecTreeNode(localRefsetSpecConcept, ace
                     .getAceFrameConfig());
 
-            if (oldRoot.getUserObject() != null && refsetSpecConcept != null) {
-                I_GetConceptData oldRefsetConcept = (I_GetConceptData) oldRoot
+            if (oldRoot.getUserObject() != null && localRefsetSpecConcept != null) {
+                I_GetConceptData oldRefsetSpecConcept = (I_GetConceptData) oldRoot
                         .getUserObject();
-                newRefset = oldRefsetConcept.getConceptId() != refsetSpecConcept
+                newRefset = oldRefsetSpecConcept.getConceptId() != localRefsetSpecConcept
                         .getConceptId();
             }
 
-            if (refsetSpecConcept != null) {
+            if (localRefsetSpecConcept != null) {
                 if (cancel) {
                     return null;
                 }
-                ;
+                if (newRefset == false) {
+                	addChildrenExpandedNodes(oldRoot);
+                }
                 List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology
                         .get().getAllExtensionsForComponent(
-                                refsetSpecConcept.getConceptId(), true);
+                        		localRefsetSpecConcept.getConceptId(), true);
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
                 HashSet<Integer> fetchedComponents = new HashSet<Integer>();
-                fetchedComponents.add(refsetSpecConcept.getConceptId());
+                fetchedComponents.add(localRefsetSpecConcept.getConceptId());
                 if (cancel) {
                     return null;
                 }
@@ -1047,8 +1088,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                     ;
                     I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode
                             .getUserObject();
-                    if (refsetSpecConcept != null && ext != null) {
-                        if (ext.getComponentId() == refsetSpecConcept
+                    if (localRefsetSpecConcept != null && ext != null) {
+                        if (ext.getComponentId() == localRefsetSpecConcept
                                 .getConceptId()) {
                             root.add(extNode);
                         } else {
@@ -1114,8 +1155,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                 }
                 ;
                 if (newRefset == false) {
-                    specTree.setSelectionPath(selectionPath);
-                    specTree.setLeadSelectionPath(selectionPath);
+                    expandNodes(root);
+                    if (newSelectedNode != null) {
+                        specTree.setSelectionPath(new TreePath(newSelectedNode.getPath()));
+                        specTree.setLeadSelectionPath(new TreePath(newSelectedNode.getPath()));
+                    }
+                    specTreeScroller.getHorizontalScrollBar().setValue(scrollHorizValue);
+                    specTreeScroller.getVerticalScrollBar().setValue(scrollVertValue);
+                } else {
+                    specTreeScroller.getHorizontalScrollBar().setValue(0);
+                    specTreeScroller.getVerticalScrollBar().setValue(0);
                 }
 
             } catch (InterruptedException e) {
@@ -1125,6 +1174,18 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
             }
             super.finished();
         }
+
+		private void expandNodes(RefsetSpecTreeNode node) {
+			if (getId(node) == selectedNodeId) {
+				newSelectedNode  = node;
+			}
+			if (childrenExpandedNodes.contains(getId(node))) {
+				specTree.expandPath(new TreePath(node.getPath()));
+				for (RefsetSpecTreeNode childNode: node.getChildren()) {
+					expandNodes(childNode);
+				}
+			}
+		}
 
     }
 

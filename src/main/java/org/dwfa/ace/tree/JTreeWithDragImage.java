@@ -177,30 +177,17 @@ public class JTreeWithDragImage extends JTree {
         	if (selection == null) {
         		selection = nextToLastSelection;
         	}
-        	
-            DefaultTreeModel m = (DefaultTreeModel) JTreeWithDragImage.this.getModel();
             logSelectionPaths(selection, "Initial Selection Paths:");
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
-            Enumeration<DefaultMutableTreeNode> childEnum = root.children();
-            while (childEnum.hasMoreElements()) {
-                m.nodeChanged(childEnum.nextElement());
-            }
-            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                AceLog.getAppLog().fine("Tree data changed");
-            }
-            
-        	if (scroller != null) {
-            	int horizValue = scroller.getHorizontalScrollBar().getValue();
-            	int vertValue = scroller.getVerticalScrollBar().getValue();
-                Timer timer = new Timer(1000, new RestoreSelectionSwingWorker(JTreeWithDragImage.this,
-    					lastPropagationId, horizValue, vertValue,
-    					selection, helper));
-                timer.setRepeats(false);
-                timer.start();
-				AceLog.getAppLog().info("Started timer for RestoreSelectionSwingWorker: " + lastPropagationId);
-        	}
+            int horizValue = Integer.MAX_VALUE;
+            int vertValue = Integer.MAX_VALUE;
+            if (scroller != null) {
+            	horizValue = scroller.getHorizontalScrollBar().getValue();
+            	vertValue = scroller.getVerticalScrollBar().getValue();
+            }        	
+            restoreTreePositionAndSelection(selection, horizValue, vertValue);
  
         }
+
 
 		private void logSelectionPaths(TreePath selectionPath, String prefix) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -310,6 +297,31 @@ public class JTreeWithDragImage extends JTree {
 		for (ChangeListener l : listeners) {
 			l.stateChanged(event);
 		}
+	}
+	public void restoreTreePositionAndSelection(int horizValue, int vertValue) {
+		restoreTreePositionAndSelection(null, horizValue, vertValue);
+	}
+	@SuppressWarnings("unchecked")
+	public void restoreTreePositionAndSelection(TreePath selection,
+			int horizValue, int vertValue) {
+		DefaultTreeModel m = (DefaultTreeModel) JTreeWithDragImage.this.getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
+        Enumeration<DefaultMutableTreeNode> childEnum = root.children();
+        while (childEnum.hasMoreElements()) {
+            m.nodeChanged(childEnum.nextElement());
+        }
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("Tree data changed");
+        }
+        
+    	if (scroller != null) {
+            Timer timer = new Timer(1000, new RestoreSelectionSwingWorker(JTreeWithDragImage.this,
+					lastPropagationId, horizValue, vertValue,
+					selection, helper));
+            timer.setRepeats(false);
+            timer.start();
+			AceLog.getAppLog().info("Started timer for RestoreSelectionSwingWorker: " + lastPropagationId);
+    	}
 	}
 
 }

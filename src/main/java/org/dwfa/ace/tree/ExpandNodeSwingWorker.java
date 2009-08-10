@@ -364,8 +364,14 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 	}
 
 	private void expandIfInList() {
+		
+		TreePath thisPath = new TreePath(node.getPath());
+		if (tree.isExpanded(thisPath) == false) {
+			tree.expandPath(thisPath);
+		} 		
+		
 		for (DefaultMutableTreeNode child : sortedNodes) {
-			TreePath tp = new TreePath(child.getPath());
+			TreePath childPath = new TreePath(child.getPath());
 			I_GetConceptData cb = (I_GetConceptData) child.getUserObject();
 
 			if (config.getChildrenExpandedNodes()
@@ -385,8 +391,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 					ancestor = (DefaultMutableTreeNode) ancestor.getParent();
 				}
 
-				if (tree.isExpanded(tp) == false) {
-					tree.expandPath(tp);
+				if (tree.isExpanded(childPath) == false) {
+					tree.expandPath(childPath);
 				} else {
 					AceLog.getAppLog().info(" Already expanded");
 				}
