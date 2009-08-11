@@ -16,47 +16,47 @@ import org.apache.maven.plugin.logging.Log;
 
 /**
  * Goal which generates shell scripts to start the dwfa bundle.
- * 
+ *
  * @goal generate-scripts
  */
 public class GenerateScripts extends AbstractMojo {
 	/**
 	 * Location of the build directory.
-	 * 
+	 *
 	 * @parameter expression="${project.build.directory}"
 	 */
 	private File outputDirectory;
 
     /**
      * Location to write the script files.
-     * 
+     *
      * @parameter
      */
     private String scriptOutputDir;
 
     /**
      * Location of the jar files.
-     * 
+     *
      * @parameter
      */
     private String jarDir;
 
 	/**
 	 * Location of the libraries.
-	 * 
+	 *
 	 * @parameter
 	 */
 	private String libDir;
-	
+
 	/**
 	 * Location to write the script files.
-	 * 
+	 *
 	 * @parameter
 	 */
 	private String[] scriptNames;
 
     /**
-     * The execution information for this commit operation. 
+     * The execution information for this commit operation.
      * @parameter expression="${mojoExecution}"
      */
     private MojoExecution execution;
@@ -99,7 +99,7 @@ public class GenerateScripts extends AbstractMojo {
 		}
 		l.info("scriptOutputDir: " + scriptOutputDir);
 		l.info("outputDirectory: " + outputDirectory);
-        
+
         File[] jars;
         if (jarDir != null) {
             jars = new File(outputDirectory + fileSep + jarDir).listFiles(new FileFilter() {
@@ -117,9 +117,9 @@ public class GenerateScripts extends AbstractMojo {
                         }
                     });
         }
-		
+
 		if (scriptNames == null) {
-			
+
 	        startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle", true, false, false, false);
 	        startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false, false, false);
 	        startAllScript(jars, "startJehriAuthoring", "start-jehri-authoring.config", "500m", "500m", "Jehri Authoring Bundle", true, false, false, false);
@@ -162,7 +162,7 @@ public class GenerateScripts extends AbstractMojo {
 	 */
 	private void startAllScript(File[] jars, String scriptName, String startFileName,
 			String startHeap, String maxHeap, String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
-		
+
 		File windowScript = new File(outputDirectory + fileSep
 				+ scriptOutputDir + fileSep + scriptName + ".bat");
 		File linuxScript = new File(outputDirectory + fileSep + scriptOutputDir
@@ -171,11 +171,11 @@ public class GenerateScripts extends AbstractMojo {
 				+ fileSep + scriptName + "OsX.sh");
 
 		List<Scripter> scripters = new ArrayList<Scripter>();
-		
+
 		scripters.add(new WindowsScripter(windowScript, libDir));
 		scripters.add(new PosixScripter(linuxScript, libDir));
 		scripters.add(new OSXScripter(unixScript, libDir));
-		
+
 		for(Scripter scripter : scripters) {
 			try {
 				scripter.writeStartupScript(
@@ -191,17 +191,17 @@ public class GenerateScripts extends AbstractMojo {
 
 	/**
 	 * Abstract class that writes startup scripts for the workbench
-	 * 
+	 *
 	 * @author adrian
 	 *
 	 */
 	private static abstract class Scripter {
-		
+
 		File scriptFile;
 		String libDir;
-		
+
 		protected int indent = 0;
-		
+
 		/**
 		 * Create a Scripter
 		 * @param scriptFile The file to write
@@ -211,7 +211,7 @@ public class GenerateScripts extends AbstractMojo {
 			this.scriptFile = scriptFile;
 			this.libDir = libDir;
 		}
-		
+
 		/**
 		 * Write a startup script for the workbench
 		 * @param jars			A list of JAR files to put on the classpath
@@ -230,7 +230,7 @@ public class GenerateScripts extends AbstractMojo {
 			scriptFile.getParentFile().mkdirs();
 			// create file writer
 			FileWriter fw = new FileWriter(scriptFile);
-			
+
 			// write java path
 			indent += 4;
 			if(bundledJre) {
@@ -239,13 +239,13 @@ public class GenerateScripts extends AbstractMojo {
 				fw.write("java");
 			}
 			fw.write(lineContinuance());
-			
+
 			// write debug options
 			if(debug) {
 				writeLine(fw, "-Xdebug");
 				writeLine(fw, "-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
 			}
-			
+
 			// write profiling options
 			if(profile) {
 				writeFileLine(fw, "-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/");
@@ -255,20 +255,19 @@ public class GenerateScripts extends AbstractMojo {
 				writeFileLine(fw, "-Xdebug");
 				writeFileLine(fw, "-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
 			}
-			
+
 			// write heap size
 			writeLine(fw, String.format("-Xms%1$s", startHeap));
 			writeLine(fw, String.format("-Xmx%1$s", maxHeap));
-			
+
 			// write OS X specific options
 			if(isOSX()){
 				writeLine(fw, String.format("-Xdock:name=\"%1$s\"", xdockName));
 	            writeFileLine(fw, "-Xdock:icon=config/icon/bundle.gif");
 				writeLine(fw, "-Dapple.laf.useScreenMenuBar=true");
 			}
-			
+
 			// write JINI security options
-			writeFileLine(fw, "-Djava.ext.dirs=lib-ext");
 			writeFileLine(fw, "-Djava.util.logging.config.file=config/logging.properties");
 			writeFileLine(fw, "-Djava.security.policy=config/dwa.policy");
 			writeFileLine(fw, "-Djava.security.properties=config/dynamic-policy.security-properties");
@@ -276,7 +275,7 @@ public class GenerateScripts extends AbstractMojo {
 			writeFileLine(fw, "-Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore");
 			writeLine(fw, "-Djava.protocol.handler.pkgs=net.jini.url");
 			writeLine(fw, "-Dorg.dwfa.jiniport=8080");
-			
+
 			// write classpath
 			indent += 4;
 			writeLine(fw, "-cp");
@@ -287,21 +286,21 @@ public class GenerateScripts extends AbstractMojo {
 				fw.write(pathSeparator());
 			}
 			writeLine(fw, "");
-			
+
 			// write start class
 			indent += 4;
 			writeLine(fw, "com.sun.jini.start.ServiceStarter");
 			fw.write("config");
 			fw.write(fileSeparator());
 			fw.write(startFileName);
-			
+
 			fw.close();
-			
+
 			// change file permissions
 			setFilePermissions(scriptFile);
-			
+
 		}
-		
+
 		/**
 		 * Try to set the executable bit
 		 * @param scriptFile	The file to set
@@ -318,7 +317,7 @@ public class GenerateScripts extends AbstractMojo {
 				}
 			}
 		}
-		
+
 		/**
 		 * Write a line to the file, followed by a line continuation
 		 * @param fw			A FileWriter
@@ -329,7 +328,7 @@ public class GenerateScripts extends AbstractMojo {
 			fw.write(line);
 			fw.write(lineContinuance());
 		}
-		
+
 		/**
 		 * Write a line to the file, replacing file separators for the target
 		 * environment
@@ -341,7 +340,7 @@ public class GenerateScripts extends AbstractMojo {
 			line = line.replace('/', fileSeparator());
 			writeLine(fw, line);
 		}
-		
+
 		/**
 		 * Return a string repeated a number of times
 		 * @param base	The string to repeat
@@ -355,7 +354,7 @@ public class GenerateScripts extends AbstractMojo {
 			}
 			return rv;
 		}
-		
+
 		/**
 		 * Is the target OSX?
 		 * @return true if the target is OSX
@@ -363,14 +362,14 @@ public class GenerateScripts extends AbstractMojo {
 		protected boolean isOSX() {
 			return false;
 		}
-		
+
 		/**
 		 * Return the correct file separator for the target environment
 		 * @return
 		 */
 		protected abstract char fileSeparator();
 		/**
-		 * Return the correct PATH separator for the target environment 
+		 * Return the correct PATH separator for the target environment
 		 * @return
 		 */
 		protected abstract String pathSeparator();
@@ -380,16 +379,16 @@ public class GenerateScripts extends AbstractMojo {
 		 * @return
 		 */
 		protected abstract String lineContinuance();
-		
+
 	}
-	
+
 	/**
 	 * Class that writes a startup script for cmd.exe
 	 * @author adrian
 	 *
 	 */
 	private static class WindowsScripter extends Scripter {
-	
+
 		public WindowsScripter(File scriptFile, String libDir) {
 			super(scriptFile, libDir);
 		}
@@ -398,26 +397,26 @@ public class GenerateScripts extends AbstractMojo {
 		protected char fileSeparator() {
 			return '\\';
 		}
-		
+
 		@Override
 		protected String pathSeparator() {
 			return ";";
 		}
-		
+
 		@Override
 		protected String lineContinuance() {
 			return " ";
 		}
-		
+
 	}
-	
+
 	/**
 	 * Class that writes a startup script for POSIX shells
 	 * @author adrian
 	 *
 	 */
 	private static class PosixScripter extends Scripter {
-		
+
 		public PosixScripter(File scriptFile, String libDir) {
 			super(scriptFile, libDir);
 		}
@@ -426,18 +425,18 @@ public class GenerateScripts extends AbstractMojo {
 		protected char fileSeparator() {
 			return '/';
 		}
-		
+
 		@Override
 		protected String pathSeparator() {
 			return ":";
 		}
-		
+
 		@Override
 		protected String lineContinuance() {
 			return " \\\n" + repeat(" ", indent);
 		}
 	}
-	
+
 	/**
 	 * Class that writes a startup script for POSIX shells
 	 * and also does Mac-y stuff
@@ -454,7 +453,7 @@ public class GenerateScripts extends AbstractMojo {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * @param jars
 	 * @throws MojoExecutionException
