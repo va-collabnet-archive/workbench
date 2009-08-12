@@ -91,7 +91,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			I_IdVersioned idv = new ThinIdVersioned(newId, 2);
 			//add 
 			ThinIdPart idPart = new ThinIdPart();
-			idPart.setIdStatus(currentId);
+			idPart.setStatusId(currentId);
 			idPart.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
 			idPart.setSource(snomedType3UuidSource);
 			idPart.setSourceId(snomedUid);
@@ -99,7 +99,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			idv.addVersion(idPart);
 
 			idPart = new ThinIdPart();
-			idPart.setIdStatus(currentId);
+			idPart.setStatusId(currentId);
 			idPart.setPathId(snomedPath.getConceptId());
 			idPart.setSource(snomedIntIdSource);
 			idPart.setSourceId(new Long(snomedId));
@@ -168,7 +168,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		con.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
 		con.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
 		
-		con.setConceptStatus(getNativeStatus((Integer) conceptStatus));
+		con.setStatusId(getNativeStatus((Integer) conceptStatus));
 		con.setDefined(defChar);
 		
 		int conId = getIntId((Long) conceptKey, releaseDate);
@@ -283,7 +283,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 		rel.setCharacteristicId(getNativeCharacteristicType((Integer) characteristic));
 		rel.setGroup(group);
 		rel.setRefinabilityId(getNativeRefinability((Integer) refinability));
-		rel.setRelTypeId(getIntId((Long) relationshipTypeConceptID, releaseDate));
+		rel.setTypeId(getIntId((Long) relationshipTypeConceptID, releaseDate));
 
 		int relId = getIntId((Long) relID, releaseDate);
 		int c1id = getIntId((Long) conceptOneID, releaseDate);
