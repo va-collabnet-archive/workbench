@@ -22,7 +22,6 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMEDExtension;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
@@ -74,19 +73,12 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 			I_IdVersioned dup = vodb.getId(snomedUid);
 			if (dup != null) {
 				boolean error = true;
-				if (dup.getTuples().size() == 1) {
-					if (SNOMEDExtension.getSnomedIdsUsed().contains(snomedUid)) {
-						error = false;
-					}
-				}
 				if (error) {
 					StringBuffer buf = new StringBuffer();
 					buf.append("Severe error: ");
 					buf.append(snomedId);
 					buf.append(" generates a duplicate type 3 UUID. ");
 					buf.append(dup.toString());
-					buf.append(" Extension ids: ");
-					buf.append(SNOMEDExtension.getSnomedIdsUsed());
 					throw new Exception(buf.toString());
 				}
 			}
