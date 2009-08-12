@@ -12,14 +12,15 @@ import java.util.Collection;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
-import org.dwfa.util.bean.BeanList;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
 
 /**
@@ -56,7 +57,14 @@ public class ShowInfoDialog extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        JOptionPane.showMessageDialog(new JFrame(), this.message);
+		JFrame parentFrame = null;
+		for (JFrame frame: OpenFrames.getFrames()) {
+			if (frame.isActive()) {
+				parentFrame = frame;
+				break;
+			}
+		}
+		JOptionPane.showMessageDialog(parentFrame, this.message);
         return Condition.CONTINUE;
     }
 

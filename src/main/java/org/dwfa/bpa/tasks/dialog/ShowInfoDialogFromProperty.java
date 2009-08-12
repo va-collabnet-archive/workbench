@@ -12,6 +12,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -70,7 +71,14 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
             throws TaskFailedException {
 		try {
 			String msg = (String) process.readProperty(messagePropertyName);
-		    JOptionPane.showMessageDialog(new JFrame(), msg);
+			JFrame parentFrame = null;
+			for (JFrame frame: OpenFrames.getFrames()) {
+				if (frame.isActive()) {
+					parentFrame = frame;
+					break;
+				}
+			}
+		    JOptionPane.showMessageDialog(parentFrame, msg);
 		    return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
