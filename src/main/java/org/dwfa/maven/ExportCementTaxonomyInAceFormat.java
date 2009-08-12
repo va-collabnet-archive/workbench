@@ -1,5 +1,13 @@
 package org.dwfa.maven;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -9,20 +17,11 @@ import org.dwfa.cement.DocumentAuxiliary;
 import org.dwfa.cement.HL7;
 import org.dwfa.cement.QueueType;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMEDExtension;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.dwfa.tapi.spec.TaxonomySpec;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize Terminology) taxonomies in
@@ -61,10 +60,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
        * A taxonomy that provides the metadata necessary to implement refsets. 
        */
       REFSET_AUXILIARY, 
-      /**
-       * A taxonomy that extends snomed, by adding Gregorian date as a unit of time. 
-       */
-      SNOMED_EXTENSION};
+      };
       
       /**
        * Taxonomies to export. Must be one or more of the Taxonomies provided in the <code>TAXONOMIES enum</code> in this class.
@@ -173,10 +169,6 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
                case REFSET_AUXILIARY:
                   RefsetAuxiliary ra = new RefsetAuxiliary();
                   ra.addToMemoryTermServer(mts);
-                  break;
-               case SNOMED_EXTENSION:
-                  SNOMEDExtension se = new SNOMEDExtension();
-                  se.addToMemoryTermServer(mts);
                   break;
 
                default:
