@@ -293,7 +293,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener,
 				}
 				f.dispose(); // Get rid of the dialog box
 			} catch (Exception ex) {
-				logger.log(Level.SEVERE, ex.getMessage(), ex);
+				ProcessBuilderPanel.logWithAlerts.alertAndLogException(ex);
 			}
 			treeModel.fireTreeStructureChanged();
 			if (logger.isLoggable(Level.INFO)) {
