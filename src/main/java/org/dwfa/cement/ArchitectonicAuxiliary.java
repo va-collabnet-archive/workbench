@@ -1092,9 +1092,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             RefsetAuxiliary rsa = new RefsetAuxiliary();
             rsa.addToMemoryTermServer(mts);
 
-            SNOMEDExtension sme = new SNOMEDExtension();
-            sme.addToMemoryTermServer(mts);
-
             HL7 hl7 = new HL7();
             hl7.addToMemoryTermServer(mts);
 
