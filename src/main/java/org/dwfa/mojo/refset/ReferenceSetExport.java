@@ -61,11 +61,13 @@ public class ReferenceSetExport extends AbstractMojo implements
     boolean useRF2 = false;
 
     /**
-     * The module that this refset belongs to. e.g. AU pathology module.
+     * RF2 Descriptor - this is required if useRF2 is set to true. This
+     * describes the module, namespace, content sub type and country information
+     * required to export in RF2.
      * 
      * @parameter
      */
-    ConceptDescriptor module;
+    RF2Descriptor rf2Descriptor;
 
     /**
      * Export specification that dictates which concepts are exported and which
@@ -138,6 +140,7 @@ public class ReferenceSetExport extends AbstractMojo implements
     private HashMap<Integer, String> pathReleaseVersions = new HashMap<Integer, String>();
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+
         if (!fixedMapDirectory.exists() || !fixedMapDirectory.isDirectory()
                 || !fixedMapDirectory.canRead()) {
             throw new MojoExecutionException(
@@ -169,8 +172,8 @@ public class ReferenceSetExport extends AbstractMojo implements
 
             MemberRefsetHandler.setFixedMapDirectory(fixedMapDirectory);
             MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
-            if (module != null) {
-                MemberRefsetHandler.setModule(module);
+            if (rf2Descriptor != null && rf2Descriptor.getModule() != null) {
+                MemberRefsetHandler.setModule(rf2Descriptor.getModule());
             }
 
             tf.iterateConcepts(this);
@@ -451,12 +454,34 @@ public class ReferenceSetExport extends AbstractMojo implements
                 releaseVersion = getReleaseVersion(refsetConcept);
             }
 
-            uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(
-                    uuidRefsetOutputDirectory, "UUID_" + refsetName + "_"
-                            + releaseVersion + refsetType.getFileExtension())));
-            sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(
-                    sctidRefsetOutputDirectory, "SCTID_" + refsetName + "_"
-                            + releaseVersion + refsetType.getFileExtension())));
+            if (useRF2) {
+                /*
+                 * <FileType>_<ContentType>_<ContentSubType>_<Country|Namespace>_
+                 * <Date>.<ext> e.g. der2_SCTID.Activities of daily
+                 * living.concept.refset_National_UK1999999_20090131.txt
+                 */
+                String uuidFilePrefix = "der2_SCTID.";
+                String sctIdFilePrefix = "der2_UUID.";
+                String fileName = refsetName + "."
+                        + refsetType.getFileExtension() + "_"
+                        + rf2Descriptor.getContentSubType() + "_"
+                        + rf2Descriptor.getCountryCode()
+                        + rf2Descriptor.getNamespace() + "_" + releaseVersion
+                        + ".txt";
+                uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(
+                        uuidFilePrefix + fileName)));
+                sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(
+                        sctIdFilePrefix + fileName)));
+            } else {
+                uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(
+                        uuidRefsetOutputDirectory, "UUID_" + refsetName + "_"
+                                + releaseVersion
+                                + refsetType.getFileExtension())));
+                sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(
+                        sctidRefsetOutputDirectory, "SCTID_" + refsetName + "_"
+                                + releaseVersion
+                                + refsetType.getFileExtension())));
+            }
 
             writerMap.put(refsetId + "UUID", uuidRefsetWriter);
             writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);

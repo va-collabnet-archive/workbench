@@ -97,8 +97,8 @@ public abstract class MemberRefsetHandler extends
                 I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
                 Collection<UUID> statusUuids = tf.getUids(conceptPart
                         .getStatusId());
-
-                String id = toId(tf, memberId, sctId);
+                String id = getMemberId(memberId, sctId, componentId, refsetNid);
+                // String id = toId(tf, memberId, sctId);
                 String effectiveDate = getDate(tf, conceptPart.getVersion());
                 boolean active = isActiveStatus(statusUuids);
                 String moduleId = toId(tf, getModule().getConceptId(), sctId);
