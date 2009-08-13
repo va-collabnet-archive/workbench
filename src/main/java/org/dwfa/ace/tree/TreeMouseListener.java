@@ -18,14 +18,15 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.search.SimilarConceptQuery;
+import org.dwfa.vodb.bind.ThinExtBinder;
 
 public class TreeMouseListener implements MouseListener {
 
@@ -117,6 +118,30 @@ public class TreeMouseListener implements MouseListener {
 			JPopupMenu popup = new JPopupMenu();
 			JMenuItem noActionItem = new JMenuItem("");
 			popup.add(noActionItem);
+			
+			if (ace.getRefsetSpecInSpecEditor() != null) {
+				JTree specTree = ace.getTreeInSpecEditor();
+				if (specTree.isVisible() && specTree.getSelectionCount() > 0) {
+					TreePath selPath = specTree.getSelectionPath();
+					if (selPath != null) {
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
+								.getLastPathComponent();
+						I_ThinExtByRefVersioned specPart = (I_ThinExtByRefVersioned) node
+								.getUserObject();
+						switch (ThinExtBinder.getExtensionType(specPart)) {
+						case CONCEPT_CONCEPT:
+							popup.addSeparator();
+							addRefsetItems(popup, new File(AceFrame.pluginRoot,
+							"refsetspec/branch-popup"), specPart);
+							break;
+						default:
+						}
+					}
+				}
+			}
+			
+			
+			popup.addSeparator();
 			JMenuItem searchForSimilarConcepts = new JMenuItem("Search for similar concepts...");
 			popup.add(searchForSimilarConcepts);
 			searchForSimilarConcepts.addActionListener(new SetSearchToSimilar());
@@ -124,6 +149,13 @@ public class TreeMouseListener implements MouseListener {
 			ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"), 
 					ace.getAceFrameConfig().getWorker());
 			return popup;
+	}
+
+	private void addRefsetItems(JPopupMenu popup, File directory,
+			I_ThinExtByRefVersioned specPart) throws FileNotFoundException,
+			IOException, ClassNotFoundException {
+		ProcessPopupUtil.addSubmenMenuItems(popup, directory, ace.getAceFrameConfig()
+				.getWorker());
 	}
 
 	private void openOrCloseParent(JTree tree, DefaultTreeModel model,

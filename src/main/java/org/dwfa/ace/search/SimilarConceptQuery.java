@@ -23,17 +23,32 @@ public class SimilarConceptQuery {
 		List<I_TestSearchResults> extraCriterion = new ArrayList<I_TestSearchResults>();
 		// Get text, all unique words...
 		TreeSet<String> uniqueWords = new TreeSet<String>();
+		TreeSet<String> commonWords = new TreeSet<String>();
 		for (I_DescriptionVersioned dv: concept.getDescriptions()) {
+			TreeSet<String> uniqueDescriptionWords = new TreeSet<String>();
 			for (I_DescriptionPart part: dv.getVersions()) {
 				String[] parts = part.getText().toLowerCase().split("\\s+");
 				for (String word: parts) {
-					uniqueWords.add(word);
+					if (word.length() > 2 && (word.toLowerCase().equals("the") == false)) {
+						uniqueWords.add(word);
+						uniqueDescriptionWords.add(word);
+					}
 				}
-			}			
+			}	
+			if (commonWords.size() == 0) {
+				commonWords.addAll(uniqueDescriptionWords);
+			} else {
+				commonWords.retainAll(uniqueDescriptionWords);
+			}
 		}
 		StringBuffer queryBuff = new StringBuffer();
-		for (String word: uniqueWords) {
+		for (String word: commonWords) {
 			queryBuff.append("+");
+			queryBuff.append(word);
+			queryBuff.append(" ");
+		}
+		uniqueWords.removeAll(commonWords);
+		for (String word: uniqueWords) {
 			queryBuff.append(word);
 			queryBuff.append(" ");
 		}
