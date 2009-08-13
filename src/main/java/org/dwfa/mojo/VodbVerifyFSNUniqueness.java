@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -52,11 +53,21 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
      */
     private boolean failBuildOnException = false;
 
+    /**
+     * Statuses to consider when checking FSN’s
+     *
+     * @parameter
+     */
+    private ConceptDescriptor[] statuses;
+
     private class FindUniqueFSNs implements I_ProcessDescriptions {
 
         I_TermFactory termFactory;
         BufferedWriter outputWriter;
         HashSet<String> uniqueFsns;
+        List <UUID> statusUuids;
+        UUID fsnUuid;
+        boolean isCheckStatus;
 
         public FindUniqueFSNs() throws Exception {
             outputDirectory.mkdirs();
@@ -65,6 +76,16 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
                             + outputFileName)));
             termFactory = LocalVersionedTerminology.get();
             uniqueFsns = new HashSet<String>();
+            statusUuids = new ArrayList<UUID>();
+            fsnUuid = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next();
+
+            //Only check the status if there is more than one status in the list
+            isCheckStatus = statuses.length > 0;
+            getLog().info("isCheckStatus: " + isCheckStatus);
+
+                for (ConceptDescriptor status : statuses) {
+                    statusUuids.add(UUID.fromString(status.getUuid()));
+                }
         }
 
         public void processDescription(I_DescriptionVersioned description) throws Exception {
@@ -73,15 +94,32 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
 
             // check if it's a FSN
             UUID currentDescriptionTypeUuid = termFactory.getConcept(
-                    latestDescription.getTypeId()).getUids().iterator().next();
-            UUID fsnUuid = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next();
-            if (currentDescriptionTypeUuid.equals(fsnUuid)) {
+                    latestDescription.getTypeId()).getUids().iterator().next();                                    
+
+            // check if it's an active status
+            UUID currentDescriptionStatusUuid = termFactory.getConcept(
+                    latestDescription.getStatusId())
+                    .getUids().iterator().next();
+
+            //Check the Uuids are equal
+            boolean isUuidsEqual = currentDescriptionTypeUuid.equals(fsnUuid);
+            
+
+            //Is the status defined in the list of statuses to check?
+            boolean isStatusListed = false;
+
+            if (isCheckStatus) {
+                isStatusListed = statusUuids.contains(currentDescriptionStatusUuid);
+            }
+
+            if ((!isCheckStatus && isUuidsEqual)
+                    || (isCheckStatus && isStatusListed && isUuidsEqual)) {
 
                 String descriptionText = latestDescription.getText();
 
                 if (uniqueFsns.contains(descriptionText)) {
                     if (exceptions.contains(descriptionText)) {
-                        // don't report as it's an exception
+                        // don't report as ie t's an exception
                     } else {
                         if (!failBuildOnException) {
                             getLog().info("Duplicate FSN: " + descriptionText);
