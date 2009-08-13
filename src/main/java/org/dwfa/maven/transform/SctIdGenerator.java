@@ -1,10 +1,10 @@
 package org.dwfa.maven.transform;
 
 public class SctIdGenerator {
-      
+
    public static enum NAMESPACE {
-      NEHTA("1000036");
-      
+      NEHTA("1000036"), NHS("1999999");
+
       private String digits;
       private NAMESPACE(String digits) {
          this.digits = digits;
@@ -13,10 +13,10 @@ public class SctIdGenerator {
          return digits;
       }
    };
-   
+
    public static enum PROJECT {
-      AMT("01"), AU("02");
-      
+      AMT("01"), AU("02"), REFSET("03");
+
       private String digits;
       private PROJECT(String digits) {
          this.digits = digits;
@@ -25,7 +25,7 @@ public class SctIdGenerator {
          return digits;
       }
    };
-   
+
    public static enum TYPE {
       CONCEPT("10"), DESCRIPTION("11"), RELATIONSHIP("12"), SUBSET("13");
       private String digits;
@@ -71,19 +71,19 @@ public class SctIdGenerator {
    }
 
    public static String generate(long sequence, PROJECT project, NAMESPACE namespace, TYPE type)  {
-      
+
       if (sequence <= 0) {
          throw new RuntimeException("sequence must be > 0");
       }
-      
+
       String mergedid =  Long.toString(sequence) + project.digits + namespace.digits + type.digits;
-      
+
       return mergedid + verhoeffCompute(mergedid);
    }
 
    public static  boolean verhoeffCheck(String idAsString) {
       int check = 0;
-      
+
       for ( int i=idAsString.length()-1; i >=0; i--) {
          check = Dihedral[ check ][ FnF [ (idAsString.length()-i-1) % 8 ] [ new Integer(new String(new char[]{idAsString.charAt(i)}))]];
       }
@@ -98,7 +98,7 @@ public class SctIdGenerator {
       int check = 0;
       for ( int i = idAsString.length()-1; i >=0; i-- ) {
          check = Dihedral[ check ][ FnF [((idAsString.length()-i) % 8) ][ new Integer(new String(new char[]{idAsString.charAt(i)}))]];
-         
+
          }
       return InverseD5[ check ];
    }
