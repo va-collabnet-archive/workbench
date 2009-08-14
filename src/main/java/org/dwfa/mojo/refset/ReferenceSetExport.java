@@ -460,18 +460,18 @@ public class ReferenceSetExport extends AbstractMojo implements
                  * <Date>.<ext> e.g. der2_SCTID.Activities of daily
                  * living.concept.refset_National_UK1999999_20090131.txt
                  */
-                String uuidFilePrefix = "der2_SCTID.";
-                String sctIdFilePrefix = "der2_UUID.";
-                String fileName = refsetName + "."
-                        + refsetType.getFileExtension() + "_"
-                        + rf2Descriptor.getContentSubType() + "_"
+                String sctIdFilePrefix = "der2_SCTID.";
+                String uuidFilePrefix = "der2_UUID.";
+                String fileName = refsetName + refsetType.getFileExtension()
+                        + "_" + rf2Descriptor.getContentSubType() + "_"
                         + rf2Descriptor.getCountryCode()
                         + rf2Descriptor.getNamespace() + "_" + releaseVersion
                         + ".txt";
                 uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(
-                        uuidFilePrefix + fileName)));
-                sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(
-                        sctIdFilePrefix + fileName)));
+                        uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
+                sctIdRefsetWriter = new BufferedWriter(
+                        new FileWriter(new File(sctidRefsetOutputDirectory,
+                                sctIdFilePrefix + fileName)));
             } else {
                 uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(
                         uuidRefsetOutputDirectory, "UUID_" + refsetName + "_"
