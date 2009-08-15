@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
@@ -628,13 +629,10 @@ public class ReferenceSetExport extends AbstractMojo implements
                         .localize().getNid());
 
         I_IntSet statusSet = tf.newIntSet();
-        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize()
-                .getNid());
-        statusSet
-                .add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-
-        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList,
-                statusSet, positions);
+        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        
+        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, positions, LANGUAGE_SORT_PREF.TYPE_B4_LANG);
         if (descTuple == null) {
             UUID conceptUuid = conceptData.getUids().iterator().next();
             throw new MojoExecutionException(
