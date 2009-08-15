@@ -547,6 +547,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         private UniversalFixedDescription[] descriptions;
 
         private static PrimordialId[] descTypeOrder;
+        
+        private I_ConceptualizeLocally local;
 
       private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
          this(new String[] {descriptionString}, null, parents);
@@ -707,7 +709,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
 
         public I_ConceptualizeLocally localize() throws IOException, TerminologyException {
-            return LocalFixedConcept.get(getUids(), primitive);
+        	if (local == null) {
+        		local = LocalFixedConcept.get(getUids(), primitive);
+        	}
+            return local;
         }
         public Collection<I_RelateConceptsUniversally> getDestRels(Collection<I_ConceptualizeUniversally> types, I_StoreUniversalFixedTerminology termStore) {
             throw new UnsupportedOperationException();
@@ -1211,115 +1216,235 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         return localFullySpecifiedDescPrefList;
     }
 
+    public enum LANG_CODE {
+    	EN, EN_AU, EN_BZ, EN_CA, EN_GB, EN_IE, EN_JM, EN_NZ,
+    	EN_TT, EN_US, EN_ZA, LIT, ES, ES_AR, ES_BO, ES_CL, ES_CO, ES_CR,
+    	ES_DO, ES_EC, ES_ES, ES_GT, ES_HN, EX_MX, ES_NI, ES_PA, ES_PE,
+    	ES_ER, ES_PY, ES_SV, ES_UY, ES_VE, FR, FR_BE, FR_CA, FR_FR, FR_CH,
+    	FR_LU, FR_MC, DA, DA_DK, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
+        ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
+    }
+    
+    public static I_ConceptualizeUniversally getLanguageConcept(String langCode) {
+    	String normalizedLangCode = langCode.toUpperCase().replace('-', '_');
+    	switch (LANG_CODE.valueOf(normalizedLangCode)) {
+    	case DA:
+            return ArchitectonicAuxiliary.Concept.DA;
+    	case DA_DK:
+            return ArchitectonicAuxiliary.Concept.DA_DK;
+    	case EN:
+            return ArchitectonicAuxiliary.Concept.EN;
+    	case EN_AU:
+            return ArchitectonicAuxiliary.Concept.EN_AU;
+    	case EN_BZ:
+            return ArchitectonicAuxiliary.Concept.EN_BZ;
+    	case EN_CA:
+            return ArchitectonicAuxiliary.Concept.EN_CA;
+    	case EN_GB:
+            return ArchitectonicAuxiliary.Concept.EN_GB;
+    	case EN_IE:
+            return ArchitectonicAuxiliary.Concept.EN_IE;
+    	case EN_JM:
+            return ArchitectonicAuxiliary.Concept.EN_JM;
+    	case EN_NZ:
+            return ArchitectonicAuxiliary.Concept.EN_NZ;
+    	case EN_TT:
+            return ArchitectonicAuxiliary.Concept.EN_TT;
+    	case EN_US:
+            return ArchitectonicAuxiliary.Concept.EN_US;
+    	case EN_ZA:
+            return ArchitectonicAuxiliary.Concept.EN_ZA;
+    	case ES:
+            return ArchitectonicAuxiliary.Concept.ES;
+    	case ES_AR:
+            return ArchitectonicAuxiliary.Concept.ES_AR;
+    	case ES_BO:
+            return ArchitectonicAuxiliary.Concept.ES_BO;
+    	case ES_CL:
+            return ArchitectonicAuxiliary.Concept.ES_CL;
+    	case ES_CO:
+            return ArchitectonicAuxiliary.Concept.ES_CO;
+    	case ES_CR:
+            return ArchitectonicAuxiliary.Concept.ES_CR;
+    	case ES_DO:
+            return ArchitectonicAuxiliary.Concept.ES_DO;
+    	case ES_EC:
+            return ArchitectonicAuxiliary.Concept.ES_EC;
+    	case ES_ES:
+            return ArchitectonicAuxiliary.Concept.ES_ES;
+     	case ES_GT:
+            return ArchitectonicAuxiliary.Concept.ES_GT;
+    	case ES_HN:
+            return ArchitectonicAuxiliary.Concept.ES_HN;
+    	case ES_NI:
+            return ArchitectonicAuxiliary.Concept.ES_NI;
+    	case ES_PA:
+            return ArchitectonicAuxiliary.Concept.ES_PA;
+    	case ES_PE:
+            return ArchitectonicAuxiliary.Concept.ES_PE;
+    	case ES_PY:
+            return ArchitectonicAuxiliary.Concept.ES_PY;
+    	case ES_SV:
+            return ArchitectonicAuxiliary.Concept.ES_SV;
+    	case ES_UY:
+            return ArchitectonicAuxiliary.Concept.ES_UY;
+    	case ES_VE:
+            return ArchitectonicAuxiliary.Concept.ES_VE;
+    	case FR:
+            return ArchitectonicAuxiliary.Concept.FR;
+    	case FR_BE:
+            return ArchitectonicAuxiliary.Concept.FR_BE;
+    	case FR_CA:
+            return ArchitectonicAuxiliary.Concept.FR_CA;
+    	case FR_CH:
+            return ArchitectonicAuxiliary.Concept.FR_CH;
+    	case FR_FR:
+            return ArchitectonicAuxiliary.Concept.FR_FR;
+    	case FR_LU:
+            return ArchitectonicAuxiliary.Concept.FR_LU;
+    	case FR_MC:
+            return ArchitectonicAuxiliary.Concept.FR_MC;
+    	case LIT:
+            return ArchitectonicAuxiliary.Concept.LIT;
+    	case LT:
+            return ArchitectonicAuxiliary.Concept.LT;
+    	case LT_LT:
+            return ArchitectonicAuxiliary.Concept.LT_LT;
+    	case SV:
+            return ArchitectonicAuxiliary.Concept.SV;
+    	case SV_FI:
+            return ArchitectonicAuxiliary.Concept.SV_FI;
+    	case SV_SE:
+            return ArchitectonicAuxiliary.Concept.SV_SE;
+    	case ZH:
+            return ArchitectonicAuxiliary.Concept.ZH;
+    	case ZH_CHS:
+            return ArchitectonicAuxiliary.Concept.ZH_CHS;
+    	case ZH_CHT:
+            return ArchitectonicAuxiliary.Concept.ZH_CHT;
+    	case ZH_CN:
+            return ArchitectonicAuxiliary.Concept.ZH_CN;
+    	case ZH_HK:
+            return ArchitectonicAuxiliary.Concept.ZH_HK;
+    	case ZH_MO:
+            return ArchitectonicAuxiliary.Concept.ZH_MO;
+    	case ZH_SG:
+            return ArchitectonicAuxiliary.Concept.ZH_SG;
+    	case ZH_TW:
+            return ArchitectonicAuxiliary.Concept.ZH_TW;
+    	}
+        throw new NoSuchElementException("UNK: " + langCode);
+    	
+    }
     public static String getLanguageCode(Collection<UUID> uuids) throws NoSuchElementException {
       if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN.getUids()))
-          return "en";
+          return LANG_CODE.EN.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_AU.getUids()))
-        return "en-AU";
+        return LANG_CODE.EN_AU.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_BZ.getUids()))
-        return "en-BZ";
+        return LANG_CODE.EN_BZ.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_CA.getUids()))
-        return "en-CA";
+        return LANG_CODE.EN_CA.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_GB.getUids()))
-        return "en-GB";
+        return LANG_CODE.EN_GB.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_IE.getUids()))
-        return "en-IE";
+        return LANG_CODE.EN_IE.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_JM.getUids()))
-        return "en-JM";
+        return LANG_CODE.EN_JM.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_NZ.getUids()))
-        return "en-NZ";
+        return LANG_CODE.EN_NZ.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_TT.getUids()))
-        return "en-TT";
+        return LANG_CODE.EN_TT.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_US.getUids()))
-        return "en-US";
+        return LANG_CODE.EN_US.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_ZA.getUids()))
-          return "en-ZA";
+          return LANG_CODE.EN_ZA.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LIT.getUids()))
-          return "LIT";
+          return LANG_CODE.LIT.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES.getUids()))
-          return "es";
+          return LANG_CODE.ES.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_AR.getUids()))
-          return "es-AR";
+          return LANG_CODE.ES_AR.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_BO.getUids()))
-          return "es-BO";
+          return LANG_CODE.ES_BO.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_CL.getUids()))
-          return "es-CL";
+          return LANG_CODE.ES_CL.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_CO.getUids()))
-          return "es-CO";
+          return LANG_CODE.ES_CO.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_CR.getUids()))
-          return "es-CR";
+          return LANG_CODE.ES_CR.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_DO.getUids()))
-          return "es-DO";
+          return LANG_CODE.ES_DO.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_EC.getUids()))
-          return "es-EC";
+          return LANG_CODE.ES_EC.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_ES.getUids()))
-          return "es-ES";
+          return LANG_CODE.ES_ES.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_GT.getUids()))
-          return "es-GT";
+          return LANG_CODE.ES_GT.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_HN.getUids()))
-          return "es-HN";
+          return LANG_CODE.ES_HN.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_MX.getUids()))
-          return "es-MX";
+          return LANG_CODE.EX_MX.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_NI.getUids()))
-          return "es-NI";
+          return LANG_CODE.ES_NI.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PA.getUids()))
-          return "es-PA";
+          return LANG_CODE.ES_PA.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PE.getUids()))
-          return "es-PE";
+          return LANG_CODE.ES_PE.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PR.getUids()))
-          return "es-PR";
+          return LANG_CODE.ES_ER.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_PY.getUids()))
-          return "es-PY";
+          return LANG_CODE.ES_PY.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_SV.getUids()))
-          return "es-SV";
+          return LANG_CODE.ES_SV.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_UY.getUids()))
-          return "es-UY";
+          return LANG_CODE.ES_UY.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ES_VE.getUids()))
-          return "es-VE";
+          return LANG_CODE.ES_VE.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR.getUids()))
-          return "fr";
+          return LANG_CODE.FR.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_BE.getUids()))
-          return "fr-BE";
+          return LANG_CODE.FR_BE.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_CA.getUids()))
-          return "fr-CA";
+          return LANG_CODE.FR_CA.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_FR.getUids()))
-          return "fr-FR";
+          return LANG_CODE.FR_FR.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_CH.getUids()))
-          return "fr-CH";
+          return LANG_CODE.FR_CH.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_LU.getUids()))
-          return "fr-LU";
+          return LANG_CODE.FR_LU.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FR_MC.getUids()))
-          return "fr-MC";
+          return LANG_CODE.FR_MC.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DA.getUids()))
-          return "da";
+          return LANG_CODE.DA.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DA_DK.getUids()))
-          return "da-DK";
+          return LANG_CODE.DA_DK.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SV.getUids()))
-          return "sv";
+          return LANG_CODE.SV.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SV_FI.getUids()))
-          return "sv-FI";
+          return LANG_CODE.SV_FI.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SV_SE.getUids()))
-          return "sv-SE";
+          return LANG_CODE.SV_SE.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LT.getUids()))
-          return "lt";
+          return LANG_CODE.LT.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LT_LT.getUids()))
-          return "lt-LT";
+          return LANG_CODE.LT_LT.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH.getUids()))
-          return "zh";
+          return LANG_CODE.ZH.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_CN.getUids()))
-          return "zh-CN";
+          return LANG_CODE.ZH_CN.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_HK.getUids()))
-          return "zh-HK";
+          return LANG_CODE.ZH_HK.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_CHS.getUids()))
-          return "zh-CHS";
+          return LANG_CODE.ZH_CHS.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_CHT.getUids()))
-          return "zh-CHT";
+          return LANG_CODE.ZH_CHT.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_MO.getUids()))
-          return "zh-MO";
+          return LANG_CODE.ZH_MO.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_SG.getUids()))
-          return "zh-SG";
+          return LANG_CODE.ZH_SG.toString();
       else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ZH_TW.getUids()))
-          return "zh-TW";
+          return LANG_CODE.ZH_TW.toString();
       throw new NoSuchElementException("UNK: " + uuids);
   }
 }
