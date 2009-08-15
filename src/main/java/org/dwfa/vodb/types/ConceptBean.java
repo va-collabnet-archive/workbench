@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
@@ -957,36 +958,99 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		return uncommittedIds;
 	}
 
-	public I_DescriptionTuple getDescTuple(I_IntList prefOrder,
+	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
 			I_ConfigAceFrame config) throws IOException {
-		return getDescTuple(prefOrder, config.getAllowedStatus(), config
-				.getViewPositionSet());
+		return getDescTuple(typePrefOrder, config.getLanguagePreferenceList(),
+				config.getAllowedStatus(), 
+				config.getViewPositionSet(), config.getLanguageSortPref());
 	}
 
-	public I_DescriptionTuple getDescTuple(I_IntList prefOrder,
-			I_IntSet allowedStatus, Set<I_Position> positionSet)
-			throws IOException {
-		I_IntSet typeSet = new IntSet();
-		for (int nid : prefOrder.getListArray()) {
-			typeSet.add(nid);
-		}
-		Collection<I_DescriptionTuple> descriptions;
+	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
+			I_IntList langPrefOrder, I_IntSet allowedStatus,
+			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException {
 		try {
-			descriptions = getDescriptionTuples(
-					allowedStatus, typeSet, positionSet, true, true);
+			I_IntSet typeSet = new IntSet();
+			for (int nid : typePrefOrder.getListArray()) {
+				typeSet.add(nid);
+			}
+			switch (sortPref) {
+			case LANG_B4_TYPE:
+				return getLangPreferredDesc(getDescriptionTuples(allowedStatus,
+						typeSet, positionSet, true, true), typePrefOrder,
+						langPrefOrder, allowedStatus, positionSet, typeSet);
+			case TYPE_B4_LANG:
+				return getTypePreferredDesc(getDescriptionTuples(allowedStatus,
+						typeSet, positionSet, true, true), typePrefOrder,
+						langPrefOrder, allowedStatus, positionSet, typeSet);
+			default:
+				throw new IOException("Can't handle sort type: " + sortPref);
+			}
 		} catch (TerminologyException e) {
 			throw new ToIoException(e);
 		}
-		if (prefOrder == null) {
-			return descriptions.iterator().next();
-		} else {
-			for (int typeId : prefOrder.getListValues()) {
+	}
+
+	private I_DescriptionTuple getTypePreferredDesc(
+			Collection<I_DescriptionTuple> descriptions,
+			I_IntList typePrefOrder, I_IntList langPrefOrder,
+			I_IntSet allowedStatus, Set<I_Position> positionSet,
+			I_IntSet typeSet) throws IOException, ToIoException {
+		if (descriptions.size() > 1) {
+			List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
+			for (int typeId : typePrefOrder.getListValues()) {
 				for (I_DescriptionTuple d : descriptions) {
 					if (d.getTypeId() == typeId) {
-						return d;
+						matchedList.add(d);
+						if (matchedList.size() == 2) {
+							break;
+						}
 					}
 				}
+				if (matchedList.size() > 0) {
+					if (matchedList.size() == 1) {
+						return matchedList.get(0);
+					}
+					return getLangPreferredDesc(matchedList, typePrefOrder,
+							langPrefOrder, allowedStatus, positionSet, typeSet);
+				}
 			}
+			return descriptions.iterator().next();
+		}
+		return null;
+	}
+
+	private I_DescriptionTuple getLangPreferredDesc(
+			Collection<I_DescriptionTuple> descriptions,
+			I_IntList typePrefOrder, I_IntList langPrefOrder,
+			I_IntSet allowedStatus, Set<I_Position> positionSet,
+			I_IntSet typeSet) throws IOException, ToIoException {
+		if (descriptions.size() > 1) {
+			List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
+			for (int langId : langPrefOrder.getListValues()) {
+				for (I_DescriptionTuple d : descriptions) {
+					try {
+						int tupleLangId = ArchitectonicAuxiliary
+								.getLanguageConcept(d.getLang()).localize()
+								.getNid();
+						if (tupleLangId == langId) {
+							matchedList.add(d);
+							if (matchedList.size() == 2) {
+								break;
+							}
+						}
+					} catch (TerminologyException e) {
+						throw new ToIoException(e);
+					}
+				}
+				if (matchedList.size() > 0) {
+					if (matchedList.size() == 1) {
+						return matchedList.get(0);
+					}
+					return getTypePreferredDesc(matchedList, typePrefOrder,
+							langPrefOrder, allowedStatus, positionSet, typeSet);
+				}
+			}
+			return descriptions.iterator().next();
 		}
 		return null;
 	}

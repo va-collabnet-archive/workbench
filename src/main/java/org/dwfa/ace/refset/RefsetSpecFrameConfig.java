@@ -1092,4 +1092,12 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setRefsetInSpecEditor(I_GetConceptData refset) {
         frameConfig.setRefsetInSpecEditor(refset);
     }
+
+	public LANGUAGE_SORT_PREF getLanguageSortPref() {
+		return frameConfig.getLanguageSortPref();
+	}
+
+	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
+		frameConfig.setLanguageSortPref(langSortPref);
+	}
 }

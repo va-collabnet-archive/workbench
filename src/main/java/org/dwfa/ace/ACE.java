@@ -106,6 +106,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -2215,6 +2216,16 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
     private JComponent makeLanguagePanel() {
         JPanel langPrefPanel = new JPanel(new GridLayout(0, 1));
+        JComboBox sortOrderCombo = new JComboBox(LANGUAGE_SORT_PREF.values());
+        sortOrderCombo.setSelectedItem(aceFrameConfig.getLanguageSortPref());
+        langPrefPanel.add(sortOrderCombo);
+        sortOrderCombo.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox)e.getSource();
+                LANGUAGE_SORT_PREF sortPref = (LANGUAGE_SORT_PREF)cb.getSelectedItem();
+                aceFrameConfig.setLanguageSortPref(sortPref);
+            }        	
+        });
         langPrefPanel.add(new JScrollPane(makeTermList(
                 "Langauge/Dialect preference order:", aceFrameConfig
                         .getLanguagePreferenceList())));

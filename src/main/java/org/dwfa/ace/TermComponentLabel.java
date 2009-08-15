@@ -26,6 +26,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -43,8 +44,12 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdTuple;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
@@ -118,8 +123,10 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 						null, config.getViewPositionSet())) {
 					buff.append("    <description type='"); 
 					ConceptBean type = ConceptBean.get(dt.getTypeId());
+					
 					I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(), 
-							config.getAllowedStatus(), config.getViewPositionSet());
+							config.getLanguagePreferenceList(),
+							config.getAllowedStatus(), config.getViewPositionSet(), config.getLanguageSortPref());
 					buff.append(typeDesc.getText()); 
 					buff.append("'\n                 text='"); 
 					buff.append(dt.getText());
@@ -146,7 +153,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 			buff.append("<id source='");
 			ConceptBean source = ConceptBean.get(idt.getSource());
 			I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(), 
-					config.getAllowedStatus(), config.getViewPositionSet());
+					config.getLanguagePreferenceList(),
+					config.getAllowedStatus(), config.getViewPositionSet(), config.getLanguageSortPref());
 			buff.append(sourceDesc.getText());
 			buff.append("' value='");
 			buff.append(idt.getSourceId().toString());
@@ -186,7 +194,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 		throws IOException {
 			ConceptBean source = ConceptBean.get(idt.getSource());
 			I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(), 
-					config.getAllowedStatus(), config.getViewPositionSet());
+					config.getLanguagePreferenceList(),
+					config.getAllowedStatus(), config.getViewPositionSet(), config.getLanguageSortPref());
 			buff.append(sourceDesc.getText());
 			buff.append("\t");
 			buff.append(idt.getSourceId().toString());

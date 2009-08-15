@@ -1154,4 +1154,12 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setRefsetInSpecEditor(I_GetConceptData refset) {
         baseFrame.setRefsetInSpecEditor(refset);
     }
+
+	public LANGUAGE_SORT_PREF getLanguageSortPref() {
+		return baseFrame.getLanguageSortPref();
+	}
+
+	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
+		baseFrame.setLanguageSortPref(langSortPref);
+	}
 }

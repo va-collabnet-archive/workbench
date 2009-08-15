@@ -111,7 +111,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 39;
+    private static final int dataVersion = 40;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -290,6 +290,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 39
     private Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>> conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
+    
+    //40
+    private LANGUAGE_SORT_PREF langSortPref = LANGUAGE_SORT_PREF.TYPE_B4_LANG;
 
     // transient
     private transient MasterWorker worker;
@@ -499,6 +502,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 39
         out.writeObject(conceptPanelPlugins);
+        
+        // 40
+        out.writeObject(langSortPref);
     }
 
     private void writeConceptAsId(I_GetConceptData concept,
@@ -937,7 +943,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     }
                 }
             }
-
+            if (objDataVersion >= 40) {
+            	langSortPref = (LANGUAGE_SORT_PREF) in.readObject();
+            } else {
+            	langSortPref = LANGUAGE_SORT_PREF.TYPE_B4_LANG;
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -2985,5 +2995,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setRefsetInSpecEditor(I_GetConceptData refset) {
         aceFrame.getCdePanel().setRefsetInSpecEditor(refset);
     }
+
+	public LANGUAGE_SORT_PREF getLanguageSortPref() {
+		return langSortPref;
+	}
+
+	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
+		Object old = this.langSortPref;
+		this.langSortPref = langSortPref;
+        changeSupport.firePropertyChange("refsetSpecChanged", old, langSortPref);
+	}
 
 }

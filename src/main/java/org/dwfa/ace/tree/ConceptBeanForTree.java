@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
@@ -207,8 +208,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
       return bean.getImageTuples(allowedStatus, allowedTypes, positions);
    }
 
-   public I_DescriptionTuple getDescTuple(I_IntList arg0, I_IntSet arg1, Set<I_Position> arg2) throws IOException {
-      return bean.getDescTuple(arg0, arg1, arg2);
+   public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
+			I_IntList langPrefOrder, I_IntSet allowedStatus,
+			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException {
+      return bean.getDescTuple(typePrefOrder,
+			langPrefOrder, allowedStatus,
+			positionSet, sortPref);
    }
 
    public int getRelId() {
