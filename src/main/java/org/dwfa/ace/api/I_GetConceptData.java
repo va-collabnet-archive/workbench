@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
@@ -509,11 +510,13 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
 	public I_IdVersioned getId() throws IOException;
 
-	public I_DescriptionTuple getDescTuple(I_IntList treeDescPreferenceList,
-			I_IntSet allowedStatus, Set<I_Position> positions)
+	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
+			I_IntList langPrefOrder, I_IntSet allowedStatus,
+			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref)
 			throws IOException;
 
-    public I_DescriptionTuple getDescTuple(I_IntList treeDescPreferenceList, I_ConfigAceFrame config)
+    public I_DescriptionTuple getDescTuple(I_IntList descTypePreferenceList, 
+    		I_ConfigAceFrame config)
             throws IOException;
 
 	public I_IntSet getUncommittedIds();

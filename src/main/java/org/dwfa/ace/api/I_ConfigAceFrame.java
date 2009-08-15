@@ -33,6 +33,22 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public enum SPECIAL_SVN_ENTRIES {
         PROFILE_CSU(), PROFILE_DBU(), BERKELEY_DB();
     };
+    
+    public enum LANGUAGE_SORT_PREF {
+    	LANG_B4_TYPE("language before type"), TYPE_B4_LANG("type before language");
+    	
+    	private String desc;
+    	private LANGUAGE_SORT_PREF(String desc) {
+    		this.desc = desc;
+    	}
+    	
+    	public String toString() {
+    		return desc;
+    	}
+    }
+    
+    public LANGUAGE_SORT_PREF getLanguageSortPref();
+    public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref);
 
     public boolean isActive();
 
