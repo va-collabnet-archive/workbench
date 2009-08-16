@@ -1731,6 +1731,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
         conceptTabs.addTab("List", new ImageIcon(ACE.class
                 .getResource("/16x16/plain/notebook.png")),
                 getConceptListEditor());
+        refsetTabIndex = conceptTabs.getTabCount();
 
         refsetSpecPanel = new RefsetSpecPanel(this);
         conceptTabs.addTab("RefSet Spec", new ImageIcon(ACE.class
@@ -3881,5 +3882,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
 	public SearchPanel getSearchPanel() {
 		return searchPanel;
+	}
+
+	int refsetTabIndex = -2;
+	public boolean refsetTabIsSelected() {
+		return conceptTabs.getSelectedIndex() == refsetTabIndex;
+			
 	}
 }

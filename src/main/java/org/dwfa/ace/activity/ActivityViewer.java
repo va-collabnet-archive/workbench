@@ -377,6 +377,7 @@ public class ActivityViewer {
     }
     
     public static void toFront() {
+    	viewer.viewerFrame.setVisible(true);
     	viewer.viewerFrame.toFront();
     }
 }

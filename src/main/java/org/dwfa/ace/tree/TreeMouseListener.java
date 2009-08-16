@@ -119,7 +119,7 @@ public class TreeMouseListener implements MouseListener {
 			JMenuItem noActionItem = new JMenuItem("");
 			popup.add(noActionItem);
 			
-			if (ace.getRefsetSpecInSpecEditor() != null) {
+			if (ace.getRefsetSpecInSpecEditor() != null && ace.refsetTabIsSelected()) {
 				JTree specTree = ace.getTreeInSpecEditor();
 				if (specTree.isVisible() && specTree.getSelectionCount() > 0) {
 					TreePath selPath = specTree.getSelectionPath();
