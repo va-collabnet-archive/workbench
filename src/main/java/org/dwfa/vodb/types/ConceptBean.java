@@ -1026,28 +1026,30 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			I_IntSet typeSet) throws IOException, ToIoException {
 		if (descriptions.size() > 1) {
 			List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
-			for (int langId : langPrefOrder.getListValues()) {
-				for (I_DescriptionTuple d : descriptions) {
-					try {
-						int tupleLangId = ArchitectonicAuxiliary
-								.getLanguageConcept(d.getLang()).localize()
-								.getNid();
-						if (tupleLangId == langId) {
-							matchedList.add(d);
-							if (matchedList.size() == 2) {
-								break;
+			if (langPrefOrder != null && langPrefOrder.getListValues() != null) {
+				for (int langId : langPrefOrder.getListValues()) {
+					for (I_DescriptionTuple d : descriptions) {
+						try {
+							int tupleLangId = ArchitectonicAuxiliary
+									.getLanguageConcept(d.getLang()).localize()
+									.getNid();
+							if (tupleLangId == langId) {
+								matchedList.add(d);
+								if (matchedList.size() == 2) {
+									break;
+								}
 							}
+						} catch (TerminologyException e) {
+							throw new ToIoException(e);
 						}
-					} catch (TerminologyException e) {
-						throw new ToIoException(e);
 					}
-				}
-				if (matchedList.size() > 0) {
-					if (matchedList.size() == 1) {
-						return matchedList.get(0);
+					if (matchedList.size() > 0) {
+						if (matchedList.size() == 1) {
+							return matchedList.get(0);
+						}
+						return getTypePreferredDesc(matchedList, typePrefOrder,
+								langPrefOrder, allowedStatus, positionSet, typeSet);
 					}
-					return getTypePreferredDesc(matchedList, typePrefOrder,
-							langPrefOrder, allowedStatus, positionSet, typeSet);
 				}
 			}
 			return descriptions.iterator().next();

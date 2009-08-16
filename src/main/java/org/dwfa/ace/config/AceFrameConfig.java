@@ -917,6 +917,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     pathColorMap.put(key, pathColor);
                 }
                 languagePreferenceList = IntList.readIntListStrict(in);
+                if (languagePreferenceList == null) {
+                	languagePreferenceList = new IntList();
+                }
             }
             if (objDataVersion >= 38) {
                 // 38
@@ -2810,6 +2813,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_IntList getLanguagePreferenceList() {
+    	if (languagePreferenceList == null) {
+    		languagePreferenceList = new IntList();
+    	}
         return languagePreferenceList;
     }
 
