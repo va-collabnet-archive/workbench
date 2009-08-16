@@ -1085,8 +1085,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     }
 
     public I_IntList getLanguagePreferenceList() {
-        // TODO Auto-generated method stub
-        return null;
+        return frameConfig.getLanguagePreferenceList();
     }
 
     public void setRefsetInSpecEditor(I_GetConceptData refset) {
