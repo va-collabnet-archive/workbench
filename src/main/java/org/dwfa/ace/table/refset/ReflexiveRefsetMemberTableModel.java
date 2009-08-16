@@ -1,9 +1,12 @@
 package org.dwfa.ace.table.refset;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
@@ -50,8 +53,14 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 			if (stopWork || extension == null) {
 				return false;
 			}
-			for (I_ThinExtByRefPart part : extension.getVersions()) {
-				ThinExtByRefTuple ebrTuple = new ThinExtByRefTuple(extension, part);
+			I_IntSet statusSet = host.getConfig().getAllowedStatus();
+			Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
+			if (host.getShowHistory() == true) {
+				statusSet = null;
+				positionSet = null;
+			}
+			for (I_ThinExtByRefPart part : extension.getTuples(statusSet, positionSet, true, false)) {
+				ThinExtByRefTuple ebrTuple = (ThinExtByRefTuple) part;
 				for (ReflexiveRefsetFieldData col: columns) {
 					if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
 						switch (col.invokeOnObjectType) {
