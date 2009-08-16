@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -129,20 +130,33 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 		if (specPart != null) {
 			popup.addSeparator();
 			
-			List<I_ThinExtByRefTuple> tuples = specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), true);
-			
-			if (tuples.iterator().hasNext()) {
-				JMenuItem retireActionItem = new JMenuItem("Retire");
-				retireActionItem.addActionListener(new RetireSpecAction(tuples.iterator().next()));
-				popup.add(retireActionItem);
-			} else {
-				tuples = specPart.getTuples(null, aceConfig.getViewPositionSet(), true);
+			boolean uncommitted = false;
+			for (I_ThinExtByRefPart part: specPart.getVersions()) {
+				if (part.getVersion() == Integer.MAX_VALUE) {
+					uncommitted = true;
+					break;
+				}
 			}
-			if (tuples.iterator().hasNext()) {
-				JMenuItem changeActionItem = new JMenuItem("Change...");
-				changeActionItem.addActionListener(new ChangeSpecAction(tuples.iterator().next()));
-				popup.add(changeActionItem);
-			} 
+			if (uncommitted) {
+				JMenuItem cancelActionItem = new JMenuItem("Cancel change");
+				cancelActionItem.addActionListener(new CancelChangeAction(specPart));
+				popup.add(cancelActionItem);
+			} else {
+				List<I_ThinExtByRefTuple> tuples = specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), true);
+				
+				if (tuples.iterator().hasNext()) {
+					JMenuItem retireActionItem = new JMenuItem("Retire");
+					retireActionItem.addActionListener(new RetireSpecAction(tuples.iterator().next()));
+					popup.add(retireActionItem);
+				} else {
+					tuples = specPart.getTuples(null, aceConfig.getViewPositionSet(), true);
+				}
+				if (tuples.iterator().hasNext()) {
+					JMenuItem changeActionItem = new JMenuItem("Change...");
+					changeActionItem.addActionListener(new ChangeSpecAction(tuples.iterator().next()));
+					popup.add(changeActionItem);
+				} 
+			}
 			
 		}
 		
@@ -169,6 +183,26 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 			}
 			thinExtByRefTuple.getCore().addVersion(newPart);
 			LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
+			specEditor.updateSpecTree(false);
+		}		
+	}
+	private class CancelChangeAction implements ActionListener {
+		private I_ThinExtByRefVersioned specPart;
+		
+		private CancelChangeAction(I_ThinExtByRefVersioned specPart) {
+			super();
+			this.specPart = specPart;
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+			for (I_ThinExtByRefPart part: specPart.getVersions()) {
+				if (part.getVersion() == Integer.MAX_VALUE) {
+					partsToRemove.add(part);
+				}
+			}
+			specPart.getVersions().removeAll(partsToRemove);
+			LocalVersionedTerminology.get().addUncommitted(specPart);
 			specEditor.updateSpecTree(false);
 		}		
 	}
