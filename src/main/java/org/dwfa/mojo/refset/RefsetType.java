@@ -11,6 +11,8 @@ import java.util.List;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
@@ -18,6 +20,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.mojo.refset.writers.BooleanRefsetHandler;
+import org.dwfa.mojo.refset.writers.ConceptConceptConceptRefsetHandler;
+import org.dwfa.mojo.refset.writers.ConceptConceptRefsetHandler;
 import org.dwfa.mojo.refset.writers.ConceptDoubleRefsetHandler;
 import org.dwfa.mojo.refset.writers.ConceptIntegerRefsetHandler;
 import org.dwfa.mojo.refset.writers.ConceptRefsetHandler;
@@ -33,6 +37,16 @@ enum RefsetType {
         ".concept.refset"
     ),
 
+    CONCEPT_CONCEPT(
+            Concept.CONCEPT_CONCEPT_EXTENSION,
+            ConceptConceptRefsetHandler.class, //TODO
+            ".concept.concept.refset"
+    ),
+    CONCEPT_CONCEPT_CONCEPT(
+            Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION,
+            ConceptConceptConceptRefsetHandler.class, //TODO
+            ".concept.concept.concept.refset"
+        ),
     INTEGER(
         Concept.INT_EXTENSION,
         IntegerRefsetHandler.class,
@@ -79,6 +93,10 @@ enum RefsetType {
             return BOOLEAN;
         } else if (part instanceof I_ThinExtByRefPartConcept) {
             return CONCEPT;
+        } else if (part instanceof I_ThinExtByRefPartConceptConcept) {
+            return CONCEPT_CONCEPT;
+        } else if (part instanceof I_ThinExtByRefPartConceptConceptConcept) {
+            return CONCEPT_CONCEPT_CONCEPT;
         } else if (part instanceof I_ThinExtByRefPartConceptInt) {
             return CONCEPT_INTEGER;
         } else if (part instanceof I_ThinExtByRefPartInteger) {
