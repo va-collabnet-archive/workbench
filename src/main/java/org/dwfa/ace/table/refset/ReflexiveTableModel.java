@@ -357,6 +357,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 		if (allTuples.size() == 0 && rowIndex == 0) {
 			return " ";
 		}
+		if (rowIndex < 0) {
+			return " ";
+		}
 		try {
 			I_ThinExtByRefTuple tuple = allTuples.get(rowIndex);
 			Object value = null;

@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -167,7 +166,7 @@ public class ActivityViewer {
 
     ComponentFrame viewerFrame;
 
-    JPanel activitiesPanel = new JPanel(new GridLayout(0, 1));
+    JPanel activitiesPanel = new JPanel(new GridBagLayout());
 
     List<I_ShowActivity> activitiesList = new ArrayList<I_ShowActivity>();
 
@@ -182,7 +181,7 @@ public class ActivityViewer {
                     .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             viewerFrame.setContentPane(scroller);
             viewerFrame.setLocation(20, 20);
-            viewerFrame.setSize(500, 300);
+            viewerFrame.setSize(600, 400);
             viewerFrame.setVisible(true);
 
             JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
@@ -270,14 +269,24 @@ public class ActivityViewer {
                         Collections.sort(viewer.activitiesList,
                                 activityComparator);
                         synchronized (viewer.activitiesList) {
-                            while (viewer.activitiesList.size() > 10) {
-                                viewer.activitiesList.remove(10);
+                            while (viewer.activitiesList.size() > 40) {
+                                viewer.activitiesList.remove(40);
                             }
                         }
                         Set<JPanel> secondaryPanels = new HashSet<JPanel>();
                         viewer.activitiesPanel.removeAll();
+                        GridBagConstraints gbc = new GridBagConstraints();
+                        gbc.gridx = 0;
+                        gbc.gridy = 0;
+                        gbc.weightx = 1;
+                        gbc.weighty = 0;
+                        gbc.fill = GridBagConstraints.HORIZONTAL;
+                        gbc.anchor = GridBagConstraints.NORTHWEST;
+                        gbc.gridwidth = 1;
+                        gbc.gridheight = 1;
                         for (I_ShowActivity a : viewer.activitiesList) {
-                            viewer.activitiesPanel.add(a.getViewPanel());
+                            viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                            gbc.gridy++;
                             addSecondaryActivityPanel(secondaryPanels, a);
                         }
                         tickleSize();
@@ -308,9 +317,18 @@ public class ActivityViewer {
                         if (origOrder.equals(viewer.activitiesList) == false) {
                             viewer.activitiesPanel.removeAll();
                             Set<JPanel> secondaryPanels = new HashSet<JPanel>();
-
+                            GridBagConstraints gbc = new GridBagConstraints();
+                            gbc.gridx = 0;
+                            gbc.gridy = 0;
+                            gbc.weightx = 1;
+                            gbc.weighty = 0;
+                            gbc.fill = GridBagConstraints.HORIZONTAL;
+                            gbc.anchor = GridBagConstraints.NORTHWEST;
+                            gbc.gridwidth = 1;
+                            gbc.gridheight = 1;
                             for (I_ShowActivity a : viewer.activitiesList) {
-                                viewer.activitiesPanel.add(a.getViewPanel());
+                                viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                                gbc.gridy++;
                                 addSecondaryActivityPanel(secondaryPanels, a);
                             }
                             tickleSize();
@@ -353,8 +371,18 @@ public class ActivityViewer {
             public void run() {
                 viewer.activitiesList.remove(activity);
                 viewer.activitiesPanel.removeAll();
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                gbc.weightx = 1;
+                gbc.weighty = 0;
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.anchor = GridBagConstraints.NORTHWEST;
+                gbc.gridwidth = 1;
+                gbc.gridheight = 1;
                 for (I_ShowActivity a : viewer.activitiesList) {
-                    viewer.activitiesPanel.add(a.getViewPanel());
+                    viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                    gbc.gridy++;
                 }
                 tickleSize();
             }
