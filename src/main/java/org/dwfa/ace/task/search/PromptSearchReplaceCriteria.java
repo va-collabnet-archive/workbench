@@ -22,14 +22,16 @@ import org.dwfa.util.bean.Spec;
 public class PromptSearchReplaceCriteria extends AbstractTask {
 
 	private static final long serialVersionUID = 1L;
-	
-	private static final int dataVersion = 1;
+
+	private static final int dataVersion = 2;
+
+    private static int objDataVersion = -1;
 
 	/**
-	 * 
+	 *
 	 */
-		
-	
+
+
 	private String searchStringPropName = ProcessAttachmentKeys.FIND_TEXT.getAttachmentKey();
 	private String replaceStringPropName = ProcessAttachmentKeys.REPLACE_TEXT.getAttachmentKey();
 	private String caseSensitivePropName = ProcessAttachmentKeys.CASE_SENSITIVITY.getAttachmentKey();
@@ -37,6 +39,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 	private String searchFsnPropName = ProcessAttachmentKeys.SEARCH_FSN.getAttachmentKey();
 	private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
 	private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
+    private String retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -47,19 +50,30 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 		out.writeObject(searchFsnPropName);
 		out.writeObject(searchPftPropName);
 		out.writeObject(searchSynonymPropName);
+        out.writeObject(retireAsStatusPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
-			searchStringPropName = (String) in.readObject();
-			replaceStringPropName = (String) in.readObject();
-			caseSensitivePropName = (String) in.readObject();
+		objDataVersion = in.readInt();
+		if (objDataVersion == 1) {
+            searchStringPropName = (String) in.readObject();
+            replaceStringPropName = (String) in.readObject();
+            caseSensitivePropName = (String) in.readObject();
 			searchAllPropName = (String) in.readObject();
 			searchFsnPropName = (String) in.readObject();
 			searchPftPropName = (String) in.readObject();
 			searchSynonymPropName = (String) in.readObject();
+            retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
+        } else if (objDataVersion == 2) {
+            searchStringPropName = (String) in.readObject();
+            replaceStringPropName = (String) in.readObject();
+            caseSensitivePropName = (String) in.readObject();
+			searchAllPropName = (String) in.readObject();
+			searchFsnPropName = (String) in.readObject();
+			searchPftPropName = (String) in.readObject();
+			searchSynonymPropName = (String) in.readObject();
+            retireAsStatusPropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -71,7 +85,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 	}
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work arg1)
 			throws TaskFailedException {
-	
+
         SearchReplaceDialog dialog = new SearchReplaceDialog();
         dialog.pack();
         dialog.setTitle("Search and Replace");
@@ -82,7 +96,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         Dimension screenSize = toolkit.getScreenSize();
 
         //Calculate the frame location
-        int x = (screenSize.width - dialog.getWidth()) / 2;  
+        int x = (screenSize.width - dialog.getWidth()) / 2;
         int y = (screenSize.height - dialog.getHeight()) / 2;
 
         //Set the new frame location
@@ -104,12 +118,13 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         boolean searchFsn = dialog.isFullySpecifiedName();
         boolean searchPft = dialog.isPreferredTerm();
         boolean searchSynonym = dialog.isSynonym();
-        
+        int retireAsStatus = dialog.getRetireAsStatus();
+
         dialog.dispose();
         dialog = null;
 
         try {
-        	
+
         	// Set the values from the dialog as properties for this process
 			process.setProperty(searchStringPropName, searchString);
 			process.setProperty(replaceStringPropName, replaceString);
@@ -118,6 +133,8 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 			process.setProperty(searchFsnPropName, searchFsn);
 			process.setProperty(searchPftPropName, searchPft);
 			process.setProperty(searchSynonymPropName, searchSynonym);
+            process.setProperty(retireAsStatusPropName, retireAsStatus);
+
 		} catch (IntrospectionException e) {
 			throw new TaskFailedException("Can't bind variables from Find and Replace dialog: " + e);
 		} catch (IllegalAccessException e) {
@@ -125,7 +142,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException("Can't bind variables from Find and Replace dialog: " + e);
 		}
-        
+
 		return Condition.ITEM_COMPLETE;
 	}
 	public String getSearchStringPropName() {
@@ -170,7 +187,16 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 	public void setSearchSynonymPropName(String searchSynonymPropName) {
 		this.searchSynonymPropName = searchSynonymPropName;
 	}
-	public Collection<Condition> getConditions() {
+
+    public String getRetireAsStatusPropName() {
+        return retireAsStatusPropName;
+    }
+
+    public void setRetireAsStatusPropName(String retireAsStatusPropName) {
+        this.retireAsStatusPropName = retireAsStatusPropName;
+    }
+
+    public Collection<Condition> getConditions() {
 		return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
 	}
 	public int[] getDataContainerIds() {

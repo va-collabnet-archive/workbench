@@ -45,11 +45,13 @@ import org.dwfa.util.bean.Spec;
 public class SearchReplaceTermsInList extends AbstractTask {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	private static final int dataVersion = 1;
+
+	private static final int dataVersion = 2;
+
+    private static int objDataVersion = -1;
 
 
 	private String searchStringPropName = ProcessAttachmentKeys.FIND_TEXT.getAttachmentKey();
@@ -59,8 +61,11 @@ public class SearchReplaceTermsInList extends AbstractTask {
 	private String searchFsnPropName = ProcessAttachmentKeys.SEARCH_FSN.getAttachmentKey();
 	private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
 	private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
+    private String retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
 
-	
+    private List<I_GetConceptData> statuses;
+
+
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(searchStringPropName);
@@ -70,12 +75,13 @@ public class SearchReplaceTermsInList extends AbstractTask {
 		out.writeObject(searchFsnPropName);
 		out.writeObject(searchPftPropName);
 		out.writeObject(searchSynonymPropName);
+        out.writeObject(retireAsStatusPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
+		objDataVersion = in.readInt();
+		if (objDataVersion == 1) {
 			searchStringPropName = (String) in.readObject();
 			replaceStringPropName = (String) in.readObject();
 			caseSensitivePropName = (String) in.readObject();
@@ -83,12 +89,22 @@ public class SearchReplaceTermsInList extends AbstractTask {
 			searchFsnPropName = (String) in.readObject();
 			searchPftPropName = (String) in.readObject();
 			searchSynonymPropName = (String) in.readObject();
+            retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
+        } else if (objDataVersion >= 2) {
+            searchStringPropName = (String) in.readObject();
+			replaceStringPropName = (String) in.readObject();
+			caseSensitivePropName = (String) in.readObject();
+			searchAllPropName = (String) in.readObject();
+			searchFsnPropName = (String) in.readObject();
+			searchPftPropName = (String) in.readObject();
+			searchSynonymPropName = (String) in.readObject();
+            retireAsStatusPropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
 	}
 
-	
+
 	public void complete(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
 		// Nothing to do...
@@ -132,6 +148,8 @@ public class SearchReplaceTermsInList extends AbstractTask {
 					+ process.readProperty(searchPftPropName));
 			boolean searchSynonym = Boolean.valueOf(""
 					+ process.readProperty(searchSynonymPropName));
+            int retireAsStatus = Integer.valueOf(""
+					+ process.readProperty(retireAsStatusPropName));
 
 			// create list of IDs of description types to check (e.g. preferred
 			// term)
@@ -237,7 +255,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 														.getConcept(description
 																.getTypeId()),
 												config);
-								
+
 								I_DescriptionPart newLastPart = newDesc.getLastTuple().getPart();
 								for (I_Path path : paths) {
 									// retire the existing description
@@ -245,7 +263,11 @@ public class SearchReplaceTermsInList extends AbstractTask {
 											.duplicatePart();
 									newRetiredPart.setPathId(path.getConceptId());
 									newRetiredPart.setVersion(Integer.MAX_VALUE);
-									newRetiredPart.setStatusId(retiredConceptId);
+                                    if (retireAsStatus != -1) {
+                                        newRetiredPart.setStatusId(retireAsStatus);
+                                    } else {
+									    newRetiredPart.setStatusId(retiredConceptId);
+                                    }
 									description.getDescVersioned().addVersion(
 											newRetiredPart);
 									// Set the status to that of the original,
@@ -400,7 +422,15 @@ public class SearchReplaceTermsInList extends AbstractTask {
 		this.searchSynonymPropName = searchSynonymPropName;
 	}
 
-	public Collection<Condition> getConditions() {
+    public String getRetireAsStatusPropName() {
+        return retireAsStatusPropName;
+    }
+
+    public void setRetireAsStatusPropName(String retireAsStatusPropName) {
+        this.retireAsStatusPropName = retireAsStatusPropName;
+    }
+
+    public Collection<Condition> getConditions() {
 		return CONTINUE_CONDITION;
 	}
 

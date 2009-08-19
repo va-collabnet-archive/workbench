@@ -7,7 +7,7 @@ public class SearchReplaceDescription {
 	private String finalDesc;
 	private String origDescHtml;
 	private String finalDescHtml;
-	private String descType;
+	private String descType;    
 	
 	public SearchReplaceDescription(String origDesc, String finalDesc, String origDescHtml, String finalDescHtml, String descType) {
 		super();

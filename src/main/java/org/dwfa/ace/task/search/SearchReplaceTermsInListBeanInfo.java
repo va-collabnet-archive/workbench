@@ -69,7 +69,14 @@ public class SearchReplaceTermsInListBeanInfo extends SimpleBeanInfo {
             caseSensitivePropName.setDisplayName("<html><font color='green'>Case Sensitive Prop Name");
             caseSensitivePropName.setShortDescription("");
 
-            PropertyDescriptor rv[] = { searchStringPropName, replaceStringPropName, caseSensitivePropName, searchAllPropName, searchFsnPropName, searchPftPropName, searchSynonymPropName };
+            PropertyDescriptor retireAsStatusPropName =
+                new PropertyDescriptor("retireAsStatusPropName", SearchReplaceTermsInList.class);
+            retireAsStatusPropName.setBound(true);
+            retireAsStatusPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            retireAsStatusPropName.setDisplayName("<html><font color='green'>Retire as status Prop Name");
+            retireAsStatusPropName.setShortDescription("");
+
+            PropertyDescriptor rv[] = { searchStringPropName, replaceStringPropName, caseSensitivePropName, searchAllPropName, searchFsnPropName, searchPftPropName, searchSynonymPropName, retireAsStatusPropName };
             return rv;
             
         } catch (IntrospectionException e) {
