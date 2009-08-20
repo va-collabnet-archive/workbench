@@ -62,7 +62,17 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setAllowedStatus(I_IntSet allowedStatus);
 
+    /**
+     * Description types for display when the concept view has the use preferences toggle on. 
+     * @return
+     */
     public I_IntSet getDescTypes();
+
+    /**
+     * Relationship types for display when the concept view has the use preferences toggle on. 
+     * @return
+     */
+    public I_IntSet getPrefFilterTypesForRel();
 
     public void setDescTypes(I_IntSet allowedTypes);
 

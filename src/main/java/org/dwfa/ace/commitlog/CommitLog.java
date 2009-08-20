@@ -100,10 +100,12 @@ public class CommitLog implements I_WriteChangeSet {
 			      tempOut.append(dateFormat.format(new Date(time)));
 			      tempOut.append("\textension\t");
 			      tempOut.append(extensionChange.getUniversalAceBean().getMemberUid().toString());
-			      tempOut.append("\t");
-			      tempOut.append(tf.getConcept(extensionChange.getMemberId()).getInitialText());
-			      tempOut.append("\t");
-			      tempOut.append(tf.getConcept(extensionChange.getMemberId()).getUids().toString());
+			      if (tf.hasConcept(extensionChange.getMemberId())) {
+				      tempOut.append("\t");
+				      tempOut.append(tf.getConcept(extensionChange.getMemberId()).getInitialText());
+				      tempOut.append("\t");
+				      tempOut.append(tf.getConcept(extensionChange.getMemberId()).getUids().toString());
+			      }
 			      tempOut.append("\n");
 			  } else {
 			     throw new IOException("Can't handle class: " + change.getClass().getName());
