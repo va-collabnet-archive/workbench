@@ -552,7 +552,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
             }
             return;
         }
-        I_Transact extraToAdd = null;
         ConceptBean uncommittedBean = null;
         if (ExtensionByReferenceBean.class.isAssignableFrom(to.getClass())) {
             ExtensionByReferenceBean eb = (ExtensionByReferenceBean) to;
@@ -583,12 +582,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
                         }
                     }
                     return;
-                } else {
-                    if (LocalVersionedTerminology.get().hasConcept(
-                            eb.getExtension().getComponentId())) {
-                        extraToAdd = ConceptBean.get(eb.getExtension()
-                                .getComponentId());
-                    }
                 }
             } catch (IOException e) {
                 AceLog.getEditLog().alertAndLogException(e);
@@ -617,9 +610,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
             }
         }
         uncommitted.add(to);
-        if (extraToAdd != null) {
-            addUncommitted(extraToAdd);
-        }
         if (aceConfig != null) {
             for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
                 frameConfig.setCommitEnabled(true);
