@@ -565,7 +565,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 					String errString = conceptId
 							+ " (" + sequence + ") " + " has no descriptions " + getUids();
 					getDescriptions();
-					AceLog.getEditLog().severe(errorBuffer.toString());
 					return errString;
 				}
 

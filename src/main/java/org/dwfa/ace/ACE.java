@@ -2050,7 +2050,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
         preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
         int width = 600;
-        int height = 550;
+        int height = 775;
         preferencesPalette.setSize(width, height);
 
         Rectangle topBounds = getTopBoundsForPalette();
@@ -2131,7 +2131,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
         return conflictConfigPanel;
     }
 
-    private JComponent makeDescPrefPanel() {
+    private JComponent makeTypeFilterPanel() {
 
         TerminologyListModel descTypeTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getDescTypes().getSetValues()) {
@@ -2143,69 +2143,25 @@ public class ACE extends JPanel implements PropertyChangeListener,
         descList.setBorder(BorderFactory
                 .createTitledBorder("Description types: "));
 
-        JPanel descPrefPanel = new JPanel(new GridLayout(0, 1));
-        descPrefPanel.add(new JScrollPane(descList));
-
-        TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
-        for (int id : aceFrameConfig.getShortLabelDescPreferenceList()
-                .getListValues()) {
-            shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+        JPanel typeFilterPanel = new JPanel(new GridLayout(0, 1));
+        typeFilterPanel.add(new JScrollPane(descList));
+        
+        TerminologyListModel relTypeTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getPrefFilterTypesForRel().getSetValues()) {
+        	relTypeTableModel.addElement(ConceptBean.get(id));
         }
-        shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
-                .getShortLabelDescPreferenceList());
-        TerminologyList shortLabelOrderList = new TerminologyList(
-                shortLabelPrefOrderTableModel, aceFrameConfig);
+        relTypeTableModel.addListDataListener(aceFrameConfig.getPrefFilterTypesForRel());
+        TerminologyList relTypeList = new TerminologyList(relTypeTableModel,
+                aceFrameConfig);
+        relTypeList.setBorder(BorderFactory
+                .createTitledBorder("Relationship types: "));
 
-        shortLabelOrderList.setBorder(BorderFactory
-                .createTitledBorder("Short Label preference order: "));
-        descPrefPanel.add(new JScrollPane(shortLabelOrderList));
-
-        TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
-        for (int id : aceFrameConfig.getLongLabelDescPreferenceList()
-                .getListValues()) {
-            longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
-        }
-        longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
-                .getLongLabelDescPreferenceList());
-        TerminologyList longLabelOrderList = new TerminologyList(
-                longLabelPrefOrderTableModel, aceFrameConfig);
-
-        longLabelOrderList.setBorder(BorderFactory
-                .createTitledBorder("Long label preference order: "));
-        descPrefPanel.add(new JScrollPane(longLabelOrderList));
-
-        TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
-        for (int id : aceFrameConfig.getTreeDescPreferenceList()
-                .getListValues()) {
-            treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
-        }
-        treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig
-                .getTreeDescPreferenceList());
-        TerminologyList treePrefOrderList = new TerminologyList(
-                treeDescPrefOrderTableModel, aceFrameConfig);
-
-        treePrefOrderList.setBorder(BorderFactory
-                .createTitledBorder("Tree preference order: "));
-        descPrefPanel.add(new JScrollPane(treePrefOrderList));
-
-        TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
-        for (int id : aceFrameConfig.getTableDescPreferenceList()
-                .getListValues()) {
-            descPrefOrderTableModel.addElement(ConceptBean.get(id));
-        }
-        descPrefOrderTableModel.addListDataListener(aceFrameConfig
-                .getTableDescPreferenceList());
-        TerminologyList prefOrderList = new TerminologyList(
-                descPrefOrderTableModel, aceFrameConfig);
-
-        prefOrderList.setBorder(BorderFactory
-                .createTitledBorder("Table preference order: "));
-        descPrefPanel.add(new JScrollPane(prefOrderList));
-
-        return descPrefPanel;
+        typeFilterPanel.add(new JScrollPane(relTypeList));
+        
+        return typeFilterPanel;
     }
 
-    private JComponent makeLanguagePanel() {
+    private JComponent makeDescPanel() {
         JPanel langPrefPanel = new JPanel(new GridLayout(0, 1));
         JComboBox sortOrderCombo = new JComboBox(LANGUAGE_SORT_PREF.values());
         sortOrderCombo.setSelectedItem(aceFrameConfig.getLanguageSortPref());
@@ -2220,6 +2176,62 @@ public class ACE extends JPanel implements PropertyChangeListener,
         langPrefPanel.add(new JScrollPane(makeTermList(
                 "Langauge/Dialect preference order:", aceFrameConfig
                         .getLanguagePreferenceList())));
+        TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getShortLabelDescPreferenceList()
+                .getListValues()) {
+            shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
+                .getShortLabelDescPreferenceList());
+        TerminologyList shortLabelOrderList = new TerminologyList(
+                shortLabelPrefOrderTableModel, aceFrameConfig);
+
+        shortLabelOrderList.setBorder(BorderFactory
+                .createTitledBorder("Short Label preference order: "));
+        langPrefPanel.add(new JScrollPane(shortLabelOrderList));
+
+        TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getLongLabelDescPreferenceList()
+                .getListValues()) {
+            longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig
+                .getLongLabelDescPreferenceList());
+        TerminologyList longLabelOrderList = new TerminologyList(
+                longLabelPrefOrderTableModel, aceFrameConfig);
+
+        longLabelOrderList.setBorder(BorderFactory
+                .createTitledBorder("Long label preference order: "));
+        langPrefPanel.add(new JScrollPane(longLabelOrderList));
+
+        TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getTreeDescPreferenceList()
+                .getListValues()) {
+            treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig
+                .getTreeDescPreferenceList());
+        TerminologyList treePrefOrderList = new TerminologyList(
+                treeDescPrefOrderTableModel, aceFrameConfig);
+
+        treePrefOrderList.setBorder(BorderFactory
+                .createTitledBorder("Tree preference order: "));
+        langPrefPanel.add(new JScrollPane(treePrefOrderList));
+
+        TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getTableDescPreferenceList()
+                .getListValues()) {
+            descPrefOrderTableModel.addElement(ConceptBean.get(id));
+        }
+        descPrefOrderTableModel.addListDataListener(aceFrameConfig
+                .getTableDescPreferenceList());
+        TerminologyList prefOrderList = new TerminologyList(
+                descPrefOrderTableModel, aceFrameConfig);
+
+        prefOrderList.setBorder(BorderFactory
+                .createTitledBorder("Table preference order: "));
+        langPrefPanel.add(new JScrollPane(prefOrderList));
+
         return langPrefPanel;
 
     }
@@ -2330,11 +2342,11 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
     private JTabbedPane makeViewConfig() throws Exception {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("descriptions", makeDescPrefPanel());
+        tabs.addTab("descriptions", makeDescPanel());
+        tabs.addTab("filters", makeTypeFilterPanel());
+        tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("roots", makeRootPrefPanel());
         tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
-        tabs.addTab("language", makeLanguagePanel());
-        tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("conflict", makeConflictViewPanel());
         return tabs;
     }

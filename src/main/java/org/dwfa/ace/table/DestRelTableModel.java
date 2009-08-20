@@ -33,12 +33,11 @@ public class DestRelTableModel extends RelTableModel {
 		I_IntSet allowedTypes = null;
 		Set<I_Position> positions = host.getConfig().getViewPositionSet();
 		if (usePrefs) {
-         if (host.getConfig().getDestRelTypes().getSetValues().length == 0) {
-            allowedTypes = null;
-         } else {
-            allowedTypes = host.getConfig().getDestRelTypes();
-         }
-			
+	         if (host.getConfig().getPrefFilterTypesForRel().getSetValues().length == 0) {
+	            allowedTypes = null;
+	         } else {
+	            allowedTypes = host.getConfig().getPrefFilterTypesForRel();
+	         }	
 		}
 		if (showHistory) {
 			positions = null;

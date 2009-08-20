@@ -881,4 +881,8 @@ public abstract class RelTableModel extends AbstractTableModel implements
 		return host.getShowHistory();
 	}
 
+	protected I_ConfigAceFrame getConfig() {
+		return config;
+	}
+
 }

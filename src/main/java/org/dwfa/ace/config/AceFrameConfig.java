@@ -111,7 +111,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 40;
+    private static final int dataVersion = 41;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -293,6 +293,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     //40
     private LANGUAGE_SORT_PREF langSortPref = LANGUAGE_SORT_PREF.TYPE_B4_LANG;
+    
+    //41
+    private I_IntSet prefFilterTypesForRel = new IntSet();
 
     // transient
     private transient MasterWorker worker;
@@ -505,6 +508,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         // 40
         out.writeObject(langSortPref);
+        
+        //41
+        IntSet.writeIntSet(out, prefFilterTypesForRel);
     }
 
     private void writeConceptAsId(I_GetConceptData concept,
@@ -950,6 +956,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	langSortPref = (LANGUAGE_SORT_PREF) in.readObject();
             } else {
             	langSortPref = LANGUAGE_SORT_PREF.TYPE_B4_LANG;
+            }
+            
+            if (objDataVersion >= 41) {
+            	prefFilterTypesForRel = IntSet.readIntSetIgnoreMapErrors(in);
+            } else {
+            	prefFilterTypesForRel = new IntSet();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -3010,6 +3022,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		Object old = this.langSortPref;
 		this.langSortPref = langSortPref;
         changeSupport.firePropertyChange("refsetSpecChanged", old, langSortPref);
+	}
+
+	public I_IntSet getPrefFilterTypesForRel() {
+		return prefFilterTypesForRel;
 	}
 
 }

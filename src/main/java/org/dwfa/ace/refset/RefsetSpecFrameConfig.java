@@ -1099,4 +1099,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
 		frameConfig.setLanguageSortPref(langSortPref);
 	}
+
+	public I_IntSet getPrefFilterTypesForRel() {
+		return frameConfig.getPrefFilterTypesForRel();
+	}
 }

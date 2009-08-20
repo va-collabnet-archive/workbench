@@ -33,10 +33,10 @@ public class SrcRelTableModel extends RelTableModel {
 		I_IntSet allowedTypes = null;
 		Set<I_Position> positions = host.getConfig().getViewPositionSet();
 		if (usePrefs) {
-         if (host.getConfig().getSourceRelTypes().getSetValues().length == 0) {
+         if (host.getConfig().getPrefFilterTypesForRel().getSetValues().length == 0) {
             allowedTypes = null;
          } else {
-            allowedTypes = host.getConfig().getSourceRelTypes();
+            allowedTypes = host.getConfig().getPrefFilterTypesForRel();
          }
 			
 		}

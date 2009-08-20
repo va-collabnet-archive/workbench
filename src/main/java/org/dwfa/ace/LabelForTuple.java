@@ -56,6 +56,7 @@ public abstract class LabelForTuple extends JLabel implements
 			private void maybeShowPopup(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 		        	showPopup();
+					e.consume();
 		        }
 		    }
 		});

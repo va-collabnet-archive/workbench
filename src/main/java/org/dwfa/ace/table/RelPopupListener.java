@@ -262,6 +262,7 @@ public class RelPopupListener extends MouseAdapter {
         JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
             "You must select at least one path to edit on...");
       }
+	  e.consume();
     }
   }
 }

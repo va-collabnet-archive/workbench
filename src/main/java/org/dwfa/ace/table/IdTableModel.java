@@ -545,6 +545,7 @@ public class IdTableModel extends AbstractTableModel implements
 		            JOptionPane.showMessageDialog(table.getTopLevelAncestor(), "You must select at least one path to edit on...");
 				}
 			}
+			e.consume();
 		}
 	}
 	public PopupListener makePopupListener(JTable table, I_ConfigAceFrame config) {

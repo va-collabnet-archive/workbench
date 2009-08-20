@@ -1162,4 +1162,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
 		baseFrame.setLanguageSortPref(langSortPref);
 	}
+
+	public I_IntSet getPrefFilterTypesForRel() {
+		return baseFrame.getPrefFilterTypesForRel();
+	}
 }
