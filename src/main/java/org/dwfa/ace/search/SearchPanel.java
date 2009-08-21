@@ -88,6 +88,7 @@ public class SearchPanel extends JPanel {
 			searchTypeCombo.setVisible(!toggle.isSelected());
 			addButton.setVisible(!toggle.isSelected());
 			removeButton.setVisible(!toggle.isSelected());
+			linkSpinner.setVisible(!toggle.isSelected());
 			for (CriterionPanel test: criterionPanels) {
 				test.setVisible(toggle.isSelected());
 			}
@@ -361,6 +362,8 @@ public class SearchPanel extends JPanel {
 
 	private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
 
+	private JSpinner linkSpinner;
+
     public SearchPanel(I_ConfigAceFrame config) {
         super(new GridBagLayout());
         this.config = config;
@@ -497,7 +500,7 @@ public class SearchPanel extends JPanel {
 		LinkListModel linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), 
 				LINK_TYPE.UNLINKED.ordinal());
 
-		JSpinner linkSpinner = new JSpinner(linkSpinnerModel);
+		linkSpinner = new JSpinner(linkSpinnerModel);
 		linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
 
 		linkSpinner.setEditor(new LinkEditor(linkSpinner));

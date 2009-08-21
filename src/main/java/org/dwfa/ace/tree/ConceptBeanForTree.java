@@ -177,16 +177,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	}
 
 	public I_DescriptionTuple getDescTuple(I_ConfigAceFrame config) throws IOException {
-		if (this.bean.getUids().contains(UUID.fromString("b140f8b3-eae8-4bba-8c75-6f73f3711ee5"))) {
-			System.out.println("Found...");
-		}
 		return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
 	}
 
 	public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
-		if (this.bean.getUids().contains(UUID.fromString("b140f8b3-eae8-4bba-8c75-6f73f3711ee5"))) {
-			System.out.println("Found...");
-		}
 		return bean.getDescTuple(prefOrder, config);
 	}
 
