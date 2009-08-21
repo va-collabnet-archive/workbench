@@ -190,7 +190,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 	 		 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
 	                	 		FR_BE(new String[] {"French-Belgium (language concept)","French-Belgium"}, null,
 	                	 		 	    new I_ConceptualizeUniversally[] { FR }) ,
-	                	 		FR_CA(new String[] {"French-France (language concept)","French-France"}, null,
+	                	 		FR_CA(new String[] {"French-Canadian (language concept)","French-Canadian"}, null,
 	                	 		 	    new I_ConceptualizeUniversally[] { FR }) ,
 	                	 		FR_FR(new String[] {"French-France (language concept)","French-France"}, null,
 	                	 		 	    new I_ConceptualizeUniversally[] { FR }) ,
@@ -235,7 +235,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     	 		ZH_TW(new String[] {"Chinese-Taiwan (language concept)","Chinese-Taiwan"}, null,
                     	 		 	    new I_ConceptualizeUniversally[] { ZH }) ,
 
-                                       
+
                        /*
                         */
                DESCRIPTION_FORM("description form",
@@ -547,7 +547,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         private UniversalFixedDescription[] descriptions;
 
         private static PrimordialId[] descTypeOrder;
-        
+
         private I_ConceptualizeLocally local;
 
       private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
@@ -1224,7 +1224,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	FR_LU, FR_MC, DA, DA_DK, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
         ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
     }
-    
+
     public static I_ConceptualizeUniversally getLanguageConcept(String langCode) {
     	String normalizedLangCode = langCode.toUpperCase().replace('-', '_');
     	switch (LANG_CODE.valueOf(normalizedLangCode)) {
@@ -1334,7 +1334,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             return ArchitectonicAuxiliary.Concept.ZH_TW;
     	}
         throw new NoSuchElementException("UNK: " + langCode);
-    	
+
     }
     public static String getLanguageCode(Collection<UUID> uuids) throws NoSuchElementException {
       if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN.getUids()))
