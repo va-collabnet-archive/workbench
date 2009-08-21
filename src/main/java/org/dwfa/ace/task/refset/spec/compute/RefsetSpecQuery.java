@@ -121,6 +121,12 @@ public class RefsetSpecQuery {
         // process all statements and subqueries
         switch (groupingType) {
             case (AND_GROUPING):
+
+                if (statements.size() == 0 && subqueries.size() == 0) {
+                    throw new TerminologyException(
+                            "Spec is invalid - dangling AND.");
+                }
+
                 for (RefsetSpecStatement statement : statements) {
                     if (!statement.execute(component)) {
                         // can exit the AND early, as at least one statement is
@@ -141,6 +147,11 @@ public class RefsetSpecQuery {
                 // will return true
                 return true;
             case (OR_GROUPING):
+
+                if (statements.size() == 0 && subqueries.size() == 0) {
+                    throw new TerminologyException(
+                            "Spec is invalid - dangling OR.");
+                }
 
                 for (RefsetSpecStatement statement : statements) {
                     if (statement.execute(component)) {
@@ -263,6 +274,18 @@ public class RefsetSpecQuery {
                     + query.getTotalStatementCount();
         }
         return totalStatementCount;
+    }
+
+    public boolean isValidQuery() {
+        for (RefsetSpecQuery query : subqueries) {
+            if (query.getTotalStatementCount() == 0) {
+                return false;
+            }
+            if (!query.isValidQuery()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void setTotalStatementCount(int totalStatementCount) {

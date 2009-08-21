@@ -28,6 +28,8 @@ import org.dwfa.cement.RefsetAuxiliary;
 public class RefsetHelper {
 
     protected I_TermFactory termFactory;
+    protected Set<I_Path> userEditPaths;
+    protected I_ConfigAceFrame config;
 
     protected int currentStatusId;
     protected int retiredStatusId;
@@ -47,6 +49,11 @@ public class RefsetHelper {
                 .localize().getNid();
         conceptTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize()
                 .getNid();
+        config = termFactory.getActiveAceFrameConfig();
+        userEditPaths = null;
+        if (config != null) {
+            userEditPaths = config.getEditingPathSet();
+        }
     }
 
     /**
@@ -64,7 +71,6 @@ public class RefsetHelper {
      */
     public I_ThinExtByRefPartConcept getCurrentRefsetExtension(int refsetId,
             int conceptId) throws Exception {
-        I_ThinExtByRefPartConcept currentRefsetExtension = null;
 
         for (I_ThinExtByRefVersioned extension : termFactory
                 .getAllExtensionsForComponent(conceptId)) {
@@ -84,10 +90,10 @@ public class RefsetHelper {
             // confirm its the right extension value and its status is current
             if (latestPart != null
                     && latestPart.getStatusId() == currentStatusId) {
-                currentRefsetExtension = latestPart;
+                return latestPart;
             }
         }
-        return currentRefsetExtension;
+        return null;
     }
 
     public boolean hasCurrentRefsetExtension(int refsetId, int conceptId,
@@ -111,7 +117,7 @@ public class RefsetHelper {
                 if (latestPart.getStatusId() == currentStatusId) {
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
                         int partValue = ((I_ThinExtByRefPartConcept) latestPart)
-                                .getConceptId();
+                                .getC1id();
                         if (partValue == memberTypeId) {
                             return true;
                         }
@@ -309,8 +315,6 @@ public class RefsetHelper {
     public boolean newRefsetExtension(int refsetId, int conceptId,
             int memberTypeId) throws Exception {
 
-        Set<I_Path> userEditPaths = null;
-
         // check subject is not already a member
         if (hasCurrentRefsetExtension(refsetId, conceptId, memberTypeId)) {
             if (logger.isLoggable(Level.FINE)) {
@@ -324,11 +328,6 @@ public class RefsetHelper {
 
         // create a new extension (with a part for each path the user is
         // editing)
-
-        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-        if (config != null) {
-            userEditPaths = config.getEditingPathSet();
-        }
 
         int newMemberId = termFactory.uuidToNativeWithGeneration(UUID
                 .randomUUID(), unspecifiedUuid, userEditPaths,
@@ -346,13 +345,54 @@ public class RefsetHelper {
             conceptExtension.setPathId(editPath.getConceptId());
             conceptExtension.setStatusId(currentStatusId);
             conceptExtension.setVersion(Integer.MAX_VALUE);
-            conceptExtension.setConceptId(memberTypeId);
+            conceptExtension.setC1id(memberTypeId);
 
             newExtension.addVersion(conceptExtension);
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+
         return true;
+    }
+
+    /**
+     * Add a concept to a refset
+     * 
+     * @param refsetId
+     *            The subject refset
+     * @param componentId
+     *            The component to be added
+     * @param memberTypeId
+     *            The value of the concept extension to be added to the new
+     *            member concept.
+     */
+    public void newRefsetExtensionNoCheck(int refsetId, int componentId,
+            int memberTypeId) throws Exception {
+
+        // create a new extension (with a part for each path the user is
+        // editing)
+        int newMemberId = termFactory.uuidToNativeWithGeneration(UUID
+                .randomUUID(), unspecifiedUuid, userEditPaths,
+                Integer.MAX_VALUE);
+
+        I_ThinExtByRefVersioned newExtension = termFactory
+                .newExtensionNoChecks(refsetId, newMemberId, componentId,
+                        conceptTypeId);
+
+        for (I_Path editPath : userEditPaths) {
+
+            I_ThinExtByRefPartConcept conceptExtension = termFactory
+                    .newConceptExtensionPart();
+
+            conceptExtension.setPathId(editPath.getConceptId());
+            conceptExtension.setStatusId(currentStatusId);
+            conceptExtension.setVersion(Integer.MAX_VALUE);
+            conceptExtension.setC1id(memberTypeId);
+
+            newExtension.addVersion(conceptExtension);
+        }
+
+        termFactory.addUncommittedNoChecks(newExtension);
     }
 
     public boolean newConceptConceptRefsetExtension(int refsetId,
@@ -731,8 +771,6 @@ public class RefsetHelper {
     public boolean retireRefsetExtension(int refsetId, int conceptId,
             int memberTypeId) throws Exception {
 
-        boolean wasRemoved = false;
-
         // check subject is not already a member
         for (I_ThinExtByRefVersioned extension : termFactory
                 .getAllExtensionsForComponent(conceptId)) {
@@ -753,7 +791,8 @@ public class RefsetHelper {
                 if (latestPart.getStatusId() == currentStatusId) {
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
                         int partValue = ((I_ThinExtByRefPartConcept) latestPart)
-                                .getConceptId();
+                                .getC1id();
+
                         if (partValue == memberTypeId) {
                             // found a member to retire
 
@@ -763,13 +802,13 @@ public class RefsetHelper {
                             clone.setVersion(Integer.MAX_VALUE);
                             extension.addVersion(clone);
                             termFactory.addUncommittedNoChecks(extension);
-                            wasRemoved = true;
+                            return true;
                         }
                     }
                 }
             }
         }
-        return wasRemoved;
+        return false;
     }
 
     /**

@@ -4,45 +4,92 @@ public class ProgressReport {
 
     private int nonMembersCleanedCount = 0;
     private int membersCount = 0;
+    private int newMembersCount = 0;
+    private int toBeRetiredMembersCount = 0;
+    private int databaseCount = 0;
     long startTime = 0;
     long endTime = 0;
     boolean complete = false;
     boolean step1Complete = false;
     boolean step2Complete = false;
+    boolean step3Complete = false;
+    boolean step4Complete = false;
+    boolean step5Complete = false;
 
     public String toString() {
-        String result = "<html>" + "1) Creating refset spec query.";
+
+        // step 1
+        String result = "<html>"
+                + "1) Creating / validating refset spec query :";
         if (!step1Complete) {
-            result = result
-                    + "<font color='green'> Executing. <br><font color='black'>";
+            result = result + "<font color='green'> Executing.";
         } else {
-            result = result
-                    + "<font color='red'> COMPLETE. <br><font color='black'>";
+            result = result + "<font color='red'> COMPLETE.";
         }
+        result = result + "<br><font color='black'>";
 
-        result = result + "2) Executing refset spec query over database.";
+        // step 2
+        result = result + "2) Calculating required updates :";
 
-        if (!step2Complete) {
-            result = result
-                    + "<font color='green'> Executing. <br><font color='black'>";
-        } else {
-            result = result
-                    + "<font color='red'> COMPLETE. <br><font color='black'>";
+        if (step1Complete) {
+            if (!step2Complete) {
+                result = result + "<font color='green'> Executing.";
+            } else {
+                result = result + "<font color='red'> COMPLETE.";
+            }
         }
+        result = result + "<br><font color='black'>";
 
-        result = result + "Members found : " + membersCount + "<br>"
-                + "Non-members cleaned : " + nonMembersCleanedCount + "<br>";
+        result = result + "Number of new members : " + newMembersCount + " / "
+                + databaseCount + "<br>" + "Number of to-be-retired members : "
+                + toBeRetiredMembersCount + " / " + databaseCount + "<br>";
 
-        if (!complete && step2Complete) {
-            result = result + "<br>" + "Finalising refset, please wait...";
+        // step 3
+        result = result + "3) Creating new member refsets :";
+        // + getMembersCount() + " / " + newMembersCount;
+        if (step2Complete) {
+            if (!step3Complete) {
+                result = result + "<font color='green'> Executing.";
+            } else {
+                result = result + "<font color='red'> COMPLETE.";
+            }
         }
+        result = result + "<br><font color='black'>";
+
+        // step 4
+        result = result + "4) Retiring old member refsets :";
+        // + getNonMembersCleanedCount() + " / " + toBeRetiredMembersCount;
+        if (step3Complete) {
+            if (!step4Complete) {
+                result = result + "<font color='green'> Executing.";
+            } else {
+                result = result + "<font color='red'> COMPLETE.";
+            }
+        }
+        result = result + "<br><font color='black'>";
+
+        // step 5
+        result = result + "5) Adding / removing marked parent refsets :";
+        if (step4Complete) {
+            if (!step5Complete) {
+                result = result + "<font color='green'> Executing.";
+            } else {
+                result = result + "<font color='red'> COMPLETE.";
+            }
+        }
+        result = result + "<br><font color='black'>";
 
         if (complete) {
             long minutes = (endTime - startTime) / 60000;
             long seconds = ((endTime - startTime) % 60000) / 1000;
             result = result + "Total execution time: " + minutes + " minutes, "
                     + seconds + " seconds.";
-        }
+        } /*
+           * else { long minutes = (new Date().getTime() - startTime) / 60000;
+           * long seconds = ((new Date().getTime() - startTime) % 60000) / 1000;
+           * result = result + "Current execution time: " + minutes +
+           * " minutes, " + seconds + " seconds."; }
+           */
         return result;
     }
 
@@ -100,5 +147,53 @@ public class ProgressReport {
 
     public void setStep2Complete(boolean step2Complete) {
         this.step2Complete = step2Complete;
+    }
+
+    public boolean isStep3Complete() {
+        return step3Complete;
+    }
+
+    public void setStep3Complete(boolean step3Complete) {
+        this.step3Complete = step3Complete;
+    }
+
+    public boolean isStep4Complete() {
+        return step4Complete;
+    }
+
+    public void setStep4Complete(boolean step4Complete) {
+        this.step4Complete = step4Complete;
+    }
+
+    public boolean isStep5Complete() {
+        return step5Complete;
+    }
+
+    public void setStep5Complete(boolean step5Complete) {
+        this.step5Complete = step5Complete;
+    }
+
+    public int getNewMembersCount() {
+        return newMembersCount;
+    }
+
+    public void setNewMembersCount(int newMembersCount) {
+        this.newMembersCount = newMembersCount;
+    }
+
+    public int getToBeRetiredMembersCount() {
+        return toBeRetiredMembersCount;
+    }
+
+    public void setToBeRetiredMembersCount(int toBeRetiredMembersCount) {
+        this.toBeRetiredMembersCount = toBeRetiredMembersCount;
+    }
+
+    public int getDatabaseCount() {
+        return databaseCount;
+    }
+
+    public void setDatabaseCount(int databaseCount) {
+        this.databaseCount = databaseCount;
     }
 }

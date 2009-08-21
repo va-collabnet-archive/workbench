@@ -105,12 +105,12 @@ public class MemberRefsetHelper extends RefsetHelper {
         addAllToRefset(members, batchDescription, useMonitor);
     }
 
-    protected void addMarkedParents(Integer... conceptIds) throws Exception {
+    public void addMarkedParents(Integer... conceptIds) throws Exception {
         new MarkedParentRefsetHelper(memberRefsetId, memberTypeId)
                 .addParentMembers(conceptIds);
     }
 
-    protected void removeMarkedParents(Integer... conceptIds) throws Exception {
+    public void removeMarkedParents(Integer... conceptIds) throws Exception {
         new MarkedParentRefsetHelper(memberRefsetId, memberTypeId)
                 .removeParentMembers(conceptIds);
     }
@@ -249,7 +249,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 
                     I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple
                             .getPart();
-                    if (part.getConceptId() == memberTypeId) {
+                    if (part.getC1id() == memberTypeId) {
                         results.add(thinExtByRefTuple.getComponentId());
                     }
                 }
