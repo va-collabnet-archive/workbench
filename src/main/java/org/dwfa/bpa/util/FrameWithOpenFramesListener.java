@@ -84,8 +84,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
 
     protected JMenuItem docsMI, supportMI, optionsMI, aboutMI;
     // Ask AWT which menu modifier we should be using.
-    final static int MENU_MASK = Toolkit.getDefaultToolkit()
-            .getMenuShortcutKeyMask();
+    final static int MENU_MASK = ComponentFrame.getMenuMask();
 
     // Check that we are on Mac OS X. This is crucial to loading and using the
     // OSXAdapter class.

@@ -45,7 +45,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 	protected ComponentFrameBean cfb;
 	protected final static int MENU_MASK = getMenuMask();
 
-	private static int getMenuMask() {
+	public static int getMenuMask() {
 		try {
 			return Toolkit.getDefaultToolkit()
 			.getMenuShortcutKeyMask();
