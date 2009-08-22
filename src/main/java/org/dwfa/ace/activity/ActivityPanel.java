@@ -25,6 +25,7 @@ import org.dwfa.swing.SwingTask;
 public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     private long startTime = System.currentTimeMillis();
+    private static boolean showDeleteButton = false;
 
     public long getStartTime() {
         return startTime;
@@ -48,7 +49,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
         @Override
         public void doRun() {
-            deleteButton.setVisible(true);
+        	if (showDeleteButton) {
+                deleteButton.setVisible(true);
+        	}
         }
 
     }
