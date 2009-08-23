@@ -410,6 +410,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 		private void maybeShowPopup(MouseEvent e) {
 			if (e.isPopupTrigger()) {
 				attachmentPopup.show(e.getComponent(), e.getX(), e.getY());
+				e.consume();
 			}
 		}
 	}
