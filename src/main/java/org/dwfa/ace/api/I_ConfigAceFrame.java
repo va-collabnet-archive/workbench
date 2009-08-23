@@ -571,5 +571,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer();
 
     public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext);
+    
+    public I_DescriptionTuple getSearchResultsSelection();
 
 }
