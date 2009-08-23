@@ -30,6 +30,9 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
 	
 	@Override
 	public I_DescriptionTuple getDescription(int rowIndex) {
+		if (rowIndex < 0 || rowIndex == descriptionList.size()) {
+			return null;
+		}
 		return descriptionList.get(rowIndex).getLastTuple();
 	}
 

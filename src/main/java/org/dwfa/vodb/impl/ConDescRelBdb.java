@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -58,11 +57,11 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.CheckAndProcessLuceneMatch;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.I_StoreConceptAttributes;
@@ -141,84 +140,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			throw new UnsupportedOperationException();
 		}
 
-	}
-
-	private static class CheckAndProcessLuceneMatch implements Runnable {
-
-		Collection<LuceneMatch> matches;
-
-		List<I_TestSearchResults> checkList;
-
-		I_ConfigAceFrame config;
-
-		Document doc;
-
-		private float score;
-
-		private CountDownLatch hitLatch;
-
-		private I_StoreDescriptions descStore;
-
-		public CheckAndProcessLuceneMatch(CountDownLatch hitLatch,
-				LuceneProgressUpdator updater, Document doc, float score,
-				Collection<LuceneMatch> matches,
-				List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
-				I_StoreDescriptions descStore) {
-			super();
-			this.doc = doc;
-			this.score = score;
-			this.matches = matches;
-			this.checkList = checkList;
-			this.config = config;
-			this.hitLatch = hitLatch;
-			this.descStore = descStore;
-		}
-
-		public void run() {
-			if (hitLatch.getCount() > 0) {
-				int nid = Integer.parseInt(doc.get("dnid"));
-				int cnid = Integer.parseInt(doc.get("cnid"));
-				try {
-					ThinDescVersioned descV = (ThinDescVersioned) descStore
-							.getDescription(nid, cnid);
-					LuceneMatch match = new LuceneMatch(descV, score);
-					if (checkList == null || checkList.size() == 0) {
-						matches.add(match);
-						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-							AceLog.getAppLog().fine(
-									"processing match: " + descV
-											+ " new match size: "
-											+ matches.size());
-						}
-					} else {
-						try {
-							boolean failed = false;
-							for (I_TestSearchResults test : checkList) {
-								if (test.test(descV, config) == false) {
-									failed = true;
-									break;
-								}
-							}
-
-							if (failed == false) {
-								matches.add(match);
-							}
-						} catch (TaskFailedException e) {
-							AceLog.getAppLog().alertAndLogException(e);
-						}
-					}
-				} catch (IOException e1) {
-					AceLog.getAppLog().alertAndLogException(e1);
-				} catch (DatabaseException e1) {
-					AceLog.getAppLog().alertAndLogException(e1);
-				}
-				this.hitLatch.countDown();
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine(
-							"Hit latch: " + this.hitLatch.getCount());
-				}
-			}
-		}
 	}
 
 	public class ConDescRelBinding extends TupleBinding implements
@@ -1606,8 +1527,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			Query q = new QueryParser("desc", new StandardAnalyzer())
 				.parse(query);
 			if (luceneDir.exists() == false) {
-				updater
-						.setProgressInfo("Making lucene index -- this may take a while...");
+				updater.setProgressInfo("Making lucene index -- this may take a while...");
 				createLuceneDescriptionIndex();
 			}
 			updater.setIndeterminate(true);

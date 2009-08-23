@@ -89,6 +89,7 @@ public class SearchPanel extends JPanel {
 			addButton.setVisible(!toggle.isSelected());
 			removeButton.setVisible(!toggle.isSelected());
 			linkSpinner.setVisible(!toggle.isSelected());
+			showHistory.setVisible(!toggle.isSelected());
 			for (CriterionPanel test: criterionPanels) {
 				test.setVisible(toggle.isSelected());
 			}
@@ -191,6 +192,7 @@ public class SearchPanel extends JPanel {
                 // no rows are selected
             } else {
                 int selectedRow = lsm.getMinSelectionIndex();
+                lastSelectedRow = selectedRow;
                 int modelRow = sortingTable.modelIndex(selectedRow);
                 I_DescriptionTuple tuple = model.getDescription(modelRow);
                 ConceptBean cb = ConceptBean.get(tuple.getConceptId());
@@ -351,6 +353,8 @@ public class SearchPanel extends JPanel {
     private JButton loadButton;
 
     private JButton saveButton;
+    
+    private JToggleButton showHistory;
 
     private List<I_TestSearchResults> extraCriterion;
 
@@ -363,6 +367,8 @@ public class SearchPanel extends JPanel {
 	private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
 
 	private JSpinner linkSpinner;
+
+	private int lastSelectedRow = -1;
 
     public SearchPanel(I_ConfigAceFrame config) {
         super(new GridBagLayout());
@@ -474,7 +480,7 @@ public class SearchPanel extends JPanel {
         add(searchSetting, gbc);
 
         gbc.gridx++;
-        searchButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/find.png")));
+        searchButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/gear_find.png")));
         searchButton.addActionListener(getActionMap().get("search"));
         searchButton.setToolTipText("perform a search");
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -506,8 +512,12 @@ public class SearchPanel extends JPanel {
 		linkSpinner.setEditor(new LinkEditor(linkSpinner));
 
 		add(linkSpinner, gbc);
+		
         gbc.gridx++;
-
+        showHistory = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
+        showHistory.setToolTipText("show current and historical descriptions, including retired descriptions and descriptions of retired concepts");
+        add(showHistory, gbc);
+        gbc.gridx++;
         loadButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
         loadButton.setToolTipText("read search specification from disk");
         loadButton.addActionListener(new LoadQuery());
@@ -527,7 +537,7 @@ public class SearchPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 6;
+        gbc.gridwidth = 7;
         gbc.gridheight = 3;
 
         add(criterion, gbc);
@@ -554,6 +564,7 @@ public class SearchPanel extends JPanel {
 		descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
 		descTable.setDefaultRenderer(String.class, renderer);
 		descTable.setDefaultRenderer(Boolean.class, renderer);
+		descTable.addMouseListener(new DescSearchResultsTablePopupListener(config));
 
         sortingTable.setTableHeader(descTable.getTableHeader());
 
@@ -574,7 +585,7 @@ public class SearchPanel extends JPanel {
         sortingTable.setSortingStatus(0, SortOrder.DESCENDING);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 11;
+        gbc.gridwidth = 12;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
@@ -643,6 +654,7 @@ public class SearchPanel extends JPanel {
     }
 
     private void startSearch() {
+    	lastSelectedRow = -1;
         updateExtraCriterion();
 
         if (searchPhraseField.getText().length() > 1) {
@@ -744,11 +756,27 @@ public class SearchPanel extends JPanel {
 	}
 
 	public List<I_TestSearchResults> getExtraCriterion() {
-        return extraCriterion;
+		List<I_TestSearchResults> extraCriterionCopy = new ArrayList<I_TestSearchResults>(extraCriterion);	
+		if (showHistory.isSelected() == false) {
+			extraCriterionCopy.add(new ActiveConceptAndDescTest());
+		}
+        return extraCriterionCopy;
     }
 	
 	public void changeLinkListener(LINK_TYPE type) {
 		this.linkType = type;
+	}
+
+	public I_DescriptionTuple getSearchResultsSelection() {
+		int selectedRow = lastSelectedRow ;
+		if (descTable.getSelectedRow() > 0) {
+			selectedRow = descTable.getSelectedRow();
+		}
+		StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
+		if (swdt != null) {
+			return swdt.getTuple();
+		}
+		return null;
 	}
 
 }

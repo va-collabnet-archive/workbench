@@ -173,7 +173,11 @@ public abstract class TupleAdder<V, W> {
 			}
 			partsToAdd.removeAll(partsToRemove);
 		} else {
-			for (I_Position p : positions) {
+			HashSet<I_Position> positionCopy;
+			synchronized (positions) {
+				positionCopy = new HashSet<I_Position>(positions);
+			}
+			for (I_Position p : positionCopy) {
 				ArrayList<PathSortInfo> pathInfo = new ArrayList<PathSortInfo>();
 				if (p.getVersion() == Integer.MAX_VALUE) {
 					addPaths(pathInfo, 0, Integer.MAX_VALUE - 1, p.getPath());

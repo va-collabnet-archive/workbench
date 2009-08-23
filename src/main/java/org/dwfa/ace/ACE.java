@@ -95,6 +95,7 @@ import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdVersioned;
@@ -2162,10 +2163,26 @@ public class ACE extends JPanel implements PropertyChangeListener,
     }
 
     private JComponent makeDescPanel() {
-        JPanel langPrefPanel = new JPanel(new GridLayout(0, 1));
+        JPanel langPrefPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        
+        JLabel sortOrderLabel = new JLabel(" Language/Type preference order:");
+        sortOrderLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+        langPrefPanel.add(sortOrderLabel, gbc);
+        gbc.gridx++;
+        gbc.weightx = 1;
+        
         JComboBox sortOrderCombo = new JComboBox(LANGUAGE_SORT_PREF.values());
         sortOrderCombo.setSelectedItem(aceFrameConfig.getLanguageSortPref());
-        langPrefPanel.add(sortOrderCombo);
+        langPrefPanel.add(sortOrderCombo, gbc);
         sortOrderCombo.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
                 JComboBox cb = (JComboBox)e.getSource();
@@ -2173,9 +2190,16 @@ public class ACE extends JPanel implements PropertyChangeListener,
                 aceFrameConfig.setLanguageSortPref(sortPref);
             }        	
         });
+        
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1;
+        gbc.gridwidth = 2;
+
         langPrefPanel.add(new JScrollPane(makeTermList(
-                "Langauge/Dialect preference order:", aceFrameConfig
-                        .getLanguagePreferenceList())));
+                "Langauge (Dialect) preference order:", aceFrameConfig
+                        .getLanguagePreferenceList())), gbc);
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getShortLabelDescPreferenceList()
                 .getListValues()) {
@@ -2188,7 +2212,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
         shortLabelOrderList.setBorder(BorderFactory
                 .createTitledBorder("Short Label preference order: "));
-        langPrefPanel.add(new JScrollPane(shortLabelOrderList));
+        langPrefPanel.add(new JScrollPane(shortLabelOrderList), gbc);
+        gbc.gridy++;
 
         TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getLongLabelDescPreferenceList()
@@ -2202,7 +2227,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
         longLabelOrderList.setBorder(BorderFactory
                 .createTitledBorder("Long label preference order: "));
-        langPrefPanel.add(new JScrollPane(longLabelOrderList));
+        langPrefPanel.add(new JScrollPane(longLabelOrderList), gbc);
+        gbc.gridy++;
 
         TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getTreeDescPreferenceList()
@@ -2216,7 +2242,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
         treePrefOrderList.setBorder(BorderFactory
                 .createTitledBorder("Tree preference order: "));
-        langPrefPanel.add(new JScrollPane(treePrefOrderList));
+        langPrefPanel.add(new JScrollPane(treePrefOrderList), gbc);
+        gbc.gridy++;
 
         TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getTableDescPreferenceList()
@@ -2230,7 +2257,8 @@ public class ACE extends JPanel implements PropertyChangeListener,
 
         prefOrderList.setBorder(BorderFactory
                 .createTitledBorder("Table preference order: "));
-        langPrefPanel.add(new JScrollPane(prefOrderList));
+        langPrefPanel.add(new JScrollPane(prefOrderList), gbc);
+        gbc.gridy++;
 
         return langPrefPanel;
 
@@ -2239,12 +2267,21 @@ public class ACE extends JPanel implements PropertyChangeListener,
     private JComponent makeTaxonomyPrefPanel() {
         JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
 
-        JPanel checkPanel = new JPanel(new GridLayout(0, 1));
-        JPanel checkPanel2 = new JPanel(new GridLayout(0, 1));
 
-        relPrefPanel.add(new JScrollPane(makeTermList("parent relationships:",
+        TerminologyListModel rootModel = new TerminologyListModel();
+        for (int id : aceFrameConfig.getRoots().getSetValues()) {
+            rootModel.addElement(ConceptBean.get(id));
+        }
+        rootModel.addListDataListener(aceFrameConfig.getRoots());
+        TerminologyList rootList = new TerminologyList(rootModel,
+                aceFrameConfig);
+        rootList.setBorder(BorderFactory.createTitledBorder("Roots:"));
+        relPrefPanel.add(new JScrollPane(rootList));
+        
+        
+        relPrefPanel.add(new JScrollPane(makeTermList("Parent relationships:",
                 aceFrameConfig.getDestRelTypes())));
-        relPrefPanel.add(new JScrollPane(makeTermList("child relationships:",
+        relPrefPanel.add(new JScrollPane(makeTermList("Child relationships:",
                 aceFrameConfig.getSourceRelTypes())));
 
         /*
@@ -2252,25 +2289,52 @@ public class ACE extends JPanel implements PropertyChangeListener,
          * , "variableHeightTaxonomyView", aceFrameConfig
          * .getVariableHeightTaxonomyView(), false));
          */
-        checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view",
+        JPanel checkPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+       checkPanel.add(getCheckboxEditor("show viewer images in taxonomy view",
                 "showViewerImagesInTaxonomy", aceFrameConfig
-                        .getShowViewerImagesInTaxonomy(), true));
+                        .getShowViewerImagesInTaxonomy(), true), gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridy++;
         checkPanel.add(getCheckboxEditor("show refset info in taxonomy view",
                 "showRefsetInfoInTaxonomy", aceFrameConfig
-                        .getShowRefsetInfoInTaxonomy(), true));
-        relPrefPanel.add(checkPanel);
-        relPrefPanel.add(new JScrollPane(makeTermList(
+                        .getShowRefsetInfoInTaxonomy(), true), gbc);
+        gbc.weighty = 1;
+        gbc.gridheight = 3;
+        gbc.gridy++;
+        checkPanel.add(new JScrollPane(makeTermList(
                 "Refsets to show in taxonomy view: ", aceFrameConfig
-                        .getRefsetsToShowInTaxonomy())));
+                        .getRefsetsToShowInTaxonomy())), gbc);
+        relPrefPanel.add(checkPanel);
 
-        checkPanel2.add(getCheckboxEditor("sort taxonomy using refset",
+        JPanel checkPanel2 = new JPanel(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+        checkPanel2.add(getCheckboxEditor("sort taxonomy using refsets",
                 "sortTaxonomyUsingRefset", aceFrameConfig
-                        .getSortTaxonomyUsingRefset(), true));
+                        .getSortTaxonomyUsingRefset(), true), gbc);
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridy++;
+        gbc.gridheight = 3;
+        checkPanel2.add(new JScrollPane(makeTermList(
+                "Refsets to sort taxonomy view: ", aceFrameConfig
+                        .getRefsetsToSortTaxonomy())), gbc);
         relPrefPanel.add(checkPanel2);
 
-        relPrefPanel.add(new JScrollPane(makeTermList(
-                "Refsets to sort taxonomy view: ", aceFrameConfig
-                        .getRefsetsToSortTaxonomy())));
         return relPrefPanel;
     }
 
@@ -2327,25 +2391,12 @@ public class ACE extends JPanel implements PropertyChangeListener,
         return new JScrollPane(statusList);
     }
 
-    private JComponent makeRootPrefPanel() {
-        TerminologyListModel rootModel = new TerminologyListModel();
-        for (int id : aceFrameConfig.getRoots().getSetValues()) {
-            rootModel.addElement(ConceptBean.get(id));
-        }
-        rootModel.addListDataListener(aceFrameConfig.getRoots());
-        TerminologyList rootList = new TerminologyList(rootModel,
-                aceFrameConfig);
-        rootList
-                .setBorder(BorderFactory.createTitledBorder("Hierarchy roots:"));
-        return new JScrollPane(rootList);
-    }
 
     private JTabbedPane makeViewConfig() throws Exception {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("descriptions", makeDescPanel());
         tabs.addTab("filters", makeTypeFilterPanel());
         tabs.addTab("status", makeStatusPrefPanel());
-        tabs.addTab("roots", makeRootPrefPanel());
         tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
         tabs.addTab("conflict", makeConflictViewPanel());
         return tabs;
@@ -3890,5 +3941,9 @@ public class ACE extends JPanel implements PropertyChangeListener,
 	public boolean refsetTabIsSelected() {
 		return conceptTabs.getSelectedIndex() == refsetTabIndex;
 			
+	}
+
+	public I_DescriptionTuple getSearchResultsSelection() {
+		return searchPanel.getSearchResultsSelection();
 	}
 }

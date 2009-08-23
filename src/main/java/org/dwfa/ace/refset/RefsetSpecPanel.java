@@ -59,7 +59,8 @@ public class RefsetSpecPanel extends JPanel {
 
 	private ReflexiveRefsetTableModel refsetTableModel;
 
-    private static final String HIERARCHICAL_VIEW = "hierarchical view";
+    private static final String HIERARCHICAL_VIEW = "refset taxonomy";
+    private static final String REFSET_AND_PARENT_ONLY_VIEW = "refset tree";
     private static final String TABLE_VIEW = "table view";
 
     public RefsetSpecPanel(ACE ace) throws Exception {
@@ -67,19 +68,29 @@ public class RefsetSpecPanel extends JPanel {
         aceFrameConfig = ace.getAceFrameConfig();
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
-        TermTreeHelper treeHelper = new TermTreeHelper(
-                new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet()), ace);
         
-        editor = new RefsetSpecEditor(ace, treeHelper);
+        TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(
+                new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false), ace);
+        
+        TermTreeHelper refsetAndParentOnlyTreeHelper = new TermTreeHelper(
+                new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
+        
+        editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper);
         split.setTopComponent(editor.getContentPanel());
 
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
-                treeHelper);
-        ace.getAceFrameConfig().addPropertyChangeListener("commit", treeHelper);
-        editor.getLabel().addTermChangeListener(treeHelper);
+        		refsetAndParentOnlyTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("commit", refsetAndParentOnlyTreeHelper);
+        editor.getLabel().addTermChangeListener(refsetAndParentOnlyTreeHelper);
+
+        ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
+                hierarchicalTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("commit", hierarchicalTreeHelper);
+        editor.getLabel().addTermChangeListener(hierarchicalTreeHelper);
 
         bottomTabs = new JTabbedPane();
-        bottomTabs.addTab(HIERARCHICAL_VIEW, treeHelper.getHierarchyPanel());
+        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
+        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
         setupRefsetTable();

@@ -95,6 +95,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         public void run() {
             try {
             	dates = new ArrayList<Date>();
+            	dates.add(new Date(ThinVersionHelper.convert(Integer.MIN_VALUE)));
             	for (TimePathId tp: AceConfig.getVodb().getTimePathList()) {
             		if (tp.getPathId() == path.getConceptId()) {
             			dates.add(new Date(ThinVersionHelper.convert(tp.getTime())));
@@ -104,10 +105,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                 if (PositionPanel.this.dates.size() > 1) {
                     Collections.sort(PositionPanel.this.dates);
                 }
-                if (selectPositionOnly == false) {
-                    PositionPanel.this.dates.add(null); // For the top "latest"
-                    // position...
-                }
+                PositionPanel.this.dates.add(null); // For the top "latest" position...
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("Processing path: "
                             + ConceptBean.get(path.getConceptId()).getInitialText() +

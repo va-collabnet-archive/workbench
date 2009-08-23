@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import javax.swing.JTree;
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
@@ -49,6 +51,8 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.bind.ThinExtBinder;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
@@ -131,10 +135,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     private I_IntSet childrenExpandedNodes;
 
-    RefsetSpecFrameConfig(I_ConfigAceFrame frameConfig, I_IntSet childrenExpandedNodes) {
+    RefsetSpecFrameConfig(I_ConfigAceFrame frameConfig, I_IntSet childrenExpandedNodes, boolean refsetParentOnly) {
         super();
         this.frameConfig = frameConfig;
         this.childrenExpandedNodes = childrenExpandedNodes;
+        this.refsetParentOnly = refsetParentOnly;
     }
 
     public void addEditingPath(I_Path p) {
@@ -481,9 +486,63 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public I_IntList getTableDescPreferenceList() {
         return frameConfig.getTableDescPreferenceList();
     }
+    
+    private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
+		public void filter(I_GetConceptData node, List<I_RelTuple> srcRels,
+				List<I_RelTuple> destRels, I_ConfigAceFrame frameConfig)
+				throws TerminologyException, IOException {
+			
+			List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
+			for (I_RelTuple rt: srcRels) {
+				ConceptBean child = ConceptBean.get(rt.getC2Id());
+				if (notMarkedParent(child)) {
+					relsToRemove.add(rt);
+				}
+			}
+			srcRels.removeAll(relsToRemove);
+			
+			relsToRemove = new ArrayList<I_RelTuple>();
+			for (I_RelTuple rt: destRels) {
+				ConceptBean child = ConceptBean.get(rt.getC1Id());
+				if (notMarkedParent(child)) {
+					relsToRemove.add(rt);
+				}
+			}
+			destRels.removeAll(relsToRemove);
+			
+		}
+
+		private boolean notMarkedParent(ConceptBean child) throws IOException, TerminologyException {
+                for (I_ThinExtByRefVersioned ext : child.getExtensions()) {
+                	if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
+                        if (ThinExtBinder.getExtensionType(ext) == EXT_TYPE.CONCEPT) {
+                            List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
+                        	ext.addTuples(getAllowedStatus(), getViewPositionSet(),
+                                 returnTuples, false);
+                           if (returnTuples.size() > 0) {
+                        	   return false;
+                           }
+                           
+                        }
+                		
+                	}              
+             }			
+			return true;
+		}
+    	
+    }
+
+    List<I_FilterTaxonomyRels> filterList;
+	private boolean refsetParentOnly;
     public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList() {
-        return frameConfig.getTaxonomyRelFilterList();
+    	if (filterList == null) {
+    		filterList = new ArrayList<I_FilterTaxonomyRels>(frameConfig.getTaxonomyRelFilterList());
+    		if (refsetParentOnly) {
+    		filterList.add(new RefsetParentOnlyFilter());
+    		}
+    	}
+        return filterList;
     }
 
     public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList() {
@@ -1102,5 +1161,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
 	public I_IntSet getPrefFilterTypesForRel() {
 		return frameConfig.getPrefFilterTypesForRel();
+	}
+
+	public I_DescriptionTuple getSearchResultsSelection() {
+		return frameConfig.getSearchResultsSelection();
 	}
 }

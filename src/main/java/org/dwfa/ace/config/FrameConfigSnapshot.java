@@ -21,6 +21,7 @@ import javax.swing.JTree;
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
@@ -1165,5 +1166,9 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	public I_IntSet getPrefFilterTypesForRel() {
 		return baseFrame.getPrefFilterTypesForRel();
+	}
+
+	public I_DescriptionTuple getSearchResultsSelection() {
+		return baseFrame.getSearchResultsSelection();
 	}
 }

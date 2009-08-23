@@ -43,6 +43,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
@@ -3028,4 +3029,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		return prefFilterTypesForRel;
 	}
 
+	public I_DescriptionTuple getSearchResultsSelection() {
+		return aceFrame.getCdePanel().getSearchResultsSelection();
+	}
+
+	
 }

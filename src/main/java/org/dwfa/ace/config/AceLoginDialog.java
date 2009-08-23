@@ -194,7 +194,6 @@ public class AceLoginDialog extends javax.swing.JDialog  {
     public File getUserProfile(File profileDirToSet) throws TaskFailedException {
 		if (profileDirToSet != null) {
 			List<File> profiles = new ArrayList<File>();
-			profiles.add(null);
 			getProfiles(profiles, new File("profiles"));
 			profileSelectionBox.setModel(new DefaultComboBoxModel(profiles.toArray()));
 			profileSelectionBox.validate();

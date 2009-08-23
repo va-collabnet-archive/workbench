@@ -27,6 +27,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
+import org.dwfa.vodb.types.ExtensionByReferenceBean;
 
 public class RefsetSpecTreeMouseListener implements MouseListener {
 
@@ -195,15 +196,27 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
-			for (I_ThinExtByRefPart part: specPart.getVersions()) {
-				if (part.getVersion() == Integer.MAX_VALUE) {
-					partsToRemove.add(part);
+			try {
+				List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+				for (I_ThinExtByRefPart part : specPart.getVersions()) {
+					if (part.getVersion() == Integer.MAX_VALUE) {
+						partsToRemove.add(part);
+					}
 				}
+				ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) LocalVersionedTerminology
+						.get().getExtensionWrapper(specPart.getMemberId());
+				specPart.getVersions().removeAll(partsToRemove);
+				if (specPart.getVersions().size() == 0) {
+					ebrBean.discard();
+				}
+				LocalVersionedTerminology.get().addUncommitted(specPart);
+				if (specPart.getVersions().size() == 0) {
+					ebrBean.abort();
+				}
+				specEditor.updateSpecTree(false);
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
 			}
-			specPart.getVersions().removeAll(partsToRemove);
-			LocalVersionedTerminology.get().addUncommitted(specPart);
-			specEditor.updateSpecTree(false);
 		}		
 	}
 	private class ChangeSpecAction implements ActionListener {

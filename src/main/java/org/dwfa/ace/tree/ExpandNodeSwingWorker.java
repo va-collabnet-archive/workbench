@@ -187,10 +187,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 					I_GetConceptData cb = ConceptBeanForTree.get(conceptId, relId, 0,
 							false, ExpandNodeSwingWorker.this.config);
 					boolean leaf = false;
-					if ((config.getDestRelTypes()
-							.getSetValues().length == 0)
-							&& (config
-									.getSourceRelTypes().getSetValues().length == 0)) {
+					if ((config.getDestRelTypes().getSetValues().length == 0)
+							&& (config.getSourceRelTypes().getSetValues().length == 0)) {
 						leaf = cb.isLeaf(null, false);
 					} else {
 						leaf = cb.isLeaf(config, false);

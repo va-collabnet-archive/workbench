@@ -150,7 +150,6 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements
 		this.searchPanel.addStopActionListener(stopListener);
 		this.searchPanel.setProgressInfo("   Searching all...  ");
 		this.searchPanel.setProgressIndeterminate(true);
-
 	}
 
 	public void updateMatches() {

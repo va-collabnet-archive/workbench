@@ -179,6 +179,8 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	private boolean firstCommit = false;
 
 	private I_ThinExtByRefVersioned extension;
+	
+	private boolean discard = false;
 
 	private static int dataVersion = 1;
 
@@ -303,7 +305,13 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 		return memberId;
 	}
 
+	public void discard() {
+		this.discard = true;
+	}
 	public boolean isUncommitted() throws IOException {
+		if (discard) {
+			return false;
+		}
 		if (extension != null) {
 			if (extension.getVersions().size() > 0) {
 				for (I_ThinExtByRefPart part : getExtension().getVersions()) {
@@ -312,7 +320,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 					}
 				}
 				return false;
-			} 		
+			} 
 		}
 		return true;
 	}

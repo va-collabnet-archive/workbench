@@ -33,11 +33,11 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.CheckAndProcessLuceneMatch;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ConceptIdKeyForDescCreator;
@@ -429,8 +429,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 			timer.start();
 		}
 		if (luceneDir.exists() == false) {
-			updater
-					.setProgressInfo("Making lucene index -- this may take a while...");
+			updater.setProgressInfo("Making lucene index -- this may take a while...");
 			createLuceneDescriptionIndex();
 		}
 		updater.setIndeterminate(true);
@@ -569,84 +568,6 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 		descCursor.close();
 	}
 
-
-	private static class CheckAndProcessLuceneMatch implements Runnable {
-
-		Collection<LuceneMatch> matches;
-
-		List<I_TestSearchResults> checkList;
-
-		I_ConfigAceFrame config;
-
-		Document doc;
-
-		private float score;
-
-		private CountDownLatch hitLatch;
-
-		private I_StoreDescriptions descStore;
-
-		public CheckAndProcessLuceneMatch(CountDownLatch hitLatch,
-				LuceneProgressUpdator updater, Document doc, float score,
-				Collection<LuceneMatch> matches,
-				List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
-				I_StoreDescriptions descStore) {
-			super();
-			this.doc = doc;
-			this.score = score;
-			this.matches = matches;
-			this.checkList = checkList;
-			this.config = config;
-			this.hitLatch = hitLatch;
-			this.descStore = descStore;
-		}
-
-		public void run() {
-			if (hitLatch.getCount() > 0) {
-				int nid = Integer.parseInt(doc.get("dnid"));
-				int cnid = Integer.parseInt(doc.get("cnid"));
-				try {
-					ThinDescVersioned descV = (ThinDescVersioned) descStore
-							.getDescription(nid, cnid);
-					LuceneMatch match = new LuceneMatch(descV, score);
-					if (checkList == null || checkList.size() == 0) {
-						matches.add(match);
-						if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-							AceLog.getAppLog().fine(
-									"processing match: " + descV
-											+ " new match size: "
-											+ matches.size());
-						}
-					} else {
-						try {
-							boolean failed = false;
-							for (I_TestSearchResults test : checkList) {
-								if (test.test(descV, config) == false) {
-									failed = true;
-									break;
-								}
-							}
-
-							if (failed == false) {
-								matches.add(match);
-							}
-						} catch (TaskFailedException e) {
-							AceLog.getAppLog().alertAndLogException(e);
-						}
-					}
-				} catch (IOException e1) {
-					AceLog.getAppLog().alertAndLogException(e1);
-				} catch (DatabaseException e1) {
-					AceLog.getAppLog().alertAndLogException(e1);
-				}
-				this.hitLatch.countDown();
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine(
-							"Hit latch: " + this.hitLatch.getCount());
-				}
-			}
-		}
-	}
 
 	/*
 	 * (non-Javadoc)

@@ -390,6 +390,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                 }
             }
             updateSpecTree(false);
+            
             if (treeHelper.getRenderer() != null) {
                 treeHelper.getRenderer().propertyChange(
                         new PropertyChangeEvent(this,
@@ -406,6 +407,27 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                         new PropertyChangeEvent(this,
                                 "showViewerImagesInTaxonomy", null, null));
                 treeHelper.getRenderer().propertyChange(
+                        new PropertyChangeEvent(this, "refsetsToShow", null,
+                                null));
+            } else {
+                AceLog.getAppLog().info("treeHelper.getRenderer() == null");
+            }
+            if (refsetTree.getRenderer() != null) {
+            	refsetTree.getRenderer().propertyChange(
+                        new PropertyChangeEvent(this,
+                                "showRefsetInfoInTaxonomy", null, null));
+            	refsetTree.getRenderer().propertyChange(
+                        new PropertyChangeEvent(this,
+                                "variableHeightTaxonomyView", null, null));
+            	refsetTree.getRenderer()
+                        .propertyChange(
+                                new PropertyChangeEvent(this,
+                                        "highlightConflictsInTaxonomyView",
+                                        null, null));
+            	refsetTree.getRenderer().propertyChange(
+                        new PropertyChangeEvent(this,
+                                "showViewerImagesInTaxonomy", null, null));
+            	refsetTree.getRenderer().propertyChange(
                         new PropertyChangeEvent(this, "refsetsToShow", null,
                                 null));
             } else {
@@ -501,11 +523,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private JScrollPane specTreeScroller;
 
-    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper)
+	private TermTreeHelper refsetTree;
+
+    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree)
             throws Exception {
         super();
         this.ace = ace;
         this.treeHelper = treeHelper;
+        this.refsetTree = refsetTree;
         topPanel = new JPanel(new GridBagLayout());
 
         this.tabHistoryList = (LinkedList<I_GetConceptData>) ace
