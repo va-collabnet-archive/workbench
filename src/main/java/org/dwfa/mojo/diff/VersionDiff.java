@@ -236,6 +236,24 @@ public class VersionDiff extends AbstractMojo {
 	private List<Integer> v2_description_status_filter_int;
 
 	/**
+	 * Optional list of description type to filter v1 type
+	 * 
+	 * @parameter
+	 */
+	private List<String> v1_description_type_filter = new ArrayList<String>();
+
+	private List<Integer> v1_description_type_filter_int;
+
+	/**
+	 * Optional list of description type to filter v2 type
+	 * 
+	 * @parameter
+	 */
+	private List<String> v2_description_type_filter = new ArrayList<String>();
+
+	private List<Integer> v2_description_type_filter_int;
+
+	/**
 	 * Optional regex to filter v1 term
 	 * 
 	 * @parameter
@@ -248,6 +266,34 @@ public class VersionDiff extends AbstractMojo {
 	 * @parameter
 	 */
 	private String v2_description_term_filter;
+
+	/**
+	 * Optional regex to filter v1 lang
+	 * 
+	 * @parameter
+	 */
+	private String v1_description_lang_filter;
+
+	/**
+	 * Optional regex to filter v2 lang
+	 * 
+	 * @parameter
+	 */
+	private String v2_description_lang_filter;
+
+	/**
+	 * Optional filter on v1 case
+	 * 
+	 * @parameter
+	 */
+	private Boolean v1_description_case_filter;
+
+	/**
+	 * Optional filter on v2 case
+	 * 
+	 * @parameter
+	 */
+	private Boolean v2_description_case_filter;
 
 	/**
 	 * Set to true to include added relationships.
@@ -315,6 +361,78 @@ public class VersionDiff extends AbstractMojo {
 	 * @parameter default-value=true
 	 */
 	private boolean changed_relationship_group;
+
+	/**
+	 * Optional list of relationship status to filter v1
+	 * 
+	 * @parameter
+	 */
+	private List<String> v1_relationship_status_filter = new ArrayList<String>();
+
+	private List<Integer> v1_relationship_status_filter_int;
+
+	/**
+	 * Optional list of relationship status to filter v2
+	 * 
+	 * @parameter
+	 */
+	private List<String> v2_relationship_status_filter = new ArrayList<String>();
+
+	private List<Integer> v2_relationship_status_filter_int;
+
+	/**
+	 * Optional list of relationship characteristic to filter v1 characteristic
+	 * 
+	 * @parameter
+	 */
+	private List<String> v1_relationship_characteristic_filter = new ArrayList<String>();
+
+	private List<Integer> v1_relationship_characteristic_filter_int;
+
+	/**
+	 * Optional list of relationship characteristic to filter v2
+	 * 
+	 * @parameter
+	 */
+	private List<String> v2_relationship_characteristic_filter = new ArrayList<String>();
+
+	private List<Integer> v2_relationship_characteristic_filter_int;
+
+	/**
+	 * Optional list of relationship refinability to filter v1
+	 * 
+	 * @parameter
+	 */
+	private List<String> v1_relationship_refinability_filter = new ArrayList<String>();
+
+	private List<Integer> v1_relationship_refinability_filter_int;
+
+	/**
+	 * Optional list of relationship refinability to filter v2
+	 * 
+	 * @parameter
+	 */
+	private List<String> v2_relationship_refinability_filter = new ArrayList<String>();
+
+	private List<Integer> v2_relationship_refinability_filter_int;
+
+	/**
+	 * Optional list of relationship type to filter v1
+	 * 
+	 * @parameter
+	 */
+	private List<String> v1_relationship_type_filter = new ArrayList<String>();
+
+	private List<Integer> v1_relationship_type_filter_int;
+
+	/**
+	 * Optional list of relationship type to filter v2
+	 * 
+	 * @parameter
+	 */
+	private List<String> v2_relationship_type_filter = new ArrayList<String>();
+
+	private List<Integer> v2_relationship_type_filter_int;
 
 	private I_GetConceptData refset;
 
@@ -503,15 +621,16 @@ public class VersionDiff extends AbstractMojo {
 		tf.addUncommitted(newExtension);
 	}
 
-	private List<Integer> buildStatus(List<String> status, String tag)
+	private List<Integer> buildConceptEnum(List<String> concepts, String tag)
 			throws Exception {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
+		logConfig(tag + " size = " + concepts.size());
 		I_TermFactory tf = LocalVersionedTerminology.get();
-		for (String str : status) {
+		for (String str : concepts) {
 			I_GetConceptData con = tf.getConcept(Arrays.asList(UUID
 					.fromString(str)));
 			if (con == null) {
-				getLog().info("Can't find " + str);
+				logConfig(tag + " ERROR - Can't find " + str);
 				continue;
 			}
 			ret.add(con.getConceptId());
@@ -570,10 +689,15 @@ public class VersionDiff extends AbstractMojo {
 		}
 	}
 
+	int descriptions = 0;
+
+	int descriptions_filtered = 0;
+
 	private void compareDescriptions(I_GetConceptData c, I_Path path)
 			throws Exception {
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		for (I_DescriptionVersioned d : c.getDescriptions()) {
+			descriptions++;
 			I_DescriptionPart d1 = null;
 			I_DescriptionPart d2 = null;
 			for (I_DescriptionPart dd : d.getVersions()) {
@@ -597,6 +721,12 @@ public class VersionDiff extends AbstractMojo {
 					&& !v2_description_status_filter_int.contains(d2
 							.getStatusId()))
 				continue;
+			if (v1_description_type_filter_int.size() > 0 && d1 != null
+					&& !v1_description_type_filter_int.contains(d1.getTypeId()))
+				continue;
+			if (v2_description_type_filter_int.size() > 0 && d2 != null
+					&& !v2_description_type_filter_int.contains(d2.getTypeId()))
+				continue;
 			if (v1_description_term_filter != null
 					&& !v1_description_term_filter.equals("") && d1 != null
 					&& !d1.getText().matches(v1_description_term_filter))
@@ -605,6 +735,23 @@ public class VersionDiff extends AbstractMojo {
 					&& !v2_description_term_filter.equals("") && d2 != null
 					&& !d2.getText().matches(v2_description_term_filter))
 				continue;
+			if (v1_description_lang_filter != null
+					&& !v1_description_lang_filter.equals("") && d1 != null
+					&& !d1.getLang().matches(v1_description_lang_filter))
+				continue;
+			if (v2_description_lang_filter != null
+					&& !v2_description_lang_filter.equals("") && d2 != null
+					&& !d2.getLang().matches(v2_description_lang_filter))
+				continue;
+			if (v1_description_case_filter != null
+					&& d1 != null
+					&& !d1.getInitialCaseSignificant() == v1_description_case_filter)
+				continue;
+			if (v2_description_case_filter != null
+					&& d1 != null
+					&& !d1.getInitialCaseSignificant() == v2_description_case_filter)
+				continue;
+			descriptions_filtered++;
 			if (this.added_descriptions && d1 == null && d2 != null) {
 				addToRefset(c.getConceptId(), this.added_description_change,
 						String.valueOf(d.getDescId()) + "\t" + d2);
@@ -686,114 +833,160 @@ public class VersionDiff extends AbstractMojo {
 		}
 	}
 
+	int relationships = 0;
+
+	int relationships_filtered = 0;
+
 	private void compareRelationships(I_GetConceptData c, I_Path path)
 			throws Exception {
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		for (I_RelVersioned d : c.getSourceRels()) {
-			I_RelPart d1 = null;
-			I_RelPart d2 = null;
+			relationships++;
+			I_RelPart r1 = null;
+			I_RelPart r2 = null;
 			for (I_RelPart dd : d.getVersions()) {
 				if (dd.getPathId() != path.getConceptId())
 					continue;
 				// Find the greatest version <= the one of interest
 				if (dd.getVersion() <= v1_id
-						&& (d1 == null || d1.getVersion() < dd.getVersion()))
-					d1 = dd;
+						&& (r1 == null || r1.getVersion() < dd.getVersion()))
+					r1 = dd;
 				if (dd.getVersion() <= v2_id
-						&& (d2 == null || d2.getVersion() < dd.getVersion()))
-					d2 = dd;
+						&& (r2 == null || r2.getVersion() < dd.getVersion()))
+					r2 = dd;
 			}
-			if (this.added_relationships && d1 == null && d2 != null) {
+			if (v1_relationship_status_filter_int.size() > 0
+					&& r1 != null
+					&& !v1_relationship_status_filter_int.contains(r1
+							.getStatusId()))
+				continue;
+			if (v2_relationship_status_filter_int.size() > 0
+					&& r2 != null
+					&& !v2_relationship_status_filter_int.contains(r2
+							.getStatusId()))
+				continue;
+			if (v1_relationship_characteristic_filter_int.size() > 0
+					&& r1 != null
+					&& !v1_relationship_characteristic_filter_int.contains(r1
+							.getCharacteristicId()))
+				continue;
+			if (v2_relationship_characteristic_filter_int.size() > 0
+					&& r2 != null
+					&& !v2_relationship_characteristic_filter_int.contains(r2
+							.getCharacteristicId()))
+				continue;
+			if (v1_relationship_refinability_filter_int.size() > 0
+					&& r1 != null
+					&& !v1_relationship_refinability_filter_int.contains(r1
+							.getRefinabilityId()))
+				continue;
+			if (v2_relationship_refinability_filter_int.size() > 0
+					&& r2 != null
+					&& !v2_relationship_refinability_filter_int.contains(r2
+							.getRefinabilityId()))
+				continue;
+			if (v1_relationship_type_filter_int.size() > 0
+					&& r1 != null
+					&& !v1_relationship_type_filter_int
+							.contains(r1.getTypeId()))
+				continue;
+			if (v2_relationship_type_filter_int.size() > 0
+					&& r2 != null
+					&& !v2_relationship_type_filter_int
+							.contains(r2.getTypeId()))
+				continue;
+			relationships_filtered++;
+			if (this.added_relationships && r1 == null && r2 != null) {
 				addToRefset(c.getConceptId(), this.added_relationship_change,
-						String.valueOf(d.getRelId()) + "\t" + d2);
+						String.valueOf(d.getRelId()) + "\t" + r2);
 				incr(this.added_relationship_change);
 			}
-			if (this.deleted_relationships && d1 != null && d2 == null) {
+			if (this.deleted_relationships && r1 != null && r2 == null) {
 				addToRefset(c.getConceptId(), this.deleted_relationship_change,
-						String.valueOf(d.getRelId()) + "\t" + d1);
+						String.valueOf(d.getRelId()) + "\t" + r1);
 				incr(this.deleted_relationship_change);
 			}
-			if (d1 != null && d2 != null && d1.getVersion() != d2.getVersion()) {
+			if (r1 != null && r2 != null && r1.getVersion() != r2.getVersion()) {
 				// Something changed
 				if (this.changed_relationship_status
-						&& d1.getStatusId() != d2.getStatusId()
+						&& r1.getStatusId() != r2.getStatusId()
 						&& (this.v1_relationship_status.size() == 0 || this.v1_relationship_status_int
-								.contains(d1.getStatusId()))
+								.contains(r1.getStatusId()))
 						&& (this.v2_relationship_status.size() == 0 || this.v2_relationship_status_int
-								.contains(d2.getStatusId()))) {
+								.contains(r2.getStatusId()))) {
 					addToRefset(c.getConceptId(),
 							this.relationship_status_change, String.valueOf(d
 									.getRelId())
 									+ "\t"
-									+ d2
+									+ r2
 									+ ": "
-									+ tf.getConcept(d1.getStatusId())
+									+ tf.getConcept(r1.getStatusId())
 											.getInitialText()
 									+ " -> "
-									+ tf.getConcept(d2.getStatusId())
+									+ tf.getConcept(r2.getStatusId())
 											.getInitialText());
 					incr(this.relationship_status_change);
 				}
 				// characteristic
 				if (this.changed_relationship_characteristic
-						&& d1.getCharacteristicId() != d2.getCharacteristicId()) {
+						&& r1.getCharacteristicId() != r2.getCharacteristicId()) {
 					addToRefset(c.getConceptId(),
 							this.relationship_characteristic_change, String
 									.valueOf(d.getRelId())
 									+ "\t"
-									+ d2
+									+ r2
 									+ ": "
-									+ tf.getConcept(d1.getCharacteristicId())
+									+ tf.getConcept(r1.getCharacteristicId())
 											.getInitialText()
 									+ " -> "
-									+ tf.getConcept(d2.getCharacteristicId())
+									+ tf.getConcept(r2.getCharacteristicId())
 											.getInitialText());
 					incr(this.relationship_characteristic_change);
 				}
 				// refinability
 				if (this.changed_relationship_refinability
-						&& d1.getRefinabilityId() != d2.getRefinabilityId()) {
+						&& r1.getRefinabilityId() != r2.getRefinabilityId()) {
 					addToRefset(c.getConceptId(),
 							this.relationship_refinability_change, String
 									.valueOf(d.getRelId())
 									+ "\t"
-									+ d2
+									+ r2
 									+ ": "
-									+ tf.getConcept(d1.getCharacteristicId())
+									+ tf.getConcept(r1.getCharacteristicId())
 											.getInitialText()
 									+ " -> "
-									+ tf.getConcept(d2.getCharacteristicId())
+									+ tf.getConcept(r2.getCharacteristicId())
 											.getInitialText());
 					incr(this.relationship_refinability_change);
 				}
 				// type
 				if (this.changed_relationship_type
-						&& d1.getTypeId() != d2.getTypeId()) {
+						&& r1.getTypeId() != r2.getTypeId()) {
 					addToRefset(c.getConceptId(),
 							this.relationship_type_change, String.valueOf(d
 									.getRelId())
 									+ "\t"
-									+ d2
+									+ r2
 									+ ": "
-									+ tf.getConcept(d1.getTypeId())
+									+ tf.getConcept(r1.getTypeId())
 											.getInitialText()
 									+ " -> "
-									+ tf.getConcept(d2.getTypeId())
+									+ tf.getConcept(r2.getTypeId())
 											.getInitialText());
 					incr(this.relationship_type_change);
 				}
 				// group
 				if (this.changed_relationship_group
-						&& d1.getGroup() != d2.getGroup()) {
+						&& r1.getGroup() != r2.getGroup()) {
 					addToRefset(c.getConceptId(),
 							this.relationship_group_change, String.valueOf(d
 									.getRelId())
 									+ "\t"
-									+ d2
+									+ r2
 									+ ": "
-									+ d1.getGroup()
+									+ r1.getGroup()
 									+ " -> "
-									+ d2.getGroup());
+									+ r2.getGroup());
 					incr(this.relationship_group_change);
 				}
 			}
@@ -816,7 +1009,7 @@ public class VersionDiff extends AbstractMojo {
 		getLog().info(str);
 	}
 
-	private void diff() throws Exception {
+	private I_Path processConfig() throws Exception {
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		I_Path path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
 		I_Position pos1 = tf.newPosition(path, v1_id);
@@ -834,19 +1027,19 @@ public class VersionDiff extends AbstractMojo {
 		this.diff_count.put(this.deleted_concept_change, 0);
 		logConfig("changed_concept_status = " + this.changed_concept_status);
 		this.diff_count.put(this.concept_status_change, 0);
-		this.v1_concept_status_int = buildStatus(this.v1_concept_status,
+		this.v1_concept_status_int = buildConceptEnum(this.v1_concept_status,
 				"v1_concept_status");
-		this.v2_concept_status_int = buildStatus(this.v2_concept_status,
+		this.v2_concept_status_int = buildConceptEnum(this.v2_concept_status,
 				"v2_concept_status");
 		logConfig("changed_defined = " + this.changed_defined);
 		this.diff_count.put(this.defined_change, 0);
-		this.v1_isa_filter_int = buildStatus(this.v1_isa_filter,
+		this.v1_isa_filter_int = buildConceptEnum(this.v1_isa_filter,
 				"v1_isa_filter");
-		this.v2_isa_filter_int = buildStatus(this.v2_isa_filter,
+		this.v2_isa_filter_int = buildConceptEnum(this.v2_isa_filter,
 				"v2_isa_filter");
-		this.v1_concept_status_filter_int = buildStatus(
+		this.v1_concept_status_filter_int = buildConceptEnum(
 				this.v1_concept_status_filter, "v1_concept_status_filter");
-		this.v2_concept_status_filter_int = buildStatus(
+		this.v2_concept_status_filter_int = buildConceptEnum(
 				this.v2_concept_status_filter, "v2_concept_status_filter");
 		logConfig("added_descriptions = " + this.added_descriptions);
 		this.diff_count.put(this.added_description_change, 0);
@@ -855,9 +1048,9 @@ public class VersionDiff extends AbstractMojo {
 		logConfig("changed_description_status = "
 				+ this.changed_description_status);
 		this.diff_count.put(this.description_status_change, 0);
-		this.v1_description_status_int = buildStatus(
+		this.v1_description_status_int = buildConceptEnum(
 				this.v1_description_status, "v1_description_status");
-		this.v2_description_status_int = buildStatus(
+		this.v2_description_status_int = buildConceptEnum(
 				this.v2_description_status, "v2_description_status");
 		logConfig("changed_description_term = " + this.changed_description_term);
 		this.diff_count.put(this.description_term_change, 0);
@@ -868,16 +1061,28 @@ public class VersionDiff extends AbstractMojo {
 		this.diff_count.put(this.description_language_change, 0);
 		logConfig("changed_description_case = " + this.changed_description_case);
 		this.diff_count.put(this.description_case_change, 0);
-		this.v1_description_status_filter_int = buildStatus(
+		this.v1_description_status_filter_int = buildConceptEnum(
 				this.v1_description_status_filter,
 				"v1_description_status_filter");
-		this.v2_description_status_filter_int = buildStatus(
+		this.v2_description_status_filter_int = buildConceptEnum(
 				this.v2_description_status_filter,
 				"v2_description_status_filter");
+		this.v1_description_type_filter_int = buildConceptEnum(
+				this.v1_description_type_filter, "v1_description_type_filter");
+		this.v2_description_type_filter_int = buildConceptEnum(
+				this.v2_description_type_filter, "v2_description_type_filter");
 		logConfig("v1_description_term_filter = "
 				+ this.v1_description_term_filter);
 		logConfig("v2_description_term_filter = "
 				+ this.v2_description_term_filter);
+		logConfig("v1_description_lang_filter = "
+				+ this.v1_description_lang_filter);
+		logConfig("v2_description_lang_filter = "
+				+ this.v2_description_lang_filter);
+		logConfig("v1_description_case_filter = "
+				+ this.v1_description_case_filter);
+		logConfig("v2_description_case_filter = "
+				+ this.v2_description_case_filter);
 		logConfig("added_relationships = " + this.added_relationships);
 		this.diff_count.put(this.added_relationship_change, 0);
 		logConfig("deleted_relationships = " + this.deleted_relationships);
@@ -885,9 +1090,9 @@ public class VersionDiff extends AbstractMojo {
 		logConfig("changed_relationship_status = "
 				+ this.changed_relationship_status);
 		this.diff_count.put(this.relationship_status_change, 0);
-		this.v1_relationship_status_int = buildStatus(
+		this.v1_relationship_status_int = buildConceptEnum(
 				this.v1_relationship_status, "v1_relationship_status");
-		this.v2_relationship_status_int = buildStatus(
+		this.v2_relationship_status_int = buildConceptEnum(
 				this.v2_relationship_status, "v2_relationship_status");
 		logConfig("changed_relationship_characteristic = "
 				+ this.changed_relationship_characteristic);
@@ -901,8 +1106,38 @@ public class VersionDiff extends AbstractMojo {
 		logConfig("changed_relationship_group = "
 				+ this.changed_relationship_group);
 		this.diff_count.put(this.relationship_group_change, 0);
-		int concepts = 0;
-		int concepts_filtered = 0;
+		this.v1_relationship_status_filter_int = buildConceptEnum(
+				this.v1_relationship_status_filter,
+				"v1_relationship_status_filter");
+		this.v2_relationship_status_filter_int = buildConceptEnum(
+				this.v2_relationship_status_filter,
+				"v2_relationship_status_filter");
+		this.v1_relationship_characteristic_filter_int = buildConceptEnum(
+				this.v1_relationship_characteristic_filter,
+				"v1_relationship_characteristic_filter");
+		this.v2_relationship_characteristic_filter_int = buildConceptEnum(
+				this.v2_relationship_characteristic_filter,
+				"v2_relationship_characteristic_filter");
+		this.v1_relationship_refinability_filter_int = buildConceptEnum(
+				this.v1_relationship_refinability_filter,
+				"v1_relationship_refinability_filter");
+		this.v2_relationship_refinability_filter_int = buildConceptEnum(
+				this.v2_relationship_refinability_filter,
+				"v2_relationship_refinability_filter");
+		this.v1_relationship_type_filter_int = buildConceptEnum(
+				this.v1_relationship_type_filter, "v1_relationship_type_filter");
+		this.v2_relationship_type_filter_int = buildConceptEnum(
+				this.v2_relationship_type_filter, "v2_relationship_type_filter");
+		return path;
+	}
+
+	int concepts = 0;
+
+	int concepts_filtered = 0;
+
+	private void diff() throws Exception {
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		I_Path path = processConfig();
 
 		listRoots(path);
 
@@ -960,6 +1195,10 @@ public class VersionDiff extends AbstractMojo {
 
 		logStats("concepts " + concepts);
 		logStats("concepts_filtered " + concepts_filtered);
+		logStats("descriptions " + descriptions);
+		logStats("descriptions_filtered " + descriptions_filtered);
+		logStats("relationships " + relationships);
+		logStats("relationships_filtered " + relationships_filtered);
 		for (Entry<Integer, Integer> e : this.diff_count.entrySet()) {
 			logStats(tf.getConcept(e.getKey()).getInitialText() + " "
 					+ e.getValue());
@@ -1047,6 +1286,62 @@ public class VersionDiff extends AbstractMojo {
 			getLog()
 					.info(
 							"Status: "
+									+ tf.getConcept(c.getUids()).getUids().get(
+											0)
+									+ " "
+									+ tf.getConcept(c.getUids())
+											.getInitialText());
+		}
+	}
+
+	private void listDescriptionType() throws Exception {
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		for (Concept c : Arrays
+				.asList(
+						ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE,
+						ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE,
+						ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE)) {
+			getLog().info(
+					"Description type: "
+							+ tf.getConcept(c.getUids()).getUids().get(0) + " "
+							+ tf.getConcept(c.getUids()).getInitialText());
+		}
+	}
+
+	private void listCharacteristic() throws Exception {
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		for (Concept c : Arrays.asList(
+				ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC,
+				ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC,
+				ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC,
+				ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC)) {
+			getLog().info(
+					"Characteristic type: "
+							+ tf.getConcept(c.getUids()).getUids().get(0) + " "
+							+ tf.getConcept(c.getUids()).getInitialText());
+		}
+	}
+
+	private void listRefinability() throws Exception {
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		for (Concept c : Arrays.asList(
+				ArchitectonicAuxiliary.Concept.NOT_REFINABLE,
+				ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY,
+				ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY)) {
+			getLog().info(
+					"Refinability type: "
+							+ tf.getConcept(c.getUids()).getUids().get(0) + " "
+							+ tf.getConcept(c.getUids()).getInitialText());
+		}
+	}
+
+	private void listRel() throws Exception {
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		for (org.dwfa.cement.SNOMED.Concept c : Arrays
+				.asList(SNOMED.Concept.IS_A)) {
+			getLog()
+					.info(
+							"Rel type: "
 									+ tf.getConcept(c.getUids()).getUids().get(
 											0)
 									+ " "
@@ -1223,10 +1518,12 @@ public class VersionDiff extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			this.listVersions();
-
 			this.listPaths();
-
 			this.listStatus();
+			this.listDescriptionType();
+			this.listCharacteristic();
+			this.listRefinability();
+			this.listRel();
 
 			this.config = this.createChangeTypeConcept("Configuration")
 					.getConceptId();
