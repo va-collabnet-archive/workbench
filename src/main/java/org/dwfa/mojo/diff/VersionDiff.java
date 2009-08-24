@@ -1,6 +1,7 @@
 package org.dwfa.mojo.diff;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -37,7 +38,73 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 
 /**
- * Generate a Refset for all concepts in the Concept enum
+ * Compare two version of SNOMED
+ * 
+ * <p>
+ * For each component in SNOMED (concepts, descriptions, and relationships), the
+ * parameters permit the configuration of the types of change to include in the
+ * refset. Some of these change inclusion parameters also include the ability to
+ * further qualify the change. The concept, description, and relationship status
+ * types have a status type parameter which allow for the specification of a
+ * "reactivation" change refset, by specifying the "v1" status to be the
+ * inactive status types and the "v2" status to be the active status types.
+ * 
+ * <p>
+ * There is some commonality among the parameters for all components. Each
+ * component type has the ability to specify addition, deletion (but should not
+ * happen if v2 &gt; v1), and change in status type along with qualification of
+ * the status type.
+ * 
+ * <p>
+ * For concepts, a change in "defined" status may be specified.
+ * 
+ * <p>
+ * For descriptions, a change in term, type, language, or case sensitivity may
+ * be specified.
+ * 
+ * <p>
+ * For relationships, a change in characteristic, type, refinability, and group
+ * may be specified.
+ * 
+ * <p>
+ * There is also the ability to specify "filters" on components to focus on
+ * specific aspects of SNOMED. Note that filters restrict the components on
+ * which comparisons are performed, which the change type specification limits
+ * the changes which are reported.
+ * 
+ * <p>
+ * The ISA filter restricts the concepts to one or more sub-hierarchies. To
+ * focus on a status change in the clinical findings section, specify the uuid
+ * for "clinical finding" in the v1 ISA filter. Note that this is version
+ * specific, since finding a clinical finding concept that has been retired
+ * requires using the previous ISA relationship, not the current one.
+ * 
+ * <p>
+ * Each components allows for the specification of a status filter.
+ * 
+ * <p>
+ * Descriptions have filters on term, type, language, and case. The language
+ * filter utilizes and regular expression. Thus changes to English language
+ * descriptions (including dialects) are "(?i)en.*". Similarly, the terms may be
+ * filtered using regular expressions.
+ * 
+ * <p>
+ * Relationships have filters on characteristic, refinability, and type.
+ * 
+ * <p>
+ * The created refset is a concept-concept-string refset. <br>
+ * concept1 is the changed concept (inclding changed description and
+ * relationships) <br>
+ * concept2 is the change type (e.g. added concept, changed concept status). The
+ * configuration information is included in the refset as a config type.
+ * Statistic on the counts of each type of change are recorded as a stats type.
+ * The components counts (concepts, descriptions, relationships) are included as
+ * a stat type, along with the counts of the components post-filtering. <br>
+ * The string is a comment further describing the specifics of the change.
+ * 
+ * <p>
+ * If the list_file parameter is specified, the contents of the created refset
+ * are written to the file in a more-or-less human readable format.
  * 
  * @goal version-diff
  * 
@@ -433,6 +500,13 @@ public class VersionDiff extends AbstractMojo {
 	private List<String> v2_relationship_type_filter = new ArrayList<String>();
 
 	private List<Integer> v2_relationship_type_filter_int;
+
+	/**
+	 * List refset to file if present
+	 * 
+	 * @parameter
+	 */
+	private File list_file;
 
 	private I_GetConceptData refset;
 
@@ -1211,7 +1285,7 @@ public class VersionDiff extends AbstractMojo {
 	private void listDiff() throws Exception {
 		getLog().info("diff list");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-				"diff.txt")));
+				list_file)));
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		List<Integer> description_changes = Arrays.asList(
 				this.added_description_change, this.deleted_description_change,
@@ -1507,9 +1581,14 @@ public class VersionDiff extends AbstractMojo {
 	 * 
 	 * <br>&lt;configuration&gt;
 	 * 
-	 * <br>&lt;v1&gt;v1-id&lt;v1&gt;
 	 * 
-	 * <br>&lt;v2&gt;v2-id&lt;v2&gt;
+	 * 
+	 * <br>&lt;path_uuid&gt;8c230474-9f11-30ce-9cad-185a96fd03a2&lt;/path_uuid&gt
+	 * ;
+	 * 
+	 * <br>&lt;v1&gt;-612920153&lt;/v1&gt;
+	 * 
+	 * <br>&lt;v2&gt;-597018953&lt;/v2&gt;
 	 * 
 	 * <br>&lt;/configuration&gt;
 	 * 
@@ -1573,7 +1652,8 @@ public class VersionDiff extends AbstractMojo {
 					"Changed Relationship Group").getConceptId();
 
 			this.diff();
-			this.listDiff();
+			if (this.list_file != null)
+				this.listDiff();
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
 		}
