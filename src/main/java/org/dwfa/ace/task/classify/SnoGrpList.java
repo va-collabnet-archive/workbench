@@ -7,10 +7,10 @@ import java.util.List;
 public class SnoGrpList extends ArrayList<SnoGrp> {
 	private static final long serialVersionUID = 1L;
 
-	public SnoGrpList(){
+	public SnoGrpList() {
 		super();
 	}
-	
+
 	/**
 	 * Construct a ROLE_GROUP_LIST from <code>List&lt;SnoRel&gt;</code><br>
 	 * <br>
@@ -19,7 +19,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
 	 * provide overall computational efficiency.</font>
 	 * 
 	 */
-	public SnoGrpList(List<SnoRel> rels){
+	public SnoGrpList(List<SnoRel> rels) {
 		super();
 		// First Group
 		SnoGrp group = new SnoGrp();
@@ -45,7 +45,7 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
 
 	public int countRels() {
 		int returnCount = 0;
-		for (SnoGrp sg :  this)
+		for (SnoGrp sg : this)
 			returnCount += sg.size();
 		return returnCount;
 	}
@@ -66,10 +66,10 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
 
 		// Check in the reverse direction.
 		SnoGrpList sgPass1 = new SnoGrpList();
-		for (int ai = max - 1; ai >= 0; ai--) {
+		for (int ai = max - 1; ai > 0; ai--) {
 			SnoGrp groupA = this.get(ai);
 			boolean keep = true;
-			for (int bi = max - 2; bi > 0; bi--) {
+			for (int bi = ai - 1; bi >= 0; bi--) {
 				SnoGrp groupB = this.get(bi);
 				if (groupA.subsumes(groupB)) {
 					keep = false;
@@ -82,13 +82,13 @@ public class SnoGrpList extends ArrayList<SnoGrp> {
 		sgPass1.add(this.get(0));
 
 		// Repeat in reverse order.
-		// Duplicates will have been eliminated in the first pass.
+		// KEY: Duplicates will have been reduced to singleton in the first pass
 		SnoGrpList sgPass2 = new SnoGrpList();
 		max = sgPass1.size();
-		for (int ai = max - 1; ai >= 0; ai--) {
+		for (int ai = max - 1; ai > 0; ai--) {
 			SnoGrp groupA = this.get(ai);
 			boolean keep = true;
-			for (int bi = max - 2; bi > 0; bi--) {
+			for (int bi = ai - 1; bi >= 0; bi--) {
 				SnoGrp groupB = this.get(bi);
 				if (groupA.subsumes(groupB)) {
 					keep = false;
