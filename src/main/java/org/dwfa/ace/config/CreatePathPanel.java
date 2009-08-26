@@ -6,8 +6,9 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
@@ -40,7 +41,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      */
     private static final long serialVersionUID = -6900445108100412148L;
     JTextField desc;
-    SelectPathAndPositionPanel sppp;
+    SelectPathAndPositionPanelWithCombo sppp;
     TermComponentLabel parent;
     /**
      * @param config
@@ -85,7 +86,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
       PropertySetListenerGlue browsingPositionGlue = new PropertySetListenerGlue(null, null, 
               null, null, Position.class, config);
               */
-      sppp = new SelectPathAndPositionPanel(true, "as origin", aceConfig, null);
+      sppp = new SelectPathAndPositionPanelWithCombo(true, "as origin", aceConfig, null);
       c.fill = GridBagConstraints.BOTH;
       c.anchor = GridBagConstraints.NORTHWEST;
       c.gridwidth = 2;
@@ -114,7 +115,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
             return;
         }
-        List<I_Position> origins = this.sppp.getSelectedPositions();
+        Collection<I_Position> origins = this.sppp.getSelectedPositions();
         AceLog.getAppLog().info(origins.toString());
         if (origins.size() == 0) {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must select at least one origin for path.");
@@ -133,7 +134,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
         	int nativePathId = AceConfig.getVodb().uuidToNativeWithGeneration(newPathUid, idSource,
         			p, thinDate);
-        	Path newPath = new Path(nativePathId, origins);
+        	Path newPath = new Path(nativePathId, new ArrayList<I_Position>(origins));
          	// path id and uuid == the corresponding concepts UUID...
         	
         	ConceptBean cb = ConceptBean.get(nativePathId);

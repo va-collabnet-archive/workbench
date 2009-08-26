@@ -92,7 +92,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 	private JCheckBox colorPath;
 
     private class Setup implements Runnable {
-        public void run() {
+    	I_Position startingPosition;
+    	
+        public Setup(I_Position startingPosition) {
+			this.startingPosition = startingPosition;
+		}
+
+		public void run() {
             try {
             	dates = new ArrayList<Date>();
             	dates.add(new Date(ThinVersionHelper.convert(Integer.MIN_VALUE)));
@@ -151,7 +157,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                             c.fill = GridBagConstraints.NONE;
                             c.gridwidth = 1;
                             c.gridy++;
-                            JComponent sliderPanel = setupSliderPanel();
+                            JComponent sliderPanel = setupSliderPanel(startingPosition);
                             c.weightx = 0;
                             // this.add(new JScrollPane(sliderPanel), c);
                             PositionPanel.this.add(sliderPanel, c);
@@ -164,6 +170,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                             c.weighty = 1;
                             addFiller(c);
                             // this.setBorder(BorderFactory.createTitledBorder("PositionPanel"));
+                            
+                            revalidate();
+                            repaint(0,0,getWidth(), getHeight());
                         } catch (Exception ex) {
                 			AceLog.getAppLog().alertAndLogException(ex);
                         }
@@ -176,6 +185,11 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         }
     }
 
+    public PositionPanel(I_Path path,
+            boolean selectPositionOnly, String purpose,
+            String name, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws DatabaseException {
+    	this(path, selectPositionOnly, purpose, name, aceConfig, selectGlue, null);
+    }
     /**
      * @param config
      * @throws QueryException
@@ -184,7 +198,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      */
     public PositionPanel(I_Path path,
             boolean selectPositionOnly, String purpose,
-            String name, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws DatabaseException {
+            String name, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue, I_Position position) throws DatabaseException {
         super(new GridBagLayout(), name, null);
         Font defaultFont = new JLabel().getFont();
        	monoSpaceFont = new Font("Monospaced", defaultFont.getStyle(), defaultFont.getSize());
@@ -209,7 +223,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         	colorPath.setOpaque(true);
         }
 
-        new Thread(new Setup(), "PositionPanel Setup").start();
+        new Thread(new Setup(position), "PositionPanel Setup").start();
         Dimension size = new Dimension(330, 310);
         setSize(size);
         setPreferredSize(size);
@@ -227,6 +241,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
     }
 
     /**
+     * @param startingPosition 
      * @param c
      * @throws QueryException
      * @throws InvocationTargetException
@@ -236,7 +251,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      * @throws SecurityException
      */
     @SuppressWarnings("unchecked")
-	private JComponent setupSliderPanel() throws
+	private JComponent setupSliderPanel(I_Position startingPosition) throws
             SecurityException, IllegalArgumentException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
     	int coarseLabelInset = 8;
@@ -343,6 +358,8 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                     }
 
                 }
+            } else if (startingPosition != null) {
+            	setupPathsEqual((Position) startingPosition);
             }
             this.fineControl.addChangeListener(this);
             c.gridheight = 1;
@@ -508,8 +525,10 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             this.position = new Position(ThinVersionHelper.convert(d.getTime()), this.path);
             if (oldPosition.equals(this.position) == false) {
                 try {
-                    this.selectGlue.replaceObj(oldPosition,
-                            this.position);
+                	if (this.selectGlue != null) {
+                        this.selectGlue.replaceObj(oldPosition,
+                                this.position);
+                	}
                 } catch (Exception e1) {
         			AceLog.getAppLog().alertAndLogException(e1);
                 }

@@ -120,6 +120,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.config.SelectPathAndPositionPanel;
+import org.dwfa.ace.config.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.list.TerminologyIntList;
@@ -2036,13 +2037,13 @@ public class ACE extends JPanel implements PropertyChangeListener,
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("View", makeViewConfig());
         tabs.addTab("Edit", makeEditConfig());
-        tabs.addTab("Path", new SelectPathAndPositionPanel(false, "for view",
+        tabs.addTab("Path", new SelectPathAndPositionPanelWithCombo(false, "for view",
                 aceFrameConfig, new PropertySetListenerGlue(
                         "removeViewPosition", "addViewPosition",
                         "replaceViewPosition", "getViewPositionSet",
                         I_Position.class, aceFrameConfig)));
         tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
-        tabs.addTab("Ref Set", makeRefsetConfig());
+        tabs.addTab("RefSet", makeRefsetConfig());
         tabs.addTab("Component Panel", makeComponentConfig());
         tabs.addTab("Classifier", makeClassifierConfig());
 
