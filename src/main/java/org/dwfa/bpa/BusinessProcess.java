@@ -1,7 +1,7 @@
 /*
  * Created on Mar 18, 2005
  *
- * Copyright 2005 by Informatics, Inc. 
+ * Copyright 2005 by Informatics, Inc.
  */
 package org.dwfa.bpa;
 
@@ -71,7 +71,7 @@ import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 /**
  * @author kec
- * 
+ *
  */
 public class BusinessProcess implements I_EncodeBusinessProcess,
 		VetoableChangeListener {
@@ -94,7 +94,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		public void write(Object attachment) {
 			BusinessProcess.this.writeAttachment(attachmentKey, attachment);
 		}
-		
+
 		public Object getAttachmentKey() {
 			return "A: " + attachmentKey;
 		}
@@ -300,7 +300,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 						}
 					} else {
 						if (attachmentSpec.getPropertyName().equals(processPropDesc.getName()) == false) {
-							throw new RuntimeException(attachmentSpec.getPropertyName() + 
+							throw new RuntimeException(attachmentSpec.getPropertyName() +
 									" does not equal " + processPropDesc.getName());
 						}
 					}
@@ -382,10 +382,10 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 
 	// version 10
 	private Map<String, PropertySpec> propertySpecs = new HashMap<String, PropertySpec>();
-	
+
 	// version 11
 	private String docSource;
-	
+
 
 	// transient and static
 	private transient I_DefineTask lastTaskAdded;
@@ -428,7 +428,11 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		int objDataVersion = in.readInt();
 		if ((objDataVersion > 0) && (objDataVersion <= dataVersion)) {
 			this.taskInfoList = (List<TaskInfo>) in.readObject();
-			in.readObject(); // was data container list
+	        try {
+	            in.readObject(); // was data container list
+	        } catch (Exception e) {
+	            // ignore any exceptions thrown since we don't support this List<TaskInfo> obj anymore
+	        }
 			this.changeSupport = new PropertyChangeSupportWithPropagationId(this);
 			this.vetoSupport = new VetoableChangeSupport(this);
 			this.exitCondition = (Condition) in.readObject();
@@ -500,7 +504,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 					}
 				}
 			}
-			
+
 			if ((objDataVersion > 10)) {
 				this.docSource = (String) in.readObject();
 			}
@@ -513,7 +517,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 
 	/**
 	 * /**
-	 * 
+	 *
 	 * @param processID
 	 *            The processID to set.
 	 */
@@ -1132,7 +1136,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 
 		PropertySpec specToChange = propertySpecs.remove("A: " + oldKey);
 		boolean isExternal = externalProperties.remove(specToChange);
-		
+
 		if (specToChange != null) {
 			specToChange.setPropertyName(newKey);
 			PropertySpec changedSpec = specToChange;
@@ -1759,11 +1763,11 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 		}
 		return this.renderer;
 	}
-	
+
 	public String getProcessDocumentationSource() {
 		return docSource;
 	}
-	
+
 	public void setProcessDocumentationSource(String docSource) {
 		this.docSource = docSource;
 	}
@@ -1771,14 +1775,14 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 	public String getProcessDocumentation() throws Exception {
 		return getProcessDocumentation(null);
 	}
-	
+
 	public String getProcessDocumentation(I_RenderDocumentation renderer) throws Exception {
 		if (renderer == null) {
 			renderer = new DefaultProcessDocRenderer();
-		} 
+		}
 		return renderer.getDocumentation(this);
 	}
-	
+
 	public void fireDescriptorChanged(PropertyDescriptor pd) {
 		this.changeSupport.firePropertyChange("PropertyDescriptor: " + pd.getName(), null, pd);
 	}
