@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,6 +37,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
  * Compare two version of SNOMED
@@ -120,18 +122,28 @@ public class VersionDiff extends AbstractMojo {
 	 * @parameter
 	 */
 	private String path_uuid;
-
+	
 	/**
-	 * The id of v1.
+	 * The time for v1 in yyyy.mm.dd hh:mm:ss zzz format
 	 * 
 	 * @parameter
 	 */
+	private String v1;
+
+	/**
+	 * The id of v1.
+	 */
 	private Integer v1_id;
+	
+	/**
+	 * The time for v2 in yyyy.mm.dd hh:mm:ss zzz format
+	 * 
+	 * @parameter
+	 */
+	private String v2;
 
 	/**
 	 * The id of v2.
-	 * 
-	 * @parameter
 	 */
 	private Integer v2_id;
 
@@ -1086,15 +1098,26 @@ public class VersionDiff extends AbstractMojo {
 	private I_Path processConfig() throws Exception {
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		I_Path path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
+		this.v1_id = ThinVersionHelper.convertTz(this.v1);
+		this.v2_id = ThinVersionHelper.convertTz(this.v2);
 		I_Position pos1 = tf.newPosition(path, v1_id);
 		I_Position pos2 = tf.newPosition(path, v2_id);
 		this.createRefsetConcept(pos1, pos2);
 		getLog().info("Refset: " + refset.getInitialText());
 		getLog().info("Refset: " + refset.getUids().get(0));
+		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z");
+		// Date d = sdf.parse("2008.07.31 00:00:00 PDT");
+		// long v1x = ThinVersionHelper.convert(d.getTime());
+		// d = sdf.parse("2009.01.31 00:00:00 PST");
+		// long v2x = ThinVersionHelper.convert(d.getTime());
+		// logConfig("v1 parse = " + v1x + " " + (v1x - v1_id));
+		// logConfig("v2 parse = " + v2x + " " + (v2x - v2_id));
+		logConfig("v1: " + v1);
+		logConfig("v2: " + v2);
 		logConfig("v1_id = " + this.v1_id);
 		logConfig("v2_id = " + this.v2_id);
-		logConfig("v1: " + pos1.toString());
-		logConfig("v2: " + pos2.toString());
+		logConfig("v1 local tz: " + pos1.toString());
+		logConfig("v2 local tz: " + pos2.toString());
 		logConfig("added_concepts = " + this.added_concepts);
 		this.diff_count.put(this.added_concept_change, 0);
 		logConfig("deleted_concepts = " + this.deleted_concepts);
@@ -1449,6 +1472,20 @@ public class VersionDiff extends AbstractMojo {
 						&& cvp.getText().contains("version")) {
 					getLog().info("Version: " + cvp.getText());
 					getLog().info("         " + cvp.getVersion());
+					getLog().info(
+							"         "
+									+ ThinVersionHelper
+											.format(cvp.getVersion()));
+					getLog().info(
+							"         "
+									+ ThinVersionHelper
+											.formatTz(cvp.getVersion()));
+					for (String tz : Arrays.asList("GMT", "EST", "PST", "GMT-04:00")) {
+						getLog().info(
+								"         "
+										+ ThinVersionHelper.formatTz(cvp
+												.getVersion(), tz));
+					}
 				}
 			}
 		}
@@ -1583,6 +1620,14 @@ public class VersionDiff extends AbstractMojo {
 	 * 
 	 * 
 	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * <br>&lt;path_uuid&gt;8c230474-9f11-30ce-9cad-185a96fd03a2&lt;/path_uuid&gt
 	 * ;
 	 * 
@@ -1658,4 +1703,26 @@ public class VersionDiff extends AbstractMojo {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
 		}
 	}
+
+	// "Configuration"
+	// "Statistics"
+	// "Added Concept"
+	// "Deleted Concept"
+	// "Changed Concept Status"
+	// "Changed Defined"
+	// "Added Description"
+	// "Deleted Description"
+	// "Changed Description Status"
+	// "Changed Description Term"
+	// "Changed Description Type"
+	// "Changed Description Language"
+	// "Changed Description Case"
+	// "Added Relationship"
+	// "Deleted Relationship"
+	// "Changed Relationship Status"
+	// "Changed Relationship Characteristic"
+	// "Changed Relationship Refinability"
+	// "Changed Relationship Type"
+	// "Changed Relationship Group"
+
 }
