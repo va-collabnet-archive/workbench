@@ -129,7 +129,7 @@ public abstract class RefsetUtilities {
 		return allParents;
 	}
 
-	public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
+    public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
 
 		List<Integer> children = new ArrayList<Integer>();
 

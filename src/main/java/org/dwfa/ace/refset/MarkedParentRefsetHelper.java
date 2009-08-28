@@ -4,12 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 
 public class MarkedParentRefsetHelper extends RefsetHelper {
@@ -28,8 +27,6 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         this.refsetId = refsetId;
         this.memberTypeId = memberTypeId;
         this.refsetHelper = new RefsetHelper(termFactory);
-        // this.parentMemberTypeId =
-        // ConceptConstants.PARENT_MARKER.localize().getNid();
         this.parentMemberTypeId =
                 termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptId();
         this.parentRefsetId = getParentRefset();
@@ -41,9 +38,9 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 
         Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
         for (Integer conceptId : conceptIds) {
-            ancestors.addAll(getAllAncestors(termFactory.getConcept(conceptId), termFactory.getConcept(refsetId),
-                traversingConditions));
+            ancestors.addAll(getAllAncestors(termFactory.getConcept(conceptId), traversingConditions));
         }
+
         for (I_GetConceptData concept : ancestors) {
             newRefsetExtension(parentRefsetId, concept.getConceptId(), parentMemberTypeId);
         }
@@ -59,8 +56,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
             if (isMarkedParent(conceptId)) {
                 toBeRetired.add(conceptId);
             }
-            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), termFactory
-                .getConcept(refsetId), traversingConditions)) {
+            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), traversingConditions)) {
                 toBeRetired.add(concept.getConceptId());
             }
         }
@@ -71,21 +67,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         // lineage that should not be modified.
         Set<Integer> lineageToExclude = new HashSet<Integer>();
         for (Integer parentId : toBeRetired) {
-
-            I_GetConceptData parent = termFactory.getConcept(parentId);
-            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-            I_IntSet isARel = termFactory.newIntSet();
-            // get the appropriate is-a type (SNOMED or architectonic), based on
-            // "marked parent is-a type" rel
-            isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(termFactory, termFactory
-                .getConcept(refsetId)));
-
-            Set<I_GetConceptData> children =
-                    parent
-                        .getDestRelOrigins(config.getAllowedStatus(), isARel, config.getViewPositionSet(), true, true);
-
-            for (I_GetConceptData child : children) {
-                Integer childId = child.getConceptId();
+            for (Integer childId : refsetHelper.getChildrenOfConcept(parentId)) {
                 if (!toBeRetired.contains(childId) && (isMarkedParent(childId) || isMember(childId))) {
                     lineageToExclude.add(childId);
                 }
@@ -99,8 +81,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         // Find all ancestors of the lineages not to be modified
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
         for (Integer conceptId : lineageToExclude) {
-            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), termFactory
-                .getConcept(refsetId), traversingConditions)) {
+            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), traversingConditions)) {
                 ancestorIdsToExclude.add(concept.getConceptId());
             }
         }
@@ -110,7 +91,6 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 
         // Retire the rest
         for (Integer markedParentId : toBeRetired) {
-
             retireRefsetExtension(parentRefsetId, markedParentId, parentMemberTypeId);
         }
     }
@@ -127,14 +107,11 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 
         I_GetConceptData memberRefset = termFactory.getConcept(refsetId);
 
-        I_IntSet allowedStatus = termFactory.newIntSet();
-        allowedStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-
         I_IntSet allowedType = termFactory.newIntSet();
         allowedType.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
 
         Set<I_GetConceptData> targetParentRefsets =
-                memberRefset.getSourceRelTargets(allowedStatus, allowedType, null, false);
+                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null, false, true);
 
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
             throw new TerminologyException("Unable to locate parent member refset for '"
@@ -146,6 +123,45 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         }
         I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
         return parentRefset.getConceptId();
+    }
+
+    /**
+     * Check for a is_a relationship type defined on the member refset concept
+     * otherwise default to just using
+     * either a SNOMED or ArchitectonicAuxiliary is_a relationship type
+     */
+    @Override
+    protected I_IntSet getIsARelTypes() throws Exception {
+        if (this.isARelTypes == null) {
+            try {
+                I_IntSet isATypes = termFactory.newIntSet();
+                isATypes.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
+                    .getConceptId());
+                I_GetConceptData memberRefset = termFactory.getConcept(this.refsetId);
+                Set<I_GetConceptData> requiredIsAType =
+                        memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, false, true);
+
+                if (requiredIsAType != null && requiredIsAType.size() > 0) {
+                    // relationship exists so use the is-a specified by the
+                    // marked-parent-is-a relationship
+                    this.isARelTypes = termFactory.newIntSet();
+                    this.isARelTypes.add(requiredIsAType.iterator().next().getConceptId());
+                } else {
+                    // no specified marked-parent-is-a relationship defined, so
+                    // first default to using
+                    // SNOMED or ArchitectonicAuxiliary is_a relationship type
+                    super.getIsARelTypes();
+                }
+            } catch (NoMappingException ex) {
+                // marked-parent-is-a relationship type is unknown so default
+                super.getIsARelTypes();
+            }
+        }
+        return this.isARelTypes;
+    }
+
+    public boolean hasCurrentMarkedParentExtension(int conceptId) throws Exception {
+        return super.hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
     }
 
     /**
@@ -195,5 +211,4 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
             return false;
         }
     }
-
 }

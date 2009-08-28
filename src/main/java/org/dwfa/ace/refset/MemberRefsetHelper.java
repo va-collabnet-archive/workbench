@@ -19,10 +19,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.batch.Batch;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.AllowDataCheckSuppression;
 
 /**
  * Utility class providing refset membership operations.
  */
+@AllowDataCheckSuppression
 public class MemberRefsetHelper extends RefsetHelper {
 
     private Logger logger = Logger.getLogger(MemberRefsetHelper.class.getName());
@@ -63,6 +65,7 @@ public class MemberRefsetHelper extends RefsetHelper {
             public void onComplete() throws Exception {
                 List<UUID> markedParentsUuid =
                         Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
                         monitor.setText("Adding marked parent members...");
@@ -133,6 +136,7 @@ public class MemberRefsetHelper extends RefsetHelper {
             public void onComplete() throws Exception {
                 List<UUID> markedParentsUuid =
                         Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
                         monitor.setText("Removing marked parent members...");

@@ -248,9 +248,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // Step 3 : create new member refsets
             for (Integer memberId : newMembers) {
-                memberRefsetHelper.newRefsetExtensionNoCheck(refset
-                        .getConceptId(), memberId, normalMemberConcept
-                        .getConceptId());
+                memberRefsetHelper.newRefsetExtension(
+                    refset.getConceptId(), memberId, normalMemberConcept.getConceptId(), false);
                 if (cancelComputation) {
                     break;
                 }

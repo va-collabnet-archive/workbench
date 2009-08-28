@@ -24,18 +24,24 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.SNOMED;
+import org.dwfa.tapi.AllowDataCheckSuppression;
 
+@AllowDataCheckSuppression
 public class RefsetHelper {
 
     protected I_TermFactory termFactory;
-    protected Set<I_Path> userEditPaths;
-    protected I_ConfigAceFrame config;
 
     protected int currentStatusId;
     protected int retiredStatusId;
     protected int conceptTypeId;
 
     protected int unspecifiedUuid;
+
+    protected Set<I_Position> viewPositions;
+    protected Set<I_Path> editPaths;
+    protected I_IntSet allowedStatuses;
+    protected I_IntSet isARelTypes;
 
     private Logger logger = Logger.getLogger(RefsetHelper.class.getName());
 
@@ -45,25 +51,17 @@ public class RefsetHelper {
         retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
         unspecifiedUuid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid();
         conceptTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
-        config = termFactory.getActiveAceFrameConfig();
-        userEditPaths = null;
-        if (config != null) {
-            userEditPaths = config.getEditingPathSet();
-        }
     }
 
     /**
      * Gets the last I_ThinExtByRefPartConcept that has a status of current for
      * a refset and concept.
      * 
-     * @param refsetId
-     *            int
-     * @param conceptId
-     *            int
+     * @param refsetId int
+     * @param conceptId int
      * @return I_ThinExtByRefPartConcept with a status of current.
      * 
-     * @throws Exception
-     *             if cannot get all extension for a concept id..
+     * @throws Exception if cannot get all extension for a concept id..
      */
     public I_ThinExtByRefPartConcept getCurrentRefsetExtension(int refsetId, int conceptId) throws Exception {
 
@@ -266,77 +264,47 @@ public class RefsetHelper {
     }
 
     /**
-     * Add a concept to a refset
+     * Add a concept to a refset (if it doesn't already exist)
      * 
-     * @param refsetId
-     *            The subject refset
-     * @param conceptId
-     *            The concept to be added
-     * @param memberTypeId
-     *            The value of the concept extension to be added to the new
-     *            member concept.
+     * @see {@link #newRefsetExtension(int, int, int, boolean)}
      */
     public boolean newRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
-
-        // check subject is not already a member
-        if (hasCurrentRefsetExtension(refsetId, conceptId, memberTypeId)) {
-            if (logger.isLoggable(Level.FINE)) {
-                String extValueDesc = termFactory.getConcept(memberTypeId).getInitialText();
-                logger.fine("Concept is already a '" + extValueDesc + "' of the refset. Skipping.");
-            }
-            return false;
-        }
-
-        // create a new extension (with a part for each path the user is
-        // editing)
-
-        int newMemberId =
-                termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, userEditPaths,
-                    Integer.MAX_VALUE);
-
-        I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtensionNoChecks(refsetId, newMemberId, conceptId, conceptTypeId);
-
-        for (I_Path editPath : userEditPaths) {
-
-            I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
-
-            conceptExtension.setPathId(editPath.getConceptId());
-            conceptExtension.setStatusId(currentStatusId);
-            conceptExtension.setVersion(Integer.MAX_VALUE);
-            conceptExtension.setC1id(memberTypeId);
-
-            newExtension.addVersion(conceptExtension);
-        }
-
-        termFactory.addUncommittedNoChecks(newExtension);
-
-        return true;
+        return newRefsetExtension(refsetId, conceptId, memberTypeId, true);
     }
 
     /**
      * Add a concept to a refset
      * 
-     * @param refsetId
-     *            The subject refset
-     * @param componentId
-     *            The component to be added
-     * @param memberTypeId
-     *            The value of the concept extension to be added to the new
-     *            member concept.
+     * @param refsetId The subject refset
+     * @param conceptId The concept to be added
+     * @param memberTypeId The value of the concept extension to be added to the new member concept.
+     * @param checkNotExists Is true, will only execute if the extension does not already exist.
      */
-    public void newRefsetExtensionNoCheck(int refsetId, int componentId, int memberTypeId) throws Exception {
+    public boolean newRefsetExtension(int refsetId, int conceptId, int memberTypeId, boolean checkNotExists)
+            throws Exception {
+
+        if (checkNotExists) {
+            // check subject is not already a member
+            if (hasCurrentRefsetExtension(refsetId, conceptId, memberTypeId)) {
+                if (logger.isLoggable(Level.FINE)) {
+                    String extValueDesc = termFactory.getConcept(memberTypeId).getInitialText();
+                    logger.fine("Concept is already a '" + extValueDesc + "' of the refset. Skipping.");
+                }
+                return false;
+            }
+        }
 
         // create a new extension (with a part for each path the user is
         // editing)
+
         int newMemberId =
-                termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, userEditPaths,
+                termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, getEditPaths(),
                     Integer.MAX_VALUE);
 
         I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId, conceptTypeId);
+                termFactory.newExtensionNoChecks(refsetId, newMemberId, conceptId, conceptTypeId);
 
-        for (I_Path editPath : userEditPaths) {
+        for (I_Path editPath : getEditPaths()) {
 
             I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
 
@@ -349,6 +317,7 @@ public class RefsetHelper {
         }
 
         termFactory.addUncommittedNoChecks(newExtension);
+        return true;
     }
 
     public boolean newConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, UUID memberUuid,
@@ -668,12 +637,9 @@ public class RefsetHelper {
     /**
      * Remove a concept from a refset
      * 
-     * @param refsetId
-     *            The subject refset
-     * @param conceptId
-     *            The concept to be removed
-     * @param memberTypeId
-     *            The value of the concept extension to be removed (the
+     * @param refsetId The subject refset
+     * @param conceptId The concept to be removed
+     * @param memberTypeId The value of the concept extension to be removed (the
      *            membership type).
      */
     public boolean retireRefsetExtension(int refsetId, int conceptId, int memberTypeId) throws Exception {
@@ -696,7 +662,6 @@ public class RefsetHelper {
                 if (latestPart.getStatusId() == currentStatusId) {
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
                         int partValue = ((I_ThinExtByRefPartConcept) latestPart).getC1id();
-
                         if (partValue == memberTypeId) {
                             // found a member to retire
 
@@ -729,28 +694,10 @@ public class RefsetHelper {
     public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept, I_GetConceptData memberRefset,
             Condition... conditions) throws Exception {
 
-        Set<I_Position> userViewPositions = null;
-        I_IntSet userViewStatuses;
-
-        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-
-        if (config != null) {
-            userViewPositions = config.getViewPositionSet();
-            userViewStatuses = config.getAllowedStatus();
-        } else {
-            userViewStatuses = termFactory.newIntSet();
-            userViewStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-        }
-
-        I_IntSet isARel = termFactory.newIntSet();
-        // get the appropriate is-a type (SNOMED or architectonic), based on
-        // "marked parent is-a type" rel
-        isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(termFactory, memberRefset));
-
         // find all the children
         Set<I_GetConceptData> descendants =
-                getAllDescendants(new HashSet<I_GetConceptData>(), concept, userViewStatuses, isARel,
-                    userViewPositions, conditions);
+                getAllDescendants(new HashSet<I_GetConceptData>(), concept, getAllowedStatuses(), getIsARelTypes(),
+                    getViewPositions(), conditions);
 
         logger.fine("Found " + descendants.size() + " descendants of concept '" + concept.getInitialText() + "'.");
 
@@ -762,7 +709,7 @@ public class RefsetHelper {
             throws Exception {
 
         ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
-            positions, false)) {
+            positions, false, true)) {
             I_GetConceptData childConcept = termFactory.getConcept(childTuple.getC1Id());
             if (childConcept.getConceptId() == parent.getConceptId()) {
                 continue ITERATE_CHILDREN;
@@ -786,32 +733,12 @@ public class RefsetHelper {
      * Get all the ancestors (parents, parents of parents, etc) of a particular
      * concept.
      */
-    public Set<I_GetConceptData> getAllAncestors(I_GetConceptData concept, I_GetConceptData memberRefset,
-            Condition... conditions) throws Exception {
-
-        Set<I_Position> userViewPositions = null;
-        I_IntSet userViewStatuses;
-
-        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-
-        if (config != null) {
-            userViewPositions = config.getViewPositionSet();
-            userViewStatuses = config.getAllowedStatus();
-        } else {
-            userViewStatuses = termFactory.newIntSet();
-            userViewStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-        }
-
-        I_IntSet isARel = termFactory.newIntSet();
-
-        // get the appropriate is-a type (SNOMED or architectonic), based on
-        // "marked parent is-a type" rel
-        isARel.add(new RefsetUtilImpl().getMarkedParentIsARelationshipTarget(termFactory, memberRefset));
+    public Set<I_GetConceptData> getAllAncestors(I_GetConceptData concept, Condition... conditions) throws Exception {
 
         // find all the parents
         Set<I_GetConceptData> parentConcepts =
-                getAllAncestors(new HashSet<I_GetConceptData>(), concept, userViewStatuses, isARel, userViewPositions,
-                    conditions);
+                getAllAncestors(new HashSet<I_GetConceptData>(), concept, getAllowedStatuses(), getIsARelTypes(),
+                    getViewPositions(), conditions);
 
         logger.fine("Found " + parentConcepts.size() + " ancestors of concept '" + concept.getInitialText() + "'.");
 
@@ -823,7 +750,7 @@ public class RefsetHelper {
             throws Exception {
 
         ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
-            positions, false)) {
+            positions, false, true)) {
             I_GetConceptData parentConcept = termFactory.getConcept(childTuple.getC2Id());
             if (parentConcept.getConceptId() == child.getConceptId()) {
                 continue ITERATE_PARENTS;
@@ -843,6 +770,84 @@ public class RefsetHelper {
         return resultSet;
     }
 
+    /**
+     * @return The view positions from the active config.
+     *         Returns null if no config set or config contains no view
+     *         positions.
+     */
+    protected Set<I_Position> getViewPositions() throws Exception {
+        if (this.viewPositions == null) {
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+
+            if (config != null) {
+                this.viewPositions = config.getViewPositionSet();
+            }
+
+            if (this.viewPositions == null) {
+                this.viewPositions = new HashSet<I_Position>();
+            }
+        }
+
+        return (this.viewPositions.isEmpty()) ? null : this.viewPositions;
+    }
+
+    /**
+     * @return The edit paths from the active config.
+     *         Returns null if no config set or the config defines no paths for
+     *         editing.
+     */
+    protected Set<I_Path> getEditPaths() throws Exception {
+        if (this.editPaths == null) {
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+
+            if (config != null) {
+                this.editPaths = config.getEditingPathSet();
+            }
+
+            if (this.editPaths == null) {
+                this.editPaths = new HashSet<I_Path>();
+            }
+        }
+
+        return (this.editPaths.isEmpty()) ? null : this.editPaths;
+    }
+
+    /**
+     * @return The allowed status from the active config.
+     *         Returns just "CURRENT" if no config set.
+     */
+    protected I_IntSet getAllowedStatuses() throws Exception {
+        if (this.allowedStatuses == null) {
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+
+            if (config != null) {
+                this.allowedStatuses = config.getAllowedStatus();
+            } else {
+                this.allowedStatuses = termFactory.newIntSet();
+                this.allowedStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+            }
+        }
+
+        return this.allowedStatuses;
+    }
+
+    /**
+     * @return By default (unless overridden by a subclass) will provide both
+     *         the SNOMED and ArchitectonicAuxiliary IS_A concepts.
+     */
+    protected I_IntSet getIsARelTypes() throws Exception {
+        if (this.isARelTypes == null) {
+            this.isARelTypes = termFactory.newIntSet();
+            this.isARelTypes.add(SNOMED.Concept.IS_A.localize().getNid());
+            this.isARelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        }
+        return this.isARelTypes;
+    }
+
+    /**
+     * A simple template for logic that defines if a process should be executed
+     * on a particular subject (concept).
+     */
     public interface Condition {
         public boolean evaluate(I_GetConceptData concept) throws Exception;
     }
@@ -854,4 +859,5 @@ public class RefsetHelper {
     public void setConceptTypeId(int conceptTypeId) {
         this.conceptTypeId = conceptTypeId;
     }
+
 }
