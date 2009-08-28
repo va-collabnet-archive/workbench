@@ -133,7 +133,7 @@ public class ImportBaselineJarReader implements ActionListener {
 	public ImportBaselineJarReader(final Configuration riverConfig) {
 		try {
 			final File jarFile = FileDialogUtil
-					.getExistingFile("Select baseline jar file to import");
+					.getExistingFile("Select baseline jar file to import", null, null, config.getActiveFrame());
 			ProgressUpdator updater = new ProgressUpdator();
 			updater.activity.addActionListener(this);
 			ACE.threadPool.execute(new Runnable() {
@@ -247,7 +247,7 @@ public class ImportBaselineJarReader implements ActionListener {
 									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);
-									cdeFrame.setJMenuBar(cdePanel.createMenuBar());
+									cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
 
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);

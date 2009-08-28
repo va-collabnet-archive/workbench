@@ -159,7 +159,7 @@ public class JarWriter implements  ActionListener {
 	private void exportJar()
 			throws TaskFailedException {
 		try {
-			File jarFile = FileDialogUtil.getNewFile("Export all to new jar file");
+			File jarFile = FileDialogUtil.getNewFile("Export all to new jar file", null, aceConfig.getActiveFrame());
 			File tempDir = new File(UUID.randomUUID().toString());
 			tempDir.mkdirs();
 			File conceptFile = new File(tempDir, "concepts.ace");

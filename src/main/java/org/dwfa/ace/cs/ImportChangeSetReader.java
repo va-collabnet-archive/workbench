@@ -1,5 +1,6 @@
 package org.dwfa.ace.cs;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -111,19 +112,19 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
 	}
 
-	public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel) {
-		this(riverConfig);
+	public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel, Frame parentFrame) {
+		this(riverConfig, parentFrame);
 		this.secondaryProgressPanel = secondaryProgressPanel;
 	}
 
-	public ImportChangeSetReader(final Configuration riverConfig) {
+	public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame) {
 		try {
 			final File csFile = FileDialogUtil
 					.getExistingFile("Select Java Change Set to Import...", new FilenameFilter() {
 
 						public boolean accept(File dir, String name) {
 							return name.toLowerCase().endsWith(".jcs");
-						}});
+						}}, null, parentFrame);
 			ProgressUpdator updater = new ProgressUpdator();
 			updater.activity.addActionListener(this);
 			ACE.threadPool.execute(new Runnable() {
@@ -174,7 +175,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);
-									cdeFrame.setJMenuBar(cdePanel.createMenuBar());
+									cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
 
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);

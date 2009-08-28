@@ -55,9 +55,8 @@ public class AceListRenderer extends DefaultListCellRenderer {
 								I_GetConceptData concept = (I_GetConceptData) value;
 								I_ModelTerminologyList listModel = (I_ModelTerminologyList) list
 										.getModel();
-								if (listModel.getElementAt(index)
-										.getConceptId() == concept
-										.getConceptId()) {
+								I_GetConceptData another = listModel.getElementAt(index);
+								if (another != null && another.getConceptId() == concept.getConceptId()) {
 									listModel.removeElement(index);
 									AceLog.getAppLog().info(
 											"element " + concept.getConceptId() + 

@@ -30,7 +30,10 @@ public class TerminologyListModel extends AbstractListModel implements
 	}
 
 	public I_GetConceptData getElementAt(int index) {
-		return elements.get(index);
+		if (index >= 0 && index < elements.size()) {
+			return elements.get(index);
+		}
+		return null;
 	}
 
 	public int getSize() {

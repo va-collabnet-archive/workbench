@@ -184,7 +184,7 @@ public class AceFrame extends ComponentFrame {
 
 	@Override
 	public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
-		getCdePanel().addToMenuBar(mainMenuBar, cfb.getEditMenu());
+		getCdePanel().addToMenuBar(mainMenuBar, cfb.getEditMenu(), this);
 	}
 
 	/**

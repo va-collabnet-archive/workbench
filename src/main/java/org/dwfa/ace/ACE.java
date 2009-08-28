@@ -60,6 +60,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JList;
@@ -119,7 +120,6 @@ import org.dwfa.ace.checks.UncommittedListModel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
-import org.dwfa.ace.config.SelectPathAndPositionPanel;
 import org.dwfa.ace.config.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
@@ -1530,7 +1530,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
                 .getTabHistoryMap().get("viewerHistoryList"));
     }
 
-    public JMenuBar createMenuBar() throws LoginException, SecurityException,
+    public JMenuBar createMenuBar(JFrame frame) throws LoginException, SecurityException,
             ConfigurationException, IOException, PrivilegedActionException,
             IntrospectionException, InvocationTargetException,
             IllegalAccessException, PropertyVetoException,
@@ -1538,18 +1538,18 @@ public class ACE extends JPanel implements PropertyChangeListener,
         JMenuBar menuBar = new JMenuBar();
         JMenu editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
-        addToMenuBar(menuBar, editMenu);
+        addToMenuBar(menuBar, editMenu, frame);
         return menuBar;
     }
 
-    public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu)
+    public JMenuBar addToMenuBar(JMenuBar menuBar, JMenu editMenu, JFrame aceFrame)
             throws LoginException, SecurityException, ConfigurationException,
             IOException, PrivilegedActionException, IntrospectionException,
             InvocationTargetException, IllegalAccessException,
             PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
-        addFileMenu(menuBar);
-        addEditMenu(menuBar, editMenu);
+        addFileMenu(menuBar, aceFrame);
+        addEditMenu(menuBar, editMenu, aceFrame);
         ProcessPopupUtil.addProcessMenus(menuBar, pluginRoot, menuWorker);
 
         return menuBar;
@@ -1569,7 +1569,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
     	ProcessPopupUtil.addProcessMenuItems(menuBar, menuDir, menuWorker);
     }
 
-    private void addEditMenu(JMenuBar menuBar, JMenu editMenu) {
+    private void addEditMenu(JMenuBar menuBar, JMenu editMenu, JFrame aceFrame) {
         editMenu.removeAll();
         JMenuItem menuItem;
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -1618,7 +1618,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
         menuBar.add(editMenu);
     }
 
-    public void addFileMenu(JMenuBar menuBar) throws LoginException,
+    public void addFileMenu(JMenuBar menuBar, JFrame aceFrame) throws LoginException,
             ConfigurationException, IOException, PrivilegedActionException,
             SecurityException, IntrospectionException,
             InvocationTargetException, IllegalAccessException,
@@ -1632,7 +1632,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
              * fileMenu.add(menuItem); fileMenu.addSeparator();
              */
             menuItem = new JMenuItem("Import Java Changeset...");
-            menuItem.addActionListener(new ImportJavaChangeset(config));
+            menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame));
             fileMenu.add(menuItem);
             fileMenu.addSeparator();
             /*
@@ -1647,10 +1647,10 @@ public class ACE extends JPanel implements PropertyChangeListener,
             menuItem.addActionListener(new ChangeFramePassword(this));
             fileMenu.add(menuItem);
             menuItem = new JMenuItem("Save Profile");
-            menuItem.addActionListener(new SaveProfile());
+            menuItem.addActionListener(new SaveProfile(aceFrame));
             fileMenu.add(menuItem);
             menuItem = new JMenuItem("Save Profile As...");
-            menuItem.addActionListener(new SaveProfileAs());
+            menuItem.addActionListener(new SaveProfileAs(aceFrame));
             fileMenu.add(menuItem);
             menuBar.add(fileMenu);
         }

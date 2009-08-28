@@ -177,7 +177,7 @@ public class ImportUpdateJarReader implements ActionListener {
 	public ImportUpdateJarReader(final Configuration riverConfig) {
 		try {
 			final File jarFile = FileDialogUtil
-					.getExistingFile("Select update jar file to import");
+					.getExistingFile("Select update jar file to import", null, null, config.getActiveFrame());
 			ProgressUpdator updater = new ProgressUpdator();
 			updater.activity.addActionListener(this);
 			ACE.threadPool.execute(new Runnable() {
@@ -292,7 +292,7 @@ public class ImportUpdateJarReader implements ActionListener {
 									cdePanel.setup(ace);
 									JFrame cdeFrame = new JFrame(ace.getFrameName());
 									cdeFrame.setContentPane(cdePanel);
-									cdeFrame.setJMenuBar(cdePanel.createMenuBar());
+									cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
 
 									cdeFrame.setBounds(ace.getBounds());
 									cdeFrame.setVisible(true);

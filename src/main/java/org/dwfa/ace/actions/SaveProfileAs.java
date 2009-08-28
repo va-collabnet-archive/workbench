@@ -1,5 +1,6 @@
 package org.dwfa.ace.actions;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -10,10 +11,13 @@ import org.dwfa.fd.FileDialogUtil;
 
 public class SaveProfileAs implements ActionListener {
 
+	Frame parentFrame;
+	
+	
     public void actionPerformed(ActionEvent e) {
         try {
             File outFile = FileDialogUtil.getNewFile("Save profile as...",
-                                                     new File("profiles/default.ace"));
+                      new File("profiles/default.ace"), parentFrame);
             AceConfig.config.setProfileFile(outFile);
             AceConfig.config.save();
         } catch (Exception e1) {
@@ -21,5 +25,11 @@ public class SaveProfileAs implements ActionListener {
         }
 
     }
+
+
+	public SaveProfileAs(Frame parentFrame) {
+		super();
+		this.parentFrame = parentFrame;
+	}
 
 }

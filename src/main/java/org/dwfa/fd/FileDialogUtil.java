@@ -5,20 +5,12 @@ import java.awt.Frame;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import javax.swing.JFrame;
-
 import org.dwfa.bpa.process.TaskFailedException;
 
 public class FileDialogUtil {
-	public static File getNewFile(String frameTitle, File defaultFile) throws TaskFailedException {
-		return getNewFile(frameTitle, defaultFile, null);
-	}
 	
 	public static File getNewFile(String frameTitle, File defaultFile, Frame parentFrame) throws TaskFailedException {
 		// Create a file dialog box to prompt for a new file to display
-		if (parentFrame == null) {
-			parentFrame = new JFrame();
-		}
 		FileDialog f = new FileDialog(parentFrame, frameTitle,
 				FileDialog.SAVE);
 		if (defaultFile != null) {
@@ -38,21 +30,7 @@ public class FileDialogUtil {
 		
 	}
 	
-	public static File getNewFile(String frameTitle) throws TaskFailedException {
-		return getNewFile(frameTitle, null);
-	}
 	
-	public static File getExistingFile(String frameTitle) throws TaskFailedException {
-		return getExistingFile(frameTitle, null);
-	}
-	public static File getExistingFile(String frameTitle, FilenameFilter filter) throws TaskFailedException {
-		return getExistingFile(frameTitle, filter, null);
-	}
-
-	public static File getExistingFile(String frameTitle, FilenameFilter filter, File defaultDirectory) throws TaskFailedException {
-		// Create a file dialog box to prompt for a new file to display
-		return getExistingFile(frameTitle, filter, defaultDirectory, null);
-	}
 
 	public static File getExistingFile(String frameTitle, FilenameFilter filter, File defaultDirectory, Frame parentFrame) throws TaskFailedException {
 		// Create a file dialog box to prompt for a new file to display

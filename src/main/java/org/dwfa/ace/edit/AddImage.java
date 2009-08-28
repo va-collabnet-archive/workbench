@@ -19,6 +19,7 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -41,7 +42,7 @@ public class AddImage extends AddComponent {
 
 	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) throws Exception {
 			final File imageFile = FileDialogUtil
-					.getExistingFile("Select image file to associate with concept");
+					.getExistingFile("Select image file to associate with concept", null, null, ((AceFrameConfig) config).getAceFrame());
 			ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
 			int dotLoc = imageFile.getName().lastIndexOf('.');
 			String format = imageFile.getName().substring(dotLoc + 1);

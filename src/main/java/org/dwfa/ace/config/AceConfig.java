@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.swing.JFrame;
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -453,5 +455,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public void setProperty(String key, Object value) throws IOException {
 		properties.put(key, value);
+	}
+
+	public JFrame getActiveFrame() {
+		for (I_ConfigAceFrame f: aceFrames) {
+			if (f.isActive()) {
+				return ((AceFrameConfig) f).getAceFrame() ;
+			}
+		}
+		return null;
 	}
 }
