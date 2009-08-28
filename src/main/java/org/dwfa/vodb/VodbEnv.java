@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,8 +94,11 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.svn.Svn;
+import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -820,7 +824,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
         newBean.setUncommittedConceptAttributes(conceptAttributes);
         newBean.getUncommittedIds().add(nid);
-        ACE.addUncommitted(newBean);
+        addUncommitted((I_Transact)newBean);
         return newBean;
     }
 
@@ -835,7 +839,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig)
             throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
-        ACE.addUncommitted((I_Transact) concept);
+        addUncommitted((I_Transact) concept);
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
                 .getUids());
         int descId = uuidToNativeWithGeneration(newDescriptionId, idSource,
@@ -920,7 +924,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
         concept.getUncommittedSourceRels().add(rel);
         concept.getUncommittedIds().add(relId);
-        ACE.addUncommitted((I_Transact) concept);
+        addUncommitted((I_Transact) concept);
         return rel;
 
     }
@@ -965,7 +969,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
         concept.getUncommittedSourceRels().add(rel);
         concept.getUncommittedIds().add(relId);
-        ACE.addUncommitted((I_Transact) concept);
+        addUncommitted((I_Transact) concept);
         return rel;
 
     }
@@ -1882,5 +1886,64 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 		} catch (DatabaseException e) {
 			throw new ToIoException(e);
 		}
+	}
+	
+	private void addUncommitted(I_Transact to) {
+		if (isDataChecksSuppressed()) {
+			ACE.addUncommittedNoChecks(to);
+		} else {
+			ACE.addUncommitted(to);
+		}
+	}
+	
+	/**
+	 * If a class that is calling a method in this class defines the {@link AllowDataCheckSuppression} 
+	 * annotation then we will traverse back up the the call stack for a method that declares the 
+	 * {@link SuppressDataChecks} annotation. If found returns true.
+	 */
+	private boolean isDataChecksSuppressed() {
+		boolean suppressAllowed = false;
+		
+		for (StackTraceElement e : new Throwable().getStackTrace()) {
+			Class<?> elementClass;
+			try {
+				elementClass = Class.forName(e.getClassName());
+			} catch (ClassNotFoundException ex) {
+				throw new TerminologyRuntimeException("No class for " + e.getClassName(), ex);
+			}		
+			
+			// Skip this class
+			if (elementClass.equals(this.getClass())) {
+				continue;
+			}
+			
+			// Verify the immediate calling class (first time only) allows suppression
+			if (!suppressAllowed) {
+				AllowDataCheckSuppression allowAnnotation = 
+					elementClass.getAnnotation(AllowDataCheckSuppression.class);
+				
+				if (allowAnnotation != null) {
+					suppressAllowed = true;
+				} else {
+					return false;
+				}
+			}
+			
+			do {
+				for (Method m : elementClass.getDeclaredMethods()) {
+					if (m.getName().equals(e.getMethodName())) {
+						SuppressDataChecks annotation = m.getAnnotation(SuppressDataChecks.class);
+						if (annotation != null) {
+							return true;
+						}
+					}
+				}
+				// Check the superclass, if it exists, in case the method in inherited 
+				elementClass = elementClass.getSuperclass();
+			} while (elementClass != null);
+			
+		}
+		
+		return false;
 	}
 }
