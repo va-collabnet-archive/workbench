@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -46,7 +45,6 @@ import org.dwfa.queue.QueueServer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.VodbEnv;
-import org.tigris.subversion.javahl.ClientException;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -118,9 +116,19 @@ public class AceRunner {
 			boolean acePropertiesFileExists = acePropertiesFile.exists();
 			aceProperties = new Properties();
 
+			boolean initialized = false;
 			if (acePropertiesFileExists) {
 				aceProperties
 						.loadFromXML(new FileInputStream(acePropertiesFile));
+				initialized = Boolean.parseBoolean((String) aceProperties.get("initialized"));
+			}
+			if (acePropertiesFileExists == false || initialized == false) {
+				try {
+					new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
+				} catch (Exception ex) {
+					AceLog.getAppLog().alertAndLogException(ex);
+					System.exit(0);
+				}
 			}
 
 			aceProperties.put("initialized", "true");
@@ -136,15 +144,15 @@ public class AceRunner {
 
 			SvnPrompter prompter = new SvnPrompter();
 			if (aceConfigFile != null && aceConfigFile.exists() && acePropertiesFile.exists()) {
-				
+
 				// Put up a dialog to select the configuration file...
 				CountDownLatch latch = new CountDownLatch(1);
 				GetProfileWorker profiler = new GetProfileWorker(aceConfigFile, aceProperties, jiniConfig, latch);
 				profiler.start();
 				latch.await();
-				
+
 				aceConfigFile = profiler.aceConfigFile;
-				
+
 				ObjectInputStream ois = new ObjectInputStream(
 						new BufferedInputStream(new FileInputStream(
 								aceConfigFile)));
@@ -172,7 +180,7 @@ public class AceRunner {
 			AceConfig.config.addChangeSetWriters();
 			int successCount = 0;
 			int frameCount = 0;
-			
+
 			for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
 				frameCount++;
 				if (ace.isActive()) {
@@ -263,7 +271,7 @@ public class AceRunner {
 		private AceLoginDialog aceLoginDialog;
 		CountDownLatch latch;
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-		
+
 		public GetProfileWorker(File aceConfigFile, Properties aceProperties, Configuration jiniConfig, CountDownLatch latch) {
 			super();
 			parentFrame = new JFrame();
@@ -277,15 +285,15 @@ public class AceRunner {
 						public void run() {
 							parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
 							parentFrame.pack();
-							
+
 							parentFrame.setVisible(true);
-							parentFrame.setLocation((d.width/2) - (parentFrame.getWidth()/2), 
+							parentFrame.setLocation((d.width/2) - (parentFrame.getWidth()/2),
 									(d.height/2) - (parentFrame.getHeight()/2));
 							OpenFrames.addFrame(parentFrame);
 							AceLog.getAppLog().info("### Using a new frame");
 							newFrame = true;
 						}
-						
+
 					});
 				} catch (InterruptedException e) {
 					AceLog.getAppLog().alertAndLogException(e);
@@ -294,7 +302,7 @@ public class AceRunner {
 				}
 			}
 			aceLoginDialog = new AceLoginDialog(parentFrame);
-			aceLoginDialog.setLocation((d.width/2) - (aceLoginDialog.getWidth()/2), 
+			aceLoginDialog.setLocation((d.width/2) - (aceLoginDialog.getWidth()/2),
 					(d.height/2) - (aceLoginDialog.getHeight()/2));
 			this.aceConfigFile = aceConfigFile;
 			this.jiniConfig = jiniConfig;
@@ -334,7 +342,7 @@ public class AceRunner {
 						AceLog.getAppLog().info("### Adding a new frame 1");
 						newFrame = true;
 					}
-					
+
 				});
 			}
 			return true;
@@ -350,11 +358,7 @@ public class AceRunner {
 
 				aceProperties.setProperty("last-profile-dir", FileIO
 						.getRelativePath(aceConfigFile));
-				
-				new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(
-						new File("config", "ace.properties"), 
-						aceLoginDialog.connectToSvn());
-				
+
 				if (newFrame) {
 					OpenFrames.removeFrame(parentFrame);
 					parentFrame.setVisible(false);
@@ -362,18 +366,6 @@ public class AceRunner {
 				latch.countDown();
 				OpenFrames.removeFrameListener(fl);
 			} catch (TaskFailedException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-				System.exit(0);
-			} catch (ClientException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-				System.exit(0);
-			} catch (FileNotFoundException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-				System.exit(0);
-			} catch (ConfigurationException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-				System.exit(0);
-			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 				System.exit(0);
 			}
