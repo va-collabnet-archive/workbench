@@ -39,9 +39,10 @@ public interface I_TermFactory {
     public void setProperty(String key, String value) throws IOException;
 
     /**
-     * Return a map of all properties in the database. The returned map is unmodifiable. To
+     * Return a map of all properties in the database. The returned map is
+     * unmodifiable. To
      * set properties, use the <code>setProperty</code> method.
-     *
+     * 
      * @return an unmodifable map of the properties.
      * @throws IOException
      */
@@ -67,17 +68,20 @@ public interface I_TermFactory {
     /**
      * Find a concept using a textual identifier from a known identifier scheme
      * (it is known to be a UUID or an SCTID, etc)
-     *
+     * 
      * @param conceptId Any textual id, for instance a SNOMED CT ID or a UUID
-     * @param sourceId The native id of the source scheme concept, eg {@link ArchitectonicAuxiliary.Concept.SNOMED_INT_ID}
+     * @param sourceId The native id of the source scheme concept, eg
+     *            {@link ArchitectonicAuxiliary.Concept.SNOMED_INT_ID}
      * @throws TerminologyException if a suitable concept is not located
      */
-    public I_GetConceptData getConcept(String conceptId, int sourceId) throws TerminologyException, ParseException, IOException;
+    public I_GetConceptData getConcept(String conceptId, int sourceId) throws TerminologyException, ParseException,
+            IOException;
 
     /**
-     * Find concepts with a matching textual identifier where the identifier scheme/type is unknown.
+     * Find concepts with a matching textual identifier where the identifier
+     * scheme/type is unknown.
      * This may result in multiple matches.
-     *
+     * 
      * @param conceptId Any textual id, for instance a SNOMED CT id
      * @throws TerminologyException if no suitable concepts are located
      */
@@ -87,15 +91,15 @@ public interface I_TermFactory {
 
     public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang,
             String text, I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
-                IOException;
+            IOException;
 
     public I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang,
             String text, I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
-                IOException;
+            IOException;
 
     /**
      * Gets a description given a description native ID and a concept native ID
-     *
+     * 
      * @param dnid description native ID
      * @param cnid concept native ID
      * @return description matching the description and concept IDs
@@ -104,22 +108,23 @@ public interface I_TermFactory {
      */
     public I_DescriptionVersioned getDescription(int dnid, int cnid) throws TerminologyException, IOException;
 
-   /**
-    * Gets a description given a description ID
-    *
-    * @param descriptionId
-    * @return
-    * @throws TerminologyException
-    * @throws ParseException
-    * @throws IOException
-    */
-    I_DescriptionVersioned getDescription(String descriptionId) throws TerminologyException, ParseException, IOException;
+    /**
+     * Gets a description given a description ID
+     * 
+     * @param descriptionId
+     * @return
+     * @throws TerminologyException
+     * @throws ParseException
+     * @throws IOException
+     */
+    I_DescriptionVersioned getDescription(String descriptionId) throws TerminologyException, ParseException,
+            IOException;
 
     /**
      * Uses the configuration to set default values for the relationship, and
      * uses the currently selected concept in the hierarchy viewer as the
      * relationship destination.
-     *
+     * 
      * @param newRelUid
      * @param concept
      * @return
@@ -132,7 +137,7 @@ public interface I_TermFactory {
     /**
      * New relationship that <em>DOES NOT</em> use the default values set by
      * the configuration.
-     *
+     * 
      * @param newRelUid
      * @param concept
      * @param relType
@@ -145,8 +150,8 @@ public interface I_TermFactory {
      * @throws IOException
      */
     public I_RelVersioned newRelationship(UUID newRelUid, I_GetConceptData concept, I_GetConceptData relType,
-        I_GetConceptData relDestination, I_GetConceptData relCharacteristic, I_GetConceptData relRefinability,
-        I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
+            I_GetConceptData relDestination, I_GetConceptData relCharacteristic, I_GetConceptData relRefinability,
+            I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException;
 
     public LogWithAlerts getEditLog();
@@ -179,7 +184,7 @@ public interface I_TermFactory {
     public void addUncommittedNoChecks(I_ThinExtByRefVersioned extension);
 
     /**
-     *
+     * 
      * @return An unmodifiable set of uncommitted items.
      */
     public Set<I_Transact> getUncommitted();
@@ -209,7 +214,7 @@ public interface I_TermFactory {
     public void loadFromDirectory(File dataDir, String encoding) throws Exception;
 
     /**
-     *
+     * 
      * @param args
      * @throws Exception
      * @deprecated use loadFromSingleJar
@@ -284,13 +289,18 @@ public interface I_TermFactory {
     public I_IntList newIntList();
 
     public I_IdVersioned getId(int nid) throws TerminologyException, IOException;
+
     public I_IdVersioned getId(UUID uid) throws TerminologyException, IOException;
+
     public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException;
+
     public I_IdVersioned getAuthorityId() throws TerminologyException, IOException;
+
     public I_IdVersioned getPreviousAuthorityId() throws TerminologyException, IOException;
 
     /**
      * Delete any uncommitted changes.
+     * 
      * @throws IOException
      */
 
@@ -300,7 +310,7 @@ public interface I_TermFactory {
      * Turn off the writing of changes to change sets.
      * Typical usage is to call this method before importing
      * change sets so that the changes don't get duplicated.
-     *
+     * 
      */
     public void suspendChangeSetWriters();
 
@@ -309,22 +319,24 @@ public interface I_TermFactory {
      * Typical usage is to call this methods after completion
      * of importing change sets, so than user changes get
      * properly recorded.
-     *
+     * 
      */
     public void resumeChangeSetWriters();
 
     /**
-     *
+     * 
      * @return a new description part with all content uninitialized.
      */
     public I_DescriptionPart newDescriptionPart();
+
     /**
-     *
+     * 
      * @return a new concept attribute part with all content uninitialized.
      */
     public I_ConceptAttributePart newConceptAttributePart();
+
     /**
-     *
+     * 
      * @return a new relationship part with all content uninitialized.
      */
     public I_RelPart newRelPart();
@@ -346,65 +358,95 @@ public interface I_TermFactory {
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
 
     // TODO We need a method call that will include the concept id...
-    public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted) throws IOException;
+    public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
+            throws IOException;
 
-    // TODO getAllExtensionsForConcept() -- return all extensions of the concept, or any desc, rel, or ext of this concept...
+    // TODO getAllExtensionsForConcept() -- return all extensions of the
+    // concept, or any desc, rel, or ext of this concept...
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
+
     public I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId);
 
     public I_ThinExtByRefPartBoolean newBooleanExtensionPart();
+
     public I_ThinExtByRefPartConcept newConceptExtensionPart();
+
     public I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart();
+
     public I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart();
+
     public I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart();
+
     public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart();
+
     public I_ThinExtByRefPartConceptString newConceptStringExtensionPart();
+
     public I_ThinExtByRefPartInteger newIntegerExtensionPart();
+
     public I_ThinExtByRefPartLanguage newLanguageExtensionPart();
+
     public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
+
     public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart();
+
     public I_ThinExtByRefPartString newStringExtensionPart();
 
     public String getStats() throws IOException;
 
     /**
-     * Use of this call is discouraged for routine use. It is provided to allow more efficiency for some types of
-     * operations such as writing the results of a large computation such as a classification or a refset generation.
-     * It should not be used to bypass the transactional model for manually generated changes.
-     *
+     * Use of this call is discouraged for routine use. It is provided to allow
+     * more efficiency for some types of
+     * operations such as writing the results of a large computation such as a
+     * classification or a refset generation.
+     * It should not be used to bypass the transactional model for manually
+     * generated changes.
+     * 
      * @return
      */
     public I_WriteDirectToDb getDirectInterface();
 
-
     public boolean hasId(Collection<UUID> uids) throws IOException;
+
     public boolean hasId(UUID uid) throws IOException;
+
     public boolean hasImage(int imageId) throws IOException;
+
     public boolean hasPath(int nativeId) throws IOException;
+
     public boolean hasRel(int relId, int conceptId) throws IOException;
+
     public boolean hasDescription(int descId, int conceptId) throws IOException;
+
     public boolean hasConcept(int conceptId) throws IOException;
+
     public boolean hasExtension(int memberId) throws IOException;
 
     public boolean getTransactional();
+
     public void startTransaction() throws IOException;
+
     public void cancelTransaction() throws IOException;
+
     public void commitTransaction() throws IOException;
 
     /**
-     * @param displayInViewer If true, the activity will be lodged in the activity viewer window
+     * @param displayInViewer If true, the activity will be lodged in the
+     *            activity viewer window
      */
     public I_ShowActivity newActivityPanel(boolean displayInViewer);
 
     public I_HandleSubversion getSvnHandler();
-    
+
     /**
-     * Count of the number of concepts in the database. 
-     * The count may not be accurate in the face of concurrent update operations in the database
+     * Count of the number of concepts in the database.
+     * The count may not be accurate in the face of concurrent update operations
+     * in the database
+     * 
      * @return
      * @throws IOException
      */
     public int getConceptCount() throws IOException;
 
+    public void writeId(I_IdVersioned versioned) throws IOException;
 
 }
