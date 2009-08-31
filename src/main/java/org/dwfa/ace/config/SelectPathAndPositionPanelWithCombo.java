@@ -5,7 +5,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -80,8 +79,10 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 					.getTimePathList();
 			int modTimeCount = 0;
 			for (TimePathId tp : timePathEntries) {
-				if (tp.getPathId() == path.getConceptId()) {
-					modTimeCount++;
+				if (tp != null && path != null) {
+					if (tp.getPathId() == path.getConceptId()) {
+						modTimeCount++;
+					}
 				}
 			}
 			if (currentPositionPanel != null) {
