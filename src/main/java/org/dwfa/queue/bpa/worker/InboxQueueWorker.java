@@ -44,6 +44,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.core.transaction.Transaction;
 
+import org.apache.geronimo.javamail.store.pop3.POP3Folder;
 import org.dwfa.bpa.gui.I_ManageUserTransactions;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -60,7 +61,6 @@ import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
-import com.sun.mail.pop3.POP3Folder;
 
 
 /**
