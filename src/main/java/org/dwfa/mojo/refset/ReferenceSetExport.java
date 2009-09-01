@@ -44,9 +44,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
- * 
+ *
  * This mojo exports reference sets from an ACE database
- * 
+ *
  * @goal refset-export
  * @author Dion McMurtrie
  */
@@ -55,7 +55,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Whether to use RF2 for the export. If not, the alternate release format
      * will be used (this is also the default).
-     * 
+     *
      * @parameter
      */
     boolean useRF2 = false;
@@ -64,7 +64,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * RF2 Descriptor - this is required if useRF2 is set to true. This
      * describes the module, namespace, content sub type and country information
      * required to export in RF2.
-     * 
+     *
      * @parameter
      */
     RF2Descriptor rf2Descriptor;
@@ -80,7 +80,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * A then none of the reference set will be exported. However if the export
      * spec does include A, but not C then the reference set will be exported
      * except it will only have members B and D - C will be omitted.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -88,7 +88,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Defines the directory to which the UUID based reference sets are exported
-     * 
+     *
      * @parameter
      * @required
      */
@@ -97,7 +97,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Defines the directory to which the SCTID based reference sets are
      * exported
-     * 
+     *
      * @parameter
      * @required
      */
@@ -105,7 +105,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Directory where the fixed SCTID map is located
-     * 
+     *
      * @parameter
      * @required
      */
@@ -113,7 +113,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Directory where the read/write SCTID maps are stored
-     * 
+     *
      * @parameter
      * @required
      */
@@ -122,7 +122,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Release version used to embed in the refset file names - if not specified
      * then the "path version" reference set is used to determine the version
-     * 
+     *
      * @parameter
      */
     String releaseVersion;
