@@ -2,6 +2,7 @@ package org.dwfa.util;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ResourceBundle;
 import java.util.logging.Filter;
@@ -10,10 +11,17 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.bpa.util.OpenFrames;
+
 public class LogWithAlerts {
+	
+	
+	
 	Logger logger;
 	
 	public LogWithAlerts(String logName) {
@@ -24,7 +32,6 @@ public class LogWithAlerts {
 	public Logger getLogger() {
 		return logger;
 	}
-
 	public void alertAndLogException(Component parent, Throwable ex) {
 		alertAndLog(parent, Level.SEVERE, ex.getLocalizedMessage(), ex);
 	}
@@ -38,12 +45,12 @@ public class LogWithAlerts {
 			final Level level, final String message, 
 			final Throwable ex) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			alertAndLogPrivate(parent, level, message, ex); 
+			alertAndLogPrivate(getActiveFrame(parent), level, message, ex); 
 		} else {
 	        try {
 	            SwingUtilities.invokeAndWait(new Runnable() {
 	              public void run() {
-	        		alertAndLogPrivate(parent, level, message, ex); 
+	        		alertAndLogPrivate(getActiveFrame(parent), level, message, ex); 
 	              }
 	              
 	            });
@@ -98,6 +105,7 @@ public class LogWithAlerts {
 		
 	}
 
+	private static JFrame activeFrame;
 	public static Component getActiveFrame(Component parent) {
 		if (parent == null) {
 			for (Frame f: Frame.getFrames()) {
@@ -107,11 +115,42 @@ public class LogWithAlerts {
 				}
 			}
 			if (parent == null) {
-				Logger.global.log(Level.WARNING, "cannot find active parent frame");
+				if (SwingUtilities.isEventDispatchThread()) {
+					setupActiveFrame();
+				} else {
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							public void run() {
+								setupActiveFrame();
+							}
+						});
+					} catch (InterruptedException e) {
+						Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+					} catch (InvocationTargetException e) {
+						Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+					}
+				}
 			}
 		}
-		return parent;
+		if (parent != null) {
+			return parent;
+		} else {
+			return activeFrame;
+		}
 	}
+
+	private static void setupActiveFrame() {
+		if (activeFrame == null) {
+			activeFrame = new JFrame();
+			activeFrame.setContentPane(new JLabel("Startup..."));
+			activeFrame.pack();
+			activeFrame.setVisible(true);
+			activeFrame.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width/2) - 10,
+					(Toolkit.getDefaultToolkit().getScreenSize().height/2) - 10);
+			OpenFrames.addFrame(activeFrame);
+		}
+	}
+
 	public void addHandler(Handler arg0) throws SecurityException {
 		getLogger().addHandler(arg0);
 	}

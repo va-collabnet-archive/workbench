@@ -526,14 +526,14 @@ public class ComponentFrameBean implements ActionListener,
   }
 
   public void windowActivated(WindowEvent e) {
-    System.out.println("ComponentFrameBean: windowActivated()");
+    System.out.println("ComponentFrameBean: windowActivated() " + frame.getTitle());
     if (PhantomFrame.class.isAssignableFrom(frame.getClass()) == false) {
       OpenFrames.addFrame(frame);
     }
   }
 
   public void windowDeactivated(WindowEvent e) {
-    System.out.println("ComponentFrameBean: windowDeactivated()");
+    System.out.println("ComponentFrameBean: windowDeactivated() " + frame.getTitle());
     OpenFrames.removeFrame(null);
   }
 

@@ -27,8 +27,9 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
 
   public PhantomFrame(String[] args, LifeCycle lc) throws Exception {
     super(args, lc, true);
+    this.setName("Phantom Frame");
     JLabel l = new JLabel(
-        "<html>This window shows up to give access to a menu bar<p>when all the other windows have closed...");
+        "<html>This window shows up to give access to a menu bar<p>when no other windows are showing...");
     l.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     this.add(l);
     this.pack();

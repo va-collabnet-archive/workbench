@@ -5,13 +5,18 @@
  */
 package org.dwfa.bpa.util;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -26,11 +31,21 @@ public class OpenFrames implements PropertyChangeListener {
 
     private static OpenFrames singleton = new OpenFrames();
     
+    static {
+    	try {
+    		if (GraphicsEnvironment.isHeadless() == false) {
+    			singleton.addFrame(new PhantomFrame(null, null));
+    		}
+		} catch (Exception e) {
+			Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+		}
+    }
+    
 	private Collection<JFrame> frames;
     
     private Collection<I_InitComponentMenus> newWindowMenuItemGenerators;
 
-	private Collection<ListDataListener> frameListeners = new ArrayList<ListDataListener>();
+	private Collection<ListDataListener> frameListeners = Collections.synchronizedList(new ArrayList<ListDataListener>());
     
     private static class FrameComparator implements Comparator<JFrame> {
         
@@ -69,10 +84,14 @@ public class OpenFrames implements PropertyChangeListener {
     }
 
 	public static synchronized void addFrame(JFrame frame) {
-        singleton.frames.add(frame);
-        frame.addPropertyChangeListener("title", singleton);
-        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.INTERVAL_ADDED,  0,  getNumOfFrames());
-        singleton.fireIntervalAdded(lde);
+		if (frame.getName().equals("Phantom Frame") && singleton.frames.size() > 0) {
+			// Don't add a second phantom frame...
+		} else {
+	        singleton.frames.add(frame);
+	        frame.addPropertyChangeListener("title", singleton);
+	        ListDataEvent lde = new ListDataEvent(singleton,  ListDataEvent.INTERVAL_ADDED,  0,  getNumOfFrames());
+	        singleton.fireIntervalAdded(lde);
+		}
     }
 
 	public static synchronized void removeFrame(JFrame frame) {
@@ -92,7 +111,12 @@ public class OpenFrames implements PropertyChangeListener {
 	 * @param l
 	 */
 	public static void addFrameListener(ListDataListener l) {
-        singleton.frameListeners.add(l);
+		if (PhantomFrame.class.isAssignableFrom(l.getClass()) && 
+				singleton.frameListeners.size() > 0) {
+			// Don't add a second phantom frame...
+		} else {
+			singleton.frameListeners.add(l);
+		}
 	}
 
 	/**
@@ -100,7 +124,9 @@ public class OpenFrames implements PropertyChangeListener {
 	 * @param l
 	 */
 	public static void removeFrameListener(ListDataListener l) {
-        singleton.frameListeners.remove(l);
+    	synchronized (singleton.frameListeners) {
+    		singleton.frameListeners.remove(l);
+		}
 	}
 
 	//   Notify all listeners that have registered interest for
@@ -109,21 +135,27 @@ public class OpenFrames implements PropertyChangeListener {
 	// the fire method.
 
 	protected void fireContentsChanged(ListDataEvent e) {
-        for (ListDataListener l: frameListeners) {
-            l.contentsChanged(e);
-        }
+    	synchronized (frameListeners) {
+            for (ListDataListener l: frameListeners) {
+                l.contentsChanged(e);
+            }
+		}
 	}
     
     protected void fireIntervalAdded(ListDataEvent e) {
-        for (ListDataListener l: frameListeners) {
-            l.intervalAdded(e);
-        }
+    	synchronized (frameListeners) {
+            for (ListDataListener l: frameListeners) {
+                l.intervalAdded(e);
+            }
+		}
     }
     
     protected void fireIntervalRemoved(ListDataEvent e) {
-        for (ListDataListener l: frameListeners) {
-            l.intervalRemoved(e);
-        }
+    	synchronized (frameListeners) {
+            for (ListDataListener l: frameListeners) {
+                l.intervalRemoved(e);
+            }
+		}
     }
 
 
