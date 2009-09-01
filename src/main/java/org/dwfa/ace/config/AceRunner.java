@@ -147,8 +147,6 @@ public class AceRunner {
 			}
 			
 			
-			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "About to start");
-			
 			SvnPrompter prompter = new SvnPrompter();
 			File profileDir = new File("profiles");
 			if (profileDir.exists() == false) {
