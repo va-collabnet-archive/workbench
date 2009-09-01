@@ -22,6 +22,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.util.LogWithAlerts;
 
 public class ProcessPopupUtil {
 
@@ -54,7 +55,7 @@ public class ProcessPopupUtil {
 				} catch (Exception ex) {
 
 					worker.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
 							"<html>Exception processing action: " + action
 									+ "<p><p>" + ex.getMessage()
 									+ "<p><p>See log for details.");

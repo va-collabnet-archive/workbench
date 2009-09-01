@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.jini.JiniManager;
+import org.dwfa.util.LogWithAlerts;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -122,7 +123,7 @@ public class AceReadOnlyRunner {
          // Execute startup processes here...
 
          if (successCount == 0) {
-            JOptionPane.showMessageDialog(null, "No frames where opened. Now exiting.", "No successful logins...",
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "No frames where opened. Now exiting.", "No successful logins...",
                   JOptionPane.ERROR_MESSAGE);
             System.exit(0);
          }

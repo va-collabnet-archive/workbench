@@ -159,6 +159,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -207,7 +208,7 @@ public class ACE extends JPanel implements PropertyChangeListener,
                 } catch (Exception ex) {
 
                     worker.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(null,
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "<html>Exception processing action: " + action
                                     + "<p><p>" + ex.getMessage()
                                     + "<p><p>See log for details.");

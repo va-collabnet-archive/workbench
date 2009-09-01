@@ -1,5 +1,6 @@
 package org.dwfa.ace.config;
 
+import java.awt.Frame;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,6 +28,7 @@ import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.SelectObjectDialog;
 import org.dwfa.svn.Svn;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.VodbEnv;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
@@ -126,7 +128,7 @@ class AceSvn {
 				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
 			boolean connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
 					.showConfirmDialog(
-							null,
+							LogWithAlerts.getActiveFrame(null),
 							"Would you like to connect over the network to Subversion?",
 							"Confirm network operation",
 							JOptionPane.YES_NO_OPTION));

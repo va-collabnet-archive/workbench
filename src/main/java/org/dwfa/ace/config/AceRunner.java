@@ -2,6 +2,7 @@ package org.dwfa.ace.config;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -43,6 +44,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.VodbEnv;
 
@@ -65,7 +67,7 @@ public class AceRunner {
 					// all ok
 				} else {
 					JOptionPane
-							.showMessageDialog(null, "<html>Your ip address ("
+							.showMessageDialog(LogWithAlerts.getActiveFrame(null), "<html>Your ip address ("
 									+ currentLocalHost.toString()
 									+ ") <br> has changed since startup ("
 									+ startupLocalHost.toString()
@@ -87,6 +89,7 @@ public class AceRunner {
 	public Configuration jiniConfig;
 	public File aceConfigFile;
 	public Properties aceProperties;
+	public Boolean initializeFromSubversion = false;
 
 	public AceRunner(String[] args, LifeCycle lc) {
 		try {
@@ -132,17 +135,28 @@ public class AceRunner {
 			}
 
 			aceProperties.put("initialized", "true");
+			
 			if (jiniConfig != null) {
 				aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
 						.getName(), "aceConfigFile", File.class, new File(
 						"config/config.ace"));
+				initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass()
+						.getName(), "initFromSubversion", Boolean.class, Boolean.FALSE);
 			} else {
 				aceConfigFile = new File("config/config.ace");
 			}
-			aceProperties.storeToXML(
-					new FileOutputStream(acePropertiesFile), null);
-
+			
+			
+			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "About to start");
+			
 			SvnPrompter prompter = new SvnPrompter();
+			File profileDir = new File("profiles");
+			if (profileDir.exists() == false) {
+				new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(
+						new File("config", "ace.properties"), 
+						true);
+			}
+
 			if (aceConfigFile != null && aceConfigFile.exists() && acePropertiesFile.exists()) {
 
 				// Put up a dialog to select the configuration file...
@@ -164,15 +178,19 @@ public class AceRunner {
 				prompter.setUsername(AceConfig.config.getUsername());
 				prompter.setPassword(profiler.getPassword());
 			} else {
-				File dbFolder = new File("berkeley-db");
-				if (jiniConfig != null) {
-					dbFolder = (File) jiniConfig.getEntry(this.getClass()
-							.getName(), "dbFolder", File.class, new File(
-							"target/berkeley-db"));
+				if (initializeFromSubversion) {
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unable to initialize from subversion. Is the network connected?");
+				} else {
+					File dbFolder = new File("berkeley-db");
+					if (jiniConfig != null) {
+						dbFolder = (File) jiniConfig.getEntry(this.getClass()
+								.getName(), "dbFolder", File.class, new File(
+								"target/berkeley-db"));
+					}
+					AceConfig.config = new AceConfig(dbFolder);
+					AceConfig.config.setProfileFile(aceConfigFile);
+					AceConfig.setupAceConfig(AceConfig.config, null, null, false);
 				}
-				AceConfig.config = new AceConfig(dbFolder);
-				AceConfig.config.setProfileFile(aceConfigFile);
-				AceConfig.setupAceConfig(AceConfig.config, null, null, false);
 			}
 			aceProperties.storeToXML(new FileOutputStream(acePropertiesFile),
 					null);
@@ -221,7 +239,7 @@ public class AceRunner {
 			}
 
 			if (successCount == 0) {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
 						"No frames where opened. Now exiting.",
 						"No successful logins...", JOptionPane.ERROR_MESSAGE);
 				System.exit(0);

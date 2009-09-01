@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.VodbEnv;
 
 public class SvnLog {
@@ -182,7 +183,7 @@ public class SvnLog {
 
 		public static void alertAndLog(Exception e) {
 			if (VodbEnv.headless == false) {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
 					    "<html>" + e.getMessage() + 
 					    "<br>See log for more details",
 					    "Subversion Exception",
