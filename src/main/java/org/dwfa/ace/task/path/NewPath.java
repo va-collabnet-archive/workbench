@@ -169,11 +169,11 @@ private static final long serialVersionUID = 1L;
    }
 
    public TermEntry getParentPathTermEntry() {
-      return originPathTermEntry;
+      return parentPathTermEntry;
    }
 
    public void setParentPathTermEntry(TermEntry parentPath) {
-      this.originPathTermEntry = parentPath;
+      this.parentPathTermEntry = parentPath;
    }
 
    public String getProfilePropName() {
