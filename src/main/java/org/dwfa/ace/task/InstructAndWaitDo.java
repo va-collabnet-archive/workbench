@@ -44,6 +44,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -468,11 +469,11 @@ public class InstructAndWaitDo extends AbstractTask {
 	protected I_GetConceptData getSelectedConcept() throws IOException {
 		List<I_GetConceptData> cons = getSelectedConcepts();
 		if (cons.size() == 0) {
-			JOptionPane.showMessageDialog(null, "Please select a concept");
+			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Please select a concept");
 			return null;
 		}
 		if (cons.size() != 1) {
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
 					"Please select only one concept");
 			return null;
 		}

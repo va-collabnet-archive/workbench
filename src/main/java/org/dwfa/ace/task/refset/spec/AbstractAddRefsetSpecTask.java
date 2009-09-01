@@ -26,6 +26,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
     /**
@@ -68,7 +69,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     .getActiveAceFrameConfig();
             if (configFrame.getEditingPathSet().size() == 0) {
                 String msg = "Unable to add spec. Editing path set is empty.";
-                JOptionPane.showMessageDialog(null, msg);
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                 throw new TaskFailedException(msg);
             }
 
@@ -116,7 +117,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     configFrame.fireRefsetSpecChanged(ext);
                 } else {
                     String msg = "Unable to add spec. Selected parent must be a branching spec.";
-                    JOptionPane.showMessageDialog(null, msg);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                     throw new TaskFailedException(msg);
                 }
             } else {

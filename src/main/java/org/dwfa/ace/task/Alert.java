@@ -11,6 +11,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -63,7 +64,7 @@ public class Alert extends AbstractTask {
 			readProperty = "";
 		}
 		
-		JOptionPane.showMessageDialog(null, alertText + readProperty, "", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), alertText + readProperty, "", JOptionPane.WARNING_MESSAGE);
 		
 		return Condition.CONTINUE;
 	}

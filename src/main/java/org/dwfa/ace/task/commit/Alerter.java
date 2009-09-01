@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.util.LogWithAlerts;
 
 public class Alerter  {
     private Logger log;
@@ -67,7 +68,7 @@ public class Alerter  {
         		": " + alert.getAlertMessage());
     }
     private void presentAlert() throws Exception {
-        JOptionPane.showMessageDialog(null, alert.getAlertMessage(),
+        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), alert.getAlertMessage(),
                                       "Commit test failed: ",
                                       JOptionPane.ERROR_MESSAGE);
         
