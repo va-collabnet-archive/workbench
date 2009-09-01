@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.util.LogWithAlerts;
 
 public class ProcessMenuActionListener implements ActionListener {
     private class MenuProcessThread implements Runnable {
@@ -50,7 +51,7 @@ public class ProcessMenuActionListener implements ActionListener {
 
                 worker.getLogger().log(Level.SEVERE, ex.getMessage(),
                         ex);
-                JOptionPane.showMessageDialog(null, "<html>Exception processing action: " + 
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "<html>Exception processing action: " + 
                         action + "<p><p>" + 
                         ex.getMessage() + "<p><p>See log for details.");
             }
