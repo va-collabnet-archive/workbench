@@ -104,14 +104,18 @@ private static final long serialVersionUID = 1L;
             origins.add(tf.newPosition(originPath, tf.convertToThinVersion(originTime)));
 
             I_Path editPath = tf.newPath(origins, newPathConcept);
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	          if (profile == null) {
-	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	          }
-            profile.getEditingPathSet().clear();
-            profile.addEditingPath(editPath);
-            profile.getViewPositionSet().clear();
-            profile.addViewPosition(tf.newPosition(editPath, Integer.MAX_VALUE));
+            
+            if (!isEmpty(profilePropName)) {
+                I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+    	          if (profile == null) {
+    	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+    	          }
+                profile.getEditingPathSet().clear();
+                profile.addEditingPath(editPath);
+                profile.getViewPositionSet().clear();
+                profile.addViewPosition(tf.newPosition(editPath, Integer.MAX_VALUE));
+            }
+            
             tf.commit();
 
          } catch (Exception e) {
@@ -126,7 +130,11 @@ private static final long serialVersionUID = 1L;
    }
    
    
-   protected static I_GetConceptData createComponents(String Description, I_TermFactory tf, I_ConfigAceFrame activeProfile, 
+   private boolean isEmpty(String value) {    
+       return ((value == null) || (value.trim().isEmpty())); 
+   }
+
+protected static I_GetConceptData createComponents(String Description, I_TermFactory tf, I_ConfigAceFrame activeProfile, 
 		   TermEntry parent ) throws NoSuchAlgorithmException, UnsupportedEncodingException, TerminologyException, IOException {
 	      
 	      UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, Description);

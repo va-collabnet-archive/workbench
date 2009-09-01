@@ -21,7 +21,7 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             profilePropName.setBound(true);
             profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             profilePropName.setDisplayName("<html><font color='green'>profile property:");
-            profilePropName.setShortDescription("The property containing the profile to set the editing path to the created path.");
+            profilePropName.setShortDescription("The property containing the profile which will be set to view and edit the newly created path. Leave blank to ignore.");
 
 
           
