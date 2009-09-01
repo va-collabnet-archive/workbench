@@ -17,7 +17,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.file.IterableFileReader;
@@ -71,7 +74,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * String representation of the tuple in Release Format 2.
-     * 
+     *
      * @param tf
      * @param tuple
      *            extension part to format
@@ -84,36 +87,92 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      */
     public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
             int componentId, boolean sctId) throws TerminologyException, IOException {
+        String formattedLine = getRefsetAndReferencePart(tf, part, memberId, refsetNid, componentId, sctId);
 
         try {
-
             if (part instanceof I_ThinExtByRefPartConcept) {
                 I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
-                Collection<UUID> statusUuids = tf.getUids(conceptPart.getStatusId());
-                String id = getMemberId(memberId, sctId, componentId, refsetNid);
-                // String id = toId(tf, memberId, sctId);
-                String effectiveDate = getDate(tf, conceptPart.getVersion());
-                boolean active = isActiveStatus(statusUuids);
-                String moduleId = toId(tf, getModule().getConceptId(), sctId);
-                String refsetId = toId(tf, refsetNid, sctId);
-                String referencedComponentId = toId(tf, componentId, sctId);
-                String conceptId = toId(tf, conceptPart.getC1id(), sctId);
 
-                return id + FILE_DELIMITER + effectiveDate + FILE_DELIMITER + active + FILE_DELIMITER + moduleId
-                    + FILE_DELIMITER + refsetId + FILE_DELIMITER + referencedComponentId + FILE_DELIMITER + conceptId;
+                formattedLine += toId(tf, conceptPart.getC1id(), sctId);
+            } else if (part instanceof I_ThinExtByRefPartString) {
+                I_ThinExtByRefPartString stringPart = (I_ThinExtByRefPartString) part;
+
+                formattedLine += stringPart.getStringValue();
+            } else if (part instanceof I_ThinExtByRefPartInteger) {
+                I_ThinExtByRefPartInteger stringPart = (I_ThinExtByRefPartInteger) part;
+
+                formattedLine += stringPart.getValue();
+            } else if (part instanceof I_ThinExtByRefPartBoolean) {
+                I_ThinExtByRefPartBoolean stringPart = (I_ThinExtByRefPartBoolean) part;
+
+                formattedLine += stringPart.getValue();
             } else {
-                throw new Exception("Part is not of type concept ext " + part);
+                throw new Exception("No known refset format type for this extension " + part.getClass().getName());
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
         }
+
+        return formattedLine;
+    }
+
+    /**
+     * Returns the first 6 columns for a refset file.
+     *
+     * @param tf I_TermFactory DB access
+     * @param part I_ThinExtByRefPart the concept extension
+     * @param memberId Integer member id, may be null or not exists in the DB.
+     * @param refsetNid int refset id
+     * @param componentId int referenced component id
+     * @param useSctId boolean use a new sct ids
+     *
+     * @return RF2 formatted refset line except the annotation/concept
+     * @throws TerminologyException DB errors
+     * @throws IOException DB errors
+     */
+    private String getRefsetAndReferencePart(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId,
+            int refsetNid, int componentId, boolean useSctId) throws TerminologyException, IOException {
+        StringBuffer formattedLine = new StringBuffer();
+
+        Collection<UUID> statusUuids = tf.getUids(part.getStatusId());
+        String id = getMemberId(memberId, useSctId, componentId, refsetNid);
+        String effectiveDate = getDate(tf, part.getVersion());
+        boolean active = isActiveStatus(statusUuids);
+        String moduleId = toId(tf, getModule().getConceptId(), useSctId);
+        String refsetId = toId(tf, refsetNid, useSctId);
+        String referencedComponentId = toId(tf, componentId, useSctId);
+
+        formattedLine.append(id);
+        formattedLine.append(FILE_DELIMITER);
+        formattedLine.append(effectiveDate);
+        formattedLine.append(FILE_DELIMITER);
+        formattedLine.append(((active) ? 1 : 0));
+        formattedLine.append(FILE_DELIMITER);
+        formattedLine.append(moduleId);
+        formattedLine.append(FILE_DELIMITER);
+        formattedLine.append(refsetId);
+        formattedLine.append(FILE_DELIMITER);
+        formattedLine.append(referencedComponentId);
+        formattedLine.append(FILE_DELIMITER);
+
+        return formattedLine.toString();
+    }
+
+    public static boolean isActiveStatus(Collection<UUID> statusUuids) {
+        boolean active;
+        int activeId = ArchitectonicAuxiliary.getSnomedConceptStatusId(statusUuids);
+        if (activeId == 0) {
+            active = true;
+        } else {
+            active = false;
+        }
+        return active;
     }
 
     /**
      * String representation of the refset tuple as a subset.
-     * 
+     *
      * @param tf
      * @param tuple
      *            extension part to format
@@ -158,17 +217,6 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         return toId(tf, refsetNid, true);
     }
 
-    public static boolean isActiveStatus(Collection<UUID> statusUuids) {
-        boolean active;
-        int activeId = ArchitectonicAuxiliary.getSnomedConceptStatusId(statusUuids);
-        if (activeId == 0) {
-            active = true;
-        } else {
-            active = false;
-        }
-        return active;
-    }
-
     /**
      * @return the header line for the refset file of this type in RF2
      */
@@ -188,7 +236,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
             int componentId, boolean sctId) throws TerminologyException, IOException {
         return getMemberId(memberId, sctId, componentId, refsetId) + FILE_DELIMITER
             + toId(tf, tuple.getPathId(), sctId) + FILE_DELIMITER + getDate(tf, tuple.getVersion()) + FILE_DELIMITER
-            + toId(tf, tuple.getStatus(), sctId) + FILE_DELIMITER + toId(tf, refsetId, sctId) + FILE_DELIMITER
+            + toId(tf, tuple.getStatusId(), sctId) + FILE_DELIMITER + toId(tf, refsetId, sctId) + FILE_DELIMITER
             + toId(tf, componentId, sctId);
     }
 
@@ -278,7 +326,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     protected void setGenericExtensionPartFields(I_ThinExtByRefPart part) throws Exception {
         part.setPathId(getNid((UUID) currentRow.get(MemberRefsetHandler.PATH_ID)));
-        part.setStatus(getNid((UUID) currentRow.get(MemberRefsetHandler.STATUS_ID)));
+        part.setStatusId(getNid((UUID) currentRow.get(MemberRefsetHandler.STATUS_ID)));
         part.setVersion((Integer) currentRow.get(MemberRefsetHandler.VERSION));
     }
 
