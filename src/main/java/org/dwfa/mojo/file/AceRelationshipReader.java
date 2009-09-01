@@ -14,11 +14,11 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
     public AceRelationshipReader(File file) {
         setSourceFile(file);
     }
-    
+
     @Override
     protected AceRelationshipRow processLine(String line) {
         AceRelationshipRow aceDescriptionRow;
-        
+
         try {
             aceDescriptionRow = new AceRelationshipRow(line);
         } catch (IndexOutOfBoundsException ex) {
@@ -28,12 +28,12 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
             logger.info("Cannot process line:" + ex);
             throw new TerminologyRuntimeException(ex);
         }
-        
+
         return aceDescriptionRow;
     }
 
     /**
-     * Ace description file line. 
+     * Ace description file line.
      *
      */
     public class AceRelationshipRow {
@@ -55,16 +55,16 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
         String effectiveTime;
         String pathUuid;
         String statusUuid;
-        
+
         /**
          * Default constructor.
          */
         public AceRelationshipRow() {
         }
-        
+
         /**
          * Creates a AceDescriptionRow from an ace line.
-         * 
+         *
          * @param line From an ace concept file
          * @throws TerminologyException if not in the correct format.
          */
@@ -346,9 +346,9 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
             this.statusUuid = statusUuid;
         }
 
-        
+
         /**
-         * 
+         *
         <columnSpecs>
             <!-- 0 -->
             <transform implementation="org.dwfa.maven.transform.UuidToSctRelIdWithGeneration">
