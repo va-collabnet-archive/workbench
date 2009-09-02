@@ -82,7 +82,7 @@ public class SaveNewProfile extends AbstractTask {
 			I_ConfigAceDb newDbProfile = profileToSave.getDbConfig();
 
 			String workingCopyStr = FileIO
-					.getNormalizedRelativePath(creatorsProfileFile);
+					.getNormalizedRelativePath(creatorsProfileFile.getParentFile());
 
 			String userDirStr = "profiles" + File.separator
 					+ profileToSave.getUsername();
@@ -102,6 +102,11 @@ public class SaveNewProfile extends AbstractTask {
 				String sequenceToFind = "src/main/profiles/";
 				int sequenceLocation = creatorSvd.getRepositoryUrlStr()
 						.indexOf(sequenceToFind);
+				if (sequenceLocation == -1) {
+					sequenceToFind = "src/main/resources/profiles/";
+					sequenceLocation = creatorSvd.getRepositoryUrlStr()
+					.indexOf(sequenceToFind);
+				}
 				int sequenceEnd = sequenceLocation + sequenceToFind.length();
 				String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr()
 						.substring(0, sequenceEnd);
