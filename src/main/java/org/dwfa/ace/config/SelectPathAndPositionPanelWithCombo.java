@@ -75,6 +75,9 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 	public void actionPerformed(ActionEvent evt) {
 		try {
 			I_Path path = (I_Path) pathCombo.getSelectedItem();
+			if (path == null) {
+				return;
+			}
 			List<TimePathId> timePathEntries = AceConfig.getVodb()
 					.getTimePathList();
 			int modTimeCount = 0;
