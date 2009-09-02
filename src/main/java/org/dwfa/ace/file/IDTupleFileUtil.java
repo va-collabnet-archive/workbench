@@ -48,7 +48,7 @@ public class IDTupleFileUtil {
 
             UUID primaryUuid = UUID.fromString(lineParts[1]);
             UUID sourceSystemUuid = UUID.fromString(lineParts[2]);
-            Object sourceId = lineParts[3];
+            String sourceId = lineParts[3];
 
             UUID pathUuid = UUID.fromString(lineParts[4]);
             UUID statusUuid = UUID.fromString(lineParts[5]);
@@ -59,19 +59,25 @@ public class IDTupleFileUtil {
                     ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNativeId(), termFactory
                     .getPath(new UUID[] { pathUuid }), effectiveDate);
 
-                if (!sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator()
+                I_IdVersioned versioned = termFactory.getId(primaryUuid);
+                I_IdPart part = versioned.getVersions().get(0).duplicate();
+                part.setStatusId(termFactory.uuidToNative(statusUuid));
+                part.setPathId(termFactory.uuidToNative(pathUuid));
+                part.setSource(termFactory.uuidToNative(sourceSystemUuid));
+                part.setVersion(effectiveDate);
+                if (sourceSystemUuid
+                    .equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
+                    part.setSourceId(UUID.fromString(sourceId));
+                } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator()
                     .next())) {
-                    I_IdVersioned versioned = termFactory.getId(primaryUuid);
-                    I_IdPart part = versioned.getVersions().get(0).duplicate();
-                    part.setStatusId(termFactory.uuidToNative(statusUuid));
-                    part.setPathId(termFactory.uuidToNative(pathUuid));
-                    part.setSource(termFactory.uuidToNative(sourceSystemUuid));
-                    part.setSourceId(sourceId);
-                    part.setVersion(effectiveDate);
-                    if (!versioned.hasVersion(part)) {
-                        versioned.addVersion(part);
-                        termFactory.writeId(versioned);
-                    }
+                    part.setSourceId(new Long(sourceId));
+                } else {
+                    part.setSourceId(sourceId); // use string
+                }
+
+                if (!versioned.hasVersion(part)) {
+                    versioned.addVersion(part);
+                    termFactory.writeId(versioned);
                 }
             }
 
