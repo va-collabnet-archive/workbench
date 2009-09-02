@@ -131,7 +131,7 @@ private static final long serialVersionUID = 1L;
    
    
    private boolean isEmpty(String value) {    
-       return ((value == null) || (value.trim().isEmpty())); 
+       return ((value == null) || (value.trim().length() == 0)); 
    }
 
 protected static I_GetConceptData createComponents(String Description, I_TermFactory tf, I_ConfigAceFrame activeProfile, 
