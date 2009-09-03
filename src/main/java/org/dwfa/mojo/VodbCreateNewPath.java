@@ -5,14 +5,16 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -22,7 +24,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.status.SetStatusUtil;
+import org.dwfa.ace.task.status.TupleListUtil;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
@@ -91,6 +93,14 @@ public class VodbCreateNewPath extends AbstractMojo {
      */
     private File targetDirectory;
 
+    /**
+     * If true, set version timestamps (commit time) to the beginning of SNOMED time to ensure it
+     * preceeds all other changes.
+     * 
+     * @parameter
+     */
+    boolean setVersionAsBeginningOfTime = false;
+    
     public void execute() throws MojoExecutionException, MojoFailureException {
         // Use the architectonic branch for all path editing.
         try {
@@ -151,47 +161,51 @@ public class VodbCreateNewPath extends AbstractMojo {
         }
     }
 
-    private I_GetConceptData createNewPathConcept(I_TermFactory tf,
-            I_ConfigAceFrame activeConfig, UUID pathUUID)
-            throws TerminologyException, IOException, Exception,
-            NoSuchAlgorithmException, UnsupportedEncodingException {
-        I_GetConceptData pathConcept = tf
-        .newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
-
+    private I_GetConceptData createNewPathConcept(I_TermFactory tf, I_ConfigAceFrame activeConfig, UUID pathUUID)
+            throws TerminologyException, IOException, Exception, NoSuchAlgorithmException, UnsupportedEncodingException {
+        
+        List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
+        
+        I_GetConceptData pathConcept = tf.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
+        
         I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
-        if (status!=null) {
-            SetStatusUtil.setStatusOfConceptInfo(status.getVerifiedConcept(),cav.getTuples());
-        }
+        newTuples.addAll(cav.getTuples());
 
-        UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                pathUUID.toString() +
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() +
-                pathFsDesc);
+        UUID fsDescUuid =
+                Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
+                    + ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + pathFsDesc);
 
-        I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
-        if (status!=null) {
-            SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idv.getTuples());
-        }
-        UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                pathUUID.toString() +
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() +
-                pathPrefDesc);
+        I_DescriptionVersioned idv =
+                tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
+                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
+        newTuples.addAll(idv.getTuples());
+        
+        UUID prefDescUuid =
+                Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
+                    + ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + pathPrefDesc);
 
-        I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
-        if (status!=null) {
-            SetStatusUtil.setStatusOfDescriptionInfo(status.getVerifiedConcept(),idvpt.getTuples());
-        }
+        I_DescriptionVersioned idvpt =
+                tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
+                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
+        newTuples.addAll(idvpt.getTuples());
 
-        UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                pathUUID.toString() + fsDescUuid + prefDescUuid);
+        UUID relUuid =
+                Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString() + fsDescUuid
+                    + prefDescUuid);
 
         I_RelVersioned rel = tf.newRelationship(relUuid, pathConcept, activeConfig);
-        if (status!=null) {
-            SetStatusUtil.setStatusOfRelInfo(status.getVerifiedConcept(),rel.getTuples());
+        newTuples.addAll(rel.getTuples());
+        
+        if (status != null) {
+            TupleListUtil.setStatus(status.getVerifiedConcept(), newTuples);
         }
-//            need to do an immediate commit so that new concept will be available to path when read from changeset
+        
+        if (setVersionAsBeginningOfTime) {
+            TupleListUtil.setVersion(Integer.MIN_VALUE, newTuples);
+        }
+        
+        // need to do an immediate commit so that new concept will be available
+        // to path when read from changeset
         tf.commit();
         return pathConcept;
     }
