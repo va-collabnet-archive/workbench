@@ -19,7 +19,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.status.SetStatusUtil;
+import org.dwfa.ace.task.status.TupleListUtil;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -46,7 +46,8 @@ public class NewPath extends AbstractTask {
 	
 private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
+   private static final int DATA_VERSION = 2;
+   
    // path's origin, need to be a "real" path
    private TermEntry originPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());  
    
@@ -57,30 +58,35 @@ private static final long serialVersionUID = 1L;
 
    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
    
+   private String newConceptPropName = ProcessAttachmentKeys.NEW_CONCEPT.getAttachmentKey();
+   
    private String  PathDescription = "Use Attachement";
 
    private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
+      out.writeInt(DATA_VERSION);
       out.writeObject(originPathTermEntry);;
       out.writeObject(originTime);
       out.writeObject(profilePropName);
       out.writeObject(parentPathTermEntry );
       out.writeObject(PathDescription);
+      out.writeObject(newConceptPropName);
    }
 
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
+      int objDataVersion = in.readInt();      
+      if (objDataVersion <= DATA_VERSION) {
     	  originPathTermEntry = (TermEntry)in.readObject();
     	  originTime = (String)in.readObject();
           profilePropName = (String)in.readObject();
           parentPathTermEntry = (TermEntry)in.readObject();
-          PathDescription = (String)in.readObject();    
-         
+          PathDescription = (String)in.readObject();
       } else {
          throw new IOException("Can't handle dataversion: " + objDataVersion);
       }
-
+      
+      if (objDataVersion == DATA_VERSION) {
+          newConceptPropName = (String)in.readObject();          
+      } 
    }
 
    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
@@ -89,77 +95,87 @@ private static final long serialVersionUID = 1L;
    }
 
    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-      try {
-    	 String DescriptionForNewPath = (String) process.readProperty(PathDescription);
-         I_TermFactory tf = LocalVersionedTerminology.get();
-         I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
-         Set<I_Path> savedEditingPaths = new HashSet<I_Path>(activeProfile.getEditingPathSet());
-         try {
-            //create parent of path 
-            I_GetConceptData newPathConcept = createComponents(DescriptionForNewPath, tf, activeProfile,parentPathTermEntry);
-            // create origin of path 
+        try {
+            String descriptionForNewPath = (String) process.readProperty(PathDescription);
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
+            Set<I_Path> savedEditingPaths = new HashSet<I_Path>(activeProfile.getEditingPathSet());
+
+            // create parent of path
+            I_GetConceptData newPathConcept =
+                    createComponents(descriptionForNewPath, tf, activeProfile, parentPathTermEntry);
+            // create origin of path
             Set<I_Position> origins = new HashSet<I_Position>();
 
             I_Path originPath = tf.getPath(originPathTermEntry.ids);
             origins.add(tf.newPosition(originPath, tf.convertToThinVersion(originTime)));
 
             I_Path editPath = tf.newPath(origins, newPathConcept);
-            
-            if (!isEmpty(profilePropName)) {
+
+            if (!isBlank(profilePropName)) {
                 I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-    	          if (profile == null) {
-    	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-    	          }
+                if (profile == null) {
+                    profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+                }
                 profile.getEditingPathSet().clear();
                 profile.addEditingPath(editPath);
                 profile.getViewPositionSet().clear();
                 profile.addViewPosition(tf.newPosition(editPath, Integer.MAX_VALUE));
             }
-            
+
             tf.commit();
 
-         } catch (Exception e) {
+            // pass on the new path concept for subsequent tasks that may wish to use it
+            if (!isBlank(newConceptPropName)) {                
+                process.setProperty(newConceptPropName, tf.getConcept(editPath.getConceptId()));
+            }
+            
+            if (!isBlank(profilePropName)) {
+                activeProfile.getEditingPathSet().clear();
+                activeProfile.getEditingPathSet().addAll(savedEditingPaths);
+            }
+            
+            return Condition.CONTINUE;
+            
+        } catch (Exception e) {
             throw new TaskFailedException(e);
-         }
-         activeProfile.getEditingPathSet().clear();
-         activeProfile.getEditingPathSet().addAll(savedEditingPaths);
-         return Condition.CONTINUE;
-      } catch (Exception e) {
-         throw new TaskFailedException(e);
-      }
+        }
    }
    
    
-   private boolean isEmpty(String value) {    
+   private boolean isBlank(String value) {    
        return ((value == null) || (value.trim().length() == 0)); 
    }
 
-protected static I_GetConceptData createComponents(String Description, I_TermFactory tf, I_ConfigAceFrame activeProfile, 
-		   TermEntry parent ) throws NoSuchAlgorithmException, UnsupportedEncodingException, TerminologyException, IOException {
+   protected static I_GetConceptData createComponents(String Description, I_TermFactory tf, I_ConfigAceFrame activeProfile, TermEntry parent ) 
+           throws NoSuchAlgorithmException, UnsupportedEncodingException, TerminologyException, IOException {
 	      
-	      UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, Description);
+        UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, Description);
 
-	      I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId, false, activeProfile);
+        I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId, false, activeProfile);
 
-	      I_GetConceptData statusConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-	      
-	      SetStatusUtil.setStatusOfConceptInfo(statusConcept,newPathConcept.getConceptAttributes().getTuples());
-	      
-	      I_DescriptionVersioned idv = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + Description), newPathConcept, "en",
-	            Description, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeProfile);
-	      SetStatusUtil.setStatusOfDescriptionInfo(statusConcept,idv.getTuples());
+        I_GetConceptData statusConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
-	      I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-	      I_GetConceptData relDestination = tf.getConcept(parent.ids);
-	      I_GetConceptData relCharacteristic = tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
-	            .getUids());
-	      I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-	      
-	      UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + Description + "relid");
-	      tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability,
-	            statusConcept, 0, activeProfile);
-	      return newPathConcept;
-	   }
+        TupleListUtil.setStatus(statusConcept, newPathConcept.getConceptAttributes().getTuples());
+
+        I_DescriptionVersioned idv =
+                tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0]
+                    + Description), newPathConcept, "en", Description,
+                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeProfile);
+        TupleListUtil.setStatus(statusConcept, idv.getTuples());
+
+        I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+        I_GetConceptData relDestination = tf.getConcept(parent.ids);
+        I_GetConceptData relCharacteristic =
+                tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+        I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+
+        UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + Description + "relid");
+        tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability,
+            statusConcept, 0, activeProfile);
+        return newPathConcept;
+   }
+   
    public Collection<Condition> getConditions() {
       return CONTINUE_CONDITION;
    }
@@ -206,6 +222,14 @@ public String getPathDescription() {
 
 public void setPathDescription(String pathDescription) {
 	PathDescription = pathDescription;
+}
+
+public String getNewConceptPropName() {
+    return newConceptPropName;
+}
+
+public void setNewConceptPropName(String newConceptPropName) {
+    this.newConceptPropName = newConceptPropName;
 }
 
 

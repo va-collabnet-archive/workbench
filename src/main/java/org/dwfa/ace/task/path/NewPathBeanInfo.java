@@ -22,9 +22,6 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             profilePropName.setDisplayName("<html><font color='green'>profile property:");
             profilePropName.setShortDescription("The property containing the profile which will be set to view and edit the newly created path. Leave blank to ignore.");
-
-
-          
             
             PropertyDescriptor originPathTermEntry =
                 new PropertyDescriptor("originPathTermEntry", getBeanDescriptor().getBeanClass());
@@ -55,8 +52,15 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             pathDescription.setDisplayName("<html><font color='green'>Path Description");
             pathDescription.setShortDescription("Description For NewPath");
  
+            PropertyDescriptor newConceptPropName =
+                new PropertyDescriptor("newConceptPropName", getBeanDescriptor().getBeanClass());
+            newConceptPropName.setBound(true);
+            newConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newConceptPropName.setDisplayName("<html><font color='green'>new path concept property:");
+            newConceptPropName.setShortDescription("The property which will be set to contain the new path concept");
+            
             PropertyDescriptor rv[] =
-                { originPathTermEntry, parentPathTermEntry, originTime, profilePropName,pathDescription};
+                { originPathTermEntry, parentPathTermEntry, originTime, profilePropName, pathDescription, newConceptPropName};
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
