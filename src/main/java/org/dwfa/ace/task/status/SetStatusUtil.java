@@ -7,8 +7,12 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 
+/**
+ * @deprecated Use {@link TupleListUtil}
+ */
+@Deprecated
 public class SetStatusUtil {
-
+    
 	public static void setStatusOfRelInfo(I_GetConceptData status, List<I_RelTuple> reltuples) {
 		for (I_RelTuple rt : reltuples) {
 			rt.setStatusId(status.getConceptId());
