@@ -5,11 +5,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -147,22 +150,30 @@ private static final long serialVersionUID = 1L;
        return ((value == null) || (value.trim().length() == 0)); 
    }
 
-   protected static I_GetConceptData createComponents(String Description, I_TermFactory tf, I_ConfigAceFrame activeProfile, TermEntry parent ) 
+   protected static I_GetConceptData createComponents(String description, I_TermFactory tf, I_ConfigAceFrame activeProfile, TermEntry parent ) 
            throws NoSuchAlgorithmException, UnsupportedEncodingException, TerminologyException, IOException {
 	      
-        UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, Description);
+        UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, description);
+
+        List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
 
         I_GetConceptData newPathConcept = tf.newConcept(type5ConceptId, false, activeProfile);
 
         I_GetConceptData statusConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
-        TupleListUtil.setStatus(statusConcept, newPathConcept.getConceptAttributes().getTuples());
+        newTuples.addAll(newPathConcept.getConceptAttributes().getTuples());
 
-        I_DescriptionVersioned idv =
-                tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0]
-                    + Description), newPathConcept, "en", Description,
-                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeProfile);
-        TupleListUtil.setStatus(statusConcept, idv.getTuples());
+        I_DescriptionVersioned idvFsn =
+                tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + description), 
+                    newPathConcept, "en", description, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), 
+                    activeProfile);
+        
+        I_DescriptionVersioned idvPt =
+                tf.newDescription(UUID.randomUUID(), newPathConcept, "en", description, 
+                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeProfile);
+        
+        newTuples.addAll(idvFsn.getTuples());
+        newTuples.addAll(idvPt.getTuples());
 
         I_GetConceptData relType = tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
         I_GetConceptData relDestination = tf.getConcept(parent.ids);
@@ -170,9 +181,12 @@ private static final long serialVersionUID = 1L;
                 tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
         I_GetConceptData relRefinability = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
 
-        UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + Description + "relid");
+        UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + description + "relid");
         tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability,
             statusConcept, 0, activeProfile);
+        
+        TupleListUtil.setStatus(statusConcept, newTuples);
+        
         return newPathConcept;
    }
    
