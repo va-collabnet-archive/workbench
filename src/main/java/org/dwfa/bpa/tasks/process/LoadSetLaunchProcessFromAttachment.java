@@ -14,6 +14,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -28,13 +29,16 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
     private String processName;
     private String processSubject;
 
+    private boolean dataCheckingSuppressed = false;
+    
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
-
+    private static final int dataVersion = 2;
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(processPropName);
+        out.writeObject(dataCheckingSuppressed);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -45,7 +49,10 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-
+        
+        if (objDataVersion == dataVersion) {
+            dataCheckingSuppressed = (Boolean) in.readObject();
+        }
     }
 
      @SuppressWarnings("unchecked")
@@ -95,7 +102,11 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
             // Launch Process...
             Stack<I_EncodeBusinessProcess> ps = worker.getProcessStack();
             worker.setProcessStack(new Stack<I_EncodeBusinessProcess>());
-            processToLaunch.execute(worker);
+            if (isDataCheckingSuppressed()) {
+                executeWithSuppression(processToLaunch, worker);
+            } else {
+                processToLaunch.execute(worker);
+            }
             worker.setProcessStack(ps);
             return Condition.CONTINUE;
         } catch (Exception e) {
@@ -103,6 +114,11 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
         }
     }
 
+    @SuppressDataChecks
+    private void executeWithSuppression(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        process.execute(worker);
+    }
+     
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
 
@@ -155,5 +171,13 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
 	public void setProcessPropName(String processPropName) {
 		this.processPropName = processPropName;
 	}
+
+    public boolean isDataCheckingSuppressed() {
+        return dataCheckingSuppressed;
+    }
+
+    public void setDataCheckingSuppressed(boolean dataCheckingSuppressed) {
+        this.dataCheckingSuppressed = dataCheckingSuppressed;
+    }
 
 }
