@@ -30,6 +30,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
+import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -41,11 +42,11 @@ import org.dwfa.util.id.Type5UuidFactory;
  *
  * @created 15/01/2008
  */
+@AllowDataCheckSuppression
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
-
-/*This task has the same function with the "new path" in the preference panel */
 public class NewPath extends AbstractTask {
-
+    /*This task has the same function with the "new path" in the preference panel */
+    
 	
 private static final long serialVersionUID = 1L;
 
