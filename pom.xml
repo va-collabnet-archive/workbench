@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.dwfa</groupId>
 		<artifactId>dwfa-pom</artifactId>
-		<version>2.25</version>
+		<version>2.26</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dwfa</groupId>
@@ -224,12 +224,6 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<configuration>
 					<useReleaseProfile>false</useReleaseProfile>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<workspace>/eclipse/workspace</workspace>
 				</configuration>
 			</plugin>
 			<plugin>
