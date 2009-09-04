@@ -28,10 +28,9 @@ import net.jini.config.ConfigurationException;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
+import org.dwfa.vodb.VodbEnv;
 
 public class ActivityViewer {
-
-    private static boolean headless = true;
 
     private static ActivityViewer viewer;
 
@@ -174,7 +173,7 @@ public class ActivityViewer {
 
     private ActivityViewer() throws Exception {
         super();
-        if (headless == false) {
+        if (VodbEnv.headless == false) {
             viewerFrame = new ActivityViewerFrame();
             JScrollPane scroller = new JScrollPane();
             scroller
@@ -252,7 +251,7 @@ public class ActivityViewer {
 
     public static void addActivity(final I_ShowActivity activity)
             throws Exception {
-        if (headless == false) {
+        if (VodbEnv.headless == false) {
             activity.addShowActivityListener(completeListener);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -300,7 +299,7 @@ public class ActivityViewer {
     }
 
     public static void reSort() {
-        if (headless == false) {
+        if (VodbEnv.headless == false) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 // TODO turn this into a future task... So sorting does not
@@ -396,14 +395,6 @@ public class ActivityViewer {
         viewer.viewerFrame.setSize(size);
     }
 
-    public static boolean isHeadless() {
-        return headless;
-    }
-
-    public static void setHeadless(boolean headless) {
-        ActivityViewer.headless = headless;
-    }
-    
     public static void toFront() {
     	viewer.viewerFrame.setVisible(true);
     	viewer.viewerFrame.toFront();

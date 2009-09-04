@@ -2,7 +2,6 @@ package org.dwfa.ace.config;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -34,7 +33,6 @@ import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
@@ -95,8 +93,7 @@ public class AceRunner {
 		try {
 			AceRunner.args = args;
 			AceRunner.lc = lc;
-
-			ActivityViewer.setHeadless(false);
+			VodbEnv.headless = false;
 
 			setupCustomProtocolHandler();
 

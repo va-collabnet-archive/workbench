@@ -17,12 +17,12 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.jini.JiniManager;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.vodb.VodbEnv;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -40,7 +40,7 @@ public class AceReadOnlyRunner {
 
    public AceReadOnlyRunner(final String[] args, final LifeCycle lc) {
       ACE.editMode = false;
-      ActivityViewer.setHeadless(false);
+	  VodbEnv.headless = false;
       JiniManager.setLocalOnly(true);
       try {
          this.args = args;

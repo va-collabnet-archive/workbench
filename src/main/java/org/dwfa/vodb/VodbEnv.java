@@ -183,19 +183,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
-    public static boolean headless = false;
-
-    static {
-        try {
-               headless = GraphicsEnvironment.isHeadless();
-               if (headless == false) {
-                   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-               }
-            } catch (Throwable e) {
-               headless = true;
-            }
-    }
-
+    public static boolean headless = true;
 
     public void setup(Object envHome, boolean readOnly, Long cacheSize)
             throws ToIoException {
