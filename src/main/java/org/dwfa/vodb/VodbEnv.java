@@ -188,7 +188,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     static {
         try {
                headless = GraphicsEnvironment.isHeadless();
-               Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+               if (headless == false) {
+                   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+               }
             } catch (Throwable e) {
                headless = true;
             }
