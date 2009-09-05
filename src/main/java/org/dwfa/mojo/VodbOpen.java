@@ -68,6 +68,7 @@ public class VodbOpen extends AbstractMojo {
     private File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        System.setProperty("java.awt.headless", "true");
         try {
             if (useExistingDb && LocalVersionedTerminology.get() != null) {
                 return;

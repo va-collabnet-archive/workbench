@@ -9,7 +9,7 @@
     <artifactId>term-mojo</artifactId>
     <version>1.40-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
-    <name>ACE mojo</name>
+    <name>term mojo</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/index.html</url>
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/term-mojo/trunk/dev</connection>
@@ -30,8 +30,7 @@
     <inceptionYear>2006</inceptionYear>
     <description>This project provides a set of maven goals that are used to
         transform terminology data in preparation for importing into standard file
-        formats used by the ACE version-oriented database, and by other applications.
-    </description>
+        formats used by the version-oriented database, and by other applications.</description>
     <dependencies>
         <dependency>
             <groupId>org.dwfa</groupId>

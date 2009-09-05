@@ -24,18 +24,6 @@ import org.dwfa.tapi.TerminologyException;
 public class VodbSetDefaultActivateConfig extends AbstractMojo {
 
     /**
-     * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would
-     * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin.
-     *
-     * @parameter expression="${project.build.directory}"
-     * @required
-     */
-    @SuppressWarnings("unused")
-    private String outputDirectory;
-
-    /**
      * Location of the build directory.
      *
      * @parameter expression="${project.build.directory}"
@@ -44,6 +32,7 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
     private File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+       System.setProperty("java.awt.headless", "true");
        try {
            try {
                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(),
