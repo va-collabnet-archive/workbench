@@ -88,7 +88,7 @@ public class SpecifyOutputFile extends AbstractTask {
 							if (dialog.getFile().toLowerCase().endsWith(extension) == false) {
 								dialog.setFile(dialog.getFile() + extension);
 							}
-							process.setProperty(outputFilePropName, dialog.getFile());
+							process.setProperty(outputFilePropName, dialog.getDirectory() + File.separator + dialog.getFile());
 						} catch (IntrospectionException e) {
 							ex = e;
 						} catch (IllegalAccessException e) {
