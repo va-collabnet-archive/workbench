@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -132,7 +133,7 @@ public class AceRunner {
 			}
 
 			aceProperties.put("initialized", "true");
-			
+
 			if (jiniConfig != null) {
 				aceConfigFile = (File) jiniConfig.getEntry(this.getClass()
 						.getName(), "aceConfigFile", File.class, new File(
@@ -142,15 +143,39 @@ public class AceRunner {
 			} else {
 				aceConfigFile = new File("config/config.ace");
 			}
-			
-			
+
+
 			SvnPrompter prompter = new SvnPrompter();
 			File profileDir = new File("profiles");
-			if (profileDir.exists() == false) {
+			if (profileDir.exists() == false && initializeFromSubversion) {
 				new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(
-						new File("config", "ace.properties"), 
+						new File("config", "ace.properties"),
 						true);
 			}
+
+            if (aceConfigFile == null || !aceConfigFile.exists()) {
+                aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+                File lastProfileDir = new File(aceProperties.getProperty("last-profile-dir"));
+
+                if (lastProfileDir.isFile()) {
+                    aceConfigFile = lastProfileDir;
+                } else {
+                    String[] profileFiles = lastProfileDir.list(new FilenameFilter() {
+
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith(".ace");
+                        }
+                    });
+
+                    if (profileFiles.length == 1) {
+                        aceConfigFile = new File(lastProfileDir, profileFiles[0]).getCanonicalFile();
+                    } else if (profileFiles.length > 1) {
+                        AceLog.getAppLog().warning(
+                            "Profile from jini configuration does not exist and more than one profile file found in " +
+                            "last profile directory " + lastProfileDir + ", unable to determine profile to use.");
+                    }
+                }
+            }
 
 			if (aceConfigFile != null && aceConfigFile.exists() && acePropertiesFile.exists()) {
 
