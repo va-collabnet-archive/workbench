@@ -1,5 +1,17 @@
 package org.dwfa.vodb.types;
 
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
+import org.dwfa.tapi.TerminologyException;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,18 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.ebr.I_GetExtensionData;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
-import org.dwfa.tapi.TerminologyException;
 
 public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 
@@ -179,7 +179,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	private boolean firstCommit = false;
 
 	private I_ThinExtByRefVersioned extension;
-	
+
 	private boolean discard = false;
 
 	private static int dataVersion = 1;
@@ -246,7 +246,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.dwfa.vodb.types.I_GetExtensionData#getExtension()
 	 */
 	public I_ThinExtByRefVersioned getExtension() throws IOException {
@@ -258,7 +258,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.dwfa.vodb.types.I_GetExtensionData#getUniversalAceBean()
 	 */
 	public UniversalAceExtByRefBean getUniversalAceBean()
@@ -298,14 +298,18 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.dwfa.vodb.types.I_GetExtensionData#getMemberId()
 	 */
 	public int getMemberId() {
 		return memberId;
 	}
 
-	public void discard() {
+    public void removeFromCache() throws IOException {
+        abort();
+    }
+
+    public void discard() {
 		this.discard = true;
 	}
 	public boolean isUncommitted() throws IOException {
@@ -320,7 +324,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 					}
 				}
 				return false;
-			} 
+			}
 		}
 		return true;
 	}

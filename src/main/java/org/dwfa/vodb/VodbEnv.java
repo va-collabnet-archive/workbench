@@ -1,28 +1,10 @@
 package org.dwfa.vodb;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
-import javax.swing.SwingUtilities;
-
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.JEVersion;
+import com.sleepycat.je.Transaction;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
@@ -142,11 +124,25 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.JEVersion;
-import com.sleepycat.je.Transaction;
+import javax.swing.SwingUtilities;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * @author kec
@@ -183,7 +179,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     private BdbEnv bdbEnv;
 
     private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
-    
+
     public static boolean isHeadless() {
 		return DwfaEnv.isHeadless();
     }
@@ -406,6 +402,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     public I_ThinExtByRefVersioned getExtension(int memberId)
             throws IOException {
         return bdbEnv.getExtension(memberId);
+    }
+
+    public void removeFromCacheAndRollbackTransaction(final int memberId) throws IOException {
+        removeFromExtensionCache(memberId);
+        cancel();
+    }
+
+    private void removeFromExtensionCache(final int memberId) throws IOException {
+        getExtensionWrapper(memberId).removeFromCache();
     }
 
     public boolean hasExtension(int memberId) throws IOException {
@@ -1883,7 +1888,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			throw new ToIoException(e);
 		}
 	}
-	
+
 	private void addUncommitted(I_Transact to) {
 		if (isDataChecksSuppressed()) {
 			ACE.addUncommittedNoChecks(to);
@@ -1891,40 +1896,40 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			ACE.addUncommitted(to);
 		}
 	}
-	
+
 	/**
-	 * If a class that is calling a method in this class defines the {@link AllowDataCheckSuppression} 
-	 * annotation then we will traverse back up the the call stack for a method that declares the 
+	 * If a class that is calling a method in this class defines the {@link AllowDataCheckSuppression}
+	 * annotation then we will traverse back up the the call stack for a method that declares the
 	 * {@link SuppressDataChecks} annotation. If found returns true.
 	 */
 	private boolean isDataChecksSuppressed() {
 		boolean suppressAllowed = false;
-		
+
 		for (StackTraceElement e : new Throwable().getStackTrace()) {
 			Class<?> elementClass;
 			try {
 				elementClass = Class.forName(e.getClassName());
 			} catch (ClassNotFoundException ex) {
 				throw new TerminologyRuntimeException("No class for " + e.getClassName(), ex);
-			}		
-			
+			}
+
 			// Skip this class
 			if (elementClass.equals(this.getClass())) {
 				continue;
 			}
-			
+
 			// Verify the immediate calling class (first time only) allows suppression
 			if (!suppressAllowed) {
-				AllowDataCheckSuppression allowAnnotation = 
+				AllowDataCheckSuppression allowAnnotation =
 					elementClass.getAnnotation(AllowDataCheckSuppression.class);
-				
+
 				if (allowAnnotation != null) {
 					suppressAllowed = true;
 				} else {
 					return false;
 				}
 			}
-			
+
 			do {
 				for (Method m : elementClass.getDeclaredMethods()) {
 					if (m.getName().equals(e.getMethodName())) {
@@ -1934,12 +1939,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 						}
 					}
 				}
-				// Check the superclass, if it exists, in case the method in inherited 
+				// Check the superclass, if it exists, in case the method in inherited
 				elementClass = elementClass.getSuperclass();
 			} while (elementClass != null);
-			
+
 		}
-		
+
 		return false;
 	}
 }
