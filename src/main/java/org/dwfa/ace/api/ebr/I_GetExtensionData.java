@@ -1,17 +1,21 @@
 package org.dwfa.ace.api.ebr;
 
-import java.io.IOException;
-
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.tapi.TerminologyException;
 
+import java.io.IOException;
+
 public interface I_GetExtensionData {
 
-   public abstract I_ThinExtByRefVersioned getExtension() throws IOException;
+   I_ThinExtByRefVersioned getExtension() throws IOException;
 
-   public abstract UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException;
+   UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException;
 
-   public abstract int getMemberId();
+   int getMemberId();
 
+    /**
+     * Removes this extension from the uncommitted extension cache.
+     * @throws IOException If an exception occurs.
+     */
+    void removeFromCache() throws IOException;
 }
