@@ -182,7 +182,7 @@ public class SvnLog {
 		}
 
 		public static void alertAndLog(Exception e) {
-			if (VodbEnv.headless == false) {
+			if (VodbEnv.isHeadless() == false) {
 				JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
 					    "<html>" + e.getMessage() + 
 					    "<br>See log for more details",

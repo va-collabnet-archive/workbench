@@ -827,13 +827,13 @@ public class ACE extends JPanel implements PropertyChangeListener,
                     uncommitted.clear();
                     uncommittedNoChecks.clear();
                     dataCheckMap.clear();
-                    if (VodbEnv.headless == false) {
+                    if (VodbEnv.isHeadless() == false) {
                         fireCommit();
                     }
                     AceLog.getEditLog().info(
                             "Finished commit: " + version + " ("
                                     + now.getTime() + ")");
-                    if (aceConfig != null && VodbEnv.headless == false) {
+                    if (aceConfig != null && VodbEnv.isHeadless() == false) {
                         for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
                             if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
                                 frameConfig.setCommitEnabled(true);

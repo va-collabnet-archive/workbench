@@ -94,7 +94,7 @@ public class AceRunner {
 		try {
 			AceRunner.args = args;
 			AceRunner.lc = lc;
-			VodbEnv.headless = false;
+			VodbEnv.setHeadless(false);
 
 			setupCustomProtocolHandler();
 

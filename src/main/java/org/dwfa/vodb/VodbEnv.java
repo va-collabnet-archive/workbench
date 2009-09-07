@@ -91,6 +91,7 @@ import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.svn.Svn;
@@ -182,9 +183,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     private BdbEnv bdbEnv;
 
     private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+    
+    public static boolean isHeadless() {
+		return DwfaEnv.isHeadless();
+    }
 
-    public static boolean headless = true;
-
+    public static void setHeadless(Boolean headless) {
+    	DwfaEnv.setHeadless(headless);
+    }
     public void setup(Object envHome, boolean readOnly, Long cacheSize)
             throws ToIoException {
         try {
@@ -247,7 +253,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Runtime.getRuntime().addShutdownHook(new ShutdownThread());
             long startTime = System.currentTimeMillis();
             this.envHome = envHome;
-            if (headless) {
+            if (isHeadless()) {
                 activityFrame = new UpperInfoOnlyConsoleMonitor();
             } else {
                 activityFrame = new ActivityPanel(true, true, null);
@@ -1750,7 +1756,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public I_ShowActivity newActivityPanel(boolean displayInViewer) {
-        if (headless) {
+        if (isHeadless()) {
             return new UpperInfoOnlyConsoleMonitor();
         } else {
             ActivityPanel ap = new ActivityPanel(true, true, null);

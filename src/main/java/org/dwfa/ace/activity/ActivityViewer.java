@@ -173,7 +173,7 @@ public class ActivityViewer {
 
     private ActivityViewer() throws Exception {
         super();
-        if (VodbEnv.headless == false) {
+        if (VodbEnv.isHeadless() == false) {
             viewerFrame = new ActivityViewerFrame();
             JScrollPane scroller = new JScrollPane();
             scroller
@@ -251,7 +251,7 @@ public class ActivityViewer {
 
     public static void addActivity(final I_ShowActivity activity)
             throws Exception {
-        if (VodbEnv.headless == false) {
+        if (VodbEnv.isHeadless() == false) {
             activity.addShowActivityListener(completeListener);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -299,7 +299,7 @@ public class ActivityViewer {
     }
 
     public static void reSort() {
-        if (VodbEnv.headless == false) {
+        if (VodbEnv.isHeadless() == false) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 // TODO turn this into a future task... So sorting does not

@@ -40,7 +40,7 @@ public class AceReadOnlyRunner {
 
    public AceReadOnlyRunner(final String[] args, final LifeCycle lc) {
       ACE.editMode = false;
-	  VodbEnv.headless = false;
+	  VodbEnv.setHeadless(false);
       JiniManager.setLocalOnly(true);
       try {
          this.args = args;
