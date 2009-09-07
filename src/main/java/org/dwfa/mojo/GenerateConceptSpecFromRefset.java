@@ -49,7 +49,7 @@ public class GenerateConceptSpecFromRefset extends AbstractMojo {
 	/**
 	 * The Java file output location.
 	 * 
-	 * @parameter expression="${project.build.sourceDirectory}"
+	 * @parameter expression="${project.build.directory}/generated-sources/main/java"
 	 */
 	private File outputDirectory;
 
