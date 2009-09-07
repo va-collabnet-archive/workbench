@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -28,9 +27,9 @@ import org.dwfa.mojo.refset.ExportSpecification;
  * </p>
  * <p>
  * </p>
- * 
- * 
- * 
+ *
+ *
+ *
  * @see <code>org.apache.maven.plugin.AbstractMojo</code>
  * @author PeterVawser
  * @goal exportdata
@@ -40,14 +39,14 @@ public class ExportDatabase extends AbstractMojo {
 	/**
 	 * Date format to use in output files
 	 * If not specified the Path Version Reference Set will be used to determine the release version.
-	 * 
+	 *
 	 * @parameter
 	 */
 	private String releaseDate;
 
 	/**
 	 * Location of the directory to output data files to.
-	 * 
+	 *
 	 * @parameter expression="${project.build.directory}"
 	 * @required
 	 */
@@ -55,35 +54,35 @@ public class ExportDatabase extends AbstractMojo {
 
 	/**
 	 * File name for concept table data output file
-	 * 
+	 *
 	 * @parameter expression="ids.txt"
 	 */
 	private String idsDataFileName;
 
 	/**
 	 * File name for concept table data output file
-	 * 
+	 *
 	 * @parameter expression="concepts.txt"
 	 */
 	private String conceptDataFileName;
 
 	/**
 	 * File name for relationship table data output file
-	 * 
+	 *
 	 * @parameter expression="relationships.txt"
 	 */
 	private String relationshipsDataFileName;
 
 	/**
 	 * File name for description table data output file
-	 * 
+	 *
 	 * @parameter expression="descriptions.txt"
 	 */
 	private String descriptionsDataFileName;
 
 	/**
 	 * File name for description table data output file
-	 * 
+	 *
 	 * @parameter expression="errorLog.txt"
 	 */
 	private String errorLogFileName;
@@ -98,7 +97,7 @@ public class ExportDatabase extends AbstractMojo {
     /**
 	 * The set of specifications used to determine if a concept should be
 	 * exported.
-	 * 
+	 *
 	 * @parameter
 	 * @required
 	 */
@@ -106,7 +105,7 @@ public class ExportDatabase extends AbstractMojo {
 
 	/**
 	 * Positions to export data.
-	 * 
+	 *
 	 * @parameter
 	 * @required
 	 */
@@ -114,7 +113,7 @@ public class ExportDatabase extends AbstractMojo {
 
 	/**
 	 * Status values to include in export
-	 * 
+	 *
 	 * @parameter
 	 * @required
 	 */
@@ -135,12 +134,21 @@ public class ExportDatabase extends AbstractMojo {
       */
      private File targetDirectory;
 
+     /**
+      * Indicates if the concepts, descriptions and relationships exported must be a cohesive
+      * self supporting set (true), or if the resulting export may contain references to entities
+      * not represented in the export (false).
+      *
+      * @parameter expression=true
+      */
+	private boolean exportCohesiveSet;
+
      public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
 			if (MojoUtil.alreadyRun(getLog(), outputDirectory
 					+ conceptDataFileName + descriptionsDataFileName
-					+ relationshipsDataFileName, 
+					+ relationshipsDataFileName,
 					this.getClass(), targetDirectory)) {
 				return;
 			}
@@ -180,7 +188,7 @@ public class ExportDatabase extends AbstractMojo {
 			idsFile.getParentFile().mkdirs();
 			File idMapFile = new File(buildDirectory + "/generated-resources/sct-uuid-maps", "exported-ids-sct-map.txt");
 			idMapFile.getParentFile().mkdirs();
-			
+
 			Writer conceptWriter = new BufferedWriter(new FileWriter(
 					conceptFile));
 			Writer relationshipWriter = new BufferedWriter(new FileWriter(
@@ -196,6 +204,7 @@ public class ExportDatabase extends AbstractMojo {
 					positions, statusValues, specs, getLog());
 			expItr.setReleaseDate(releaseDate);
             expItr.setValidatePositions(validatePositions);
+            expItr.setExportCohesiveSet(exportCohesiveSet);
             LocalVersionedTerminology.get().iterateConcepts(expItr);
 
 			conceptWriter.close();
