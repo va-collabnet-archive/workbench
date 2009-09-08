@@ -53,13 +53,13 @@ public class Svn implements I_HandleSubversion {
 			switch (impl) {
 			case NATIVE:
 				client = new SVNClient();
-				AceLog.getAppLog().info("Created native svn client: " + client);
+				AceLog.getAppLog().info("Created native svn client: " + client.getVersion());
 				break;
 
 			case SVN_KIT:
 				client = SVNClientImpl.newInstance();
 				AceLog.getAppLog().info(
-						"Created Svnkit pure java svn client: " + client);
+						"Created Svnkit pure java svn client: " + client.getVersion());
 				break;
 
 			default:
@@ -224,26 +224,30 @@ public class Svn implements I_HandleSubversion {
 			if (newFiles + deletedFiles + modifiedFiles > 0) {
 				String commitMessage = "new: " + newFiles + " deleted: "
 						+ deletedFiles + " modified: " + modifiedFiles;
+				SvnLog.info(commitMessage);
 				if (interactive
 						&& SvnPrompter.class.isAssignableFrom(authenticator
 								.getClass())) {
+					SvnLog.info("getting commit message...");
 					SvnPrompter p = (SvnPrompter) authenticator;
 					commitMessage = p.askQuestion(svd.getRepositoryUrlStr(),
 							"commit message: ", commitMessage, true);
 				}
 				if (interactive) {
+					SvnLog.info("authenticating");
 					handleAuthentication(authenticator);
 				}
-				switchToReadWriteRepository(svd);
 				int depth = Depth.unknown;
 				boolean noUnlock = true;
 				boolean keepChangelist = false;
 				String[] changelists = null;
 				Map<String, String> revpropTable = new HashMap<String, String>();
+				SvnLog.info("start commit: " + svd.getWorkingCopyStr());
 				Svn.getSvnClient().commit(
 						new String[] { svd.getWorkingCopyStr() },
 						commitMessage, depth, noUnlock, keepChangelist,
 						changelists, revpropTable);
+				SvnLog.info("finish commit");
 			}
 
 		} catch (ClientException e) {
@@ -658,7 +662,6 @@ public class Svn implements I_HandleSubversion {
 			if (interactive) {
 				handleAuthentication(authenticator);
 			}
-			switchToReadWriteRepository(svd);
 			Svn.getSvnClient().lock(
 					new String[] { toUnlock.getAbsolutePath() },
 					svd.getUsername(), false);
@@ -685,7 +688,6 @@ public class Svn implements I_HandleSubversion {
 			if (interactive) {
 				handleAuthentication(authenticator);
 			}
-			switchToReadWriteRepository(svd);
 			Svn.getSvnClient().lock(new String[] { toLock.getAbsolutePath() },
 					svd.getUsername(), false);
 		} catch (ClientException e) {
@@ -777,34 +779,4 @@ public class Svn implements I_HandleSubversion {
 		}
 		return currentRepo;
 	}
-
-	private static void switchToReadWriteRepository(SubversionData svd) {
-		SvnLog.info("Starting switch to read/write");
-		try {
-			String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
-			String newRepo = normalizeEnding(svd.getRepositoryUrlStr());
-			if (currentRepo.equals(newRepo)) {
-				SvnLog
-						.info("Finished switch to read/write: no change necessary");
-				return;
-			}
-			String path = svd.getWorkingCopyStr();
-			String url = svd.getRepositoryUrlStr();
-			Revision revision = Revision.HEAD;
-			Revision pegRevision = Revision.HEAD;
-			int depth = Depth.infinity;
-			boolean depthIsSticky = true;
-			boolean ignoreExternals = true;
-			boolean allowUnverObstructions = false;
-			SvnLog.info(" switching from: " + currentRepo + " to: " + url);
-			long version = Svn.getSvnClient().doSwitch(path, url, revision,
-					pegRevision, depth, depthIsSticky, ignoreExternals,
-					allowUnverObstructions);
-			SvnLog.info("Finished switch to read/write at version: " + version);
-		} catch (ClientException e) {
-			SvnLog.alertAndLog(e);
-			SvnLog.info("Finished switch to read/write: " + e.toString());
-		}
-	}
-
 }
