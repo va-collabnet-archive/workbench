@@ -19,78 +19,65 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = {
-		@Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-		@Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-		@Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 public class TestForIsa extends AbstractConceptTest {
 
-	private static final long serialVersionUID = 1;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			//
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            //
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	@Override
-	public List<AlertToDataConstraintFailure> test(I_GetConceptData concept,
-			boolean forCommit) throws TaskFailedException {
-		try {
-			ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
+    @Override
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
+            throws TaskFailedException {
+        try {
+            ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-			I_ConfigAceFrame activeProfile = termFactory
-					.getActiveAceFrameConfig();
+            I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
 
-			if (activeProfile.getRoots().contains(concept.getConceptId()))
-				return alertList;
+            if (activeProfile.getRoots().contains(concept.getConceptId()))
+                return alertList;
 
-			I_GetConceptData snomed_isa = getConceptSafe(termFactory,
-					SNOMED.Concept.IS_A.getUids());
-			I_GetConceptData aux_isa = getConceptSafe(termFactory,
-					ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+            I_GetConceptData snomed_isa = getConceptSafe(termFactory, SNOMED.Concept.IS_A.getUids());
+            I_GetConceptData aux_isa = getConceptSafe(termFactory, ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
 
-			Set<I_Position> allPositions = getPositions(termFactory);
+            Set<I_Position> allPositions = getPositions(termFactory);
 
-			// See if an ISA exists on the path
-			for (I_RelTuple rel : concept.getSourceRelTuples(activeProfile
-					.getAllowedStatus(), null, allPositions, true)) {
-				if ((snomed_isa != null && rel.getRelTypeId() == snomed_isa
-						.getConceptId())
-						|| (aux_isa != null && rel.getRelTypeId() == aux_isa
-								.getConceptId()))
-					return alertList;
-			}
+            // See if an ISA exists on the path
+            for (I_RelTuple rel : concept
+                .getSourceRelTuples(activeProfile.getAllowedStatus(), null, allPositions, true)) {
+                if ((snomed_isa != null && rel.getRelTypeId() == snomed_isa.getConceptId())
+                    || (aux_isa != null && rel.getRelTypeId() == aux_isa.getConceptId()))
+                    return alertList;
+            }
 
-			// Not on the path, see if one exists elsewhere
-			boolean found = false;
-			for (I_RelTuple rel : concept.getSourceRelTuples(activeProfile
-					.getAllowedStatus(), null, null, true)) {
-				if ((snomed_isa != null && rel.getRelTypeId() == snomed_isa
-						.getConceptId())
-						|| (aux_isa != null && rel.getRelTypeId() == aux_isa
-								.getConceptId()))
-					found = true;
-			}
-			alertList.add(new AlertToDataConstraintFailure(
-					AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-					"<html>No IS_A relationship"
-							+ (found ? " - check editing path settings" : ""),
-					concept));
-			return alertList;
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            // Not on the path, see if one exists elsewhere
+            boolean found = false;
+            for (I_RelTuple rel : concept.getSourceRelTuples(activeProfile.getAllowedStatus(), null, null, true)) {
+                if ((snomed_isa != null && rel.getRelTypeId() == snomed_isa.getConceptId())
+                    || (aux_isa != null && rel.getRelTypeId() == aux_isa.getConceptId()))
+                    found = true;
+            }
+            alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+                "<html>No IS_A relationship" + (found ? " - check editing path settings" : ""), concept));
+            return alertList;
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
 }
