@@ -52,11 +52,10 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      * @see GetConceptDataValidationStrategy#validate()
      * @see NotEmptyConceptDataValidator
      */
-    @Override
     public void validate() throws ValidationException {
         for (I_DescriptionVersioned description : descriptions) {
             for (I_DescriptionPart part : description.getVersions()) {
-                if (isPartRequiredConceptType(requiredConcept, part) && !isHasValue(part)) {
+                if (isPartRequiredConceptType(requiredConcept, part) && !hasValue(part)) {
                     throw new ValidationException(String.format("Concept %1$s has empty %2$s",
                             conceptToValidate.getConceptId(), requiredConcept.toString()));
                 }
@@ -73,7 +72,7 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      * false -if the {@link I_DescriptionPart#getText()} method returns a value that not
      * null or has a length of zero.
      */
-    private boolean isHasValue(I_DescriptionPart part) {
+    private boolean hasValue(I_DescriptionPart part) {
         boolean isNotEmpty = true;
 
         if (part.getText() != null) {

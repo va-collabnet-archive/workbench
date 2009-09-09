@@ -27,7 +27,6 @@ public class SimpleConstraintFailureChooser implements AlertToDataConstraintFail
         this.isForCommit = isForCommit;
     }
 
-    @Override
     public AlertToDataConstraintFailureFactory getFactory() {
         if (isForCommit) {
             return new ErrorConstraintFailureFactory();
