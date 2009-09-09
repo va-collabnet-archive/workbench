@@ -38,6 +38,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.comparator.TupleComparator;
 import org.dwfa.mojo.refset.ExportSpecification;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -348,11 +349,15 @@ public class ExportIterator implements I_ProcessConcepts {
 			// Fully specified name
 			createRecord(stringBuilder, descForConceptFile.getText());
 
-			// CTV3ID
-			createRecord(stringBuilder, "null");
+            // CTV3ID
+            I_IdPart ctv3IdPart =
+                    getLatestVersion(concept.getId().getVersions(), ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
+            createRecord(stringBuilder, (ctv3IdPart != null) ? ctv3IdPart.getSourceId().toString() : "null");
 
-			// SNOMED 3 ID... We ignore this for now.
-			createRecord(stringBuilder, "null");
+            // SNOMED 3 ID
+            I_IdPart snomedIdPart =
+                    getLatestVersion(concept.getId().getVersions(), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
+            createRecord(stringBuilder, (snomedIdPart != null) ? snomedIdPart.getSourceId().toString() : "null");
 
 			// IsPrimative value
 			createRecord(stringBuilder, latestAttrib.isDefined() ? 0 : 1);
@@ -381,6 +386,27 @@ public class ExportIterator implements I_ProcessConcepts {
 			return true;
 		}// End method getUuidBasedConceptDetaiils
 	}
+
+    /**
+     * Get the latest version for the list of parts with the source <code>sourceConcept</code>
+     *
+     * @param sourceConcept Concept eg CTV3_ID, SNOMED_RT_ID etc
+     * @return I_IdPart latest Id version for the sourceConcept.
+     * @throws IOException DB errors
+     */
+    private I_IdPart getLatestVersion(List<I_IdPart> idParts, Concept sourceConcept) throws TerminologyException,
+            IOException, NoMappingException {
+        I_IdPart latestVersion = null;
+
+        for (I_IdPart iIdPart : idParts) {
+            if (iIdPart.getSource() == termFactory.uuidToNative(sourceConcept.getUids())
+                && (latestVersion == null || iIdPart.getVersion() > latestVersion.getVersion())) {
+                latestVersion = iIdPart;
+            }
+        }
+
+        return latestVersion;
+    }
 
     private List<I_DescriptionTuple> getLatestTuples(List<I_DescriptionTuple> descTuples) {
 
