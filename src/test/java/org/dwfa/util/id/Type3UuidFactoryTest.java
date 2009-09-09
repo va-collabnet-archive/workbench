@@ -7,7 +7,12 @@ import static org.dwfa.util.id.Type3UuidFactory.SNOMED_ROOT_DESCID;
 import static org.dwfa.util.id.Type3UuidFactory.SNOMED_ROOT_DESC_UUID;
 import static org.dwfa.util.id.Type3UuidFactory.SNOMED_ROOT_UUID;
 
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
+
+import org.dwfa.cement.ArchitectonicAuxiliary;
+
+import sun.security.action.GetLongAction;
 
 import junit.framework.TestCase;
 
@@ -65,6 +70,26 @@ public class Type3UuidFactoryTest extends TestCase {
 			if (e.getGeneratedId().equals(Type3UuidFactory.fromEnum(e)) == false) {
 				fail("UUIDs not equal");
 			}
+		}
+	}
+	
+	public void testSNOMEDCore() {
+		System.out.println(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getClass().getName());
+		assertEquals(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getClass().getName(), 
+				"org.dwfa.cement.ArchitectonicAuxiliary$Concept");
+		System.out.println(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString());
+		assertEquals("8c230474-9f11-30ce-9cad-185a96fd03a2", 
+				ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString());
+		System.out.println(Type3UuidFactory.fromEnum(ArchitectonicAuxiliary.Concept.SNOMED_CORE));
+		assertEquals("8c230474-9f11-30ce-9cad-185a96fd03a2", 
+				Type3UuidFactory.fromEnum(ArchitectonicAuxiliary.Concept.SNOMED_CORE).toString());
+        try {
+            String name = "org.dwfa.cement.ArchitectonicAuxiliary$Concept.SNOMED_CORE";
+        	System.out.println(UUID.nameUUIDFromBytes(name.getBytes("8859_1")).toString());
+    		assertEquals("8c230474-9f11-30ce-9cad-185a96fd03a2", 
+    				UUID.nameUUIDFromBytes(name.getBytes("8859_1")).toString());
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
