@@ -16,10 +16,12 @@
 package org.dwfa.ace.task.commit.failureconstraintfactory;
 
 /**
- *
+ * This class represents and implementation of {@link AlertToDataConstraintFailureAbstractFactory} that
+ * uses the {@code forCommit} flag on {@link AbstractConceptTest#test(org.dwfa.ace.api.I_GetConceptData, boolean)}
+ * to determine the type of {@link AlertToDataConstraintFailureFactory} to return.
  * @author Matthew Edwards
  */
-public class SimpleConstraintFailureChooser implements AlertToDataConstraintFailureFactoryChooser {
+public class SimpleConstraintFailureChooser implements AlertToDataConstraintFailureAbstractFactory {
 
     private boolean isForCommit;
 
@@ -27,6 +29,9 @@ public class SimpleConstraintFailureChooser implements AlertToDataConstraintFail
         this.isForCommit = isForCommit;
     }
 
+    /**
+     * @see AlertToDataConstraintFailureAbstractFactory#getFactory()
+     */
     public AlertToDataConstraintFailureFactory getFactory() {
         if (isForCommit) {
             return new ErrorConstraintFailureFactory();
