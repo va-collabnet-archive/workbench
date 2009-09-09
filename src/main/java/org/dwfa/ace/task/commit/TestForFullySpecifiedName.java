@@ -1,12 +1,5 @@
 package org.dwfa.ace.task.commit;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -23,6 +16,13 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 @BeanList(specs = {
 		@Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
@@ -59,8 +59,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 			Set<I_Position> allPositions = getPositions(termFactory);
 
 			ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-			for (I_DescriptionTuple desc : concept.getDescriptionTuples(
-					activeProfile.getAllowedStatus(), null, allPositions, true)) {
+            List<I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, activeProfile);
+            for (I_DescriptionTuple desc : descriptionTupleList) {
 				descriptions.add(desc.getDescVersioned());
 			}
 			for (I_DescriptionVersioned desc : concept
@@ -74,7 +74,17 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 		}
 	}
 
-	private List<AlertToDataConstraintFailure> testDescriptions(
+    private List<I_DescriptionTuple> getDescriptionTupleList(final I_GetConceptData concept,
+                                                             final I_ConfigAceFrame activeProfile) throws IOException {
+
+        Set<I_Position> allPositions = null;
+        I_IntSet allTypes = null;
+        boolean conflictResolvedLatestState = true;
+        return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), allTypes, allPositions,
+                                            conflictResolvedLatestState);
+    }
+
+    private List<AlertToDataConstraintFailure> testDescriptions(
 			I_GetConceptData concept,
 			ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit)
 			throws Exception {
