@@ -41,8 +41,7 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
     private final List<I_DescriptionVersioned> descriptions;
 
     public NotEmptyConceptDataValidator(final I_GetConceptData requiredType,
-            final List<I_DescriptionVersioned> descriptions, final I_GetConceptData conceptToValidate)
-            throws Exception {
+            final List<I_DescriptionVersioned> descriptions, final I_GetConceptData conceptToValidate) {
         this.requiredConcept = requiredType;
         this.descriptions = descriptions;
         this.conceptToValidate = conceptToValidate;
@@ -73,15 +72,10 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      * null or has a length of zero.
      */
     private boolean hasValue(I_DescriptionPart part) {
-        boolean isNotEmpty = true;
-
-        if (part.getText() != null) {
-            isNotEmpty = part.getText().length() > 0;
-        } else {
-            isNotEmpty = false;
+        if (part.getText() == null) {
+            return false;
         }
-
-        return isNotEmpty;
+        return part.getText().length() > 0;
     }
 
     /**
