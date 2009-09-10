@@ -2,7 +2,6 @@ package org.dwfa.ace.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
@@ -38,6 +37,9 @@ public class LocalVersionedTerminology {
 							.getPreviousAuthorityId())) {
 						setFactory(factory);
 					} else {
+						AceLog.getAppLog().info("authorityId: " + authorityId);
+						AceLog.getAppLog().info("factory.getAuthorityId(): " + factory.getAuthorityId());
+						AceLog.getAppLog().info("factory.getPreviousAuthorityId(): " + factory.getPreviousAuthorityId());
 						throw new RuntimeException(
 								"LocalVersionedTerminology.factory is already set to: "
 										+ LocalVersionedTerminology.factory
