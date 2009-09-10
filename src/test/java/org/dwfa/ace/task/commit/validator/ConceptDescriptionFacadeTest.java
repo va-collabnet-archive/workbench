@@ -139,11 +139,6 @@ public class ConceptDescriptionFacadeTest {
         return this;
     }
 
-    private void initExpectations() throws Exception {
-
-        expect(mockConcept.getUncommittedDescriptions()).andReturn(uncommittedDescriptions).once();
-    }
-
     private class MockConceptTest extends AbstractConceptTest {
 
         @Override
