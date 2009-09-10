@@ -259,7 +259,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
       initWithGridBagLayout();
       setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3), BorderFactory
             .createLineBorder(Color.GRAY)));
-      showStatus.setSelected(true);
+      showStatus.setSelected(false);
       showStatus.addActionListener(this);
       longForm.addActionListener(this);
       resolveButton.addActionListener(new ImplementActionListener());
@@ -795,6 +795,8 @@ public class ConflictPanel extends JPanel implements ActionListener {
          resolutionPanel.add(resolveButton, resolutionConstraints);
 
          resolutionConstraints.anchor = GridBagConstraints.NORTHWEST;
+         resolutionConstraints.gridwidth = 2;
+         resolutionConstraints.gridx = 0;
          resolutionConstraints.gridx = 0;
          resolutionConstraints.gridy = 0;
          resolutionConstraints.weighty = 0;

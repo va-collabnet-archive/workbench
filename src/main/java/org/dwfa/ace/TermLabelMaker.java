@@ -18,7 +18,7 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class TermLabelMaker {
 
-	public static final int LABEL_WIDTH = 330;
+	public static final int LABEL_WIDTH = 400;
 
 	public static I_ImplementActiveLabel newLabel(
 			I_ConceptAttributeTuple conAttribute, boolean showLongForm,
@@ -162,7 +162,7 @@ public class TermLabelMaker {
 		labelBuff.append("<font face='Dialog' size='3' color='blue'>");
 		labelBuff.append(typeBean.getInitialText());
 		labelBuff
-				.append(" &nbsp;</font><br><font face='Dialog' size='3' color='green'>");
+				.append(" &nbsp;</font><font face='Dialog' size='3' color='green'>");
 		labelBuff.append(destBean.getInitialText());
 		labelBuff.append(" &nbsp;</font>");
 		StringBuffer writeBuff = labelBuff;
