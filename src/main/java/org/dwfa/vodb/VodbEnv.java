@@ -397,7 +397,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     private void removeFromExtensionCache(final int memberId) throws IOException {
-        getExtensionWrapper(memberId).removeFromCache();
+        ((ExtensionByReferenceBean)getExtensionWrapper(memberId)).removeFromCache();
     }
 
     public boolean hasExtension(int memberId) throws IOException {
