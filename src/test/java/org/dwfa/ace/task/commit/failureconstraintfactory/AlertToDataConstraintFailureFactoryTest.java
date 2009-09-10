@@ -23,11 +23,6 @@ import org.easymock.internal.MocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests the {@link AlertToDataConstraintFailureFactory} creates the correct type of
- * {@link AlertToDataConstraintFailure)
- * @author Matthew Edwards
- */
 public class AlertToDataConstraintFailureFactoryTest {
 
     private I_GetConceptData mockConceptData;
@@ -42,7 +37,7 @@ public class AlertToDataConstraintFailureFactoryTest {
     @Test
     public void testGetErrorAlertType() throws Exception {
         String message = "test alert with alert type 'ERROR'";
-        AlertToDataConstraintFailureFactoryChooser factoryChooser = new SimpleConstraintFailureChooser(true);
+        AlertToDataConstraintFailureAbstractFactory factoryChooser = new SimpleConstraintFailureChooser(true);
         AlertToDataConstraintFailureFactory factory = factoryChooser.getFactory();
         AlertToDataConstraintFailure alert = factory.createAlertToDataConstraintFailure(message, mockConceptData);
         Assert.assertEquals(alert.getAlertType(), ALERT_TYPE.ERROR);
@@ -53,7 +48,7 @@ public class AlertToDataConstraintFailureFactoryTest {
     @Test
     public void testGetWarningAlertType() throws Exception {
         String message = "test alert with alert type 'WARNING'";
-        AlertToDataConstraintFailureFactoryChooser factoryChooser = new SimpleConstraintFailureChooser(false);
+        AlertToDataConstraintFailureAbstractFactory factoryChooser = new SimpleConstraintFailureChooser(false);
         AlertToDataConstraintFailureFactory factory = factoryChooser.getFactory();
         AlertToDataConstraintFailure alert = factory.createAlertToDataConstraintFailure(message, mockConceptData);
         Assert.assertEquals(alert.getAlertType(), ALERT_TYPE.WARNING);

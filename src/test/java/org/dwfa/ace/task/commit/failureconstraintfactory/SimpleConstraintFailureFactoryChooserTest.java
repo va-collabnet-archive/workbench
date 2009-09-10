@@ -18,14 +18,9 @@ package org.dwfa.ace.task.commit.failureconstraintfactory;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * Tests the {@link SimpleCosntraintFailureFactoryChooser} returns the correct
- * {@link AlertToDataConstraintFailureFactory}
- * @author Matthew Edwards
- */
 public class SimpleConstraintFailureFactoryChooserTest {
 
-    private AlertToDataConstraintFailureFactoryChooser factoryChooser;
+    private AlertToDataConstraintFailureAbstractFactory factoryChooser;
 
     @Test
     public void testsGetErrorConstraintFailureFactory() throws Exception {
