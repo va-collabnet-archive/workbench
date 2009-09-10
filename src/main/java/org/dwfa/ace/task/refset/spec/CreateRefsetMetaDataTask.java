@@ -25,9 +25,15 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Creates meta data required for a refset spec. This consists of a refset spec,
- * marked parent and refset components. Required input to this task is the name
- * of the refset spec being created.
+ * Creates meta data required for a new refset.
+ * Meta data created includes :
+ * concepts (member refset, refset spec, marked parent, comments refset,
+ * promotion refset)
+ * descriptions (FSN and PT for each concept)
+ * relationships (member refset -> refset identity, remaining concepts ->
+ * supporting refset)
+ * 
+ * Required input to this task is the name of the refset spec being created.
  * 
  * @author Chrissy Hill
  * 
@@ -37,8 +43,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
-    private String newRefsetPropName = ProcessAttachmentKeys.MESSAGE
-            .getAttachmentKey();
+    private String newRefsetPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private I_TermFactory termFactory;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -46,8 +51,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         out.writeObject(newRefsetPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             newRefsetPropName = (String) in.readObject();
@@ -56,58 +60,53 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(final I_EncodeBusinessProcess process,
-            I_Work worker) throws TaskFailedException {
+    public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             termFactory = LocalVersionedTerminology.get();
 
             String name = (String) process.readProperty(newRefsetPropName);
 
-            I_GetConceptData fsnConcept = termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                            .getUids());
-            I_GetConceptData ptConcept = termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-                            .getUids());
-            I_GetConceptData isA = termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-                            .getUids());
-            I_GetConceptData refsetParent = termFactory
-                    .getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY
-                            .getUids());
-            I_GetConceptData markedParentRel = termFactory
-                    .getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET
-                            .getUids());
-            I_GetConceptData markedParentIsATypeRel = termFactory
-                    .getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE
-                            .getUids());
-            I_GetConceptData specifiesRefsetRel = termFactory
-                    .getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET
-                            .getUids());
+            I_GetConceptData fsnConcept =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            I_GetConceptData ptConcept =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+            I_GetConceptData isA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+            I_GetConceptData refsetIdentity = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+            I_GetConceptData supportingRefset =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
+            I_GetConceptData markedParentRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+            I_GetConceptData markedParentIsATypeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
+            I_GetConceptData specifiesRefsetRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
 
             // check that the name isn't null or empty etc
             if (name == null || name.trim().equals("")) {
                 throw new TaskFailedException("Refset name cannot be empty.");
             }
 
-            String refsetName = name + " refset";
+            String memberRefsetName = name + " refset";
             String refsetSpecName = name + " refset spec";
             String markedParentName = name + " marked parent";
+            String promotionName = name + " promotion refset";
+            String commentsName = name + " comments refset";
 
-            // create 3 new concepts
-            I_GetConceptData refset = newConcept();
+            // create new concepts
+            I_GetConceptData memberRefset = newConcept();
             I_GetConceptData refsetSpec = newConcept();
             I_GetConceptData markedParent = newConcept();
+            I_GetConceptData promotionRefset = newConcept();
+            I_GetConceptData commentsRefset = newConcept();
 
             // create FSN and PT for each
-            newDescription(refset, fsnConcept, refsetName);
-            newDescription(refset, ptConcept, refsetName);
+            newDescription(memberRefset, fsnConcept, memberRefsetName);
+            newDescription(memberRefset, ptConcept, memberRefsetName);
 
             newDescription(refsetSpec, fsnConcept, refsetSpecName);
             newDescription(refsetSpec, ptConcept, refsetSpecName);
@@ -115,30 +114,34 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newDescription(markedParent, fsnConcept, markedParentName);
             newDescription(markedParent, ptConcept, markedParentName);
 
+            newDescription(promotionRefset, fsnConcept, promotionName);
+            newDescription(promotionRefset, ptConcept, promotionName);
+
+            newDescription(commentsRefset, fsnConcept, commentsName);
+            newDescription(commentsRefset, ptConcept, commentsName);
+
             // create relationships
-            newRelationship(refset, isA, refsetParent);
-            newRelationship(refset, markedParentRel, markedParent);
+            newRelationship(memberRefset, markedParentRel, markedParent);
             I_GetConceptData isADestination = null;
             if (termFactory.hasId(SNOMED.Concept.IS_A.getUids())) {
-                isADestination = termFactory.getConcept(SNOMED.Concept.IS_A
-                        .getUids());
+                isADestination = termFactory.getConcept(SNOMED.Concept.IS_A.getUids());
             } else {
-                isADestination = termFactory
-                        .getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-                                .getUids());
+                isADestination = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
             }
-            newRelationship(refset, markedParentIsATypeRel, isADestination);
+            newRelationship(memberRefset, markedParentIsATypeRel, isADestination);
+            newRelationship(refsetSpec, specifiesRefsetRel, memberRefset);
 
-            newRelationship(refsetSpec, isA, refsetParent);
-            newRelationship(refsetSpec, specifiesRefsetRel, refset);
-
-            newRelationship(markedParent, isA, refsetParent);
+            newRelationship(memberRefset, isA, refsetIdentity);
+            newRelationship(refsetSpec, isA, supportingRefset);
+            newRelationship(markedParent, isA, supportingRefset);
+            newRelationship(promotionRefset, isA, supportingRefset);
+            newRelationship(commentsRefset, isA, supportingRefset);
 
             // commit
             termFactory.commit();
 
             // set new spec as focus
-            termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(refset);
+            termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(memberRefset);
 
             return Condition.CONTINUE;
         } catch (Exception ex) {
@@ -154,12 +157,11 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             List<I_Path> paths = termFactory.getPaths();
 
             UUID conceptUuid = UUID.randomUUID();
-            termFactory.uuidToNativeWithGeneration(conceptUuid,
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize()
-                            .getNid(), paths, Integer.MAX_VALUE);
+            termFactory.uuidToNativeWithGeneration(conceptUuid, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+                .localize().getNid(), paths, Integer.MAX_VALUE);
 
-            I_GetConceptData newConcept = termFactory.newConcept(conceptUuid,
-                    isDefined, termFactory.getActiveAceFrameConfig());
+            I_GetConceptData newConcept =
+                    termFactory.newConcept(conceptUuid, isDefined, termFactory.getActiveAceFrameConfig());
             newConcept.getConceptAttributes();
 
             return newConcept;
@@ -169,20 +171,18 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         }
     }
 
-    private void newDescription(I_GetConceptData concept,
-            I_GetConceptData descriptionType, String description)
+    private void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType, String description)
             throws Exception {
 
         try {
 
             List<I_Path> paths = termFactory.getPaths();
             UUID descUuid = UUID.randomUUID();
-            termFactory.uuidToNativeWithGeneration(descUuid,
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize()
-                            .getNid(), paths, Integer.MAX_VALUE);
+            termFactory.uuidToNativeWithGeneration(descUuid, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize()
+                .getNid(), paths, Integer.MAX_VALUE);
 
-            termFactory.newDescription(descUuid, concept, "en", description,
-                    descriptionType, termFactory.getActiveAceFrameConfig());
+            termFactory.newDescription(descUuid, concept, "en", description, descriptionType, termFactory
+                .getActiveAceFrameConfig());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -190,33 +190,25 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         }
     }
 
-    public void newRelationship(I_GetConceptData concept,
-            I_GetConceptData relationshipType, I_GetConceptData destination)
-            throws Exception {
+    public void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
+            I_GetConceptData destination) throws Exception {
         try {
-            int statusId = termFactory.getConcept(
-                    ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                    .getConceptId();
+            int statusId = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId();
 
             List<I_Path> paths = termFactory.getPaths();
             UUID relUuid = UUID.randomUUID();
 
-            I_GetConceptData charConcept = termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
-                            .getUids());
-            I_GetConceptData refConcept = termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
-                            .getUids());
+            I_GetConceptData charConcept =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            I_GetConceptData refConcept =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
             int group = 0;
 
-            termFactory.uuidToNativeWithGeneration(relUuid,
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize()
-                            .getNid(), paths, Integer.MAX_VALUE);
+            termFactory.uuidToNativeWithGeneration(relUuid, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize()
+                .getNid(), paths, Integer.MAX_VALUE);
 
-            termFactory.newRelationship(relUuid, concept, relationshipType,
-                    destination, charConcept, refConcept, termFactory
-                            .getConcept(statusId), group, termFactory
-                            .getActiveAceFrameConfig());
+            termFactory.newRelationship(relUuid, concept, relationshipType, destination, charConcept, refConcept,
+                termFactory.getConcept(statusId), group, termFactory.getActiveAceFrameConfig());
 
         } catch (Exception e) {
             e.printStackTrace();
