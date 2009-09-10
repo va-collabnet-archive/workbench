@@ -21,29 +21,28 @@ import java.util.Set;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.easymock.internal.MocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import static org.easymock.EasyMock.expect;
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.assertEquals;
+import static org.easymock.EasyMock.expect;
 
-public class ConceptDescriptionFacadeTest {
+public final class ConceptDescriptionFacadeTest {
 
+    private ConceptDescriptionFacade classBeingTested;
     private I_GetConceptData mockConcept;
     private MocksControl mocksControl;
     private I_TermFactory mockTermFactory;
     private AbstractConceptTest mockConceptTest;
-    private ConceptDescriptionFacade classBeingTested;
     private I_ConfigAceFrame mockAceFrame;
     private I_IntSet mockAllowedStatus;
     private Set<I_Position> mockPositions;
@@ -82,7 +81,9 @@ public class ConceptDescriptionFacadeTest {
     @Test
     public void getAllDescriptionsTest() throws Exception {
 
-        this.expectGetConceptFromTermFactory().expectGetConceptIdFromMockConcept().
+        this.expectGetFsnConceptOnTermFactory().
+                expectUuidToNativeOnTermFactory().
+                expectGetConceptIdFromMockConcept().
                 expectGetActiveAceFrameConfigFromTermFactory().
                 expectGetPositionsFromTermFactory().expectGetAllowedStatusOnAceConfigFrame().
                 expectGetDescTuplesWithMockStatusOnConcept().expectGetDescVersionedOnMockDescTuple().
@@ -92,20 +93,43 @@ public class ConceptDescriptionFacadeTest {
         mocksControl.replay();
         mockConcept = mockTermFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
+                getUids().
+                iterator().next());
+
+        assertEquals(mockConcept.getConceptId(), conceptId);
+
         List<I_DescriptionVersioned> descriptions = classBeingTested.getAllDescriptions(mockConcept);
         assertEquals(descriptions.size(), numExpectedDescriptions);
 
         mocksControl.verify();
     }
 
-    private ConceptDescriptionFacadeTest expectGetConceptFromTermFactory() throws Exception {
+    protected class MockConceptTest extends AbstractConceptTest {
+
+        @Override
+        public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws
+                TaskFailedException {
+            return new ArrayList<AlertToDataConstraintFailure>();
+        }
+    }
+
+    private ConceptDescriptionFacadeTest expectGetFsnConceptOnTermFactory() throws Exception {
         expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids())).
                 andReturn(mockConcept);
         return this;
     }
 
+    private ConceptDescriptionFacadeTest expectUuidToNativeOnTermFactory() throws Exception {
+        expect(mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().
+                iterator().next())).
+                andReturn(Integer.MIN_VALUE);
+        return this;
+    }
+
     private ConceptDescriptionFacadeTest expectGetConceptIdFromMockConcept() throws Exception {
-        expect(mockConcept.getConceptId()).andReturn(Integer.MIN_VALUE);
+        expect(mockConcept.getConceptId()).andReturn(Integer.MIN_VALUE).times(2);
         return this;
     }
 
@@ -130,7 +154,7 @@ public class ConceptDescriptionFacadeTest {
     }
 
     private ConceptDescriptionFacadeTest expectGetDescVersionedOnMockDescTuple() throws Exception {
-        expect(mockDescriptionTuple.getDescVersioned()).andReturn(mockVersionedDescription).anyTimes();
+        expect(mockDescriptionTuple.getDescVersioned()).andReturn(mockVersionedDescription).times(1);
         return this;
     }
 
@@ -138,14 +162,4 @@ public class ConceptDescriptionFacadeTest {
         expect(mockConcept.getUncommittedDescriptions()).andReturn(uncommittedDescriptions).once();
         return this;
     }
-
-    private class MockConceptTest extends AbstractConceptTest {
-
-        @Override
-        public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws
-                TaskFailedException {
-            return new ArrayList<AlertToDataConstraintFailure>();
-        }
-    }
 }
-
