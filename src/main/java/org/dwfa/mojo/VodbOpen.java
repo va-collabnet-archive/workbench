@@ -43,9 +43,9 @@ public class VodbOpen extends AbstractMojo {
     /**
      * Use existing if it is already open
      *
-     * @parameter
+     * @parameter expression=${useExistingDb}
      */
-    boolean useExistingDb = false;
+    String useExistingDb;
 
 
     /**
@@ -69,8 +69,10 @@ public class VodbOpen extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty("java.awt.headless", "true");
+        getLog().info("useExistingDb: " + useExistingDb);
         try {
-            if (useExistingDb && LocalVersionedTerminology.get() != null) {
+            if (useExistingDb != null && Boolean.getBoolean(useExistingDb) &&
+            		LocalVersionedTerminology.get() != null) {
                 return;
             }
 
@@ -126,11 +128,11 @@ public class VodbOpen extends AbstractMojo {
         this.cacheSize = cacheSize;
     }
 
-    public boolean isUseExistingDb() {
+    public String getUseExistingDb() {
         return useExistingDb;
     }
 
-    public void setUseExistingDb(boolean useExistingDb) {
+    public void setUseExistingDb(String useExistingDb) {
         this.useExistingDb = useExistingDb;
     }
 
