@@ -124,6 +124,13 @@ public class NewRefsetSpecWizard {
         wizardDialog.setVisible(true);
     }
 
+    public void showNonModalDialog() {
+        wizardDialog.setModal(false);
+        wizardDialog.pack();
+        wizardDialog.setLocationRelativeTo(null); // center frame
+        wizardDialog.setVisible(true);
+    }
+
     public void setCurrentPanel(String id) {
         currentPanel = id;
         cardLayout.show(cardPanel, currentPanel);

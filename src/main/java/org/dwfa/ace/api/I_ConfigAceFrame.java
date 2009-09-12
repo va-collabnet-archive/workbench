@@ -33,21 +33,23 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public enum SPECIAL_SVN_ENTRIES {
         PROFILE_CSU(), PROFILE_DBU(), BERKELEY_DB();
     };
-    
+
     public enum LANGUAGE_SORT_PREF {
-    	LANG_B4_TYPE("language before type"), TYPE_B4_LANG("type before language");
-    	
-    	private String desc;
-    	private LANGUAGE_SORT_PREF(String desc) {
-    		this.desc = desc;
-    	}
-    	
-    	public String toString() {
-    		return desc;
-    	}
+        LANG_B4_TYPE("language before type"), TYPE_B4_LANG("type before language");
+
+        private String desc;
+
+        private LANGUAGE_SORT_PREF(String desc) {
+            this.desc = desc;
+        }
+
+        public String toString() {
+            return desc;
+        }
     }
-    
+
     public LANGUAGE_SORT_PREF getLanguageSortPref();
+
     public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref);
 
     public boolean isActive();
@@ -63,13 +65,17 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setAllowedStatus(I_IntSet allowedStatus);
 
     /**
-     * Description types for display when the concept view has the use preferences toggle on. 
+     * Description types for display when the concept view has the use
+     * preferences toggle on.
+     * 
      * @return
      */
     public I_IntSet getDescTypes();
 
     /**
-     * Relationship types for display when the concept view has the use preferences toggle on. 
+     * Relationship types for display when the concept view has the use
+     * preferences toggle on.
+     * 
      * @return
      */
     public I_IntSet getPrefFilterTypesForRel();
@@ -115,8 +121,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void removeViewPosition(I_Position p);
 
-    public void replaceViewPosition(I_Position oldPosition,
-            I_Position newPosition);
+    public void replaceViewPosition(I_Position oldPosition, I_Position newPosition);
 
     public Set<I_Position> getViewPositionSet();
 
@@ -128,13 +133,11 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void fireCommit();
 
-    public void addPropertyChangeListener(String propertyName,
-            PropertyChangeListener listener);
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
     public void removePropertyChangeListener(PropertyChangeListener listener);
 
-    public void removePropertyChangeListener(String propertyName,
-            PropertyChangeListener listener);
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
     public I_IntSet getRoots();
 
@@ -156,8 +159,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setEditImageTypePopup(I_IntList editImageTypePopup);
 
-    public void setEditRelCharacteristicPopup(
-            I_IntList editRelCharacteristicPopup);
+    public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup);
 
     public void setEditRelRefinabiltyPopup(I_IntList editRelRefinabiltyPopup);
 
@@ -193,25 +195,21 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public I_GetConceptData getDefaultDescriptionType();
 
-    public void setDefaultDescriptionType(
-            I_GetConceptData defaultDescriptionType);
+    public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType);
 
     public void setDefaultImageType(I_GetConceptData defaultImageType);
 
     public I_GetConceptData getDefaultRelationshipCharacteristic();
 
-    public void setDefaultRelationshipCharacteristic(
-            I_GetConceptData defaultRelationshipCharacteristic);
+    public void setDefaultRelationshipCharacteristic(I_GetConceptData defaultRelationshipCharacteristic);
 
     public I_GetConceptData getDefaultRelationshipRefinability();
 
-    public void setDefaultRelationshipRefinability(
-            I_GetConceptData defaultRelationshipRefinability);
+    public void setDefaultRelationshipRefinability(I_GetConceptData defaultRelationshipRefinability);
 
     public I_GetConceptData getDefaultRelationshipType();
 
-    public void setDefaultRelationshipType(
-            I_GetConceptData defaultRelationshipType);
+    public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType);
 
     public I_GetConceptData getDefaultStatus();
 
@@ -233,8 +231,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setHierarchySelection(I_GetConceptData hierarchySelection);
 
-    public void setHierarchySelectionAndExpand(
-            I_GetConceptData hierarchySelection) throws IOException;
+    public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException;
 
     public MasterWorker getWorker();
 
@@ -296,6 +293,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void showListView();
 
+    public void showRefsetSpecPanel();
+
     public void setShowAddresses(boolean shown);
 
     public void setShowComponentView(boolean shown);
@@ -304,8 +303,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void performLuceneSearch(String query, I_GetConceptData root);
 
-    public void performLuceneSearch(String query,
-            List<I_TestSearchResults> extraCriterion);
+    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
 
     public void setShowPreferences(boolean shown);
 
@@ -371,19 +369,16 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public boolean isHistoryToggleVisible();
 
-    public void setTogglesInComponentPanelVisible(TOGGLES toggle,
-            boolean visible);
+    public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible);
 
     public boolean isToggleVisible(TOGGLES toggle);
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle)
-            throws TerminologyException, IOException;
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
+            IOException;
 
-    public void setRefsetInToggleVisible(REFSET_TYPES refsetType,
-            TOGGLES toggle, boolean visible);
+    public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible);
 
-    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType,
-            TOGGLES toggle);
+    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle);
 
     public void setCommitAbortButtonsVisible(boolean visible);
 
@@ -465,26 +460,22 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
      * 
      * @param conflictResolutionStrategy
      */
-    void setConflictResolutionStrategy(
-            I_ManageConflict conflictResolutionStrategy);
+    void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy);
 
     /**
      * Sets the conflict resolution strategy for this profile
      * 
      * @param conflictResolutionStrategy
      */
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(
-            Class<T> conflictResolutionStrategyClass);
+    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
 
     public Boolean getHighlightConflictsInTaxonomyView();
 
-    public void setHighlightConflictsInTaxonomyView(
-            Boolean highlightConflictsInTaxonomyView);
+    public void setHighlightConflictsInTaxonomyView(Boolean highlightConflictsInTaxonomyView);
 
     public Boolean getHighlightConflictsInComponentPanel();
 
-    public void setHighlightConflictsInComponentPanel(
-            Boolean highlightConflictsInComponentPanel);
+    public void setHighlightConflictsInComponentPanel(Boolean highlightConflictsInComponentPanel);
 
     public I_GetConceptData getRefsetInSpecEditor();
 
@@ -539,18 +530,15 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public Map<String, Object> getProperties() throws IOException;
 
-    public void addConceptPanelPlugins(HOST_ENUM host, UUID id,
-            I_PluginToConceptPanel plugin);
+    public void addConceptPanelPlugins(HOST_ENUM host, UUID id, I_PluginToConceptPanel plugin);
 
-    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host,
-            UUID id);
+    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID id);
 
     public Set<UUID> getConceptPanelPluginKeys(HOST_ENUM host);
 
     public I_PluginToConceptPanel getConceptPanelPlugin(HOST_ENUM host, UUID id);
 
-    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(
-            HOST_ENUM host);
+    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host);
 
     /**
      * 
@@ -571,7 +559,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForViewer();
 
     public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext);
-    
+
     public I_DescriptionTuple getSearchResultsSelection();
 
 }
