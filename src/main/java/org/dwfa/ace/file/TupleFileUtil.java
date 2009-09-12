@@ -206,21 +206,23 @@ public class TupleFileUtil {
             List<I_ThinExtByRefTuple> extensions =
                     currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSet(), addUncommitted,
                         returnConflictResolvedLatestState);
-            I_ThinExtByRefTuple thinTuple = extensions.get(0);
-            I_ThinExtByRefPart thinPart = thinTuple.getPart();
+            if (extensions.size() > 0) {
+                I_ThinExtByRefTuple thinTuple = extensions.get(0);
+                I_ThinExtByRefPart thinPart = thinTuple.getPart();
 
-            if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
-                outputFileWriter.append(ConceptConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
-            } else if (thinPart instanceof I_ThinExtByRefPartConceptConcept) {
-                outputFileWriter.append(ConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
-                // process each grandchild
-                if (!childNode.isLeaf()) {
-                    processNode(childNode, configFrame, outputFileWriter);
+                if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
+                    outputFileWriter.append(ConceptConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
+                } else if (thinPart instanceof I_ThinExtByRefPartConceptConcept) {
+                    outputFileWriter.append(ConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
+                    // process each grandchild
+                    if (!childNode.isLeaf()) {
+                        processNode(childNode, configFrame, outputFileWriter);
+                    }
+                } else if (thinPart instanceof I_ThinExtByRefPartConceptConceptString) {
+                    outputFileWriter.append(ConceptConceptStringExtTupleFileUtil.exportTuple(thinTuple));
+                } else {
+                    throw new TerminologyException("Unknown extension type:" + thinPart.toString());
                 }
-            } else if (thinPart instanceof I_ThinExtByRefPartConceptConceptString) {
-                outputFileWriter.append(ConceptConceptStringExtTupleFileUtil.exportTuple(thinTuple));
-            } else {
-                throw new TerminologyException("Unknown extension type:" + thinPart.toString());
             }
 
         }
