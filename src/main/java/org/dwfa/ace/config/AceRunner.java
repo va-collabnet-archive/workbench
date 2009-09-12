@@ -157,7 +157,11 @@ public class AceRunner {
 
             if (aceConfigFile == null || !aceConfigFile.exists()) {
                 aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
-                File lastProfileDir = new File(aceProperties.getProperty("last-profile-dir"));
+                String lastProfileDirStr = "profiles";
+                if (aceProperties.getProperty("last-profile-dir") != null) {
+                	lastProfileDirStr = aceProperties.getProperty("last-profile-dir");
+                }
+                File lastProfileDir = new File(lastProfileDirStr);
 
                 if (lastProfileDir.isFile()) {
                     aceConfigFile = lastProfileDir;
@@ -169,9 +173,9 @@ public class AceRunner {
                         }
                     });
 
-                    if (profileFiles.length == 1) {
+                    if (profileFiles != null && profileFiles.length == 1) {
                         aceConfigFile = new File(lastProfileDir, profileFiles[0]).getCanonicalFile();
-                    } else if (profileFiles.length > 1) {
+                    } else if (profileFiles != null && profileFiles.length > 1) {
                         AceLog.getAppLog().warning(
                             "Profile from jini configuration does not exist and more than one profile file found in " +
                             "last profile directory " + lastProfileDir + ", unable to determine profile to use.");
