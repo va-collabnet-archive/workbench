@@ -243,7 +243,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                         ANCILLARY_DATA, CROSS_MAP_EXTENSION},
                         new I_ConceptualizeUniversally [] { ArchitectonicAuxiliary.Concept.IS_A_REL,
                        REFSET_PURPOSE_REL, REFSET_TYPE_REL}),
-                SCG(new String[] { "Religions","Religions",
+                SCG_RELIGIONS(new String[] { "Religions","Religions",
                        "ORG_DWFA_CTV3_CROSS_MAP"},
                        new I_ConceptualizeUniversally [] { SCG,
                         ANCILLARY_DATA, CROSS_MAP_EXTENSION},
@@ -256,12 +256,6 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                         ANCILLARY_DATA, CROSS_MAP_EXTENSION},
                         new I_ConceptualizeUniversally [] { ArchitectonicAuxiliary.Concept.IS_A_REL,
                        REFSET_PURPOSE_REL, REFSET_TYPE_REL}),
-
-
-
-
-
-
 
                 PATHOLOGY_INCLUSION_SPEC(new String[] { "pathology inclusion specification","pathology inclusion specification",
                     "ORG_DWFA_PATHOLOGY_INCLUSION_SPEC"},
