@@ -69,7 +69,7 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.util.io.FileIO;
-import org.dwfa.ace.task.util.FileContent;
+import org.dwfa.bpa.tasks.util.FileContent;
 
 /**
  * @author kec

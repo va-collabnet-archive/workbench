@@ -21,7 +21,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.ace.task.util.FileContent;
+import org.dwfa.bpa.tasks.util.FileContent;
 
 public class ProcessAttachmentTableModel extends AbstractTableModel {
 
