@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.util.FileContent;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -157,8 +158,9 @@ public class RefsetSpecWizardTask extends AbstractTask {
                             process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refsetName);
                             process.setProperty(ProcessAttachmentKeys.MESSAGE.getAttachmentKey(), comments);
                             process.setProperty(ProcessAttachmentKeys.REQUESTOR.getAttachmentKey(), requestor);
-                            process.setProperty(ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey(), attachments);
-                            // process.writeAttachment(arg0, arg1);
+                            for (File file : attachments) {
+                                process.writeAttachment(file.getName(), new FileContent(file));
+                            }
 
                             RefsetSpecWizardTask.this.setCondition(Condition.ITEM_COMPLETE);
                             wizard.getDialog().dispose();

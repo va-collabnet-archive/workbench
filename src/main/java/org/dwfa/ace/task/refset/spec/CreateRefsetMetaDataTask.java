@@ -6,8 +6,6 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -47,8 +45,6 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     private static final int dataVersion = 1;
     private String newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private I_TermFactory termFactory;
-    private boolean success;
-    private boolean done;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -71,8 +67,6 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
-            done = false;
-            success = true;
 
             termFactory = LocalVersionedTerminology.get();
 
@@ -158,37 +152,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
         } catch (Exception e) {
             e.printStackTrace();
-            success = false;
         }
 
-        done = true;
-
-        if (!getSuccess()) {
-            throw new TaskFailedException("Unable to complete refset meta data creation");
-        }
         return Condition.CONTINUE;
-    }
-
-    private void waitTillDone(Logger l) {
-        while (!this.isDone()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                l.log(Level.SEVERE, e.getMessage(), e);
-            }
-        }
-    }
-
-    public boolean isDone() {
-        return this.done;
-    }
-
-    public void setDone(boolean b) {
-        this.done = b;
-    }
-
-    private boolean getSuccess() {
-        return success;
     }
 
     private I_GetConceptData newConcept() throws Exception {
