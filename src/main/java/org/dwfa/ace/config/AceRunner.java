@@ -50,6 +50,9 @@ import org.dwfa.vodb.VodbEnv;
 import com.sun.jini.start.LifeCycle;
 
 public class AceRunner {
+	static {
+		VodbEnv.setHeadless(false);
+	}
 
 	private class CheckIpAddressForChanges implements ActionListener {
 		InetAddress startupLocalHost;
@@ -94,7 +97,6 @@ public class AceRunner {
 		try {
 			AceRunner.args = args;
 			AceRunner.lc = lc;
-			VodbEnv.setHeadless(false);
 
 			setupCustomProtocolHandler();
 

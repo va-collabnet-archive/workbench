@@ -27,6 +27,10 @@ import org.dwfa.vodb.VodbEnv;
 import com.sun.jini.start.LifeCycle;
 
 public class AceReadOnlyRunner {
+	
+	static {
+		  VodbEnv.setHeadless(false);
+	}
 
    @SuppressWarnings("unused")
    private String[] args;
@@ -40,7 +44,6 @@ public class AceReadOnlyRunner {
 
    public AceReadOnlyRunner(final String[] args, final LifeCycle lc) {
       ACE.editMode = false;
-	  VodbEnv.setHeadless(false);
       JiniManager.setLocalOnly(true);
       try {
          this.args = args;
