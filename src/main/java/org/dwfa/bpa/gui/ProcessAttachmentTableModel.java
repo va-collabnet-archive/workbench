@@ -1,7 +1,7 @@
 /*
  * Created on Mar 6, 2006
  *
- * Copyright 2006 by Informatics, Inc. 
+ * Copyright 2006 by Informatics, Inc.
  */
 package org.dwfa.bpa.gui;
 
@@ -21,11 +21,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.ace.task.util.FileContent;
 
 public class ProcessAttachmentTableModel extends AbstractTableModel {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -82,10 +83,15 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
             if (attachment.toString().length() < 20) {
                 return attachment.toString();
             }
+            if (attachment instanceof FileContent) {
+                return "<html><font color='green'>Use 'Save as...' to view";
+            }
             return "<html><font color='green'>Use popup to view";
         case CLASS:
             if (attachment == null) {
                 return "null class";
+            } else if (attachment instanceof FileContent) {
+                return "File";
             }
             return attachment.getClass().getSimpleName();
         }
@@ -144,7 +150,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
                 this.process.writeAttachment(name, newObj);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
-            } 
+            }
         }
         this.fireTableDataChanged();
     }
@@ -179,7 +185,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
         				}
         			}
         		}
-        	} 
+        	}
         	if (canSerialize) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);

@@ -69,10 +69,11 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.util.io.FileIO;
+import org.dwfa.ace.task.util.FileContent;
 
 /**
  * @author kec
- * 
+ *
  */
 public class ProcessPanel extends JPanel implements PropertyChangeListener {
 
@@ -88,7 +89,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 			.getName());
 
 	/**
-     * 
+     *
      */
 	private static final long serialVersionUID = 1L;
 
@@ -122,7 +123,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 	private JButton addEmptyAttachmentKey;
 
 	private JSplitPane headerProcessSplit;
-	
+
 	private I_HandleDoubleClickInTaskProcess doubleClickHandler;
 
 	private class AddAttachmentActionListener implements ActionListener {
@@ -269,7 +270,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 							attachmentSortingTable.modelIndex(attachmentTable
 									.getSelectedRow()),
 							ProcessAttachmentTableModel.NAME);
-					
+
 					Object object = process.readAttachement(key);
 					if (logger.isLoggable(Level.INFO)) {
 						if (object != null) {
@@ -284,7 +285,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 				} else {
 					JOptionPane.showMessageDialog(attachmentTable, "No row is selected...");
 				}
-				
+
 			} else if (command.equals("save as...")) {
 				saveAs();
 			} else if (command.equals("remove")) {
@@ -306,7 +307,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 		}
 
 		/**
-         * 
+         *
          */
 		private void saveAs() {
 			try {
@@ -319,7 +320,16 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 				FileDialog f = new FileDialog((Frame) getTopLevelAncestor(),
 						"Save Attachment", FileDialog.SAVE);
 				f.setDirectory(System.getProperty("user.dir"));
-				f.setFile(key + ".bean");
+
+
+				if (obj instanceof FileContent) {
+				    f.setFile(((FileContent) obj).getFilename());
+				} else {
+				    f.setFile(key + ".bean");
+				}
+
+
+				//f.setFile(key + ".bean");
 				f.setVisible(true); // Display dialog and wait for response
 				if (f.getFile() != null) {
 					File processBinaryFile = new File(f.getDirectory(), f
@@ -327,9 +337,23 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 					FileOutputStream fos = new FileOutputStream(
 							processBinaryFile);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
-					ObjectOutputStream oos = new ObjectOutputStream(bos);
-					oos.writeObject(obj);
-					oos.close();
+
+					if (obj instanceof FileContent) {
+					    FileContent inputFile = (FileContent) obj;
+					    byte[] contents = inputFile.getContents();
+
+					    for (int i = 0; i < contents.length; i++) {
+					        bos.write(contents[i]);
+					    }
+					    bos.close();
+
+					} else {
+
+					    ObjectOutputStream oos = new ObjectOutputStream(bos);
+					    oos.writeObject(obj);
+					    oos.close();
+					}
+
 					if (logger.isLoggable(Level.FINER)) {
 						logger.finer("Wrote to disk:\n" + obj);
 
@@ -342,7 +366,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 		}
 
 		/**
-         * 
+         *
          */
 		private void removeAttachment() {
 			String key = (String) attachmentTableModel.getValueAt(
@@ -386,7 +410,14 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 							+ process.getName(), "Attachment", new JLabel(
 							new ImageIcon(imageBytes)));
 
-				} else {
+				} else if (FileContent.class.isAssignableFrom(object.getClass())) {
+                    FileContent contents = (FileContent) object;
+
+                    new FrameWithOpenFramesListener("Attached File: "
+                            + contents.getFilename(), "Attachment",
+                            new JLabel("To view this file, choose 'Save as...' from the previous menu."));
+
+                } else {
 					new FrameWithOpenFramesListener("Attached Object: "
 							+ process.getName(), "Attachment", new JScrollPane(
 							new JLabel(object.toString())));
@@ -500,7 +531,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param process
 	 * @param worker
 	 * @throws PropertyVetoException
@@ -843,7 +874,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 			intermediary.setTopComponent(processDocEditor.getCustomEditor());
 			JEditorPane processDocPane = new JEditorPane("text/html", process.getProcessDocumentation()) {
 				/**
-				 * 
+				 *
 				 */
 				private static final long serialVersionUID = 1L;
 
@@ -857,7 +888,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 				}
 			};
 			processDocPane.setEditable(false);
-			intermediary.setBottomComponent(new JScrollPane(processDocPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+			intermediary.setBottomComponent(new JScrollPane(processDocPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 			ProcessDocChangeListener changeListener = new ProcessDocChangeListener(processDocPane);
 			process.addPropertyChangeListener(changeListener);
@@ -867,12 +898,12 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 			headerProcessSplit.setBottomComponent(intermediary);
 		}
 	}
-	
+
 	private class ProcessDocChangeListener implements PropertyChangeListener, ActionListener {
-		  
-		
+
+
 		JEditorPane processDocPane;
-		
+
 		Timer updateTimer;
 
 		public ProcessDocChangeListener(JEditorPane processDocPane) {
@@ -896,7 +927,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 				ProcessBuilderPanel.getLogWithAlerts().alertAndLogException(ex);
 			}
 		}
-		
+
 	}
 
 	public class TextfieldKeyAdaptor extends KeyAdapter {
@@ -981,10 +1012,10 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 		} else if (evt.getPropertyName() == "destination") {
 
 		} else if (evt.getPropertyName().startsWith("PropertyDescriptor:")){
-			
-			 
+
+
 		} else if (evt.getPropertyName().startsWith("Externalize: ")){
-			
+
 		} else {
 			if (lastLayoutDoer != null) {
 				lastLayoutDoer.setStopped(true);
