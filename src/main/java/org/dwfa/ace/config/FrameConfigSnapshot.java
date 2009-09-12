@@ -70,8 +70,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.fireRefsetSpecChanged(ext);
     }
 
-    public void addConceptPanelPlugins(HOST_ENUM host, UUID id,
-            I_PluginToConceptPanel plugin) {
+    public void addConceptPanelPlugins(HOST_ENUM host, UUID id, I_PluginToConceptPanel plugin) {
         baseFrame.addConceptPanelPlugins(host, id, plugin);
     }
 
@@ -83,8 +82,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getConceptPanelPluginKeys(host);
     }
 
-    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(
-            HOST_ENUM host) {
+    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host) {
         return baseFrame.getConceptPanelPlugins(host);
     }
 
@@ -96,8 +94,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getDefaultConceptPanelPluginsForViewer();
     }
 
-    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host,
-            UUID id) {
+    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID id) {
         return baseFrame.removeConceptPanelPlugin(host, id);
     }
 
@@ -201,8 +198,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getSelectedRefsetClauseInSpecEditor();
     }
 
-    public void svnRevert(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnRevert(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnRevert(svd, authenticator, interactive);
     }
@@ -227,24 +223,20 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setContext(context);
     }
 
-    public void setHierarchySelectionAndExpand(
-            I_GetConceptData hierarchySelection) throws IOException {
+    public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
         baseFrame.setHierarchySelectionAndExpand(hierarchySelection);
     }
 
-    public void svnUpdateDatabase(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnUpdateDatabase(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnUpdateDatabase(svd, authenticator, interactive);
     }
 
-    public void svnUpdateDatabase(SubversionData svd)
-            throws TaskFailedException {
+    public void svnUpdateDatabase(SubversionData svd) throws TaskFailedException {
         baseFrame.svnUpdateDatabase(svd);
     }
 
-    public void svnImport(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnImport(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnImport(svd, authenticator, interactive);
     }
@@ -265,59 +257,50 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setDbConfig(dbConfig);
     }
 
-    public void svnLock(SubversionData svd, File toLock,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnLock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnLock(svd, toLock, authenticator, interactive);
     }
 
-    public void svnLock(SubversionData svd, File toLock)
-            throws TaskFailedException {
+    public void svnLock(SubversionData svd, File toLock) throws TaskFailedException {
         baseFrame.svnLock(svd, toLock);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnlock,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock)
-            throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
         baseFrame.svnUnlock(svd, toUnLock);
     }
 
-    public void svnCheckout(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnCheckout(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnCheckout(svd, authenticator, interactive);
     }
 
-    public void svnCleanup(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnCleanup(svd, authenticator, interactive);
     }
 
-    public void svnCommit(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnCommit(svd, authenticator, interactive);
     }
 
-    public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator,
-            boolean interactive) throws TaskFailedException {
+    public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         baseFrame.svnPurge(svd, authenticator, interactive);
     }
 
-    public void svnStatus(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnStatus(svd, authenticator, interactive);
     }
 
-    public void svnUpdate(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnUpdate(svd, authenticator, interactive);
     }
@@ -326,8 +309,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.svnList(svd);
     }
 
-    public void svnCompleteRepoInfo(SubversionData svd)
-            throws TaskFailedException {
+    public void svnCompleteRepoInfo(SubversionData svd) throws TaskFailedException {
         baseFrame.svnCompleteRepoInfo(svd);
     }
 
@@ -354,12 +336,9 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         synchronized (baseViewPositions) {
             viewPositionSet = new HashSet<I_Position>(baseViewPositions);
         }
-        this.allowedStatus = new IntSet(baseFrame.getAllowedStatus()
-                .getSetValues());
-        this.destRelTypes = new IntSet(baseFrame.getDestRelTypes()
-                .getSetValues());
-        this.srcRelTypes = new IntSet(baseFrame.getSourceRelTypes()
-                .getSetValues());
+        this.allowedStatus = new IntSet(baseFrame.getAllowedStatus().getSetValues());
+        this.destRelTypes = new IntSet(baseFrame.getDestRelTypes().getSetValues());
+        this.srcRelTypes = new IntSet(baseFrame.getSourceRelTypes().getSetValues());
     }
 
     public Set<I_Position> getViewPositionSet() {
@@ -391,8 +370,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void addPropertyChangeListener(String propertyName,
-            PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         throw new UnsupportedOperationException();
 
     }
@@ -417,8 +395,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void performLuceneSearch(String query,
-            List<I_TestSearchResults> extraCriterion) {
+    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
         throw new UnsupportedOperationException();
 
     }
@@ -433,8 +410,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void removePropertyChangeListener(String propertyName,
-            PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         throw new UnsupportedOperationException();
 
     }
@@ -454,8 +430,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void replaceViewPosition(I_Position oldPosition,
-            I_Position newPosition) {
+    public void replaceViewPosition(I_Position oldPosition, I_Position newPosition) {
         throw new UnsupportedOperationException();
 
     }
@@ -515,8 +490,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void setDefaultDescriptionType(
-            I_GetConceptData defaultDescriptionType) {
+    public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType) {
         throw new UnsupportedOperationException();
 
     }
@@ -526,20 +500,17 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void setDefaultRelationshipCharacteristic(
-            I_GetConceptData defaultRelationshipCharacteristic) {
+    public void setDefaultRelationshipCharacteristic(I_GetConceptData defaultRelationshipCharacteristic) {
         throw new UnsupportedOperationException();
 
     }
 
-    public void setDefaultRelationshipRefinability(
-            I_GetConceptData defaultRelationshipRefinability) {
+    public void setDefaultRelationshipRefinability(I_GetConceptData defaultRelationshipRefinability) {
         throw new UnsupportedOperationException();
 
     }
 
-    public void setDefaultRelationshipType(
-            I_GetConceptData defaultRelationshipType) {
+    public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
         throw new UnsupportedOperationException();
 
     }
@@ -569,8 +540,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void setEditRelCharacteristicPopup(
-            I_IntList editRelCharacteristicPopup) {
+    public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup) {
         throw new UnsupportedOperationException();
 
     }
@@ -640,8 +610,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void setRefsetInToggleVisible(REFSET_TYPES refsetType,
-            TOGGLES toggle, boolean visible) {
+    public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible) {
         throw new UnsupportedOperationException();
 
     }
@@ -751,8 +720,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void setTogglesInComponentPanelVisible(TOGGLES toggle,
-            boolean visible) {
+    public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible) {
         throw new UnsupportedOperationException();
 
     }
@@ -787,18 +755,15 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(
-            Class<T> conflictResolutionStrategyClass) {
+    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         throw new UnsupportedOperationException();
     }
 
-    public void setHighlightConflictsInComponentPanel(
-            Boolean highlightConflictsInComponentPanel) {
+    public void setHighlightConflictsInComponentPanel(Boolean highlightConflictsInComponentPanel) {
         throw new UnsupportedOperationException();
     }
 
-    public void setHighlightConflictsInTaxonomyView(
-            Boolean highlightConflictsInTaxonomyView) {
+    public void setHighlightConflictsInTaxonomyView(Boolean highlightConflictsInTaxonomyView) {
         throw new UnsupportedOperationException();
     }
 
@@ -1005,8 +970,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getQueueAddressesToShow();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle)
-            throws TerminologyException, IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
+            IOException {
         return baseFrame.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -1114,8 +1079,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.isProgressToggleVisible();
     }
 
-    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType,
-            TOGGLES toggle) {
+    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
         return baseFrame.isRefsetInToggleVisible(refsetType, toggle);
     }
 
@@ -1135,8 +1099,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getConflictResolutionStrategy();
     }
 
-    public void setConflictResolutionStrategy(
-            I_ManageConflict conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy) {
         throw new UnsupportedOperationException();
     }
 
@@ -1156,19 +1119,23 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setRefsetInSpecEditor(refset);
     }
 
-	public LANGUAGE_SORT_PREF getLanguageSortPref() {
-		return baseFrame.getLanguageSortPref();
-	}
+    public LANGUAGE_SORT_PREF getLanguageSortPref() {
+        return baseFrame.getLanguageSortPref();
+    }
 
-	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
-		baseFrame.setLanguageSortPref(langSortPref);
-	}
+    public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
+        baseFrame.setLanguageSortPref(langSortPref);
+    }
 
-	public I_IntSet getPrefFilterTypesForRel() {
-		return baseFrame.getPrefFilterTypesForRel();
-	}
+    public I_IntSet getPrefFilterTypesForRel() {
+        return baseFrame.getPrefFilterTypesForRel();
+    }
 
-	public I_DescriptionTuple getSearchResultsSelection() {
-		return baseFrame.getSearchResultsSelection();
-	}
+    public I_DescriptionTuple getSearchResultsSelection() {
+        return baseFrame.getSearchResultsSelection();
+    }
+
+    public void showRefsetSpecPanel() {
+        baseFrame.showRefsetSpecPanel();
+    }
 }

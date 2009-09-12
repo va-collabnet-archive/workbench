@@ -70,8 +70,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.fireRefsetSpecChanged(ext);
     }
 
-    public void addConceptPanelPlugins(HOST_ENUM host, UUID id,
-            I_PluginToConceptPanel plugin) {
+    public void addConceptPanelPlugins(HOST_ENUM host, UUID id, I_PluginToConceptPanel plugin) {
         frameConfig.addConceptPanelPlugins(host, id, plugin);
     }
 
@@ -83,8 +82,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getConceptPanelPluginKeys(host);
     }
 
-    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(
-            HOST_ENUM host) {
+    public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host) {
         return frameConfig.getConceptPanelPlugins(host);
     }
 
@@ -96,8 +94,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getDefaultConceptPanelPluginsForViewer();
     }
 
-    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host,
-            UUID id) {
+    public I_PluginToConceptPanel removeConceptPanelPlugin(HOST_ENUM host, UUID id) {
         return frameConfig.removeConceptPanelPlugin(host, id);
     }
 
@@ -154,8 +151,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.addPropertyChangeListener(listener);
     }
 
-    public void addPropertyChangeListener(String propertyName,
-            PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         frameConfig.addPropertyChangeListener(propertyName, listener);
     }
 
@@ -215,7 +211,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getChangeSetWriters();
     }
 
-     public I_IntSet getChildrenExpandedNodes() {
+    public I_IntSet getChildrenExpandedNodes() {
         return childrenExpandedNodes;
     }
 
@@ -363,8 +359,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle)
-            throws TerminologyException, IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
+            IOException {
         return frameConfig.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -382,13 +378,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             I_GetConceptData refset = getRefsetInSpecEditor();
             IntSet allowedTypes = new IntSet();
             try {
-                allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET
-                        .localize().getNid());
+                allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 boolean addUncommitted = true;
-                List<I_RelTuple> markedParentRefset = refset
-                        .getSourceRelTuples(frameConfig.getAllowedStatus(),
-                                allowedTypes, frameConfig.getViewPositionSet(),
-                                addUncommitted);
+                List<I_RelTuple> markedParentRefset =
+                        refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
+                            .getViewPositionSet(), addUncommitted);
                 for (I_RelTuple rel : markedParentRefset) {
                     refsetsToShow.add(rel.getC2Id());
                 }
@@ -414,9 +408,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 ConceptBean rootBean = ConceptBean.get(rootNid);
                 for (I_ThinExtByRefVersioned ext : rootBean.getExtensions()) {
                     if (refsets.contains(ext.getRefsetId())) {
-                        List<I_ThinExtByRefTuple> tuples = ext.getTuples(
-                                frameConfig.getAllowedStatus(), frameConfig
-                                        .getViewPositionSet(), true);
+                        List<I_ThinExtByRefTuple> tuples =
+                                ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(), true);
                         if (tuples != null && tuples.size() > 0) {
                             refsetRoots.add(rootNid);
                         }
@@ -486,62 +479,61 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public I_IntList getTableDescPreferenceList() {
         return frameConfig.getTableDescPreferenceList();
     }
-    
+
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
-		public void filter(I_GetConceptData node, List<I_RelTuple> srcRels,
-				List<I_RelTuple> destRels, I_ConfigAceFrame frameConfig)
-				throws TerminologyException, IOException {
-			
-			List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
-			for (I_RelTuple rt: srcRels) {
-				ConceptBean child = ConceptBean.get(rt.getC2Id());
-				if (notMarkedParent(child)) {
-					relsToRemove.add(rt);
-				}
-			}
-			srcRels.removeAll(relsToRemove);
-			
-			relsToRemove = new ArrayList<I_RelTuple>();
-			for (I_RelTuple rt: destRels) {
-				ConceptBean child = ConceptBean.get(rt.getC1Id());
-				if (notMarkedParent(child)) {
-					relsToRemove.add(rt);
-				}
-			}
-			destRels.removeAll(relsToRemove);
-			
-		}
+        public void filter(I_GetConceptData node, List<I_RelTuple> srcRels, List<I_RelTuple> destRels,
+                I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
 
-		private boolean notMarkedParent(ConceptBean child) throws IOException, TerminologyException {
-                for (I_ThinExtByRefVersioned ext : child.getExtensions()) {
-                	if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
-                        if (ThinExtBinder.getExtensionType(ext) == EXT_TYPE.CONCEPT) {
-                            List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
-                        	ext.addTuples(getAllowedStatus(), getViewPositionSet(),
-                                 returnTuples, false);
-                           if (returnTuples.size() > 0) {
-                        	   return false;
-                           }
-                           
+            List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
+            for (I_RelTuple rt : srcRels) {
+                ConceptBean child = ConceptBean.get(rt.getC2Id());
+                if (notMarkedParent(child)) {
+                    relsToRemove.add(rt);
+                }
+            }
+            srcRels.removeAll(relsToRemove);
+
+            relsToRemove = new ArrayList<I_RelTuple>();
+            for (I_RelTuple rt : destRels) {
+                ConceptBean child = ConceptBean.get(rt.getC1Id());
+                if (notMarkedParent(child)) {
+                    relsToRemove.add(rt);
+                }
+            }
+            destRels.removeAll(relsToRemove);
+
+        }
+
+        private boolean notMarkedParent(ConceptBean child) throws IOException, TerminologyException {
+            for (I_ThinExtByRefVersioned ext : child.getExtensions()) {
+                if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
+                    if (ThinExtBinder.getExtensionType(ext) == EXT_TYPE.CONCEPT) {
+                        List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
+                        ext.addTuples(getAllowedStatus(), getViewPositionSet(), returnTuples, false);
+                        if (returnTuples.size() > 0) {
+                            return false;
                         }
-                		
-                	}              
-             }			
-			return true;
-		}
-    	
+
+                    }
+
+                }
+            }
+            return true;
+        }
+
     }
 
     List<I_FilterTaxonomyRels> filterList;
-	private boolean refsetParentOnly;
+    private boolean refsetParentOnly;
+
     public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList() {
-    	if (filterList == null) {
-    		filterList = new ArrayList<I_FilterTaxonomyRels>(frameConfig.getTaxonomyRelFilterList());
-    		if (refsetParentOnly) {
-    		filterList.add(new RefsetParentOnlyFilter());
-    		}
-    	}
+        if (filterList == null) {
+            filterList = new ArrayList<I_FilterTaxonomyRels>(frameConfig.getTaxonomyRelFilterList());
+            if (refsetParentOnly) {
+                filterList.add(new RefsetParentOnlyFilter());
+            }
+        }
         return filterList;
     }
 
@@ -633,8 +625,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.isProgressToggleVisible();
     }
 
-    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType,
-            TOGGLES toggle) {
+    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
         return frameConfig.isRefsetInToggleVisible(refsetType, toggle);
     }
 
@@ -650,8 +641,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.performLuceneSearch(query, root);
     }
 
-    public void performLuceneSearch(String query,
-            List<I_TestSearchResults> extraCriterion) {
+    public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion) {
         frameConfig.performLuceneSearch(query, extraCriterion);
     }
 
@@ -663,8 +653,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.removePropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(String propertyName,
-            PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         frameConfig.removePropertyChangeListener(propertyName, listener);
     }
 
@@ -680,8 +669,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.replaceEditingPath(oldPath, newPath);
     }
 
-    public void replaceViewPosition(I_Position oldPosition,
-            I_Position newPosition) {
+    public void replaceViewPosition(I_Position oldPosition, I_Position newPosition) {
         frameConfig.replaceViewPosition(oldPosition, newPosition);
     }
 
@@ -749,14 +737,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setComponentToggleVisible(visible);
     }
 
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(
-            Class<T> conflictResolutionStrategyClass) {
-        frameConfig
-                .setConflictResolutionStrategy(conflictResolutionStrategyClass);
+    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+        frameConfig.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(
-            I_ManageConflict conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 
@@ -768,8 +753,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setDbConfig(dbConfig);
     }
 
-    public void setDefaultDescriptionType(
-            I_GetConceptData defaultDescriptionType) {
+    public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType) {
         frameConfig.setDefaultDescriptionType(defaultDescriptionType);
     }
 
@@ -777,20 +761,15 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setDefaultImageType(defaultImageType);
     }
 
-    public void setDefaultRelationshipCharacteristic(
-            I_GetConceptData defaultRelationshipCharacteristic) {
-        frameConfig
-                .setDefaultRelationshipCharacteristic(defaultRelationshipCharacteristic);
+    public void setDefaultRelationshipCharacteristic(I_GetConceptData defaultRelationshipCharacteristic) {
+        frameConfig.setDefaultRelationshipCharacteristic(defaultRelationshipCharacteristic);
     }
 
-    public void setDefaultRelationshipRefinability(
-            I_GetConceptData defaultRelationshipRefinability) {
-        frameConfig
-                .setDefaultRelationshipRefinability(defaultRelationshipRefinability);
+    public void setDefaultRelationshipRefinability(I_GetConceptData defaultRelationshipRefinability) {
+        frameConfig.setDefaultRelationshipRefinability(defaultRelationshipRefinability);
     }
 
-    public void setDefaultRelationshipType(
-            I_GetConceptData defaultRelationshipType) {
+    public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
         frameConfig.setDefaultRelationshipType(defaultRelationshipType);
     }
 
@@ -814,8 +793,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setEditImageTypePopup(editImageTypePopup);
     }
 
-    public void setEditRelCharacteristicPopup(
-            I_IntList editRelCharacteristicPopup) {
+    public void setEditRelCharacteristicPopup(I_IntList editRelCharacteristicPopup) {
         frameConfig.setEditRelCharacteristicPopup(editRelCharacteristicPopup);
     }
 
@@ -843,8 +821,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setHierarchySelection(hierarchySelection);
     }
 
-    public void setHierarchySelectionAndExpand(
-            I_GetConceptData hierarchySelection) throws IOException {
+    public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
         frameConfig.setHierarchySelectionAndExpand(hierarchySelection);
     }
 
@@ -852,16 +829,12 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setHierarchyToggleVisible(visible);
     }
 
-    public void setHighlightConflictsInComponentPanel(
-            Boolean highlightConflictsInComponentPanel) {
-        frameConfig
-                .setHighlightConflictsInComponentPanel(highlightConflictsInComponentPanel);
+    public void setHighlightConflictsInComponentPanel(Boolean highlightConflictsInComponentPanel) {
+        frameConfig.setHighlightConflictsInComponentPanel(highlightConflictsInComponentPanel);
     }
 
-    public void setHighlightConflictsInTaxonomyView(
-            Boolean highlightConflictsInTaxonomyView) {
-        frameConfig
-                .setHighlightConflictsInTaxonomyView(highlightConflictsInTaxonomyView);
+    public void setHighlightConflictsInTaxonomyView(Boolean highlightConflictsInTaxonomyView) {
+        frameConfig.setHighlightConflictsInTaxonomyView(highlightConflictsInTaxonomyView);
     }
 
     public void setHistoryToggleVisible(boolean visible) {
@@ -892,8 +865,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setProgressToggleVisible(visible);
     }
 
-    public void setRefsetInToggleVisible(REFSET_TYPES refsetType,
-            TOGGLES toggle, boolean visible) {
+    public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible) {
         frameConfig.setRefsetInToggleVisible(refsetType, toggle, visible);
     }
 
@@ -985,8 +957,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setSubversionToggleVisible(visible);
     }
 
-    public void setTogglesInComponentPanelVisible(TOGGLES toggle,
-            boolean visible) {
+    public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible) {
         frameConfig.setTogglesInComponentPanelVisible(toggle, visible);
     }
 
@@ -1022,8 +993,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.showListView();
     }
 
-    public void svnCheckout(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnCheckout(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnCheckout(svd, authenticator, interactive);
     }
@@ -1032,8 +1002,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnCheckout(svd);
     }
 
-    public void svnCleanup(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnCleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnCleanup(svd, authenticator, interactive);
     }
@@ -1042,8 +1011,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnCleanup(svd);
     }
 
-    public void svnCommit(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnCommit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnCommit(svd, authenticator, interactive);
     }
@@ -1052,13 +1020,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnCommit(svd);
     }
 
-    public void svnCompleteRepoInfo(SubversionData svd)
-            throws TaskFailedException {
+    public void svnCompleteRepoInfo(SubversionData svd) throws TaskFailedException {
         frameConfig.svnCompleteRepoInfo(svd);
     }
 
-    public void svnImport(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnImport(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnImport(svd, authenticator, interactive);
     }
@@ -1071,19 +1037,17 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.svnList(svd);
     }
 
-    public void svnLock(SubversionData svd, File toLock,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnLock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnLock(svd, toLock, authenticator, interactive);
     }
 
-    public void svnLock(SubversionData svd, File toLock)
-            throws TaskFailedException {
+    public void svnLock(SubversionData svd, File toLock) throws TaskFailedException {
         frameConfig.svnLock(svd, toLock);
     }
 
-    public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator,
-            boolean interactive) throws TaskFailedException {
+    public void svnPurge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
+            throws TaskFailedException {
         frameConfig.svnPurge(svd, authenticator, interactive);
     }
 
@@ -1091,8 +1055,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnPurge(svd);
     }
 
-    public void svnRevert(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnRevert(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnRevert(svd, authenticator, interactive);
     }
@@ -1101,8 +1064,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnRevert(svd);
     }
 
-    public void svnStatus(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnStatus(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnStatus(svd, authenticator, interactive);
     }
@@ -1111,19 +1073,16 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnStatus(svd);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnlock,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock)
-            throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
         frameConfig.svnUnlock(svd, toUnLock);
     }
 
-    public void svnUpdate(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnUpdate(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnUpdate(svd, authenticator, interactive);
     }
@@ -1132,14 +1091,12 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnUpdate(svd);
     }
 
-    public void svnUpdateDatabase(SubversionData svd,
-            PromptUserPassword3 authenticator, boolean interactive)
+    public void svnUpdateDatabase(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         frameConfig.svnUpdateDatabase(svd, authenticator, interactive);
     }
 
-    public void svnUpdateDatabase(SubversionData svd)
-            throws TaskFailedException {
+    public void svnUpdateDatabase(SubversionData svd) throws TaskFailedException {
         frameConfig.svnUpdateDatabase(svd);
     }
 
@@ -1151,19 +1108,23 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setRefsetInSpecEditor(refset);
     }
 
-	public LANGUAGE_SORT_PREF getLanguageSortPref() {
-		return frameConfig.getLanguageSortPref();
-	}
+    public LANGUAGE_SORT_PREF getLanguageSortPref() {
+        return frameConfig.getLanguageSortPref();
+    }
 
-	public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
-		frameConfig.setLanguageSortPref(langSortPref);
-	}
+    public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
+        frameConfig.setLanguageSortPref(langSortPref);
+    }
 
-	public I_IntSet getPrefFilterTypesForRel() {
-		return frameConfig.getPrefFilterTypesForRel();
-	}
+    public I_IntSet getPrefFilterTypesForRel() {
+        return frameConfig.getPrefFilterTypesForRel();
+    }
 
-	public I_DescriptionTuple getSearchResultsSelection() {
-		return frameConfig.getSearchResultsSelection();
-	}
+    public I_DescriptionTuple getSearchResultsSelection() {
+        return frameConfig.getSearchResultsSelection();
+    }
+
+    public void showRefsetSpecPanel() {
+        frameConfig.showRefsetSpecPanel();
+    }
 }
