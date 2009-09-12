@@ -35,7 +35,7 @@ import org.dwfa.util.io.FileIO;
  * 
  * @goal process-project-dirs
  * @requiresDependencyResolution compile
- * 
+ * @deprecated use the maven assembly plugin filesets instead. 
  */
 public class ProcessProjectDirectories extends AbstractMojo {
 
