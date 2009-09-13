@@ -71,13 +71,15 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             termFactory = LocalVersionedTerminology.get();
 
             String name = (String) process.readProperty(newRefsetPropName);
+            I_GetConceptData parent =
+                    termFactory.getConcept(new UUID[] { (UUID) process
+                        .readProperty(ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey()) });
 
             I_GetConceptData fsnConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData ptConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData isA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-            I_GetConceptData refsetIdentity = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
             I_GetConceptData supportingRefset =
                     termFactory.getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
             I_GetConceptData markedParentRel =
@@ -132,23 +134,42 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newRelationship(memberRefset, markedParentIsATypeRel, isADestination);
             newRelationship(refsetSpec, specifiesRefsetRel, memberRefset);
 
-            newRelationship(memberRefset, isA, refsetIdentity);
+            newRelationship(memberRefset, isA, parent);
             newRelationship(refsetSpec, isA, supportingRefset);
             newRelationship(markedParent, isA, supportingRefset);
             newRelationship(promotionRefset, isA, supportingRefset);
             newRelationship(commentsRefset, isA, supportingRefset);
 
             // commit
-            termFactory.commit();
+            // termFactory.commit();
 
             // set new spec as focus
-            termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(memberRefset);
-            termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
-            termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
+            /*
+             * termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(memberRefset
+             * );
+             * termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
+             * termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
+             */
 
-            while (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() == null) {
-                Thread.sleep(100);
-            }
+            process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), memberRefset.getUids().iterator()
+                .next());
+
+            /*
+             * while
+             * (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() ==
+             * null) {
+             * Thread.sleep(100);
+             * }
+             * while
+             * (termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor
+             * () == null) {
+             * Thread.sleep(100);
+             * }
+             */
+            // System.out.println(">>>>>>>>>>>>>>>>>>" +
+            // termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor());
+            // System.out.println(">>>>>>>>>>>>>>>>>>" +
+            // termFactory.getActiveAceFrameConfig());
 
         } catch (Exception e) {
             e.printStackTrace();

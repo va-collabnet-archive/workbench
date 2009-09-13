@@ -10,10 +10,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,16 +38,20 @@ public class NewRefsetSpecForm1 extends JPanel {
 
     // components
     private JLabel refsetNameLabel;
+    private JLabel refsetParentLabel;
     private JLabel requirementsLabel;
     private JLabel fileAttachmentLabel;
     private JButton openFileChooserButton;
+    private JComboBox refsetParentComboBox;
     private JTextField refsetNameTextField;
     private JTextField refsetRequirementsTextField;
     private NewRefsetSpecWizard wizard;
     private HashSet<File> attachments = new HashSet<File>();
+    private Set<String> refsetNames;
 
-    public NewRefsetSpecForm1(NewRefsetSpecWizard wizard) {
+    public NewRefsetSpecForm1(NewRefsetSpecWizard wizard, Set<String> refsetNames) {
         super();
+        this.refsetNames = refsetNames;
         this.wizard = wizard;
         init();
     }
@@ -60,11 +66,13 @@ public class NewRefsetSpecForm1 extends JPanel {
 
         // labels
         refsetNameLabel = new JLabel("Refset name (required):");
+        refsetParentLabel = new JLabel("Refset parent (required):");
         requirementsLabel = new JLabel("Requirements/comments (optional):");
         fileAttachmentLabel = new JLabel("File attachment (optional):");
 
         // buttons
         openFileChooserButton = new JButton("Attach a file");
+        refsetParentComboBox = new JComboBox(refsetNames.toArray());
 
         // text fields
         refsetNameTextField = new JTextField(20);
@@ -97,10 +105,27 @@ public class NewRefsetSpecForm1 extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         this.add(refsetNameTextField, gridBagConstraints);
 
-        // requirements label & text box
+        // refset parent label
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        this.add(refsetParentLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        this.add(refsetParentComboBox, gridBagConstraints);
+
+        // requirements label & text box
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -108,7 +133,7 @@ public class NewRefsetSpecForm1 extends JPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -117,7 +142,7 @@ public class NewRefsetSpecForm1 extends JPanel {
         // file attachment label and "Attach a file" button
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -125,7 +150,7 @@ public class NewRefsetSpecForm1 extends JPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.weightx = 0.0;
@@ -140,7 +165,7 @@ public class NewRefsetSpecForm1 extends JPanel {
             checkBox.addItemListener(new CheckBoxListener(attachment));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 3 + fileCount;
+            gridBagConstraints.gridy = 4 + fileCount;
             gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
             gridBagConstraints.weighty = 0.0;
             gridBagConstraints.weightx = 0.0;
@@ -150,7 +175,7 @@ public class NewRefsetSpecForm1 extends JPanel {
             JLabel attachmentLabel = new JLabel(attachment.getName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 3 + fileCount;
+            gridBagConstraints.gridy = 4 + fileCount;
             gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
             gridBagConstraints.weighty = 0.0;
             gridBagConstraints.weightx = 0.0;
@@ -163,7 +188,7 @@ public class NewRefsetSpecForm1 extends JPanel {
         // column filler
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 4 + fileCount;
+        gridBagConstraints.gridy = 5 + fileCount;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
@@ -209,6 +234,10 @@ public class NewRefsetSpecForm1 extends JPanel {
                 }
             }
         }
+    }
+
+    public String getSelectedParent() {
+        return (String) refsetParentComboBox.getSelectedItem();
     }
 
     public String getRefsetNameTextField() {
