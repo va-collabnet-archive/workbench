@@ -99,18 +99,25 @@ public class GenerateScripts extends AbstractMojo {
 		}
 		l.info("scriptOutputDir: " + scriptOutputDir);
 		l.info("outputDirectory: " + outputDirectory);
+		l.info("libDir: " + libDir);
+		l.info("jarDir: " + libDir);
 
         File[] jars;
         if (jarDir != null) {
-            jars = new File(outputDirectory + fileSep + jarDir).listFiles(new FileFilter() {
+        	File jarDirectory = new File(outputDirectory + fileSep + jarDir);
+    		l.info("jarDirectory 1: " + jarDirectory);
+            jars = jarDirectory.listFiles(new FileFilter() {
 
                         public boolean accept(File pathname) {
                             return pathname.getPath().endsWith(".jar");
                         }
                     });
         } else {
-            jars = new File(outputDirectory + fileSep + scriptOutputDir
-                            + libDir).listFiles(new FileFilter() {
+        	File jarDirectory =  new File(outputDirectory + fileSep + scriptOutputDir
+                    + libDir);
+    		l.info("jarDirectory 2: " + jarDirectory);
+        	
+            jars = jarDirectory.listFiles(new FileFilter() {
 
                         public boolean accept(File pathname) {
                             return pathname.getPath().endsWith(".jar");
@@ -225,7 +232,8 @@ public class GenerateScripts extends AbstractMojo {
 		 * @param profile		Do we want a profiler?
 		 * @throws IOException	Thrown when there is trouble writing to the file
 		 */
-		public void writeStartupScript(File[] jars, String startFileName, String startHeap, String maxHeap, String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws IOException {
+		public void writeStartupScript(File[] jars, String startFileName, String startHeap, String maxHeap, 
+				String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws IOException {
 			// make parent directories
 			scriptFile.getParentFile().mkdirs();
 			// create file writer
