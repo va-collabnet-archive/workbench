@@ -164,20 +164,21 @@ public class RefsetSpecWizardTask extends AbstractTask {
                                     "", JOptionPane.ERROR_MESSAGE);
                             } else {
                                 process.setDestination(editorInbox);
-                            }
-                            process.setPriority(p);
-                            process.setDeadline(deadline.getTime());
-                            process.setProperty(ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey(), refsetParent
-                                .getUids().iterator().next());
-                            process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refsetName);
-                            process.setProperty(ProcessAttachmentKeys.MESSAGE.getAttachmentKey(), comments);
-                            process.setProperty(ProcessAttachmentKeys.REQUESTOR.getAttachmentKey(), requestor);
-                            for (File file : attachments) {
-                                process.writeAttachment(file.getName(), new FileContent(file));
-                            }
+                                process.setPriority(p);
+                                process.setDeadline(deadline.getTime());
+                                process.setProperty(ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey(),
+                                    refsetParent.getUids().iterator().next());
+                                process
+                                    .setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refsetName);
+                                process.setProperty(ProcessAttachmentKeys.MESSAGE.getAttachmentKey(), comments);
+                                process.setProperty(ProcessAttachmentKeys.REQUESTOR.getAttachmentKey(), requestor);
+                                for (File file : attachments) {
+                                    process.writeAttachment(file.getName(), new FileContent(file));
+                                }
 
-                            RefsetSpecWizardTask.this.setCondition(Condition.ITEM_COMPLETE);
-                            wizard.getDialog().dispose();
+                                RefsetSpecWizardTask.this.setCondition(Condition.ITEM_COMPLETE);
+                                wizard.getDialog().dispose();
+                            }
                         } catch (Exception e) {
                             RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
                             e.printStackTrace();
@@ -236,6 +237,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
          * .Concept.REFSET_IDENTITY.getUids());
          * 
          * I_IntSet allowedTypes = termFactory.newIntSet();
+         * 
          * 
          * 
          * 
