@@ -49,6 +49,15 @@ public interface I_ConfigAceDb {
     public void setProperty(String key, Object value) throws IOException;
     public Map<String, Object> getProperties() throws IOException;
 
+    /**
+     * @return The concept that represents the user this profile belongs to.
+     */
+	public I_GetConceptData getUserConcept();
 	
+	/**
+	 * 
+	 * @param userConcept A concept that represents the user this profile belongs to.
+	 */
+	public void setUserConcept(I_GetConceptData userConcept);
 
 }
