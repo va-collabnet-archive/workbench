@@ -512,6 +512,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public JPanel getTopActivityPanel();
 
+    /**
+     * Shows or hides as the activity viewer.
+     * 
+     * @param show Whether to show the activity viewer.
+     * @return
+     */
+    public void setShowActivityViewer(boolean show);
+
     public Color getColorForPath(int pathNid);
 
     public void setColorForPath(int pathNid, Color pathColor);
