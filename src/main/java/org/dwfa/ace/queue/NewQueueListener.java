@@ -71,7 +71,7 @@ public class NewQueueListener implements ActionListener {
 					
 					Map<String, String> substutionMap = new TreeMap<String, String>();
 					substutionMap.put("**queueName**", queueDirectory.getName());
-					substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory));
+					substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
 					substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
 					
 					String fileName = "template.queue.config";
