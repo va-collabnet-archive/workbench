@@ -22,13 +22,13 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.util.FileContent;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.tasks.util.FileContent;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -237,6 +237,9 @@ public class RefsetSpecWizardTask extends AbstractTask {
          * .Concept.REFSET_IDENTITY.getUids());
          * 
          * I_IntSet allowedTypes = termFactory.newIntSet();
+         * 
+         * 
+         * 
          * 
          * 
          * 
