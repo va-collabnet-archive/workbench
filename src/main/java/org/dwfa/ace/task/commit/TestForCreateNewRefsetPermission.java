@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -48,12 +50,20 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
             I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
 
-            // TODO how to get active user
-            I_GetConceptData user = termFactory.getConcept(ArchitectonicAuxiliary.Concept.KEITH_CAMPBELL.getUids());
+            I_GetConceptData activeUser = getActiveUser(activeProfile.getUsername());
+            // System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> " +
+            // activeProfile.getUsername()
+            // + "<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            if (activeUser == null) {
+                alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+                    "<html>Unable to find active username.", concept));
+                return alertList;
+            }
+
+            // I_GetConceptData user =
+            // termFactory.getConcept(ArchitectonicAuxiliary.Concept.KEITH_CAMPBELL.getUids());
             // user = (I_GetConceptData)
             // activeProfile.getProperty(activeProfile.getUsername());
-            // System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + user +
-            // "<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
             // check if this concept is a child of the refset identity concept -
             // if it isn't, then there is no alert
@@ -70,7 +80,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             I_IntSet allowedTypes = termFactory.newIntSet();
             allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
             Set<I_GetConceptData> permissibleRefsetParents =
-                    user.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
+                    activeUser.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
 
             AlertToDataConstraintFailure.ALERT_TYPE alertType;
             if (forCommit) {
@@ -96,5 +106,36 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
+    }
+
+    private I_GetConceptData getActiveUser(String userString) throws Exception {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_GetConceptData userTopHierarchy = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+
+        Set<I_Position> allPositions = getPositions(termFactory);
+        I_IntSet activeStatuses = getActiveStatus(termFactory);
+        I_GetConceptData isA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(isA.getConceptId());
+        Set<I_GetConceptData> currentUsers =
+                userTopHierarchy.getDestRelOrigins(activeStatuses, allowedTypes, allPositions, true, true);
+
+        I_IntSet userNameAllowedType = termFactory.newIntSet();
+        userNameAllowedType.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER_NAME.getUids()).getId()
+            .getNativeId());
+
+        for (I_GetConceptData user : currentUsers) {
+            for (I_DescriptionTuple desc : user.getDescriptionTuples(activeStatuses, userNameAllowedType, allPositions,
+                true)) {
+
+                for (I_DescriptionPart part : desc.getDescVersioned().getVersions()) {
+                    if (part.getText().equals(userString)) {
+                        return user;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

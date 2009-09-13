@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -31,6 +32,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -156,7 +158,10 @@ public class RefsetSpecWizardTask extends AbstractTask {
                             process.setSubject(refsetName + " creation request");
                             process.setName("Create refset");
                             if (editorInbox == null) {
-                                throw new Exception("No editor inbox assigned.");
+                                RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
+                                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                    "Refset wizard cannot be completed. The selected editor has no assigned inbox.",
+                                    "", JOptionPane.ERROR_MESSAGE);
                             } else {
                                 process.setDestination(editorInbox);
                             }
@@ -174,11 +179,16 @@ public class RefsetSpecWizardTask extends AbstractTask {
                             RefsetSpecWizardTask.this.setCondition(Condition.ITEM_COMPLETE);
                             wizard.getDialog().dispose();
                         } catch (Exception e) {
+                            RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
                             e.printStackTrace();
                         }
                     }
                 }
             });
+
+            if (getCondition() == Condition.ITEM_CANCELED) {
+                throw new TaskFailedException("Wizard cancelled due to errors.");
+            }
 
             return getCondition();
         } catch (Exception ex) {
@@ -226,6 +236,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
          * .Concept.REFSET_IDENTITY.getUids());
          * 
          * I_IntSet allowedTypes = termFactory.newIntSet();
+         * 
+         * 
          * 
          * 
          * 
