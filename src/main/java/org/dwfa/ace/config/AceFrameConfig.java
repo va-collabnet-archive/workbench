@@ -2874,4 +2874,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.getCdePanel().showRefsetSpecPanel();
     }
 
+    public void setShowActivityViewer(boolean show) {
+        aceFrame.getCdePanel().setShowActivityViewer(show);
+    }
+
 }

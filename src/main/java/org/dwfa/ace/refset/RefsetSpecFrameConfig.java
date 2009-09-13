@@ -1127,4 +1127,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void showRefsetSpecPanel() {
         frameConfig.showRefsetSpecPanel();
     }
+
+    public void setShowActivityViewer(boolean show) {
+        frameConfig.setShowActivityViewer(show);
+    }
 }

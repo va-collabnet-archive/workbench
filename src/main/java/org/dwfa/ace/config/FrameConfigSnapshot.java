@@ -1138,4 +1138,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void showRefsetSpecPanel() {
         baseFrame.showRefsetSpecPanel();
     }
+
+    public void setShowActivityViewer(boolean show) {
+        baseFrame.setShowActivityViewer(show);
+    }
 }

@@ -176,8 +176,7 @@ public class ActivityViewer {
         if (VodbEnv.isHeadless() == false) {
             viewerFrame = new ActivityViewerFrame();
             JScrollPane scroller = new JScrollPane();
-            scroller
-                    .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             viewerFrame.setContentPane(scroller);
             viewerFrame.setLocation(20, 20);
             viewerFrame.setSize(600, 400);
@@ -205,8 +204,7 @@ public class ActivityViewer {
 
     private static ActivityComparator activityComparator = new ActivityComparator();
 
-    private static class ActivityComparator implements
-            Comparator<I_ShowActivity> {
+    private static class ActivityComparator implements Comparator<I_ShowActivity> {
 
         public int compare(I_ShowActivity a1, I_ShowActivity a2) {
             if (a1.isComplete() && a2.isComplete()) {
@@ -249,8 +247,7 @@ public class ActivityViewer {
 
     }
 
-    public static void addActivity(final I_ShowActivity activity)
-            throws Exception {
+    public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (VodbEnv.isHeadless() == false) {
             activity.addShowActivityListener(completeListener);
             SwingUtilities.invokeLater(new Runnable() {
@@ -265,8 +262,7 @@ public class ActivityViewer {
                             }
                         }
                         viewer.activitiesList.add(0, activity);
-                        Collections.sort(viewer.activitiesList,
-                                activityComparator);
+                        Collections.sort(viewer.activitiesList, activityComparator);
                         synchronized (viewer.activitiesList) {
                             while (viewer.activitiesList.size() > 40) {
                                 viewer.activitiesList.remove(40);
@@ -308,11 +304,9 @@ public class ActivityViewer {
                     try {
                         ArrayList<I_ShowActivity> origOrder = null;
                         synchronized (viewer.activitiesList) {
-                            origOrder = new ArrayList<I_ShowActivity>(
-                                    viewer.activitiesList);
+                            origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
                         }
-                        Collections.sort(viewer.activitiesList,
-                                activityComparator);
+                        Collections.sort(viewer.activitiesList, activityComparator);
                         if (origOrder.equals(viewer.activitiesList) == false) {
                             viewer.activitiesPanel.removeAll();
                             Set<JPanel> secondaryPanels = new HashSet<JPanel>();
@@ -341,20 +335,17 @@ public class ActivityViewer {
         }
     }
 
-    private static void addSecondaryActivityPanel(
-            final Set<JPanel> secondaryPanels, final I_ShowActivity a) {
+    private static void addSecondaryActivityPanel(final Set<JPanel> secondaryPanels, final I_ShowActivity a) {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                if (a.getSecondaryPanel() != null
-                        && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
+                if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
                     secondaryPanels.add(a.getSecondaryPanel());
                     for (Component c : a.getSecondaryPanel().getComponents()) {
                         a.getSecondaryPanel().remove(c);
                     }
                     if (a.isComplete() == false) {
-                        ActivityPanel secondaryAP = new ActivityPanel(false,
-                                true, null);
+                        ActivityPanel secondaryAP = new ActivityPanel(false, true, null);
                         a.addShowActivityListener(secondaryAP);
                         a.getSecondaryPanel().add(secondaryAP.getViewPanel());
                     }
@@ -396,7 +387,12 @@ public class ActivityViewer {
     }
 
     public static void toFront() {
-    	viewer.viewerFrame.setVisible(true);
-    	viewer.viewerFrame.toFront();
+        viewer.viewerFrame.setVisible(true);
+        viewer.viewerFrame.toFront();
+    }
+
+    public static void toBack() {
+        viewer.viewerFrame.setVisible(false);
+        viewer.viewerFrame.toBack();
     }
 }

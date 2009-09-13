@@ -3534,4 +3534,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         setShowComponentView(true);
         conceptTabs.setSelectedComponent(refsetSpecPanel);
     }
+
+    public void setShowActivityViewer(boolean show) {
+        if (show) {
+            ActivityViewer.toFront();
+        } else {
+            ActivityViewer.toBack();
+        }
+    }
 }
