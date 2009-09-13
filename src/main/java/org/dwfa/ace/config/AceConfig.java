@@ -27,16 +27,19 @@ import javax.swing.JFrame;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.svn.SvnPrompter;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
+import org.dwfa.vodb.types.ConceptBean;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -51,7 +54,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 7;
+	private static final int dataVersion = 8;
 
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
@@ -90,14 +93,19 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     // 7
     private Map<String, Object> properties = new HashMap<String, Object>();
     
+    // 8 
+    private I_GetConceptData userConcept;
+
+    
     // transient
     private transient File profileFile;
 
-	public AceConfig() throws DatabaseException {
+	public AceConfig() throws DatabaseException, TerminologyException, IOException {
 		super();
+		userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
 	}
 
-	public AceConfig(File dbFolder) throws DatabaseException {
+	public AceConfig(File dbFolder) throws DatabaseException, TerminologyException, IOException {
 		this();
 		this.dbFolder = dbFolder;
 	}
@@ -122,6 +130,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         out.writeObject(changeSetWriterFileName);
         out.writeObject(queueFolders);
         out.writeObject(properties);
+        try {
+            out.writeObject(AceConfig.getVodb().nativeToUuid(userConcept.getConceptId()));
+        } catch (DatabaseException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+        }
+
 	}
 
 	private static final String authFailureMsg = "Username and password do not match.";
@@ -189,6 +205,17 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             	properties = (Map<String, Object>) in.readObject();
             } else {
             	properties = new HashMap<String, Object>();
+            }
+            try {
+            	if (objDataVersion >= 8) {
+                	userConcept = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+            	} else {
+            		userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+            	}
+            } catch (Exception e) {
+                IOException newEx = new IOException();
+                newEx.initCause(e);
+                throw newEx;
             }
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -464,5 +491,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			}
 		}
 		return null;
+	}
+
+	public I_GetConceptData getUserConcept() {
+		return userConcept;
+	}
+
+	public void setUserConcept(I_GetConceptData userConcept) {
+		this.userConcept = userConcept;
 	}
 }
