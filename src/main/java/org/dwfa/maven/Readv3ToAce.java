@@ -108,12 +108,12 @@ public class Readv3ToAce extends AbstractMojo {
 			processRelationships(intRefset, conceptRefset, pathUUID);
             
 			/* keys create */
-            BufferedReader keyFileReader = new BufferedReader(
+           /* BufferedReader keyFileReader = new BufferedReader(
                                                               new FileReader(new File(readv3dir, "Keys.v3")));
 			while (keyFileReader.ready()) {
 			    writeKeyData(keyFileReader, stringRefset, pathUUID, termIdDescIdMap);
 			}
-            keyFileReader.close();
+            keyFileReader.close(); */
 
 			intRefset.close();
 			conceptRefset.close();
@@ -188,7 +188,7 @@ public class Readv3ToAce extends AbstractMojo {
         descriptions.close();
     }
 
-    private void writeKeyData(BufferedReader keyFileReader, Writer stringRefset, UUID pathUUID, Map<String, List<UUID>> termIdDescIdMap) throws IOException, Exception, NoSuchAlgorithmException,
+ /*   private void writeKeyData(BufferedReader keyFileReader, Writer stringRefset, UUID pathUUID, Map<String, List<UUID>> termIdDescIdMap) throws IOException, Exception, NoSuchAlgorithmException,
     UnsupportedEncodingException {
         int keyIndex = 0;
         int termidIndex = 1;
@@ -241,7 +241,7 @@ public class Readv3ToAce extends AbstractMojo {
             stringRefset.append("\n");
         }
         
-    }
+    } */
 
     private String writeDescriptionData(BufferedReader termsFileReader, BufferedReader conceptFileReader, Writer conceptRefset,
         Writer concepts, Writer descriptions, UUID pathUUID, Map<String, String> termidReadCodeMap,
