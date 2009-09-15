@@ -35,6 +35,8 @@ import javax.swing.JLabel;
 import org.dwfa.bpa.process.I_ContainData;
 import org.dwfa.bpa.process.I_DefineTask;
 
+import sun.awt.dnd.SunDragSourceContextPeer;
+
 
 
 
@@ -89,8 +91,14 @@ public class BpaGestureListener implements DragGestureListener {
 
                  Image dragImage = this.getDragImage(transferableString);
                 Point imageOffset = new Point(0,0);
-                ev.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, transferable,
-                                dragSource);
+                try {
+					ev.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, transferable,
+					                dragSource);
+				} catch (InvalidDnDOperationException e) {		
+					logger.log(Level.WARNING, e.getMessage(), e);
+					logger.log(Level.INFO, "Resetting SunDragSourceContextPeer");
+					SunDragSourceContextPeer.setDragDropInProgress(false);
+				}
             } catch (UnsupportedFlavorException e) {
                 logger.log(Level.WARNING, e.getMessage(), e);
             } catch (IOException e) {
