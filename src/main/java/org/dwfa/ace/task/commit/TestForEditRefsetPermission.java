@@ -29,7 +29,7 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
-public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
+public class TestForEditRefsetPermission extends AbstractExtensionTest {
 
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
@@ -52,7 +52,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
+    public List<AlertToDataConstraintFailure> test(I_ThinExtByRefVersioned extension, boolean forCommit)
             throws TaskFailedException {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
@@ -63,14 +63,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
 
             activeUser = configDb.getUserConcept();
             if (activeUser == null || activeUser.equals(userTopHierarchy)) {
-                return alertList;
                 // activeUser = userTopHierarchy;
-            }
-
-            // check if this concept is a child of the refset identity concept -
-            // if it isn't, then there is no alert
-            I_GetConceptData refsetIdentity = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-            if (!refsetIdentity.isParentOf(concept, true)) {
                 return alertList;
             }
 
@@ -95,15 +88,24 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             }
 
             boolean foundMatch = false;
+
+            I_GetConceptData refsetSpec = termFactory.getConcept(extension.getRefsetId());
+            I_GetConceptData specifiesRefsetRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpec, specifiesRefsetRel);
+            if (memberRefset == null) { // not a refset spec being edited
+                return alertList;
+            }
+
             for (I_GetConceptData potentialParent : permissibleRefsetParents) {
-                if (potentialParent.isParentOf(concept, true)) {
+                if (potentialParent.isParentOfOrEqualTo(memberRefset, true)) {
                     foundMatch = true;
                 }
             }
 
             if (!foundMatch) {
                 alertList.add(new AlertToDataConstraintFailure(alertType,
-                    "<html>User does not have permission to create<br>a new refset in this hierarchy.", concept));
+                    "<html>User does not have permission to edit<br>this refset.", memberRefset));
             }
 
             return alertList;
@@ -125,7 +127,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         List<I_RelTuple> roles = activeUser.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
 
         I_GetConceptData createNewRefsetPermission =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
 
         for (I_RelTuple roleRel : roles) {
             int relationshipId = roleRel.getRelId();
@@ -172,7 +174,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         Set<I_Position> allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
         I_GetConceptData createNewRefsetPermissionRel =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
 
@@ -180,5 +182,32 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
                 activeUser.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
 
         return refsets;
+    }
+
+    /**
+     * Gets the latest specified relationship's target.
+     * 
+     * @param relationshipType
+     * @return
+     * @throws Exception
+     */
+    public I_GetConceptData getLatestRelationshipTarget(I_GetConceptData concept, I_GetConceptData relationshipType)
+            throws Exception {
+
+        I_GetConceptData latestTarget = null;
+        int latestVersion = Integer.MIN_VALUE;
+
+        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
+        allowedTypes.add(relationshipType.getConceptId());
+
+        List<I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+        for (I_RelTuple rel : relationships) {
+            if (rel.getVersion() > latestVersion) {
+                latestVersion = rel.getVersion();
+                latestTarget = LocalVersionedTerminology.get().getConcept(rel.getC2Id());
+            }
+        }
+
+        return latestTarget;
     }
 }
