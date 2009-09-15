@@ -1,6 +1,7 @@
 package org.dwfa.ace.api;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -569,5 +570,23 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext);
 
     public I_DescriptionTuple getSearchResultsSelection();
+    
+    /**
+     * 
+     * @param visible True if you wish to make the workflow details sheet visible. Otherwise false. 
+     */
+    public void setShowWorkflowDetailSheet(boolean visible);
+    
+    /**
+     * 
+     * @param dim dimensions of the workflow dimension sheet. 
+     */
+    public void setWorkflowDetailSheetDimensions(Dimension dim);
+    
+    /**
+     * Developers can place components on the details sheet for interaction with the user. 
+     * @return The JPanel that implements the workflow details sheet. 
+     */
+    public JPanel getWorkflowDetailsSheet();
 
 }

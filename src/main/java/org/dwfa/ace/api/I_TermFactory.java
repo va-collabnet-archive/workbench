@@ -457,5 +457,7 @@ public interface I_TermFactory {
     int getConceptCount() throws IOException;
 
     void writeId(I_IdVersioned versioned) throws IOException;
+    
+    public List<TimePathId> getTimePathList() throws Exception;
 
 }

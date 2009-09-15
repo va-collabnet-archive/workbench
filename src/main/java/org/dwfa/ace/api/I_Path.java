@@ -23,5 +23,7 @@ public interface I_Path {
 
 	public UniversalAcePath getUniversal() throws IOException,
 			TerminologyException;
+	
+	public String toHtmlString() throws IOException;
 
 }
