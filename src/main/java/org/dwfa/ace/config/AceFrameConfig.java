@@ -1,6 +1,7 @@
 package org.dwfa.ace.config;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -2877,5 +2878,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setShowActivityViewer(boolean show) {
         aceFrame.getCdePanel().setShowActivityViewer(show);
     }
+
+	public JPanel getWorkflowDetailsSheet() {
+		return aceFrame.getCdePanel().getWorkflowDetailsSheet();
+	}
+
+	public void setShowWorkflowDetailSheet(boolean visible) {
+		aceFrame.getCdePanel().setWorfklowDetailSheetVisible(visible);
+	}
+
+	public void setWorkflowDetailSheetDimensions(Dimension dim) {
+		aceFrame.getCdePanel().setWorkflowDetailSheetDimensions(dim);
+	}
 
 }

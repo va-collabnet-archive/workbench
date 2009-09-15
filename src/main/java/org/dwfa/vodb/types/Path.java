@@ -299,4 +299,8 @@ public class Path implements I_Transact, I_Path {
       }
       return buff.toString();      
    }
+
+   public String toHtmlString() throws IOException {
+	return Path.toHtmlString(this);
+   }
 }

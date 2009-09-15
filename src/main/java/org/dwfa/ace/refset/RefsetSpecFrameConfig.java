@@ -1,6 +1,7 @@
 package org.dwfa.ace.refset;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -1131,4 +1132,16 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setShowActivityViewer(boolean show) {
         frameConfig.setShowActivityViewer(show);
     }
+
+	public JPanel getWorkflowDetailsSheet() {
+		return frameConfig.getWorkflowDetailsSheet();
+	}
+
+	public void setShowWorkflowDetailSheet(boolean visible) {
+		frameConfig.setShowWorkflowDetailSheet(visible);
+	}
+
+	public void setWorkflowDetailSheetDimensions(Dimension dim) {
+		frameConfig.setWorkflowDetailSheetDimensions(dim);
+	}
 }

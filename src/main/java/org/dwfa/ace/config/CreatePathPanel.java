@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
@@ -102,6 +103,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent e) {
+        try {
     	int n = JOptionPane.showConfirmDialog(
     		    this,
     		    "This operation will perform an immediate commit of all changes. \n\nDo you wish to proceed?",
@@ -126,7 +128,6 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
             JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must designate one parent for path.");
             return;
         }
-        try {
         	UUID newPathUid = UUID.randomUUID();
         	I_Path p = new Path(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
         	Date now = new Date();
@@ -145,7 +146,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	ThinConPart part = new ThinConPart();
         	part.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
         	part.setVersion(Integer.MAX_VALUE);
-        	part.setConceptStatus(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+        	part.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
         	part.setDefined(false);
         	con.addVersion(part);
         	cb.setUncommittedConceptAttributes(con);
@@ -176,7 +177,7 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	relPart.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
         	relPart.setVersion(Integer.MAX_VALUE);
         	relPart.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-        	relPart.setRelTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+        	relPart.setTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
         	relPart.setCharacteristicId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()));
         	relPart.setRefinabilityId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()));
         	relPart.setGroup(0);

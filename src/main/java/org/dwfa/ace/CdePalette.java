@@ -15,18 +15,23 @@ import javax.swing.Timer;
 
 public class CdePalette extends JPanel implements ComponentListener {
 	private static final long serialVersionUID = 1L;
-	private static enum Side{TOP, BOTTOM, LEFT, RIGHT};
-	public static int increment = 50;
+	private static enum POSITION{UP, DOWN, LEFT, RIGHT};
+	public static int increment = 25;
 	private JPanel ghostPanel = new JPanel();
 	
 	private class PaletteMover implements ActionListener {
 		private Point currentLocation;
 		private Point endLocation;
-		private int delay = 20;
+		private int delay = 10;
 		private Timer t;
+		private TOGGLE_DIRECTION direction;
+		private POSITION newPosition;
 		
-		public PaletteMover(Point currentLocation, Point endLocation, boolean selected) {
+		public PaletteMover(Point currentLocation, Point endLocation, boolean selected, 
+				TOGGLE_DIRECTION direction, POSITION newPosition) {
 			super();
+			this.direction = direction;
+			this.newPosition = newPosition;
             if (getRootPane() != null) {
                 this.currentLocation = currentLocation;
                 this.endLocation = endLocation;
@@ -48,24 +53,44 @@ public class CdePalette extends JPanel implements ComponentListener {
                 t.stop();
                 t.removeActionListener(this);
                 setLocation(endLocation);
-                setVisible(true);
+                if (newPosition == POSITION.UP) {
+                    setVisible(false);
+                } else {
+                    setVisible(true);
+                }
                 removeGhost();
             }
 		}
 
 
 		private void movePalette() {
-			if (Math.abs(currentLocation.x - endLocation.x) < increment) {
+			if ((Math.abs(currentLocation.x - endLocation.x) < increment) &&
+					(Math.abs(currentLocation.y - endLocation.y) < increment)){
 				currentLocation.x = endLocation.x;
+				currentLocation.y = endLocation.y;
 				ghostPanel.setLocation(currentLocation);
 				stop();
 				return;
-			} else  if (currentLocation.x > endLocation.x) {
+			} 	
+			if ((Math.abs(currentLocation.x - endLocation.x) < increment)){
+				currentLocation.x = endLocation.x;
+			}
+			if ((Math.abs(currentLocation.y - endLocation.y) < increment)){
+				currentLocation.y = endLocation.y;
+			} 
+			
+			if (currentLocation.x > endLocation.x) {
 				currentLocation.x = currentLocation.x - increment;
-			} else {
+			} else if (currentLocation.x < endLocation.x) {
 				currentLocation.x = currentLocation.x + increment;
 			}
-			ghostPanel.setLocation(currentLocation);
+			
+			if (currentLocation.y > endLocation.y) {
+				currentLocation.y = currentLocation.y - increment;
+			} else if (currentLocation.y < endLocation.y) {
+				currentLocation.y = currentLocation.y + increment;
+			}
+			ghostPanel.setLocation(currentLocation);			
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -75,7 +100,7 @@ public class CdePalette extends JPanel implements ComponentListener {
 
 	private PaletteMover mover;
 	private I_GetPalettePoint locator;
-	private Side currentSide;
+	private POSITION currentPosition;
 	public CdePalette(I_GetPalettePoint locator) {
 		super();
 		this.locator = locator;
@@ -111,31 +136,64 @@ public class CdePalette extends JPanel implements ComponentListener {
 		super.paintComponent(g);
 	}
 	
+	public enum TOGGLE_DIRECTION { UP_DOWN, LEFT_RIGHT };
 	
-	public void togglePalette(boolean selected) {
+	public void togglePalette(boolean selected,  TOGGLE_DIRECTION direction) {
 		Point locatorBounds = locator.getPalettePoint();
-		if (getBounds().x == locatorBounds.x) {
-			currentSide = Side.RIGHT;
+		POSITION newPosition = null;
+		if (direction == TOGGLE_DIRECTION.LEFT_RIGHT) {
+			if (getBounds().x == locatorBounds.x) {
+				currentPosition = POSITION.RIGHT;
+				newPosition = POSITION.LEFT;
+			} else {
+				currentPosition = POSITION.LEFT;
+				newPosition = POSITION.RIGHT;
+			}
+			if (mover != null) {
+				mover.stop();
+			}
+			setLocation(getLocation().x, locator.getPalettePoint().y);
+			mover = new PaletteMover(getLocation(), computeLocation(currentPosition), selected, 
+					direction, newPosition);
 		} else {
-			currentSide = Side.LEFT;
+			if (getBounds().y == locatorBounds.y) {
+				currentPosition = POSITION.DOWN;
+				newPosition = POSITION.UP;
+			} else {
+				currentPosition = POSITION.UP;
+				newPosition = POSITION.DOWN;
+			}
+			if (mover != null) {
+				mover.stop();
+			}
+			setLocation(getLocation().x, locator.getPalettePoint().y);
+			mover = new PaletteMover(getLocation(), computeLocation(currentPosition), selected, 
+					direction, newPosition);
 		}
-		if (mover != null) {
-			mover.stop();
-		}
-		setLocation(getLocation().x, locator.getPalettePoint().y);
-		mover = new PaletteMover(getLocation(), computeLocation(currentSide), selected);
 	}
 	
-	public Point computeLocation(Side newSide) {
+	public Point computeLocation(POSITION newSide) {
 		Point locatorBounds = locator.getPalettePoint();
 		Point newLocation;
-		if (newSide == Side.RIGHT) {
+		switch (newSide) {
+		case DOWN:
+			newLocation = new Point(locatorBounds.x,
+					locatorBounds.y - getBounds().height);
+			break;
+		case LEFT:
+			newLocation = new Point(locatorBounds.x, locatorBounds.y);
+			break;
+		case RIGHT:
 			newLocation = new Point(locatorBounds.x - getBounds().width,
 					locatorBounds.y);
-		} else if (newSide == Side.LEFT) {
-			newLocation = new Point(locatorBounds.x, locatorBounds.y);
-		} else {
-			newLocation = new Point(0,0);
+			break;
+			
+		case UP:
+			newLocation = new Point(locatorBounds.x,
+					locatorBounds.y);
+			break;
+		default:
+			throw new RuntimeException("Unexpected value: " + newSide);
 		}
 		return newLocation;
 	}
@@ -151,13 +209,14 @@ public class CdePalette extends JPanel implements ComponentListener {
 	}
 
 	public void componentResized(ComponentEvent e) {
-		setLocation(computeLocation(currentSide));	
+		setLocation(computeLocation(currentPosition));	
 	}
 
 	public void componentShown(ComponentEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
-
+	public void setLocator(I_GetPalettePoint locator) {
+		this.locator = locator;
+	}
 }

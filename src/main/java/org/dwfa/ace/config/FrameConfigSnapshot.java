@@ -1,6 +1,7 @@
 package org.dwfa.ace.config;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -1142,4 +1143,16 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setShowActivityViewer(boolean show) {
         baseFrame.setShowActivityViewer(show);
     }
+
+	public JPanel getWorkflowDetailsSheet() {
+		return baseFrame.getWorkflowDetailsSheet();
+	}
+
+	public void setShowWorkflowDetailSheet(boolean visible) {
+		baseFrame.setShowWorkflowDetailSheet(visible);
+	}
+
+	public void setWorkflowDetailSheetDimensions(Dimension dim) {
+		baseFrame.setWorkflowDetailSheetDimensions(dim);
+	}
 }
