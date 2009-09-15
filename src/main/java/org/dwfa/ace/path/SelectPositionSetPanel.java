@@ -1,18 +1,22 @@
 package org.dwfa.ace.path;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Position;
@@ -20,7 +24,21 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.tapi.TerminologyException;
 
-public class SelectPathSetPanel extends JPanel {
+public class SelectPositionSetPanel extends JPanel {
+
+	public class DeleteAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent e) {
+			I_Position p = (I_Position) positionList.getSelectedValue();
+			positionListModel.remove(p);
+			positionSet.remove(p);
+		}
+	}
 
 	/**
 	 * 
@@ -50,7 +68,7 @@ public class SelectPathSetPanel extends JPanel {
 		
 	}
 
-	public SelectPathSetPanel(I_ConfigAceFrame config) throws Exception {
+	public SelectPositionSetPanel(I_ConfigAceFrame config) throws Exception {
 		super(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -66,6 +84,8 @@ public class SelectPathSetPanel extends JPanel {
 		pppwc = new SelectPathAndPositionPanelWithCombo(true, "", 
 				config, null);
 		pppwc.setPositionCheckBoxVisible(false);
+		pppwc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
 		add(pppwc, gbc);
 		gbc.weighty = 0;
 		gbc.gridy++;
@@ -80,7 +100,14 @@ public class SelectPathSetPanel extends JPanel {
 		gbc.weighty = 1;
 		positionListModel = new ArrayListModel<I_Position>();
 		positionList = new JList(positionListModel);
+		positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+		positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+		positionList.getActionMap().put("deleteTask", new DeleteAction());
+
 		JScrollPane positionScroller = new JScrollPane(positionList);
+		positionScroller.setMinimumSize(new Dimension(100,100));
+		positionScroller.setMaximumSize(new Dimension(500,500));
+		positionScroller.setPreferredSize(new Dimension(150,150));
 		positionScroller.setBorder(BorderFactory.createTitledBorder("Position set: "));
 		add(positionScroller, gbc);
 	}

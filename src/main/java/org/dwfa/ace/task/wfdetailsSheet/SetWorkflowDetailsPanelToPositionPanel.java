@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.path.SelectPathSetPanel;
+import org.dwfa.ace.path.SelectPositionSetPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -94,7 +94,7 @@ public class SetWorkflowDetailsPanelToPositionPanel extends AbstractTask {
 			clear.evaluate(process, worker);
 			config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-			workflowDetailsSheet.add(new SelectPathSetPanel(config));
+			workflowDetailsSheet.add(new SelectPositionSetPanel(config));
 		} catch (Exception e) {
 			ex = e;
 		}
