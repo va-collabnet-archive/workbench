@@ -59,7 +59,7 @@ public class NewRefsetSpecForm2 extends JPanel {
 
         // date picker
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        deadlinePicker = new DatePicker(dateFormat);
+        deadlinePicker = new DatePicker(Calendar.getInstance(), null, dateFormat);
 
         // text fields
         requestorTextField = new JTextField(20);

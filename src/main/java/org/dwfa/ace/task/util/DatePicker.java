@@ -237,9 +237,8 @@ public class DatePicker extends JPanel {
 
         private void init() {
             setModal(true);
-            setResizable(false);
             setTitle("Select Date");
-            setSize(new Dimension(200, 220));
+
             previousYear = new JButton("<<");
             previousYear.setFocusable(false);
             previousYear.setMargin(new Insets(0, 0, 0, 0));
@@ -252,7 +251,6 @@ public class DatePicker extends JPanel {
             nextYear = new JButton(">>");
             nextYear.setFocusable(false);
             nextYear.setMargin(new Insets(0, 0, 0, 0));
-
             previousYear.addActionListener(new NextPreviousListener(Calendar.YEAR, false));
             previousMonth.addActionListener(new NextPreviousListener(Calendar.MONTH, false));
             nextMonth.addActionListener(new NextPreviousListener(Calendar.MONTH, true));
@@ -274,6 +272,7 @@ public class DatePicker extends JPanel {
             // layout components
             Box panel = new Box(BoxLayout.Y_AXIS);
             Box header = new Box(BoxLayout.X_AXIS);
+            Box days = new Box(BoxLayout.X_AXIS);
             header.add(previousYear);
             header.add(Box.createRigidArea(new Dimension(5, 5)));
             header.add(previousMonth);
@@ -283,10 +282,14 @@ public class DatePicker extends JPanel {
             header.add(nextMonth);
             header.add(Box.createRigidArea(new Dimension(5, 5)));
             header.add(nextYear);
+            days.add(Box.createHorizontalGlue());
+            days.add(dayPanel);
+            days.add(Box.createHorizontalGlue());
             panel.add(header);
-            panel.add(dayPanel);
+            panel.add(days);
             add(panel);
-
+            pack();
+            setResizable(false);
         }
 
         // returns the currently selected date
