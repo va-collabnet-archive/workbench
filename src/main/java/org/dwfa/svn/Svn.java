@@ -731,45 +731,47 @@ public class Svn implements I_HandleSubversion {
 		}
 		SvnLog.info("finished import");
 	}
-
+	private static boolean supportReadOnlySwitch = false;
 	private static void switchToReadOnlyMirror(SubversionData svd) throws TaskFailedException {
 		if (svd.getWorkingCopyStr() == null) {
 			return;
 		}
-		SvnLog.info("Starting switch to read only");
-		try {
-			File workingDir = new File(svd.getWorkingCopyStr());
-			File svnDir = new File(workingDir, ".svn");
-			if (svnDir.exists()) {
-				String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
-				String newRepo = normalizeEnding(svd.getPreferredReadRepository());
-				if (currentRepo.equals(newRepo)) {
-					SvnLog.info("Finished switch to read only: no change necessary");
-					return;
+		if (supportReadOnlySwitch) {
+			SvnLog.info("Starting switch to read only");
+			try {
+				File workingDir = new File(svd.getWorkingCopyStr());
+				File svnDir = new File(workingDir, ".svn");
+				if (svnDir.exists()) {
+					String currentRepo = normalizeEnding(getRepoInfo(svd).getUrl());
+					String newRepo = normalizeEnding(svd.getPreferredReadRepository());
+					if (currentRepo.equals(newRepo)) {
+						SvnLog.info("Finished switch to read only: no change necessary");
+						return;
+					}
+					String path = svd.getWorkingCopyStr();
+					String url = svd.getPreferredReadRepository();
+					Revision revision = Revision.HEAD;
+					Revision pegRevision = Revision.HEAD;
+					int depth = Depth.infinity;
+					boolean depthIsSticky = true;
+					boolean ignoreExternals = true;
+					boolean allowUnverObstructions = false;
+					SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl()
+							+ " to: " + url);
+					long version = Svn.getSvnClient().doSwitch(path, url, revision,
+							pegRevision, depth, depthIsSticky, ignoreExternals,
+							allowUnverObstructions);
+					SvnLog.info("Finished switch to read only at version: " + version);
+				} else {
+					SvnLog.info("Finished switch to read only: Not a working directory: " + workingDir);
 				}
-				String path = svd.getWorkingCopyStr();
-				String url = svd.getPreferredReadRepository();
-				Revision revision = Revision.HEAD;
-				Revision pegRevision = Revision.HEAD;
-				int depth = Depth.infinity;
-				boolean depthIsSticky = true;
-				boolean ignoreExternals = true;
-				boolean allowUnverObstructions = false;
-				SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl()
-						+ " to: " + url);
-				long version = Svn.getSvnClient().doSwitch(path, url, revision,
-						pegRevision, depth, depthIsSticky, ignoreExternals,
-						allowUnverObstructions);
-				SvnLog.info("Finished switch to read only at version: " + version);
-			} else {
-				SvnLog.info("Finished switch to read only: Not a working directory: " + workingDir);
+				
+			} catch (ClientException e) {
+				SvnLog.alertAndLog(e);
+				SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr() + 
+						"with exception: " + e.getLocalizedMessage());
+				throw new TaskFailedException(e);
 			}
-			
-		} catch (ClientException e) {
-			SvnLog.alertAndLog(e);
-			SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr() + 
-					"with exception: " + e.getLocalizedMessage());
-			throw new TaskFailedException(e);
 		}
 	}
 
