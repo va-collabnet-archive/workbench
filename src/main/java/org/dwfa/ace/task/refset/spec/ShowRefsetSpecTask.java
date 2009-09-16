@@ -54,20 +54,27 @@ public class ShowRefsetSpecTask extends AbstractTask {
 
             termFactory = LocalVersionedTerminology.get();
 
-            I_GetConceptData refset =
-                    termFactory.getConcept(new UUID[] { (UUID) process.readProperty(ProcessAttachmentKeys.REFSET_UUID
-                        .getAttachmentKey()) });
-
-            // set new spec as focus
-            termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(refset);
-            termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
-            termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
-
-            while (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() == null) {
-                Thread.sleep(100);
+            Object obj = process.readProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey());
+            UUID uuid = null;
+            if (obj == null) {
+                uuid = null;
+            } else {
+                uuid = (UUID) obj;
             }
-            while (termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor() == null) {
-                Thread.sleep(100);
+            if (uuid != null) {
+                I_GetConceptData refset = termFactory.getConcept(new UUID[] { uuid });
+
+                // set new spec as focus
+                termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(refset);
+                termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
+                termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
+
+                while (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() == null) {
+                    Thread.sleep(100);
+                }
+                while (termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor() == null) {
+                    Thread.sleep(100);
+                }
             }
 
         } catch (Exception e) {

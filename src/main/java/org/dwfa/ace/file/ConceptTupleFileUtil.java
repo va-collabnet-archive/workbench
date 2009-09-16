@@ -20,6 +20,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptTupleFileUtil {
 
+    public static I_GetConceptData lastConcept = null;
+
     public static String exportTuple(I_GetConceptData concept) throws TerminologyException, IOException {
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
@@ -121,6 +123,7 @@ public class ConceptTupleFileUtil {
                 I_IntSet allowedStatus = termFactory.newIntSet();
                 allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
+                lastConcept = concept;
                 Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
                 boolean addUncommitted = true;
                 boolean returnConflictResolvedLatestState = true;
@@ -162,6 +165,7 @@ public class ConceptTupleFileUtil {
                 newPart.setVersion(effectiveDate);
                 v.addVersion(newPart);
                 termFactory.addUncommitted(newConcept);
+                lastConcept = newConcept;
                 // termFactory.commit();
             }
         } catch (Exception e) {
@@ -176,6 +180,11 @@ public class ConceptTupleFileUtil {
                 return false;
             }
         }
+
         return true;
+    }
+
+    public static I_GetConceptData getLastConcept() {
+        return lastConcept;
     }
 }

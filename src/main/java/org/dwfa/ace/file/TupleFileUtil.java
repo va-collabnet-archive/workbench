@@ -36,7 +36,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class TupleFileUtil {
 
-    public void importFile(File importFile, File reportFile, UUID pathToOverrideUuid) throws TerminologyException {
+    public I_GetConceptData importFile(File importFile, File reportFile, UUID pathToOverrideUuid)
+            throws TerminologyException {
 
         try {
             BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(reportFile));
@@ -53,6 +54,8 @@ public class TupleFileUtil {
             int ccsTupleCount = 0;
             int intTupleCount = 0;
             int idTupleCount = 0;
+            Set<I_GetConceptData> concepts = new HashSet<I_GetConceptData>();
+            I_GetConceptData memberRefset = null;
 
             while (currentLine != null) {
 
@@ -65,7 +68,9 @@ public class TupleFileUtil {
                         if (ConceptTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
                             pathToOverrideUuid)) {
                             conceptTupleCount++;
+                            concepts.add(ConceptTupleFileUtil.getLastConcept());
                         }
+
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator().next())) {
                         if (DescTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
                             descTupleCount++;
@@ -117,6 +122,14 @@ public class TupleFileUtil {
                 lineCount++;
             }
 
+            // work out which of the concepts added were the member refset
+            for (I_GetConceptData concept : concepts) {
+                if (isMemberRefset(concept)) {
+                    memberRefset = concept;
+                    break;
+                }
+            }
+
             outputFileWriter.write("------------------");
             outputFileWriter.newLine();
             outputFileWriter.write("Summary of import:");
@@ -143,12 +156,27 @@ public class TupleFileUtil {
             outputFileWriter.flush();
             outputFileWriter.close();
             inputFileReader.close();
+
+            return memberRefset;
         } catch (FileNotFoundException e) {
             throw new TerminologyException("Failed to import file - file not found: " + importFile);
         } catch (IOException e) {
             throw new TerminologyException("Failed to import file - IO Exception occurred while reading file: "
                 + importFile);
+        } catch (Exception e) {
+            throw new TerminologyException("Failed to import file - Exception occurred while reading file: "
+                + importFile);
         }
+    }
+
+    private boolean isMemberRefset(I_GetConceptData concept) throws Exception {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_GetConceptData specifiesRefset = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+
+        if (getLatestRelationshipDestinationTarget(concept, specifiesRefset) != null) {
+            return true;
+        }
+        return false;
     }
 
     public void exportRefsetSpecToFile(File file, I_GetConceptData refsetSpec) throws Exception {
@@ -312,6 +340,26 @@ public class TupleFileUtil {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();
                 latestTarget = LocalVersionedTerminology.get().getConcept(rel.getC2Id());
+            }
+        }
+
+        return latestTarget;
+    }
+
+    public I_GetConceptData getLatestRelationshipDestinationTarget(I_GetConceptData concept,
+            I_GetConceptData relationshipType) throws Exception {
+
+        I_GetConceptData latestTarget = null;
+        int latestVersion = Integer.MIN_VALUE;
+
+        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
+        allowedTypes.add(relationshipType.getConceptId());
+
+        List<I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
+        for (I_RelTuple rel : relationships) {
+            if (rel.getVersion() > latestVersion) {
+                latestVersion = rel.getVersion();
+                latestTarget = LocalVersionedTerminology.get().getConcept(rel.getC1Id());
             }
         }
 

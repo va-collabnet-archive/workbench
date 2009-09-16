@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.file.TupleFileUtil;
@@ -92,7 +93,8 @@ public class ImportRefsetSpecTask extends AbstractTask {
             activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
-            tupleImporter.importFile(new File(importFileName), new File(outputFileName), pathUuid);
+            I_GetConceptData memberRefset =
+                    tupleImporter.importFile(new File(importFileName), new File(outputFileName), pathUuid);
 
             LocalVersionedTerminology.get().commit();
 
@@ -100,6 +102,11 @@ public class ImportRefsetSpecTask extends AbstractTask {
             activityPanel.setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
 
             activityPanel.complete();
+
+            if (memberRefset != null) {
+                process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), LocalVersionedTerminology
+                    .get().getUids(memberRefset.getConceptId()).iterator().next());
+            }
 
             return Condition.CONTINUE;
         } catch (Exception ex) {
