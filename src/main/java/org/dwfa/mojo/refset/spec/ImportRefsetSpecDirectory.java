@@ -38,9 +38,8 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                    .getCanonicalName()
-                    + dir.getCanonicalPath(), this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + dir.getCanonicalPath(), this
+                .getClass(), targetDirectory)) {
                 return;
             }
         } catch (Exception e) {
@@ -50,17 +49,13 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
         try {
             TupleFileUtil tupleImporter = new TupleFileUtil();
             if (!dir.isDirectory()) {
-                throw new Exception("Directory has not been configured : "
-                        + dir.getPath());
+                throw new Exception("Directory has not been configured : " + dir.getPath());
             } else {
                 getLog().info("Importing refset specs from " + dir.getPath());
                 for (File f : dir.listFiles()) {
-                    getLog().info(
-                            "Beginning import of refset spec :" + f.getPath());
-                    tupleImporter.importFile(f);
-                    getLog().info(
-                            "Finished importing refset spec from "
-                                    + f.getPath());
+                    getLog().info("Beginning import of refset spec :" + f.getPath());
+                    // tupleImporter.importFile(f);
+                    getLog().info("Finished importing refset spec from " + f.getPath());
                 }
 
                 LocalVersionedTerminology.get().commit();
