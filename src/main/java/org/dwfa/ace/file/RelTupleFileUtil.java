@@ -210,7 +210,7 @@ public class RelTupleFileUtil {
                 newPart.setVersion(effectiveDate);
 
                 v.addVersion(newPart);
-                termFactory.addUncommitted(concept);
+                termFactory.addUncommittedNoChecks(concept);
                 // termFactory.commit();
             } else {
 
@@ -224,7 +224,7 @@ public class RelTupleFileUtil {
                 newPart.setVersion(effectiveDate);
 
                 latestTuple.getRelVersioned().addVersion(newPart);
-                termFactory.addUncommitted(concept);
+                termFactory.addUncommittedNoChecks(concept);
                 // termFactory.commit();
             }
         } catch (Exception e) {

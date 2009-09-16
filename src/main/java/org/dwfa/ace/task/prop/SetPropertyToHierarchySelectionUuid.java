@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -56,8 +57,10 @@ public class SetPropertyToHierarchySelectionUuid extends AbstractTask {
             I_ConfigAceFrame config =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            process.setProperty(propName, termFactory.getUids(config.getHierarchySelection().getConceptId()).iterator()
-                .next());
+            I_GetConceptData selection = config.getHierarchySelection();
+            if (selection != null) {
+                process.setProperty(propName, termFactory.getUids(selection.getConceptId()).iterator().next());
+            }
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);

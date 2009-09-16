@@ -134,6 +134,7 @@ public class RefsetHelper {
                     if (latestPart instanceof I_ThinExtByRefPartConceptConcept) {
                         int c1Value = ((I_ThinExtByRefPartConceptConcept) latestPart).getC1id();
                         int c2Value = ((I_ThinExtByRefPartConceptConcept) latestPart).getC2id();
+                        int componentId = ((I_ThinExtByRefPartConceptConcept) latestPart).getConceptId();
                         if (c1Value == c1Id && c2Value == c2Id) {
                             return true;
                         }
@@ -277,8 +278,10 @@ public class RefsetHelper {
      * 
      * @param refsetId The subject refset
      * @param conceptId The concept to be added
-     * @param memberTypeId The value of the concept extension to be added to the new member concept.
-     * @param checkNotExists Is true, will only execute if the extension does not already exist.
+     * @param memberTypeId The value of the concept extension to be added to the
+     *            new member concept.
+     * @param checkNotExists Is true, will only execute if the extension does
+     *            not already exist.
      */
     public boolean newRefsetExtension(int refsetId, int conceptId, int memberTypeId, boolean checkNotExists)
             throws Exception {
@@ -323,64 +326,74 @@ public class RefsetHelper {
     public boolean newConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, UUID memberUuid,
             UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
 
-        Collection<I_Path> paths = termFactory.getPaths();
-        paths.clear();
-        paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+        try {
+            Collection<I_Path> paths = termFactory.getPaths();
+            paths.clear();
+            paths.add(termFactory.getPath(new UUID[] { pathUuid }));
 
-        if (memberUuid == null) {
-            memberUuid = UUID.randomUUID();
-        }
-        if (statusUuid == null) {
-            statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
-        }
-
-        int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
-
-        // check subject is not already a member
-        if (hasCurrentConceptConceptRefsetExtension(refsetId, componentId, c1Id, c2Id, termFactory.getConcept(
-            new UUID[] { statusUuid }).getConceptId())) {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Component is already a member of the refset. Skipping.");
+            if (memberUuid == null) {
+                memberUuid = UUID.randomUUID();
             }
-            return false;
-        }
+            if (statusUuid == null) {
+                statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            }
 
-        // create a new extension (with a part for each path the user is
-        // editing)
+            int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
 
-        int newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
+            // check subject is not already a member
+            if (hasCurrentConceptConceptRefsetExtension(refsetId, componentId, c1Id, c2Id, termFactory.getConcept(
+                new UUID[] { statusUuid }).getConceptId())) {
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Component is already a member of the refset. Skipping.");
+                }
+                return false;
+            }
 
-        I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId, extTypeId);
+            // create a new extension (with a part for each path the user is
+            // editing)
 
-        for (I_Path editPath : paths) {
+            int newMemberId = Integer.MAX_VALUE;
+            if (!termFactory.hasId(memberUuid)) {
+                newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
+            } else {
+                newMemberId = termFactory.getId(memberUuid).getNativeId();
+            }
 
-            I_ThinExtByRefPartConceptConcept extension = termFactory.newConceptConceptExtensionPart();
+            I_ThinExtByRefVersioned newExtension =
+                    termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId, extTypeId);
 
-            extension.setPathId(editPath.getConceptId());
-            extension.setStatusId(termFactory.getConcept(new UUID[] { statusUuid }).getConceptId());
+            for (I_Path editPath : paths) {
+
+                I_ThinExtByRefPartConceptConcept extension = termFactory.newConceptConceptExtensionPart();
+
+                extension.setPathId(editPath.getConceptId());
+                extension.setStatusId(termFactory.getConcept(new UUID[] { statusUuid }).getConceptId());
+                extension.setVersion(Integer.MAX_VALUE);
+                extension.setC1id(c1Id);
+                extension.setC2id(c2Id);
+
+                newExtension.addVersion(extension);
+            }
+
+            termFactory.addUncommittedNoChecks(newExtension);
+            termFactory.commit();
+
+            // edit the existing part's effectiveDate/version - this needs to
+            // occur after the part has been committed, or else the
+            // effectiveDate is set to the time at commit
+            int index = newExtension.getVersions().size() - 1;
+            I_ThinExtByRefPartConceptConcept extension =
+                    (I_ThinExtByRefPartConceptConcept) newExtension.getVersions().get(index);
             extension.setVersion(effectiveTime);
-            extension.setC1id(c1Id);
-            extension.setC2id(c2Id);
-
             newExtension.addVersion(extension);
+
+            termFactory.addUncommittedNoChecks(newExtension);
+            termFactory.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
-
-        termFactory.addUncommittedNoChecks(newExtension);
-        termFactory.commit();
-
-        // edit the existing part's effectiveDate/version - this needs to occur
-        // after the part has been committed, or else the effectiveDate is set
-        // to the time at commit
-        int index = newExtension.getVersions().size() - 1;
-        I_ThinExtByRefPartConceptConcept extension =
-                (I_ThinExtByRefPartConceptConcept) newExtension.getVersions().get(index);
-        extension.setVersion(effectiveTime);
-        newExtension.addVersion(extension);
-
-        termFactory.addUncommittedNoChecks(newExtension);
-        termFactory.commit();
-        return true;
     }
 
     public boolean newIntRefsetExtension(int refsetId, int componentId, int value, UUID memberUuid, UUID pathUuid,

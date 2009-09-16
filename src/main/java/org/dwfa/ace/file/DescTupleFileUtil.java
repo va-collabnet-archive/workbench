@@ -185,7 +185,7 @@ public class DescTupleFileUtil {
                 newLastPart.setVersion(effectiveDate);
 
                 v.addVersion(newLastPart);
-                termFactory.addUncommitted(concept);
+                termFactory.addUncommittedNoChecks(concept);
                 // termFactory.commit();
             } else {
                 I_DescriptionPart newLastPart = latestTuple.getDescVersioned().getLastTuple().getPart().duplicate();
@@ -198,7 +198,7 @@ public class DescTupleFileUtil {
                 newLastPart.setVersion(effectiveDate);
 
                 latestTuple.getDescVersioned().addVersion(newLastPart);
-                termFactory.addUncommitted(concept);
+                termFactory.addUncommittedNoChecks(concept);
                 // termFactory.commit();
             }
         } catch (Exception e) {

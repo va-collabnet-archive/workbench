@@ -26,10 +26,7 @@ public class ConceptConceptExtTupleFileUtil {
             UUID refsetUuid = termFactory.getUids(tuple.getRefsetId()).iterator().next();
             UUID componentUuid = termFactory.getUids(tuple.getComponentId()).iterator().next();
             UUID typeUuid = termFactory.getUids(tuple.getTypeId()).iterator().next(); // this
-            // should
-            // be
-            // concept
-            // concept
+
             if (!typeUuid.equals(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids().iterator().next())) {
                 throw new TerminologyException("Non concept-concept ext tuple passed to concept-concept file util.");
             }

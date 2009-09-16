@@ -146,10 +146,10 @@ public class ConceptTupleFileUtil {
                     newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
                     newPart.setDefined(isDefined);
                     newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-                    newPart.setVersion(effectiveDate);
+                    newPart.setVersion(Integer.MAX_VALUE);
 
                     latestTuple.getConVersioned().addVersion(newPart);
-                    termFactory.addUncommitted(concept);
+                    termFactory.addUncommittedNoChecks(concept);
                     // termFactory.commit();
                 }
             } else {
@@ -158,17 +158,37 @@ public class ConceptTupleFileUtil {
                         termFactory.newConcept(conceptUuid, isDefined, termFactory.getActiveAceFrameConfig());
                 I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
-                I_ConceptAttributePart newPart = v.getVersions().get(0).duplicate();
+                int numberOfVersions = v.getVersions().size();
+                System.out.println(">>>> Number of concept version parts." + numberOfVersions);
+                // I_ConceptAttributePart newPart =
+                // v.getVersions().get(0).duplicate();
+                I_ConceptAttributePart newPart = termFactory.newConceptAttributePart();
+
                 newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
                 newPart.setDefined(isDefined);
                 newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-                newPart.setVersion(effectiveDate);
+                newPart.setVersion(Integer.MAX_VALUE);
                 v.addVersion(newPart);
-                termFactory.addUncommitted(newConcept);
+                termFactory.addUncommittedNoChecks(newConcept);
                 lastConcept = newConcept;
                 // termFactory.commit();
+
+                // edit the existing part's effectiveDate/version - this needs
+                // to occur after the part has been committed, or else the
+                // effectiveDate is set to the time at commit
+                /*
+                 * int index = v.getVersions().size() - 1;
+                 * I_ConceptAttributePart updatedPart = (I_ConceptAttributePart)
+                 * v.getVersions().get(index);
+                 * updatedPart.setVersion(effectiveDate);
+                 * v.addVersion(updatedPart);
+                 * 
+                 * termFactory.addUncommittedNoChecks(newConcept);
+                 * termFactory.commit();
+                 */
             }
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = "Exception of unknown cause thrown while importing concept tuple";
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
