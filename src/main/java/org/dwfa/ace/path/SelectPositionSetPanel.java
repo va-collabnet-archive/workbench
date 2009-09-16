@@ -116,6 +116,10 @@ public class SelectPositionSetPanel extends JPanel {
 		return pppwc.getCurrentPosition();
 	}
 
+	public Set<I_Position> getPositionSet() {
+		return positionSet;
+	}
+
 	
 
 }

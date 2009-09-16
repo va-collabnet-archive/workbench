@@ -89,7 +89,7 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         I_IntSet activeSet = LocalVersionedTerminology.get().newIntSet();
         I_ConfigAceFrame config = getFrameConfig();
         if (config == null) {
-            config = NewDefaultProfile.newProfile("username", "password", "adminUsername", "adminPassword");
+            config = NewDefaultProfile.newProfile("fullname", "username", "password", "adminUsername", "adminPassword");
         }
         activeSet.addAll(config.getAllowedStatus().getSetValues());
         for (ArchitectonicAuxiliary.Concept con : Arrays.asList(ArchitectonicAuxiliary.Concept.ACTIVE,

@@ -50,13 +50,13 @@ public class NewDefaultProfile extends NewProfile {
 	}
 
 	@Override
-	protected I_ConfigAceFrame setupNewProfile(String username,
+	protected I_ConfigAceFrame setupNewProfile(String fullName, String username,
 			String password, String adminUsername, String adminPassword)
 			throws TerminologyException, IOException {
-		return newProfile(username, password, adminUsername, adminPassword);
+		return newProfile(fullName, username, password, adminUsername, adminPassword);
 	}
 
-	public static I_ConfigAceFrame newProfile(String username, String password,
+	public static I_ConfigAceFrame newProfile(String fullName, String username, String password,
 			String adminUsername, String adminPassword)
 			throws TerminologyException, IOException {
 		
@@ -74,6 +74,9 @@ public class NewDefaultProfile extends NewProfile {
 		newDbProfile.setUsername(username);
 		activeConfig.setDbConfig(newDbProfile);
 		
+		if (fullName == null || fullName.length() < 2) {
+			fullName = "user's full name";
+		}
 		
 		if (username == null || username.length() < 2) {
 			username = "username";
@@ -247,8 +250,16 @@ public class NewDefaultProfile extends NewProfile {
 				.getConcept(Concept.STATED_RELATIONSHIP.getUids()));
 		activeConfig.setDefaultRelationshipRefinability(tf
 				.getConcept(Concept.OPTIONAL_REFINABILITY.getUids()));
+		
 		activeConfig.setDefaultRelationshipType(tf.getConcept(Concept.IS_A_REL
 				.getUids()));
+		
+		try {
+			activeConfig.setDefaultRelationshipType(tf.getConcept(SNOMED.Concept.IS_A.getUids()));
+		} catch (NoMappingException e) {
+			// nothing to do...
+		}
+		
 		activeConfig.setDefaultStatus(tf.getConcept(Concept.ACTIVE.getUids()));
 
 		I_IntList treeDescPrefList = activeConfig.getTreeDescPreferenceList();

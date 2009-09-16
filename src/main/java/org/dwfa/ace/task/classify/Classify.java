@@ -435,7 +435,7 @@ public class Classify extends AbstractTask {
 		final I_Path inferredPath = getInferredPath(termFactory, statedPath,
 				termFactory.getActiveAceFrameConfig());
 
-		final I_ConfigAceFrame newConfig = NewDefaultProfile.newProfile("", "",
+		final I_ConfigAceFrame newConfig = NewDefaultProfile.newProfile("", "", "",
 				"", "");
 		newConfig.getEditingPathSet().clear();
 		newConfig.addEditingPath(inferredPath);

@@ -1,5 +1,15 @@
 package org.dwfa.ace.task.commit;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -11,16 +21,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
 
@@ -89,7 +89,7 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
 		I_IntSet activeSet = LocalVersionedTerminology.get().newIntSet();
 		I_ConfigAceFrame config = getFrameConfig();
 		if (config == null) {
-			config = NewDefaultProfile.newProfile("username", "password", "adminUsername", "adminPassword");
+			config = NewDefaultProfile.newProfile("fullname", "username", "password", "adminUsername", "adminPassword");
 		}
 		activeSet.addAll(config.getAllowedStatus().getSetValues());
 		for (ArchitectonicAuxiliary.Concept con : Arrays.asList(

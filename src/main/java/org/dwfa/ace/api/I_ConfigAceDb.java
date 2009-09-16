@@ -59,5 +59,32 @@ public interface I_ConfigAceDb {
 	 * @param userConcept A concept that represents the user this profile belongs to.
 	 */
 	public void setUserConcept(I_GetConceptData userConcept);
+	
+	/**
+	 * 
+	 * The user path can be used to reset a user to their defaults,
+	 * by setting the edit path to their user path, and by setting the
+	 * view path to the latest position on their user path. 
+	 * @return The default path specifically assigned to this user. 
+	 */
+	public I_GetConceptData getUserPath();
+	
+	/**
+	 * 
+	 * @param userPath The default path specifically assigned to this user. 
+	 */
+	public void setUserPath(I_GetConceptData userPath);
+	
+	/**
+	 * 
+	 * @return The user's full name (John Q. Public). 
+	 */
+	public String getFullName();
+	
+	/**
+	 * 
+	 * @param fullName The user's full name (John Q. Public).
+	 */
+	public void setFullName(String fullName);
 
 }

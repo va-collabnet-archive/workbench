@@ -23,6 +23,7 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 	private static final long serialVersionUID = 1;
 	private static final int dataVersion = 1;
 	
+	protected transient JTextField fullName;
 	protected transient JTextField user;
 	protected transient JTextField pwd;
 	protected transient JLabel instruction;
@@ -104,6 +105,10 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 			workflowPanel.add(instruction, c);
 			c.gridx++;
 			c.weightx = 1.0;
+			if (showFullName()) {
+				workflowPanel.add(fullName, c);
+				c.gridx++;
+			}
 			workflowPanel.add(user, c);
 			c.gridx++;
 			workflowPanel.add(pwd, c);
@@ -112,6 +117,8 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 		}
 		
 	}
+	
+	protected abstract boolean showFullName();
 
 	protected abstract void readInput();
 

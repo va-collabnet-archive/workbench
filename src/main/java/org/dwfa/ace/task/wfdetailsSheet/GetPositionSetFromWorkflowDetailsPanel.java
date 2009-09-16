@@ -1,14 +1,17 @@
 package org.dwfa.ace.task.wfdetailsSheet;
 
+import java.awt.Component;
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.path.SelectPositionSetPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -21,15 +24,14 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
-public class SetWorkflowDetailsPanelToPositionPanel extends AbstractTask {
+public class GetPositionSetFromWorkflowDetailsPanel extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
 	private static final int dataVersion = 1;
 
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	
-	private transient Exception ex = null;
-
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
@@ -61,45 +63,28 @@ public class SetWorkflowDetailsPanelToPositionPanel extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
 		try {
-			ex = null;
-			if (SwingUtilities.isEventDispatchThread()) {
-				doRun(process, worker);
-			} else {
-				SwingUtilities.invokeAndWait(new Runnable() {
-
-					public void run() {
-						doRun(process, worker); 
-					}
-
-				});
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
+			for (Component c: workflowDetailsSheet.getComponents()) {
+				if (SelectPositionSetPanel.class.isAssignableFrom(c.getClass())) {
+					SelectPositionSetPanel spsp = (SelectPositionSetPanel) c;
+					Set<I_Position> positionSet = spsp.getPositionSet();
+					process.setProperty(positionSetPropName, positionSet);
+					return Condition.CONTINUE;
+				}
 			}
-		} catch (InterruptedException e) {
-			throw new TaskFailedException(e);
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException(e);
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);
+		} catch (IntrospectionException e) {
+			throw new TaskFailedException(e);
+		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
 		} 
-		if (ex != null) {
-			throw new TaskFailedException(ex);
-		}
-		return Condition.CONTINUE;
+		throw new TaskFailedException("Cannot find SelectPositionSetPanel.");
 	}
 
-	private void doRun(final I_EncodeBusinessProcess process,
-			final I_Work worker) {
-		I_ConfigAceFrame config;
-		try {
-			config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
-			clear.setProfilePropName(getProfilePropName());
-			clear.evaluate(process, worker);
-			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-			workflowDetailsSheet.add(new SelectPositionSetPanel(config));
-		} catch (Exception e) {
-			ex = e;
-		}
-	}
 
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
@@ -115,6 +100,14 @@ public class SetWorkflowDetailsPanelToPositionPanel extends AbstractTask {
 	 */
 	public Collection<Condition> getConditions() {
 		return AbstractTask.CONTINUE_CONDITION;
+	}
+
+	public String getPositionSetPropName() {
+		return positionSetPropName;
+	}
+
+	public void setPositionSetPropName(String positionSetPropName) {
+		this.positionSetPropName = positionSetPropName;
 	}
 
 }

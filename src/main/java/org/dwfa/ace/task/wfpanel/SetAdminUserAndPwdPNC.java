@@ -49,4 +49,9 @@ public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 		return true;
 	}
 
+	@Override
+	protected boolean showFullName() {
+		return false;
+	}
+
 }

@@ -340,7 +340,7 @@ public class FasterLoad extends AbstractTask {
                 final I_Path statedPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
                 final I_Path inferredPath = getInferredPath(statedPath, termFactory.getActiveAceFrameConfig());
     
-                newConfig = NewDefaultProfile.newProfile("", "", "", "");
+                newConfig = NewDefaultProfile.newProfile("", "", "", "", "");
                 newConfig.getEditingPathSet().clear();
                 newConfig.addEditingPath(inferredPath);
     
