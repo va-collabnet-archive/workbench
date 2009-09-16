@@ -36,12 +36,23 @@ import org.dwfa.tapi.TerminologyException;
 
 public class TupleFileUtil {
 
-    public void importFile(File file) throws TerminologyException {
+    public void importFile(File importFile, File reportFile, UUID pathToOverrideUuid) throws TerminologyException {
 
         try {
-            BufferedReader inputFileReader = new BufferedReader(new FileReader(file));
+            BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(reportFile));
+            BufferedReader inputFileReader = new BufferedReader(new FileReader(importFile));
 
             String currentLine = inputFileReader.readLine();
+            int lineCount = 1;
+            int conceptTupleCount = 0;
+            int conceptExtTupleCount = 0;
+            int descTupleCount = 0;
+            int relTupleCount = 0;
+            int cccTupleCount = 0;
+            int ccTupleCount = 0;
+            int ccsTupleCount = 0;
+            int intTupleCount = 0;
+            int idTupleCount = 0;
 
             while (currentLine != null) {
 
@@ -51,40 +62,92 @@ public class TupleFileUtil {
                     UUID tupleUuid = UUID.fromString(lineParts[0]);
 
                     if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next())) {
-                        ConceptTupleFileUtil.importTuple(currentLine);
+                        if (ConceptTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            pathToOverrideUuid)) {
+                            conceptTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator().next())) {
-                        DescTupleFileUtil.importTuple(currentLine);
+                        if (DescTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
+                            descTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids().iterator().next())) {
-                        RelTupleFileUtil.importTuple(currentLine);
+                        if (RelTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
+                            relTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_TUPLE.getUids()
                         .iterator().next())) {
-                        ConceptConceptExtTupleFileUtil.importTuple(currentLine);
+                        if (ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            pathToOverrideUuid)) {
+                            ccTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE
                         .getUids().iterator().next())) {
-                        ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine);
+                        if (ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            pathToOverrideUuid)) {
+                            cccTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_STRING_TUPLE
                         .getUids().iterator().next())) {
-                        ConceptConceptStringExtTupleFileUtil.importTuple(currentLine);
+                        if (ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            pathToOverrideUuid)) {
+                            ccsTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_TUPLE.getUids().iterator()
                         .next())) {
-                        ConceptExtTupleFileUtil.importTuple(currentLine);
+                        if (ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            pathToOverrideUuid)) {
+                            conceptExtTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_INT_TUPLE.getUids().iterator()
                         .next())) {
-                        IntExtTupleFileUtil.importTuple(currentLine);
+                        if (IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            pathToOverrideUuid)) {
+                            intTupleCount++;
+                        }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next())) {
-                        IDTupleFileUtil.importTuple(currentLine);
+                        if (IDTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
+                            idTupleCount++;
+                        }
                     } else {
                         throw new TerminologyException("Unimplemented tuple UUID : " + tupleUuid);
                     }
                 }
 
                 currentLine = inputFileReader.readLine();
+                lineCount++;
             }
 
+            outputFileWriter.write("------------------");
+            outputFileWriter.newLine();
+            outputFileWriter.write("Summary of import:");
+            outputFileWriter.newLine();
+            outputFileWriter.write("ID tuples imported: " + idTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Concept tuples imported: " + conceptTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Desc tuples imported: " + descTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Rel tuples imported: " + relTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Concept ext tuples imported: " + conceptExtTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Concept-concept ext tuples imported: " + ccTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Concept-concept-concept ext tuples imported: " + cccTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Concept-concept-string tuples imported: " + ccsTupleCount);
+            outputFileWriter.newLine();
+            outputFileWriter.write("Int ext tuples imported: " + intTupleCount);
+            outputFileWriter.newLine();
+
+            outputFileWriter.flush();
+            outputFileWriter.close();
+            inputFileReader.close();
         } catch (FileNotFoundException e) {
-            throw new TerminologyException("Failed to import file - file not found: " + file);
+            throw new TerminologyException("Failed to import file - file not found: " + importFile);
         } catch (IOException e) {
-            throw new TerminologyException("Failed to import file - IO Exception occurred while reading file: " + file);
+            throw new TerminologyException("Failed to import file - IO Exception occurred while reading file: "
+                + importFile);
         }
     }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -33,10 +34,11 @@ public class ImportRefsetSpecTask extends AbstractTask {
 	 */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
-    private String inputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE
-            .getAttachmentKey();
+    private String inputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
+    private String outputFilePropName = ProcessAttachmentKeys.OUTPUT_FILE.getAttachmentKey();
+    private String pathUuidPropName = ProcessAttachmentKeys.PATH_UUID.getAttachmentKey();
 
     public String getInputFilePropName() {
         return inputFilePropName;
@@ -49,50 +51,53 @@ public class ImportRefsetSpecTask extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(inputFilePropName);
+        out.writeObject(outputFilePropName);
+        out.writeObject(pathUuidPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            // Nothing to do
+        if (objDataVersion <= 1) {
             inputFilePropName = (String) in.readObject();
+        } else if (objDataVersion == 2) {
+            inputFilePropName = (String) in.readObject();
+            outputFilePropName = (String) in.readObject();
+            pathUuidPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         // initialise the progress panel
-        I_ShowActivity activityPanel = LocalVersionedTerminology.get()
-                .newActivityPanel(true);
+        I_ShowActivity activityPanel = LocalVersionedTerminology.get().newActivityPanel(true);
         try {
-            String fileName = (String) process.readProperty(inputFilePropName);
+            String importFileName = (String) process.readProperty(inputFilePropName);
+            String outputFileName = (String) process.readProperty(outputFilePropName);
+            Object pathObj = process.readProperty(pathUuidPropName);
+            UUID pathUuid;
+            if (pathObj == null) {
+                pathUuid = null;
+            } else {
+                pathUuid = (UUID) pathObj;
+            }
 
             activityPanel.setIndeterminate(true);
-            activityPanel
-                    .setProgressInfoUpper("Importing refset spec from file : "
-                            + fileName);
-            activityPanel
-                    .setProgressInfoLower("<html><font color='black'> In progress.");
+            activityPanel.setProgressInfoUpper("Importing refset spec from file : " + importFileName);
+            activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
-            tupleImporter.importFile(new File(fileName));
+            tupleImporter.importFile(new File(importFileName), new File(outputFileName), pathUuid);
 
             LocalVersionedTerminology.get().commit();
 
-            activityPanel
-                    .setProgressInfoUpper("Importing refset spec from file : "
-                            + fileName);
-            activityPanel
-                    .setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
+            activityPanel.setProgressInfoUpper("Importing refset spec from file : " + importFileName);
+            activityPanel.setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
 
             activityPanel.complete();
 
@@ -114,5 +119,21 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    public String getOutputFilePropName() {
+        return outputFilePropName;
+    }
+
+    public void setOutputFilePropName(String outputFilePropName) {
+        this.outputFilePropName = outputFilePropName;
+    }
+
+    public String getPathUuidPropName() {
+        return pathUuidPropName;
+    }
+
+    public void setPathUuidPropName(String pathUuidPropName) {
+        this.pathUuidPropName = pathUuidPropName;
     }
 }

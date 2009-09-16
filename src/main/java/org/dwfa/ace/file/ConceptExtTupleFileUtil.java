@@ -1,5 +1,6 @@
 package org.dwfa.ace.file;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -47,51 +48,116 @@ public class ConceptExtTupleFileUtil {
         }
     }
 
-    public static void importTuple(String inputLine) throws TerminologyException {
+    public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
+            UUID pathToOverrideUuid) throws TerminologyException {
 
         try {
             String[] lineParts = inputLine.split("\t");
 
-            UUID memberUuid = UUID.fromString(lineParts[1]);
-            UUID refsetUuid = UUID.fromString(lineParts[2]);
-            UUID componentUuid = UUID.fromString(lineParts[3]);
-            UUID typeUuid = UUID.fromString(lineParts[4]);
-            if (!typeUuid.equals(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next())) {
-                throw new TerminologyException("Non concept ext string passed to concept file util.");
+            UUID memberUuid;
+            UUID refsetUuid;
+            UUID componentUuid;
+            UUID conceptUuid;
+            UUID pathUuid;
+            UUID statusUuid;
+            int effectiveDate;
+
+            try {
+                memberUuid = UUID.fromString(lineParts[1]);
+                refsetUuid = UUID.fromString(lineParts[2]);
+                componentUuid = UUID.fromString(lineParts[3]);
+                conceptUuid = UUID.fromString(lineParts[5]);
+                if (pathToOverrideUuid == null) {
+                    pathUuid = UUID.fromString(lineParts[6]);
+                } else {
+                    pathUuid = pathToOverrideUuid;
+                }
+                statusUuid = UUID.fromString(lineParts[7]);
+            } catch (Exception e) {
+                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+                return false;
             }
-            UUID conceptUuid = UUID.fromString(lineParts[5]);
-            UUID pathUuid = UUID.fromString(lineParts[6]);
-            UUID statusUuid = UUID.fromString(lineParts[7]);
-            int effectiveDate = Integer.parseInt(lineParts[8]);
+
+            try {
+                effectiveDate = Integer.parseInt(lineParts[8]);
+            } catch (Exception e) {
+                String errorMessage = "Cannot parse Integer from string -> Integer " + e.getMessage();
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+                return false;
+            }
 
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            /*
-             * if (!termFactory.hasId(memberUuid)) { throw new Exception(
-             * "Relevant ID tuple must occur before reference to a UUID."); }
-             */
+            if (!termFactory.hasId(pathUuid)) {
+                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
 
+                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+            }
             if (!termFactory.hasId(refsetUuid)) {
-                throw new Exception("Refset UUID : " + refsetUuid.toString() + " referenced but doesn't exist.");
+                String errorMessage = "Refset UUID has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+
+                IDTupleFileUtil.generateIdFromUuid(refsetUuid, pathUuid);
             }
             if (!termFactory.hasId(componentUuid)) {
-                throw new Exception("Component UUID : " + componentUuid.toString() + " referenced but doesn't exist.");
+                String errorMessage = "Component UUID has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+
+                IDTupleFileUtil.generateIdFromUuid(componentUuid, pathUuid);
             }
-            if (!termFactory.hasId(pathUuid)) {
-                throw new Exception("path UUID : " + pathUuid.toString() + " referenced but doesn't exist.");
+            if (!termFactory.hasId(conceptUuid)) {
+                String errorMessage = "conceptUuid UUID has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+
+                IDTupleFileUtil.generateIdFromUuid(conceptUuid, pathUuid);
             }
             if (!termFactory.hasId(statusUuid)) {
-                throw new Exception("status UUID : " + statusUuid.toString() + " referenced but doesn't exist.");
+                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+
+                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+            }
+            try {
+                refsetHelper.newConceptRefsetExtension(termFactory.getId(refsetUuid).getNativeId(), termFactory.getId(
+                    componentUuid).getNativeId(), termFactory.getId(conceptUuid).getNativeId(), memberUuid, pathUuid,
+                    statusUuid, effectiveDate);
+            } catch (Exception e) {
+                String errorMessage = "Exception thrown while creating new concept refset extension";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+                return false;
             }
 
-            refsetHelper.newConceptRefsetExtension(termFactory.getId(refsetUuid).getNativeId(), termFactory.getId(
-                componentUuid).getNativeId(), termFactory.getId(conceptUuid).getNativeId(), memberUuid, pathUuid,
-                statusUuid, effectiveDate);
-
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new TerminologyException("Exception thrown while importing line: " + inputLine);
+            String errorMessage = "Exception of unknown cause thrown while importing concept ext tuple";
+            try {
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+                return false;
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return false;
+            }
         }
+        return true;
     }
 }

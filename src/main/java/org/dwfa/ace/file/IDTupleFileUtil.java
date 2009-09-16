@@ -1,5 +1,6 @@
 package org.dwfa.ace.file;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +40,8 @@ public class IDTupleFileUtil {
             + statusUuid + "\t" + effectiveDate + "\n";
     }
 
-    public static void importTuple(String inputLine) throws TerminologyException {
+    public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
+            UUID pathToOverrideUuid) throws TerminologyException {
 
         try {
 
@@ -50,9 +52,31 @@ public class IDTupleFileUtil {
             UUID sourceSystemUuid = UUID.fromString(lineParts[2]);
             String sourceId = lineParts[3];
 
-            UUID pathUuid = UUID.fromString(lineParts[4]);
+            UUID pathUuid;
+            if (pathToOverrideUuid == null) {
+                pathUuid = UUID.fromString(lineParts[4]);
+            } else {
+                pathUuid = pathToOverrideUuid;
+            }
             UUID statusUuid = UUID.fromString(lineParts[5]);
             int effectiveDate = Integer.parseInt(lineParts[6]);
+
+            if (!termFactory.hasId(pathUuid)) {
+                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+
+                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+            }
+            if (!termFactory.hasId(statusUuid)) {
+                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+
+                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+            }
 
             if (!termFactory.hasId(primaryUuid)) {
                 termFactory.uuidToNativeWithGeneration(primaryUuid, termFactory.getId(
@@ -82,8 +106,24 @@ public class IDTupleFileUtil {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new TerminologyException("Exception thrown while importing line: " + inputLine);
+            String errorMessage = "Exception of unknown cause thrown while importing concept-concept-string ext tuple";
+            try {
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+                return false;
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return false;
+            }
         }
+        return true;
+    }
+
+    public static void generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        termFactory.uuidToNativeWithGeneration(uuidToGenerate, termFactory.getId(
+            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNativeId(), termFactory
+            .getPath(new UUID[] { pathUuid }), Integer.MAX_VALUE);
     }
 }
