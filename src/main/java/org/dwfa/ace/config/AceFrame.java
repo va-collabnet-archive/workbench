@@ -29,9 +29,7 @@ import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.svn.SvnPrompter;
@@ -427,19 +425,11 @@ public class AceFrame extends ComponentFrame {
 			return false;
 		}
 		if (frameConfig.getMasterConfig() != null) {
-			if (frameConfig.getMasterConfig().aceFrames.size() > 1) {
-				if (frameConfig.getMasterConfig().aceFrames
-						.contains(this.frameConfig)) {
-					frameConfig.getMasterConfig().aceFrames
-							.remove(this.frameConfig);
-					getQuitList().remove(cdePanel);
-					return true;
-				} else {
-					JOptionPane
-							.showMessageDialog(this,
-									"<html>Cannot close. <br>Ace config is missing the window profile. ");
-					return false;
-				}
+			if ((frameConfig.getMasterConfig().aceFrames.size() > 1) || 
+					(AceConfig.config != frameConfig.getDbConfig())) {
+				frameConfig.getMasterConfig().aceFrames.remove(this.frameConfig);
+				getQuitList().remove(cdePanel);
+				return true;
 			}
 			if (cfb.quit()) {
 				this.setVisible(false);

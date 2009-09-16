@@ -54,7 +54,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 8;
+	private static final int dataVersion = 9;
 
 	private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
@@ -96,6 +96,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     // 8 
     private I_GetConceptData userConcept;
 
+    // 9 
+    private I_GetConceptData userPath;
+    private String fullName;
+
     
     // transient
     private transient File profileFile;
@@ -103,6 +107,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	public AceConfig() throws DatabaseException, TerminologyException, IOException {
 		super();
 		userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+		userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
 	}
 
 	public AceConfig(File dbFolder) throws DatabaseException, TerminologyException, IOException {
@@ -131,12 +136,24 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         out.writeObject(queueFolders);
         out.writeObject(properties);
         try {
+        	if (userConcept == null) {
+        		userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+        	}
+        	if (userPath == null) {
+        		userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+        	}
             out.writeObject(AceConfig.getVodb().nativeToUuid(userConcept.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(userPath.getConceptId()));
+            out.writeObject(fullName);
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
             throw newEx;
-        }
+        } catch (TerminologyException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+		}
 
 	}
 
@@ -212,6 +229,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             	} else {
             		userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
             	}
+            	if (objDataVersion >= 9) {
+                	userPath = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                	fullName = (String) in.readObject();
+            	} else {
+            		userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+            		fullName = username;
+            	}
             } catch (Exception e) {
                 IOException newEx = new IOException();
                 newEx.initCause(e);
@@ -237,7 +261,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		SvnPrompter prompter = new SvnPrompter();
 		prompter.prompt("config file", "username");
 
-		I_ConfigAceFrame profile = NewDefaultProfile.newProfile(prompter.getUsername(), prompter.getPassword(), 
+		I_ConfigAceFrame profile = NewDefaultProfile.newProfile(prompter.getUsername(), 
+				prompter.getUsername(), prompter.getPassword(), 
 				"admin", "visit.bend");
 		config.setUsername(profile.getUsername());
 		config.aceFrames.add(profile);
@@ -499,5 +524,21 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public void setUserConcept(I_GetConceptData userConcept) {
 		this.userConcept = userConcept;
+	}
+
+	public I_GetConceptData getUserPath() {
+		return userPath;
+	}
+
+	public void setUserPath(I_GetConceptData userPath) {
+		this.userPath = userPath;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 }
