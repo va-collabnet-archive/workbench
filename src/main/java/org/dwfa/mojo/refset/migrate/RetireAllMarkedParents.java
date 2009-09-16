@@ -52,7 +52,7 @@ public class RetireAllMarkedParents extends AbstractMojo {
         
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		if (config == null) {
-			config = NewDefaultProfile.newProfile(null, null, null, null);
+			config = NewDefaultProfile.newProfile(null, null, null, null, null);
 			termFactory.setActiveAceFrameConfig(config);
 		}
 		config.getEditingPathSet().clear();

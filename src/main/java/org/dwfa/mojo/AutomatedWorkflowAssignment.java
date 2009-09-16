@@ -175,7 +175,8 @@ public class AutomatedWorkflowAssignment extends AbstractMojo {
 	    				    		
 	    	MojoWorker mw = new MojoWorker( workerConfiguration, UUID.randomUUID() ,"MoJo worker" );
 	    		
-	    	I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile( assigneeProfile, assigneeProfile, assigneeProfile, assigneeProfile );
+	    	I_ConfigAceFrame configFrame = NewDefaultProfile.newProfile(assigneeProfile, assigneeProfile, 
+	    			assigneeProfile, assigneeProfile, assigneeProfile );
 	    	mw.writeAttachment( WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), configFrame );
 	    	mw.getLogger().setLevel( Level.FINE );
 	    		    	

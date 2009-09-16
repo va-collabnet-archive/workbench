@@ -43,7 +43,7 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
                throw new MojoExecutionException(e.getLocalizedMessage(), e);
            }
            I_TermFactory tf = LocalVersionedTerminology.get();
-           I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null);
+           I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null, null);
 
             tf.setActiveAceFrameConfig(activeConfig);
         } catch (IOException e) {
