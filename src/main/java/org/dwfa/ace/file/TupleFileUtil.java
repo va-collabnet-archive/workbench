@@ -19,6 +19,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
@@ -46,10 +47,13 @@ public class TupleFileUtil {
     private int intTupleCount;
     private int idTupleCount;
 
+    protected static Set<UUID> pathUuids = new HashSet<UUID>();
+
     public I_GetConceptData importFile(File importFile, File reportFile, UUID pathToOverrideUuid)
             throws TerminologyException {
 
         try {
+            pathUuids.clear();
             BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(reportFile));
             BufferedReader inputFileReader = new BufferedReader(new FileReader(importFile));
 
@@ -168,6 +172,8 @@ public class TupleFileUtil {
             outputFileWriter.close();
             inputFileReader.close();
 
+            addPaths();
+
             return memberRefset;
         } catch (FileNotFoundException e) {
             throw new TerminologyException("Failed to import file - file not found: " + importFile);
@@ -177,6 +183,19 @@ public class TupleFileUtil {
         } catch (Exception e) {
             throw new TerminologyException("Failed to import file - Exception occurred while reading file: "
                 + importFile);
+        }
+    }
+
+    private void addPaths() throws TerminologyException, IOException {
+        // make sure that imported path being used is viewable.
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+        for (UUID pathUuid : pathUuids) {
+            I_Path path = termFactory.getPath(new UUID[] { pathUuid });
+            I_Position position = termFactory.newPosition(path, Integer.MAX_VALUE);
+            if (!termFactory.getActiveAceFrameConfig().getViewPositionSet().contains(position)) {
+                termFactory.getActiveAceFrameConfig().addViewPosition(position);
+            }
         }
     }
 

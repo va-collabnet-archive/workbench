@@ -31,16 +31,12 @@ public class ConceptExtTupleFileUtil {
             }
 
             I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple.getPart();
-            UUID conceptUuid = termFactory.getUids(part.getConceptId()).iterator().next();
+            UUID conceptUuid = termFactory.getUids(part.getC1id()).iterator().next();
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();
             int effectiveDate = tuple.getVersion();
 
-            // String idTuple = IDTupleFileUtil.exportTuple(termFactory
-            // .getId(memberUuid));
-
-            return // idTuple + "\n" +
-            tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
+            return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
                 + conceptUuid + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,6 +89,8 @@ public class ConceptExtTupleFileUtil {
 
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+            TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
@@ -147,6 +145,7 @@ public class ConceptExtTupleFileUtil {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = "Exception of unknown cause thrown while importing concept ext tuple";
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");

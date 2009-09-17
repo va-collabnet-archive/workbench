@@ -36,12 +36,8 @@ public class IntExtTupleFileUtil {
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();
             int effectiveDate = tuple.getVersion();
 
-            // String idTuple = IDTupleFileUtil.exportTuple(termFactory
-            // .getId(memberUuid));
-
-            return // idTuple + "\n" +
-            tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t" + value
-                + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";
+            return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
+                + value + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
@@ -94,6 +90,8 @@ public class IntExtTupleFileUtil {
             RefsetHelper refsetHelper = new RefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
+            TupleFileUtil.pathUuids.add(pathUuid);
+
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -139,6 +137,7 @@ public class IntExtTupleFileUtil {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = "Exception of unknown cause thrown while importing int ext tuple";
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");

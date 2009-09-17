@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -13,7 +12,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -101,6 +99,8 @@ public class DescTupleFileUtil {
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
+            TupleFileUtil.pathUuids.add(pathUuid);
+
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -150,13 +150,13 @@ public class DescTupleFileUtil {
             I_IntSet allowedTypes = termFactory.newIntSet();
             allowedTypes.add(termFactory.getId(typeUuid).getNativeId());
             I_GetConceptData concept = termFactory.getConcept(conceptId);
-            Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
+            // Set<I_Position> positions =
+            // termFactory.getActiveAceFrameConfig().getViewPositionSet();
             boolean returnConflictResolvedLatestState = true;
 
             // check if the part exists
             List<I_DescriptionTuple> parts =
-                    concept.getDescriptionTuples(allowedStatus, allowedTypes, positions,
-                        returnConflictResolvedLatestState);
+                    concept.getDescriptionTuples(allowedStatus, allowedTypes, null, returnConflictResolvedLatestState);
             I_DescriptionTuple latestTuple = null;
             for (I_DescriptionTuple part : parts) {
                 if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
@@ -186,7 +186,6 @@ public class DescTupleFileUtil {
 
                 v.addVersion(newLastPart);
                 termFactory.addUncommittedNoChecks(concept);
-                // termFactory.commit();
             } else {
                 I_DescriptionPart newLastPart = latestTuple.getDescVersioned().getLastTuple().getPart().duplicate();
                 newLastPart.setLang(lang);
@@ -199,9 +198,9 @@ public class DescTupleFileUtil {
 
                 latestTuple.getDescVersioned().addVersion(newLastPart);
                 termFactory.addUncommittedNoChecks(concept);
-                // termFactory.commit();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = "Exception of unknown cause thrown while importing desc tuple";
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");

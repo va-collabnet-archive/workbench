@@ -3,7 +3,6 @@ package org.dwfa.ace.file;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
@@ -11,8 +10,6 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
@@ -93,20 +90,8 @@ public class ConceptTupleFileUtil {
             }
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            /*
-             * user has opted not to override the refset spec import file's path
-             * data with a specified path, so we need to make sure that imported
-             * path
-             * is viewable.
-             */
-            if (pathToOverrideUuid == null) {
 
-                I_Path path = termFactory.getPath(new UUID[] { pathUuid });
-                I_Position position = termFactory.newPosition(path, Integer.MAX_VALUE);
-                if (!termFactory.getActiveAceFrameConfig().getViewPositionSet().contains(position)) {
-                    termFactory.getActiveAceFrameConfig().addViewPosition(position);
-                }
-            }
+            TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
@@ -140,14 +125,21 @@ public class ConceptTupleFileUtil {
                 allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 lastConcept = concept;
-                Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
+                // Set<I_Position> positions =
+                // termFactory.getActiveAceFrameConfig().getViewPositionSet();
                 boolean addUncommitted = true;
                 boolean returnConflictResolvedLatestState = true;
 
                 // check if the part exists
                 List<I_ConceptAttributeTuple> parts =
-                        concept.getConceptAttributeTuples(allowedStatus, positions, addUncommitted,
+                        concept.getConceptAttributeTuples(allowedStatus, null, addUncommitted,
                             returnConflictResolvedLatestState);
+                /*
+                 * List<I_ConceptAttributeTuple> parts =
+                 * concept.getConceptAttributeTuples(allowedStatus, positions,
+                 * addUncommitted,
+                 * returnConflictResolvedLatestState);
+                 */
                 I_ConceptAttributeTuple latestTuple = null;
                 for (I_ConceptAttributeTuple part : parts) {
                     if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
@@ -166,7 +158,6 @@ public class ConceptTupleFileUtil {
 
                     latestTuple.getConVersioned().addVersion(newPart);
                     termFactory.addUncommittedNoChecks(concept);
-                    // termFactory.commit();
                 }
             } else {
                 // need to create concept + part
@@ -174,34 +165,24 @@ public class ConceptTupleFileUtil {
                         termFactory.newConcept(conceptUuid, isDefined, termFactory.getActiveAceFrameConfig());
                 I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
-                int numberOfVersions = v.getVersions().size();
-                System.out.println(">>>> Number of concept version parts." + numberOfVersions);
-                // I_ConceptAttributePart newPart =
-                // v.getVersions().get(0).duplicate();
-                I_ConceptAttributePart newPart = termFactory.newConceptAttributePart();
-
-                newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
-                newPart.setDefined(isDefined);
-                newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-                newPart.setVersion(Integer.MAX_VALUE);
-                v.addVersion(newPart);
-                termFactory.addUncommittedNoChecks(newConcept);
                 lastConcept = newConcept;
-                // termFactory.commit();
 
-                // edit the existing part's effectiveDate/version - this needs
-                // to occur after the part has been committed, or else the
-                // effectiveDate is set to the time at commit
-                /*
-                 * int index = v.getVersions().size() - 1;
-                 * I_ConceptAttributePart updatedPart = (I_ConceptAttributePart)
-                 * v.getVersions().get(index);
-                 * updatedPart.setVersion(effectiveDate);
-                 * v.addVersion(updatedPart);
-                 * 
-                 * termFactory.addUncommittedNoChecks(newConcept);
-                 * termFactory.commit();
-                 */
+                // edit the existing part's effectiveDate/version
+                int index = v.getVersions().size() - 1;
+                I_ConceptAttributePart part;
+                if (index >= 0) {
+                    part = (I_ConceptAttributePart) v.getVersions().get(index);
+                    part.setVersion(effectiveDate);
+                } else {
+                    part = termFactory.newConceptAttributePart();
+                    part.setStatusId(termFactory.getId(statusUuid).getNativeId());
+                    part.setDefined(isDefined);
+                    part.setVersion(Integer.MAX_VALUE);
+                }
+                part.setPathId(termFactory.getId(pathUuid).getNativeId());
+                v.addVersion(part);
+                termFactory.addUncommittedNoChecks(newConcept);
+
             }
         } catch (Exception e) {
             e.printStackTrace();

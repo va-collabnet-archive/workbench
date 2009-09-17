@@ -4,13 +4,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -100,6 +98,8 @@ public class RelTupleFileUtil {
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
+            TupleFileUtil.pathUuids.add(pathUuid);
+
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -171,13 +171,14 @@ public class RelTupleFileUtil {
             allowedTypes.add(termFactory.getId(relTypeUuid).getNativeId());
 
             I_GetConceptData concept = termFactory.getConcept(new UUID[] { c1Uuid });
-            Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
+            // Set<I_Position> positions =
+            // termFactory.getActiveAceFrameConfig().getViewPositionSet();
             boolean returnConflictResolvedLatestState = true;
             boolean addUncommitted = true;
 
             // check if the part exists
             List<I_RelTuple> parts =
-                    concept.getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted,
+                    concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
                         returnConflictResolvedLatestState);
             I_RelTuple latestTuple = null;
             for (I_RelTuple part : parts) {
@@ -211,7 +212,6 @@ public class RelTupleFileUtil {
 
                 v.addVersion(newPart);
                 termFactory.addUncommittedNoChecks(concept);
-                // termFactory.commit();
             } else {
 
                 I_RelPart newPart = latestTuple.getPart().duplicate();
@@ -225,9 +225,9 @@ public class RelTupleFileUtil {
 
                 latestTuple.getRelVersioned().addVersion(newPart);
                 termFactory.addUncommittedNoChecks(concept);
-                // termFactory.commit();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = "Exception of unknown cause thrown while importing rel tuple";
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");

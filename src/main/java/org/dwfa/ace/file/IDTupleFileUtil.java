@@ -61,6 +61,8 @@ public class IDTupleFileUtil {
             UUID statusUuid = UUID.fromString(lineParts[5]);
             int effectiveDate = Integer.parseInt(lineParts[6]);
 
+            TupleFileUtil.pathUuids.add(pathUuid);
+
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -106,7 +108,8 @@ public class IDTupleFileUtil {
             }
 
         } catch (Exception e) {
-            String errorMessage = "Exception of unknown cause thrown while importing concept-concept-string ext tuple";
+            e.printStackTrace();
+            String errorMessage = "Exception of unknown cause thrown while importing ID tuple";
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
