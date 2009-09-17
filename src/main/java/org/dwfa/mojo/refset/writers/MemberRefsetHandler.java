@@ -74,7 +74,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * String representation of the tuple in Release Format 2.
-     *
+     * 
      * @param tf
      * @param tuple
      *            extension part to format
@@ -119,14 +119,14 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * Returns the first 6 columns for a refset file.
-     *
+     * 
      * @param tf I_TermFactory DB access
      * @param part I_ThinExtByRefPart the concept extension
      * @param memberId Integer member id, may be null or not exists in the DB.
      * @param refsetNid int refset id
      * @param componentId int referenced component id
      * @param useSctId boolean use a new sct ids
-     *
+     * 
      * @return RF2 formatted refset line except the annotation/concept
      * @throws TerminologyException DB errors
      * @throws IOException DB errors
@@ -172,7 +172,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * String representation of the refset tuple as a subset.
-     *
+     * 
      * @param tf
      * @param tuple
      *            extension part to format
@@ -408,9 +408,9 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         if (sctGenerator != null) {
             sctGenerator.writeMaps();
             sctGenerator = null;
-            fixedMapDirectory = null;
-            readWriteMapDirectory = null;
         }
+        fixedMapDirectory = null;
+        readWriteMapDirectory = null;
     }
 
     public static void setModule(ConceptDescriptor moduleDescriptor) throws Exception {
