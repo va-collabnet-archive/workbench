@@ -99,9 +99,6 @@ public abstract class NewProfile extends AbstractTask {
 				if (newProfile.getAddressesList().contains(username) == false) {
 					newProfile.getAddressesList().add(username);
 				}
-				if (username != null && newProfile.getQueueAddressesToShow().contains(username) == false) {
-					newProfile.getQueueAddressesToShow().add(username);
-				}
 			}
 			process.setProperty(profilePropName, newProfile);
 			return Condition.CONTINUE;
@@ -190,6 +187,14 @@ public abstract class NewProfile extends AbstractTask {
 
 	public void setUsernamePropName(String usernamePropName) {
 		this.usernamePropName = usernamePropName;
+	}
+
+	public String getFullNamePropName() {
+		return fullNamePropName;
+	}
+
+	public void setFullNamePropName(String fullNamePropName) {
+		this.fullNamePropName = fullNamePropName;
 	}
 
 }

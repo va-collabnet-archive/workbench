@@ -1,16 +1,27 @@
 package org.dwfa.ace.task.profile;
 
+import java.awt.Color;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
 
+import net.jini.config.Configuration;
+import net.jini.config.ConfigurationProvider;
+import net.jini.core.entry.Entry;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -23,31 +34,43 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.jini.ElectronicAddress;
+import org.dwfa.queue.QueueServer;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.util.io.FileIO;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class CreateUserPathAndQueues extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 
-	private String commitProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	private String commitProfilePropName = ProcessAttachmentKeys.COMMIT_PROFILE.getAttachmentKey();
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
+		out.writeObject(commitProfilePropName);
+		out.writeObject(positionSetPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
+		if (objDataVersion <= dataVersion) {
 			profilePropName = (String) in.readObject();
+			if (objDataVersion >= 2) {
+				commitProfilePropName = (String) in.readObject();
+				positionSetPropName = (String) in.readObject();
+			} else {
+				profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+				positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -73,18 +96,50 @@ public class CreateUserPathAndQueues extends AbstractTask {
 			I_ConfigAceFrame commitConfig = (I_ConfigAceFrame) process.readProperty(commitProfilePropName);
 			Set<I_Position> positionSet = (Set<I_Position>) process.readProperty(positionSetPropName);
 
+			String userDirStr = "profiles" + File.separator + config.getUsername();
+			File userDir = new File(userDirStr);
+			File userQueueRoot = new File(userDir, "queues");
+			userQueueRoot.mkdirs();
+
 			// Create new concept for user...
 			createUser(config, commitConfig);
 			
 			// Create new path for user...
-			createPath(config, commitConfig, positionSet);
+			createUserPath(config, commitConfig, positionSet);
+
+			createClassifierPath(config, commitConfig, positionSet);
 			
+			// Set roots
+			for (int rootNid: commitConfig.getRoots().getSetValues()) {
+				config.getRoots().add(rootNid);
+			}
+			// Set src rels
+			for (int relTypeNid: commitConfig.getSourceRelTypes().getSetValues()) {
+				config.getSourceRelTypes().add(relTypeNid);
+			}
+
+			// Set dest rels
+			for (int relTypeNid: commitConfig.getDestRelTypes().getSetValues()) {
+				config.getDestRelTypes().add(relTypeNid);
+			}
+			
+			// Set path colors
+			for (Integer pathNid: commitConfig.getPathColorMap().keySet()) {
+				config.setColorForPath(pathNid, commitConfig.getColorForPath(pathNid));
+			}
+			
+			// clear the user's path color
+			if (commitConfig.getDbConfig().getUserPath() != null) {
+				Color userColor = config.getPathColorMap().remove(commitConfig.getDbConfig().getUserPath().getConceptId());
+				config.setColorForPath(config.getDbConfig().getUserPath().getConceptId(), userColor);
+			}
+
 			// Create inbox
-			config.getQueueAddressesToShow().add(config.getDbConfig().getUsername() + ".inbox");
+			createInbox(config, config.getUsername() + ".inbox", userQueueRoot);
 			// Create todo box
-			config.getQueueAddressesToShow().add(config.getDbConfig().getUsername() + ".todo");
-			// Create complete box
-			config.getQueueAddressesToShow().add(config.getDbConfig().getUsername() + ".completed");
+			createInbox(config, config.getUsername() + ".todo", userQueueRoot);
+			// Create outbox box
+			createOutbox(config, config.getUsername() + ".outbox", userQueueRoot);
 			
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
@@ -92,7 +147,111 @@ public class CreateUserPathAndQueues extends AbstractTask {
 		return Condition.CONTINUE;
 	}
 	
-	private void createUser(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig) throws TaskFailedException, TerminologyException, IOException {
+	String[] QueueTypes = new String[] {"aging", "archival", "compute", "inbox", "launcher", "outbox" };
+
+	private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot) {
+		config.getQueueAddressesToShow().add(inboxName);
+		createQueue(config, "inbox", inboxName, userQueueRoot);
+	}
+	
+	private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot) {
+		config.getQueueAddressesToShow().add(outboxName);		
+		createQueue(config, "outbox", outboxName, userQueueRoot);
+	}
+	
+	private void createQueue(I_ConfigAceFrame config, String queueType, String queueName,
+			File userQueueRoot) {
+
+		try {
+
+			if (userQueueRoot.exists() == false) {
+				userQueueRoot.mkdirs();
+			}
+
+			File queueDirectory = new File(userQueueRoot, queueName);
+
+			queueDirectory.mkdirs();
+
+			String nodeInboxAddress = queueDirectory.getName().toLowerCase()
+					.replace(' ', '.');
+			nodeInboxAddress = nodeInboxAddress.replace("....", ".");
+			nodeInboxAddress = nodeInboxAddress.replace("...", ".");
+			nodeInboxAddress = nodeInboxAddress.replace("..", ".");
+
+			Map<String, String> substutionMap = new TreeMap<String, String>();
+			substutionMap.put("**queueName**", queueDirectory.getName());
+			substutionMap.put("**directory**", FileIO.getRelativePath(
+					queueDirectory).replace('\\', '/'));
+			substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
+
+			String fileName = "template.queue.config";
+			if (queueType.equals("aging")) {
+				fileName = "template.queueAging.config";
+			} else if (queueType.equals("archival")) {
+				fileName = "template.queueArchival.config";
+			} else if (queueType.equals("compute")) {
+				fileName = "template.queueCompute.config";
+			} else if (queueType.equals("inbox")) {
+				substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
+				substutionMap.put("**mailUsername**", "**mailUsername**");
+				fileName = "template.queueInbox.config";
+			} else if (queueType.equals("launcher")) {
+				fileName = "template.queueLauncher.config";
+			} else if (queueType.equals("outbox")) {
+				substutionMap.put("//**allGroups**mailHost",
+						"//**allGroups**mailHost");
+				substutionMap.put("//**outbox**mailHost",
+						"//**outbox**mailHost");
+				substutionMap.put("**mailHost**", "**mailHost**");
+				fileName = "template.queueOutbox.config";
+			}
+
+			File queueConfigTemplate = new File("config", fileName);
+			String configTemplateString = FileIO.readerToString(new FileReader(
+					queueConfigTemplate));
+
+			for (String key : substutionMap.keySet()) {
+				configTemplateString = configTemplateString.replace(key,
+						substutionMap.get(key));
+			}
+
+			File newQueueConfig = new File(queueDirectory, "queue.config");
+			FileWriter fw = new FileWriter(newQueueConfig);
+			fw.write(configTemplateString);
+			fw.close();
+
+			config.getDbConfig().getQueues().add(
+					FileIO.getRelativePath(newQueueConfig));
+			Configuration queueConfig = ConfigurationProvider
+					.getInstance(new String[] { newQueueConfig
+							.getAbsolutePath() });
+			Entry[] entries = (Entry[]) queueConfig.getEntry(
+					"org.dwfa.queue.QueueServer", "entries", Entry[].class,
+					new Entry[] {});
+			for (Entry entry : entries) {
+				if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+					ElectronicAddress ea = (ElectronicAddress) entry;
+					config.getQueueAddressesToShow().add(ea.address);
+					break;
+				}
+			}
+			if (QueueServer.started(newQueueConfig)) {
+				AceLog.getAppLog().info(
+						"Queue already started: "
+								+ newQueueConfig.toURI().toURL()
+										.toExternalForm());
+			} else {
+				new QueueServer(new String[] { newQueueConfig
+						.getCanonicalPath() }, null);
+			}
+
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+	}
+	
+	private void createUser(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig) throws TaskFailedException, 
+		TerminologyException, IOException {
         AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
         if (config.getDbConfig().getFullName() == null || config.getDbConfig().getFullName().length() == 0) {
             JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), 
@@ -100,7 +259,8 @@ public class CreateUserPathAndQueues extends AbstractTask {
             throw new TaskFailedException();
         }
              	//Needs a concept record...
-           	I_GetConceptData userConcept = LocalVersionedTerminology.get().newConcept(UUID.randomUUID(), false, commitConfig);
+           	I_GetConceptData userConcept = LocalVersionedTerminology.get().newConcept(UUID.randomUUID(), 
+           			false, commitConfig);
           	
         	//Needs a description record...
         	I_DescriptionVersioned fsDesc = LocalVersionedTerminology.get().newDescription(
@@ -108,11 +268,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
         			ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), commitConfig);
         	userConcept.getUncommittedDescriptions().add(fsDesc);
         	I_DescriptionVersioned prefDesc = LocalVersionedTerminology.get().newDescription(
-        			UUID.randomUUID(), userConcept, "en", config.getDbConfig().getUsername(), 
+        			UUID.randomUUID(), userConcept, "en", config.getUsername(), 
         			ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), commitConfig);
         	userConcept.getUncommittedDescriptions().add(prefDesc);
         	I_DescriptionVersioned inboxDesc = LocalVersionedTerminology.get().newDescription(
-        			UUID.randomUUID(), userConcept, "en", config.getDbConfig().getUsername() + ".inbox", 
+        			UUID.randomUUID(), userConcept, "en", config.getUsername() + ".inbox", 
         			ArchitectonicAuxiliary.Concept.USER_INBOX.localize(), commitConfig);
         	userConcept.getUncommittedDescriptions().add(inboxDesc);
 
@@ -124,12 +284,32 @@ public class CreateUserPathAndQueues extends AbstractTask {
         			tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
-        	
         	userConcept.getUncommittedSourceRels().add(rel);
+        	config.getDbConfig().setUserConcept(userConcept);
 	}
 	
-	private void createPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<I_Position> positionSet) throws Exception {
-        AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
+	private void createUserPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, 
+			Set<I_Position> positionSet) throws Exception {
+		I_Path userPath = createNewPath(config, 
+				commitConfig, positionSet, " user path");
+		config.addEditingPath(userPath);
+		I_GetConceptData userPathConcept = LocalVersionedTerminology.get().getConcept(userPath.getConceptId());
+		config.setClassifierInputPath(userPathConcept);
+		config.getViewPositionSet().add(LocalVersionedTerminology.get().newPosition(userPath, Integer.MAX_VALUE));
+		config.getDbConfig().setUserPath(userPathConcept);
+	}
+
+	private void createClassifierPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, 
+			Set<I_Position> positionSet) throws Exception {
+		I_Path classifierPath = createNewPath(config, 
+				commitConfig, positionSet, " classifier path");
+		config.setClassifierOutputPath(LocalVersionedTerminology.get().getConcept(classifierPath.getConceptId()));
+	}
+
+	private I_Path createNewPath(I_ConfigAceFrame config,
+			I_ConfigAceFrame commitConfig, Set<I_Position> positionSet, String suffix)
+			throws TaskFailedException, TerminologyException, IOException {
+		AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
         if (config.getDbConfig().getFullName() == null || config.getDbConfig().getFullName().length() == 0) {
             JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), 
             		"Full name cannot be empty.");
@@ -137,9 +317,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
         }
          AceLog.getAppLog().info(positionSet.toString());
         if (positionSet.size() == 0) {
-            JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), 
-            		"You must select at least one origin for path.");
-            return;
+            throw new TaskFailedException("You must select at least one origin for path.");
         }
        	UUID newPathUid = UUID.randomUUID();
          	
@@ -148,11 +326,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
           	
         	//Needs a description record...
         	I_DescriptionVersioned fsDesc = LocalVersionedTerminology.get().newDescription(
-        			UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getFullName() + " development path", 
+        			UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getFullName() + suffix, 
         			ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), commitConfig);
         	pathConcept.getUncommittedDescriptions().add(fsDesc);
         	I_DescriptionVersioned prefDesc = LocalVersionedTerminology.get().newDescription(
-        			UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getUsername() + " development path", 
+        			UUID.randomUUID(), pathConcept, "en", config.getUsername() + suffix, 
         			ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), commitConfig);
         	pathConcept.getUncommittedDescriptions().add(prefDesc);
 
@@ -166,7 +344,12 @@ public class CreateUserPathAndQueues extends AbstractTask {
         			tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
         	
         	pathConcept.getUncommittedSourceRels().add(rel);
-        	        	        	        	
+        	try {
+				tf.commit();
+			} catch (Exception e) {
+				throw new TaskFailedException();
+			}
+        return tf.newPath(positionSet, pathConcept);
 	}
 
 
@@ -192,6 +375,14 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
 	public void setPositionSetPropName(String positionSetPropName) {
 		this.positionSetPropName = positionSetPropName;
+	}
+
+	public String getCommitProfilePropName() {
+		return commitProfilePropName;
+	}
+
+	public void setCommitProfilePropName(String commitProfilePropName) {
+		this.commitProfilePropName = commitProfilePropName;
 	}
 
 }

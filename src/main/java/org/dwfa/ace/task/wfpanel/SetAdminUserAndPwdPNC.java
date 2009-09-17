@@ -32,7 +32,7 @@ public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 	}
 
 	protected void setupInput() {
-		instruction = new JLabel("Enter admin user and pwd:");
+		instruction = new JLabel("Enter admin info: ");
 		user = new JTextField(config.getAdminUsername());
 		pwd = new JPasswordField(config.getAdminPassword());
 		user.selectAll();
@@ -52,6 +52,10 @@ public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 	@Override
 	protected boolean showFullName() {
 		return false;
+	}
+	@Override
+	protected void finalSetup() {
+		user.requestFocusInWindow();
 	}
 
 }

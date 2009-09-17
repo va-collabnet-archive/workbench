@@ -27,7 +27,7 @@ import org.dwfa.util.bean.Spec;
 public class GetPositionSetFromWorkflowDetailsPanel extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
@@ -35,13 +35,19 @@ public class GetPositionSetFromWorkflowDetailsPanel extends AbstractTask {
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
+		out.writeObject(positionSetPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
+		if (objDataVersion <= dataVersion) {
 			profilePropName = (String) in.readObject();
+			if (objDataVersion >= 2) {
+				positionSetPropName = (String) in.readObject();
+			} else {
+				positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}

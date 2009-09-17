@@ -32,7 +32,7 @@ public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 	}
 
 	protected void setupInput() {
-		instruction = new JLabel("Enter name, username and pwd:");
+		instruction = new JLabel("Enter user info: ");
 		fullName = new JTextField(config.getDbConfig().getFullName());
 		fullName.selectAll();
 		user = new JTextField(config.getUsername());
@@ -40,7 +40,6 @@ public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 		pwd = new JPasswordField(config.getPassword());
 		pwd.selectAll();
 		fullName.selectAll();
-		user.requestFocusInWindow();
 	}
 
 	protected void readInput() {
@@ -60,4 +59,8 @@ public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
 		return true;
 	}
 
+	@Override
+	protected void finalSetup() {
+		fullName.requestFocusInWindow();
+	}
 }

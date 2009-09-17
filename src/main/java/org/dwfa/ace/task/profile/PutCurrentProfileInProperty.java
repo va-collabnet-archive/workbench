@@ -29,7 +29,7 @@ public class PutCurrentProfileInProperty extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+    private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);

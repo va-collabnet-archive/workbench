@@ -17,6 +17,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.NoMappingException;
@@ -75,17 +76,21 @@ public class NewDefaultProfile extends NewProfile {
 		activeConfig.setDbConfig(newDbProfile);
 		
 		if (fullName == null || fullName.length() < 2) {
-			fullName = "user's full name";
+			fullName = "Full Name";
 		}
 		
 		if (username == null || username.length() < 2) {
 			username = "username";
+		}
+		if (password == null || password.length() < 2) {
+			password = "sct";
 		}
 		if (adminUsername == null || adminUsername.length() < 2) {
 			adminUsername = "admin";
 			adminPassword = "visit.bend";
 		}
 
+		activeConfig.getDbConfig().setFullName(fullName);
 		activeConfig.setUsername(username);
 		activeConfig.setPassword(password);
 		activeConfig.setAdminPassword(adminPassword);
@@ -155,10 +160,17 @@ public class NewDefaultProfile extends NewProfile {
 
 		try {
 			relTypes.add(tf.uuidToNative(SNOMED.Concept.IS_A.getUids()));
+			activeConfig.setClassifierIsaType(tf.getConcept(SNOMED.Concept.IS_A.getUids()));
+			activeConfig.setClassificationRoot(tf.getConcept(SNOMED.Concept.ROOT.getUids()));
 		} catch (NoMappingException e) {
-			// nothing to do...
+			activeConfig.setClassifierIsaType(tf.getConcept(
+					ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids()));
+			activeConfig.setClassificationRoot(tf.getConcept(
+					ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+			// nothing else to do...
 		}
 		activeConfig.setEditRelTypePopup(relTypes);
+		
 
 		I_IntSet roots = tf.newIntSet();
 		addIfNotNull(roots, Concept.ARCHITECTONIC_ROOT_CONCEPT, tf);
@@ -196,13 +208,13 @@ public class NewDefaultProfile extends NewProfile {
 		activeConfig.setAllowedStatus(allowedStatus);
 
 		I_IntSet destRelTypes = tf.newIntSet();
-		destRelTypes.add(tf.uuidToNative(Concept.IS_A_REL.getUids()));
-
 		try {
 			destRelTypes.add(tf.uuidToNative(SNOMED.Concept.IS_A.getUids()));
 		} catch (NoMappingException e) {
 			// nothing to do...
 		}
+		destRelTypes.add(tf.uuidToNative(Concept.IS_A_REL.getUids()));
+
 		activeConfig.setDestRelTypes(destRelTypes);
 
 		I_IntSet sourceRelTypes = tf.newIntSet();

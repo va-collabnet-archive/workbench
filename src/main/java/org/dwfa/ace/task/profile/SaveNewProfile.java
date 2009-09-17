@@ -65,9 +65,9 @@ public class SaveNewProfile extends AbstractTask {
 			throws TaskFailedException {
 		try {
 			I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	          if (profileToSave == null) {
-	        	  profileToSave = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	          }
+	        if (profileToSave == null) {
+	        	profileToSave = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	        }
 			
 			profileToSave.setFrameName(profileToSave.getUsername() + " editor");
 

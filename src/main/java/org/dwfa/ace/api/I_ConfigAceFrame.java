@@ -588,5 +588,11 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
      * @return The JPanel that implements the workflow details sheet. 
      */
     public JPanel getWorkflowDetailsSheet();
+    
+    /**
+     * 
+     * @return a map of the path nids, and the color associated with that path.
+     */
+    public Map<Integer, Color> getPathColorMap();
 
 }

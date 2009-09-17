@@ -19,6 +19,13 @@ public class NewDefaultProfileBeanInfo extends SimpleBeanInfo {
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("The property that will contain the profile this task creates.");
 
+            PropertyDescriptor fullNamePropName =
+                new PropertyDescriptor("fullNamePropName", getBeanDescriptor().getBeanClass());
+            fullNamePropName.setBound(true);
+            fullNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fullNamePropName.setDisplayName("<html><font color='green'>full name prop:");
+            fullNamePropName.setShortDescription("The property that contains the user's full name.");
+
             PropertyDescriptor usernamePropName =
                 new PropertyDescriptor("usernamePropName", getBeanDescriptor().getBeanClass());
             usernamePropName.setBound(true);
@@ -48,7 +55,7 @@ public class NewDefaultProfileBeanInfo extends SimpleBeanInfo {
             adminPasswordPropName.setShortDescription("The property that contains the admin password.");
 
             PropertyDescriptor rv[] =
-                { profilePropName,  usernamePropName, passwordPropName, adminUsernamePropName, 
+                { profilePropName,  fullNamePropName, usernamePropName, passwordPropName, adminUsernamePropName, 
                     adminPasswordPropName};
             return rv;
         } catch (IntrospectionException e) {
