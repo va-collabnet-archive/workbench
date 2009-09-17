@@ -258,33 +258,29 @@ public class CreateUserPathAndQueues extends AbstractTask {
             		"Full name cannot be empty.");
             throw new TaskFailedException();
         }
+    	I_TermFactory tf = LocalVersionedTerminology.get();
              	//Needs a concept record...
-           	I_GetConceptData userConcept = LocalVersionedTerminology.get().newConcept(UUID.randomUUID(), 
+           	I_GetConceptData userConcept = tf.newConcept(UUID.randomUUID(), 
            			false, commitConfig);
           	
         	//Needs a description record...
-        	I_DescriptionVersioned fsDesc = LocalVersionedTerminology.get().newDescription(
+           	tf.newDescription(
         			UUID.randomUUID(), userConcept, "en", config.getDbConfig().getFullName(), 
         			ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), commitConfig);
-        	userConcept.getUncommittedDescriptions().add(fsDesc);
-        	I_DescriptionVersioned prefDesc = LocalVersionedTerminology.get().newDescription(
+           	tf.newDescription(
         			UUID.randomUUID(), userConcept, "en", config.getUsername(), 
         			ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), commitConfig);
-        	userConcept.getUncommittedDescriptions().add(prefDesc);
-        	I_DescriptionVersioned inboxDesc = LocalVersionedTerminology.get().newDescription(
+           	tf.newDescription(
         			UUID.randomUUID(), userConcept, "en", config.getUsername() + ".inbox", 
         			ArchitectonicAuxiliary.Concept.USER_INBOX.localize(), commitConfig);
-        	userConcept.getUncommittedDescriptions().add(inboxDesc);
 
-        	I_TermFactory tf = LocalVersionedTerminology.get();
         	//Needs a relationship record...
-        	I_RelVersioned rel = LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(), userConcept, 
+           	tf.newRelationship(UUID.randomUUID(), userConcept, 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
-        	userConcept.getUncommittedSourceRels().add(rel);
         	config.getDbConfig().setUserConcept(userConcept);
 	}
 	
@@ -320,30 +316,28 @@ public class CreateUserPathAndQueues extends AbstractTask {
             throw new TaskFailedException("You must select at least one origin for path.");
         }
        	UUID newPathUid = UUID.randomUUID();
-         	
+
+    	I_TermFactory tf = LocalVersionedTerminology.get();
+
             	//Needs a concept record...
-           	I_GetConceptData pathConcept = LocalVersionedTerminology.get().newConcept(newPathUid, false, commitConfig);
+           	I_GetConceptData pathConcept = tf.newConcept(newPathUid, false, commitConfig);
           	
         	//Needs a description record...
-        	I_DescriptionVersioned fsDesc = LocalVersionedTerminology.get().newDescription(
+           	tf.newDescription(
         			UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getFullName() + suffix, 
         			ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), commitConfig);
-        	pathConcept.getUncommittedDescriptions().add(fsDesc);
-        	I_DescriptionVersioned prefDesc = LocalVersionedTerminology.get().newDescription(
+           	tf.newDescription(
         			UUID.randomUUID(), pathConcept, "en", config.getUsername() + suffix, 
         			ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), commitConfig);
-        	pathConcept.getUncommittedDescriptions().add(prefDesc);
 
-        	I_TermFactory tf = LocalVersionedTerminology.get();
         	//Needs a relationship record...
-        	I_RelVersioned rel = LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(), pathConcept, 
+           	tf.newRelationship(UUID.randomUUID(), pathConcept, 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
         	
-        	pathConcept.getUncommittedSourceRels().add(rel);
         	try {
 				tf.commit();
 			} catch (Exception e) {
