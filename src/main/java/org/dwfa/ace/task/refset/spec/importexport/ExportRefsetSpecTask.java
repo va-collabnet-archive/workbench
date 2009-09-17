@@ -36,10 +36,10 @@ public class ExportRefsetSpecTask extends AbstractTask {
 	 */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
-    private String outputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE
-            .getAttachmentKey();
+    private String outputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
+    private String reportFilePropName = ProcessAttachmentKeys.OUTPUT_FILE.getAttachmentKey();
 
     public String getOutputFilePropName() {
         return outputFilePropName;
@@ -52,65 +52,59 @@ public class ExportRefsetSpecTask extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(outputFilePropName);
+        out.writeObject(reportFilePropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            // Nothing to do
+        if (objDataVersion <= 1) {
             outputFilePropName = (String) in.readObject();
+        } else if (objDataVersion == 2) {
+            outputFilePropName = (String) in.readObject();
+            reportFilePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        I_ShowActivity activityPanel = LocalVersionedTerminology.get()
-                .newActivityPanel(true);
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        I_ShowActivity activityPanel = LocalVersionedTerminology.get().newActivityPanel(true);
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                    .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-                            .name());
+            I_ConfigAceFrame configFrame =
+                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-            String fileName = (String) process.readProperty(outputFilePropName);
+            String exportFileName = (String) process.readProperty(outputFilePropName);
+            String reportFileName = (String) process.readProperty(reportFilePropName);
             TupleFileUtil tupleExporter = new TupleFileUtil();
 
             if (configFrame.getRefsetSpecInSpecEditor() == null) {
-                throw new TerminologyException(
-                        "No refset spec found - the refset spec should have \n"
-                                + "a src relationship of type 'specifies refset' to the \n "
-                                + "member refset. Make sure the refset to be exported \n "
-                                + "is in the refset spec panel.");
+                throw new TerminologyException("No refset spec found - the refset spec should have \n"
+                    + "a src relationship of type 'specifies refset' to the \n "
+                    + "member refset. Make sure the refset to be exported \n " + "is in the refset spec panel.");
             }
             if (configFrame.getRefsetInSpecEditor() == null) {
-                throw new TerminologyException(
-                        "No member spec found. Please put the refset to \n "
-                                + "be exported in the refset spec panel.");
+                throw new TerminologyException("No member spec found. Please put the refset to \n "
+                    + "be exported in the refset spec panel.");
             }
-            File file = new File(fileName);
+            File exportFile = new File(exportFileName);
+            File reportFile = new File(reportFileName);
 
             // initialise the progress panel
 
             activityPanel.setIndeterminate(true);
             activityPanel.setProgressInfoUpper("Exporting refset spec : "
-                    + configFrame.getRefsetSpecInSpecEditor().getInitialText());
-            activityPanel
-                    .setProgressInfoLower("<html><font color='black'> In progress.");
+                + configFrame.getRefsetSpecInSpecEditor().getInitialText());
+            activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
-            tupleExporter.exportRefsetSpecToFile(file, configFrame
-                    .getRefsetSpecInSpecEditor());
+            tupleExporter.exportRefsetSpecToFile(exportFile, reportFile, configFrame.getRefsetSpecInSpecEditor());
 
             activityPanel.setProgressInfoUpper("Exporting refset spec : "
-                    + configFrame.getRefsetSpecInSpecEditor().getInitialText());
-            activityPanel
-                    .setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
+                + configFrame.getRefsetSpecInSpecEditor().getInitialText());
+            activityPanel.setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");
 
             activityPanel.complete();
 
@@ -127,5 +121,13 @@ public class ExportRefsetSpecTask extends AbstractTask {
 
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    public String getReportFilePropName() {
+        return reportFilePropName;
+    }
+
+    public void setReportFilePropName(String reportFilePropName) {
+        this.reportFilePropName = reportFilePropName;
     }
 }

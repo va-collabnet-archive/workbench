@@ -11,6 +11,7 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -46,6 +47,7 @@ public class ConceptTupleFileUtil {
             UUID pathToOverrideUuid) throws TerminologyException {
 
         try {
+
             String[] lineParts = inputLine.split("\t");
 
             UUID conceptUuid;
@@ -91,6 +93,20 @@ public class ConceptTupleFileUtil {
             }
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
+            /*
+             * user has opted not to override the refset spec import file's path
+             * data with a specified path, so we need to make sure that imported
+             * path
+             * is viewable.
+             */
+            if (pathToOverrideUuid == null) {
+
+                I_Path path = termFactory.getPath(new UUID[] { pathUuid });
+                I_Position position = termFactory.newPosition(path, Integer.MAX_VALUE);
+                if (!termFactory.getActiveAceFrameConfig().getViewPositionSet().contains(position)) {
+                    termFactory.getActiveAceFrameConfig().addViewPosition(position);
+                }
+            }
 
             if (!termFactory.hasId(pathUuid)) {
                 String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";

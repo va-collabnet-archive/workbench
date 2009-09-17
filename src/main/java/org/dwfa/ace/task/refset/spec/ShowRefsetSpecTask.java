@@ -69,11 +69,14 @@ public class ShowRefsetSpecTask extends AbstractTask {
                 termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
                 termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
 
-                while (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() == null) {
-                    Thread.sleep(100);
+                int count = 0;
+                while (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() == null && count < 10) {
+                    Thread.sleep(1000);
+                    count++;
                 }
-                while (termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor() == null) {
-                    Thread.sleep(100);
+                while (termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor() == null && count < 10) {
+                    Thread.sleep(1000);
+                    count++;
                 }
             }
 
