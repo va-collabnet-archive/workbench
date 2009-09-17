@@ -1144,4 +1144,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	public void setWorkflowDetailSheetDimensions(Dimension dim) {
 		frameConfig.setWorkflowDetailSheetDimensions(dim);
 	}
+
+	public Map<Integer, Color> getPathColorMap() {
+		return frameConfig.getPathColorMap();
+	}
 }

@@ -2696,6 +2696,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setColorForPath(int pathNid, Color pathColor) {
         pathColorMap.put(pathNid, pathColor);
     }
+    
+    public Map<Integer, Color> getPathColorMap() {
+    	return pathColorMap;
+    }
 
     public I_IntList getLanguagePreferenceList() {
         if (languagePreferenceList == null) {

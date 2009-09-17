@@ -1155,4 +1155,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public void setWorkflowDetailSheetDimensions(Dimension dim) {
 		baseFrame.setWorkflowDetailSheetDimensions(dim);
 	}
+
+	public Map<Integer, Color> getPathColorMap() {
+		return baseFrame.getPathColorMap();
+	}
 }
