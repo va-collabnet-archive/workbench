@@ -27,6 +27,7 @@ import java.util.jar.JarFile;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.JarExtractor;
+import org.dwfa.vodb.types.Path;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -34,7 +35,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
 	enum REFSET_FILE_TYPES {
 		BOOLEAN("boolean.refset"), CONCEPT("concept.refset"), CONINT(
-				"conint.refset"), MEASUREMENT("measurement.refset"), INTEGER("integer.refset"), 
+				"conint.refset"), MEASUREMENT("measurement.refset"), INTEGER("integer.refset"),
 				LANGUAGE("language.refset"), STRING("string.refset");
 
 		private String fileNameSuffix;
@@ -47,11 +48,11 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             return fileNameSuffix;
         }
 	};
-	
+
 	private static class NamedThreadFactory implements ThreadFactory {
 	    private int threadCount = 0;
 	    private String factoryName = "factory";
-	    
+
 	    public NamedThreadFactory(String factoryName) {
             super();
             this.factoryName = factoryName;
@@ -77,7 +78,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	public static int countLines(File file) throws IOException
     {
         Reader reader = new InputStreamReader(new FileInputStream(file));
-        
+
         int lineCount = 0;
         char[] buffer = new char[4096];
         for (int charsRead = reader.read(buffer); charsRead >= 0; charsRead = reader.read(buffer))
@@ -91,7 +92,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
         reader.close();
         return lineCount;
     }
-	
+
 	public void executeSnomed(File constantDir) throws Exception {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -112,17 +113,17 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 							&& (name.equals("ids.txt") == false);
 				}
 			})) {
-			    
+
 			    int lineCount = countLines(contentFile);
 				getLog().info("Content file: " + contentFile.getName() + " has lines: " + lineCount);
-				
-				
-				
+
+
+
 				FileReader fr = new FileReader(contentFile);
 				BufferedReader br = new BufferedReader(fr);
-				
-				
-				
+
+
+
 				if (contentFile.getName().startsWith("concepts")) {
 					readConcepts(br, releaseDate, FORMAT.SNOMED,  new CountDownLatch(Integer.MAX_VALUE));
 				} else if (contentFile.getName().startsWith("descriptions")) {
@@ -155,7 +156,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	public static enum FORMAT {
 		SNOMED, ACE
 	};
-	
+
 	private class LoadDescriptionCallable implements Callable<Boolean> {
 
         private File dataFile;
@@ -184,13 +185,13 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
         		throw new Exception(ex);
         	}
         }
-	    
+
 	}
 
 	/**
-	 * This is the one I think we will support going forward. 
+	 * This is the one I think we will support going forward.
 	 * @param dataDir
-	 * @param encoding 
+	 * @param encoding
 	 * @throws Exception
 	 */
 	public void executeFromDir(File dataDir, String encoding) throws Exception {
@@ -202,10 +203,10 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 						&& (f.getName().toLowerCase().contains("_report") == false));
 			}
 		});
-		
+
         HashMap<String, CountDownLatch> latchMap = new HashMap<String, CountDownLatch>();
         HashMap<String, Future<Boolean>> futureMap = new HashMap<String, Future<Boolean>>();
-		
+
 		for (File dataFile : dataFiles) {
             int lineCount = countLines(dataFile);
             getLog().info("Content file: " + dataFile.getName() + " has lines: " + lineCount);
@@ -250,11 +251,11 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 		        future.get();
 		    }
 		}
-		
-		
+
+
 	    HashMap<String, CountDownLatch> refsetLatchMap = new HashMap<String, CountDownLatch>();
 	    HashMap<String, Future<Boolean>> refsetFutureMap = new HashMap<String, Future<Boolean>>();
-        
+
 		for (final REFSET_FILE_TYPES refsetFileType : REFSET_FILE_TYPES.values()) {
 		    File[] matchingFiles = dataDir.listFiles(new FileFilter() {
                 public boolean accept(File f) {
@@ -264,7 +265,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
                     return false;
                 }
 		    });
-		    
+
 		    if (matchingFiles != null) {
 		        for (File match: matchingFiles) {
 	                getLog().info("Refset file: " + match);
@@ -285,19 +286,19 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             getLog().info("awaiting refset latch: " + latchKey + " current count: " + latch.getCount());
             latch.await();
         }
-        
+
         for (String futureKey: refsetFutureMap.keySet()) {
             Future<Boolean> future =refsetFutureMap.get(futureKey);
             CountDownLatch latch =refsetLatchMap.get(futureKey);
             getLog().info("awaiting refset future: " + futureKey + " latch count: " + latch.getCount());
             future.get();
         }
-        
+
         getLog().info("flushing id buffer.");
 		flushIdBuffer();
         getLog().info("Done flushing id buffer.");
 
-        
+
 		// Do the id file last...
 		File idFile = new File(dataDir, "ids.txt");
 		if (idFile.exists()) {
@@ -310,18 +311,28 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
             getLog().info("Awaiting idLatch: " + idLatch.getCount());
             idLatch.await();
 		}
+
+		writeNewPaths();
+
 		cleanupSNOMED(null);
 	}
-	
+
 	protected abstract void flushIdBuffer() throws Exception;
 
+	/**
+	 * Add all the new paths to the paths store.
+	 *
+	 * @throws Exception looking up path int id.
+	 */
+	public abstract void writeNewPaths() throws Exception;
+
 	private class LoadRefset implements Callable<Boolean>  {
-	    
+
 	    Reader r;
 	    File rf;
 	    CountDownLatch refsetLatch;
         private REFSET_FILE_TYPES refsetType;
-	    
+
 	    private LoadRefset(Reader r, REFSET_FILE_TYPES refsetType, File rf, CountDownLatch refsetLatch) {
             super();
             this.r = r;
@@ -423,17 +434,17 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 		default:
 			throw new IOException("Can't handle refset type: " + refsetFileType);
 		}
-		
+
 	}
-	
+
 	protected abstract void startRefsetRead(REFSET_FILE_TYPES refsetFileType, File rf) throws IOException;
 	protected abstract void finishRefsetRead(REFSET_FILE_TYPES refsetFileType, File rf, CountDownLatch refsetLatch) throws IOException, Exception;
 
     protected abstract void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
-			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception; 
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception;
 
 	protected abstract void readConceptMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
-			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)throws IOException, ParseException, DatabaseException, Exception; 
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)throws IOException, ParseException, DatabaseException, Exception;
 
 	protected abstract void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
 			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception;
@@ -462,8 +473,8 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	        }
 	        executeFromDir(rootDir, "UTF-8");
 	    } else {
-	        //Need to depricate this method for processing SNOMED, and inferring history. 
-	        //Better to have everyone use ace format. 
+	        //Need to depricate this method for processing SNOMED, and inferring history.
+	        //Better to have everyone use ace format.
 	        JarFile constantJar = new JarFile(jarFile);
 
 	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -502,7 +513,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	            cleanupSNOMED(null);
 	        }
 	    }
-        
+
 	}
 
 	protected Object getId(StreamTokenizer st) {

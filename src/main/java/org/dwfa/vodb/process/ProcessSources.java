@@ -23,6 +23,7 @@ import java.io.StreamTokenizer;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -42,6 +43,9 @@ public abstract class ProcessSources {
     public abstract Logger getLog();
 
     boolean skipFirstLine;
+
+    /** Used to store the set of path uuids so that the paths can be create in the path store. */
+    private HashSet<UUID> pathUuid = new HashSet<UUID>();;
 
     private TreeSet<Date> releaseDates = new TreeSet<Date>();
 
@@ -94,6 +98,7 @@ public abstract class ProcessSources {
 
             tokenType = st.nextToken();
             Object pathId = getId(st);
+            pathUuid.add((UUID) pathId);
 
             writeConcept(statusDate, conceptKey, conceptStatus, defChar, Arrays.asList(new Object[] { pathId }));
             concepts++;
@@ -170,7 +175,7 @@ public abstract class ProcessSources {
                     statusDate = getDate(st);
                 }
 
-                
+
                 tokenType = st.nextToken();
                 if ((tokenType != 13) && (tokenType != 10)) {
                     pathUuid = (UUID) getId(st);
@@ -315,6 +320,7 @@ public abstract class ProcessSources {
 
             tokenType = st.nextToken();
             Object pathId = getId(st);
+            pathUuid.add((UUID) pathId);
 
             writeRelationship(statusDate, relID, Arrays.asList(new Object[] { statusId }), conceptOneID,
                               relationshipTypeConceptID, conceptTwoID, characteristic, refinability, group, Arrays
@@ -388,7 +394,7 @@ public abstract class ProcessSources {
             }
 
             relationshipLatch.countDown();
-            
+
             // Beginning of loop
             tokenType = st.nextToken();
         }
@@ -396,7 +402,7 @@ public abstract class ProcessSources {
     }
 
     protected abstract Object getId(StreamTokenizer st);
-    
+
 
 
     protected Date getDate(StreamTokenizer st) throws ParseException {
@@ -468,6 +474,8 @@ public abstract class ProcessSources {
 
             tokenType = st.nextToken();
             Object pathId = getId(st);
+            pathUuid.add((UUID) pathId);
+
             writeDescription(statusDate, descriptionId, status, conceptId, text, capSignificant, typeInt, lang, Arrays
                     .asList(new Object[] { pathId }));
            descriptions++;
@@ -590,6 +598,16 @@ public abstract class ProcessSources {
         }
         return intSet;
     }
+
+    /**
+     * The set of edit path uuids in the concept, description and relationship files.
+     *
+     * @return the pathUuid HashSet<UUID>
+     */
+    protected final HashSet<UUID> getPathUuids() {
+        return pathUuid;
+    }
+
 
     public abstract void execute(File snomedDir) throws Exception;
 

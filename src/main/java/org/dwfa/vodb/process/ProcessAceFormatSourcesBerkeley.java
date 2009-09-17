@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -44,18 +45,20 @@ import org.dwfa.vodb.types.ThinRelVersioned;
 import com.sleepycat.je.DatabaseException;
 
 public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
+    /** Used to store the set of path int ids so that the paths can be create in the path store. */
+    private HashSet<Integer> pathUuid = new HashSet<Integer>();
 
     public void flushIdBuffer() throws Exception {
         map.flushIdBuffer();
     }
-    
+
     private static class MaxId {
         int max = Integer.MIN_VALUE;
-        
+
         public synchronized void max(int x) {
             max = Math.max(max, x);
         }
-        
+
         public synchronized int next() {
             max++;
             return max;
@@ -129,7 +132,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                     getLog().info("processed " + count + " identifiers. ");
                 }
             }
-            
+
             map = new BerkeleyIdMapper();
             this.ids.clear();
             getLog().info("Converted to Berkeley-based id mapper");
@@ -267,7 +270,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     public void cleanupSNOMED(I_IntSet relsToIgnore) throws Exception {
-        //nothing to clean up since using ace formats. 
+        //nothing to clean up since using ace formats.
     }
 
     @SuppressWarnings("unchecked")
@@ -279,18 +282,18 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         con.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
         con.setVersion(ThinVersionHelper.convert(releaseDate.getTime()));
         con.setStatusId(map.getIntId((UUID) conceptStatus, aceAuxPath, version));
-        con.setDefined(defChar);        
+        con.setDefined(defChar);
         int conceptId = map.getIntId((UUID) conceptKey, aceAuxPath, version);
         I_ConceptAttributeVersioned vcon = null;
         if (vodb.hasConcept(conceptId)) {
             vcon = vodb.getConceptAttributes(conceptId);
-        } 
+        }
         if (vcon == null) {
             vcon = new ThinConVersioned(map.getIntId((UUID) conceptKey, aceAuxPath, version), 1);
         }
         if (vcon.addVersion(con)) {
             vodb.writeConceptAttributes(vcon);
-        } 
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -387,6 +390,18 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             vodb.writeId(idv);
         }
 
+    }
+
+    /**
+     * Write the new paths.
+     *
+     * @see org.dwfa.vodb.process.ProcessAceFormatSources#writeNewPaths()
+     */
+    public void writeNewPaths() throws Exception {
+        for (UUID pathUuid : getPathUuids()) {
+            Path path = new Path(map.getIntId(pathUuid, aceAuxPath, 0), null);
+            path.commit(0, null);
+        }
     }
 
     protected void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
