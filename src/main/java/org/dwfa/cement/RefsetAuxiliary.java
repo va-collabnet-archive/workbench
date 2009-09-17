@@ -172,6 +172,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 				REFSET_PURPOSE_REL(new String[] { "refset purpose rel", "refset purpose rel"}, REFSET_RELATIONSHIP),
 				REFSET_OWNER(new String[] { "refset owner", "refset owner"}, REFSET_RELATIONSHIP),
 				REFSET_EDITOR(new String[] { "refset editor", "refset editor"}, REFSET_RELATIONSHIP),
+				REFSET_REVIEWER(new String[] { "refset reviewer", "refset reviewer"}, REFSET_RELATIONSHIP),
 				SPECIFIES_REFSET(new String[] { "specifies refset", "specifies refset"}, REFSET_RELATIONSHIP),
 				MARKED_PARENT_REFSET(new String[] { "marked parent refset", "marked parent refset"},
 						new I_ConceptualizeUniversally[] { REFSET_RELATIONSHIP },
