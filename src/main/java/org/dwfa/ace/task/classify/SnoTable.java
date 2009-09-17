@@ -28,15 +28,15 @@ public class SnoTable {
     private final static int anfFlag = 0x00000020;
     private final static int scfFlag = 0x00000040;
     private final static int lcfFlag = 0x00000080;
-    private final static int totalColFlags = 6;
+    private final static int totalColFlags = 6; // !! 7 SF, S, I, DN, AN, SC, LC
     private final static int totalCol = 8;
 
-    //private final static int isaProxFlag = 0x00010000;
-    //private final static int isaProxPrimFlag = 0x00020000;
-    //private final static int roleProxFlag = 0x00100000;
-    //private final static int roleDiffFromRootFlag = 0x00200000;
-    //private final static int roleDiffFromProxFlag = 0x00400000;
-    //private final static int roleDiffFromProxPrimFlag = 0x00800000;
+    // private final static int isaProxFlag = 0x00010000;
+    // private final static int isaProxPrimFlag = 0x00020000;
+    // private final static int roleProxFlag = 0x00100000;
+    // private final static int roleDiffFromRootFlag = 0x00200000;
+    // private final static int roleDiffFromProxFlag = 0x00400000;
+    // private final static int roleDiffFromProxPrimFlag = 0x00800000;
 
     // // !!! which forms use
     SnoGrpList isaProxSnoGrpList = null; // USE: Distribution, Authoring Normal
@@ -51,7 +51,7 @@ public class SnoTable {
     SnoGrpList roleStatedSnoGrpList = null; // USE: Stated
 
     ArrayList<SnoTableRow> snoTableRows = null;
-    
+
     // ** WORKBENCH PARTICULARS **
     private I_TermFactory tf;
 
@@ -74,8 +74,15 @@ public class SnoTable {
     private int countFindSelfDuplPartGE2 = 0;
     private int countIsCDefinedDuplPartGE2 = 0;
 
+    // Setup Strings
+    String xStr = new String("•");
+    String bStr = new String(" ");
+    String errStr = new String("*");
+    String typeFont = "<font face='Dialog' size='3' color='blue'>";
+    String valueFont = "<font face='Dialog' size='3' color='green'>";
+
     // ** :DEBUG: **
-    private boolean debug = true;
+    private boolean debug = false;
 
     @SuppressWarnings("serial")
     private class SnoTableRow extends SnoGrp {
@@ -158,14 +165,15 @@ public class SnoTable {
         ArrayList<SnoRel> isaProxList = null;
         ArrayList<SnoRel> isaProxPrimList = null;
         ArrayList<SnoRel> isaStatedList = null;
+
         try {
-            
+
             // GET STATED DATA
             isaStatedList = findIsaProximal(cBean, cStatedPath);
             isaStatedSnoGrpList = new SnoGrpList();
             for (SnoRel sr : isaStatedList)
                 isaStatedSnoGrpList.add(new SnoGrp(sr));
-            
+
             List<SnoRel> roleProx = findRoleProximal(cBean, cStatedPath);
             roleStatedSnoGrpList = splitGrouped(roleProx);
             SnoGrp rv0 = splitNonGrouped(roleProx);
@@ -173,7 +181,7 @@ public class SnoTable {
             for (int i = rv0.size() - 1; i >= 0; i--) {
                 roleStatedSnoGrpList.add(0, new SnoGrp(rv0.get(i)));
             }
-            
+
             // GET INFERRED DATA
             // USE: Distribution Normal, Authoring Normal
             isaProxList = findIsaProximal(cBean, cInferredPath);
@@ -246,7 +254,7 @@ public class SnoTable {
         diff = markRows(isaStatedSnoGrpList, snoTableRows, flags);
         for (SnoGrp sg : diff)
             snoTableRows.add(new SnoTableRow(sg, flags));
-        
+
         flags = dnfFlag | anfFlag | inferFlag;
         diff = markRows(isaProxSnoGrpList, snoTableRows, flags);
         for (SnoGrp sg : diff)
@@ -261,8 +269,8 @@ public class SnoTable {
         flags = stateFlag;
         diff = markRows(roleStatedSnoGrpList, snoTableRows, flags);
         for (SnoGrp sg : diff)
-            snoTableRows.add(new SnoTableRow(sg, flags));        
-        
+            snoTableRows.add(new SnoTableRow(sg, flags));
+
         // ROLE VALUES: Distribution Normal Form, Long Canonical Form
         flags = dnfFlag | lcfFlag | inferFlag;
         diff = markRows(roleDiffFromRootList, snoTableRows, flags);
@@ -280,13 +288,6 @@ public class SnoTable {
         diff = markRows(roleDiffFromProxPrimList, snoTableRows, flags);
         for (SnoGrp sg : diff)
             snoTableRows.add(new SnoTableRow(sg, flags));
-
-        // Setup Strings
-        String xStr = new String("•");
-        String bStr = new String(" ");
-        String errStr = new String("*");
-        String typeFont = "<font face='Dialog' size='3' color='blue'>";
-        String valueFont = "<font face='Dialog' size='3' color='green'>";
 
         int totalRows = snoTableRows.size();
         String tableStrings[][] = new String[totalRows][totalCol];
@@ -335,6 +336,9 @@ public class SnoTable {
             }
             tableStrings[i][6] = str.toString();
         }
+
+        if (debug)
+            logTable(tableStrings);
 
         return tableStrings;
     }
@@ -572,6 +576,7 @@ public class SnoTable {
         rv_A = rv_A.whichRoleValAreNonRedundant();
         rgl_A = rgl_A.whichNonRedundant();
 
+
         // Remove any un-grouped which do not differentiate from other groups
         SnoGrpList grpList0 = new SnoGrpList();
         for (SnoRel a : rv_A)
@@ -582,6 +587,75 @@ public class SnoTable {
         for (int i = grpList0.size() - 1; i >= 0; i--) {
             rgl_A.add(0, grpList0.get(i));
         }
+
+        return rgl_A;
+    }
+
+    private SnoGrpList findRoleDiffFromRootGrp0(I_GetConceptData cBean,
+            List<I_Position> posList) throws TerminologyException, IOException {
+        SnoGrpList rgl_A;
+        SnoGrpList rgl_B;
+        SnoGrp rv_A;
+        SnoGrp rv_B;
+
+        // GET IMMEDIATE PROXIMAL ROLES & SEPARATE GROUPS
+        List<SnoRel> roleRTProx = findRoleProximal(cBean, posList);
+        rgl_A = splitGrouped(roleRTProx);
+        rv_A = splitNonGrouped(roleRTProx);
+
+        // GET PROXIMAL ISAs, one next level up at a time
+        List<SnoRel> isaRTNext = findIsaProximal(cBean, posList);
+        List<SnoRel> isaRTNextB = new ArrayList<SnoRel>();
+        while (isaRTNext.size() > 0) {
+
+            // FOR EACH CURRENT PROXIMAL CONCEPT...
+            for (SnoRel isaRT : isaRTNext) {
+                // Get I_GetConceptData (aka ConceptBean) from Nid
+                // tf.getConcept may throw an exception
+                I_GetConceptData isaCB = tf.getConcept(isaRT.c2Id);
+
+                // ... EVALUATE PROXIMAL ROLES & SEPARATE GROUP
+                roleRTProx = findRoleProximal(isaCB, posList);
+                rgl_B = splitGrouped(roleRTProx);
+                rv_B = splitNonGrouped(roleRTProx);
+
+                // KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
+                rv_A = rv_A.whichRoleValDifferFrom(rv_B);
+                // setup rv_A for the next iteration
+                // add anything new which also differentiates
+                rv_A.addAllWithSort(rv_B.whichRoleValDifferFrom(rv_A));
+
+                // KEEP DIFFERENTIATED GROUPS
+                // keep what continues to differentiate
+                rgl_A = rgl_A.whichDifferentiateFrom(rgl_B);
+                // add anything new which also differentiates
+                rgl_A.addAll(rgl_B.whichDifferentiateFrom(rgl_A));
+
+                // ... GET PROXIMAL ISAs
+                isaRTNextB.addAll(findIsaProximal(isaCB, posList));
+            }
+
+            // SETUP NEXT LEVEL OF ISAs
+            isaRTNext = isaRTNextB;
+            isaRTNextB = new ArrayList<SnoRel>();
+        }
+
+        // last check for redundant -- check may not be needed
+        rv_A = rv_A.whichRoleValAreNonRedundant();
+        rgl_A = rgl_A.whichNonRedundant();
+
+        // Remove any un-grouped which do not differentiate from other groups
+        SnoGrpList grpList0 = new SnoGrpList();
+        for (SnoRel a : rv_A)
+            grpList0.add(new SnoGrp(a));
+        grpList0 = grpList0.whichDifferentiateFrom(rgl_A);
+
+        // Repackage the un-grouped for passing to the GUI label presentation.
+        SnoGrp keepGrp0 = new SnoGrp();
+        for (SnoGrp g : grpList0)
+            keepGrp0.add(g.get(0));
+        // All un-grouped must in position 0 of the returned group list
+        rgl_A.add(0, keepGrp0.sortByType());
 
         return rgl_A;
     }
@@ -600,7 +674,7 @@ public class SnoTable {
         SnoGrp unGrpB = new SnoGrp();
         for (SnoRel isaSnoRel : isaList) {
             I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-            SnoGrpList tmpGrpList = findRoleDiffFromRoot(isaCB, posList);
+            SnoGrpList tmpGrpList = findRoleDiffFromRootGrp0(isaCB, posList);
 
             // separate un-grouped
             SnoGrp tmpUnGrp;
@@ -644,7 +718,7 @@ public class SnoTable {
             throws TerminologyException, IOException {
 
         // FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
-        SnoGrpList grpListA = findRoleDiffFromRoot(cBean, posList);
+        SnoGrpList grpListA = findRoleDiffFromRootGrp0(cBean, posList);
         // separate un-grouped
         SnoGrp unGrpA;
         if (grpListA.size() > 0)
@@ -658,7 +732,7 @@ public class SnoTable {
         SnoGrp unGrpB = new SnoGrp();
         for (SnoRel isaSnoRel : isaList) {
             I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-            SnoGrpList tmpGrpList = findRoleDiffFromRoot(isaCB, posList);
+            SnoGrpList tmpGrpList = findRoleDiffFromRootGrp0(isaCB, posList);
 
             // separate un-grouped
             SnoGrp tmpUnGrp;
@@ -743,4 +817,28 @@ public class SnoTable {
         return sg;
     }
 
+    private String logTable(String[][] data) {
+        StringBuilder s = new StringBuilder();
+
+        s.append("\r\n::: \tSF\tI \tDN\tAN\tSC\tLC");
+
+        for (int i = 0; i < data.length; i++) {
+            s.append("\r\n::: ");
+            for (int j = 0; j < totalColFlags; j++) {
+                if (data[i][j].equalsIgnoreCase(xStr)) {
+                    s.append("\tX ");
+                } else {
+                    s.append("\t ");
+                }
+            }
+            String s1 = data[i][totalColFlags].replace(typeFont, "");
+            s1 = s1.replace(valueFont, "");
+            s1 = s1.replace("<html>", "");
+            s1 = s1.replace("</font>", "");
+            s1 = s1.replace("<br>", " || ");
+            s.append("\t " + s1);
+        }
+        AceLog.getAppLog().log(Level.INFO, s.toString());
+        return null;
+    }
 }
