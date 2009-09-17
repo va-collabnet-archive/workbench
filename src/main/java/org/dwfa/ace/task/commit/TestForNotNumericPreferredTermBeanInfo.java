@@ -18,12 +18,12 @@ package org.dwfa.ace.task.commit;
 import java.beans.BeanDescriptor;
 
 /**
- * The <code>TestForPreferredTermValueBeanInfo</code> class represents a BeanInfo helper class for the
- * {@link TestForNotNumericFsn} Task for use within the Process Builder in ACE.
+ * The <code>TestForNotNumericPreferredTermBeanInfo</code> class represents a BeanInfo helper class for the
+ * {@link TestForNotNumericPreferredTerm} Task for use within the Process Builder in ACE.
  *
  * @author Matthew Edwards
  */
-public class TestForNotNumericFsnBeanInfo extends TestForUneditedDefaultsBeanInfo {
+public class TestForNotNumericPreferredTermBeanInfo extends TestForUneditedDefaultsBeanInfo {
 
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
@@ -31,7 +31,7 @@ public class TestForNotNumericFsnBeanInfo extends TestForUneditedDefaultsBeanInf
     @Override
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TestForIsa.class);
-        bd.setDisplayName("<html><font color='green'><center>Test For<br>Numeric Fsn value");
+        bd.setDisplayName("<html><font color='green'><center>Test For<br>Numeric Preferred Term value");
         return bd;
     }
 }

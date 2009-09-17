@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -85,7 +83,7 @@ public class TestForFsnValue extends AbstractConceptTest {
             try {
                 validator.validate();
             } catch (ValidationException e) {
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, e.getMessage());
+                getLogger().info(e.getMessage());
                 alerts.add(getAlertFactory(forCommit).createAlertToDataConstraintFailure(String.format(ALERT_MESSAGE,
                         requiredConcept.toString()), concept));
             }

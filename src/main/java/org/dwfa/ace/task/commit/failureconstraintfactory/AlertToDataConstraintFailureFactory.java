@@ -25,7 +25,6 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
  */
 public interface AlertToDataConstraintFailureFactory {
 
-
     /**
      * Delegates instance creation of AlertToDataConstraintFailure objects to the subclass.
      * Each Subclass is responsible for creating it's {@code AlertToDataConstraintFailure} objects.

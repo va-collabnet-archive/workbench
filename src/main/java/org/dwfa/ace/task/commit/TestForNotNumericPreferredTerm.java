@@ -15,8 +15,6 @@
  */
 package org.dwfa.ace.task.commit;
 
-import org.dwfa.ace.task.commit.validator.impl.NotEmptyConceptDataValidator;
-import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -28,7 +26,9 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.commit.failureconstraintfactory.AlertToDataConstraintFailureFactory;
 import org.dwfa.ace.task.commit.failureconstraintfactory.SimpleConstraintFailureChooser;
 import org.dwfa.ace.task.commit.validator.ConceptDescriptionFacade;
+import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import org.dwfa.ace.task.commit.validator.ValidationException;
+import org.dwfa.ace.task.commit.validator.impl.NotNumericConceptDataValidator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
@@ -36,9 +36,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * The <code>TestForPreferredTermValue</code> class represents a data constraint test that is to be run on any
- * <code>concept</code> to verify that it has a 'preferred term' that is not null and a value with a length greater
- * than <code>0</code>;
+ * The <code>TestForNotNumericPreferredTerm</code> class represents a data constraint test that is to be run on any
+ * <code>concept</code> to verify that it has a 'preferred term' that is not a purely numeric value.
  *
  * @author Matthew Edwards
  */
@@ -46,12 +45,13 @@ import org.dwfa.util.bean.Spec;
     @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
     @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
     @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
-public class TestForPreferredTermValue extends AbstractConceptTest {
+public class TestForNotNumericPreferredTerm extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
     private static final int DATA_VERSION = 1;
     private static final String ALERT_MESSAGE =
-            "<html>Empty value found:<br><font color='blue'>%1$s</font><br>Please enter a value before commit...";
+            "<html>Non alpha-numeric value found:<br><font color='blue'>%1$s</font>" +
+            "<br>Please enter an alpha-numeric value before commit...";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(DATA_VERSION);
@@ -79,7 +79,7 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
                     getAllDescriptions(concept);
 
             GetConceptDataValidationStrategy validator =
-                    new NotEmptyConceptDataValidator(requiredConcept, descriptions, concept);
+                    new NotNumericConceptDataValidator(requiredConcept, descriptions, concept);
             try {
                 validator.validate();
             } catch (ValidationException e) {
@@ -89,7 +89,7 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
             }
 
 //            return alerts;
-           return new ArrayList<AlertToDataConstraintFailure>();
+            return new ArrayList<AlertToDataConstraintFailure>();
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
@@ -103,3 +103,4 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
         return LocalVersionedTerminology.get();
     }
 }
+
