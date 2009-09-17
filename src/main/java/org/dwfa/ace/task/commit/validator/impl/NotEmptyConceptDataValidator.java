@@ -20,6 +20,7 @@ import java.util.List;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.task.commit.validator.ConceptDataComparerStrategy;
 import org.dwfa.ace.task.commit.validator.ValidationException;
 
 /**
@@ -39,22 +40,48 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
     private final I_GetConceptData requiredConcept;
     private final I_GetConceptData conceptToValidate;
     private final List<I_DescriptionVersioned> descriptions;
+    private final ConceptDataComparerStrategy comparer;
 
-    public NotEmptyConceptDataValidator(final I_GetConceptData requiredType,
+    /**
+     * Constructs and Instance of NotEmptyConceptDataValidator with a default Concept to DescriptionPart comparison
+     * algorithm of type {@link ConceptTypeToDescriptionTypeComparer}
+     * @param requiredConcept {@link I_GetConceptData} the concept to check
+     * @param descriptions a List of {@link I_DescriptionVersioned} objects to iterate through to find the
+     *          requiredConcept
+     * @param conceptToValidate the current concept being validated.
+     */
+    public NotEmptyConceptDataValidator(final I_GetConceptData requiredConcept,
             final List<I_DescriptionVersioned> descriptions, final I_GetConceptData conceptToValidate) {
-        this.requiredConcept = requiredType;
-        this.descriptions = descriptions;
+        this(requiredConcept, conceptToValidate, descriptions, new ConceptTypeToDescriptionTypeComparer());
+    }
+
+    /**
+     * Constructs and Instance of NotEmptyConceptDataValidator.
+     * @param requiredConcept {@link I_GetConceptData} the concept to check
+     * @param descriptions a List of {@link I_DescriptionVersioned} objects to iterate through to find the
+     *          requiredConcept
+     * @param conceptToValidate the current concept being validated.
+     * @param comparer the algorithm used to compare the requiredConcept to the Description parts of the
+     * {@link I_DescriptionVersioned} objects in the {@code descriptions} List.
+     */
+    public NotEmptyConceptDataValidator(I_GetConceptData requiredConcept, I_GetConceptData conceptToValidate,
+            List<I_DescriptionVersioned> descriptions, ConceptDataComparerStrategy comparer) {
+        this.requiredConcept = requiredConcept;
         this.conceptToValidate = conceptToValidate;
+        this.descriptions = descriptions;
+        this.comparer = comparer;
     }
 
     /**
      * @see GetConceptDataValidationStrategy#validate()
+     * @see ConceptDataComparerStrategy#isPartRequiredConceptType(org.dwfa.ace.api.I_GetConceptData,
+     * org.dwfa.ace.api.I_DescriptionPart)
      * @see NotEmptyConceptDataValidator
      */
     public void validate() throws ValidationException {
         for (I_DescriptionVersioned description : descriptions) {
             for (I_DescriptionPart part : description.getVersions()) {
-                if (isPartRequiredConceptType(requiredConcept, part) && !hasValue(part)) {
+                if (comparer.isPartRequiredConceptType(requiredConcept, part) && !hasValue(part)) {
                     throw new ValidationException(String.format("Concept %1$s has empty %2$s",
                             conceptToValidate.getConceptId(), requiredConcept.toString()));
                 }
@@ -76,15 +103,5 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
             return false;
         }
         return part.getText().length() > 0;
-    }
-
-    /**
-     * Utility Method to check whether a I_DescriptionPart type is of the required Concept Type.
-     * @param requiredConceptType the {@code I_GetConceptData} that is required.
-     * @param part the {@code I_DescriptionPart} to check
-     * @return true/false whether the I_Description part type is the same as the {@code I_GetConceptData}
-     */
-    private boolean isPartRequiredConceptType(I_GetConceptData requiredConceptType, I_DescriptionPart part) {
-        return part.getTypeId() == requiredConceptType.getConceptId();
     }
 }
