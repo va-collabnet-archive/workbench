@@ -106,8 +106,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	public AceConfig() throws DatabaseException, TerminologyException, IOException {
 		super();
-		userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
-		userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
 	}
 
 	public AceConfig(File dbFolder) throws DatabaseException, TerminologyException, IOException {
@@ -255,9 +253,17 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 			VodbEnv vodbEnv = new VodbEnv();
 			vodbEnv.setup(config.dbFolder, config.readOnly, cacheSize);
 			LocalVersionedTerminology.set(vodbEnv);
+			if (config.userConcept == null) {
+				config.userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+			}
+			if (config.userPath == null) {
+				config.userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+			}
+
 		} catch (Exception e) {
 			throw new ToIoException(e);
 		}
+		
 		SvnPrompter prompter = new SvnPrompter();
 		prompter.prompt("config file", "username");
 
