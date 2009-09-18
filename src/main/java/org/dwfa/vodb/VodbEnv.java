@@ -1,10 +1,26 @@
 package org.dwfa.vodb;
 
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.JEVersion;
-import com.sleepycat.je.Transaction;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import javax.swing.SwingUtilities;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
@@ -124,25 +140,11 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-import javax.swing.SwingUtilities;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.JEVersion;
+import com.sleepycat.je.Transaction;
 
 /**
  * @author kec
@@ -764,7 +766,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             attributePart.setVersion(Integer.MAX_VALUE);
             attributePart.setDefined(defined);
             attributePart.setPathId(p.getConceptId());
-            attributePart.setConceptStatus(status);
+            attributePart.setStatusId(status);
             conceptAttributes.addVersion(attributePart);
         }
         newBean.setUncommittedConceptAttributes(conceptAttributes);
@@ -846,7 +848,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             relPart.setVersion(Integer.MAX_VALUE);
             relPart.setPathId(p.getConceptId());
             relPart.setStatusId(status);
-            relPart.setRelTypeId(aceFrameConfig.getDefaultRelationshipType().getConceptId());
+            relPart.setTypeId(aceFrameConfig.getDefaultRelationshipType().getConceptId());
             relPart.setCharacteristicId(aceFrameConfig.getDefaultRelationshipCharacteristic().getConceptId());
             relPart.setRefinabilityId(aceFrameConfig.getDefaultRelationshipRefinability().getConceptId());
             relPart.setGroup(0);
@@ -887,7 +889,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             relPart.setVersion(Integer.MAX_VALUE);
             relPart.setPathId(p.getConceptId());
             relPart.setStatusId(status);
-            relPart.setRelTypeId(relType.getConceptId());
+            relPart.setTypeId(relType.getConceptId());
             relPart.setCharacteristicId(relCharacteristic.getConceptId());
             relPart.setRefinabilityId(relRefinability.getConceptId());
             relPart.setGroup(relGroup);

@@ -26,7 +26,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,12 +43,8 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
@@ -300,11 +295,15 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 	public I_AmTermComponent getTermComponent() {
 		return termComponent;
 	}
+	private boolean frozen = false;
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.I_ContainTermComponent#setTermComponent(org.dwfa.vodb.types.I_AmTermComponent)
 	 */
 	public void setTermComponent(I_AmTermComponent termComponent) {
+		if (isFrozen()) {
+			return;
+		}
 		Object old = this.termComponent;
 		this.termComponent = termComponent;
 		if (termComponent != null) {
@@ -363,6 +362,14 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
 		// Nothing to do...
+	}
+
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
 	}
 
 }
