@@ -235,7 +235,5 @@ public class GrantPanel extends JPanel {
 		grantListScroller.setBorder(BorderFactory.createTitledBorder("Grants to commit: "));
 		add(grantListScroller, gbc);
 	}
-	
-	
 
 }
