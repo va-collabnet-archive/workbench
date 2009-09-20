@@ -24,6 +24,8 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.QueueType;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -86,7 +88,8 @@ public class ToUserSelectedQueue extends AbstractTask {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates;
-            if (this.queueType == null) {
+            if (this.queueType == null  || 
+            		this.queueType.ids[0].equals(QueueType.Concept.QUEUE_TYPE.getUids().iterator().next())) {
                 attrSetTemplates = null;
                 getLogger().info("Setting queue type to null.");
             } else {
