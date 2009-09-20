@@ -521,7 +521,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         uncommittedNoChecks.add(to);
     }
 
-    public static void addUncommitted(I_Transact to) {
+    public static synchronized void addUncommitted(I_Transact to) {
         if (commitInProgress) {
             try {
                 to.abort();
