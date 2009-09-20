@@ -133,11 +133,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
 			}
 
 			// Create inbox
-			createInbox(config, config.getUsername() + ".inbox", userQueueRoot);
+			createInbox(config, config.getUsername() + ".inbox", userQueueRoot, config.getUsername() + ".inbox");
 			// Create todo box
-			createInbox(config, config.getUsername() + ".todo", userQueueRoot);
+			createInbox(config, config.getUsername() + ".todo", userQueueRoot, config.getUsername() + ".inbox");
 			// Create outbox box
-			createOutbox(config, config.getUsername() + ".outbox", userQueueRoot);
+			createOutbox(config, config.getUsername() + ".outbox", userQueueRoot, config.getUsername() + ".inbox");
 			
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
@@ -147,18 +147,20 @@ public class CreateUserPathAndQueues extends AbstractTask {
 	
 	String[] QueueTypes = new String[] {"aging", "archival", "compute", "inbox", "launcher", "outbox" };
 
-	private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot) {
+	private void createInbox(I_ConfigAceFrame config, String inboxName, 
+			File userQueueRoot, String nodeInboxAddress) {
 		config.getQueueAddressesToShow().add(inboxName);
-		createQueue(config, "inbox", inboxName, userQueueRoot);
+		createQueue(config, "inbox", inboxName, userQueueRoot, nodeInboxAddress);
 	}
 	
-	private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot) {
+	private void createOutbox(I_ConfigAceFrame config, String outboxName, 
+			File userQueueRoot, String nodeInboxAddress) {
 		config.getQueueAddressesToShow().add(outboxName);		
-		createQueue(config, "outbox", outboxName, userQueueRoot);
+		createQueue(config, "outbox", outboxName, userQueueRoot, nodeInboxAddress);
 	}
 	
 	private void createQueue(I_ConfigAceFrame config, String queueType, String queueName,
-			File userQueueRoot) {
+			File userQueueRoot, String nodeInboxAddress) {
 
 		try {
 
@@ -168,16 +170,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
 			File queueDirectory = new File(userQueueRoot, queueName);
 
-			queueDirectory.mkdirs();
-
-			String nodeInboxAddress = queueDirectory.getName().toLowerCase()
-					.replace(' ', '.');
-			nodeInboxAddress = nodeInboxAddress.replace("....", ".");
-			nodeInboxAddress = nodeInboxAddress.replace("...", ".");
-			nodeInboxAddress = nodeInboxAddress.replace("..", ".");
+			queueDirectory.mkdirs();			
 
 			Map<String, String> substutionMap = new TreeMap<String, String>();
 			substutionMap.put("**queueName**", queueDirectory.getName());
+			substutionMap.put("**inboxAddress**", queueDirectory.getName());
 			substutionMap.put("**directory**", FileIO.getRelativePath(
 					queueDirectory).replace('\\', '/'));
 			substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
