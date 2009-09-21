@@ -25,11 +25,11 @@ public class Type5UuidFactory {
 
    public static UUID PATH_ID_FROM_FS_DESC = UUID.fromString("5a2e7786-3e41-11dc-8314-0800200c9a66");
 
-   public static UUID OPCS_CONCEPT_ID = UUID.fromString("26854022-8bd0-11dc-8314-0800200c9a66");
+  public static UUID OPCS_CONCEPT_ID = UUID.fromString("26854022-8bd0-11dc-8314-0800200c9a66");
    public static UUID OPCS_DESC_ID = UUID.fromString("26854023-8bd0-11dc-8314-0800200c9a66");
    public static UUID OPCS_REL_ID = UUID.fromString("26854024-8bd0-11dc-8314-0800200c9a66");
    
-   public static UUID READV3_CONCEPT_ID = UUID.fromString("45419916-8ecd-11dc-8314-0800200c9a66");
+   /*  public static UUID READV3_CONCEPT_ID = UUID.fromString("45419916-8ecd-11dc-8314-0800200c9a66");
    public static UUID READV3_REL_ID = UUID.fromString("45419917-8ecd-11dc-8314-0800200c9a66");
    public static UUID READV3_TERM30_DESC_ID = UUID.fromString("45419918-8ecd-11dc-8314-0800200c9a66");
    public static UUID READV3_TERM60_DESC_ID = UUID.fromString("45419919-8ecd-11dc-8314-0800200c9a66");
@@ -53,7 +53,7 @@ public class Type5UuidFactory {
    public static UUID READV3_TEMPL_FOR_REL = UUID.fromString("bd98b290-bc0d-11dc-95ff-0800200c9a66");
    public static UUID READV3_TEMPL = UUID.fromString("bd98b291-bc0d-11dc-95ff-0800200c9a66");
    public static UUID READV3_CROSS_MAP_FOR_REL = UUID.fromString("bd98b292-bc0d-11dc-95ff-0800200c9a66");
-   public static UUID READV3_CROSS_MAP = UUID.fromString("bd98b293-bc0d-11dc-95ff-0800200c9a66");
+   public static UUID READV3_CROSS_MAP = UUID.fromString("bd98b293-bc0d-11dc-95ff-0800200c9a66"); */
  
 
     
