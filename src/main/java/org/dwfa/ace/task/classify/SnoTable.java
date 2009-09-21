@@ -38,7 +38,7 @@ public class SnoTable {
     // private final static int roleDiffFromProxFlag = 0x00400000;
     // private final static int roleDiffFromProxPrimFlag = 0x00800000;
 
-    // // !!! which forms use
+    // INFERRED GROUP LISTS
     SnoGrpList isaProxSnoGrpList = null; // USE: Distribution, Authoring Normal
     SnoGrpList isaProxPrimSnoGrpList = null; // USE: Short, Long Canonical
 
@@ -46,10 +46,13 @@ public class SnoTable {
     SnoGrpList roleDiffFromProxList = null;
     SnoGrpList roleDiffFromProxPrimList = null;
 
-    //
+    // STATED GROUP LISTS
     SnoGrpList isaStatedSnoGrpList = null; // USE: Stated
     SnoGrpList roleStatedSnoGrpList = null; // USE: Stated
 
+    // ROWS OF DATA IN TABLE
+    String cBeanStr;
+    boolean cBeanDef;
     ArrayList<SnoTableRow> snoTableRows = null;
 
     // ** WORKBENCH PARTICULARS **
@@ -75,7 +78,7 @@ public class SnoTable {
     private int countIsCDefinedDuplPartGE2 = 0;
 
     // Setup Strings
-    String xStr = new String("•");
+    String xStr = new String(String.valueOf('\u2022')); // &bull; U+2022 (8226), small bullet.
     String bStr = new String(" ");
     String errStr = new String("*");
     String typeFont = "<font face='Dialog' size='3' color='blue'>";
@@ -167,6 +170,8 @@ public class SnoTable {
         ArrayList<SnoRel> isaStatedList = null;
 
         try {
+            cBeanStr = cBean.getInitialText(); // Remember concept name
+            cBeanDef = isCDefined(cBean, cStatedPath);
 
             // GET STATED DATA
             isaStatedList = findIsaProximal(cBean, cStatedPath);
@@ -174,13 +179,7 @@ public class SnoTable {
             for (SnoRel sr : isaStatedList)
                 isaStatedSnoGrpList.add(new SnoGrp(sr));
 
-            List<SnoRel> roleProx = findRoleProximal(cBean, cStatedPath);
-            roleStatedSnoGrpList = splitGrouped(roleProx);
-            SnoGrp rv0 = splitNonGrouped(roleProx);
-            // Add un-grouped to beginning in sort order
-            for (int i = rv0.size() - 1; i >= 0; i--) {
-                roleStatedSnoGrpList.add(0, new SnoGrp(rv0.get(i)));
-            }
+            roleStatedSnoGrpList = findRoleGrpProximal(cBean, cStatedPath);
 
             // GET INFERRED DATA
             // USE: Distribution Normal, Authoring Normal
@@ -196,14 +195,14 @@ public class SnoTable {
                 isaProxPrimSnoGrpList.add(new SnoGrp(sr));
 
             // USE: Distribution Normal Form, Long Canonical Form
-            roleDiffFromRootList = findRoleDiffFromRoot(cBean, cInferredPath);
+            roleDiffFromRootList = findRoleGrpDiffFromRoot(cBean, cInferredPath);
 
             // USE: Authoring Form
-            roleDiffFromProxList = findRoleDiffFromProx(cBean, isaProxList,
+            roleDiffFromProxList = findRoleGrpDiffFromProx(cBean, isaProxList,
                     cInferredPath);
 
             // USE: Short Canonical Form
-            roleDiffFromProxPrimList = findRoleDiffFromProxPrim(cBean,
+            roleDiffFromProxPrimList = findRoleGrpDiffFromProxPrim(cBean,
                     isaProxPrimList, cInferredPath);
 
         } catch (TerminologyException e) {
@@ -474,6 +473,28 @@ public class SnoTable {
         }
     }
 
+    private SnoGrpList findRoleGrpProximal(I_GetConceptData cBean,
+            List<I_Position> posList) {
+        SnoGrpList returnSnoGrpList;
+
+        // Find individual proximal roles
+        List<SnoRel> roleSnoRelProx = findRoleProximal(cBean, posList);
+
+        // Get the role groups as groups
+        returnSnoGrpList = splitGrouped(roleSnoRelProx);
+
+        // Get group "0" roles as one group
+        SnoGrp tmpGroup0 = splitNonGrouped(roleSnoRelProx);
+
+        // Convert each group "0" role into its own group of one role each.
+        // Add each singleton group to beginning in sort order
+        for (int i = tmpGroup0.size() - 1; i >= 0; i--) {
+            returnSnoGrpList.add(0, new SnoGrp(tmpGroup0.get(i)));
+        }
+
+        return returnSnoGrpList;
+    }
+
     private List<SnoRel> findRoleProximal(I_GetConceptData cBean,
             List<I_Position> posList) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
@@ -523,264 +544,6 @@ public class SnoTable {
         return returnSnoRels;
     }
 
-    private SnoGrpList findRoleDiffFromRoot(I_GetConceptData cBean,
-            List<I_Position> posList) throws TerminologyException, IOException {
-        SnoGrpList rgl_A;
-        SnoGrpList rgl_B;
-        SnoGrp rv_A;
-        SnoGrp rv_B;
-
-        // GET IMMEDIATE PROXIMAL ROLES & SEPARATE GROUPS
-        List<SnoRel> roleSnoRelProx = findRoleProximal(cBean, posList);
-        rgl_A = splitGrouped(roleSnoRelProx);
-        rv_A = splitNonGrouped(roleSnoRelProx);
-
-        // GET PROXIMAL ISAs, one next level up at a time
-        List<SnoRel> isaSnoRelNext = findIsaProximal(cBean, posList);
-        List<SnoRel> isaSnoRelNextB = new ArrayList<SnoRel>();
-        while (isaSnoRelNext.size() > 0) {
-
-            // FOR EACH CURRENT PROXIMAL CONCEPT...
-            for (SnoRel isaSnoRel : isaSnoRelNext) {
-                // Get I_GetConceptData (aka ConceptBean) from Nid
-                // tf.getConcept may throw an exception
-                I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-
-                // ... EVALUATE PROXIMAL ROLES & SEPARATE GROUP
-                roleSnoRelProx = findRoleProximal(isaCB, posList);
-                rgl_B = splitGrouped(roleSnoRelProx);
-                rv_B = splitNonGrouped(roleSnoRelProx);
-
-                // KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
-                rv_A = rv_A.whichRoleValDifferFrom(rv_B);
-                // setup rv_A for the next iteration
-                // add anything new which also differentiates
-                rv_A.addAllWithSort(rv_B.whichRoleValDifferFrom(rv_A));
-
-                // KEEP DIFFERENTIATED GROUPS
-                // keep what continues to differentiate
-                rgl_A = rgl_A.whichDifferentiateFrom(rgl_B);
-                // add anything new which also differentiates
-                rgl_A.addAll(rgl_B.whichDifferentiateFrom(rgl_A));
-
-                // ... GET PROXIMAL ISAs
-                isaSnoRelNextB.addAll(findIsaProximal(isaCB, posList));
-            }
-
-            // SETUP NEXT LEVEL OF ISAs
-            isaSnoRelNext = isaSnoRelNextB;
-            isaSnoRelNextB = new ArrayList<SnoRel>();
-        }
-
-        // last check for redundant -- check may not be needed
-        rv_A = rv_A.whichRoleValAreNonRedundant();
-        rgl_A = rgl_A.whichNonRedundant();
-
-
-        // Remove any un-grouped which do not differentiate from other groups
-        SnoGrpList grpList0 = new SnoGrpList();
-        for (SnoRel a : rv_A)
-            grpList0.add(new SnoGrp(a));
-        grpList0 = grpList0.whichDifferentiateFrom(rgl_A);
-
-        // Add un-grouped to beginning in sort order
-        for (int i = grpList0.size() - 1; i >= 0; i--) {
-            rgl_A.add(0, grpList0.get(i));
-        }
-
-        return rgl_A;
-    }
-
-    private SnoGrpList findRoleDiffFromRootGrp0(I_GetConceptData cBean,
-            List<I_Position> posList) throws TerminologyException, IOException {
-        SnoGrpList rgl_A;
-        SnoGrpList rgl_B;
-        SnoGrp rv_A;
-        SnoGrp rv_B;
-
-        // GET IMMEDIATE PROXIMAL ROLES & SEPARATE GROUPS
-        List<SnoRel> roleRTProx = findRoleProximal(cBean, posList);
-        rgl_A = splitGrouped(roleRTProx);
-        rv_A = splitNonGrouped(roleRTProx);
-
-        // GET PROXIMAL ISAs, one next level up at a time
-        List<SnoRel> isaRTNext = findIsaProximal(cBean, posList);
-        List<SnoRel> isaRTNextB = new ArrayList<SnoRel>();
-        while (isaRTNext.size() > 0) {
-
-            // FOR EACH CURRENT PROXIMAL CONCEPT...
-            for (SnoRel isaRT : isaRTNext) {
-                // Get I_GetConceptData (aka ConceptBean) from Nid
-                // tf.getConcept may throw an exception
-                I_GetConceptData isaCB = tf.getConcept(isaRT.c2Id);
-
-                // ... EVALUATE PROXIMAL ROLES & SEPARATE GROUP
-                roleRTProx = findRoleProximal(isaCB, posList);
-                rgl_B = splitGrouped(roleRTProx);
-                rv_B = splitNonGrouped(roleRTProx);
-
-                // KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
-                rv_A = rv_A.whichRoleValDifferFrom(rv_B);
-                // setup rv_A for the next iteration
-                // add anything new which also differentiates
-                rv_A.addAllWithSort(rv_B.whichRoleValDifferFrom(rv_A));
-
-                // KEEP DIFFERENTIATED GROUPS
-                // keep what continues to differentiate
-                rgl_A = rgl_A.whichDifferentiateFrom(rgl_B);
-                // add anything new which also differentiates
-                rgl_A.addAll(rgl_B.whichDifferentiateFrom(rgl_A));
-
-                // ... GET PROXIMAL ISAs
-                isaRTNextB.addAll(findIsaProximal(isaCB, posList));
-            }
-
-            // SETUP NEXT LEVEL OF ISAs
-            isaRTNext = isaRTNextB;
-            isaRTNextB = new ArrayList<SnoRel>();
-        }
-
-        // last check for redundant -- check may not be needed
-        rv_A = rv_A.whichRoleValAreNonRedundant();
-        rgl_A = rgl_A.whichNonRedundant();
-
-        // Remove any un-grouped which do not differentiate from other groups
-        SnoGrpList grpList0 = new SnoGrpList();
-        for (SnoRel a : rv_A)
-            grpList0.add(new SnoGrp(a));
-        grpList0 = grpList0.whichDifferentiateFrom(rgl_A);
-
-        // Repackage the un-grouped for passing to the GUI label presentation.
-        SnoGrp keepGrp0 = new SnoGrp();
-        for (SnoGrp g : grpList0)
-            keepGrp0.add(g.get(0));
-        // All un-grouped must in position 0 of the returned group list
-        rgl_A.add(0, keepGrp0.sortByType());
-
-        return rgl_A;
-    }
-
-    private SnoGrpList findRoleDiffFromProx(I_GetConceptData cBean,
-            List<SnoRel> isaList, List<I_Position> posList)
-            throws TerminologyException, IOException {
-
-        // FIND IMMEDIATE ROLES OF *THIS*CONCEPT*
-        List<SnoRel> roleSnoRelSetA = findRoleProximal(cBean, posList);
-        SnoGrpList grpListA = splitGrouped(roleSnoRelSetA);
-        SnoGrp unGrpA = splitNonGrouped(roleSnoRelSetA);
-
-        // FIND NON-REDUNDANT ROLE SET OF PROXIMATE ISA
-        SnoGrpList grpListB = new SnoGrpList();
-        SnoGrp unGrpB = new SnoGrp();
-        for (SnoRel isaSnoRel : isaList) {
-            I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-            SnoGrpList tmpGrpList = findRoleDiffFromRootGrp0(isaCB, posList);
-
-            // separate un-grouped
-            SnoGrp tmpUnGrp;
-            if (tmpGrpList.size() > 0)
-                tmpUnGrp = tmpGrpList.remove(0);
-            else
-                break;
-
-            // KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
-            unGrpB = unGrpB.whichRoleValDifferFrom(tmpUnGrp);
-            // setup rv_A for the next iteration
-            // add anything new which also differentiates
-            unGrpB.addAllWithSort(tmpUnGrp.whichRoleValDifferFrom(unGrpB));
-
-            // keep role-groups which continue to differentiate
-            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
-            // add anything new which also differentiates
-            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
-        }
-
-        // KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE
-        unGrpA = unGrpA.whichRoleValDifferFrom(unGrpB);
-        grpListA.whichDifferentiateFrom(grpListB);
-
-        // Remove any un-grouped which do not differentiate from other groups
-        SnoGrpList grpList0 = new SnoGrpList();
-        for (SnoRel a : unGrpA)
-            grpList0.add(new SnoGrp(a));
-        grpList0 = grpList0.whichDifferentiateFrom(grpListA);
-
-        // Add un-grouped to beginning in sort order
-        for (int i = grpList0.size() - 1; i >= 0; i--) {
-            grpListA.add(0, grpList0.get(i));
-        }
-
-        return grpListA;
-    }
-
-    private SnoGrpList findRoleDiffFromProxPrim(I_GetConceptData cBean,
-            List<SnoRel> isaList, List<I_Position> posList)
-            throws TerminologyException, IOException {
-
-        // FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
-        SnoGrpList grpListA = findRoleDiffFromRootGrp0(cBean, posList);
-        // separate un-grouped
-        SnoGrp unGrpA;
-        if (grpListA.size() > 0)
-            unGrpA = grpListA.remove(0);
-        else {
-            return grpListA;
-        }
-
-        // FIND ROLE SET OF MOST PROXIMATE PRIMITIVE
-        SnoGrpList grpListB = new SnoGrpList();
-        SnoGrp unGrpB = new SnoGrp();
-        for (SnoRel isaSnoRel : isaList) {
-            I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
-            SnoGrpList tmpGrpList = findRoleDiffFromRootGrp0(isaCB, posList);
-
-            // separate un-grouped
-            SnoGrp tmpUnGrp;
-            if (tmpGrpList.size() > 0)
-                tmpUnGrp = tmpGrpList.remove(0);
-            else
-                break;
-
-            // KEEP DIFFERENTIATED, STAND ALONE, ROLE-VALUE PAIRS
-            unGrpB = unGrpB.whichRoleValDifferFrom(tmpUnGrp);
-            // setup rv_A for the next iteration
-            // add anything new which also differentiates
-            unGrpB.addAllWithSort(tmpUnGrp.whichRoleValDifferFrom(unGrpB));
-
-            // keep role-groups which continue to differentiate
-            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
-            // add anything new which also differentiates
-            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
-        }
-
-        // KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE PRIMITIVE
-        unGrpA = unGrpA.whichRoleValDifferFrom(unGrpB);
-        grpListA.whichDifferentiateFrom(grpListB);
-
-        // Remove any un-grouped which do not differentiate from other groups
-        SnoGrpList grpList0 = new SnoGrpList();
-        for (SnoRel a : unGrpA)
-            grpList0.add(new SnoGrp(a));
-        grpList0 = grpList0.whichDifferentiateFrom(grpListA);
-
-        // Add un-grouped to beginning in sort order
-        for (int i = grpList0.size() - 1; i >= 0; i--) {
-            grpListA.add(0, grpList0.get(i));
-        }
-
-        return grpListA;
-    }
-
-    private SnoGrp splitNonGrouped(List<SnoRel> relsIn) {
-        List<SnoRel> relsOut = new ArrayList<SnoRel>();
-        for (SnoRel r : relsIn)
-            if (r.group == 0)
-                relsOut.add(r);
-        SnoGrp sgOut = new SnoGrp(relsOut, true);
-        sgOut = sgOut.whichRoleValAreNonRedundant();
-        return sgOut; // returns as sorted.
-    }
-
     private SnoGrpList splitGrouped(List<SnoRel> relsIn) {
         SnoGrpList sg = new SnoGrpList();
 
@@ -817,8 +580,125 @@ public class SnoTable {
         return sg;
     }
 
+    private SnoGrp splitNonGrouped(List<SnoRel> relsIn) {
+        List<SnoRel> relsOut = new ArrayList<SnoRel>();
+        for (SnoRel r : relsIn)
+            if (r.group == 0)
+                relsOut.add(r);
+        SnoGrp sgOut = new SnoGrp(relsOut, true);
+        sgOut = sgOut.whichRoleValAreNonRedundant();
+        return sgOut; // returns as sorted.
+    }
+
+    private SnoGrpList findRoleGrpDiffFromRoot(I_GetConceptData cBean,
+            List<I_Position> posList) throws TerminologyException, IOException {
+        SnoGrpList grpListA;
+        SnoGrpList grpListB;
+
+        // GET IMMEDIATE PROXIMAL ROLES OF *THIS*CONCEPT*
+        grpListA = findRoleGrpProximal(cBean, posList);
+
+        // GET PROXIMAL ISAs, one next level up at a time
+        List<SnoRel> isaSnoRelNext = findIsaProximal(cBean, posList);
+        List<SnoRel> isaSnoRelNextB = new ArrayList<SnoRel>();
+        while (isaSnoRelNext.size() > 0) {
+
+            // FOR EACH CURRENT PROXIMAL CONCEPT...
+            for (SnoRel isaSnoRel : isaSnoRelNext) {
+                // Get I_GetConceptData (aka ConceptBean) from Nid
+                // tf.getConcept may throw an exception
+                I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
+
+                // ... EVALUATE PROXIMAL ROLES & SEPARATE GROUP
+                grpListB = findRoleGrpProximal(isaCB, posList);
+
+                // KEEP DIFFERENTIATED GROUPS
+                // keep what continues to differentiate
+                grpListA = grpListA.whichDifferentiateFrom(grpListB);
+                // add anything new which also differentiates
+                grpListA.addAll(grpListB.whichDifferentiateFrom(grpListA));
+
+                // ... GET PROXIMAL ISAs
+                isaSnoRelNextB.addAll(findIsaProximal(isaCB, posList));
+            }
+
+            // SETUP NEXT LEVEL OF ISAs
+            isaSnoRelNext = isaSnoRelNextB;
+            isaSnoRelNextB = new ArrayList<SnoRel>();
+        }
+
+        // last check for redundant -- check may not be needed
+        grpListA = grpListA.whichNonRedundant();
+
+        return grpListA;
+    }
+
+    private SnoGrpList findRoleGrpDiffFromProx(I_GetConceptData cBean,
+            List<SnoRel> isaList, List<I_Position> posList)
+            throws TerminologyException, IOException {
+
+        // FIND IMMEDIATE ROLES OF *THIS*CONCEPT*
+        SnoGrpList grpListA = findRoleGrpProximal(cBean, posList);
+        if (grpListA.size() == 0) // NOTHING TO DIFFERENTIATE
+            return grpListA;
+
+        // FIND NON-REDUNDANT ROLE SET OF PROXIMATE ISA
+        SnoGrpList grpListB = new SnoGrpList();
+        for (SnoRel isaSnoRel : isaList) {
+            I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
+            SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList);
+
+            // IF EMPTY LIST, SKIP TO NEXT
+            if (tmpGrpList.size() == 0)
+                break;
+
+            // keep role-groups which continue to differentiate
+            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
+            // add anything new which also differentiates
+            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
+        }
+
+        // KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE
+        grpListA = grpListA.whichDifferentiateFrom(grpListB);
+
+        return grpListA;
+    }
+
+    private SnoGrpList findRoleGrpDiffFromProxPrim(I_GetConceptData cBean,
+            List<SnoRel> isaList, List<I_Position> posList)
+            throws TerminologyException, IOException {
+
+        // FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
+        SnoGrpList grpListA = findRoleGrpDiffFromRoot(cBean, posList);
+        if (grpListA.size() == 0) // NOTHING TO DIFFERENTIATE
+            return grpListA;
+
+        // FIND ROLE SET OF MOST PROXIMATE PRIMITIVE
+        SnoGrpList grpListB = new SnoGrpList();
+        for (SnoRel isaSnoRel : isaList) {
+            I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
+            SnoGrpList tmpGrpList = findRoleGrpDiffFromRoot(isaCB, posList);
+
+            // IF EMPTY LIST, SKIP TO NEXT
+            if (tmpGrpList.size() == 0)
+                break;
+
+            // keep role-groups which continue to differentiate
+            grpListB = grpListB.whichDifferentiateFrom(tmpGrpList);
+            // add anything new which also differentiates
+            grpListB.addAll(tmpGrpList.whichDifferentiateFrom(grpListB));
+        }
+
+        // KEEP ONLY ROLES DIFFERENTIATED FROM MOST PROXIMATE PRIMITIVE
+        grpListA = grpListA.whichDifferentiateFrom(grpListB);
+
+        return grpListA;
+    }
+
     private String logTable(String[][] data) {
         StringBuilder s = new StringBuilder();
+        s.append("\r\n::: TABLE -- \"" + cBeanStr + "\" "
+                + ((cBeanDef == true) ? "(( DEFINED ))" : "(( PRIMITIVE ))"));
 
         s.append("\r\n::: \tSF\tI \tDN\tAN\tSC\tLC");
 
