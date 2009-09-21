@@ -3,11 +3,13 @@ package org.dwfa.ace.task.refset.spec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -37,14 +39,15 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
     private static final int dataVersion = 2;
 
     private Boolean clauseIsTrue = true;
+    private transient Exception ex = null;
+    private transient Condition returnCondition = Condition.CONTINUE;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(clauseIsTrue);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             if (objDataVersion < 2) {
@@ -57,24 +60,47 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
         }
     }
 
-    public final void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public final void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public final Condition evaluate(I_EncodeBusinessProcess process,
-            I_Work worker) throws TaskFailedException {
+    public final Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker)
+            throws TaskFailedException {
+
         try {
-            I_ConfigAceFrame configFrame = LocalVersionedTerminology.get()
-                    .getActiveAceFrameConfig();
+            ex = null;
+            if (SwingUtilities.isEventDispatchThread()) {
+                doRun(process, worker);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        doRun(process, worker);
+                    }
+                });
+            }
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        }
+        if (ex != null) {
+            throw new TaskFailedException(ex);
+        }
+        return returnCondition;
+    }
+
+    private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
+        try {
+            I_ConfigAceFrame configFrame = LocalVersionedTerminology.get().getActiveAceFrameConfig();
             if (configFrame.getEditingPathSet().size() == 0) {
                 String msg = "Unable to add spec. Editing path set is empty.";
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                 throw new TaskFailedException(msg);
             }
 
-            I_GetConceptData refsetSpec = configFrame
-                    .getRefsetSpecInSpecEditor();
+            I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
             if (refsetSpec != null) {
                 JTree specTree = configFrame.getTreeInSpecEditor();
 
@@ -86,13 +112,11 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                 boolean canAdd = true;
                 if (selection != null) {
                     canAdd = false;
-                    selectedNode = (DefaultMutableTreeNode) selection
-                            .getLastPathComponent();
-                    I_ThinExtByRefVersioned selectedSpec = (I_ThinExtByRefVersioned) selectedNode
-                            .getUserObject();
+                    selectedNode = (DefaultMutableTreeNode) selection.getLastPathComponent();
+                    I_ThinExtByRefVersioned selectedSpec = (I_ThinExtByRefVersioned) selectedNode.getUserObject();
                     componentId = selectedSpec.getMemberId();
-                    if (selectedSpec.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION
-                            .localize().getNid()) {
+                    if (selectedSpec.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize()
+                        .getNid()) {
                         canAdd = true;
                     }
                 }
@@ -100,17 +124,14 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                 if (canAdd) {
                     I_TermFactory tf = LocalVersionedTerminology.get();
                     int typeId = getRefsetPartTypeId();
-                    int memberId = tf.uuidToNativeWithGeneration(UUID
-                            .randomUUID(),
-                            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                                    .localize().getNid(), configFrame
+                    int memberId =
+                            tf.uuidToNativeWithGeneration(UUID.randomUUID(),
+                                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), configFrame
                                     .getEditingPathSet(), Integer.MAX_VALUE);
 
-                    I_ThinExtByRefVersioned ext = tf.newExtension(refsetId,
-                            memberId, componentId, typeId);
+                    I_ThinExtByRefVersioned ext = tf.newExtension(refsetId, memberId, componentId, typeId);
                     for (I_Path p : configFrame.getEditingPathSet()) {
-                        I_ThinExtByRefPart specPart = createAndPopulatePart(tf,
-                                p, configFrame);
+                        I_ThinExtByRefPart specPart = createAndPopulatePart(tf, p, configFrame);
                         ext.addVersion(specPart);
                     }
                     tf.addUncommitted(ext);
@@ -121,22 +142,19 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     throw new TaskFailedException(msg);
                 }
             } else {
-                throw new TaskFailedException(
-                        "Unable to complete operation. Refset is null.");
+                throw new TaskFailedException("Unable to complete operation. Refset is null.");
             }
-            return Condition.CONTINUE;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new TaskFailedException(ex);
+            returnCondition = Condition.CONTINUE;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ex = e;
         }
     }
 
-    protected abstract I_ThinExtByRefPart createAndPopulatePart(
-            I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame)
+    protected abstract I_ThinExtByRefPart createAndPopulatePart(I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame)
             throws IOException, TerminologyException;
 
-    protected abstract int getRefsetPartTypeId() throws IOException,
-            TerminologyException;
+    protected abstract int getRefsetPartTypeId() throws IOException, TerminologyException;
 
     public int[] getDataContainerIds() {
         return new int[] {};

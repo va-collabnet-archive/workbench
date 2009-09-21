@@ -106,7 +106,6 @@ public class SetWFToOwnerOrReviewerPanelTask extends AbstractTask {
             }
 
             wfSheet.add(new SelectOwnerOrReviewerPanel(reviewerUuids, owner));
-            wfSheet.validate();
         } catch (Exception e) {
             ex = e;
         }

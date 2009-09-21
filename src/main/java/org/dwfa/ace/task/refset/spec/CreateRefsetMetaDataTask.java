@@ -210,9 +210,6 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), memberRefset.getUids().iterator()
                 .next());
 
-            System.out.println(SwingUtilities.isEventDispatchThread());
-            System.out.println("********************" + Thread.currentThread().getName());
-
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),

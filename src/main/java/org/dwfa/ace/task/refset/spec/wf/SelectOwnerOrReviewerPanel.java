@@ -89,19 +89,20 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
             GridBagConstraints gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
+            gridBagConstraints.insets = new Insets(20, 5, 10, 10); // padding
             gridBagConstraints.weighty = 0.0;
             gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
             this.add(userLabel, gridBagConstraints);
+            y++;
 
             while (buttons.hasMoreElements()) {
                 AbstractButton button = buttons.nextElement();
 
                 // add button to panel
                 gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = y;
-                gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
+                gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
                 gridBagConstraints.weighty = 0.0;
                 gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
                 this.add(button, gridBagConstraints);
@@ -111,27 +112,29 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
         }
 
         JLabel commentsLabel = new JLabel("Comments for workflow recipient:");
-        commentsTextField = new JTextField(20);
+        commentsTextField = new JTextField(30);
+
+        y++;
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y + 1;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.insets = new Insets(20, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         this.add(commentsLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y + 1;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
+        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         this.add(commentsTextField, gridBagConstraints);
 
         // column filler
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = y + 2;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.weightx = 1.0;
