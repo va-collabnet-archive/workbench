@@ -271,7 +271,23 @@ public class RefsetSpecWizardTask extends AbstractTask {
         allowedTypes.add(descriptionType.getConceptId());
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
-        List<I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(null, allowedTypes, null, true);
+
+        I_IntSet activeStatuses = LocalVersionedTerminology.get().newIntSet();
+        activeStatuses.add(LocalVersionedTerminology.get()
+            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptId());
+        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
+            (ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptId());
+        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
+            (ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())).getConceptId());
+        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
+            (ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids())).getConceptId());
+        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
+            (ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptId());
+        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
+            (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptId());
+
+        List<I_DescriptionTuple> descriptionResults =
+                concept.getDescriptionTuples(activeStatuses, allowedTypes, null, true);
 
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {
