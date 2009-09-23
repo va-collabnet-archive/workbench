@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.OpenFrames;
 
 public class LogWithAlerts {
@@ -44,21 +45,23 @@ public class LogWithAlerts {
 	public void alertAndLog(final Component parent, 
 			final Level level, final String message, 
 			final Throwable ex) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			alertAndLogPrivate(getActiveFrame(parent), level, message, ex); 
-		} else {
-	        try {
-	            SwingUtilities.invokeAndWait(new Runnable() {
-	              public void run() {
-	        		alertAndLogPrivate(getActiveFrame(parent), level, message, ex); 
-	              }
-	              
-	            });
-	          } catch (InterruptedException e) {
-	      		getLogger().log(Level.SEVERE, message, e);
-	          } catch (InvocationTargetException e) {
-		      	getLogger().log(Level.SEVERE, message, e);
-	          }
+		if (DwfaEnv.isHeadless() == false) {
+			if (SwingUtilities.isEventDispatchThread()) {
+				alertAndLogPrivate(getActiveFrame(parent), level, message, ex); 
+			} else {
+		        try {
+		            SwingUtilities.invokeAndWait(new Runnable() {
+		              public void run() {
+		        		alertAndLogPrivate(getActiveFrame(parent), level, message, ex); 
+		              }
+		              
+		            });
+		          } catch (InterruptedException e) {
+		      		getLogger().log(Level.SEVERE, message, e);
+		          } catch (InvocationTargetException e) {
+			      	getLogger().log(Level.SEVERE, message, e);
+		          }
+			}
 		}
 	}
 
