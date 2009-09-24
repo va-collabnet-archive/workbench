@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
@@ -220,7 +221,8 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
         HashMap<String, CountDownLatch> latchMap = new HashMap<String, CountDownLatch>();
         HashMap<String, Future<Boolean>> futureMap = new HashMap<String, Future<Boolean>>();
 
-		for (File dataFile : dataFiles) {
+        SortedSet<File> sortedDataFiles = new TreeSet<File>(Arrays.asList(dataFiles));
+		for (File dataFile : sortedDataFiles) {
             int lineCount = countLines(dataFile);
             getLog().info("Content file: " + dataFile.getName() + " has lines: " + lineCount);
 
