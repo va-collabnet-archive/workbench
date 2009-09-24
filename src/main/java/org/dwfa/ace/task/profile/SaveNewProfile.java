@@ -135,7 +135,7 @@ public class SaveNewProfile extends AbstractTask {
 			newDbProfile.getAceFrames().clear();
 			newDbProfile.getAceFrames().add(profileToSave);
 			newDbProfile.setChangeSetRoot(changeSetRoot);
-			newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "." + UUID.randomUUID().toString() + ".jcs");
+			newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "#0#" + UUID.randomUUID().toString() + ".jcs");
 			newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
 			newDbProfile.setProfileFile(profileFile);
 			newDbProfile.setUsername(profileToSave.getUsername());

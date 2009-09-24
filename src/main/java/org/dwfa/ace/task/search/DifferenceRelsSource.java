@@ -14,8 +14,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = {
-		@Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
-		@Spec(directory = "search", type = BeanType.TASK_BEAN) })
+		@Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN) })
 public class DifferenceRelsSource extends AbstractDifferenceRels {
 
 	/**
