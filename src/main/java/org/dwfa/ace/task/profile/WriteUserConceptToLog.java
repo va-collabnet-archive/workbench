@@ -1,14 +1,11 @@
 package org.dwfa.ace.task.profile;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
