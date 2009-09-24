@@ -72,7 +72,7 @@ import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class SearchPanel extends JPanel {
+public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public class MaximizeSearchListener implements ActionListener {
 
@@ -537,7 +537,7 @@ public class SearchPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 7;
+        gbc.gridwidth = 6;
         gbc.gridheight = 3;
 
         add(criterion, gbc);
@@ -777,6 +777,10 @@ public class SearchPanel extends JPanel {
 			return swdt.getTuple();
 		}
 		return null;
+	}
+
+	public List<CriterionPanel> getCriterionPanels() {
+		return criterionPanels;
 	}
 
 }

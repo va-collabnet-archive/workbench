@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
@@ -59,6 +61,7 @@ public interface I_StoreDescriptions extends I_StoreInBdb {
 			CountDownLatch latch, List<I_TestSearchResults> checkList,
 			I_ConfigAceFrame config, LuceneProgressUpdator updater)
 			throws DatabaseException, IOException, ParseException;
+	
 
 	public void createLuceneDescriptionIndex() throws IOException;
 

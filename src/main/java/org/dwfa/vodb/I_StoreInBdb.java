@@ -17,6 +17,7 @@ public interface I_StoreInBdb {
 	public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException, IOException;
 
 	public void setupBean(ConceptBean cb) throws IOException;
+	
 
 
 }

@@ -198,6 +198,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 					afc.setMasterConfig(this);
 				}
 			}
+			if (username == null || username.equals("null")) {
+				username = aceFrames.get(0).getUsername();
+			}
 			if (objDataVersion >= 2) {
 				loggerRiverConfigFile = (String) in.readObject();
 			} else {
@@ -214,7 +217,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
             }
             AceLog.getAppLog().info("changeSetRoot: " + changeSetRoot);
-            if (changeSetRoot.equals("profiles/users/null")) {
+            if (changeSetRoot.equals(new File("profiles/users/null"))) {
                 changeSetRoot = new File("profiles" + File.separator + username + File.separator + "changesets");
                 AceLog.getAppLog().info("changeSetRoot: " + changeSetRoot);
            }
@@ -473,7 +476,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		String[] nameParts = getChangeSetWriterFileName().split("#");
 		  int sequence = Integer.parseInt(nameParts[1]);
 		  sequence++;
-		  setChangeSetWriterFileName(nameParts[0] + '#' + sequence + "#" + UUID.randomUUID() + ".jcs");
+		  setChangeSetWriterFileName(getUsername() + '#' + sequence + "#" + UUID.randomUUID() + ".jcs");
 	}
 
     public File getChangeSetRoot() {

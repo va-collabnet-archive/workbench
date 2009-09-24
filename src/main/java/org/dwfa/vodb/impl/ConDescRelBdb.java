@@ -25,6 +25,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 
+import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -1592,6 +1593,64 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 	}
 
+	public void searchConcepts(I_TrackContinuation tracker, IntList matches,
+			CountDownLatch conceptLatch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config) throws DatabaseException, IOException {
+
+		Stopwatch timer = null;
+		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+			timer = new Stopwatch();
+			timer.start();
+		}
+		Iterator<I_GetConceptData> conItr = getConceptIterator();
+		Semaphore checkSemaphore = new Semaphore(15);
+		while (conItr.hasNext()) {
+			I_GetConceptData concept = conItr.next();
+			if (tracker.continueWork()) {
+				List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
+				CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
+				for (I_DescriptionVersioned descV: descriptions) {
+					try {
+						checkSemaphore.acquire();
+					} catch (InterruptedException e) {
+						AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
+								e);
+					}
+					IntList intListMatches = null;
+					// Semaphore checkSemaphore, IntList matches,
+					ACE.threadPool.execute(new CheckAndProcessSearchTest(
+							checkSemaphore, intListMatches, concept, checkList, config));
+				}
+				try {
+					descriptionLatch.await();
+				} catch (InterruptedException e) {
+					AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+				}
+				conceptLatch.countDown();
+			} else {
+				while (conceptLatch.getCount() > 0) {
+					conceptLatch.countDown();
+				}
+				break;
+			}
+		}
+		try {
+			conceptLatch.await();
+		} catch (InterruptedException e) {
+			AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+		}
+		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+			if (tracker.continueWork()) {
+				AceLog.getAppLog().info(
+						"Search 2 time: " + timer.getElapsedTime());
+			} else {
+				AceLog.getAppLog().info(
+						"Canceled. Elapsed time: " + timer.getElapsedTime());
+			}
+			timer.stop();
+		}
+	}
+
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
 			Collection<I_DescriptionVersioned> matches, CountDownLatch conceptLatch,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
@@ -1971,6 +2030,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	public int getConceptCount() throws DatabaseException {
 		return (int) conDescRelDb.count();
 	}
+
 
 	
 }

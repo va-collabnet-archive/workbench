@@ -12,9 +12,12 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -27,7 +30,6 @@ import java.util.jar.JarFile;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.JarExtractor;
-import org.dwfa.vodb.types.Path;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -106,13 +108,25 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 			Date releaseDate = dateFormat.parse(releaseDir.getName());
 
 			addReleaseDate(releaseDate);
+			
+			Comparator<File> fileComparator = new Comparator<File>() {
+				
+				public int compare(File o1, File o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			};
 
+			SortedSet<File> sortedFiles = new TreeSet<File>();
 			for (File contentFile : releaseDir.listFiles(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
 					return name.endsWith(".txt")
 							&& (name.equals("ids.txt") == false);
 				}
 			})) {
+				sortedFiles.add(contentFile);
+			}
+			
+			for (File contentFile : sortedFiles) {
 
 			    int lineCount = countLines(contentFile);
 				getLog().info("Content file: " + contentFile.getName() + " has lines: " + lineCount);
@@ -121,7 +135,6 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
 				FileReader fr = new FileReader(contentFile);
 				BufferedReader br = new BufferedReader(fr);
-
 
 
 				if (contentFile.getName().startsWith("concepts")) {

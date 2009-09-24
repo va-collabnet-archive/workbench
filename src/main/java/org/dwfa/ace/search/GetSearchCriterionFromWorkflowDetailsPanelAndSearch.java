@@ -1,16 +1,19 @@
-package org.dwfa.ace.task.wfdetailsSheet;
+package org.dwfa.ace.search;
 
-import java.awt.GridLayout;
+import java.awt.Component;
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.grant.GrantPanel;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.path.SelectPositionSetPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -20,30 +23,34 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.vodb.VodbEnv;
+import org.dwfa.vodb.VodbFixedServer;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
-public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
+public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+	private static final int dataVersion = 2;
 
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	private String commitProfilePropName = ProcessAttachmentKeys.COMMIT_PROFILE.getAttachmentKey();
+	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	
-	private transient Exception ex = null;
-
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
-		out.writeObject(commitProfilePropName);
+		out.writeObject(positionSetPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
+		if (objDataVersion <= dataVersion) {
 			profilePropName = (String) in.readObject();
-			commitProfilePropName = (String) in.readObject();
+			if (objDataVersion >= 2) {
+				positionSetPropName = (String) in.readObject();
+			} else {
+				positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -65,48 +72,27 @@ public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
 		try {
-			ex = null;
-			if (SwingUtilities.isEventDispatchThread()) {
-				doRun(process, worker);
-			} else {
-				SwingUtilities.invokeAndWait(new Runnable() {
-
-					public void run() {
-						doRun(process, worker); 
-					}
-
-				});
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
+			for (Component c: workflowDetailsSheet.getComponents()) {
+				if (DifferenceSearchPanel.class.isAssignableFrom(c.getClass())) {
+					DifferenceSearchPanel dsp = (DifferenceSearchPanel) c;
+					dsp.getCriterion();
+					//AceConfig.getVodb().searchRegex(tracker, p, matches, latch, checkList, config)
+					
+					return Condition.CONTINUE;
+				}
 			}
-		} catch (InterruptedException e) {
-			throw new TaskFailedException(e);
 		} catch (InvocationTargetException e) {
 			throw new TaskFailedException(e);
 		} catch (IllegalArgumentException e) {
 			throw new TaskFailedException(e);
+		} catch (IntrospectionException e) {
+			throw new TaskFailedException(e);
+		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
 		} 
-		if (ex != null) {
-			throw new TaskFailedException(ex);
-		}
-		return Condition.CONTINUE;
-	}
-
-	private void doRun(final I_EncodeBusinessProcess process,
-			final I_Work worker) {
-		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-			I_ConfigAceFrame commitConfig = (I_ConfigAceFrame) process.readProperty(commitProfilePropName);
-			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
-			clear.setProfilePropName(getProfilePropName());
-			clear.evaluate(process, worker);
-			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-	        int width = 400;
-	        int height = 500;
-	        workflowDetailsSheet.setSize(width, height);
-	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-			workflowDetailsSheet.add(new GrantPanel(config, commitConfig));
-		} catch (Exception e) {
-			ex = e;
-		}
+		throw new TaskFailedException("Could not find: DifferenceSearchPanel");
 	}
 
 
@@ -126,11 +112,12 @@ public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
 		return AbstractTask.CONTINUE_CONDITION;
 	}
 
-	public String getCommitProfilePropName() {
-		return commitProfilePropName;
+	public String getPositionSetPropName() {
+		return positionSetPropName;
 	}
 
-	public void setCommitProfilePropName(String commitProfilePropName) {
-		this.commitProfilePropName = commitProfilePropName;
+	public void setPositionSetPropName(String positionSetPropName) {
+		this.positionSetPropName = positionSetPropName;
 	}
+
 }

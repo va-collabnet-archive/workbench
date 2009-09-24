@@ -117,7 +117,15 @@ public class CriterionPanel extends JPanel {
 
     private JComboBox criterionCombo;
 
-    public CriterionPanel(SearchPanel searchPanel, I_TestSearchResults beanToSet) throws ClassNotFoundException,
+    public CriterionPanel(I_MakeCriterionPanel searchPanel, 
+    		I_TestSearchResults beanToSet) throws ClassNotFoundException,
+            InstantiationException, IllegalAccessException {
+    	this(searchPanel, beanToSet, new ArrayList<I_TestSearchResults>());
+    	
+    }
+
+    public CriterionPanel(I_MakeCriterionPanel searchPanel, 
+    		I_TestSearchResults beanToSet, List<I_TestSearchResults> criterionOptions) throws ClassNotFoundException,
             InstantiationException, IllegalAccessException {
         super(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -144,7 +152,7 @@ public class CriterionPanel extends JPanel {
 
         gbc.gridx++;
 
-        setupCriterionOptions();
+        setupCriterionOptions(criterionOptions);
 
         criterionCombo = new JComboBox(comboItems.toArray()) {
 			/**
@@ -212,38 +220,40 @@ public class CriterionPanel extends JPanel {
         add(editorPanel, gbc);
     }
 
-    public CriterionPanel(SearchPanel searchPanel) throws ClassNotFoundException, InstantiationException,
+    public CriterionPanel(I_MakeCriterionPanel searchPanel) throws ClassNotFoundException, InstantiationException,
             IllegalAccessException {
         this(searchPanel, null);
     }
 
     @SuppressWarnings("unchecked")
-    private void setupCriterionOptions() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private void setupCriterionOptions(List<I_TestSearchResults> criterionOptions) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         File searchPluginFolder = new File("search");
-        criterionOptions = new ArrayList<I_TestSearchResults>();
-        File[] searchPlugins = searchPluginFolder.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".task");
+        this.criterionOptions = new ArrayList<I_TestSearchResults>();
+        if (criterionOptions == null || criterionOptions.size() == 0) {
+            File[] searchPlugins = searchPluginFolder.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".task");
+                }
+            });
+            if (searchPlugins != null) {
+    	        for (File plugin : searchPlugins) {
+    	            try {
+    	                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(plugin)));
+    	                Object pluginObj = ois.readObject();
+    	                ois.close();
+    	                if (I_TestSearchResults.class.isAssignableFrom(pluginObj.getClass())) {
+    	                    criterionOptions.add((I_TestSearchResults) pluginObj);
+    	                }
+    	            } catch (IOException ex) {
+    	                AceLog.getAppLog().alertAndLogException(ex);
+    	            } catch (ClassNotFoundException ex) {
+    	                AceLog.getAppLog().alertAndLogException(ex);
+    	            }
+    	        }
+            } else {
+            	AceLog.getAppLog().alertAndLogException(this, new Exception("No search plugins in folder: " 
+            			+ searchPluginFolder.getAbsolutePath()));
             }
-        });
-        if (searchPlugins != null) {
-	        for (File plugin : searchPlugins) {
-	            try {
-	                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(plugin)));
-	                Object pluginObj = ois.readObject();
-	                ois.close();
-	                if (I_TestSearchResults.class.isAssignableFrom(pluginObj.getClass())) {
-	                    criterionOptions.add((I_TestSearchResults) pluginObj);
-	                }
-	            } catch (IOException ex) {
-	                AceLog.getAppLog().alertAndLogException(ex);
-	            } catch (ClassNotFoundException ex) {
-	                AceLog.getAppLog().alertAndLogException(ex);
-	            }
-	        }
-        } else {
-        	AceLog.getAppLog().alertAndLogException(this, new Exception("No search plugins in folder: " 
-        			+ searchPluginFolder.getAbsolutePath()));
         }
         for (I_TestSearchResults bean : criterionOptions) {
         	try {

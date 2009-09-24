@@ -1,6 +1,5 @@
 package org.dwfa.ace.task.wfdetailsSheet;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -10,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.grant.GrantPanel;
+import org.dwfa.ace.search.DifferenceSearchPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -22,7 +21,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
-public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
+public class SetWorkflowDetailsSheetToCriterionPanel extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
 	private static final int dataVersion = 1;
@@ -94,21 +93,19 @@ public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
 			final I_Work worker) {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-			I_ConfigAceFrame commitConfig = (I_ConfigAceFrame) process.readProperty(commitProfilePropName);
 			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
 			clear.setProfilePropName(getProfilePropName());
 			clear.evaluate(process, worker);
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-	        int width = 400;
-	        int height = 500;
+	        int width = 750;
+	        int height = 150;
 	        workflowDetailsSheet.setSize(width, height);
-	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-			workflowDetailsSheet.add(new GrantPanel(config, commitConfig));
+
+			workflowDetailsSheet.add(new DifferenceSearchPanel(config));
 		} catch (Exception e) {
 			ex = e;
 		}
 	}
-
 
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
@@ -133,4 +130,5 @@ public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
 	public void setCommitProfilePropName(String commitProfilePropName) {
 		this.commitProfilePropName = commitProfilePropName;
 	}
+
 }

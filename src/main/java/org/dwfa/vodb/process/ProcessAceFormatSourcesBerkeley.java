@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -32,6 +33,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_MapIds;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
@@ -359,7 +361,14 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
                 // rel ok
             } else {
-                 throw new Exception("Duplicate rels with different c1 and c2 for: " + relID);
+           	 I_GetConceptData c1 = ConceptBean.get(c1id);
+        	 I_GetConceptData c2 = ConceptBean.get(c2id);
+        	 I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
+            	 
+                 throw new Exception("Duplicate rels with different c1 and c2 for: " + relID +
+                		 " c1: " + c1 +
+                		 "\n c2: " + c2 +
+                		 "\n c3: " + c3);
             }
         } else {
             vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map

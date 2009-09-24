@@ -14,6 +14,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.DatabaseSetupConfig;
@@ -947,5 +948,12 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 
 	public int getConceptCount() throws DatabaseException {
 		return conAttBdb.getConceptCount();
+	}
+
+	public void searchConcepts(I_TrackContinuation tracker, IntList matches,
+			CountDownLatch latch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config) throws DatabaseException, IOException,
+			ParseException {
+		conAttBdb.searchConcepts(tracker, matches, latch, checkList, config);
 	}
 }

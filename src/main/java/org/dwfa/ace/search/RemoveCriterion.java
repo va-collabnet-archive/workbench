@@ -13,17 +13,17 @@ public class RemoveCriterion implements ActionListener {
     /**
      * 
      */
-    private final SearchPanel searchPanel;
+    private final I_MakeCriterionPanel searchPanel;
     JPanel criterionPanel;
 
-    RemoveCriterion(SearchPanel searchPanel, JPanel criterionPanel) {
+    RemoveCriterion(I_MakeCriterionPanel searchPanel, JPanel criterionPanel) {
         super();
         this.searchPanel = searchPanel;
         this.criterionPanel = criterionPanel;
     }
 
     public void actionPerformed(ActionEvent e) {
-        this.searchPanel.criterionPanels.remove(criterionPanel);
+        this.searchPanel.getCriterionPanels().remove(criterionPanel);
         this.searchPanel.layoutCriterion();
     }
 
