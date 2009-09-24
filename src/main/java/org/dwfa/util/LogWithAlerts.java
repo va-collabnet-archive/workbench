@@ -62,6 +62,8 @@ public class LogWithAlerts {
 			      	getLogger().log(Level.SEVERE, message, e);
 		          }
 			}
+		} else {
+			getLogger().log(level, message, ex);
 		}
 	}
 
