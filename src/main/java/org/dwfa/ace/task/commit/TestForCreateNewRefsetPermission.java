@@ -56,6 +56,10 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             throws TaskFailedException {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
+            if (true) {
+                return alertList;
+            }
+
             termFactory = LocalVersionedTerminology.get();
             configFrame = termFactory.getActiveAceFrameConfig();
             configDb = configFrame.getDbConfig();
@@ -63,15 +67,21 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
 
             activeUser = configDb.getUserConcept();
             if (activeUser == null || activeUser.equals(userTopHierarchy)) {
+                System.out.println("************ : " + activeUser);
                 return alertList;
                 // activeUser = userTopHierarchy;
             }
+            System.out.println("************************: " + activeUser);
 
             // check if this concept is a child of the refset identity concept -
             // if it isn't, then there is no alert
             I_GetConceptData refsetIdentity = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
             if (!refsetIdentity.isParentOf(concept, true)) {
+
+                System.out.println(concept + " IS NOT A CHILD OF " + refsetIdentity);
                 return alertList;
+            } else {
+                System.out.println(concept + " IS A CHILD OF " + refsetIdentity);
             }
 
             // two types of permissions to check - first are permissions
@@ -104,6 +114,9 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             if (!foundMatch) {
                 alertList.add(new AlertToDataConstraintFailure(alertType,
                     "<html>User does not have permission to create<br>a new refset in this hierarchy.", concept));
+                System.out.println("User doesn't have permission ____________");
+            } else {
+                System.out.println("user has permission !!!!!!!!!!!!");
             }
 
             return alertList;

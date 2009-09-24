@@ -160,6 +160,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
                         try {
                             I_GetConceptData owner =
                                     termFactory.getActiveAceFrameConfig().getDbConfig().getUserConcept();
+                            System.out.println(">>>>>>>>>>>>>>>>>>>>owner: " + owner.getInitialText());
                             if (owner == null) {
                                 RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
                                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
