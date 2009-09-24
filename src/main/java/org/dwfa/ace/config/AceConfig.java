@@ -122,6 +122,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
+		if (username == null || username.equals("null")) {
+			username = aceFrames.get(0).getUsername();
+		}
 		out.writeObject(username);
 		out.writeObject(null); //for historic password...
 		out.writeObject(dbFolder);
@@ -152,7 +155,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             newEx.initCause(e);
             throw newEx;
 		}
-
 	}
 
 	private static final String authFailureMsg = "Username and password do not match.";
@@ -208,9 +210,15 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                    changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
                 }
             } else {
-                changeSetRoot = new File("profiles" + File.separator + username);
+                changeSetRoot = new File("profiles" + File.separator + username + File.separator + "changesets");
                 changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
             }
+            AceLog.getAppLog().info("changeSetRoot: " + changeSetRoot);
+            if (changeSetRoot.equals("profiles/users/null")) {
+                changeSetRoot = new File("profiles" + File.separator + username + File.separator + "changesets");
+                AceLog.getAppLog().info("changeSetRoot: " + changeSetRoot);
+           }
+            AceLog.getAppLog().info("username: " + username);
             if (objDataVersion >= 6) {
             	queueFolders = (Collection<String>) in.readObject();
             } else {
@@ -242,6 +250,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
+		AceLog.getAppLog().info("changeSetWriterFileName: " + changeSetWriterFileName);
+        renameChangeSetFile();
+		AceLog.getAppLog().info("changeSetWriterFileName: " + changeSetWriterFileName);
+
 		this.vetoSupport = new VetoableChangeSupport(this);
 		this.changeSupport = new PropertyChangeSupport(this);
 	}
@@ -413,7 +425,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 					+ UUID.randomUUID().toString() + ".jcs");
 		}
 		
-        this.changeSetRoot = new File("profiles" + File.separator + username);
+        this.changeSetRoot = new File("profiles" + File.separator + username + File.separator + "changesets");
 		this.changeSupport.firePropertyChange("username", old, username);
 	}
 
@@ -445,12 +457,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         if (changeSetFile.exists()) {
            int maxSize = 512000;
            if (changeSetFile.length() > maxSize) {
-              String[] nameParts = getChangeSetWriterFileName().split("#");
-              int sequence = Integer.parseInt(nameParts[1]);
-              sequence++;
-              setChangeSetWriterFileName(nameParts[0] + '#' + sequence + "#" + nameParts[2]);
-              AceLog.getAppLog().info("change set exceeds " + maxSize + 
-                    " bytes. Incrementing file to: " + getChangeSetWriterFileName());
+              renameChangeSetFile();
+    		  AceLog.getAppLog().info("change set exceeds " + maxSize + 
+    			        " bytes. Incrementing file to: " + getChangeSetWriterFileName());
            }
         }
         FileOutputStream fos = new FileOutputStream(profileFile);
@@ -459,6 +468,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         oos.writeObject(this);
         oos.close();
     }
+
+	private void renameChangeSetFile() {
+		String[] nameParts = getChangeSetWriterFileName().split("#");
+		  int sequence = Integer.parseInt(nameParts[1]);
+		  sequence++;
+		  setChangeSetWriterFileName(nameParts[0] + '#' + sequence + "#" + UUID.randomUUID() + ".jcs");
+	}
 
     public File getChangeSetRoot() {
         return changeSetRoot;
