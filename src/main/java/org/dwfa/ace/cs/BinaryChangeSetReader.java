@@ -110,6 +110,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
 	public long nextCommitTime() throws IOException, ClassNotFoundException {
 		lazyInit();
+        ACE.commitSequence++;
 		if (nextCommit == null) {
 			try {
 				nextCommit = ois.readLong();

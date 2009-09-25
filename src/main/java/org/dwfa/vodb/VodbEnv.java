@@ -637,6 +637,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public void writeRel(I_RelVersioned rel) throws IOException {
+        ACE.commitSequence++;
         try {
             bdbEnv.writeRel(rel);
         } catch (DatabaseException e) {
@@ -831,6 +832,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             throw new TerminologyException(
                 "<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
         }
+        ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
         int relId =
                 uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
@@ -866,6 +868,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException {
         canEdit(aceFrameConfig);
+        ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
         int relId =
@@ -1402,6 +1405,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             int pathNid, int version, int relStatusNid, int relTypeNid, int relCharacteristicNid,
             int relRefinabilityNid, int relGroup) throws TerminologyException, IOException {
 
+        ACE.commitSequence++;
         int relId = nativeGenerationForUuid(relUuid, uuidType, pathNid, version);
         ThinRelVersioned rel = new ThinRelVersioned(relId, conceptNid, relDestinationNid, 1);
         ThinRelPart part = new ThinRelPart();
@@ -1418,6 +1422,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public I_RelVersioned newRelationshipBypassCommit(int relNid, int conceptNid, int relDestinationNid)
             throws IOException {
+        ACE.commitSequence++;
         return new ThinRelVersioned(relNid, conceptNid, relDestinationNid, 1);
     }
 
@@ -1806,4 +1811,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
         return false;
     }
+
+	public void searchConcepts(I_TrackContinuation tracker,
+			org.apache.commons.collections.primitives.IntList matches,
+			CountDownLatch latch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config) throws DatabaseException, IOException,
+			ParseException {
+		bdbEnv.searchConcepts(tracker, matches, latch, checkList, config);
+	}
+    
+    
 }

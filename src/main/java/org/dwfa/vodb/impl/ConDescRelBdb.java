@@ -833,8 +833,11 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 						int c2Id = ti.readInt();
 						int versionCount = ti.readShort();
 						if (versionCount < 0) {
-							throw new IOException("Negative rel version count: " + versionCount + 
-									" for concept: \n\n"+ conceptBean);
+							throw new IOException(
+									"Negative rel version count: "
+											+ versionCount
+											+ " for concept: \n\n"
+											+ conceptBean);
 						}
 						ThinRelVersioned relv = new ThinRelVersioned(relId,
 								conceptNid, c2Id, versionCount);
@@ -863,8 +866,11 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 						int descId = ti.readInt();
 						int versionCount = ti.readShort();
 						if (versionCount < 0) {
-							throw new IOException("Negative desc version count: " + versionCount + 
-									" for concept: \n\n"+ conceptBean);
+							throw new IOException(
+									"Negative desc version count: "
+											+ versionCount
+											+ " for concept: \n\n"
+											+ conceptBean);
 						}
 						ThinDescVersioned descV = new ThinDescVersioned(descId,
 								conceptNid, versionCount);
@@ -916,13 +922,18 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							to.writeInt(rel.getRelId());
 							to.writeInt(rel.getC2Id());
 							if (rel.versionCount() >= Short.MAX_VALUE) {
-								AceLog.getAppLog().warning("Relationship has " + rel.versionCount() + 
-										" versions: \n\n" + conceptBean);
+								AceLog.getAppLog().warning(
+										"Relationship has "
+												+ rel.versionCount()
+												+ " versions: \n\n"
+												+ conceptBean);
 							}
 							to.writeShort(rel.versionCount());
 							for (I_RelPart part : rel.getVersions()) {
 								try {
-									to.writeShort(relPartBdb.getRelPartId(part));
+									to
+											.writeShort(relPartBdb
+													.getRelPartId(part));
 								} catch (DatabaseException e) {
 									throw new RuntimeException(e);
 								}
@@ -932,7 +943,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					if (conceptBean.getRelOrigins() == null) {
 						to.writeInt(0);
 					} else {
-						to.writeInt(conceptBean.getRelOrigins()
+						to
+								.writeInt(conceptBean.getRelOrigins()
 										.getSetValues().length);
 						for (int i : conceptBean.getRelOrigins().getSetValues()) {
 							to.writeInt(i);
@@ -943,15 +955,19 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					} else {
 						int descSize = conceptBean.getDescriptions().size();
 						if (descSize >= Short.MAX_VALUE) {
-							AceLog.getAppLog().warning("Concept has " + descSize + 
-									" descriptions: \n\n" + conceptBean);
+							AceLog.getAppLog().warning(
+									"Concept has " + descSize
+											+ " descriptions: \n\n"
+											+ conceptBean);
 						}
 						to.writeShort(descSize);
 						for (I_DescriptionVersioned desc : conceptBean.descriptions) {
 							to.writeInt(desc.getDescId());
 							if (desc.versionCount() >= Short.MAX_VALUE) {
-								AceLog.getAppLog().warning("Description has " + descSize + 
-										" versions: \n\n" + conceptBean);
+								AceLog.getAppLog().warning(
+										"Description has " + descSize
+												+ " versions: \n\n"
+												+ conceptBean);
 							}
 							to.writeShort(desc.versionCount());
 							for (I_DescriptionPart part : desc.getVersions()) {
@@ -1459,10 +1475,15 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
 		Hits saHits = luceneSearcher.search(q);
 		if (saHits.length() > 0) {
-			AceLog.getAppLog().info("StandardAnalyzer query returned " + saHits.length() + " hits");
+			AceLog.getAppLog().info(
+					"StandardAnalyzer query returned " + saHits.length()
+							+ " hits");
 			return saHits;
 		}
-		AceLog.getAppLog().info("StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
+		AceLog
+				.getAppLog()
+				.info(
+						"StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
 		q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);
 		return luceneSearcher.search(q);
 	}
@@ -1516,19 +1537,20 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				+ concId);
 	}
 
-
 	public CountDownLatch searchLucene(I_TrackContinuation tracker,
 			String query, Collection<LuceneMatch> matches,
 			CountDownLatch latch, List<I_TestSearchResults> checkList,
 			I_ConfigAceFrame config, LuceneProgressUpdator updater)
 			throws DatabaseException, IOException, ParseException {
-		Stopwatch timer = new Stopwatch();;
+		Stopwatch timer = new Stopwatch();
+		;
 		timer.start();
 		try {
 			Query q = new QueryParser("desc", new StandardAnalyzer())
-				.parse(query);
+					.parse(query);
 			if (luceneDir.exists() == false) {
-				updater.setProgressInfo("Making lucene index -- this may take a while...");
+				updater
+						.setProgressInfo("Making lucene index -- this may take a while...");
 				createLuceneDescriptionIndex();
 			}
 			updater.setIndeterminate(true);
@@ -1536,23 +1558,30 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				updater.setProgressInfo("Opening search index...");
 				luceneSearcher = new IndexSearcher(luceneDir.getAbsolutePath());
 			}
-			updater.setProgressInfo("Starting StandardAnalyzer lucene query...");
+			updater
+					.setProgressInfo("Starting StandardAnalyzer lucene query...");
 			long startTime = System.currentTimeMillis();
 			updater.setProgressInfo("Query complete in "
 					+ Long.toString(System.currentTimeMillis() - startTime)
 					+ " ms.");
 			Hits hits = luceneSearcher.search(q);
-			
+
 			if (hits.length() > 0) {
-				AceLog.getAppLog().info("StandardAnalyzer query returned " + hits.length() + " hits");
+				AceLog.getAppLog().info(
+						"StandardAnalyzer query returned " + hits.length()
+								+ " hits");
 			} else {
-				updater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
-				AceLog.getAppLog().info("StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
-				q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);
+				updater
+						.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
+				AceLog
+						.getAppLog()
+						.info(
+								"StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
+				q = new QueryParser("desc", new WhitespaceAnalyzer())
+						.parse(query);
 				hits = luceneSearcher.search(q);
 			}
 
-			
 			updater.setProgressInfo("Query complete in "
 					+ Long.toString(System.currentTimeMillis() - startTime)
 					+ " ms. Hits: " + hits.length());
@@ -1595,7 +1624,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 	public void searchConcepts(I_TrackContinuation tracker, IntList matches,
 			CountDownLatch conceptLatch, List<I_TestSearchResults> checkList,
-			I_ConfigAceFrame config) throws DatabaseException, IOException {
+			I_ConfigAceFrame config) throws IOException {
 
 		Stopwatch timer = null;
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
@@ -1607,25 +1636,17 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		while (conItr.hasNext()) {
 			I_GetConceptData concept = conItr.next();
 			if (tracker.continueWork()) {
-				List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
-				CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
-				for (I_DescriptionVersioned descV: descriptions) {
-					try {
-						checkSemaphore.acquire();
-					} catch (InterruptedException e) {
-						AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
-								e);
-					}
-					IntList intListMatches = null;
-					// Semaphore checkSemaphore, IntList matches,
-					ACE.threadPool.execute(new CheckAndProcessSearchTest(
-							checkSemaphore, intListMatches, concept, checkList, config));
-				}
 				try {
-					descriptionLatch.await();
+					checkSemaphore.acquire();
 				} catch (InterruptedException e) {
-					AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+					AceLog.getAppLog().log(Level.WARNING,
+							e.getLocalizedMessage(), e);
 				}
+				IntList intListMatches = null;
+				// Semaphore checkSemaphore, IntList matches,
+				ACE.threadPool.execute(new CheckAndProcessSearchTest(
+						checkSemaphore, intListMatches, concept, checkList,
+						config));
 				conceptLatch.countDown();
 			} else {
 				while (conceptLatch.getCount() > 0) {
@@ -1652,9 +1673,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
-			Collection<I_DescriptionVersioned> matches, CountDownLatch conceptLatch,
-			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
-			throws DatabaseException, IOException {
+			Collection<I_DescriptionVersioned> matches,
+			CountDownLatch conceptLatch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config) throws DatabaseException, IOException {
 		Stopwatch timer = null;
 		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
 			timer = new Stopwatch();
@@ -1665,22 +1686,26 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		while (conItr.hasNext()) {
 			I_GetConceptData concept = conItr.next();
 			if (tracker.continueWork()) {
-				List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
-				CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
-				for (I_DescriptionVersioned descV: descriptions) {
+				List<I_DescriptionVersioned> descriptions = concept
+						.getDescriptions();
+				CountDownLatch descriptionLatch = new CountDownLatch(
+						descriptions.size());
+				for (I_DescriptionVersioned descV : descriptions) {
 					try {
 						checkSemaphore.acquire();
 					} catch (InterruptedException e) {
-						AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(),
-								e);
+						AceLog.getAppLog().log(Level.WARNING,
+								e.getLocalizedMessage(), e);
 					}
-					ACE.threadPool.execute(new CheckAndProcessRegexMatch(descriptionLatch,
-							checkSemaphore, p, matches, descV, checkList, config));
+					ACE.threadPool.execute(new CheckAndProcessRegexMatch(
+							descriptionLatch, checkSemaphore, p, matches,
+							descV, checkList, config));
 				}
 				try {
 					descriptionLatch.await();
 				} catch (InterruptedException e) {
-					AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+					AceLog.getAppLog().log(Level.WARNING,
+							e.getLocalizedMessage(), e);
 				}
 				conceptLatch.countDown();
 			} else {
@@ -2031,6 +2056,4 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		return (int) conDescRelDb.count();
 	}
 
-
-	
 }

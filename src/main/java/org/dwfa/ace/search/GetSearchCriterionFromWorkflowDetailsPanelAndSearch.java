@@ -6,14 +6,16 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JPanel;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
+import org.apache.commons.collections.primitives.IntList;
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.path.SelectPositionSetPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -23,11 +25,11 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.dwfa.vodb.VodbEnv;
-import org.dwfa.vodb.VodbFixedServer;
+
+import com.sleepycat.je.DatabaseException;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
-public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends AbstractTask {
+public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends AbstractTask implements I_TrackContinuation {
 	private static final long serialVersionUID = 1;
 
 	private static final int dataVersion = 2;
@@ -69,17 +71,21 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
 	 */
-	public Condition evaluate(final I_EncodeBusinessProcess process,
-			final I_Work worker) throws TaskFailedException {
+	public Condition evaluate(I_EncodeBusinessProcess process,
+			I_Work worker) throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			for (Component c: workflowDetailsSheet.getComponents()) {
 				if (DifferenceSearchPanel.class.isAssignableFrom(c.getClass())) {
 					DifferenceSearchPanel dsp = (DifferenceSearchPanel) c;
-					dsp.getCriterion();
-					//AceConfig.getVodb().searchRegex(tracker, p, matches, latch, checkList, config)
-					
+					IntList matches = new ArrayIntList();
+					CountDownLatch conceptLatch = new CountDownLatch(LocalVersionedTerminology.get().getConceptCount());
+					AceConfig.getVodb().searchConcepts((I_TrackContinuation) this, matches,
+							conceptLatch, dsp.getCriterion(),
+							config);
+					conceptLatch.await();
+					worker.getLogger().info("Search found: " + matches.size() + " matches.");
 					return Condition.CONTINUE;
 				}
 			}
@@ -90,6 +96,14 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 		} catch (IntrospectionException e) {
 			throw new TaskFailedException(e);
 		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
+		} catch (DatabaseException e) {
+			throw new TaskFailedException(e);
+		} catch (IOException e) {
+			throw new TaskFailedException(e);
+		} catch (ParseException e) {
+			throw new TaskFailedException(e);
+		} catch (InterruptedException e) {
 			throw new TaskFailedException(e);
 		} 
 		throw new TaskFailedException("Could not find: DifferenceSearchPanel");
@@ -118,6 +132,10 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 
 	public void setPositionSetPropName(String positionSetPropName) {
 		this.positionSetPropName = positionSetPropName;
+	}
+
+	public boolean continueWork() {
+		return true;
 	}
 
 }
