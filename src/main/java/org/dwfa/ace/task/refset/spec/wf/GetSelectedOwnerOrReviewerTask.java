@@ -94,8 +94,12 @@ public class GetSelectedOwnerOrReviewerTask extends AbstractTask {
                     }
 
                     process.setProperty(nextUserTermEntryPropName, inboxAddress);
-                    process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { userConcept
-                        .getUids().iterator().next() });
+                    // process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
+                    // new UUID[] { userConcept
+                    // .getUids().iterator().next() });
+
+                    process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(),
+                        new UUID[] { userConcept.getUids().iterator().next() });
 
                     return Condition.ITEM_COMPLETE;
                 }
