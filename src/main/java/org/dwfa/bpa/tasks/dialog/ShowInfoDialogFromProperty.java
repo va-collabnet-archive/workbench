@@ -71,6 +71,7 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
             throws TaskFailedException {
 		try {
 			String msg = (String) process.readProperty(messagePropertyName);
+			msg = process.substituteProperties(msg);
 			JFrame parentFrame = null;
 			for (JFrame frame: OpenFrames.getFrames()) {
 				if (frame.isActive()) {
