@@ -278,7 +278,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 						if (active) {
 							try {
 								I_DescriptionTuple desc = getDescription(row);
-								ACE.addUncommitted(ConceptBean.get(desc.getConceptId()));
+								if (desc != null) {
+									ACE.addUncommitted(ConceptBean.get(desc.getConceptId()));
+								}
 							} catch (IOException e) {
 								AceLog.getAppLog().alertAndLogException(e);
 							}
