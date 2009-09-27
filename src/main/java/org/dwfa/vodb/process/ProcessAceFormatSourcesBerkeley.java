@@ -365,8 +365,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         	 I_GetConceptData c2 = ConceptBean.get(c2id);
         	 I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
             	 
-                 throw new Exception("Duplicate rels with different c1 and c2 for: " + relID +
-                		 " c1: " + c1 +
+                 throw new Exception("Duplicate rels with different c1 and c2:\n relId: " + relID +
+                		 "\n c1: " + c1 +
                 		 "\n c2: " + c2 +
                 		 "\n c3: " + c3);
             }

@@ -224,14 +224,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			boolean addUncommitted) throws IOException {
 
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-		if (getConceptAttributes() != null) {
-			getConceptAttributes().addTuples(allowedStatus, positionSet,
+		getConceptAttributes().addTuples(allowedStatus, positionSet,
 					returnTuples, addUncommitted);
-		} 
-		if (addUncommitted && getUncommittedConceptAttributes() != null) {
-			getUncommittedConceptAttributes().addTuples(allowedStatus, positionSet,
-					returnTuples, addUncommitted);
-		}
 		return returnTuples;
 	}
 	
@@ -239,16 +233,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			I_IntSet allowedStatus, Set<I_Position> positionSet,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-		if (getConceptAttributes() != null) {
-			getConceptAttributes().addTuples(allowedStatus, positionSet,
+		getConceptAttributes().addTuples(allowedStatus, positionSet,
 					returnTuples, addUncommitted, returnConflictResolvedLatestState);
-		}
-		if (addUncommitted) {
-			if (getUncommittedConceptAttributes() != null) {
-				getUncommittedConceptAttributes().addTuples(allowedStatus, positionSet,
-						returnTuples, addUncommitted, returnConflictResolvedLatestState);
-			}
-		}
 		return returnTuples;
 	}
 	
@@ -1464,6 +1450,10 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			}
 		}
 		return null;
+	}
+
+	public static void purge() {
+		cbeans = new HashMap<Integer, Reference<ConceptBean>>();
 	}
 
 }

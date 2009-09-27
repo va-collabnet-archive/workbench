@@ -1642,10 +1642,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					AceLog.getAppLog().log(Level.WARNING,
 							e.getLocalizedMessage(), e);
 				}
-				IntList intListMatches = null;
 				// Semaphore checkSemaphore, IntList matches,
 				ACE.threadPool.execute(new CheckAndProcessSearchTest(
-						checkSemaphore, intListMatches, concept, checkList,
+						checkSemaphore, matches, concept, checkList,
 						config));
 				conceptLatch.countDown();
 			} else {

@@ -309,6 +309,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         try {
             bdbEnv.close();
             closed = true;
+            ConceptBean.purge();
+            ExtensionByReferenceBean.purge();
+            LocalVersionedTerminology.close(this);
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }

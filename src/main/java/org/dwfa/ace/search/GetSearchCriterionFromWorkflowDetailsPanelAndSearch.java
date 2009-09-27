@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JPanel;
@@ -14,6 +15,7 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -71,19 +73,25 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
 	 */
+	@SuppressWarnings("unchecked")
 	public Condition evaluate(I_EncodeBusinessProcess process,
 			I_Work worker) throws TaskFailedException {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			Set<I_Position> positionSet = (Set<I_Position>) process.readProperty(getPositionSetPropName());
+			worker.getLogger().info("Position set for search: " + positionSet);
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			for (Component c: workflowDetailsSheet.getComponents()) {
 				if (DifferenceSearchPanel.class.isAssignableFrom(c.getClass())) {
 					DifferenceSearchPanel dsp = (DifferenceSearchPanel) c;
 					IntList matches = new ArrayIntList();
+					
 					CountDownLatch conceptLatch = new CountDownLatch(LocalVersionedTerminology.get().getConceptCount());
+					I_ConfigAceFrame differenceSearchConfig = new DifferenceSearchConfig(config,
+							positionSet);
 					AceConfig.getVodb().searchConcepts((I_TrackContinuation) this, matches,
 							conceptLatch, dsp.getCriterion(),
-							config);
+							differenceSearchConfig);
 					conceptLatch.await();
 					worker.getLogger().info("Search found: " + matches.size() + " matches.");
 					return Condition.CONTINUE;

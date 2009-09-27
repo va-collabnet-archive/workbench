@@ -38,6 +38,11 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	private static HashMap<Integer, Reference<ExtensionByReferenceBean>> ebrBeans = new HashMap<Integer, Reference<ExtensionByReferenceBean>>();
 
 	private static HashSet<ExtensionByReferenceBean> newExtensions = new HashSet<ExtensionByReferenceBean>();
+	
+	public static void purge() {
+		ebrBeans = new HashMap<Integer, Reference<ExtensionByReferenceBean>>();
+		newExtensions = new HashSet<ExtensionByReferenceBean>();
+	}
 
 	private ExtensionByReferenceBean(int memberId) {
 		super();

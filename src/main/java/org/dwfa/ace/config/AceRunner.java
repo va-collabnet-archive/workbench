@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Properties;
@@ -38,7 +37,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
-import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.queue.QueueServer;
@@ -95,10 +93,10 @@ public class AceRunner {
 
 	public AceRunner(String[] args, LifeCycle lc) {
 		try {
+		    AceProtocols.setupExtraProtocols();
+
 			AceRunner.args = args;
 			AceRunner.lc = lc;
-
-			setupCustomProtocolHandler();
 
 			AceLog.getAppLog().info(
 					"\n*******************\n" + "\n Starting "
@@ -564,13 +562,6 @@ public class AceRunner {
 			argsStr = Arrays.asList(args).toString();
 		}
 		return argsStr;
-	}
-
-	private void setupCustomProtocolHandler() {
-		AceLog.getAppLog().info(
-				"java.protocol.handler.pkgs: "
-						+ System.getProperty("java.protocol.handler.pkgs"));
-		URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
 	}
 
 	private void setupDatabase(AceConfig aceConfig, File configFileFile)
