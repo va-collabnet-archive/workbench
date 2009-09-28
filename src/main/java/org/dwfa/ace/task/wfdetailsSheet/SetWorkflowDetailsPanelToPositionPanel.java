@@ -96,8 +96,8 @@ public class SetWorkflowDetailsPanelToPositionPanel extends AbstractTask {
 			clear.setProfilePropName(getProfilePropName());
 			clear.evaluate(process, worker);
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-	        int width = 400;
-	        int height = 600;
+	        int width = 475;
+	        int height = 625;
 	        workflowDetailsSheet.setSize(width, height);
 	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
 			workflowDetailsSheet.add(new SelectPositionSetPanel(config));
