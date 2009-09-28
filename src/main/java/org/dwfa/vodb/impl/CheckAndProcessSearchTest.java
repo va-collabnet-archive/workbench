@@ -24,6 +24,8 @@ public class CheckAndProcessSearchTest implements Runnable {
 
 	Semaphore checkSemaphore;
 
+	Semaphore addSemaphore = new Semaphore(1);
+
 	public CheckAndProcessSearchTest(Semaphore checkSemaphore, IntList matches,
 			I_GetConceptData conceptToTest,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
@@ -37,7 +39,13 @@ public class CheckAndProcessSearchTest implements Runnable {
 
 	public void run() {
 		if (checkList == null || checkList.size() == 0) {
-			matches.add(conceptToTest.getConceptId());
+			try {
+				addSemaphore.acquire();
+				matches.add(conceptToTest.getConceptId());
+				addSemaphore.release();
+			} catch (InterruptedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		} else {
 			try {
 				boolean failed = false;
@@ -49,7 +57,9 @@ public class CheckAndProcessSearchTest implements Runnable {
 				}
 
 				if (failed == false) {
+					addSemaphore.acquire();
 					matches.add(conceptToTest.getConceptId());
+					addSemaphore.release();
 				}
 			} catch (TaskFailedException e) {
 				if (ACE.editMode) {
@@ -58,6 +68,8 @@ public class CheckAndProcessSearchTest implements Runnable {
 					AceLog.getAppLog().log(Level.SEVERE,
 							e.getLocalizedMessage(), e);
 				}
+			} catch (InterruptedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 		checkSemaphore.release();
