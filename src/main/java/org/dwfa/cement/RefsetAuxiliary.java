@@ -22,7 +22,8 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
-	public enum Concept implements I_ConceptualizeUniversally {
+	public enum Concept 
+	implements I_ConceptEnumeration,I_ConceptualizeUniversally {
 		REFSET_AUXILIARY(new String[] { "Refset Auxiliary Concept", "Refset Auxiliary Concept"}),
 			REFSET_SPEC(new String[] { "refset specification concept", "refset spec"}, REFSET_AUXILIARY),
             	SPEC_GROUPING(new String[] { "Refset specification grouping", "Refset specification grouping"}, REFSET_SPEC),
@@ -443,6 +444,17 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		private UniversalFixedRel[] rels;
 
 		private UniversalFixedDescription[] descriptions;
+		
+		public String[] parents_S;
+		public String[] descriptions_S;
+		
+		public String[] getParents_S(){
+			return parents_S;
+		}
+		
+		public String[] getDescriptions_S(){
+			return descriptions_S;
+		}
 
       private Concept(String[] descriptions) {
          this(descriptions, new I_ConceptualizeUniversally[] { });
@@ -452,6 +464,17 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
       }
 		private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
 			this.conceptUids.add(Type3UuidFactory.fromEnum(this));
+            if(parents.length > 0){	
+                parents_S = new String[parents.length];
+                for(int i=0;i<parents.length ; i++)
+                {
+                  parents_S[i] = parents[i].toString();
+                }
+                }
+                if(descriptionStrings.length > 0){
+                	descriptions_S = descriptionStrings;
+                }
+			
 			try {
 				this.rels = DocumentAuxiliary.makeRels(this, parents);
 				this.descriptions = DocumentAuxiliary.makeDescriptions(this, descriptionStrings, descTypeOrder);
