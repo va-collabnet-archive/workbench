@@ -14,9 +14,12 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -280,20 +283,30 @@ public class AceRunner {
 			}
 
 			// Startup other queues here...
+			List<String> queuesToRemove = new ArrayList<String>();
 			for (String queue : AceConfig.config.getQueues()) {
 				File queueFile = new File(queue);
-				AceLog.getAppLog().info(
-						"Found queue: "
-								+ queueFile.toURI().toURL().toExternalForm());
-				if (QueueServer.started(queueFile)) {
+				if (queueFile.exists()) {
 					AceLog.getAppLog().info(
-							"Queue already started: "
-									+ queueFile.toURI().toURL()
-											.toExternalForm());
+							"Found queue: "
+									+ queueFile.toURI().toURL().toExternalForm());
+					if (QueueServer.started(queueFile)) {
+						AceLog.getAppLog().info(
+								"Queue already started: "
+										+ queueFile.toURI().toURL()
+												.toExternalForm());
+					} else {
+						new QueueServer(
+								new String[] { queueFile.getCanonicalPath() }, lc);
+					}
 				} else {
-					new QueueServer(
-							new String[] { queueFile.getCanonicalPath() }, lc);
+					queuesToRemove.add(queue);
 				}
+			}
+			if (queuesToRemove.size() > 0) {
+				AceConfig.config.getQueues().removeAll(queuesToRemove);
+				AceLog.getAppLog().alertAndLog(Level.WARNING, "Removing queues that are not accessable: " + queuesToRemove, 
+						new Exception("Removing queues that are not accessable: " + queuesToRemove));
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
