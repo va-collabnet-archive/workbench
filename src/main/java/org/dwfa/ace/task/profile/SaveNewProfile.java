@@ -147,6 +147,12 @@ public class SaveNewProfile extends AbstractTask {
 			oos.writeObject(newDbProfile);
 			oos.close();
 
+            File startupFolder = new File(userDir, "startup");
+            startupFolder.mkdirs();
+            
+            File shutdownFolder = new File(userDir, "shutdown");
+            shutdownFolder.mkdirs();
+
 			// Depending on bundle type, synchronize with subversion...
 			switch (bundleType) {
 			case CHANGE_SET_UPDATE:
