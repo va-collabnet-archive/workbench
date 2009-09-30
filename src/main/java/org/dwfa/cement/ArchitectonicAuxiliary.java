@@ -54,7 +54,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     }
 
 
-    public enum Concept implements I_ConceptualizeUniversally {
+    public enum Concept implements I_ConceptEnumeration,I_ConceptualizeUniversally {
 
         ARCHITECTONIC_ROOT_CONCEPT("Terminology Auxiliary concept", getArchitectonicText(),
             new I_ConceptualizeUniversally[] { }),
@@ -603,6 +603,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ID_SOURCE });
        ;
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        
+        public String[] parents_S;
+        public String[] descriptions_S;
 
         private Boolean primitive = true;
 
@@ -613,6 +616,14 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         private static PrimordialId[] descTypeOrder;
 
         private I_ConceptualizeLocally local;
+        
+		public String[] getParents_S(){
+			return parents_S;
+		}
+		
+		public String[] getDescriptions_S(){
+			return descriptions_S;
+		}  
 
       private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
          this(new String[] {descriptionString}, null, parents);
@@ -639,6 +650,18 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             			descriptionStrings = newDescriptionStrings;
             		}
             	}
+            if(parents.length > 0){	
+            parents_S = new String[parents.length];
+            for(int i=0;i<parents.length ; i++)
+            {
+              parents_S[i] = parents[i].toString();
+            }
+            }
+            if(descriptionStrings.length > 0){
+            	descriptions_S = descriptionStrings;
+            }
+
+            
 
                 this.rels = makeRels(this, parents);
                 this.descriptions = makeDescriptions(this, descriptionStrings, defString);

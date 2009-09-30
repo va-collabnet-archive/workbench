@@ -21,7 +21,7 @@ import org.dwfa.tapi.impl.UniversalFixedRel;
 import org.dwfa.util.id.Type3UuidFactory;
 
 public class QueueType implements I_AddToMemoryTermServer {
-	public enum Concept implements I_ConceptualizeUniversally {
+	public enum Concept implements I_ConceptEnumeration,I_ConceptualizeUniversally {
 		QUEUE_TYPE("Queue Type"),
 			AGING_QUEUE("aging queue", QUEUE_TYPE),
 			ARCHIVAL_QUEUE("archival queue", QUEUE_TYPE),
@@ -41,6 +41,17 @@ public class QueueType implements I_AddToMemoryTermServer {
 		
 		private UniversalFixedDescription[] descriptions;
 		
+		public String[] parents_S;
+		public String[] descriptions_S;
+		
+		public String[] getParents_S(){
+			return parents_S;
+		}
+		
+		public String[] getDescriptions_S(){
+			return descriptions_S;
+		}
+		
 		private Concept(String descriptionString) {
 			this(new String[] { descriptionString }, new I_ConceptualizeUniversally[] { });
 		}
@@ -49,6 +60,17 @@ public class QueueType implements I_AddToMemoryTermServer {
 		}
 		private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
 			this.conceptUids.add(Type3UuidFactory.fromEnum(this)); 
+			if(parents.length > 0){	
+                parents_S = new String[parents.length];
+                for(int i=0;i<parents.length ; i++)
+                {
+                  parents_S[i] = parents[i].toString();
+                }
+                }
+                if(descriptionStrings.length > 0){
+                	descriptions_S = descriptionStrings;
+                }
+                
 			try {
 				this.rels = DocumentAuxiliary.makeRels(this, parents);
 				this.descriptions = DocumentAuxiliary.makeDescriptions(this, descriptionStrings, descTypeOrder);
