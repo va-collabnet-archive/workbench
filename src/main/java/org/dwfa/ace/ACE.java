@@ -2089,6 +2089,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:", aceFrameConfig
             .getLanguagePreferenceList())), gbc);
+        
+        gbc.gridy++;
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getShortLabelDescPreferenceList().getListValues()) {
             shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
