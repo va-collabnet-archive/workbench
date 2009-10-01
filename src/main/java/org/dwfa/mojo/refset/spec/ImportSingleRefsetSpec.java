@@ -66,7 +66,7 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
         }
 
         try {
-            reportFile.mkdirs();
+            reportFile.getParentFile().mkdirs();
             TupleFileUtil tupleImporter = new TupleFileUtil();
             UUID uuid = null;
             if (editPathDescriptor != null) {
