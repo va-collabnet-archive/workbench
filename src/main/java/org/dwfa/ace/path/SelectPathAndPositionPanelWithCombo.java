@@ -7,9 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -58,8 +61,16 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 		
 		gbc.gridx++;
 		gbc.weightx = 1;
-		pathCombo = new JComboBox(LocalVersionedTerminology.get().getPaths().toArray());
-		if (aceConfig.getEditingPathSet().size() > 0) {
+		
+		SortedSet<I_Path> sortedPaths = new TreeSet<I_Path>(new Comparator<I_Path>() {
+			public int compare(I_Path o1, I_Path o2) {
+				return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
+			}
+		});
+		
+		sortedPaths.addAll(LocalVersionedTerminology.get().getPaths());
+		pathCombo = new JComboBox(sortedPaths.toArray());
+		if (sortedPaths.size() > 0) {
 			pathCombo.setSelectedItem(aceConfig.getEditingPathSet().iterator().next());
 		}
 		pathCombo.addActionListener(this);
