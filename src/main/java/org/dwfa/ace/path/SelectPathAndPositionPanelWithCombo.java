@@ -29,7 +29,7 @@ import org.dwfa.tapi.TerminologyException;
 
 public class SelectPathAndPositionPanelWithCombo extends JPanel implements ActionListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel positionPanelContainer;
@@ -41,7 +41,7 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 	private PositionPanel currentPositionPanel;
 	private I_Path currentPath;
 
-	public SelectPathAndPositionPanelWithCombo(boolean selectPositionOnly, String purpose, 
+	public SelectPathAndPositionPanelWithCombo(boolean selectPositionOnly, String purpose,
 			I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws Exception {
 		super(new GridBagLayout());
 		this.selectPositionOnly = selectPositionOnly;
@@ -58,24 +58,30 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 		gbc.weightx = 0;
 		gbc.weighty = 0;
 		add(new JLabel(" path:"), gbc);
-		
+
 		gbc.gridx++;
 		gbc.weightx = 1;
-		
+
 		SortedSet<I_Path> sortedPaths = new TreeSet<I_Path>(new Comparator<I_Path>() {
 			public int compare(I_Path o1, I_Path o2) {
 				return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
 			}
 		});
-		
+
 		sortedPaths.addAll(LocalVersionedTerminology.get().getPaths());
-		pathCombo = new JComboBox(sortedPaths.toArray());
-		if (sortedPaths.size() > 0) {
-			pathCombo.setSelectedItem(aceConfig.getEditingPathSet().iterator().next());
-		}
+        pathCombo = new JComboBox(sortedPaths.toArray());
+        if (sortedPaths.size() > 0) {
+            if (aceConfig.getEditingPathSet().iterator().hasNext()) {
+                pathCombo.setSelectedItem(aceConfig.getEditingPathSet().iterator().next());
+            } else {
+                pathCombo.setSelectedIndex(0);
+            }
+        }
+
+
 		pathCombo.addActionListener(this);
 		add(pathCombo, gbc);
-		
+
 		gbc.gridy++;
 		gbc.gridx = 0;
 		gbc.weighty = 1;
@@ -105,13 +111,13 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 			if (currentPositionPanel != null) {
 				positionPanelContainer.remove(currentPositionPanel);
 				if (currentPositionPanel.isPositionSelected()) {
-					positionMap.put(currentPath, 
+					positionMap.put(currentPath,
 							currentPositionPanel.getPosition());
 				} else {
 					positionMap.remove(currentPath);
 				}
 				positionPanelContainer.setLayout(new GridLayout(1,1));
-				
+
 			}
 			PositionPanel pp;
 			if (positionMap.containsKey(path)) {
@@ -121,7 +127,7 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 				pp = new PositionPanel(path, selectPositionOnly,
 						purpose, path.toString(), aceConfig, selectGlue);
 			}
-			
+
 			positionPanelContainer.add(pp);
 			currentPositionPanel = pp;
 			pp.setPositionCheckBoxVisible(positionCheckBoxVisible);
@@ -130,13 +136,13 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 			AceLog.getAppLog().alertAndLogException(ex);
 		}
 	}
-	
+
 	private Map<I_Path, I_Position> positionMap = new HashMap<I_Path, I_Position>();
 	private boolean positionCheckBoxVisible = true;
-	
+
 	public Collection<I_Position> getSelectedPositions() throws TerminologyException, IOException {
 		if (currentPositionPanel.isPositionSelected()) {
-			positionMap.put(currentPath, 
+			positionMap.put(currentPath,
 					currentPositionPanel.getPosition());
 		} else {
 			positionMap.remove(currentPath);
