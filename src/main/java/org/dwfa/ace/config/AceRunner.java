@@ -305,7 +305,16 @@ public class AceRunner {
 			}
 			if (queuesToRemove.size() > 0) {
 				AceConfig.config.getQueues().removeAll(queuesToRemove);
-				AceLog.getAppLog().alertAndLog(Level.WARNING, "Removing queues that are not accessable: " + queuesToRemove, 
+				StringBuffer buff = new StringBuffer();
+				buff.append("<html><body>Removing queues that are not accessible: <br>");
+				for (String queue: queuesToRemove) {
+					buff.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+					buff.append(queue);
+					buff.append("<br>");
+				}
+				buff.append("</body></html>");
+				
+				AceLog.getAppLog().alertAndLog(Level.WARNING, buff.toString(), 
 						new Exception("Removing queues that are not accessable: " + queuesToRemove));
 			}
 		} catch (Exception e) {

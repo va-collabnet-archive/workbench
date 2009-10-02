@@ -1633,6 +1633,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 		Iterator<I_GetConceptData> conItr = getConceptIterator();
 		Semaphore checkSemaphore = new Semaphore(15);
+		Semaphore addSemaphore = new Semaphore(1);
 		while (conItr.hasNext()) {
 			I_GetConceptData concept = conItr.next();
 			if (tracker.continueWork()) {
@@ -1644,8 +1645,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 				}
 				// Semaphore checkSemaphore, IntList matches,
 				ACE.threadPool.execute(new CheckAndProcessSearchTest(
-						checkSemaphore, matches, concept, checkList,
-						config));
+						checkSemaphore, addSemaphore, matches, concept, 
+						checkList, config));
 				conceptLatch.countDown();
 			} else {
 				while (conceptLatch.getCount() > 0) {

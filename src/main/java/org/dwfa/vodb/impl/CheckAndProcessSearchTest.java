@@ -24,9 +24,9 @@ public class CheckAndProcessSearchTest implements Runnable {
 
 	Semaphore checkSemaphore;
 
-	Semaphore addSemaphore = new Semaphore(1);
+	Semaphore addSemaphore;
 
-	public CheckAndProcessSearchTest(Semaphore checkSemaphore, IntList matches,
+	public CheckAndProcessSearchTest(Semaphore checkSemaphore, Semaphore addSemaphore, IntList matches,
 			I_GetConceptData conceptToTest,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
 		super();
@@ -35,6 +35,7 @@ public class CheckAndProcessSearchTest implements Runnable {
 		this.checkList = checkList;
 		this.config = config;
 		this.checkSemaphore = checkSemaphore;
+		this.addSemaphore = addSemaphore;
 	}
 
 	public void run() {
