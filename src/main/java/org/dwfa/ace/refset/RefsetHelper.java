@@ -1,5 +1,7 @@
 package org.dwfa.ace.refset;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +28,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.AllowDataCheckSuppression;
+import org.dwfa.util.id.Type5UuidFactory;
 
 @AllowDataCheckSuppression
 public class RefsetHelper {
@@ -300,9 +303,17 @@ public class RefsetHelper {
         // create a new extension (with a part for each path the user is
         // editing)
 
+        // generate a UUID based on this refset's input data so that it is
+        // stable in future executions
+        UUID memberUuid =
+                generateUuid(termFactory.getUids(refsetId).iterator().next(), termFactory.getUids(conceptId).iterator()
+                    .next(), termFactory.getUids(memberTypeId).iterator().next());
+        if (memberUuid == null) {
+            memberUuid = UUID.randomUUID();
+        }
+
         int newMemberId =
-                termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, getEditPaths(),
-                    Integer.MAX_VALUE);
+                termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, getEditPaths(), Integer.MAX_VALUE);
 
         I_ThinExtByRefVersioned newExtension =
                 termFactory.newExtensionNoChecks(refsetId, newMemberId, conceptId, conceptTypeId);
@@ -321,6 +332,19 @@ public class RefsetHelper {
 
         termFactory.addUncommittedNoChecks(newExtension);
         return true;
+    }
+
+    private UUID generateUuid(UUID uuid, UUID uuid2, UUID uuid3) {
+        try {
+            UUID intermediateUuid = Type5UuidFactory.get(uuid, uuid2.toString());
+            return Type5UuidFactory.get(intermediateUuid, uuid3.toString());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean newConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, UUID memberUuid,
