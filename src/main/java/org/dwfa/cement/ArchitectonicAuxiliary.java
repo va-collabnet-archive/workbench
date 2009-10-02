@@ -343,6 +343,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_SAME_AS_REL("is same as (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_ANALOG("is an analog of (relationship type)",
+                             new I_ConceptualizeUniversally[] { RELATIONSHIP }),         
             IS_ALIAS_OF("is alias of (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             DUP_REL_TYPE("dup rel type (terminology constant)",
