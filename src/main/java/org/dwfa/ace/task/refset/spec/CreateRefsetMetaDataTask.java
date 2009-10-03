@@ -148,6 +148,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                     termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_REVIEWER.getUids());
             I_GetConceptData refsetOwnerRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OWNER.getUids());
             I_GetConceptData refsetEditorRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_EDITOR.getUids());
+            I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+            I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
 
             // check that the name isn't null or empty etc
             if (name == null || name.trim().equals("")) {
@@ -207,8 +209,13 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 newRelationship(memberRefset, refsetReviewerRel, reviewer);
             }
 
+            newRelationship(memberRefset, promotionRel, promotionRefset);
+            newRelationship(memberRefset, commentsRel, commentsRefset);
+
             process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), memberRefset.getUids().iterator()
                 .next());
+            process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids()
+                .iterator().next());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -237,7 +244,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             // edit the existing part's status
             I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
-            newConcept.getConceptAttributes();
+
             int index = v.getVersions().size() - 1;
             I_ConceptAttributePart part;
             if (index >= 0) {

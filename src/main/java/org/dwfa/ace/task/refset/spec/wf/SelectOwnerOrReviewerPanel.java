@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
@@ -64,7 +65,12 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
 
         this.setLayout(new GridBagLayout());
         int y = 0;
-        if (reviewerUuids.length == 0) {
+        HashSet<UUID> uniqueReviewerUuids = new HashSet<UUID>();
+        for (UUID reviewerUuid : reviewerUuids) {
+            uniqueReviewerUuids.add(reviewerUuid);
+        }
+        uniqueReviewerUuids.remove(owner.getUids().iterator().next());
+        if (uniqueReviewerUuids.size() == 0) {
             setSelectedUser(new TermEntry(owner.getUids()));
         } else {
             options = new ButtonGroup();
@@ -74,13 +80,16 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
             options.add(ownerOption);
             userMap.put(owner.getInitialText(), owner);
 
-            for (UUID reviewerUuid : reviewerUuids) {
+            for (UUID reviewerUuid : uniqueReviewerUuids) {
                 I_GetConceptData reviewer = termFactory.getConcept(new UUID[] { reviewerUuid });
                 JRadioButton option = new JRadioButton("Reviewer: " + reviewer.getInitialText());
                 option.setActionCommand(reviewer.getInitialText());
                 option.addActionListener(this);
                 options.add(option);
                 userMap.put(reviewer.getInitialText(), reviewer);
+
+                option.setSelected(true);
+                setSelectedUser(new TermEntry(reviewerUuid));
             }
 
             Enumeration<AbstractButton> buttons = options.getElements();
@@ -110,8 +119,12 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
                 y++;
             }
         }
-
-        JLabel commentsLabel = new JLabel("Comments for workflow recipient:");
+        JLabel commentsLabel;
+        if (uniqueReviewerUuids.size() == 0) {
+            commentsLabel = new JLabel("Comments for the owner (" + owner.getInitialText() + "):");
+        } else {
+            commentsLabel = new JLabel("Comments for workflow recipient:");
+        }
         commentsTextField = new JTextField(30);
 
         y++;

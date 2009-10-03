@@ -29,9 +29,6 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
-    private I_TermFactory termFactory;
-    private I_ConfigAceDb configDb;
-    private I_ConfigAceFrame configFrame;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -52,9 +49,9 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
-            termFactory = LocalVersionedTerminology.get();
-            configFrame = termFactory.getActiveAceFrameConfig();
-            configDb = configFrame.getDbConfig();
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_ConfigAceFrame configFrame = termFactory.getActiveAceFrameConfig();
+            I_ConfigAceDb configDb = configFrame.getDbConfig();
             I_GetConceptData userTopHierarchy = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
             I_GetConceptData activeUser = configDb.getUserConcept();
@@ -108,7 +105,8 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         }
     }
 
-    private Set<I_GetConceptData> getValidRefsetsFromRolePermissions(I_GetConceptData concept) throws Exception {
+    public Set<I_GetConceptData> getValidRefsetsFromRolePermissions(I_GetConceptData concept) throws Exception {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
         Set<I_GetConceptData> refsets = new HashSet<I_GetConceptData>();
 
         Set<I_Position> allPositions = getPositions(termFactory);
@@ -154,8 +152,9 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         return refsets;
     }
 
-    private Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
+    public Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
             throws Exception {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
         Set<I_Position> allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
         I_GetConceptData createNewRefsetPermissionRel =

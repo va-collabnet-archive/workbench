@@ -58,15 +58,13 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     private I_ConfigAceFrame configFrame;
     private I_TermFactory termFactory;
 
-    private boolean useMonitor = false;
     private boolean cancelComputation = false;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             // Nothing to do
@@ -75,35 +73,27 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            configFrame = (I_ConfigAceFrame) worker
-                    .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-                            .name());
+            configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             long startTime = new Date().getTime();
             termFactory = LocalVersionedTerminology.get();
-            I_GetConceptData normalMemberConcept = termFactory
-                    .getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
+            I_GetConceptData normalMemberConcept =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
             int conceptsToProcess = termFactory.getConceptCount();
-            Iterator<I_GetConceptData> conceptIterator = termFactory
-                    .getConceptIterator();
+            Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
             int conceptsProcessed = 0;
             I_GetConceptData currentConcept;
-            List<UUID> markedParentsUuid = Arrays
-                    .asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE
-                            .getUuids());
+            List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
             Set<Integer> newMembers = new HashSet<Integer>();
             Set<Integer> retiredMembers = new HashSet<Integer>();
 
             // initialise the progress panel
-            I_ShowActivity computeRefsetActivityPanel = termFactory
-                    .newActivityPanel(true);
+            I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(true);
             computeRefsetActivityPanel.setMaximum(conceptsToProcess);
             computeRefsetActivityPanel.setStringPainted(true);
             computeRefsetActivityPanel.setValue(0);
@@ -113,26 +103,22 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             progressReportHtmlGenerator.setStartTime(startTime);
 
             // verify a refset spec has been set in the refset spec editor panel
-            I_GetConceptData refsetSpec = configFrame
-                    .getRefsetSpecInSpecEditor();
+            I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
             if (refsetSpec == null) {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.complete();
-                computeRefsetActivityPanel
-                        .setProgressInfoLower("Refset spec is null.");
+                computeRefsetActivityPanel.setProgressInfoLower("Refset spec is null.");
                 throw new TaskFailedException("Refset spec is null.");
             }
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             if (refset == null) {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.complete();
-                computeRefsetActivityPanel
-                        .setProgressInfoLower("Refset is null.");
+                computeRefsetActivityPanel.setProgressInfoLower("Refset is null.");
                 throw new TaskFailedException("Refset is null.");
             }
 
-            computeRefsetActivityPanel.setProgressInfoUpper("Computing refset "
-                    + ": " + refset.getInitialText());
+            computeRefsetActivityPanel.setProgressInfoUpper("Computing refset " + ": " + refset.getInitialText());
 
             // set up cancel button on activity viewer panel
             GridBagConstraints c = new GridBagConstraints();
@@ -150,57 +136,46 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
             cancelButton.addActionListener(new ButtonListener(this));
 
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
             // Step 1: create the query object, based on the refset spec
-            RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame,
-                    termFactory, refsetSpec, refset);
-            MemberRefsetHelper memberRefsetHelper = new MemberRefsetHelper(
-                    refset.getConceptId(), normalMemberConcept.getConceptId());
+            RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
+            MemberRefsetHelper memberRefsetHelper =
+                    new MemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
             // check validity of query
             if (query.getTotalStatementCount() == 0) {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.complete();
-                computeRefsetActivityPanel
-                        .setProgressInfoLower("Refset spec is empty - skipping execution.");
-                throw new TaskFailedException(
-                        "Refset spec is empty - skipping execution.");
+                computeRefsetActivityPanel.setProgressInfoLower("Refset spec is empty - skipping execution.");
+                throw new TaskFailedException("Refset spec is empty - skipping execution.");
             }
             if (!query.isValidQuery()) {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.complete();
                 computeRefsetActivityPanel
-                        .setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
-                throw new TaskFailedException(
-                        "Refset spec has dangling AND/OR. These must have sub-statements.");
+                    .setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
+                throw new TaskFailedException("Refset spec has dangling AND/OR. These must have sub-statements.");
             }
 
             progressReportHtmlGenerator.setStep1Complete(true);
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
-            getLogger().info(
-                    "Start execution of refset spec : "
-                            + refsetSpec.getInitialText());
+            getLogger().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 
             // create a list of all the current refset members (this requires
             // filtering out retired versions)
-            List<I_ThinExtByRefVersioned> allRefsetMembers = termFactory
-                    .getRefsetExtensionMembers(refset.getConceptId());
-            HashSet<Integer> currentRefsetMemberIds = filterNonCurrentRefsetMembers(
-                    allRefsetMembers, memberRefsetHelper,
-                    refset.getConceptId(), normalMemberConcept.getConceptId());
+            List<I_ThinExtByRefVersioned> allRefsetMembers =
+                    termFactory.getRefsetExtensionMembers(refset.getConceptId());
+            HashSet<Integer> currentRefsetMemberIds =
+                    filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
+                        normalMemberConcept.getConceptId());
 
             while (conceptIterator.hasNext()) {
                 currentConcept = conceptIterator.next();
                 conceptsProcessed++;
 
-                boolean containsCurrentMember = currentRefsetMemberIds
-                        .contains(currentConcept.getConceptId());
+                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
                 if (query.execute(currentConcept)) {
                     if (!containsCurrentMember) {
                         newMembers.add(currentConcept.getConceptId());
@@ -212,13 +187,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 }
 
                 if (conceptsProcessed % 10000 == 0) {
-                    progressReportHtmlGenerator.setNewMembersCount(newMembers
-                            .size());
-                    progressReportHtmlGenerator
-                            .setToBeRetiredMembersCount(retiredMembers.size());
-                    computeRefsetActivityPanel
-                            .setProgressInfoLower(progressReportHtmlGenerator
-                                    .toString());
+                    progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                    progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                    computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
                     computeRefsetActivityPanel.setValue(conceptsProcessed);
                 }
 
@@ -228,9 +199,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
 
             progressReportHtmlGenerator.setStep2Complete(true);
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
             computeRefsetActivityPanel.setIndeterminate(true);
             computeRefsetActivityPanel.setStringPainted(false);
 
@@ -240,52 +209,44 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 cancelButton.setVisible(false);
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.complete();
-                computeRefsetActivityPanel
-                        .setProgressInfoLower("User cancelled.");
-                throw new TaskFailedException(
-                        "User cancelled refset computation.");
+                computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+                throw new TaskFailedException("User cancelled refset computation.");
             }
 
             // Step 3 : create new member refsets
             for (Integer memberId : newMembers) {
-                memberRefsetHelper.newRefsetExtension(
-                    refset.getConceptId(), memberId, normalMemberConcept.getConceptId(), false);
+                memberRefsetHelper.newRefsetExtension(refset.getConceptId(), memberId, normalMemberConcept
+                    .getConceptId(), false);
                 if (cancelComputation) {
                     break;
                 }
             }
             progressReportHtmlGenerator.setStep3Complete(true);
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
             // Step 4: retire old member refsets
             for (Integer retiredMemberId : retiredMembers) {
-                memberRefsetHelper.retireRefsetExtension(refset.getConceptId(),
-                        retiredMemberId, normalMemberConcept.getConceptId());
+                memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId, normalMemberConcept
+                    .getConceptId());
                 if (cancelComputation) {
                     break;
                 }
             }
             progressReportHtmlGenerator.setStep4Complete(true);
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
             // Step 5 : add / remove marked parent refsets
             if (termFactory.hasId(markedParentsUuid)) {
 
                 for (Integer newMember : newMembers) {
-                    memberRefsetHelper
-                            .addMarkedParents(new Integer[] { newMember });
+                    memberRefsetHelper.addMarkedParents(new Integer[] { newMember });
                     if (cancelComputation) {
                         break;
                     }
                 }
 
                 for (Integer retiredMember : retiredMembers) {
-                    memberRefsetHelper
-                            .removeMarkedParents(new Integer[] { retiredMember });
+                    memberRefsetHelper.removeMarkedParents(new Integer[] { retiredMember });
                     if (cancelComputation) {
                         break;
                     }
@@ -302,26 +263,17 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                  */
             }
             progressReportHtmlGenerator.setStep5Complete(true);
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
-            getLogger().info(
-                    "Number of new refset members: " + newMembers.size());
-            getLogger().info(
-                    "Total number of concepts processed: " + conceptsProcessed);
-            getLogger().info(
-                    "End execution of refset spec : "
-                            + refsetSpec.getInitialText());
+            getLogger().info("Number of new refset members: " + newMembers.size());
+            getLogger().info("Total number of concepts processed: " + conceptsProcessed);
+            getLogger().info("End execution of refset spec : " + refsetSpec.getInitialText());
 
             progressReportHtmlGenerator.setMembersCount(newMembers.size());
-            progressReportHtmlGenerator
-                    .setNonMembersCleanedCount(retiredMembers.size());
+            progressReportHtmlGenerator.setNonMembersCleanedCount(retiredMembers.size());
             progressReportHtmlGenerator.setEndTime(new Date().getTime());
             progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel
-                    .setProgressInfoLower(progressReportHtmlGenerator
-                            .toString());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
             computeRefsetActivityPanel.complete();
             cancelButton.setEnabled(false);
             cancelButton.setVisible(false);
@@ -329,10 +281,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             if (cancelComputation) {
                 termFactory.cancel();
                 progressReportHtmlGenerator.setComplete(true);
-                computeRefsetActivityPanel
-                        .setProgressInfoLower("User cancelled.");
-                throw new TaskFailedException(
-                        "User cancelled refset computation.");
+                computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+                throw new TaskFailedException("User cancelled refset computation.");
             }
 
             return Condition.CONTINUE;
@@ -370,15 +320,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         }
     }
 
-    private HashSet<Integer> filterNonCurrentRefsetMembers(
-            List<I_ThinExtByRefVersioned> list,
-            MemberRefsetHelper refsetHelper, int refsetId, int memberTypeId)
-            throws Exception {
+    private HashSet<Integer> filterNonCurrentRefsetMembers(List<I_ThinExtByRefVersioned> list,
+            MemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
 
         HashSet<Integer> newList = new HashSet<Integer>();
         for (I_ThinExtByRefVersioned v : list) {
-            if (refsetHelper.hasCurrentRefsetExtension(refsetId, v
-                    .getComponentId(), memberTypeId)) {
+            if (refsetHelper.hasCurrentRefsetExtension(refsetId, v.getComponentId(), memberTypeId)) {
                 newList.add(v.getComponentId());
             }
         }

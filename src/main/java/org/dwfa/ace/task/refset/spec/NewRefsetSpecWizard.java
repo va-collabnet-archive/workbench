@@ -140,6 +140,10 @@ public class NewRefsetSpecWizard {
         return panels.get(currentPanel);
     }
 
+    public JPanel getPanelFromString(String str) {
+        return panels.get(str);
+    }
+
     class ButtonListener implements ActionListener {
 
         public ButtonListener() {
@@ -160,24 +164,36 @@ public class NewRefsetSpecWizard {
         private void nextButtonPressed() {
             if (currentPanel.equals("panel1")) {
                 NewRefsetSpecForm1 form1 = (NewRefsetSpecForm1) getCurrentPanel();
-                if (form1.getRefsetNameTextField() != null) {
+                if (form1.getRefsetNames().size() == 0) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "The current user does not have permission to create new refsets.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                    createData = false;
+                    wizardDialog.dispose();
+                } else if (form1.getRefsetNameTextField() == null) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset name is required.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                } else {
                     setCurrentPanel("panel2");
                     nextButton.setText("Finish");
                     nextButton.setEnabled(true);
                     backButton.setEnabled(true);
                     cancelButton.setEnabled(true);
-                } else {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset name is required.", "",
-                        JOptionPane.ERROR_MESSAGE);
                 }
             } else if (currentPanel.equals("panel2")) {
                 NewRefsetSpecForm2 form2 = (NewRefsetSpecForm2) getCurrentPanel();
-                if (form2.getDeadline() != null) {
-                    createData = true;
+                if (form2.getEditors().size() == 0) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "No editors available. These should be added using the new-user BP.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                    createData = false;
                     wizardDialog.dispose();
-                } else {
+                } else if (form2.getDeadline() == null) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Deadline is required.", "",
                         JOptionPane.ERROR_MESSAGE);
+                } else {
+                    createData = true;
+                    wizardDialog.dispose();
                 }
             }
         }

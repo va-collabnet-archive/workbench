@@ -9,6 +9,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
 
 /**
@@ -47,13 +50,18 @@ public class NewRefsetSpecForm2 extends JPanel {
     private JComboBox reviewerComboBox;
     private JButton addReviewerButton;
     private Set<String> editors;
+    private Set<String> reviewers;
+    private HashMap<String, I_GetConceptData> fsnUserMap;
+    private HashMap<String, I_GetConceptData> refsetMap;
     private Set<String> selectedReviewers;
 
     private NewRefsetSpecWizard wizard;
 
-    public NewRefsetSpecForm2(NewRefsetSpecWizard wizard, Set<String> editors) {
+    public NewRefsetSpecForm2(NewRefsetSpecWizard wizard, HashMap<String, I_GetConceptData> fsnUserMap,
+            HashMap<String, I_GetConceptData> refsetMap) {
         super();
-        this.editors = editors;
+        this.fsnUserMap = fsnUserMap;
+        this.refsetMap = refsetMap;
         selectedReviewers = new HashSet<String>();
         this.wizard = wizard;
         init();
@@ -83,9 +91,56 @@ public class NewRefsetSpecForm2 extends JPanel {
 
         // misc
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
-        editorComboBox = new JComboBox(editors.toArray());
-        reviewerComboBox = new JComboBox(editors.toArray());
         addReviewerButton = new JButton("Add reviewer");
+
+        NewRefsetSpecForm1 form1 = (NewRefsetSpecForm1) wizard.getPanelFromString("panel1");
+        String parentString = form1.getSelectedParent();
+
+        if (parentString == null) {
+            editors = fsnUserMap.keySet();
+            reviewers = fsnUserMap.keySet();
+        } else {
+            editors = getPermissibleEditors(parentString);
+            reviewers = getPermissibleReviewers(parentString);
+        }
+
+        editorComboBox = new JComboBox(editors.toArray());
+        reviewerComboBox = new JComboBox(reviewers.toArray());
+    }
+
+    private Set<String> getPermissibleEditors(String refsetString) {
+        try {
+            I_GetConceptData refset = refsetMap.get(refsetString);
+            if (refset == null) {
+                return fsnUserMap.keySet();
+            }
+            Set<String> permissibleEditors = new HashSet<String>();
+
+            for (I_GetConceptData concept : fsnUserMap.values()) {
+                TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
+                Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
+                permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(concept));
+                permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(concept));
+
+                if (permissibleRefsetParents.contains(refset)) {
+                    permissibleEditors.add(concept.getInitialText());
+                }
+            }
+            return permissibleEditors;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fsnUserMap.keySet();
+        }
+    }
+
+    private Set<String> getPermissibleReviewers(String refsetString) {
+        try {
+            // TODO implement after review data check is created
+            return fsnUserMap.keySet();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fsnUserMap.keySet();
+        }
     }
 
     private void addListeners() {
@@ -129,9 +184,16 @@ public class NewRefsetSpecForm2 extends JPanel {
         gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(editorComboBox, gridBagConstraints);
+        if (editors.size() == 0) {
+            // add a label instead that indicates no editors are available
+            JLabel noEditorAvailLabel = new JLabel("No editors available - add these using new-user BP.");
+            this.add(noEditorAvailLabel, gridBagConstraints);
+        } else {
+            this.add(editorComboBox, gridBagConstraints);
+        }
 
         // reviewer
+        int reviewerCount = 0;
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -146,42 +208,47 @@ public class NewRefsetSpecForm2 extends JPanel {
         gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(reviewerComboBox, gridBagConstraints);
+        if (reviewers.size() == 0) {
+            // add a label instead that indicates no reviewers are available
+            JLabel noReviewersAvailLabel = new JLabel("No reviewers available - add these using new-user BP.");
+            this.add(noReviewersAvailLabel, gridBagConstraints);
+        } else {
+            this.add(reviewerComboBox, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(addReviewerButton, gridBagConstraints);
-
-        int reviewerCount = 0;
-        for (String reviewer : selectedReviewers) {
-
-            JCheckBox checkBox = new JCheckBox();
-            checkBox.setSelected(true);
-            checkBox.addItemListener(new CheckBoxListener(reviewer));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 3 + reviewerCount;
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = 2;
             gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
             gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-            this.add(checkBox, gridBagConstraints);
-
-            JLabel attachmentLabel = new JLabel(reviewer);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 3 + reviewerCount;
-            gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.weightx = 0.0;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-            this.add(attachmentLabel, gridBagConstraints);
+            this.add(addReviewerButton, gridBagConstraints);
 
-            reviewerCount++;
+            for (String reviewer : selectedReviewers) {
+
+                JCheckBox checkBox = new JCheckBox();
+                checkBox.setSelected(true);
+                checkBox.addItemListener(new CheckBoxListener(reviewer));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = 3 + reviewerCount;
+                gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
+                gridBagConstraints.weighty = 0.0;
+                gridBagConstraints.weightx = 0.0;
+                gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+                this.add(checkBox, gridBagConstraints);
+
+                JLabel attachmentLabel = new JLabel(reviewer);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.gridy = 3 + reviewerCount;
+                gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
+                gridBagConstraints.weighty = 0.0;
+                gridBagConstraints.weightx = 0.0;
+                gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+                this.add(attachmentLabel, gridBagConstraints);
+
+                reviewerCount++;
+            }
         }
 
         // deadline
@@ -255,12 +322,23 @@ public class NewRefsetSpecForm2 extends JPanel {
 
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.DESELECTED) {
-                selectedReviewers.remove(reviewer);
-                layoutComponents();
-                wizard.getDialog().pack();
-                wizard.getDialog().repaint();
+                removeSelectedReviewer(reviewer);
             }
         }
+    }
+
+    public void removeSelectedReviewer(String reviewer) {
+        selectedReviewers.remove(reviewer);
+        layoutComponents();
+        wizard.getDialog().pack();
+        wizard.getDialog().repaint();
+    }
+
+    public void removeAllSelectedReviewers() {
+        selectedReviewers.clear();
+        layoutComponents();
+        wizard.getDialog().pack();
+        wizard.getDialog().repaint();
     }
 
     public String getSelectedEditor() {
@@ -292,5 +370,9 @@ public class NewRefsetSpecForm2 extends JPanel {
 
     public String getPriority() {
         return (String) priorityComboBox.getSelectedItem();
+    }
+
+    public Set<String> getEditors() {
+        return editors;
     }
 }
