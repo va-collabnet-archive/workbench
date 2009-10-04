@@ -542,10 +542,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getTaxonomyRendererOverrideList();
     }
 
-    public JPanel getTopActivityPanel() {
-        return frameConfig.getTopActivityPanel();
-    }
-
     public I_IntList getTreeDescPreferenceList() {
         return frameConfig.getTreeDescPreferenceList();
     }
@@ -620,10 +616,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public boolean isPreferencesToggleVisible() {
         return frameConfig.isPreferencesToggleVisible();
-    }
-
-    public boolean isProgressToggleVisible() {
-        return frameConfig.isProgressToggleVisible();
     }
 
     public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
@@ -862,10 +854,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setPreferencesToggleVisible(visible);
     }
 
-    public void setProgressToggleVisible(boolean visible) {
-        frameConfig.setProgressToggleVisible(visible);
-    }
-
     public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible) {
         frameConfig.setRefsetInToggleVisible(refsetType, toggle, visible);
     }
@@ -960,10 +948,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public void setTogglesInComponentPanelVisible(TOGGLES toggle, boolean visible) {
         frameConfig.setTogglesInComponentPanelVisible(toggle, visible);
-    }
-
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        frameConfig.setTopActivityPanel(ap);
     }
 
     public void setTreeTermDividerLoc(int termTreeDividerLoc) {
@@ -1147,5 +1131,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
 	public Map<Integer, Color> getPathColorMap() {
 		return frameConfig.getPathColorMap();
+	}
+
+	public I_ShowActivity getTopActivityListener() {
+		return frameConfig.getTopActivityListener();
 	}
 }

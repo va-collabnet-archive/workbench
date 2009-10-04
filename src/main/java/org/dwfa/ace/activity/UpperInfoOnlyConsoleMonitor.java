@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 
@@ -89,12 +90,12 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
         throw new UnsupportedOperationException();
     }
 
-    public JPanel getSecondaryPanel() {
+    public I_ShowActivity getSecondaryPanel() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void setSecondaryPanel(JPanel panel) {
+    public void setSecondaryPanel(I_ShowActivity panel) {
         // TODO Auto-generated method stub
 
     }
@@ -112,4 +113,29 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
         // TODO Auto-generated method stub
 
     }
+
+	public I_ConfigAceFrame getAceFrameConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getProgressInfoLower() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getProgressInfoUpper() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean isStringPainted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void syncWith(I_ShowActivity another) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -1,6 +1,7 @@
 package org.dwfa.vodb.impl;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
@@ -25,8 +26,11 @@ public class CheckAndProcessSearchTest implements Runnable {
 	Semaphore checkSemaphore;
 
 	Semaphore addSemaphore;
+	
+	CountDownLatch conceptLatch;
 
-	public CheckAndProcessSearchTest(Semaphore checkSemaphore, Semaphore addSemaphore, IntList matches,
+	public CheckAndProcessSearchTest(CountDownLatch conceptLatch, Semaphore checkSemaphore, 
+			Semaphore addSemaphore, IntList matches,
 			I_GetConceptData conceptToTest,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
 		super();
@@ -36,6 +40,7 @@ public class CheckAndProcessSearchTest implements Runnable {
 		this.config = config;
 		this.checkSemaphore = checkSemaphore;
 		this.addSemaphore = addSemaphore;
+		this.conceptLatch = conceptLatch;
 	}
 
 	public void run() {
@@ -74,6 +79,7 @@ public class CheckAndProcessSearchTest implements Runnable {
 			}
 		}
 		checkSemaphore.release();
+		conceptLatch.countDown();
 	}
 
 }

@@ -2210,10 +2210,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return aceFrame.getCdePanel().isPreferencesToggleVisible();
     }
 
-    public boolean isProgressToggleVisible() {
-        return aceFrame.getCdePanel().isProgressToggleVisible();
-    }
-
     public boolean isSubversionToggleVisible() {
         return aceFrame.getCdePanel().isSubversionToggleVisible();
     }
@@ -2281,14 +2277,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
     }
 
-    public void setProgressToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setProgressToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.TREE_PROGRESS);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.TREE_PROGRESS);
-        }
-    }
 
     public void setSubversionToggleVisible(boolean visible) {
         aceFrame.getCdePanel().setSubversionToggleVisible(visible);
@@ -2681,14 +2669,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("classifierOutputPath", old, outputPath);
     }
 
-    public JPanel getTopActivityPanel() {
-        return aceFrame.getCdePanel().getTopActivityPanel();
-    }
-
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        aceFrame.getCdePanel().setTopActivityPanel(ap);
-    }
-
     public Color getColorForPath(int pathNid) {
         return pathColorMap.get(pathNid);
     }
@@ -2893,6 +2873,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
 	public void setWorkflowDetailSheetDimensions(Dimension dim) {
 		aceFrame.getCdePanel().setWorkflowDetailSheetDimensions(dim);
+	}
+
+	public I_ShowActivity getTopActivityListener() {
+		return aceFrame.getCdePanel().getTopActivityListener();
 	}
 
 }

@@ -143,14 +143,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         this.baseFrame = baseFrame;
     }
 
-    public JPanel getTopActivityPanel() {
-        return baseFrame.getTopActivityPanel();
-    }
-
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        baseFrame.setTopActivityPanel(ap);
-    }
-
     public I_GetConceptData getClassificationRoot() {
         return baseFrame.getClassificationRoot();
     }
@@ -1076,10 +1068,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.isPreferencesToggleVisible();
     }
 
-    public boolean isProgressToggleVisible() {
-        return baseFrame.isProgressToggleVisible();
-    }
-
     public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
         return baseFrame.isRefsetInToggleVisible(refsetType, toggle);
     }
@@ -1158,5 +1146,9 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
 	public Map<Integer, Color> getPathColorMap() {
 		return baseFrame.getPathColorMap();
+	}
+
+	public I_ShowActivity getTopActivityListener() {
+		return baseFrame.getTopActivityListener();
 	}
 }

@@ -1,6 +1,8 @@
 package org.dwfa.ace.search;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -12,10 +14,13 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntIterator;
-import org.apache.commons.collections.primitives.IntList;
+import org.dwfa.ace.I_UpdateProgress;
+import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
@@ -36,7 +41,7 @@ import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.types.ConceptBean;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
-public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends AbstractTask implements I_TrackContinuation {
+public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends AbstractTask implements I_TrackContinuation, ActionListener {
 	private static final long serialVersionUID = 1;
 
 	private static final int dataVersion = 3;
@@ -44,7 +49,21 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	private String resultSetPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
-	
+
+	private transient CountDownLatch conceptLatch;
+
+	private transient int total;
+
+	public transient String upperProgressMessage = "Performing search...";
+
+	public transient String lowerProgressMessage = "progress: ";
+
+	private transient boolean continueWork = true;
+
+	private ArrayIntList matches = new ArrayIntList();
+
+	private I_ConfigAceFrame config;
+
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
@@ -70,6 +89,10 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
+		upperProgressMessage = "Performing search...";
+		lowerProgressMessage = "progress: ";
+		continueWork = true;
+		matches = new ArrayIntList();
 	}
 
 	public String getProfilePropName() {
@@ -79,8 +102,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
-
-
+	
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
@@ -89,16 +111,19 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	public Condition evaluate(I_EncodeBusinessProcess process,
 			I_Work worker) throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			total = -1;
+			config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
 			Set<I_Position> positionSet = (Set<I_Position>) process.readProperty(getPositionSetPropName());
 			worker.getLogger().info("Position set for search: " + positionSet);
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			for (Component c: workflowDetailsSheet.getComponents()) {
 				if (DifferenceSearchPanel.class.isAssignableFrom(c.getClass())) {
-					final IntList matches = new ArrayIntList();
 					DifferenceSearchPanel dsp = (DifferenceSearchPanel) c;
-					
-					CountDownLatch conceptLatch = new CountDownLatch(LocalVersionedTerminology.get().getConceptCount());
+					total = LocalVersionedTerminology.get().getConceptCount();
+					conceptLatch = new CountDownLatch(total);
+					if (VodbEnv.isHeadless() == false) {
+						new ProgressUpdator();
+					}
 					I_ConfigAceFrame differenceSearchConfig = new DifferenceSearchConfig(config,
 							positionSet);
 					AceConfig.getVodb().searchConcepts((I_TrackContinuation) this, matches,
@@ -134,12 +159,12 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 					} else {
 						if (VodbEnv.isHeadless() == false) {
 					         final I_ModelTerminologyList model = (I_ModelTerminologyList) config.getBatchConceptList().getModel();
-					         AceLog.getAppLog().info("Adding first 1000 from a list of size: " + idListList.size());
+					         AceLog.getAppLog().info("Adding first 5000 from a list of size: " + idListList.size());
 					         
 					         SwingUtilities.invokeAndWait(new Runnable() {
 
 					            public void run() {
-					            	for (int i = 0; i < 1000; i++) {
+					            	for (int i = 0; i < 5000; i++) {
 					                    I_GetConceptData conceptInList = ConceptBean.get(matches.get(i));
 					                    model.addElement(conceptInList);
 					                 }
@@ -149,6 +174,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 					         config.showListView();
 						}				         
 					}
+					continueWork = false; //Search work is done...
 					return Condition.CONTINUE;
 				}
 			}
@@ -159,6 +185,54 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	}
 
 
+	private class ProgressUpdator implements I_UpdateProgress {
+		Timer updateTimer;
+
+		boolean firstUpdate = true;
+
+		ActivityPanel activity = new ActivityPanel(true, null, config);
+
+		private long startTime;
+
+		public ProgressUpdator() {
+			super();
+			updateTimer = new Timer(1000, this);
+			activity.addActionListener(GetSearchCriterionFromWorkflowDetailsPanelAndSearch.this);
+			actionPerformed(null);
+			updateTimer.start();
+			startTime = System.currentTimeMillis();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (firstUpdate) {
+				firstUpdate = false;
+				try {
+					ActivityViewer.addActivity(activity);
+				} catch (Exception e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
+			}
+			activity.setIndeterminate(total == -1);
+			int processed = (int) (total - conceptLatch.getCount());
+			activity.setValue(processed);
+			activity.setMaximum(total);
+			activity.setProgressInfoUpper(upperProgressMessage);
+			lowerProgressMessage = "Matches: " + matches.size() + " Concepts processed: " + processed;
+			activity.setProgressInfoLower(lowerProgressMessage);				
+			if (!continueWork) {
+				long endTime = System.currentTimeMillis() - startTime;
+				upperProgressMessage = "Search complete";
+				lowerProgressMessage = lowerProgressMessage + " Elapsed seconds: " + endTime/1000;
+				activity.setProgressInfoUpper(upperProgressMessage);
+				activity.setProgressInfoLower(lowerProgressMessage);				
+				activity.complete();
+				updateTimer.stop();
+			}
+		}
+
+	}
+
+	
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
 	 *      org.dwfa.bpa.process.I_Work)
@@ -184,7 +258,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 	}
 
 	public boolean continueWork() {
-		return true;
+		return continueWork ;
 	}
 
 	public String getResultSetPropName() {
@@ -195,4 +269,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends Abstrac
 		this.resultSetPropName = resultSetPropName;
 	}
 
+	public void actionPerformed(ActionEvent e) {
+		continueWork = false;
+	}
 }

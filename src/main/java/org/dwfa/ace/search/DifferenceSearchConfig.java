@@ -433,10 +433,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		return frameConfig.getTaxonomyRendererOverrideList();
 	}
 
-	public JPanel getTopActivityPanel() {
-		return frameConfig.getTopActivityPanel();
-	}
-
 	public I_IntList getTreeDescPreferenceList() {
 		return frameConfig.getTreeDescPreferenceList();
 	}
@@ -523,10 +519,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
 	public boolean isPreferencesToggleVisible() {
 		return frameConfig.isPreferencesToggleVisible();
-	}
-
-	public boolean isProgressToggleVisible() {
-		return frameConfig.isProgressToggleVisible();
 	}
 
 	public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType,
@@ -801,10 +793,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		frameConfig.setPreferencesToggleVisible(visible);
 	}
 
-	public void setProgressToggleVisible(boolean visible) {
-		frameConfig.setProgressToggleVisible(visible);
-	}
-
 	public void setProperty(String key, Object value) throws IOException {
 		frameConfig.setProperty(key, value);
 	}
@@ -917,10 +905,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public void setTogglesInComponentPanelVisible(TOGGLES toggle,
 			boolean visible) {
 		frameConfig.setTogglesInComponentPanelVisible(toggle, visible);
-	}
-
-	public void setTopActivityPanel(I_ShowActivity ap) {
-		frameConfig.setTopActivityPanel(ap);
 	}
 
 	public void setTreeTermDividerLoc(int termTreeDividerLoc) {
@@ -1082,6 +1066,10 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
 	public void validate() {
 		frameConfig.validate();
+	}
+
+	public I_ShowActivity getTopActivityListener() {
+		return frameConfig.getTopActivityListener();
 	}
 	
 }

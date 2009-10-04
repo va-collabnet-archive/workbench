@@ -1644,13 +1644,18 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							e.getLocalizedMessage(), e);
 				}
 				// Semaphore checkSemaphore, IntList matches,
-				ACE.threadPool.execute(new CheckAndProcessSearchTest(
+				ACE.threadPool.execute(new CheckAndProcessSearchTest(conceptLatch,
 						checkSemaphore, addSemaphore, matches, concept, 
 						checkList, config));
-				conceptLatch.countDown();
 			} else {
 				while (conceptLatch.getCount() > 0) {
 					conceptLatch.countDown();
+				}
+				try {
+					checkSemaphore.acquire(15);
+				} catch (InterruptedException e) {
+					AceLog.getAppLog().log(Level.WARNING,
+							e.getLocalizedMessage(), e);
 				}
 				break;
 			}

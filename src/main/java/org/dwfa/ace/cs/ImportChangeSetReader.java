@@ -12,7 +12,6 @@ import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -23,6 +22,7 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.config.AceConfig;
@@ -65,14 +65,14 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
 	private AceConfig config;
 
-	private JPanel secondaryProgressPanel;
+	private I_ShowActivity secondaryProgressPanel;
 
 	private class ProgressUpdator implements I_UpdateProgress {
 		Timer updateTimer;
 
 		boolean firstUpdate = true;
 
-		ActivityPanel activity = new ActivityPanel(true, true, secondaryProgressPanel);
+		ActivityPanel activity = new ActivityPanel(true, secondaryProgressPanel, config.aceFrames.get(0));
 
 		public ProgressUpdator() {
 			super();
@@ -112,7 +112,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
 	}
 
-	public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel, Frame parentFrame) {
+	public ImportChangeSetReader(final Configuration riverConfig, I_ShowActivity secondaryProgressPanel, Frame parentFrame) {
 		this(riverConfig, parentFrame);
 		this.secondaryProgressPanel = secondaryProgressPanel;
 	}

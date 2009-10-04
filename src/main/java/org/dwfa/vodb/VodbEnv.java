@@ -250,7 +250,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             if (isHeadless()) {
                 activityFrame = new UpperInfoOnlyConsoleMonitor();
             } else {
-                activityFrame = new ActivityPanel(true, true, null);
+                activityFrame = new ActivityPanel(true, null, null);
             }
 
             AceLog.getAppLog().info("Setting up db: " + envHome);
@@ -1630,11 +1630,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         bdbEnv.commitTransaction();
     }
 
-    public I_ShowActivity newActivityPanel(boolean displayInViewer) {
+    public I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig) {
         if (isHeadless()) {
             return new UpperInfoOnlyConsoleMonitor();
         } else {
-            ActivityPanel ap = new ActivityPanel(true, true, null);
+            ActivityPanel ap = new ActivityPanel(true, null, aceFrameConfig);
             ap.setIndeterminate(true);
             ap.setProgressInfoUpper("New activity");
             ap.setProgressInfoLower("");

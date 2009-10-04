@@ -72,7 +72,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements
 		public ProgressUpdator(boolean addToViewer) {
 			super();
 			this.addToViewer = addToViewer;
-			activity = new ActivityPanel(addToViewer, addToViewer, config.getTopActivityPanel());
+			activity = new ActivityPanel(addToViewer, null, config);
 			updateTimer = new Timer(300, this);
 			updateTimer.start();
 		}

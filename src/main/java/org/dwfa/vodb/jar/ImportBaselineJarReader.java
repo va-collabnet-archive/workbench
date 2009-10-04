@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
@@ -95,7 +96,7 @@ public class ImportBaselineJarReader implements ActionListener {
 
 		boolean firstUpdate = true;
 
-		ActivityPanel activity = new ActivityPanel(true, true, null);
+		ActivityPanel activity = new ActivityPanel(true, null, null);
 
 		public ProgressUpdator() {
 			super();

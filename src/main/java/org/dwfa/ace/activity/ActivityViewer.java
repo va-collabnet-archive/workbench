@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import net.jini.config.ConfigurationException;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
@@ -95,11 +96,11 @@ public class ActivityViewer {
         public void setValue(int n) {
         }
 
-        public JPanel getSecondaryPanel() {
+        public I_ShowActivity getSecondaryPanel() {
             return null;
         }
 
-        public void setSecondaryPanel(JPanel panel) {
+        public void setSecondaryPanel(I_ShowActivity panel) {
         }
 
         public void setStringPainted(boolean stringPainted) {
@@ -114,6 +115,27 @@ public class ActivityViewer {
             // TODO Auto-generated method stub
 
         }
+
+		public I_ConfigAceFrame getAceFrameConfig() {
+			return null;
+		}
+
+
+		public void syncWith(I_ShowActivity another) {
+			
+		}
+
+		public String getProgressInfoLower() {
+			return null;
+		}
+
+		public String getProgressInfoUpper() {
+			return null;
+		}
+
+		public boolean isStringPainted() {
+			return false;
+		}
 
     }
 
@@ -268,7 +290,7 @@ public class ActivityViewer {
                                 viewer.activitiesList.remove(40);
                             }
                         }
-                        Set<JPanel> secondaryPanels = new HashSet<JPanel>();
+                        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
                         viewer.activitiesPanel.removeAll();
                         GridBagConstraints gbc = new GridBagConstraints();
                         gbc.gridx = 0;
@@ -279,6 +301,7 @@ public class ActivityViewer {
                         gbc.anchor = GridBagConstraints.NORTHWEST;
                         gbc.gridwidth = 1;
                         gbc.gridheight = 1;
+                        linkToSourceFrameActivityPanel();
                         for (I_ShowActivity a : viewer.activitiesList) {
                             viewer.activitiesPanel.add(a.getViewPanel(), gbc);
                             gbc.gridy++;
@@ -290,9 +313,35 @@ public class ActivityViewer {
                     }
                 }
 
+
             });
         }
     }
+
+	private static void linkToSourceFrameActivityPanel() {
+		Set<I_ShowActivity> activeActivityListeners = new HashSet<I_ShowActivity>();
+		for (I_ShowActivity a: viewer.activitiesList) {
+			if (a.getAceFrameConfig() != null) {
+				a.removeShowActivityListener(a.getAceFrameConfig().getTopActivityListener());
+				ActionListener[] stopListeners = a.getAceFrameConfig().getTopActivityListener()
+						.getStopButton().getActionListeners();
+				for (ActionListener l: stopListeners) {
+					a.getAceFrameConfig().getTopActivityListener()
+					.getStopButton().removeActionListener(l);
+				}
+			}
+		}
+		for (I_ShowActivity a : viewer.activitiesList) {
+			if (a.getAceFrameConfig() != null) {
+				I_ShowActivity frameActivity = a.getAceFrameConfig().getTopActivityListener();
+		    	if (activeActivityListeners.contains(frameActivity) == false) {
+		    		a.addShowActivityListener(frameActivity);
+		    		activeActivityListeners.add(frameActivity);
+		     		frameActivity.syncWith(a);
+		    	}
+			}
+		}
+	}
 
     public static void reSort() {
         if (VodbEnv.isHeadless() == false) {
@@ -309,7 +358,7 @@ public class ActivityViewer {
                         Collections.sort(viewer.activitiesList, activityComparator);
                         if (origOrder.equals(viewer.activitiesList) == false) {
                             viewer.activitiesPanel.removeAll();
-                            Set<JPanel> secondaryPanels = new HashSet<JPanel>();
+                            Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
                             GridBagConstraints gbc = new GridBagConstraints();
                             gbc.gridx = 0;
                             gbc.gridy = 0;
@@ -319,6 +368,7 @@ public class ActivityViewer {
                             gbc.anchor = GridBagConstraints.NORTHWEST;
                             gbc.gridwidth = 1;
                             gbc.gridheight = 1;
+                            linkToSourceFrameActivityPanel();
                             for (I_ShowActivity a : viewer.activitiesList) {
                                 viewer.activitiesPanel.add(a.getViewPanel(), gbc);
                                 gbc.gridy++;
@@ -335,48 +385,51 @@ public class ActivityViewer {
         }
     }
 
-    private static void addSecondaryActivityPanel(final Set<JPanel> secondaryPanels, final I_ShowActivity a) {
-        SwingUtilities.invokeLater(new Runnable() {
+    private static void addSecondaryActivityPanel(final Set<I_ShowActivity> secondaryPanels, final I_ShowActivity a) {
+       	if (VodbEnv.isHeadless() == false) {
+            SwingUtilities.invokeLater(new Runnable() {
 
-            public void run() {
-                if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
-                    secondaryPanels.add(a.getSecondaryPanel());
-                    for (Component c : a.getSecondaryPanel().getComponents()) {
-                        a.getSecondaryPanel().remove(c);
-                    }
-                    if (a.isComplete() == false) {
-                        ActivityPanel secondaryAP = new ActivityPanel(false, true, null);
-                        a.addShowActivityListener(secondaryAP);
-                        a.getSecondaryPanel().add(secondaryAP.getViewPanel());
+                public void run() {
+                    if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
+                        secondaryPanels.add(a.getSecondaryPanel());
+                        for (Component c : a.getSecondaryPanel().getViewPanel().getComponents()) {
+                            a.getSecondaryPanel().getViewPanel().remove(c);
+                        }
+                        if (a.isComplete() == false) {
+                            ActivityPanel secondaryAP = new ActivityPanel(false, null, a.getAceFrameConfig());
+                            a.addShowActivityListener(secondaryAP);
+                            a.getSecondaryPanel().getViewPanel().add(secondaryAP);
+                        }
                     }
                 }
-            }
-        });
-
+            });
+       	}
     }
 
     public static void removeActivity(final I_ShowActivity activity) {
-        SwingUtilities.invokeLater(new Runnable() {
+    	if (VodbEnv.isHeadless() == false) {
+            SwingUtilities.invokeLater(new Runnable() {
 
-            public void run() {
-                viewer.activitiesList.remove(activity);
-                viewer.activitiesPanel.removeAll();
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = 0;
-                gbc.weightx = 1;
-                gbc.weighty = 0;
-                gbc.fill = GridBagConstraints.HORIZONTAL;
-                gbc.anchor = GridBagConstraints.NORTHWEST;
-                gbc.gridwidth = 1;
-                gbc.gridheight = 1;
-                for (I_ShowActivity a : viewer.activitiesList) {
-                    viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                    gbc.gridy++;
+                public void run() {
+                    viewer.activitiesList.remove(activity);
+                    viewer.activitiesPanel.removeAll();
+                    GridBagConstraints gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 0;
+                    gbc.weightx = 1;
+                    gbc.weighty = 0;
+                    gbc.fill = GridBagConstraints.HORIZONTAL;
+                    gbc.anchor = GridBagConstraints.NORTHWEST;
+                    gbc.gridwidth = 1;
+                    gbc.gridheight = 1;
+                    for (I_ShowActivity a : viewer.activitiesList) {
+                        viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                        gbc.gridy++;
+                    }
+                    tickleSize();
                 }
-                tickleSize();
-            }
-        });
+            });
+    	}
     }
 
     private static void tickleSize() {

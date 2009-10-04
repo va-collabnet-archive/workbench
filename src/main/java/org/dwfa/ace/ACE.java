@@ -92,6 +92,7 @@ import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
+import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -1258,8 +1259,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     AceFrameConfig aceFrameConfig;
 
-    private JPanel topActivityPanel;
-
     private static AceConfig aceConfig;
 
     public static boolean editMode = true;
@@ -1919,6 +1918,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     boolean svnPositionSet = false;
     private JButton showProgressButton;
+	private ActivityPanel topActivityListener;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -2821,8 +2821,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(showProgressButton, c);
         c.gridx++;
 
-        topActivityPanel = new JPanel(new GridLayout(1, 1));
-        topPanel.add((JPanel) topActivityPanel, c);
+        JPanel topActivityPanel = new JPanel(new GridLayout(1, 1));
+        topActivityListener = new ActivityPanel(false, null, aceFrameConfig);
+        topActivityListener.setEraseWhenFinishedEnabled(true);
+        topActivityListener.complete();
+        topActivityPanel.add(topActivityListener.getViewPanel());
+        topPanel.add(topActivityPanel, c);
         c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
@@ -3079,15 +3083,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.removeLinkedComponent(component);
     }
 
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        for (Component c : topActivityPanel.getComponents()) {
-            topActivityPanel.remove(c);
-        }
-        topActivityPanel.add(ap.getViewPanel());
-    }
-
-    public JPanel getTopActivityPanel() {
-        return topActivityPanel;
+    public I_ShowActivity getTopActivityListener() {
+        return topActivityListener;
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -3438,10 +3435,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return showPreferencesButton.isVisible();
     }
 
-    public boolean isProgressToggleVisible() {
-        return topActivityPanel.isVisible();
-    }
-
     public boolean isSubversionToggleVisible() {
         return showSubversionButton.isVisible();
     }
@@ -3498,14 +3491,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 showPreferencesButton.setVisible(visible);
-            }
-        });
-    }
-
-    public void setProgressToggleVisible(final boolean visible) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                topActivityPanel.setVisible(visible);
             }
         });
     }
