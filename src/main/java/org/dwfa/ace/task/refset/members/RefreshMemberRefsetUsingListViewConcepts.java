@@ -85,7 +85,7 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();			
 			
 			I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(
-					true);
+					true, termFactory.getActiveAceFrameConfig());
 			computeRefsetActivityPanel.setProgressInfoUpper("Computing refset " 
 					+ ": " + refset.getInitialText());
 			computeRefsetActivityPanel.setProgressInfoLower(

@@ -163,7 +163,6 @@ public class InstructWithDoneAndTodo extends AbstractTask {
 
         });
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
     }
@@ -175,8 +174,6 @@ public class InstructWithDoneAndTodo extends AbstractTask {
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         inboxButtonVisible = config.isInboxToggleVisible();

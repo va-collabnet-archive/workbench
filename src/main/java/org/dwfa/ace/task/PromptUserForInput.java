@@ -133,8 +133,6 @@ public class PromptUserForInput extends AbstractTask {
                 .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
@@ -232,7 +230,6 @@ public class PromptUserForInput extends AbstractTask {
         }
 
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
         return returnCondition;

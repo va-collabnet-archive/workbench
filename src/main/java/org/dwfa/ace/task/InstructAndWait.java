@@ -98,8 +98,6 @@ public class InstructAndWait extends AbstractTask {
             .name());
       boolean builderVisible = config.isBuilderToggleVisible();
       config.setBuilderToggleVisible(false);
-      boolean progressPanelVisible = config.isProgressToggleVisible();
-      config.setProgressToggleVisible(false);
       boolean subversionButtonVisible = config.isBuilderToggleVisible();
       config.setSubversionToggleVisible(false);
 		try {
@@ -170,7 +168,6 @@ public class InstructAndWait extends AbstractTask {
 			throw new TaskFailedException(e);
 		}
       config.setBuilderToggleVisible(builderVisible);
-      config.setProgressToggleVisible(progressPanelVisible);
       config.setSubversionToggleVisible(subversionButtonVisible);
 		return Condition.CONTINUE;
 	}

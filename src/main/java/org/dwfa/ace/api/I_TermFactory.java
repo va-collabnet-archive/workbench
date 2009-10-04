@@ -442,7 +442,7 @@ public interface I_TermFactory {
      * @param displayInViewer If true, the activity will be lodged in the
      *            activity viewer window
      */
-    I_ShowActivity newActivityPanel(boolean displayInViewer);
+    I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig);
 
     I_HandleSubversion getSvnHandler();
 

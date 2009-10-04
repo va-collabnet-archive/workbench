@@ -140,7 +140,7 @@ public class BatchMonitor {
      */
     public void start() throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        activity = termFactory.newActivityPanel(false);
+        activity = termFactory.newActivityPanel(false, termFactory.getActiveAceFrameConfig());
         activity.setProgressInfoUpper(description);
         activity.setProgressInfoLower("Commencing...");
         activity.setMaximum((int)totalEvents);

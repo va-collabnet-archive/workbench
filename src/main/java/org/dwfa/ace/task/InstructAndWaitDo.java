@@ -498,8 +498,6 @@ public class InstructAndWaitDo extends AbstractTask {
 			// Get some space
 			boolean builderVisible = config.isBuilderToggleVisible();
 			config.setBuilderToggleVisible(true);
-			boolean progressPanelVisible = config.isProgressToggleVisible();
-			config.setProgressToggleVisible(false);
 			// EKM - changed to subversion toggle
 			boolean subversionButtonVisible = config
 					.isSubversionToggleVisible();
@@ -607,7 +605,6 @@ public class InstructAndWaitDo extends AbstractTask {
 			});
 			// Restore to initial state
 			config.setBuilderToggleVisible(builderVisible);
-			config.setProgressToggleVisible(progressPanelVisible);
 			config.setSubversionToggleVisible(subversionButtonVisible);
 			config.setInboxToggleVisible(inboxButtonVisible);
 			return returnCondition;

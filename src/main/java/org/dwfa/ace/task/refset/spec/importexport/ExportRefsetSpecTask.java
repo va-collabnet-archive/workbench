@@ -72,8 +72,10 @@ public class ExportRefsetSpecTask extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        I_ShowActivity activityPanel = LocalVersionedTerminology.get().newActivityPanel(true);
+    	I_ShowActivity activityPanel = null;
         try {
+            activityPanel = LocalVersionedTerminology.get().newActivityPanel(true, 
+            		LocalVersionedTerminology.get().getActiveAceFrameConfig());
             I_ConfigAceFrame configFrame =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
@@ -110,7 +112,9 @@ public class ExportRefsetSpecTask extends AbstractTask {
 
             return Condition.CONTINUE;
         } catch (Exception ex) {
-            activityPanel.complete();
+        	if (activityPanel != null) {
+                activityPanel.complete();
+        	}
             throw new TaskFailedException(ex);
         }
     }

@@ -234,7 +234,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 			// ** GUI: 1. LOAD DATA **
 			continueThisAction = true;
-			gui = tf.newActivityPanel(true); // in activity viewer
+			gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
 			gui.addActionListener(this);
 			gui.setProgressInfoUpper("Classifier 1/5: load data");
 			gui.setIndeterminate(false);
@@ -312,7 +312,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			pcEdit = null; // :MEMORY:
 
 			// ** GUI: 2 RUN CLASSIFIER **
-			gui = tf.newActivityPanel(true); // in activity viewer
+			gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
 			gui.addActionListener(this);
 			gui.setProgressInfoUpper("Classifier 2/5: classify data");
 			gui.setProgressInfoLower("... can take 4 to 6 minutes ...");
@@ -337,7 +337,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			}
 
 			// ** GUI: 3 GET CLASSIFIER RESULTS **
-			gui = tf.newActivityPanel(true); // in activity viewer
+			gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
 			gui.addActionListener(this);
 			gui.setProgressInfoUpper("Classifier 3/5: retrieve solution set");
 			gui.setIndeterminate(false);
@@ -366,7 +366,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			}
 
 			// ** GUI: 4 GET CLASSIFIER PATH DATA **
-			gui = tf.newActivityPanel(true); // in activity viewer
+			gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
 			gui.addActionListener(this);
 			String tmpS = "Classifier 4/5: get previously inferred & compare";
 			gui.setProgressInfoUpper(tmpS);
@@ -398,7 +398,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 			// ** GUI: 5 WRITE BACK RESULTS **
 			gui.complete(); // PHASE 5. DONE
-			gui = tf.newActivityPanel(true); // in activity viewer
+			gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
 			gui.addActionListener(this);
 			gui.setProgressInfoUpper("Classifier 5/5: write back updates"
 					+ " to classifier path");

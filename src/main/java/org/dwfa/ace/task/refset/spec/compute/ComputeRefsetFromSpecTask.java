@@ -93,7 +93,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             Set<Integer> retiredMembers = new HashSet<Integer>();
 
             // initialise the progress panel
-            I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(true);
+            I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame);
             computeRefsetActivityPanel.setMaximum(conceptsToProcess);
             computeRefsetActivityPanel.setStringPainted(true);
             computeRefsetActivityPanel.setValue(0);

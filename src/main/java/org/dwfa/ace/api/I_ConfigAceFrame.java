@@ -350,10 +350,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public boolean isInboxToggleVisible();
 
-    public void setProgressToggleVisible(boolean visible);
-
-    public boolean isProgressToggleVisible();
-
     public void setComponentToggleVisible(boolean visible);
 
     public boolean isComponentToggleVisible();
@@ -509,9 +505,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public I_ManageConflict[] getAllConflictResolutionStrategies();
 
-    public void setTopActivityPanel(I_ShowActivity ap);
-
-    public JPanel getTopActivityPanel();
+    public I_ShowActivity getTopActivityListener();
 
     /**
      * Shows or hides as the activity viewer.
