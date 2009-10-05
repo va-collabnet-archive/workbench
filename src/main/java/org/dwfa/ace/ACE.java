@@ -1732,7 +1732,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JPanel workflowPanel;
     
-    private CdePalette workflowDetailsSheet;
+    private JPanel workflowDetailsSheet;
 
     private JPanel signpostPanel = new JPanel();
 
@@ -2716,27 +2716,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         historyPalette.setVisible(true);
     }
 
-    
-    private void makeWorkflowDetailsSheet() {
-        JLayeredPane layers = getRootPane().getLayeredPane();
-        workflowDetailsSheet = new CdePalette(new BorderLayout(), new LeftPalettePoint());
-        CenteredPalettePoint locator = new CenteredPalettePoint(workflowDetailsSheet);
-        workflowDetailsSheet.setLocator(locator);
-        workflowDetailsSheet.add(new JPanel(), BorderLayout.CENTER);
-        workflowDetailsSheet.setBorder(BorderFactory.createRaisedBevelBorder());
-        layers.add(workflowDetailsSheet, JLayeredPane.PALETTE_LAYER);
-        int width = 400;
-        int height = 500;
-        Rectangle topBounds = getTopBoundsForPalette();
-        workflowDetailsSheet.setSize(width, height);
-
-        workflowDetailsSheet.setLocation(new Point(locator.getPalettePoint().x, topBounds.y - height));
-        workflowDetailsSheet.setOpaque(true);
-        workflowDetailsSheet.doLayout();
-        addComponentListener(workflowDetailsSheet);
-        workflowDetailsSheet.setVisible(true);
-    }
-
 
     private void makeAddressPalette() {
         JLayeredPane layers = getRootPane().getLayeredPane();
@@ -2830,8 +2809,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
-        workflowPanel = new JPanel();
-        topPanel.add(workflowPanel, c);
+        JPanel oldWorkflowPanel = new JPanel();
+        topPanel.add(oldWorkflowPanel, c);
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0;
         c.gridx++;
@@ -3177,6 +3156,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return workflowPanel;
     }
     
+    public void setWorkflowPanel(JPanel workflowPanel) {
+        this.workflowPanel = workflowPanel;
+    }
+
     public JPanel getWorkflowDetailsPanel() {
     	return workflowDetailsSheet;
     }
@@ -3567,7 +3550,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     int refsetTabIndex = -2;
-	private boolean workflowDetailsSheetVisible = false;
 
     public boolean refsetTabIsSelected() {
         return conceptTabs.getSelectedIndex() == refsetTabIndex;
@@ -3591,32 +3573,20 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
+    public void setWorkflowDetailsSheet(JPanel workflowDetailsSheet) {
+    	this.workflowDetailsSheet = workflowDetailsSheet;
+    }
 	public JPanel getWorkflowDetailsSheet() {
-		if (workflowDetailsSheet == null) {
-			makeWorkflowDetailsSheet();
-		}
 		return workflowDetailsSheet;
 	}
 
-	public void setWorfklowDetailSheetVisible(boolean visible) {
-		if (workflowDetailsSheetVisible == visible) {
-			return;
-		}
-        if (workflowDetailsSheet == null) {
-            try {
-            	makeWorkflowDetailsSheet();
-            } catch (Exception ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            }
-        }
-        workflowDetailsSheetVisible = !workflowDetailsSheetVisible;
-        if (workflowDetailsSheetVisible) {
-            getRootPane().getLayeredPane().moveToFront(workflowDetailsSheet);
-            deselectOthers(showSignpostPanelToggle);
-        }
-        workflowDetailsSheet.togglePalette(true, 
-        		TOGGLE_DIRECTION.UP_DOWN);
-
+	public void setWorfklowDetailSheetVisible(final boolean visible) {
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			public void run() {
+				workflowDetailsSheet.setVisible(visible);
+			}
+		});
 	}
 
 	public void setWorkflowDetailSheetDimensions(Dimension dim) {

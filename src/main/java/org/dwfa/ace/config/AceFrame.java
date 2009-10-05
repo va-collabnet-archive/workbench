@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -28,6 +29,7 @@ import javax.swing.WindowConstants;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.WizardPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
@@ -96,7 +98,17 @@ public class AceFrame extends ComponentFrame {
 		this.frameConfig = (AceFrameConfig) frameConfig;
 		setTitle(getFrameName());
 		((AceFrameConfig) frameConfig).setAceFrame(this);
+
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        WizardPanel wizPanel = new WizardPanel();
+        layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
+        wizPanel.setLocation(400, 0);
+
+		getCdePanel().setWorkflowDetailsSheet(wizPanel.getWfDetailsPanel());
+		getCdePanel().setWorkflowPanel(wizPanel.getWfPanel());
+		getCdePanel().setWorfklowDetailSheetVisible(false);
 		getCdePanel().setup(frameConfig);
+		
 		setContentPane(cdePanel);
 		Rectangle defaultBounds = getDefaultFrameSize();
 		Rectangle bounds = frameConfig.getBounds();
@@ -118,6 +130,8 @@ public class AceFrame extends ComponentFrame {
 			executeStartupProcesses(worker, startupFolder);
 		}
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		
+
 	}
 
 	private void executeStartupProcesses(MasterWorker worker, File startupFolder) {

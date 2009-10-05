@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.task.search.DifferenceConceptStatus;
 import org.dwfa.ace.task.search.DifferenceFullySpecifiedName;
 import org.dwfa.ace.task.search.DifferencePreferredName;
 import org.dwfa.ace.task.search.DifferenceRelsDestination;
@@ -102,6 +103,7 @@ public class DifferenceSearchPanel extends JPanel implements I_MakeCriterionPane
     public CriterionPanel makeCriterionPanel() throws ClassNotFoundException, InstantiationException,
             IllegalAccessException {
     	List<I_TestSearchResults> criterionOptions = new ArrayList<I_TestSearchResults>();
+    	criterionOptions.add(new DifferenceConceptStatus());
     	criterionOptions.add(new DifferenceFullySpecifiedName());
     	criterionOptions.add(new DifferencePreferredName());
     	criterionOptions.add(new DifferenceRelsDestination());
