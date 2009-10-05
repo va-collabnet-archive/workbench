@@ -134,6 +134,7 @@ public class InstructAndWait extends AbstractTask {
 					stepButton.addActionListener(new StepActionListener());
 					c.gridx++;
 					workflowPanel.add(new JLabel("     "), c);
+					workflowPanel.setVisible(true);
 					workflowPanel.validate();
 					Container cont = workflowPanel;
 					while (cont != null) {

@@ -581,6 +581,7 @@ public class InstructAndWaitDo extends AbstractTask {
 						cont.validate();
 						cont = cont.getParent();
 					}
+					workflowPanel.setVisible(true);
 					stepButton.requestFocusInWindow();
 				}
 			});

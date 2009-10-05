@@ -5,29 +5,24 @@ import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.conflict.detector.DescriptionTupleConflictComparator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 
-public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
+public class DifferenceConceptStatus extends AbstractSearchTest {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final int dataVersion = 1;
-
-	private static I_IntSet allowedTypes;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -52,10 +47,6 @@ public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
 				// compare...
 				return applyInversion(false);
 			}
-			if (allowedTypes == null) {
-				allowedTypes = LocalVersionedTerminology.get().newIntSet();
-				allowedTypes.addAll(getAllowedTypes());
-			}
 			I_GetConceptData conceptToTest;
 			if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
 				conceptToTest = (I_GetConceptData) component;
@@ -67,25 +58,29 @@ public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
 			} else {
 				return applyInversion(false);
 			}
-
-			Set<I_DescriptionTuple> firstSet = null;
+			
+			I_ConceptAttributeTuple firstTuple = null;
+			boolean firstPass = true;
 			for (I_Position p: frameConfig.getViewPositionSet()) {
-				Set<I_Position> viewSet = new HashSet<I_Position>();
-				viewSet.add(p);
-				List<I_DescriptionTuple> tuples = conceptToTest.getDescriptionTuples(
-						frameConfig.getAllowedStatus(), allowedTypes,
-						viewSet);
-				if (firstSet == null) {
-					firstSet = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
-					firstSet.addAll(tuples);
-				} else {
-					int firstSetSize = firstSet.size();
-					if (firstSetSize != tuples.size()) {
-						return applyInversion(true);
+				Set<I_Position> positionSet = new HashSet<I_Position>();
+				positionSet.add(p);
+				List<I_ConceptAttributeTuple> tuples = conceptToTest.getConceptAttributeTuples(
+						frameConfig.getAllowedStatus(), positionSet);
+				if (firstPass) {
+					if (tuples.size() > 0) {
+						firstTuple = tuples.get(0);
 					}
-					firstSet.addAll(tuples);
-					if (firstSet.size() != firstSetSize) {
-						return applyInversion(true);
+					firstPass = false;
+				} else {
+					if (tuples.size() > 0) {
+						if (firstTuple == null) {
+							return applyInversion(true);
+						}
+						return (applyInversion(firstTuple.getStatusId() != tuples.get(0).getStatusId()));
+					} else {
+						if (firstTuple != null) {
+							return (applyInversion(true));
+						}
 					}
 				}
 			}
@@ -96,6 +91,4 @@ public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
 			throw new TaskFailedException(e);
 		}
 	}
-
-	protected abstract int[] getAllowedTypes() throws IOException, TerminologyException;
 }

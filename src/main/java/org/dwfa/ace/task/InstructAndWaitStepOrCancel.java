@@ -137,8 +137,6 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     c.weightx = 1.0;
                     c.weighty = 0;
                     c.anchor = GridBagConstraints.WEST;
-                    workflowPanel.add(new JPanel(), c); // Filler
-                    c.gridx++;
                     c.weightx = 0.0;
                     workflowPanel.add(new JLabel(instruction), c);
                     c.gridx++;
@@ -156,13 +154,14 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     stopButton.addActionListener(new StopActionListener());
                     stopButton.setToolTipText("Cancel");
                     c.gridx++;
-                    workflowPanel.add(new JLabel("     "), c);
+                    workflowPanel.add(new JLabel("  "), c);
                     workflowPanel.validate();
                     Container cont = workflowPanel;
                     while (cont != null) {
                         cont.validate();
                         cont = cont.getParent();
                     }
+					workflowPanel.setVisible(true);
                     stepButton.requestFocusInWindow();
                 }
             });

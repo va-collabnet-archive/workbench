@@ -137,6 +137,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         c.gridx++;
         workflowPanel.add(new JLabel("     "), c);
         workflowPanel.validate();
+		workflowPanel.setVisible(true);
         Container cont = workflowPanel;
         while (cont != null) {
             cont.validate();

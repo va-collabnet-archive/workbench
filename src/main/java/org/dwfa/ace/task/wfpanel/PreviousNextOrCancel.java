@@ -164,6 +164,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
 				for (int i = 0; i < components.length; i++) {
 					workflowPanel.remove(components[i]);
 				}
+				workflowPanel.setVisible(false);
 				workflowPanel.validate();
 				Container cont = workflowPanel;
 				while (cont != null) {
@@ -191,6 +192,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
 		inboxButtonVisible = config.isInboxToggleVisible();
 		config.setInboxToggleVisible(false);
 		workflowPanel = config.getWorkflowPanel();
+		workflowPanel.setVisible(true);
 	}
 
 	/**

@@ -114,6 +114,7 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 			workflowPanel.add(pwd, c);
 			c.weightx = 0.0;
 			setupPreviousNextOrCancelButtons(workflowPanel, c);
+			workflowPanel.setVisible(true);
 			finalSetup();
 		}
 		

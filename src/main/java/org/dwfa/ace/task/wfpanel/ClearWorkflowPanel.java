@@ -82,9 +82,11 @@ public class ClearWorkflowPanel extends AbstractTask {
 						for (int i = 0; i < components.length; i++) {
 							workflowPanel.remove(components[i]);
 						}
+						workflowPanel.setVisible(false);
 					} catch (Exception e) {
 						ex = e;
 					} 
+					
 				}
 			});
 		} catch (InterruptedException e) {

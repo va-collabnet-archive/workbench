@@ -112,6 +112,7 @@ public class InstructAndWaitPNC extends PreviousNextOrCancel {
 			c.weightx = 0.0;
 			workflowPanel.add(new JLabel(instruction), c);
 			setupPreviousNextOrCancelButtons(workflowPanel, c);
+			workflowPanel.setVisible(true);
 		}
 		
 	}

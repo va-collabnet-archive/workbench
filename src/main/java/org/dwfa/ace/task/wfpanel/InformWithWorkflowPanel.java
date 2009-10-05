@@ -111,6 +111,7 @@ public class InformWithWorkflowPanel extends AbstractTask {
 	                        cont.validate();
 	                        cont = cont.getParent();
 	                    }
+						workflowPanel.setVisible(true);
 						workflowPanel.paintImmediately(0, 0, workflowPanel.getWidth(), workflowPanel.getHeight());
 					} catch (Exception e) {
 						ex = e;
