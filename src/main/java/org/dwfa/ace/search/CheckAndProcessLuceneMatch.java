@@ -68,9 +68,11 @@ public class CheckAndProcessLuceneMatch implements Runnable {
 					try {
 						boolean failed = false;
 						for (I_TestSearchResults test : checkList) {
-							if (test.test(descV, config) == false) {
-								failed = true;
-								break;
+							if (test != null) {
+								if (test.test(descV, config) == false) {
+									failed = true;
+									break;
+								}
 							}
 						}
 

@@ -46,8 +46,8 @@ public class WizardPanel extends JPanel {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			super.componentResized(e);
-			int locationY = getLocation().x;
-			int locationX = getLocation().y;
+			int locationY = getLocation().y;
+			int locationX = getLocation().x;
 			setLocationRelativeToAcePanel(locationY, locationX);
 		}
 

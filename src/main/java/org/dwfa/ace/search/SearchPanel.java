@@ -124,7 +124,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             try {
                 // Create a file dialog box to prompt for a new file to display
                 updateExtraCriterion();
-                QueryBean qb = new QueryBean(searchPhraseField.getText(), getExtraCriterion());
+                QueryBean qb = new QueryBean(searchPhraseField.getText(), extraCriterion);
                 FileDialog f = new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
                                               FileDialog.SAVE);
                 File searchFolder = new File("search");
@@ -604,7 +604,6 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     public void setQuery(QueryBean qb) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         searchPhraseField.setText(qb.getQueryString());
         criterionPanels.clear();
-        AceLog.getAppLog().info("Extra criterion: " + qb.getExtraCriterion());
         for (I_TestSearchResults criterion: qb.getExtraCriterion()) {
             criterionPanels.add(new CriterionPanel(this, criterion));
         }
@@ -670,7 +669,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
                 ACE.threadPool.execute(new SearchAllWorker(this, model, config));
         	} else {
-                JOptionPane.showMessageDialog(getRootPane(), "<html>Unindexed search (a search with an empty query string),<br>requires at least one advanced search criterion. ", 
+                JOptionPane.showMessageDialog(getRootPane(), 
+                		"<html>Unindexed search (a search with an empty query string),<br>"+
+                		"requires at least one advanced search criterion. ", 
                 		"Search Error", JOptionPane.ERROR_MESSAGE);
         	}
         } else {
@@ -682,7 +683,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private void updateExtraCriterion() {
         extraCriterion = new ArrayList<I_TestSearchResults>();
         for (CriterionPanel criterionPanel : criterionPanels) {
-            extraCriterion.add(criterionPanel.getBean());
+        	I_TestSearchResults test = criterionPanel.getBean();
+        	if (test != null) {
+                extraCriterion.add(test);
+        	}
         }
     }
 
