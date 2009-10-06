@@ -35,10 +35,12 @@ public class CommitLog implements I_WriteChangeSet {
 	   private transient I_TermFactory tf;
 	   
 	   private static SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+	   private static SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
 
 	   public CommitLog(File changeSetFile, File tempFile) {
 		super();
-		this.changeSetFile = changeSetFile;
+		this.changeSetFile = new File(changeSetFile.getParent(), 
+				fileDateFormat.format(new Date()) + "." + changeSetFile.getName());
 		this.tempFile = tempFile;
 	}
 
