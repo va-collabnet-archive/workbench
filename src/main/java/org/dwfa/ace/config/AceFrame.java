@@ -100,7 +100,7 @@ public class AceFrame extends ComponentFrame {
 		((AceFrameConfig) frameConfig).setAceFrame(this);
 
         JLayeredPane layers = getRootPane().getLayeredPane();
-        WizardPanel wizPanel = new WizardPanel();
+        WizardPanel wizPanel = new WizardPanel(getCdePanel());
         layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
         wizPanel.setLocation(400, 0);
 
@@ -109,14 +109,14 @@ public class AceFrame extends ComponentFrame {
 		getCdePanel().setWorfklowDetailSheetVisible(false);
 		getCdePanel().setup(frameConfig);
 		
-		setContentPane(cdePanel);
+		setContentPane(getCdePanel());
 		Rectangle defaultBounds = getDefaultFrameSize();
 		Rectangle bounds = frameConfig.getBounds();
 		bounds.width = Math.min(bounds.width, defaultBounds.width);
 		bounds.height = Math.min(bounds.height, defaultBounds.height);
 		setBounds(bounds);
 		doWindowActivation();
-		getQuitList().add(cdePanel);
+		getQuitList().add(getCdePanel());
 		this.addWindowListener(new AceWindowActionListener());
 		MasterWorker worker = new MasterWorker(config);
 		cdePanel.getAceFrameConfig().setWorker(worker);
@@ -130,8 +130,6 @@ public class AceFrame extends ComponentFrame {
 			executeStartupProcesses(worker, startupFolder);
 		}
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		
-
 	}
 
 	private void executeStartupProcesses(MasterWorker worker, File startupFolder) {

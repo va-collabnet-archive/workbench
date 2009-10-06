@@ -29,11 +29,8 @@ public class WizardPanel extends JPanel {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			int locationY = wizardStartPoint.y + (e.getLocationOnScreen().y - dragStartPoint.y);
-			if (locationY < 0 || locationY < 15) {
-				locationY = 0;
-			}
-			setLocation(wizardStartPoint.x + (e.getLocationOnScreen().x - dragStartPoint.x), 
-					locationY);
+			int locationX = wizardStartPoint.x + (e.getLocationOnScreen().x - dragStartPoint.x);
+			setLocationRelativeToAcePanel(locationY, locationX);
 		}
 
 		@Override
@@ -44,9 +41,23 @@ public class WizardPanel extends JPanel {
 		
 	}
 	
+	private class AceComponentListener extends ComponentAdapter {
+
+		@Override
+		public void componentResized(ComponentEvent e) {
+			super.componentResized(e);
+			int locationY = getLocation().x;
+			int locationX = getLocation().y;
+			setLocationRelativeToAcePanel(locationY, locationX);
+		}
+
+		
+	}
+	
 	private JPanel wfPanel = new JPanel();
 	private JPanel wfDetailsPanel = new JPanel();
 	private JLabel dragLabel = new JLabel();
+	private ACE acePanel;
 	
 	private class WfDetailsChangedListener extends ComponentAdapter {
 
@@ -65,8 +76,9 @@ public class WizardPanel extends JPanel {
 		
 	}
 
-	public WizardPanel() {
+	public WizardPanel(ACE acePanel) {
 		super();
+		this.acePanel = acePanel;
 		setLayout(null);
 		setOpaque(false);
 		setSize(2000, 2000);
@@ -95,6 +107,7 @@ public class WizardPanel extends JPanel {
 		wfDetailsPanel.setVisible(false);
 		wfDetailsPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 		wfDetailsPanel.addComponentListener(new WfDetailsChangedListener());
+		acePanel.addComponentListener(new AceComponentListener());
 	}
 
 	public JPanel getWfPanel() {
@@ -104,4 +117,21 @@ public class WizardPanel extends JPanel {
 	public JPanel getWfDetailsPanel() {
 		return wfDetailsPanel;
 	}
+	
+	private void setLocationRelativeToAcePanel(int locationY, int locationX) {
+		if (locationY < acePanel.getY() || locationY < 15) {
+			locationY = acePanel.getY();
+		}
+		if (locationY > acePanel.getY() + acePanel.getHeight() - 20) {
+			locationY = acePanel.getY() + acePanel.getHeight() - 20;
+		}
+		if (locationX < acePanel.getX()) {
+			locationX = acePanel.getX();
+		}
+		if (locationX > acePanel.getX() + acePanel.getWidth() - 20) {
+			locationX = acePanel.getX() + acePanel.getWidth() - 20;
+		}
+		setLocation(locationX, locationY);
+	}
+
 }
