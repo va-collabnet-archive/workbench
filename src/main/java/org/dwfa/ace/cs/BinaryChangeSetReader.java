@@ -130,6 +130,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					"Reading from log " + changeSetFile.getName() + " until "
 							+ new Date(endTime).toString());
 		}
+		boolean firstException = true;
 		while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
 			try {
 				Object obj = ois.readObject();
@@ -195,11 +196,20 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				getVodb().setProperty(
 						FileIO.getNormalizedRelativePath(changeSetFile),
 						Long.toString(changeSetFile.length()));
-			} catch (DatabaseException e) {
-				throw new ToIoException(e);
-			} catch (TerminologyException e) {
-				throw new ToIoException(e);
-			}
+			} catch (Exception e) {
+				if (firstException) {
+					AceLog.getEditLog().alertAndLog(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. ",
+									e);
+					firstException = false;
+				} else {
+					AceLog.getEditLog().log(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. ",
+									e);
+				}
+			} 
 		}
 		try {
 			if (AceLog.getEditLog().isLoggable(Level.FINE)) {
@@ -332,17 +342,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			ConceptBean localBean = ConceptBean.get(bean.getId().getUIDs());
 			localBean.flush();
 			return localBean;
-		} catch (DatabaseException e) {
+		} catch (Exception e) {
 			AceLog.getEditLog().severe(
 					"Error committing bean in change set: " + changeSetFile
 							+ "\nUniversalAceBean:  \n" + bean);
 			throw new ToIoException(e);
-		} catch (TerminologyException e) {
-			AceLog.getEditLog().severe(
-					"Error committing bean in change set: " + changeSetFile
-							+ "\nUniversalAceBean:  \n" + bean);
-			throw new ToIoException(e);
-		}
+		} 
 	}
 
 	private void commitAceEbr(UniversalAceExtByRefBean bean, long time,
@@ -426,6 +431,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			throw new IOException("commit time = Long.MAX_VALUE");
 		}
 		// Do all the commiting...
+		boolean firstException = true;
 		for (UniversalAceIdentification id : list.getUncommittedIds()) {
 			try {
 				AceLog.getEditLog().fine("commitUncommittedIds: " + id);
@@ -483,15 +489,44 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				 */
 				getVodb().writeId(tid);
 			} catch (DatabaseException e) {
-				AceLog.getEditLog().alertAndLog(
-						Level.SEVERE,
-						"Database exception. Ignoring component, and continuing import."
-								+ id, e);
+				if (firstException) {
+					AceLog.getEditLog().alertAndLog(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
+									+ id, e);
+					firstException = false;
+				} else {
+					AceLog.getEditLog().log(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
+									+ id, e);
+				}
 			} catch (TerminologyException e) {
-				AceLog.getEditLog().alertAndLog(
-						Level.SEVERE,
-						"TerminologyException. Ignoring component, and continuing import."
-								+ id, e);
+				if (firstException) {
+					AceLog.getEditLog().alertAndLog(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
+									+ id, e);
+					firstException = false;
+				} else {
+					AceLog.getEditLog().log(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
+									+ id, e);
+				}
+			} catch (Exception e) {
+				if (firstException) {
+					AceLog.getEditLog().alertAndLog(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions."
+									+ id, e);
+					firstException = false;
+				} else {
+					AceLog.getEditLog().log(
+							Level.SEVERE,
+							"Exception. Ignoring component, and continuing import. Examine log for future exceptions."
+									+ id, e);
+				}
 			}
 
 		}
