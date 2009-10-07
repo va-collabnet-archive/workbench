@@ -157,7 +157,9 @@ public class AceRunner {
 			}
 
             if (aceConfigFile == null || !aceConfigFile.exists()) {
-                aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+            	if (acePropertiesFileExists) {
+            		aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+            	}
                 String lastProfileDirStr = "profiles";
                 if (aceProperties.getProperty("last-profile-dir") != null) {
                 	lastProfileDirStr = aceProperties.getProperty("last-profile-dir");
