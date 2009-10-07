@@ -601,6 +601,13 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         RX_NORM("RX Norm ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        READ_V3("Read V3 ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),  
+        READ_V2("Read V2 ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),    
+        READ_4B("Read 4Byte ID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),                    
+                
         CPT("CPT ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE });
        ;
