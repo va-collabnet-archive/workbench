@@ -78,7 +78,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 
 public class Sct2AceMojo extends AbstractMojo {
 
-    private static final String FILE_SEPERATOR = File.separator;
+    private static final String FILE_SEPARATOR = File.separator;
 
     /**
      * Line terminator is deliberately set to CR-LF which is DOS style
@@ -88,12 +88,12 @@ public class Sct2AceMojo extends AbstractMojo {
     private static final String TAB_CHARACTER = "\t";
 
     private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH =
-            FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs" + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "ukde";
+            FILE_SEPARATOR + "net" + FILE_SEPARATOR + "nhs" + FILE_SEPARATOR + "uktc" + FILE_SEPARATOR + "ukde";
 
     private static final String NHS_UK_EXTENSION_FILE_PATH =
-            FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs" + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "uke";
+            FILE_SEPARATOR + "net" + FILE_SEPARATOR + "nhs" + FILE_SEPARATOR + "uktc" + FILE_SEPARATOR + "uke";
 
-    private static final String SNOMED_FILE_PATH = FILE_SEPERATOR + "org" + FILE_SEPERATOR + "snomed";
+    private static final String SNOMED_FILE_PATH = FILE_SEPARATOR + "org" + FILE_SEPARATOR + "snomed";
 
     /**
      * Location of the build directory.
@@ -157,7 +157,7 @@ public class Sct2AceMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String outputDirectory = FILE_SEPERATOR + "classes" + FILE_SEPERATOR + "ace";
+    private String outputDirectory = FILE_SEPARATOR + "classes" + FILE_SEPARATOR + "ace";
 
     private static String sourceCtv3Uuid =
             ArchitectonicAuxiliary.Concept.CTV3_ID.getUids().iterator().next().toString();
@@ -442,15 +442,15 @@ public class Sct2AceMojo extends AbstractMojo {
 
         // SHOW input sub directory from POM file
         if (!targetSubDir.equals("")) {
-            targetSubDir = FILE_SEPERATOR + targetSubDir;
+            targetSubDir = FILE_SEPARATOR + targetSubDir;
             getLog().info("POM Input Sub Directory: " + targetSubDir);
         }
 
         // SHOW input directories from POM file
         for (int i = 0; i < sctInputDirArray.length; i++) {
             getLog().info("POM Input Directory (" + i + "): " + sctInputDirArray[i]);
-            if (!sctInputDirArray[i].startsWith(FILE_SEPERATOR)) {
-                sctInputDirArray[i] = FILE_SEPERATOR + sctInputDirArray[i];
+            if (!sctInputDirArray[i].startsWith(FILE_SEPARATOR)) {
+                sctInputDirArray[i] = FILE_SEPARATOR + sctInputDirArray[i];
             }
         }
 
@@ -492,7 +492,7 @@ public class Sct2AceMojo extends AbstractMojo {
         List<List<SCTFile>> listOfRDirs = getSnomedFiles(wDir, subDir, inDirs, "relationships"); 
         	
         // SETUP "ids.txt" OUTPUT FILE
-        String idsFileName = wDir + outputDirectory + FILE_SEPERATOR + "ids.txt";
+        String idsFileName = wDir + outputDirectory + FILE_SEPARATOR + "ids.txt";
         BufferedWriter idstxtWriter;
         try {
             idstxtWriter = new BufferedWriter(new FileWriter(idsFileName, appendToAceFiles));
@@ -557,16 +557,38 @@ public class Sct2AceMojo extends AbstractMojo {
             ArrayList<File> fv = new ArrayList<File>();
             listFilesRecursive(fv, f1, "sct_"+ pattern);
             
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+            File[] files = new File[0]; 
+            files = fv.toArray(files);
+            Arrays.sort(files);
+            
+            FileFilter filter = new FileFilter() {
+            	public boolean accept(File pathname) {
+					if(inputFilters == null || inputFilters.length == 0) {
+						return true;
+					} else {
+						for(String filter : inputFilters) {
+							if(pathname.getAbsolutePath().matches(filter)) {
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+            };
+            
+            for(File f2 : files) {
+                
+            	if(filter.accept(f2)) {
+            		 // ADD SCTFile Entry
+                    String tempRevDate = getFileRevDate(f2);
+                    String tmpPathID = getFilePathID(f2, wDir, subDir);
+                    SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
+                    listOfFiles.add(tmpObj);
+                    getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+            	}
+               
             }
+            
             listOfDirs.add(listOfFiles);
         }
 		return listOfDirs;
@@ -590,7 +612,7 @@ public class Sct2AceMojo extends AbstractMojo {
         getLog().info("START CONCEPTS PROCESSING...");
 
         // SETUP CONCEPTS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPERATOR + "concepts.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "concepts.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new FileWriter(outFileName, appendToAceFiles));
         getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
@@ -731,13 +753,13 @@ public class Sct2AceMojo extends AbstractMojo {
 
         getLog().info("START DESCRIPTIONS PROCESSING...");
         // SETUP DESCRIPTIONS EXCEPTION REPORT
-        String erFileName = wDir + outputDirectory + FILE_SEPERATOR + "descriptions_report.txt";
+        String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions_report.txt";
         BufferedWriter er;
         er = new BufferedWriter(new FileWriter(erFileName));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         // SETUP DESCRIPTIONS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPERATOR + "descriptions.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName, appendToAceFiles), "UTF-8"));
         getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
@@ -894,13 +916,13 @@ public class Sct2AceMojo extends AbstractMojo {
         getLog().info("START RELATIONSHIPS PROCESSING...");
 
         // Setup exception report
-        String erFileName = wDir + outputDirectory + FILE_SEPERATOR + "relationships_report.txt";
+        String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "relationships_report.txt";
         BufferedWriter er;
         er = new BufferedWriter(new FileWriter(erFileName));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         // SETUP CONCEPTS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPERATOR + "relationships.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "relationships.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new FileWriter(outFileName, appendToAceFiles));
         getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
