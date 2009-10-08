@@ -123,6 +123,13 @@ public class Sct2AceMojo extends AbstractMojo {
      */
     private String[] sctInputDirArray;
 
+    
+    /**
+     * If this contains anything, only convert paths which match one of the enclosed regex
+     * @parameter
+     */
+    private String[] inputFilters;
+    
     /**
      *
      * @parameter default-value="false"
@@ -476,78 +483,14 @@ public class Sct2AceMojo extends AbstractMojo {
         }
 
         // SETUP CONCEPTS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfCDirs = new ArrayList<List<SCTFile>>();
-        for (int i = 0; i < inDirs.length; i++) {
-            ArrayList<SCTFile> listOfCFiles = new ArrayList<SCTFile>();
-
-            getLog().info("CONCEPTS (" + i + "): " + wDir + subDir + inDirs[i]);
-
-            // PARSE each sub-directory for "sct_descriptions*.txt" files
-            File f1 = new File(wDir + subDir + inDirs[i]);
-            ArrayList<File> fv = new ArrayList<File>();
-            listFilesRecursive(fv, f1, "sct_concepts");
-
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfCFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
-            }
-            listOfCDirs.add(listOfCFiles);
-        }
+        List<List<SCTFile>> listOfCDirs = getSnomedFiles(wDir, subDir, inDirs, "concept");
 
         // SETUP DESCRIPTIONS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfDDirs = new ArrayList<List<SCTFile>>();
-        for (int i = 0; i < inDirs.length; i++) {
-            ArrayList<SCTFile> listOfDFiles = new ArrayList<SCTFile>();
-            getLog().info("DESCRIPTIONS (" + i + "): " + wDir + subDir + inDirs[i]);
-
-            // PARSE each sub-directory for "sct_descriptions*.txt" files
-            File f1 = new File(wDir + subDir + inDirs[i]);
-            ArrayList<File> fv = new ArrayList<File>();
-            listFilesRecursive(fv, f1, "sct_descriptions");
-
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfDFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
-            }
-            listOfDDirs.add(listOfDFiles);
-        }
-
+        List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
+ 
         // SETUP RELATIONSHIPS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfRDirs = new ArrayList<List<SCTFile>>();
-        for (int i = 0; i < inDirs.length; i++) {
-            ArrayList<SCTFile> listOfRFiles = new ArrayList<SCTFile>();
-            getLog().info("RELATIONSHIPS (" + i + "): " + wDir + subDir + inDirs[i]);
-
-            // PARSE each sub-directory for "sct_relationships*.txt" files
-            File f1 = new File(wDir + subDir + inDirs[i]);
-            ArrayList<File> fv = new ArrayList<File>();
-            listFilesRecursive(fv, f1, "sct_relationships");
-
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfRFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
-            }
-            listOfRDirs.add(listOfRFiles);
-        }
-
+        List<List<SCTFile>> listOfRDirs = getSnomedFiles(wDir, subDir, inDirs, "relationships"); 
+        	
         // SETUP "ids.txt" OUTPUT FILE
         String idsFileName = wDir + outputDirectory + FILE_SEPERATOR + "ids.txt";
         BufferedWriter idstxtWriter;
@@ -598,6 +541,36 @@ public class Sct2AceMojo extends AbstractMojo {
         getLog().info("*** SCT2ACE PROCESSING COMPLETED ***");
         getLog().info("CONVERSION TIME: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
     }
+
+	private List<List<SCTFile>> getSnomedFiles(String wDir, String subDir,
+			String[] inDirs, String pattern) throws MojoFailureException {
+		
+		List<List<SCTFile>> listOfDirs = new ArrayList<List<SCTFile>>();
+        for (int ii = 0; ii < inDirs.length; ii++) {
+            ArrayList<SCTFile> listOfFiles = new ArrayList<SCTFile>();
+
+            getLog().info(
+            		String.format("%1$s (%2$s): %3$s%4$s%5$s",
+            				pattern.toUpperCase(), ii, wDir, subDir, inDirs[ii]));
+
+            File f1 = new File(wDir + subDir + inDirs[ii]);
+            ArrayList<File> fv = new ArrayList<File>();
+            listFilesRecursive(fv, f1, "sct_"+ pattern);
+            
+            Iterator<File> it = fv.iterator();
+            while (it.hasNext()) {
+                File f2 = it.next();
+                // ADD SCTFile Entry
+                String tempRevDate = getFileRevDate(f2);
+                String tmpPathID = getFilePathID(f2, wDir, subDir);
+                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
+                listOfFiles.add(tmpObj);
+                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+            }
+            listOfDirs.add(listOfFiles);
+        }
+		return listOfDirs;
+	}
 
     /*
      * ORDER: CONCEPTID CONCEPTSTATUS FULLYSPECIFIEDNAME CTV3ID SNOMEDID
